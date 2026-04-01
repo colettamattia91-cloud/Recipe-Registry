@@ -27,7 +27,8 @@ All notable changes to this project are documented in this file.
 - 
 
 ### Changed
-- 
+- UI refresh now skips hidden frames and runs when the window is visible.
 
 ### Fixed
-- 
+- Prevented profession scan side effects while idle by scanning only when Blizzard profession windows are actually open.
+- Reduced background UI churn that could contribute to perceived focus/input interruptions when the addon window is closed.

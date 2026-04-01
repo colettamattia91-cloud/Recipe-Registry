@@ -111,10 +111,10 @@ function Addon:ProcessRecipeSignal()
     if self.Data then
         self.Data:DetectProfessions()
         local changed = false
-        if (TradeSkillFrame and TradeSkillFrame:IsShown()) or (GetTradeSkillLine and GetTradeSkillLine()) then
+        if TradeSkillFrame and TradeSkillFrame:IsShown() then
             changed = self.Data:ScanTradeSkill() or changed
         end
-        if (CraftFrame and CraftFrame:IsShown()) or (GetCraftDisplaySkillLine and GetCraftDisplaySkillLine()) then
+        if CraftFrame and CraftFrame:IsShown() then
             changed = self.Data:ScanCraft() or changed
         end
         if changed and self.Sync then

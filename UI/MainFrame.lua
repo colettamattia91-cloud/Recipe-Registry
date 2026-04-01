@@ -927,7 +927,7 @@ function UI:Toggle()
 end
 
 function UI:Refresh()
-    if not self.frame then return end
+    if not self.frame or not self.frame:IsShown() then return end
     self:RefreshStatusBar()
     self:RefreshProfessionButtons()
     self:RefreshRecipeList()
