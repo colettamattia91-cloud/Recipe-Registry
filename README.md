@@ -35,16 +35,6 @@ Material pricing provider order:
 
 If neither source has data, the material is marked as missing price.
 
-## CurseForge Relations (Recommended)
-When publishing on CurseForge, configure these project relations:
-
-- AtlasLootClassic: Optional dependency
-- TradeSkillMaster: Optional dependency
-- Auctionator: Optional dependency
-
-Fallback compatibility notes:
-- AtlasLoot resolver supports AtlasLootClassic (primary) and AtlasLoot legacy global shape when present.
-- Pricing resolution order is TSM (`dbmarket`, `dbminbuyout`) then Auctionator fallback.
 
 ## Main Features
 ### Guild recipe registry
@@ -109,24 +99,7 @@ Install Recipe Registry from CurseForge and launch the game.
 - Pricing quality depends on available market sources and cache state.
 
 ## Feedback
-If you publish on CurseForge, add your Issue Tracker link here so users can report bugs and request features.
-
-## CurseForge Metadata Template
-Use this block when creating or updating your CurseForge project page.
-
-- Project name: Recipe Registry
-- Game version: The Burning Crusade Classic (2.5.x)
-- Primary category: Professions
-- Secondary categories: Guild, Auction & Economy
-- Summary (short): Guild crafting directory with synced profession data, material pricing, and crafter contact tools.
-- Project URL: <your-curseforge-project-url>
-- Source URL: <your-repository-url>
-- Issue tracker URL: <your-issue-tracker-url>
-- License: <your-license>
-- Relations:
-	- AtlasLootClassic (optional dependency)
-	- TradeSkillMaster (optional dependency)
-	- Auctionator (optional dependency)
+[Issue](https://github.com/colettamattia91-cloud/Recipe-Registry/issues)
 
 ### Suggested CurseForge Description Snippet
 Recipe Registry is a guild-focused crafting directory for TBC Anniversary. It scans profession data locally, syncs crafts between guild members, shows who can craft each recipe, estimates material costs with optional TSM/Auctionator integration, and lets you quickly contact online crafters.
