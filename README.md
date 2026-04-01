@@ -89,7 +89,6 @@ Install Recipe Registry from CurseForge and launch the game.
 4. Wait briefly for guild sync handshakes to populate remote crafters.
 
 ## Performance Notes
-- CPU and memory live polling is intentionally removed to avoid frame spikes.
 - Search refresh is debounced to reduce UI recomputation.
 - Sync/coordinator recompute is throttled to avoid unnecessary churn.
 
