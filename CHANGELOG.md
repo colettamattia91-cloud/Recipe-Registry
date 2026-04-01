@@ -22,7 +22,7 @@ All notable changes to this project are documented in this file.
 - Prevented self auto-whisper from crafter request action.
 - Tooltip behavior improved for material rows (cursor-anchored item tooltips).
 
-## [Unreleased]
+## [1.2.1] - 2026-04-01
 ### Added
 - 
 
