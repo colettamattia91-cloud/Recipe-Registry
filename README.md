@@ -94,7 +94,6 @@ Install Recipe Registry from CurseForge and launch the game.
 - Sync/coordinator recompute is throttled to avoid unnecessary churn.
 
 ## Known Notes
-- Data is independent from old GuildCrafts databases.
 - If item info is uncached, names/icons may resolve after a short delay.
 - Pricing quality depends on available market sources and cache state.
 
