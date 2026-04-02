@@ -664,9 +664,12 @@ end
 
 function Data:ScanCraft()
     local title = GetCraftDisplaySkillLine and GetCraftDisplaySkillLine()
-    local canonical = self:GetCanonicalProfession(title or "Enchanting")
+    local canonical = self:GetCanonicalProfession(title or "")
     if canonical ~= "Enchanting" then
-        canonical = "Enchanting"
+        -- CraftFrame is open for a non-Enchanting skill (e.g. Beast Training).
+        -- Skip the scan to avoid storing class spells as Enchanting recipes.
+        Addon:Debug("ScanCraft skipped: CraftFrame shows", title or "nil", "->", canonical or "nil")
+        return false
     end
 
     local entry = self:GetOrCreateMember(self:GetPlayerKey())
