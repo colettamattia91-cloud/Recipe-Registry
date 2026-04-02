@@ -7,7 +7,7 @@ local Addon = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME,
 )
 
 _G.RecipeRegistry = Addon
-Addon.DISPLAY_VERSION = "1.2.0"
+Addon.DISPLAY_VERSION = "1.2.2"
 Addon.WIRE_VERSION = 2
 Addon.ADDON_PREFIX = "RRG1"
 Addon.debugMode = false
@@ -82,21 +82,36 @@ function Addon:OnLoginReady()
 end
 
 function Addon:OnTradeSkillShow()
-    if self.Data then
-        local changed = self.Data:ScanTradeSkill()
-        if changed and self.Sync then
-            self.Sync:AdvertiseLocalRevision("trade-scan")
-        end
+    -- Defer scan so the Blizzard TradeSkillFrame finishes initialising first.
+    if self._tradeSkillScanTimer then
+        self:CancelTimer(self._tradeSkillScanTimer, true)
     end
+    self._tradeSkillScanTimer = self:ScheduleTimer(function()
+        self._tradeSkillScanTimer = nil
+        if not (TradeSkillFrame and TradeSkillFrame:IsShown()) then return end
+        if self.Data then
+            local changed = self.Data:ScanTradeSkill()
+            if changed and self.Sync then
+                self.Sync:AdvertiseLocalRevision("trade-scan")
+            end
+        end
+    end, 0.3)
 end
 
 function Addon:OnCraftShow()
-    if self.Data then
-        local changed = self.Data:ScanCraft()
-        if changed and self.Sync then
-            self.Sync:AdvertiseLocalRevision("craft-scan")
-        end
+    if self._craftScanTimer then
+        self:CancelTimer(self._craftScanTimer, true)
     end
+    self._craftScanTimer = self:ScheduleTimer(function()
+        self._craftScanTimer = nil
+        if not (CraftFrame and CraftFrame:IsShown()) then return end
+        if self.Data then
+            local changed = self.Data:ScanCraft()
+            if changed and self.Sync then
+                self.Sync:AdvertiseLocalRevision("craft-scan")
+            end
+        end
+    end, 0.3)
 end
 
 function Addon:OnRecipeSignal()
@@ -110,6 +125,8 @@ function Addon:ProcessRecipeSignal()
     self._recipeSignalTimer = nil
     if self.Data then
         self.Data:DetectProfessions()
+        -- A real recipe change happened: force a fresh scan on the next profession open.
+        self.Data._scanNeeded = true
         local changed = false
         if TradeSkillFrame and TradeSkillFrame:IsShown() then
             changed = self.Data:ScanTradeSkill() or changed
@@ -136,6 +153,10 @@ end
 function Addon:RequestRefresh(reason)
     if reason then
         self._refreshReasons[reason] = true
+    end
+    -- Skip scheduling if our UI frame doesn't exist or isn't shown.
+    if not (self.UI and self.UI.frame and self.UI.frame:IsShown()) then
+        return
     end
     if self._refreshTimer then return end
     self._refreshTimer = self:ScheduleTimer(function()

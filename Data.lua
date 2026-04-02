@@ -19,6 +19,7 @@ local GetTradeSkillInvSlotFilter = GetTradeSkillInvSlotFilter
 local SetTradeSkillInvSlotFilter = SetTradeSkillInvSlotFilter
 local GetTradeSkillItemNameFilter = GetTradeSkillItemNameFilter
 local SetTradeSkillItemNameFilter = SetTradeSkillItemNameFilter
+local GetTradeSkillItemLevelFilter = GetTradeSkillItemLevelFilter
 local SetTradeSkillItemLevelFilter = SetTradeSkillItemLevelFilter
 local TradeSkillOnlyShowMakeable = TradeSkillOnlyShowMakeable
 local TradeSkillOnlyShowSkillUps = TradeSkillOnlyShowSkillUps
@@ -186,36 +187,93 @@ end
 local function snapshotTradeSkillFilters()
     local state = {
         nameFilter = nil,
-        subclass = nil,
-        invslot = nil,
+        itemLevelMin = nil,
+        itemLevelMax = nil,
+        subclassIndex = 0,
+        invslotIndex = 0,
+        onlyMakeable = false,
+        onlySkillUps = false,
     }
+
+    -- Name filter: prefer the EditBox widget text as authoritative source.
+    -- On reopen, Blizzard restores EditBox text from memory but may not yet have
+    -- called OnTextChanged, so GetTradeSkillItemNameFilter() can still return ""
+    -- even though the box visually shows the previous filter.
+    local filterBox = _G.TradeSkillFilterBox
+    local filterBoxText = (filterBox and type(filterBox.GetText) == "function")
+        and filterBox:GetText() or nil
 
     if type(GetTradeSkillItemNameFilter) == "function" then
         local ok, value = pcall(GetTradeSkillItemNameFilter)
         if ok then state.nameFilter = value or "" end
     end
 
+    -- If the EditBox has text but the API filter is empty, Blizzard hasn't applied
+    -- the EditBox value yet → take the EditBox text as the real filter.
+    if filterBoxText and filterBoxText ~= "" and (state.nameFilter == nil or state.nameFilter == "") then
+        state.nameFilter = filterBoxText
+    end
+
+    if type(GetTradeSkillItemLevelFilter) == "function" then
+        local ok, minLevel, maxLevel = pcall(GetTradeSkillItemLevelFilter)
+        if ok then
+            state.itemLevelMin = minLevel
+            state.itemLevelMax = maxLevel
+        end
+    end
+
+    -- In TBC Classic SetTradeSkillSubClassFilter takes a single index:
+    -- 0 = show all, i = show only subclass i.
+    -- Determine whether all are active (0) or a specific one.
     if type(GetTradeSkillSubClasses) == "function" and type(GetTradeSkillSubClassFilter) == "function" then
         local count = select("#", GetTradeSkillSubClasses())
-        state.subclass = {}
+        local activeIndex = 0
+        local activeCount = 0
         for i = 1, count do
-            state.subclass[i] = GetTradeSkillSubClassFilter(i) and true or false
+            if GetTradeSkillSubClassFilter(i) then
+                activeCount = activeCount + 1
+                activeIndex = i
+            end
         end
+        state.subclassIndex = (activeCount == count or count == 0) and 0 or activeIndex
     end
 
     if type(GetTradeSkillInvSlots) == "function" and type(GetTradeSkillInvSlotFilter) == "function" then
         local count = select("#", GetTradeSkillInvSlots())
-        state.invslot = {}
+        local activeIndex = 0
+        local activeCount = 0
         for i = 1, count do
-            state.invslot[i] = GetTradeSkillInvSlotFilter(i) and true or false
+            if GetTradeSkillInvSlotFilter(i) then
+                activeCount = activeCount + 1
+                activeIndex = i
+            end
         end
+        state.invslotIndex = (activeCount == count or count == 0) and 0 or activeIndex
+    end
+
+    -- Snapshot the "Have Materials" checkbox if the Blizzard frame is available.
+    local makeableBtn = _G.TradeSkillFrameAvailableFilterCheckButton
+    if makeableBtn and type(makeableBtn.GetChecked) == "function" then
+        state.onlyMakeable = makeableBtn:GetChecked() and true or false
+    end
+
+    -- Snapshot the "Has Skill Up" checkbox.
+    local skillUpBtn = _G.TradeSkillFrameFilterSkillUps
+    if skillUpBtn and type(skillUpBtn.GetChecked) == "function" then
+        state.onlySkillUps = skillUpBtn:GetChecked() and true or false
     end
 
     return state
 end
 
 local function clearTradeSkillFilters()
-    if type(SetTradeSkillItemNameFilter) == "function" then
+    -- Clear the EditBox widget first: this triggers OnTextChanged which calls
+    -- SetTradeSkillItemNameFilter("") and TradeSkillFrame_Update internally,
+    -- keeping the API state and the visual in full sync during the scan.
+    local filterBox = _G.TradeSkillFilterBox
+    if filterBox and type(filterBox.SetText) == "function" then
+        filterBox:SetText("")
+    elseif type(SetTradeSkillItemNameFilter) == "function" then
         pcall(SetTradeSkillItemNameFilter, "")
     end
     if type(SetTradeSkillItemLevelFilter) == "function" then
@@ -227,31 +285,63 @@ local function clearTradeSkillFilters()
     if type(TradeSkillOnlyShowSkillUps) == "function" then
         pcall(TradeSkillOnlyShowSkillUps, false)
     end
+    -- 0 = show all subclasses / inv slots in TBC Classic
     if type(SetTradeSkillSubClassFilter) == "function" then
-        pcall(SetTradeSkillSubClassFilter, -1, 1, 1)
+        pcall(SetTradeSkillSubClassFilter, 0)
     end
     if type(SetTradeSkillInvSlotFilter) == "function" then
-        pcall(SetTradeSkillInvSlotFilter, -1, 1, 1)
+        pcall(SetTradeSkillInvSlotFilter, 0)
     end
 end
 
 local function restoreTradeSkillFilters(state)
     if not state then return end
 
-    if type(SetTradeSkillSubClassFilter) == "function" and type(state.subclass) == "table" then
-        for i = 1, #state.subclass do
-            pcall(SetTradeSkillSubClassFilter, i, state.subclass[i] and 1 or 0)
-        end
+    -- Single-index restore: 0 = all, i = specific subclass/slot
+    if type(SetTradeSkillSubClassFilter) == "function" then
+        pcall(SetTradeSkillSubClassFilter, state.subclassIndex or 0)
     end
 
-    if type(SetTradeSkillInvSlotFilter) == "function" and type(state.invslot) == "table" then
-        for i = 1, #state.invslot do
-            pcall(SetTradeSkillInvSlotFilter, i, state.invslot[i] and 1 or 0)
-        end
+    if type(SetTradeSkillInvSlotFilter) == "function" then
+        pcall(SetTradeSkillInvSlotFilter, state.invslotIndex or 0)
     end
 
     if type(SetTradeSkillItemNameFilter) == "function" and state.nameFilter ~= nil then
         pcall(SetTradeSkillItemNameFilter, state.nameFilter)
+    end
+    -- Restore the EditBox widget and trigger Blizzard's OnTextChanged handler.
+    -- This is the authoritative path: the handler calls SetTradeSkillItemNameFilter
+    -- and TradeSkillFrame_Update on its own, ensuring the list is actually filtered.
+    local filterBox = _G.TradeSkillFilterBox
+    if filterBox and type(filterBox.SetText) == "function" then
+        filterBox:SetText(state.nameFilter or "")
+    end
+
+    if type(SetTradeSkillItemLevelFilter) == "function" and state.itemLevelMin ~= nil and state.itemLevelMax ~= nil then
+        pcall(SetTradeSkillItemLevelFilter, state.itemLevelMin, state.itemLevelMax)
+    end
+
+    -- Restore "Have Materials" / "Has Skill Up" toggles
+    if type(TradeSkillOnlyShowMakeable) == "function" then
+        pcall(TradeSkillOnlyShowMakeable, state.onlyMakeable or false)
+    end
+    if type(TradeSkillOnlyShowSkillUps) == "function" then
+        pcall(TradeSkillOnlyShowSkillUps, state.onlySkillUps or false)
+    end
+
+    -- Sync the Blizzard checkbox visuals to match the restored state
+    local makeableBtn = _G.TradeSkillFrameAvailableFilterCheckButton
+    if makeableBtn and type(makeableBtn.SetChecked) == "function" then
+        makeableBtn:SetChecked(state.onlyMakeable or false)
+    end
+    local skillUpBtn = _G.TradeSkillFrameFilterSkillUps
+    if skillUpBtn and type(skillUpBtn.SetChecked) == "function" then
+        skillUpBtn:SetChecked(state.onlySkillUps or false)
+    end
+
+    -- Force Blizzard frame to re-render with the restored filters
+    if TradeSkillFrame and TradeSkillFrame:IsShown() and type(TradeSkillFrame_Update) == "function" then
+        pcall(TradeSkillFrame_Update)
     end
 end
 
@@ -275,6 +365,10 @@ local function restoreCraftFilters(state)
     if type(SetCraftItemNameFilter) == "function" and state.nameFilter ~= nil then
         pcall(SetCraftItemNameFilter, state.nameFilter)
     end
+    -- Force Blizzard CraftFrame to re-render with restored filters
+    if CraftFrame and CraftFrame:IsShown() and type(CraftFrame_Update) == "function" then
+        pcall(CraftFrame_Update)
+    end
 end
 
 local function isSubsetOf(smaller, bigger)
@@ -289,6 +383,10 @@ end
 function Data:OnInitialize()
     Addon.db = LibStub("AceDB-3.0"):New("RecipeRegistryDB", DB_DEFAULTS, true)
     self.db = Addon.db
+    -- When true, the next TRADE_SKILL_SHOW / CRAFT_SHOW will run a full scan
+    -- even if recipe data already exists in the DB. Set by recipe-change events.
+    -- Starts false: data loaded from DB is considered valid until a change fires.
+    self._scanNeeded = false
     if type(self.db.profile.minimap) ~= "table" then
         self.db.profile.minimap = {
             hide = false,
@@ -415,15 +513,32 @@ function Data:ScanTradeSkill()
     local canonical = self:GetCanonicalProfession(title)
     if not TRACKED[canonical] then return false end
 
+    -- Only touch the native UI when necessary:
+    -- • first time this profession is seen (no data in DB yet), OR
+    -- • a recipe-change signal explicitly requested a rescan (_scanNeeded).
+    -- On routine open/close cycles the data in DB is current → skip entirely.
+    local entry = self:GetOrCreateMember(self:GetPlayerKey())
+    local prof = entry.professions[canonical]
+    local hasData = prof and prof.count and prof.count > 0
+    if hasData and not self._scanNeeded then
+        return false
+    end
+    -- Consume the flag before scanning so a signal fired during the scan is
+    -- not silently swallowed (it will re-set the flag for the next open).
+    self._scanNeeded = false
+
     local filterState = snapshotTradeSkillFilters()
     clearTradeSkillFilters()
 
     local recipes = {}
+    local collapsedHeaders = {}
     local ok, err = pcall(function()
+        -- Record which headers were collapsed so we can re-collapse after scan.
         local numSkills = GetNumTradeSkills() or 0
         for i = numSkills, 1, -1 do
-            local _, recipeType, _, isExpanded = GetTradeSkillInfo(i)
+            local headerName, recipeType, _, isExpanded = GetTradeSkillInfo(i)
             if recipeType == "header" and not isExpanded then
+                collapsedHeaders[headerName or i] = true
                 pcall(ExpandTradeSkillSubClass, i)
             end
         end
@@ -435,6 +550,20 @@ function Data:ScanTradeSkill()
                 local itemID = extractItemID(GetTradeSkillItemLink(i))
                 local recipeKey = itemID or -(extractSpellID(GetTradeSkillRecipeLink(i)) or i)
                 recipes[recipeKey] = true
+            end
+        end
+
+        -- Re-collapse previously collapsed headers to restore visual state.
+        if next(collapsedHeaders) then
+            numSkills = GetNumTradeSkills() or 0
+            local CollapseTradeSkillSubClass = CollapseTradeSkillSubClass
+            if type(CollapseTradeSkillSubClass) == "function" then
+                for i = 1, numSkills do
+                    local headerName, recipeType, _, isExpanded = GetTradeSkillInfo(i)
+                    if recipeType == "header" and isExpanded and collapsedHeaders[headerName or i] then
+                        pcall(CollapseTradeSkillSubClass, i)
+                    end
+                end
             end
         end
     end)
@@ -455,6 +584,14 @@ function Data:ScanCraft()
     if canonical ~= "Enchanting" then
         canonical = "Enchanting"
     end
+
+    local entry = self:GetOrCreateMember(self:GetPlayerKey())
+    local prof = entry.professions[canonical]
+    local hasData = prof and prof.count and prof.count > 0
+    if hasData and not self._scanNeeded then
+        return false
+    end
+    self._scanNeeded = false
 
     local filterState = snapshotCraftFilters()
     clearCraftFilters()

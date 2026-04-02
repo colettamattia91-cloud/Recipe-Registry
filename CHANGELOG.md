@@ -22,13 +22,12 @@ All notable changes to this project are documented in this file.
 - Prevented self auto-whisper from crafter request action.
 - Tooltip behavior improved for material rows (cursor-anchored item tooltips).
 
-## [1.2.1] - 2026-04-01
-### Added
-- 
-
+## [1.2.2] - 2026-04-02
 ### Changed
 - UI refresh now skips hidden frames and runs when the window is visible.
+- `RequestRefresh` now skips timer scheduling entirely when the addon UI frame isn't shown, reducing unnecessary background work during sync bursts.
+- Profession scan now skips touching the native UI entirely when recipe data is already current. A full scan (snapshot → clear → scan → restore) only runs on the first open or after a recipe-change event (`NEW_RECIPE_LEARNED`, `SPELLS_CHANGED`), eliminating all filter/state interference during routine profession-window open/close cycles.
 
 ### Fixed
-- Prevented profession scan side effects while idle by scanning only when Blizzard profession windows are actually open.
-- Reduced background UI churn that could contribute to perceived focus/input interruptions when the addon window is closed.
+- Fixed native profession context loss on reopen by avoiding scan-side UI mutations during routine open/close cycles.
+- Fixed native profession recipe list intermittently appearing empty (notably Cooking) when a forced scan is required.
