@@ -153,6 +153,20 @@ local function shouldRefreshItemName(name, itemID)
     return name == ("item:" .. tostring(itemID))
 end
 
+-- Validates that a recipe key represents a real craft, not a non-craft spell.
+-- Positive keys (item-based) are always valid.
+-- Negative keys (spell-based) must have a known AtlasLoot profession mapping.
+local function isValidRecipeKey(recipeKey)
+    local n = tonumber(recipeKey)
+    if not n then return false end
+    if n > 0 then return true end  -- item-based: always valid
+    -- spell-based: check AtlasLoot
+    local recipe, profession = getAtlasLootHandles()
+    if not profession or not profession.GetProfessionData then return true end  -- no AtlasLoot: can't filter, allow
+    local data = profession.GetProfessionData(-n)
+    return data ~= nil
+end
+
 local function formatReagents(reagentIDs, reagentCounts)
     local parts = {}
     for i = 1, #(reagentIDs or {}) do
@@ -622,7 +636,9 @@ function Data:ScanCraft()
             if recipeName and recipeType ~= "header" and recipeType ~= "subheader" then
                 local itemID = extractItemID(GetCraftItemLink(i))
                 local recipeKey = itemID or -(extractSpellID(GetCraftRecipeLink(i)) or i)
-                recipes[recipeKey] = true
+                if isValidRecipeKey(recipeKey) then
+                    recipes[recipeKey] = true
+                end
             end
         end
     end)
@@ -708,7 +724,9 @@ function Data:BuildSnapshotChunks(memberKey)
         local count = 0
         local recipeKeys = {}
         for recipeKey in pairs(prof.recipes or {}) do
-            recipeKeys[#recipeKeys + 1] = recipeKey
+            if isValidRecipeKey(recipeKey) then
+                recipeKeys[#recipeKeys + 1] = recipeKey
+            end
         end
         sort(recipeKeys, function(a, b) return tostring(a) < tostring(b) end)
 
@@ -783,7 +801,9 @@ function Data:AppendIncomingChunk(chunk)
             recipes = {},
         }
         for _, recipeKey in ipairs(chunk.recipeKeys or {}) do
-            prof.recipes[recipeKey] = true
+            if isValidRecipeKey(recipeKey) then
+                prof.recipes[recipeKey] = true
+            end
         end
         prof.skillRank = chunk.skillRank or prof.skillRank or 0
         prof.skillMaxRank = chunk.skillMaxRank or prof.skillMaxRank or 0
