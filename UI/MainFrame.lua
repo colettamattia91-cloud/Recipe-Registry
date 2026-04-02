@@ -537,6 +537,9 @@ function UI:CreateMainFrame()
     f.detailContent = detailContent
     f.detailLines = {}
 
+    local detailTooltip = CreateFrame("GameTooltip", "RecipeRegistryDetailTooltip", right, "GameTooltipTemplate")
+    f.detailTooltip = detailTooltip
+
     local footer = CreateFrame("Frame", nil, f, "BackdropTemplate")
     footer:SetPoint("BOTTOMLEFT", 1, 1)
     footer:SetPoint("BOTTOMRIGHT", -1, 1)
@@ -649,6 +652,11 @@ function UI:EnsureDetailLine(index)
 
     line:SetScript("OnClick", function(self, button)
         if button ~= "LeftButton" then return end
+        if self.isOfflineToggle then
+            UI._offlineCraftersExpanded = not UI._offlineCraftersExpanded
+            UI:RefreshDetailPanel()
+            return
+        end
         if IsShiftKeyDown() then
             insertLinkInChat(self.link)
             return
@@ -826,6 +834,7 @@ function UI:RenderDetailLines(lines, lineLinks, lineMeta)
         if meta and meta.tooltipLink then
             line.tooltipLink = meta.tooltipLink
         end
+        line.isOfflineToggle = meta and meta.isOfflineToggle or false
         line:Show()
     end
     for i = #lines + 1, #self.frame.detailLines do
@@ -843,6 +852,10 @@ function UI:RefreshDetailPanel()
         self.currentDetail = nil
         self.frame.detailTitle:SetText("Recipe details")
         self.frame.detailSub:SetText("Select a recipe to see materials and available crafters.")
+        if self.frame.detailTooltip then
+            self.frame.detailTooltip:Hide()
+        end
+        self.frame.detailScroll:SetPoint("TOPLEFT", 8, -54)
         lines[#lines + 1] = "No recipe selected."
         self:RenderDetailLines(lines, lineLinks, lineMeta)
         return
@@ -864,21 +877,77 @@ function UI:RefreshDetailPanel()
     subtitleParts[#subtitleParts + 1] = string.format("%d crafter(s)", detail.crafterCount or 0)
     self.frame.detailSub:SetText(table.concat(subtitleParts, "  •  "))
 
-    lines[#lines + 1] = "|cffffd100Crafters|r"
-    if detail.crafters and #detail.crafters > 0 then
-        local selfKey = Addon.Data and Addon.Data.GetPlayerKey and Addon.Data:GetPlayerKey() or nil
+    -- Embedded product / enchant tooltip
+    local tt = self.frame.detailTooltip
+    tt:SetOwner(self.frame.right, "ANCHOR_NONE")
+    tt:ClearAllPoints()
+    tt:SetPoint("TOPLEFT", self.frame.detailSub, "BOTTOMLEFT", -2, -8)
+    local hasTooltip = false
+    if detail.createdItemID then
+        tt:SetHyperlink("item:" .. detail.createdItemID)
+        hasTooltip = tt:IsShown()
+    elseif detail.spellID then
+        tt:SetHyperlink("spell:" .. detail.spellID)
+        hasTooltip = tt:IsShown()
+    end
+    if hasTooltip then
+        tt:Show()
+        local tooltipHeight = tt:GetHeight() or 0
+        self.frame.detailScroll:SetPoint("TOPLEFT", 8, -(54 + tooltipHeight + 12))
+    else
+        tt:Hide()
+        self.frame.detailScroll:SetPoint("TOPLEFT", 8, -54)
+    end
+
+    -- Reset offline accordion state when recipe changes
+    if self._lastDetailRecipeKey ~= self.selectedRecipeKey then
+        self._offlineCraftersExpanded = nil
+        self._lastDetailRecipeKey = self.selectedRecipeKey
+    end
+
+    -- Split crafters into online / offline
+    local onlineCrafters = {}
+    local offlineCrafters = {}
+    if detail.crafters then
         for _, crafter in ipairs(detail.crafters) do
-            local state = statusTag(crafter.online)
+            if crafter.online then
+                onlineCrafters[#onlineCrafters + 1] = crafter
+            else
+                offlineCrafters[#offlineCrafters + 1] = crafter
+            end
+        end
+    end
+
+    lines[#lines + 1] = "|cffffd100Crafters|r"
+    if #onlineCrafters == 0 and #offlineCrafters == 0 then
+        lines[#lines + 1] = "No crafter known yet"
+    else
+        local selfKey = Addon.Data and Addon.Data.GetPlayerKey and Addon.Data:GetPlayerKey() or nil
+        for _, crafter in ipairs(onlineCrafters) do
+            local state = statusTag(true)
             lines[#lines + 1] = string.format("%s %s", state, getClassColorizedName(crafter.memberKey))
-            if crafter.online and (not selfKey or crafter.memberKey ~= selfKey) then
+            if (not selfKey or crafter.memberKey ~= selfKey) then
                 lineMeta[#lines] = {
                     canRequest = true,
                     memberKey = crafter.memberKey,
                 }
             end
         end
-    else
-        lines[#lines + 1] = "No crafter known yet"
+        if #offlineCrafters > 0 then
+            -- Default: collapsed if any online crafter, expanded if all offline
+            if self._offlineCraftersExpanded == nil then
+                self._offlineCraftersExpanded = (#onlineCrafters == 0)
+            end
+            local arrow = self._offlineCraftersExpanded and "|cff9fa6b2\226\150\190" or "|cff9fa6b2\226\150\184"
+            lines[#lines + 1] = string.format("%s Offline (%d)|r", arrow, #offlineCrafters)
+            lineMeta[#lines] = { isOfflineToggle = true }
+            if self._offlineCraftersExpanded then
+                for _, crafter in ipairs(offlineCrafters) do
+                    local state = statusTag(false)
+                    lines[#lines + 1] = string.format("%s %s", state, getClassColorizedName(crafter.memberKey))
+                end
+            end
+        end
     end
 
     lines[#lines + 1] = " "

@@ -948,6 +948,22 @@ local function refreshDetailAssets(info)
         end
     end
 
+    -- Refresh label if it is still a placeholder
+    if info.isItem and info.createdItemName and shouldRefreshItemName(info.label, info.createdItemID) then
+        info.label = info.createdItemName
+        changedSearch = true
+    elseif info.isSpell and info.spellID then
+        local placeholderSpell = "spell:" .. tostring(info.spellID)
+        if info.label == placeholderSpell or not info.label or info.label == "" then
+            local spellName = info.spellName or safeGetSpellName(info.spellID)
+            if spellName then
+                info.label = spellName
+                info.spellName = spellName
+                changedSearch = true
+            end
+        end
+    end
+
     if info.professionID then
         info.professionName = getAtlasLootProfessionName(info.professionID)
     end
