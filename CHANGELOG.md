@@ -24,10 +24,9 @@ All notable changes to this project are documented in this file.
 
 ## [1.2.2] - 2026-04-02
 ### Changed
-- UI refresh now skips hidden frames and runs when the window is visible.
-- `RequestRefresh` now skips timer scheduling entirely when the addon UI frame isn't shown, reducing unnecessary background work during sync bursts.
-- Profession scan now skips touching the native UI entirely when recipe data is already current. A full scan (snapshot → clear → scan → restore) only runs on the first open or after a recipe-change event (`NEW_RECIPE_LEARNED`, `SPELLS_CHANGED`), eliminating all filter/state interference during routine profession-window open/close cycles.
+- Profession scan now skips the native UI entirely when recipe data is already current; a full scan only runs on the first open or after a recipe-change event, eliminating filter/state interference during routine open/close cycles.
+- `RequestRefresh` skips scheduling when the addon UI frame is hidden, reducing background work during sync bursts.
 
 ### Fixed
-- Fixed native profession context loss on reopen by avoiding scan-side UI mutations during routine open/close cycles.
-- Fixed native profession recipe list intermittently appearing empty (notably Cooking) when a forced scan is required.
+- Fixed native profession window losing filters and context on reopen.
+- Fixed recipe list appearing empty (notably Cooking) after a forced scan.

@@ -90,16 +90,35 @@ local TITLE_ALIAS_SPELL_IDS = {
 local localeMap
 
 local function getAtlasLootHandles()
-    local atlas = _G.AtlasLoot
-    if type(atlas) ~= "table" or type(atlas.Data) ~= "table" then
-        return nil, nil
+    -- Build candidates without nil holes (ipairs stops at first nil).
+    local candidates = {}
+    if type(_G.AtlasLootClassic) == "table" then
+        candidates[#candidates + 1] = _G.AtlasLootClassic
     end
-    local recipe = atlas.Data.Recipe
-    local profession = atlas.Data.Profession
-    if type(recipe) ~= "table" or type(profession) ~= "table" then
-        return nil, nil
+    if type(_G.AtlasLoot) == "table" then
+        candidates[#candidates + 1] = _G.AtlasLoot
     end
-    return recipe, profession
+
+    for _, atlas in ipairs(candidates) do
+        -- Prefer modern shape: AtlasLoot.Data.Recipe / AtlasLoot.Data.Profession
+        local data = type(atlas.Data) == "table" and atlas.Data or atlas
+        local recipe = data.Recipe
+        local profession = data.Profession
+        if type(recipe) == "table" and type(profession) == "table" then
+            return recipe, profession
+        end
+    end
+
+    return nil, nil
+end
+
+local function getAtlasLootProfessionName(professionID)
+    if not professionID then return nil end
+    local _, profession = getAtlasLootHandles()
+    if profession and type(profession.GetProfessionName) == "function" then
+        return profession.GetProfessionName(professionID)
+    end
+    return nil
 end
 
 local function safeGetItemName(itemID)
@@ -929,8 +948,8 @@ local function refreshDetailAssets(info)
         end
     end
 
-    if info.professionID and _G.AtlasLoot and _G.AtlasLoot.Data and _G.AtlasLoot.Data.Profession and _G.AtlasLoot.Data.Profession.GetProfessionName then
-        info.professionName = _G.AtlasLoot.Data.Profession.GetProfessionName(info.professionID)
+    if info.professionID then
+        info.professionName = getAtlasLootProfessionName(info.professionID)
     end
 
     if changedSearch then
@@ -1025,6 +1044,17 @@ function Data:GetRecipeDisplayInfo(recipeKey)
                 }
             end
         end
+        -- AtlasLoot can miss some direct-enchant entries depending on dataset/version.
+        -- Keep spell-based recipes usable by falling back to native spell data.
+        if not info.spellID then
+            info.spellID = -n
+        end
+        if not info.spellName then
+            info.spellName = safeGetSpellName(info.spellID)
+        end
+        if not info.spellIcon and info.spellID then
+            info.spellIcon = GetSpellTexture and GetSpellTexture(info.spellID) or nil
+        end
         info.label = info.spellName or safeGetSpellName(-n) or ("spell:" .. tostring(-n))
     elseif n and n > 0 then
         local atlas = self:GetAtlasLootCreatedItemInfo(n)
@@ -1064,8 +1094,8 @@ function Data:GetRecipeDisplayInfo(recipeKey)
         info.label = tostring(recipeKey)
     end
 
-    if info.professionID and _G.AtlasLoot and _G.AtlasLoot.Data and _G.AtlasLoot.Data.Profession and _G.AtlasLoot.Data.Profession.GetProfessionName then
-        info.professionName = _G.AtlasLoot.Data.Profession.GetProfessionName(info.professionID)
+    if info.professionID then
+        info.professionName = getAtlasLootProfessionName(info.professionID)
     end
 
     local parts = {
