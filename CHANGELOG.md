@@ -30,3 +30,21 @@ All notable changes to this project are documented in this file.
 ### Fixed
 - Fixed native profession window losing filters and context on reopen.
 - Fixed recipe list appearing empty (notably Cooking) after a forced scan.
+
+## [1.3.0] - 2026-04-03
+### Added
+- Offline crafters are now grouped in a collapsible accordion; collapsed by default when at least one crafter is online, expanded when all are offline.
+- Hovering the recipe title in the detail panel shows the full item/enchant tooltip at the cursor.
+- Item names now auto-refresh when WoW populates its cache (`GET_ITEM_INFO_RECEIVED`), fixing "item:12345" placeholders on cold login.
+- `/rr clean` command removes invalid non-craft spells from the saved database for all known members.
+- Debug logging for blocked sync recipes (visible with `/rr debug`).
+
+### Changed
+- Default window size increased to 1200×750 (minimum 1000×620) for better detail panel readability.
+- Shift-click on the recipe title now links the crafted item first (instead of the spell), fixing "?" icons for recipients.
+- Added spacing between icon and recipe name in the detail panel title.
+
+### Fixed
+- Fixed recipe labels stuck as "item:12345" placeholders; `refreshDetailAssets` now updates `info.label` when the resolved name becomes available.
+- Fixed Beast Training (Hunter) spells being scanned as Enchanting recipes: `ScanCraft` now skips any CraftFrame that is not Enchanting.
+- Non-craft spells (e.g. Backstab, Blizzard, pet abilities) are now blocked at scan, outgoing sync, and incoming sync level via AtlasLoot validation with a spell-subtext fallback for clients without AtlasLoot.
