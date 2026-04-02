@@ -156,15 +156,15 @@ end
 -- Validates that a recipe key represents a real craft, not a non-craft spell.
 -- Positive keys (item-based) are always valid.
 -- Negative keys (spell-based) must have a known AtlasLoot profession mapping.
+-- In TBC Classic AtlasLoot covers every learnable recipe, so a missing entry
+-- means the spell is not a craft.
 local function isValidRecipeKey(recipeKey)
     local n = tonumber(recipeKey)
     if not n then return false end
     if n > 0 then return true end  -- item-based: always valid
-    -- spell-based: check AtlasLoot
-    local recipe, profession = getAtlasLootHandles()
+    local _, profession = getAtlasLootHandles()
     if not profession or not profession.GetProfessionData then return true end  -- no AtlasLoot: can't filter, allow
-    local data = profession.GetProfessionData(-n)
-    return data ~= nil
+    return profession.GetProfessionData(-n) ~= nil
 end
 
 local function formatReagents(reagentIDs, reagentCounts)
@@ -472,6 +472,36 @@ function Data:InvalidateRecipeCaches()
     self._recipeCraftersCache = nil
 end
 
+function Data:CleanInvalidRecipes()
+    local totalRemoved = 0
+    for memberKey, entry in pairs(self:GetMembersDB()) do
+        for profName, prof in pairs(entry.professions or {}) do
+            local toRemove = {}
+            for recipeKey in pairs(prof.recipes or {}) do
+                if not isValidRecipeKey(recipeKey) then
+                    toRemove[#toRemove + 1] = recipeKey
+                end
+            end
+            for _, recipeKey in ipairs(toRemove) do
+                prof.recipes[recipeKey] = nil
+                totalRemoved = totalRemoved + 1
+                Addon:Debug("Removed invalid recipe", recipeKey, "from", memberKey, profName)
+            end
+            if #toRemove > 0 then
+                local count = 0
+                for _ in pairs(prof.recipes) do count = count + 1 end
+                prof.count = count
+                prof.signature = stableRecipeSignature(prof.recipes)
+            end
+        end
+    end
+    if totalRemoved > 0 then
+        self:InvalidateRecipeCaches()
+        Addon:RequestRefresh("clean")
+    end
+    return totalRemoved
+end
+
 function Data:TouchLocalRevision(reason)
     local entry = self:GetOrCreateMember(self:GetPlayerKey())
     entry.rev = (entry.rev or 0) + 1
@@ -636,9 +666,7 @@ function Data:ScanCraft()
             if recipeName and recipeType ~= "header" and recipeType ~= "subheader" then
                 local itemID = extractItemID(GetCraftItemLink(i))
                 local recipeKey = itemID or -(extractSpellID(GetCraftRecipeLink(i)) or i)
-                if isValidRecipeKey(recipeKey) then
-                    recipes[recipeKey] = true
-                end
+                recipes[recipeKey] = true
             end
         end
     end)
@@ -803,6 +831,8 @@ function Data:AppendIncomingChunk(chunk)
         for _, recipeKey in ipairs(chunk.recipeKeys or {}) do
             if isValidRecipeKey(recipeKey) then
                 prof.recipes[recipeKey] = true
+            else
+                Addon:Debug("Blocked invalid recipe from sync:", recipeKey, "profession:", chunk.profession, "from:", chunk.memberKey)
             end
         end
         prof.skillRank = chunk.skillRank or prof.skillRank or 0
@@ -1164,36 +1194,7 @@ function Data:GetRecipeList(profName, query, sortMode)
         for currentProfName, prof in pairs(profs) do
             if not profName or profName == "All" or currentProfName == profName then
                 for recipeKey in pairs(prof.recipes or {}) do
-                    -- Filter out non-craft spell keys (e.g. Backstab, Blizzard from corrupted sync)
-                    local n = tonumber(recipeKey)
-                    if n and n < 0 then
-                        local detail = self:GetRecipeDisplayInfo(recipeKey)
-                        if detail and not detail.professionID and not detail.createdItemID and not detail.recipeItemID then
-                            -- Spell has no AtlasLoot mapping and no item association — skip it
-                        else
-                            local row = map[recipeKey]
-                            if not row then
-                                row = {
-                                    recipeKey = recipeKey,
-                                    detail = detail,
-                                    label = (detail and detail.label) or self:ResolveRecipeLabel(recipeKey) or tostring(recipeKey),
-                                    profNames = {},
-                                    crafters = {},
-                                    crafterCount = 0,
-                                    onlineCount = 0,
-                                }
-                                map[recipeKey] = row
-                            end
-                            row.profNames[currentProfName] = true
-                            if not row.crafters[memberKey] then
-                                row.crafters[memberKey] = true
-                                row.crafterCount = row.crafterCount + 1
-                                if self:IsMemberOnline(memberKey) then
-                                    row.onlineCount = row.onlineCount + 1
-                                end
-                            end
-                        end
-                    else
+                    if isValidRecipeKey(recipeKey) then
                         local row = map[recipeKey]
                         if not row then
                             local detail = self:GetRecipeDisplayInfo(recipeKey)

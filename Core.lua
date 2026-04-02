@@ -270,10 +270,18 @@ function Addon:SlashHandler(input)
         return
     end
 
-    if cmd == "help" then
-        self:Print("Commands: /rr, /rr options, /rr rescan, /rr mini, /rr sync, /rr prices <item name|link>, /rr share [guild|party|raid|say], /rr pull, /rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID>, /rr dump, /rr wipe")
+    if cmd == "clean" then
+        if self.Data then
+            local removed = self.Data:CleanInvalidRecipes()
+            self:Print(string.format("Cleaned %d invalid recipe(s) from database.", removed))
+        end
         return
     end
 
-    self:Print("Commands: /rr, /rr options, /rr rescan, /rr mini, /rr sync, /rr prices <item name|link>, /rr share [guild|party|raid|say], /rr pull, /rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID>, /rr dump, /rr wipe")
+    if cmd == "help" then
+        self:Print("Commands: /rr, /rr options, /rr rescan, /rr mini, /rr sync, /rr prices <item name|link>, /rr share [guild|party|raid|say], /rr pull, /rr clean, /rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID>, /rr dump, /rr wipe")
+        return
+    end
+
+    self:Print("Commands: /rr, /rr options, /rr rescan, /rr mini, /rr sync, /rr prices <item name|link>, /rr share [guild|party|raid|say], /rr pull, /rr clean, /rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID>, /rr dump, /rr wipe")
 end
