@@ -514,9 +514,9 @@ function UI:CreateMainFrame()
         if button ~= "LeftButton" or not IsShiftKeyDown() then return end
         local detail = UI.currentDetail
         if not detail then return end
-        local link = (detail.spellID and GetSpellLink and GetSpellLink(detail.spellID))
+        local link = getItemLinkByID(detail.createdItemID)
             or getItemLinkByID(detail.recipeItemID)
-            or getItemLinkByID(detail.createdItemID)
+            or (detail.spellID and GetSpellLink and GetSpellLink(detail.spellID))
         insertLinkInChat(link)
     end)
     detailTitleButton:SetScript("OnEnter", function(self)
@@ -524,11 +524,11 @@ function UI:CreateMainFrame()
         if not detail then return end
         local hasLink = false
         if detail.createdItemID then
-            GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, 0)
+            GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
             GameTooltip:SetHyperlink("item:" .. detail.createdItemID)
             hasLink = true
         elseif detail.spellID then
-            GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, 0)
+            GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
             GameTooltip:SetHyperlink("spell:" .. detail.spellID)
             hasLink = true
         end
@@ -884,7 +884,7 @@ function UI:RefreshDetailPanel()
     if titleItemID then
         titleText = getItemColorizedName(titleItemID, titleText)
     end
-    self.frame.detailTitle:SetText(iconTagText .. titleText)
+    self.frame.detailTitle:SetText(iconTagText .. " " .. titleText)
 
     local subtitleParts = {}
     if detail.professionName then subtitleParts[#subtitleParts + 1] = detail.professionName end
