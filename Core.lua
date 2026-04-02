@@ -7,7 +7,7 @@ local Addon = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME,
 )
 
 _G.RecipeRegistry = Addon
-Addon.DISPLAY_VERSION = "1.2.2"
+Addon.DISPLAY_VERSION = "1.2.3"
 Addon.WIRE_VERSION = 2
 Addon.ADDON_PREFIX = "RRG1"
 Addon.debugMode = false

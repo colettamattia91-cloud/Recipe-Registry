@@ -2,7 +2,7 @@
 ## Title: Recipe Registry
 ## Notes: Lean guild profession tracker with owner-driven sync and AtlasLoot-assisted local resolution
 ## Author: OpenAI + User collaboration
-## Version: 1.2.2
+## Version: 1.2.3
 ## SavedVariables: RecipeRegistryDB
 ## SavedVariablesPerCharacter: RecipeRegistryCharDB
 ## X-Category: Guild

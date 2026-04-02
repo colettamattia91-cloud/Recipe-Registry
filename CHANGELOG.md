@@ -22,7 +22,7 @@ All notable changes to this project are documented in this file.
 - Prevented self auto-whisper from crafter request action.
 - Tooltip behavior improved for material rows (cursor-anchored item tooltips).
 
-## [1.2.2] - 2026-04-02
+## [1.2.3] - 2026-04-02
 ### Changed
 - Profession scan now skips the native UI entirely when recipe data is already current; a full scan only runs on the first open or after a recipe-change event, eliminating filter/state interference during routine open/close cycles.
 - `RequestRefresh` skips scheduling when the addon UI frame is hidden, reducing background work during sync bursts.
