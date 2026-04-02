@@ -1144,26 +1144,57 @@ function Data:GetRecipeList(profName, query, sortMode)
         for currentProfName, prof in pairs(profs) do
             if not profName or profName == "All" or currentProfName == profName then
                 for recipeKey in pairs(prof.recipes or {}) do
-                    local row = map[recipeKey]
-                    if not row then
+                    -- Filter out non-craft spell keys (e.g. Backstab, Blizzard from corrupted sync)
+                    local n = tonumber(recipeKey)
+                    if n and n < 0 then
                         local detail = self:GetRecipeDisplayInfo(recipeKey)
-                        row = {
-                            recipeKey = recipeKey,
-                            detail = detail,
-                            label = (detail and detail.label) or self:ResolveRecipeLabel(recipeKey) or tostring(recipeKey),
-                            profNames = {},
-                            crafters = {},
-                            crafterCount = 0,
-                            onlineCount = 0,
-                        }
-                        map[recipeKey] = row
-                    end
-                    row.profNames[currentProfName] = true
-                    if not row.crafters[memberKey] then
-                        row.crafters[memberKey] = true
-                        row.crafterCount = row.crafterCount + 1
-                        if self:IsMemberOnline(memberKey) then
-                            row.onlineCount = row.onlineCount + 1
+                        if detail and not detail.professionID and not detail.createdItemID and not detail.recipeItemID then
+                            -- Spell has no AtlasLoot mapping and no item association — skip it
+                        else
+                            local row = map[recipeKey]
+                            if not row then
+                                row = {
+                                    recipeKey = recipeKey,
+                                    detail = detail,
+                                    label = (detail and detail.label) or self:ResolveRecipeLabel(recipeKey) or tostring(recipeKey),
+                                    profNames = {},
+                                    crafters = {},
+                                    crafterCount = 0,
+                                    onlineCount = 0,
+                                }
+                                map[recipeKey] = row
+                            end
+                            row.profNames[currentProfName] = true
+                            if not row.crafters[memberKey] then
+                                row.crafters[memberKey] = true
+                                row.crafterCount = row.crafterCount + 1
+                                if self:IsMemberOnline(memberKey) then
+                                    row.onlineCount = row.onlineCount + 1
+                                end
+                            end
+                        end
+                    else
+                        local row = map[recipeKey]
+                        if not row then
+                            local detail = self:GetRecipeDisplayInfo(recipeKey)
+                            row = {
+                                recipeKey = recipeKey,
+                                detail = detail,
+                                label = (detail and detail.label) or self:ResolveRecipeLabel(recipeKey) or tostring(recipeKey),
+                                profNames = {},
+                                crafters = {},
+                                crafterCount = 0,
+                                onlineCount = 0,
+                            }
+                            map[recipeKey] = row
+                        end
+                        row.profNames[currentProfName] = true
+                        if not row.crafters[memberKey] then
+                            row.crafters[memberKey] = true
+                            row.crafterCount = row.crafterCount + 1
+                            if self:IsMemberOnline(memberKey) then
+                                row.onlineCount = row.onlineCount + 1
+                            end
                         end
                     end
                 end

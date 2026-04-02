@@ -44,6 +44,7 @@ function Addon:OnEnable()
     self:RegisterEvent("SPELLS_CHANGED", "OnRecipeSignal")
     self:RegisterEvent("SKILL_LINES_CHANGED", "OnRecipeSignal")
     self:RegisterEvent("GUILD_ROSTER_UPDATE", "OnGuildRosterUpdate")
+    self:RegisterEvent("GET_ITEM_INFO_RECEIVED", "OnItemInfoReceived")
     self:ScheduleTimer(function()
         if self.MinimapButton then self.MinimapButton:Refresh() end
         if self.UI then self.UI:CreateMainFrame() end
@@ -148,6 +149,17 @@ function Addon:OnGuildRosterUpdate()
         self.Sync:OnGuildRosterUpdate()
     end
     self:RequestRefresh("roster")
+end
+
+function Addon:OnItemInfoReceived()
+    if self._itemInfoTimer then return end
+    self._itemInfoTimer = self:ScheduleTimer(function()
+        self._itemInfoTimer = nil
+        if self.Data then
+            self.Data:InvalidateRecipeCaches()
+        end
+        self:RequestRefresh("item-cache")
+    end, 0.5)
 end
 
 function Addon:RequestRefresh(reason)
