@@ -302,7 +302,7 @@ function UI:CreateMainFrame()
     if self.frame then return end
 
     local f = CreateFrame("Frame", "RecipeRegistryFrame", UIParent, "BackdropTemplate")
-    f:SetSize(1080, 660)
+    f:SetSize(1200, 750)
     f:SetPoint("CENTER")
     f:SetMovable(true)
     f:EnableMouse(true)
@@ -311,9 +311,9 @@ function UI:CreateMainFrame()
     f:SetScript("OnDragStop", f.StopMovingOrSizing)
     f:SetResizable(true)
     if f.SetResizeBounds then
-        f:SetResizeBounds(920, 560)
+        f:SetResizeBounds(1000, 620)
     elseif f.SetMinResize then
-        f:SetMinResize(920, 560)
+        f:SetMinResize(1000, 620)
     end
     f:SetClampedToScreen(true)
     f:SetFrameStrata("HIGH")
@@ -519,6 +519,24 @@ function UI:CreateMainFrame()
             or getItemLinkByID(detail.createdItemID)
         insertLinkInChat(link)
     end)
+    detailTitleButton:SetScript("OnEnter", function(self)
+        local detail = UI.currentDetail
+        if not detail then return end
+        local hasLink = false
+        if detail.createdItemID then
+            GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, 0)
+            GameTooltip:SetHyperlink("item:" .. detail.createdItemID)
+            hasLink = true
+        elseif detail.spellID then
+            GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, 0)
+            GameTooltip:SetHyperlink("spell:" .. detail.spellID)
+            hasLink = true
+        end
+        if hasLink then GameTooltip:Show() end
+    end)
+    detailTitleButton:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
     f.detailTitleButton = detailTitleButton
 
     local detailSub = right:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
@@ -536,9 +554,6 @@ function UI:CreateMainFrame()
     f.detailScroll = detailScroll
     f.detailContent = detailContent
     f.detailLines = {}
-
-    local detailTooltip = CreateFrame("GameTooltip", "RecipeRegistryDetailTooltip", right, "GameTooltipTemplate")
-    f.detailTooltip = detailTooltip
 
     local footer = CreateFrame("Frame", nil, f, "BackdropTemplate")
     footer:SetPoint("BOTTOMLEFT", 1, 1)
@@ -877,27 +892,8 @@ function UI:RefreshDetailPanel()
     subtitleParts[#subtitleParts + 1] = string.format("%d crafter(s)", detail.crafterCount or 0)
     self.frame.detailSub:SetText(table.concat(subtitleParts, "  •  "))
 
-    -- Embedded product / enchant tooltip
-    local tt = self.frame.detailTooltip
-    tt:SetOwner(self.frame.right, "ANCHOR_NONE")
-    tt:ClearAllPoints()
-    tt:SetPoint("TOPLEFT", self.frame.detailSub, "BOTTOMLEFT", -2, -8)
-    local hasTooltip = false
-    if detail.createdItemID then
-        tt:SetHyperlink("item:" .. detail.createdItemID)
-        hasTooltip = tt:IsShown()
-    elseif detail.spellID then
-        tt:SetHyperlink("spell:" .. detail.spellID)
-        hasTooltip = tt:IsShown()
-    end
-    if hasTooltip then
-        tt:Show()
-        local tooltipHeight = tt:GetHeight() or 0
-        self.frame.detailScroll:SetPoint("TOPLEFT", 8, -(54 + tooltipHeight + 12))
-    else
-        tt:Hide()
-        self.frame.detailScroll:SetPoint("TOPLEFT", 8, -54)
-    end
+    -- Reset scroll position (no embedded tooltip anymore)
+    self.frame.detailScroll:SetPoint("TOPLEFT", 8, -54)
 
     -- Reset offline accordion state when recipe changes
     if self._lastDetailRecipeKey ~= self.selectedRecipeKey then
