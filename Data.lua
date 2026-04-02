@@ -158,13 +158,34 @@ end
 -- Negative keys (spell-based) must have a known AtlasLoot profession mapping.
 -- In TBC Classic AtlasLoot covers every learnable recipe, so a missing entry
 -- means the spell is not a craft.
+-- Fallback when AtlasLoot is absent: check spell subtext for profession rank
+-- keywords (Apprentice/Journeyman/Expert/Artisan/Master) which only craft
+-- spells have; class spells use "Rank N" or have no subtext.
+local CRAFT_RANK_KEYWORDS = {
+    ["Apprentice"] = true, ["Journeyman"] = true, ["Expert"] = true,
+    ["Artisan"] = true, ["Master"] = true,
+}
 local function isValidRecipeKey(recipeKey)
     local n = tonumber(recipeKey)
     if not n then return false end
     if n > 0 then return true end  -- item-based: always valid
     local _, profession = getAtlasLootHandles()
-    if not profession or not profession.GetProfessionData then return true end  -- no AtlasLoot: can't filter, allow
-    return profession.GetProfessionData(-n) ~= nil
+    if profession and profession.GetProfessionData then
+        return profession.GetProfessionData(-n) ~= nil
+    end
+    -- Fallback: no AtlasLoot — check spell subtext for craft rank keywords
+    local spellName = safeGetSpellName(-n)
+    if not spellName then return true end  -- can't resolve spell: benefit of doubt
+    local subtext
+    if type(GetSpellSubtext) == "function" then
+        subtext = GetSpellSubtext(-n)
+    elseif type(GetSpellBookItemInfo) ~= "function" then
+        -- No API to check subtext: allow through
+        return true
+    end
+    if subtext and CRAFT_RANK_KEYWORDS[subtext] then return true end
+    -- No recognised craft subtext: block it
+    return false
 end
 
 local function formatReagents(reagentIDs, reagentCounts)
