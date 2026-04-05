@@ -762,8 +762,6 @@ function Data:GetLocalSummary()
     }
 end
 
--- Returns sorted list of known subclasses for profName from the session scan cache.
--- Only populated after the player has opened that profession window this session.
 function Data:BuildSnapshotChunks(memberKey)
     local entry = self:GetMember(memberKey)
     if not entry then return {} end
