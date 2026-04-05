@@ -636,6 +636,15 @@ function UI:EnsureRecipeRow(index)
             UI:RefreshDetailPanel()
         end
     end)
+    row:SetScript("OnEnter", function(self)
+        if not self.tooltipLink then return end
+        GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+        GameTooltip:SetHyperlink(self.tooltipLink)
+        GameTooltip:Show()
+    end)
+    row:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
 
     self.frame.recipeRows[index] = row
     return row
@@ -853,6 +862,11 @@ function UI:RefreshRecipeList()
         
         local detail = rowData.detail or {}
         local colorItemID = detail.createdItemID or detail.recipeItemID
+        local tooltipLink = (detail.createdItemID and ("item:" .. detail.createdItemID))
+            or (detail.recipeItemID and ("item:" .. detail.recipeItemID))
+            or (detail.spellID and ("spell:" .. detail.spellID))
+            or nil
+        row.tooltipLink = tooltipLink
         local titleText = rowData.label
         local rowIcon = detail.createdItemIcon or detail.recipeItemIcon or detail.spellIcon or getItemIcon(colorItemID)
         if rowIcon then

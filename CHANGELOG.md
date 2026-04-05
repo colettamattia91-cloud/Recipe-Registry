@@ -2,18 +2,6 @@
 
 All notable changes to this project are documented in this file.
 
-## [1.3.1] - 2026-04-05
-### Added
-- Character-based favorites system: click the star icon in the recipe list to add/remove favorites.
-- New `Favorites` filter at the top of the left profession list to show only favorite recipes.
-- Right-click on a recipe row now toggles favorite state as a shortcut.
-
-### Changed
-- Herbalism and Skinning are hidden from the left profession list in TBC, since they do not provide recipe entries.
-- Favorite state is stored in profile data (`profile.favorites`) and persists per character.
-
-### Notes
-- Profession subcategories UI was reverted for now and is not part of this release.
 
 ## [1.2.0] - 2026-04-01
 ### Added
@@ -61,3 +49,14 @@ All notable changes to this project are documented in this file.
 - Fixed recipe labels stuck as "item:12345" placeholders; `refreshDetailAssets` now updates `info.label` when the resolved name becomes available.
 - Fixed Beast Training (Hunter) spells being scanned as Enchanting recipes: `ScanCraft` now skips any CraftFrame that is not Enchanting.
 - Non-craft spells (e.g. Backstab, Blizzard, pet abilities) are now blocked at scan, outgoing sync, and incoming sync level via AtlasLoot validation with a spell-subtext fallback for clients without AtlasLoot.
+
+## [1.3.1] - 2026-04-05
+### Added
+- Character-based favorites system: click the star icon in the recipe list to add/remove favorites.
+- New `Favorites` filter at the top of the left profession list to show only favorite recipes.
+- Right-click on a recipe row now toggles favorite state as a shortcut.
+- Hovering a recipe row in the center list now shows the related item/spell tooltip at cursor.
+
+### Changed
+- Herbalism and Skinning are hidden from the left profession list in TBC, since they do not provide recipe entries.
+- Favorite state is stored in profile data (`profile.favorites`) and persists per character.
