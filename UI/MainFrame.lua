@@ -5,8 +5,8 @@ Addon.UI = UI
 local SEARCH_DEBOUNCE = 0.15
 
 local PROF_ORDER = {
-    "All", "Alchemy", "Blacksmithing", "Cooking", "Enchanting", "Engineering",
-    "Herbalism", "Jewelcrafting", "Leatherworking", "Mining", "Skinning", "Tailoring"
+    "Favorites", "All", "Alchemy", "Blacksmithing", "Cooking", "Enchanting", "Engineering",
+    "Jewelcrafting", "Leatherworking", "Mining", "Tailoring"
 }
 
 local PROFESSION_SPELL_IDS = {
@@ -600,14 +600,41 @@ function UI:EnsureRecipeRow(index)
 
     local meta = row:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     meta:SetPoint("BOTTOMLEFT", icon, "BOTTOMRIGHT", 12, 7)
-    meta:SetPoint("BOTTOMRIGHT", -10, 7)
+    meta:SetPoint("BOTTOMRIGHT", -56, 7)
     meta:SetJustifyH("LEFT")
     row.meta = meta
 
-    row:SetScript("OnClick", function(self)
-        UI.selectedRecipeKey = self.recipeKey
-        UI:RefreshRecipeList()
-        UI:RefreshDetailPanel()
+    local favoriteButton = CreateFrame("Button", nil, row)
+    favoriteButton:SetSize(20, 20)
+    favoriteButton:SetPoint("TOPRIGHT", -8, -6)
+    favoriteButton.icon = favoriteButton:CreateTexture(nil, "ARTWORK")
+    favoriteButton.icon:SetAllPoints()
+    favoriteButton.icon:SetTexture("Interface\\Icons\\STAR")
+    favoriteButton:SetScript("OnClick", function(self, button)
+        if button ~= "LeftButton" then return end
+        if not UI.selectedRecipeKey or UI.selectedRecipeKey ~= self.recipeKey then
+            UI.selectedRecipeKey = self.recipeKey
+        end
+        UI:ToggleFavorite(self.recipeKey)
+    end)
+    favoriteButton:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+        GameTooltip:AddLine(self.isFavorite and "Remove from favorites" or "Add to favorites")
+        GameTooltip:Show()
+    end)
+    favoriteButton:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    row.favoriteButton = favoriteButton
+
+    row:SetScript("OnClick", function(self, button)
+        if button == "RightButton" then
+            UI:ToggleFavorite(self.recipeKey)
+        else
+            UI.selectedRecipeKey = self.recipeKey
+            UI:RefreshRecipeList()
+            UI:RefreshDetailPanel()
+        end
     end)
 
     self.frame.recipeRows[index] = row
@@ -693,6 +720,28 @@ function UI:EnsureDetailLine(index)
     return line
 end
 
+function UI:IsFavorite(recipeKey)
+    if not Addon.db or not Addon.db.profile or not Addon.db.profile.favorites then
+        return false
+    end
+    return Addon.db.profile.favorites[tostring(recipeKey)] or false
+end
+
+function UI:ToggleFavorite(recipeKey)
+    if not Addon.db or not Addon.db.profile then return end
+    if not Addon.db.profile.favorites then
+        Addon.db.profile.favorites = {}
+    end
+    local key = tostring(recipeKey)
+    if Addon.db.profile.favorites[key] then
+        Addon.db.profile.favorites[key] = nil
+    else
+        Addon.db.profile.favorites[key] = true
+    end
+    UI:RefreshRecipeList()
+    UI:RefreshDetailPanel()
+end
+
 function UI:RefreshStatusBar()
     local sync = Addon.Sync
     local state = sync and sync.GetUiState and sync:GetUiState() or nil
@@ -748,7 +797,9 @@ function UI:RefreshProfessionButtons()
     local summary = Addon.Data:GetProfessionSummary()
     for _, profName in ipairs(PROF_ORDER) do
         local button = self.frame.profButtons[profName]
-        if profName == "All" then
+        if profName == "Favorites" then
+            button:SetLabel("Favorites")
+        elseif profName == "All" then
             button:SetLabel("All")
         else
             button:SetLabel(profName, getProfessionIcon(profName))
@@ -759,9 +810,23 @@ end
 
 function UI:RefreshRecipeList()
     if not self.frame then return end
-    local rows = Addon.Data:GetRecipeList(self.selectedProfession, self.searchText, self.sortMode)
+    local rows = Addon.Data:GetRecipeList(self.selectedProfession == "Favorites" and "All" or self.selectedProfession, self.searchText, self.sortMode)
+    
+    -- Filter by favorites if selected
+    if self.selectedProfession == "Favorites" then
+        local filteredRows = {}
+        for _, row in ipairs(rows) do
+            if self:IsFavorite(row.recipeKey) then
+                filteredRows[#filteredRows + 1] = row
+            end
+        end
+        rows = filteredRows
+    end
+    
     self.currentRecipeRows = rows
-    self.frame.recipeHeader:SetText(self.selectedProfession == "All" and "Recipes" or (self.selectedProfession .. " recipes"))
+    local headerText = self.selectedProfession == "Favorites" and "Favorite recipes" 
+        or (self.selectedProfession == "All" and "Recipes" or (self.selectedProfession .. " recipes"))
+    self.frame.recipeHeader:SetText(headerText)
     self.frame.sortAlpha:SetSelected(self.sortMode == "alpha")
     self.frame.sortRarity:SetSelected(self.sortMode == "rarity")
 
@@ -775,6 +840,17 @@ function UI:RefreshRecipeList()
         local row = self:EnsureRecipeRow(i)
         row:SetPoint("TOPLEFT", 0, -((i - 1) * 56))
         row.recipeKey = rowData.recipeKey
+        
+        -- Update favorite button appearance
+        local isFav = self:IsFavorite(rowData.recipeKey)
+        row.favoriteButton.isFavorite = isFav
+        row.favoriteButton.recipeKey = rowData.recipeKey
+        if isFav then
+            row.favoriteButton.icon:SetVertexColor(1.0, 0.84, 0.0, 1)  -- Gold for favorite
+        else
+            row.favoriteButton.icon:SetVertexColor(0.5, 0.5, 0.5, 1)    -- Gray for non-favorite
+        end
+        
         local detail = rowData.detail or {}
         local colorItemID = detail.createdItemID or detail.recipeItemID
         local titleText = rowData.label
@@ -795,7 +871,7 @@ function UI:RefreshRecipeList()
         end
         row.title:SetText(titleText)
         local metaParts = {}
-        if self.selectedProfession == "All" and rowData.professionList and #rowData.professionList > 0 then
+        if self.selectedProfession ~= "Favorites" and self.selectedProfession == "All" and rowData.professionList and #rowData.professionList > 0 then
             metaParts[#metaParts + 1] = table.concat(rowData.professionList, ", ")
         end
         metaParts[#metaParts + 1] = string.format("%d crafter(s)", rowData.crafterCount or 0)

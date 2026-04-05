@@ -52,6 +52,7 @@ local DB_DEFAULTS = {
             hide = false,
             angle = 220,
         },
+        favorites = {},  -- Set of recipe keys marked as favorites
     },
 }
 
@@ -450,6 +451,9 @@ function Data:OnInitialize()
         if self.db.profile.minimap.hide == nil then self.db.profile.minimap.hide = false end
         if type(self.db.profile.minimap.angle) ~= "number" then self.db.profile.minimap.angle = 220 end
     end
+    if type(self.db.profile.favorites) ~= "table" then
+        self.db.profile.favorites = {}
+    end
     self._onlineCache = {}
     self._currentProfs = {}
 end
@@ -758,6 +762,8 @@ function Data:GetLocalSummary()
     }
 end
 
+-- Returns sorted list of known subclasses for profName from the session scan cache.
+-- Only populated after the player has opened that profession window this session.
 function Data:BuildSnapshotChunks(memberKey)
     local entry = self:GetMember(memberKey)
     if not entry then return {} end

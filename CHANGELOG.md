@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented in this file.
 
+## [1.3.1] - 2026-04-05
+### Added
+- Character-based favorites system: click the star icon in the recipe list to add/remove favorites.
+- New `Favorites` filter at the top of the left profession list to show only favorite recipes.
+- Right-click on a recipe row now toggles favorite state as a shortcut.
+
+### Changed
+- Herbalism and Skinning are hidden from the left profession list in TBC, since they do not provide recipe entries.
+- Favorite state is stored in profile data (`profile.favorites`) and persists per character.
+
+### Notes
+- Profession subcategories UI was reverted for now and is not part of this release.
+
 ## [1.2.0] - 2026-04-01
 ### Added
 - Slash command namespace moved to `/rr` and help text updated.
