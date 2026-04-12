@@ -501,14 +501,45 @@ function UI:CreateMainFrame()
 
     local detailTitle = right:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     detailTitle:SetPoint("TOPLEFT", 12, -12)
-    detailTitle:SetPoint("TOPRIGHT", -12, -12)
+    detailTitle:SetPoint("TOPRIGHT", -44, -12)
     detailTitle:SetJustifyH("LEFT")
+    if detailTitle.SetWordWrap then
+        detailTitle:SetWordWrap(false)
+    end
+    if detailTitle.SetMaxLines then
+        detailTitle:SetMaxLines(1)
+    end
     detailTitle:SetText("Recipe details")
     f.detailTitle = detailTitle
 
+    local detailFavoriteButton = CreateFrame("Button", nil, right)
+    detailFavoriteButton:SetSize(22, 22)
+    detailFavoriteButton:SetPoint("TOPRIGHT", -12, -10)
+    detailFavoriteButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+    detailFavoriteButton.text = detailFavoriteButton:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    detailFavoriteButton.text:SetAllPoints()
+    detailFavoriteButton.text:SetJustifyH("CENTER")
+    detailFavoriteButton.text:SetJustifyV("MIDDLE")
+    detailFavoriteButton:SetScript("OnClick", function(self, button)
+        if button ~= "LeftButton" then return end
+        if not self.recipeKey then return end
+        UI.selectedRecipeKey = self.recipeKey
+        UI:ToggleFavorite(self.recipeKey)
+    end)
+    detailFavoriteButton:SetScript("OnEnter", function(self)
+        if not self.recipeKey then return end
+        GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+        GameTooltip:AddLine(self.isFavorite and "Remove from favorites" or "Add to favorites")
+        GameTooltip:Show()
+    end)
+    detailFavoriteButton:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    f.detailFavoriteButton = detailFavoriteButton
+
     local detailTitleButton = CreateFrame("Button", nil, right)
     detailTitleButton:SetPoint("TOPLEFT", 10, -10)
-    detailTitleButton:SetPoint("TOPRIGHT", -32, -10)
+    detailTitleButton:SetPoint("TOPRIGHT", detailFavoriteButton, "TOPLEFT", -8, 0)
     detailTitleButton:SetHeight(18)
     detailTitleButton:SetScript("OnClick", function(_, button)
         if button ~= "LeftButton" or not IsShiftKeyDown() then return end
@@ -594,8 +625,14 @@ function UI:EnsureRecipeRow(index)
 
     local title = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     title:SetPoint("TOPLEFT", icon, "TOPRIGHT", 12, -1)
-    title:SetPoint("TOPRIGHT", -10, -8)
+    title:SetPoint("TOPRIGHT", -38, -8)
     title:SetJustifyH("LEFT")
+    if title.SetWordWrap then
+        title:SetWordWrap(false)
+    end
+    if title.SetMaxLines then
+        title:SetMaxLines(1)
+    end
     row.title = title
 
     local meta = row:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
@@ -607,9 +644,11 @@ function UI:EnsureRecipeRow(index)
     local favoriteButton = CreateFrame("Button", nil, row)
     favoriteButton:SetSize(20, 20)
     favoriteButton:SetPoint("TOPRIGHT", -8, -6)
-    favoriteButton.icon = favoriteButton:CreateTexture(nil, "ARTWORK")
-    favoriteButton.icon:SetAllPoints()
-    favoriteButton.icon:SetTexture("Interface\\Icons\\STAR")
+    favoriteButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+    favoriteButton.text = favoriteButton:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    favoriteButton.text:SetAllPoints()
+    favoriteButton.text:SetJustifyH("CENTER")
+    favoriteButton.text:SetJustifyV("MIDDLE")
     favoriteButton:SetScript("OnClick", function(self, button)
         if button ~= "LeftButton" then return end
         if not UI.selectedRecipeKey or UI.selectedRecipeKey ~= self.recipeKey then
@@ -626,6 +665,7 @@ function UI:EnsureRecipeRow(index)
         GameTooltip:Hide()
     end)
     row.favoriteButton = favoriteButton
+    row:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 
     row:SetScript("OnClick", function(self, button)
         if button == "RightButton" then
@@ -839,7 +879,17 @@ function UI:RefreshRecipeList()
     self.frame.sortAlpha:SetSelected(self.sortMode == "alpha")
     self.frame.sortRarity:SetSelected(self.sortMode == "rarity")
 
-    if not self.selectedRecipeKey and #rows > 0 then
+    local selectedExists = false
+    if self.selectedRecipeKey then
+        for _, rowData in ipairs(rows) do
+            if rowData.recipeKey == self.selectedRecipeKey then
+                selectedExists = true
+                break
+            end
+        end
+    end
+
+    if (not self.selectedRecipeKey or not selectedExists) and #rows > 0 then
         self.selectedRecipeKey = rows[1].recipeKey
     elseif #rows == 0 then
         self.selectedRecipeKey = nil
@@ -855,9 +905,11 @@ function UI:RefreshRecipeList()
         row.favoriteButton.isFavorite = isFav
         row.favoriteButton.recipeKey = rowData.recipeKey
         if isFav then
-            row.favoriteButton.icon:SetVertexColor(1.0, 0.84, 0.0, 1)  -- Gold for favorite
+            row.favoriteButton.text:SetText("*")
+            row.favoriteButton.text:SetTextColor(1.0, 0.84, 0.0, 1)
         else
-            row.favoriteButton.icon:SetVertexColor(0.5, 0.5, 0.5, 1)    -- Gray for non-favorite
+            row.favoriteButton.text:SetText("*")
+            row.favoriteButton.text:SetTextColor(0.45, 0.45, 0.45, 1)
         end
         
         local detail = rowData.detail or {}
@@ -957,6 +1009,10 @@ function UI:RefreshDetailPanel()
         self.currentDetail = nil
         self.frame.detailTitle:SetText("Recipe details")
         self.frame.detailSub:SetText("Select a recipe to see materials and available crafters.")
+        self.frame.detailFavoriteButton.recipeKey = nil
+        self.frame.detailFavoriteButton.isFavorite = false
+        self.frame.detailFavoriteButton.text:SetText("*")
+        self.frame.detailFavoriteButton.text:SetTextColor(0.35, 0.35, 0.35, 1)
         if self.frame.detailTooltip then
             self.frame.detailTooltip:Hide()
         end
@@ -968,6 +1024,7 @@ function UI:RefreshDetailPanel()
 
     local detail = Addon.Data:GetRecipeDetail(self.selectedRecipeKey)
     self.currentDetail = detail
+    local isFavorite = self:IsFavorite(self.selectedRecipeKey)
     local iconTagText = textureTag(detail.createdItemIcon or detail.recipeItemIcon or detail.spellIcon, 18)
     local titleItemID = detail.createdItemID or detail.recipeItemID
     local titleText = detail.label or tostring(self.selectedRecipeKey)
@@ -975,6 +1032,14 @@ function UI:RefreshDetailPanel()
         titleText = getItemColorizedName(titleItemID, titleText)
     end
     self.frame.detailTitle:SetText(iconTagText .. " " .. titleText)
+    self.frame.detailFavoriteButton.recipeKey = self.selectedRecipeKey
+    self.frame.detailFavoriteButton.isFavorite = isFavorite
+    self.frame.detailFavoriteButton.text:SetText("*")
+    if isFavorite then
+        self.frame.detailFavoriteButton.text:SetTextColor(1.0, 0.84, 0.0, 1)
+    else
+        self.frame.detailFavoriteButton.text:SetTextColor(0.45, 0.45, 0.45, 1)
+    end
 
     local subtitleParts = {}
     if detail.professionName then subtitleParts[#subtitleParts + 1] = detail.professionName end
