@@ -144,6 +144,7 @@ end
 function Addon:OnGuildRosterUpdate()
     if self.Data then
         self.Data:RebuildOnlineCache()
+        self.Data:InvalidateRecipeCaches("presence")
     end
     if self.Sync then
         self.Sync:OnGuildRosterUpdate()
@@ -156,7 +157,9 @@ function Addon:OnItemInfoReceived()
     self._itemInfoTimer = self:ScheduleTimer(function()
         self._itemInfoTimer = nil
         if self.Data then
-            self.Data:InvalidateRecipeCaches()
+            -- Item cache fills in names/icons progressively; keep heavy detail data
+            -- cached and only rebuild recipe rows/search text that depend on labels.
+            self.Data:InvalidateRecipeCaches("list")
         end
         self:RequestRefresh("item-cache")
     end, 0.5)
@@ -173,10 +176,11 @@ function Addon:RequestRefresh(reason)
     if self._refreshTimer then return end
     self._refreshTimer = self:ScheduleTimer(function()
         self._refreshTimer = nil
+        local reasons = self._refreshReasons
         self._refreshReasons = {}
         safecall(function()
             if self.UI and self.UI.Refresh then
-                self.UI:Refresh()
+                self.UI:Refresh(reasons)
             end
         end)
     end, 0.25)

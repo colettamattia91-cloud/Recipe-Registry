@@ -53,10 +53,18 @@ All notable changes to this project are documented in this file.
 ## [1.3.1] - 2026-04-05
 ### Added
 - Character-based favorites system: click the star icon in the recipe list to add/remove favorites.
+- Favorite toggle is also available in the detail panel header for the selected recipe.
 - New `Favorites` filter at the top of the left profession list to show only favorite recipes.
 - Right-click on a recipe row now toggles favorite state as a shortcut.
 - Hovering a recipe row in the center list now shows the related item/spell tooltip at cursor.
+- Global recipe search can now run without selecting a profession first.
 
 ### Changed
 - Herbalism and Skinning are hidden from the left profession list in TBC, since they do not provide recipe entries.
-- Favorite state is stored in profile data (`profile.favorites`) and persists per character.
+- Favorite state now persists per character.
+- The minimap button behavior and saved position handling have been modernized.
+- The recipe browser now starts without forcing the `All` profession view, encouraging profession-first browsing or global search.
+- Global search waits for a short minimum query before searching the full recipe index, with updated empty-state messaging and headers.
+- Recipe browsing and crafter updates are now more responsive, especially in larger guild datasets.
+- Item name/icon refreshes now feel smoother and avoid unnecessary redraws while data is still loading.
+- Window refresh behavior has been refined to reduce unnecessary work while the UI is open.

@@ -3,9 +3,11 @@ local UI = Addon:NewModule("UI")
 Addon.UI = UI
 
 local SEARCH_DEBOUNCE = 0.15
+local GLOBAL_SEARCH_DEBOUNCE = 0.35
+local GLOBAL_SEARCH_MIN_CHARS = 2
 
 local PROF_ORDER = {
-    "Favorites", "All", "Alchemy", "Blacksmithing", "Cooking", "Enchanting", "Engineering",
+    "Favorites", "Alchemy", "Blacksmithing", "Cooking", "Enchanting", "Engineering",
     "Jewelcrafting", "Leatherworking", "Mining", "Tailoring"
 }
 
@@ -34,6 +36,7 @@ local COLOR_ROW = {0.08, 0.08, 0.08, 0.96}
 local COLOR_ROW_SELECTED = {0.13, 0.11, 0.08, 0.98}
 local COLOR_BUTTON = {0.075, 0.075, 0.075, 0.98}
 local COLOR_BUTTON_ACTIVE = {0.13, 0.11, 0.08, 0.98}
+local FAVORITE_ICON = "Interface\\AddOns\\RecipeRegistry\\UI\\Assets\\favorite-star"
 
 local function unpackColor(t)
     return t[1], t[2], t[3]
@@ -100,7 +103,7 @@ end
 
 local function materialTextureTag(texture)
     if not texture then return "" end
-    return string.format("|T%s:18:18:0:0|t", texture)
+    return string.format("|T%s:18:18:0:0:64:64:5:59:5:59|t", texture)
 end
 
 local function statusTag(online)
@@ -287,11 +290,114 @@ local function createStatCard(parent, label, width)
     return card
 end
 
+local function setTextIfChanged(region, value)
+    value = value or ""
+    if region._rrText == value then return end
+    region._rrText = value
+    region:SetText(value)
+end
+
+local function setTextureIfChanged(region, value)
+    if region._rrTexture == value then return end
+    region._rrTexture = value
+    region:SetTexture(value)
+end
+
+local function setVertexColorIfChanged(region, r, g, b, a)
+    a = a == nil and 1 or a
+    local key = string.format("%.4f|%.4f|%.4f|%.4f", r or 0, g or 0, b or 0, a)
+    if region._rrVertexColor == key then return end
+    region._rrVertexColor = key
+    region:SetVertexColor(r or 0, g or 0, b or 0, a)
+end
+
+local function setShownIfChanged(frame, shouldShow)
+    shouldShow = shouldShow and true or false
+    if frame._rrShown == shouldShow then return end
+    frame._rrShown = shouldShow
+    if shouldShow then
+        frame:Show()
+    else
+        frame:Hide()
+    end
+end
+
+local function setBackdropColorsIfChanged(frame, bgR, bgG, bgB, bgA, borderR, borderG, borderB, borderA)
+    local bgKey = string.format("%.4f|%.4f|%.4f|%.4f", bgR or 0, bgG or 0, bgB or 0, bgA or 0)
+    if frame._rrBackdropBg ~= bgKey then
+        frame._rrBackdropBg = bgKey
+        frame:SetBackdropColor(bgR, bgG, bgB, bgA)
+    end
+    local borderKey = string.format("%.4f|%.4f|%.4f|%.4f", borderR or 0, borderG or 0, borderB or 0, borderA or 0)
+    if frame._rrBackdropBorder ~= borderKey then
+        frame._rrBackdropBorder = borderKey
+        frame:SetBackdropBorderColor(borderR, borderG, borderB, borderA)
+    end
+end
+
+local function setFavoriteButtonState(button, isFavorite)
+    if not button or not button.icon then return end
+    setTextureIfChanged(button.icon, FAVORITE_ICON)
+    button.icon:SetTexCoord(0, 1, 0, 1)
+    if isFavorite then
+        setVertexColorIfChanged(button.icon, 1.0, 1.0, 1.0, 1)
+    else
+        setVertexColorIfChanged(button.icon, 0.34, 0.40, 0.55, 0.95)
+    end
+end
+
 function UI:OnInitialize()
-    self.selectedProfession = (Addon.db and Addon.db.profile and Addon.db.profile.selectedProfession) or "All"
+    self.selectedProfession = Addon.db and Addon.db.profile and Addon.db.profile.selectedProfession or nil
     self.sortMode = (Addon.db and Addon.db.profile and Addon.db.profile.sortMode) or "alpha"
     self.selectedRecipeKey = nil
     self.searchText = ""
+end
+
+local function buildRefreshPlan(reasons)
+    local plan = {
+        status = false,
+        professions = false,
+        list = false,
+        detail = false,
+        visibleRows = false,
+    }
+
+    if not reasons or next(reasons) == nil then
+        plan.status = true
+        plan.professions = true
+        plan.list = true
+        plan.detail = true
+        plan.visibleRows = true
+        return plan
+    end
+
+    for reason in pairs(reasons) do
+        if reason == "coordinator" or reason == "queue" then
+            plan.status = true
+        elseif reason == "roster" then
+            plan.status = true
+            plan.list = true
+            plan.detail = true
+        elseif reason == "item-cache" then
+            plan.visibleRows = true
+            plan.detail = true
+        elseif reason == "detect-professions" then
+            plan.professions = true
+            plan.status = true
+        else
+            plan.status = true
+            plan.professions = true
+            plan.list = true
+            plan.detail = true
+            plan.visibleRows = true
+        end
+    end
+
+    if plan.list then
+        plan.detail = true
+    end
+
+    return plan
 end
 
 function UI:OnEnable()
@@ -407,13 +513,17 @@ function UI:CreateMainFrame()
         if UI._searchTimer then
             Addon:CancelTimer(UI._searchTimer, true)
         end
+        local delay = SEARCH_DEBOUNCE
+        if UI.selectedProfession == nil and UI.searchText ~= "" then
+            delay = GLOBAL_SEARCH_DEBOUNCE
+        end
         UI._searchTimer = Addon:ScheduleTimer(function()
             UI._searchTimer = nil
             if not UI.frame or not UI.frame:IsShown() then return end
             UI:RefreshRecipeList()
             UI:RefreshDetailPanel()
             UI:RefreshSummaryCards()
-        end, SEARCH_DEBOUNCE)
+        end, delay)
     end)
     f.searchBox = searchBox
 
@@ -431,8 +541,12 @@ function UI:CreateMainFrame()
             b:SetPoint("TOPLEFT", lastProf, "BOTTOMLEFT", 0, -6)
         end
         b:SetScript("OnClick", function()
-            UI.selectedProfession = profName
-            if Addon.db and Addon.db.profile then Addon.db.profile.selectedProfession = profName end
+            if UI.selectedProfession == profName then
+                UI.selectedProfession = nil
+            else
+                UI.selectedProfession = profName
+            end
+            if Addon.db and Addon.db.profile then Addon.db.profile.selectedProfession = UI.selectedProfession end
             UI.selectedRecipeKey = nil
             UI:Refresh()
         end)
@@ -501,7 +615,7 @@ function UI:CreateMainFrame()
 
     local detailTitle = right:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     detailTitle:SetPoint("TOPLEFT", 12, -12)
-    detailTitle:SetPoint("TOPRIGHT", -44, -12)
+    detailTitle:SetPoint("TOPRIGHT", -52, -12)
     detailTitle:SetJustifyH("LEFT")
     if detailTitle.SetWordWrap then
         detailTitle:SetWordWrap(false)
@@ -513,13 +627,11 @@ function UI:CreateMainFrame()
     f.detailTitle = detailTitle
 
     local detailFavoriteButton = CreateFrame("Button", nil, right)
-    detailFavoriteButton:SetSize(22, 22)
-    detailFavoriteButton:SetPoint("TOPRIGHT", -12, -10)
+    detailFavoriteButton:SetSize(18, 18)
+    detailFavoriteButton:SetPoint("TOPRIGHT", -14, -12)
     detailFavoriteButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-    detailFavoriteButton.text = detailFavoriteButton:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    detailFavoriteButton.text:SetAllPoints()
-    detailFavoriteButton.text:SetJustifyH("CENTER")
-    detailFavoriteButton.text:SetJustifyV("MIDDLE")
+    detailFavoriteButton.icon = detailFavoriteButton:CreateTexture(nil, "ARTWORK")
+    detailFavoriteButton.icon:SetAllPoints()
     detailFavoriteButton:SetScript("OnClick", function(self, button)
         if button ~= "LeftButton" then return end
         if not self.recipeKey then return end
@@ -539,7 +651,7 @@ function UI:CreateMainFrame()
 
     local detailTitleButton = CreateFrame("Button", nil, right)
     detailTitleButton:SetPoint("TOPLEFT", 10, -10)
-    detailTitleButton:SetPoint("TOPRIGHT", detailFavoriteButton, "TOPLEFT", -8, 0)
+    detailTitleButton:SetPoint("TOPRIGHT", detailFavoriteButton, "TOPLEFT", -10, 0)
     detailTitleButton:SetHeight(18)
     detailTitleButton:SetScript("OnClick", function(_, button)
         if button ~= "LeftButton" or not IsShiftKeyDown() then return end
@@ -607,7 +719,7 @@ function UI:EnsureRecipeRow(index)
     if row then return row end
 
     row = CreateFrame("Button", nil, self.frame.recipeContent, "BackdropTemplate")
-    row:SetSize(314, 56)
+    row:SetSize(314, 70)
     createBackdrop(row, COLOR_ROW[1], COLOR_ROW[2], COLOR_ROW[3], COLOR_ROW[4], 0.22, 0.22, 0.22, 1)
 
     local stripe = row:CreateTexture(nil, "ARTWORK")
@@ -625,7 +737,7 @@ function UI:EnsureRecipeRow(index)
 
     local title = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     title:SetPoint("TOPLEFT", icon, "TOPRIGHT", 12, -1)
-    title:SetPoint("TOPRIGHT", -38, -8)
+    title:SetPoint("TOPRIGHT", -40, -1)
     title:SetJustifyH("LEFT")
     if title.SetWordWrap then
         title:SetWordWrap(false)
@@ -635,20 +747,31 @@ function UI:EnsureRecipeRow(index)
     end
     row.title = title
 
+    local stats = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    stats:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -5)
+    stats:SetPoint("TOPRIGHT", -40, -22)
+    stats:SetJustifyH("LEFT")
+    stats:SetTextColor(0.82, 0.82, 0.82)
+    row.stats = stats
+
     local meta = row:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    meta:SetPoint("BOTTOMLEFT", icon, "BOTTOMRIGHT", 12, 7)
-    meta:SetPoint("BOTTOMRIGHT", -56, 7)
+    meta:SetPoint("TOPLEFT", stats, "BOTTOMLEFT", 0, -4)
+    meta:SetPoint("TOPRIGHT", -40, -42)
     meta:SetJustifyH("LEFT")
+    if meta.SetWordWrap then
+        meta:SetWordWrap(false)
+    end
+    if meta.SetMaxLines then
+        meta:SetMaxLines(1)
+    end
     row.meta = meta
 
     local favoriteButton = CreateFrame("Button", nil, row)
     favoriteButton:SetSize(20, 20)
-    favoriteButton:SetPoint("TOPRIGHT", -8, -6)
+    favoriteButton:SetPoint("RIGHT", -10, 0)
     favoriteButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-    favoriteButton.text = favoriteButton:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    favoriteButton.text:SetAllPoints()
-    favoriteButton.text:SetJustifyH("CENTER")
-    favoriteButton.text:SetJustifyV("MIDDLE")
+    favoriteButton.icon = favoriteButton:CreateTexture(nil, "ARTWORK")
+    favoriteButton.icon:SetAllPoints()
     favoriteButton:SetScript("OnClick", function(self, button)
         if button ~= "LeftButton" then return end
         if not UI.selectedRecipeKey or UI.selectedRecipeKey ~= self.recipeKey then
@@ -695,17 +818,13 @@ function UI:EnsureDetailLine(index)
     if line then return line end
     line = CreateFrame("Button", nil, self.frame.detailContent)
     line:SetSize(420, 22)
-    line:SetPoint("TOPLEFT", 0, -((index - 1) * 22))
     line.text = line:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     line.text:SetPoint("TOPLEFT", 0, 0)
-    line.text:SetPoint("BOTTOMRIGHT", -24, 0)
+    line.text:SetPoint("TOPRIGHT", -4, 0)
     line.text:SetJustifyH("LEFT")
-    line.text:SetSpacing(4)
+    line.text:SetSpacing(2)
     if line.text.SetWordWrap then
-        line.text:SetWordWrap(false)
-    end
-    if line.text.SetMaxLines then
-        line.text:SetMaxLines(1)
+        line.text:SetWordWrap(true)
     end
 
     line.actionButton = CreateFrame("Button", nil, line)
@@ -770,22 +889,22 @@ function UI:EnsureDetailLine(index)
 end
 
 function UI:IsFavorite(recipeKey)
-    if not Addon.db or not Addon.db.profile or not Addon.db.profile.favorites then
+    if not Addon.charDB or not Addon.charDB.favorites then
         return false
     end
-    return Addon.db.profile.favorites[tostring(recipeKey)] or false
+    return Addon.charDB.favorites[tostring(recipeKey)] or false
 end
 
 function UI:ToggleFavorite(recipeKey)
-    if not Addon.db or not Addon.db.profile then return end
-    if not Addon.db.profile.favorites then
-        Addon.db.profile.favorites = {}
+    if not Addon.charDB then return end
+    if not Addon.charDB.favorites then
+        Addon.charDB.favorites = {}
     end
     local key = tostring(recipeKey)
-    if Addon.db.profile.favorites[key] then
-        Addon.db.profile.favorites[key] = nil
+    if Addon.charDB.favorites[key] then
+        Addon.charDB.favorites[key] = nil
     else
-        Addon.db.profile.favorites[key] = true
+        Addon.charDB.favorites[key] = true
     end
     UI:RefreshRecipeList()
     UI:RefreshDetailPanel()
@@ -817,29 +936,39 @@ function UI:RefreshStatusBar()
     elseif queued and queued > 0 then
         subtitle = subtitle .. string.format(" • %d update(s) queued", queued)
     end
-    self.frame.subtitle:SetText(subtitle)
+    setTextIfChanged(self.frame.subtitle, subtitle)
 
     if onlineNodes > 1 then
-        self.frame.syncDot:SetVertexColor(0.2, 0.9, 0.2, 1)
+        setVertexColorIfChanged(self.frame.syncDot, 0.2, 0.9, 0.2, 1)
         self.frame.autoLabel:SetTextColor(0.7, 0.95, 0.7)
     elseif onlineNodes == 1 then
-        self.frame.syncDot:SetVertexColor(1.0, 0.82, 0.0, 1)
+        setVertexColorIfChanged(self.frame.syncDot, 1.0, 0.82, 0.0, 1)
         self.frame.autoLabel:SetTextColor(1.0, 0.9, 0.45)
     else
-        self.frame.syncDot:SetVertexColor(0.75, 0.2, 0.2, 1)
+        setVertexColorIfChanged(self.frame.syncDot, 0.75, 0.2, 0.2, 1)
         self.frame.autoLabel:SetTextColor(1.0, 0.75, 0.75)
     end
 
-    self.frame.cards.members.value:SetText(tostring(members))
-    self.frame.cards.network.value:SetText(string.format("%d / %d", onlineNodes, state and state.registry or 0))
-    self.frame.cards.updated.value:SetText(ageText(summary.updatedAt))
-    self.frame.cards.updated.text:SetText("Last local update")
+    setTextIfChanged(self.frame.cards.members.value, tostring(members))
+    setTextIfChanged(self.frame.cards.network.value, string.format("%d / %d", onlineNodes, state and state.registry or 0))
+    setTextIfChanged(self.frame.cards.updated.value, ageText(summary.updatedAt))
+    setTextIfChanged(self.frame.cards.updated.text, "Last local update")
 end
 
 function UI:RefreshSummaryCards()
     local shown = self.currentRecipeRows and #self.currentRecipeRows or 0
-    self.frame.cards.recipes.value:SetText(tostring(shown))
-    self.frame.cards.recipes.text:SetText(self.selectedProfession == "All" and "Recipes shown" or (self.selectedProfession .. " shown"))
+    setTextIfChanged(self.frame.cards.recipes.value, tostring(shown))
+    local label
+    if self.selectedProfession == "Favorites" then
+        label = "Favorites shown"
+    elseif self.selectedProfession then
+        label = self.selectedProfession .. " shown"
+    elseif self.searchText and self.searchText ~= "" then
+        label = "Search results"
+    else
+        label = "Recipes shown"
+    end
+    setTextIfChanged(self.frame.cards.recipes.text, label)
 end
 
 function UI:RefreshProfessionButtons()
@@ -848,8 +977,6 @@ function UI:RefreshProfessionButtons()
         local button = self.frame.profButtons[profName]
         if profName == "Favorites" then
             button:SetLabel("Favorites")
-        elseif profName == "All" then
-            button:SetLabel("All")
         else
             button:SetLabel(profName, getProfessionIcon(profName))
         end
@@ -859,7 +986,16 @@ end
 
 function UI:RefreshRecipeList()
     if not self.frame then return end
-    local rows = Addon.Data:GetRecipeList(self.selectedProfession == "Favorites" and "All" or self.selectedProfession, self.searchText, self.sortMode)
+    local effectiveProfession = self.selectedProfession
+    if effectiveProfession == "Favorites" then
+        effectiveProfession = nil
+    end
+    local globalSearch = (self.selectedProfession == nil and self.searchText and self.searchText ~= "")
+    local canRunGlobalSearch = globalSearch and string.len(self.searchText or "") >= GLOBAL_SEARCH_MIN_CHARS
+    local rows = {}
+    if self.selectedProfession == "Favorites" or self.selectedProfession ~= nil or canRunGlobalSearch then
+        rows = Addon.Data:GetRecipeList(effectiveProfession, self.searchText, self.sortMode)
+    end
     
     -- Filter by favorites if selected
     if self.selectedProfession == "Favorites" then
@@ -873,9 +1009,19 @@ function UI:RefreshRecipeList()
     end
     
     self.currentRecipeRows = rows
-    local headerText = self.selectedProfession == "Favorites" and "Favorite recipes" 
-        or (self.selectedProfession == "All" and "Recipes" or (self.selectedProfession .. " recipes"))
-    self.frame.recipeHeader:SetText(headerText)
+    local headerText
+    if self.selectedProfession == "Favorites" then
+        headerText = "Favorite recipes"
+    elseif self.selectedProfession then
+        headerText = self.selectedProfession .. " recipes"
+    elseif globalSearch and not canRunGlobalSearch then
+        headerText = string.format("Type at least %d characters to search all recipes", GLOBAL_SEARCH_MIN_CHARS)
+    elseif globalSearch then
+        headerText = "Search results"
+    else
+        headerText = "Select a profession or search"
+    end
+    setTextIfChanged(self.frame.recipeHeader, headerText)
     self.frame.sortAlpha:SetSelected(self.sortMode == "alpha")
     self.frame.sortRarity:SetSelected(self.sortMode == "rarity")
 
@@ -897,20 +1043,14 @@ function UI:RefreshRecipeList()
 
     for i, rowData in ipairs(rows) do
         local row = self:EnsureRecipeRow(i)
-        row:SetPoint("TOPLEFT", 0, -((i - 1) * 56))
+        row:SetPoint("TOPLEFT", 0, -((i - 1) * 70))
         row.recipeKey = rowData.recipeKey
         
         -- Update favorite button appearance
         local isFav = self:IsFavorite(rowData.recipeKey)
         row.favoriteButton.isFavorite = isFav
         row.favoriteButton.recipeKey = rowData.recipeKey
-        if isFav then
-            row.favoriteButton.text:SetText("*")
-            row.favoriteButton.text:SetTextColor(1.0, 0.84, 0.0, 1)
-        else
-            row.favoriteButton.text:SetText("*")
-            row.favoriteButton.text:SetTextColor(0.45, 0.45, 0.45, 1)
-        end
+        setFavoriteButtonState(row.favoriteButton, isFav)
         
         local detail = rowData.detail or {}
         local colorItemID = detail.createdItemID or detail.recipeItemID
@@ -922,82 +1062,145 @@ function UI:RefreshRecipeList()
         local titleText = rowData.label
         local rowIcon = detail.createdItemIcon or detail.recipeItemIcon or detail.spellIcon or getItemIcon(colorItemID)
         if rowIcon then
-            row.icon:SetTexture(rowIcon)
-            row.icon:Show()
+            setTextureIfChanged(row.icon, rowIcon)
+            setShownIfChanged(row.icon, true)
         else
-            row.icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
-            row.icon:Show()
+            setTextureIfChanged(row.icon, "Interface\\Icons\\INV_Misc_QuestionMark")
+            setShownIfChanged(row.icon, true)
         end
         if colorItemID then
             titleText = getItemColorizedName(colorItemID, rowData.label)
             local sr, sg, sb = getQualityColor(getItemQuality(colorItemID) or 1)
-            row.stripe:SetVertexColor(sr, sg, sb, 1)
+            setVertexColorIfChanged(row.stripe, sr, sg, sb, 1)
         else
-            row.stripe:SetVertexColor(0.42, 0.42, 0.42, 1)
+            setVertexColorIfChanged(row.stripe, 0.42, 0.42, 0.42, 1)
         end
-        row.title:SetText(titleText)
+        setTextIfChanged(row.title, titleText)
+        local statsParts = {
+            string.format("%d crafter(s)", rowData.crafterCount or 0),
+        }
+        if (rowData.onlineCount or 0) > 0 then
+            statsParts[#statsParts + 1] = string.format("|cff55d66b%d online|r", rowData.onlineCount or 0)
+        end
+        setTextIfChanged(row.stats, table.concat(statsParts, "\n"))
         local metaParts = {}
-        if self.selectedProfession ~= "Favorites" and self.selectedProfession == "All" and rowData.professionList and #rowData.professionList > 0 then
+        if self.selectedProfession == nil and rowData.professionList and #rowData.professionList > 0 then
             metaParts[#metaParts + 1] = table.concat(rowData.professionList, ", ")
         end
-        metaParts[#metaParts + 1] = string.format("%d crafter(s)", rowData.crafterCount or 0)
-        if (rowData.onlineCount or 0) > 0 then
-            metaParts[#metaParts + 1] = string.format("%d online", rowData.onlineCount or 0)
-        end
         row.meta:SetText(table.concat(metaParts, "  •  "))
-        if self.selectedRecipeKey == rowData.recipeKey then
-            row:SetBackdropColor(COLOR_ROW_SELECTED[1], COLOR_ROW_SELECTED[2], COLOR_ROW_SELECTED[3], COLOR_ROW_SELECTED[4])
-            row:SetBackdropBorderColor(1, 0.82, 0, 0.95)
-        else
-            row:SetBackdropColor(COLOR_ROW[1], COLOR_ROW[2], COLOR_ROW[3], COLOR_ROW[4])
-            row:SetBackdropBorderColor(0.22, 0.22, 0.22, 1)
+        metaParts = {}
+        if self.selectedProfession == nil and rowData.professionList and #rowData.professionList > 0 then
+            metaParts[#metaParts + 1] = table.concat(rowData.professionList, ", ")
         end
-        row:Show()
+        setTextIfChanged(row.meta, table.concat(metaParts, " - "))
+        if self.selectedRecipeKey == rowData.recipeKey then
+            setBackdropColorsIfChanged(row, COLOR_ROW_SELECTED[1], COLOR_ROW_SELECTED[2], COLOR_ROW_SELECTED[3], COLOR_ROW_SELECTED[4], 1, 0.82, 0, 0.95)
+        else
+            setBackdropColorsIfChanged(row, COLOR_ROW[1], COLOR_ROW[2], COLOR_ROW[3], COLOR_ROW[4], 0.22, 0.22, 0.22, 1)
+        end
+        setShownIfChanged(row, true)
     end
     for i = #rows + 1, #self.frame.recipeRows do
-        self.frame.recipeRows[i]:Hide()
+        setShownIfChanged(self.frame.recipeRows[i], false)
     end
-    self.frame.recipeContent:SetHeight(math.max(1, #rows * 56 + 10))
+    local contentHeight = math.max(1, #rows * 70 + 10)
+    if self.frame.recipeContent._rrHeight ~= contentHeight then
+        self.frame.recipeContent._rrHeight = contentHeight
+        self.frame.recipeContent:SetHeight(contentHeight)
+    end
     self:RefreshSummaryCards()
 end
 
+function UI:RefreshVisibleRecipeRowAssets()
+    if not self.frame or not self.currentRecipeRows then
+        return
+    end
+
+    for i, rowData in ipairs(self.currentRecipeRows) do
+        local row = self.frame.recipeRows[i]
+        if not row or row._rrShown == false then
+            break
+        end
+
+        local detail = Addon.Data:GetRecipeDisplayInfo(rowData.recipeKey) or rowData.detail or {}
+        rowData.detail = detail
+        rowData.label = (detail and detail.label) or rowData.label or tostring(rowData.recipeKey)
+
+        local colorItemID = detail.createdItemID or detail.recipeItemID
+        local titleText = rowData.label
+        if colorItemID then
+            titleText = getItemColorizedName(colorItemID, rowData.label)
+        end
+        setTextIfChanged(row.title, titleText)
+
+        local tooltipLink = (detail.createdItemID and ("item:" .. detail.createdItemID))
+            or (detail.recipeItemID and ("item:" .. detail.recipeItemID))
+            or (detail.spellID and ("spell:" .. detail.spellID))
+            or nil
+        row.tooltipLink = tooltipLink
+
+        local rowIcon = detail.createdItemIcon or detail.recipeItemIcon or detail.spellIcon or getItemIcon(colorItemID)
+        if rowIcon then
+            setTextureIfChanged(row.icon, rowIcon)
+            setShownIfChanged(row.icon, true)
+        else
+            setTextureIfChanged(row.icon, "Interface\\Icons\\INV_Misc_QuestionMark")
+            setShownIfChanged(row.icon, true)
+        end
+
+        if colorItemID then
+            local sr, sg, sb = getQualityColor(getItemQuality(colorItemID) or 1)
+            setVertexColorIfChanged(row.stripe, sr, sg, sb, 1)
+        else
+            setVertexColorIfChanged(row.stripe, 0.42, 0.42, 0.42, 1)
+        end
+    end
+end
+
 function UI:RenderDetailLines(lines, lineLinks, lineMeta)
+    local yOffset = 0
     for i, text in ipairs(lines) do
         local line = self:EnsureDetailLine(i)
-        line.text:SetText(text)
+        setTextIfChanged(line.text, text)
         line.link = lineLinks and lineLinks[i] or nil
         line.tooltipLink = nil
         line.requestTarget = nil
         local meta = lineMeta and lineMeta[i] or nil
+        line:ClearAllPoints()
+        line:SetPoint("TOPLEFT", 0, -yOffset)
+        line:SetWidth(420)
         if meta and meta.canRequest and meta.memberKey then
             line.requestTarget = whisperTargetFromMemberKey(meta.memberKey)
-            line.actionButton:Show()
-            if line._lastActionText ~= text then
-                local textWidth = line.text:GetStringWidth() or 0
-                local desiredX = math.min(392, math.max(24, textWidth + 14))
-                line._lastActionText = text
-                line._lastActionX = desiredX
-                line.actionButton:ClearAllPoints()
-                line.actionButton:SetPoint("LEFT", line, "LEFT", desiredX, 0)
-            elseif line._lastActionX then
-                line.actionButton:ClearAllPoints()
-                line.actionButton:SetPoint("LEFT", line, "LEFT", line._lastActionX, 0)
-            end
+            setShownIfChanged(line.actionButton, true)
+            line.text:ClearAllPoints()
+            line.text:SetPoint("TOPLEFT", 0, 0)
+            line.text:SetPoint("TOPRIGHT", -24, 0)
         else
-            line.actionButton:Hide()
-            line._lastActionText = nil
-            line._lastActionX = nil
+            setShownIfChanged(line.actionButton, false)
+            line.text:ClearAllPoints()
+            line.text:SetPoint("TOPLEFT", 0, 0)
+            line.text:SetPoint("TOPRIGHT", -4, 0)
         end
         if meta and meta.tooltipLink then
             line.tooltipLink = meta.tooltipLink
         end
         line.isOfflineToggle = meta and meta.isOfflineToggle or false
-        line:Show()
+        local textHeight = math.max(16, math.ceil(line.text:GetStringHeight() or 0))
+        local lineHeight = math.max(20, textHeight + 6)
+        line:SetHeight(lineHeight)
+        line.actionButton:ClearAllPoints()
+        line.actionButton:SetPoint("RIGHT", -2, 0)
+        setShownIfChanged(line, true)
+        yOffset = yOffset + lineHeight + 4
     end
     for i = #lines + 1, #self.frame.detailLines do
-        self.frame.detailLines[i]:Hide()
+        setShownIfChanged(self.frame.detailLines[i], false)
     end
-    self.frame.detailContent:SetHeight(math.max(1, #lines * 22 + 18))
+    local detailHeight = math.max(1, yOffset + 10)
+    if self.frame.detailContent._rrHeight ~= detailHeight then
+        self.frame.detailContent._rrHeight = detailHeight
+        self.frame.detailContent:SetHeight(detailHeight)
+    end
 end
 
 function UI:RefreshDetailPanel()
@@ -1007,12 +1210,11 @@ function UI:RefreshDetailPanel()
     local lineMeta = {}
     if not self.selectedRecipeKey then
         self.currentDetail = nil
-        self.frame.detailTitle:SetText("Recipe details")
-        self.frame.detailSub:SetText("Select a recipe to see materials and available crafters.")
+        setTextIfChanged(self.frame.detailTitle, "Recipe details")
+        setTextIfChanged(self.frame.detailSub, "Select a recipe to see materials and available crafters.")
         self.frame.detailFavoriteButton.recipeKey = nil
         self.frame.detailFavoriteButton.isFavorite = false
-        self.frame.detailFavoriteButton.text:SetText("*")
-        self.frame.detailFavoriteButton.text:SetTextColor(0.35, 0.35, 0.35, 1)
+        setFavoriteButtonState(self.frame.detailFavoriteButton, false)
         if self.frame.detailTooltip then
             self.frame.detailTooltip:Hide()
         end
@@ -1031,21 +1233,16 @@ function UI:RefreshDetailPanel()
     if titleItemID then
         titleText = getItemColorizedName(titleItemID, titleText)
     end
-    self.frame.detailTitle:SetText(iconTagText .. " " .. titleText)
+    setTextIfChanged(self.frame.detailTitle, iconTagText .. " " .. titleText)
     self.frame.detailFavoriteButton.recipeKey = self.selectedRecipeKey
     self.frame.detailFavoriteButton.isFavorite = isFavorite
-    self.frame.detailFavoriteButton.text:SetText("*")
-    if isFavorite then
-        self.frame.detailFavoriteButton.text:SetTextColor(1.0, 0.84, 0.0, 1)
-    else
-        self.frame.detailFavoriteButton.text:SetTextColor(0.45, 0.45, 0.45, 1)
-    end
+    setFavoriteButtonState(self.frame.detailFavoriteButton, isFavorite)
 
     local subtitleParts = {}
     if detail.professionName then subtitleParts[#subtitleParts + 1] = detail.professionName end
     if detail.directEnchant then subtitleParts[#subtitleParts + 1] = "Direct enchant" end
     subtitleParts[#subtitleParts + 1] = string.format("%d crafter(s)", detail.crafterCount or 0)
-    self.frame.detailSub:SetText(table.concat(subtitleParts, "  •  "))
+    setTextIfChanged(self.frame.detailSub, table.concat(subtitleParts, "  •  "))
 
     -- Reset scroll position (no embedded tooltip anymore)
     self.frame.detailScroll:SetPoint("TOPLEFT", 8, -54)
@@ -1109,7 +1306,7 @@ function UI:RefreshDetailPanel()
             local name = getItemColorizedName(reagent.itemID, safeText(reagent.name))
             local unitCost = formatMoney(reagent.unitCost)
             local lineCost = formatMoney(reagent.totalCost)
-            lines[#lines + 1] = string.format("%s %s x%d", materialTextureTag(icon), name, reagent.count or 1)
+            lines[#lines + 1] = string.format("%s  %s x%d", materialTextureTag(icon), name, reagent.count or 1)
             lineLinks[#lines] = getItemLinkByID(reagent.itemID)
             lineMeta[#lines] = {
                 tooltipLink = getItemLinkByID(reagent.itemID),
@@ -1141,17 +1338,28 @@ function UI:Toggle()
         self.frame:Hide()
     else
         self.frame:Show()
-        self:Refresh()
+        self:Refresh(nil)
         self.frame.searchBox:SetText(self.searchText or "")
     end
 end
 
-function UI:Refresh()
+function UI:Refresh(reasons)
     if not self.frame or not self.frame:IsShown() then return end
-    self:RefreshStatusBar()
-    self:RefreshProfessionButtons()
-    self:RefreshRecipeList()
-    self:RefreshDetailPanel()
+    local plan = buildRefreshPlan(reasons)
+    if plan.status then
+        self:RefreshStatusBar()
+    end
+    if plan.professions then
+        self:RefreshProfessionButtons()
+    end
+    if plan.list then
+        self:RefreshRecipeList()
+    elseif plan.visibleRows then
+        self:RefreshVisibleRecipeRowAssets()
+    end
+    if plan.detail then
+        self:RefreshDetailPanel()
+    end
 end
 
 function UI:ShareSelectedRecipe(channelInput)

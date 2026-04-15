@@ -46,13 +46,12 @@ local DB_DEFAULTS = {
         members = {},
     },
     profile = {
-        selectedProfession = "All",
+        selectedProfession = nil,
         sortMode = "alpha",
         minimap = {
             hide = false,
-            angle = 220,
+            minimapPos = 220,
         },
-        favorites = {},  -- Set of recipe keys marked as favorites
     },
 }
 
@@ -89,8 +88,39 @@ local TITLE_ALIAS_SPELL_IDS = {
 }
 
 local localeMap
+local recipeValidityCache = {}
+local atlasHandlesCache
+local atlasProfessionNameCache = {}
+
+local function cloneArray(src)
+    if type(src) ~= "table" then return src end
+    local out = {}
+    for i = 1, #src do
+        out[i] = src[i]
+    end
+    return out
+end
+
+local function cloneAtlasInfo(info)
+    if type(info) ~= "table" then return info end
+    local out = {}
+    for k, v in pairs(info) do
+        out[k] = v
+    end
+    if info.reagentIDs then
+        out.reagentIDs = cloneArray(info.reagentIDs)
+    end
+    if info.reagentCounts then
+        out.reagentCounts = cloneArray(info.reagentCounts)
+    end
+    return out
+end
 
 local function getAtlasLootHandles()
+    if atlasHandlesCache and atlasHandlesCache.recipe and atlasHandlesCache.profession then
+        return atlasHandlesCache.recipe, atlasHandlesCache.profession
+    end
+
     -- Build candidates without nil holes (ipairs stops at first nil).
     local candidates = {}
     if type(_G.AtlasLootClassic) == "table" then
@@ -106,6 +136,10 @@ local function getAtlasLootHandles()
         local recipe = data.Recipe
         local profession = data.Profession
         if type(recipe) == "table" and type(profession) == "table" then
+            atlasHandlesCache = {
+                recipe = recipe,
+                profession = profession,
+            }
             return recipe, profession
         end
     end
@@ -115,9 +149,14 @@ end
 
 local function getAtlasLootProfessionName(professionID)
     if not professionID then return nil end
+    if atlasProfessionNameCache[professionID] ~= nil then
+        return atlasProfessionNameCache[professionID]
+    end
     local _, profession = getAtlasLootHandles()
     if profession and type(profession.GetProfessionName) == "function" then
-        return profession.GetProfessionName(professionID)
+        local name = profession.GetProfessionName(professionID)
+        atlasProfessionNameCache[professionID] = name
+        return name
     end
     return nil
 end
@@ -169,14 +208,25 @@ local CRAFT_RANK_KEYWORDS = {
 local function isValidRecipeKey(recipeKey)
     local n = tonumber(recipeKey)
     if not n then return false end
-    if n > 0 then return true end  -- item-based: always valid
+    if recipeValidityCache[n] ~= nil then
+        return recipeValidityCache[n]
+    end
+    if n > 0 then
+        recipeValidityCache[n] = true
+        return true
+    end  -- item-based: always valid
     local _, profession = getAtlasLootHandles()
     if profession and profession.GetProfessionData then
-        return profession.GetProfessionData(-n) ~= nil
+        local valid = profession.GetProfessionData(-n) ~= nil
+        recipeValidityCache[n] = valid
+        return valid
     end
     -- Fallback: no AtlasLoot — check spell subtext for craft rank keywords
     local spellName = safeGetSpellName(-n)
-    if not spellName then return true end  -- can't resolve spell: benefit of doubt
+    if not spellName then
+        recipeValidityCache[n] = true
+        return true
+    end  -- can't resolve spell: benefit of doubt
     local subtext
     if type(GetSpellSubtext) == "function" then
         subtext = GetSpellSubtext(-n)
@@ -184,8 +234,12 @@ local function isValidRecipeKey(recipeKey)
         -- No API to check subtext: allow through
         return true
     end
-    if subtext and CRAFT_RANK_KEYWORDS[subtext] then return true end
+    if subtext and CRAFT_RANK_KEYWORDS[subtext] then
+        recipeValidityCache[n] = true
+        return true
+    end
     -- No recognised craft subtext: block it
+    recipeValidityCache[n] = false
     return false
 end
 
@@ -438,6 +492,16 @@ end
 function Data:OnInitialize()
     Addon.db = LibStub("AceDB-3.0"):New("RecipeRegistryDB", DB_DEFAULTS, true)
     self.db = Addon.db
+    if type(_G.RecipeRegistryCharDB) ~= "table" then
+        _G.RecipeRegistryCharDB = {}
+    end
+    if type(_G.RecipeRegistryCharDB.favorites) ~= "table" then
+        _G.RecipeRegistryCharDB.favorites = {}
+    end
+    Addon.charDB = _G.RecipeRegistryCharDB
+    self._atlasRecipeInfoCache = {}
+    self._atlasSpellInfoCache = {}
+    self._atlasCreatedItemInfoCache = {}
     -- When true, the next TRADE_SKILL_SHOW / CRAFT_SHOW will run a full scan
     -- even if recipe data already exists in the DB. Set by recipe-change events.
     -- Starts false: data loaded from DB is considered valid until a change fires.
@@ -445,14 +509,22 @@ function Data:OnInitialize()
     if type(self.db.profile.minimap) ~= "table" then
         self.db.profile.minimap = {
             hide = false,
-            angle = 220,
+            minimapPos = 220,
         }
     else
         if self.db.profile.minimap.hide == nil then self.db.profile.minimap.hide = false end
-        if type(self.db.profile.minimap.angle) ~= "number" then self.db.profile.minimap.angle = 220 end
-    end
-    if type(self.db.profile.favorites) ~= "table" then
-        self.db.profile.favorites = {}
+        if type(self.db.profile.minimap.minimapPos) ~= "number" then
+            local legacyAngle = self.db.profile.minimap.angle
+            if type(legacyAngle) == "number" then
+                if math.abs(legacyAngle) <= (math.pi * 2 + 0.001) then
+                    self.db.profile.minimap.minimapPos = math.deg(legacyAngle) % 360
+                else
+                    self.db.profile.minimap.minimapPos = legacyAngle % 360
+                end
+            else
+                self.db.profile.minimap.minimapPos = 220
+            end
+        end
     end
     self._onlineCache = {}
     self._currentProfs = {}
@@ -491,10 +563,22 @@ function Data:GetOrCreateMember(memberKey)
     return db[memberKey]
 end
 
-function Data:InvalidateRecipeCaches()
+function Data:InvalidateRecipeCaches(scope)
+    if scope == "list" then
+        self._recipeListCache = nil
+        return
+    end
+    if scope == "presence" then
+        self._recipeListCache = nil
+        self._recipeCraftersCache = nil
+        self._recipeIndex = nil
+        return
+    end
+
     self._recipeListCache = nil
     self._recipeDetailCache = nil
     self._recipeCraftersCache = nil
+    self._recipeIndex = nil
 end
 
 function Data:CleanInvalidRecipes()
@@ -979,6 +1063,57 @@ function Data:GetCraftersForItem(itemID)
     return rows
 end
 
+function Data:BuildRecipeIndex()
+    local index = {}
+    for memberKey, entry in pairs(self:GetMembersDB()) do
+        local profs = entry.professions or {}
+        local isOnline = self:IsMemberOnline(memberKey)
+        for currentProfName, prof in pairs(profs) do
+            for recipeKey in pairs(prof.recipes or {}) do
+                if isValidRecipeKey(recipeKey) then
+                    local row = index[recipeKey]
+                    if not row then
+                        row = {
+                            recipeKey = recipeKey,
+                            profNames = {},
+                            crafters = {},
+                            crafterRows = {},
+                            crafterCount = 0,
+                            onlineCount = 0,
+                        }
+                        index[recipeKey] = row
+                    end
+
+                    row.profNames[currentProfName] = true
+                    row.crafterRows[#row.crafterRows + 1] = {
+                        memberKey = memberKey,
+                        profession = currentProfName,
+                        online = isOnline,
+                        skillRank = prof.skillRank or 0,
+                        skillMaxRank = prof.skillMaxRank or 0,
+                        updatedAt = entry.updatedAt or 0,
+                    }
+
+                    if not row.crafters[memberKey] then
+                        row.crafters[memberKey] = true
+                        row.crafterCount = row.crafterCount + 1
+                        if isOnline then
+                            row.onlineCount = row.onlineCount + 1
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    self._recipeIndex = index
+    return index
+end
+
+function Data:GetRecipeIndex()
+    return self._recipeIndex or self:BuildRecipeIndex()
+end
+
 local function refreshDetailAssets(info)
     if not info then return end
 
@@ -1216,52 +1351,32 @@ function Data:GetRecipeList(profName, query, sortMode)
         return self._recipeListCache[cacheKey]
     end
 
-    local map = {}
-    for memberKey, entry in pairs(self:GetMembersDB()) do
-        local profs = entry.professions or {}
-        for currentProfName, prof in pairs(profs) do
-            if not profName or profName == "All" or currentProfName == profName then
-                for recipeKey in pairs(prof.recipes or {}) do
-                    if isValidRecipeKey(recipeKey) then
-                        local row = map[recipeKey]
-                        if not row then
-                            local detail = self:GetRecipeDisplayInfo(recipeKey)
-                            row = {
-                                recipeKey = recipeKey,
-                                detail = detail,
-                                label = (detail and detail.label) or self:ResolveRecipeLabel(recipeKey) or tostring(recipeKey),
-                                profNames = {},
-                                crafters = {},
-                                crafterCount = 0,
-                                onlineCount = 0,
-                            }
-                            map[recipeKey] = row
-                        end
-                        row.profNames[currentProfName] = true
-                        if not row.crafters[memberKey] then
-                            row.crafters[memberKey] = true
-                            row.crafterCount = row.crafterCount + 1
-                            if self:IsMemberOnline(memberKey) then
-                                row.onlineCount = row.onlineCount + 1
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-
     local out = {}
     local q = lowerSafe(query)
-    for _, row in pairs(map) do
-        local searchText = row.detail and row.detail.searchText or lowerSafe(row.label)
-        if q == "" or searchText:find(q, 1, true) then
+    local recipeIndex = self:GetRecipeIndex()
+    for recipeKey, indexed in pairs(recipeIndex) do
+        local include = (not profName or profName == "All")
+        if not include and indexed.profNames[profName] then
+            include = true
+        end
+        if include then
+            local detail = self:GetRecipeDisplayInfo(recipeKey)
+            local row = {
+                recipeKey = recipeKey,
+                detail = detail,
+                label = (detail and detail.label) or self:ResolveRecipeLabel(recipeKey) or tostring(recipeKey),
+                crafterCount = indexed.crafterCount or 0,
+                onlineCount = indexed.onlineCount or 0,
+            }
             row.professionList = {}
-            for currentProfName in pairs(row.profNames) do
+            for currentProfName in pairs(indexed.profNames) do
                 row.professionList[#row.professionList + 1] = currentProfName
             end
             sort(row.professionList)
-            out[#out + 1] = row
+            local searchText = row.detail and row.detail.searchText or lowerSafe(row.label)
+            if q == "" or searchText:find(q, 1, true) then
+                out[#out + 1] = row
+            end
         end
     end
 
@@ -1297,18 +1412,10 @@ function Data:GetRecipeCrafters(recipeKey)
     end
 
     local rows = {}
-    for memberKey, entry in pairs(self:GetMembersDB()) do
-        for profName, prof in pairs(entry.professions or {}) do
-            if prof.recipes and prof.recipes[recipeKey] then
-                rows[#rows + 1] = {
-                    memberKey = memberKey,
-                    profession = profName,
-                    online = self:IsMemberOnline(memberKey),
-                    skillRank = prof.skillRank or 0,
-                    skillMaxRank = prof.skillMaxRank or 0,
-                    updatedAt = entry.updatedAt or 0,
-                }
-            end
+    local indexed = self:GetRecipeIndex()[recipeKey]
+    if indexed and indexed.crafterRows then
+        for i = 1, #indexed.crafterRows do
+            rows[#rows + 1] = indexed.crafterRows[i]
         end
     end
     sort(rows, function(a, b)
@@ -1350,6 +1457,11 @@ function Data:HasAtlasLootResolver()
 end
 
 function Data:GetAtlasLootRecipeInfo(recipeItemID)
+    local cached = self._atlasRecipeInfoCache and self._atlasRecipeInfoCache[recipeItemID]
+    if cached then
+        return cloneAtlasInfo(cached)
+    end
+
     local recipe, profession = getAtlasLootHandles()
     if not recipe or not profession or not recipeItemID then return nil end
     local recipeData = recipe.GetRecipeData and recipe.GetRecipeData(recipeItemID)
@@ -1357,7 +1469,7 @@ function Data:GetAtlasLootRecipeInfo(recipeItemID)
     local spellID = recipeData[3]
     local spellData = spellID and profession.GetProfessionData and profession.GetProfessionData(spellID) or nil
     local createdItemID = spellID and profession.GetCreatedItemID and profession.GetCreatedItemID(spellID) or nil
-    return {
+    local info = {
         recipeItemID = recipeItemID,
         professionID = recipeData[1],
         minRank = recipeData[2],
@@ -1367,15 +1479,22 @@ function Data:GetAtlasLootRecipeInfo(recipeItemID)
         createdItemName = safeGetItemName(createdItemID),
         spellData = spellData,
     }
+    self._atlasRecipeInfoCache[recipeItemID] = cloneAtlasInfo(info)
+    return info
 end
 
 function Data:GetAtlasLootSpellInfo(spellID)
+    local cached = self._atlasSpellInfoCache and self._atlasSpellInfoCache[spellID]
+    if cached then
+        return cloneAtlasInfo(cached)
+    end
+
     local recipe, profession = getAtlasLootHandles()
     if not recipe or not profession or not spellID then return nil end
     local spellData = profession.GetProfessionData and profession.GetProfessionData(spellID)
     if not spellData then return nil end
     local recipeItemID = recipe.GetRecipeForSpell and recipe.GetRecipeForSpell(spellID) or nil
-    return {
+    local info = {
         spellID = spellID,
         spellName = safeGetSpellName(spellID),
         professionID = spellData[2],
@@ -1390,9 +1509,16 @@ function Data:GetAtlasLootSpellInfo(spellID)
         reagentCounts = spellData[7] or {},
         numCreated = spellData[8] or 1,
     }
+    self._atlasSpellInfoCache[spellID] = cloneAtlasInfo(info)
+    return info
 end
 
 function Data:GetAtlasLootCreatedItemInfo(createdItemID)
+    local cached = self._atlasCreatedItemInfoCache and self._atlasCreatedItemInfoCache[createdItemID]
+    if cached then
+        return cloneAtlasInfo(cached)
+    end
+
     local recipe, profession = getAtlasLootHandles()
     if not recipe or not profession or not createdItemID then return nil end
     local spellID = profession.GetCraftSpellForCreatedItem and profession.GetCraftSpellForCreatedItem(createdItemID) or nil
@@ -1400,6 +1526,7 @@ function Data:GetAtlasLootCreatedItemInfo(createdItemID)
     local info = self:GetAtlasLootSpellInfo(spellID) or {}
     info.createdItemID = createdItemID
     info.createdItemName = safeGetItemName(createdItemID)
+    self._atlasCreatedItemInfoCache[createdItemID] = cloneAtlasInfo(info)
     return info
 end
 
