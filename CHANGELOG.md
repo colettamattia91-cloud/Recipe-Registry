@@ -50,7 +50,7 @@ All notable changes to this project are documented in this file.
 - Fixed Beast Training (Hunter) spells being scanned as Enchanting recipes: `ScanCraft` now skips any CraftFrame that is not Enchanting.
 - Non-craft spells (e.g. Backstab, Blizzard, pet abilities) are now blocked at scan, outgoing sync, and incoming sync level via AtlasLoot validation with a spell-subtext fallback for clients without AtlasLoot.
 
-## [1.3.1] - 2026-04-05
+## [1.4.0] - 2026-04-16
 ### Added
 - Character-based favorites system: click the star icon in the recipe list to add/remove favorites.
 - Favorite toggle is also available in the detail panel header for the selected recipe.
