@@ -23,6 +23,37 @@ local function itemNameFromID(itemID)
     return name
 end
 
+local function extractItemIDFromQuery(query)
+    if not query or query == "" then return nil end
+    local text = tostring(query)
+    local itemID = text:match("|Hitem:(%d+)") or text:match("item:(%d+)")
+    return itemID and tonumber(itemID) or nil
+end
+
+local function extractItemLinkFromQuery(query)
+    if not query or query == "" then return nil end
+    local text = tostring(query)
+    local plainLink = text:match("(|Hitem:[^|]+|h%[[^%]]+%]|h)")
+    if plainLink then
+        return plainLink
+    end
+    local coloredLink = text:match("(|c%x+|Hitem:[^|]+|h%[[^%]]+%]|h|r)")
+    if coloredLink then
+        return coloredLink
+    end
+    return nil
+end
+
+local function extractItemNameFromQuery(query)
+    if not query or query == "" then return "" end
+    local text = tostring(query)
+    local linkedName = text:match("|h%[([^%]]+)%]|h")
+    if linkedName and linkedName ~= "" then
+        return linkedName
+    end
+    return text
+end
+
 local function formatMoney(copper)
     if type(copper) ~= "number" then return "n/a" end
     local g = math.floor(copper / 10000)
@@ -85,7 +116,7 @@ function Market:GetPriceFromTSM(itemID)
     return nil
 end
 
-function Market:GetPriceFromAuctionator(itemID)
+function Market:GetPriceFromAuctionator(itemID, itemLink)
     local auctionator = _G.Auctionator
     local api = auctionator and auctionator.API and auctionator.API.v1
     if not api then return nil end
@@ -98,10 +129,14 @@ function Market:GetPriceFromAuctionator(itemID)
         end
     end
 
-    if type(api.GetAuctionPriceByItemLink) == "function" and type(GetItemInfo) == "function" then
-        local _, itemLink = GetItemInfo(itemID)
-        if itemLink then
-            local ok, value = pcall(api.GetAuctionPriceByItemLink, "RecipeRegistry", itemLink)
+    if type(api.GetAuctionPriceByItemLink) == "function" then
+        local link = itemLink
+        if not link and type(GetItemInfo) == "function" then
+            local _, resolvedLink = GetItemInfo(itemID)
+            link = resolvedLink
+        end
+        if link then
+            local ok, value = pcall(api.GetAuctionPriceByItemLink, "RecipeRegistry", link)
             local copper = ok and clampCopper(value) or nil
             if copper and copper > 0 then
                 return copper, "Auctionator"
@@ -112,7 +147,7 @@ function Market:GetPriceFromAuctionator(itemID)
     return nil
 end
 
-function Market:GetMaterialCost(itemID)
+function Market:GetMaterialCost(itemID, itemLink)
     if not itemID then return nil, nil end
 
     local now = time()
@@ -123,7 +158,7 @@ function Market:GetMaterialCost(itemID)
 
     local price, source = self:GetPriceFromTSM(itemID)
     if not price then
-        price, source = self:GetPriceFromAuctionator(itemID)
+        price, source = self:GetPriceFromAuctionator(itemID, itemLink)
     end
 
     self.priceCache[itemID] = {
@@ -135,20 +170,21 @@ function Market:GetMaterialCost(itemID)
     return price, source
 end
 
-function Market:ResolveItemID(query)
+function Market:ResolveItemQuery(query)
     if not query or query == "" then return nil end
 
-    local fromLink = tostring(query):match("item:(%d+)")
+    local fromLink = extractItemIDFromQuery(query)
+    local itemLink = extractItemLinkFromQuery(query)
     if fromLink then
-        return tonumber(fromLink)
+        return fromLink, itemLink
     end
 
     local asNumber = tonumber(query)
     if asNumber then
-        return asNumber
+        return asNumber, itemLink
     end
 
-    local wanted = normalizeName(query)
+    local wanted = normalizeName(extractItemNameFromQuery(query))
     if wanted == "" then return nil end
 
     local function checkName(id)
@@ -163,12 +199,12 @@ function Market:ResolveItemID(query)
         local detail = Addon.Data:GetRecipeDetail(Addon.UI.selectedRecipeKey)
         if detail then
             local id = checkName(detail.createdItemID)
-            if id then return id end
+            if id then return id, itemLink end
             id = checkName(detail.recipeItemID)
-            if id then return id end
+            if id then return id, itemLink end
             for _, reagent in ipairs(detail.reagents or {}) do
                 id = checkName(reagent.itemID)
-                if id then return id end
+                if id then return id, itemLink end
             end
         end
     end
@@ -177,27 +213,27 @@ function Market:ResolveItemID(query)
         local rows = Addon.Data:GetRecipeList("All", "", "alpha") or {}
         local partialMatch = nil
         for _, row in ipairs(rows) do
-            local detail = row.detail or (Addon.Data.GetRecipeDetail and Addon.Data:GetRecipeDetail(row.recipeKey))
-            if detail then
-                local id = checkName(detail.createdItemID)
-                if id then return id end
-                id = checkName(detail.recipeItemID)
-                if id then return id end
-                for _, reagent in ipairs(detail.reagents or {}) do
-                    local itemID = reagent.itemID
-                    local n = normalizeName(itemNameFromID(itemID))
-                    if n ~= "" then
-                        if n == wanted then
-                            return itemID
-                        end
-                        if (not partialMatch) and n:find(wanted, 1, true) then
-                            partialMatch = itemID
+                local detail = row.detail or (Addon.Data.GetRecipeDetail and Addon.Data:GetRecipeDetail(row.recipeKey))
+                if detail then
+                    local id = checkName(detail.createdItemID)
+                    if id then return id, itemLink end
+                    id = checkName(detail.recipeItemID)
+                    if id then return id, itemLink end
+                    for _, reagent in ipairs(detail.reagents or {}) do
+                        local itemID = reagent.itemID
+                        local n = normalizeName(itemNameFromID(itemID))
+                        if n ~= "" then
+                            if n == wanted then
+                                return itemID, itemLink
+                            end
+                            if (not partialMatch) and n:find(wanted, 1, true) then
+                                partialMatch = itemID
                         end
                     end
                 end
             end
         end
-        if partialMatch then return partialMatch end
+        if partialMatch then return partialMatch, itemLink end
     end
 
     return nil
@@ -266,13 +302,13 @@ function Market:DumpStatus(rest)
         return
     end
 
-    local itemID = self:ResolveItemID(query)
+    local itemID, itemLink = self:ResolveItemQuery(query)
     if not itemID then
         Addon:Print(string.format("Could not resolve item from '%s'. Use item link or exact name.", query))
         return
     end
 
-    local price, source = self:GetMaterialCost(itemID)
+    local price, source = self:GetMaterialCost(itemID, itemLink)
     local resolvedName = itemNameFromID(itemID) or "?"
     if price then
         Addon:Print(string.format("Item %s (%d) price=%s source=%s", resolvedName, itemID, formatMoney(price), tostring(source or "unknown")))

@@ -43,6 +43,11 @@ local tostring = tostring
 
 local DB_DEFAULTS = {
     global = {
+        meta = {
+            schemaVersion = 2,
+            lastWeeklyCleanupAt = 0,
+            bootstrapCompletedAt = 0,
+        },
         members = {},
     },
     profile = {
@@ -97,6 +102,22 @@ local function cloneArray(src)
     local out = {}
     for i = 1, #src do
         out[i] = src[i]
+    end
+    return out
+end
+
+local function countRecipeKeys(recipeKeys)
+    local count = 0
+    for _ in pairs(recipeKeys or {}) do
+        count = count + 1
+    end
+    return count
+end
+
+local function cloneTableShallow(src)
+    local out = {}
+    for key, value in pairs(src or {}) do
+        out[key] = value
     end
     return out
 end
@@ -528,6 +549,7 @@ function Data:OnInitialize()
     end
     self._onlineCache = {}
     self._currentProfs = {}
+    self:MigrateDatabase()
 end
 
 function Data:GetCanonicalProfession(name)
@@ -546,8 +568,41 @@ function Data:GetMembersDB()
     return self.db.global.members
 end
 
+function Data:GetGlobalMeta()
+    self.db.global.meta = self.db.global.meta or {}
+    if type(self.db.global.meta.schemaVersion) ~= "number" then
+        self.db.global.meta.schemaVersion = 1
+    end
+    if type(self.db.global.meta.lastWeeklyCleanupAt) ~= "number" then
+        self.db.global.meta.lastWeeklyCleanupAt = 0
+    end
+    if type(self.db.global.meta.bootstrapCompletedAt) ~= "number" then
+        self.db.global.meta.bootstrapCompletedAt = 0
+    end
+    return self.db.global.meta
+end
+
+function Data:GetSchemaVersion()
+    return self:GetGlobalMeta().schemaVersion or 1
+end
+
+function Data:SetLastWeeklyCleanupAt(ts)
+    self:GetGlobalMeta().lastWeeklyCleanupAt = ts or time()
+end
+
+function Data:MarkBootstrapCompleted(ts)
+    self:GetGlobalMeta().bootstrapCompletedAt = ts or time()
+end
+
 function Data:GetMember(memberKey)
     return self.db.global.members[memberKey]
+end
+
+function Data:GetMemberSourceType(memberKey)
+    if memberKey == self:GetPlayerKey() then
+        return "owner"
+    end
+    return "replica"
 end
 
 function Data:GetOrCreateMember(memberKey)
@@ -557,10 +612,76 @@ function Data:GetOrCreateMember(memberKey)
             owner = memberKey,
             rev = 0,
             updatedAt = 0,
+            sourceType = self:GetMemberSourceType(memberKey),
+            guildStatus = "active",
+            lastSeenInGuildAt = time(),
             professions = {},
         }
     end
+    self:NormalizeMemberEntry(db[memberKey], memberKey)
     return db[memberKey]
+end
+
+function Data:NormalizeProfessionBlock(entry, professionKey, prof)
+    prof = prof or {}
+    prof.recipes = prof.recipes or {}
+    prof.count = type(prof.count) == "number" and prof.count or countRecipeKeys(prof.recipes)
+    prof.signature = prof.signature or stableRecipeSignature(prof.recipes)
+    prof.skillRank = prof.skillRank or 0
+    prof.skillMaxRank = prof.skillMaxRank or 0
+    prof.blockRevision = type(prof.blockRevision) == "number" and prof.blockRevision or (entry.rev or 0)
+    prof.lastUpdatedAt = type(prof.lastUpdatedAt) == "number" and prof.lastUpdatedAt or (entry.updatedAt or 0)
+    prof.sourceType = prof.sourceType or entry.sourceType or self:GetMemberSourceType(entry.owner)
+    prof.guildStatus = prof.guildStatus or entry.guildStatus or "active"
+    prof.lastSeenInGuildAt = type(prof.lastSeenInGuildAt) == "number" and prof.lastSeenInGuildAt or (entry.lastSeenInGuildAt or entry.updatedAt or 0)
+    return prof
+end
+
+function Data:NormalizeMemberEntry(entry, memberKey)
+    if type(entry) ~= "table" then return nil end
+    entry.owner = entry.owner or memberKey
+    entry.rev = entry.rev or 0
+    entry.updatedAt = entry.updatedAt or 0
+    entry.sourceType = entry.sourceType or self:GetMemberSourceType(memberKey)
+    entry.guildStatus = entry.guildStatus or "active"
+    entry.lastSeenInGuildAt = type(entry.lastSeenInGuildAt) == "number" and entry.lastSeenInGuildAt or (entry.updatedAt or 0)
+    entry.staleAt = type(entry.staleAt) == "number" and entry.staleAt or 0
+    entry.professions = entry.professions or {}
+    for professionKey, prof in pairs(entry.professions) do
+        entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, prof)
+    end
+    return entry
+end
+
+function Data:MigrateDatabase()
+    local meta = self:GetGlobalMeta()
+    local schemaVersion = meta.schemaVersion or 1
+    local now = time()
+
+    for memberKey, entry in pairs(self:GetMembersDB()) do
+        self:NormalizeMemberEntry(entry, memberKey)
+        if schemaVersion < 2 then
+            if entry.owner == self:GetPlayerKey() then
+                entry.sourceType = "owner"
+            elseif entry.sourceType ~= "bootstrap" then
+                entry.sourceType = "replica"
+            end
+            if not entry.lastSeenInGuildAt or entry.lastSeenInGuildAt <= 0 then
+                entry.lastSeenInGuildAt = entry.updatedAt or now
+            end
+            entry.guildStatus = entry.guildStatus or "active"
+            for professionKey, prof in pairs(entry.professions or {}) do
+                prof.blockRevision = prof.blockRevision or entry.rev or 0
+                prof.lastUpdatedAt = prof.lastUpdatedAt or entry.updatedAt or now
+                prof.sourceType = prof.sourceType or entry.sourceType
+                prof.guildStatus = prof.guildStatus or entry.guildStatus
+                prof.lastSeenInGuildAt = prof.lastSeenInGuildAt or entry.lastSeenInGuildAt or now
+                entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, prof)
+            end
+        end
+    end
+
+    meta.schemaVersion = 2
 end
 
 function Data:InvalidateRecipeCaches(scope)
@@ -579,6 +700,202 @@ function Data:InvalidateRecipeCaches(scope)
     self._recipeDetailCache = nil
     self._recipeCraftersCache = nil
     self._recipeIndex = nil
+end
+
+function Data:BuildSyncBlockKey(ownerCharacter, professionKey)
+    if not ownerCharacter or not professionKey then return nil end
+    return string.format("%s::%s", tostring(ownerCharacter), tostring(professionKey))
+end
+
+function Data:ParseSyncBlockKey(blockKey)
+    if type(blockKey) ~= "string" then return nil, nil end
+    local ownerCharacter, professionKey = blockKey:match("^(.-)::(.+)$")
+    if not ownerCharacter or not professionKey then
+        return nil, nil
+    end
+    return ownerCharacter, professionKey
+end
+
+function Data:GetSyncBlock(memberKey, professionKey)
+    local entry = self:GetMember(memberKey)
+    local profession = entry and entry.professions and entry.professions[professionKey]
+    if not entry or not profession then return nil end
+
+    local recipeCount = profession.count
+    if type(recipeCount) ~= "number" then
+        recipeCount = countRecipeKeys(profession.recipes)
+    end
+
+    return {
+        blockKey = self:BuildSyncBlockKey(memberKey, professionKey),
+        ownerCharacter = memberKey,
+        professionKey = professionKey,
+        revision = profession.blockRevision or entry.rev or 0,
+        lastUpdatedAt = profession.lastUpdatedAt or entry.updatedAt or 0,
+        sourceType = profession.sourceType or entry.sourceType or self:GetMemberSourceType(memberKey),
+        guildStatus = profession.guildStatus or entry.guildStatus or "active",
+        lastSeenInGuildAt = profession.lastSeenInGuildAt or entry.lastSeenInGuildAt or entry.updatedAt or 0,
+        count = recipeCount,
+        fingerprint = profession.signature or stableRecipeSignature(profession.recipes),
+        skillRank = profession.skillRank or 0,
+        skillMaxRank = profession.skillMaxRank or 0,
+    }
+end
+
+function Data:GetAllSyncBlocks(includeStale)
+    local blocks = {}
+    for memberKey, entry in pairs(self:GetMembersDB()) do
+        if not self:IsMockMember(memberKey, entry) and (includeStale or (entry.guildStatus or "active") == "active") then
+            for professionKey in pairs(entry.professions or {}) do
+                local block = self:GetSyncBlock(memberKey, professionKey)
+                if block then
+                    blocks[#blocks + 1] = block
+                end
+            end
+        end
+    end
+    sort(blocks, function(a, b)
+        if a.ownerCharacter ~= b.ownerCharacter then
+            return a.ownerCharacter < b.ownerCharacter
+        end
+        return a.professionKey < b.professionKey
+    end)
+    return blocks
+end
+
+function Data:BuildSyncManifest(includeStale)
+    local manifest = {
+        builtAt = time(),
+        memberKey = self:GetPlayerKey(),
+        blocks = {},
+        totals = {
+            blocks = 0,
+            recipes = 0,
+        },
+    }
+
+    for _, block in ipairs(self:GetAllSyncBlocks(includeStale)) do
+        manifest.blocks[block.blockKey] = {
+            ownerCharacter = block.ownerCharacter,
+            professionKey = block.professionKey,
+            revision = block.revision,
+            lastUpdatedAt = block.lastUpdatedAt,
+            sourceType = block.sourceType,
+            guildStatus = block.guildStatus,
+            lastSeenInGuildAt = block.lastSeenInGuildAt,
+            count = block.count,
+            fingerprint = block.fingerprint,
+        }
+        manifest.totals.blocks = manifest.totals.blocks + 1
+        manifest.totals.recipes = manifest.totals.recipes + (block.count or 0)
+    end
+
+    return manifest
+end
+
+function Data:GetDatasetCompletenessEstimate()
+    local manifest = self:BuildSyncManifest(false)
+    return manifest.totals.blocks, manifest.totals.recipes
+end
+
+function Data:IsBootstrapCandidate()
+    local blockCount, recipeCount = self:GetDatasetCompletenessEstimate()
+    return blockCount > 0 and recipeCount > 0
+end
+
+function Data:IsBootstrapNeeded()
+    local blockCount, recipeCount = self:GetDatasetCompletenessEstimate()
+    if blockCount == 0 then return true end
+    return recipeCount == 0
+end
+
+function Data:IsMemberVisible(memberKey, includeStale)
+    local entry = type(memberKey) == "table" and memberKey or self:GetMember(memberKey)
+    if not entry then return false end
+    if includeStale then return true end
+    return (entry.guildStatus or "active") == "active"
+end
+
+function Data:IsUserVisibleMember(memberKey, entry, includeStale)
+    entry = type(memberKey) == "table" and memberKey or entry or self:GetMember(memberKey)
+    if not entry then return false end
+    if self:IsMockMember(memberKey, entry) then return false end
+    return self:IsMemberVisible(entry, includeStale)
+end
+
+function Data:GetSortedMemberKeys(includeStale)
+    local keys = {}
+    for memberKey, entry in pairs(self:GetMembersDB()) do
+        if self:IsUserVisibleMember(memberKey, entry, includeStale) then
+            keys[#keys + 1] = memberKey
+        end
+    end
+    sort(keys)
+    return keys
+end
+
+function Data:MarkMemberActive(memberKey, seenAt)
+    local entry = self:GetMember(memberKey)
+    if not entry then return false end
+    entry.guildStatus = "active"
+    entry.lastSeenInGuildAt = seenAt or time()
+    entry.staleAt = 0
+    for professionKey, prof in pairs(entry.professions or {}) do
+        prof.guildStatus = "active"
+        prof.lastSeenInGuildAt = entry.lastSeenInGuildAt
+        entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, prof)
+    end
+    return true
+end
+
+function Data:MarkMemberStale(memberKey, staleAt)
+    local entry = self:GetMember(memberKey)
+    if not entry or entry.owner == self:GetPlayerKey() then return false end
+    if entry.guildStatus == "stale" then return false end
+    entry.guildStatus = "stale"
+    entry.staleAt = staleAt or time()
+    for professionKey, prof in pairs(entry.professions or {}) do
+        prof.guildStatus = "stale"
+        entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, prof)
+    end
+    self:InvalidateRecipeCaches("presence")
+    return true
+end
+
+function Data:DeleteMember(memberKey)
+    if not memberKey then return false end
+    self.db.global.members[memberKey] = nil
+    self:InvalidateRecipeCaches("presence")
+    if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
+        Addon.Tooltip:InvalidateIndex()
+    end
+    return true
+end
+
+function Data:IsMockMember(memberKey, entry)
+    entry = entry or self:GetMember(memberKey)
+    if type(memberKey) == "string"
+        and (memberKey:find("__RRMockPeer", 1, true) == 1 or memberKey:find("__RRMockOwner", 1, true) == 1) then
+        return true
+    end
+    return entry and entry.isMock == true or false
+end
+
+function Data:DeleteMockMembers()
+    local removed = 0
+    for memberKey, entry in pairs(self:GetMembersDB()) do
+        if self:IsMockMember(memberKey, entry) then
+            self.db.global.members[memberKey] = nil
+            removed = removed + 1
+        end
+    end
+    if removed > 0 then
+        self:InvalidateRecipeCaches("presence")
+        if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
+            Addon.Tooltip:InvalidateIndex()
+        end
+    end
+    return removed
 end
 
 function Data:CleanInvalidRecipes()
@@ -616,6 +933,9 @@ function Data:TouchLocalRevision(reason)
     entry.rev = (entry.rev or 0) + 1
     entry.updatedAt = time()
     entry.lastReason = reason
+    entry.sourceType = "owner"
+    entry.guildStatus = "active"
+    entry.lastSeenInGuildAt = entry.updatedAt
     return entry.rev
 end
 
@@ -634,6 +954,7 @@ function Data:DetectProfessions()
                 entry.professions[canonical] = entry.professions[canonical] or { recipes = {} }
                 entry.professions[canonical].skillRank = skillRank or 0
                 entry.professions[canonical].skillMaxRank = skillMaxRank or 0
+                entry.professions[canonical] = self:NormalizeProfessionBlock(entry, canonical, entry.professions[canonical])
             end
         end
     end
@@ -809,6 +1130,11 @@ function Data:ApplyScanResult(profession, recipeKeys)
     prof.signature = newSignature
     prof.count = count
     prof.lastScan = time()
+    prof.blockRevision = (entry.rev or 0) + (changed and 1 or 0)
+    prof.lastUpdatedAt = prof.lastScan
+    prof.sourceType = "owner"
+    prof.guildStatus = "active"
+    prof.lastSeenInGuildAt = prof.lastScan
 
     if self._currentProfs[profession] then
         prof.skillRank = self._currentProfs[profession].skillRank or 0
@@ -819,6 +1145,7 @@ function Data:ApplyScanResult(profession, recipeKeys)
 
     if changed then
         self:TouchLocalRevision("scan:" .. profession)
+        prof.blockRevision = entry.rev or prof.blockRevision
         Addon:Debug("Scan changed", profession, count, "recipe ids")
         Addon:Print(string.format("Scanned %s: %d recipe(s) found.", profession, count))
     else
@@ -878,6 +1205,7 @@ function Data:BuildSnapshotChunks(memberKey)
                     memberKey = memberKey,
                     rev = entry.rev or 0,
                     updatedAt = entry.updatedAt or 0,
+                    sourceType = entry.sourceType or self:GetMemberSourceType(memberKey),
                     profession = profName,
                     skillRank = prof.skillRank or 0,
                     skillMaxRank = prof.skillMaxRank or 0,
@@ -893,6 +1221,7 @@ function Data:BuildSnapshotChunks(memberKey)
             memberKey = memberKey,
             rev = entry.rev or 0,
             updatedAt = entry.updatedAt or 0,
+            sourceType = entry.sourceType or self:GetMemberSourceType(memberKey),
             profession = profName,
             skillRank = prof.skillRank or 0,
             skillMaxRank = prof.skillMaxRank or 0,
@@ -906,6 +1235,7 @@ function Data:BuildSnapshotChunks(memberKey)
             memberKey = memberKey,
             rev = entry.rev or 0,
             updatedAt = entry.updatedAt or 0,
+            sourceType = entry.sourceType or self:GetMemberSourceType(memberKey),
             profession = nil,
             recipeKeys = {},
             partial = false,
@@ -939,6 +1269,7 @@ function Data:AppendIncomingChunk(chunk)
             skillRank = chunk.skillRank or 0,
             skillMaxRank = chunk.skillMaxRank or 0,
             recipes = {},
+            sourceType = chunk.sourceType or "replica",
         }
         for _, recipeKey in ipairs(chunk.recipeKeys or {}) do
             if isValidRecipeKey(recipeKey) then
@@ -949,25 +1280,28 @@ function Data:AppendIncomingChunk(chunk)
         end
         prof.skillRank = chunk.skillRank or prof.skillRank or 0
         prof.skillMaxRank = chunk.skillMaxRank or prof.skillMaxRank or 0
+        prof.lastUpdatedAt = chunk.updatedAt or state.updatedAt or time()
+        prof.sourceType = chunk.sourceType or prof.sourceType or "replica"
         state.professions[chunk.profession] = prof
     end
 end
 
-function Data:FinalizeIncomingSnapshot(memberKey, rev)
+function Data:FinalizeIncomingSnapshot(memberKey, rev, opts)
     if not self._incoming or not self._incoming[memberKey] then return false end
     local state = self._incoming[memberKey]
     if state.rev ~= rev then return false end
+    opts = opts or {}
 
     local current = self:GetMember(memberKey)
-    if current and (current.rev or 0) >= rev then
-        self._incoming[memberKey] = nil
-        return false
-    end
 
     local finalEntry = {
         owner = memberKey,
         rev = rev,
         updatedAt = state.updatedAt or time(),
+        sourceType = opts.sourceType or state.sourceType or "replica",
+        guildStatus = "active",
+        lastSeenInGuildAt = time(),
+        isMock = opts.isMock == true,
         professions = {},
     }
 
@@ -998,11 +1332,27 @@ function Data:FinalizeIncomingSnapshot(memberKey, rev)
             count = count,
             signature = stableRecipeSignature(incomingRecipes),
             lastScan = state.updatedAt or time(),
+            blockRevision = rev,
+            lastUpdatedAt = state.updatedAt or time(),
+            sourceType = prof.sourceType or finalEntry.sourceType,
+            guildStatus = "active",
+            lastSeenInGuildAt = finalEntry.lastSeenInGuildAt,
         }
     end
 
-    self.db.global.members[memberKey] = finalEntry
+    local applied, reason, resolved = Addon.MergeEngine:ApplyIfNewer(current, finalEntry, {
+        preserveOwner = memberKey == self:GetPlayerKey(),
+    })
     self._incoming[memberKey] = nil
+
+    if not applied then
+        if Addon.Sync and Addon.Sync.RecordMergeSkip then
+            Addon.Sync:RecordMergeSkip(reason)
+        end
+        return false
+    end
+
+    self.db.global.members[memberKey] = self:NormalizeMemberEntry(resolved, memberKey)
     self:InvalidateRecipeCaches()
     Addon:RequestRefresh("snapshot-merge")
     if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
@@ -1014,11 +1364,13 @@ end
 function Data:GetProfessionSummary()
     local result = {}
     for memberKey, entry in pairs(self:GetMembersDB()) do
-        for profName, prof in pairs(entry.professions or {}) do
+        if self:IsUserVisibleMember(memberKey, entry) then
+            for profName, prof in pairs(entry.professions or {}) do
             local row = result[profName] or { members = 0, recipes = 0 }
             row.members = row.members + 1
             row.recipes = row.recipes + (prof.count or 0)
             result[profName] = row
+            end
         end
     end
     return result
@@ -1027,7 +1379,7 @@ end
 function Data:GetMembersForProfession(profName)
     local rows = {}
     for memberKey, entry in pairs(self:GetMembersDB()) do
-        local prof = entry.professions and entry.professions[profName]
+        local prof = self:IsUserVisibleMember(memberKey, entry) and entry.professions and entry.professions[profName]
         if prof then
             rows[#rows + 1] = {
                 memberKey = memberKey,
@@ -1050,9 +1402,11 @@ function Data:GetCraftersForItem(itemID)
     local rows = {}
     if not itemID then return rows end
     for memberKey, entry in pairs(self:GetMembersDB()) do
-        for profName, prof in pairs(entry.professions or {}) do
-            if prof.recipes and prof.recipes[itemID] then
-                rows[#rows + 1] = { memberKey = memberKey, profession = profName, online = self:IsMemberOnline(memberKey) }
+        if self:IsUserVisibleMember(memberKey, entry) then
+            for profName, prof in pairs(entry.professions or {}) do
+                if prof.recipes and prof.recipes[itemID] then
+                    rows[#rows + 1] = { memberKey = memberKey, profession = profName, online = self:IsMemberOnline(memberKey) }
+                end
             end
         end
     end
@@ -1066,10 +1420,11 @@ end
 function Data:BuildRecipeIndex()
     local index = {}
     for memberKey, entry in pairs(self:GetMembersDB()) do
-        local profs = entry.professions or {}
-        local isOnline = self:IsMemberOnline(memberKey)
-        for currentProfName, prof in pairs(profs) do
-            for recipeKey in pairs(prof.recipes or {}) do
+        if self:IsUserVisibleMember(memberKey, entry) then
+            local profs = entry.professions or {}
+            local isOnline = self:IsMemberOnline(memberKey)
+            for currentProfName, prof in pairs(profs) do
+                for recipeKey in pairs(prof.recipes or {}) do
                 if isValidRecipeKey(recipeKey) then
                     local row = index[recipeKey]
                     if not row then
@@ -1101,6 +1456,7 @@ function Data:BuildRecipeIndex()
                             row.onlineCount = row.onlineCount + 1
                         end
                     end
+                end
                 end
             end
         end
@@ -1440,11 +1796,13 @@ end
 
 function Data:DumpSummary()
     local totalMembers, totalProfs, totalRecipes = 0, 0, 0
-    for _, entry in pairs(self:GetMembersDB()) do
-        totalMembers = totalMembers + 1
-        for _, prof in pairs(entry.professions or {}) do
-            totalProfs = totalProfs + 1
-            totalRecipes = totalRecipes + (prof.count or 0)
+    for memberKey, entry in pairs(self:GetMembersDB()) do
+        if self:IsUserVisibleMember(memberKey, entry, true) then
+            totalMembers = totalMembers + 1
+            for _, prof in pairs(entry.professions or {}) do
+                totalProfs = totalProfs + 1
+                totalRecipes = totalRecipes + (prof.count or 0)
+            end
         end
     end
     local s = self:GetLocalSummary()
@@ -1619,6 +1977,7 @@ function Data:WipeDatabase()
     end
     self._incoming = {}
     self._currentProfs = {}
+    self:GetGlobalMeta().bootstrapCompletedAt = 0
 
     if Addon.Sync then
         Addon.Sync.registry = {}

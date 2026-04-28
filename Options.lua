@@ -62,11 +62,26 @@ function Options:OnEnable()
     end)
     priceDiagButton:SetPoint("TOPLEFT", minimapButton, "BOTTOMLEFT", 0, -8)
 
+    local perfButton = createButton(panel, "Toggle Perf Debug", 180, function()
+        Addon:SlashHandler("perf toggle")
+    end)
+    perfButton:SetPoint("TOPLEFT", priceDiagButton, "BOTTOMLEFT", 0, -8)
+
+    local perfDumpButton = createButton(panel, "Dump Perf Status", 180, function()
+        Addon:SlashHandler("perf dump")
+    end)
+    perfDumpButton:SetPoint("TOPLEFT", perfButton, "BOTTOMLEFT", 0, -8)
+
+    local mockButton = createButton(panel, "Start Mock Sync", 180, function()
+        Addon:SlashHandler("mock start medium")
+    end)
+    mockButton:SetPoint("TOPLEFT", perfDumpButton, "BOTTOMLEFT", 0, -8)
+
     local help = panel:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
-    help:SetPoint("TOPLEFT", priceDiagButton, "BOTTOMLEFT", 0, -14)
+    help:SetPoint("TOPLEFT", mockButton, "BOTTOMLEFT", 0, -14)
     help:SetWidth(560)
     help:SetJustifyH("LEFT")
-    help:SetText("Slash commands: /rr, /rr prices <item name|item link>, /rr share [guild|party|raid|say]. In recipe details, Shift-click title/materials to insert links in chat. Online crafters show a request icon: click it to whisper a craft request.")
+    help:SetText("Slash commands: /rr, /rr perf [toggle|dump|reset], /rr mock [status|start <light|medium|heavy|burst|bootstrap>|stop|reset], /rr prices <item name|item link>, /rr share [guild|party|raid|say]. In recipe details, Shift-click title/materials to insert links in chat. Online crafters show a request icon: click it to whisper a craft request.")
 
     panel.default = function()
     end

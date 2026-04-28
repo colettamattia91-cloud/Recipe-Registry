@@ -7,12 +7,12 @@ Inspired by the original GuildCraft TBC workflow and adapted with a modern, ligh
 It scans your professions locally, syncs craft data with guildmates, and gives you a searchable list of who can craft what.
 
 ## Highlights
-- Lightweight guild sync with owner-driven data transfer
+- Progressive guild sync with chunked background transfer and pause-safe behavior
 - Searchable recipe directory with profession filters and rarity sorting
 - Recipe detail panel with crafters, reagents, and estimated material cost
 - Online crafter quick-request icon (one-click whisper template)
 - Shift-click linking from recipe title and material rows
-- Minimap button and options panel
+- Manual roster cleanup button, minimap button, and options panel
 
 ## Compatibility
 - Target game version: The Burning Crusade Classic (Anniversary / 2.5.x)
@@ -39,8 +39,16 @@ If neither source has data, the material is marked as missing price.
 ## Main Features
 ### Guild recipe registry
 - Scans your profession windows and stores learned recipe keys
-- Syncs member snapshots directly from owners
+- Syncs data progressively in logical `character + profession` blocks
+- Uses replica peers to help converge offline-owner data over time
+- Pauses automatic sync work in combat, raid, and instance contexts
 - Maintains online/offline crafter visibility
+
+### Roster lifecycle
+- `Roster Cleanup` runs local-only guild membership maintenance
+- Missing guild members are marked `stale` first and disappear from normal results
+- Long-stale records are pruned only after the retention window
+- Cleanup work runs in small background chunks instead of blocking the UI
 
 ### Modern directory UI
 - Fast recipe list with search and profession tabs
@@ -72,6 +80,27 @@ If neither source has data, the material is marked as missing price.
 - `/rr dump` print DB summary
 - `/rr wipe` clear addon DB (keeps addon installed, resets data)
 
+## Debug And Test Commands
+### Performance
+- `/rr perf toggle` show or hide the performance/debug panel
+- `/rr perf dump` print scheduler, queue, and sync counters
+- `/rr perf reset` clear performance and sync counters
+- `/rr perf help` show the performance command help
+
+### Mock Sync
+- `/rr mock status` print current mock state and counters
+- `/rr mock start light|medium|heavy|burst` run direct snapshot load tests
+- `/rr mock start bootstrap` run a heavier bootstrap-style transfer test
+- `/rr mock start traffic` run full `HELLO/MANI/REQ/SNAP` local traffic
+- `/rr mock start offline` test offline-owner convergence through replica peers
+- `/rr mock start trafficburst` stress test the replica traffic path
+- `/rr mock start roster` simulate roster cleanup with active, stale, and prunable members
+- `/rr mock start rosterheavy` heavier roster cleanup simulation
+- `/rr mock cleanup` remove local mock data and mock sync state
+- `/rr mock reset` clear mock counters
+- `/rr mock stop` stop the local mock worker
+- `/rr mock help` show the mock command help
+
 ## Installation
 ### CurseForge App
 Install Recipe Registry from CurseForge and launch the game.
@@ -86,11 +115,14 @@ Install Recipe Registry from CurseForge and launch the game.
 1. Join a guild.
 2. Open each profession window at least once to populate your local scans.
 3. Use `/rr` to open the directory.
-4. Wait briefly for guild sync handshakes to populate remote crafters.
+4. Wait briefly for progressive guild sync handshakes and block requests to populate remote crafters.
+5. Use `Roster Cleanup` when you want to refresh stale ex-guild data locally.
 
 ## Performance Notes
 - Search refresh is debounced to reduce UI recomputation.
-- Sync/coordinator recompute is throttled to avoid unnecessary churn.
+- Sync, manifest handling, inbound apply, and roster cleanup all run in chunked background steps.
+- Automatic sync pauses in combat, raid, and instance contexts.
+- UI refreshes are deferred to avoid bursty redraws while sync work is in progress.
 
 ## Known Notes
 - If item info is uncached, names/icons may resolve after a short delay.
@@ -107,5 +139,6 @@ Recipe Registry is a guild-focused crafting directory for TBC Anniversary. It sc
 - Update changelog in `CHANGELOG.md`
 - Verify slash commands and options panel
 - Test recipe scan and guild sync on at least two characters
+- Test `Roster Cleanup` and the relevant mock scenarios
 - Test optional integrations: AtlasLoot, TSM, Auctionator
 - Package zip with top-level folder `RecipeRegistry`

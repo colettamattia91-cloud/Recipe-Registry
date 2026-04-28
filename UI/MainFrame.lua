@@ -147,10 +147,21 @@ local function createBackdrop(frame, bgR, bgG, bgB, bgA, borderR, borderG, borde
     frame:SetBackdropBorderColor(borderR or COLOR_BORDER[1], borderG or COLOR_BORDER[2], borderB or COLOR_BORDER[3], borderA or COLOR_BORDER[4])
 end
 
+local function releaseSearchFocus()
+    local ui = Addon.UI
+    local searchBox = ui and ui.frame and ui.frame.searchBox
+    if searchBox and searchBox.HasFocus and searchBox:HasFocus() then
+        searchBox:ClearFocus()
+    end
+end
+
 local function createButton(parent, text, width, height)
     local b = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
     b:SetSize(width, height)
     b:SetText(text)
+    b:SetScript("OnMouseDown", function()
+        releaseSearchFocus()
+    end)
     return b
 end
 
@@ -169,7 +180,10 @@ local function createCardStyleButton(parent, width, height)
     b.highlight:SetAllPoints()
     b.highlight:SetTexture("Interface\\Buttons\\WHITE8x8")
     b.highlight:SetVertexColor(1, 1, 1, 0.04)
-    b:SetScript("OnMouseDown", function(self) self:SetBackdropColor(0.10, 0.10, 0.10, 1) end)
+    b:SetScript("OnMouseDown", function(self)
+        releaseSearchFocus()
+        self:SetBackdropColor(0.10, 0.10, 0.10, 1)
+    end)
     b:SetScript("OnMouseUp", function(self) end)
     function b:SetSelected(selected)
         if selected then
@@ -353,6 +367,22 @@ function UI:OnInitialize()
     self.searchText = ""
 end
 
+function UI:ClearSearch()
+    self.searchText = ""
+    if self._searchTimer then
+        Addon:CancelTimer(self._searchTimer, true)
+        self._searchTimer = nil
+    end
+    if self.frame and self.frame.searchBox then
+        self.frame.searchBox:SetText("")
+        self.frame.searchBox:ClearFocus()
+    end
+end
+
+function UI:HandleFrameHidden()
+    self:ClearSearch()
+end
+
 local function buildRefreshPlan(reasons)
     local plan = {
         status = false,
@@ -425,13 +455,35 @@ function UI:CreateMainFrame()
     f:SetFrameStrata("HIGH")
     createBackdrop(f, COLOR_BG[1], COLOR_BG[2], COLOR_BG[3], COLOR_BG[4], COLOR_BORDER[1], COLOR_BORDER[2], COLOR_BORDER[3], COLOR_BORDER[4])
     f:Hide()
+    f:SetScript("OnHide", function()
+        UI:HandleFrameHidden()
+    end)
     table.insert(UISpecialFrames, "RecipeRegistryFrame")
+
+    local function clearSearchFocus()
+        if f.searchBox and f.searchBox.HasFocus and f.searchBox:HasFocus() then
+            f.searchBox:ClearFocus()
+        end
+    end
+
+    local function hookFocusRelease(frame)
+        local previous = frame:GetScript("OnMouseDown")
+        frame:SetScript("OnMouseDown", function(self, ...)
+            clearSearchFocus()
+            if previous then
+                previous(self, ...)
+            end
+        end)
+    end
+
+    hookFocusRelease(f)
 
     local titleBar = CreateFrame("Frame", nil, f, "BackdropTemplate")
     titleBar:SetPoint("TOPLEFT", 1, -1)
     titleBar:SetPoint("TOPRIGHT", -1, -1)
     titleBar:SetHeight(46)
     createBackdrop(titleBar, COLOR_TITLE_BG[1], COLOR_TITLE_BG[2], COLOR_TITLE_BG[3], COLOR_TITLE_BG[4], COLOR_BORDER[1], COLOR_BORDER[2], COLOR_BORDER[3], 1)
+    hookFocusRelease(titleBar)
 
     local title = titleBar:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     title:SetPoint("TOPLEFT", 12, -7)
@@ -455,14 +507,27 @@ function UI:CreateMainFrame()
         end
     end)
 
-    local rescan = createButton(titleBar, "Rescan", 72, 22)
-    rescan:SetPoint("RIGHT", close, "LEFT", -12, 0)
-    rescan:SetScript("OnClick", function() Addon:SlashHandler("rescan") end)
-    f.rescanButton = rescan
+    local cleanup = createButton(titleBar, "Roster Cleanup", 112, 22)
+    cleanup:SetPoint("RIGHT", close, "LEFT", -12, 0)
+    cleanup:SetScript("OnClick", function()
+        if not (Addon.GuildLifecycleMaintenance and Addon.GuildLifecycleMaintenance.StartManualCleanup) then
+            Addon:Print("Guild cleanup is not available.")
+            return
+        end
+        local started, reason = Addon.GuildLifecycleMaintenance:StartManualCleanup()
+        if started then
+            Addon:Print("Guild roster cleanup started in background.")
+        elseif reason == "already-running" then
+            Addon:Print("Guild roster cleanup is already running.")
+        else
+            Addon:Print("Guild roster cleanup could not start.")
+        end
+    end)
+    f.cleanupButton = cleanup
 
     local syncDot = titleBar:CreateTexture(nil, "OVERLAY")
     syncDot:SetSize(10, 10)
-    syncDot:SetPoint("RIGHT", rescan, "LEFT", -10, 0)
+    syncDot:SetPoint("RIGHT", cleanup, "LEFT", -10, 0)
     syncDot:SetTexture("Interface\\Buttons\\WHITE8x8")
     syncDot:SetVertexColor(0.2, 0.9, 0.2, 1)
     f.syncDot = syncDot
@@ -478,6 +543,7 @@ function UI:CreateMainFrame()
     topBand:SetPoint("TOPRIGHT", -10, -58)
     topBand:SetHeight(52)
     f.topBand = topBand
+    hookFocusRelease(topBand)
 
     local card1 = createStatCard(topBand, "Known members", 190)
     card1:SetPoint("LEFT", 0, 0)
@@ -495,6 +561,7 @@ function UI:CreateMainFrame()
     left:SetWidth(240)
     createBackdrop(left, COLOR_PANEL[1], COLOR_PANEL[2], COLOR_PANEL[3], COLOR_PANEL[4], COLOR_BORDER[1], COLOR_BORDER[2], COLOR_BORDER[3], COLOR_BORDER[4])
     f.left = left
+    hookFocusRelease(left)
 
     local searchLabel = left:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     searchLabel:SetPoint("TOPLEFT", 12, -12)
@@ -569,6 +636,7 @@ function UI:CreateMainFrame()
     center:SetWidth(360)
     createBackdrop(center, COLOR_PANEL[1], COLOR_PANEL[2], COLOR_PANEL[3], COLOR_PANEL[4], COLOR_BORDER[1], COLOR_BORDER[2], COLOR_BORDER[3], COLOR_BORDER[4])
     f.center = center
+    hookFocusRelease(center)
 
     local recipeHeader = center:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     recipeHeader:SetPoint("TOPLEFT", 12, -12)
@@ -612,6 +680,7 @@ function UI:CreateMainFrame()
     right:SetPoint("BOTTOMRIGHT", -10, 34)
     createBackdrop(right, COLOR_PANEL[1], COLOR_PANEL[2], COLOR_PANEL[3], COLOR_PANEL[4], COLOR_BORDER[1], COLOR_BORDER[2], COLOR_BORDER[3], COLOR_BORDER[4])
     f.right = right
+    hookFocusRelease(right)
 
     local detailTitle = right:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     detailTitle:SetPoint("TOPLEFT", 12, -12)
@@ -703,6 +772,7 @@ function UI:CreateMainFrame()
     footer:SetPoint("BOTTOMRIGHT", -1, 1)
     footer:SetHeight(24)
     createBackdrop(footer, COLOR_TITLE_BG[1], COLOR_TITLE_BG[2], COLOR_TITLE_BG[3], 1, 0.16, 0.16, 0.16, 1)
+    hookFocusRelease(footer)
 
     local footerText = footer:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     footerText:SetPoint("LEFT", 12, 0)
@@ -711,7 +781,46 @@ function UI:CreateMainFrame()
     footerText:SetJustifyH("LEFT")
     f.footerText = footerText
 
+    local debugPanel = CreateFrame("Frame", nil, f, "BackdropTemplate")
+    debugPanel:SetPoint("TOPRIGHT", -10, -118)
+    debugPanel:SetSize(290, 120)
+    createBackdrop(debugPanel, 0.03, 0.03, 0.03, 0.95, 0.65, 0.55, 0.18, 0.95)
+    debugPanel:Hide()
+    f.debugPanel = debugPanel
+
+    local debugTitle = debugPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    debugTitle:SetPoint("TOPLEFT", 10, -10)
+    debugTitle:SetText("Performance Debug")
+    f.debugTitle = debugTitle
+
+    local debugText = debugPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    debugText:SetPoint("TOPLEFT", debugTitle, "BOTTOMLEFT", 0, -8)
+    debugText:SetPoint("TOPRIGHT", -10, -10)
+    debugText:SetJustifyH("LEFT")
+    debugText:SetJustifyV("TOP")
+    debugText:SetSpacing(2)
+    if debugText.SetWordWrap then
+        debugText:SetWordWrap(true)
+    end
+    debugText:SetText("")
+    f.debugText = debugText
+
+    local debugReset = createButton(debugPanel, "Reset", 64, 18)
+    debugReset:SetPoint("BOTTOMRIGHT", -10, 8)
+    debugReset:SetScript("OnClick", function()
+        Addon:SlashHandler("perf reset")
+    end)
+    f.debugReset = debugReset
+
+    local debugDump = createButton(debugPanel, "Dump", 64, 18)
+    debugDump:SetPoint("RIGHT", debugReset, "LEFT", -6, 0)
+    debugDump:SetScript("OnClick", function()
+        Addon:SlashHandler("perf dump")
+    end)
+    f.debugDump = debugDump
+
     self.frame = f
+    self:RefreshDebugVisibility()
 end
 
 function UI:EnsureRecipeRow(index)
@@ -914,9 +1023,12 @@ function UI:RefreshStatusBar()
     local sync = Addon.Sync
     local state = sync and sync.GetUiState and sync:GetUiState() or nil
     local summary = Addon.Data:GetLocalSummary()
+    local bootstrap = state and state.bootstrap or nil
+    local cleanupRunning = Addon.GuildLifecycleMaintenance and Addon.GuildLifecycleMaintenance.IsCleanupRunning
+        and Addon.GuildLifecycleMaintenance:IsCleanupRunning() or false
 
     local members = 0
-    for _ in pairs(Addon.Data:GetMembersDB()) do
+    for _ in ipairs(Addon.Data:GetSortedMemberKeys(false)) do
         members = members + 1
     end
 
@@ -924,6 +1036,7 @@ function UI:RefreshStatusBar()
     local queued = state and state.queued or 0
     local inFlight = state and state.inFlight
     local role = state and state.role or "Client"
+    local paused = state and state.paused or false
 
     local subtitle = string.format(
         "Automatic sync • %s • %d guild node(s) • %d known member(s)",
@@ -935,6 +1048,23 @@ function UI:RefreshStatusBar()
         subtitle = subtitle .. string.format(" • syncing %s", tostring(inFlight))
     elseif queued and queued > 0 then
         subtitle = subtitle .. string.format(" • %d update(s) queued", queued)
+    end
+    if paused then
+        subtitle = subtitle .. " | paused"
+    end
+    if bootstrap then
+        if bootstrap.inProgress then
+            subtitle = subtitle .. " | bootstrap in progress"
+        elseif bootstrap.canBootstrap then
+            subtitle = subtitle .. " | bootstrap available"
+        elseif bootstrap.completed then
+            subtitle = subtitle .. " | bootstrap completed"
+        else
+            subtitle = subtitle .. " | bootstrap not needed"
+        end
+    end
+    if cleanupRunning then
+        subtitle = subtitle .. " | roster cleanup running"
     end
     setTextIfChanged(self.frame.subtitle, subtitle)
 
@@ -949,10 +1079,68 @@ function UI:RefreshStatusBar()
         self.frame.autoLabel:SetTextColor(1.0, 0.75, 0.75)
     end
 
+    if paused then
+        setVertexColorIfChanged(self.frame.syncDot, 0.75, 0.2, 0.2, 1)
+        self.frame.autoLabel:SetTextColor(1.0, 0.75, 0.75)
+    end
+
     setTextIfChanged(self.frame.cards.members.value, tostring(members))
     setTextIfChanged(self.frame.cards.network.value, string.format("%d / %d", onlineNodes, state and state.registry or 0))
     setTextIfChanged(self.frame.cards.updated.value, ageText(summary.updatedAt))
     setTextIfChanged(self.frame.cards.updated.text, "Last local update")
+    if self.frame.cleanupButton then
+        self.frame.cleanupButton:SetText(cleanupRunning and "Cleaning..." or "Roster Cleanup")
+        if cleanupRunning then
+            self.frame.cleanupButton:Disable()
+        else
+            self.frame.cleanupButton:Enable()
+        end
+    end
+    self:RefreshDebugPanel()
+end
+
+function UI:RefreshDebugVisibility()
+    if not (self.frame and self.frame.debugPanel) then return end
+    if Addon.perfDebugMode then
+        self.frame.debugPanel:Show()
+        self:RefreshDebugPanel()
+    else
+        self.frame.debugPanel:Hide()
+    end
+end
+
+function UI:RefreshDebugPanel()
+    if not (self.frame and self.frame.debugPanel and Addon.perfDebugMode) then return end
+
+    local perf = Addon.Performance and Addon.Performance.GetDebugSnapshot and Addon.Performance:GetDebugSnapshot() or nil
+    local sync = Addon.Sync and Addon.Sync.GetDebugSnapshot and Addon.Sync:GetDebugSnapshot() or nil
+    local bootstrap = Addon.BootstrapSync and Addon.BootstrapSync.GetUiState and Addon.BootstrapSync:GetUiState() or nil
+    local mock = Addon.MockSync and Addon.MockSync.GetDebugSnapshot and Addon.MockSync:GetDebugSnapshot() or nil
+
+    local perfTelemetry = perf and perf.telemetry or {}
+    local syncTelemetry = sync and sync.telemetry or {}
+    local mockTelemetry = mock and mock.telemetry or {}
+    local queueLengths = perf and perf.queueLengths or {}
+    local queueParts = {}
+    for category, size in pairs(queueLengths or {}) do
+        if size and size > 0 then
+            queueParts[#queueParts + 1] = string.format("%s:%d", tostring(category), tonumber(size) or 0)
+        end
+    end
+    table.sort(queueParts)
+
+    local lines = {
+        string.format("Scheduler avg/max: %.2f / %.2f ms", perfTelemetry.averageStepCostMs or 0, perfTelemetry.maxStepCostMs or 0),
+        string.format("Steps: %d  Over budget: %d", perfTelemetry.jobSteps or 0, perfTelemetry.overBudgetSteps or 0),
+        string.format("UI marks/flushes: %d / %d", perfTelemetry.uiRefreshMarks or 0, perfTelemetry.uiRefreshFlushes or 0),
+        string.format("Outbound sent: %d  Inbound recv/applied: %d / %d", syncTelemetry.sentChunks or 0, syncTelemetry.receivedChunks or 0, syncTelemetry.appliedChunks or 0),
+        string.format("Queues req/out/in/final: %d / %d / %d / %d", sync and sync.pendingRequests or 0, sync and sync.outboundChunks or 0, sync and sync.inboundChunks or 0, sync and sync.inboundFinalize or 0),
+        string.format("Paused cycles: %d  Eq skips: %d", syncTelemetry.pausedSyncCycles or 0, syncTelemetry.skippedEquivalentMerges or 0),
+        string.format("Bootstrap: %s", bootstrap and (bootstrap.inProgress and "running" or (bootstrap.canBootstrap and "available" or (bootstrap.completed and "done" or "not-needed"))) or "n/a"),
+        string.format("Mock: %s pending=%d delivered=%d", mock and (mock.active and (mock.scenarioName or "running") or "idle") or "n/a", mock and mock.pendingPayloads or 0, mockTelemetry.payloadsDelivered or 0),
+        string.format("Worker queues: %s", #queueParts > 0 and table.concat(queueParts, ", ") or "idle"),
+    }
+    setTextIfChanged(self.frame.debugText, table.concat(lines, "\n"))
 end
 
 function UI:RefreshSummaryCards()
@@ -1338,6 +1526,7 @@ function UI:Toggle()
         self.frame:Hide()
     else
         self.frame:Show()
+        self:RefreshDebugVisibility()
         self:Refresh(nil)
         self.frame.searchBox:SetText(self.searchText or "")
     end

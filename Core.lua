@@ -7,10 +7,11 @@ local Addon = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME,
 )
 
 _G.RecipeRegistry = Addon
-Addon.DISPLAY_VERSION = "1.4.0"
+Addon.DISPLAY_VERSION = "1.5.0"
 Addon.WIRE_VERSION = 2
 Addon.ADDON_PREFIX = "RRG1"
 Addon.debugMode = false
+Addon.perfDebugMode = false
 Addon._refreshReasons = {}
 
 local function safecall(fn, ...)
@@ -29,6 +30,48 @@ function Addon:Debug(...)
         out[#out + 1] = tostring(select(i, ...))
     end
     self:Print("|cff8888ff[debug]|r " .. table.concat(out, " "))
+end
+
+local function copySet(src)
+    local out = {}
+    for key, value in pairs(src or {}) do
+        out[key] = value
+    end
+    return out
+end
+
+local function trimInput(text)
+    return (text and text:match("^%s*(.-)%s*$")) or ""
+end
+
+local function splitCommand(text)
+    local trimmed = trimInput(text)
+    if trimmed == "" then
+        return "", ""
+    end
+
+    local cmd, rest = trimmed:match("^(%S+)%s*(.-)$")
+    return cmd or "", rest or ""
+end
+
+local function printPerfHelp(self)
+    self:Print("/rr perf toggle - mostra o nasconde il pannello performance/debug.")
+    self:Print("/rr perf dump - stampa scheduler, code e contatori sync correnti.")
+    self:Print("/rr perf reset - azzera i contatori performance e sync.")
+end
+
+local function printMockHelp(self)
+    self:Print("/rr mock status - stato attuale del mock e ultimi contatori.")
+    self:Print("/rr mock start light|medium|heavy|burst - carico snapshot diretto crescente.")
+    self:Print("/rr mock start bootstrap - trasferimento pesante in stile bootstrap.")
+    self:Print("/rr mock start traffic - test completo HELLO/MANI/REQ/SNAP.")
+    self:Print("/rr mock start offline - convergenza di owner offline via peer replica.")
+    self:Print("/rr mock start trafficburst - stress test del traffico replica.")
+    self:Print("/rr mock start roster - simula roster cleanup con stale e prune.")
+    self:Print("/rr mock start rosterheavy - variante più pesante del test roster.")
+    self:Print("/rr mock cleanup - rimuove dati/stato mock locali dal client.")
+    self:Print("/rr mock reset - azzera i contatori mock.")
+    self:Print("/rr mock stop - ferma solo il worker mock locale attivo.")
 end
 
 function Addon:OnInitialize()
@@ -166,17 +209,18 @@ function Addon:OnItemInfoReceived()
 end
 
 function Addon:RequestRefresh(reason)
-    if reason then
-        self._refreshReasons[reason] = true
-    end
-    -- Skip scheduling if our UI frame doesn't exist or isn't shown.
-    if not (self.UI and self.UI.frame and self.UI.frame:IsShown()) then
+    if self.Performance and self.Performance.MarkUIRefreshNeeded then
+        self.Performance:MarkUIRefreshNeeded(reason)
         return
     end
+
+    if reason then self._refreshReasons[reason] = true end
+    if not (self.UI and self.UI.frame and self.UI.frame:IsShown()) then return end
     if self._refreshTimer then return end
+
     self._refreshTimer = self:ScheduleTimer(function()
         self._refreshTimer = nil
-        local reasons = self._refreshReasons
+        local reasons = copySet(self._refreshReasons)
         self._refreshReasons = {}
         safecall(function()
             if self.UI and self.UI.Refresh then
@@ -187,8 +231,8 @@ function Addon:RequestRefresh(reason)
 end
 
 function Addon:SlashHandler(input)
-    local cmd, rest = self:GetArgs(input or "", 2)
-    cmd = cmd and cmd:lower() or ""
+    local cmd, rest = splitCommand(input)
+    cmd = cmd:lower()
 
     if cmd == "" or cmd == "show" then
         if self.UI then self.UI:Toggle() end
@@ -198,6 +242,97 @@ function Addon:SlashHandler(input)
     if cmd == "debug" then
         self.debugMode = not self.debugMode
         self:Print("Debug " .. (self.debugMode and "enabled" or "disabled"))
+        return
+    end
+
+    if cmd == "perf" then
+        local perfCmd = trimInput(rest):lower()
+        if perfCmd == "help" then
+            printPerfHelp(self)
+            return
+        end
+        if perfCmd == "" or perfCmd == "show" or perfCmd == "toggle" then
+            self.perfDebugMode = not self.perfDebugMode
+            if self.UI and self.UI.RefreshDebugVisibility then
+                self.UI:RefreshDebugVisibility()
+            end
+            self:RequestRefresh("perf")
+            self:Print("Performance debug " .. (self.perfDebugMode and "enabled" or "disabled"))
+            return
+        end
+        if perfCmd == "dump" or perfCmd == "status" then
+            if self.Performance and self.Performance.DumpDebugStatus then
+                self.Performance:DumpDebugStatus()
+            end
+            if self.Sync and self.Sync.DumpStatus then
+                self.Sync:DumpStatus()
+            end
+            return
+        end
+        if perfCmd == "reset" or perfCmd == "clear" then
+            if self.Performance and self.Performance.ResetTelemetry then
+                self.Performance:ResetTelemetry()
+            end
+            if self.Sync and self.Sync.ResetTelemetry then
+                self.Sync:ResetTelemetry()
+            end
+            self:RequestRefresh("perf")
+            self:Print("Performance counters reset.")
+            return
+        end
+        self:Print("Usage: /rr perf [toggle|dump|reset|help]")
+        return
+    end
+
+    if cmd == "mock" then
+        local mockCmd, mockRest = splitCommand(rest)
+        mockCmd = mockCmd:lower()
+        mockRest = trimInput(mockRest):lower()
+        if not self.MockSync then
+            self:Print("Mock sync module not available.")
+            return
+        end
+        if mockCmd == "help" then
+            printMockHelp(self)
+            return
+        end
+        if mockCmd == "" or mockCmd == "status" then
+            self.MockSync:DumpStatus()
+            return
+        end
+        if mockCmd == "start" then
+            local scenario = mockRest ~= "" and mockRest or "medium"
+            local ok, err = self.MockSync:StartScenario(scenario)
+            if ok then
+                self:Print("Mock sync started: " .. scenario)
+            else
+                self:Print("Mock sync start failed: " .. tostring(err))
+            end
+            return
+        end
+        if mockCmd == "stop" then
+            self.MockSync:Stop()
+            self:Print("Mock sync stopped.")
+            return
+        end
+        if mockCmd == "cleanup" or mockCmd == "clean" then
+            local removedMembers, removedRegistry, removedOnlineNodes, removedPending = self.MockSync:Cleanup()
+            self:Print(string.format(
+                "Mock cleanup complete. members=%d registry=%d nodes=%d pending=%d",
+                removedMembers or 0,
+                removedRegistry or 0,
+                removedOnlineNodes or 0,
+                removedPending or 0
+            ))
+            return
+        end
+        if mockCmd == "reset" then
+            self.MockSync:ResetTelemetry()
+            self:Print("Mock sync counters reset.")
+            self:RequestRefresh("mock")
+            return
+        end
+        self:Print("Usage: /rr mock [status|start <light|medium|heavy|burst|bootstrap|traffic|offline|trafficburst|roster|rosterheavy>|stop|cleanup|reset|help]")
         return
     end
 
@@ -283,9 +418,9 @@ function Addon:SlashHandler(input)
     end
 
     if cmd == "help" then
-        self:Print("Commands: /rr, /rr options, /rr rescan, /rr mini, /rr sync, /rr prices <item name|link>, /rr share [guild|party|raid|say], /rr pull, /rr clean, /rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID>, /rr dump, /rr wipe")
+        self:Print("Commands: /rr, /rr options, /rr mini, /rr sync, /rr perf [toggle|dump|reset|help], /rr mock [status|start <light|medium|heavy|burst|bootstrap|traffic|offline|trafficburst|roster|rosterheavy>|stop|cleanup|reset|help], /rr prices <item name|link>, /rr share [guild|party|raid|say], /rr pull, /rr clean, /rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID>, /rr dump, /rr wipe")
         return
     end
 
-    self:Print("Commands: /rr, /rr options, /rr rescan, /rr mini, /rr sync, /rr prices <item name|link>, /rr share [guild|party|raid|say], /rr pull, /rr clean, /rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID>, /rr dump, /rr wipe")
+    self:Print("Commands: /rr, /rr options, /rr mini, /rr sync, /rr perf [toggle|dump|reset|help], /rr mock [status|start <light|medium|heavy|burst|bootstrap|traffic|offline|trafficburst|roster|rosterheavy>|stop|cleanup|reset|help], /rr prices <item name|link>, /rr share [guild|party|raid|say], /rr pull, /rr clean, /rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID>, /rr dump, /rr wipe")
 end
