@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented in this file.
 
+## [1.5.1] - 2026-05-01
+### Fixed
+- Improved sync reliability for offline guildmates so their profession data is more likely to be discovered and filled in from other already-synced guild members.
+
 ## [1.5.0] - 2026-04-28
 ### Added
 - Automatic guild recipe sync now fills in missing data progressively, including recipes belonging to guildmates who are currently offline when another synced guildmate already knows them.

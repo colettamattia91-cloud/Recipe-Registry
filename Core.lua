@@ -7,7 +7,7 @@ local Addon = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME,
 )
 
 _G.RecipeRegistry = Addon
-Addon.DISPLAY_VERSION = "1.5.0"
+Addon.DISPLAY_VERSION = "1.5.1"
 Addon.WIRE_VERSION = 2
 Addon.ADDON_PREFIX = "RRG1"
 Addon.debugMode = false
@@ -66,12 +66,13 @@ local function printMockHelp(self)
     self:Print("/rr mock start bootstrap - trasferimento pesante in stile bootstrap.")
     self:Print("/rr mock start traffic - test completo HELLO/MANI/REQ/SNAP.")
     self:Print("/rr mock start offline - convergenza di owner offline via peer replica.")
+    self:Print("/rr mock start offlinewipe - simula wipe locale + owner offline sconosciuti via replica.")
     self:Print("/rr mock start trafficburst - stress test del traffico replica.")
     self:Print("/rr mock start roster - simula roster cleanup con stale e prune.")
     self:Print("/rr mock start rosterheavy - variante più pesante del test roster.")
     self:Print("/rr mock cleanup - rimuove dati/stato mock locali dal client.")
     self:Print("/rr mock reset - azzera i contatori mock.")
-    self:Print("/rr mock stop - ferma solo il worker mock locale attivo.")
+    self:Print("/rr mock stop - ferma il worker mock locale e riapre il traffico reale.")
 end
 
 function Addon:OnInitialize()
@@ -332,7 +333,7 @@ function Addon:SlashHandler(input)
             self:RequestRefresh("mock")
             return
         end
-        self:Print("Usage: /rr mock [status|start <light|medium|heavy|burst|bootstrap|traffic|offline|trafficburst|roster|rosterheavy>|stop|cleanup|reset|help]")
+        self:Print("Usage: /rr mock [status|start <light|medium|heavy|burst|bootstrap|traffic|offline|offlinewipe|trafficburst|roster|rosterheavy>|stop|cleanup|reset|help]")
         return
     end
 

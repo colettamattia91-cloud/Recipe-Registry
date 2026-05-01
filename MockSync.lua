@@ -16,16 +16,17 @@ local MOCK_PROFESSIONS = {
 }
 
 local SCENARIOS = {
-    light = { peers = 2, professions = 2, recipesPerProfession = 30, chunkSize = 20, peerDelay = 0.12 },
-    medium = { peers = 4, professions = 3, recipesPerProfession = 70, chunkSize = 24, peerDelay = 0.09 },
-    heavy = { peers = 8, professions = 4, recipesPerProfession = 120, chunkSize = 28, peerDelay = 0.06 },
-    burst = { peers = 12, professions = 4, recipesPerProfession = 160, chunkSize = 40, peerDelay = 0.02 },
-    bootstrap = { peers = 1, professions = 6, recipesPerProfession = 220, chunkSize = 32, peerDelay = 0.04, sourceType = "bootstrap" },
-    traffic = { mode = "traffic", peers = 3, ownersPerPeer = 2, professions = 3, recipesPerProfession = 80, chunkSize = 24, peerDelay = 0.08, requestDelay = 0.05, sourceType = "replica" },
-    offline = { mode = "traffic", peers = 4, ownersPerPeer = 3, professions = 3, recipesPerProfession = 110, chunkSize = 24, peerDelay = 0.06, requestDelay = 0.05, sourceType = "replica" },
-    trafficburst = { mode = "traffic", peers = 6, ownersPerPeer = 3, professions = 4, recipesPerProfession = 150, chunkSize = 32, peerDelay = 0.02, requestDelay = 0.02, sourceType = "replica" },
-    roster = { mode = "roster", activeMembers = 6, missingMembers = 4, prunableMembers = 2, professions = 3, recipesPerProfession = 18 },
-    rosterheavy = { mode = "roster", activeMembers = 12, missingMembers = 8, prunableMembers = 5, professions = 4, recipesPerProfession = 28 },
+    light = { peers = 2, professions = 2, recipesPerProfession = 30, chunkSize = 20, peerDelay = 0.12, hardIsolation = true },
+    medium = { peers = 4, professions = 3, recipesPerProfession = 70, chunkSize = 24, peerDelay = 0.09, hardIsolation = true },
+    heavy = { peers = 8, professions = 4, recipesPerProfession = 120, chunkSize = 28, peerDelay = 0.06, hardIsolation = true },
+    burst = { peers = 12, professions = 4, recipesPerProfession = 160, chunkSize = 40, peerDelay = 0.02, hardIsolation = true },
+    bootstrap = { peers = 1, professions = 6, recipesPerProfession = 220, chunkSize = 32, peerDelay = 0.04, sourceType = "bootstrap", hardIsolation = true },
+    traffic = { mode = "traffic", peers = 3, ownersPerPeer = 2, professions = 3, recipesPerProfession = 80, chunkSize = 24, peerDelay = 0.08, requestDelay = 0.05, sourceType = "replica", hardIsolation = true },
+    offline = { mode = "traffic", peers = 4, ownersPerPeer = 3, professions = 3, recipesPerProfession = 110, chunkSize = 24, peerDelay = 0.06, requestDelay = 0.05, sourceType = "replica", hardIsolation = true },
+    offlinewipe = { mode = "traffic", peers = 4, ownersPerPeer = 3, professions = 3, recipesPerProfession = 110, chunkSize = 24, peerDelay = 0.06, requestDelay = 0.05, sourceType = "replica", hardIsolation = true },
+    trafficburst = { mode = "traffic", peers = 6, ownersPerPeer = 3, professions = 4, recipesPerProfession = 150, chunkSize = 32, peerDelay = 0.02, requestDelay = 0.02, sourceType = "replica", hardIsolation = true },
+    roster = { mode = "roster", activeMembers = 6, missingMembers = 4, prunableMembers = 2, professions = 3, recipesPerProfession = 18, hardIsolation = true },
+    rosterheavy = { mode = "roster", activeMembers = 12, missingMembers = 8, prunableMembers = 5, professions = 4, recipesPerProfession = 28, hardIsolation = true },
 }
 
 local function nowSeconds()
@@ -67,6 +68,7 @@ end
 
 function MockSync:Reset()
     self.active = false
+    self.hardIsolation = false
     self.scenarioName = nil
     self.scenarioConfig = nil
     self.pendingPayloads = {}
@@ -84,6 +86,7 @@ function MockSync:Reset()
         trafficSnapshots = 0,
         rosterRunsStarted = 0,
         rosterRunsCompleted = 0,
+        suppressedSends = 0,
     }
 end
 
@@ -99,6 +102,7 @@ function MockSync:ResetTelemetry()
         trafficSnapshots = 0,
         rosterRunsStarted = 0,
         rosterRunsCompleted = 0,
+        suppressedSends = 0,
     }
 end
 
@@ -175,6 +179,7 @@ function MockSync:StartRosterScenario(name, config)
 
     self:Cleanup()
     self.active = true
+    self.hardIsolation = config.hardIsolation == true
     self.scenarioName = name
     self.scenarioConfig = config
     self.rosterScenario = {
@@ -261,6 +266,14 @@ function MockSync:IsLocalTrafficEnabled(sourceKey, memberKey)
     if sourceKey and not self.mockDatasets[sourceKey] then return false end
     if memberKey and not self:IsMockKey(memberKey) then return false end
     return true
+end
+
+function MockSync:IsHardIsolationEnabled()
+    return self.active == true and self.hardIsolation == true
+end
+
+function MockSync:RecordSuppressedSend()
+    self.telemetry.suppressedSends = (self.telemetry.suppressedSends or 0) + 1
 end
 
 function MockSync:QueuePayload(deliverAt, payload)
@@ -487,7 +500,9 @@ function MockSync:QueueScenarioPayloads(name)
     local config = self:GetScenarioConfig(name)
     if not config then return false, "unknown-scenario" end
 
+    self:Cleanup()
     self.active = true
+    self.hardIsolation = config.hardIsolation == true
     self.scenarioName = name
     self.scenarioConfig = config
     self.pendingPayloads = {}
@@ -612,8 +627,25 @@ function MockSync:HandleLocalRequest(request)
     if not dataset then return false end
     local owner = dataset.owners and dataset.owners[request.memberKey]
     if not owner then return false end
+
+    local requestedBlocks = request.requestedBlocks or {}
+    local hasSpecificBlockRequest = type(requestedBlocks) == "table" and #requestedBlocks > 0
     if (owner.rev or 0) <= (request.knownRev or 0) then
-        return false
+        if not hasSpecificBlockRequest then
+            return false
+        end
+
+        local hasRequestedBlock = false
+        for _, blockKey in ipairs(requestedBlocks) do
+            local ownerCharacter, professionKey = Addon.Data:ParseSyncBlockKey(blockKey)
+            if ownerCharacter == request.memberKey and professionKey and owner.professions and owner.professions[professionKey] then
+                hasRequestedBlock = true
+                break
+            end
+        end
+        if not hasRequestedBlock then
+            return false
+        end
     end
 
     self.telemetry.trafficRequests = self.telemetry.trafficRequests + 1
@@ -667,6 +699,7 @@ function MockSync:Stop()
     self.pendingPayloads = {}
     self.mockDatasets = {}
     self.active = false
+    self.hardIsolation = false
     self.scenarioName = nil
     self.scenarioConfig = nil
     self.rosterScenario = nil
@@ -715,6 +748,7 @@ function MockSync:GetDebugSnapshot()
         telemetry = self.telemetry,
         scenarioCount = countKeys(SCENARIOS),
         localTraffic = self.scenarioConfig and self.scenarioConfig.mode == "traffic" or false,
+        hardIsolation = self:IsHardIsolationEnabled(),
         rosterScenario = self.rosterScenario,
         rosterRunning = rosterRunning,
         lastCleanup = lastCleanup,
@@ -725,10 +759,11 @@ function MockSync:DumpStatus()
     local snapshot = self:GetDebugSnapshot()
     local telemetry = snapshot.telemetry or {}
     Addon:Print(format(
-        "Mock active=%s scenario=%s traffic=%s pending=%d datasets=%d started=%d completed=%d queued=%d delivered=%d peers=%d announcements=%d requests=%d snapshots=%d",
+        "Mock active=%s scenario=%s traffic=%s isolated=%s pending=%d datasets=%d started=%d completed=%d queued=%d delivered=%d peers=%d announcements=%d requests=%d snapshots=%d suppressed=%d",
         tostring(snapshot.active),
         tostring(snapshot.scenarioName or "none"),
         tostring(snapshot.localTraffic),
+        tostring(snapshot.hardIsolation),
         snapshot.pendingPayloads or 0,
         snapshot.datasets or 0,
         telemetry.scenariosStarted or 0,
@@ -738,7 +773,8 @@ function MockSync:DumpStatus()
         telemetry.peersSimulated or 0,
         telemetry.trafficAnnouncements or 0,
         telemetry.trafficRequests or 0,
-        telemetry.trafficSnapshots or 0
+        telemetry.trafficSnapshots or 0,
+        telemetry.suppressedSends or 0
     ))
     if snapshot.rosterScenario then
         local roster = snapshot.rosterScenario

@@ -41,6 +41,42 @@ local function shallowCopyTable(src)
     return out
 end
 
+local function cloneStringSet(src)
+    local out = {}
+    for _, value in ipairs(src or {}) do
+        if value then
+            out[#out + 1] = value
+        end
+    end
+    return out
+end
+
+local function mergeRequestedBlocks(existing, incoming)
+    if type(existing) ~= "table" or #existing == 0 then
+        return cloneStringSet(incoming)
+    end
+    if type(incoming) ~= "table" or #incoming == 0 then
+        return cloneStringSet(existing)
+    end
+
+    local seen = {}
+    local merged = {}
+    for _, blockKey in ipairs(existing) do
+        if blockKey and not seen[blockKey] then
+            seen[blockKey] = true
+            merged[#merged + 1] = blockKey
+        end
+    end
+    for _, blockKey in ipairs(incoming) do
+        if blockKey and not seen[blockKey] then
+            seen[blockKey] = true
+            merged[#merged + 1] = blockKey
+        end
+    end
+    sort(merged)
+    return merged
+end
+
 local function isMockKey(memberKey)
     return type(memberKey) == "string"
         and (memberKey:find("__RRMockPeer", 1, true) == 1 or memberKey:find("__RRMockOwner", 1, true) == 1)
@@ -106,6 +142,13 @@ function Sync:GetWhisperTarget(memberKey)
     return name or memberKey
 end
 
+function Sync:IsRealTrafficSuppressed()
+    return Addon.MockSync
+        and Addon.MockSync.IsHardIsolationEnabled
+        and Addon.MockSync:IsHardIsolationEnabled()
+        or false
+end
+
 function Sync:IsMockKey(memberKey)
     if isMockKey(memberKey) then return true end
     local row = memberKey and self.registry and self.registry[memberKey] or nil
@@ -158,6 +201,12 @@ function Sync:AdvertiseLocalRevision(reason)
 end
 
 function Sync:SendGuildEnvelope(kind, payload, priority)
+    if self:IsRealTrafficSuppressed() then
+        if Addon.MockSync and Addon.MockSync.RecordSuppressedSend then
+            Addon.MockSync:RecordSuppressedSend()
+        end
+        return
+    end
     payload.kind = kind
     payload.sender = self:GetSelfKey()
     payload.sentAt = time()
@@ -168,6 +217,12 @@ function Sync:SendGuildEnvelope(kind, payload, priority)
 end
 
 function Sync:SendDirectEnvelope(kind, payload, targetKey, priority)
+    if self:IsRealTrafficSuppressed() then
+        if Addon.MockSync and Addon.MockSync.RecordSuppressedSend then
+            Addon.MockSync:RecordSuppressedSend()
+        end
+        return
+    end
     local target = self:GetWhisperTarget(targetKey)
     if not target then return end
     payload.kind = kind
@@ -371,7 +426,14 @@ function Sync:QueueRequest(sourceKey, memberKey, targetRev, why, opts)
     end
 
     local q = self.pendingRequests[memberKey]
-    if q and (q.rev or 0) >= (targetRev or 0) then return end
+    if q and (q.rev or 0) >= (targetRev or 0) then
+        if opts.requestedBlocks and #opts.requestedBlocks > 0 then
+            q.requestedBlocks = mergeRequestedBlocks(q.requestedBlocks, opts.requestedBlocks)
+            q.allowReplicaSource = q.allowReplicaSource or opts.allowReplicaSource == true
+            q.source = opts.allowReplicaSource and sourceKey or q.source
+        end
+        return
+    end
 
     self.pendingRequests[memberKey] = {
         source = sourceKey,
@@ -382,6 +444,7 @@ function Sync:QueueRequest(sourceKey, memberKey, targetRev, why, opts)
         attempts = q and q.attempts or 0,
         resumeAttempts = 0,
         allowReplicaSource = opts.allowReplicaSource == true,
+        requestedBlocks = cloneStringSet(opts.requestedBlocks),
     }
     Addon:Debug("Queued direct request", memberKey, "from", sourceKey, "rev", targetRev or 0, why or "")
     Addon:RequestRefresh("queue")
@@ -425,9 +488,12 @@ function Sync:ProcessRequestQueue()
 
     local oldestKey, oldest
     for memberKey, info in pairs(self.pendingRequests) do
-        if not oldest or info.queuedAt < oldest.queuedAt then
-            oldest = info
-            oldestKey = memberKey
+        local allowLocalMock = self:ShouldAllowLocalMockTraffic(info and info.source, memberKey)
+        if not self:IsRealTrafficSuppressed() or allowLocalMock then
+            if not oldest or info.queuedAt < oldest.queuedAt then
+                oldest = info
+                oldestKey = memberKey
+            end
         end
     end
     if not oldest then return end
@@ -448,6 +514,7 @@ function Sync:ProcessRequestQueue()
         attempts = (oldest.attempts or 0) + 1,
         resumeAttempts = 0,
         allowReplicaSource = oldest.allowReplicaSource == true,
+        requestedBlocks = cloneStringSet(oldest.requestedBlocks),
     }
 
     local localEntry = Addon.Data:GetMember(oldest.memberKey)
@@ -463,6 +530,7 @@ function Sync:ProcessRequestQueue()
             knownRev = knownRev,
             wantRev = oldest.rev or 0,
             allowReplicaSource = oldest.allowReplicaSource == true,
+            requestedBlocks = cloneStringSet(oldest.requestedBlocks),
         })
         if not accepted then
             self:FailInFlight(false)
@@ -473,6 +541,7 @@ function Sync:ProcessRequestQueue()
         key = oldest.memberKey,
         knownRev = knownRev,
         wantRev = oldest.rev or 0,
+        requestedBlocks = cloneStringSet(oldest.requestedBlocks),
     }, oldest.source, "ALERT")
 end
 
@@ -494,6 +563,7 @@ function Sync:FailInFlight(requeue)
             attempts = req.attempts or 1,
             resumeAttempts = req.resumeAttempts or 0,
             allowReplicaSource = req.allowReplicaSource == true,
+            requestedBlocks = cloneStringSet(req.requestedBlocks),
         }
     end
     if self.inFlight then
@@ -515,7 +585,29 @@ function Sync:HandleRequest(payload)
     local entry = Addon.Data:GetMember(payload.key)
     if not entry then return end
     if (entry.guildStatus or "active") ~= "active" then return end
-    if (entry.rev or 0) <= (payload.knownRev or 0) then return end
+
+    local requestedBlocks = payload.requestedBlocks or {}
+    local hasSpecificBlockRequest = type(requestedBlocks) == "table" and #requestedBlocks > 0
+    if (entry.rev or 0) <= (payload.knownRev or 0) then
+        if not hasSpecificBlockRequest then
+            return
+        end
+
+        local hasRequestedBlock = false
+        for _, blockKey in ipairs(requestedBlocks) do
+            local ownerCharacter, professionKey = Addon.Data:ParseSyncBlockKey(blockKey)
+            if ownerCharacter == payload.key and professionKey then
+                local prof = entry.professions and entry.professions[professionKey]
+                if prof and (prof.guildStatus or entry.guildStatus or "active") == "active" then
+                    hasRequestedBlock = true
+                    break
+                end
+            end
+        end
+        if not hasRequestedBlock then
+            return
+        end
+    end
 
     local sessionId = self:BuildSessionId(payload.key, entry.rev or 0)
     local chunks = Addon.Data:BuildSnapshotChunks(payload.key)
@@ -709,6 +801,7 @@ function Sync:HandleManifestChunk(payload)
     for ownerCharacter, request in pairs(groupedRequests or {}) do
         self:QueueRequest(senderKey, ownerCharacter, request.revision or 0, "manifest", {
             allowReplicaSource = true,
+            requestedBlocks = request.blockKeys,
         })
     end
     Addon:RequestRefresh("manifest")
@@ -1012,6 +1105,7 @@ function Sync:GetDebugSnapshot()
         inboundFinalize = #self.inboundFinalizeQueue,
         inFlight = self.inFlight and self.inFlight.memberKey or nil,
         paused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() or false,
+        isolated = self:IsRealTrafficSuppressed(),
         telemetry = self.telemetry,
     }
 end
@@ -1114,7 +1208,7 @@ end
 function Sync:DumpStatus()
     local role = self:IsCoordinator() and "Coordinator" or "Client"
     Addon:Print(string.format(
-        "Role=%s coordinator=%s onlineNodes=%d registry=%d queued=%d inFlight=%s outgoing=%d outboundChunks=%d inboundChunks=%d paused=%s",
+        "Role=%s coordinator=%s onlineNodes=%d registry=%d queued=%d inFlight=%s outgoing=%d outboundChunks=%d inboundChunks=%d paused=%s isolated=%s",
         role,
         tostring(self.coordinatorKey),
         countKeys(self.onlineNodes),
@@ -1124,6 +1218,7 @@ function Sync:DumpStatus()
         countKeys(self.outgoingSessions),
         #self.outboundChunkQueue,
         #self.inboundChunkQueue,
-        tostring(Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() or false)
+        tostring(Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() or false),
+        tostring(self:IsRealTrafficSuppressed())
     ))
 end
