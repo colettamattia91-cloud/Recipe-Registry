@@ -1809,6 +1809,102 @@ function Data:DumpSummary()
     Addon:Print(string.format("Members=%d Professions=%d Recipes=%d | Local rev=%d updated=%d", totalMembers, totalProfs, totalRecipes, s.rev, s.updatedAt))
 end
 
+function Data:DumpManifestSummary()
+    local manifest = self:BuildSyncManifest(false)
+    local localKey = self:GetPlayerKey()
+    local totalBlocks = 0
+    local totalRecipes = 0
+    local ownerBlocks = 0
+    local replicaBlocks = 0
+    local replicaOwners = {}
+    local staleMembers = 0
+    local staleOwnerKeys = {}
+
+    for memberKey, entry in pairs(self:GetMembersDB()) do
+        if not self:IsMockMember(memberKey, entry) and (entry.guildStatus or "active") == "stale" then
+            staleMembers = staleMembers + 1
+            staleOwnerKeys[#staleOwnerKeys + 1] = memberKey
+        end
+    end
+
+    for _, block in pairs(manifest.blocks or {}) do
+        totalBlocks = totalBlocks + 1
+        totalRecipes = totalRecipes + (block.count or 0)
+        if block.ownerCharacter == localKey and (block.sourceType or "owner") == "owner" then
+            ownerBlocks = ownerBlocks + 1
+        else
+            replicaBlocks = replicaBlocks + 1
+            replicaOwners[block.ownerCharacter] = replicaOwners[block.ownerCharacter] or {
+                blocks = 0,
+                recipes = 0,
+                sourceType = block.sourceType or "replica",
+                professions = {},
+            }
+            replicaOwners[block.ownerCharacter].blocks = replicaOwners[block.ownerCharacter].blocks + 1
+            replicaOwners[block.ownerCharacter].recipes = replicaOwners[block.ownerCharacter].recipes + (block.count or 0)
+            replicaOwners[block.ownerCharacter].sourceType = block.sourceType or replicaOwners[block.ownerCharacter].sourceType
+            replicaOwners[block.ownerCharacter].professions[#replicaOwners[block.ownerCharacter].professions + 1] = block.professionKey
+        end
+    end
+
+    local replicaOwnerKeys = {}
+    for ownerCharacter in pairs(replicaOwners) do
+        replicaOwnerKeys[#replicaOwnerKeys + 1] = ownerCharacter
+    end
+    sort(replicaOwnerKeys)
+
+    Addon:Print(string.format(
+        "Manifest local=%s blocks=%d recipes=%d ownerBlocks=%d replicaBlocks=%d replicaOwners=%d staleMembers=%d",
+        tostring(localKey),
+        totalBlocks,
+        totalRecipes,
+        ownerBlocks,
+        replicaBlocks,
+        #replicaOwnerKeys,
+        staleMembers
+    ))
+
+    if #replicaOwnerKeys == 0 then
+        Addon:Print("Manifest replica owners: none")
+    else
+        Addon:Print("Manifest replica owners:")
+        local maxLines = math.min(#replicaOwnerKeys, 12)
+        for index = 1, maxLines do
+            local ownerCharacter = replicaOwnerKeys[index]
+            local info = replicaOwners[ownerCharacter]
+            sort(info.professions)
+            Addon:Print(string.format(
+                "  %s blocks=%d recipes=%d publish=replica authority=%s professions=%s",
+                tostring(ownerCharacter),
+                info.blocks or 0,
+                info.recipes or 0,
+                tostring(info.sourceType or "replica"),
+                table.concat(info.professions or {}, ",")
+            ))
+        end
+        if #replicaOwnerKeys > maxLines then
+            Addon:Print(string.format("  ... and %d more", #replicaOwnerKeys - maxLines))
+        end
+    end
+    if #staleOwnerKeys > 0 then
+        sort(staleOwnerKeys)
+        Addon:Print("Manifest stale excluded:")
+        local maxStaleLines = math.min(#staleOwnerKeys, 8)
+        for index = 1, maxStaleLines do
+            local memberKey = staleOwnerKeys[index]
+            local entry = self:GetMember(memberKey)
+            local profCount = 0
+            for _ in pairs(entry and entry.professions or {}) do
+                profCount = profCount + 1
+            end
+            Addon:Print(string.format("  %s professions=%d", tostring(memberKey), profCount))
+        end
+        if #staleOwnerKeys > maxStaleLines then
+            Addon:Print(string.format("  ... and %d more", #staleOwnerKeys - maxStaleLines))
+        end
+    end
+end
+
 function Data:HasAtlasLootResolver()
     local recipe, profession = getAtlasLootHandles()
     return recipe ~= nil and profession ~= nil

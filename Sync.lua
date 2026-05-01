@@ -20,6 +20,7 @@ local OUTGOING_CHUNK_DELAY = 0.20
 local MAX_RESUME_ATTEMPTS = 3
 local COORDINATOR_RECOMPUTE_DELAY = 0.35
 local MANIFEST_PUSH_COOLDOWN = 20
+local OFFLINE_DEBUG_LOG_LIMIT = 12
 
 local function countKeys(tbl)
     local n = 0
@@ -39,6 +40,18 @@ local function shallowCopyTable(src)
         out[key] = value
     end
     return out
+end
+
+local function countArrayUnique(values)
+    local seen = {}
+    local count = 0
+    for _, value in ipairs(values or {}) do
+        if value and not seen[value] then
+            seen[value] = true
+            count = count + 1
+        end
+    end
+    return count
 end
 
 local function cloneStringSet(src)
@@ -106,7 +119,14 @@ function Sync:OnInitialize()
         skippedEquivalentMerges = 0,
         pausedSyncCycles = 0,
         busySeedRejections = 0,
+        replicaManifestOwnersSeen = 0,
+        replicaManifestBlocksSeen = 0,
+        replicaRequestsQueued = 0,
+        replicaRequestsServed = 0,
+        replicaOwnersApplied = 0,
+        replicaNewOwnersApplied = 0,
     }
+    self.offlineDebugLog = {}
 end
 
 function Sync:ResetTelemetry()
@@ -117,7 +137,23 @@ function Sync:ResetTelemetry()
         skippedEquivalentMerges = 0,
         pausedSyncCycles = 0,
         busySeedRejections = 0,
+        replicaManifestOwnersSeen = 0,
+        replicaManifestBlocksSeen = 0,
+        replicaRequestsQueued = 0,
+        replicaRequestsServed = 0,
+        replicaOwnersApplied = 0,
+        replicaNewOwnersApplied = 0,
     }
+    self.offlineDebugLog = {}
+end
+
+function Sync:PushOfflineDebugEvent(kind, detail)
+    local stamp = date and date("%H:%M:%S") or tostring(time())
+    local line = string.format("%s %s %s", tostring(stamp), tostring(kind or "event"), tostring(detail or ""))
+    self.offlineDebugLog[#self.offlineDebugLog + 1] = line
+    while #self.offlineDebugLog > OFFLINE_DEBUG_LOG_LIMIT do
+        table.remove(self.offlineDebugLog, 1)
+    end
 end
 
 function Sync:Startup()
@@ -262,6 +298,8 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
         self:HandleTransferDone(payload, distribution, sender)
     elseif payload.kind == "MANI" then
         self:HandleManifestChunk(payload, distribution, sender)
+    elseif payload.kind == "MREQ" then
+        self:HandleManifestRequest(payload, distribution, sender)
     end
 end
 
@@ -613,6 +651,14 @@ function Sync:HandleRequest(payload)
     local chunks = Addon.Data:BuildSnapshotChunks(payload.key)
     if #chunks == 0 then return end
 
+    if payload.requestedBlocks and #payload.requestedBlocks > 0
+        and payload.key ~= self:GetSelfKey()
+        and payload.key ~= targetKey
+        and not Addon.Data:IsMemberOnline(payload.key) then
+        self.telemetry.replicaRequestsServed = self.telemetry.replicaRequestsServed + 1
+        self:PushOfflineDebugEvent("served", string.format("%s to %s blocks=%d", tostring(payload.key), tostring(targetKey), #payload.requestedBlocks))
+    end
+
     self.outgoingSessions[sessionId] = {
         sessionId = sessionId,
         memberKey = payload.key,
@@ -741,6 +787,28 @@ function Sync:SendManifestToPeer(peerKey, why)
     self._lastManifestSentAt[peerKey] = time()
 end
 
+function Sync:RequestManifestRefresh(peerKey)
+    if peerKey and peerKey ~= "" then
+        if self:IsMockKey(peerKey) then return end
+        self:SendDirectEnvelope("MREQ", {
+            key = self:GetSelfKey(),
+            why = "manual",
+        }, peerKey, "NORMAL")
+        return
+    end
+
+    self:SendGuildEnvelope("MREQ", {
+        key = self:GetSelfKey(),
+        why = "manual-all",
+    }, "NORMAL")
+end
+
+function Sync:HandleManifestRequest(payload)
+    if not payload.sender or payload.sender == self:GetSelfKey() then return end
+    if self:IsMockKey(payload.sender) then return end
+    self:SendManifestToPeer(payload.sender, "force")
+end
+
 function Sync:BroadcastManifestToOnlinePeers(why)
     for peerKey in pairs(self.onlineNodes or {}) do
         if peerKey ~= self:GetSelfKey() and not self:IsMockKey(peerKey) then
@@ -798,11 +866,36 @@ function Sync:HandleManifestChunk(payload)
 
     Addon.TrickleSync:StorePeerManifest(senderKey, manifest)
     local _, groupedRequests = Addon.TrickleSync:QueueMissingBlocksForPeer(senderKey, manifest)
+    local replicaOwners = {}
+    local replicaBlocks = 0
+    for blockKey, block in pairs(manifest.blocks or {}) do
+        if block and block.ownerCharacter and block.ownerCharacter ~= senderKey and not Addon.Data:IsMemberOnline(block.ownerCharacter) then
+            replicaBlocks = replicaBlocks + 1
+            replicaOwners[#replicaOwners + 1] = block.ownerCharacter
+        elseif block and block.sourceType == "replica" and block.ownerCharacter and not Addon.Data:IsMemberOnline(block.ownerCharacter) then
+            replicaBlocks = replicaBlocks + 1
+            replicaOwners[#replicaOwners + 1] = block.ownerCharacter
+        end
+    end
+    if replicaBlocks > 0 then
+        local uniqueReplicaOwners = countArrayUnique(replicaOwners)
+        self.telemetry.replicaManifestBlocksSeen = self.telemetry.replicaManifestBlocksSeen + replicaBlocks
+        self.telemetry.replicaManifestOwnersSeen = self.telemetry.replicaManifestOwnersSeen + uniqueReplicaOwners
+        self:PushOfflineDebugEvent("manifest", string.format("peer=%s owners=%d blocks=%d", tostring(senderKey), uniqueReplicaOwners, replicaBlocks))
+    end
     for ownerCharacter, request in pairs(groupedRequests or {}) do
-        self:QueueRequest(senderKey, ownerCharacter, request.revision or 0, "manifest", {
-            allowReplicaSource = true,
-            requestedBlocks = request.blockKeys,
-        })
+        local ownerIsOnline = Addon.Data:IsMemberOnline(ownerCharacter)
+        local shouldRequestReplica = ownerCharacter == senderKey or not ownerIsOnline
+        if ownerCharacter ~= senderKey and not ownerIsOnline then
+            self.telemetry.replicaRequestsQueued = self.telemetry.replicaRequestsQueued + 1
+            self:PushOfflineDebugEvent("queued", string.format("%s from %s blocks=%d rev=%d", tostring(ownerCharacter), tostring(senderKey), #(request.blockKeys or {}), request.revision or 0))
+        end
+        if shouldRequestReplica then
+            self:QueueRequest(senderKey, ownerCharacter, request.revision or 0, "manifest", {
+                allowReplicaSource = true,
+                requestedBlocks = request.blockKeys,
+            })
+        end
     end
     Addon:RequestRefresh("manifest")
 end
@@ -1004,12 +1097,20 @@ end
 
 function Sync:MergeChunkStep(item)
     if not item then return false end
+    local hadLocalEntry = Addon.Data:GetMember(item.memberKey) ~= nil
     local merged = Addon.Data:FinalizeIncomingSnapshot(item.memberKey, item.rev, {
         sourceType = "replica",
         isMock = self:IsMockKey(item.memberKey) or self:IsMockKey(item.sender),
     })
     if merged then
         self.telemetry.appliedChunks = self.telemetry.appliedChunks + 1
+        if item.sender and item.sender ~= item.memberKey and not Addon.Data:IsMemberOnline(item.memberKey) then
+            self.telemetry.replicaOwnersApplied = self.telemetry.replicaOwnersApplied + 1
+            if not hadLocalEntry then
+                self.telemetry.replicaNewOwnersApplied = self.telemetry.replicaNewOwnersApplied + 1
+            end
+            self:PushOfflineDebugEvent("applied", string.format("%s via %s new=%s", tostring(item.memberKey), tostring(item.sender), tostring(not hadLocalEntry)))
+        end
         if self:IsCoordinator() then
             self:BroadcastIndex(item.memberKey, item.rev, item.updatedAt, item.memberKey, "snapshot-merged")
         end
@@ -1069,8 +1170,9 @@ function Sync:RequestGuildCatchup(memberKey, silent)
             end
         end
     end
+    self:RequestManifestRefresh()
     if not silent then
-        Addon:Print("Queued direct catch-up requests from data owners.")
+        Addon:Print("Queued direct catch-up requests and requested fresh manifests from online peers.")
     end
 end
 
@@ -1107,7 +1209,29 @@ function Sync:GetDebugSnapshot()
         paused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() or false,
         isolated = self:IsRealTrafficSuppressed(),
         telemetry = self.telemetry,
+        offlineDebugLog = shallowCopyArray(self.offlineDebugLog),
     }
+end
+
+function Sync:DumpOfflineSyncStatus()
+    local t = self.telemetry or {}
+    Addon:Print(string.format(
+        "Offline sync manifests owners=%d blocks=%d queued=%d served=%d applied=%d newOwners=%d",
+        t.replicaManifestOwnersSeen or 0,
+        t.replicaManifestBlocksSeen or 0,
+        t.replicaRequestsQueued or 0,
+        t.replicaRequestsServed or 0,
+        t.replicaOwnersApplied or 0,
+        t.replicaNewOwnersApplied or 0
+    ))
+    if #(self.offlineDebugLog or {}) == 0 then
+        Addon:Print("Offline sync recent: none")
+        return
+    end
+    Addon:Print("Offline sync recent:")
+    for index = 1, #self.offlineDebugLog do
+        Addon:Print("  " .. tostring(self.offlineDebugLog[index]))
+    end
 end
 
 function Sync:CleanupMockState()

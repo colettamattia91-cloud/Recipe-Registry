@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented in this file.
 
+## [1.5.2] - 2026-05-01
+### Fixed
+- Improved offline guildmate sync so already-synced online guild members can share known offline crafter data more reliably during catch-up.
+
 ## [1.5.1] - 2026-05-01
 ### Fixed
 - Improved sync reliability for offline guildmates so their profession data is more likely to be discovered and filled in from other already-synced guild members.
