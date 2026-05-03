@@ -37,6 +37,17 @@ local COLOR_ROW_SELECTED = {0.13, 0.11, 0.08, 0.98}
 local COLOR_BUTTON = {0.075, 0.075, 0.075, 0.98}
 local COLOR_BUTTON_ACTIVE = {0.13, 0.11, 0.08, 0.98}
 local FAVORITE_ICON = "Interface\\AddOns\\RecipeRegistry\\UI\\Assets\\favorite-star"
+local VALID_FRAME_POINTS = {
+    TOPLEFT = true,
+    TOP = true,
+    TOPRIGHT = true,
+    LEFT = true,
+    CENTER = true,
+    RIGHT = true,
+    BOTTOMLEFT = true,
+    BOTTOM = true,
+    BOTTOMRIGHT = true,
+}
 
 local function unpackColor(t)
     return t[1], t[2], t[3]
@@ -149,6 +160,10 @@ end
 
 local function releaseSearchFocus()
     local ui = Addon.UI
+    if ui and ui.ClearSearchFocus then
+        ui:ClearSearchFocus()
+        return
+    end
     local searchBox = ui and ui.frame and ui.frame.searchBox
     if searchBox and searchBox.HasFocus and searchBox:HasFocus() then
         searchBox:ClearFocus()
@@ -367,20 +382,97 @@ function UI:OnInitialize()
     self.searchText = ""
 end
 
-function UI:ClearSearch()
-    self.searchText = ""
+local function getMainFrameProfile()
+    if not (Addon.db and Addon.db.profile) then return nil end
+    local profile = Addon.db.profile
+    if type(profile.mainFrame) ~= "table" then
+        profile.mainFrame = {}
+    end
+    return profile.mainFrame
+end
+
+function UI:ClearSearchFocus()
+    local searchBox = self.frame and self.frame.searchBox
+    if searchBox and searchBox.HasFocus and searchBox:HasFocus() then
+        searchBox:ClearFocus()
+    end
+end
+
+function UI:CancelSearchTimer()
     if self._searchTimer then
         Addon:CancelTimer(self._searchTimer, true)
         self._searchTimer = nil
     end
+end
+
+function UI:ApplySearchNow()
+    self:CancelSearchTimer()
+    if not (self.frame and self.frame:IsShown()) then return end
+    self:RefreshRecipeList()
+    self:RefreshDetailPanel()
+    self:RefreshSummaryCards()
+end
+
+function UI:OpenChatAfterSearch()
+    if ChatFrame_OpenChat then
+        ChatFrame_OpenChat("")
+    elseif DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.editBox then
+        DEFAULT_CHAT_FRAME.editBox:Show()
+        DEFAULT_CHAT_FRAME.editBox:SetFocus()
+    end
+end
+
+function UI:ClearSearch()
+    self.searchText = ""
+    self:CancelSearchTimer()
     if self.frame and self.frame.searchBox then
         self.frame.searchBox:SetText("")
         self.frame.searchBox:ClearFocus()
     end
+    self:CancelSearchTimer()
 end
 
 function UI:HandleFrameHidden()
     self:ClearSearch()
+end
+
+function UI:SaveFramePlacement()
+    local f = self.frame
+    local settings = getMainFrameProfile()
+    if not (f and settings) then return end
+
+    local point, _, relativePoint, x, y = f:GetPoint(1)
+    settings.point = point or "CENTER"
+    settings.relativePoint = relativePoint or settings.point
+    settings.x = x or 0
+    settings.y = y or 0
+    settings.width = f:GetWidth() or settings.width or 1200
+    settings.height = f:GetHeight() or settings.height or 750
+end
+
+function UI:RestoreFramePlacement()
+    local f = self.frame
+    if not f then return end
+    local settings = getMainFrameProfile()
+    local width = settings and tonumber(settings.width) or 1200
+    local height = settings and tonumber(settings.height) or 750
+    f:SetSize(math.max(1000, width or 1200), math.max(620, height or 750))
+    f:ClearAllPoints()
+    local point = settings and settings.point
+    local relativePoint = settings and settings.relativePoint
+    if VALID_FRAME_POINTS[point] and VALID_FRAME_POINTS[relativePoint or point] then
+        f:SetPoint(point, UIParent, relativePoint or point, settings.x or 0, settings.y or 0)
+    else
+        f:SetPoint("CENTER")
+    end
+end
+
+function UI:Close(reason)
+    self:ClearSearchFocus()
+    self:CancelSearchTimer()
+    if self.frame and self.frame:IsShown() then
+        self.frame:Hide()
+    end
 end
 
 local function buildRefreshPlan(reasons)
@@ -443,8 +535,16 @@ function UI:CreateMainFrame()
     f:SetMovable(true)
     f:EnableMouse(true)
     f:RegisterForDrag("LeftButton")
-    f:SetScript("OnDragStart", f.StartMoving)
-    f:SetScript("OnDragStop", f.StopMovingOrSizing)
+    local function startMoving()
+        UI:ClearSearchFocus()
+        f:StartMoving()
+    end
+    local function stopMoving()
+        f:StopMovingOrSizing()
+        UI:SaveFramePlacement()
+    end
+    f:SetScript("OnDragStart", startMoving)
+    f:SetScript("OnDragStop", stopMoving)
     f:SetResizable(true)
     if f.SetResizeBounds then
         f:SetResizeBounds(1000, 620)
@@ -454,6 +554,8 @@ function UI:CreateMainFrame()
     f:SetClampedToScreen(true)
     f:SetFrameStrata("HIGH")
     createBackdrop(f, COLOR_BG[1], COLOR_BG[2], COLOR_BG[3], COLOR_BG[4], COLOR_BORDER[1], COLOR_BORDER[2], COLOR_BORDER[3], COLOR_BORDER[4])
+    self.frame = f
+    self:RestoreFramePlacement()
     f:Hide()
     f:SetScript("OnHide", function()
         UI:HandleFrameHidden()
@@ -483,6 +585,10 @@ function UI:CreateMainFrame()
     titleBar:SetPoint("TOPRIGHT", -1, -1)
     titleBar:SetHeight(46)
     createBackdrop(titleBar, COLOR_TITLE_BG[1], COLOR_TITLE_BG[2], COLOR_TITLE_BG[3], COLOR_TITLE_BG[4], COLOR_BORDER[1], COLOR_BORDER[2], COLOR_BORDER[3], 1)
+    titleBar:EnableMouse(true)
+    titleBar:RegisterForDrag("LeftButton")
+    titleBar:SetScript("OnDragStart", startMoving)
+    titleBar:SetScript("OnDragStop", stopMoving)
     hookFocusRelease(titleBar)
 
     local title = titleBar:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
@@ -500,11 +606,7 @@ function UI:CreateMainFrame()
     local close = CreateFrame("Button", nil, titleBar, "UIPanelCloseButton")
     close:SetPoint("RIGHT", -2, 0)
     close:SetScript("OnClick", function()
-        if HideUIPanel then
-            HideUIPanel(f)
-        else
-            f:Hide()
-        end
+        UI:Close("button")
     end)
 
     local cleanup = createButton(titleBar, "Roster Cleanup", 112, 22)
@@ -573,13 +675,18 @@ function UI:CreateMainFrame()
     searchBox:SetHeight(24)
     searchBox:SetAutoFocus(false)
     searchBox:SetTextInsets(6, 6, 0, 0)
-    searchBox:SetScript("OnEscapePressed", searchBox.ClearFocus)
+    searchBox:SetScript("OnEscapePressed", function()
+        UI:ClearSearchFocus()
+    end)
+    searchBox:SetScript("OnEnterPressed", function()
+        UI:ApplySearchNow()
+        UI:ClearSearchFocus()
+        UI:OpenChatAfterSearch()
+    end)
     searchBox:SetScript("OnTextChanged", function(box)
         UI.searchText = box:GetText() or ""
         UI.selectedRecipeKey = nil
-        if UI._searchTimer then
-            Addon:CancelTimer(UI._searchTimer, true)
-        end
+        UI:CancelSearchTimer()
         local delay = SEARCH_DEBOUNCE
         if UI.selectedProfession == nil and UI.searchText ~= "" then
             delay = GLOBAL_SEARCH_DEBOUNCE
@@ -593,6 +700,36 @@ function UI:CreateMainFrame()
         end, delay)
     end)
     f.searchBox = searchBox
+
+    local searchFocusWatcher = CreateFrame("Frame", nil, f)
+    searchFocusWatcher:Hide()
+    searchFocusWatcher:SetScript("OnUpdate", function(self, elapsed)
+        self._elapsed = (self._elapsed or 0) + (elapsed or 0)
+        if self._elapsed < 0.05 then return end
+        self._elapsed = 0
+        if not (f.searchBox and f.searchBox.HasFocus and f.searchBox:HasFocus()) then
+            self._mouseDown = nil
+            self:Hide()
+            return
+        end
+        local mouseDown = IsMouseButtonDown and (IsMouseButtonDown("LeftButton") or IsMouseButtonDown("RightButton"))
+        if mouseDown and not self._mouseDown and MouseIsOver and not MouseIsOver(f) then
+            UI:ClearSearchFocus()
+            self:Hide()
+        end
+        self._mouseDown = mouseDown and true or false
+    end)
+    searchBox:SetScript("OnEditFocusGained", function()
+        searchFocusWatcher._mouseDown = nil
+        searchFocusWatcher._elapsed = 0
+        searchFocusWatcher:Show()
+    end)
+    searchBox:SetScript("OnEditFocusLost", function()
+        searchFocusWatcher._mouseDown = nil
+        searchFocusWatcher._elapsed = 0
+        searchFocusWatcher:Hide()
+    end)
+    f.searchFocusWatcher = searchFocusWatcher
 
     local profLabel = left:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     profLabel:SetPoint("TOPLEFT", searchBox, "BOTTOMLEFT", 2, -12)
@@ -1523,8 +1660,9 @@ end
 function UI:Toggle()
     self:CreateMainFrame()
     if self.frame:IsShown() then
-        self.frame:Hide()
+        self:Close("toggle")
     else
+        self:RestoreFramePlacement()
         self.frame:Show()
         self:RefreshDebugVisibility()
         self:Refresh(nil)

@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented in this file.
 
+## [1.5.3] - 2026-05-03
+### Added
+- Tooltips for craftable items, recipe items, and spell/enchant links now show known crafters, preferring online guildmates when available.
+
+### Fixed
+- The main search box now releases focus on Enter/Escape or outside clicks, allowing chat to open normally after searching.
+- The main window close button now uses the addon's direct close path and the title bar can be dragged, with placement saved per profile.
+- Tooltip crafter indexing now avoids automatic full background rebuilds and skips dirty rebuilds in combat to prevent gameplay stutter after data changes.
+
 ## [1.5.2] - 2026-05-01
 ### Fixed
 - Improved offline guildmate sync so already-synced online guild members can share known offline crafter data more reliably during catch-up.

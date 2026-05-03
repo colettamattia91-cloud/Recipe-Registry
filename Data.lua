@@ -53,6 +53,14 @@ local DB_DEFAULTS = {
     profile = {
         selectedProfession = nil,
         sortMode = "alpha",
+        mainFrame = {
+            point = "CENTER",
+            relativePoint = "CENTER",
+            x = 0,
+            y = 0,
+            width = 1200,
+            height = 750,
+        },
         minimap = {
             hide = false,
             minimapPos = 220,
@@ -693,6 +701,9 @@ function Data:InvalidateRecipeCaches(scope)
         self._recipeListCache = nil
         self._recipeCraftersCache = nil
         self._recipeIndex = nil
+        if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
+            Addon.Tooltip:InvalidateIndex()
+        end
         return
     end
 
@@ -700,6 +711,9 @@ function Data:InvalidateRecipeCaches(scope)
     self._recipeDetailCache = nil
     self._recipeCraftersCache = nil
     self._recipeIndex = nil
+    if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
+        Addon.Tooltip:InvalidateIndex()
+    end
 end
 
 function Data:BuildSyncBlockKey(ownerCharacter, professionKey)
