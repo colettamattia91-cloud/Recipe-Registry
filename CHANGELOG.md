@@ -2,37 +2,26 @@
 
 All notable changes to this project are documented in this file.
 
-## [Unreleased]
+## [1.6.0] - 2026-05-07
 ### Added
-- Profession specializations are now tracked and synced on first discovery or real change, without repeating the same sync on every relog.
-- Existing cached crafter records can now receive newly available remote specialization metadata without requiring a local wipe first.
-- Manifest fingerprints now include specialization metadata, allowing peers to request a fresh snapshot when only specialization changed on an otherwise identical profession block.
-- Sync manifests are now cached, updated by dirty profession block, built in the background, and reused as cached `MANI` chunks across peers.
-- Manifest chunks are now queued and paced by the sync outbound worker instead of sent inline in a burst.
-- Diagnostic output now includes lightweight scan counters for pending scans, skipped scans, failures, suspected partial scans, and invalid recipe filtering.
-- Performance diagnostics now include manifest cache telemetry for readiness, dirty blocks, builds, cache hits, deferred sends, chunk reuse, and paced MANI delivery.
-- Local owner sync diagnostics are now available to inspect exactly which profession blocks, ranks, and specializations this client is publishing.
-- Corrupt data cleanup now has a preview mode and can remove malformed member keys, invalid or impossible recipe keys, stale sync queue entries, and AtlasLoot-proven recipe/profession mismatches.
-- A safe corrupt-data cleanup now runs after login in small background batches, covering only deterministic repairs and malformed sync state.
+- Profession specializations are now tracked and shared with guildmates when they are first discovered or actually changed.
+- Existing guild data can now pick up newly available profession specialization details without asking users to wipe and rebuild their local database.
+- Recipe Registry now includes a saved-data cleanup flow, plus a lightweight automatic repair pass after login for clearly invalid local records.
+- Sync and scan status output is clearer when checking whether your guild recipe database is up to date.
 
 ### Fixed
-- Sync pause protection now keys off combat and instanced content, not simply being in a raid group.
-- Profession recipe-change signals now keep pending scan state until a valid changed scan is observed, reducing the chance of losing a learned recipe by opening a different profession first.
-- Incoming snapshots sent directly by the data owner now merge with owner authority, so they can repair stale higher-revision replica caches after a wipe or rebuild.
-- Owner scans that return a suspicious recipe subset no longer overwrite the more complete local profession data.
-- Incoming replica snapshots now preserve existing profession blocks when a partial snapshot omits them.
-- Requested manifest catch-up now sends only the requested profession blocks instead of the whole cached member snapshot, reducing accidental empty-block overwrites from replicas.
-- Smaller replica manifest blocks no longer trigger a pull over richer local data, reducing repeated partial-overwrite protections from stale or empty peer caches.
-- Malformed manifest owner keys are now ignored before they can queue direct sync requests, preventing bogus request timeouts and retry loops.
-- Partial remote overwrite protection now preserves local profession metadata such as specialization, block revision, and source when keeping the richer local recipe set.
-- Local profession scans now reject impossible item IDs before they can enter the saved recipe set.
-- Guild roster cleanup now aborts when the roster snapshot looks empty or too small compared with known active members.
-- Negative spell/enchant recipe validation now falls back to spell metadata when AtlasLoot is present but missing a mapping, avoiding destructive false negatives from optional data gaps.
+- Learned recipes are less likely to be missed if the profession window is not ready yet or another profession is opened first.
+- More complete profession data is protected from being replaced by empty or incomplete data received from another guildmate.
+- Guildmates who wipe or rebuild their local data can catch up from already synced peers more reliably.
+- Profession specialization updates from other guildmates are now received more reliably, even when the recipe list itself did not change.
+- Enchanting and spell-based recipes are kept more reliably when optional recipe metadata is incomplete.
+- Guild roster cleanup is less likely to hide active guildmates while the roster is still loading.
+- Guild sync no longer pauses just because you are in a raid group outside combat or an instance.
 
 ### Changed
-- In-game help text and documentation were refreshed to cover offline sync, manifest diagnostics, and internal mock scenarios with chat-safe formatting.
-- Manual rescans now immediately use active profession API data when available and clearly report whether the request completed or remained queued.
-- Manifest diagnostics now stay compact by default, with optional verbose replica and stale-owner detail when needed.
+- Guild sync now spreads some background work more smoothly, which helps larger guild databases stay responsive.
+- Manual profession refreshes now make better use of currently available profession data and report more clearly when a refresh still needs the profession window.
+- Long sync summaries are now kept shorter by default, with detailed output reserved for troubleshooting.
 
 ## [1.5.3] - 2026-05-03
 ### Added
