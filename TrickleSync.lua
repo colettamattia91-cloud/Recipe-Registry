@@ -156,11 +156,20 @@ function TrickleSync:ComparePeerManifest(peerManifest)
         if not localBlock then
             comparison.missingHere[#comparison.missingHere + 1] = blockKey
         else
-            if (peerBlock.revision or 0) > (localBlock.revision or 0) then
+            local peerRevision = peerBlock.revision or 0
+            local localRevision = localBlock.revision or 0
+            local peerFingerprint = peerBlock.fingerprint or ""
+            local localFingerprint = localBlock.fingerprint or ""
+            local peerSource = peerBlock.sourceType or "replica"
+            local localSource = localBlock.sourceType or "replica"
+
+            if peerSource == "owner" and localSource ~= "owner" and peerFingerprint ~= localFingerprint then
                 comparison.outdatedHere[#comparison.outdatedHere + 1] = blockKey
-            elseif (peerBlock.revision or 0) < (localBlock.revision or 0) then
+            elseif peerRevision > localRevision then
+                comparison.outdatedHere[#comparison.outdatedHere + 1] = blockKey
+            elseif peerRevision < localRevision then
                 comparison.outdatedThere[#comparison.outdatedThere + 1] = blockKey
-            elseif (peerBlock.fingerprint or "") ~= (localBlock.fingerprint or "") then
+            elseif peerFingerprint ~= localFingerprint then
                 comparison.outdatedHere[#comparison.outdatedHere + 1] = blockKey
             end
         end
