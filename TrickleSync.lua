@@ -12,21 +12,70 @@ local MANIFEST_BLOCKS_PER_CHUNK = 24
 function TrickleSync:OnInitialize()
     self.peerState = {}
     self.outboundQueue = {}
+    self._manifestChunkCache = nil
+    self.telemetry = {
+        chunkBuilds = 0,
+        chunkCacheHits = 0,
+        chunkInvalidations = 0,
+    }
 end
 
-function TrickleSync:BuildLocalManifest()
-    return Addon.Data:BuildSyncManifest(false)
+function TrickleSync:BuildLocalManifest(opts)
+    if Addon.Data and Addon.Data.GetPreparedSyncManifest then
+        return Addon.Data:GetPreparedSyncManifest(opts or { allowStale = true, syncFallback = true, reason = "trickle" })
+    end
+    return Addon.Data:BuildSyncManifest(false), "built"
 end
 
-function TrickleSync:BuildManifestChunks()
-    local manifest = self:BuildLocalManifest()
+function TrickleSync:InvalidateManifestChunkCache()
+    self._manifestChunkCache = nil
+    self.telemetry = self.telemetry or {}
+    self.telemetry.chunkInvalidations = (self.telemetry.chunkInvalidations or 0) + 1
+end
+
+function TrickleSync:GetManifestChunkTelemetry()
+    self.telemetry = self.telemetry or {}
+    return self.telemetry
+end
+
+function TrickleSync:ResetManifestChunkTelemetry()
+    self.telemetry = {
+        chunkBuilds = 0,
+        chunkCacheHits = 0,
+        chunkInvalidations = 0,
+    }
+end
+
+function TrickleSync:BuildManifestChunks(opts)
+    opts = opts or {}
+    local manifest, status = self:BuildLocalManifest({
+        allowStale = opts.allowStale == true,
+        syncFallback = opts.syncFallback == true,
+        reason = opts.reason or "manifest-chunks",
+    })
+    if not manifest then return nil, nil, status or "building" end
+
     local blockKeys = {}
     for blockKey in pairs(manifest.blocks or {}) do
         blockKeys[#blockKeys + 1] = blockKey
     end
     sort(blockKeys)
 
-    local manifestId = string.format("%s:%d:%d", manifest.memberKey or "unknown", manifest.builtAt or 0, #blockKeys)
+    local manifestId = string.format(
+        "%s:%d:%d:%d",
+        manifest.memberKey or "unknown",
+        manifest.builtAt or 0,
+        manifest.manifestSerial or 0,
+        #blockKeys
+    )
+    if self._manifestChunkCache
+        and self._manifestChunkCache.manifestId == manifestId
+        and self._manifestChunkCache.chunks then
+        self.telemetry = self.telemetry or {}
+        self.telemetry.chunkCacheHits = (self.telemetry.chunkCacheHits or 0) + 1
+        return self._manifestChunkCache.chunks, manifest, status or "cached"
+    end
+
     local chunks = {}
     for startIndex = 1, #blockKeys, MANIFEST_BLOCKS_PER_CHUNK do
         local rows = {}
@@ -70,7 +119,13 @@ function TrickleSync:BuildManifestChunks()
         }
     end
 
-    return chunks, manifest
+    self.telemetry = self.telemetry or {}
+    self.telemetry.chunkBuilds = (self.telemetry.chunkBuilds or 0) + 1
+    self._manifestChunkCache = {
+        manifestId = manifestId,
+        chunks = chunks,
+    }
+    return chunks, manifest, status or "built"
 end
 
 function TrickleSync:StorePeerManifest(peerKey, peerManifest)
@@ -82,7 +137,7 @@ function TrickleSync:StorePeerManifest(peerKey, peerManifest)
 end
 
 function TrickleSync:ComparePeerManifest(peerManifest)
-    local localManifest = self:BuildLocalManifest()
+    local localManifest = self:BuildLocalManifest({ allowStale = true, syncFallback = true, reason = "compare" })
     local comparison = {
         localManifest = localManifest,
         peerManifest = peerManifest or { blocks = {} },

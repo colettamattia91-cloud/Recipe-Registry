@@ -9,6 +9,7 @@ local ipairs = ipairs
 local sort = table.sort
 local random = math.random
 local tinsert = table.insert
+local GetTime = GetTime
 
 local REQUEST_TIMEOUT = 12
 local PROGRESS_TIMEOUT = 4
@@ -17,6 +18,8 @@ local NODE_TIMEOUT = 95
 local HELLO_INTERVAL = 30
 local AUTO_SYNC_INTERVAL = 20
 local OUTGOING_CHUNK_DELAY = 0.20
+local MANIFEST_CHUNK_DELAY = 0.12
+local MANIFEST_INITIAL_JITTER = 0.35
 local MAX_RESUME_ATTEMPTS = 3
 local COORDINATOR_RECOMPUTE_DELAY = 0.35
 local MANIFEST_PUSH_COOLDOWN = 20
@@ -26,6 +29,13 @@ local function countKeys(tbl)
     local n = 0
     for _ in pairs(tbl or {}) do n = n + 1 end
     return n
+end
+
+local function nowForPacing()
+    if type(GetTime) == "function" then
+        return GetTime()
+    end
+    return time()
 end
 
 local function shallowCopyArray(src)
@@ -107,11 +117,13 @@ function Sync:OnInitialize()
     self._lastCoordinatorChangeAt = 0
     self.lastHelloAt = 0
     self.outboundChunkQueue = {}
+    self.manifestChunkQueue = {}
     self.inboundChunkQueue = {}
     self.inboundFinalizeQueue = {}
     self.peerPacing = {}
     self.partialManifestReceive = {}
     self._lastManifestSentAt = {}
+    self.pendingManifestPeers = {}
     self.telemetry = {
         sentChunks = 0,
         receivedChunks = 0,
@@ -125,6 +137,13 @@ function Sync:OnInitialize()
         replicaRequestsServed = 0,
         replicaOwnersApplied = 0,
         replicaNewOwnersApplied = 0,
+        manifestChunksSent = 0,
+        manifestChunksQueued = 0,
+        manifestChunksDelivered = 0,
+        manifestCooldownSkips = 0,
+        manifestDeferredSends = 0,
+        manifestPendingFlushes = 0,
+        manifestQueueMaxDepth = 0,
     }
     self.offlineDebugLog = {}
 end
@@ -143,6 +162,13 @@ function Sync:ResetTelemetry()
         replicaRequestsServed = 0,
         replicaOwnersApplied = 0,
         replicaNewOwnersApplied = 0,
+        manifestChunksSent = 0,
+        manifestChunksQueued = 0,
+        manifestChunksDelivered = 0,
+        manifestCooldownSkips = 0,
+        manifestDeferredSends = 0,
+        manifestPendingFlushes = 0,
+        manifestQueueMaxDepth = 0,
     }
     self.offlineDebugLog = {}
 end
@@ -166,6 +192,9 @@ function Sync:Startup()
     self:ScheduleTimer("AutoSyncTick", 6)
     self:AdvertiseLocalRevision("startup")
     self:EnsureBackgroundWorkers()
+    if Addon.Data and Addon.Data.ScheduleManifestBuild then
+        Addon.Data:ScheduleManifestBuild("startup")
+    end
 end
 
 function Sync:GetSelfKey()
@@ -775,16 +804,58 @@ function Sync:SendManifestToPeer(peerKey, why)
     if self:IsMockKey(peerKey) then return end
     local lastSentAt = self._lastManifestSentAt[peerKey] or 0
     if why ~= "force" and (time() - lastSentAt) < MANIFEST_PUSH_COOLDOWN then
+        self.telemetry.manifestCooldownSkips = (self.telemetry.manifestCooldownSkips or 0) + 1
         return
     end
 
-    local chunks = Addon.TrickleSync:BuildManifestChunks()
+    local chunks = Addon.TrickleSync:BuildManifestChunks({
+        allowStale = false,
+        syncFallback = false,
+        reason = why or "send",
+    })
+    if not chunks then
+        self.pendingManifestPeers = self.pendingManifestPeers or {}
+        self.pendingManifestPeers[peerKey] = why or "pending"
+        self.telemetry.manifestDeferredSends = (self.telemetry.manifestDeferredSends or 0) + 1
+        return
+    end
+    self:QueueManifestChunks(peerKey, chunks, why)
+    self._lastManifestSentAt[peerKey] = time()
+end
+
+function Sync:QueueManifestChunks(peerKey, chunks, why)
+    if not peerKey or not chunks then return false end
+    self.manifestChunkQueue = self.manifestChunkQueue or {}
+    local startAt = nowForPacing()
+    if why ~= "force" and MANIFEST_INITIAL_JITTER > 0 then
+        startAt = startAt + (random() * MANIFEST_INITIAL_JITTER)
+    end
+
     for index = 1, #chunks do
         local payload = shallowCopyTable(chunks[index])
         payload.why = why
-        self:SendDirectEnvelope("MANI", payload, peerKey, "NORMAL")
+        self.manifestChunkQueue[#self.manifestChunkQueue + 1] = {
+            peer = peerKey,
+            payload = payload,
+            queuedAt = time(),
+            readyAt = startAt + ((index - 1) * MANIFEST_CHUNK_DELAY),
+        }
     end
-    self._lastManifestSentAt[peerKey] = time()
+    self.telemetry.manifestChunksQueued = (self.telemetry.manifestChunksQueued or 0) + #chunks
+    if #self.manifestChunkQueue > (self.telemetry.manifestQueueMaxDepth or 0) then
+        self.telemetry.manifestQueueMaxDepth = #self.manifestChunkQueue
+    end
+    return true
+end
+
+function Sync:OnManifestCacheReady(reason)
+    if not self.pendingManifestPeers or next(self.pendingManifestPeers) == nil then return end
+    local pending = self.pendingManifestPeers
+    self.pendingManifestPeers = {}
+    self.telemetry.manifestPendingFlushes = (self.telemetry.manifestPendingFlushes or 0) + 1
+    for peerKey, why in pairs(pending) do
+        self:SendManifestToPeer(peerKey, why or reason or "manifest-ready")
+    end
 end
 
 function Sync:RequestManifestRefresh(peerKey)
@@ -1033,44 +1104,77 @@ function Sync:QueueOutboundBlock(peer, block)
     return true
 end
 
-function Sync:CanSendToPeer(peer)
+function Sync:CanSendToPeer(peer, delay)
     if not peer then return false end
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseOutbound() then
         return false
     end
     local pacing = self.peerPacing[peer]
-    if pacing and (time() - (pacing.lastSentAt or 0)) < OUTGOING_CHUNK_DELAY then
+    if pacing and (nowForPacing() - (pacing.lastSentAt or 0)) < (delay or OUTGOING_CHUNK_DELAY) then
         return false
     end
     return true
 end
 
-function Sync:SendNextLowPriorityChunk()
-    if #self.outboundChunkQueue == 0 then
-        return true
-    end
-
+function Sync:SendNextSnapshotChunk()
     local candidateIndex
     for index = 1, #self.outboundChunkQueue do
-        if self:CanSendToPeer(self.outboundChunkQueue[index].peer) then
+        if self:CanSendToPeer(self.outboundChunkQueue[index].peer, OUTGOING_CHUNK_DELAY) then
             candidateIndex = index
             break
         end
     end
     if not candidateIndex then
-        return true
+        return false
     end
 
     local queued = table.remove(self.outboundChunkQueue, candidateIndex)
     local block = queued.block
     self:SendDirectEnvelope("SNAP", block, queued.peer, "BULK")
     self.peerPacing[queued.peer] = self.peerPacing[queued.peer] or {}
-    self.peerPacing[queued.peer].lastSentAt = time()
+    self.peerPacing[queued.peer].lastSentAt = nowForPacing()
     self.telemetry.sentChunks = self.telemetry.sentChunks + 1
 
     local session = self.outgoingSessions[block.sessionId]
     if session then
         session.lastSentAt = time()
+    end
+    return true
+end
+
+function Sync:SendNextManifestChunk()
+    if #(self.manifestChunkQueue or {}) == 0 then
+        return false
+    end
+
+    local now = nowForPacing()
+    local candidateIndex
+    for index = 1, #self.manifestChunkQueue do
+        local queued = self.manifestChunkQueue[index]
+        if (queued.readyAt or 0) <= now and self:CanSendToPeer(queued.peer, MANIFEST_CHUNK_DELAY) then
+            candidateIndex = index
+            break
+        end
+    end
+    if not candidateIndex then
+        return false
+    end
+
+    local queued = table.remove(self.manifestChunkQueue, candidateIndex)
+    self:SendDirectEnvelope("MANI", queued.payload, queued.peer, "NORMAL")
+    self.peerPacing[queued.peer] = self.peerPacing[queued.peer] or {}
+    self.peerPacing[queued.peer].lastSentAt = now
+    self.telemetry.manifestChunksSent = (self.telemetry.manifestChunksSent or 0) + 1
+    self.telemetry.manifestChunksDelivered = (self.telemetry.manifestChunksDelivered or 0) + 1
+    return true
+end
+
+function Sync:SendNextLowPriorityChunk()
+    if #self.outboundChunkQueue > 0 and self:SendNextSnapshotChunk() then
+        return true
+    end
+    if self:SendNextManifestChunk() then
+        return true
     end
     return true
 end
@@ -1188,6 +1292,7 @@ function Sync:GetUiState()
         inFlight = self.inFlight and self.inFlight.memberKey or nil,
         outgoing = countKeys(self.outgoingSessions),
         outboundChunks = #self.outboundChunkQueue,
+        manifestChunks = #(self.manifestChunkQueue or {}),
         inboundChunks = #self.inboundChunkQueue,
         autoSync = true,
         paused = pauseState,
@@ -1203,6 +1308,7 @@ function Sync:GetDebugSnapshot()
         pendingRequests = countKeys(self.pendingRequests),
         outgoingSessions = countKeys(self.outgoingSessions),
         outboundChunks = #self.outboundChunkQueue,
+        manifestChunks = #(self.manifestChunkQueue or {}),
         inboundChunks = #self.inboundChunkQueue,
         inboundFinalize = #self.inboundFinalizeQueue,
         inFlight = self.inFlight and self.inFlight.memberKey or nil,
@@ -1302,6 +1408,15 @@ function Sync:CleanupMockState()
     end
     self.outboundChunkQueue = keptOutbound
 
+    local keptManifest = {}
+    for index = 1, #(self.manifestChunkQueue or {}) do
+        local item = self.manifestChunkQueue[index]
+        if not self:IsMockKey(item and item.peer) and not self:IsMockKey(item and item.payload and item.payload.memberKey) then
+            keptManifest[#keptManifest + 1] = item
+        end
+    end
+    self.manifestChunkQueue = keptManifest
+
     local keptInbound = {}
     for index = 1, #(self.inboundChunkQueue or {}) do
         local item = self.inboundChunkQueue[index]
@@ -1332,7 +1447,7 @@ end
 function Sync:DumpStatus()
     local role = self:IsCoordinator() and "Coordinator" or "Client"
     Addon:Print(string.format(
-        "Role=%s coordinator=%s onlineNodes=%d registry=%d queued=%d inFlight=%s outgoing=%d outboundChunks=%d inboundChunks=%d paused=%s isolated=%s",
+        "Role=%s coordinator=%s onlineNodes=%d registry=%d queued=%d inFlight=%s outgoing=%d outboundChunks=%d manifestChunks=%d inboundChunks=%d manifestPending=%d paused=%s isolated=%s",
         role,
         tostring(self.coordinatorKey),
         countKeys(self.onlineNodes),
@@ -1341,7 +1456,9 @@ function Sync:DumpStatus()
         self.inFlight and self.inFlight.memberKey or "none",
         countKeys(self.outgoingSessions),
         #self.outboundChunkQueue,
+        #(self.manifestChunkQueue or {}),
         #self.inboundChunkQueue,
+        countKeys(self.pendingManifestPeers),
         tostring(Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() or false),
         tostring(self:IsRealTrafficSuppressed())
     ))

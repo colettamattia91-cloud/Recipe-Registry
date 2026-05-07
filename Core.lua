@@ -44,6 +44,25 @@ local function trimInput(text)
     return (text and text:match("^%s*(.-)%s*$")) or ""
 end
 
+local function scanResultChanged(result)
+    if type(result) == "table" then
+        return result.changed == true
+    end
+    return result == true
+end
+
+local function scanActiveProfessionData(self)
+    if not self.Data then return false end
+    local changed = false
+    if self.Data.ScanTradeSkill then
+        changed = scanResultChanged(self.Data:ScanTradeSkill()) or changed
+    end
+    if self.Data.ScanCraft then
+        changed = scanResultChanged(self.Data:ScanCraft()) or changed
+    end
+    return changed
+end
+
 local function splitCommand(text)
     local trimmed = trimInput(text)
     if trimmed == "" then
@@ -54,22 +73,39 @@ local function splitCommand(text)
     return cmd or "", rest or ""
 end
 
+local MOCK_SCENARIOS = "light, medium, heavy, burst, bootstrap, traffic, offline, offlinewipe, trafficburst, roster, rosterheavy, rosterbad, integrity"
+
+local function printMainHelp(self)
+    self:Print("Commands:")
+    self:Print("/rr - open or close the main window.")
+    self:Print("/rr options, /rr mini, /rr debug")
+    self:Print("/rr rescan - queue a profession scan and scan active profession API data.")
+    self:Print("/rr dump, /rr sync, /rr offline, /rr manifest [target or verbose], /rr pull")
+    self:Print("/rr perf [toggle, dump, reset, help]")
+    self:Print("/rr mock [status, start <" .. MOCK_SCENARIOS .. ">, stop, cleanup, reset, help]")
+    self:Print("/rr prices <item name or link>, /rr share [guild, party, raid, say]")
+    self:Print("/rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID>")
+    self:Print("/rr clean, /rr wipe")
+end
+
 local function printPerfHelp(self)
     self:Print("/rr perf toggle - mostra o nasconde il pannello performance/debug.")
-    self:Print("/rr perf dump - stampa scheduler, code e contatori sync correnti.")
-    self:Print("/rr perf reset - azzera i contatori performance e sync.")
+    self:Print("/rr perf dump - stampa scheduler, code, sync e diagnostica scan.")
+    self:Print("/rr perf reset - azzera performance, sync e contatori scan.")
 end
 
 local function printMockHelp(self)
     self:Print("/rr mock status - stato attuale del mock e ultimi contatori.")
-    self:Print("/rr mock start light|medium|heavy|burst - carico snapshot diretto crescente.")
+    self:Print("/rr mock start light, medium, heavy, burst - carico snapshot diretto crescente.")
     self:Print("/rr mock start bootstrap - trasferimento pesante in stile bootstrap.")
     self:Print("/rr mock start traffic - test completo HELLO/MANI/REQ/SNAP.")
     self:Print("/rr mock start offline - convergenza di owner offline via peer replica.")
     self:Print("/rr mock start offlinewipe - simula wipe locale + owner offline sconosciuti via replica.")
     self:Print("/rr mock start trafficburst - stress test del traffico replica.")
     self:Print("/rr mock start roster - simula roster cleanup con stale e prune.")
-    self:Print("/rr mock start rosterheavy - variante più pesante del test roster.")
+    self:Print("/rr mock start rosterheavy - variante piu' pesante del test roster.")
+    self:Print("/rr mock start rosterbad - verifica il guardrail su roster snapshot incompleto.")
+    self:Print("/rr mock start integrity - verifica protezioni snapshot parziali e merge.")
     self:Print("/rr mock cleanup - rimuove dati/stato mock locali dal client.")
     self:Print("/rr mock reset - azzera i contatori mock.")
     self:Print("/rr mock stop - ferma il worker mock locale e riapre il traffico reale.")
@@ -133,9 +169,8 @@ function Addon:OnTradeSkillShow()
     end
     self._tradeSkillScanTimer = self:ScheduleTimer(function()
         self._tradeSkillScanTimer = nil
-        if not (TradeSkillFrame and TradeSkillFrame:IsShown()) then return end
         if self.Data then
-            local changed = self.Data:ScanTradeSkill()
+            local changed = scanResultChanged(self.Data:ScanTradeSkill())
             if changed and self.Sync then
                 self.Sync:AdvertiseLocalRevision("trade-scan")
             end
@@ -149,9 +184,8 @@ function Addon:OnCraftShow()
     end
     self._craftScanTimer = self:ScheduleTimer(function()
         self._craftScanTimer = nil
-        if not (CraftFrame and CraftFrame:IsShown()) then return end
         if self.Data then
-            local changed = self.Data:ScanCraft()
+            local changed = scanResultChanged(self.Data:ScanCraft())
             if changed and self.Sync then
                 self.Sync:AdvertiseLocalRevision("craft-scan")
             end
@@ -170,15 +204,13 @@ function Addon:ProcessRecipeSignal()
     self._recipeSignalTimer = nil
     if self.Data then
         self.Data:DetectProfessions()
-        -- A real recipe change happened: force a fresh scan on the next profession open.
-        self.Data._scanNeeded = true
-        local changed = false
-        if TradeSkillFrame and TradeSkillFrame:IsShown() then
-            changed = self.Data:ScanTradeSkill() or changed
+        -- A real recipe change happened: scan active API data now, or keep it pending.
+        if self.Data.MarkScanNeeded then
+            self.Data:MarkScanNeeded(nil, "recipe-event")
+        else
+            self.Data._scanNeeded = true
         end
-        if CraftFrame and CraftFrame:IsShown() then
-            changed = self.Data:ScanCraft() or changed
-        end
+        local changed = scanActiveProfessionData(self)
         if changed and self.Sync then
             self.Sync:AdvertiseLocalRevision("recipe-event")
         end
@@ -268,6 +300,12 @@ function Addon:SlashHandler(input)
             if self.Sync and self.Sync.DumpStatus then
                 self.Sync:DumpStatus()
             end
+            if self.Data and self.Data.DumpScanStatus then
+                self.Data:DumpScanStatus()
+            end
+            if self.Data and self.Data.DumpManifestCacheStatus then
+                self.Data:DumpManifestCacheStatus()
+            end
             return
         end
         if perfCmd == "reset" or perfCmd == "clear" then
@@ -277,11 +315,17 @@ function Addon:SlashHandler(input)
             if self.Sync and self.Sync.ResetTelemetry then
                 self.Sync:ResetTelemetry()
             end
+            if self.Data and self.Data.ResetScanTelemetry then
+                self.Data:ResetScanTelemetry()
+            end
+            if self.Data and self.Data.ResetManifestTelemetry then
+                self.Data:ResetManifestTelemetry()
+            end
             self:RequestRefresh("perf")
-            self:Print("Performance counters reset.")
+            self:Print("Performance, sync, scan, and manifest counters reset.")
             return
         end
-        self:Print("Usage: /rr perf [toggle|dump|reset|help]")
+        self:Print("Usage: /rr perf [toggle, dump, reset, help]")
         return
     end
 
@@ -305,7 +349,11 @@ function Addon:SlashHandler(input)
             local scenario = mockRest ~= "" and mockRest or "medium"
             local ok, err = self.MockSync:StartScenario(scenario)
             if ok then
-                self:Print("Mock sync started: " .. scenario)
+                if err then
+                    self:Print("Mock sync completed: " .. scenario .. " (" .. tostring(err) .. ")")
+                else
+                    self:Print("Mock sync started: " .. scenario)
+                end
             else
                 self:Print("Mock sync start failed: " .. tostring(err))
             end
@@ -333,7 +381,7 @@ function Addon:SlashHandler(input)
             self:RequestRefresh("mock")
             return
         end
-        self:Print("Usage: /rr mock [status|start <light|medium|heavy|burst|bootstrap|traffic|offline|offlinewipe|trafficburst|roster|rosterheavy>|stop|cleanup|reset|help]")
+        self:Print("Usage: /rr mock [status, start <" .. MOCK_SCENARIOS .. ">, stop, cleanup, reset, help]")
         return
     end
 
@@ -381,13 +429,18 @@ function Addon:SlashHandler(input)
 
     if cmd == "manifest" or cmd == "publish" then
         local target = trimInput(rest)
+        local mode = target:lower()
+        if (mode == "verbose" or mode == "details" or mode == "detail") and self.Data and self.Data.DumpManifestSummary then
+            self.Data:DumpManifestSummary({ verbose = true })
+            return
+        end
         if target ~= "" and self.Sync and self.Sync.RequestManifestRefresh then
             self.Sync:RequestManifestRefresh(target)
             self:Print("Requested fresh manifest from " .. target .. ".")
             return
         end
         if self.Data and self.Data.DumpManifestSummary then
-            self.Data:DumpManifestSummary()
+            self.Data:DumpManifestSummary({ verbose = false })
         end
         return
     end
@@ -415,7 +468,20 @@ function Addon:SlashHandler(input)
     if cmd == "rescan" then
         if self.Data then
             self.Data:DetectProfessions()
-            self:Print("Open profession windows to refresh recipe lists.")
+            if self.Data.MarkScanNeeded then
+                self.Data:MarkScanNeeded(nil, "manual-rescan")
+            else
+                self.Data._scanNeeded = true
+            end
+            local changed = scanActiveProfessionData(self)
+            if changed and self.Sync then
+                self.Sync:AdvertiseLocalRevision("manual-rescan")
+            end
+            if self.Data.HasAnyScanPending and self.Data:HasAnyScanPending() then
+                self:Print("Profession rescan queued. Open or refresh a profession to complete pending scans.")
+            else
+                self:Print("Profession rescan completed for active profession data.")
+            end
         end
         return
     end
@@ -439,9 +505,9 @@ function Addon:SlashHandler(input)
     end
 
     if cmd == "help" then
-        self:Print("Commands: /rr, /rr options, /rr mini, /rr sync, /rr perf [toggle|dump|reset|help], /rr mock [status|start <light|medium|heavy|burst|bootstrap|traffic|offline|trafficburst|roster|rosterheavy>|stop|cleanup|reset|help], /rr prices <item name|link>, /rr share [guild|party|raid|say], /rr pull, /rr clean, /rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID>, /rr dump, /rr wipe")
+        printMainHelp(self)
         return
     end
 
-    self:Print("Commands: /rr, /rr options, /rr mini, /rr sync, /rr perf [toggle|dump|reset|help], /rr mock [status|start <light|medium|heavy|burst|bootstrap|traffic|offline|trafficburst|roster|rosterheavy>|stop|cleanup|reset|help], /rr prices <item name|link>, /rr share [guild|party|raid|say], /rr pull, /rr clean, /rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID>, /rr dump, /rr wipe")
+    printMainHelp(self)
 end

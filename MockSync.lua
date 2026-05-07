@@ -6,6 +6,8 @@ local pairs = pairs
 local ipairs = ipairs
 local sort = table.sort
 local format = string.format
+local max = math.max
+local floor = math.floor
 
 local MOCK_PEER_PREFIX = "__RRMockPeer"
 local MOCK_OWNER_PREFIX = "__RRMockOwner"
@@ -27,6 +29,8 @@ local SCENARIOS = {
     trafficburst = { mode = "traffic", peers = 6, ownersPerPeer = 3, professions = 4, recipesPerProfession = 150, chunkSize = 32, peerDelay = 0.02, requestDelay = 0.02, sourceType = "replica", hardIsolation = true },
     roster = { mode = "roster", activeMembers = 6, missingMembers = 4, prunableMembers = 2, professions = 3, recipesPerProfession = 18, hardIsolation = true },
     rosterheavy = { mode = "roster", activeMembers = 12, missingMembers = 8, prunableMembers = 5, professions = 4, recipesPerProfession = 28, hardIsolation = true },
+    rosterbad = { mode = "rosterbad", activeMembers = 10, professions = 2, recipesPerProfession = 12, hardIsolation = true },
+    integrity = { mode = "integrity", professions = 2, recipesPerProfession = 16, hardIsolation = true },
 }
 
 local function nowSeconds()
@@ -74,6 +78,7 @@ function MockSync:Reset()
     self.pendingPayloads = {}
     self.mockDatasets = {}
     self.rosterScenario = nil
+    self.integrityScenario = nil
     self._scenarioSerial = 0
     self.telemetry = {
         scenariosStarted = 0,
@@ -86,6 +91,9 @@ function MockSync:Reset()
         trafficSnapshots = 0,
         rosterRunsStarted = 0,
         rosterRunsCompleted = 0,
+        integrityRunsStarted = 0,
+        integrityRunsCompleted = 0,
+        integrityRunsFailed = 0,
         suppressedSends = 0,
     }
 end
@@ -102,6 +110,9 @@ function MockSync:ResetTelemetry()
         trafficSnapshots = 0,
         rosterRunsStarted = 0,
         rosterRunsCompleted = 0,
+        integrityRunsStarted = 0,
+        integrityRunsCompleted = 0,
+        integrityRunsFailed = 0,
         suppressedSends = 0,
     }
 end
@@ -253,6 +264,155 @@ function MockSync:StartRosterScenario(name, config)
 
     Addon:RequestRefresh("mock-roster")
     return true
+end
+
+function MockSync:StartRosterBadScenario(name, config)
+    if not (Addon.GuildLifecycleMaintenance and Addon.GuildLifecycleMaintenance.StartCleanup) then
+        return false, "cleanup-unavailable"
+    end
+
+    self:Cleanup()
+    self.active = true
+    self.hardIsolation = config.hardIsolation == true
+    self.scenarioName = name
+    self.scenarioConfig = config
+    self.rosterScenario = {
+        name = name,
+        seeded = 0,
+        expectedActive = config.activeMembers or 0,
+        expectedStale = 0,
+        expectedPruned = 0,
+        running = false,
+        label = "mock-rosterbad-" .. tostring(name),
+    }
+    self.telemetry.scenariosStarted = self.telemetry.scenariosStarted + 1
+    self.telemetry.rosterRunsStarted = (self.telemetry.rosterRunsStarted or 0) + 1
+
+    local memberKeys = {}
+    for index = 1, (config.activeMembers or 0) do
+        local memberKey = self:BuildRosterKey(index)
+        self:SeedMockMember(memberKey, config.professions or 2, config.recipesPerProfession or 12, {
+            guildStatus = "active",
+            updatedAt = time(),
+            lastSeenInGuildAt = time(),
+        })
+        memberKeys[#memberKeys + 1] = memberKey
+        self.rosterScenario.seeded = self.rosterScenario.seeded + 1
+    end
+
+    local started, reason = Addon.GuildLifecycleMaintenance:StartCleanup({
+        force = true,
+        snapshot = {},
+        memberKeys = memberKeys,
+        updateLastRunAt = false,
+        label = self.rosterScenario.label,
+        mock = false,
+    })
+    if started then
+        self.rosterScenario.running = true
+        return true
+    end
+
+    self.active = false
+    self.telemetry.scenariosCompleted = self.telemetry.scenariosCompleted + 1
+    self.telemetry.rosterRunsCompleted = (self.telemetry.rosterRunsCompleted or 0) + 1
+    Addon:RequestRefresh("mock-rosterbad")
+    return reason == "roster-empty" or reason == "roster-too-small", reason or "cleanup-start-failed"
+end
+
+function MockSync:StartIntegrityScenario(name, config)
+    self:Cleanup()
+    self.active = true
+    self.hardIsolation = config.hardIsolation == true
+    self.scenarioName = name
+    self.scenarioConfig = config
+    self.integrityScenario = {
+        name = name,
+        passed = false,
+        reason = "not-run",
+    }
+    self.telemetry.scenariosStarted = self.telemetry.scenariosStarted + 1
+    self.telemetry.integrityRunsStarted = (self.telemetry.integrityRunsStarted or 0) + 1
+
+    local memberKey = self:BuildOwnerKey(77, 1)
+    local entry = self:SeedMockMember(memberKey, config.professions or 2, config.recipesPerProfession or 16, {
+        rev = 10,
+        sourceType = "replica",
+        guildStatus = "active",
+        updatedAt = time() - 60,
+        lastSeenInGuildAt = time() - 60,
+    })
+
+    local professionNames = {}
+    for professionName in pairs(entry.professions or {}) do
+        professionNames[#professionNames + 1] = professionName
+    end
+    sort(professionNames)
+    local primaryProfession = professionNames[1]
+    local secondaryProfession = professionNames[2]
+    if not primaryProfession or not secondaryProfession then
+        self.integrityScenario.reason = "missing-professions"
+        self.telemetry.integrityRunsFailed = (self.telemetry.integrityRunsFailed or 0) + 1
+        self.active = false
+        return false, "missing-professions"
+    end
+
+    local expectedPrimaryCount = entry.professions[primaryProfession].count or 0
+    local primaryKeys = {}
+    for recipeKey in pairs(entry.professions[primaryProfession].recipes or {}) do
+        primaryKeys[#primaryKeys + 1] = recipeKey
+    end
+    sort(primaryKeys, function(a, b) return tostring(a) < tostring(b) end)
+    local subset = {}
+    local subsetCount = max(1, floor(#primaryKeys / 2))
+    for index = 1, subsetCount do
+        subset[#subset + 1] = primaryKeys[index]
+    end
+
+    local incomingRev = 20
+    local incomingUpdatedAt = time()
+    Addon.Data:BeginIncomingSnapshot(memberKey, incomingRev, incomingUpdatedAt)
+    Addon.Data:AppendIncomingChunk({
+        memberKey = memberKey,
+        rev = incomingRev,
+        updatedAt = incomingUpdatedAt,
+        sourceType = "replica",
+        profession = primaryProfession,
+        skillRank = entry.professions[primaryProfession].skillRank or 0,
+        skillMaxRank = entry.professions[primaryProfession].skillMaxRank or 0,
+        recipeKeys = subset,
+    })
+    local merged = Addon.Data:FinalizeIncomingSnapshot(memberKey, incomingRev, {
+        sourceType = "replica",
+        isMock = true,
+    })
+
+    local resolved = Addon.Data:GetMember(memberKey)
+    local primaryCount = resolved and resolved.professions and resolved.professions[primaryProfession]
+        and resolved.professions[primaryProfession].count or 0
+    local secondaryExists = resolved and resolved.professions and resolved.professions[secondaryProfession] ~= nil
+    local passed = merged == true and primaryCount >= expectedPrimaryCount and secondaryExists
+    self.integrityScenario = {
+        name = name,
+        passed = passed,
+        reason = passed and "ok" or "integrity-check-failed",
+        memberKey = memberKey,
+        primaryProfession = primaryProfession,
+        primaryCount = primaryCount,
+        expectedPrimaryCount = expectedPrimaryCount,
+        secondaryProfession = secondaryProfession,
+        secondaryExists = secondaryExists,
+    }
+
+    if passed then
+        self.telemetry.integrityRunsCompleted = (self.telemetry.integrityRunsCompleted or 0) + 1
+        self.telemetry.scenariosCompleted = self.telemetry.scenariosCompleted + 1
+    else
+        self.telemetry.integrityRunsFailed = (self.telemetry.integrityRunsFailed or 0) + 1
+    end
+    self.active = false
+    Addon:RequestRefresh("mock-integrity")
+    return passed, self.integrityScenario.reason
 end
 
 function MockSync:IsMockKey(memberKey)
@@ -685,6 +845,12 @@ function MockSync:StartScenario(name)
     if config.mode == "roster" then
         return self:StartRosterScenario(name, config)
     end
+    if config.mode == "rosterbad" then
+        return self:StartRosterBadScenario(name, config)
+    end
+    if config.mode == "integrity" then
+        return self:StartIntegrityScenario(name, config)
+    end
 
     local ok, err = self:QueueScenarioPayloads(name)
     if not ok then
@@ -703,6 +869,7 @@ function MockSync:Stop()
     self.scenarioName = nil
     self.scenarioConfig = nil
     self.rosterScenario = nil
+    self.integrityScenario = nil
     self._workerScheduled = false
     Addon:RequestRefresh("mock")
 end
@@ -750,6 +917,7 @@ function MockSync:GetDebugSnapshot()
         localTraffic = self.scenarioConfig and self.scenarioConfig.mode == "traffic" or false,
         hardIsolation = self:IsHardIsolationEnabled(),
         rosterScenario = self.rosterScenario,
+        integrityScenario = self.integrityScenario,
         rosterRunning = rosterRunning,
         lastCleanup = lastCleanup,
     }
@@ -780,7 +948,7 @@ function MockSync:DumpStatus()
         local roster = snapshot.rosterScenario
         local lastCleanup = snapshot.lastCleanup
         Addon:Print(format(
-            "Mock roster running=%s seeded=%d expectedActive=%d expectedStale=%d expectedPruned=%d lastProcessed=%d lastKept=%d lastStale=%d lastPruned=%d",
+            "Mock roster running=%s seeded=%d expectedActive=%d expectedStale=%d expectedPruned=%d lastProcessed=%d lastKept=%d lastStale=%d lastPruned=%d aborted=%s reason=%s",
             tostring(snapshot.rosterRunning),
             roster.seeded or 0,
             roster.expectedActive or 0,
@@ -789,7 +957,23 @@ function MockSync:DumpStatus()
             lastCleanup and lastCleanup.processed or 0,
             lastCleanup and lastCleanup.keptActive or 0,
             lastCleanup and lastCleanup.markedStale or 0,
-            lastCleanup and lastCleanup.pruned or 0
+            lastCleanup and lastCleanup.pruned or 0,
+            tostring(lastCleanup and lastCleanup.aborted or false),
+            tostring(lastCleanup and lastCleanup.abortReason or "none")
+        ))
+    end
+    if snapshot.integrityScenario then
+        local integrity = snapshot.integrityScenario
+        Addon:Print(format(
+            "Mock integrity passed=%s reason=%s member=%s primary=%s %d/%d secondary=%s exists=%s",
+            tostring(integrity.passed),
+            tostring(integrity.reason or "none"),
+            tostring(integrity.memberKey or "none"),
+            tostring(integrity.primaryProfession or "none"),
+            integrity.primaryCount or 0,
+            integrity.expectedPrimaryCount or 0,
+            tostring(integrity.secondaryProfession or "none"),
+            tostring(integrity.secondaryExists or false)
         ))
     end
 end

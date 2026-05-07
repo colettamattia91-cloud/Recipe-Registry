@@ -621,6 +621,8 @@ function UI:CreateMainFrame()
             Addon:Print("Guild roster cleanup started in background.")
         elseif reason == "already-running" then
             Addon:Print("Guild roster cleanup is already running.")
+        elseif reason == "roster-empty" or reason == "roster-too-small" then
+            Addon:Print("Guild roster cleanup skipped: roster data looks incomplete. Try again after the guild roster updates.")
         else
             Addon:Print("Guild roster cleanup could not start.")
         end

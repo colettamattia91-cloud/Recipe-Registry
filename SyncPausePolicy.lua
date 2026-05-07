@@ -15,14 +15,11 @@ function SyncPausePolicy:OnEnable()
     self:RegisterEvent("PLAYER_REGEN_ENABLED", "RefreshPauseState")
     self:RegisterEvent("PLAYER_ENTERING_WORLD", "RefreshPauseState")
     self:RegisterEvent("ZONE_CHANGED_NEW_AREA", "RefreshPauseState")
-    self:RegisterEvent("GROUP_ROSTER_UPDATE", "RefreshPauseState")
-    self:RegisterEvent("RAID_ROSTER_UPDATE", "RefreshPauseState")
     self:RefreshPauseState()
 end
 
 function SyncPausePolicy:IsSensitiveSyncContext()
     return InCombatLockdown()
-        or IsInRaid()
         or isInInstance()
 end
 

@@ -27,6 +27,7 @@ local GetNumCrafts = GetNumCrafts
 local GetCraftInfo = GetCraftInfo
 local GetCraftItemLink = GetCraftItemLink
 local GetCraftRecipeLink = GetCraftRecipeLink
+local GetCraftSkillLine = GetCraftSkillLine
 local GetCraftDisplaySkillLine = GetCraftDisplaySkillLine
 local GetCraftItemNameFilter = GetCraftItemNameFilter
 local SetCraftItemNameFilter = SetCraftItemNameFilter
@@ -67,6 +68,8 @@ local DB_DEFAULTS = {
         },
     },
 }
+
+local MANIFEST_BUILD_BLOCKS_PER_STEP = 32
 
 local TRACKED = {
     ["Alchemy"] = true,
@@ -122,12 +125,72 @@ local function countRecipeKeys(recipeKeys)
     return count
 end
 
+local function countKeys(tbl)
+    local count = 0
+    for _ in pairs(tbl or {}) do
+        count = count + 1
+    end
+    return count
+end
+
 local function cloneTableShallow(src)
     local out = {}
     for key, value in pairs(src or {}) do
         out[key] = value
     end
     return out
+end
+
+local function cloneManifestBlock(block)
+    return cloneTableShallow(block)
+end
+
+local function cloneManifestForUpdate(manifest)
+    local copy = {
+        builtAt = manifest and manifest.builtAt or time(),
+        memberKey = manifest and manifest.memberKey,
+        manifestSerial = manifest and manifest.manifestSerial or 0,
+        blocks = {},
+        totals = {
+            blocks = manifest and manifest.totals and manifest.totals.blocks or 0,
+            recipes = manifest and manifest.totals and manifest.totals.recipes or 0,
+        },
+    }
+    for blockKey, block in pairs(manifest and manifest.blocks or {}) do
+        copy.blocks[blockKey] = cloneManifestBlock(block)
+    end
+    return copy
+end
+
+local function newManifestTelemetry()
+    return {
+        buildsStarted = 0,
+        buildsCompleted = 0,
+        fullBuilds = 0,
+        deltaBuilds = 0,
+        buildSteps = 0,
+        blocksProcessed = 0,
+        dirtyBlocksMarked = 0,
+        fullInvalidations = 0,
+        schedules = 0,
+        cacheHits = 0,
+        syncFallbackBuilds = 0,
+        deferredRequests = 0,
+    }
+end
+
+local function newManifestCache()
+    return {
+        manifest = nil,
+        dirtyAll = true,
+        dirtyBlocks = {},
+        building = false,
+        scheduled = false,
+        dirtyDuringBuild = false,
+        serial = 0,
+        lastReason = "init",
+        telemetry = newManifestTelemetry(),
+    }
 end
 
 local function cloneAtlasInfo(info)
@@ -224,10 +287,11 @@ end
 
 -- Validates that a recipe key represents a real craft, not a non-craft spell.
 -- Positive keys (item-based) are always valid.
--- Negative keys (spell-based) must have a known AtlasLoot profession mapping.
--- In TBC Classic AtlasLoot covers every learnable recipe, so a missing entry
--- means the spell is not a craft.
--- Fallback when AtlasLoot is absent: check spell subtext for profession rank
+-- Negative keys (spell-based) prefer a known AtlasLoot profession mapping.
+-- If AtlasLoot is present but misses a mapping, fall back to spell metadata
+-- instead of dropping the key immediately; this avoids destructive false
+-- negatives when optional data is incomplete.
+-- Fallback after AtlasLoot check: check spell subtext for profession rank
 -- keywords (Apprentice/Journeyman/Expert/Artisan/Master) which only craft
 -- spells have; class spells use "Rank N" or have no subtext.
 local CRAFT_RANK_KEYWORDS = {
@@ -246,11 +310,12 @@ local function isValidRecipeKey(recipeKey)
     end  -- item-based: always valid
     local _, profession = getAtlasLootHandles()
     if profession and profession.GetProfessionData then
-        local valid = profession.GetProfessionData(-n) ~= nil
-        recipeValidityCache[n] = valid
-        return valid
+        if profession.GetProfessionData(-n) ~= nil then
+            recipeValidityCache[n] = true
+            return true
+        end
     end
-    -- Fallback: no AtlasLoot — check spell subtext for craft rank keywords
+    -- Fallback: check spell subtext for craft rank keywords.
     local spellName = safeGetSpellName(-n)
     if not spellName then
         recipeValidityCache[n] = true
@@ -518,6 +583,28 @@ local function isSubsetOf(smaller, bigger)
     return true
 end
 
+local function newScanTelemetry()
+    return {
+        signals = 0,
+        scansStarted = 0,
+        scansChanged = 0,
+        scansUnchanged = 0,
+        scansSkipped = 0,
+        scansFailed = 0,
+        suspectedPartial = 0,
+        invalidRecipesBlocked = 0,
+        invalidRecipesSnapshot = 0,
+        invalidRecipesInbound = 0,
+        invalidRecipesCleaned = 0,
+        lastInvalidRecipeKey = nil,
+        lastInvalidRecipeContext = nil,
+        lastInvalidRecipeMember = nil,
+        lastInvalidRecipeProfession = nil,
+        lastProfession = nil,
+        lastSkipReason = nil,
+    }
+end
+
 function Data:OnInitialize()
     Addon.db = LibStub("AceDB-3.0"):New("RecipeRegistryDB", DB_DEFAULTS, true)
     self.db = Addon.db
@@ -531,9 +618,13 @@ function Data:OnInitialize()
     self._atlasRecipeInfoCache = {}
     self._atlasSpellInfoCache = {}
     self._atlasCreatedItemInfoCache = {}
-    -- When true, the next TRADE_SKILL_SHOW / CRAFT_SHOW will run a full scan
-    -- even if recipe data already exists in the DB. Set by recipe-change events.
-    -- Starts false: data loaded from DB is considered valid until a change fires.
+    self._scanNeededByProfession = {}
+    self._genericScanAttempts = {}
+    self._scanTelemetry = newScanTelemetry()
+    self._manifestCache = newManifestCache()
+    -- Deprecated compatibility mirror. New code tracks pending scan work by
+    -- profession plus a generic fallback for recipe events that do not identify
+    -- the changed profession.
     self._scanNeeded = false
     if type(self.db.profile.minimap) ~= "table" then
         self.db.profile.minimap = {
@@ -756,6 +847,101 @@ function Data:GetSyncBlock(memberKey, professionKey)
     }
 end
 
+local function manifestRowFromSyncBlock(block)
+    if not block then return nil end
+    return {
+        ownerCharacter = block.ownerCharacter,
+        professionKey = block.professionKey,
+        revision = block.revision,
+        lastUpdatedAt = block.lastUpdatedAt,
+        sourceType = block.sourceType,
+        guildStatus = block.guildStatus,
+        lastSeenInGuildAt = block.lastSeenInGuildAt,
+        count = block.count,
+        fingerprint = block.fingerprint,
+    }
+end
+
+function Data:EnsureManifestCache()
+    if type(self._manifestCache) ~= "table" then
+        self._manifestCache = newManifestCache()
+    end
+    local cache = self._manifestCache
+    cache.dirtyBlocks = cache.dirtyBlocks or {}
+    cache.telemetry = cache.telemetry or newManifestTelemetry()
+    return cache
+end
+
+function Data:GetManifestSerial()
+    local cache = self:EnsureManifestCache()
+    return cache.serial or 0
+end
+
+function Data:GetManifestBlockRow(blockKey)
+    local ownerCharacter, professionKey = self:ParseSyncBlockKey(blockKey)
+    if not ownerCharacter or not professionKey then return nil end
+    local entry = self:GetMember(ownerCharacter)
+    if not entry or self:IsMockMember(ownerCharacter, entry) then return nil end
+    if (entry.guildStatus or "active") ~= "active" then return nil end
+    local block = self:GetSyncBlock(ownerCharacter, professionKey)
+    if not block or (block.guildStatus or "active") ~= "active" then return nil end
+    return manifestRowFromSyncBlock(block)
+end
+
+function Data:MarkManifestDirty(blockKey, reason)
+    local cache = self:EnsureManifestCache()
+    cache.lastReason = reason or cache.lastReason or "dirty"
+    if cache.building then
+        cache.dirtyDuringBuild = true
+    end
+    if not blockKey then
+        cache.dirtyAll = true
+        cache.dirtyBlocks = {}
+        cache.telemetry.fullInvalidations = (cache.telemetry.fullInvalidations or 0) + 1
+    elseif not cache.dirtyAll then
+        if not cache.dirtyBlocks[blockKey] then
+            cache.telemetry.dirtyBlocksMarked = (cache.telemetry.dirtyBlocksMarked or 0) + 1
+        end
+        cache.dirtyBlocks[blockKey] = true
+    end
+    self:ScheduleManifestBuild(reason or "dirty")
+end
+
+function Data:MarkManifestMemberDirty(memberKey, entry, reason)
+    entry = entry or self:GetMember(memberKey)
+    if not memberKey or not entry then
+        self:MarkManifestDirty(nil, reason or "member-unknown")
+        return
+    end
+    local marked = false
+    for professionKey in pairs(entry.professions or {}) do
+        self:MarkManifestDirty(self:BuildSyncBlockKey(memberKey, professionKey), reason or "member")
+        marked = true
+    end
+    if not marked then
+        self:MarkManifestDirty(nil, reason or "member-empty")
+    end
+end
+
+function Data:IsManifestDirty()
+    local cache = self:EnsureManifestCache()
+    return cache.dirtyAll == true or next(cache.dirtyBlocks) ~= nil or cache.building == true
+end
+
+function Data:MakeManifestShell()
+    local cache = self:EnsureManifestCache()
+    return {
+        builtAt = time(),
+        memberKey = self:GetPlayerKey(),
+        manifestSerial = cache.serial or 0,
+        blocks = {},
+        totals = {
+            blocks = 0,
+            recipes = 0,
+        },
+    }
+end
+
 function Data:GetAllSyncBlocks(includeStale)
     local blocks = {}
     for memberKey, entry in pairs(self:GetMembersDB()) do
@@ -778,28 +964,10 @@ function Data:GetAllSyncBlocks(includeStale)
 end
 
 function Data:BuildSyncManifest(includeStale)
-    local manifest = {
-        builtAt = time(),
-        memberKey = self:GetPlayerKey(),
-        blocks = {},
-        totals = {
-            blocks = 0,
-            recipes = 0,
-        },
-    }
+    local manifest = self:MakeManifestShell()
 
     for _, block in ipairs(self:GetAllSyncBlocks(includeStale)) do
-        manifest.blocks[block.blockKey] = {
-            ownerCharacter = block.ownerCharacter,
-            professionKey = block.professionKey,
-            revision = block.revision,
-            lastUpdatedAt = block.lastUpdatedAt,
-            sourceType = block.sourceType,
-            guildStatus = block.guildStatus,
-            lastSeenInGuildAt = block.lastSeenInGuildAt,
-            count = block.count,
-            fingerprint = block.fingerprint,
-        }
+        manifest.blocks[block.blockKey] = manifestRowFromSyncBlock(block)
         manifest.totals.blocks = manifest.totals.blocks + 1
         manifest.totals.recipes = manifest.totals.recipes + (block.count or 0)
     end
@@ -807,8 +975,258 @@ function Data:BuildSyncManifest(includeStale)
     return manifest
 end
 
+function Data:ApplyManifestDirtyBlock(manifest, blockKey)
+    if not manifest or not blockKey then return end
+    local previous = manifest.blocks[blockKey]
+    if previous then
+        manifest.totals.blocks = math.max(0, (manifest.totals.blocks or 0) - 1)
+        manifest.totals.recipes = math.max(0, (manifest.totals.recipes or 0) - (previous.count or 0))
+        manifest.blocks[blockKey] = nil
+    end
+
+    local row = self:GetManifestBlockRow(blockKey)
+    if row then
+        manifest.blocks[blockKey] = row
+        manifest.totals.blocks = (manifest.totals.blocks or 0) + 1
+        manifest.totals.recipes = (manifest.totals.recipes or 0) + (row.count or 0)
+    end
+end
+
+function Data:CommitManifestBuild(manifest, reason, mode, processed)
+    local cache = self:EnsureManifestCache()
+    cache.manifest = manifest
+    cache.dirtyAll = cache.dirtyDuringBuild == true
+    cache.dirtyBlocks = {}
+    cache.building = false
+    cache.scheduled = false
+    cache.dirtyDuringBuild = false
+    cache.lastReason = reason or cache.lastReason
+    cache.telemetry.buildsCompleted = (cache.telemetry.buildsCompleted or 0) + 1
+    cache.telemetry.blocksProcessed = (cache.telemetry.blocksProcessed or 0) + (processed or 0)
+    if mode == "delta" then
+        cache.telemetry.deltaBuilds = (cache.telemetry.deltaBuilds or 0) + 1
+    else
+        cache.telemetry.fullBuilds = (cache.telemetry.fullBuilds or 0) + 1
+    end
+    if Addon.TrickleSync and Addon.TrickleSync.InvalidateManifestChunkCache then
+        Addon.TrickleSync:InvalidateManifestChunkCache()
+    end
+    if Addon.Sync and Addon.Sync.OnManifestCacheReady then
+        Addon.Sync:OnManifestCacheReady(reason or "manifest-cache")
+    end
+    if cache.dirtyAll then
+        self:ScheduleManifestBuild("dirty-during-build")
+    end
+end
+
+function Data:BuildManifestCacheNow(reason)
+    local cache = self:EnsureManifestCache()
+    if cache.manifest and not self:IsManifestDirty() then
+        cache.telemetry.cacheHits = (cache.telemetry.cacheHits or 0) + 1
+        return cache.manifest
+    end
+
+    cache.serial = (cache.serial or 0) + 1
+    cache.telemetry.buildsStarted = (cache.telemetry.buildsStarted or 0) + 1
+    cache.telemetry.syncFallbackBuilds = (cache.telemetry.syncFallbackBuilds or 0) + (reason == "sync-fallback" and 1 or 0)
+
+    local mode = "full"
+    local manifest
+    local processed = 0
+    if cache.manifest and not cache.dirtyAll then
+        mode = "delta"
+        manifest = cloneManifestForUpdate(cache.manifest)
+        manifest.builtAt = time()
+        manifest.memberKey = self:GetPlayerKey()
+        manifest.manifestSerial = cache.serial
+        for blockKey in pairs(cache.dirtyBlocks or {}) do
+            self:ApplyManifestDirtyBlock(manifest, blockKey)
+            processed = processed + 1
+        end
+    else
+        manifest = self:BuildSyncManifest(false)
+        manifest.manifestSerial = cache.serial
+        processed = manifest.totals.blocks or 0
+    end
+
+    self:CommitManifestBuild(manifest, reason or cache.lastReason or "sync", mode, processed)
+    return manifest
+end
+
+function Data:PrepareManifestBuildState(state)
+    local cache = self:EnsureManifestCache()
+    state = state or {}
+    state.reason = state.reason or cache.lastReason or "background"
+    state.index = 1
+    state.processed = 0
+    state.mode = (cache.manifest and not cache.dirtyAll) and "delta" or "full"
+    cache.serial = (cache.serial or 0) + 1
+    cache.telemetry.buildsStarted = (cache.telemetry.buildsStarted or 0) + 1
+    cache.scheduled = false
+    cache.building = true
+    cache.dirtyDuringBuild = false
+
+    if state.mode == "delta" then
+        state.manifest = cloneManifestForUpdate(cache.manifest)
+        state.manifest.builtAt = time()
+        state.manifest.memberKey = self:GetPlayerKey()
+        state.manifest.manifestSerial = cache.serial
+        state.blockKeys = {}
+        for blockKey in pairs(cache.dirtyBlocks or {}) do
+            state.blockKeys[#state.blockKeys + 1] = blockKey
+        end
+        sort(state.blockKeys)
+    else
+        state.manifest = self:MakeManifestShell()
+        state.manifest.manifestSerial = cache.serial
+        state.blocks = self:GetAllSyncBlocks(false)
+    end
+    return state
+end
+
+function Data:RunManifestBuildStep(state)
+    local cache = self:EnsureManifestCache()
+    if cache.manifest and not self:IsManifestDirty() and not cache.building then
+        cache.scheduled = false
+        return false
+    end
+
+    if not state or not state.mode then
+        state = self:PrepareManifestBuildState(state)
+    end
+
+    cache.telemetry.buildSteps = (cache.telemetry.buildSteps or 0) + 1
+    local processedThisStep = 0
+    while processedThisStep < MANIFEST_BUILD_BLOCKS_PER_STEP do
+        if state.mode == "delta" then
+            local blockKey = state.blockKeys[state.index]
+            if not blockKey then break end
+            self:ApplyManifestDirtyBlock(state.manifest, blockKey)
+        else
+            local block = state.blocks[state.index]
+            if not block then break end
+            state.manifest.blocks[block.blockKey] = manifestRowFromSyncBlock(block)
+            state.manifest.totals.blocks = state.manifest.totals.blocks + 1
+            state.manifest.totals.recipes = state.manifest.totals.recipes + (block.count or 0)
+        end
+        state.index = state.index + 1
+        state.processed = (state.processed or 0) + 1
+        processedThisStep = processedThisStep + 1
+    end
+
+    local done
+    if state.mode == "delta" then
+        done = state.index > #(state.blockKeys or {})
+    else
+        done = state.index > #(state.blocks or {})
+    end
+    if not done then return true, state end
+
+    self:CommitManifestBuild(state.manifest, state.reason, state.mode, state.processed or 0)
+    return false
+end
+
+function Data:ScheduleManifestBuild(reason)
+    local cache = self:EnsureManifestCache()
+    if cache.scheduled or cache.building then return end
+    if not (Addon.Performance and Addon.Performance.ScheduleJob) then return end
+    cache.scheduled = true
+    cache.lastReason = reason or cache.lastReason or "scheduled"
+    cache.telemetry.schedules = (cache.telemetry.schedules or 0) + 1
+    Addon.Performance:ScheduleJob("manifest-cache-build", function(state)
+        return self:RunManifestBuildStep(state)
+    end, {
+        category = "sync-manifest",
+        label = "manifest-cache-build",
+        budgetMs = 2,
+        state = {
+            reason = reason or "scheduled",
+        },
+    })
+end
+
+function Data:GetPreparedSyncManifest(opts)
+    opts = opts or {}
+    local cache = self:EnsureManifestCache()
+    if cache.manifest and not self:IsManifestDirty() then
+        cache.telemetry.cacheHits = (cache.telemetry.cacheHits or 0) + 1
+        return cache.manifest, "ready"
+    end
+    if opts.allowStale and cache.manifest then
+        cache.telemetry.cacheHits = (cache.telemetry.cacheHits or 0) + 1
+        self:ScheduleManifestBuild(opts.reason or "stale-request")
+        return cache.manifest, "stale"
+    end
+    if opts.syncFallback then
+        return self:BuildManifestCacheNow("sync-fallback"), "built"
+    end
+    cache.telemetry.deferredRequests = (cache.telemetry.deferredRequests or 0) + 1
+    self:ScheduleManifestBuild(opts.reason or "request")
+    return nil, "building"
+end
+
+function Data:GetManifestDebugSnapshot()
+    local cache = self:EnsureManifestCache()
+    local manifest = cache.manifest
+    return {
+        ready = manifest ~= nil and not self:IsManifestDirty(),
+        hasManifest = manifest ~= nil,
+        dirtyAll = cache.dirtyAll == true,
+        dirtyBlocks = countKeys(cache.dirtyBlocks),
+        building = cache.building == true,
+        scheduled = cache.scheduled == true,
+        serial = cache.serial or 0,
+        blocks = manifest and manifest.totals and manifest.totals.blocks or 0,
+        recipes = manifest and manifest.totals and manifest.totals.recipes or 0,
+        lastReason = cache.lastReason or "none",
+        telemetry = cache.telemetry or newManifestTelemetry(),
+    }
+end
+
+function Data:DumpManifestCacheStatus()
+    local snapshot = self:GetManifestDebugSnapshot()
+    local telemetry = snapshot.telemetry or {}
+    local chunkTelemetry = Addon.TrickleSync and Addon.TrickleSync.GetManifestChunkTelemetry
+        and Addon.TrickleSync:GetManifestChunkTelemetry()
+        or {}
+    local syncTelemetry = Addon.Sync and Addon.Sync.telemetry or {}
+    local manifestQueueDepth = Addon.Sync and Addon.Sync.manifestChunkQueue and #Addon.Sync.manifestChunkQueue or 0
+    Addon:Print(string.format(
+        "Manifest cache ready=%s dirtyAll=%s dirtyBlocks=%d building=%s scheduled=%s serial=%d blocks=%d recipes=%d builds=%d full=%d delta=%d steps=%d processed=%d hits=%d deferred=%d chunkBuilds=%d chunkHits=%d maniQueued=%d maniSent=%d maniQueue=%d last=%s",
+        tostring(snapshot.ready),
+        tostring(snapshot.dirtyAll),
+        snapshot.dirtyBlocks or 0,
+        tostring(snapshot.building),
+        tostring(snapshot.scheduled),
+        snapshot.serial or 0,
+        snapshot.blocks or 0,
+        snapshot.recipes or 0,
+        telemetry.buildsCompleted or 0,
+        telemetry.fullBuilds or 0,
+        telemetry.deltaBuilds or 0,
+        telemetry.buildSteps or 0,
+        telemetry.blocksProcessed or 0,
+        telemetry.cacheHits or 0,
+        telemetry.deferredRequests or 0,
+        chunkTelemetry.chunkBuilds or 0,
+        chunkTelemetry.chunkCacheHits or 0,
+        syncTelemetry.manifestChunksQueued or 0,
+        syncTelemetry.manifestChunksSent or 0,
+        manifestQueueDepth,
+        tostring(snapshot.lastReason or "none")
+    ))
+end
+
+function Data:ResetManifestTelemetry()
+    local cache = self:EnsureManifestCache()
+    cache.telemetry = newManifestTelemetry()
+    if Addon.TrickleSync and Addon.TrickleSync.ResetManifestChunkTelemetry then
+        Addon.TrickleSync:ResetManifestChunkTelemetry()
+    end
+end
+
 function Data:GetDatasetCompletenessEstimate()
-    local manifest = self:BuildSyncManifest(false)
+    local manifest = self:GetPreparedSyncManifest({ allowStale = true, syncFallback = true, reason = "completeness" })
     return manifest.totals.blocks, manifest.totals.recipes
 end
 
@@ -859,6 +1277,7 @@ function Data:MarkMemberActive(memberKey, seenAt)
         prof.lastSeenInGuildAt = entry.lastSeenInGuildAt
         entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, prof)
     end
+    self:MarkManifestMemberDirty(memberKey, entry, "member-active")
     return true
 end
 
@@ -872,12 +1291,14 @@ function Data:MarkMemberStale(memberKey, staleAt)
         prof.guildStatus = "stale"
         entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, prof)
     end
+    self:MarkManifestMemberDirty(memberKey, entry, "member-stale")
     self:InvalidateRecipeCaches("presence")
     return true
 end
 
 function Data:DeleteMember(memberKey)
     if not memberKey then return false end
+    self:MarkManifestMemberDirty(memberKey, self:GetMember(memberKey), "member-delete")
     self.db.global.members[memberKey] = nil
     self:InvalidateRecipeCaches("presence")
     if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
@@ -904,6 +1325,7 @@ function Data:DeleteMockMembers()
         end
     end
     if removed > 0 then
+        self:MarkManifestDirty(nil, "mock-cleanup")
         self:InvalidateRecipeCaches("presence")
         if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
             Addon.Tooltip:InvalidateIndex()
@@ -920,6 +1342,7 @@ function Data:CleanInvalidRecipes()
             for recipeKey in pairs(prof.recipes or {}) do
                 if not isValidRecipeKey(recipeKey) then
                     toRemove[#toRemove + 1] = recipeKey
+                    self:RecordInvalidRecipeKey(recipeKey, "clean", memberKey, profName)
                 end
             end
             for _, recipeKey in ipairs(toRemove) do
@@ -932,6 +1355,7 @@ function Data:CleanInvalidRecipes()
                 for _ in pairs(prof.recipes) do count = count + 1 end
                 prof.count = count
                 prof.signature = stableRecipeSignature(prof.recipes)
+                self:MarkManifestDirty(self:BuildSyncBlockKey(memberKey, profName), "clean")
             end
         end
     end
@@ -965,10 +1389,14 @@ function Data:DetectProfessions()
                     skillMaxRank = skillMaxRank or 0,
                 }
                 local entry = self:GetOrCreateMember(self:GetPlayerKey())
+                local wasNewProfession = entry.professions[canonical] == nil
                 entry.professions[canonical] = entry.professions[canonical] or { recipes = {} }
                 entry.professions[canonical].skillRank = skillRank or 0
                 entry.professions[canonical].skillMaxRank = skillMaxRank or 0
                 entry.professions[canonical] = self:NormalizeProfessionBlock(entry, canonical, entry.professions[canonical])
+                if wasNewProfession then
+                    self:MarkManifestDirty(self:BuildSyncBlockKey(entry.owner or self:GetPlayerKey(), canonical), "detect-profession")
+                end
             end
         end
     end
@@ -1014,26 +1442,241 @@ function Data:GetGuildMemberMeta(memberKey)
     return self._guildMetaCache and self._guildMetaCache[memberKey] or nil
 end
 
-function Data:ScanTradeSkill()
-    local title = GetTradeSkillLine and GetTradeSkillLine()
-    if not title then return false end
-    local canonical = self:GetCanonicalProfession(title)
-    if not TRACKED[canonical] then return false end
+function Data:EnsureScanState()
+    self._scanNeededByProfession = self._scanNeededByProfession or {}
+    self._genericScanAttempts = self._genericScanAttempts or {}
+    if type(self._scanTelemetry) ~= "table" then
+        self._scanTelemetry = newScanTelemetry()
+    end
+end
 
-    -- Only touch the native UI when necessary:
-    -- • first time this profession is seen (no data in DB yet), OR
-    -- • a recipe-change signal explicitly requested a rescan (_scanNeeded).
-    -- On routine open/close cycles the data in DB is current → skip entirely.
+function Data:RecordScanTelemetry(field, amount)
+    self:EnsureScanState()
+    self._scanTelemetry[field] = (self._scanTelemetry[field] or 0) + (amount or 1)
+end
+
+function Data:RecordInvalidRecipeKey(recipeKey, context, memberKey, profession)
+    self:EnsureScanState()
+    local t = self._scanTelemetry
+    t.invalidRecipesBlocked = (t.invalidRecipesBlocked or 0) + 1
+    if context == "snapshot" then
+        t.invalidRecipesSnapshot = (t.invalidRecipesSnapshot or 0) + 1
+    elseif context == "inbound" then
+        t.invalidRecipesInbound = (t.invalidRecipesInbound or 0) + 1
+    elseif context == "clean" then
+        t.invalidRecipesCleaned = (t.invalidRecipesCleaned or 0) + 1
+    end
+    t.lastInvalidRecipeKey = recipeKey
+    t.lastInvalidRecipeContext = context
+    t.lastInvalidRecipeMember = memberKey
+    t.lastInvalidRecipeProfession = profession
+end
+
+function Data:MarkScanNeeded(profession, reason)
+    self:EnsureScanState()
+    local canonical = profession and self:GetCanonicalProfession(profession) or nil
+    if canonical and TRACKED[canonical] then
+        self._scanNeededByProfession[canonical] = reason or true
+    else
+        self._genericScanNeeded = reason or true
+        self._genericScanAttempts = {}
+    end
+    self._scanNeeded = true
+    self:RecordScanTelemetry("signals")
+end
+
+function Data:HasScanPending(profession)
+    self:EnsureScanState()
+    local canonical = profession and self:GetCanonicalProfession(profession) or nil
+    if canonical and self._scanNeededByProfession[canonical] then
+        return true
+    end
+    if self._genericScanNeeded ~= nil then
+        return true
+    end
+    return self._scanNeeded == true and next(self._scanNeededByProfession) == nil
+end
+
+function Data:HasAnyScanPending()
+    self:EnsureScanState()
+    if self._genericScanNeeded ~= nil then
+        return true
+    end
+    return next(self._scanNeededByProfession) ~= nil
+end
+
+function Data:SyncLegacyScanFlag()
+    self._scanNeeded = self:HasAnyScanPending()
+end
+
+function Data:CompleteScanAttempt(result)
+    if not result or not result.profession then return end
+    self:EnsureScanState()
+    if not result.valid or result.suspectedPartial then
+        self:SyncLegacyScanFlag()
+        return
+    end
+
+    local hadGenericPending = self._genericScanNeeded ~= nil
+        or (self._scanNeeded == true and next(self._scanNeededByProfession) == nil)
+    local genericReason = self._genericScanNeeded
+    self._scanNeededByProfession[result.profession] = nil
+    if hadGenericPending then
+        if result.changed or genericReason == "manual-rescan" or genericReason == nil then
+            self._genericScanNeeded = nil
+            self._genericScanAttempts = {}
+        else
+            self._genericScanAttempts[result.profession] = true
+        end
+    end
+    self:SyncLegacyScanFlag()
+end
+
+function Data:MakeScanResult(profession, opts)
+    opts = opts or {}
+    return {
+        profession = profession,
+        changed = opts.changed == true,
+        valid = opts.valid == true,
+        skipped = opts.skipped == true,
+        skipReason = opts.skipReason,
+        count = opts.count or 0,
+        previousCount = opts.previousCount or 0,
+        suspectedPartial = opts.suspectedPartial == true,
+    }
+end
+
+function Data:SkipScan(profession, reason, previousCount)
+    self:EnsureScanState()
+    self:RecordScanTelemetry("scansSkipped")
+    self._scanTelemetry.lastProfession = profession
+    self._scanTelemetry.lastSkipReason = reason
+    return self:MakeScanResult(profession, {
+        skipped = true,
+        skipReason = reason,
+        previousCount = previousCount or 0,
+    })
+end
+
+function Data:GetScanTelemetry()
+    self:EnsureScanState()
+    return self._scanTelemetry
+end
+
+function Data:ResetScanTelemetry()
+    self._scanTelemetry = newScanTelemetry()
+end
+
+function Data:DumpScanStatus()
+    local scan = self:GetScanTelemetry()
+    Addon:Print(string.format(
+        "Scan signals=%d started=%d changed=%d unchanged=%d skipped=%d failed=%d partial=%d invalid=%d pending=%s last=%s/%s",
+        scan.signals or 0,
+        scan.scansStarted or 0,
+        scan.scansChanged or 0,
+        scan.scansUnchanged or 0,
+        scan.scansSkipped or 0,
+        scan.scansFailed or 0,
+        scan.suspectedPartial or 0,
+        scan.invalidRecipesBlocked or 0,
+        tostring(self:HasAnyScanPending()),
+        tostring(scan.lastProfession or "none"),
+        tostring(scan.lastSkipReason or "none")
+    ))
+    if (scan.invalidRecipesBlocked or 0) > 0 then
+        Addon:Print(string.format(
+            "Recipe validation snapshot=%d inbound=%d cleaned=%d last=%s/%s/%s/%s",
+            scan.invalidRecipesSnapshot or 0,
+            scan.invalidRecipesInbound or 0,
+            scan.invalidRecipesCleaned or 0,
+            tostring(scan.lastInvalidRecipeContext or "none"),
+            tostring(scan.lastInvalidRecipeKey or "none"),
+            tostring(scan.lastInvalidRecipeMember or "none"),
+            tostring(scan.lastInvalidRecipeProfession or "none")
+        ))
+    end
+end
+
+function Data:GetActiveTradeSkillProfession()
+    local title = GetTradeSkillLine and GetTradeSkillLine()
+    if not title or title == "" or title == "UNKNOWN" then
+        return nil, "trade-no-title"
+    end
+    local canonical = self:GetCanonicalProfession(title)
+    if not TRACKED[canonical] then
+        return canonical, "trade-untracked"
+    end
+    return canonical
+end
+
+function Data:CanScanTradeSkillData()
+    local canonical, reason = self:GetActiveTradeSkillProfession()
+    if not canonical then
+        return false, reason or "trade-no-title", canonical
+    end
+    if reason then
+        return false, reason, canonical
+    end
+    if type(GetNumTradeSkills) ~= "function" or type(GetTradeSkillInfo) ~= "function" then
+        return false, "trade-api-missing", canonical
+    end
+    local numSkills = GetNumTradeSkills()
+    if type(numSkills) ~= "number" or numSkills <= 0 then
+        return false, "trade-data-not-ready", canonical
+    end
+    return true, nil, canonical, numSkills
+end
+
+function Data:GetActiveCraftProfession()
+    local title = GetCraftSkillLine and GetCraftSkillLine(1)
+    if not title or title == "" or title == "UNKNOWN" then
+        title = GetCraftDisplaySkillLine and GetCraftDisplaySkillLine()
+    end
+    if not title or title == "" or title == "UNKNOWN" then
+        return nil, "craft-no-title"
+    end
+    local canonical = self:GetCanonicalProfession(title)
+    if canonical ~= "Enchanting" then
+        return canonical, "craft-not-enchanting"
+    end
+    return canonical
+end
+
+function Data:CanScanCraftData()
+    local canonical, reason = self:GetActiveCraftProfession()
+    if not canonical then
+        return false, reason or "craft-no-title", canonical
+    end
+    if reason then
+        return false, reason, canonical
+    end
+    if type(GetNumCrafts) ~= "function" or type(GetCraftInfo) ~= "function" then
+        return false, "craft-api-missing", canonical
+    end
+    local numCrafts = GetNumCrafts()
+    if type(numCrafts) ~= "number" or numCrafts <= 0 then
+        return false, "craft-data-not-ready", canonical
+    end
+    return true, nil, canonical, numCrafts
+end
+
+function Data:ScanTradeSkill()
+    self:EnsureScanState()
+    local canScan, reason, canonical, initialNumSkills = self:CanScanTradeSkillData()
+    if not canScan then return self:SkipScan(canonical, reason or "trade-data-not-ready") end
+
+    -- Routine opens reuse cached owner data; pending recipe signals and first
+    -- scans still force a full read of the active profession.
     local entry = self:GetOrCreateMember(self:GetPlayerKey())
     local prof = entry.professions[canonical]
     local hasData = prof and prof.count and prof.count > 0
-    if hasData and not self._scanNeeded then
-        return false
+    if hasData and not self:HasScanPending(canonical) then
+        return self:SkipScan(canonical, "cached", prof.count or 0)
     end
-    -- Consume the flag before scanning so a signal fired during the scan is
-    -- not silently swallowed (it will re-set the flag for the next open).
-    self._scanNeeded = false
 
+    self:RecordScanTelemetry("scansStarted")
+    self._scanTelemetry.lastProfession = canonical
+    self._scanTelemetry.lastSkipReason = nil
     local filterState = snapshotTradeSkillFilters()
     clearTradeSkillFilters()
 
@@ -1041,7 +1684,7 @@ function Data:ScanTradeSkill()
     local collapsedHeaders = {}
     local ok, err = pcall(function()
         -- Record which headers were collapsed so we can re-collapse after scan.
-        local numSkills = GetNumTradeSkills() or 0
+        local numSkills = initialNumSkills or GetNumTradeSkills() or 0
         for i = numSkills, 1, -1 do
             local headerName, recipeType, _, isExpanded = GetTradeSkillInfo(i)
             if recipeType == "header" and not isExpanded then
@@ -1079,36 +1722,45 @@ function Data:ScanTradeSkill()
 
     if not ok then
         Addon:Print("Trade skill scan failed: " .. tostring(err))
-        return false
+        self:RecordScanTelemetry("scansFailed")
+        return self:MakeScanResult(canonical, {
+            valid = false,
+            skipReason = "trade-scan-failed",
+            previousCount = prof and prof.count or 0,
+        })
     end
 
     return self:ApplyScanResult(canonical, recipes)
 end
 
 function Data:ScanCraft()
-    local title = GetCraftDisplaySkillLine and GetCraftDisplaySkillLine()
-    local canonical = self:GetCanonicalProfession(title or "")
-    if canonical ~= "Enchanting" then
-        -- CraftFrame is open for a non-Enchanting skill (e.g. Beast Training).
-        -- Skip the scan to avoid storing class spells as Enchanting recipes.
-        Addon:Debug("ScanCraft skipped: CraftFrame shows", title or "nil", "->", canonical or "nil")
-        return false
+    self:EnsureScanState()
+    local canScan, reason, canonical, initialNumCrafts = self:CanScanCraftData()
+    if not canScan then
+        if reason == "craft-not-enchanting" then
+            -- CraftFrame is open for a non-Enchanting skill (e.g. Beast Training).
+            -- Skip the scan to avoid storing class spells as Enchanting recipes.
+            Addon:Debug("ScanCraft skipped: CraftFrame shows", canonical or "nil")
+        end
+        return self:SkipScan(canonical, reason or "craft-data-not-ready")
     end
 
     local entry = self:GetOrCreateMember(self:GetPlayerKey())
     local prof = entry.professions[canonical]
     local hasData = prof and prof.count and prof.count > 0
-    if hasData and not self._scanNeeded then
-        return false
+    if hasData and not self:HasScanPending(canonical) then
+        return self:SkipScan(canonical, "cached", prof.count or 0)
     end
-    self._scanNeeded = false
 
+    self:RecordScanTelemetry("scansStarted")
+    self._scanTelemetry.lastProfession = canonical
+    self._scanTelemetry.lastSkipReason = nil
     local filterState = snapshotCraftFilters()
     clearCraftFilters()
 
     local recipes = {}
     local ok, err = pcall(function()
-        for i = 1, (GetNumCrafts() or 0) do
+        for i = 1, (initialNumCrafts or GetNumCrafts() or 0) do
             local recipeName, recipeType = GetCraftInfo(i)
             if recipeName and recipeType ~= "header" and recipeType ~= "subheader" then
                 local itemID = extractItemID(GetCraftItemLink(i))
@@ -1122,10 +1774,32 @@ function Data:ScanCraft()
 
     if not ok then
         Addon:Print("Craft scan failed: " .. tostring(err))
-        return false
+        self:RecordScanTelemetry("scansFailed")
+        return self:MakeScanResult(canonical, {
+            valid = false,
+            skipReason = "craft-scan-failed",
+            previousCount = prof and prof.count or 0,
+        })
     end
 
     return self:ApplyScanResult(canonical, recipes)
+end
+
+function Data:WarnSuspiciousScan(profession, previousCount, count)
+    self._lastPartialScanWarning = self._lastPartialScanWarning or {}
+    local now = time()
+    local last = self._lastPartialScanWarning[profession] or 0
+    if now - last >= 60 then
+        self._lastPartialScanWarning[profession] = now
+        Addon:Print(string.format(
+            "Skipped %s scan: found %d recipe(s), keeping existing owner data with %d. Reopen the profession to retry.",
+            tostring(profession),
+            count or 0,
+            previousCount or 0
+        ))
+    else
+        Addon:Debug("Skipped suspicious partial scan", profession, "new", count or 0, "old", previousCount or 0)
+    end
 end
 
 function Data:ApplyScanResult(profession, recipeKeys)
@@ -1134,12 +1808,30 @@ function Data:ApplyScanResult(profession, recipeKeys)
     local oldSignature = prof.signature or ""
     local newSignature = stableRecipeSignature(recipeKeys)
     local changed = (oldSignature ~= newSignature)
+    local previousCount = prof.count or countRecipeKeys(prof.recipes)
+    local count = countRecipeKeys(recipeKeys)
+
+    if previousCount > 0 and count < previousCount then
+        self:RecordScanTelemetry("suspectedPartial")
+        prof.lastScanAttempt = time()
+        prof.lastScanSkipReason = "suspected-partial"
+        entry.professions[profession] = prof
+        self:WarnSuspiciousScan(profession, previousCount, count)
+        local result = self:MakeScanResult(profession, {
+            valid = true,
+            changed = false,
+            count = count,
+            previousCount = previousCount,
+            suspectedPartial = true,
+            skipReason = "suspected-partial",
+        })
+        self:CompleteScanAttempt(result)
+        return result
+    end
 
     prof.recipes = {}
-    local count = 0
     for recipeKey in pairs(recipeKeys or {}) do
         prof.recipes[recipeKey] = true
-        count = count + 1
     end
     prof.signature = newSignature
     prof.count = count
@@ -1158,17 +1850,27 @@ function Data:ApplyScanResult(profession, recipeKeys)
     entry.professions[profession] = prof
 
     if changed then
+        self:RecordScanTelemetry("scansChanged")
         self:TouchLocalRevision("scan:" .. profession)
         prof.blockRevision = entry.rev or prof.blockRevision
+        self:MarkManifestDirty(self:BuildSyncBlockKey(entry.owner or self:GetPlayerKey(), profession), "scan")
         Addon:Debug("Scan changed", profession, count, "recipe ids")
         Addon:Print(string.format("Scanned %s: %d recipe(s) found.", profession, count))
     else
+        self:RecordScanTelemetry("scansUnchanged")
         Addon:Print(string.format("Scanned %s: unchanged (%d recipe(s)).", profession, count))
     end
 
     self:InvalidateRecipeCaches()
     Addon:RequestRefresh("scan")
-    return changed
+    local result = self:MakeScanResult(profession, {
+        valid = true,
+        changed = changed,
+        count = count,
+        previousCount = previousCount,
+    })
+    self:CompleteScanAttempt(result)
+    return result
 end
 
 function Data:GetLocalSummary()
@@ -1207,6 +1909,8 @@ function Data:BuildSnapshotChunks(memberKey)
         for recipeKey in pairs(prof.recipes or {}) do
             if isValidRecipeKey(recipeKey) then
                 recipeKeys[#recipeKeys + 1] = recipeKey
+            else
+                self:RecordInvalidRecipeKey(recipeKey, "snapshot", memberKey, profName)
             end
         end
         sort(recipeKeys, function(a, b) return tostring(a) < tostring(b) end)
@@ -1289,6 +1993,7 @@ function Data:AppendIncomingChunk(chunk)
             if isValidRecipeKey(recipeKey) then
                 prof.recipes[recipeKey] = true
             else
+                self:RecordInvalidRecipeKey(recipeKey, "inbound", chunk.memberKey, chunk.profession)
                 Addon:Debug("Blocked invalid recipe from sync:", recipeKey, "profession:", chunk.profession, "from:", chunk.memberKey)
             end
         end
@@ -1325,17 +2030,19 @@ function Data:FinalizeIncomingSnapshot(memberKey, rev, opts)
         for _ in pairs(incomingRecipes) do count = count + 1 end
 
         local currentProf = current and current.professions and current.professions[profName] or nil
-        if currentProf and currentProf.recipes and currentProf.count and currentProf.count > count and count > 0 then
+        local currentCount = currentProf and (currentProf.count or countRecipeKeys(currentProf.recipes)) or 0
+        if currentProf and currentProf.recipes and currentCount > count then
             local incomingRank = prof.skillRank or 0
             local currentRank = currentProf.skillRank or 0
             if incomingRank >= currentRank and isSubsetOf(incomingRecipes, currentProf.recipes) then
+                local incomingCount = count
                 local merged = {}
                 for recipeKey in pairs(currentProf.recipes) do merged[recipeKey] = true end
                 for recipeKey in pairs(incomingRecipes) do merged[recipeKey] = true end
                 incomingRecipes = merged
                 count = 0
                 for _ in pairs(incomingRecipes) do count = count + 1 end
-                Addon:Print(string.format("Protected %s %s from a partial remote overwrite (%d -> %d kept).", memberKey, profName, count, currentProf.count or count))
+                Addon:Print(string.format("Protected %s %s from a partial remote overwrite (%d -> %d kept).", memberKey, profName, incomingCount, currentCount))
             end
         end
 
@@ -1354,6 +2061,24 @@ function Data:FinalizeIncomingSnapshot(memberKey, rev, opts)
         }
     end
 
+    if current and finalEntry.sourceType ~= "owner" then
+        local preserved = 0
+        for profName, currentProf in pairs(current.professions or {}) do
+            if not finalEntry.professions[profName] then
+                local clone = cloneTableShallow(currentProf)
+                clone.recipes = {}
+                for recipeKey in pairs(currentProf.recipes or {}) do
+                    clone.recipes[recipeKey] = true
+                end
+                finalEntry.professions[profName] = clone
+                preserved = preserved + 1
+            end
+        end
+        if preserved > 0 then
+            Addon:Debug("Preserved", preserved, "profession block(s) missing from incoming snapshot for", memberKey)
+        end
+    end
+
     local applied, reason, resolved = Addon.MergeEngine:ApplyIfNewer(current, finalEntry, {
         preserveOwner = memberKey == self:GetPlayerKey(),
     })
@@ -1367,6 +2092,7 @@ function Data:FinalizeIncomingSnapshot(memberKey, rev, opts)
     end
 
     self.db.global.members[memberKey] = self:NormalizeMemberEntry(resolved, memberKey)
+    self:MarkManifestMemberDirty(memberKey, self.db.global.members[memberKey], "snapshot-merge")
     self:InvalidateRecipeCaches()
     Addon:RequestRefresh("snapshot-merge")
     if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
@@ -1821,9 +2547,12 @@ function Data:DumpSummary()
     end
     local s = self:GetLocalSummary()
     Addon:Print(string.format("Members=%d Professions=%d Recipes=%d | Local rev=%d updated=%d", totalMembers, totalProfs, totalRecipes, s.rev, s.updatedAt))
+    self:DumpScanStatus()
 end
 
-function Data:DumpManifestSummary()
+function Data:DumpManifestSummary(opts)
+    opts = opts or {}
+    local verbose = opts.verbose == true
     local manifest = self:BuildSyncManifest(false)
     local localKey = self:GetPlayerKey()
     local totalBlocks = 0
@@ -1880,6 +2609,11 @@ function Data:DumpManifestSummary()
 
     if #replicaOwnerKeys == 0 then
         Addon:Print("Manifest replica owners: none")
+    elseif not verbose then
+        Addon:Print(string.format(
+            "Manifest replica owners: %d (use /rr manifest verbose for details)",
+            #replicaOwnerKeys
+        ))
     else
         Addon:Print("Manifest replica owners:")
         local maxLines = math.min(#replicaOwnerKeys, 12)
@@ -1902,19 +2636,26 @@ function Data:DumpManifestSummary()
     end
     if #staleOwnerKeys > 0 then
         sort(staleOwnerKeys)
-        Addon:Print("Manifest stale excluded:")
-        local maxStaleLines = math.min(#staleOwnerKeys, 8)
-        for index = 1, maxStaleLines do
-            local memberKey = staleOwnerKeys[index]
-            local entry = self:GetMember(memberKey)
-            local profCount = 0
-            for _ in pairs(entry and entry.professions or {}) do
-                profCount = profCount + 1
+        if not verbose then
+            Addon:Print(string.format(
+                "Manifest stale excluded: %d (use /rr manifest verbose for details)",
+                #staleOwnerKeys
+            ))
+        else
+            Addon:Print("Manifest stale excluded:")
+            local maxStaleLines = math.min(#staleOwnerKeys, 8)
+            for index = 1, maxStaleLines do
+                local memberKey = staleOwnerKeys[index]
+                local entry = self:GetMember(memberKey)
+                local profCount = 0
+                for _ in pairs(entry and entry.professions or {}) do
+                    profCount = profCount + 1
+                end
+                Addon:Print(string.format("  %s professions=%d", tostring(memberKey), profCount))
             end
-            Addon:Print(string.format("  %s professions=%d", tostring(memberKey), profCount))
-        end
-        if #staleOwnerKeys > maxStaleLines then
-            Addon:Print(string.format("  ... and %d more", #staleOwnerKeys - maxStaleLines))
+            if #staleOwnerKeys > maxStaleLines then
+                Addon:Print(string.format("  ... and %d more", #staleOwnerKeys - maxStaleLines))
+            end
         end
     end
 end
@@ -2088,12 +2829,16 @@ function Data:WipeDatabase()
     self._incoming = {}
     self._currentProfs = {}
     self:GetGlobalMeta().bootstrapCompletedAt = 0
+    self:MarkManifestDirty(nil, "wipe")
 
     if Addon.Sync then
         Addon.Sync.registry = {}
         Addon.Sync.pendingRequests = {}
         Addon.Sync.partialReceive = {}
         Addon.Sync.outgoingSessions = {}
+        Addon.Sync.outboundChunkQueue = {}
+        Addon.Sync.manifestChunkQueue = {}
+        Addon.Sync.pendingManifestPeers = {}
         Addon.Sync.inFlight = nil
         Addon.Sync.lastAdvertisedRev = nil
     end
