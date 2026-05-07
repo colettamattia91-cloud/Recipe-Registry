@@ -16,6 +16,7 @@ All notable changes to this project are documented in this file.
 ### Fixed
 - Sync pause protection now keys off combat and instanced content, not simply being in a raid group.
 - Profession recipe-change signals now keep pending scan state until a valid changed scan is observed, reducing the chance of losing a learned recipe by opening a different profession first.
+- Incoming snapshots sent directly by the data owner now merge with owner authority, so they can repair stale higher-revision replica caches after a wipe or rebuild.
 - Owner scans that return a suspicious recipe subset no longer overwrite the more complete local profession data.
 - Incoming replica snapshots now preserve existing profession blocks when a partial snapshot omits them.
 - Guild roster cleanup now aborts when the roster snapshot looks empty or too small compared with known active members.

@@ -1204,8 +1204,9 @@ end
 function Sync:MergeChunkStep(item)
     if not item then return false end
     local hadLocalEntry = Addon.Data:GetMember(item.memberKey) ~= nil
+    local sourceType = (item.sender and item.sender == item.memberKey) and "owner" or "replica"
     local merged = Addon.Data:FinalizeIncomingSnapshot(item.memberKey, item.rev, {
-        sourceType = "replica",
+        sourceType = sourceType,
         isMock = self:IsMockKey(item.memberKey) or self:IsMockKey(item.sender),
     })
     if merged then
