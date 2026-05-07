@@ -677,7 +677,9 @@ function Sync:HandleRequest(payload)
     end
 
     local sessionId = self:BuildSessionId(payload.key, entry.rev or 0)
-    local chunks = Addon.Data:BuildSnapshotChunks(payload.key)
+    local chunks = Addon.Data:BuildSnapshotChunks(payload.key, {
+        requestedBlocks = hasSpecificBlockRequest and requestedBlocks or nil,
+    })
     if #chunks == 0 then return end
 
     if payload.requestedBlocks and #payload.requestedBlocks > 0

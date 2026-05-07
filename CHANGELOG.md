@@ -19,6 +19,9 @@ All notable changes to this project are documented in this file.
 - Incoming snapshots sent directly by the data owner now merge with owner authority, so they can repair stale higher-revision replica caches after a wipe or rebuild.
 - Owner scans that return a suspicious recipe subset no longer overwrite the more complete local profession data.
 - Incoming replica snapshots now preserve existing profession blocks when a partial snapshot omits them.
+- Requested manifest catch-up now sends only the requested profession blocks instead of the whole cached member snapshot, reducing accidental empty-block overwrites from replicas.
+- Smaller replica manifest blocks no longer trigger a pull over richer local data, reducing repeated partial-overwrite protections from stale or empty peer caches.
+- Partial remote overwrite protection now preserves local profession metadata such as specialization, block revision, and source when keeping the richer local recipe set.
 - Guild roster cleanup now aborts when the roster snapshot looks empty or too small compared with known active members.
 - Negative spell/enchant recipe validation now falls back to spell metadata when AtlasLoot is present but missing a mapping, avoiding destructive false negatives from optional data gaps.
 

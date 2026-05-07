@@ -2006,15 +2006,29 @@ function Data:GetLocalSummary()
     }
 end
 
-function Data:BuildSnapshotChunks(memberKey)
+function Data:BuildSnapshotChunks(memberKey, opts)
     local entry = self:GetMember(memberKey)
     if not entry then return {} end
+    opts = opts or {}
+
+    local requestedProfessions = nil
+    if type(opts.requestedBlocks) == "table" and #opts.requestedBlocks > 0 then
+        requestedProfessions = {}
+        for _, blockKey in ipairs(opts.requestedBlocks) do
+            local ownerCharacter, professionKey = self:ParseSyncBlockKey(blockKey)
+            if ownerCharacter == memberKey and professionKey then
+                requestedProfessions[professionKey] = true
+            end
+        end
+    end
 
     local chunks = {}
     local chunkSize = 120
     local profNames = {}
     for profName in pairs(entry.professions or {}) do
-        profNames[#profNames + 1] = profName
+        if not requestedProfessions or requestedProfessions[profName] then
+            profNames[#profNames + 1] = profName
+        end
     end
     sort(profNames)
 
@@ -2067,7 +2081,7 @@ function Data:BuildSnapshotChunks(memberKey)
         }
     end
 
-    if #chunks == 0 then
+    if #chunks == 0 and not requestedProfessions then
         chunks[1] = {
             memberKey = memberKey,
             rev = entry.rev or 0,
@@ -2154,6 +2168,7 @@ function Data:FinalizeIncomingSnapshot(memberKey, rev, opts)
 
         local currentProf = current and current.professions and current.professions[profName] or nil
         local currentCount = currentProf and (currentProf.count or countRecipeKeys(currentProf.recipes)) or 0
+        local protectedPartial = false
         if currentProf and currentProf.recipes and currentCount > count then
             local incomingRank = prof.skillRank or 0
             local currentRank = currentProf.skillRank or 0
@@ -2165,21 +2180,44 @@ function Data:FinalizeIncomingSnapshot(memberKey, rev, opts)
                 incomingRecipes = merged
                 count = 0
                 for _ in pairs(incomingRecipes) do count = count + 1 end
-                Addon:Print(string.format("Protected %s %s from a partial remote overwrite (%d -> %d kept).", memberKey, profName, incomingCount, currentCount))
+                protectedPartial = true
+                Addon:Print(string.format(
+                    "Protected %s %s from a partial remote overwrite (%d -> %d kept, source=%s).",
+                    memberKey,
+                    profName,
+                    incomingCount,
+                    currentCount,
+                    tostring(prof.sourceType or finalEntry.sourceType or "replica")
+                ))
             end
         end
 
+        local skillRank = prof.skillRank or 0
+        local skillMaxRank = prof.skillMaxRank or 0
+        local specialization = prof.specialization or nil
+        local blockRevision = rev
+        local lastUpdatedAt = state.updatedAt or time()
+        local sourceType = prof.sourceType or finalEntry.sourceType
+        if protectedPartial and currentProf then
+            skillRank = math.max(currentProf.skillRank or 0, skillRank)
+            skillMaxRank = math.max(currentProf.skillMaxRank or 0, skillMaxRank)
+            specialization = specialization or currentProf.specialization
+            blockRevision = currentProf.blockRevision or blockRevision
+            lastUpdatedAt = currentProf.lastUpdatedAt or lastUpdatedAt
+            sourceType = currentProf.sourceType or sourceType
+        end
+
         finalEntry.professions[profName] = {
-            skillRank = prof.skillRank or 0,
-            skillMaxRank = prof.skillMaxRank or 0,
-            specialization = prof.specialization or nil,
+            skillRank = skillRank,
+            skillMaxRank = skillMaxRank,
+            specialization = specialization,
             recipes = incomingRecipes,
             count = count,
             signature = stableRecipeSignature(incomingRecipes),
             lastScan = state.updatedAt or time(),
-            blockRevision = rev,
-            lastUpdatedAt = state.updatedAt or time(),
-            sourceType = prof.sourceType or finalEntry.sourceType,
+            blockRevision = blockRevision,
+            lastUpdatedAt = lastUpdatedAt,
+            sourceType = sourceType,
             guildStatus = "active",
             lastSeenInGuildAt = finalEntry.lastSeenInGuildAt,
         }
