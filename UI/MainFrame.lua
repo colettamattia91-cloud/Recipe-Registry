@@ -1600,7 +1600,11 @@ function UI:RefreshDetailPanel()
         local selfKey = Addon.Data and Addon.Data.GetPlayerKey and Addon.Data:GetPlayerKey() or nil
         for _, crafter in ipairs(onlineCrafters) do
             local state = statusTag(true)
-            lines[#lines + 1] = string.format("%s %s", state, getClassColorizedName(crafter.memberKey))
+            local nameText = getClassColorizedName(crafter.memberKey)
+            if crafter.specialization then
+                nameText = nameText .. " " .. colorText("[" .. crafter.specialization .. "]", unpackColor(MUTED))
+            end
+            lines[#lines + 1] = string.format("%s %s", state, nameText)
             if (not selfKey or crafter.memberKey ~= selfKey) then
                 lineMeta[#lines] = {
                     canRequest = true,
@@ -1619,7 +1623,11 @@ function UI:RefreshDetailPanel()
             if self._offlineCraftersExpanded then
                 for _, crafter in ipairs(offlineCrafters) do
                     local state = statusTag(false)
-                    lines[#lines + 1] = string.format("%s %s", state, getClassColorizedName(crafter.memberKey))
+                    local nameText = getClassColorizedName(crafter.memberKey)
+                    if crafter.specialization then
+                        nameText = nameText .. " " .. colorText("[" .. crafter.specialization .. "]", unpackColor(MUTED))
+                    end
+                    lines[#lines + 1] = string.format("%s %s", state, nameText)
                 end
             end
         end

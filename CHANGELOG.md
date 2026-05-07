@@ -4,24 +4,27 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 ### Added
-- Added `/rr mock start integrity` and `/rr mock start rosterbad` for local checks around partial snapshot merges and incomplete roster cleanup snapshots.
+- Added new local integrity and roster-guard test scenarios to validate partial snapshot merges and incomplete guild roster cleanup cases.
 
 ### Fixed
 - Sync pause protection now keys off combat and instanced content, not simply being in a raid group.
 - Profession recipe-change signals now keep pending scan state until a valid changed scan is observed, reducing the chance of losing a learned recipe by opening a different profession first.
+- Profession specializations now bump local revision and trigger sync on first discovery or real change, without re-advertising the same specialization on every relog.
+- Replica merges can now hydrate a newly synced remote specialization onto an existing equal-revision cached crafter record, so peers no longer need a local wipe to see it.
+- Manifest fingerprints now include specialization metadata, so peers request a fresh snapshot when only specialization changed on an otherwise identical profession block.
 - Owner scans that return a suspicious recipe subset no longer overwrite the more complete local profession data.
 - Incoming replica snapshots now preserve existing profession blocks when a partial snapshot omits them.
 - Guild roster cleanup now aborts when the roster snapshot looks empty or too small compared with known active members.
 - Negative spell/enchant recipe validation now falls back to spell metadata when AtlasLoot is present but missing a mapping, avoiding destructive false negatives from optional data gaps.
 
 ### Changed
-- `/rr dump` and `/rr perf dump` now include lightweight scan diagnostics for pending scans, skipped scans, failures, suspected partial scans, and invalid recipe filtering.
-- `/rr help`, `/rr mock help`, and README command output docs now include manifest/offline diagnostics and every mock scenario, using chat-safe separators instead of WoW control-pipe characters.
-- `/rr rescan` now immediately scans active profession API data when available and reports whether the manual scan completed or remains queued.
-- `/rr manifest` now stays compact by default; `/rr manifest verbose` prints the capped replica/stale detail lists when needed.
+- Diagnostic output now includes lightweight scan counters for pending scans, skipped scans, failures, suspected partial scans, and invalid recipe filtering.
+- In-game help text and documentation were refreshed to cover offline sync, manifest diagnostics, and internal mock scenarios with chat-safe formatting.
+- Manual rescans now immediately use active profession API data when available and clearly report whether the request completed or remained queued.
+- Manifest diagnostics now stay compact by default, with optional verbose replica and stale-owner detail when needed.
 - Sync manifests are now cached, updated by dirty profession block, built in the background, and reused as cached `MANI` chunks across peers.
 - Manifest chunks are now queued and paced by the sync outbound worker instead of sent inline in a burst.
-- `/rr perf dump` now includes manifest cache telemetry for readiness, dirty blocks, builds, cache hits, deferred sends, chunk reuse, queued MANI chunks, and sent MANI chunks.
+- Performance diagnostics now include manifest cache telemetry for readiness, dirty blocks, builds, cache hits, deferred sends, chunk reuse, and paced MANI delivery.
 
 ## [1.5.3] - 2026-05-03
 ### Added

@@ -103,6 +103,38 @@ local TITLE_ALIAS_SPELL_IDS = {
     ["Mining"] = 2656,
 }
 
+-- Professions that support specializations in TBC Classic.
+-- Each entry maps a specialization display name to the spell ID the player
+-- must know in order to have that spec.
+local PROFESSION_SPECIALIZATIONS = {
+    ["Alchemy"] = {
+        { name = "Potion Master",         spellID = 28675 },
+        { name = "Elixir Master",         spellID = 28677 },
+        { name = "Transmutation Master",  spellID = 28672 },
+    },
+    ["Blacksmithing"] = {
+        { name = "Armorsmith",            spellID = 9788  },
+        { name = "Master Axesmith",       spellID = 17041 },
+        { name = "Master Hammersmith",    spellID = 17040 },
+        { name = "Master Swordsmith",     spellID = 17039 },
+        { name = "Weaponsmith",           spellID = 9787  },
+    },
+    ["Tailoring"] = {
+        { name = "Mooncloth Tailoring",   spellID = 26798 },
+        { name = "Shadoweave Tailoring",  spellID = 26801 },
+        { name = "Spellfire Tailoring",   spellID = 26797 },
+    },
+    ["Leatherworking"] = {
+        { name = "Dragonscale Leatherworking", spellID = 10656 },
+        { name = "Elemental Leatherworking",   spellID = 10658 },
+        { name = "Tribal Leatherworking",      spellID = 10660 },
+    },
+    ["Engineering"] = {
+        { name = "Gnomish Engineering",   spellID = 20219 },
+        { name = "Goblin Engineering",    spellID = 20222 },
+    },
+}
+
 local localeMap
 local recipeValidityCache = {}
 local atlasHandlesCache
@@ -348,6 +380,17 @@ local function formatReagents(reagentIDs, reagentCounts)
     return table.concat(parts, ", ")
 end
 
+local function detectSpecialization(professionName)
+    local specs = PROFESSION_SPECIALIZATIONS[professionName]
+    if not specs then return nil end
+    for _, spec in ipairs(specs) do
+        if IsSpellKnown and IsSpellKnown(spec.spellID) then
+            return spec.name
+        end
+    end
+    return nil
+end
+
 local function buildLocaleMap()
     localeMap = {}
     for canonical, spellID in pairs(PROFESSION_SPELL_IDS) do
@@ -368,6 +411,12 @@ local function stableRecipeSignature(recipeKeys)
     end
     sort(keys, function(a, b) return tostring(a) < tostring(b) end)
     return concat(keys, ":")
+end
+
+local function buildManifestFingerprint(profession)
+    local recipeSignature = profession and profession.signature or stableRecipeSignature(profession and profession.recipes)
+    local specialization = profession and profession.specialization or ""
+    return string.format("%s|spec:%s", tostring(recipeSignature or ""), tostring(specialization or ""))
 end
 
 local function lowerSafe(v)
@@ -728,6 +777,7 @@ function Data:NormalizeProfessionBlock(entry, professionKey, prof)
     prof.signature = prof.signature or stableRecipeSignature(prof.recipes)
     prof.skillRank = prof.skillRank or 0
     prof.skillMaxRank = prof.skillMaxRank or 0
+    prof.specialization = prof.specialization or nil
     prof.blockRevision = type(prof.blockRevision) == "number" and prof.blockRevision or (entry.rev or 0)
     prof.lastUpdatedAt = type(prof.lastUpdatedAt) == "number" and prof.lastUpdatedAt or (entry.updatedAt or 0)
     prof.sourceType = prof.sourceType or entry.sourceType or self:GetMemberSourceType(entry.owner)
@@ -841,7 +891,7 @@ function Data:GetSyncBlock(memberKey, professionKey)
         guildStatus = profession.guildStatus or entry.guildStatus or "active",
         lastSeenInGuildAt = profession.lastSeenInGuildAt or entry.lastSeenInGuildAt or entry.updatedAt or 0,
         count = recipeCount,
-        fingerprint = profession.signature or stableRecipeSignature(profession.recipes),
+        fingerprint = buildManifestFingerprint(profession),
         skillRank = profession.skillRank or 0,
         skillMaxRank = profession.skillMaxRank or 0,
     }
@@ -1377,23 +1427,63 @@ function Data:TouchLocalRevision(reason)
     return entry.rev
 end
 
+function Data:ApplyLocalProfessionMetadata(profession, metadata)
+    local entry = self:GetOrCreateMember(self:GetPlayerKey())
+    local prof = entry.professions[profession] or { recipes = {} }
+    local oldSpecialization = prof.specialization
+    local newSpecialization = metadata and metadata.specialization or nil
+    local specializationChanged = oldSpecialization ~= newSpecialization
+
+    prof.skillRank = metadata and (metadata.skillRank or 0) or prof.skillRank or 0
+    prof.skillMaxRank = metadata and (metadata.skillMaxRank or 0) or prof.skillMaxRank or 0
+    prof.specialization = newSpecialization
+    prof.sourceType = "owner"
+    prof.guildStatus = "active"
+    prof.lastSeenInGuildAt = time()
+    entry.professions[profession] = self:NormalizeProfessionBlock(entry, profession, prof)
+
+    if not specializationChanged then
+        return false, oldSpecialization, newSpecialization
+    end
+
+    local newRev = self:TouchLocalRevision("specialization:" .. tostring(profession))
+    prof = entry.professions[profession]
+    prof.blockRevision = newRev or prof.blockRevision
+    prof.lastUpdatedAt = entry.updatedAt or time()
+    prof.lastSeenInGuildAt = entry.lastSeenInGuildAt or prof.lastUpdatedAt
+    prof.sourceType = "owner"
+    prof.guildStatus = "active"
+    entry.professions[profession] = self:NormalizeProfessionBlock(entry, profession, prof)
+    self:MarkManifestDirty(self:BuildSyncBlockKey(entry.owner or self:GetPlayerKey(), profession), "specialization")
+    Addon:Debug(
+        "Specialization changed",
+        profession,
+        tostring(oldSpecialization or "none"),
+        "->",
+        tostring(newSpecialization or "none")
+    )
+    return true, oldSpecialization, newSpecialization
+end
+
 function Data:DetectProfessions()
     self._currentProfs = {}
+    local metadataChanged = false
     for i = 1, GetNumSkillLines() do
         local name, isHeader, _, skillRank, _, _, skillMaxRank = GetSkillLineInfo(i)
         if not isHeader and name then
             local canonical = self:GetCanonicalProfession(name)
             if TRACKED[canonical] then
+                local specialization = detectSpecialization(canonical)
                 self._currentProfs[canonical] = {
                     skillRank = skillRank or 0,
                     skillMaxRank = skillMaxRank or 0,
+                    specialization = specialization,
                 }
                 local entry = self:GetOrCreateMember(self:GetPlayerKey())
                 local wasNewProfession = entry.professions[canonical] == nil
                 entry.professions[canonical] = entry.professions[canonical] or { recipes = {} }
-                entry.professions[canonical].skillRank = skillRank or 0
-                entry.professions[canonical].skillMaxRank = skillMaxRank or 0
-                entry.professions[canonical] = self:NormalizeProfessionBlock(entry, canonical, entry.professions[canonical])
+                local changed = self:ApplyLocalProfessionMetadata(canonical, self._currentProfs[canonical])
+                metadataChanged = changed or metadataChanged
                 if wasNewProfession then
                     self:MarkManifestDirty(self:BuildSyncBlockKey(entry.owner or self:GetPlayerKey(), canonical), "detect-profession")
                 end
@@ -1401,6 +1491,7 @@ function Data:DetectProfessions()
         end
     end
     Addon:RequestRefresh("detect-professions")
+    return metadataChanged
 end
 
 function Data:RebuildOnlineCache()
@@ -1807,9 +1898,10 @@ function Data:ApplyScanResult(profession, recipeKeys)
     local prof = entry.professions[profession] or { recipes = {} }
     local oldSignature = prof.signature or ""
     local newSignature = stableRecipeSignature(recipeKeys)
-    local changed = (oldSignature ~= newSignature)
+    local recipeChanged = (oldSignature ~= newSignature)
     local previousCount = prof.count or countRecipeKeys(prof.recipes)
     local count = countRecipeKeys(recipeKeys)
+    local oldSpecialization = prof.specialization
 
     if previousCount > 0 and count < previousCount then
         self:RecordScanTelemetry("suspectedPartial")
@@ -1845,17 +1937,42 @@ function Data:ApplyScanResult(profession, recipeKeys)
     if self._currentProfs[profession] then
         prof.skillRank = self._currentProfs[profession].skillRank or 0
         prof.skillMaxRank = self._currentProfs[profession].skillMaxRank or 0
+        prof.specialization = self._currentProfs[profession].specialization
     end
+    local specializationChanged = oldSpecialization ~= prof.specialization
+    local changed = recipeChanged or specializationChanged
 
     entry.professions[profession] = prof
 
     if changed then
         self:RecordScanTelemetry("scansChanged")
-        self:TouchLocalRevision("scan:" .. profession)
+        if specializationChanged and not recipeChanged then
+            self:TouchLocalRevision("specialization-scan:" .. profession)
+        else
+            self:TouchLocalRevision("scan:" .. profession)
+        end
         prof.blockRevision = entry.rev or prof.blockRevision
-        self:MarkManifestDirty(self:BuildSyncBlockKey(entry.owner or self:GetPlayerKey(), profession), "scan")
-        Addon:Debug("Scan changed", profession, count, "recipe ids")
-        Addon:Print(string.format("Scanned %s: %d recipe(s) found.", profession, count))
+        self:MarkManifestDirty(
+            self:BuildSyncBlockKey(entry.owner or self:GetPlayerKey(), profession),
+            specializationChanged and not recipeChanged and "specialization-scan" or "scan"
+        )
+        if recipeChanged then
+            Addon:Debug("Scan changed", profession, count, "recipe ids")
+            Addon:Print(string.format("Scanned %s: %d recipe(s) found.", profession, count))
+        else
+            Addon:Debug(
+                "Scan specialization changed",
+                profession,
+                tostring(oldSpecialization or "none"),
+                "->",
+                tostring(prof.specialization or "none")
+            )
+            Addon:Print(string.format(
+                "Scanned %s: specialization updated to %s.",
+                profession,
+                tostring(prof.specialization or "none")
+            ))
+        end
     else
         self:RecordScanTelemetry("scansUnchanged")
         Addon:Print(string.format("Scanned %s: unchanged (%d recipe(s)).", profession, count))
@@ -1927,6 +2044,7 @@ function Data:BuildSnapshotChunks(memberKey)
                     profession = profName,
                     skillRank = prof.skillRank or 0,
                     skillMaxRank = prof.skillMaxRank or 0,
+                    specialization = prof.specialization or nil,
                     recipeKeys = pending,
                     partial = true,
                 }
@@ -1943,6 +2061,7 @@ function Data:BuildSnapshotChunks(memberKey)
             profession = profName,
             skillRank = prof.skillRank or 0,
             skillMaxRank = prof.skillMaxRank or 0,
+            specialization = prof.specialization or nil,
             recipeKeys = pending,
             partial = false,
         }
@@ -1986,6 +2105,7 @@ function Data:AppendIncomingChunk(chunk)
         local prof = state.professions[chunk.profession] or {
             skillRank = chunk.skillRank or 0,
             skillMaxRank = chunk.skillMaxRank or 0,
+            specialization = chunk.specialization or nil,
             recipes = {},
             sourceType = chunk.sourceType or "replica",
         }
@@ -1999,6 +2119,9 @@ function Data:AppendIncomingChunk(chunk)
         end
         prof.skillRank = chunk.skillRank or prof.skillRank or 0
         prof.skillMaxRank = chunk.skillMaxRank or prof.skillMaxRank or 0
+        if chunk.specialization ~= nil then
+            prof.specialization = chunk.specialization
+        end
         prof.lastUpdatedAt = chunk.updatedAt or state.updatedAt or time()
         prof.sourceType = chunk.sourceType or prof.sourceType or "replica"
         state.professions[chunk.profession] = prof
@@ -2049,6 +2172,7 @@ function Data:FinalizeIncomingSnapshot(memberKey, rev, opts)
         finalEntry.professions[profName] = {
             skillRank = prof.skillRank or 0,
             skillMaxRank = prof.skillMaxRank or 0,
+            specialization = prof.specialization or nil,
             recipes = incomingRecipes,
             count = count,
             signature = stableRecipeSignature(incomingRecipes),
@@ -2186,6 +2310,7 @@ function Data:BuildRecipeIndex()
                         online = isOnline,
                         skillRank = prof.skillRank or 0,
                         skillMaxRank = prof.skillMaxRank or 0,
+                        specialization = prof.specialization or nil,
                         updatedAt = entry.updatedAt or 0,
                     }
 

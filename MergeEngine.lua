@@ -55,12 +55,33 @@ function MergeEngine:IgnoreEquivalent(localEntry, incomingEntry)
         if (localProf.count or 0) ~= (incomingProf.count or 0) then return false end
         if (localProf.skillRank or 0) ~= (incomingProf.skillRank or 0) then return false end
         if (localProf.skillMaxRank or 0) ~= (incomingProf.skillMaxRank or 0) then return false end
+        -- A missing specialization from an old client should not clear richer
+        -- local metadata, but an incoming non-nil specialization should be
+        -- allowed to upgrade a legacy nil record.
+        if incomingProf.specialization ~= nil then
+            if localProf.specialization ~= incomingProf.specialization then return false end
+        end
         if (localProf.signature or "") ~= (incomingProf.signature or "") then return false end
     end
     for profName in pairs(incomingProfs) do
         if not localProfs[profName] then return false end
     end
     return true
+end
+
+function MergeEngine:HasIncomingMetadataUpgrade(localEntry, incomingEntry)
+    if not localEntry or not incomingEntry then return false end
+    local localProfs = localEntry.professions or {}
+    local incomingProfs = incomingEntry.professions or {}
+
+    for profName, incomingProf in pairs(incomingProfs) do
+        local localProf = localProfs[profName]
+        if localProf and localProf.specialization == nil and incomingProf.specialization ~= nil then
+            return true
+        end
+    end
+
+    return false
 end
 
 function MergeEngine:ShouldApplyIncoming(localEntry, incomingEntry, opts)
@@ -78,8 +99,13 @@ function MergeEngine:ShouldApplyIncoming(localEntry, incomingEntry, opts)
     if winner == "incoming" then
         return true, "newer"
     end
-    if winner == "equal" and not localEntry then
-        return true, "missing-local"
+    if winner == "equal" then
+        if not localEntry then
+            return true, "missing-local"
+        end
+        if self:HasIncomingMetadataUpgrade(localEntry, incomingEntry) then
+            return true, "metadata-upgrade"
+        end
     end
     return false, winner
 end

@@ -170,7 +170,8 @@ function Addon:OnTradeSkillShow()
     self._tradeSkillScanTimer = self:ScheduleTimer(function()
         self._tradeSkillScanTimer = nil
         if self.Data then
-            local changed = scanResultChanged(self.Data:ScanTradeSkill())
+            local metadataChanged = self.Data:DetectProfessions() == true
+            local changed = scanResultChanged(self.Data:ScanTradeSkill()) or metadataChanged
             if changed and self.Sync then
                 self.Sync:AdvertiseLocalRevision("trade-scan")
             end
@@ -185,7 +186,8 @@ function Addon:OnCraftShow()
     self._craftScanTimer = self:ScheduleTimer(function()
         self._craftScanTimer = nil
         if self.Data then
-            local changed = scanResultChanged(self.Data:ScanCraft())
+            local metadataChanged = self.Data:DetectProfessions() == true
+            local changed = scanResultChanged(self.Data:ScanCraft()) or metadataChanged
             if changed and self.Sync then
                 self.Sync:AdvertiseLocalRevision("craft-scan")
             end
@@ -203,14 +205,14 @@ end
 function Addon:ProcessRecipeSignal()
     self._recipeSignalTimer = nil
     if self.Data then
-        self.Data:DetectProfessions()
+        local metadataChanged = self.Data:DetectProfessions() == true
         -- A real recipe change happened: scan active API data now, or keep it pending.
         if self.Data.MarkScanNeeded then
             self.Data:MarkScanNeeded(nil, "recipe-event")
         else
             self.Data._scanNeeded = true
         end
-        local changed = scanActiveProfessionData(self)
+        local changed = scanActiveProfessionData(self) or metadataChanged
         if changed and self.Sync then
             self.Sync:AdvertiseLocalRevision("recipe-event")
         end
@@ -467,13 +469,13 @@ function Addon:SlashHandler(input)
 
     if cmd == "rescan" then
         if self.Data then
-            self.Data:DetectProfessions()
+            local metadataChanged = self.Data:DetectProfessions() == true
             if self.Data.MarkScanNeeded then
                 self.Data:MarkScanNeeded(nil, "manual-rescan")
             else
                 self.Data._scanNeeded = true
             end
-            local changed = scanActiveProfessionData(self)
+            local changed = scanActiveProfessionData(self) or metadataChanged
             if changed and self.Sync then
                 self.Sync:AdvertiseLocalRevision("manual-rescan")
             end

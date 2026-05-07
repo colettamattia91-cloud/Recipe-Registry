@@ -727,6 +727,7 @@ function Sync:SendOutgoingSession(sessionId, onlySeqs)
                 profession = chunk.profession,
                 skillRank = chunk.skillRank,
                 skillMaxRank = chunk.skillMaxRank,
+                specialization = chunk.specialization,
                 recipeKeys = chunk.recipeKeys,
                 seq = seq,
                 total = state.total,
@@ -1194,6 +1195,7 @@ function Sync:DecodeChunkStep(payload)
         profession = payload.profession,
         skillRank = payload.skillRank,
         skillMaxRank = payload.skillMaxRank,
+        specialization = payload.specialization,
         recipeKeys = payload.recipeKeys,
     })
     return true

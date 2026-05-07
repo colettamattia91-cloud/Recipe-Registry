@@ -49,6 +49,7 @@ local function addRow(index, key, recipeKey, crafter)
         profession = crafter.profession,
         online = crafter.online and true or false,
         skillRank = crafter.skillRank or 0,
+        specialization = crafter.specialization or nil,
         updatedAt = crafter.updatedAt or 0,
     }
 end
@@ -236,7 +237,11 @@ function Tooltip:AddCraftLines(tooltip, rows, renderKey)
     for i = 1, maxRows do
         local row = displayRows[i]
         local r, g, b = row.online and 0.4 or 0.65, row.online and 1 or 0.65, row.online and 0.4 or 0.65
-        tooltip:AddLine(string.format("%s (%s)", tostring(row.memberKey), tostring(row.profession)), r, g, b)
+        local nameText = string.format("%s (%s)", tostring(row.memberKey), tostring(row.profession))
+        if row.specialization then
+            nameText = nameText .. string.format(" [%s]", row.specialization)
+        end
+        tooltip:AddLine(nameText, r, g, b)
     end
     if #displayRows > maxRows then
         tooltip:AddLine(string.format("+%d more", #displayRows - maxRows), 0.7, 0.7, 0.7)
