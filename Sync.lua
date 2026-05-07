@@ -220,6 +220,22 @@ function Sync:IsMockKey(memberKey)
     return row and row.isMock == true or false
 end
 
+function Sync:IsValidSyncMemberKey(memberKey)
+    if Addon.Data and Addon.Data.IsValidMemberKey then
+        return Addon.Data:IsValidMemberKey(memberKey)
+    end
+    return type(memberKey) == "string"
+        and memberKey ~= ""
+        and not memberKey:find(":", 1, true)
+        and memberKey:find("-", 1, true) ~= nil
+end
+
+function Sync:IsRequestShapeValid(request)
+    return request
+        and self:IsValidSyncMemberKey(request.memberKey)
+        and self:IsValidSyncMemberKey(request.source)
+end
+
 function Sync:ShouldAllowLocalMockTraffic(sourceKey, memberKey)
     if not (Addon.MockSync and Addon.MockSync.IsLocalTrafficEnabled) then
         return false
@@ -333,7 +349,7 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
 end
 
 function Sync:TouchNode(key, version)
-    if not key then return end
+    if not self:IsValidSyncMemberKey(key) then return end
     self.onlineNodes[key] = self.onlineNodes[key] or {}
     self.onlineNodes[key].lastSeen = time()
     self.onlineNodes[key].version = version or self.onlineNodes[key].version
@@ -368,7 +384,9 @@ end
 function Sync:RecomputeCoordinator()
     local keys = {}
     for key in pairs(self.onlineNodes) do
-        if not self:IsMockKey(key) and (Addon.Data:IsMemberOnline(key) or key == self:GetSelfKey()) then
+        if self:IsValidSyncMemberKey(key)
+            and not self:IsMockKey(key)
+            and (Addon.Data:IsMemberOnline(key) or key == self:GetSelfKey()) then
             keys[#keys + 1] = key
         end
     end
@@ -390,7 +408,8 @@ function Sync:IsCoordinator()
 end
 
 function Sync:RecordRevisionHint(memberKey, rev, updatedAt, owner, meta)
-    if not memberKey then return end
+    if not self:IsValidSyncMemberKey(memberKey) then return end
+    if owner and not self:IsValidSyncMemberKey(owner) then owner = memberKey end
     meta = meta or {}
     local row = self.registry[memberKey] or { owner = owner or memberKey, rev = 0, updatedAt = 0 }
     if owner then row.owner = owner end
@@ -409,7 +428,7 @@ end
 
 function Sync:GetKnownOwner(memberKey)
     local row = self.registry[memberKey]
-    if row and row.owner then return row.owner end
+    if row and self:IsValidSyncMemberKey(row.owner) then return row.owner end
     return memberKey
 end
 
@@ -419,6 +438,7 @@ function Sync:GetKnownRevision(memberKey)
 end
 
 function Sync:HandleHello(payload)
+    if not self:IsValidSyncMemberKey(payload.key) then return end
     self:TouchNode(payload.key, payload.version)
     self:RecordRevisionHint(payload.key, payload.rev, payload.updatedAt, payload.key)
     if self:IsMockKey(payload.key) then return end
@@ -437,6 +457,7 @@ function Sync:HandleHello(payload)
 end
 
 function Sync:HandleAdvertise(payload)
+    if not self:IsValidSyncMemberKey(payload.key) or not self:IsValidSyncMemberKey(payload.sender) then return end
     self:TouchNode(payload.sender)
     self:RecordRevisionHint(payload.key, payload.rev, payload.updatedAt, payload.key)
     if self:IsMockKey(payload.key) or self:IsMockKey(payload.sender) then return end
@@ -454,6 +475,8 @@ function Sync:HandleAdvertise(payload)
 end
 
 function Sync:BroadcastIndex(memberKey, rev, updatedAt, owner, why)
+    if not self:IsValidSyncMemberKey(memberKey) then return end
+    if owner and not self:IsValidSyncMemberKey(owner) then owner = memberKey end
     if self:IsMockKey(memberKey) or self:IsMockKey(owner) then return end
     self:RecordRevisionHint(memberKey, rev, updatedAt, owner)
     self:SendGuildEnvelope("IDX", {
@@ -466,23 +489,36 @@ function Sync:BroadcastIndex(memberKey, rev, updatedAt, owner, why)
 end
 
 function Sync:HandleIndex(payload)
+    if not self:IsValidSyncMemberKey(payload.key) or not self:IsValidSyncMemberKey(payload.sender) then return end
     self:TouchNode(payload.sender)
     if self:IsCoordinator() then return end
     if self.coordinatorKey and payload.sender ~= self.coordinatorKey then return end
     if self:IsMockKey(payload.key) or self:IsMockKey(payload.sender) then return end
 
-    self:RecordRevisionHint(payload.key, payload.rev, payload.updatedAt, payload.owner or payload.key)
+    local ownerKey = self:IsValidSyncMemberKey(payload.owner) and payload.owner or payload.key
+    self:RecordRevisionHint(payload.key, payload.rev, payload.updatedAt, ownerKey)
 
     local localEntry = Addon.Data:GetMember(payload.key)
     local localRev = localEntry and localEntry.rev or 0
     local remoteRev = payload.rev or 0
     if remoteRev > localRev then
-        self:QueueRequest(payload.owner or payload.key, payload.key, remoteRev, "index")
+        self:QueueRequest(ownerKey, payload.key, remoteRev, "index")
     end
 end
 
 function Sync:QueueRequest(sourceKey, memberKey, targetRev, why, opts)
     if not sourceKey or not memberKey then return end
+    if not self:IsValidSyncMemberKey(memberKey) then
+        Addon:Debug("Skipped malformed sync request", tostring(memberKey), "from", tostring(sourceKey), why or "")
+        return
+    end
+    if not self:IsValidSyncMemberKey(sourceKey) then
+        sourceKey = self:GetKnownOwner(memberKey)
+    end
+    if not self:IsValidSyncMemberKey(sourceKey) then
+        Addon:Debug("Skipped sync request with malformed source", tostring(memberKey), "from", tostring(sourceKey), why or "")
+        return
+    end
     local allowLocalMock = self:ShouldAllowLocalMockTraffic(sourceKey, memberKey)
     if (self:IsMockKey(sourceKey) or self:IsMockKey(memberKey)) and not allowLocalMock then return end
     opts = opts or {}
@@ -519,6 +555,11 @@ end
 
 function Sync:ProcessRequestQueue()
     if self.inFlight then
+        if not self:IsRequestShapeValid(self.inFlight) then
+            Addon:Debug("Dropping malformed in-flight request", tostring(self.inFlight.memberKey), "from", tostring(self.inFlight.source))
+            self:FailInFlight(false)
+            return
+        end
         if not self:IsRequestStillViable(self.inFlight) then
             Addon:Debug("Dropping in-flight request; source unavailable", self.inFlight.memberKey)
             self:FailInFlight(true)
@@ -555,11 +596,15 @@ function Sync:ProcessRequestQueue()
 
     local oldestKey, oldest
     for memberKey, info in pairs(self.pendingRequests) do
-        local allowLocalMock = self:ShouldAllowLocalMockTraffic(info and info.source, memberKey)
-        if not self:IsRealTrafficSuppressed() or allowLocalMock then
-            if not oldest or info.queuedAt < oldest.queuedAt then
-                oldest = info
-                oldestKey = memberKey
+        if not self:IsRequestShapeValid(info) then
+            self.pendingRequests[memberKey] = nil
+        else
+            local allowLocalMock = self:ShouldAllowLocalMockTraffic(info and info.source, memberKey)
+            if not self:IsRealTrafficSuppressed() or allowLocalMock then
+                if not oldest or info.queuedAt < oldest.queuedAt then
+                    oldest = info
+                    oldestKey = memberKey
+                end
             end
         end
     end
@@ -613,13 +658,13 @@ function Sync:ProcessRequestQueue()
 end
 
 function Sync:IsRequestStillViable(request)
-    if not request or not request.source then return false end
+    if not self:IsRequestShapeValid(request) then return false end
     if request.source == self:GetSelfKey() then return true end
     return self.onlineNodes[request.source] ~= nil
 end
 
 function Sync:FailInFlight(requeue)
-    if self.inFlight and requeue then
+    if self.inFlight and requeue and self:IsRequestShapeValid(self.inFlight) then
         local req = self.inFlight
         self.pendingRequests[req.memberKey] = {
             source = req.source,
@@ -646,7 +691,7 @@ end
 
 function Sync:HandleRequest(payload)
     local targetKey = payload.sender
-    if not targetKey then return end
+    if not self:IsValidSyncMemberKey(targetKey) or not self:IsValidSyncMemberKey(payload.key) then return end
     if self:IsMockKey(targetKey) or self:IsMockKey(payload.key) then return end
 
     local entry = Addon.Data:GetMember(payload.key)
@@ -739,6 +784,7 @@ function Sync:SendOutgoingSession(sessionId, onlySeqs)
 end
 
 function Sync:HandleSnapshotChunk(payload)
+    if not self:IsValidSyncMemberKey(payload.key) or not self:IsValidSyncMemberKey(payload.sender) then return end
     if payload.key == self:GetSelfKey() and payload.sender == self:GetSelfKey() then return end
 
     local state = self.partialReceive[payload.key]
@@ -804,6 +850,7 @@ end
 
 function Sync:SendManifestToPeer(peerKey, why)
     if not peerKey or not Addon.TrickleSync then return end
+    if not self:IsValidSyncMemberKey(peerKey) then return end
     if self:IsMockKey(peerKey) then return end
     local lastSentAt = self._lastManifestSentAt[peerKey] or 0
     if why ~= "force" and (time() - lastSentAt) < MANIFEST_PUSH_COOLDOWN then
@@ -878,31 +925,33 @@ function Sync:RequestManifestRefresh(peerKey)
 end
 
 function Sync:HandleManifestRequest(payload)
-    if not payload.sender or payload.sender == self:GetSelfKey() then return end
+    if not self:IsValidSyncMemberKey(payload.sender) or payload.sender == self:GetSelfKey() then return end
     if self:IsMockKey(payload.sender) then return end
     self:SendManifestToPeer(payload.sender, "force")
 end
 
 function Sync:BroadcastManifestToOnlinePeers(why)
     for peerKey in pairs(self.onlineNodes or {}) do
-        if peerKey ~= self:GetSelfKey() and not self:IsMockKey(peerKey) then
+        if peerKey ~= self:GetSelfKey() and self:IsValidSyncMemberKey(peerKey) and not self:IsMockKey(peerKey) then
             self:SendManifestToPeer(peerKey, why or "broadcast")
         end
     end
 end
 
 function Sync:HandleManifestChunk(payload)
-    if not payload.sender or payload.sender == self:GetSelfKey() then return end
+    if not self:IsValidSyncMemberKey(payload.sender) or payload.sender == self:GetSelfKey() then return end
+    if not payload.manifestId then return end
     if self:IsMockKey(payload.sender) and not self:ShouldAllowLocalMockTraffic(payload.sender, nil) then return end
 
     local senderKey = payload.sender
+    local manifestMemberKey = self:IsValidSyncMemberKey(payload.memberKey) and payload.memberKey or senderKey
     self.partialManifestReceive[senderKey] = self.partialManifestReceive[senderKey] or {}
     local state = self.partialManifestReceive[senderKey][payload.manifestId]
     if not state then
         state = {
             manifestId = payload.manifestId,
             builtAt = payload.builtAt or time(),
-            memberKey = payload.memberKey or senderKey,
+            memberKey = manifestMemberKey,
             totals = payload.totals or {},
             total = payload.total or 1,
             seen = {},
@@ -914,7 +963,19 @@ function Sync:HandleManifestChunk(payload)
     state.seen[payload.seq or 1] = true
     state.total = payload.total or state.total or 1
     for _, block in ipairs(payload.blocks or {}) do
-        state.blocks[block.blockKey] = block
+        local blockKey = block and block.blockKey
+        local ownerCharacter, professionKey = Addon.Data:ParseSyncBlockKey(blockKey)
+        if Addon.Data:IsValidMemberKey(ownerCharacter)
+            and type(professionKey) == "string"
+            and professionKey ~= ""
+            and (not block.ownerCharacter or block.ownerCharacter == ownerCharacter)
+            and (not block.professionKey or block.professionKey == professionKey) then
+            block.ownerCharacter = ownerCharacter
+            block.professionKey = professionKey
+            state.blocks[blockKey] = block
+        else
+            Addon:Debug("Ignored malformed manifest block", tostring(blockKey), "from", tostring(senderKey))
+        end
     end
 
     local complete = true
@@ -943,10 +1004,10 @@ function Sync:HandleManifestChunk(payload)
     local replicaOwners = {}
     local replicaBlocks = 0
     for blockKey, block in pairs(manifest.blocks or {}) do
-        if block and block.ownerCharacter and block.ownerCharacter ~= senderKey and not Addon.Data:IsMemberOnline(block.ownerCharacter) then
+        if block and Addon.Data:IsValidMemberKey(block.ownerCharacter) and block.ownerCharacter ~= senderKey and not Addon.Data:IsMemberOnline(block.ownerCharacter) then
             replicaBlocks = replicaBlocks + 1
             replicaOwners[#replicaOwners + 1] = block.ownerCharacter
-        elseif block and block.sourceType == "replica" and block.ownerCharacter and not Addon.Data:IsMemberOnline(block.ownerCharacter) then
+        elseif block and block.sourceType == "replica" and Addon.Data:IsValidMemberKey(block.ownerCharacter) and not Addon.Data:IsMemberOnline(block.ownerCharacter) then
             replicaBlocks = replicaBlocks + 1
             replicaOwners[#replicaOwners + 1] = block.ownerCharacter
         end
@@ -1008,6 +1069,7 @@ end
 function Sync:HandleResumeRequest(payload)
     local session = self.outgoingSessions[payload.sessionId]
     if not session then return end
+    if not self:IsValidSyncMemberKey(payload.sender) or not self:IsValidSyncMemberKey(payload.key) then return end
     if self:IsMockKey(payload.sender) or self:IsMockKey(payload.key) then return end
     if session.targetKey ~= payload.sender then return end
     if session.memberKey ~= payload.key or session.rev ~= payload.rev then return end
@@ -1020,6 +1082,7 @@ end
 function Sync:HandleTransferDone(payload)
     local session = self.outgoingSessions[payload.sessionId]
     if not session then return end
+    if not self:IsValidSyncMemberKey(payload.sender) then return end
     if self:IsMockKey(payload.sender) then return end
     if session.targetKey ~= payload.sender then return end
     self.outgoingSessions[payload.sessionId] = nil
@@ -1189,6 +1252,7 @@ end
 
 function Sync:DecodeChunkStep(payload)
     if not payload then return false end
+    if not self:IsValidSyncMemberKey(payload.key) then return false end
     Addon.Data:AppendIncomingChunk({
         memberKey = payload.key,
         rev = payload.rev,
@@ -1205,6 +1269,7 @@ end
 
 function Sync:MergeChunkStep(item)
     if not item then return false end
+    if not self:IsValidSyncMemberKey(item.memberKey) then return false end
     local hadLocalEntry = Addon.Data:GetMember(item.memberKey) ~= nil
     local sourceType = (item.sender and item.sender == item.memberKey) and "owner" or "replica"
     local merged = Addon.Data:FinalizeIncomingSnapshot(item.memberKey, item.rev, {
@@ -1447,6 +1512,160 @@ function Sync:CleanupMockState()
     self:RecomputeCoordinator()
     Addon:RequestRefresh("mock-cleanup")
     return removedRegistry, removedOnlineNodes, removedPendingRequests
+end
+
+function Sync:CleanCorruptState(opts)
+    opts = opts or {}
+    local dryRun = opts.dryRun == true
+    local stats = {
+        removed = 0,
+        registry = 0,
+        onlineNodes = 0,
+        pendingRequests = 0,
+        partialReceives = 0,
+        outgoingSessions = 0,
+        queues = 0,
+        inFlight = 0,
+    }
+
+    local function drop(tbl, key, field)
+        stats.removed = stats.removed + 1
+        stats[field] = (stats[field] or 0) + 1
+        if not dryRun then
+            tbl[key] = nil
+        end
+    end
+
+    for key, row in pairs(self.registry or {}) do
+        if not self:IsValidSyncMemberKey(key) or (row and row.owner and not self:IsValidSyncMemberKey(row.owner)) then
+            drop(self.registry, key, "registry")
+        end
+    end
+
+    for key in pairs(self.onlineNodes or {}) do
+        if not self:IsValidSyncMemberKey(key) then
+            drop(self.onlineNodes, key, "onlineNodes")
+        end
+    end
+
+    for memberKey, info in pairs(self.pendingRequests or {}) do
+        if not self:IsRequestShapeValid(info) then
+            drop(self.pendingRequests, memberKey, "pendingRequests")
+        end
+    end
+
+    for memberKey, info in pairs(self.partialReceive or {}) do
+        if not self:IsValidSyncMemberKey(memberKey)
+            or (info and info.source and not self:IsValidSyncMemberKey(info.source)) then
+            drop(self.partialReceive, memberKey, "partialReceives")
+        end
+    end
+
+    for peerKey, manifests in pairs(self.partialManifestReceive or {}) do
+        if not self:IsValidSyncMemberKey(peerKey) then
+            drop(self.partialManifestReceive, peerKey, "partialReceives")
+        elseif type(manifests) == "table" then
+            for manifestId, state in pairs(manifests) do
+                if state and state.memberKey and not self:IsValidSyncMemberKey(state.memberKey) then
+                    stats.removed = stats.removed + 1
+                    stats.partialReceives = stats.partialReceives + 1
+                    if not dryRun then
+                        manifests[manifestId] = nil
+                    end
+                end
+            end
+            if not dryRun and next(manifests) == nil then
+                self.partialManifestReceive[peerKey] = nil
+            end
+        end
+    end
+
+    for key in pairs(self._lastManifestSentAt or {}) do
+        if not self:IsValidSyncMemberKey(key) then
+            drop(self._lastManifestSentAt, key, "queues")
+        end
+    end
+    for key in pairs(self.pendingManifestPeers or {}) do
+        if not self:IsValidSyncMemberKey(key) then
+            drop(self.pendingManifestPeers, key, "queues")
+        end
+    end
+    for key in pairs(self.peerPacing or {}) do
+        if not self:IsValidSyncMemberKey(key) then
+            drop(self.peerPacing, key, "queues")
+        end
+    end
+
+    for sessionId, state in pairs(self.outgoingSessions or {}) do
+        if not self:IsValidSyncMemberKey(state and state.memberKey)
+            or not self:IsValidSyncMemberKey(state and state.targetKey) then
+            drop(self.outgoingSessions, sessionId, "outgoingSessions")
+        end
+    end
+
+    local function keepQueue(src, validFn)
+        local kept = {}
+        for index = 1, #(src or {}) do
+            local item = src[index]
+            if validFn(item) then
+                kept[#kept + 1] = item
+            else
+                stats.removed = stats.removed + 1
+                stats.queues = stats.queues + 1
+            end
+        end
+        return kept
+    end
+
+    if not dryRun then
+        self.outboundChunkQueue = keepQueue(self.outboundChunkQueue, function(item)
+            return self:IsValidSyncMemberKey(item and item.peer)
+                and self:IsValidSyncMemberKey(item and item.block and item.block.key)
+        end)
+        self.manifestChunkQueue = keepQueue(self.manifestChunkQueue, function(item)
+            return self:IsValidSyncMemberKey(item and item.peer)
+                and self:IsValidSyncMemberKey(item and item.payload and item.payload.memberKey)
+        end)
+        self.inboundChunkQueue = keepQueue(self.inboundChunkQueue, function(item)
+            return self:IsValidSyncMemberKey(item and item.key)
+                and self:IsValidSyncMemberKey(item and item.sender)
+        end)
+        self.inboundFinalizeQueue = keepQueue(self.inboundFinalizeQueue, function(item)
+            return self:IsValidSyncMemberKey(item and item.memberKey)
+                and (not item.sender or self:IsValidSyncMemberKey(item.sender))
+        end)
+    else
+        keepQueue(self.outboundChunkQueue, function(item)
+            return self:IsValidSyncMemberKey(item and item.peer)
+                and self:IsValidSyncMemberKey(item and item.block and item.block.key)
+        end)
+        keepQueue(self.manifestChunkQueue, function(item)
+            return self:IsValidSyncMemberKey(item and item.peer)
+                and self:IsValidSyncMemberKey(item and item.payload and item.payload.memberKey)
+        end)
+        keepQueue(self.inboundChunkQueue, function(item)
+            return self:IsValidSyncMemberKey(item and item.key)
+                and self:IsValidSyncMemberKey(item and item.sender)
+        end)
+        keepQueue(self.inboundFinalizeQueue, function(item)
+            return self:IsValidSyncMemberKey(item and item.memberKey)
+                and (not item.sender or self:IsValidSyncMemberKey(item.sender))
+        end)
+    end
+
+    if self.inFlight and not self:IsRequestShapeValid(self.inFlight) then
+        stats.removed = stats.removed + 1
+        stats.inFlight = 1
+        if not dryRun then
+            self.inFlight = nil
+        end
+    end
+
+    if stats.removed > 0 and not dryRun then
+        self:RecomputeCoordinator()
+        Addon:RequestRefresh("clean-sync")
+    end
+    return stats
 end
 
 function Sync:DumpStatus()

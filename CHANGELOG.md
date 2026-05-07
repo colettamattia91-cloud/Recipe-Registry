@@ -12,6 +12,8 @@ All notable changes to this project are documented in this file.
 - Diagnostic output now includes lightweight scan counters for pending scans, skipped scans, failures, suspected partial scans, and invalid recipe filtering.
 - Performance diagnostics now include manifest cache telemetry for readiness, dirty blocks, builds, cache hits, deferred sends, chunk reuse, and paced MANI delivery.
 - Local owner sync diagnostics are now available to inspect exactly which profession blocks, ranks, and specializations this client is publishing.
+- Corrupt data cleanup now has a preview mode and can remove malformed member keys, invalid or impossible recipe keys, stale sync queue entries, and AtlasLoot-proven recipe/profession mismatches.
+- A safe corrupt-data cleanup now runs after login in small background batches, covering only deterministic repairs and malformed sync state.
 
 ### Fixed
 - Sync pause protection now keys off combat and instanced content, not simply being in a raid group.
@@ -21,7 +23,9 @@ All notable changes to this project are documented in this file.
 - Incoming replica snapshots now preserve existing profession blocks when a partial snapshot omits them.
 - Requested manifest catch-up now sends only the requested profession blocks instead of the whole cached member snapshot, reducing accidental empty-block overwrites from replicas.
 - Smaller replica manifest blocks no longer trigger a pull over richer local data, reducing repeated partial-overwrite protections from stale or empty peer caches.
+- Malformed manifest owner keys are now ignored before they can queue direct sync requests, preventing bogus request timeouts and retry loops.
 - Partial remote overwrite protection now preserves local profession metadata such as specialization, block revision, and source when keeping the richer local recipe set.
+- Local profession scans now reject impossible item IDs before they can enter the saved recipe set.
 - Guild roster cleanup now aborts when the roster snapshot looks empty or too small compared with known active members.
 - Negative spell/enchant recipe validation now falls back to spell metadata when AtlasLoot is present but missing a mapping, avoiding destructive false negatives from optional data gaps.
 

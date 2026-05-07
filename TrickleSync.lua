@@ -9,6 +9,16 @@ local time = time
 
 local MANIFEST_BLOCKS_PER_CHUNK = 24
 
+local function getValidManifestBlockParts(blockKey, block)
+    if not Addon.Data or not Addon.Data.ParseSyncBlockKey then return nil, nil end
+    local ownerCharacter, professionKey = Addon.Data:ParseSyncBlockKey(blockKey)
+    if not Addon.Data:IsValidMemberKey(ownerCharacter) then return nil, nil end
+    if type(professionKey) ~= "string" or professionKey == "" then return nil, nil end
+    if block and block.ownerCharacter and block.ownerCharacter ~= ownerCharacter then return nil, nil end
+    if block and block.professionKey and block.professionKey ~= professionKey then return nil, nil end
+    return ownerCharacter, professionKey
+end
+
 function TrickleSync:OnInitialize()
     self.peerState = {}
     self.outboundQueue = {}
@@ -149,34 +159,37 @@ function TrickleSync:ComparePeerManifest(peerManifest)
 
     local peerBlocks = comparison.peerManifest.blocks or {}
     for blockKey, peerBlock in pairs(peerBlocks) do
-        if (peerBlock.guildStatus or "active") ~= "active" then
+        local ownerCharacter = getValidManifestBlockParts(blockKey, peerBlock)
+        if not ownerCharacter then
+            -- Ignore malformed manifest rows instead of turning them into REQ keys.
+        elseif (peerBlock.guildStatus or "active") ~= "active" then
             -- Stale records should not drive normal convergence.
         else
-        local localBlock = localManifest.blocks[blockKey]
-        if not localBlock then
-            comparison.missingHere[#comparison.missingHere + 1] = blockKey
-        else
-            local peerRevision = peerBlock.revision or 0
-            local localRevision = localBlock.revision or 0
-            local peerFingerprint = peerBlock.fingerprint or ""
-            local localFingerprint = localBlock.fingerprint or ""
-            local peerSource = peerBlock.sourceType or "replica"
-            local localSource = localBlock.sourceType or "replica"
-            local peerCount = peerBlock.count or 0
-            local localCount = localBlock.count or 0
+            local localBlock = localManifest.blocks[blockKey]
+            if not localBlock then
+                comparison.missingHere[#comparison.missingHere + 1] = blockKey
+            else
+                local peerRevision = peerBlock.revision or 0
+                local localRevision = localBlock.revision or 0
+                local peerFingerprint = peerBlock.fingerprint or ""
+                local localFingerprint = localBlock.fingerprint or ""
+                local peerSource = peerBlock.sourceType or "replica"
+                local localSource = localBlock.sourceType or "replica"
+                local peerCount = peerBlock.count or 0
+                local localCount = localBlock.count or 0
 
-            if peerSource ~= "owner" and localCount > peerCount then
-                comparison.outdatedThere[#comparison.outdatedThere + 1] = blockKey
-            elseif peerSource == "owner" and localSource ~= "owner" and peerFingerprint ~= localFingerprint then
-                comparison.outdatedHere[#comparison.outdatedHere + 1] = blockKey
-            elseif peerRevision > localRevision then
-                comparison.outdatedHere[#comparison.outdatedHere + 1] = blockKey
-            elseif peerRevision < localRevision then
-                comparison.outdatedThere[#comparison.outdatedThere + 1] = blockKey
-            elseif peerFingerprint ~= localFingerprint then
-                comparison.outdatedHere[#comparison.outdatedHere + 1] = blockKey
+                if peerSource ~= "owner" and localCount > peerCount then
+                    comparison.outdatedThere[#comparison.outdatedThere + 1] = blockKey
+                elseif peerSource == "owner" and localSource ~= "owner" and peerFingerprint ~= localFingerprint then
+                    comparison.outdatedHere[#comparison.outdatedHere + 1] = blockKey
+                elseif peerRevision > localRevision then
+                    comparison.outdatedHere[#comparison.outdatedHere + 1] = blockKey
+                elseif peerRevision < localRevision then
+                    comparison.outdatedThere[#comparison.outdatedThere + 1] = blockKey
+                elseif peerFingerprint ~= localFingerprint then
+                    comparison.outdatedHere[#comparison.outdatedHere + 1] = blockKey
+                end
             end
-        end
         end
     end
 
@@ -208,7 +221,7 @@ function TrickleSync:GroupBlockRequestsByOwner(peerManifest, blockKeys)
     local grouped = {}
     for _, blockKey in ipairs(blockKeys or {}) do
         local block = peerManifest and peerManifest.blocks and peerManifest.blocks[blockKey]
-        local ownerCharacter = block and block.ownerCharacter
+        local ownerCharacter = getValidManifestBlockParts(blockKey, block)
         if ownerCharacter then
             local row = grouped[ownerCharacter] or {
                 revision = 0,

@@ -85,7 +85,7 @@ local function printMainHelp(self)
     self:Print("/rr mock [status, start <" .. MOCK_SCENARIOS .. ">, stop, cleanup, reset, help]")
     self:Print("/rr prices <item name or link>, /rr share [guild, party, raid, say]")
     self:Print("/rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID>")
-    self:Print("/rr clean, /rr wipe")
+    self:Print("/rr clean [check], /rr wipe")
 end
 
 local function printPerfHelp(self)
@@ -158,6 +158,11 @@ function Addon:OnLoginReady()
     end
     if self.Sync then
         self.Sync:Startup()
+    end
+    if self.Data and self.Data.ScheduleSafeAutoClean then
+        self:ScheduleTimer(function()
+            self.Data:ScheduleSafeAutoClean({ maxMembersPerStep = 8 })
+        end, 8)
     end
     self:RequestRefresh("login")
 end
@@ -505,10 +510,34 @@ function Addon:SlashHandler(input)
         return
     end
 
-    if cmd == "clean" then
-        if self.Data then
-            local removed = self.Data:CleanInvalidRecipes()
-            self:Print(string.format("Cleaned %d invalid recipe(s) from database.", removed))
+    if cmd == "clean" or cmd == "repair" then
+        local mode = trimInput(rest):lower()
+        local dryRun = mode == "check" or mode == "dryrun" or mode == "dry-run" or mode == "preview"
+        local dataStats = self.Data and self.Data.CleanCorruptData and self.Data:CleanCorruptData({ dryRun = dryRun }) or {}
+        local syncStats = self.Sync and self.Sync.CleanCorruptState and self.Sync:CleanCorruptState({ dryRun = dryRun }) or {}
+        local repaired = (dataStats.repairedBlocks or 0) + (dataStats.repairedCounts or 0) + (dataStats.repairedSignatures or 0)
+        self:Print(string.format(
+            "%s members=%d professions=%d recipes=%d mismatches=%d repaired=%d sync=%d.",
+            dryRun and "Cleanup check:" or "Cleanup complete:",
+            dataStats.removedMembers or 0,
+            dataStats.removedProfessions or 0,
+            dataStats.removedRecipes or 0,
+            dataStats.mismatchedRecipes or 0,
+            repaired,
+            syncStats.removed or 0
+        ))
+        if dataStats.lastRecipeKey then
+            self:Print(string.format(
+                "Last recipe removed: %s from %s %s reason=%s%s",
+                tostring(dataStats.lastRecipeKey),
+                tostring(dataStats.lastMemberKey or "?"),
+                tostring(dataStats.lastProfession or "?"),
+                tostring(dataStats.lastReason or "?"),
+                dataStats.lastActualProfession and (" actual=" .. tostring(dataStats.lastActualProfession)) or ""
+            ))
+        end
+        if dryRun then
+            self:Print("Run /rr clean to apply these cleanup changes.")
         end
         return
     end
