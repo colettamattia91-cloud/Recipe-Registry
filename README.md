@@ -1,68 +1,73 @@
 # Recipe Registry
 
-Recipe Registry is a guild-focused crafting directory for World of Warcraft: The Burning Crusade Classic Anniversary realms.
+Recipe Registry turns your guild into a proper crafting network for World of Warcraft: The Burning Crusade Classic Anniversary realms.
 
-It quietly builds a shared view of your guild's professions, recipes, and crafter availability so you can stop guessing who can make what and start finding answers fast.
+Instead of asking in chat who can craft an item, who has the right specialization, or who is online right now, you get a clean in-game directory that keeps up with your guild over time.
 
-## What It Does
+Recipe Registry scans your own professions locally, syncs profession knowledge with guildmates who use the addon, and builds a searchable registry of recipes, crafters, materials, skill ranks, and supported TBC profession specializations.
 
-Recipe Registry scans your own professions locally, keeps that data protected, and gradually syncs profession knowledge across guildmates who also use the addon. The result is a searchable in-game registry of recipes, crafters, materials, and profession details, including supported TBC profession specializations.
+It is built to be useful every day, not just impressive on paper: fast to browse, easy to understand, and gentle enough to run quietly in the background.
 
-It is designed to feel lightweight during normal play while still giving larger guilds a dependable long-term crafting directory.
+## Why Players Install It
 
-## Core Features
+- Find the right crafter in seconds instead of asking in guild chat over and over
+- See who is online now and who can help later when they log back in
+- Keep profession data organized by character and profession, not buried in chat history
+- Surface supported profession specializations where they actually matter
+- Give your guild a shared long-term memory for crafting without turning gameplay into menu work
 
-### Shared guild recipe directory
-- Builds a guild-wide crafting database from real player profession data
-- Tracks recipes per character and profession instead of flattening everything into one noisy list
-- Preserves online and offline crafter visibility so you can still find the right person later
-- Syncs progressively in the background instead of trying to move everything at once
-- Uses replica peers to help fill in offline guildmate data over time
+## What You Get
 
-### Profession-aware details
-- Stores profession skill ranks alongside recipe ownership
-- Tracks supported TBC profession specializations such as Alchemy, Blacksmithing, Tailoring, Leatherworking, and Engineering specializations
-- Shows crafter specialization in relevant recipe and crafter views when available
-- Protects complete local profession data from suspicious partial scans
+### A real guild crafting directory
+- Builds a shared guild database from real profession data
+- Keeps recipes grouped by character and profession for cleaner browsing
+- Preserves visibility for both online and offline crafters
+- Uses progressive background sync instead of trying to flood everyone at once
+- Lets replica peers help fill in offline guildmate data over time
 
-### Searchable browser UI
-- Fast searchable recipe list with profession tabs
-- Rarity-aware crafted item presentation
+### Better recipe discovery
+- Fast searchable recipe browser with profession tabs
 - Favorites per character
-- Detailed recipe panel with crafters, materials, item links, and output information
-- Online crafters are surfaced first to reduce friction when you need something crafted now
+- Rarity-aware crafted item presentation
+- Detailed recipe view with output info, crafter list, and materials
+- Online crafters shown first when you need a craft right away
 
-### Crafting cost support
-- Material cost estimates directly in the recipe detail panel
+### Crafter context that actually helps
+- Tracks profession skill ranks alongside recipe ownership
+- Tracks supported TBC profession specializations including Alchemy, Blacksmithing, Tailoring, Leatherworking, and Engineering specializations
+- Shows specialization in relevant crafter and recipe views when available
+- Helps you identify not just who can craft something, but who has the right version of that profession
+
+### Cost and material visibility
+- Material cost estimates in the recipe detail panel
 - Unit and total reagent price display
 - Overall recipe cost summary when price data is available
-- Graceful fallback when price sources are missing or incomplete
+- Clean fallback behavior when pricing sources are missing
 
-### Tooltip integration
+### Tooltip and chat quality-of-life
 - Adds known crafters to supported item, recipe, and spell or enchant tooltips
-- Prefers online guildmates when possible
-- Helps you spot available crafters directly from links, bags, and normal gameplay UI
+- Makes guild crafting knowledge visible directly from normal gameplay
+- Supports easy recipe sharing and quick crafter contact flows
 
-### Chat and sharing quality-of-life
-- Quick sharing of selected recipe details and materials to common chat channels
-- Easy linking from the recipe detail view
-- One-click whisper shortcut for online crafters
+### Safe long-term guild data
+- Protects complete local data from suspicious partial profession scans
+- Hides stale ex-guild data from normal browsing before pruning it later
+- Uses safety checks to avoid destructive cleanup when roster data looks incomplete
+- Keeps sync work paced and chunked to reduce noise and avoid bursty behavior in larger guilds
 
-### Roster maintenance
-- Includes local cleanup tools for ex-guild or stale members
-- Hides stale data from normal browsing before any permanent pruning happens
-- Uses safety checks so an incomplete roster snapshot does not accidentally wipe good data
+## Built For TBC Guild Life
 
-### Background sync and performance safeguards
-- Background jobs are chunked to reduce stutter
-- Automatic sync work pauses in combat and instanced content
-- Manifest and snapshot traffic are paced to avoid bursty behavior in larger guilds
-- Dirty profession blocks are updated incrementally rather than rebuilding everything blindly
+Recipe Registry is especially nice in guilds where:
+
+- multiple players cover the same profession with different specializations
+- crafting requests happen often enough that chat becomes repetitive
+- people play on different schedules and many useful crafters are offline when needed
+- you want a practical replacement for "does anyone know who can make this?"
 
 ## Optional Integrations
 
 ### AtlasLoot
-AtlasLoot improves local recipe resolution, especially for spell-based or enchant-style recipes, crafted outputs, and reagent metadata. The addon still works without it, but some recipe detail will be less rich.
+AtlasLoot improves local recipe resolution, especially for spell-based or enchant-style recipes, crafted outputs, and reagent metadata. Recipe Registry works without it, but some recipe detail will be less rich.
 
 ### TradeSkillMaster and Auctionator
 If market addons are available, Recipe Registry can estimate reagent and craft costs. TradeSkillMaster is checked first, with Auctionator used as a fallback.
@@ -70,7 +75,7 @@ If market addons are available, Recipe Registry can estimate reagent and craft c
 ## Compatibility
 
 - Built for WoW TBC Anniversary / The Burning Crusade Classic 2.5.x
-- Works as a standalone guild recipe addon
+- Works perfectly well as a standalone guild recipe addon
 - Optional addons enhance pricing and recipe detail, but are not required for core sync and browsing
 
 ## Installation
@@ -84,13 +89,13 @@ Install Recipe Registry through CurseForge, then launch the game.
 3. Make sure the folder name is `RecipeRegistry`.
 4. Restart the game or reload the interface.
 
-## First-Time Setup
+## Getting Started
 
 1. Join a guild.
 2. Open each of your profession windows at least once so your local data can be scanned.
 3. Open the addon window from the minimap button or the addon's normal in-game entry point.
 4. Give the guild sync a little time to exchange profession blocks with other users.
-5. Refresh old roster data when needed through the addon's cleanup flow.
+5. Browse recipes, mark favorites, and refresh old roster data whenever needed through the addon's cleanup flow.
 
 ## Notes
 
@@ -100,11 +105,11 @@ Install Recipe Registry through CurseForge, then launch the game.
 
 ## Support The Project
 
-If Recipe Registry saves your guild time and you want to help keep it maintained, improved, and battle-tested, you can support development here:
+If Recipe Registry makes guild crafting smoother for you and your friends, and you want to help keep it maintained and improved, you can support development here:
 
 [paypal.me/Kaedros](https://paypal.me/Kaedros)
 
-Thank you. It genuinely helps.
+Thank you. It genuinely helps keep the project alive.
 
 ## Feedback And Support
 
