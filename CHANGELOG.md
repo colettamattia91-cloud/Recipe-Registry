@@ -11,6 +11,7 @@ All notable changes to this project are documented in this file.
 - Manifest chunks are now queued and paced by the sync outbound worker instead of sent inline in a burst.
 - Diagnostic output now includes lightweight scan counters for pending scans, skipped scans, failures, suspected partial scans, and invalid recipe filtering.
 - Performance diagnostics now include manifest cache telemetry for readiness, dirty blocks, builds, cache hits, deferred sends, chunk reuse, and paced MANI delivery.
+- Local owner sync diagnostics are now available to inspect exactly which profession blocks, ranks, and specializations this client is publishing.
 
 ### Fixed
 - Sync pause protection now keys off combat and instanced content, not simply being in a raid group.

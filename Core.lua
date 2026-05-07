@@ -80,7 +80,7 @@ local function printMainHelp(self)
     self:Print("/rr - open or close the main window.")
     self:Print("/rr options, /rr mini, /rr debug")
     self:Print("/rr rescan - queue a profession scan and scan active profession API data.")
-    self:Print("/rr dump, /rr sync, /rr offline, /rr manifest [target or verbose], /rr pull")
+    self:Print("/rr dump, /rr self [profession], /rr sync, /rr offline, /rr manifest [target or verbose], /rr pull")
     self:Print("/rr perf [toggle, dump, reset, help]")
     self:Print("/rr mock [status, start <" .. MOCK_SCENARIOS .. ">, stop, cleanup, reset, help]")
     self:Print("/rr prices <item name or link>, /rr share [guild, party, raid, say]")
@@ -389,6 +389,13 @@ function Addon:SlashHandler(input)
 
     if cmd == "dump" then
         if self.Data then self.Data:DumpSummary() end
+        return
+    end
+
+    if cmd == "self" or cmd == "local" or cmd == "me" then
+        if self.Data and self.Data.DumpLocalSyncStatus then
+            self.Data:DumpLocalSyncStatus(rest)
+        end
         return
     end
 

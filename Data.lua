@@ -2675,6 +2675,67 @@ function Data:DumpSummary()
     self:DumpScanStatus()
 end
 
+function Data:DumpLocalSyncStatus(professionFilter)
+    local memberKey = self:GetPlayerKey()
+    local entry = self:GetOrCreateMember(memberKey)
+    local professionKeys = {}
+    local totalRecipes = 0
+
+    for profName, prof in pairs(entry.professions or {}) do
+        professionKeys[#professionKeys + 1] = profName
+        totalRecipes = totalRecipes + (prof.count or countRecipeKeys(prof.recipes))
+    end
+    sort(professionKeys)
+
+    Addon:Print(string.format(
+        "Local sync owner=%s rev=%d updated=%d professions=%d recipes=%d",
+        tostring(memberKey),
+        entry.rev or 0,
+        entry.updatedAt or 0,
+        #professionKeys,
+        totalRecipes
+    ))
+
+    if #professionKeys == 0 then
+        Addon:Print("Local sync professions: none")
+        return
+    end
+
+    local requestedProfession = tostring(professionFilter or ""):match("^%s*(.-)%s*$") or ""
+    if requestedProfession ~= "" then
+        local canonical = self:GetCanonicalProfession(requestedProfession)
+        local resolved = entry.professions[canonical] and canonical or nil
+        if not resolved then
+            for _, profName in ipairs(professionKeys) do
+                if lowerSafe(profName) == lowerSafe(canonical) or lowerSafe(profName) == lowerSafe(requestedProfession) then
+                    resolved = profName
+                    break
+                end
+            end
+        end
+        if not resolved then
+            Addon:Print("Local sync profession not found: " .. tostring(requestedProfession) .. ".")
+            return
+        end
+        professionKeys = { resolved }
+    end
+
+    for _, profName in ipairs(professionKeys) do
+        local prof = entry.professions[profName]
+        Addon:Print(string.format(
+            "  %s count=%d skill=%d/%d spec=%s blockRev=%d source=%s updated=%d",
+            tostring(profName),
+            prof and (prof.count or countRecipeKeys(prof.recipes)) or 0,
+            prof and (prof.skillRank or 0) or 0,
+            prof and (prof.skillMaxRank or 0) or 0,
+            tostring(prof and prof.specialization or "none"),
+            prof and (prof.blockRevision or 0) or 0,
+            tostring(prof and prof.sourceType or "owner"),
+            prof and (prof.lastUpdatedAt or 0) or 0
+        ))
+    end
+end
+
 function Data:DumpManifestSummary(opts)
     opts = opts or {}
     local verbose = opts.verbose == true
