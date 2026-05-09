@@ -926,7 +926,7 @@ end
 function MockSync:DumpStatus()
     local snapshot = self:GetDebugSnapshot()
     local telemetry = snapshot.telemetry or {}
-    Addon:Print(format(
+    Addon:SystemPrint(format(
         "Mock active=%s scenario=%s traffic=%s isolated=%s pending=%d datasets=%d started=%d completed=%d queued=%d delivered=%d peers=%d announcements=%d requests=%d snapshots=%d suppressed=%d",
         tostring(snapshot.active),
         tostring(snapshot.scenarioName or "none"),
@@ -947,7 +947,7 @@ function MockSync:DumpStatus()
     if snapshot.rosterScenario then
         local roster = snapshot.rosterScenario
         local lastCleanup = snapshot.lastCleanup
-        Addon:Print(format(
+        Addon:SystemPrint(format(
             "Mock roster running=%s seeded=%d expectedActive=%d expectedStale=%d expectedPruned=%d lastProcessed=%d lastKept=%d lastStale=%d lastPruned=%d aborted=%s reason=%s",
             tostring(snapshot.rosterRunning),
             roster.seeded or 0,
@@ -964,7 +964,7 @@ function MockSync:DumpStatus()
     end
     if snapshot.integrityScenario then
         local integrity = snapshot.integrityScenario
-        Addon:Print(format(
+        Addon:SystemPrint(format(
             "Mock integrity passed=%s reason=%s member=%s primary=%s %d/%d secondary=%s exists=%s",
             tostring(integrity.passed),
             tostring(integrity.reason or "none"),

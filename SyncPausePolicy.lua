@@ -2,7 +2,7 @@ local Addon = _G.RecipeRegistry
 local SyncPausePolicy = Addon:NewModule("SyncPausePolicy", "AceEvent-3.0")
 Addon.SyncPausePolicy = SyncPausePolicy
 
-local function isInInstance()
+local function isInSensitiveInstance()
     if type(IsInInstance) ~= "function" then
         return false
     end
@@ -20,7 +20,7 @@ end
 
 function SyncPausePolicy:IsSensitiveSyncContext()
     return InCombatLockdown()
-        or isInInstance()
+        or isInSensitiveInstance()
 end
 
 function SyncPausePolicy:ShouldPauseOutbound()
@@ -28,6 +28,10 @@ function SyncPausePolicy:ShouldPauseOutbound()
 end
 
 function SyncPausePolicy:ShouldPauseInboundApply()
+    return self:IsSensitiveSyncContext()
+end
+
+function SyncPausePolicy:ShouldPauseProtocolTraffic()
     return self:IsSensitiveSyncContext()
 end
 
@@ -41,11 +45,17 @@ function SyncPausePolicy:RefreshPauseState()
         if paused then
             Addon.Performance:PauseCategory("sync-outbound")
             Addon.Performance:PauseCategory("sync-inbound")
+            Addon.Performance:PauseCategory("sync-manifest")
             Addon.Performance:PauseCategory("bootstrap")
+            Addon.Performance:PauseCategory("maintenance")
+            Addon.Performance:PauseCategory("ui")
         else
             Addon.Performance:ResumeCategory("sync-outbound")
             Addon.Performance:ResumeCategory("sync-inbound")
+            Addon.Performance:ResumeCategory("sync-manifest")
             Addon.Performance:ResumeCategory("bootstrap")
+            Addon.Performance:ResumeCategory("maintenance")
+            Addon.Performance:ResumeCategory("ui")
         end
     end
     if Addon.Sync and Addon.Sync.RecordPauseCycle then

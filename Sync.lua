@@ -9,6 +9,8 @@ local ipairs = ipairs
 local sort = table.sort
 local random = math.random
 local tinsert = table.insert
+local tremove = table.remove
+local min = math.min
 local GetTime = GetTime
 
 local REQUEST_TIMEOUT = 12
@@ -23,6 +25,9 @@ local MANIFEST_INITIAL_JITTER = 0.35
 local MAX_RESUME_ATTEMPTS = 3
 local COORDINATOR_RECOMPUTE_DELAY = 0.35
 local MANIFEST_PUSH_COOLDOWN = 20
+local MANIFEST_CATCHUP_OWNER_CAP_PER_FLUSH = 8
+local MANIFEST_CATCHUP_BLOCK_CAP_PER_FLUSH = 32
+local MANIFEST_CATCHUP_DRAIN_DELAY = 0.20
 local OFFLINE_DEBUG_LOG_LIMIT = 12
 
 local function countKeys(tbl)
@@ -50,6 +55,21 @@ local function shallowCopyTable(src)
         out[key] = value
     end
     return out
+end
+
+local function getManifestAnnouncementId(chunks, manifest)
+    if type(chunks) == "table" and chunks[1] and chunks[1].manifestId then
+        return tostring(chunks[1].manifestId)
+    end
+    if type(manifest) ~= "table" then return nil end
+    local totals = manifest.totals or {}
+    return string.format(
+        "%s:%d:%d:%d",
+        tostring(manifest.memberKey or "unknown"),
+        tonumber(manifest.builtAt or 0) or 0,
+        tonumber(manifest.manifestSerial or 0) or 0,
+        tonumber(totals.blocks or 0) or 0
+    )
 end
 
 local function countArrayUnique(values)
@@ -100,6 +120,48 @@ local function mergeRequestedBlocks(existing, incoming)
     return merged
 end
 
+local function cloneFingerprintMap(src)
+    local out = {}
+    for blockKey, fingerprint in pairs(src or {}) do
+        if blockKey and fingerprint ~= nil then
+            out[blockKey] = fingerprint
+        end
+    end
+    return out
+end
+
+local function mergeExpectedFingerprints(existing, incoming)
+    local merged = cloneFingerprintMap(existing)
+    for blockKey, fingerprint in pairs(incoming or {}) do
+        if blockKey and fingerprint ~= nil then
+            merged[blockKey] = fingerprint
+        end
+    end
+    return merged
+end
+
+local function sliceExpectedFingerprints(src, blockKeys)
+    local out = {}
+    for _, blockKey in ipairs(blockKeys or {}) do
+        local fingerprint = src and src[blockKey] or nil
+        if fingerprint ~= nil then
+            out[blockKey] = fingerprint
+        end
+    end
+    return out
+end
+
+local function cloneStringRange(src, firstIndex, lastIndex)
+    local out = {}
+    local finalIndex = min(lastIndex or #(src or {}), #(src or {}))
+    for index = firstIndex or 1, finalIndex do
+        if src[index] then
+            out[#out + 1] = src[index]
+        end
+    end
+    return out
+end
+
 local function isMockKey(memberKey)
     return type(memberKey) == "string"
         and (memberKey:find("__RRMockPeer", 1, true) == 1 or memberKey:find("__RRMockOwner", 1, true) == 1)
@@ -123,7 +185,11 @@ function Sync:OnInitialize()
     self.peerPacing = {}
     self.partialManifestReceive = {}
     self._lastManifestSentAt = {}
+    self._lastManifestAnnouncedId = {}
+    self._helloManifestRefreshRequested = {}
     self.pendingManifestPeers = {}
+    self.manifestCatchupQueue = {}
+    self._manifestCatchupJobActive = false
     self.telemetry = {
         sentChunks = 0,
         receivedChunks = 0,
@@ -140,10 +206,21 @@ function Sync:OnInitialize()
         manifestChunksSent = 0,
         manifestChunksQueued = 0,
         manifestChunksDelivered = 0,
+        manifestChunksReceived = 0,
         manifestCooldownSkips = 0,
+        manifestUnchangedSkips = 0,
         manifestDeferredSends = 0,
         manifestPendingFlushes = 0,
         manifestQueueMaxDepth = 0,
+        manifestBuildRequests = 0,
+        manifestForceReplies = 0,
+        manifestCatchupCandidates = 0,
+        manifestCatchupQueued = 0,
+        manifestCatchupDeferred = 0,
+        manifestCatchupDrained = 0,
+        manifestCatchupSkippedOnlineOwners = 0,
+        manifestCatchupSkippedStaleOwners = 0,
+        manifestCatchupMaxDeferred = 0,
     }
     self.offlineDebugLog = {}
 end
@@ -165,12 +242,55 @@ function Sync:ResetTelemetry()
         manifestChunksSent = 0,
         manifestChunksQueued = 0,
         manifestChunksDelivered = 0,
+        manifestChunksReceived = 0,
         manifestCooldownSkips = 0,
+        manifestUnchangedSkips = 0,
         manifestDeferredSends = 0,
         manifestPendingFlushes = 0,
         manifestQueueMaxDepth = 0,
+        manifestBuildRequests = 0,
+        manifestForceReplies = 0,
+        manifestCatchupCandidates = 0,
+        manifestCatchupQueued = 0,
+        manifestCatchupDeferred = 0,
+        manifestCatchupDrained = 0,
+        manifestCatchupSkippedOnlineOwners = 0,
+        manifestCatchupSkippedStaleOwners = 0,
+        manifestCatchupMaxDeferred = 0,
     }
     self.offlineDebugLog = {}
+end
+
+function Sync:ResetRuntimeStateForDatabaseWipe()
+    self.onlineNodes = {}
+    self.registry = {}
+    self.pendingRequests = {}
+    self.partialReceive = {}
+    self.outgoingSessions = {}
+    self.coordinatorKey = nil
+    self.inFlight = nil
+    self.lastAdvertisedRev = nil
+    self._lastCoordinatorChangeAt = 0
+    self.lastHelloAt = 0
+    self.outboundChunkQueue = {}
+    self.manifestChunkQueue = {}
+    self.inboundChunkQueue = {}
+    self.inboundFinalizeQueue = {}
+    self.peerPacing = {}
+    self.partialManifestReceive = {}
+    self._lastManifestSentAt = {}
+    self._lastManifestAnnouncedId = {}
+    self._helloManifestRefreshRequested = {}
+    self.pendingManifestPeers = {}
+    self.manifestCatchupQueue = {}
+    self._manifestCatchupJobActive = false
+    self:RecomputeCoordinator()
+    Addon:RequestRefresh("queue")
+end
+
+function Sync:KickoffDatabaseResync()
+    self:RequestManifestRefresh()
+    self:ScheduleHello(0.5)
 end
 
 function Sync:PushOfflineDebugEvent(kind, detail)
@@ -236,6 +356,43 @@ function Sync:IsRequestShapeValid(request)
         and self:IsValidSyncMemberKey(request.source)
 end
 
+function Sync:IsRequestAlreadySatisfied(request)
+    if not request or not self:IsValidSyncMemberKey(request.memberKey) then return false end
+    local entry = Addon.Data:GetMember(request.memberKey)
+    if not entry then return false end
+
+    local targetRev = request.rev or 0
+    if (entry.rev or 0) < targetRev then
+        return false
+    end
+
+    local requestedBlocks = request.requestedBlocks or {}
+    local expectedFingerprints = request.expectedFingerprints or {}
+    if type(requestedBlocks) ~= "table" or #requestedBlocks == 0 then
+        return true
+    end
+
+    for _, blockKey in ipairs(requestedBlocks) do
+        local ownerCharacter, professionKey = Addon.Data:ParseSyncBlockKey(blockKey)
+        if ownerCharacter ~= request.memberKey or not professionKey then
+            return false
+        end
+        local prof = entry.professions and entry.professions[professionKey]
+        if not prof or (prof.guildStatus or entry.guildStatus or "active") ~= "active" then
+            return false
+        end
+        local expectedFingerprint = expectedFingerprints[blockKey]
+        if expectedFingerprint ~= nil then
+            local localBlock = Addon.Data:GetSyncBlock(request.memberKey, professionKey)
+            local localFingerprint = localBlock and localBlock.fingerprint or nil
+            if localFingerprint ~= expectedFingerprint then
+                return false
+            end
+        end
+    end
+    return true
+end
+
 function Sync:ShouldAllowLocalMockTraffic(sourceKey, memberKey)
     if not (Addon.MockSync and Addon.MockSync.IsLocalTrafficEnabled) then
         return false
@@ -253,6 +410,9 @@ function Sync:ScheduleHello(delay)
 end
 
 function Sync:BroadcastHello()
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic() then
+        return
+    end
     self.lastHelloAt = time()
     local summary = Addon.Data:GetLocalSummary()
     self:RecordRevisionHint(summary.memberKey, summary.rev, summary.updatedAt, summary.memberKey)
@@ -266,6 +426,9 @@ function Sync:BroadcastHello()
 end
 
 function Sync:AdvertiseLocalRevision(reason)
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic() then
+        return
+    end
     local summary = Addon.Data:GetLocalSummary()
     if self.lastAdvertisedRev == summary.rev and reason ~= "startup" then return end
     self.lastAdvertisedRev = summary.rev
@@ -282,6 +445,9 @@ function Sync:AdvertiseLocalRevision(reason)
 end
 
 function Sync:SendGuildEnvelope(kind, payload, priority)
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic(kind) then
+        return
+    end
     if self:IsRealTrafficSuppressed() then
         if Addon.MockSync and Addon.MockSync.RecordSuppressedSend then
             Addon.MockSync:RecordSuppressedSend()
@@ -298,6 +464,9 @@ function Sync:SendGuildEnvelope(kind, payload, priority)
 end
 
 function Sync:SendDirectEnvelope(kind, payload, targetKey, priority)
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic(kind) then
+        return
+    end
     if self:IsRealTrafficSuppressed() then
         if Addon.MockSync and Addon.MockSync.RecordSuppressedSend then
             Addon.MockSync:RecordSuppressedSend()
@@ -322,6 +491,9 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
     local ok, payload = LibStub("AceSerializer-3.0"):Deserialize(text)
     if not ok or type(payload) ~= "table" then return end
     if payload.sender == self:GetSelfKey() then return end
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic(payload.kind) then
+        return
+    end
 
     if payload.sender then
         self:TouchNode(payload.sender, payload.version)
@@ -370,6 +542,9 @@ function Sync:PruneOnlineNodes()
     for key, info in pairs(self.onlineNodes) do
         if info.lastSeen and (now - info.lastSeen) > NODE_TIMEOUT then
             self.onlineNodes[key] = nil
+            self._lastManifestSentAt[key] = nil
+            self._lastManifestAnnouncedId[key] = nil
+            self._helloManifestRefreshRequested[key] = nil
         end
     end
 end
@@ -443,6 +618,10 @@ function Sync:HandleHello(payload)
     self:RecordRevisionHint(payload.key, payload.rev, payload.updatedAt, payload.key)
     if self:IsMockKey(payload.key) then return end
     self:SendManifestToPeer(payload.key, "hello")
+    if not self._helloManifestRefreshRequested[payload.key] then
+        self._helloManifestRefreshRequested[payload.key] = time()
+        self:RequestManifestRefresh(payload.key)
+    end
 
     local localEntry = Addon.Data:GetMember(payload.key)
     local localRev = localEntry and localEntry.rev or 0
@@ -528,10 +707,21 @@ function Sync:QueueRequest(sourceKey, memberKey, targetRev, why, opts)
         sourceKey = knownOwner
     end
 
+    if self:IsRequestAlreadySatisfied({
+        memberKey = memberKey,
+        rev = targetRev or 0,
+        requestedBlocks = opts.requestedBlocks,
+        expectedFingerprints = opts.expectedFingerprints,
+    }) then
+        Addon:Debug("Skipped satisfied sync request", memberKey, "from", sourceKey, "rev", targetRev or 0, why or "")
+        return
+    end
+
     local q = self.pendingRequests[memberKey]
     if q and (q.rev or 0) >= (targetRev or 0) then
         if opts.requestedBlocks and #opts.requestedBlocks > 0 then
             q.requestedBlocks = mergeRequestedBlocks(q.requestedBlocks, opts.requestedBlocks)
+            q.expectedFingerprints = mergeExpectedFingerprints(q.expectedFingerprints, opts.expectedFingerprints)
             q.allowReplicaSource = q.allowReplicaSource or opts.allowReplicaSource == true
             q.source = opts.allowReplicaSource and sourceKey or q.source
         end
@@ -548,16 +738,27 @@ function Sync:QueueRequest(sourceKey, memberKey, targetRev, why, opts)
         resumeAttempts = 0,
         allowReplicaSource = opts.allowReplicaSource == true,
         requestedBlocks = cloneStringSet(opts.requestedBlocks),
+        expectedFingerprints = cloneFingerprintMap(opts.expectedFingerprints),
     }
     Addon:Debug("Queued direct request", memberKey, "from", sourceKey, "rev", targetRev or 0, why or "")
     Addon:RequestRefresh("queue")
 end
 
 function Sync:ProcessRequestQueue()
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic() then
+        return
+    end
     if self.inFlight then
         if not self:IsRequestShapeValid(self.inFlight) then
             Addon:Debug("Dropping malformed in-flight request", tostring(self.inFlight.memberKey), "from", tostring(self.inFlight.source))
             self:FailInFlight(false)
+            return
+        end
+        if self:IsRequestAlreadySatisfied(self.inFlight) then
+            Addon:Debug("Dropping satisfied in-flight request", self.inFlight.memberKey)
+            self.partialReceive[self.inFlight.memberKey] = nil
+            self.inFlight = nil
+            Addon:RequestRefresh("queue")
             return
         end
         if not self:IsRequestStillViable(self.inFlight) then
@@ -598,6 +799,8 @@ function Sync:ProcessRequestQueue()
     for memberKey, info in pairs(self.pendingRequests) do
         if not self:IsRequestShapeValid(info) then
             self.pendingRequests[memberKey] = nil
+        elseif self:IsRequestAlreadySatisfied(info) then
+            self.pendingRequests[memberKey] = nil
         else
             local allowLocalMock = self:ShouldAllowLocalMockTraffic(info and info.source, memberKey)
             if not self:IsRealTrafficSuppressed() or allowLocalMock then
@@ -609,6 +812,11 @@ function Sync:ProcessRequestQueue()
         end
     end
     if not oldest then return end
+
+    if self:IsRequestAlreadySatisfied(oldest) then
+        self.pendingRequests[oldestKey] = nil
+        return
+    end
 
     if not self:IsRequestStillViable(oldest) then
         self.pendingRequests[oldestKey] = nil
@@ -627,6 +835,7 @@ function Sync:ProcessRequestQueue()
         resumeAttempts = 0,
         allowReplicaSource = oldest.allowReplicaSource == true,
         requestedBlocks = cloneStringSet(oldest.requestedBlocks),
+        expectedFingerprints = cloneFingerprintMap(oldest.expectedFingerprints),
     }
 
     local localEntry = Addon.Data:GetMember(oldest.memberKey)
@@ -660,11 +869,17 @@ end
 function Sync:IsRequestStillViable(request)
     if not self:IsRequestShapeValid(request) then return false end
     if request.source == self:GetSelfKey() then return true end
+    if Addon.Data and Addon.Data.GetGuildMemberMeta then
+        local meta = Addon.Data:GetGuildMemberMeta(request.source)
+        if meta and meta.online == false then
+            return false
+        end
+    end
     return self.onlineNodes[request.source] ~= nil
 end
 
 function Sync:FailInFlight(requeue)
-    if self.inFlight and requeue and self:IsRequestShapeValid(self.inFlight) then
+    if self.inFlight and requeue and self:IsRequestShapeValid(self.inFlight) and not self:IsRequestAlreadySatisfied(self.inFlight) then
         local req = self.inFlight
         self.pendingRequests[req.memberKey] = {
             source = req.source,
@@ -676,6 +891,7 @@ function Sync:FailInFlight(requeue)
             resumeAttempts = req.resumeAttempts or 0,
             allowReplicaSource = req.allowReplicaSource == true,
             requestedBlocks = cloneStringSet(req.requestedBlocks),
+            expectedFingerprints = cloneFingerprintMap(req.expectedFingerprints),
         }
     end
     if self.inFlight then
@@ -852,13 +1068,14 @@ function Sync:SendManifestToPeer(peerKey, why)
     if not peerKey or not Addon.TrickleSync then return end
     if not self:IsValidSyncMemberKey(peerKey) then return end
     if self:IsMockKey(peerKey) then return end
+    self.telemetry.manifestBuildRequests = (self.telemetry.manifestBuildRequests or 0) + 1
     local lastSentAt = self._lastManifestSentAt[peerKey] or 0
     if why ~= "force" and (time() - lastSentAt) < MANIFEST_PUSH_COOLDOWN then
         self.telemetry.manifestCooldownSkips = (self.telemetry.manifestCooldownSkips or 0) + 1
         return
     end
 
-    local chunks = Addon.TrickleSync:BuildManifestChunks({
+    local chunks, manifest = Addon.TrickleSync:BuildManifestChunks({
         allowStale = false,
         syncFallback = false,
         reason = why or "send",
@@ -869,8 +1086,16 @@ function Sync:SendManifestToPeer(peerKey, why)
         self.telemetry.manifestDeferredSends = (self.telemetry.manifestDeferredSends or 0) + 1
         return
     end
+    local manifestId = getManifestAnnouncementId(chunks, manifest)
+    if why ~= "force" and manifestId and self._lastManifestAnnouncedId[peerKey] == manifestId then
+        self.telemetry.manifestUnchangedSkips = (self.telemetry.manifestUnchangedSkips or 0) + 1
+        return
+    end
     self:QueueManifestChunks(peerKey, chunks, why)
     self._lastManifestSentAt[peerKey] = time()
+    if manifestId then
+        self._lastManifestAnnouncedId[peerKey] = manifestId
+    end
 end
 
 function Sync:QueueManifestChunks(peerKey, chunks, why)
@@ -927,6 +1152,7 @@ end
 function Sync:HandleManifestRequest(payload)
     if not self:IsValidSyncMemberKey(payload.sender) or payload.sender == self:GetSelfKey() then return end
     if self:IsMockKey(payload.sender) then return end
+    self.telemetry.manifestForceReplies = (self.telemetry.manifestForceReplies or 0) + 1
     self:SendManifestToPeer(payload.sender, "force")
 end
 
@@ -938,10 +1164,243 @@ function Sync:BroadcastManifestToOnlinePeers(why)
     end
 end
 
+function Sync:IsManifestCatchupOwnerBusy(ownerCharacter)
+    if not ownerCharacter then return true end
+    if self.pendingRequests and self.pendingRequests[ownerCharacter] then return true end
+    if self.inFlight and self.inFlight.memberKey == ownerCharacter then return true end
+    return false
+end
+
+function Sync:GetManifestCatchupOutstandingCost()
+    local owners = 0
+    local blocks = 0
+    for _, request in pairs(self.pendingRequests or {}) do
+        owners = owners + 1
+        local requestedBlocks = request and request.requestedBlocks or nil
+        blocks = blocks + math.max(1, #(requestedBlocks or {}))
+    end
+    if self.inFlight then
+        owners = owners + 1
+        blocks = blocks + math.max(1, #(self.inFlight.requestedBlocks or {}))
+    end
+    return owners, blocks
+end
+
+function Sync:IsLocallyStaleOwner(ownerCharacter)
+    local entry = Addon.Data and Addon.Data.GetMember and Addon.Data:GetMember(ownerCharacter) or nil
+    return entry and (entry.guildStatus or "active") ~= "active" or false
+end
+
+function Sync:SortManifestCatchupCandidates(candidates)
+    sort(candidates, function(a, b)
+        if a.directOwner ~= b.directOwner then return a.directOwner end
+        if a.offlineReplica ~= b.offlineReplica then return a.offlineReplica end
+        if (a.revision or 0) ~= (b.revision or 0) then return (a.revision or 0) > (b.revision or 0) end
+        if #(a.blockKeys or {}) ~= #(b.blockKeys or {}) then return #(a.blockKeys or {}) > #(b.blockKeys or {}) end
+        return tostring(a.ownerCharacter or "") < tostring(b.ownerCharacter or "")
+    end)
+end
+
+function Sync:BuildManifestCatchupCandidates(senderKey, groupedRequests)
+    local candidates = {}
+    local seenCandidates = 0
+    for ownerCharacter, request in pairs(groupedRequests or {}) do
+        local blockKeys = cloneStringSet(request and request.blockKeys)
+        if self:IsValidSyncMemberKey(ownerCharacter) and #blockKeys > 0 then
+            seenCandidates = seenCandidates + 1
+            local ownerIsOnline = Addon.Data:IsMemberOnline(ownerCharacter)
+            local directOwner = ownerCharacter == senderKey
+            if not directOwner and ownerIsOnline then
+                self.telemetry.manifestCatchupSkippedOnlineOwners = (self.telemetry.manifestCatchupSkippedOnlineOwners or 0) + 1
+            elseif not directOwner and self:IsLocallyStaleOwner(ownerCharacter) then
+                self.telemetry.manifestCatchupSkippedStaleOwners = (self.telemetry.manifestCatchupSkippedStaleOwners or 0) + 1
+            else
+                candidates[#candidates + 1] = {
+                    senderKey = senderKey,
+                    ownerCharacter = ownerCharacter,
+                    revision = request and request.revision or 0,
+                    blockKeys = blockKeys,
+                    expectedFingerprints = cloneFingerprintMap(request and request.fingerprints),
+                    directOwner = directOwner,
+                    offlineReplica = not directOwner and not ownerIsOnline,
+                    sourceType = request and request.sourceType,
+                    wasDeferred = request and request.wasDeferred == true or false,
+                }
+            end
+        end
+    end
+    self.telemetry.manifestCatchupCandidates = (self.telemetry.manifestCatchupCandidates or 0) + seenCandidates
+    self:SortManifestCatchupCandidates(candidates)
+    return candidates
+end
+
+function Sync:DeferManifestCatchupCandidate(candidate)
+    if not (candidate and self:IsValidSyncMemberKey(candidate.ownerCharacter)) then return end
+    candidate.blockKeys = cloneStringSet(candidate.blockKeys)
+    candidate.expectedFingerprints = sliceExpectedFingerprints(candidate.expectedFingerprints, candidate.blockKeys)
+    if #candidate.blockKeys == 0 then return end
+    self.manifestCatchupQueue = self.manifestCatchupQueue or {}
+    if not candidate.wasDeferred then
+        self.telemetry.manifestCatchupDeferred = (self.telemetry.manifestCatchupDeferred or 0) + 1
+    end
+    candidate.wasDeferred = true
+    self.manifestCatchupQueue[#self.manifestCatchupQueue + 1] = candidate
+    if #self.manifestCatchupQueue > (self.telemetry.manifestCatchupMaxDeferred or 0) then
+        self.telemetry.manifestCatchupMaxDeferred = #self.manifestCatchupQueue
+    end
+end
+
+function Sync:QueueManifestCatchupRequest(candidate)
+    if not (candidate and self:IsValidSyncMemberKey(candidate.ownerCharacter) and self:IsValidSyncMemberKey(candidate.senderKey)) then
+        return false, false
+    end
+    if self:IsRequestAlreadySatisfied({
+        memberKey = candidate.ownerCharacter,
+        rev = candidate.revision or 0,
+        requestedBlocks = candidate.blockKeys,
+        expectedFingerprints = candidate.expectedFingerprints,
+    }) then
+        if candidate.wasDeferred then
+            self.telemetry.manifestCatchupDrained = (self.telemetry.manifestCatchupDrained or 0) + 1
+        end
+        return true, false
+    end
+    if self:IsManifestCatchupOwnerBusy(candidate.ownerCharacter) then
+        return false, false
+    end
+    self:QueueRequest(candidate.senderKey, candidate.ownerCharacter, candidate.revision or 0, "manifest", {
+        allowReplicaSource = true,
+        requestedBlocks = candidate.blockKeys,
+        expectedFingerprints = candidate.expectedFingerprints,
+    })
+    self.telemetry.manifestCatchupQueued = (self.telemetry.manifestCatchupQueued or 0) + 1
+    if candidate.wasDeferred then
+        self.telemetry.manifestCatchupDrained = (self.telemetry.manifestCatchupDrained or 0) + 1
+    end
+    if candidate.offlineReplica then
+        self.telemetry.replicaRequestsQueued = (self.telemetry.replicaRequestsQueued or 0) + 1
+        self:PushOfflineDebugEvent("queued", string.format(
+            "%s from %s blocks=%d rev=%d",
+            tostring(candidate.ownerCharacter),
+            tostring(candidate.senderKey),
+            #(candidate.blockKeys or {}),
+            candidate.revision or 0
+        ))
+    end
+    return true, true
+end
+
+function Sync:FlushManifestCatchupCandidates(candidates)
+    local ownersQueued, blocksQueued = self:GetManifestCatchupOutstandingCost()
+    local ownersAdded = 0
+    local blocksAdded = 0
+    local deferred = {}
+
+    for _, candidate in ipairs(candidates or {}) do
+        local blockKeys = cloneStringSet(candidate.blockKeys)
+        local index = 1
+        while index <= #blockKeys do
+            if ownersQueued >= MANIFEST_CATCHUP_OWNER_CAP_PER_FLUSH or blocksQueued >= MANIFEST_CATCHUP_BLOCK_CAP_PER_FLUSH then
+                local rest = shallowCopyTable(candidate)
+                rest.blockKeys = cloneStringRange(blockKeys, index, #blockKeys)
+                rest.expectedFingerprints = sliceExpectedFingerprints(candidate.expectedFingerprints, rest.blockKeys)
+                deferred[#deferred + 1] = rest
+                break
+            end
+            if self:IsManifestCatchupOwnerBusy(candidate.ownerCharacter) then
+                local rest = shallowCopyTable(candidate)
+                rest.blockKeys = cloneStringRange(blockKeys, index, #blockKeys)
+                rest.expectedFingerprints = sliceExpectedFingerprints(candidate.expectedFingerprints, rest.blockKeys)
+                deferred[#deferred + 1] = rest
+                break
+            end
+
+            local availableBlocks = MANIFEST_CATCHUP_BLOCK_CAP_PER_FLUSH - blocksQueued
+            local takeCount = min(#blockKeys - index + 1, availableBlocks)
+            if takeCount <= 0 then
+                local rest = shallowCopyTable(candidate)
+                rest.blockKeys = cloneStringRange(blockKeys, index, #blockKeys)
+                rest.expectedFingerprints = sliceExpectedFingerprints(candidate.expectedFingerprints, rest.blockKeys)
+                deferred[#deferred + 1] = rest
+                break
+            end
+
+            local chunk = shallowCopyTable(candidate)
+            chunk.blockKeys = cloneStringRange(blockKeys, index, index + takeCount - 1)
+            chunk.expectedFingerprints = sliceExpectedFingerprints(candidate.expectedFingerprints, chunk.blockKeys)
+            local consumed, queued = self:QueueManifestCatchupRequest(chunk)
+            if consumed then
+                if queued then
+                    ownersQueued = ownersQueued + 1
+                    blocksQueued = blocksQueued + #chunk.blockKeys
+                    ownersAdded = ownersAdded + 1
+                    blocksAdded = blocksAdded + #chunk.blockKeys
+                end
+                index = index + takeCount
+            else
+                local rest = shallowCopyTable(candidate)
+                rest.blockKeys = cloneStringRange(blockKeys, index, #blockKeys)
+                rest.expectedFingerprints = sliceExpectedFingerprints(candidate.expectedFingerprints, rest.blockKeys)
+                deferred[#deferred + 1] = rest
+                break
+            end
+        end
+    end
+
+    for _, candidate in ipairs(deferred) do
+        self:DeferManifestCatchupCandidate(candidate)
+    end
+    if #deferred > 0 then
+        self:ScheduleManifestCatchupDrain()
+    end
+    return ownersAdded, blocksAdded, #deferred
+end
+
+function Sync:DrainManifestCatchupQueue()
+    if #(self.manifestCatchupQueue or {}) == 0 then return false end
+    local pending = self.manifestCatchupQueue
+    self.manifestCatchupQueue = {}
+    self:SortManifestCatchupCandidates(pending)
+    self:FlushManifestCatchupCandidates(pending)
+    return #(self.manifestCatchupQueue or {}) > 0
+end
+
+function Sync:ScheduleManifestCatchupDrain()
+    if self._manifestCatchupJobActive then return end
+    if not (Addon.Performance and Addon.Performance.ScheduleJob) then
+        self._manifestCatchupJobActive = true
+        self:ScheduleTimer(function()
+            self._manifestCatchupJobActive = false
+            self:DrainManifestCatchupQueue()
+        end, MANIFEST_CATCHUP_DRAIN_DELAY)
+        return
+    end
+    self._manifestCatchupJobActive = true
+    Addon.Performance:ScheduleJob("manifest-catchup-drain", function(state)
+        state = state or {}
+        state.nextRunAt = state.nextRunAt or (nowForPacing() + MANIFEST_CATCHUP_DRAIN_DELAY)
+        if nowForPacing() < state.nextRunAt then
+            return true, state
+        end
+        local keepGoing = self:DrainManifestCatchupQueue()
+        if keepGoing then
+            state.nextRunAt = nowForPacing() + MANIFEST_CATCHUP_DRAIN_DELAY
+            return true, state
+        end
+        self._manifestCatchupJobActive = false
+        return false, state
+    end, {
+        category = "sync-manifest-catchup",
+        label = "manifest-catchup-drain",
+        budgetMs = 1,
+    })
+end
+
 function Sync:HandleManifestChunk(payload)
     if not self:IsValidSyncMemberKey(payload.sender) or payload.sender == self:GetSelfKey() then return end
     if not payload.manifestId then return end
     if self:IsMockKey(payload.sender) and not self:ShouldAllowLocalMockTraffic(payload.sender, nil) then return end
+    self.telemetry.manifestChunksReceived = (self.telemetry.manifestChunksReceived or 0) + 1
 
     local senderKey = payload.sender
     local manifestMemberKey = self:IsValidSyncMemberKey(payload.memberKey) and payload.memberKey or senderKey
@@ -1018,20 +1477,8 @@ function Sync:HandleManifestChunk(payload)
         self.telemetry.replicaManifestOwnersSeen = self.telemetry.replicaManifestOwnersSeen + uniqueReplicaOwners
         self:PushOfflineDebugEvent("manifest", string.format("peer=%s owners=%d blocks=%d", tostring(senderKey), uniqueReplicaOwners, replicaBlocks))
     end
-    for ownerCharacter, request in pairs(groupedRequests or {}) do
-        local ownerIsOnline = Addon.Data:IsMemberOnline(ownerCharacter)
-        local shouldRequestReplica = ownerCharacter == senderKey or not ownerIsOnline
-        if ownerCharacter ~= senderKey and not ownerIsOnline then
-            self.telemetry.replicaRequestsQueued = self.telemetry.replicaRequestsQueued + 1
-            self:PushOfflineDebugEvent("queued", string.format("%s from %s blocks=%d rev=%d", tostring(ownerCharacter), tostring(senderKey), #(request.blockKeys or {}), request.revision or 0))
-        end
-        if shouldRequestReplica then
-            self:QueueRequest(senderKey, ownerCharacter, request.revision or 0, "manifest", {
-                allowReplicaSource = true,
-                requestedBlocks = request.blockKeys,
-            })
-        end
-    end
+    local catchupCandidates = self:BuildManifestCatchupCandidates(senderKey, groupedRequests)
+    self:FlushManifestCatchupCandidates(catchupCandidates)
     Addon:RequestRefresh("manifest")
 end
 
@@ -1231,7 +1678,6 @@ function Sync:SendNextManifestChunk()
     self.peerPacing[queued.peer] = self.peerPacing[queued.peer] or {}
     self.peerPacing[queued.peer].lastSentAt = now
     self.telemetry.manifestChunksSent = (self.telemetry.manifestChunksSent or 0) + 1
-    self.telemetry.manifestChunksDelivered = (self.telemetry.manifestChunksDelivered or 0) + 1
     return true
 end
 
@@ -1271,6 +1717,16 @@ function Sync:MergeChunkStep(item)
     if not item then return false end
     if not self:IsValidSyncMemberKey(item.memberKey) then return false end
     local hadLocalEntry = Addon.Data:GetMember(item.memberKey) ~= nil
+    local localEntry = Addon.Data:GetMember(item.memberKey)
+    if item.sender and item.sender ~= item.memberKey
+        and localEntry
+        and (localEntry.guildStatus or "active") ~= "active" then
+        if Addon.Data._incoming then
+            Addon.Data._incoming[item.memberKey] = nil
+        end
+        self:PushOfflineDebugEvent("stale-skip", string.format("%s via %s", tostring(item.memberKey), tostring(item.sender)))
+        return false
+    end
     local sourceType = (item.sender and item.sender == item.memberKey) and "owner" or "replica"
     local merged = Addon.Data:FinalizeIncomingSnapshot(item.memberKey, item.rev, {
         sourceType = sourceType,
@@ -1391,7 +1847,7 @@ end
 
 function Sync:DumpOfflineSyncStatus()
     local t = self.telemetry or {}
-    Addon:Print(string.format(
+    Addon:SystemPrint(string.format(
         "Offline sync manifests owners=%d blocks=%d queued=%d served=%d applied=%d newOwners=%d",
         t.replicaManifestOwnersSeen or 0,
         t.replicaManifestBlocksSeen or 0,
@@ -1401,12 +1857,12 @@ function Sync:DumpOfflineSyncStatus()
         t.replicaNewOwnersApplied or 0
     ))
     if #(self.offlineDebugLog or {}) == 0 then
-        Addon:Print("Offline sync recent: none")
+        Addon:SystemPrint("Offline sync recent: none")
         return
     end
-    Addon:Print("Offline sync recent:")
+    Addon:SystemPrint("Offline sync recent:")
     for index = 1, #self.offlineDebugLog do
-        Addon:Print("  " .. tostring(self.offlineDebugLog[index]))
+        Addon:SystemPrint("  " .. tostring(self.offlineDebugLog[index]))
     end
 end
 
@@ -1462,6 +1918,16 @@ function Sync:CleanupMockState()
             self._lastManifestSentAt[peerKey] = nil
         end
     end
+    for peerKey in pairs(self._lastManifestAnnouncedId or {}) do
+        if self:IsMockKey(peerKey) then
+            self._lastManifestAnnouncedId[peerKey] = nil
+        end
+    end
+    for peerKey in pairs(self._helloManifestRefreshRequested or {}) do
+        if self:IsMockKey(peerKey) then
+            self._helloManifestRefreshRequested[peerKey] = nil
+        end
+    end
 
     for sessionId, state in pairs(self.outgoingSessions or {}) do
         if self:IsMockKey(state and state.memberKey) or self:IsMockKey(state and state.targetKey) then
@@ -1486,6 +1952,15 @@ function Sync:CleanupMockState()
         end
     end
     self.manifestChunkQueue = keptManifest
+
+    local keptCatchup = {}
+    for index = 1, #(self.manifestCatchupQueue or {}) do
+        local item = self.manifestCatchupQueue[index]
+        if not self:IsMockKey(item and item.senderKey) and not self:IsMockKey(item and item.ownerCharacter) then
+            keptCatchup[#keptCatchup + 1] = item
+        end
+    end
+    self.manifestCatchupQueue = keptCatchup
 
     local keptInbound = {}
     for index = 1, #(self.inboundChunkQueue or {}) do
@@ -1585,6 +2060,16 @@ function Sync:CleanCorruptState(opts)
             drop(self._lastManifestSentAt, key, "queues")
         end
     end
+    for key in pairs(self._lastManifestAnnouncedId or {}) do
+        if not self:IsValidSyncMemberKey(key) then
+            drop(self._lastManifestAnnouncedId, key, "queues")
+        end
+    end
+    for key in pairs(self._helloManifestRefreshRequested or {}) do
+        if not self:IsValidSyncMemberKey(key) then
+            drop(self._helloManifestRefreshRequested, key, "queues")
+        end
+    end
     for key in pairs(self.pendingManifestPeers or {}) do
         if not self:IsValidSyncMemberKey(key) then
             drop(self.pendingManifestPeers, key, "queues")
@@ -1626,6 +2111,10 @@ function Sync:CleanCorruptState(opts)
             return self:IsValidSyncMemberKey(item and item.peer)
                 and self:IsValidSyncMemberKey(item and item.payload and item.payload.memberKey)
         end)
+        self.manifestCatchupQueue = keepQueue(self.manifestCatchupQueue, function(item)
+            return self:IsValidSyncMemberKey(item and item.senderKey)
+                and self:IsValidSyncMemberKey(item and item.ownerCharacter)
+        end)
         self.inboundChunkQueue = keepQueue(self.inboundChunkQueue, function(item)
             return self:IsValidSyncMemberKey(item and item.key)
                 and self:IsValidSyncMemberKey(item and item.sender)
@@ -1642,6 +2131,10 @@ function Sync:CleanCorruptState(opts)
         keepQueue(self.manifestChunkQueue, function(item)
             return self:IsValidSyncMemberKey(item and item.peer)
                 and self:IsValidSyncMemberKey(item and item.payload and item.payload.memberKey)
+        end)
+        keepQueue(self.manifestCatchupQueue, function(item)
+            return self:IsValidSyncMemberKey(item and item.senderKey)
+                and self:IsValidSyncMemberKey(item and item.ownerCharacter)
         end)
         keepQueue(self.inboundChunkQueue, function(item)
             return self:IsValidSyncMemberKey(item and item.key)
@@ -1670,7 +2163,7 @@ end
 
 function Sync:DumpStatus()
     local role = self:IsCoordinator() and "Coordinator" or "Client"
-    Addon:Print(string.format(
+    Addon:SystemPrint(string.format(
         "Role=%s coordinator=%s onlineNodes=%d registry=%d queued=%d inFlight=%s outgoing=%d outboundChunks=%d manifestChunks=%d inboundChunks=%d manifestPending=%d paused=%s isolated=%s",
         role,
         tostring(self.coordinatorKey),
@@ -1685,5 +2178,27 @@ function Sync:DumpStatus()
         countKeys(self.pendingManifestPeers),
         tostring(Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() or false),
         tostring(self:IsRealTrafficSuppressed())
+    ))
+    local tel = self.telemetry or {}
+    Addon:SystemPrint(string.format(
+        "Manifest requests=%d sent=%d received=%d queued=%d cooldownSkips=%d unchangedSkips=%d forceReplies=%d deferred=%d flushes=%d maxQueue=%d catchupCandidates=%d catchupQueued=%d catchupDeferred=%d catchupDrained=%d catchupSkipOnline=%d catchupSkipStale=%d catchupQueue=%d catchupMax=%d",
+        tel.manifestBuildRequests or 0,
+        tel.manifestChunksSent or 0,
+        tel.manifestChunksReceived or 0,
+        tel.manifestChunksQueued or 0,
+        tel.manifestCooldownSkips or 0,
+        tel.manifestUnchangedSkips or 0,
+        tel.manifestForceReplies or 0,
+        tel.manifestDeferredSends or 0,
+        tel.manifestPendingFlushes or 0,
+        tel.manifestQueueMaxDepth or 0,
+        tel.manifestCatchupCandidates or 0,
+        tel.manifestCatchupQueued or 0,
+        tel.manifestCatchupDeferred or 0,
+        tel.manifestCatchupDrained or 0,
+        tel.manifestCatchupSkippedOnlineOwners or 0,
+        tel.manifestCatchupSkippedStaleOwners or 0,
+        #(self.manifestCatchupQueue or {}),
+        tel.manifestCatchupMaxDeferred or 0
     ))
 end

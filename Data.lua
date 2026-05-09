@@ -194,6 +194,16 @@ local function cloneManifestForUpdate(manifest)
     return copy
 end
 
+local function nowMs()
+    if type(debugprofilestop) == "function" then
+        return debugprofilestop()
+    end
+    if type(GetTime) == "function" then
+        return GetTime() * 1000
+    end
+    return 0
+end
+
 local function newManifestTelemetry()
     return {
         buildsStarted = 0,
@@ -208,6 +218,9 @@ local function newManifestTelemetry()
         cacheHits = 0,
         syncFallbackBuilds = 0,
         deferredRequests = 0,
+        totalBuildCostMs = 0,
+        maxBuildCostMs = 0,
+        lastBuildCostMs = 0,
     }
 end
 
@@ -1078,7 +1091,7 @@ function Data:ApplyManifestDirtyBlock(manifest, blockKey)
     end
 end
 
-function Data:CommitManifestBuild(manifest, reason, mode, processed)
+function Data:CommitManifestBuild(manifest, reason, mode, processed, startMs)
     local cache = self:EnsureManifestCache()
     cache.manifest = manifest
     cache.dirtyAll = cache.dirtyDuringBuild == true
@@ -1094,8 +1107,16 @@ function Data:CommitManifestBuild(manifest, reason, mode, processed)
     else
         cache.telemetry.fullBuilds = (cache.telemetry.fullBuilds or 0) + 1
     end
+    if startMs then
+        local costMs = nowMs() - startMs
+        cache.telemetry.totalBuildCostMs = (cache.telemetry.totalBuildCostMs or 0) + costMs
+        cache.telemetry.lastBuildCostMs = costMs
+        if costMs > (cache.telemetry.maxBuildCostMs or 0) then
+            cache.telemetry.maxBuildCostMs = costMs
+        end
+    end
     if Addon.TrickleSync and Addon.TrickleSync.InvalidateManifestChunkCache then
-        Addon.TrickleSync:InvalidateManifestChunkCache()
+        Addon.TrickleSync:InvalidateManifestChunkCache(reason or "commit")
     end
     if Addon.Sync and Addon.Sync.OnManifestCacheReady then
         Addon.Sync:OnManifestCacheReady(reason or "manifest-cache")
@@ -1112,6 +1133,7 @@ function Data:BuildManifestCacheNow(reason)
         return cache.manifest
     end
 
+    local startMs = nowMs()
     cache.serial = (cache.serial or 0) + 1
     cache.telemetry.buildsStarted = (cache.telemetry.buildsStarted or 0) + 1
     cache.telemetry.syncFallbackBuilds = (cache.telemetry.syncFallbackBuilds or 0) + (reason == "sync-fallback" and 1 or 0)
@@ -1135,7 +1157,7 @@ function Data:BuildManifestCacheNow(reason)
         processed = manifest.totals.blocks or 0
     end
 
-    self:CommitManifestBuild(manifest, reason or cache.lastReason or "sync", mode, processed)
+    self:CommitManifestBuild(manifest, reason or cache.lastReason or "sync", mode, processed, startMs)
     return manifest
 end
 
@@ -1145,6 +1167,7 @@ function Data:PrepareManifestBuildState(state)
     state.reason = state.reason or cache.lastReason or "background"
     state.index = 1
     state.processed = 0
+    state.startMs = nowMs()
     state.mode = (cache.manifest and not cache.dirtyAll) and "delta" or "full"
     cache.serial = (cache.serial or 0) + 1
     cache.telemetry.buildsStarted = (cache.telemetry.buildsStarted or 0) + 1
@@ -1208,7 +1231,7 @@ function Data:RunManifestBuildStep(state)
     end
     if not done then return true, state end
 
-    self:CommitManifestBuild(state.manifest, state.reason, state.mode, state.processed or 0)
+    self:CommitManifestBuild(state.manifest, state.reason, state.mode, state.processed or 0, state.startMs)
     return false
 end
 
@@ -1254,6 +1277,11 @@ end
 function Data:GetManifestDebugSnapshot()
     local cache = self:EnsureManifestCache()
     local manifest = cache.manifest
+    local tel = cache.telemetry or newManifestTelemetry()
+    local avgCostMs = 0
+    if (tel.buildsCompleted or 0) > 0 then
+        avgCostMs = (tel.totalBuildCostMs or 0) / tel.buildsCompleted
+    end
     return {
         ready = manifest ~= nil and not self:IsManifestDirty(),
         hasManifest = manifest ~= nil,
@@ -1265,7 +1293,10 @@ function Data:GetManifestDebugSnapshot()
         blocks = manifest and manifest.totals and manifest.totals.blocks or 0,
         recipes = manifest and manifest.totals and manifest.totals.recipes or 0,
         lastReason = cache.lastReason or "none",
-        telemetry = cache.telemetry or newManifestTelemetry(),
+        avgBuildCostMs = avgCostMs,
+        maxBuildCostMs = tel.maxBuildCostMs or 0,
+        lastBuildCostMs = tel.lastBuildCostMs or 0,
+        telemetry = tel,
     }
 end
 
@@ -1277,8 +1308,8 @@ function Data:DumpManifestCacheStatus()
         or {}
     local syncTelemetry = Addon.Sync and Addon.Sync.telemetry or {}
     local manifestQueueDepth = Addon.Sync and Addon.Sync.manifestChunkQueue and #Addon.Sync.manifestChunkQueue or 0
-    Addon:Print(string.format(
-        "Manifest cache ready=%s dirtyAll=%s dirtyBlocks=%d building=%s scheduled=%s serial=%d blocks=%d recipes=%d builds=%d full=%d delta=%d steps=%d processed=%d hits=%d deferred=%d chunkBuilds=%d chunkHits=%d maniQueued=%d maniSent=%d maniQueue=%d last=%s",
+    Addon:SystemPrint(string.format(
+        "Manifest cache ready=%s dirtyAll=%s dirtyBlocks=%d building=%s scheduled=%s serial=%d blocks=%d recipes=%d builds=%d full=%d delta=%d steps=%d processed=%d hits=%d deferred=%d chunkBuilds=%d chunkHits=%d chunkInvalidations=%d maniQueued=%d maniSent=%d maniQueue=%d avgCostMs=%.2f maxCostMs=%.2f lastCostMs=%.2f last=%s",
         tostring(snapshot.ready),
         tostring(snapshot.dirtyAll),
         snapshot.dirtyBlocks or 0,
@@ -1296,9 +1327,13 @@ function Data:DumpManifestCacheStatus()
         telemetry.deferredRequests or 0,
         chunkTelemetry.chunkBuilds or 0,
         chunkTelemetry.chunkCacheHits or 0,
+        chunkTelemetry.chunkInvalidations or 0,
         syncTelemetry.manifestChunksQueued or 0,
         syncTelemetry.manifestChunksSent or 0,
         manifestQueueDepth,
+        snapshot.avgBuildCostMs or 0,
+        snapshot.maxBuildCostMs or 0,
+        snapshot.lastBuildCostMs or 0,
         tostring(snapshot.lastReason or "none")
     ))
 end
@@ -1673,7 +1708,7 @@ function Data:ScheduleSafeAutoClean(opts)
                 state.syncRemoved = syncStats and syncStats.removed or 0
                 commitCorruptClean(self, state.stats, state.dirtyAll, state.dirtyBlocks, "auto-clean")
                 if hasCorruptCleanChanges(state.stats) or (state.syncRemoved or 0) > 0 then
-                    Addon:Print(string.format(
+                    Addon:SystemPrint(string.format(
                         "Auto-clean repaired saved data: members=%d professions=%d recipes=%d repaired=%d sync=%d.",
                         state.stats.removedMembers or 0,
                         state.stats.removedProfessions or 0,
@@ -1960,7 +1995,7 @@ end
 
 function Data:DumpScanStatus()
     local scan = self:GetScanTelemetry()
-    Addon:Print(string.format(
+    Addon:SystemPrint(string.format(
         "Scan signals=%d started=%d changed=%d unchanged=%d skipped=%d failed=%d partial=%d invalid=%d pending=%s last=%s/%s",
         scan.signals or 0,
         scan.scansStarted or 0,
@@ -1975,7 +2010,7 @@ function Data:DumpScanStatus()
         tostring(scan.lastSkipReason or "none")
     ))
     if (scan.invalidRecipesBlocked or 0) > 0 then
-        Addon:Print(string.format(
+        Addon:SystemPrint(string.format(
             "Recipe validation snapshot=%d inbound=%d cleaned=%d last=%s/%s/%s/%s",
             scan.invalidRecipesSnapshot or 0,
             scan.invalidRecipesInbound or 0,
@@ -2117,7 +2152,7 @@ function Data:ScanTradeSkill()
     restoreTradeSkillFilters(filterState)
 
     if not ok then
-        Addon:Print("Trade skill scan failed: " .. tostring(err))
+        Addon:SystemPrint("Trade skill scan failed: " .. tostring(err))
         self:RecordScanTelemetry("scansFailed")
         return self:MakeScanResult(canonical, {
             valid = false,
@@ -2174,7 +2209,7 @@ function Data:ScanCraft()
     restoreCraftFilters(filterState)
 
     if not ok then
-        Addon:Print("Craft scan failed: " .. tostring(err))
+        Addon:SystemPrint("Craft scan failed: " .. tostring(err))
         self:RecordScanTelemetry("scansFailed")
         return self:MakeScanResult(canonical, {
             valid = false,
@@ -2192,7 +2227,7 @@ function Data:WarnSuspiciousScan(profession, previousCount, count)
     local last = self._lastPartialScanWarning[profession] or 0
     if now - last >= 60 then
         self._lastPartialScanWarning[profession] = now
-        Addon:Print(string.format(
+        Addon:SystemPrint(string.format(
             "Skipped %s scan: found %d recipe(s), keeping existing owner data with %d. Reopen the profession to retry.",
             tostring(profession),
             count or 0,
@@ -2268,7 +2303,7 @@ function Data:ApplyScanResult(profession, recipeKeys)
         )
         if recipeChanged then
             Addon:Debug("Scan changed", profession, count, "recipe ids")
-            Addon:Print(string.format("Scanned %s: %d recipe(s) found.", profession, count))
+            Addon:SystemPrint(string.format("Scanned %s: %d recipe(s) found.", profession, count))
         else
             Addon:Debug(
                 "Scan specialization changed",
@@ -2277,7 +2312,7 @@ function Data:ApplyScanResult(profession, recipeKeys)
                 "->",
                 tostring(prof.specialization or "none")
             )
-            Addon:Print(string.format(
+            Addon:SystemPrint(string.format(
                 "Scanned %s: specialization updated to %s.",
                 profession,
                 tostring(prof.specialization or "none")
@@ -2285,7 +2320,7 @@ function Data:ApplyScanResult(profession, recipeKeys)
         end
     else
         self:RecordScanTelemetry("scansUnchanged")
-        Addon:Print(string.format("Scanned %s: unchanged (%d recipe(s)).", profession, count))
+        Addon:SystemPrint(string.format("Scanned %s: unchanged (%d recipe(s)).", profession, count))
     end
 
     self:InvalidateRecipeCaches()
@@ -2491,7 +2526,7 @@ function Data:FinalizeIncomingSnapshot(memberKey, rev, opts)
                 count = 0
                 for _ in pairs(incomingRecipes) do count = count + 1 end
                 protectedPartial = true
-                Addon:Print(string.format(
+                Addon:SystemPrint(string.format(
                     "Protected %s %s from a partial remote overwrite (%d -> %d kept, source=%s).",
                     memberKey,
                     profName,
@@ -3019,7 +3054,7 @@ function Data:DumpSummary()
         end
     end
     local s = self:GetLocalSummary()
-    Addon:Print(string.format("Members=%d Professions=%d Recipes=%d | Local rev=%d updated=%d", totalMembers, totalProfs, totalRecipes, s.rev, s.updatedAt))
+    Addon:SystemPrint(string.format("Members=%d Professions=%d Recipes=%d | Local rev=%d updated=%d", totalMembers, totalProfs, totalRecipes, s.rev, s.updatedAt))
     self:DumpScanStatus()
 end
 
@@ -3035,7 +3070,7 @@ function Data:DumpLocalSyncStatus(professionFilter)
     end
     sort(professionKeys)
 
-    Addon:Print(string.format(
+    Addon:SystemPrint(string.format(
         "Local sync owner=%s rev=%d updated=%d professions=%d recipes=%d",
         tostring(memberKey),
         entry.rev or 0,
@@ -3045,7 +3080,7 @@ function Data:DumpLocalSyncStatus(professionFilter)
     ))
 
     if #professionKeys == 0 then
-        Addon:Print("Local sync professions: none")
+        Addon:SystemPrint("Local sync professions: none")
         return
     end
 
@@ -3062,7 +3097,7 @@ function Data:DumpLocalSyncStatus(professionFilter)
             end
         end
         if not resolved then
-            Addon:Print("Local sync profession not found: " .. tostring(requestedProfession) .. ".")
+            Addon:SystemPrint("Local sync profession not found: " .. tostring(requestedProfession) .. ".")
             return
         end
         professionKeys = { resolved }
@@ -3070,7 +3105,7 @@ function Data:DumpLocalSyncStatus(professionFilter)
 
     for _, profName in ipairs(professionKeys) do
         local prof = entry.professions[profName]
-        Addon:Print(string.format(
+        Addon:SystemPrint(string.format(
             "  %s count=%d skill=%d/%d spec=%s blockRev=%d source=%s updated=%d",
             tostring(profName),
             prof and (prof.count or countRecipeKeys(prof.recipes)) or 0,
@@ -3130,7 +3165,7 @@ function Data:DumpManifestSummary(opts)
     end
     sort(replicaOwnerKeys)
 
-    Addon:Print(string.format(
+    Addon:SystemPrint(string.format(
         "Manifest local=%s blocks=%d recipes=%d ownerBlocks=%d replicaBlocks=%d replicaOwners=%d staleMembers=%d",
         tostring(localKey),
         totalBlocks,
@@ -3142,20 +3177,20 @@ function Data:DumpManifestSummary(opts)
     ))
 
     if #replicaOwnerKeys == 0 then
-        Addon:Print("Manifest replica owners: none")
+        Addon:SystemPrint("Manifest replica owners: none")
     elseif not verbose then
-        Addon:Print(string.format(
+        Addon:SystemPrint(string.format(
             "Manifest replica owners: %d (use /rr manifest verbose for details)",
             #replicaOwnerKeys
         ))
     else
-        Addon:Print("Manifest replica owners:")
+        Addon:SystemPrint("Manifest replica owners:")
         local maxLines = math.min(#replicaOwnerKeys, 12)
         for index = 1, maxLines do
             local ownerCharacter = replicaOwnerKeys[index]
             local info = replicaOwners[ownerCharacter]
             sort(info.professions)
-            Addon:Print(string.format(
+            Addon:SystemPrint(string.format(
                 "  %s blocks=%d recipes=%d publish=replica authority=%s professions=%s",
                 tostring(ownerCharacter),
                 info.blocks or 0,
@@ -3165,18 +3200,18 @@ function Data:DumpManifestSummary(opts)
             ))
         end
         if #replicaOwnerKeys > maxLines then
-            Addon:Print(string.format("  ... and %d more", #replicaOwnerKeys - maxLines))
+            Addon:SystemPrint(string.format("  ... and %d more", #replicaOwnerKeys - maxLines))
         end
     end
     if #staleOwnerKeys > 0 then
         sort(staleOwnerKeys)
         if not verbose then
-            Addon:Print(string.format(
+            Addon:SystemPrint(string.format(
                 "Manifest stale excluded: %d (use /rr manifest verbose for details)",
                 #staleOwnerKeys
             ))
         else
-            Addon:Print("Manifest stale excluded:")
+            Addon:SystemPrint("Manifest stale excluded:")
             local maxStaleLines = math.min(#staleOwnerKeys, 8)
             for index = 1, maxStaleLines do
                 local memberKey = staleOwnerKeys[index]
@@ -3185,13 +3220,27 @@ function Data:DumpManifestSummary(opts)
                 for _ in pairs(entry and entry.professions or {}) do
                     profCount = profCount + 1
                 end
-                Addon:Print(string.format("  %s professions=%d", tostring(memberKey), profCount))
+                Addon:SystemPrint(string.format("  %s professions=%d", tostring(memberKey), profCount))
             end
             if #staleOwnerKeys > maxStaleLines then
-                Addon:Print(string.format("  ... and %d more", #staleOwnerKeys - maxStaleLines))
+                Addon:SystemPrint(string.format("  ... and %d more", #staleOwnerKeys - maxStaleLines))
             end
         end
     end
+
+    local snapshot = self:GetManifestDebugSnapshot()
+    local syncTel = Addon.Sync and Addon.Sync.telemetry or {}
+    Addon:SystemPrint(string.format(
+        "Manifest builds=%d (full=%d delta=%d) avgCostMs=%.2f maxCostMs=%.2f requests=%d cooldownSkips=%d forceReplies=%d",
+        snapshot.telemetry.buildsCompleted or 0,
+        snapshot.telemetry.fullBuilds or 0,
+        snapshot.telemetry.deltaBuilds or 0,
+        snapshot.avgBuildCostMs or 0,
+        snapshot.maxBuildCostMs or 0,
+        syncTel.manifestBuildRequests or 0,
+        syncTel.manifestCooldownSkips or 0,
+        syncTel.manifestForceReplies or 0
+    ))
 end
 
 function Data:HasAtlasLootResolver()
@@ -3275,7 +3324,7 @@ end
 
 function Data:DumpAtlasLootStatus()
     local recipe, profession = getAtlasLootHandles()
-    Addon:Print(string.format("AtlasLoot resolver: %s | Recipe=%s | Profession=%s", self:HasAtlasLootResolver() and "ready" or "missing", recipe and "yes" or "no", profession and "yes" or "no"))
+    Addon:SystemPrint(string.format("AtlasLoot resolver: %s | Recipe=%s | Profession=%s", self:HasAtlasLootResolver() and "ready" or "missing", recipe and "yes" or "no", profession and "yes" or "no"))
 end
 
 local function formatOutputDesc(createdItemID, createdItemName, professionID)
@@ -3295,11 +3344,11 @@ function Data:DebugRecipeItem(recipeItemID)
     end
     local info = self:GetAtlasLootRecipeInfo(recipeItemID)
     if not info then
-        Addon:Print("No AtlasLoot recipe data for item " .. tostring(recipeItemID))
+        Addon:SystemPrint("No AtlasLoot recipe data for item " .. tostring(recipeItemID))
         return
     end
     local reagents = info.spellData and formatReagents(info.spellData[6], info.spellData[7]) or "none"
-    Addon:Print(string.format("Recipe %d -> prof=%s rank=%d spell=%s(%d) output=%s reagents=[%s]",
+    Addon:SystemPrint(string.format("Recipe %d -> prof=%s rank=%d spell=%s(%d) output=%s reagents=[%s]",
         recipeItemID,
         tostring(info.professionID),
         tonumber(info.minRank or 0),
@@ -3317,10 +3366,10 @@ function Data:DebugSpell(spellID)
     end
     local info = self:GetAtlasLootSpellInfo(spellID)
     if not info then
-        Addon:Print("No AtlasLoot profession data for spell " .. tostring(spellID))
+        Addon:SystemPrint("No AtlasLoot profession data for spell " .. tostring(spellID))
         return
     end
-    Addon:Print(string.format("Spell %s(%d) -> prof=%s min=%d low=%d high=%d output=%s recipe=%s(%s) num=%d reagents=[%s]",
+    Addon:SystemPrint(string.format("Spell %s(%d) -> prof=%s min=%d low=%d high=%d output=%s recipe=%s(%s) num=%d reagents=[%s]",
         tostring(info.spellName or "?"),
         tonumber(info.spellID or 0),
         tostring(info.professionID),
@@ -3342,10 +3391,10 @@ function Data:DebugCreatedItem(createdItemID)
     end
     local info = self:GetAtlasLootCreatedItemInfo(createdItemID)
     if not info then
-        Addon:Print("No AtlasLoot craft mapping for created item " .. tostring(createdItemID) .. ". In TBC many enchanting formulas are direct enchants and do not create an item; use /rr r <recipeItemID> or /rr s <spellID> for those.")
+        Addon:SystemPrint("No AtlasLoot craft mapping for created item " .. tostring(createdItemID) .. ". In TBC many enchanting formulas are direct enchants and do not create an item; use /rr r <recipeItemID> or /rr s <spellID> for those.")
         return
     end
-    Addon:Print(string.format("Created item %s(%d) -> spell=%s(%d) recipe=%s(%s)",
+    Addon:SystemPrint(string.format("Created item %s(%d) -> spell=%s(%d) recipe=%s(%s)",
         tostring(info.createdItemName or "?"),
         tonumber(createdItemID or 0),
         tostring(info.spellName or "?"),
@@ -3366,19 +3415,14 @@ function Data:WipeDatabase()
     self:MarkManifestDirty(nil, "wipe")
 
     if Addon.Sync then
-        Addon.Sync.registry = {}
-        Addon.Sync.pendingRequests = {}
-        Addon.Sync.partialReceive = {}
-        Addon.Sync.outgoingSessions = {}
-        Addon.Sync.outboundChunkQueue = {}
-        Addon.Sync.manifestChunkQueue = {}
-        Addon.Sync.pendingManifestPeers = {}
-        Addon.Sync.inFlight = nil
-        Addon.Sync.lastAdvertisedRev = nil
+        Addon.Sync:ResetRuntimeStateForDatabaseWipe()
     end
 
     self:InvalidateRecipeCaches()
     self:DetectProfessions()
-    Addon:Print("Database wiped. AtlasLoot lookups stay available; sync cache is clean.")
+    if Addon.Sync then
+        Addon.Sync:KickoffDatabaseResync()
+    end
+    Addon:Print("Database wiped. AtlasLoot lookups stay available; sync cache is clean and a fresh guild resync was requested.")
     Addon:RequestRefresh("wipe")
 end

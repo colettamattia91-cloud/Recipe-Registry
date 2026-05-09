@@ -296,7 +296,7 @@ function Performance:DumpDebugStatus()
         queueParts[#queueParts + 1] = string.format("%s=%d", tostring(category), tonumber(size) or 0)
     end
     table.sort(queueParts)
-    Addon:Print(string.format(
+    Addon:SystemPrint(string.format(
         "Perf steps=%d avg=%.2fms max=%.2fms overBudget=%d uiFlush=%d uiMarks=%d queues=%s",
         telemetry.jobSteps or 0,
         telemetry.averageStepCostMs or 0,

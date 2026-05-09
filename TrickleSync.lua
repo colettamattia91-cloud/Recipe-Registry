@@ -27,6 +27,7 @@ function TrickleSync:OnInitialize()
         chunkBuilds = 0,
         chunkCacheHits = 0,
         chunkInvalidations = 0,
+        lastInvalidationReason = "none",
     }
 end
 
@@ -37,10 +38,11 @@ function TrickleSync:BuildLocalManifest(opts)
     return Addon.Data:BuildSyncManifest(false), "built"
 end
 
-function TrickleSync:InvalidateManifestChunkCache()
+function TrickleSync:InvalidateManifestChunkCache(reason)
     self._manifestChunkCache = nil
     self.telemetry = self.telemetry or {}
     self.telemetry.chunkInvalidations = (self.telemetry.chunkInvalidations or 0) + 1
+    self.telemetry.lastInvalidationReason = reason or "unknown"
 end
 
 function TrickleSync:GetManifestChunkTelemetry()
@@ -53,6 +55,7 @@ function TrickleSync:ResetManifestChunkTelemetry()
         chunkBuilds = 0,
         chunkCacheHits = 0,
         chunkInvalidations = 0,
+        lastInvalidationReason = "none",
     }
 end
 
@@ -146,8 +149,10 @@ function TrickleSync:StorePeerManifest(peerKey, peerManifest)
     return self.peerState[peerKey].manifest
 end
 
-function TrickleSync:ComparePeerManifest(peerManifest)
-    local localManifest = self:BuildLocalManifest({ allowStale = true, syncFallback = true, reason = "compare" })
+function TrickleSync:ComparePeerManifest(peerManifest, opts)
+    opts = opts or {}
+    local includeRemoteDiffs = opts.includeRemoteDiffs ~= false
+    local localManifest = self:BuildLocalManifest({ allowStale = true, syncFallback = true, reason = opts.reason or "compare" })
     local comparison = {
         localManifest = localManifest,
         peerManifest = peerManifest or { blocks = {} },
@@ -175,27 +180,33 @@ function TrickleSync:ComparePeerManifest(peerManifest)
                 local localFingerprint = localBlock.fingerprint or ""
                 local peerSource = peerBlock.sourceType or "replica"
                 local localSource = localBlock.sourceType or "replica"
-                local peerCount = peerBlock.count or 0
                 local localCount = localBlock.count or 0
+                local peerCount = peerBlock.count or 0
 
                 if peerSource ~= "owner" and localCount > peerCount then
-                    comparison.outdatedThere[#comparison.outdatedThere + 1] = blockKey
-                elseif peerSource == "owner" and localSource ~= "owner" and peerFingerprint ~= localFingerprint then
+                    if includeRemoteDiffs then
+                        comparison.outdatedThere[#comparison.outdatedThere + 1] = blockKey
+                    end
+                elseif peerSource == "owner"
+                    and localSource ~= "owner"
+                    and peerFingerprint ~= localFingerprint then
                     comparison.outdatedHere[#comparison.outdatedHere + 1] = blockKey
                 elseif peerRevision > localRevision then
                     comparison.outdatedHere[#comparison.outdatedHere + 1] = blockKey
-                elseif peerRevision < localRevision then
-                    comparison.outdatedThere[#comparison.outdatedThere + 1] = blockKey
                 elseif peerFingerprint ~= localFingerprint then
                     comparison.outdatedHere[#comparison.outdatedHere + 1] = blockKey
+                elseif includeRemoteDiffs and peerRevision < localRevision then
+                        comparison.outdatedThere[#comparison.outdatedThere + 1] = blockKey
                 end
             end
         end
     end
 
-    for blockKey in pairs(localManifest.blocks or {}) do
-        if not peerBlocks[blockKey] then
-            comparison.missingThere[#comparison.missingThere + 1] = blockKey
+    if includeRemoteDiffs then
+        for blockKey in pairs(localManifest.blocks or {}) do
+            if not peerBlocks[blockKey] then
+                comparison.missingThere[#comparison.missingThere + 1] = blockKey
+            end
         end
     end
 
@@ -203,7 +214,10 @@ function TrickleSync:ComparePeerManifest(peerManifest)
 end
 
 function TrickleSync:ComputeMissingBlocks(peerManifest)
-    local comparison = self:ComparePeerManifest(peerManifest)
+    local comparison = self:ComparePeerManifest(peerManifest, {
+        includeRemoteDiffs = false,
+        reason = "compare-local-missing",
+    })
     local blocks = {}
 
     for _, blockKey in ipairs(comparison.missingHere) do
@@ -226,9 +240,11 @@ function TrickleSync:GroupBlockRequestsByOwner(peerManifest, blockKeys)
             local row = grouped[ownerCharacter] or {
                 revision = 0,
                 blockKeys = {},
+                fingerprints = {},
                 sourceType = block.sourceType or "replica",
             }
             row.blockKeys[#row.blockKeys + 1] = blockKey
+            row.fingerprints[blockKey] = block and block.fingerprint or nil
             if (block.revision or 0) > (row.revision or 0) then
                 row.revision = block.revision or 0
             end

@@ -3,6 +3,7 @@ local Tooltip = Addon:NewModule("Tooltip", "AceEvent-3.0", "AceTimer-3.0")
 Addon.Tooltip = Tooltip
 
 local MAX_TOOLTIP_CRAFTERS = 5
+local TOOLTIP_INDEX_RECIPES_PER_STEP = 64
 
 local ipairs = ipairs
 local pairs = pairs
@@ -68,6 +69,8 @@ function Tooltip:OnEnable()
     self.indexDirty = true
     self.index = {}
     self.indexVersion = 0
+    self._indexBuildGeneration = 0
+    self._indexBuildJobActive = false
     self:RegisterEvent("GET_ITEM_INFO_RECEIVED", "InvalidateIndex")
     self:RegisterEvent("GUILD_ROSTER_UPDATE", "InvalidateIndex")
     self:HookTooltip(GameTooltip)
@@ -99,23 +102,61 @@ function Tooltip:HookTooltip(tooltip)
 end
 
 function Tooltip:InvalidateIndex()
+    self._indexBuildGeneration = (self._indexBuildGeneration or 0) + 1
     self.indexDirty = true
     if self._timer then
         self:CancelTimer(self._timer, true)
         self._timer = nil
     end
+    self:EnsureIndexBuildScheduled()
+end
+
+function Tooltip:BuildIndexState(state)
+    state = state or {}
+    if state.initialized then
+        return state
+    end
+    if not (Addon.Data and Addon.Data.GetRecipeIndex) then
+        state.initialized = true
+        state.recipeIndex = {}
+        state.recipeKeys = {}
+        state.index = {}
+        state.indexVersion = (self.indexVersion or 0) + 1
+        state.cursor = 1
+        return state
+    end
+
+    local recipeIndex = Addon.Data:GetRecipeIndex() or {}
+    local recipeKeys = {}
+    for recipeKey in pairs(recipeIndex) do
+        recipeKeys[#recipeKeys + 1] = recipeKey
+    end
+    sort(recipeKeys, function(a, b)
+        return tostring(a) < tostring(b)
+    end)
+
+    state.initialized = true
+    state.recipeIndex = recipeIndex
+    state.recipeKeys = recipeKeys
+    state.index = {}
+    state.indexVersion = (self.indexVersion or 0) + 1
+    state.cursor = 1
+    return state
+end
+
+function Tooltip:CommitBuiltIndex(index, version)
+    self.index = index or {}
+    self.indexVersion = version or ((self.indexVersion or 0) + 1)
+    self.indexDirty = false
 end
 
 function Tooltip:RebuildIndex()
-    self.indexDirty = false
-    self.indexVersion = (self.indexVersion or 0) + 1
-    self.index = {}
-    if not (Addon.Data and Addon.Data.GetRecipeIndex) then
-        return
-    end
+    local state = self:BuildIndexState({})
+    local recipeIndex = state.recipeIndex or {}
+    local index = state.index or {}
 
-    local recipeIndex = Addon.Data:GetRecipeIndex()
-    for recipeKey, indexed in pairs(recipeIndex or {}) do
+    for _, recipeKey in ipairs(state.recipeKeys or {}) do
+        local indexed = recipeIndex[recipeKey]
         local numericKey = tonumber(recipeKey)
         local crafters = indexed and indexed.crafterRows
         local key
@@ -126,24 +167,102 @@ function Tooltip:RebuildIndex()
         end
         if key and crafters then
             for _, crafter in ipairs(crafters) do
-                addRow(self.index, key, recipeKey, crafter)
+                addRow(index, key, recipeKey, crafter)
             end
         end
     end
 
-    for _, bucket in pairs(self.index) do
+    for _, bucket in pairs(index) do
         sortRows(bucket.rows)
         bucket.seen = nil
     end
+    self:CommitBuiltIndex(index, state.indexVersion)
+end
+
+function Tooltip:RunIndexBuildStep(state)
+    state = self:BuildIndexState(state)
+    local currentGeneration = self._indexBuildGeneration or 0
+    if (state.generation or 0) ~= currentGeneration then
+        return false, state
+    end
+
+    local processed = 0
+    local recipeKeys = state.recipeKeys or {}
+    local recipeIndex = state.recipeIndex or {}
+    local index = state.index or {}
+
+    while state.cursor <= #recipeKeys and processed < TOOLTIP_INDEX_RECIPES_PER_STEP do
+        local recipeKey = recipeKeys[state.cursor]
+        local indexed = recipeIndex[recipeKey]
+        local numericKey = tonumber(recipeKey)
+        local crafters = indexed and indexed.crafterRows
+        local key
+        if numericKey and numericKey > 0 then
+            key = makeItemKey(numericKey)
+        elseif numericKey and numericKey < 0 then
+            key = makeSpellKey(-numericKey)
+        end
+        if key and crafters then
+            for _, crafter in ipairs(crafters) do
+                addRow(index, key, recipeKey, crafter)
+            end
+        end
+        state.cursor = state.cursor + 1
+        processed = processed + 1
+    end
+
+    if state.cursor <= #recipeKeys then
+        return true, state
+    end
+
+    for _, bucket in pairs(index) do
+        sortRows(bucket.rows)
+        bucket.seen = nil
+    end
+    if (state.generation or 0) == (self._indexBuildGeneration or 0) then
+        self:CommitBuiltIndex(index, state.indexVersion)
+    end
+    return false, state
+end
+
+function Tooltip:EnsureIndexBuildScheduled()
+    if not self.indexDirty or self._indexBuildJobActive then return end
+    if not (Addon.Performance and Addon.Performance.ScheduleJob) then return end
+
+    self._indexBuildJobActive = true
+    local generation = self._indexBuildGeneration or 0
+    Addon.Performance:ScheduleJob("tooltip-index-build", function(state)
+        state = state or {}
+        state.generation = state.generation or generation
+        local keepGoing, newState = self:RunIndexBuildStep(state)
+        if not keepGoing then
+            self._indexBuildJobActive = false
+            if self.indexDirty and (state.generation or 0) ~= (self._indexBuildGeneration or 0) then
+                self:EnsureIndexBuildScheduled()
+            end
+        end
+        return keepGoing, newState
+    end, {
+        category = "ui",
+        label = "tooltip-index-build",
+        budgetMs = 2,
+        state = {
+            generation = generation,
+        },
+    })
 end
 
 function Tooltip:GetRowsForKey(key)
     if not key then return nil end
     if self.indexDirty then
-        if InCombatLockdown and InCombatLockdown() then
-            return nil
+        self:EnsureIndexBuildScheduled()
+        if not self._indexBuildJobActive then
+            if InCombatLockdown and InCombatLockdown() then
+                local staleBucket = self.index and self.index[key]
+                return staleBucket and staleBucket.rows or nil
+            end
+            self:RebuildIndex()
         end
-        self:RebuildIndex()
     end
     local bucket = self.index and self.index[key]
     return bucket and bucket.rows or nil
