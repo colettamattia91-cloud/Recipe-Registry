@@ -3,6 +3,17 @@
 All notable changes to this project are documented in this file.
 
 ## [Unreleased]
+### Changed
+- Snapshot serving memory work is still under investigation and intentionally not part of `1.8.1`; any lighter `SNAP` session materialization changes remain deferred until they can be exercised against real peers.
+
+## [1.8.1] - 2026-05-10
+### Added
+- Local backend coverage now includes a bounded catalog cache regression spec for the recipe list and recipe detail caches.
+
+### Changed
+- Recipe catalog list and detail caches are now bounded, which reduces steady-state addon memory growth when many distinct searches and recipe detail lookups are opened over time.
+- Recipe index rows are now sorted once during index build and reused directly, avoiding an extra crafter cache copy for every recipe lookup.
+- Tooltip crafter indexing now stores recipe keys instead of duplicating full crafter rows per item/spell bucket, lowering the UI memory footprint while keeping the same visible tooltip results.
 
 ## [1.8.0] - 2026-05-10
 ### Added

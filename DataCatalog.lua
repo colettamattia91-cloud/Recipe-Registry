@@ -18,6 +18,9 @@ local safeGetItemName = Private.safeGetItemName
 local safeGetSpellName = Private.safeGetSpellName
 local shouldRefreshItemName = Private.shouldRefreshItemName
 
+local MAX_RECIPE_LIST_CACHE_ENTRIES = 12
+local MAX_RECIPE_DETAIL_CACHE_ENTRIES = 128
+
 local function refreshDetailAssets(info)
     if not info then return end
 
@@ -95,6 +98,26 @@ local function refreshDetailAssets(info)
     end
 end
 
+local function rememberBoundedCache(cache, order, key, value, maxEntries)
+    if cache[key] == nil then
+        order[#order + 1] = key
+        if #order > maxEntries then
+            local evictedKey = table.remove(order, 1)
+            cache[evictedKey] = nil
+        end
+    end
+    cache[key] = value
+end
+
+local function sortCrafterRows(rows)
+    sort(rows, function(a, b)
+        if a.online ~= b.online then return a.online end
+        if a.skillRank ~= b.skillRank then return a.skillRank > b.skillRank end
+        if a.memberKey ~= b.memberKey then return a.memberKey < b.memberKey end
+        return tostring(a.profession) < tostring(b.profession)
+    end)
+end
+
 function Data:GetProfessionSummary()
     local result = {}
     for memberKey, entry in pairs(self:GetMembersDB()) do
@@ -165,10 +188,10 @@ function Data:BuildRecipeIndex()
                             row = {
                                 recipeKey = recipeKey,
                                 profNames = {},
-                                crafters = {},
                                 crafterRows = {},
                                 crafterCount = 0,
                                 onlineCount = 0,
+                                _seenMembers = {},
                             }
                             index[recipeKey] = row
                         end
@@ -184,8 +207,8 @@ function Data:BuildRecipeIndex()
                             updatedAt = entry.updatedAt or 0,
                         }
 
-                        if not row.crafters[memberKey] then
-                            row.crafters[memberKey] = true
+                        if not row._seenMembers[memberKey] then
+                            row._seenMembers[memberKey] = true
                             row.crafterCount = row.crafterCount + 1
                             if isOnline then
                                 row.onlineCount = row.onlineCount + 1
@@ -195,6 +218,11 @@ function Data:BuildRecipeIndex()
                 end
             end
         end
+    end
+
+    for _, row in pairs(index) do
+        sortCrafterRows(row.crafterRows)
+        row._seenMembers = nil
     end
 
     self._recipeIndex = index
@@ -228,6 +256,7 @@ end
 function Data:GetRecipeDisplayInfo(recipeKey)
     if recipeKey == nil then return nil end
     self._recipeDetailCache = self._recipeDetailCache or {}
+    self._recipeDetailCacheOrder = self._recipeDetailCacheOrder or {}
     local cached = self._recipeDetailCache[recipeKey]
     if cached then
         refreshDetailAssets(cached)
@@ -350,7 +379,13 @@ function Data:GetRecipeDisplayInfo(recipeKey)
     end
     info.searchText = lowerSafe(table.concat(parts, " "))
     refreshDetailAssets(info)
-    self._recipeDetailCache[recipeKey] = info
+    rememberBoundedCache(
+        self._recipeDetailCache,
+        self._recipeDetailCacheOrder,
+        recipeKey,
+        info,
+        MAX_RECIPE_DETAIL_CACHE_ENTRIES
+    )
     return info
 end
 
@@ -358,6 +393,7 @@ function Data:GetRecipeList(profName, query, sortMode)
     sortMode = sortMode or "alpha"
     local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode)
     self._recipeListCache = self._recipeListCache or {}
+    self._recipeListCacheOrder = self._recipeListCacheOrder or {}
     if self._recipeListCache[cacheKey] then
         return self._recipeListCache[cacheKey]
     end
@@ -411,31 +447,19 @@ function Data:GetRecipeList(profName, query, sortMode)
         return tostring(a.recipeKey) < tostring(b.recipeKey)
     end)
 
-    self._recipeListCache[cacheKey] = out
+    rememberBoundedCache(
+        self._recipeListCache,
+        self._recipeListCacheOrder,
+        cacheKey,
+        out,
+        MAX_RECIPE_LIST_CACHE_ENTRIES
+    )
     return out
 end
 
 function Data:GetRecipeCrafters(recipeKey)
-    self._recipeCraftersCache = self._recipeCraftersCache or {}
-    local cached = self._recipeCraftersCache[recipeKey]
-    if cached then
-        return cached
-    end
-
-    local rows = {}
     local indexed = self:GetRecipeIndex()[recipeKey]
-    if indexed and indexed.crafterRows then
-        for i = 1, #indexed.crafterRows do
-            rows[#rows + 1] = indexed.crafterRows[i]
-        end
-    end
-    sort(rows, function(a, b)
-        if a.online ~= b.online then return a.online end
-        if a.skillRank ~= b.skillRank then return a.skillRank > b.skillRank end
-        return a.memberKey < b.memberKey
-    end)
-    self._recipeCraftersCache[recipeKey] = rows
-    return rows
+    return indexed and indexed.crafterRows or {}
 end
 
 function Data:GetRecipeDetail(recipeKey)

@@ -916,11 +916,12 @@ end
 function Data:InvalidateRecipeCaches(scope)
     if scope == "list" then
         self._recipeListCache = nil
+        self._recipeListCacheOrder = nil
         return
     end
     if scope == "presence" then
         self._recipeListCache = nil
-        self._recipeCraftersCache = nil
+        self._recipeListCacheOrder = nil
         self._recipeIndex = nil
         if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
             Addon.Tooltip:InvalidateIndex()
@@ -929,8 +930,9 @@ function Data:InvalidateRecipeCaches(scope)
     end
 
     self._recipeListCache = nil
+    self._recipeListCacheOrder = nil
     self._recipeDetailCache = nil
-    self._recipeCraftersCache = nil
+    self._recipeDetailCacheOrder = nil
     self._recipeIndex = nil
     if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
         Addon.Tooltip:InvalidateIndex()

@@ -29,30 +29,18 @@ local function makeSpellKey(spellID)
     return "spell:" .. tostring(spellID)
 end
 
-local function addRow(index, key, recipeKey, crafter)
-    if not key or not crafter then return end
+local function addRecipeKey(index, key, recipeKey)
+    if not key or recipeKey == nil then return end
     local bucket = index[key]
     if not bucket then
-        bucket = { rows = {}, seen = {} }
+        bucket = { recipeKeys = {}, seen = {} }
         index[key] = bucket
     end
 
-    local seenKey = table.concat({
-        tostring(recipeKey or ""),
-        tostring(crafter.memberKey or ""),
-        tostring(crafter.profession or ""),
-    }, "\031")
+    local seenKey = tostring(recipeKey)
     if bucket.seen[seenKey] then return end
     bucket.seen[seenKey] = true
-    bucket.rows[#bucket.rows + 1] = {
-        recipeKey = recipeKey,
-        memberKey = crafter.memberKey,
-        profession = crafter.profession,
-        online = crafter.online and true or false,
-        skillRank = crafter.skillRank or 0,
-        specialization = crafter.specialization or nil,
-        updatedAt = crafter.updatedAt or 0,
-    }
+    bucket.recipeKeys[#bucket.recipeKeys + 1] = recipeKey
 end
 
 local function sortRows(rows)
@@ -158,22 +146,18 @@ function Tooltip:RebuildIndex()
     for _, recipeKey in ipairs(state.recipeKeys or {}) do
         local indexed = recipeIndex[recipeKey]
         local numericKey = tonumber(recipeKey)
-        local crafters = indexed and indexed.crafterRows
         local key
         if numericKey and numericKey > 0 then
             key = makeItemKey(numericKey)
         elseif numericKey and numericKey < 0 then
             key = makeSpellKey(-numericKey)
         end
-        if key and crafters then
-            for _, crafter in ipairs(crafters) do
-                addRow(index, key, recipeKey, crafter)
-            end
+        if key and indexed and indexed.crafterRows and #indexed.crafterRows > 0 then
+            addRecipeKey(index, key, recipeKey)
         end
     end
 
     for _, bucket in pairs(index) do
-        sortRows(bucket.rows)
         bucket.seen = nil
     end
     self:CommitBuiltIndex(index, state.indexVersion)
@@ -195,17 +179,14 @@ function Tooltip:RunIndexBuildStep(state)
         local recipeKey = recipeKeys[state.cursor]
         local indexed = recipeIndex[recipeKey]
         local numericKey = tonumber(recipeKey)
-        local crafters = indexed and indexed.crafterRows
         local key
         if numericKey and numericKey > 0 then
             key = makeItemKey(numericKey)
         elseif numericKey and numericKey < 0 then
             key = makeSpellKey(-numericKey)
         end
-        if key and crafters then
-            for _, crafter in ipairs(crafters) do
-                addRow(index, key, recipeKey, crafter)
-            end
+        if key and indexed and indexed.crafterRows and #indexed.crafterRows > 0 then
+            addRecipeKey(index, key, recipeKey)
         end
         state.cursor = state.cursor + 1
         processed = processed + 1
@@ -216,7 +197,6 @@ function Tooltip:RunIndexBuildStep(state)
     end
 
     for _, bucket in pairs(index) do
-        sortRows(bucket.rows)
         bucket.seen = nil
     end
     if (state.generation or 0) == (self._indexBuildGeneration or 0) then
@@ -261,6 +241,34 @@ function Tooltip:OnSyncWarmupEnded()
     end
 end
 
+function Tooltip:ResolveBucketRows(bucket)
+    if not bucket then return nil end
+    if not (Addon.Data and Addon.Data.GetRecipeCrafters) then return nil end
+
+    local recipeKeys = bucket.recipeKeys or {}
+    if #recipeKeys == 1 then
+        return Addon.Data:GetRecipeCrafters(recipeKeys[1])
+    end
+
+    local rows = {}
+    local seen = {}
+    for _, recipeKey in ipairs(recipeKeys) do
+        for _, row in ipairs(Addon.Data:GetRecipeCrafters(recipeKey) or {}) do
+            local seenKey = table.concat({
+                tostring(row.recipeKey or recipeKey or ""),
+                tostring(row.memberKey or ""),
+                tostring(row.profession or ""),
+            }, "\031")
+            if not seen[seenKey] then
+                seen[seenKey] = true
+                rows[#rows + 1] = row
+            end
+        end
+    end
+    sortRows(rows)
+    return rows
+end
+
 function Tooltip:GetRowsForKey(key)
     if not key then return nil end
     if self.indexDirty then
@@ -268,13 +276,13 @@ function Tooltip:GetRowsForKey(key)
         if not self._indexBuildJobActive then
             if InCombatLockdown and InCombatLockdown() then
                 local staleBucket = self.index and self.index[key]
-                return staleBucket and staleBucket.rows or nil
+                return self:ResolveBucketRows(staleBucket)
             end
             self:RebuildIndex()
         end
     end
     local bucket = self.index and self.index[key]
-    return bucket and bucket.rows or nil
+    return self:ResolveBucketRows(bucket)
 end
 
 function Tooltip:MergeRows(...)
