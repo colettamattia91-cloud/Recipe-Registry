@@ -15,6 +15,9 @@ function SyncPausePolicy:OnEnable()
     self:RegisterEvent("PLAYER_REGEN_ENABLED", "RefreshPauseState")
     self:RegisterEvent("PLAYER_ENTERING_WORLD", "RefreshPauseState")
     self:RegisterEvent("ZONE_CHANGED_NEW_AREA", "RefreshPauseState")
+    self._wasPaused = false
+    self._wasInstance = false
+    self._wasCombat = false
     self:RefreshPauseState()
 end
 
@@ -40,7 +43,9 @@ function SyncPausePolicy:AutoResumeWhenSafe()
 end
 
 function SyncPausePolicy:RefreshPauseState()
-    local paused = self:IsSensitiveSyncContext()
+    local inCombat = InCombatLockdown()
+    local inInstance = isInSensitiveInstance()
+    local paused = inCombat or inInstance
     if Addon.Performance then
         if paused then
             Addon.Performance:PauseCategory("sync-outbound")
@@ -58,8 +63,18 @@ function SyncPausePolicy:RefreshPauseState()
             Addon.Performance:ResumeCategory("ui")
         end
     end
+    if self._wasPaused and not paused and Addon.Sync and Addon.Sync.EnterWarmup then
+        if self._wasInstance then
+            Addon.Sync:EnterWarmup("instance-exit", 15)
+        elseif self._wasCombat then
+            Addon.Sync:EnterWarmup("combat-exit", 6)
+        end
+    end
     if Addon.Sync and Addon.Sync.RecordPauseCycle then
         Addon.Sync:RecordPauseCycle(paused)
     end
+    self._wasPaused = paused
+    self._wasInstance = inInstance
+    self._wasCombat = inCombat
     Addon:RequestRefresh("sync-pause")
 end

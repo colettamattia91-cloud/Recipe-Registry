@@ -7,7 +7,7 @@ local Addon = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME,
 )
 
 _G.RecipeRegistry = Addon
-Addon.DISPLAY_VERSION = "1.7.0"
+Addon.DISPLAY_VERSION = "1.8.0"
 Addon.WIRE_VERSION = 2
 Addon.ADDON_PREFIX = "RRG1"
 Addon.debugMode = false
@@ -434,6 +434,22 @@ function Addon:SlashHandler(input)
         return
     end
 
+    if cmd == "syncreset" then
+        if not self.debugMode then
+            printMainHelp(self)
+            return
+        end
+        if self.Sync and self.Sync.ResetRuntimeQueues then
+            self.Sync:ResetRuntimeQueues("slash", {
+                clearDiscovery = false,
+                clearManifestPeerState = true,
+                kickoffResync = true,
+                userVisible = true,
+            })
+        end
+        return
+    end
+
     if cmd == "sync" or cmd == "comms" then
         if self.Sync then self.Sync:DumpStatus() end
         return
@@ -454,7 +470,11 @@ function Addon:SlashHandler(input)
             return
         end
         if target ~= "" and self.Sync and self.Sync.RequestManifestRefresh then
-            self.Sync:RequestManifestRefresh(target)
+            self.Sync:RequestManifestRefresh(target, {
+                force = true,
+                clearBackoff = true,
+                reason = "manual",
+            })
             self:Print("Requested fresh manifest from " .. target .. ".")
             return
         end

@@ -2,6 +2,26 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased]
+
+## [1.8.0] - 2026-05-10
+### Added
+- Additional sync diagnostics and guarded runtime reset tooling are now available for targeted troubleshooting of stalled local sync sessions.
+
+### Changed
+- Direct sync requests now use bounded retries, temporary peer backoff, and healthier source selection so one silent peer does not keep the single-flight queue stuck for minutes.
+- Direct sync can now keep a small bounded set of owner requests active at once, immediately backfilling freed slots instead of waiting for the next global queue tick.
+- The new bounded parallelism improves catch-up throughput while reducing wasted work through deduplication, queue caps, stale-state pruning, deferred manifest fallback, and cache reuse instead of increasing background aggressiveness across the board.
+- Snapshot transfer session IDs are now collision-safe under same-second burst traffic, and stale outgoing, partial snapshot, partial manifest, and peer-manifest runtime state is pruned more aggressively.
+- Targeted manifest refreshes now retry on later `HELLO` sessions until a peer manifest is actually received, and manual manifest pulls clear temporary peer backoff so stalled peers can be probed again without waiting out a long timeout window.
+- Login, reload, combat-exit, and instance-exit recovery now use a short warm-up window that defers heavier manifest fan-out, catch-up drain, and background tooltip rebuild work instead of resuming everything at once.
+- Direct sync now pumps the next queued request immediately after a transfer finishes or fails, and deferred manifest catch-up no longer waits on an unrelated in-flight request before making progress.
+- Periodic `HELLO` and auto-tick flows no longer proactively rebroadcast manifests to every peer, relying instead on targeted `HELLO` replies and explicit refresh paths to reduce manifest queue growth and background memory pressure.
+- Peer-manifest comparison no longer forces synchronous local manifest fallback builds during warm-up or other busy windows, and replay is retried automatically once the cache is ready.
+- Diagnostic `TrickleSync` outbound queues are now bounded and replaced per compare pass instead of growing forever across repeated peer manifests.
+- Sync routing now refreshes stale guild roster metadata before making harder viability decisions, so live online peers are less likely to be ignored because of stale local roster state.
+- Combat and instance pause gates remain authoritative for the heavier background work, so the new sync behavior stays transparent for normal users and does not bypass safety pauses in sensitive contexts.
+
 ## [1.7.0] - 2026-05-09
 ### Added
 - Debug-only sync and manifest diagnostics now expose richer internal counters and communication telemetry when troubleshooting larger guild scenarios.

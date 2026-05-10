@@ -8,6 +8,8 @@ local sort = table.sort
 local time = time
 
 local MANIFEST_BLOCKS_PER_CHUNK = 24
+local TRICKLE_OUTBOUND_QUEUE_PER_PEER_CAP = 96
+local TRICKLE_OUTBOUND_QUEUE_GLOBAL_CAP = 384
 
 local function getValidManifestBlockParts(blockKey, block)
     if not Addon.Data or not Addon.Data.ParseSyncBlockKey then return nil, nil end
@@ -27,6 +29,8 @@ function TrickleSync:OnInitialize()
         chunkBuilds = 0,
         chunkCacheHits = 0,
         chunkInvalidations = 0,
+        queueCapHits = 0,
+        queueCapDrops = 0,
         lastInvalidationReason = "none",
     }
 end
@@ -55,6 +59,8 @@ function TrickleSync:ResetManifestChunkTelemetry()
         chunkBuilds = 0,
         chunkCacheHits = 0,
         chunkInvalidations = 0,
+        queueCapHits = 0,
+        queueCapDrops = 0,
         lastInvalidationReason = "none",
     }
 end
@@ -152,7 +158,22 @@ end
 function TrickleSync:ComparePeerManifest(peerManifest, opts)
     opts = opts or {}
     local includeRemoteDiffs = opts.includeRemoteDiffs ~= false
-    local localManifest = self:BuildLocalManifest({ allowStale = true, syncFallback = true, reason = opts.reason or "compare" })
+    local localManifest, status = self:BuildLocalManifest({
+        allowStale = true,
+        syncFallback = true,
+        reason = opts.reason or "compare",
+    })
+    if not localManifest then
+        return {
+            localManifest = nil,
+            peerManifest = peerManifest or { blocks = {} },
+            missingHere = {},
+            missingThere = {},
+            outdatedHere = {},
+            outdatedThere = {},
+            status = status or "building",
+        }, status or "building"
+    end
     local comparison = {
         localManifest = localManifest,
         peerManifest = peerManifest or { blocks = {} },
@@ -160,6 +181,7 @@ function TrickleSync:ComparePeerManifest(peerManifest, opts)
         missingThere = {},
         outdatedHere = {},
         outdatedThere = {},
+        status = status or "ready",
     }
 
     local peerBlocks = comparison.peerManifest.blocks or {}
@@ -210,14 +232,17 @@ function TrickleSync:ComparePeerManifest(peerManifest, opts)
         end
     end
 
-    return comparison
+    return comparison, status or "ready"
 end
 
 function TrickleSync:ComputeMissingBlocks(peerManifest)
-    local comparison = self:ComparePeerManifest(peerManifest, {
+    local comparison, status = self:ComparePeerManifest(peerManifest, {
         includeRemoteDiffs = false,
         reason = "compare-local-missing",
     })
+    if not comparison or not comparison.localManifest then
+        return nil, comparison, status or "building"
+    end
     local blocks = {}
 
     for _, blockKey in ipairs(comparison.missingHere) do
@@ -228,7 +253,7 @@ function TrickleSync:ComputeMissingBlocks(peerManifest)
     end
 
     sort(blocks)
-    return blocks, comparison
+    return blocks, comparison, status or "ready"
 end
 
 function TrickleSync:GroupBlockRequestsByOwner(peerManifest, blockKeys)
@@ -257,18 +282,45 @@ end
 
 function TrickleSync:QueueMissingBlocksForPeer(peerKey, peerManifest)
     if not peerKey then return 0, {} end
-    local missingBlocks = self:ComputeMissingBlocks(peerManifest)
-    local queue = self.outboundQueue[peerKey] or {}
+    local missingBlocks, _comparison, status = self:ComputeMissingBlocks(peerManifest)
+    if not missingBlocks then
+        self.outboundQueue[peerKey] = nil
+        self.peerState[peerKey] = self.peerState[peerKey] or {}
+        self.peerState[peerKey].lastManifestAt = time()
+        self.peerState[peerKey].queuedBlocks = 0
+        return 0, {}, status or "building"
+    end
 
+    local otherQueued = 0
+    for otherPeer, queue in pairs(self.outboundQueue or {}) do
+        if otherPeer ~= peerKey then
+            otherQueued = otherQueued + #(queue or {})
+        end
+    end
+
+    local queue = {}
+    local dropped = 0
     for _, blockKey in ipairs(missingBlocks) do
-        queue[#queue + 1] = blockKey
+        if #queue >= TRICKLE_OUTBOUND_QUEUE_PER_PEER_CAP then
+            dropped = dropped + 1
+        elseif (otherQueued + #queue) >= TRICKLE_OUTBOUND_QUEUE_GLOBAL_CAP then
+            dropped = dropped + 1
+        else
+            queue[#queue + 1] = blockKey
+        end
+    end
+
+    self.telemetry = self.telemetry or {}
+    if dropped > 0 then
+        self.telemetry.queueCapHits = (self.telemetry.queueCapHits or 0) + 1
+        self.telemetry.queueCapDrops = (self.telemetry.queueCapDrops or 0) + dropped
     end
 
     self.outboundQueue[peerKey] = queue
     self.peerState[peerKey] = self.peerState[peerKey] or {}
     self.peerState[peerKey].lastManifestAt = time()
     self.peerState[peerKey].queuedBlocks = #queue
-    return #queue, self:GroupBlockRequestsByOwner(peerManifest, missingBlocks)
+    return #queue, self:GroupBlockRequestsByOwner(peerManifest, queue), status or "ready"
 end
 
 function TrickleSync:GetQueuedBlocks(peerKey)

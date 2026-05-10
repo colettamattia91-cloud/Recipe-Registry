@@ -228,6 +228,9 @@ end
 function Tooltip:EnsureIndexBuildScheduled()
     if not self.indexDirty or self._indexBuildJobActive then return end
     if not (Addon.Performance and Addon.Performance.ScheduleJob) then return end
+    if Addon.Sync and Addon.Sync.IsInWarmup and Addon.Sync:IsInWarmup() then
+        return
+    end
 
     self._indexBuildJobActive = true
     local generation = self._indexBuildGeneration or 0
@@ -250,6 +253,12 @@ function Tooltip:EnsureIndexBuildScheduled()
             generation = generation,
         },
     })
+end
+
+function Tooltip:OnSyncWarmupEnded()
+    if self.indexDirty then
+        self:EnsureIndexBuildScheduled()
+    end
 end
 
 function Tooltip:GetRowsForKey(key)
