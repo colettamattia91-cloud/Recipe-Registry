@@ -34,6 +34,28 @@ local function manifestRowFromSyncBlock(block)
     }
 end
 
+local function estimateDatasetCompletenessFromMembers(data)
+    local blockCount = 0
+    local recipeCount = 0
+
+    for memberKey, entry in pairs(data:GetMembersDB()) do
+        if data:IsValidMemberKey(memberKey)
+            and not data:IsMockMember(memberKey, entry)
+            and (entry.guildStatus or "active") == "active" then
+            for _, profession in pairs(entry.professions or {}) do
+                blockCount = blockCount + 1
+                local count = profession and profession.count
+                if type(count) ~= "number" then
+                    count = countRecipeKeys(profession and profession.recipes)
+                end
+                recipeCount = recipeCount + (count or 0)
+            end
+        end
+    end
+
+    return blockCount, recipeCount
+end
+
 function Data:BuildSyncBlockKey(ownerCharacter, professionKey)
     if not ownerCharacter or not professionKey then return nil end
     if not self:IsValidMemberKey(ownerCharacter) then return nil end
@@ -441,7 +463,7 @@ function Data:DumpManifestCacheStatus()
         or {}
     local syncTelemetry = Addon.Sync and Addon.Sync.telemetry or {}
     local manifestQueueDepth = Addon.Sync and Addon.Sync.manifestChunkQueue and #Addon.Sync.manifestChunkQueue or 0
-    Addon:SystemPrint(string.format(
+    Addon:Print(string.format(
         "Manifest cache ready=%s dirtyAll=%s dirtyBlocks=%d building=%s scheduled=%s serial=%d blocks=%d recipes=%d builds=%d full=%d delta=%d steps=%d processed=%d hits=%d fallback=%d deferred=%d chunkBuilds=%d chunkHits=%d chunkInvalidations=%d maniQueued=%d maniSent=%d maniQueue=%d avgCostMs=%.2f maxCostMs=%.2f lastCostMs=%.2f last=%s",
         tostring(snapshot.ready),
         tostring(snapshot.dirtyAll),
@@ -482,6 +504,9 @@ end
 
 function Data:GetDatasetCompletenessEstimate()
     local manifest = self:GetPreparedSyncManifest({ allowStale = true, syncFallback = true, reason = "completeness" })
+    if not manifest or type(manifest.totals) ~= "table" then
+        return estimateDatasetCompletenessFromMembers(self)
+    end
     return manifest.totals.blocks, manifest.totals.recipes
 end
 
@@ -542,7 +567,7 @@ function Data:DumpManifestSummary(opts)
     end
     sort(replicaOwnerKeys)
 
-    Addon:SystemPrint(string.format(
+    Addon:Print(string.format(
         "Manifest local=%s blocks=%d recipes=%d ownerBlocks=%d replicaBlocks=%d replicaOwners=%d staleMembers=%d",
         tostring(localKey),
         totalBlocks,
@@ -554,20 +579,20 @@ function Data:DumpManifestSummary(opts)
     ))
 
     if #replicaOwnerKeys == 0 then
-        Addon:SystemPrint("Manifest replica owners: none")
+        Addon:Print("Manifest replica owners: none")
     elseif not verbose then
-        Addon:SystemPrint(string.format(
+        Addon:Print(string.format(
             "Manifest replica owners: %d (use /rr manifest verbose for details)",
             #replicaOwnerKeys
         ))
     else
-        Addon:SystemPrint("Manifest replica owners:")
+        Addon:Print("Manifest replica owners:")
         local maxLines = min(#replicaOwnerKeys, 12)
         for index = 1, maxLines do
             local ownerCharacter = replicaOwnerKeys[index]
             local info = replicaOwners[ownerCharacter]
             sort(info.professions)
-            Addon:SystemPrint(string.format(
+            Addon:Print(string.format(
                 "  %s blocks=%d recipes=%d publish=replica authority=%s professions=%s",
                 tostring(ownerCharacter),
                 info.blocks or 0,
@@ -577,18 +602,18 @@ function Data:DumpManifestSummary(opts)
             ))
         end
         if #replicaOwnerKeys > maxLines then
-            Addon:SystemPrint(string.format("  ... and %d more", #replicaOwnerKeys - maxLines))
+            Addon:Print(string.format("  ... and %d more", #replicaOwnerKeys - maxLines))
         end
     end
     if #staleOwnerKeys > 0 then
         sort(staleOwnerKeys)
         if not verbose then
-            Addon:SystemPrint(string.format(
+            Addon:Print(string.format(
                 "Manifest stale excluded: %d (use /rr manifest verbose for details)",
                 #staleOwnerKeys
             ))
         else
-            Addon:SystemPrint("Manifest stale excluded:")
+            Addon:Print("Manifest stale excluded:")
             local maxStaleLines = min(#staleOwnerKeys, 8)
             for index = 1, maxStaleLines do
                 local memberKey = staleOwnerKeys[index]
@@ -597,10 +622,10 @@ function Data:DumpManifestSummary(opts)
                 for _ in pairs(entry and entry.professions or {}) do
                     profCount = profCount + 1
                 end
-                Addon:SystemPrint(string.format("  %s professions=%d", tostring(memberKey), profCount))
+                Addon:Print(string.format("  %s professions=%d", tostring(memberKey), profCount))
             end
             if #staleOwnerKeys > maxStaleLines then
-                Addon:SystemPrint(string.format("  ... and %d more", #staleOwnerKeys - maxStaleLines))
+                Addon:Print(string.format("  ... and %d more", #staleOwnerKeys - maxStaleLines))
             end
         end
     end
@@ -635,7 +660,7 @@ function Data:DumpManifestSummary(opts)
             partialPeers = partialPeers + 1
         end
     end
-    Addon:SystemPrint(string.format(
+    Addon:Print(string.format(
         "Manifest builds=%d (full=%d delta=%d) avgCostMs=%.2f maxCostMs=%.2f requests=%d cooldownSkips=%d forceReplies=%d",
         snapshot.telemetry.buildsCompleted or 0,
         snapshot.telemetry.fullBuilds or 0,
@@ -646,7 +671,7 @@ function Data:DumpManifestSummary(opts)
         syncTel.manifestCooldownSkips or 0,
         syncTel.manifestForceReplies or 0
     ))
-    Addon:SystemPrint(string.format(
+    Addon:Print(string.format(
         "Manifest runtime residentPeers=%d queuedPeers=%d queuedBlocks=%d partialPeers=%d partialOpen=%d fallbackBuilds=%d deferred=%d",
         residentPeers,
         queuedPeers,

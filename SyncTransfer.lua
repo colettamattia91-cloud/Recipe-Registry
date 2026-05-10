@@ -165,7 +165,7 @@ function Sync:HandleSnapshotChunk(payload)
     end
 
     if complete then
-        self.partialReceive[payload.key] = nil
+        self:ReleaseCompletedTransferState(payload.key, payload.sessionId, "snapshot-complete")
         self.inboundFinalizeQueue[#self.inboundFinalizeQueue + 1] = {
             memberKey = payload.key,
             rev = payload.rev,
@@ -173,6 +173,7 @@ function Sync:HandleSnapshotChunk(payload)
             sender = payload.sender,
             sessionId = payload.sessionId,
         }
+        self:EnforceRuntimeQueueCaps("snapshot-complete")
         if not self:IsMockKey(payload.sender) then
             self:SendDirectEnvelope("DONE", {
                 sessionId = payload.sessionId,
@@ -241,7 +242,7 @@ function Sync:HandleTransferDone(payload)
     if not self:IsValidSyncMemberKey(payload.sender) then return end
     if self:IsMockKey(payload.sender) then return end
     if session.targetKey ~= payload.sender then return end
-    self.outgoingSessions[payload.sessionId] = nil
+    self:ReleaseCompletedTransferState(session.memberKey, payload.sessionId, "done")
 end
 
 function Sync:PruneOutgoingSessions()
@@ -249,8 +250,7 @@ function Sync:PruneOutgoingSessions()
     local removed = 0
     for sessionId, state in pairs(self.outgoingSessions) do
         if (now - (state.createdAt or now)) > SESSION_TIMEOUT then
-            self.outgoingSessions[sessionId] = nil
-            removed = removed + 1
+            removed = removed + self:ReleaseCompletedTransferState(state.memberKey, sessionId, "outgoing-timeout")
         end
     end
     if removed > 0 then
@@ -263,8 +263,7 @@ function Sync:PrunePartialReceives()
     local removed = 0
     for memberKey, state in pairs(self.partialReceive) do
         if (now - (state.lastProgressAt or now)) > SESSION_TIMEOUT then
-            self.partialReceive[memberKey] = nil
-            removed = removed + 1
+            removed = removed + self:ReleaseCompletedTransferState(memberKey, state and state.sessionId, "partial-timeout")
             if self:GetInFlightRequest(memberKey) then
                 self:FailInFlight(memberKey, true, "partial-timeout")
             end
@@ -282,6 +281,7 @@ function Sync:QueueOutboundBlock(peer, block)
         block = block,
         queuedAt = time(),
     }
+    self:EnforceRuntimeQueueCaps("outbound")
     return true
 end
 
@@ -336,6 +336,7 @@ end
 function Sync:EnqueueReceivedChunk(payload)
     self.inboundChunkQueue[#self.inboundChunkQueue + 1] = shallowCopyTable(payload)
     self.telemetry.receivedChunks = self.telemetry.receivedChunks + 1
+    self:EnforceRuntimeQueueCaps("inbound")
 end
 
 function Sync:DecodeChunkStep(payload)

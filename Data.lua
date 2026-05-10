@@ -853,8 +853,8 @@ end
 function Data:NormalizeProfessionBlock(entry, professionKey, prof)
     prof = prof or {}
     prof.recipes = prof.recipes or {}
-    prof.count = type(prof.count) == "number" and prof.count or countRecipeKeys(prof.recipes)
-    prof.signature = prof.signature or stableRecipeSignature(prof.recipes)
+    prof.count = countRecipeKeys(prof.recipes)
+    prof.signature = stableRecipeSignature(prof.recipes)
     prof.skillRank = prof.skillRank or 0
     prof.skillMaxRank = prof.skillMaxRank or 0
     prof.specialization = prof.specialization or nil
@@ -919,12 +919,21 @@ function Data:InvalidateRecipeCaches(scope)
         self._recipeListCacheOrder = nil
         return
     end
+    if scope == "metadata" then
+        self._recipeDetailCache = nil
+        self._recipeDetailCacheOrder = nil
+        self._recipeIndex = nil
+        if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
+            Addon.Tooltip:InvalidateIndex("metadata")
+        end
+        return
+    end
     if scope == "presence" then
         self._recipeListCache = nil
         self._recipeListCacheOrder = nil
         self._recipeIndex = nil
         if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
-            Addon.Tooltip:InvalidateIndex()
+            Addon.Tooltip:InvalidateIndex("presence")
         end
         return
     end
@@ -935,7 +944,7 @@ function Data:InvalidateRecipeCaches(scope)
     self._recipeDetailCacheOrder = nil
     self._recipeIndex = nil
     if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
-        Addon.Tooltip:InvalidateIndex()
+        Addon.Tooltip:InvalidateIndex(scope or "full")
     end
 end
 
@@ -1044,8 +1053,19 @@ function Data:TouchLocalRevision(reason)
 end
 
 function Data:RebuildOnlineCache()
-    self._onlineCache = {}
-    self._guildMetaCache = {}
+    local previousOnline = self._onlineCache or {}
+    local previousMeta = self._guildMetaCache or {}
+    local nextOnline = {}
+    local nextMeta = {}
+    local delta = {
+        presenceChanged = false,
+        membershipChanged = false,
+        guildStatusChanged = false,
+        knownMembersChanged = false,
+        onlineCountChanged = false,
+        onlineCount = 0,
+        previousOnlineCount = countKeys(previousOnline),
+    }
     for i = 1, GetNumGuildMembers() do
         local fullName, rankName, rankIndex, level, classDisplayName, zone, publicNote, officerNote, online, status, classFileName = GetGuildRosterInfo(i)
         if fullName then
@@ -1057,9 +1077,10 @@ function Data:RebuildOnlineCache()
             realm = (realm or "UnknownRealm"):gsub("[%s%-]", "")
             local memberKey = name .. "-" .. realm
             if online then
-                self._onlineCache[memberKey] = true
+                nextOnline[memberKey] = true
+                delta.onlineCount = delta.onlineCount + 1
             end
-            self._guildMetaCache[memberKey] = {
+            nextMeta[memberKey] = {
                 name = fullName,
                 rankName = rankName,
                 rankIndex = rankIndex,
@@ -1072,7 +1093,43 @@ function Data:RebuildOnlineCache()
             }
         end
     end
+    for memberKey, meta in pairs(nextMeta) do
+        local previous = previousMeta[memberKey]
+        if not previous then
+            delta.membershipChanged = true
+            delta.knownMembersChanged = true
+        else
+            if (previous.online and true or false) ~= (meta.online and true or false) then
+                delta.presenceChanged = true
+            end
+            if previous.status ~= meta.status then
+                delta.guildStatusChanged = true
+                delta.knownMembersChanged = true
+            end
+            if previous.rankIndex ~= meta.rankIndex
+                or previous.level ~= meta.level
+                or previous.classFile ~= meta.classFile
+                or previous.zone ~= meta.zone then
+                delta.knownMembersChanged = true
+            end
+        end
+    end
+    for memberKey in pairs(previousMeta) do
+        if not nextMeta[memberKey] then
+            delta.membershipChanged = true
+            delta.knownMembersChanged = true
+            if previousOnline[memberKey] then
+                delta.presenceChanged = true
+            end
+        end
+    end
+    if delta.previousOnlineCount ~= delta.onlineCount then
+        delta.onlineCountChanged = true
+    end
+    self._onlineCache = nextOnline
+    self._guildMetaCache = nextMeta
     self._guildRosterBuiltAt = time()
+    return delta
 end
 
 function Data:IsMemberOnline(memberKey)

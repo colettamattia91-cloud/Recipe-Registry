@@ -144,6 +144,10 @@ function Sync:GetRuntimeObservabilitySnapshot()
         partialReceives = countKeys(self.partialReceive),
         partialReceiveOldestAge = getOldestStateAge(self.partialReceive, "lastProgressAt"),
         outgoingOldestAge = getOldestStateAge(self.outgoingSessions, "createdAt"),
+        transitionActive = self.IsInWorldTransition and self:IsInWorldTransition() or false,
+        transitionReason = self.worldTransitionReason,
+        transitionRemaining = self.GetWorldTransitionRemaining and self:GetWorldTransitionRemaining() or 0,
+        transitionQueued = #(self.transitionDrainQueue or {}),
         partialManifestPeers = partialManifestPeers,
         partialManifestOpen = partialManifestOpen,
         partialManifestOldestAge = partialManifestOldestAge,
@@ -158,6 +162,7 @@ function Sync:GetRuntimeObservabilitySnapshot()
         manifestFallbackBuilds = manifestTelemetry.syncFallbackBuilds or 0,
         manifestFallbackDeferrals = manifestTelemetry.syncFallbackDeferrals or 0,
         manifestDeferredRequests = manifestTelemetry.deferredRequests or 0,
+        runtimeQueuePressure = self.telemetry and self.telemetry.runtimeQueuePressure or 0,
     }
 end
 
@@ -181,6 +186,8 @@ function Sync:GetUiState()
         autoSync = true,
         paused = pauseState,
         warmup = self:IsInWarmup(),
+        transition = runtime.transitionActive,
+        transitionRemaining = runtime.transitionRemaining,
         bootstrap = bootstrapState,
         partialReceives = runtime.partialReceives,
         partialManifestOpen = runtime.partialManifestOpen,
@@ -209,6 +216,9 @@ function Sync:GetDebugSnapshot()
         warmup = self:IsInWarmup(),
         warmupRemaining = self:GetWarmupRemaining(),
         warmupReason = self.warmupReason,
+        transition = runtime.transitionActive,
+        transitionRemaining = runtime.transitionRemaining,
+        transitionReason = runtime.transitionReason,
         isolated = self:IsRealTrafficSuppressed(),
         peerBackoffCount = backoffCount,
         peerBackoffList = backoffList,
@@ -233,6 +243,7 @@ function Sync:GetDebugSnapshot()
         trickleOldestManifestAge = runtime.trickleOldestManifestAge,
         manifestFallbackBuilds = runtime.manifestFallbackBuilds,
         manifestDeferredRequests = runtime.manifestDeferredRequests,
+        lifecycleDebugLog = shallowCopyArray(self.lifecycleDebugLog),
         telemetry = self.telemetry,
         offlineDebugLog = shallowCopyArray(self.offlineDebugLog),
     }
@@ -595,8 +606,8 @@ function Sync:DumpStatus()
     local role = self:IsCoordinator() and "Coordinator" or "Client"
     local runtime = self:GetRuntimeObservabilitySnapshot()
     local primary = self:GetInFlightRequest()
-    Addon:SystemPrint(string.format(
-        "Role=%s coordinator=%s onlineNodes=%d registry=%d queued=%d activeReq=%d inFlight=%s outgoing=%d outboundChunks=%d manifestChunks=%d inboundChunks=%d manifestPending=%d paused=%s warmup=%s isolated=%s",
+    Addon:Print(string.format(
+        "Role=%s coordinator=%s onlineNodes=%d registry=%d queued=%d activeReq=%d inFlight=%s outgoing=%d outboundChunks=%d manifestChunks=%d inboundChunks=%d manifestPending=%d paused=%s warmup=%s transition=%s(%ds) isolated=%s",
         role,
         tostring(self.coordinatorKey),
         countKeys(self.onlineNodes),
@@ -611,17 +622,20 @@ function Sync:DumpStatus()
         countKeys(self.pendingManifestPeers),
         tostring(Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() or false),
         tostring(self:IsInWarmup()),
+        tostring(runtime.transitionActive or false),
+        runtime.transitionRemaining or 0,
         tostring(self:IsRealTrafficSuppressed())
     ))
     local tel = self.telemetry or {}
-    Addon:SystemPrint(string.format(
-        "Manifest requests=%d sent=%d received=%d queued=%d cooldownSkips=%d unchangedSkips=%d forceReplies=%d deferred=%d flushes=%d maxQueue=%d catchupCandidates=%d catchupQueued=%d catchupDeferred=%d catchupDrained=%d catchupSkipOnline=%d catchupSkipStale=%d catchupQueue=%d catchupMax=%d",
+    Addon:Print(string.format(
+        "Manifest requests=%d sent=%d received=%d queued=%d cooldownSkips=%d unchangedSkips=%d identicalSkips=%d forceReplies=%d deferred=%d flushes=%d maxQueue=%d catchupCandidates=%d catchupQueued=%d catchupDeferred=%d catchupDrained=%d catchupSkipOnline=%d catchupSkipStale=%d catchupQueue=%d catchupMax=%d avoided=%d",
         tel.manifestBuildRequests or 0,
         tel.manifestChunksSent or 0,
         tel.manifestChunksReceived or 0,
         tel.manifestChunksQueued or 0,
         tel.manifestCooldownSkips or 0,
         tel.manifestUnchangedSkips or 0,
+        tel.manifestIdenticalBlockSkips or 0,
         tel.manifestForceReplies or 0,
         tel.manifestDeferredSends or 0,
         tel.manifestPendingFlushes or 0,
@@ -633,10 +647,11 @@ function Sync:DumpStatus()
         tel.manifestCatchupSkippedOnlineOwners or 0,
         tel.manifestCatchupSkippedStaleOwners or 0,
         #(self.manifestCatchupQueue or {}),
-        tel.manifestCatchupMaxDeferred or 0
+        tel.manifestCatchupMaxDeferred or 0,
+        tel.manifestRequestsAvoided or 0
     ))
-    Addon:SystemPrint(string.format(
-        "Requests oldestAge=%ds oldestSource=%s oldestWhy=%s activeReq=%d/%d inFlightAge=%ds inFlightAttempts=%d inFlightSource=%s inFlightWhy=%s peerBackoff=%d [%s] retries=%d drops=%d warmupDefers=%d",
+    Addon:Print(string.format(
+        "Requests oldestAge=%ds oldestSource=%s oldestWhy=%s activeReq=%d/%d inFlightAge=%ds inFlightAttempts=%d inFlightSource=%s inFlightWhy=%s peerBackoff=%d [%s] retries=%d drops=%d warmupDefers=%d transitionDefers=%d skippedHello=%d",
         oldestPending and max(0, time() - (oldestPending.queuedAt or time())) or 0,
         oldestPending and tostring(oldestPending.source) or "none",
         oldestPending and tostring(oldestPending.why or "") or "none",
@@ -650,15 +665,19 @@ function Sync:DumpStatus()
         backoffList or "none",
         tel.requestRetries or 0,
         tel.requestDrops or 0,
-        tel.warmupDeferrals or 0
+        tel.warmupDeferrals or 0,
+        tel.transitionDeferrals or 0,
+        tel.transitionSkippedHello or 0
     ))
-    Addon:SystemPrint(string.format(
-        "Runtime partialRecv=%d partialAge=%ds partialManifestPeers=%d partialManifestOpen=%d partialManifestAge=%ds tricklePeers=%d residentPeers=%d queuedPeers=%d queuedBlocks=%d maxPeerQueue=%d queueCap=%d/%d outgoingAge=%ds prunes=out:%d part:%d mani:%d trickle:%d/%d fallbackBuilds=%d fallbackDefers=%d deferredManifest=%d",
+    Addon:Print(string.format(
+        "Runtime partialRecv=%d partialAge=%ds partialManifestPeers=%d partialManifestOpen=%d partialManifestAge=%ds transitionQueue=%d pressure=%d tricklePeers=%d residentPeers=%d queuedPeers=%d queuedBlocks=%d maxPeerQueue=%d queueCap=%d/%d outgoingAge=%ds prunes=out:%d part:%d mani:%d trickle:%d/%d runtimeCap=%d fallbackBuilds=%d fallbackDefers=%d deferredManifest=%d",
         runtime.partialReceives or 0,
         runtime.partialReceiveOldestAge or 0,
         runtime.partialManifestPeers or 0,
         runtime.partialManifestOpen or 0,
         runtime.partialManifestOldestAge or 0,
+        runtime.transitionQueued or 0,
+        runtime.runtimeQueuePressure or 0,
         runtime.tricklePeerState or 0,
         runtime.trickleResidentManifests or 0,
         runtime.trickleQueuedPeers or 0,
@@ -672,6 +691,7 @@ function Sync:DumpStatus()
         tel.prunedPartialManifestReceives or 0,
         tel.prunedTricklePeerState or 0,
         tel.prunedTrickleOutboundQueues or 0,
+        tel.queueCapPrunes or 0,
         runtime.manifestFallbackBuilds or 0,
         runtime.manifestFallbackDeferrals or 0,
         runtime.manifestDeferredRequests or 0

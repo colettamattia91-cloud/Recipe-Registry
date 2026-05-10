@@ -522,6 +522,72 @@ local function buildRefreshPlan(reasons)
     return plan
 end
 
+function UI:GetDegradedModeReason()
+    if not Addon.Data then
+        return "data-unavailable"
+    end
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() then
+        return "sensitive-context"
+    end
+    if Addon.Sync and Addon.Sync.IsInWarmup and Addon.Sync:IsInWarmup() then
+        return "warmup"
+    end
+    if Addon.Sync and Addon.Sync.IsInWorldTransition and Addon.Sync:IsInWorldTransition() then
+        return "world-transition"
+    end
+    if not (self.frame and self.frame.recipeRows and self.frame.detailLines) then
+        return "frame-not-ready"
+    end
+    return nil
+end
+
+function UI:IsHeavyRefreshAllowed()
+    return self:GetDegradedModeReason() == nil
+end
+
+function UI:MarkFullRefreshPending(reason)
+    self.fullRefreshPending = true
+    self.fullRefreshPendingReason = reason or self.fullRefreshPendingReason or "pending"
+    if Addon.Sync and Addon.Sync.telemetry then
+        Addon.Sync.telemetry.transitionDeferredUI = (Addon.Sync.telemetry.transitionDeferredUI or 0) + 1
+    end
+end
+
+function UI:RefreshDegradedStatus(reason)
+    if not self.frame then return end
+    reason = tostring(reason or "sync-pending")
+    self.currentRecipeRows = {}
+    self.currentDetail = nil
+    self.selectedRecipeKey = nil
+    setTextIfChanged(self.frame.recipeHeader, "Status only while Recipe Registry stabilizes")
+    for index = 1, #(self.frame.recipeRows or {}) do
+        setShownIfChanged(self.frame.recipeRows[index], false)
+    end
+    if self.frame.recipeContent and self.frame.recipeContent.SetHeight then
+        self.frame.recipeContent:SetHeight(1)
+    end
+    setTextIfChanged(self.frame.detailTitle, "Recipe details")
+    setTextIfChanged(self.frame.detailSub, "Heavy UI refresh is deferred until sync becomes stable.")
+    self:RenderDetailLines({
+        string.format("Status-only mode active: %s.", reason:gsub("%-", " ")),
+        "The full recipe list and detail panel will resume automatically.",
+    }, {}, {})
+    self:RefreshSummaryCards()
+end
+
+function UI:TryResumeFullRefresh()
+    if not self.fullRefreshPending then
+        return false
+    end
+    if not self:IsHeavyRefreshAllowed() then
+        return false
+    end
+    self.fullRefreshPending = false
+    self.fullRefreshPendingReason = nil
+    Addon:RequestRefresh("resume-full-refresh")
+    return true
+end
+
 function UI:OnEnable()
     self:CreateMainFrame()
 end
@@ -1161,14 +1227,19 @@ end
 function UI:RefreshStatusBar()
     local sync = Addon.Sync
     local state = sync and sync.GetUiState and sync:GetUiState() or nil
-    local summary = Addon.Data:GetLocalSummary()
+    local summary = Addon.Data and Addon.Data.GetLocalSummary and Addon.Data:GetLocalSummary() or {
+        updatedAt = 0,
+    }
     local bootstrap = state and state.bootstrap or nil
+    local degradedReason = self:GetDegradedModeReason()
     local cleanupRunning = Addon.GuildLifecycleMaintenance and Addon.GuildLifecycleMaintenance.IsCleanupRunning
         and Addon.GuildLifecycleMaintenance:IsCleanupRunning() or false
 
     local members = 0
-    for _ in ipairs(Addon.Data:GetSortedMemberKeys(false)) do
-        members = members + 1
+    if Addon.Data and Addon.Data.GetSortedMemberKeys then
+        for _ in ipairs(Addon.Data:GetSortedMemberKeys(false)) do
+            members = members + 1
+        end
     end
 
     local onlineNodes = state and state.onlineNodes or 0
@@ -1204,6 +1275,9 @@ function UI:RefreshStatusBar()
     end
     if cleanupRunning then
         subtitle = subtitle .. " | roster cleanup running"
+    end
+    if degradedReason then
+        subtitle = subtitle .. " | status only: " .. degradedReason:gsub("%-", " ")
     end
     setTextIfChanged(self.frame.subtitle, subtitle)
 
@@ -1675,13 +1749,29 @@ function UI:Toggle()
         self:RestoreFramePlacement()
         self.frame:Show()
         self:RefreshDebugVisibility()
-        self:Refresh(nil)
+        local degradedReason = self:GetDegradedModeReason()
+        if degradedReason then
+            self:RefreshStatusBar()
+            self:RefreshDegradedStatus(degradedReason)
+            self:MarkFullRefreshPending(degradedReason)
+        else
+            self:Refresh(nil)
+        end
         self.frame.searchBox:SetText(self.searchText or "")
     end
 end
 
 function UI:Refresh(reasons)
     if not self.frame or not self.frame:IsShown() then return end
+    local degradedReason = self:GetDegradedModeReason()
+    if degradedReason then
+        self:RefreshStatusBar()
+        self:RefreshDegradedStatus(degradedReason)
+        self:MarkFullRefreshPending(degradedReason)
+        return
+    end
+    self.fullRefreshPending = false
+    self.fullRefreshPendingReason = nil
     local plan = buildRefreshPlan(reasons)
     if plan.status then
         self:RefreshStatusBar()

@@ -7,6 +7,8 @@ local time = time
 local pairs = pairs
 local sort = table.sort
 local max = math.max
+local min = math.min
+local remove = table.remove
 
 local countKeys = Private.countKeys
 local isMockKey = Private.isMockKey
@@ -23,9 +25,32 @@ local PEER_BACKOFF_FAILURE_THRESHOLD = Constants.PEER_BACKOFF_FAILURE_THRESHOLD
 local PEER_BACKOFF_SECONDS = Constants.PEER_BACKOFF_SECONDS
 local HELLO_AUTO_BACKOFF_SECONDS = Constants.HELLO_AUTO_BACKOFF_SECONDS
 local POST_WORLD_GRACE_SECONDS = Constants.POST_WORLD_GRACE_SECONDS
+local POST_INSTANCE_GRACE_SECONDS = Constants.POST_INSTANCE_GRACE_SECONDS
+local POST_RELOAD_IN_INSTANCE_GRACE_SECONDS = Constants.POST_RELOAD_IN_INSTANCE_GRACE_SECONDS
 local HELLO_INTERVAL = Constants.HELLO_INTERVAL
 local AUTO_SYNC_INTERVAL = Constants.AUTO_SYNC_INTERVAL
 local COORDINATOR_RECOMPUTE_DELAY = Constants.COORDINATOR_RECOMPUTE_DELAY
+local MAX_OUTBOUND_CHUNKS = Constants.MAX_OUTBOUND_CHUNKS
+local MAX_MANIFEST_CHUNKS = Constants.MAX_MANIFEST_CHUNKS
+local MAX_INBOUND_CHUNKS = Constants.MAX_INBOUND_CHUNKS
+local MAX_INBOUND_FINALIZE_QUEUE = Constants.MAX_INBOUND_FINALIZE_QUEUE
+local MAX_PARTIAL_RECEIVES = Constants.MAX_PARTIAL_RECEIVES
+local MAX_PARTIAL_MANIFESTS_TOTAL = Constants.MAX_PARTIAL_MANIFESTS_TOTAL
+local MAX_PARTIAL_MANIFESTS_PER_PEER = Constants.MAX_PARTIAL_MANIFESTS_PER_PEER
+local MAX_MANIFEST_CATCHUP_QUEUE = Constants.MAX_MANIFEST_CATCHUP_QUEUE
+local MAX_PENDING_REQUESTS = Constants.MAX_PENDING_REQUESTS
+
+local LIFECYCLE_DEBUG_LIMIT = 20
+
+local function countNestedEntries(groups)
+    local total = 0
+    for _, bucket in pairs(groups or {}) do
+        if type(bucket) == "table" then
+            total = total + countKeys(bucket)
+        end
+    end
+    return total
+end
 
 function Sync:OnInitialize()
     self.onlineNodes = {}
@@ -60,17 +85,23 @@ function Sync:OnInitialize()
     self.peerHealth = {}
     self.warmupUntil = 0
     self.warmupReason = nil
+    self.worldTransitionUntil = 0
+    self.worldTransitionReason = nil
+    self.transitionDrainQueue = {}
+    self._transitionDrainJobActive = false
     self._coalescedManifestReason = nil
     self._coalescedManifestFirstAt = 0
     self._sessionIdCounter = 0
     self._requestDispatchCounter = 0
     self.telemetry = newSyncTelemetry()
     self.offlineDebugLog = {}
+    self.lifecycleDebugLog = {}
 end
 
 function Sync:ResetTelemetry()
     self.telemetry = newSyncTelemetry()
     self.offlineDebugLog = {}
+    self.lifecycleDebugLog = {}
 end
 
 function Sync:ResetRuntimeQueues(reason, opts)
@@ -106,10 +137,15 @@ function Sync:ResetRuntimeQueues(reason, opts)
     self.peerHealth = {}
     self.warmupUntil = 0
     self.warmupReason = nil
+    self.worldTransitionUntil = 0
+    self.worldTransitionReason = nil
+    self.transitionDrainQueue = {}
+    self._transitionDrainJobActive = false
     self._coalescedManifestReason = nil
     self._coalescedManifestFirstAt = 0
     self._sessionIdCounter = 0
     self._requestDispatchCounter = 0
+    self.lifecycleDebugLog = {}
     if opts.clearManifestPeerState ~= false then
         self._lastManifestSentAt = {}
         self._lastManifestAnnouncedId = {}
@@ -122,6 +158,10 @@ function Sync:ResetRuntimeQueues(reason, opts)
         self:CancelTimer(self._coalescedManifestTimer, true)
         self._coalescedManifestTimer = nil
     end
+    if self._transitionTimer then
+        self:CancelTimer(self._transitionTimer, true)
+        self._transitionTimer = nil
+    end
     self:RecomputeCoordinator()
     if opts.kickoffResync then
         self:KickoffDatabaseResync()
@@ -131,6 +171,16 @@ function Sync:ResetRuntimeQueues(reason, opts)
         Addon:Print("Sync runtime reset. Saved recipes were kept and a fresh guild resync was requested.")
     else
         Addon:SystemPrint("Sync runtime reset: " .. tostring(reason or "manual"))
+    end
+end
+
+function Sync:PushLifecycleEvent(kind, detail)
+    local stamp = date and date("%H:%M:%S") or tostring(time())
+    local line = string.format("%s %s %s", tostring(stamp), tostring(kind or "event"), tostring(detail or ""))
+    self.lifecycleDebugLog = self.lifecycleDebugLog or {}
+    self.lifecycleDebugLog[#self.lifecycleDebugLog + 1] = line
+    while #self.lifecycleDebugLog > LIFECYCLE_DEBUG_LIMIT do
+        remove(self.lifecycleDebugLog, 1)
     end
 end
 
@@ -281,19 +331,7 @@ function Sync:QueuePendingManifestComparePeer(peerKey)
 end
 
 function Sync:ShouldDeferInlineManifestFallback(_reason)
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() then
-        return true
-    end
-    if self:IsInWarmup() then
-        return true
-    end
-    if #(self.outboundChunkQueue or {}) > 8 or #(self.manifestChunkQueue or {}) > 8 then
-        return true
-    end
-    if #self.inboundChunkQueue > 10 or #self.inboundFinalizeQueue > 4 then
-        return true
-    end
-    return false
+    return self:ShouldDeferHeavyLifecycleWork("manifest-fallback")
 end
 
 function Sync:GetInFlightRequests()
@@ -362,6 +400,15 @@ function Sync:ClearInFlightRequest(memberKey)
 end
 
 function Sync:ScheduleHello(delay)
+    if self:ShouldDeferHeavyLifecycleWork("hello") then
+        self.telemetry.transitionSkippedHello = (self.telemetry.transitionSkippedHello or 0) + 1
+        self.telemetry.transitionDeferrals = (self.telemetry.transitionDeferrals or 0) + 1
+        self:QueueTransitionDrainWork({
+            kind = "hello",
+            reason = "deferred-hello",
+        })
+        return
+    end
     self:ScheduleTimer("BroadcastHello", delay or 0.5)
 end
 
@@ -395,6 +442,7 @@ function Sync:EnterWarmup(reason, seconds)
         self._warmupTimer = nil
         self:HandleWarmupExpired()
     end, duration)
+    self:PushLifecycleEvent("WARMUP_START", tostring(self.warmupReason))
 end
 
 function Sync:IsInWarmup()
@@ -406,6 +454,173 @@ function Sync:GetWarmupRemaining()
         return 0
     end
     return max(0, (self.warmupUntil or 0) - time())
+end
+
+function Sync:EnterWorldTransition(reason, seconds)
+    local duration = max(1, tonumber(seconds) or POST_WORLD_GRACE_SECONDS)
+    local untilAt = time() + duration
+    if (self.worldTransitionUntil or 0) < untilAt then
+        self.worldTransitionUntil = untilAt
+    end
+    self.worldTransitionReason = tostring(reason or self.worldTransitionReason or "world-transition")
+    self:PushLifecycleEvent("TRANSITION_GATE_START", string.format("%s %ds", tostring(self.worldTransitionReason), duration))
+    if self._transitionTimer then
+        self:CancelTimer(self._transitionTimer, true)
+        self._transitionTimer = nil
+    end
+    self._transitionTimer = self:ScheduleTimer(function()
+        self._transitionTimer = nil
+        self:ScheduleTransitionDrain("transition-expired")
+    end, duration)
+end
+
+function Sync:IsInWorldTransition()
+    return (self.worldTransitionUntil or 0) > time()
+end
+
+function Sync:GetWorldTransitionRemaining()
+    if not self:IsInWorldTransition() then
+        return 0
+    end
+    return max(0, (self.worldTransitionUntil or 0) - time())
+end
+
+function Sync:EstimateRuntimeQueuePressure()
+    local pressure = 0
+    pressure = pressure + min(100, math.floor((#(self.outboundChunkQueue or {}) / max(1, MAX_OUTBOUND_CHUNKS)) * 100))
+    pressure = pressure + min(100, math.floor((#(self.manifestChunkQueue or {}) / max(1, MAX_MANIFEST_CHUNKS)) * 100))
+    pressure = pressure + min(100, math.floor((#(self.inboundChunkQueue or {}) / max(1, MAX_INBOUND_CHUNKS)) * 100))
+    pressure = pressure + min(100, math.floor((#(self.inboundFinalizeQueue or {}) / max(1, MAX_INBOUND_FINALIZE_QUEUE)) * 100))
+    pressure = pressure + min(100, math.floor((countKeys(self.pendingRequests or {}) / max(1, MAX_PENDING_REQUESTS)) * 100))
+    pressure = pressure + min(100, math.floor((countKeys(self.partialReceive or {}) / max(1, MAX_PARTIAL_RECEIVES)) * 100))
+    pressure = pressure + min(100, math.floor((countNestedEntries(self.partialManifestReceive) / max(1, MAX_PARTIAL_MANIFESTS_TOTAL)) * 100))
+    pressure = pressure + min(100, math.floor((#(self.manifestCatchupQueue or {}) / max(1, MAX_MANIFEST_CATCHUP_QUEUE)) * 100))
+    pressure = math.floor(pressure / 8)
+    self.telemetry.runtimeQueuePressure = pressure
+    self.telemetry.outboundChunkQueueMax = max(self.telemetry.outboundChunkQueueMax or 0, #(self.outboundChunkQueue or {}))
+    self.telemetry.manifestChunkQueueMax = max(self.telemetry.manifestChunkQueueMax or 0, #(self.manifestChunkQueue or {}))
+    self.telemetry.inboundChunkQueueMax = max(self.telemetry.inboundChunkQueueMax or 0, #(self.inboundChunkQueue or {}))
+    self.telemetry.inboundFinalizeQueueMax = max(self.telemetry.inboundFinalizeQueueMax or 0, #(self.inboundFinalizeQueue or {}))
+    self.telemetry.partialReceiveMax = max(self.telemetry.partialReceiveMax or 0, countKeys(self.partialReceive or {}))
+    self.telemetry.partialManifestReceiveMax = max(self.telemetry.partialManifestReceiveMax or 0, countNestedEntries(self.partialManifestReceive))
+    self.telemetry.pendingRequestMax = max(self.telemetry.pendingRequestMax or 0, countKeys(self.pendingRequests or {}))
+    return pressure
+end
+
+function Sync:ShouldDeferHeavyLifecycleWork(reason)
+    local normalized = tostring(reason or "")
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() then
+        return true, "sensitive-context"
+    end
+    if self:IsInWarmup() then
+        return true, "warmup"
+    end
+    if self:IsInWorldTransition() then
+        return true, "world-transition"
+    end
+    if self:EstimateRuntimeQueuePressure() >= 70 then
+        return true, "queue-pressure"
+    end
+    if (normalized == "ui" or normalized == "roster-ui")
+        and not (Addon.UI and Addon.UI.frame and Addon.UI.frame:IsShown()) then
+        return true, "ui-hidden"
+    end
+    return false, nil
+end
+
+function Sync:QueueTransitionDrainWork(item, atFront)
+    if type(item) ~= "table" or not item.kind then return end
+    self.transitionDrainQueue = self.transitionDrainQueue or {}
+    if atFront then
+        table.insert(self.transitionDrainQueue, 1, item)
+    else
+        self.transitionDrainQueue[#self.transitionDrainQueue + 1] = item
+    end
+end
+
+function Sync:RunTransitionDrainStep(state, _budget)
+    state = state or {}
+    if self:IsInWarmup() or self:IsInWorldTransition() then
+        local waitFor = self:IsInWarmup() and self:GetWarmupRemaining() or self:GetWorldTransitionRemaining()
+        state.nextRunAt = time() + max(1, waitFor)
+        return true, state
+    end
+
+    local item = self.transitionDrainQueue and self.transitionDrainQueue[1] or nil
+    if not item then
+        return false, state
+    end
+
+    remove(self.transitionDrainQueue, 1)
+    self.telemetry.transitionDrainSteps = (self.telemetry.transitionDrainSteps or 0) + 1
+    self:PushLifecycleEvent("TRANSITION_DRAIN_STEP", tostring(item.kind))
+
+    if item.kind == "manifest-peer" then
+        if item.peerKey and self.onlineNodes and self.onlineNodes[item.peerKey] then
+            self:SendManifestToPeer(item.peerKey, item.why or "transition")
+        end
+    elseif item.kind == "manifest-refresh" then
+        if item.peerKey and self.onlineNodes and self.onlineNodes[item.peerKey] then
+            self:RequestManifestRefresh(item.peerKey, { reason = item.reason or "transition" })
+        end
+    elseif item.kind == "broadcast-manifest" then
+        self:BroadcastManifestToOnlinePeers(item.why or "transition", {
+            ignoreWarmup = true,
+            ignoreTransition = true,
+        })
+    elseif item.kind == "manifest-compare-flush" then
+        self:FlushPendingManifestComparePeers(item.reason or "transition")
+    elseif item.kind == "catchup" then
+        self:ScheduleManifestCatchupDrain()
+    elseif item.kind == "tooltip" then
+        if Addon.Tooltip and Addon.Tooltip.OnSyncWarmupEnded then
+            Addon.Tooltip:OnSyncWarmupEnded()
+        end
+    elseif item.kind == "hello" then
+        self:BroadcastHello()
+    elseif item.kind == "ui" then
+        Addon:RequestRefresh(item.reason or "transition")
+    end
+
+    state.nextRunAt = time() + 1
+    return #(self.transitionDrainQueue or {}) > 0, state
+end
+
+function Sync:ScheduleTransitionDrain(reason)
+    if self._transitionDrainJobActive then return end
+    if #(self.transitionDrainQueue or {}) == 0 then return end
+    self._transitionDrainJobActive = true
+    if not (Addon.Performance and Addon.Performance.ScheduleJob) then
+        self:ScheduleTimer(function()
+            self._transitionDrainJobActive = false
+            local keepGoing = self:RunTransitionDrainStep({ nextRunAt = time() }, 1)
+            if keepGoing then
+                self:ScheduleTransitionDrain(reason)
+            end
+        end, 1)
+        return
+    end
+
+    Addon.Performance:ScheduleJob("transition-drain", function(state)
+        state = state or {}
+        state.nextRunAt = state.nextRunAt or time()
+        if time() < state.nextRunAt then
+            return true, state
+        end
+        local keepGoing, nextState = self:RunTransitionDrainStep(state, 1)
+        if not keepGoing then
+            self._transitionDrainJobActive = false
+            return false, nextState
+        end
+        return true, nextState
+    end, {
+        category = "sync-manifest-catchup",
+        label = reason or "transition-drain",
+        budgetMs = 1,
+        state = {
+            nextRunAt = time() + 1,
+        },
+    })
 end
 
 function Sync:QueueWarmupManifestPeer(peerKey, why)
@@ -458,11 +673,17 @@ function Sync:HandleWarmupExpired()
     end
 
     self.warmupUntil = 0
+    self:PushLifecycleEvent("WARMUP_END", tostring(self.warmupReason or "warmup"))
     local peers = self._warmupDeferredManifestPeers or {}
     self._warmupDeferredManifestPeers = {}
     for peerKey, why in pairs(peers) do
         if self.onlineNodes and self.onlineNodes[peerKey] then
-            self:SendManifestToPeer(peerKey, why or "warmup")
+            self.telemetry.transitionDeferredManifestPeers = (self.telemetry.transitionDeferredManifestPeers or 0) + 1
+            self:QueueTransitionDrainWork({
+                kind = "manifest-peer",
+                peerKey = peerKey,
+                why = why or "warmup",
+            })
         end
     end
 
@@ -470,21 +691,255 @@ function Sync:HandleWarmupExpired()
     self._warmupDeferredManifestRefreshPeers = {}
     for peerKey in pairs(refreshPeers) do
         if self.onlineNodes and self.onlineNodes[peerKey] then
-            self:RequestManifestRefresh(peerKey)
+            self.telemetry.transitionDeferredManifestPeers = (self.telemetry.transitionDeferredManifestPeers or 0) + 1
+            self:QueueTransitionDrainWork({
+                kind = "manifest-refresh",
+                peerKey = peerKey,
+                reason = "warmup",
+            })
         end
+    end
+
+    if self._pendingManifestComparePeers and next(self._pendingManifestComparePeers) ~= nil then
+        self:QueueTransitionDrainWork({
+            kind = "manifest-compare-flush",
+            reason = "warmup-expired",
+        }, true)
     end
 
     local why = self._pendingWarmupManifestBroadcastReason
     self._pendingWarmupManifestBroadcastReason = nil
     if why then
-        self:BroadcastManifestToOnlinePeers(why, { ignoreWarmup = true })
+        self:QueueTransitionDrainWork({
+            kind = "broadcast-manifest",
+            why = why,
+        })
     end
     if #(self.manifestCatchupQueue or {}) > 0 then
-        self:ScheduleManifestCatchupDrain()
+        self.telemetry.transitionDeferredCatchup = (self.telemetry.transitionDeferredCatchup or 0) + 1
+        self:QueueTransitionDrainWork({ kind = "catchup" })
     end
     if Addon.Tooltip and Addon.Tooltip.OnSyncWarmupEnded then
-        Addon.Tooltip:OnSyncWarmupEnded()
+        self.telemetry.transitionDeferredTooltip = (self.telemetry.transitionDeferredTooltip or 0) + 1
+        self:QueueTransitionDrainWork({ kind = "tooltip" })
     end
+    self.telemetry.transitionDeferredUI = (self.telemetry.transitionDeferredUI or 0) + 1
+    self:QueueTransitionDrainWork({
+        kind = "ui",
+        reason = "transition-resume",
+    })
+    if #(self.transitionDrainQueue or {}) > 0 then
+        self:ScheduleTransitionDrain("warmup-expired")
+    end
+end
+
+function Sync:DropObsoleteManifestChunks(_reason)
+    local queue = self.manifestChunkQueue or {}
+    if #queue <= MAX_MANIFEST_CHUNKS then
+        return 0
+    end
+
+    local newestByPeer = {}
+    local seenChunkKeys = {}
+    for _, queued in ipairs(queue) do
+        local peerKey = queued and queued.peer or nil
+        local payload = queued and queued.payload or nil
+        local manifestId = payload and payload.manifestId or nil
+        if peerKey and manifestId then
+            newestByPeer[peerKey] = manifestId
+        end
+    end
+
+    local kept = {}
+    local removed = 0
+    for index = #queue, 1, -1 do
+        local queued = queue[index]
+        local peerKey = queued and queued.peer or nil
+        local payload = queued and queued.payload or nil
+        local manifestId = payload and payload.manifestId or nil
+        local dedupeKey = table.concat({
+            tostring(peerKey or ""),
+            tostring(manifestId or ""),
+            tostring(payload and payload.seq or 0),
+        }, "\031")
+        if seenChunkKeys[dedupeKey] then
+            removed = removed + 1
+        elseif #kept >= MAX_MANIFEST_CHUNKS then
+            removed = removed + 1
+        elseif peerKey and manifestId and newestByPeer[peerKey] ~= manifestId then
+            removed = removed + 1
+        else
+            seenChunkKeys[dedupeKey] = true
+            kept[#kept + 1] = queued
+        end
+    end
+
+    if removed > 0 then
+        local normalized = {}
+        for index = #kept, 1, -1 do
+            normalized[#normalized + 1] = kept[index]
+        end
+        self.manifestChunkQueue = normalized
+    end
+    return removed
+end
+
+function Sync:DropDuplicateOutboundChunks(_reason)
+    local queue = self.outboundChunkQueue or {}
+    if #queue <= MAX_OUTBOUND_CHUNKS then
+        return 0
+    end
+
+    local kept = {}
+    local seen = {}
+    local removed = 0
+    for index = #queue, 1, -1 do
+        local queued = queue[index]
+        local block = queued and queued.block or nil
+        local dedupeKey = table.concat({
+            tostring(queued and queued.peer or ""),
+            tostring(block and block.sessionId or ""),
+            tostring(block and block.seq or ""),
+            tostring(block and block.key or ""),
+        }, "\031")
+        if seen[dedupeKey] or #kept >= MAX_OUTBOUND_CHUNKS then
+            removed = removed + 1
+        else
+            seen[dedupeKey] = true
+            kept[#kept + 1] = queued
+        end
+    end
+    if removed > 0 then
+        local normalized = {}
+        for index = #kept, 1, -1 do
+            normalized[#normalized + 1] = kept[index]
+        end
+        self.outboundChunkQueue = normalized
+    end
+    return removed
+end
+
+function Sync:ReleaseCompletedTransferState(memberKey, sessionId, _reason)
+    local released = 0
+    if memberKey and self.partialReceive and self.partialReceive[memberKey] then
+        local state = self.partialReceive[memberKey]
+        if not sessionId or state.sessionId == sessionId then
+            self.partialReceive[memberKey] = nil
+            released = released + 1
+        end
+    end
+
+    if sessionId and self.outgoingSessions and self.outgoingSessions[sessionId] then
+        self.outgoingSessions[sessionId] = nil
+        released = released + 1
+    end
+
+    if sessionId and self.outboundChunkQueue and #self.outboundChunkQueue > 0 then
+        local kept = {}
+        for _, queued in ipairs(self.outboundChunkQueue) do
+            if not (queued and queued.block and queued.block.sessionId == sessionId) then
+                kept[#kept + 1] = queued
+            else
+                released = released + 1
+            end
+        end
+        self.outboundChunkQueue = kept
+    end
+
+    if released > 0 then
+        self.telemetry.releasedIncomingStates = (self.telemetry.releasedIncomingStates or 0) + released
+    end
+    return released
+end
+
+function Sync:EnforceRuntimeQueueCaps(_reason)
+    local pruned = 0
+    pruned = pruned + self:DropDuplicateOutboundChunks("cap")
+    pruned = pruned + self:DropObsoleteManifestChunks("cap")
+
+    while #(self.outboundChunkQueue or {}) > MAX_OUTBOUND_CHUNKS do
+        remove(self.outboundChunkQueue, 1)
+        pruned = pruned + 1
+    end
+    while #(self.inboundChunkQueue or {}) > MAX_INBOUND_CHUNKS do
+        remove(self.inboundChunkQueue, 1)
+        pruned = pruned + 1
+    end
+    while #(self.inboundFinalizeQueue or {}) > MAX_INBOUND_FINALIZE_QUEUE do
+        remove(self.inboundFinalizeQueue, 1)
+        pruned = pruned + 1
+    end
+    while #(self.manifestCatchupQueue or {}) > MAX_MANIFEST_CATCHUP_QUEUE do
+        remove(self.manifestCatchupQueue, 1)
+        pruned = pruned + 1
+    end
+
+    local partialCount = countKeys(self.partialReceive or {})
+    if partialCount > MAX_PARTIAL_RECEIVES then
+        local rows = {}
+        for memberKey, state in pairs(self.partialReceive or {}) do
+            rows[#rows + 1] = {
+                memberKey = memberKey,
+                stamp = tonumber(state and state.lastProgressAt or 0) or 0,
+            }
+        end
+        sort(rows, function(a, b) return a.stamp < b.stamp end)
+        for index = 1, (partialCount - MAX_PARTIAL_RECEIVES) do
+            local row = rows[index]
+            if row and self.partialReceive[row.memberKey] then
+                self.partialReceive[row.memberKey] = nil
+                pruned = pruned + 1
+            end
+        end
+    end
+
+    local nestedTotal = countNestedEntries(self.partialManifestReceive)
+    if nestedTotal > MAX_PARTIAL_MANIFESTS_TOTAL then
+        for peerKey, manifests in pairs(self.partialManifestReceive or {}) do
+            while countKeys(manifests) > MAX_PARTIAL_MANIFESTS_PER_PEER do
+                local oldestKey
+                local oldestStamp
+                for manifestId, state in pairs(manifests or {}) do
+                    local stamp = tonumber(state and state.builtAt or 0) or 0
+                    if not oldestKey or stamp < oldestStamp then
+                        oldestKey = manifestId
+                        oldestStamp = stamp
+                    end
+                end
+                if not oldestKey then break end
+                manifests[oldestKey] = nil
+                pruned = pruned + 1
+            end
+            if next(manifests) == nil then
+                self.partialManifestReceive[peerKey] = nil
+            end
+        end
+    end
+
+    local pendingCount = countKeys(self.pendingRequests or {})
+    if pendingCount > MAX_PENDING_REQUESTS then
+        local rows = {}
+        for memberKey, request in pairs(self.pendingRequests or {}) do
+            rows[#rows + 1] = {
+                memberKey = memberKey,
+                stamp = tonumber(request and request.queuedAt or 0) or 0,
+            }
+        end
+        sort(rows, function(a, b) return a.stamp < b.stamp end)
+        for index = 1, (pendingCount - MAX_PENDING_REQUESTS) do
+            local row = rows[index]
+            if row and self.pendingRequests[row.memberKey] then
+                self.pendingRequests[row.memberKey] = nil
+                pruned = pruned + 1
+            end
+        end
+    end
+
+    if pruned > 0 then
+        self.telemetry.queueCapPrunes = (self.telemetry.queueCapPrunes or 0) + pruned
+    end
+    self:EstimateRuntimeQueuePressure()
+    return pruned
 end
 
 function Sync:IsPeerBackoffActive(sourceKey)
@@ -607,6 +1062,7 @@ function Sync:PruneState()
     self:PrunePartialReceives()
     self:PrunePartialManifestReceives()
     self:PruneTricklePeerState()
+    self:EnforceRuntimeQueueCaps("prune")
     self:RecomputeCoordinator()
 end
 
@@ -689,6 +1145,9 @@ function Sync:ShouldDeferManifestCatchup()
     if self:IsInWarmup() then
         return "warmup", max(MANIFEST_CATCHUP_DRAIN_DELAY, self:GetWarmupRemaining())
     end
+    if self:IsInWorldTransition() then
+        return "world-transition", max(MANIFEST_CATCHUP_DRAIN_DELAY, self:GetWorldTransitionRemaining())
+    end
     if #(self.outboundChunkQueue or {}) > 8 or #(self.manifestChunkQueue or {}) > 8 then
         return "outbound-busy", 0.5
     end
@@ -706,6 +1165,11 @@ function Sync:AutoSyncTick()
     if not IsInGuild() then return end
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() then
         self.telemetry.pausedSyncCycles = self.telemetry.pausedSyncCycles + 1
+        return
+    end
+    if self:IsInWorldTransition() then
+        self.telemetry.transitionDeferrals = (self.telemetry.transitionDeferrals or 0) + 1
+        self:EstimateRuntimeQueuePressure()
         return
     end
 

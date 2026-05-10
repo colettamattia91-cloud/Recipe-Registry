@@ -155,6 +155,38 @@ function TrickleSync:StorePeerManifest(peerKey, peerManifest)
     return self.peerState[peerKey].manifest
 end
 
+function TrickleSync:IsPeerBlockEquivalentToLocal(peerBlock, localBlock)
+    if type(peerBlock) ~= "table" or type(localBlock) ~= "table" then
+        return false
+    end
+    if (peerBlock.guildStatus or "active") ~= "active" or (localBlock.guildStatus or "active") ~= "active" then
+        return false
+    end
+    if peerBlock.ownerCharacter ~= localBlock.ownerCharacter then
+        return false
+    end
+    if peerBlock.professionKey ~= localBlock.professionKey then
+        return false
+    end
+    if (peerBlock.revision or 0) ~= (localBlock.revision or 0) then
+        return false
+    end
+    if (peerBlock.count or 0) ~= (localBlock.count or 0) then
+        return false
+    end
+    if (peerBlock.fingerprint or "") ~= (localBlock.fingerprint or "") then
+        return false
+    end
+
+    local peerSource = peerBlock.sourceType or "replica"
+    local localSource = localBlock.sourceType or "replica"
+    if peerSource ~= localSource and not (peerSource ~= "owner" and localSource ~= "owner") then
+        return false
+    end
+
+    return true
+end
+
 function TrickleSync:ComparePeerManifest(peerManifest, opts)
     opts = opts or {}
     local includeRemoteDiffs = opts.includeRemoteDiffs ~= false
@@ -171,6 +203,8 @@ function TrickleSync:ComparePeerManifest(peerManifest, opts)
             missingThere = {},
             outdatedHere = {},
             outdatedThere = {},
+            identicalBlocks = {},
+            ignoredStaleBlocks = {},
             status = status or "building",
         }, status or "building"
     end
@@ -181,6 +215,8 @@ function TrickleSync:ComparePeerManifest(peerManifest, opts)
         missingThere = {},
         outdatedHere = {},
         outdatedThere = {},
+        identicalBlocks = {},
+        ignoredStaleBlocks = {},
         status = status or "ready",
     }
 
@@ -191,10 +227,13 @@ function TrickleSync:ComparePeerManifest(peerManifest, opts)
             -- Ignore malformed manifest rows instead of turning them into REQ keys.
         elseif (peerBlock.guildStatus or "active") ~= "active" then
             -- Stale records should not drive normal convergence.
+            comparison.ignoredStaleBlocks[#comparison.ignoredStaleBlocks + 1] = blockKey
         else
             local localBlock = localManifest.blocks[blockKey]
             if not localBlock then
                 comparison.missingHere[#comparison.missingHere + 1] = blockKey
+            elseif self:IsPeerBlockEquivalentToLocal(peerBlock, localBlock) then
+                comparison.identicalBlocks[#comparison.identicalBlocks + 1] = blockKey
             else
                 local peerRevision = peerBlock.revision or 0
                 local localRevision = localBlock.revision or 0
@@ -281,14 +320,14 @@ function TrickleSync:GroupBlockRequestsByOwner(peerManifest, blockKeys)
 end
 
 function TrickleSync:QueueMissingBlocksForPeer(peerKey, peerManifest)
-    if not peerKey then return 0, {} end
-    local missingBlocks, _comparison, status = self:ComputeMissingBlocks(peerManifest)
+    if not peerKey then return 0, {}, "missing-peer", nil end
+    local missingBlocks, comparison, status = self:ComputeMissingBlocks(peerManifest)
     if not missingBlocks then
         self.outboundQueue[peerKey] = nil
         self.peerState[peerKey] = self.peerState[peerKey] or {}
         self.peerState[peerKey].lastManifestAt = time()
         self.peerState[peerKey].queuedBlocks = 0
-        return 0, {}, status or "building"
+        return 0, {}, status or "building", comparison
     end
 
     local otherQueued = 0
@@ -320,7 +359,7 @@ function TrickleSync:QueueMissingBlocksForPeer(peerKey, peerManifest)
     self.peerState[peerKey] = self.peerState[peerKey] or {}
     self.peerState[peerKey].lastManifestAt = time()
     self.peerState[peerKey].queuedBlocks = #queue
-    return #queue, self:GroupBlockRequestsByOwner(peerManifest, queue), status or "ready"
+    return #queue, self:GroupBlockRequestsByOwner(peerManifest, missingBlocks), status or "ready", comparison
 end
 
 function TrickleSync:GetQueuedBlocks(peerKey)

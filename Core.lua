@@ -142,10 +142,31 @@ function Addon:OnPlayerEnteringWorld(_event, isLogin, isReload)
         return
     end
 
-    if C_GuildInfo and C_GuildInfo.GuildRoster then
-        C_GuildInfo.GuildRoster()
-    elseif GuildRoster then
-        GuildRoster()
+    if self.Sync and self.Sync.EnterWorldTransition then
+        local syncConstants = self.Sync._private and self.Sync._private.constants or {}
+        local inInstance = IsInInstance and select(1, IsInInstance()) or false
+        local duration = inInstance and (syncConstants.POST_INSTANCE_GRACE_SECONDS or 15)
+            or (syncConstants.POST_WORLD_GRACE_SECONDS or 12)
+        if (isLogin or isReload) and inInstance then
+            duration = syncConstants.POST_RELOAD_IN_INSTANCE_GRACE_SECONDS or duration
+        end
+        self.Sync:EnterWorldTransition(
+            isLogin and "login"
+                or (isReload and "reload")
+                or (inInstance and "instance-enter")
+                or "zone-enter",
+            duration
+        )
+    end
+
+    if self.Data and self.Data.RequestGuildRosterRefresh then
+        local requested = self.Data:RequestGuildRosterRefresh("player-entering-world", {
+            force = isLogin or isReload,
+            cooldown = (isLogin or isReload) and 0 or 4,
+        })
+        if not requested and self.Sync and self.Sync.telemetry then
+            self.Sync.telemetry.transitionSkippedRosterRefresh = (self.Sync.telemetry.transitionSkippedRosterRefresh or 0) + 1
+        end
     end
 
     if isLogin or isReload then
@@ -158,6 +179,13 @@ function Addon:OnPlayerEnteringWorld(_event, isLogin, isReload)
 end
 
 function Addon:OnLoginReady()
+    if self.Sync and self.Sync.ShouldDeferHeavyLifecycleWork then
+        local shouldDefer = self.Sync:ShouldDeferHeavyLifecycleWork("login")
+        if shouldDefer then
+            self:ScheduleTimer("OnLoginReady", 2)
+            return
+        end
+    end
     if self.Data then
         self.Data:DetectProfessions()
     end
@@ -229,15 +257,50 @@ function Addon:ProcessRecipeSignal()
     end
 end
 
-function Addon:OnGuildRosterUpdate()
-    if self.Data then
-        self.Data:RebuildOnlineCache()
+function Addon:ScheduleRosterUpdate(reason)
+    if self.Sync and self.Sync.telemetry then
+        self.Sync.telemetry.rosterEventsSeen = (self.Sync.telemetry.rosterEventsSeen or 0) + 1
+    end
+    if self._rosterUpdateTimer then
+        if self.Sync and self.Sync.telemetry then
+            self.Sync.telemetry.rosterEventsCoalesced = (self.Sync.telemetry.rosterEventsCoalesced or 0) + 1
+        end
+        return
+    end
+    self._rosterUpdateTimer = self:ScheduleTimer(function()
+        self._rosterUpdateTimer = nil
+        self:ProcessScheduledRosterUpdate(reason or "roster")
+    end, 2)
+end
+
+function Addon:ProcessScheduledRosterUpdate(reason)
+    local delta = self.Data and self.Data.RebuildOnlineCache and self.Data:RebuildOnlineCache() or nil
+    local heavyUpdate = not delta
+        or delta.membershipChanged
+        or delta.guildStatusChanged
+        or delta.knownMembersChanged
+    local presenceOnly = delta
+        and not heavyUpdate
+        and (delta.presenceChanged or delta.onlineCountChanged)
+
+    if self.Data and (heavyUpdate or presenceOnly) then
         self.Data:InvalidateRecipeCaches("presence")
     end
     if self.Sync then
+        if presenceOnly and self.Sync.telemetry then
+            self.Sync.telemetry.rosterPresenceOnlyUpdates = (self.Sync.telemetry.rosterPresenceOnlyUpdates or 0) + 1
+        elseif self.Sync.telemetry then
+            self.Sync.telemetry.rosterHeavyUpdates = (self.Sync.telemetry.rosterHeavyUpdates or 0) + 1
+        end
         self.Sync:OnGuildRosterUpdate()
     end
-    self:RequestRefresh("roster")
+    if heavyUpdate or presenceOnly then
+        self:RequestRefresh(reason or "roster")
+    end
+end
+
+function Addon:OnGuildRosterUpdate()
+    self:ScheduleRosterUpdate("roster")
 end
 
 function Addon:OnItemInfoReceived()
@@ -306,6 +369,9 @@ function Addon:SlashHandler(input)
             return
         end
         if perfCmd == "dump" or perfCmd == "status" then
+            if not self.debugMode then
+                return
+            end
             if self.Performance and self.Performance.DumpDebugStatus then
                 self.Performance:DumpDebugStatus()
             end
@@ -398,6 +464,9 @@ function Addon:SlashHandler(input)
     end
 
     if cmd == "dump" then
+        if not self.debugMode then
+            return
+        end
         if self.Data then self.Data:DumpSummary() end
         return
     end
@@ -451,11 +520,17 @@ function Addon:SlashHandler(input)
     end
 
     if cmd == "sync" or cmd == "comms" then
+        if not self.debugMode then
+            return
+        end
         if self.Sync then self.Sync:DumpStatus() end
         return
     end
 
     if cmd == "offline" or cmd == "replica" then
+        if not self.debugMode then
+            return
+        end
         if self.Sync and self.Sync.DumpOfflineSyncStatus then
             self.Sync:DumpOfflineSyncStatus()
         end
@@ -466,6 +541,9 @@ function Addon:SlashHandler(input)
         local target = trimInput(rest)
         local mode = target:lower()
         if (mode == "verbose" or mode == "details" or mode == "detail") and self.Data and self.Data.DumpManifestSummary then
+            if not self.debugMode then
+                return
+            end
             self.Data:DumpManifestSummary({ verbose = true })
             return
         end
@@ -479,6 +557,9 @@ function Addon:SlashHandler(input)
             return
         end
         if self.Data and self.Data.DumpManifestSummary then
+            if not self.debugMode then
+                return
+            end
             self.Data:DumpManifestSummary({ verbose = false })
         end
         return

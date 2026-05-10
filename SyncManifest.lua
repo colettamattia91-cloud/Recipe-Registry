@@ -31,6 +31,17 @@ function Sync:SendManifestToPeer(peerKey, why)
     if not peerKey or not Addon.TrickleSync then return end
     if not self:IsValidSyncMemberKey(peerKey) then return end
     if self:IsMockKey(peerKey) then return end
+    if self:IsInWorldTransition() and why ~= "force" then
+        self.telemetry.transitionDeferredManifestPeers = (self.telemetry.transitionDeferredManifestPeers or 0) + 1
+        self.telemetry.transitionDeferrals = (self.telemetry.transitionDeferrals or 0) + 1
+        self:QueueTransitionDrainWork({
+            kind = "manifest-peer",
+            peerKey = peerKey,
+            why = why or "transition",
+        })
+        self:ScheduleTransitionDrain("manifest-peer")
+        return
+    end
     self.telemetry.manifestBuildRequests = (self.telemetry.manifestBuildRequests or 0) + 1
     local lastSentAt = self._lastManifestSentAt[peerKey] or 0
     if why ~= "force" and (time() - lastSentAt) < MANIFEST_PUSH_COOLDOWN then
@@ -83,6 +94,7 @@ function Sync:QueueManifestChunks(peerKey, chunks, why)
     if #self.manifestChunkQueue > (self.telemetry.manifestQueueMaxDepth or 0) then
         self.telemetry.manifestQueueMaxDepth = #self.manifestChunkQueue
     end
+    self:EnforceRuntimeQueueCaps("manifest-queue")
     return true
 end
 
@@ -99,19 +111,37 @@ function Sync:OnManifestCacheReady(reason)
 end
 
 function Sync:ProcessPeerManifestComparison(senderKey, manifest)
-    local _queuedBlocks, groupedRequests, compareStatus = Addon.TrickleSync:QueueMissingBlocksForPeer(senderKey, manifest)
+    local _queuedBlocks, groupedRequests, compareStatus, comparison = Addon.TrickleSync:QueueMissingBlocksForPeer(senderKey, manifest)
     if compareStatus == "building" or compareStatus == "deferred" then
         self:QueuePendingManifestComparePeer(senderKey)
-        return false
+        return {
+            changedLocalData = false,
+            queuedRequests = 0,
+            deferredRequests = 0,
+            identicalBlocks = 0,
+            metadataOnlyBlocks = 0,
+            ignoredStaleBlocks = 0,
+            shouldRefreshUI = false,
+        }
+    end
+
+    local identicalBlocks = comparison and #(comparison.identicalBlocks or {}) or 0
+    local ignoredStaleBlocks = comparison and #(comparison.ignoredStaleBlocks or {}) or 0
+    if identicalBlocks > 0 then
+        self.telemetry.manifestIdenticalBlockSkips = (self.telemetry.manifestIdenticalBlockSkips or 0) + identicalBlocks
+        self.telemetry.manifestEquivalentPeerSkips = (self.telemetry.manifestEquivalentPeerSkips or 0) + 1
     end
 
     local catchupCandidates = self:BuildManifestCatchupCandidates(senderKey, groupedRequests)
     local deferReason = self:ShouldDeferManifestCatchup()
+    local deferredRequests = 0
+    local queuedBefore = self.telemetry.manifestCatchupQueued or 0
     if deferReason then
         self.telemetry.warmupDeferrals = (self.telemetry.warmupDeferrals or 0) + 1
         Addon:Debug("Deferring manifest catch-up batch", tostring(senderKey), tostring(deferReason))
         for _, candidate in ipairs(catchupCandidates) do
             self:DeferManifestCatchupCandidate(candidate)
+            deferredRequests = deferredRequests + 1
         end
         if #catchupCandidates > 0 then
             self:ScheduleManifestCatchupDrain()
@@ -119,7 +149,20 @@ function Sync:ProcessPeerManifestComparison(senderKey, manifest)
     else
         self:FlushManifestCatchupCandidates(catchupCandidates)
     end
-    return true
+    local queuedRequests = max(0, (self.telemetry.manifestCatchupQueued or 0) - queuedBefore)
+    if queuedRequests == 0 and identicalBlocks > 0 then
+        self.telemetry.manifestRequestsAvoided = (self.telemetry.manifestRequestsAvoided or 0) + identicalBlocks
+        self.telemetry.avoidedRequests = (self.telemetry.avoidedRequests or 0) + identicalBlocks
+    end
+    return {
+        changedLocalData = queuedRequests > 0 or deferredRequests > 0,
+        queuedRequests = queuedRequests,
+        deferredRequests = deferredRequests,
+        identicalBlocks = identicalBlocks,
+        metadataOnlyBlocks = 0,
+        ignoredStaleBlocks = ignoredStaleBlocks,
+        shouldRefreshUI = queuedRequests > 0 or deferredRequests > 0,
+    }
 end
 
 function Sync:FlushPendingManifestComparePeers(_reason)
@@ -142,6 +185,17 @@ function Sync:RequestManifestRefresh(peerKey, opts)
     opts = opts or {}
     if peerKey and peerKey ~= "" then
         if self:IsMockKey(peerKey) then return end
+        if self:IsInWorldTransition() and not opts.force then
+            self.telemetry.transitionDeferredManifestPeers = (self.telemetry.transitionDeferredManifestPeers or 0) + 1
+            self.telemetry.transitionDeferrals = (self.telemetry.transitionDeferrals or 0) + 1
+            self:QueueTransitionDrainWork({
+                kind = "manifest-refresh",
+                peerKey = peerKey,
+                reason = opts.reason or "transition",
+            })
+            self:ScheduleTransitionDrain("manifest-refresh")
+            return
+        end
         if not self:ShouldRequestManifestRefresh(peerKey, opts) then return end
         if opts.clearBackoff then
             self:ClearPeerBackoff(peerKey)
@@ -201,6 +255,15 @@ function Sync:BroadcastManifestToOnlinePeers(why, opts)
         self.telemetry.warmupDeferrals = (self.telemetry.warmupDeferrals or 0) + 1
         self._pendingWarmupManifestBroadcastReason = why or self._pendingWarmupManifestBroadcastReason or "broadcast"
         Addon:Debug("Warmup deferring manifest fan-out", tostring(why or "broadcast"))
+        return
+    end
+    if self:IsInWorldTransition() and not opts.ignoreTransition then
+        self.telemetry.transitionDeferrals = (self.telemetry.transitionDeferrals or 0) + 1
+        self:QueueTransitionDrainWork({
+            kind = "broadcast-manifest",
+            why = why or "broadcast",
+        })
+        self:ScheduleTransitionDrain("manifest-broadcast")
         return
     end
     for peerKey in pairs(self.onlineNodes or {}) do
@@ -522,8 +585,10 @@ function Sync:HandleManifestChunk(payload)
         self.telemetry.replicaManifestOwnersSeen = self.telemetry.replicaManifestOwnersSeen + uniqueReplicaOwners
         self:PushOfflineDebugEvent("manifest", string.format("peer=%s owners=%d blocks=%d", tostring(senderKey), uniqueReplicaOwners, replicaBlocks))
     end
-    self:ProcessPeerManifestComparison(senderKey, manifest)
-    Addon:RequestRefresh("manifest")
+    local comparisonResult = self:ProcessPeerManifestComparison(senderKey, manifest)
+    if comparisonResult and comparisonResult.shouldRefreshUI then
+        Addon:RequestRefresh("manifest")
+    end
 end
 
 function Sync:SendNextManifestChunk()

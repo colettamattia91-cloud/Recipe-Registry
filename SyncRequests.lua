@@ -148,8 +148,16 @@ function Sync:ShouldAllowLocalMockTraffic(sourceKey, memberKey)
 end
 
 function Sync:ShouldDeferRequestDispatch(request)
-    if not self:IsInWarmup() then return false end
-    return not isManualReason(request and request.why)
+    if isManualReason(request and request.why) then
+        return false
+    end
+    if self:IsInWarmup() then
+        return true
+    end
+    if self.IsInWorldTransition and self:IsInWorldTransition() then
+        return true
+    end
+    return false
 end
 
 function Sync:QueueRequest(sourceKey, memberKey, targetRev, why, opts)
@@ -213,6 +221,9 @@ function Sync:QueueRequest(sourceKey, memberKey, targetRev, why, opts)
         requestedBlocks = cloneStringSet(opts.requestedBlocks),
         expectedFingerprints = cloneFingerprintMap(opts.expectedFingerprints),
     }
+    if self.EnforceRuntimeQueueCaps then
+        self:EnforceRuntimeQueueCaps("queue-request")
+    end
     Addon:Debug("Queued direct request", memberKey, "from", sourceKey, "rev", targetRev or 0, why or "")
     Addon:RequestRefresh("queue")
 end
@@ -429,6 +440,9 @@ function Sync:FailInFlight(memberKey, requeue, reason)
                 requestedBlocks = cloneStringSet(req.requestedBlocks),
                 expectedFingerprints = cloneFingerprintMap(req.expectedFingerprints),
             }
+            if self.EnforceRuntimeQueueCaps then
+                self:EnforceRuntimeQueueCaps("retry-request")
+            end
             self.telemetry.requestRetries = (self.telemetry.requestRetries or 0) + 1
         end
         if self:IsValidSyncMemberKey(req.source) and not self:IsMockKey(req.source) and not self:IsInWarmup() then

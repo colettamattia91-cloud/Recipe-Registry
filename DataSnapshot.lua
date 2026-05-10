@@ -132,6 +132,70 @@ function Data:BeginIncomingSnapshot(memberKey, rev, updatedAt)
     }
 end
 
+function Data:ComputeRecipeSignature(recipes)
+    return stableRecipeSignature(recipes or {})
+end
+
+function Data:CompareIncomingProfession(currentProf, incomingProf)
+    local currentRecipes = currentProf and currentProf.recipes or {}
+    local incomingRecipes = incomingProf and incomingProf.recipes or {}
+    local currentSignature = currentProf and (currentProf.signature or self:ComputeRecipeSignature(currentRecipes)) or ""
+    local incomingSignature = incomingProf and (incomingProf.signature or self:ComputeRecipeSignature(incomingRecipes)) or ""
+    local currentCount = currentProf and (currentProf.count or countRecipeKeys(currentRecipes)) or 0
+    local incomingCount = incomingProf and (incomingProf.count or countRecipeKeys(incomingRecipes)) or 0
+    local signatureChanged = currentSignature ~= incomingSignature or currentCount ~= incomingCount
+    local metadataChanged = false
+
+    if not signatureChanged then
+        metadataChanged = (currentProf and (currentProf.skillRank or 0) or 0) ~= (incomingProf and (incomingProf.skillRank or 0) or 0)
+            or (currentProf and (currentProf.skillMaxRank or 0) or 0) ~= (incomingProf and (incomingProf.skillMaxRank or 0) or 0)
+            or (currentProf and currentProf.specialization or nil) ~= (incomingProf and incomingProf.specialization or nil)
+            or (currentProf and (currentProf.blockRevision or 0) or 0) ~= (incomingProf and (incomingProf.blockRevision or 0) or 0)
+            or (currentProf and (currentProf.lastUpdatedAt or 0) or 0) ~= (incomingProf and (incomingProf.lastUpdatedAt or 0) or 0)
+            or (currentProf and (currentProf.sourceType or "replica") or "replica") ~= (incomingProf and (incomingProf.sourceType or "replica") or "replica")
+    end
+
+    return {
+        signatureChanged = signatureChanged,
+        metadataChanged = metadataChanged,
+        identicalRecipes = not signatureChanged,
+        identicalMetadata = not signatureChanged and not metadataChanged,
+        metadataOnly = not signatureChanged and metadataChanged,
+        currentSignature = currentSignature,
+        incomingSignature = incomingSignature,
+        currentCount = currentCount,
+        incomingCount = incomingCount,
+    }
+end
+
+function Data:ApplyIncomingMetadataOnly(memberKey, profName, incomingProf, state, opts)
+    local entry = self:GetOrCreateMember(memberKey)
+    local currentProf = entry.professions and entry.professions[profName] or nil
+    if not currentProf then
+        return false
+    end
+
+    opts = opts or {}
+    currentProf.skillRank = incomingProf.skillRank or currentProf.skillRank or 0
+    currentProf.skillMaxRank = incomingProf.skillMaxRank or currentProf.skillMaxRank or 0
+    if incomingProf.specialization ~= nil then
+        currentProf.specialization = incomingProf.specialization
+    end
+    currentProf.blockRevision = incomingProf.blockRevision or currentProf.blockRevision or entry.rev or 0
+    currentProf.lastUpdatedAt = incomingProf.lastUpdatedAt or currentProf.lastUpdatedAt or state.updatedAt or time()
+    currentProf.sourceType = incomingProf.sourceType or currentProf.sourceType or opts.sourceType or entry.sourceType or "replica"
+    currentProf.guildStatus = "active"
+    currentProf.lastSeenInGuildAt = time()
+
+    entry.rev = opts.rev or state.rev or entry.rev or 0
+    entry.updatedAt = state.updatedAt or entry.updatedAt or time()
+    entry.sourceType = opts.sourceType or state.sourceType or entry.sourceType or "replica"
+    entry.guildStatus = "active"
+    entry.lastSeenInGuildAt = time()
+    entry.professions[profName] = currentProf
+    return true
+end
+
 function Data:AppendIncomingChunk(chunk)
     if not chunk or not chunk.memberKey then return end
     self._incoming = self._incoming or {}
@@ -267,6 +331,40 @@ function Data:FinalizeIncomingSnapshot(memberKey, rev, opts)
         end
     end
 
+    local heavyChanged = current == nil
+    local metadataOnlyChanged = false
+    if current then
+        for profName, currentProf in pairs(current.professions or {}) do
+            local incomingProf = finalEntry.professions[profName]
+            if not incomingProf then
+                heavyChanged = true
+                break
+            end
+            local comparison = self:CompareIncomingProfession(currentProf, incomingProf)
+            if comparison.signatureChanged then
+                heavyChanged = true
+                break
+            end
+            if comparison.metadataOnly then
+                metadataOnlyChanged = true
+            end
+        end
+        if not heavyChanged then
+            for profName in pairs(finalEntry.professions or {}) do
+                if not (current.professions and current.professions[profName]) then
+                    heavyChanged = true
+                    break
+                end
+            end
+        end
+        if not heavyChanged then
+            metadataOnlyChanged = metadataOnlyChanged
+                or (current.rev or 0) ~= (finalEntry.rev or 0)
+                or (current.updatedAt or 0) ~= (finalEntry.updatedAt or 0)
+                or (current.sourceType or "replica") ~= (finalEntry.sourceType or "replica")
+        end
+    end
+
     local applied, reason, resolved = Addon.MergeEngine:ApplyIfNewer(current, finalEntry, {
         preserveOwner = memberKey == self:GetPlayerKey(),
     })
@@ -276,15 +374,35 @@ function Data:FinalizeIncomingSnapshot(memberKey, rev, opts)
         if Addon.Sync and Addon.Sync.RecordMergeSkip then
             Addon.Sync:RecordMergeSkip(reason)
         end
+        if reason == "equivalent" and Addon.Sync and Addon.Sync.telemetry then
+            Addon.Sync.telemetry.snapshotIdenticalSkips = (Addon.Sync.telemetry.snapshotIdenticalSkips or 0) + 1
+            Addon.Sync.telemetry.avoidedCacheInvalidations = (Addon.Sync.telemetry.avoidedCacheInvalidations or 0) + 1
+        end
         return false
     end
 
     self.db.global.members[memberKey] = self:NormalizeMemberEntry(resolved, memberKey)
     self:MarkManifestMemberDirty(memberKey, self.db.global.members[memberKey], "snapshot-merge")
+
+    if current and not heavyChanged and metadataOnlyChanged then
+        if Addon.Sync and Addon.Sync.telemetry then
+            Addon.Sync.telemetry.snapshotMetadataOnlyApplies = (Addon.Sync.telemetry.snapshotMetadataOnlyApplies or 0) + 1
+            Addon.Sync.telemetry.avoidedCacheInvalidations = (Addon.Sync.telemetry.avoidedCacheInvalidations or 0) + 1
+        end
+        self:InvalidateRecipeCaches("metadata")
+        if Addon.UI and Addon.UI.frame and Addon.UI.frame:IsShown() then
+            Addon:RequestRefresh("snapshot-metadata")
+        end
+        return true
+    end
+
+    if Addon.Sync and Addon.Sync.telemetry then
+        Addon.Sync.telemetry.snapshotHeavyApplies = (Addon.Sync.telemetry.snapshotHeavyApplies or 0) + 1
+    end
     self:InvalidateRecipeCaches()
     Addon:RequestRefresh("snapshot-merge")
     if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
-        Addon.Tooltip:InvalidateIndex()
+        Addon.Tooltip:InvalidateIndex("snapshot-merge")
     end
     return true
 end
