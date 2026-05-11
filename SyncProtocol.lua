@@ -19,6 +19,7 @@ function Sync:BroadcastHello()
         rev = summary.rev,
         updatedAt = summary.updatedAt,
         version = Addon.DISPLAY_VERSION,
+        caps = self.GetLocalProtocolCaps and self:GetLocalProtocolCaps() or nil,
     }, "ALERT")
 end
 
@@ -37,6 +38,7 @@ function Sync:AdvertiseLocalRevision(reason)
         professions = summary.professions,
         recipes = summary.recipes,
         why = reason,
+        caps = self.GetLocalProtocolCaps and self:GetLocalProtocolCaps() or nil,
     }, "ALERT")
     self:BroadcastManifestToOnlinePeers(reason or "advertise")
 end
@@ -120,6 +122,9 @@ end
 function Sync:HandleHello(payload)
     if not self:IsValidSyncMemberKey(payload.key) then return end
     self:TouchNode(payload.key, payload.version)
+    if self.RecordPeerCaps then
+        self:RecordPeerCaps(payload.sender or payload.key, payload.caps)
+    end
     self:RecordRevisionHint(payload.key, payload.rev, payload.updatedAt, payload.key)
     if self:IsMockKey(payload.key) then return end
     if self:IsInWarmup() then
@@ -153,6 +158,9 @@ end
 function Sync:HandleAdvertise(payload)
     if not self:IsValidSyncMemberKey(payload.key) or not self:IsValidSyncMemberKey(payload.sender) then return end
     self:TouchNode(payload.sender)
+    if self.RecordPeerCaps then
+        self:RecordPeerCaps(payload.sender, payload.caps)
+    end
     self:RecordRevisionHint(payload.key, payload.rev, payload.updatedAt, payload.key)
     if self:IsMockKey(payload.key) or self:IsMockKey(payload.sender) then return end
 

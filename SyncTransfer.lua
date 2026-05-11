@@ -82,6 +82,7 @@ function Sync:HandleRequest(payload)
         updatedAt = entry.updatedAt or 0,
         total = #chunks,
         chunks = chunks,
+        acceptSnapCodec = payload.acceptSnapCodec,
         createdAt = time(),
         lastSentAt = 0,
     }
@@ -311,12 +312,19 @@ function Sync:SendNextSnapshotChunk()
 
     local queued = table.remove(self.outboundChunkQueue, candidateIndex)
     local block = queued.block
-    self:SendDirectEnvelope("SNAP", block, queued.peer, "BULK")
+    local session = self.outgoingSessions[block.sessionId]
+    local wireBlock = block
+    if self.EncodeSnapshotBlockForWire then
+        wireBlock = self:EncodeSnapshotBlockForWire(block, queued.peer, {
+            acceptSnapCodec = session and session.acceptSnapCodec or nil,
+            reason = "snapshot-send",
+        }) or block
+    end
+    self:SendDirectEnvelope("SNAP", wireBlock, queued.peer, "BULK")
     self.peerPacing[queued.peer] = self.peerPacing[queued.peer] or {}
     self.peerPacing[queued.peer].lastSentAt = nowForPacing()
     self.telemetry.sentChunks = self.telemetry.sentChunks + 1
 
-    local session = self.outgoingSessions[block.sessionId]
     if session then
         session.lastSentAt = time()
     end
@@ -341,6 +349,20 @@ end
 
 function Sync:DecodeChunkStep(payload)
     if not payload then return false end
+    if payload.codec and self.DecodeSnapshotBlockFromWire then
+        local decoded, ok, reason = self:DecodeSnapshotBlockFromWire(payload)
+        if not ok then
+            self.telemetry.snapCodecDropped = (self.telemetry.snapCodecDropped or 0) + 1
+            if payload.key and payload.sessionId and self.ReleaseCompletedTransferState then
+                self:ReleaseCompletedTransferState(payload.key, payload.sessionId, "codec-error")
+            end
+            if payload.sender and self.MarkPeerFailure then
+                self:MarkPeerFailure(payload.sender, reason or "codec-error")
+            end
+            return false
+        end
+        payload = decoded
+    end
     if not self:IsValidSyncMemberKey(payload.key) then return false end
     Addon.Data:AppendIncomingChunk({
         memberKey = payload.key,

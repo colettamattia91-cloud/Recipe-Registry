@@ -55,6 +55,7 @@ end
 function Sync:OnInitialize()
     self.onlineNodes = {}
     self.registry = {}
+    self.peerCaps = {}
     self.pendingRequests = {}
     self.partialReceive = {}
     self.outgoingSessions = {}
@@ -109,6 +110,7 @@ function Sync:ResetRuntimeQueues(reason, opts)
     if opts.clearDiscovery then
         self.onlineNodes = {}
         self.registry = {}
+        self.peerCaps = {}
         self.coordinatorKey = nil
         self.lastHelloAt = 0
         self._lastCoordinatorChangeAt = 0
@@ -116,6 +118,7 @@ function Sync:ResetRuntimeQueues(reason, opts)
     self.pendingRequests = {}
     self.partialReceive = {}
     self.outgoingSessions = {}
+    self.peerCaps = {}
     self.inFlightRequests = {}
     self.inFlight = nil
     self.outboundChunkQueue = {}

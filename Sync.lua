@@ -56,6 +56,9 @@ local MAX_PARTIAL_MANIFESTS_TOTAL = 64
 local MAX_PARTIAL_MANIFESTS_PER_PEER = 8
 local MAX_MANIFEST_CATCHUP_QUEUE = 256
 local MAX_PENDING_REQUESTS = 64
+local SNAP_CODEC_ENABLED = true
+local SNAP_CODEC_MIN_BYTES = 768
+local SNAP_CODEC_ID = "snap.lsd1"
 
 local function countKeys(tbl)
     local n = 0
@@ -221,6 +224,24 @@ local function newSyncTelemetry()
         prunedPartialManifestReceives = 0,
         prunedTricklePeerState = 0,
         prunedTrickleOutboundQueues = 0,
+        snapCodecEncoded = 0,
+        snapCodecDecoded = 0,
+        snapCodecSkippedSmall = 0,
+        snapCodecFallbackNoLib = 0,
+        snapCodecFallbackNoPeerCap = 0,
+        snapCodecCompressErrors = 0,
+        snapCodecEncodeErrors = 0,
+        snapCodecDecodeNoLib = 0,
+        snapCodecDecodeErrors = 0,
+        snapCodecDecompressErrors = 0,
+        snapCodecDeserializeErrors = 0,
+        snapCodecDropped = 0,
+        snapCodecRawBytes = 0,
+        snapCodecEncodedBytes = 0,
+        snapCodecMaxEncodeMs = 0,
+        snapCodecMaxDecodeMs = 0,
+        snapCodecTotalEncodeMs = 0,
+        snapCodecTotalDecodeMs = 0,
     }
 end
 
@@ -339,6 +360,9 @@ Private.constants = {
     MAX_PARTIAL_MANIFESTS_PER_PEER = MAX_PARTIAL_MANIFESTS_PER_PEER,
     MAX_MANIFEST_CATCHUP_QUEUE = MAX_MANIFEST_CATCHUP_QUEUE,
     MAX_PENDING_REQUESTS = MAX_PENDING_REQUESTS,
+    SNAP_CODEC_ENABLED = SNAP_CODEC_ENABLED,
+    SNAP_CODEC_MIN_BYTES = SNAP_CODEC_MIN_BYTES,
+    SNAP_CODEC_ID = SNAP_CODEC_ID,
 }
 Private.countKeys = countKeys
 Private.nowForPacing = nowForPacing

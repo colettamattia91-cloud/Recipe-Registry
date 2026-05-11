@@ -76,6 +76,15 @@ Test.it("hides perf dump diagnostics unless debug is enabled", function()
     local addon, wow, data = freshAddon()
 
     data:MarkScanNeeded(nil, "test")
+    addon.bucketTelemetry = {
+        rosterEventsAbsorbed = 4,
+        rosterBuckets = 2,
+        rosterDeferred = 1,
+        itemEventsAbsorbed = 3,
+        itemBuckets = 1,
+        lastRosterBucketAt = 111,
+        lastItemBucketAt = 222,
+    }
 
     addon:SlashHandler("perf help")
     Test.truthy(printLogContains(wow, "diagnostica scan"), "perf help should mention scan diagnostics")
@@ -93,6 +102,7 @@ Test.it("hides perf dump diagnostics unless debug is enabled", function()
     addon.debugMode = true
     addon:SlashHandler("perf dump")
     Test.truthy(printLogContains(wow, "Perf steps="), "perf dump status")
+    Test.truthy(printLogContains(wow, "Buckets rosterEvents=4"), "bucket perf dump status")
     Test.truthy(printLogContains(wow, "Role="), "sync dump status")
     Test.truthy(printLogContains(wow, "Scan signals=1"), "scan dump status")
     Test.truthy(printLogContains(wow, "Manifest cache ready="), "manifest cache dump status")
@@ -101,6 +111,8 @@ Test.it("hides perf dump diagnostics unless debug is enabled", function()
     addon:SlashHandler("perf reset")
     Test.truthy(printLogContains(wow, "Performance, sync, scan, and manifest counters reset."), "perf reset output")
     Test.eq(data:GetScanTelemetry().signals, 0, "perf reset should clear scan counters")
+    Test.eq(addon.bucketTelemetry.rosterEventsAbsorbed, 0, "perf reset should clear bucket telemetry")
+    Test.eq(addon.bucketTelemetry.itemEventsAbsorbed, 0, "perf reset should clear item bucket telemetry")
 end)
 
 Test.it("queues manual rescan when no profession API data is active", function()

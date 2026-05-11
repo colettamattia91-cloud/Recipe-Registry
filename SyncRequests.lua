@@ -288,6 +288,7 @@ function Sync:DispatchPendingRequest(memberKey, request)
 
     local localEntry = Addon.Data:GetMember(request.memberKey)
     local knownRev = localEntry and localEntry.rev or 0
+    local acceptSnapCodec = self.GetLocalSnapshotCodecId and self:GetLocalSnapshotCodecId() or nil
     if self:ShouldAllowLocalMockTraffic(request.source, request.memberKey) then
         if not (Addon.MockSync and Addon.MockSync.HandleLocalRequest) then
             self:FailInFlight(request.memberKey, false, "mock-unavailable")
@@ -300,6 +301,7 @@ function Sync:DispatchPendingRequest(memberKey, request)
             wantRev = request.rev or 0,
             allowReplicaSource = request.allowReplicaSource == true,
             requestedBlocks = cloneStringSet(request.requestedBlocks),
+            acceptSnapCodec = acceptSnapCodec,
         })
         if not accepted then
             self:FailInFlight(request.memberKey, false, "mock-rejected")
@@ -313,6 +315,7 @@ function Sync:DispatchPendingRequest(memberKey, request)
         knownRev = knownRev,
         wantRev = request.rev or 0,
         requestedBlocks = cloneStringSet(request.requestedBlocks),
+        acceptSnapCodec = acceptSnapCodec,
     }, request.source, "ALERT")
     return true
 end

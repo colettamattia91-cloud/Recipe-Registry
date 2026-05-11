@@ -28,6 +28,7 @@ local Loader = {
         "Sync.lua",
         "SyncRuntime.lua",
         "SyncProtocol.lua",
+        "SyncCodec.lua",
         "SyncRequests.lua",
         "SyncTransfer.lua",
         "SyncManifest.lua",

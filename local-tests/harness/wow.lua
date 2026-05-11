@@ -86,6 +86,92 @@ local function scheduleTimer(owner, callback, delay, repeating)
     return timer
 end
 
+local function normalizeBucketKey(event, ...)
+    local first = select(1, ...)
+    if first == nil then
+        return event
+    end
+    return first
+end
+
+local function registerSerializedValue(prefix, value)
+    _G.__RecipeRegistrySerializedValues = _G.__RecipeRegistrySerializedValues or {}
+    _G.__RecipeRegistrySerializedNextId = (_G.__RecipeRegistrySerializedNextId or 0) + 1
+    local token = string.format("%s:%d", prefix, _G.__RecipeRegistrySerializedNextId)
+    _G.__RecipeRegistrySerializedValues[token] = deepcopy(value)
+    return token
+end
+
+local function sortedKeys(tbl)
+    local keys = {}
+    for key in pairs(tbl or {}) do
+        keys[#keys + 1] = key
+    end
+    table.sort(keys, function(left, right)
+        local lt, rt = realType(left), realType(right)
+        if lt == rt then
+            if lt == "number" or lt == "string" then
+                return left < right
+            end
+        end
+        return tostring(left) < tostring(right)
+    end)
+    return keys
+end
+
+local function stableDescribe(value, seen)
+    local valueType = realType(value)
+    if valueType == "table" then
+        seen = seen or {}
+        if seen[value] then
+            return "<cycle>"
+        end
+        seen[value] = true
+        local parts = {}
+        for _, key in ipairs(sortedKeys(value)) do
+            parts[#parts + 1] = tostring(key) .. "=" .. stableDescribe(value[key], seen)
+        end
+        seen[value] = nil
+        return "{" .. table.concat(parts, ",") .. "}"
+    end
+    if valueType == "string" then
+        return value
+    end
+    return tostring(value)
+end
+
+local function flushBucket(owner, registration)
+    local bucket = registration and registration.bucket
+    registration.bucket = nil
+    registration.timer = nil
+    if not bucket then
+        return
+    end
+    callScheduled(owner, registration.method, bucket)
+end
+
+local function deliverRegisteredEvent(owner, event, ...)
+    if not owner then
+        return
+    end
+
+    if owner.__events and owner.__events[event] then
+        callScheduled(owner, owner.__events[event], event, ...)
+    end
+
+    local registration = owner.__bucketEvents and owner.__bucketEvents[event]
+    if registration then
+        local key = normalizeBucketKey(event, ...)
+        registration.bucket = registration.bucket or {}
+        registration.bucket[key] = (registration.bucket[key] or 0) + 1
+        if not registration.timer then
+            registration.timer = scheduleTimer(owner, function()
+                flushBucket(owner, registration)
+            end, registration.interval or 0, false)
+        end
+    end
+end
+
 local function embedBaseMethods(target)
     function target:Print(...)
         local parts = {}
@@ -103,6 +189,16 @@ local function embedBaseMethods(target)
     function target:RegisterEvent(event, method)
         self.__events = self.__events or {}
         self.__events[event] = method or event
+    end
+
+    function target:RegisterBucketEvent(event, interval, method)
+        self.__bucketEvents = self.__bucketEvents or {}
+        self.__bucketEvents[event] = {
+            interval = interval or 0,
+            method = method or event,
+            bucket = nil,
+            timer = nil,
+        }
     end
 
     function target:UnregisterEvent(event)
@@ -207,8 +303,62 @@ local function installLibStub()
         end,
     }
 
-    local function libstub(name)
+    libs["LibSerialize"] = {
+        Serialize = function(_, payload)
+            local shape = stableDescribe(payload)
+            local token = registerSerializedValue("LS", payload)
+            return token .. "|" .. shape
+        end,
+        Deserialize = function(_, payload)
+            if realType(payload) ~= "string" then
+                return false, nil
+            end
+            local token = payload:match("^(LS:%d+)|")
+            local value = token and _G.__RecipeRegistrySerializedValues and _G.__RecipeRegistrySerializedValues[token]
+            if not value then
+                return false, nil
+            end
+            return true, deepcopy(value)
+        end,
+    }
+
+    libs["LibDeflate"] = {
+        CompressDeflate = function(_, payload)
+            if realType(payload) ~= "string" then
+                return nil
+            end
+            local token = registerSerializedValue("CD", payload)
+            return token
+        end,
+        EncodeForWoWAddonChannel = function(_, payload)
+            if realType(payload) ~= "string" then
+                return nil
+            end
+            return "WA|" .. payload
+        end,
+        DecodeForWoWAddonChannel = function(_, payload)
+            if realType(payload) ~= "string" then
+                return nil
+            end
+            return payload:match("^WA|(.+)$")
+        end,
+        DecompressDeflate = function(_, payload)
+            if realType(payload) ~= "string" then
+                return nil
+            end
+            local value = _G.__RecipeRegistrySerializedValues and _G.__RecipeRegistrySerializedValues[payload]
+            if realType(value) ~= "string" then
+                return nil
+            end
+            return value
+        end,
+    }
+
+    local function libstub(name, silent)
         local lib = libs[name]
+        if not lib and silent == true then
+            return nil
+        end
         if not lib then error("missing test LibStub library: " .. tostring(name), 2) end
         return lib
     end
@@ -278,6 +428,8 @@ local function installWowGlobals()
 
     _G.time = function() return math.floor(state.now) end
     _G.GetTime = function() return state.now end
+    _G.max = math.max
+    _G.min = math.min
     _G.debugprofilestop = function()
         state.perfNowMs = (state.perfNowMs or (state.now * 1000)) + 0.1
         return state.perfNowMs
@@ -500,6 +652,8 @@ function Wow.Reset()
     _G.RecipeRegistry = nil
     _G.RecipeRegistryDB = nil
     _G.RecipeRegistryCharDB = nil
+    _G.__RecipeRegistrySerializedValues = {}
+    _G.__RecipeRegistrySerializedNextId = 0
 
     installLibStub()
     installWowGlobals()
@@ -656,6 +810,18 @@ function Wow.DeliverComm(module, payload, opts)
     local sender = opts.sender or (payload and payload.sender) or state.playerName
     target:OnCommReceived(prefix, message, distribution, sender)
     return message
+end
+
+function Wow.DeliverEvent(target, event, ...)
+    local addon = target or _G.RecipeRegistry
+    if not addon then
+        error("Wow.DeliverEvent requires an addon target", 2)
+    end
+
+    deliverRegisteredEvent(addon, event, ...)
+    for _, module in ipairs(addon.__moduleOrder or {}) do
+        deliverRegisteredEvent(module, event, ...)
+    end
 end
 
 Wow.Reset()

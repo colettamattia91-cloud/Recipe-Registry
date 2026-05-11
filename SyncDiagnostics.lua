@@ -696,4 +696,32 @@ function Sync:DumpStatus()
         runtime.manifestFallbackDeferrals or 0,
         runtime.manifestDeferredRequests or 0
     ))
+    local rawBytes = tel.snapCodecRawBytes or 0
+    local encodedBytes = tel.snapCodecEncodedBytes or 0
+    local ratio = encodedBytes > 0 and (rawBytes / encodedBytes) or 0
+    local codecEnabled = self.IsSnapshotCodecEnabled and self:IsSnapshotCodecEnabled() or false
+    local codecSupported = self.GetSnapshotCodecSupport and self:GetSnapshotCodecSupport() ~= nil or false
+    local codecErrors = (tel.snapCodecFallbackNoLib or 0)
+        + (tel.snapCodecCompressErrors or 0)
+        + (tel.snapCodecEncodeErrors or 0)
+        + (tel.snapCodecDecodeNoLib or 0)
+        + (tel.snapCodecDecodeErrors or 0)
+        + (tel.snapCodecDecompressErrors or 0)
+        + (tel.snapCodecDeserializeErrors or 0)
+        + (tel.snapCodecDropped or 0)
+    Addon:Print(string.format(
+        "Snapshot codec enabled=%s supported=%s encoded=%d decoded=%d skippedSmall=%d noPeerCap=%d rawKB=%.1f encodedKB=%.1f ratio=%.2f maxEncMs=%.2f maxDecMs=%.2f errors=%d",
+        tostring(codecEnabled),
+        tostring(codecSupported),
+        tel.snapCodecEncoded or 0,
+        tel.snapCodecDecoded or 0,
+        tel.snapCodecSkippedSmall or 0,
+        tel.snapCodecFallbackNoPeerCap or 0,
+        rawBytes / 1024,
+        encodedBytes / 1024,
+        ratio,
+        tel.snapCodecMaxEncodeMs or 0,
+        tel.snapCodecMaxDecodeMs or 0,
+        codecErrors
+    ))
 end

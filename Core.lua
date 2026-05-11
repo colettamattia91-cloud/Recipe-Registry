@@ -3,7 +3,8 @@ local ADDON_NAME = "RecipeRegistry"
 local Addon = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME,
     "AceConsole-3.0",
     "AceEvent-3.0",
-    "AceTimer-3.0"
+    "AceTimer-3.0",
+    "AceBucket-3.0"
 )
 
 _G.RecipeRegistry = Addon
@@ -119,6 +120,15 @@ end
 function Addon:OnInitialize()
     self:RegisterChatCommand("rr", "SlashHandler")
     self:RegisterChatCommand("reciperegistry", "SlashHandler")
+    self.bucketTelemetry = {
+        rosterEventsAbsorbed = 0,
+        rosterBuckets = 0,
+        rosterDeferred = 0,
+        itemEventsAbsorbed = 0,
+        itemBuckets = 0,
+        lastRosterBucketAt = 0,
+        lastItemBucketAt = 0,
+    }
 end
 
 function Addon:OnEnable()
@@ -128,8 +138,8 @@ function Addon:OnEnable()
     self:RegisterEvent("NEW_RECIPE_LEARNED", "OnRecipeSignal")
     self:RegisterEvent("SPELLS_CHANGED", "OnRecipeSignal")
     self:RegisterEvent("SKILL_LINES_CHANGED", "OnRecipeSignal")
-    self:RegisterEvent("GUILD_ROSTER_UPDATE", "OnGuildRosterUpdate")
-    self:RegisterEvent("GET_ITEM_INFO_RECEIVED", "OnItemInfoReceived")
+    self:RegisterBucketEvent("GUILD_ROSTER_UPDATE", 1.5, "OnGuildRosterBucket")
+    self:RegisterBucketEvent("GET_ITEM_INFO_RECEIVED", 0.75, "OnItemInfoBucket")
     self:ScheduleTimer(function()
         if self.MinimapButton then self.MinimapButton:Refresh() end
         if self.UI then self.UI:CreateMainFrame() end
@@ -176,6 +186,18 @@ function Addon:OnPlayerEnteringWorld(_event, isLogin, isReload)
             self.Sync:ScheduleHello(2)
         end
     end
+end
+
+local function countBucketEvents(events)
+    local total = 0
+    for _, count in pairs(events or {}) do
+        if type(count) == "number" then
+            total = total + count
+        else
+            total = total + 1
+        end
+    end
+    return total
 end
 
 function Addon:OnLoginReady()
@@ -257,23 +279,88 @@ function Addon:ProcessRecipeSignal()
     end
 end
 
-function Addon:ScheduleRosterUpdate(reason)
+function Addon:ResetBucketTelemetry()
+    self.bucketTelemetry = self.bucketTelemetry or {}
+    self.bucketTelemetry.rosterEventsAbsorbed = 0
+    self.bucketTelemetry.rosterBuckets = 0
+    self.bucketTelemetry.rosterDeferred = 0
+    self.bucketTelemetry.itemEventsAbsorbed = 0
+    self.bucketTelemetry.itemBuckets = 0
+    self.bucketTelemetry.lastRosterBucketAt = 0
+    self.bucketTelemetry.lastItemBucketAt = 0
+end
+
+function Addon:GetBucketTelemetrySnapshot()
+    self.bucketTelemetry = self.bucketTelemetry or {}
+    return {
+        rosterEventsAbsorbed = self.bucketTelemetry.rosterEventsAbsorbed or 0,
+        rosterBuckets = self.bucketTelemetry.rosterBuckets or 0,
+        rosterDeferred = self.bucketTelemetry.rosterDeferred or 0,
+        itemEventsAbsorbed = self.bucketTelemetry.itemEventsAbsorbed or 0,
+        itemBuckets = self.bucketTelemetry.itemBuckets or 0,
+        lastRosterBucketAt = self.bucketTelemetry.lastRosterBucketAt or 0,
+        lastItemBucketAt = self.bucketTelemetry.lastItemBucketAt or 0,
+    }
+end
+
+function Addon:DumpBucketStatus()
+    local snapshot = self:GetBucketTelemetrySnapshot()
+    self:SystemPrint(string.format(
+        "Buckets rosterEvents=%d rosterFlushes=%d rosterDeferred=%d lastRosterAt=%d itemEvents=%d itemFlushes=%d lastItemAt=%d",
+        snapshot.rosterEventsAbsorbed or 0,
+        snapshot.rosterBuckets or 0,
+        snapshot.rosterDeferred or 0,
+        snapshot.lastRosterBucketAt or 0,
+        snapshot.itemEventsAbsorbed or 0,
+        snapshot.itemBuckets or 0,
+        snapshot.lastItemBucketAt or 0
+    ))
+end
+
+function Addon:OnGuildRosterBucket(events)
+    local absorbed = countBucketEvents(events)
+    self.bucketTelemetry = self.bucketTelemetry or {}
+    self.bucketTelemetry.rosterBuckets = (self.bucketTelemetry.rosterBuckets or 0) + 1
+    self.bucketTelemetry.rosterEventsAbsorbed = (self.bucketTelemetry.rosterEventsAbsorbed or 0) + absorbed
+    self.bucketTelemetry.lastRosterBucketAt = time()
     if self.Sync and self.Sync.telemetry then
-        self.Sync.telemetry.rosterEventsSeen = (self.Sync.telemetry.rosterEventsSeen or 0) + 1
+        self.Sync.telemetry.rosterEventsSeen = (self.Sync.telemetry.rosterEventsSeen or 0) + absorbed
+        self.Sync.telemetry.rosterEventsCoalesced = (self.Sync.telemetry.rosterEventsCoalesced or 0) + max(0, absorbed - 1)
     end
-    if self._rosterUpdateTimer then
-        if self.Sync and self.Sync.telemetry then
-            self.Sync.telemetry.rosterEventsCoalesced = (self.Sync.telemetry.rosterEventsCoalesced or 0) + 1
+    if self.Sync and self.Sync.ShouldDeferHeavyLifecycleWork then
+        local shouldDefer = self.Sync:ShouldDeferHeavyLifecycleWork("roster-ui")
+        if shouldDefer then
+            self.bucketTelemetry.rosterDeferred = (self.bucketTelemetry.rosterDeferred or 0) + 1
+            self:ScheduleRosterUpdate("bucket")
+            return
         end
+    end
+    self:ProcessCoalescedGuildRosterUpdate("bucket")
+end
+
+function Addon:OnItemInfoBucket(events)
+    local absorbed = countBucketEvents(events)
+    self.bucketTelemetry = self.bucketTelemetry or {}
+    self.bucketTelemetry.itemBuckets = (self.bucketTelemetry.itemBuckets or 0) + 1
+    self.bucketTelemetry.itemEventsAbsorbed = (self.bucketTelemetry.itemEventsAbsorbed or 0) + absorbed
+    self.bucketTelemetry.lastItemBucketAt = time()
+    if self.Data then
+        self.Data:InvalidateRecipeCaches("list")
+    end
+    self:RequestRefresh("item-cache")
+end
+
+function Addon:ScheduleRosterUpdate(reason)
+    if self._rosterUpdateTimer then
         return
     end
     self._rosterUpdateTimer = self:ScheduleTimer(function()
         self._rosterUpdateTimer = nil
-        self:ProcessScheduledRosterUpdate(reason or "roster")
-    end, 2)
+        self:ProcessCoalescedGuildRosterUpdate(reason or "roster")
+    end, 3)
 end
 
-function Addon:ProcessScheduledRosterUpdate(reason)
+function Addon:ProcessCoalescedGuildRosterUpdate(reason)
     local delta = self.Data and self.Data.RebuildOnlineCache and self.Data:RebuildOnlineCache() or nil
     local heavyUpdate = not delta
         or delta.membershipChanged
@@ -300,20 +387,11 @@ function Addon:ProcessScheduledRosterUpdate(reason)
 end
 
 function Addon:OnGuildRosterUpdate()
-    self:ScheduleRosterUpdate("roster")
+    self:OnGuildRosterBucket({ direct = 1 })
 end
 
 function Addon:OnItemInfoReceived()
-    if self._itemInfoTimer then return end
-    self._itemInfoTimer = self:ScheduleTimer(function()
-        self._itemInfoTimer = nil
-        if self.Data then
-            -- Item cache fills in names/icons progressively; keep heavy detail data
-            -- cached and only rebuild recipe rows/search text that depend on labels.
-            self.Data:InvalidateRecipeCaches("list")
-        end
-        self:RequestRefresh("item-cache")
-    end, 0.5)
+    self:OnItemInfoBucket({ direct = 1 })
 end
 
 function Addon:RequestRefresh(reason)
@@ -375,6 +453,9 @@ function Addon:SlashHandler(input)
             if self.Performance and self.Performance.DumpDebugStatus then
                 self.Performance:DumpDebugStatus()
             end
+            if self.DumpBucketStatus then
+                self:DumpBucketStatus()
+            end
             if self.Sync and self.Sync.DumpStatus then
                 self.Sync:DumpStatus()
             end
@@ -389,6 +470,9 @@ function Addon:SlashHandler(input)
         if perfCmd == "reset" or perfCmd == "clear" then
             if self.Performance and self.Performance.ResetTelemetry then
                 self.Performance:ResetTelemetry()
+            end
+            if self.ResetBucketTelemetry then
+                self:ResetBucketTelemetry()
             end
             if self.Sync and self.Sync.ResetTelemetry then
                 self.Sync:ResetTelemetry()
