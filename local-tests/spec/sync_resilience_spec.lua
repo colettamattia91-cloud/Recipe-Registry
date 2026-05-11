@@ -44,6 +44,7 @@ Test.it("backs off a failed source and lets another queued request proceed", fun
     local addon, wow, _data = freshAddon()
     local badSource = "Avero-TestRealm"
     local goodSource = "Morbolt-TestRealm"
+    local requestTimeout = addon.Sync._private.constants.REQUEST_TIMEOUT + 1
     addon.Sync.onlineNodes[badSource] = { lastSeen = time(), version = "1.7.0" }
     addon.Sync.onlineNodes[goodSource] = { lastSeen = time(), version = "1.7.0" }
 
@@ -52,7 +53,7 @@ Test.it("backs off a failed source and lets another queued request proceed", fun
     Test.truthy(addon.Sync.inFlight, "first request should dispatch")
     Test.eq(addon.Sync.inFlight.source, badSource, "bad source should be in-flight first")
 
-    wow.AdvanceTime(13)
+    wow.AdvanceTime(requestTimeout)
     addon.Sync:ProcessRequestQueue()
     Test.falsy(addon.Sync.inFlight, "timed out request should clear in-flight state")
     Test.truthy(addon.Sync.pendingRequests[badSource], "failed request should requeue below retry cap")
@@ -71,7 +72,7 @@ Test.it("backs off a failed source and lets another queued request proceed", fun
     addon.Sync:ProcessRequestQueue()
     Test.truthy(addon.Sync:GetInFlightRequest(badSource), "bad source should still be retryable after a single failure")
 
-    wow.AdvanceTime(13)
+    wow.AdvanceTime(requestTimeout)
     addon.Sync:ProcessRequestQueue()
     Test.truthy(addon.Sync:IsPeerBackoffActive(badSource), "repeated failures should eventually back off the peer")
 end)
@@ -151,13 +152,14 @@ end)
 Test.it("hello-auto fails fast and stays blocked until peer backoff expires", function()
     local addon, wow, _data = freshAddon()
     local peerKey = "Aldergar-TestRealm"
+    local requestTimeout = addon.Sync._private.constants.REQUEST_TIMEOUT + 1
 
     addon.Sync.onlineNodes[peerKey] = { lastSeen = time(), version = "1.6.0" }
     addon.Sync:QueueRequest(peerKey, peerKey, 9, "hello-auto")
     addon.Sync:ProcessRequestQueue()
     Test.truthy(addon.Sync.inFlight, "hello-auto should dispatch once")
 
-    wow.AdvanceTime(13)
+    wow.AdvanceTime(requestTimeout)
     addon.Sync:ProcessRequestQueue()
     Test.falsy(addon.Sync.inFlight, "hello-auto timeout should clear in-flight state")
     Test.eq(Test.countKeys(addon.Sync.pendingRequests), 0, "hello-auto should not retry forever")
@@ -166,9 +168,11 @@ Test.it("hello-auto fails fast and stays blocked until peer backoff expires", fu
     addon.Sync:QueueRequest(peerKey, peerKey, 10, "hello-auto")
     addon.Sync:ProcessRequestQueue()
     Test.falsy(addon.Sync.inFlight, "active backoff should defer a fresh hello-auto dispatch")
+    Test.eq(Test.countKeys(addon.Sync.pendingRequests), 0, "automatic hello-auto should not stay queued during backoff")
     Test.eq(countCommKind(wow, "REQ"), 1, "no extra REQ should be sent during backoff")
 
     wow.AdvanceTime(21)
+    addon.Sync:QueueRequest(peerKey, peerKey, 10, "hello-auto")
     addon.Sync:ProcessRequestQueue()
     Test.truthy(addon.Sync.inFlight, "request should dispatch again after backoff expires")
     Test.eq(addon.Sync.inFlight.source, peerKey, "same peer can be retried after backoff")

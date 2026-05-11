@@ -15,6 +15,50 @@ behavior.
 
 Date: 2026-05-11
 
+- Sync reliability execution completed from
+  `RecipeRegistry_Sync_Reliability_Preanalysis_Codex.md`.
+- Direct sync now uses a softer timeout envelope and explicit negative
+  acknowledgements instead of silent stalls. `Sync.lua` raised
+  `REQUEST_TIMEOUT/PROGRESS_TIMEOUT/SESSION_TIMEOUT` to `25/8/60`, while
+  `SyncTransfer.lua` now emits `RERR` for invalid requests, paused-instance
+  handling, queue pressure, missing data, non-serveable replicas, and empty
+  snapshots. `SyncProtocol.lua` routes those rejects back into the requester,
+  which clears the matching in-flight request by `requestId`, records reject
+  telemetry, and only schedules delayed retry for explicitly retryable cases.
+- Peer health is now split between "manifest seems alive" and "snapshot data is
+  actually serveable". `SyncRuntime.lua` tracks manifest/snapshot success and
+  failure separately, keeps temporary snapshot backoff and quarantine state,
+  remembers recent permanent rejects, exposes `CanExchangeDataWithPeer()`, and
+  reports eligibility breakdowns through `SyncDiagnostics.lua` and `/rr sync`.
+- Pause policy is no longer symmetric between combat and instances.
+  `SyncPausePolicy.lua` now keeps protocol traffic (`REQ`, `SNAP`, `HELLO`,
+  `AD`, `MREQ`, `MANI`) active during combat outside instances, while real
+  instances still pause protocol and inbound apply. Heavy UI/background work
+  remains pauseable in both combat and instance contexts, so tooltip/catalog
+  rebuilds still yield when the client is in a sensitive UI state.
+- Queue eligibility filtering was added without breaking deferred manifest
+  catch-up. Automatic requests now skip peers already in backoff or known
+  permanently ineligible, but plain "offline" does not block enqueue so
+  manifest-driven catch-up can still stage work before normal presence tracking
+  catches up. Retryable rejects now use a dedicated `readyAt` deferral instead
+  of overloading `queuedAt`, which preserves existing fairness and bounded
+  concurrency behavior for normal retries.
+- `UI/MainFrame.lua` now degrades to status-only mode in sensitive contexts
+  only when no cached recipe data exists; otherwise the addon stays readable in
+  a cached read-only state. Detail-panel "Request" actions are hidden when
+  `REQ` traffic is protocol-paused. `Tooltip.lua` now defers rebuilds through
+  `ShouldPauseTooltipRebuild()` instead of the broader old sync pause check.
+- `DataCatalog.lua` now collapses duplicate crafter rows per member during
+  recipe-index build, keeps the better row, and records diagnostics exposed by
+  `/rr perf dump` and reset by `/rr perf reset`.
+- Added focused backend coverage:
+  `sync_reliability_spec.lua`,
+  plus adjustments to `sync_resilience_spec.lua` for the new timeout values and
+  automatic-request backoff behavior.
+- Final verification after implementation:
+  `local-tests/run-syntax.ps1` -> `Lua syntax OK`
+  `local-tests/run-backend-tests.ps1` -> `Backend tests OK` (140 tests)
+
 - AceBucket plus negotiated snapshot codec execution completed from
   `RecipeRegistry_AceBucket_LibSerialize_LibDeflate_Codex_Plan.md`.
 - `Core.lua` now buckets the hottest UI-adjacent events through
@@ -117,7 +161,8 @@ Date: 2026-05-11
   `SyncRuntime.lua`, and prefers healthier sources when choosing the next
   pending request. Direct sync is no longer single-flight: it now runs a small
   bounded set of owner requests concurrently, backfills freed slots
-  immediately, and still keeps fairness, peer backoff, and retry caps.
+  immediately, keeps fairness and retry caps, and handles explicit `RERR`
+  responses for fast-fail cases instead of waiting only on timeouts.
 - Manifest catch-up cap: large peer manifests are compared immediately, but the
   derived `REQ` requests are capped per flush and the remainder is deferred
   through `manifestCatchupQueue` and the `sync-manifest-catchup` scheduler job.
@@ -157,11 +202,14 @@ Date: 2026-05-11
   members.
 - Internal chat diagnostics: non-essential scan/sync/guardrail output now goes
   through `Addon:SystemPrint(...)` and is visible only when `/rr debug` is on.
-- Raid and instance pause policy: non-essential sync traffic and background work
-  now stop much more aggressively in combat and inside real instances,
-  including outbound/inbound sync, manifest cache jobs, maintenance jobs, and
-  UI background jobs such as tooltip index rebuild. Being in a raid group
-  outside an instance no longer pauses sync by itself.
+- Raid and instance pause policy: being in a raid group outside an instance no
+  longer pauses sync by itself. Combat now pauses only heavy UI/background
+  work, while real instances still pause protocol traffic, inbound apply,
+  manifest/maintenance workers, and other non-essential sync work.
+- Cached read-only UI mode: `UI/MainFrame.lua` can still render saved recipe
+  data during combat/instance-sensitive states when cached member data exists;
+  it falls back to pure status-only mode only when there is nothing useful to
+  show locally.
 - Tooltip crafter index: invalidation now schedules an incremental background
   rebuild; hover paths keep using the previous index until the new one is
   committed, instead of rebuilding the whole tooltip index inline.
@@ -196,12 +244,13 @@ Date: 2026-05-11
 - UI refresh: callers use `Addon:RequestRefresh(reason)`. With
   `Performance.lua` active, refreshes are deferred and scoped by reason.
 - Local backend tests: `local-tests/run-backend-tests.ps1` loads WoW/Ace mocks
-  and currently covers 128 tests across P2/P4/P5/P6 behavior, AceBucket event
+  and currently covers 140 tests across P2/P4/P5/P6 behavior, AceBucket event
   coalescing, negotiated snapshot codec transport, slash output, specialization
   sync stability, manifest diagnostics, lifecycle transition gating, snapshot
   metadata-only/equivalent merges, runtime queue caps, tooltip async rebuild
-  behavior, runtime resilience, comm-boundary delivery, and a multi-node
-  comm-bus harness with 200 isolated addon peers.
+  behavior, sync reliability/reject handling, runtime resilience,
+  comm-boundary delivery, and a multi-node comm-bus harness with 200 isolated
+  addon peers.
 
 ## Load Order And Modules
 

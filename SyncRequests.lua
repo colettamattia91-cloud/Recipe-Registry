@@ -25,6 +25,11 @@ local MAX_REQUEST_RETRIES = Constants.MAX_REQUEST_RETRIES
 local MAX_HELLO_AUTO_RETRIES = Constants.MAX_HELLO_AUTO_RETRIES
 local MAX_CONCURRENT_REQUESTS = Constants.MAX_CONCURRENT_REQUESTS
 
+local function isAutomaticRequestReason(why)
+    local text = tostring(why or "")
+    return not isManualReason(text)
+end
+
 local function requestBlocksCovered(existing, expected)
     if type(expected) ~= "table" or #expected == 0 then
         return true
@@ -192,6 +197,22 @@ function Sync:QueueRequest(sourceKey, memberKey, targetRev, why, opts)
         return
     end
 
+    local eligible, ineligibleReason = self:CanExchangeDataWithPeer(sourceKey, "request", {
+        source = sourceKey,
+        memberKey = memberKey,
+        rev = targetRev or 0,
+        why = why,
+        requestedBlocks = opts.requestedBlocks,
+    })
+    if not eligible and ineligibleReason ~= "offline" then
+        if ineligibleReason == "backoff" then
+            self.telemetry.queuedBackoff = (self.telemetry.queuedBackoff or 0) + 1
+        else
+            self.telemetry.skippedNotDataEligible = (self.telemetry.skippedNotDataEligible or 0) + 1
+        end
+        return
+    end
+
     local active = self:GetInFlightRequest(memberKey)
     if self:DoesRequestCover(active, targetRev or 0, opts.requestedBlocks, opts.expectedFingerprints) then
         Addon:Debug("Skipped covered sync request", memberKey, "from", sourceKey, "rev", targetRev or 0, why or "")
@@ -246,13 +267,26 @@ function Sync:SelectNextPendingRequest(skipMembers)
         else
             local allowLocalMock = self:ShouldAllowLocalMockTraffic(info and info.source, memberKey)
             if not self:IsRealTrafficSuppressed() or allowLocalMock then
-                if self:IsPeerBackoffActive(info.source) and not isManualReason(info.why) then
-                    self.telemetry.peerBackoffSkips = (self.telemetry.peerBackoffSkips or 0) + 1
+                if (info.readyAt or 0) > time() then
+                    self.telemetry.deferredBackoffRequests = (self.telemetry.deferredBackoffRequests or 0) + 1
                 elseif self:ShouldDeferRequestDispatch(info) then
                     sawWarmupDeferred = true
-                elseif not best or self:IsBetterPendingRequest(info, best) then
-                    best = info
-                    bestKey = memberKey
+                else
+                    local eligible, reason = self:CanExchangeDataWithPeer(info.source, "dispatch", info)
+                    if not eligible then
+                        if reason == "backoff" and isAutomaticRequestReason(info.why) then
+                            self.pendingRequests[memberKey] = nil
+                            self.telemetry.peerBackoffSkips = (self.telemetry.peerBackoffSkips or 0) + 1
+                            self.telemetry.purgedBackoffRequests = (self.telemetry.purgedBackoffRequests or 0) + 1
+                        else
+                            self.telemetry.skippedNotDataEligible = (self.telemetry.skippedNotDataEligible or 0) + 1
+                        end
+                    elseif not best or self:IsBetterPendingRequest(info, best) then
+                        self.telemetry.lastSelectedPeer = tostring(info.source or "none")
+                        self.telemetry.lastSelectedReason = tostring(info.why or "request")
+                        best = info
+                        bestKey = memberKey
+                    end
                 end
             end
         end
@@ -279,6 +313,7 @@ function Sync:DispatchPendingRequest(memberKey, request)
         allowReplicaSource = request.allowReplicaSource == true,
         requestedBlocks = cloneStringSet(request.requestedBlocks),
         expectedFingerprints = cloneFingerprintMap(request.expectedFingerprints),
+        requestId = string.format("REQ-%d-%s", self._requestDispatchCounter, tostring(request.memberKey or "unknown")),
     }
     self:SetInFlightRequest(active)
     self.telemetry.requestDispatches = (self.telemetry.requestDispatches or 0) + 1
@@ -289,6 +324,7 @@ function Sync:DispatchPendingRequest(memberKey, request)
     local localEntry = Addon.Data:GetMember(request.memberKey)
     local knownRev = localEntry and localEntry.rev or 0
     local acceptSnapCodec = self.GetLocalSnapshotCodecId and self:GetLocalSnapshotCodecId() or nil
+    self.telemetry.requestIdActive = active.requestId
     if self:ShouldAllowLocalMockTraffic(request.source, request.memberKey) then
         if not (Addon.MockSync and Addon.MockSync.HandleLocalRequest) then
             self:FailInFlight(request.memberKey, false, "mock-unavailable")
@@ -302,6 +338,7 @@ function Sync:DispatchPendingRequest(memberKey, request)
             allowReplicaSource = request.allowReplicaSource == true,
             requestedBlocks = cloneStringSet(request.requestedBlocks),
             acceptSnapCodec = acceptSnapCodec,
+            requestId = active.requestId,
         })
         if not accepted then
             self:FailInFlight(request.memberKey, false, "mock-rejected")
@@ -310,13 +347,18 @@ function Sync:DispatchPendingRequest(memberKey, request)
         return true
     end
 
-    self:SendDirectEnvelope("REQ", {
+    local sent = self:SendDirectEnvelope("REQ", {
         key = request.memberKey,
         knownRev = knownRev,
         wantRev = request.rev or 0,
         requestedBlocks = cloneStringSet(request.requestedBlocks),
         acceptSnapCodec = acceptSnapCodec,
+        requestId = active.requestId,
     }, request.source, "ALERT")
+    if not sent then
+        self:FailInFlight(request.memberKey, true, "target-unavailable")
+        return false
+    end
     return true
 end
 
@@ -351,11 +393,13 @@ function Sync:ProcessRequestQueue()
                 skipPendingMembers[memberKey] = true
             elseif (now - (request.startedAt or now)) > SESSION_TIMEOUT then
                 Addon:Debug("Request session timeout", request.memberKey)
+                self.telemetry.requestTimeoutSession = (self.telemetry.requestTimeoutSession or 0) + 1
                 self:FailInFlight(memberKey, true, "session-timeout")
                 skipPendingMembers[memberKey] = true
             elseif not request.sessionId then
                 if (now - (request.startedAt or now)) > REQUEST_TIMEOUT then
                     Addon:Debug("Initial request timeout", request.memberKey)
+                    self.telemetry.requestTimeoutInitial = (self.telemetry.requestTimeoutInitial or 0) + 1
                     self:FailInFlight(memberKey, true, "initial-timeout")
                     skipPendingMembers[memberKey] = true
                 end
@@ -363,6 +407,7 @@ function Sync:ProcessRequestQueue()
                 if (request.resumeAttempts or 0) < MAX_RESUME_ATTEMPTS then
                     request.resumeAttempts = (request.resumeAttempts or 0) + 1
                     request.lastProgressAt = now
+                    self.telemetry.requestTimeoutProgress = (self.telemetry.requestTimeoutProgress or 0) + 1
                     self:SendResumeForInFlight(memberKey)
                 else
                     Addon:Debug("Resume exhausted", request.memberKey)
@@ -459,6 +504,7 @@ function Sync:FailInFlight(memberKey, requeue, reason)
         self.partialReceive[req.memberKey] = nil
     end
     self:ClearInFlightRequest(req and req.memberKey or memberKey)
+    self.telemetry.requestIdActive = nil
     Addon:RequestRefresh("queue")
     self:ScheduleQueuePump()
 end

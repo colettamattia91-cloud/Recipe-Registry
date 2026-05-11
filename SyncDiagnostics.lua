@@ -606,6 +606,7 @@ function Sync:DumpStatus()
     local role = self:IsCoordinator() and "Coordinator" or "Client"
     local runtime = self:GetRuntimeObservabilitySnapshot()
     local primary = self:GetInFlightRequest()
+    local eligibility = self.GetPeerEligibilityBreakdown and self:GetPeerEligibilityBreakdown() or {}
     Addon:Print(string.format(
         "Role=%s coordinator=%s onlineNodes=%d registry=%d queued=%d activeReq=%d inFlight=%s outgoing=%d outboundChunks=%d manifestChunks=%d inboundChunks=%d manifestPending=%d paused=%s warmup=%s transition=%s(%ds) isolated=%s",
         role,
@@ -651,7 +652,7 @@ function Sync:DumpStatus()
         tel.manifestRequestsAvoided or 0
     ))
     Addon:Print(string.format(
-        "Requests oldestAge=%ds oldestSource=%s oldestWhy=%s activeReq=%d/%d inFlightAge=%ds inFlightAttempts=%d inFlightSource=%s inFlightWhy=%s peerBackoff=%d [%s] retries=%d drops=%d warmupDefers=%d transitionDefers=%d skippedHello=%d",
+        "Requests oldestAge=%ds oldestSource=%s oldestWhy=%s activeReq=%d/%d inFlightAge=%ds inFlightAttempts=%d inFlightSource=%s inFlightWhy=%s requestId=%s peerBackoff=%d [%s] retries=%d drops=%d initialTO=%d progressTO=%d sessionTO=%d rejects=%d lastReject=%s/%s warmupDefers=%d transitionDefers=%d skippedHello=%d",
         oldestPending and max(0, time() - (oldestPending.queuedAt or time())) or 0,
         oldestPending and tostring(oldestPending.source) or "none",
         oldestPending and tostring(oldestPending.why or "") or "none",
@@ -661,16 +662,35 @@ function Sync:DumpStatus()
         primary and (primary.attempts or 0) or 0,
         primary and tostring(primary.source or "none") or "none",
         primary and tostring(primary.why or "") or "none",
+        primary and tostring(primary.requestId or "none") or "none",
         backoffCount or 0,
         backoffList or "none",
         tel.requestRetries or 0,
         tel.requestDrops or 0,
+        tel.requestTimeoutInitial or 0,
+        tel.requestTimeoutProgress or 0,
+        tel.requestTimeoutSession or 0,
+        tel.rejectsTotal or 0,
+        tostring(tel.lastRejectPeer or "none"),
+        tostring(tel.lastRejectReason or "none"),
         tel.warmupDeferrals or 0,
         tel.transitionDeferrals or 0,
         tel.transitionSkippedHello or 0
     ))
     Addon:Print(string.format(
-        "Runtime partialRecv=%d partialAge=%ds partialManifestPeers=%d partialManifestOpen=%d partialManifestAge=%ds transitionQueue=%d pressure=%d tricklePeers=%d residentPeers=%d queuedPeers=%d queuedBlocks=%d maxPeerQueue=%d queueCap=%d/%d outgoingAge=%ds prunes=out:%d part:%d mani:%d trickle:%d/%d runtimeCap=%d fallbackBuilds=%d fallbackDefers=%d deferredManifest=%d",
+        "Peer health eligible=%d ineligible=%d manifestHealthy=%d snapshotHealthy=%d manifestOnly=%d skippedNotEligible=%d queuedBackoff=%d purgedBackoff=%d deferredBackoff=%d",
+        eligibility.eligible or 0,
+        eligibility.ineligible or 0,
+        eligibility.manifestHealthy or 0,
+        eligibility.snapshotHealthy or 0,
+        eligibility.manifestOnly or 0,
+        tel.skippedNotDataEligible or 0,
+        tel.queuedBackoff or 0,
+        tel.purgedBackoffRequests or 0,
+        tel.deferredBackoffRequests or 0
+    ))
+    Addon:Print(string.format(
+        "Runtime partialRecv=%d partialAge=%ds partialManifestPeers=%d partialManifestOpen=%d partialManifestAge=%ds transitionQueue=%d pressure=%d tricklePeers=%d residentPeers=%d queuedPeers=%d queuedBlocks=%d maxPeerQueue=%d queueCap=%d/%d outgoingAge=%ds prunes=out:%d part:%d mani:%d partialManifest:%d trickle:%d/%d runtimeCap=%d fallbackBuilds=%d fallbackDefers=%d deferredManifest=%d",
         runtime.partialReceives or 0,
         runtime.partialReceiveOldestAge or 0,
         runtime.partialManifestPeers or 0,
@@ -689,6 +709,7 @@ function Sync:DumpStatus()
         tel.prunedOutgoingSessions or 0,
         tel.prunedPartialReceives or 0,
         tel.prunedPartialManifestReceives or 0,
+        tel.partialManifestPruned or 0,
         tel.prunedTricklePeerState or 0,
         tel.prunedTrickleOutboundQueues or 0,
         tel.queueCapPrunes or 0,

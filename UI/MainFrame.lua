@@ -526,8 +526,17 @@ function UI:GetDegradedModeReason()
     if not Addon.Data then
         return "data-unavailable"
     end
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() then
-        return "sensitive-context"
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseHeavyUI() then
+        local hasCachedData = false
+        for memberKey, entry in pairs(Addon.Data:GetMembersDB() or {}) do
+            if Addon.Data:IsUserVisibleMember(memberKey, entry, true) and next(entry.professions or {}) ~= nil then
+                hasCachedData = true
+                break
+            end
+        end
+        if not hasCachedData then
+            return "sensitive-context"
+        end
     end
     if Addon.Sync and Addon.Sync.IsInWarmup and Addon.Sync:IsInWarmup() then
         return "warmup"
@@ -1679,7 +1688,8 @@ function UI:RefreshDetailPanel()
                 nameText = nameText .. " " .. colorText("[" .. crafter.specialization .. "]", unpackColor(MUTED))
             end
             lines[#lines + 1] = string.format("%s %s", state, nameText)
-            if (not selfKey or crafter.memberKey ~= selfKey) then
+            if (not selfKey or crafter.memberKey ~= selfKey)
+                and not (Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("REQ")) then
                 lineMeta[#lines] = {
                     canRequest = true,
                     memberKey = crafter.memberKey,

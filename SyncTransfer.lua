@@ -7,6 +7,7 @@ local time = time
 local pairs = pairs
 local ipairs = ipairs
 local sort = table.sort
+local max = math.max
 
 local nowForPacing = Private.nowForPacing
 local shallowCopyArray = Private.shallowCopyArray
@@ -15,6 +16,99 @@ local shallowCopyTable = Private.shallowCopyTable
 local SESSION_TIMEOUT = Constants.SESSION_TIMEOUT
 local OUTGOING_CHUNK_DELAY = Constants.OUTGOING_CHUNK_DELAY
 local MANIFEST_CHUNK_DELAY = Constants.MANIFEST_CHUNK_DELAY
+
+local function isRetryableRejectReason(reason)
+    return reason == "PAUSED_INSTANCE"
+        or reason == "LOADING_TRANSITION"
+        or reason == "BUSY"
+        or reason == "RATE_LIMITED"
+        or reason == "TARGET_UNAVAILABLE"
+end
+
+function Sync:SendRequestReject(targetKey, requestPayload, reason, opts)
+    if not self:IsValidSyncMemberKey(targetKey) then
+        return false
+    end
+    opts = opts or {}
+    return self:SendDirectEnvelope("RERR", {
+        key = requestPayload and requestPayload.key or nil,
+        requestId = requestPayload and requestPayload.requestId or nil,
+        reason = tostring(reason or "INVALID_REQUEST"),
+        retryable = opts.retryable == true,
+        retryAfter = opts.retryAfter,
+        requestedBlocks = type(requestPayload and requestPayload.requestedBlocks) == "table" and #(requestPayload.requestedBlocks or {}) or 0,
+        knownRev = requestPayload and requestPayload.knownRev or 0,
+        wantedRev = requestPayload and (requestPayload.wantRev or requestPayload.wantedRev) or 0,
+    }, targetKey, "ALERT")
+end
+
+function Sync:HandlePausedRequest(payload, pauseReason)
+    if not (payload and self:IsValidSyncMemberKey(payload.sender)) then
+        return
+    end
+    self:SendRequestReject(payload.sender, payload, pauseReason or "PAUSED_INSTANCE", {
+        retryable = true,
+        retryAfter = 15,
+    })
+end
+
+function Sync:HandleRequestReject(payload)
+    if not (payload and self:IsValidSyncMemberKey(payload.sender) and self:IsValidSyncMemberKey(payload.key)) then
+        return
+    end
+    local request = self:GetInFlightRequest(payload.key)
+    if not request then
+        return
+    end
+    if request.source ~= payload.sender then
+        return
+    end
+    if payload.requestId and request.requestId and payload.requestId ~= request.requestId then
+        return
+    end
+
+    local retryable = payload.retryable == true
+    local reason = tostring(payload.reason or "REJECT")
+    self.telemetry.rejectsTotal = (self.telemetry.rejectsTotal or 0) + 1
+    self.telemetry.lastRejectPeer = tostring(payload.sender)
+    self.telemetry.lastRejectReason = reason
+    if retryable then
+        self.telemetry.rejectsRetryable = (self.telemetry.rejectsRetryable or 0) + 1
+    else
+        self.telemetry.rejectsPermanent = (self.telemetry.rejectsPermanent or 0) + 1
+        self:RememberPeerReject(payload.sender, request, reason, false, payload.retryAfter)
+    end
+
+    if retryable then
+        self:MarkPeerFailure(payload.sender, "reject:" .. reason, request)
+        if self:IsRequestShapeValid(request) and not self:IsRequestAlreadySatisfied(request) then
+            self.pendingRequests[request.memberKey] = {
+                source = request.source,
+                memberKey = request.memberKey,
+                rev = request.rev,
+                why = request.why,
+                queuedAt = time(),
+                readyAt = time() + max(1, tonumber(payload.retryAfter) or 5),
+                attempts = request.attempts or 1,
+                resumeAttempts = 0,
+                allowReplicaSource = request.allowReplicaSource == true,
+                requestedBlocks = Private.cloneStringSet(request.requestedBlocks),
+                expectedFingerprints = Private.cloneFingerprintMap(request.expectedFingerprints),
+            }
+        end
+    else
+        local health = self.peerHealth and self.peerHealth[payload.sender] or nil
+        if health then
+            health.snapshotBackoffUntil = max(health.snapshotBackoffUntil or 0, time() + 120)
+        end
+    end
+
+    self.partialReceive[payload.key] = nil
+    self:ClearInFlightRequest(payload.key)
+    self.telemetry.requestIdActive = nil
+    Addon:RequestRefresh("queue")
+    self:ScheduleQueuePump()
+end
 
 function Sync:BuildSessionId(memberKey, rev, targetKey)
     self._sessionIdCounter = (self._sessionIdCounter or 0) + 1
@@ -30,17 +124,44 @@ end
 
 function Sync:HandleRequest(payload)
     local targetKey = payload.sender
-    if not self:IsValidSyncMemberKey(targetKey) or not self:IsValidSyncMemberKey(payload.key) then return end
+    if not self:IsValidSyncMemberKey(targetKey) then return end
+    if not self:IsValidSyncMemberKey(payload.key) then
+        self:SendRequestReject(targetKey, payload, "INVALID_REQUEST", { retryable = false })
+        return
+    end
     if self:IsMockKey(targetKey) or self:IsMockKey(payload.key) then return end
 
+    local pauseReason = Addon.SyncPausePolicy and Addon.SyncPausePolicy:GetProtocolPauseReason("REQ") or nil
+    if pauseReason then
+        self:SendRequestReject(targetKey, payload, pauseReason, {
+            retryable = true,
+            retryAfter = 15,
+        })
+        return
+    end
+    if self:EstimateRuntimeQueuePressure() >= 90 then
+        self:SendRequestReject(targetKey, payload, "BUSY", {
+            retryable = true,
+            retryAfter = 10,
+        })
+        return
+    end
+
     local entry = Addon.Data:GetMember(payload.key)
-    if not entry then return end
-    if (entry.guildStatus or "active") ~= "active" then return end
+    if not entry then
+        self:SendRequestReject(targetKey, payload, "NO_ENTRY", { retryable = false })
+        return
+    end
+    if (entry.guildStatus or "active") ~= "active" then
+        self:SendRequestReject(targetKey, payload, "INACTIVE_ENTRY", { retryable = false })
+        return
+    end
 
     local requestedBlocks = payload.requestedBlocks or {}
     local hasSpecificBlockRequest = type(requestedBlocks) == "table" and #requestedBlocks > 0
     if (entry.rev or 0) <= (payload.knownRev or 0) then
         if not hasSpecificBlockRequest then
+            self:SendRequestReject(targetKey, payload, "ALREADY_KNOWN", { retryable = false })
             return
         end
 
@@ -56,15 +177,26 @@ function Sync:HandleRequest(payload)
             end
         end
         if not hasRequestedBlock then
+            self:SendRequestReject(targetKey, payload, "NO_REQUESTED_BLOCK", { retryable = false })
             return
         end
+    end
+
+    if payload.key ~= self:GetSelfKey()
+        and payload.key ~= targetKey
+        and Addon.Data:IsMemberOnline(payload.key) then
+        self:SendRequestReject(targetKey, payload, "NOT_SERVEABLE_REPLICA", { retryable = false })
+        return
     end
 
     local sessionId = self:BuildSessionId(payload.key, entry.rev or 0, targetKey)
     local chunks = Addon.Data:BuildSnapshotChunks(payload.key, {
         requestedBlocks = hasSpecificBlockRequest and requestedBlocks or nil,
     })
-    if #chunks == 0 then return end
+    if #chunks == 0 then
+        self:SendRequestReject(targetKey, payload, "EMPTY_SNAPSHOT", { retryable = false })
+        return
+    end
 
     if payload.requestedBlocks and #payload.requestedBlocks > 0
         and payload.key ~= self:GetSelfKey()
@@ -86,6 +218,8 @@ function Sync:HandleRequest(payload)
         createdAt = time(),
         lastSentAt = 0,
     }
+
+    self.lastSnapshotServedAt = time()
 
     self:SendOutgoingSession(sessionId)
 end
@@ -320,7 +454,11 @@ function Sync:SendNextSnapshotChunk()
             reason = "snapshot-send",
         }) or block
     end
-    self:SendDirectEnvelope("SNAP", wireBlock, queued.peer, "BULK")
+    local sent = self:SendDirectEnvelope("SNAP", wireBlock, queued.peer, "BULK")
+    if not sent then
+        self:MarkPeerFailure(queued.peer, "target-unavailable")
+        return false
+    end
     self.peerPacing[queued.peer] = self.peerPacing[queued.peer] or {}
     self.peerPacing[queued.peer].lastSentAt = nowForPacing()
     self.telemetry.sentChunks = self.telemetry.sentChunks + 1

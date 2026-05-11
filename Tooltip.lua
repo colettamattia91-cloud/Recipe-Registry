@@ -221,7 +221,7 @@ function Tooltip:EnsureIndexBuildScheduled()
     if Addon.Sync and Addon.Sync.IsInWorldTransition and Addon.Sync:IsInWorldTransition() then
         return
     end
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() then
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseTooltipRebuild() then
         return
     end
 

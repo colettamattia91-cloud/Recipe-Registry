@@ -65,12 +65,21 @@ end
 
 function Sync:GetLocalProtocolCaps()
     local codecId = self:GetLocalSnapshotCodecId()
-    if not codecId then
-        return nil
-    end
+    local summary = Addon.Data and Addon.Data.GetLocalSummary and Addon.Data:GetLocalSummary() or {}
+    local protocolPaused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("REQ") or false
     return {
+        wireVersion = Addon.WIRE_VERSION,
+        addonVersion = Addon.DISPLAY_VERSION,
+        canReceiveReq = not protocolPaused,
+        canSendSnap = not protocolPaused,
         snapCodec = codecId,
+        snapCodecSupported = codecId ~= nil,
         snapCodecMin = 1,
+        isPausedForSync = protocolPaused,
+        localBlockCount = summary.professions or 0,
+        localRecipeCount = summary.recipes or 0,
+        lastSnapshotSuccessAt = self.lastSnapshotSuccessAt or 0,
+        lastSnapshotServedAt = self.lastSnapshotServedAt or 0,
     }
 end
 
@@ -84,8 +93,18 @@ function Sync:RecordPeerCaps(peerKey, caps)
         return
     end
     self.peerCaps[peerKey] = {
+        wireVersion = caps.wireVersion,
+        addonVersion = caps.addonVersion,
+        canReceiveReq = caps.canReceiveReq,
+        canSendSnap = caps.canSendSnap,
         snapCodec = caps.snapCodec,
+        snapCodecSupported = caps.snapCodecSupported,
         snapCodecMin = caps.snapCodecMin,
+        isPausedForSync = caps.isPausedForSync,
+        localBlockCount = caps.localBlockCount,
+        localRecipeCount = caps.localRecipeCount,
+        lastSnapshotSuccessAt = caps.lastSnapshotSuccessAt,
+        lastSnapshotServedAt = caps.lastSnapshotServedAt,
     }
 end
 

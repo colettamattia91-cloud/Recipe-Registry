@@ -565,7 +565,9 @@ function Sync:HandleManifestChunk(payload)
         self.partialManifestReceive[senderKey] = nil
     end
     self:RecordManifestReceived(senderKey)
-    self:MarkPeerSuccess(senderKey)
+    if self.MarkManifestPeerSuccess then
+        self:MarkManifestPeerSuccess(senderKey)
+    end
 
     Addon.TrickleSync:StorePeerManifest(senderKey, manifest)
     local replicaOwners = {}

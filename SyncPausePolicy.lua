@@ -10,6 +10,10 @@ local function isInSensitiveInstance()
     return inInstance == true
 end
 
+local function isInCombat()
+    return type(InCombatLockdown) == "function" and InCombatLockdown() == true or false
+end
+
 function SyncPausePolicy:OnEnable()
     self:RegisterEvent("PLAYER_REGEN_DISABLED", "RefreshPauseState")
     self:RegisterEvent("PLAYER_REGEN_ENABLED", "RefreshPauseState")
@@ -22,19 +26,37 @@ function SyncPausePolicy:OnEnable()
 end
 
 function SyncPausePolicy:IsSensitiveSyncContext()
-    return InCombatLockdown()
-        or isInSensitiveInstance()
+    return isInCombat() or isInSensitiveInstance()
 end
 
-function SyncPausePolicy:ShouldPauseOutbound()
-    return self:IsSensitiveSyncContext()
+function SyncPausePolicy:GetProtocolPauseReason(kind)
+    kind = tostring(kind or "")
+    if kind == "RERR" then
+        return nil
+    end
+    if isInSensitiveInstance() then
+        return "PAUSED_INSTANCE"
+    end
+    return nil
+end
+
+function SyncPausePolicy:ShouldPauseOutbound(kind)
+    return self:GetProtocolPauseReason(kind) ~= nil
 end
 
 function SyncPausePolicy:ShouldPauseInboundApply()
+    return isInSensitiveInstance()
+end
+
+function SyncPausePolicy:ShouldPauseProtocolTraffic(kind)
+    return self:GetProtocolPauseReason(kind) ~= nil
+end
+
+function SyncPausePolicy:ShouldPauseHeavyUI()
     return self:IsSensitiveSyncContext()
 end
 
-function SyncPausePolicy:ShouldPauseProtocolTraffic()
+function SyncPausePolicy:ShouldPauseTooltipRebuild()
     return self:IsSensitiveSyncContext()
 end
 
@@ -43,27 +65,31 @@ function SyncPausePolicy:AutoResumeWhenSafe()
 end
 
 function SyncPausePolicy:RefreshPauseState()
-    local inCombat = InCombatLockdown()
+    local inCombat = isInCombat()
     local inInstance = isInSensitiveInstance()
-    local paused = inCombat or inInstance
+    local protocolPaused = inInstance
+    local heavyUiPaused = inCombat or inInstance
     if Addon.Performance then
-        if paused then
+        if protocolPaused then
             Addon.Performance:PauseCategory("sync-outbound")
             Addon.Performance:PauseCategory("sync-inbound")
             Addon.Performance:PauseCategory("sync-manifest")
             Addon.Performance:PauseCategory("bootstrap")
             Addon.Performance:PauseCategory("maintenance")
-            Addon.Performance:PauseCategory("ui")
         else
             Addon.Performance:ResumeCategory("sync-outbound")
             Addon.Performance:ResumeCategory("sync-inbound")
             Addon.Performance:ResumeCategory("sync-manifest")
             Addon.Performance:ResumeCategory("bootstrap")
             Addon.Performance:ResumeCategory("maintenance")
+        end
+        if heavyUiPaused then
+            Addon.Performance:PauseCategory("ui")
+        else
             Addon.Performance:ResumeCategory("ui")
         end
     end
-    if self._wasPaused and not paused and Addon.Sync and Addon.Sync.EnterWarmup then
+    if self._wasPaused and not heavyUiPaused and Addon.Sync and Addon.Sync.EnterWarmup then
         if self._wasInstance then
             Addon.Sync:EnterWarmup("instance-exit", 15)
         elseif self._wasCombat then
@@ -71,9 +97,9 @@ function SyncPausePolicy:RefreshPauseState()
         end
     end
     if Addon.Sync and Addon.Sync.RecordPauseCycle then
-        Addon.Sync:RecordPauseCycle(paused)
+        Addon.Sync:RecordPauseCycle(heavyUiPaused)
     end
-    self._wasPaused = paused
+    self._wasPaused = heavyUiPaused
     self._wasInstance = inInstance
     self._wasCombat = inCombat
     Addon:RequestRefresh("sync-pause")

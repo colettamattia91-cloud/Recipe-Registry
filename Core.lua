@@ -462,6 +462,16 @@ function Addon:SlashHandler(input)
             if self.Data and self.Data.DumpScanStatus then
                 self.Data:DumpScanStatus()
             end
+            if self.Data and self.Data.GetCatalogDiagnostics then
+                local diagnostics = self.Data:GetCatalogDiagnostics()
+                self:SystemPrint(string.format(
+                    "Catalog duplicateCrafterRows=%d collapsed=%d lastRecipe=%s lastMember=%s",
+                    diagnostics.duplicateCrafterRowsDetected or 0,
+                    diagnostics.duplicateCrafterRowsCollapsed or 0,
+                    tostring(diagnostics.lastDuplicateRecipeKey or "none"),
+                    tostring(diagnostics.lastDuplicateMemberKey or "none")
+                ))
+            end
             if self.Data and self.Data.DumpManifestCacheStatus then
                 self.Data:DumpManifestCacheStatus()
             end
@@ -482,6 +492,9 @@ function Addon:SlashHandler(input)
             end
             if self.Data and self.Data.ResetManifestTelemetry then
                 self.Data:ResetManifestTelemetry()
+            end
+            if self.Data and self.Data.ResetCatalogDiagnostics then
+                self.Data:ResetCatalogDiagnostics()
             end
             self:RequestRefresh("perf")
             self:Print("Performance, sync, scan, and manifest counters reset.")

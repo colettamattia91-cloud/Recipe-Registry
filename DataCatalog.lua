@@ -118,6 +118,41 @@ local function sortCrafterRows(rows)
     end)
 end
 
+local function getCatalogDiagnostics(data)
+    data._catalogDiagnostics = data._catalogDiagnostics or {
+        duplicateCrafterRowsDetected = 0,
+        duplicateCrafterRowsCollapsed = 0,
+        lastDuplicateRecipeKey = nil,
+        lastDuplicateMemberKey = nil,
+    }
+    return data._catalogDiagnostics
+end
+
+local function isBetterCrafterRow(candidate, current)
+    if not current then return true end
+    if candidate.online ~= current.online then
+        return candidate.online == true
+    end
+    if (candidate.skillRank or 0) ~= (current.skillRank or 0) then
+        return (candidate.skillRank or 0) > (current.skillRank or 0)
+    end
+    if (candidate.skillMaxRank or 0) ~= (current.skillMaxRank or 0) then
+        return (candidate.skillMaxRank or 0) > (current.skillMaxRank or 0)
+    end
+    if tostring(candidate.profession or "") ~= tostring(current.profession or "") then
+        return tostring(candidate.profession or "") < tostring(current.profession or "")
+    end
+    return (candidate.updatedAt or 0) > (current.updatedAt or 0)
+end
+
+function Data:GetCatalogDiagnostics()
+    return getCatalogDiagnostics(self)
+end
+
+function Data:ResetCatalogDiagnostics()
+    self._catalogDiagnostics = nil
+end
+
 function Data:GetProfessionSummary()
     local result = {}
     for memberKey, entry in pairs(self:GetMembersDB()) do
@@ -175,6 +210,7 @@ function Data:GetCraftersForItem(itemID)
 end
 
 function Data:BuildRecipeIndex()
+    local diagnostics = getCatalogDiagnostics(self)
     local index = {}
     for memberKey, entry in pairs(self:GetMembersDB()) do
         if self:IsUserVisibleMember(memberKey, entry) then
@@ -192,12 +228,13 @@ function Data:BuildRecipeIndex()
                                 crafterCount = 0,
                                 onlineCount = 0,
                                 _seenMembers = {},
+                                _crafterByMemberKey = {},
                             }
                             index[recipeKey] = row
                         end
 
                         row.profNames[currentProfName] = true
-                        row.crafterRows[#row.crafterRows + 1] = {
+                        local crafterRow = {
                             memberKey = memberKey,
                             profession = currentProfName,
                             online = isOnline,
@@ -206,6 +243,27 @@ function Data:BuildRecipeIndex()
                             specialization = prof.specialization or nil,
                             updatedAt = entry.updatedAt or 0,
                         }
+                        local existingCrafterRow = row._crafterByMemberKey[memberKey]
+                        if existingCrafterRow then
+                            diagnostics.duplicateCrafterRowsDetected = (diagnostics.duplicateCrafterRowsDetected or 0) + 1
+                            diagnostics.duplicateCrafterRowsCollapsed = (diagnostics.duplicateCrafterRowsCollapsed or 0) + 1
+                            diagnostics.lastDuplicateRecipeKey = recipeKey
+                            diagnostics.lastDuplicateMemberKey = memberKey
+                            if Addon.Sync and Addon.Sync.telemetry then
+                                Addon.Sync.telemetry.duplicateCrafterRowsDetected = (Addon.Sync.telemetry.duplicateCrafterRowsDetected or 0) + 1
+                                Addon.Sync.telemetry.duplicateCrafterRowsCollapsed = (Addon.Sync.telemetry.duplicateCrafterRowsCollapsed or 0) + 1
+                                Addon.Sync.telemetry.lastDuplicateRecipeKey = recipeKey
+                                Addon.Sync.telemetry.lastDuplicateMemberKey = memberKey
+                            end
+                            if isBetterCrafterRow(crafterRow, existingCrafterRow) then
+                                for key, value in pairs(crafterRow) do
+                                    existingCrafterRow[key] = value
+                                end
+                            end
+                        else
+                            row.crafterRows[#row.crafterRows + 1] = crafterRow
+                            row._crafterByMemberKey[memberKey] = crafterRow
+                        end
 
                         if not row._seenMembers[memberKey] then
                             row._seenMembers[memberKey] = true
@@ -223,6 +281,7 @@ function Data:BuildRecipeIndex()
     for _, row in pairs(index) do
         sortCrafterRows(row.crafterRows)
         row._seenMembers = nil
+        row._crafterByMemberKey = nil
     end
 
     self._recipeIndex = index
@@ -492,6 +551,14 @@ function Data:DumpSummary()
         totalRecipes,
         s.rev,
         s.updatedAt
+    ))
+    local diagnostics = self:GetCatalogDiagnostics()
+    Addon:SystemPrint(string.format(
+        "Catalog duplicateCrafterRows=%d collapsed=%d lastRecipe=%s lastMember=%s",
+        diagnostics.duplicateCrafterRowsDetected or 0,
+        diagnostics.duplicateCrafterRowsCollapsed or 0,
+        tostring(diagnostics.lastDuplicateRecipeKey or "none"),
+        tostring(diagnostics.lastDuplicateMemberKey or "none")
     ))
     self:DumpScanStatus()
 end

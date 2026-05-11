@@ -84,6 +84,7 @@ function Sync:OnInitialize()
     self._manifestCatchupJobActive = false
     self.peerBackoffUntil = {}
     self.peerHealth = {}
+    self.recentRejects = {}
     self.warmupUntil = 0
     self.warmupReason = nil
     self.worldTransitionUntil = 0
@@ -138,6 +139,7 @@ function Sync:ResetRuntimeQueues(reason, opts)
     self._manifestCatchupJobActive = false
     self.peerBackoffUntil = {}
     self.peerHealth = {}
+    self.recentRejects = {}
     self.warmupUntil = 0
     self.warmupReason = nil
     self.worldTransitionUntil = 0
@@ -234,6 +236,7 @@ function Sync:ClearPeerBackoff(sourceKey)
     end
     if self.peerHealth and self.peerHealth[sourceKey] then
         self.peerHealth[sourceKey].backoffUntil = 0
+        self.peerHealth[sourceKey].snapshotBackoffUntil = 0
     end
 end
 
@@ -247,6 +250,12 @@ function Sync:MarkPeerFailure(sourceKey, reason, request)
         consecutiveFailures = 0,
         lastSuccessAt = 0,
         lastFailureAt = 0,
+        manifestSuccesses = 0,
+        manifestFailures = 0,
+        snapshotSuccesses = 0,
+        snapshotFailures = 0,
+        snapshotBackoffUntil = 0,
+        snapshotQuarantineUntil = 0,
     }
     health.failures = (health.failures or 0) + 1
     health.consecutiveFailures = (health.consecutiveFailures or 0) + 1
@@ -255,14 +264,21 @@ function Sync:MarkPeerFailure(sourceKey, reason, request)
     local threshold, backoffSeconds = self:GetPeerBackoffConfig(request)
     if (health.consecutiveFailures or 0) >= (threshold or PEER_BACKOFF_FAILURE_THRESHOLD) then
         health.backoffUntil = time() + (backoffSeconds or PEER_BACKOFF_SECONDS)
+        health.snapshotBackoffUntil = health.backoffUntil
         self.peerBackoffUntil[sourceKey] = health.backoffUntil
         self.telemetry.peerBackoffApplied = (self.telemetry.peerBackoffApplied or 0) + 1
         Addon:Debug("Peer backoff", tostring(sourceKey), "for", tostring(backoffSeconds or PEER_BACKOFF_SECONDS), "seconds", tostring(reason or "timeout"))
     else
         health.backoffUntil = 0
+        health.snapshotBackoffUntil = 0
         self.peerBackoffUntil[sourceKey] = nil
     end
+    health.snapshotFailures = (health.snapshotFailures or 0) + 1
+    if (health.consecutiveFailures or 0) >= 3 then
+        health.snapshotQuarantineUntil = time() + 900
+    end
     self.peerHealth[sourceKey] = health
+    self:PurgeAutomaticPendingRequestsForPeer(sourceKey, reason or "failure")
 end
 
 function Sync:MarkPeerSuccess(sourceKey)
@@ -275,13 +291,181 @@ function Sync:MarkPeerSuccess(sourceKey)
         consecutiveFailures = 0,
         lastSuccessAt = 0,
         lastFailureAt = 0,
+        manifestSuccesses = 0,
+        manifestFailures = 0,
+        snapshotSuccesses = 0,
+        snapshotFailures = 0,
+        snapshotBackoffUntil = 0,
+        snapshotQuarantineUntil = 0,
     }
     health.successes = (health.successes or 0) + 1
+    health.snapshotSuccesses = (health.snapshotSuccesses or 0) + 1
     health.consecutiveFailures = 0
     health.lastSuccessAt = time()
     health.backoffUntil = 0
+    health.snapshotBackoffUntil = 0
+    health.snapshotQuarantineUntil = 0
     self.peerHealth[sourceKey] = health
     self.peerBackoffUntil[sourceKey] = nil
+    self.lastSnapshotSuccessAt = time()
+end
+
+function Sync:MarkManifestPeerSuccess(sourceKey)
+    if not self:IsValidSyncMemberKey(sourceKey) then return end
+    self.peerHealth = self.peerHealth or {}
+    local health = self.peerHealth[sourceKey] or {
+        successes = 0,
+        failures = 0,
+        consecutiveFailures = 0,
+        lastSuccessAt = 0,
+        lastFailureAt = 0,
+        manifestSuccesses = 0,
+        manifestFailures = 0,
+        snapshotSuccesses = 0,
+        snapshotFailures = 0,
+        snapshotBackoffUntil = 0,
+        snapshotQuarantineUntil = 0,
+    }
+    health.manifestSuccesses = (health.manifestSuccesses or 0) + 1
+    health.lastManifestSuccessAt = time()
+    self.peerHealth[sourceKey] = health
+end
+
+function Sync:BuildRequestRejectKey(peerKey, request)
+    local requestedBlocks = request and request.requestedBlocks or {}
+    return table.concat({
+        tostring(peerKey or ""),
+        tostring(request and request.memberKey or ""),
+        tostring(request and request.rev or 0),
+        table.concat(requestedBlocks, "\030"),
+    }, "\031")
+end
+
+function Sync:RememberPeerReject(peerKey, request, reason, retryable, retryAfter)
+    if not self:IsValidSyncMemberKey(peerKey) then
+        return
+    end
+    local rejectKey = self:BuildRequestRejectKey(peerKey, request)
+    self.recentRejects = self.recentRejects or {}
+    self.recentRejects[rejectKey] = {
+        reason = tostring(reason or "reject"),
+        retryable = retryable == true,
+        expiresAt = time() + max(30, tonumber(retryAfter) or 120),
+    }
+end
+
+function Sync:GetRecentPeerReject(peerKey, request)
+    local rejectKey = self:BuildRequestRejectKey(peerKey, request)
+    local row = self.recentRejects and self.recentRejects[rejectKey] or nil
+    if not row then
+        return nil
+    end
+    if (row.expiresAt or 0) <= time() then
+        self.recentRejects[rejectKey] = nil
+        return nil
+    end
+    return row
+end
+
+function Sync:PurgeAutomaticPendingRequestsForPeer(sourceKey, _reason)
+    if not self:IsValidSyncMemberKey(sourceKey) then
+        return 0
+    end
+    local removed = 0
+    for memberKey, request in pairs(self.pendingRequests or {}) do
+        if request and request.source == sourceKey and not Private.isManualReason(request.why) then
+            self.pendingRequests[memberKey] = nil
+            removed = removed + 1
+        end
+    end
+    if removed > 0 then
+        self.telemetry.purgedBackoffRequests = (self.telemetry.purgedBackoffRequests or 0) + removed
+    end
+    return removed
+end
+
+function Sync:CanExchangeDataWithPeer(peerKey, purpose, request)
+    purpose = tostring(purpose or "request")
+    request = request or {}
+    if not self:IsValidSyncMemberKey(peerKey) then
+        return false, "invalid-peer"
+    end
+    if self:IsMockKey(peerKey) and not self:ShouldAllowLocalMockTraffic(peerKey, request.memberKey or peerKey) then
+        return false, "mock-peer"
+    end
+    if peerKey ~= self:GetSelfKey() and not (self.onlineNodes and self.onlineNodes[peerKey]) then
+        return false, "offline"
+    end
+    local allowManual = Private.isManualReason(request.why)
+    if self:IsPeerBackoffActive(peerKey) and not allowManual then
+        return false, "backoff"
+    end
+    local health = self.peerHealth and self.peerHealth[peerKey] or nil
+    if health and (health.snapshotQuarantineUntil or 0) > time() and not allowManual then
+        return false, "quarantine"
+    end
+    local recentReject = self:GetRecentPeerReject(peerKey, request)
+    if recentReject and recentReject.retryable ~= true then
+        return false, "recent-reject:" .. tostring(recentReject.reason or "reject")
+    end
+    local caps = self.GetPeerCaps and self:GetPeerCaps(peerKey) or nil
+    if caps then
+        if caps.isPausedForSync == true and not allowManual then
+            return false, "peer-paused"
+        end
+        if purpose == "request" or purpose == "dispatch" then
+            if caps.canReceiveReq == false then
+                return false, "peer-cannot-receive-req"
+            end
+            if caps.canSendSnap == false then
+                return false, "peer-cannot-send-snap"
+            end
+            if caps.wireVersion and caps.wireVersion ~= Addon.WIRE_VERSION then
+                return false, "wire-mismatch"
+            end
+        end
+    end
+    return true, "eligible"
+end
+
+function Sync:GetPeerEligibilityBreakdown()
+    local eligible = 0
+    local ineligible = 0
+    local manifestHealthy = 0
+    local snapshotHealthy = 0
+    local manifestOnly = 0
+
+    for peerKey in pairs(self.onlineNodes or {}) do
+        if self:IsValidSyncMemberKey(peerKey) and peerKey ~= self:GetSelfKey() then
+            local caps = self.GetPeerCaps and self:GetPeerCaps(peerKey) or nil
+            local health = self.peerHealth and self.peerHealth[peerKey] or nil
+            if caps or (health and (health.manifestSuccesses or 0) > 0) then
+                manifestHealthy = manifestHealthy + 1
+            end
+            local peerEligible = self:CanExchangeDataWithPeer(peerKey, "dispatch", {
+                source = peerKey,
+                memberKey = peerKey,
+                why = "diagnostic",
+            })
+            if peerEligible then
+                eligible = eligible + 1
+                snapshotHealthy = snapshotHealthy + 1
+            else
+                ineligible = ineligible + 1
+                if caps or (health and (health.manifestSuccesses or 0) > 0) then
+                    manifestOnly = manifestOnly + 1
+                end
+            end
+        end
+    end
+
+    return {
+        eligible = eligible,
+        ineligible = ineligible,
+        manifestHealthy = manifestHealthy,
+        snapshotHealthy = snapshotHealthy,
+        manifestOnly = manifestOnly,
+    }
 end
 
 function Sync:GetPeerHealthScore(sourceKey)
@@ -512,7 +696,7 @@ end
 
 function Sync:ShouldDeferHeavyLifecycleWork(reason)
     local normalized = tostring(reason or "")
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() then
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseHeavyUI() then
         return true, "sensitive-context"
     end
     if self:IsInWarmup() then
@@ -986,6 +1170,9 @@ function Sync:PruneOnlineNodes()
             self._helloManifestRefreshRequested[key] = nil
             self._lastManifestReceivedAt[key] = nil
             self.peerBackoffUntil[key] = nil
+            if self.peerHealth then
+                self.peerHealth[key] = nil
+            end
         end
     end
 end
@@ -993,6 +1180,7 @@ end
 function Sync:PrunePartialManifestReceives()
     local now = time()
     local removed = 0
+    local oldestAge = 0
 
     for peerKey, manifests in pairs(self.partialManifestReceive or {}) do
         if not self:IsValidSyncMemberKey(peerKey) or type(manifests) ~= "table" then
@@ -1001,6 +1189,9 @@ function Sync:PrunePartialManifestReceives()
         else
             for manifestId, state in pairs(manifests) do
                 local builtAt = type(state) == "table" and (tonumber(state.builtAt or 0) or 0) or 0
+                if builtAt > 0 then
+                    oldestAge = max(oldestAge, max(0, now - builtAt))
+                end
                 if type(state) ~= "table" or (builtAt > 0 and (now - builtAt) > SESSION_TIMEOUT) then
                     manifests[manifestId] = nil
                     removed = removed + 1
@@ -1014,7 +1205,9 @@ function Sync:PrunePartialManifestReceives()
 
     if removed > 0 then
         self.telemetry.prunedPartialManifestReceives = (self.telemetry.prunedPartialManifestReceives or 0) + removed
+        self.telemetry.partialManifestPruned = (self.telemetry.partialManifestPruned or 0) + removed
     end
+    self.telemetry.oldestPartialManifestAge = oldestAge
 end
 
 function Sync:PruneTricklePeerState()
@@ -1166,7 +1359,7 @@ end
 
 function Sync:AutoSyncTick()
     if not IsInGuild() then return end
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() then
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("REQ") then
         self.telemetry.pausedSyncCycles = self.telemetry.pausedSyncCycles + 1
         return
     end

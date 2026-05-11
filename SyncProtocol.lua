@@ -45,13 +45,13 @@ end
 
 function Sync:SendGuildEnvelope(kind, payload, priority)
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic(kind) then
-        return
+        return false
     end
     if self:IsRealTrafficSuppressed() then
         if Addon.MockSync and Addon.MockSync.RecordSuppressedSend then
             Addon.MockSync:RecordSuppressedSend()
         end
-        return
+        return false
     end
     payload.kind = kind
     payload.sender = self:GetSelfKey()
@@ -59,28 +59,32 @@ function Sync:SendGuildEnvelope(kind, payload, priority)
     local msg = LibStub("AceSerializer-3.0"):Serialize(payload)
     if msg then
         self:SendCommMessage(PREFIX, msg, "GUILD", nil, priority or "NORMAL")
+        return true
     end
+    return false
 end
 
 function Sync:SendDirectEnvelope(kind, payload, targetKey, priority)
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic(kind) then
-        return
+        return false
     end
     if self:IsRealTrafficSuppressed() then
         if Addon.MockSync and Addon.MockSync.RecordSuppressedSend then
             Addon.MockSync:RecordSuppressedSend()
         end
-        return
+        return false
     end
     local target = self:GetWhisperTarget(targetKey)
-    if not target then return end
+    if not target then return false end
     payload.kind = kind
     payload.sender = self:GetSelfKey()
     payload.sentAt = time()
     local msg = LibStub("AceSerializer-3.0"):Serialize(payload)
     if msg then
         self:SendCommMessage(PREFIX, msg, "WHISPER", target, priority or "NORMAL")
+        return true
     end
+    return false
 end
 
 function Sync:OnCommReceived(prefix, text, distribution, sender)
@@ -90,7 +94,11 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
     local ok, payload = LibStub("AceSerializer-3.0"):Deserialize(text)
     if not ok or type(payload) ~= "table" then return end
     if payload.sender == self:GetSelfKey() then return end
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic(payload.kind) then
+    local pauseReason = Addon.SyncPausePolicy and Addon.SyncPausePolicy:GetProtocolPauseReason(payload.kind) or nil
+    if pauseReason then
+        if payload.kind == "REQ" and self.HandlePausedRequest then
+            self:HandlePausedRequest(payload, pauseReason)
+        end
         return
     end
 
@@ -116,12 +124,17 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
         self:HandleManifestChunk(payload, distribution, sender)
     elseif payload.kind == "MREQ" then
         self:HandleManifestRequest(payload, distribution, sender)
+    elseif payload.kind == "RERR" then
+        self:HandleRequestReject(payload, distribution, sender)
     end
 end
 
 function Sync:HandleHello(payload)
     if not self:IsValidSyncMemberKey(payload.key) then return end
     self:TouchNode(payload.key, payload.version)
+    if self.MarkManifestPeerSuccess then
+        self:MarkManifestPeerSuccess(payload.sender or payload.key)
+    end
     if self.RecordPeerCaps then
         self:RecordPeerCaps(payload.sender or payload.key, payload.caps)
     end
@@ -158,6 +171,9 @@ end
 function Sync:HandleAdvertise(payload)
     if not self:IsValidSyncMemberKey(payload.key) or not self:IsValidSyncMemberKey(payload.sender) then return end
     self:TouchNode(payload.sender)
+    if self.MarkManifestPeerSuccess then
+        self:MarkManifestPeerSuccess(payload.sender)
+    end
     if self.RecordPeerCaps then
         self:RecordPeerCaps(payload.sender, payload.caps)
     end
