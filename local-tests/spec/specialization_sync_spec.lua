@@ -326,7 +326,7 @@ Test.it("repairs a missing remote specialization after forcing a manifest refres
         rev = 5,
         updatedAt = 500,
         sender = memberKey,
-        version = "1.8.1",
+        version = "1.6.0",
     }, {
         sender = memberKey,
         distribution = "GUILD",

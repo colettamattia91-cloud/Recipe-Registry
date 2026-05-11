@@ -27,8 +27,6 @@ local HELLO_AUTO_BACKOFF_SECONDS = Constants.HELLO_AUTO_BACKOFF_SECONDS
 local POST_WORLD_GRACE_SECONDS = Constants.POST_WORLD_GRACE_SECONDS
 local POST_INSTANCE_GRACE_SECONDS = Constants.POST_INSTANCE_GRACE_SECONDS
 local POST_RELOAD_IN_INSTANCE_GRACE_SECONDS = Constants.POST_RELOAD_IN_INSTANCE_GRACE_SECONDS
-local VERSION_AUDIT_INTERVAL = Constants.VERSION_AUDIT_INTERVAL
-local VERSION_AUDIT_TIMEOUT = Constants.VERSION_AUDIT_TIMEOUT
 local HELLO_INTERVAL = Constants.HELLO_INTERVAL
 local AUTO_SYNC_INTERVAL = Constants.AUTO_SYNC_INTERVAL
 local COORDINATOR_RECOMPUTE_DELAY = Constants.COORDINATOR_RECOMPUTE_DELAY
@@ -58,13 +56,6 @@ function Sync:OnInitialize()
     self.onlineNodes = {}
     self.registry = {}
     self.peerCaps = {}
-    self.peerVersionInfo = {}
-    self.versionBlacklist = {}
-    self.versionCheckPending = {}
-    self.versionSyncLock = nil
-    self.latestKnownAddonVersion = Addon.DISPLAY_VERSION
-    self.lastVersionAuditAt = 0
-    self.lastVersionWarningAt = 0
     self.pendingRequests = {}
     self.partialReceive = {}
     self.outgoingSessions = {}
@@ -129,13 +120,6 @@ function Sync:ResetRuntimeQueues(reason, opts)
     self.partialReceive = {}
     self.outgoingSessions = {}
     self.peerCaps = {}
-    self.peerVersionInfo = {}
-    self.versionBlacklist = {}
-    self.versionCheckPending = {}
-    self.versionSyncLock = nil
-    self.latestKnownAddonVersion = Addon.DISPLAY_VERSION
-    self.lastVersionAuditAt = 0
-    self.lastVersionWarningAt = 0
     self.inFlightRequests = {}
     self.inFlight = nil
     self.outboundChunkQueue = {}
@@ -182,10 +166,6 @@ function Sync:ResetRuntimeQueues(reason, opts)
     if self._transitionTimer then
         self:CancelTimer(self._transitionTimer, true)
         self._transitionTimer = nil
-    end
-    if self._versionAuditTimeoutTimer then
-        self:CancelTimer(self._versionAuditTimeoutTimer, true)
-        self._versionAuditTimeoutTimer = nil
     end
     self:RecomputeCoordinator()
     if opts.kickoffResync then
@@ -410,10 +390,6 @@ function Sync:CanExchangeDataWithPeer(peerKey, purpose, request)
     if not self:IsValidSyncMemberKey(peerKey) then
         return false, "invalid-peer"
     end
-    local versionBlocked, versionReason = self:IsVersionBlockedForPeer(peerKey, purpose)
-    if versionBlocked then
-        return false, string.lower(tostring(versionReason or "version-blocked"))
-    end
     if self:IsMockKey(peerKey) and not self:ShouldAllowLocalMockTraffic(peerKey, request.memberKey or peerKey) then
         return false, "mock-peer"
     end
@@ -608,373 +584,6 @@ function Sync:ClearInFlightRequest(memberKey)
     local requests = self:GetInFlightRequests()
     requests[memberKey] = nil
     return self:RefreshPrimaryInFlight()
-end
-
-local function parseVersionNumbers(version)
-    local parts = {}
-    local found = false
-    for token in tostring(version or ""):gmatch("(%d+)") do
-        found = true
-        parts[#parts + 1] = tonumber(token) or 0
-        if #parts >= 4 then
-            break
-        end
-    end
-    if not found then
-        return nil
-    end
-    while #parts < 4 do
-        parts[#parts + 1] = 0
-    end
-    return parts
-end
-
-function Sync:CompareAddonVersions(left, right)
-    local leftParts = parseVersionNumbers(left)
-    local rightParts = parseVersionNumbers(right)
-    if not leftParts or not rightParts then
-        return nil
-    end
-    for index = 1, max(#leftParts, #rightParts) do
-        local a = leftParts[index] or 0
-        local b = rightParts[index] or 0
-        if a ~= b then
-            return a > b and 1 or -1
-        end
-    end
-    return 0
-end
-
-function Sync:IsVersionMessageKind(kind)
-    kind = tostring(kind or "")
-    return kind == "VREQ" or kind == "VACK"
-end
-
-function Sync:IsVersionControlKind(kind)
-    kind = tostring(kind or "")
-    return self:IsVersionMessageKind(kind) or kind == "RERR"
-end
-
-function Sync:GetPeerVersion(peerKey)
-    local info = self.peerVersionInfo and self.peerVersionInfo[peerKey] or nil
-    if info and type(info.version) == "string" and info.version ~= "" then
-        return info.version
-    end
-    local caps = self.GetPeerCaps and self:GetPeerCaps(peerKey) or nil
-    if caps and type(caps.addonVersion) == "string" and caps.addonVersion ~= "" then
-        return caps.addonVersion
-    end
-    local node = self.onlineNodes and self.onlineNodes[peerKey] or nil
-    if node and type(node.version) == "string" and node.version ~= "" then
-        return node.version
-    end
-    return nil
-end
-
-function Sync:IsVersionSyncBlocked()
-    return self.versionSyncLock and self.versionSyncLock.active == true or false
-end
-
-function Sync:IsPeerVersionBlacklisted(peerKey)
-    return self.versionBlacklist and self.versionBlacklist[peerKey] ~= nil or false
-end
-
-function Sync:GetVersionStatus()
-    local newestPeerVersion = self.versionSyncLock and self.versionSyncLock.peerVersion or nil
-    return {
-        localVersion = Addon.DISPLAY_VERSION,
-        latestKnownVersion = self.latestKnownAddonVersion or Addon.DISPLAY_VERSION,
-        blocked = self:IsVersionSyncBlocked(),
-        blockReason = self.versionSyncLock and self.versionSyncLock.reason or nil,
-        newerPeerKey = self.versionSyncLock and self.versionSyncLock.peerKey or nil,
-        newerPeerVersion = newestPeerVersion,
-        blacklistedPeers = countKeys(self.versionBlacklist),
-        pendingPeers = countKeys(self.versionCheckPending),
-        lastAuditAt = self.lastVersionAuditAt or 0,
-    }
-end
-
-function Sync:PrintVersionLockNotice()
-    local status = self:GetVersionStatus()
-    if not status.blocked then
-        return
-    end
-    local now = time()
-    if (self.lastVersionWarningAt or 0) > 0 and (now - (self.lastVersionWarningAt or 0)) < 60 then
-        return
-    end
-    self.lastVersionWarningAt = now
-    Addon:Print(string.format(
-        "Recipe Registry sync locked: your version %s is obsolete compared with %s (%s). Update the addon to restore synchronization.",
-        tostring(status.localVersion or "?"),
-        tostring(status.newerPeerKey or "a newer peer"),
-        tostring(status.newerPeerVersion or "?")
-    ))
-end
-
-function Sync:ClearPeerVersionBlacklist(peerKey, _reason)
-    if self.versionBlacklist then
-        self.versionBlacklist[peerKey] = nil
-    end
-    local info = self.peerVersionInfo and self.peerVersionInfo[peerKey] or nil
-    if info then
-        info.blacklisted = false
-        info.blacklistReason = nil
-    end
-end
-
-function Sync:BlacklistPeerForVersion(peerKey, reason, version)
-    if not self:IsValidSyncMemberKey(peerKey) or peerKey == self:GetSelfKey() or self:IsMockKey(peerKey) then
-        return
-    end
-    self.versionBlacklist = self.versionBlacklist or {}
-    self.peerVersionInfo = self.peerVersionInfo or {}
-    local existing = self.versionBlacklist[peerKey]
-    self.versionBlacklist[peerKey] = {
-        reason = tostring(reason or "version-mismatch"),
-        version = version or self:GetPeerVersion(peerKey),
-        blacklistedAt = time(),
-    }
-    local info = self.peerVersionInfo[peerKey] or {}
-    info.version = version or info.version
-    info.blacklisted = true
-    info.blacklistReason = tostring(reason or "version-mismatch")
-    info.lastSeenAt = time()
-    self.peerVersionInfo[peerKey] = info
-    if not existing and self.telemetry then
-        self.telemetry.versionBlacklists = (self.telemetry.versionBlacklists or 0) + 1
-    end
-end
-
-function Sync:EnterVersionSyncLock(peerKey, version, reason)
-    local previousVersion = self.versionSyncLock and self.versionSyncLock.peerVersion or nil
-    self.versionSyncLock = {
-        active = true,
-        peerKey = peerKey,
-        peerVersion = version,
-        localVersion = Addon.DISPLAY_VERSION,
-        reason = tostring(reason or "peer-newer"),
-        lockedAt = self.versionSyncLock and self.versionSyncLock.lockedAt or time(),
-    }
-    local latestComparison = self:CompareAddonVersions(version, self.latestKnownAddonVersion or Addon.DISPLAY_VERSION)
-    if latestComparison and latestComparison > 0 then
-        self.latestKnownAddonVersion = version
-    end
-    if self.telemetry then
-        self.telemetry.versionLockouts = (self.telemetry.versionLockouts or 0) + 1
-    end
-    self.pendingRequests = {}
-    self.outgoingSessions = {}
-    self.outboundChunkQueue = {}
-    self.manifestChunkQueue = {}
-    self.inboundChunkQueue = {}
-    self.inboundFinalizeQueue = {}
-    self.partialReceive = {}
-    self.partialManifestReceive = {}
-    self.pendingManifestPeers = {}
-    self._pendingManifestComparePeers = {}
-    self.manifestCatchupQueue = {}
-    self:ClearInFlightRequest()
-    local previousComparison = previousVersion and self:CompareAddonVersions(version, previousVersion) or nil
-    if not previousVersion or not previousComparison or previousComparison >= 0 then
-        self:PrintVersionLockNotice()
-    end
-    Addon:RequestRefresh("version-lock")
-end
-
-function Sync:ObservePeerVersion(peerKey, version, source, opts)
-    opts = opts or {}
-    if not self:IsValidSyncMemberKey(peerKey) or peerKey == self:GetSelfKey() or self:IsMockKey(peerKey) then
-        return 0
-    end
-    version = tostring(version or "")
-    if version == "" then
-        return 0
-    end
-
-    self.peerVersionInfo = self.peerVersionInfo or {}
-    local info = self.peerVersionInfo[peerKey] or {}
-    info.version = version
-    info.lastSeenAt = time()
-    info.lastSource = tostring(source or "unknown")
-    if opts.responded then
-        info.lastRespondedAt = time()
-        if self.versionCheckPending then
-            self.versionCheckPending[peerKey] = nil
-        end
-        if self.telemetry then
-            self.telemetry.versionResponses = (self.telemetry.versionResponses or 0) + 1
-        end
-    end
-    self.peerVersionInfo[peerKey] = info
-
-    local latestComparison = self:CompareAddonVersions(version, self.latestKnownAddonVersion or Addon.DISPLAY_VERSION)
-    if latestComparison and latestComparison > 0 then
-        self.latestKnownAddonVersion = version
-    end
-
-    local comparison = self:CompareAddonVersions(version, Addon.DISPLAY_VERSION)
-    if comparison and comparison > 0 then
-        self:EnterVersionSyncLock(peerKey, version, source or "peer-newer")
-    elseif comparison and comparison < 0 then
-        self:BlacklistPeerForVersion(peerKey, "older-version", version)
-    elseif opts.responded then
-        self:ClearPeerVersionBlacklist(peerKey, "version-compatible")
-    end
-
-    if opts.responded then
-        self:RescheduleVersionAuditTimeout()
-    end
-    return comparison
-end
-
-function Sync:ShouldRequestPeerVersion(peerKey, opts)
-    opts = opts or {}
-    if not self:IsValidSyncMemberKey(peerKey) or peerKey == self:GetSelfKey() or self:IsMockKey(peerKey) then
-        return false
-    end
-    if not (self.onlineNodes and self.onlineNodes[peerKey]) then
-        return false
-    end
-    local pending = self.versionCheckPending and self.versionCheckPending[peerKey] or nil
-    if pending and (pending.expiresAt or 0) > time() then
-        return false
-    end
-    local info = self.peerVersionInfo and self.peerVersionInfo[peerKey] or nil
-    if not opts.force and info and (info.lastRespondedAt or 0) > 0 and (time() - (info.lastRespondedAt or 0)) < VERSION_AUDIT_INTERVAL then
-        return false
-    end
-    return true
-end
-
-function Sync:RescheduleVersionAuditTimeout()
-    if self._versionAuditTimeoutTimer then
-        self:CancelTimer(self._versionAuditTimeoutTimer, true)
-        self._versionAuditTimeoutTimer = nil
-    end
-    local nextExpiry = nil
-    for _, row in pairs(self.versionCheckPending or {}) do
-        if type(row) == "table" and (row.expiresAt or 0) > 0 and (not nextExpiry or row.expiresAt < nextExpiry) then
-            nextExpiry = row.expiresAt
-        end
-    end
-    if not nextExpiry then
-        return
-    end
-    self._versionAuditTimeoutTimer = self:ScheduleTimer(function()
-        self._versionAuditTimeoutTimer = nil
-        self:FinalizeVersionAuditTimeouts()
-    end, max(0.5, nextExpiry - time()))
-end
-
-function Sync:RequestPeerVersion(peerKey, reason, opts)
-    opts = opts or {}
-    if not self:ShouldRequestPeerVersion(peerKey, opts) then
-        return false
-    end
-    local sent = self:SendDirectEnvelope("VREQ", {
-        version = Addon.DISPLAY_VERSION,
-        why = tostring(reason or "audit"),
-    }, peerKey, "ALERT")
-    if not sent then
-        return false
-    end
-    self.versionCheckPending = self.versionCheckPending or {}
-    self.versionCheckPending[peerKey] = {
-        requestedAt = time(),
-        expiresAt = time() + VERSION_AUDIT_TIMEOUT,
-        reason = tostring(reason or "audit"),
-    }
-    self:RescheduleVersionAuditTimeout()
-    return true
-end
-
-function Sync:RunVersionAudit(reason)
-    self.lastVersionAuditAt = time()
-    if self.telemetry then
-        self.telemetry.versionAuditRuns = (self.telemetry.versionAuditRuns or 0) + 1
-        self.telemetry.lastVersionAuditReason = tostring(reason or "audit")
-    end
-    local requested = 0
-    for peerKey in pairs(self.onlineNodes or {}) do
-        if self:RequestPeerVersion(peerKey, reason or "audit", { force = true }) then
-            requested = requested + 1
-        end
-    end
-    Addon:RequestRefresh("version-audit")
-    return requested
-end
-
-function Sync:FinalizeVersionAuditTimeouts()
-    local now = time()
-    local timedOut = 0
-    for peerKey, row in pairs(self.versionCheckPending or {}) do
-        if type(row) ~= "table" or (row.expiresAt or 0) <= now then
-            self.versionCheckPending[peerKey] = nil
-            self:BlacklistPeerForVersion(peerKey, "no-version-response", self:GetPeerVersion(peerKey))
-            timedOut = timedOut + 1
-        end
-    end
-    if timedOut > 0 and self.telemetry then
-        self.telemetry.versionAuditTimeouts = (self.telemetry.versionAuditTimeouts or 0) + timedOut
-    end
-    self:RescheduleVersionAuditTimeout()
-    Addon:RequestRefresh("version-timeout")
-end
-
-function Sync:HandleVersionRequest(payload)
-    if not (payload and self:IsValidSyncMemberKey(payload.sender)) then
-        return
-    end
-    if self.ObservePeerVersion then
-        self:ObservePeerVersion(payload.sender, payload.version, "vreq", {
-            responded = false,
-        })
-    end
-    self:SendDirectEnvelope("VACK", {
-        version = Addon.DISPLAY_VERSION,
-        wireVersion = Addon.WIRE_VERSION,
-    }, payload.sender, "ALERT")
-end
-
-function Sync:HandleVersionResponse(payload)
-    if not (payload and self:IsValidSyncMemberKey(payload.sender)) then
-        return
-    end
-    self:ObservePeerVersion(payload.sender, payload.version, "vack", {
-        responded = true,
-    })
-end
-
-function Sync:DumpVersionStatus()
-    local status = self:GetVersionStatus()
-    local blockedText = status.blocked and string.format(
-        "LOCKED newerPeer=%s(%s)",
-        tostring(status.newerPeerKey or "unknown"),
-        tostring(status.newerPeerVersion or "?")
-    ) or "clear"
-    Addon:Print(string.format(
-        "Version local=%s latestKnown=%s blacklisted=%d pending=%d state=%s",
-        tostring(status.localVersion or "?"),
-        tostring(status.latestKnownVersion or "?"),
-        status.blacklistedPeers or 0,
-        status.pendingPeers or 0,
-        blockedText
-    ))
-end
-
-function Sync:IsVersionBlockedForPeer(peerKey, kind)
-    kind = tostring(kind or "")
-    if self:IsVersionControlKind(kind) then
-        return false, nil
-    end
-    if self:IsVersionSyncBlocked() then
-        return true, "LOCAL_VERSION_OBSOLETE"
-    end
-    if self:IsPeerVersionBlacklisted(peerKey) then
-        return true, "PEER_VERSION_BLACKLIST"
-    end
-    return false, nil
 end
 
 function Sync:ScheduleHello(delay)
@@ -1561,9 +1170,6 @@ function Sync:PruneOnlineNodes()
             self._helloManifestRefreshRequested[key] = nil
             self._lastManifestReceivedAt[key] = nil
             self.peerBackoffUntil[key] = nil
-            if self.versionCheckPending then
-                self.versionCheckPending[key] = nil
-            end
             if self.peerHealth then
                 self.peerHealth[key] = nil
             end

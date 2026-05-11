@@ -125,13 +125,6 @@ end
 function Sync:HandleRequest(payload)
     local targetKey = payload.sender
     if not self:IsValidSyncMemberKey(targetKey) then return end
-    if self.IsVersionBlockedForPeer then
-        local blocked, reason = self:IsVersionBlockedForPeer(targetKey, "REQ")
-        if blocked then
-            self:SendRequestReject(targetKey, payload, reason or "VERSION_BLOCKED", { retryable = false })
-            return
-        end
-    end
     if not self:IsValidSyncMemberKey(payload.key) then
         self:SendRequestReject(targetKey, payload, "INVALID_REQUEST", { retryable = false })
         return
@@ -266,8 +259,6 @@ end
 
 function Sync:HandleSnapshotChunk(payload)
     if not self:IsValidSyncMemberKey(payload.key) or not self:IsValidSyncMemberKey(payload.sender) then return end
-    if self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() then return end
-    if self.IsPeerVersionBlacklisted and self:IsPeerVersionBlacklisted(payload.sender) then return end
     if payload.key == self:GetSelfKey() and payload.sender == self:GetSelfKey() then return end
 
     local state = self.partialReceive[payload.key]
@@ -371,8 +362,6 @@ function Sync:HandleResumeRequest(payload)
     local session = self.outgoingSessions[payload.sessionId]
     if not session then return end
     if not self:IsValidSyncMemberKey(payload.sender) or not self:IsValidSyncMemberKey(payload.key) then return end
-    if self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() then return end
-    if self.IsPeerVersionBlacklisted and self:IsPeerVersionBlacklisted(payload.sender) then return end
     if self:IsMockKey(payload.sender) or self:IsMockKey(payload.key) then return end
     if session.targetKey ~= payload.sender then return end
     if session.memberKey ~= payload.key or session.rev ~= payload.rev then return end
@@ -386,8 +375,6 @@ function Sync:HandleTransferDone(payload)
     local session = self.outgoingSessions[payload.sessionId]
     if not session then return end
     if not self:IsValidSyncMemberKey(payload.sender) then return end
-    if self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() then return end
-    if self.IsPeerVersionBlacklisted and self:IsPeerVersionBlacklisted(payload.sender) then return end
     if self:IsMockKey(payload.sender) then return end
     if session.targetKey ~= payload.sender then return end
     self:ReleaseCompletedTransferState(session.memberKey, payload.sessionId, "done")

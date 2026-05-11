@@ -31,8 +31,6 @@ function Sync:SendManifestToPeer(peerKey, why)
     if not peerKey or not Addon.TrickleSync then return end
     if not self:IsValidSyncMemberKey(peerKey) then return end
     if self:IsMockKey(peerKey) then return end
-    if self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() then return end
-    if self.IsPeerVersionBlacklisted and self:IsPeerVersionBlacklisted(peerKey) then return end
     if self:IsInWorldTransition() and why ~= "force" then
         self.telemetry.transitionDeferredManifestPeers = (self.telemetry.transitionDeferredManifestPeers or 0) + 1
         self.telemetry.transitionDeferrals = (self.telemetry.transitionDeferrals or 0) + 1
@@ -185,20 +183,8 @@ end
 
 function Sync:RequestManifestRefresh(peerKey, opts)
     opts = opts or {}
-    if self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() then
-        if opts.reason == "manual" or opts.reason == "manual-all" then
-            self:PrintVersionLockNotice()
-        end
-        return
-    end
     if peerKey and peerKey ~= "" then
         if self:IsMockKey(peerKey) then return end
-        if self.IsPeerVersionBlacklisted and self:IsPeerVersionBlacklisted(peerKey) then
-            if opts.reason == "manual" or opts.reason == "manual-all" then
-                Addon:Print("Version check blocked sync with " .. tostring(peerKey) .. " until that peer updates the addon.")
-            end
-            return
-        end
         if self:IsInWorldTransition() and not opts.force then
             self.telemetry.transitionDeferredManifestPeers = (self.telemetry.transitionDeferredManifestPeers or 0) + 1
             self.telemetry.transitionDeferrals = (self.telemetry.transitionDeferrals or 0) + 1
@@ -231,8 +217,6 @@ end
 function Sync:HandleManifestRequest(payload)
     if not self:IsValidSyncMemberKey(payload.sender) or payload.sender == self:GetSelfKey() then return end
     if self:IsMockKey(payload.sender) then return end
-    if self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() then return end
-    if self.IsPeerVersionBlacklisted and self:IsPeerVersionBlacklisted(payload.sender) then return end
     self.telemetry.manifestForceReplies = (self.telemetry.manifestForceReplies or 0) + 1
     self:SendManifestToPeer(payload.sender, "force")
 end
@@ -523,8 +507,6 @@ function Sync:HandleManifestChunk(payload)
     if not self:IsValidSyncMemberKey(payload.sender) or payload.sender == self:GetSelfKey() then return end
     if not payload.manifestId then return end
     if self:IsMockKey(payload.sender) and not self:ShouldAllowLocalMockTraffic(payload.sender, nil) then return end
-    if self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() then return end
-    if self.IsPeerVersionBlacklisted and self:IsPeerVersionBlacklisted(payload.sender) then return end
     self.telemetry.manifestChunksReceived = (self.telemetry.manifestChunksReceived or 0) + 1
 
     local senderKey = payload.sender

@@ -171,7 +171,6 @@ function Sync:GetUiState()
     local bootstrapState = Addon.BootstrapSync and Addon.BootstrapSync:GetUiState() or nil
     local runtime = self:GetRuntimeObservabilitySnapshot()
     local primary = self:GetInFlightRequest()
-    local versionState = self.GetVersionStatus and self:GetVersionStatus() or nil
     return {
         role = self:IsCoordinator() and "Coordinator" or "Client",
         coordinatorKey = self.coordinatorKey,
@@ -186,7 +185,6 @@ function Sync:GetUiState()
         inboundChunks = #self.inboundChunkQueue,
         autoSync = true,
         paused = pauseState,
-        version = versionState,
         warmup = self:IsInWarmup(),
         transition = runtime.transitionActive,
         transitionRemaining = runtime.transitionRemaining,
@@ -610,7 +608,7 @@ function Sync:DumpStatus()
     local primary = self:GetInFlightRequest()
     local eligibility = self.GetPeerEligibilityBreakdown and self:GetPeerEligibilityBreakdown() or {}
     Addon:Print(string.format(
-        "Role=%s coordinator=%s onlineNodes=%d registry=%d queued=%d activeReq=%d inFlight=%s outgoing=%d outboundChunks=%d manifestChunks=%d inboundChunks=%d manifestPending=%d paused=%s versionLocked=%s warmup=%s transition=%s(%ds) isolated=%s",
+        "Role=%s coordinator=%s onlineNodes=%d registry=%d queued=%d activeReq=%d inFlight=%s outgoing=%d outboundChunks=%d manifestChunks=%d inboundChunks=%d manifestPending=%d paused=%s warmup=%s transition=%s(%ds) isolated=%s",
         role,
         tostring(self.coordinatorKey),
         countKeys(self.onlineNodes),
@@ -624,7 +622,6 @@ function Sync:DumpStatus()
         #self.inboundChunkQueue,
         countKeys(self.pendingManifestPeers),
         tostring(Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() or false),
-        tostring(self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() or false),
         tostring(self:IsInWarmup()),
         tostring(runtime.transitionActive or false),
         runtime.transitionRemaining or 0,

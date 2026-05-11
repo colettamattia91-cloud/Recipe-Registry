@@ -46,8 +46,6 @@ local POST_RELOAD_IN_INSTANCE_GRACE_SECONDS = 30
 local POST_COMBAT_GRACE_SECONDS = 6
 local MANIFEST_MERGE_ANNOUNCE_DEBOUNCE = 8
 local MANIFEST_MERGE_ANNOUNCE_MAX_DELAY = 25
-local VERSION_AUDIT_INTERVAL = 900
-local VERSION_AUDIT_TIMEOUT = 8
 local OFFLINE_DEBUG_LOG_LIMIT = 12
 local MAX_OUTBOUND_CHUNKS = 320
 local MAX_MANIFEST_CHUNKS = 256
@@ -199,12 +197,6 @@ local function newSyncTelemetry()
         requestIdActive = nil,
         lastSelectedPeer = nil,
         lastSelectedReason = nil,
-        versionAuditRuns = 0,
-        versionAuditTimeouts = 0,
-        versionResponses = 0,
-        versionBlacklists = 0,
-        versionLockouts = 0,
-        lastVersionAuditReason = nil,
         rosterRefreshRequests = 0,
         manifestCompareDeferred = 0,
         warmupDeferrals = 0,
@@ -378,8 +370,6 @@ Private.constants = {
     POST_COMBAT_GRACE_SECONDS = POST_COMBAT_GRACE_SECONDS,
     MANIFEST_MERGE_ANNOUNCE_DEBOUNCE = MANIFEST_MERGE_ANNOUNCE_DEBOUNCE,
     MANIFEST_MERGE_ANNOUNCE_MAX_DELAY = MANIFEST_MERGE_ANNOUNCE_MAX_DELAY,
-    VERSION_AUDIT_INTERVAL = VERSION_AUDIT_INTERVAL,
-    VERSION_AUDIT_TIMEOUT = VERSION_AUDIT_TIMEOUT,
     OFFLINE_DEBUG_LOG_LIMIT = OFFLINE_DEBUG_LOG_LIMIT,
     MAX_OUTBOUND_CHUNKS = MAX_OUTBOUND_CHUNKS,
     MAX_MANIFEST_CHUNKS = MAX_MANIFEST_CHUNKS,
@@ -420,11 +410,7 @@ function Sync:Startup()
     self.queueTicker = self:ScheduleRepeatingTimer("ProcessRequestQueue", 1)
     self.pruneTicker = self:ScheduleRepeatingTimer("PruneState", 5)
     self.autoSyncTicker = self:ScheduleRepeatingTimer("AutoSyncTick", AUTO_SYNC_INTERVAL)
-    self.versionAuditTicker = self:ScheduleRepeatingTimer("RunVersionAudit", VERSION_AUDIT_INTERVAL)
     self:ScheduleTimer("AutoSyncTick", 6)
-    self:ScheduleTimer(function()
-        self:RunVersionAudit("login")
-    end, 5)
     self:AdvertiseLocalRevision("startup")
     self:EnsureBackgroundWorkers()
     if Addon.Data and Addon.Data.ScheduleManifestBuild then

@@ -29,16 +29,6 @@ local function countGuildCommKind(wow, kind)
     return total
 end
 
-local function countCommKind(wow, kind)
-    local total = 0
-    for _, row in ipairs(wow.GetSentComm()) do
-        if type(row.message) == "table" and row.message.kind == kind then
-            total = total + 1
-        end
-    end
-    return total
-end
-
 io.write("Slash command output\n")
 
 Test.it("prints the complete main command surface", function()
@@ -50,25 +40,10 @@ Test.it("prints the complete main command surface", function()
     Test.truthy(printLogContains(wow, "/rr rescan - queue a profession scan"), "rescan help")
     Test.truthy(printLogContains(wow, "/rr dump, /rr self [profession], /rr sync, /rr offline, /rr manifest [target or verbose], /rr pull"), "diagnostic help")
     Test.truthy(printLogContains(wow, "offlinewipe"), "offlinewipe scenario in help")
-    Test.truthy(printLogContains(wow, "/rr options, /rr mini, /rr debug, /rr version, /rr ver"), "debug/version command in help")
+    Test.truthy(printLogContains(wow, "/rr options, /rr mini, /rr debug"), "debug command in help")
     Test.truthy(printLogContains(wow, "/rr clean [check], /rr wipe"), "maintenance commands in help")
     Test.truthy(printLogDoesNotContain(wow, "syncreset"), "syncreset should stay hidden from public help")
     Test.truthy(printLogDoesNotContain(wow, "|"), "main help should avoid WoW chat control pipe characters")
-end)
-
-Test.it("runs manual version checks from slash commands", function()
-    local addon, wow = freshAddon()
-    local peerKey = "Versionpeer-TestRealm"
-
-    addon.Sync:TouchNode(peerKey, "1.8.1")
-    addon:SlashHandler("version")
-
-    Test.eq(countCommKind(wow, "VREQ"), 1, "manual version should send one VREQ")
-    Test.truthy(printLogContains(wow, "Requested version check from 1 peer(s)."), "version command should print request count")
-    Test.truthy(printLogContains(wow, "Version local="), "version command should print version summary")
-
-    addon:SlashHandler("ver")
-    Test.eq(countCommKind(wow, "VREQ"), 1, "short alias should not duplicate an in-flight VREQ")
 end)
 
 Test.it("prints corrupt data cleanup check output", function()

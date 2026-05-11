@@ -31,7 +31,7 @@ end
 
 function SyncPausePolicy:GetProtocolPauseReason(kind)
     kind = tostring(kind or "")
-    if kind == "RERR" or kind == "VREQ" or kind == "VACK" then
+    if kind == "RERR" then
         return nil
     end
     if isInSensitiveInstance() then

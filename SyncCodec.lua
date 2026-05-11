@@ -67,9 +67,6 @@ function Sync:GetLocalProtocolCaps()
     local codecId = self:GetLocalSnapshotCodecId()
     local summary = Addon.Data and Addon.Data.GetLocalSummary and Addon.Data:GetLocalSummary() or {}
     local protocolPaused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("REQ") or false
-    if self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() then
-        protocolPaused = true
-    end
     return {
         wireVersion = Addon.WIRE_VERSION,
         addonVersion = Addon.DISPLAY_VERSION,

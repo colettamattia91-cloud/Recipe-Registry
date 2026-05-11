@@ -15,41 +15,6 @@ behavior.
 
 Date: 2026-05-11
 
-- Version compatibility gating execution completed after the sync reliability
-  pass.
-- `SyncRuntime.lua` now owns addon-version comparison, per-peer version
-  observation, timeout tracking, temporary version-audit pending state,
-  blacklist state for silent/older peers, and a hard local sync lock when a
-  newer peer version is observed. The lock drains in-flight sync state and
-  preserves only local/cached read access.
-- `SyncProtocol.lua` now carries explicit `VREQ` and `VACK` control traffic.
-  Login warmup schedules one delayed version audit, `Sync.lua` runs a periodic
-  audit every 15 minutes, and `Core.lua` exposes manual `/rr version` and
-  `/rr ver` commands that trigger the same audit path and dump current version
-  state.
-- Same-version peers remain on the existing sync path with no behavior change.
-  Peers that respond with an older version are blacklisted until they answer
-  with a compatible version in a later session, while silent peers are
-  blacklisted after audit timeout because they are treated as legacy/obsolete
-  until proven otherwise.
-- If any peer reports a newer addon version than the local install,
-  `SyncRuntime.lua` enters a local obsolete-version lock. All normal sync
-  traffic is then blocked at protocol, manifest, request, and transfer entry
-  points, but UI/data browsing remains available against previously cached
-  records. `Addon:SystemPrint(...)` emits a throttled chat warning telling the
-  player to update the addon before sync can resume.
-- `UI/MainFrame.lua` now reflects version gating in the status bar: blocked
-  local state forces a red sync indicator and shows the required upgrade gap,
-  while non-fatal peer blacklists are surfaced as a peer-count warning without
-  hiding cached content.
-- Added focused backend coverage:
-  `version_sync_spec.lua`,
-  plus targeted updates to existing specs whose assumptions previously treated
-  version-mismatched peers as neutral.
-- Final verification after implementation:
-  `local-tests/run-syntax.ps1` -> `Lua syntax OK`
-  `local-tests/run-backend-tests.ps1` -> `Backend tests OK`
-
 - Sync reliability execution completed from
   `RecipeRegistry_Sync_Reliability_Preanalysis_Codex.md`.
 - Direct sync now uses a softer timeout envelope and explicit negative
@@ -190,23 +155,14 @@ Date: 2026-05-11
   triggers one targeted `MREQ` so unchanged peers can repair missing metadata
   after reloads or addon updates. During warmup, that extra `MREQ` is
   intentionally suppressed to avoid login/reload fan-out spikes because the
-  normal `HELLO` exchange already causes peer manifest replies. New version
-  audits do not alter this flow for compatible peers, but version lock or
-  version blacklist state suppresses follow-up manifest traffic entirely.
-- Version compatibility gate: `SyncRuntime.lua` compares semantic numeric addon
-  versions, drives `VREQ`/`VACK` audit state, blacklists older or silent
-  peers, and enters a local hard sync lock if any contacted peer reports a
-  newer version. The lock is intentionally stricter than ordinary pause policy:
-  normal sync work stops, but cached browsing and diagnostics remain readable.
+  normal `HELLO` exchange already causes peer manifest replies.
 - Direct request resilience: `SyncRequests.lua` now caps retries, avoids
   endlessly appending `:retry`, tracks temporary per-peer backoff via
   `SyncRuntime.lua`, and prefers healthier sources when choosing the next
   pending request. Direct sync is no longer single-flight: it now runs a small
   bounded set of owner requests concurrently, backfills freed slots
   immediately, keeps fairness and retry caps, and handles explicit `RERR`
-  responses for fast-fail cases instead of waiting only on timeouts. Request
-  enqueue and transfer start now also respect version lock and peer blacklist
-  state before any snapshot traffic is attempted.
+  responses for fast-fail cases instead of waiting only on timeouts.
 - Manifest catch-up cap: large peer manifests are compared immediately, but the
   derived `REQ` requests are capped per flush and the remainder is deferred
   through `manifestCatchupQueue` and the `sync-manifest-catchup` scheduler job.
@@ -253,8 +209,7 @@ Date: 2026-05-11
 - Cached read-only UI mode: `UI/MainFrame.lua` can still render saved recipe
   data during combat/instance-sensitive states when cached member data exists;
   it falls back to pure status-only mode only when there is nothing useful to
-  show locally. The same browsing guarantee is now reused by obsolete-version
-  lockout: sync is disabled, but previously downloaded data remains visible.
+  show locally.
 - Tooltip crafter index: invalidation now schedules an incremental background
   rebuild; hover paths keep using the previous index until the new one is
   committed, instead of rebuilding the whole tooltip index inline.
@@ -289,13 +244,13 @@ Date: 2026-05-11
 - UI refresh: callers use `Addon:RequestRefresh(reason)`. With
   `Performance.lua` active, refreshes are deferred and scoped by reason.
 - Local backend tests: `local-tests/run-backend-tests.ps1` loads WoW/Ace mocks
-  and currently covers 145 tests across P2/P4/P5/P6 behavior, AceBucket event
+  and currently covers 140 tests across P2/P4/P5/P6 behavior, AceBucket event
   coalescing, negotiated snapshot codec transport, slash output, specialization
   sync stability, manifest diagnostics, lifecycle transition gating, snapshot
   metadata-only/equivalent merges, runtime queue caps, tooltip async rebuild
-  behavior, sync reliability/reject handling, version compatibility gating,
-  runtime resilience, comm-boundary delivery, and a multi-node comm-bus
-  harness with 200 isolated addon peers.
+  behavior, sync reliability/reject handling, runtime resilience,
+  comm-boundary delivery, and a multi-node comm-bus harness with 200 isolated
+  addon peers.
 
 ## Load Order And Modules
 
