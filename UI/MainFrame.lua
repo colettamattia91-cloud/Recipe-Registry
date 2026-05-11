@@ -1256,6 +1256,7 @@ function UI:RefreshStatusBar()
     local inFlight = state and state.inFlight
     local role = state and state.role or "Client"
     local paused = state and state.paused or false
+    local versionState = state and state.version or nil
 
     local subtitle = string.format(
         "Automatic sync • %s • %d guild node(s) • %d known member(s)",
@@ -1270,6 +1271,15 @@ function UI:RefreshStatusBar()
     end
     if paused then
         subtitle = subtitle .. " | paused"
+    end
+    if versionState and versionState.blocked then
+        subtitle = subtitle .. string.format(
+            " | update required: %s < %s",
+            tostring(versionState.localVersion or "?"),
+            tostring(versionState.newerPeerVersion or "?")
+        )
+    elseif versionState and (versionState.blacklistedPeers or 0) > 0 then
+        subtitle = subtitle .. string.format(" | peer blacklist: %d", versionState.blacklistedPeers or 0)
     end
     if bootstrap then
         if bootstrap.inProgress then
@@ -1290,7 +1300,10 @@ function UI:RefreshStatusBar()
     end
     setTextIfChanged(self.frame.subtitle, subtitle)
 
-    if onlineNodes > 1 then
+    if versionState and versionState.blocked then
+        setVertexColorIfChanged(self.frame.syncDot, 0.75, 0.2, 0.2, 1)
+        self.frame.autoLabel:SetTextColor(1.0, 0.75, 0.75)
+    elseif onlineNodes > 1 then
         setVertexColorIfChanged(self.frame.syncDot, 0.2, 0.9, 0.2, 1)
         self.frame.autoLabel:SetTextColor(0.7, 0.95, 0.7)
     elseif onlineNodes == 1 then

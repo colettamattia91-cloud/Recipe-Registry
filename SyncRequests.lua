@@ -363,6 +363,9 @@ function Sync:DispatchPendingRequest(memberKey, request)
 end
 
 function Sync:ProcessRequestQueue()
+    if self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() then
+        return
+    end
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic() then
         return
     end
@@ -510,8 +513,18 @@ function Sync:FailInFlight(memberKey, requeue, reason)
 end
 
 function Sync:RequestGuildCatchup(memberKey, silent)
+    if self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() then
+        self:PrintVersionLockNotice()
+        return
+    end
     if memberKey and memberKey ~= "" then
         if self:IsMockKey(memberKey) then return end
+        if self.IsPeerVersionBlacklisted and self:IsPeerVersionBlacklisted(memberKey) then
+            if not silent then
+                Addon:Print("Sync blocked for " .. tostring(memberKey) .. " until that peer updates the addon.")
+            end
+            return
+        end
         local remoteRev = self:GetKnownRevision(memberKey)
         if remoteRev == 0 then
             local localEntry = Addon.Data:GetMember(memberKey)

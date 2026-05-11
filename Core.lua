@@ -84,7 +84,7 @@ local MOCK_SCENARIOS = "light, medium, heavy, burst, bootstrap, traffic, offline
 local function printMainHelp(self)
     self:Print("Commands:")
     self:Print("/rr - open or close the main window.")
-    self:Print("/rr options, /rr mini, /rr debug")
+    self:Print("/rr options, /rr mini, /rr debug, /rr version, /rr ver")
     self:Print("/rr rescan - queue a profession scan and scan active profession API data.")
     self:Print("/rr dump, /rr self [profession], /rr sync, /rr offline, /rr manifest [target or verbose], /rr pull")
     self:Print("/rr perf [toggle, dump, reset, help]")
@@ -428,6 +428,21 @@ function Addon:SlashHandler(input)
     if cmd == "debug" then
         self.debugMode = not self.debugMode
         self:Print("Debug " .. (self.debugMode and "enabled" or "disabled"))
+        return
+    end
+
+    if cmd == "version" or cmd == "ver" then
+        if self.Sync and self.Sync.RunVersionAudit then
+            local requested = self.Sync:RunVersionAudit("manual")
+            if self.Sync.DumpVersionStatus then
+                self.Sync:DumpVersionStatus()
+            end
+            if requested and requested > 0 then
+                self:Print(string.format("Requested version check from %d peer(s).", requested))
+            else
+                self:Print("No online peers available for version check.")
+            end
+        end
         return
     end
 

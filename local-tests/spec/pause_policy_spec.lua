@@ -81,7 +81,7 @@ Test.it("keeps protocol traffic active in raid groups outside instances", functi
         rev = 5,
         updatedAt = 500,
         sender = "Peerone-TestRealm",
-        version = "1.6.0",
+        version = "1.8.1",
     }, {
         sender = "Peerone-TestRealm",
         distribution = "GUILD",
@@ -121,7 +121,7 @@ Test.it("halts protocol traffic and inbound sync handling while in instances", f
         rev = 5,
         updatedAt = 500,
         sender = "Peerone-TestRealm",
-        version = "1.6.0",
+        version = "1.8.1",
     }, {
         sender = "Peerone-TestRealm",
         distribution = "GUILD",

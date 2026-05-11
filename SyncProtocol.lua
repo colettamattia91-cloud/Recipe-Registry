@@ -8,6 +8,9 @@ local time = time
 local PREFIX = Constants.PREFIX
 
 function Sync:BroadcastHello()
+    if self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() then
+        return
+    end
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic() then
         return
     end
@@ -24,6 +27,9 @@ function Sync:BroadcastHello()
 end
 
 function Sync:AdvertiseLocalRevision(reason)
+    if self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() then
+        return
+    end
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic() then
         return
     end
@@ -37,6 +43,7 @@ function Sync:AdvertiseLocalRevision(reason)
         updatedAt = summary.updatedAt,
         professions = summary.professions,
         recipes = summary.recipes,
+        version = Addon.DISPLAY_VERSION,
         why = reason,
         caps = self.GetLocalProtocolCaps and self:GetLocalProtocolCaps() or nil,
     }, "ALERT")
@@ -44,6 +51,9 @@ function Sync:AdvertiseLocalRevision(reason)
 end
 
 function Sync:SendGuildEnvelope(kind, payload, priority)
+    if self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() and not (self.IsVersionControlKind and self:IsVersionControlKind(kind)) then
+        return false
+    end
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic(kind) then
         return false
     end
@@ -65,6 +75,12 @@ function Sync:SendGuildEnvelope(kind, payload, priority)
 end
 
 function Sync:SendDirectEnvelope(kind, payload, targetKey, priority)
+    if self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() and not (self.IsVersionControlKind and self:IsVersionControlKind(kind)) then
+        return false
+    end
+    if targetKey and self.IsPeerVersionBlacklisted and self:IsPeerVersionBlacklisted(targetKey) and not (self.IsVersionControlKind and self:IsVersionControlKind(kind)) then
+        return false
+    end
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic(kind) then
         return false
     end
@@ -106,6 +122,24 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
         self:TouchNode(payload.sender, payload.version)
     end
 
+    if payload.kind == "VREQ" then
+        self:HandleVersionRequest(payload, distribution, sender)
+        return
+    elseif payload.kind == "VACK" then
+        self:HandleVersionResponse(payload, distribution, sender)
+        return
+    end
+
+    if payload.sender and self.IsVersionBlockedForPeer then
+        local blocked, reason = self:IsVersionBlockedForPeer(payload.sender, payload.kind)
+        if blocked and payload.kind ~= "HELLO" and payload.kind ~= "AD" then
+            if payload.kind == "REQ" and self.SendRequestReject then
+                self:SendRequestReject(payload.sender, payload, reason or "VERSION_BLOCKED", { retryable = false })
+            end
+            return
+        end
+    end
+
     if payload.kind == "HELLO" then
         self:HandleHello(payload, distribution, sender)
     elseif payload.kind == "AD" then
@@ -138,8 +172,20 @@ function Sync:HandleHello(payload)
     if self.RecordPeerCaps then
         self:RecordPeerCaps(payload.sender or payload.key, payload.caps)
     end
+    if self.ObservePeerVersion then
+        local advertisedVersion = payload.version
+            or (payload.caps and payload.caps.addonVersion)
+        self:ObservePeerVersion(payload.sender or payload.key, advertisedVersion, "hello", {
+            responded = false,
+        })
+    end
+    if self.RequestPeerVersion then
+        self:RequestPeerVersion(payload.sender or payload.key, "hello")
+    end
     self:RecordRevisionHint(payload.key, payload.rev, payload.updatedAt, payload.key)
     if self:IsMockKey(payload.key) then return end
+    if self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() then return end
+    if self.IsPeerVersionBlacklisted and self:IsPeerVersionBlacklisted(payload.sender or payload.key) then return end
     if self:IsInWarmup() then
         self.telemetry.warmupDeferrals = (self.telemetry.warmupDeferrals or 0) + 1
         Addon:Debug("Warmup deferring manifest reply", tostring(payload.key))
@@ -177,8 +223,20 @@ function Sync:HandleAdvertise(payload)
     if self.RecordPeerCaps then
         self:RecordPeerCaps(payload.sender, payload.caps)
     end
+    if self.ObservePeerVersion then
+        local advertisedVersion = payload.version
+            or (payload.caps and payload.caps.addonVersion)
+        self:ObservePeerVersion(payload.sender, advertisedVersion, "advertise", {
+            responded = false,
+        })
+    end
+    if self.RequestPeerVersion then
+        self:RequestPeerVersion(payload.sender, "advertise")
+    end
     self:RecordRevisionHint(payload.key, payload.rev, payload.updatedAt, payload.key)
     if self:IsMockKey(payload.key) or self:IsMockKey(payload.sender) then return end
+    if self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() then return end
+    if self.IsPeerVersionBlacklisted and self:IsPeerVersionBlacklisted(payload.sender) then return end
 
     local localEntry = Addon.Data:GetMember(payload.key)
     local localRev = localEntry and localEntry.rev or 0
@@ -209,6 +267,8 @@ end
 function Sync:HandleIndex(payload)
     if not self:IsValidSyncMemberKey(payload.key) or not self:IsValidSyncMemberKey(payload.sender) then return end
     self:TouchNode(payload.sender)
+    if self.IsVersionSyncBlocked and self:IsVersionSyncBlocked() then return end
+    if self.IsPeerVersionBlacklisted and self:IsPeerVersionBlacklisted(payload.sender) then return end
     if self:IsCoordinator() then return end
     if self.coordinatorKey and payload.sender ~= self.coordinatorKey then return end
     if self:IsMockKey(payload.key) or self:IsMockKey(payload.sender) then return end

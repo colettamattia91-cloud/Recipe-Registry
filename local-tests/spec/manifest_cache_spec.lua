@@ -123,7 +123,7 @@ Test.it("defers inline manifest compare fallback during warmup and replays it on
     local blockKey = data:BuildSyncBlockKey(peerKey, "Alchemy")
 
     addon.Sync:EnterWarmup("test", 12)
-    addon.Sync.onlineNodes[peerKey] = { lastSeen = time(), version = "1.7.0" }
+    addon.Sync.onlineNodes[peerKey] = { lastSeen = time(), version = "1.8.1" }
 
     wow.DeliverComm(addon.Sync, {
         kind = "MANI",
@@ -303,7 +303,7 @@ Test.it("retries targeted manifest refreshes on later hello sessions until a man
         rev = 5,
         updatedAt = 500,
         sender = peerKey,
-        version = "1.6.0",
+        version = "1.8.1",
     }, {
         sender = peerKey,
         distribution = "GUILD",
@@ -317,7 +317,7 @@ Test.it("retries targeted manifest refreshes on later hello sessions until a man
         rev = 5,
         updatedAt = 501,
         sender = peerKey,
-        version = "1.6.0",
+        version = "1.8.1",
     }, {
         sender = peerKey,
         distribution = "GUILD",
@@ -332,7 +332,7 @@ Test.it("retries targeted manifest refreshes on later hello sessions until a man
         rev = 5,
         updatedAt = 502,
         sender = peerKey,
-        version = "1.6.0",
+        version = "1.8.1",
     }, {
         sender = peerKey,
         distribution = "GUILD",
@@ -362,7 +362,7 @@ Test.it("retries targeted manifest refreshes on later hello sessions until a man
         rev = 5,
         updatedAt = 503,
         sender = peerKey,
-        version = "1.6.0",
+        version = "1.8.1",
     }, {
         sender = peerKey,
         distribution = "GUILD",
@@ -380,7 +380,7 @@ Test.it("retries targeted manifest refreshes on later hello sessions until a man
         rev = 5,
         updatedAt = 504,
         sender = peerKey,
-        version = "1.6.0",
+        version = "1.8.1",
     }, {
         sender = peerKey,
         distribution = "GUILD",
@@ -394,7 +394,7 @@ Test.it("wiping the database clears sync session state and requests a fresh guil
     local peerKey = "Peerone-Testrealm"
     local blockKey = data:BuildSyncBlockKey(peerKey, "Alchemy")
 
-    addon.Sync.onlineNodes[peerKey] = { lastSeen = time(), version = "1.6.0" }
+    addon.Sync.onlineNodes[peerKey] = { lastSeen = time(), version = "1.8.1" }
     addon.Sync.registry[peerKey] = { owner = peerKey, rev = 7, updatedAt = 700 }
     addon.Sync.pendingRequests[peerKey] = {
         source = peerKey,
@@ -471,7 +471,7 @@ Test.it("prunes stale partial manifest and trickle peer state on the periodic pr
     local addon, _wow, data = freshAddon()
     local peerKey = "Peerone-Testrealm"
 
-    addon.Sync.onlineNodes[peerKey] = { lastSeen = time() - 200, version = "1.6.0" }
+    addon.Sync.onlineNodes[peerKey] = { lastSeen = time() - 200, version = "1.8.1" }
     addon.Sync.partialManifestReceive[peerKey] = {
         stale = {
             manifestId = "stale",

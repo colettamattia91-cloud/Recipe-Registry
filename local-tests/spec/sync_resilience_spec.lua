@@ -45,8 +45,8 @@ Test.it("backs off a failed source and lets another queued request proceed", fun
     local badSource = "Avero-TestRealm"
     local goodSource = "Morbolt-TestRealm"
     local requestTimeout = addon.Sync._private.constants.REQUEST_TIMEOUT + 1
-    addon.Sync.onlineNodes[badSource] = { lastSeen = time(), version = "1.7.0" }
-    addon.Sync.onlineNodes[goodSource] = { lastSeen = time(), version = "1.7.0" }
+    addon.Sync.onlineNodes[badSource] = { lastSeen = time(), version = "1.8.1" }
+    addon.Sync.onlineNodes[goodSource] = { lastSeen = time(), version = "1.8.1" }
 
     addon.Sync:QueueRequest(badSource, badSource, 5, "index")
     addon.Sync:ProcessRequestQueue()
@@ -83,9 +83,9 @@ Test.it("backfills the next queued request immediately when a bounded request sl
     local secondPeer = "Morbolt-TestRealm"
     local thirdPeer = "Cindar-TestRealm"
 
-    addon.Sync.onlineNodes[firstPeer] = { lastSeen = time(), version = "1.7.0" }
-    addon.Sync.onlineNodes[secondPeer] = { lastSeen = time(), version = "1.7.0" }
-    addon.Sync.onlineNodes[thirdPeer] = { lastSeen = time(), version = "1.7.0" }
+    addon.Sync.onlineNodes[firstPeer] = { lastSeen = time(), version = "1.8.1" }
+    addon.Sync.onlineNodes[secondPeer] = { lastSeen = time(), version = "1.8.1" }
+    addon.Sync.onlineNodes[thirdPeer] = { lastSeen = time(), version = "1.8.1" }
 
     addon.Sync:QueueRequest(firstPeer, firstPeer, 6, "index")
     addon.Sync:QueueRequest(secondPeer, secondPeer, 5, "index")
@@ -137,7 +137,7 @@ Test.it("keeps direct request burst parallelism bounded under load", function()
 
     for index = 1, #peers do
         local peerKey = peers[index]
-        addon.Sync.onlineNodes[peerKey] = { lastSeen = time(), version = "1.7.0" }
+        addon.Sync.onlineNodes[peerKey] = { lastSeen = time(), version = "1.8.1" }
         addon.Sync:QueueRequest(peerKey, peerKey, 10 + index, "index")
     end
 
@@ -154,7 +154,7 @@ Test.it("hello-auto fails fast and stays blocked until peer backoff expires", fu
     local peerKey = "Aldergar-TestRealm"
     local requestTimeout = addon.Sync._private.constants.REQUEST_TIMEOUT + 1
 
-    addon.Sync.onlineNodes[peerKey] = { lastSeen = time(), version = "1.6.0" }
+    addon.Sync.onlineNodes[peerKey] = { lastSeen = time(), version = "1.8.1" }
     addon.Sync:QueueRequest(peerKey, peerKey, 9, "hello-auto")
     addon.Sync:ProcessRequestQueue()
     Test.truthy(addon.Sync.inFlight, "hello-auto should dispatch once")
@@ -200,7 +200,7 @@ Test.it("stale roster metadata does not veto a live sync source and triggers a r
     })
     addon.Data:RebuildOnlineCache()
     addon.Data._guildRosterBuiltAt = time() - 60
-    addon.Sync.onlineNodes[peerKey] = { lastSeen = time(), version = "1.7.0" }
+    addon.Sync.onlineNodes[peerKey] = { lastSeen = time(), version = "1.8.1" }
 
     local viable = addon.Sync:IsRequestStillViable({
         source = peerKey,
@@ -219,7 +219,7 @@ Test.it("warmup defers manifest fan-out and targeted manifest refreshes until ex
 
     seedProfession(data, localKey, "Alchemy", 98101, { sourceType = "owner" })
     data:BuildManifestCacheNow("steady")
-    addon.Sync.onlineNodes[peerKey] = { lastSeen = time(), version = "1.6.0" }
+    addon.Sync.onlineNodes[peerKey] = { lastSeen = time(), version = "1.8.1" }
     addon.Sync:EnterWarmup("test", 12)
 
     addon.Sync:BroadcastManifestToOnlinePeers("auto-tick")
@@ -231,7 +231,7 @@ Test.it("warmup defers manifest fan-out and targeted manifest refreshes until ex
         rev = 5,
         updatedAt = 500,
         sender = peerKey,
-        version = "1.6.0",
+        version = "1.8.1",
     }, {
         sender = peerKey,
         distribution = "GUILD",
@@ -239,6 +239,16 @@ Test.it("warmup defers manifest fan-out and targeted manifest refreshes until ex
 
     Test.eq(countCommKind(wow, "MREQ"), 0, "warmup should avoid extra targeted manifest refreshes during login grace")
     Test.eq(#addon.Sync.manifestChunkQueue, 0, "warmup should defer manifest replies triggered by HELLO")
+
+    wow.DeliverComm(addon.Sync, {
+        kind = "VACK",
+        sender = peerKey,
+        version = "1.8.1",
+        wireVersion = addon.WIRE_VERSION,
+    }, {
+        sender = peerKey,
+        distribution = "WHISPER",
+    })
 
     wow.AdvanceTime(13)
     wow.RunTimers(10)
@@ -273,7 +283,7 @@ Test.it("warmup defers manifest catch-up drain until the grace window ends", fun
     local ownerKey = "Offlineone-TestRealm"
     local blockKey = data:BuildSyncBlockKey(ownerKey, "Alchemy")
 
-    addon.Sync.onlineNodes[senderKey] = { lastSeen = time(), version = "1.7.0" }
+    addon.Sync.onlineNodes[senderKey] = { lastSeen = time(), version = "1.8.1" }
     addon.Sync:EnterWarmup("test", 12)
     addon.Sync.manifestCatchupQueue = {
         {
@@ -307,8 +317,8 @@ Test.it("catch-up drain still progresses while an unrelated request is already i
     local otherPeer = "Avero-TestRealm"
     local blockKey = data:BuildSyncBlockKey(ownerKey, "Alchemy")
 
-    addon.Sync.onlineNodes[senderKey] = { lastSeen = time(), version = "1.7.0" }
-    addon.Sync.onlineNodes[otherPeer] = { lastSeen = time(), version = "1.7.0" }
+    addon.Sync.onlineNodes[senderKey] = { lastSeen = time(), version = "1.8.1" }
+    addon.Sync.onlineNodes[otherPeer] = { lastSeen = time(), version = "1.8.1" }
     addon.Sync.inFlight = {
         source = otherPeer,
         memberKey = otherPeer,
