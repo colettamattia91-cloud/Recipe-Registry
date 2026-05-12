@@ -271,6 +271,7 @@ Test.it("keeps manifest output compact by default and verbose on request", funct
         sourceType = "replica",
         guildStatus = "stale",
     }
+    data:BuildManifestCacheNow("compact-summary")
 
     addon:SlashHandler("manifest")
     Test.truthy(printLogContains(wow, "Manifest replica owners: 1 (use /rr manifest verbose for details)"), "compact replica manifest output")
@@ -281,6 +282,47 @@ Test.it("keeps manifest output compact by default and verbose on request", funct
     addon:SlashHandler("manifest verbose")
     Test.truthy(printLogContains(wow, "  Replicaone-Testrealm blocks=1 recipes=1 publish=replica authority=replica professions=Alchemy"), "verbose replica detail")
     Test.truthy(printLogContains(wow, "  Staleone-Testrealm professions=1"), "verbose stale detail")
+end)
+
+Test.it("uses the manifest cache for slash summary without forcing a synchronous rebuild", function()
+    local addon, wow, data = freshAddon()
+    addon.debugMode = true
+    local localKey = data:GetPlayerKey()
+    local entry = data:GetOrCreateMember(localKey)
+
+    entry.rev = 2
+    entry.updatedAt = 100
+    entry.sourceType = "owner"
+    entry.guildStatus = "active"
+    entry.professions.Alchemy = data:NormalizeProfessionBlock(entry, "Alchemy", {
+        recipes = { [92010] = true },
+        count = 1,
+        blockRevision = 2,
+        lastUpdatedAt = 100,
+        sourceType = "owner",
+        guildStatus = "active",
+    })
+    data:MarkManifestDirty(data:BuildSyncBlockKey(localKey, "Alchemy"), "slash-cache-initial")
+    data:BuildManifestCacheNow("slash-cache-initial")
+
+    entry.professions.Alchemy.recipes[92011] = true
+    entry.professions.Alchemy.count = 2
+    data:MarkManifestDirty(data:BuildSyncBlockKey(localKey, "Alchemy"), "slash-cache-dirty")
+
+    local originalBuildSyncManifest = data.BuildSyncManifest
+    data.BuildSyncManifest = function()
+        error("BuildSyncManifest should not run for /rr manifest")
+    end
+
+    addon:SlashHandler("manifest")
+
+    data.BuildSyncManifest = originalBuildSyncManifest
+
+    local snapshot = data:GetManifestDebugSnapshot()
+    Test.truthy(printLogContains(wow, "Manifest cache ready=false"), "manifest command should show cache state")
+    Test.truthy(printLogContains(wow, "status=stale"), "manifest command should describe stale cache status")
+    Test.truthy(printLogContains(wow, "Manifest local="), "manifest command should still print cached summary")
+    Test.truthy(snapshot.scheduled or snapshot.building, "dirty slash manifest should schedule a cache refresh")
 end)
 
 Test.it("prints target manifest request output", function()

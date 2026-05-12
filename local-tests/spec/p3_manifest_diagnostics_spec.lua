@@ -122,6 +122,51 @@ Test.it("counts manifest build requests in Sync telemetry", function()
     Test.eq(addon.Sync.telemetry.manifestBuildRequests, 2, "two build requests after second send")
 end)
 
+Test.it("prints structured manifest batch, receive, and compare diagnostics in debug mode", function()
+    local addon, wow, data = freshAddon()
+    addon.debugMode = true
+    local localKey = data:GetPlayerKey()
+    local peerKey = "Peerone-Testrealm"
+    seedProfession(data, localKey, "Alchemy", 95021, { sourceType = "owner" })
+    data:BuildManifestCacheNow("initial")
+
+    addon.Sync:SendManifestToPeer(peerKey, "force")
+    Test.truthy(printLogContains(wow, "Manifest batch peer=" .. peerKey), "batch diagnostics should include peer")
+    Test.truthy(printLogContains(wow, "queuedChunks="), "batch diagnostics should include queued chunks")
+    Test.truthy(printLogContains(wow, "sentChunks=0"), "batch diagnostics should include sent chunk count")
+    Test.truthy(printLogContains(wow, "reason=force"), "batch diagnostics should include reason")
+
+    addon.Sync:HandleManifestChunk({
+        sender = peerKey,
+        manifestId = "Peerone-Testrealm:100:1:1",
+        seq = 1,
+        total = 1,
+        builtAt = 100,
+        memberKey = peerKey,
+        totals = { blocks = 1, recipes = 1 },
+        blocks = {
+            {
+                blockKey = "Peerone-Testrealm::Alchemy",
+                ownerCharacter = peerKey,
+                professionKey = "Alchemy",
+                revision = 2,
+                lastUpdatedAt = 100,
+                sourceType = "owner",
+                guildStatus = "active",
+                count = 1,
+                fingerprint = "peer-95021",
+            },
+        },
+    })
+
+    Test.truthy(printLogContains(wow, "Manifest receive peer=" .. peerKey), "receive diagnostics should include peer")
+    Test.truthy(printLogContains(wow, "receivedSeqs=1/1"), "receive diagnostics should include receive progress")
+    Test.truthy(printLogContains(wow, "missingSeqs=none"), "receive diagnostics should include missing seqs")
+    Test.truthy(printLogContains(wow, "Manifest compare peer=" .. peerKey), "compare diagnostics should include peer")
+    Test.truthy(printLogContains(wow, "blockCount=1"), "compare diagnostics should include block count")
+    Test.truthy(printLogContains(wow, "queuedRequests="), "compare diagnostics should include queued request count")
+end)
+
 Test.it("counts manifest force replies", function()
     local addon, _wow, data = freshAddon()
     local localKey = data:GetPlayerKey()

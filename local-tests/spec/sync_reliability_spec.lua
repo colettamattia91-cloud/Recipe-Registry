@@ -27,6 +27,15 @@ local function lastCommByKind(wow, kind)
     return nil
 end
 
+local function printLogContains(wow, needle)
+    for _, line in ipairs(wow.GetPrints()) do
+        if tostring(line):find(needle, 1, true) then
+            return true
+        end
+    end
+    return false
+end
+
 local function seedProfession(data, memberKey, profession, recipeKey, opts)
     opts = opts or {}
     local entry = data:GetOrCreateMember(memberKey)
@@ -270,7 +279,8 @@ Test.it("manifest health stays good while snapshot health is bad", function()
 end)
 
 Test.it("stale partial manifests are pruned with telemetry", function()
-    local addon, _wow, _data = freshAddon()
+    local addon, wow, _data = freshAddon()
+    addon.debugMode = true
 
     addon.Sync.partialManifestReceive["Peerone-TestRealm"] = {
         ["manifest-1"] = {
@@ -286,6 +296,7 @@ Test.it("stale partial manifests are pruned with telemetry", function()
 
     Test.eq(addon.Sync.partialManifestReceive["Peerone-TestRealm"], nil, "stale partial manifest should be pruned")
     Test.eq(addon.Sync.telemetry.partialManifestPruned or 0, 1, "partial manifest prune telemetry")
+    Test.truthy(printLogContains(wow, "Manifest prune peer=Peerone-TestRealm manifestId=manifest-1 received=1/2 reason=timeout"), "prune diagnostics should include manifest details")
 end)
 
 Test.it("duplicate crafter rows are collapsed per member", function()

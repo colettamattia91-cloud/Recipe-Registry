@@ -524,7 +524,12 @@ end
 function Data:DumpManifestSummary(opts)
     opts = opts or {}
     local verbose = opts.verbose == true
-    local manifest = self:BuildSyncManifest(false)
+    local snapshot = self:GetManifestDebugSnapshot()
+    local manifest, manifestStatus = self:GetPreparedSyncManifest({
+        allowStale = true,
+        syncFallback = false,
+        reason = "slash-manifest",
+    })
     local localKey = self:GetPlayerKey()
     local totalBlocks = 0
     local totalRecipes = 0
@@ -541,7 +546,7 @@ function Data:DumpManifestSummary(opts)
         end
     end
 
-    for _, block in pairs(manifest.blocks or {}) do
+    for _, block in pairs(manifest and manifest.blocks or {}) do
         totalBlocks = totalBlocks + 1
         totalRecipes = totalRecipes + (block.count or 0)
         if block.ownerCharacter == localKey and (block.sourceType or "owner") == "owner" then
@@ -567,6 +572,18 @@ function Data:DumpManifestSummary(opts)
     end
     sort(replicaOwnerKeys)
 
+    Addon:Print(string.format(
+        "Manifest cache ready=%s hasManifest=%s status=%s dirtyAll=%s dirtyBlocks=%d building=%s scheduled=%s serial=%d last=%s",
+        tostring(snapshot.ready),
+        tostring(snapshot.hasManifest),
+        tostring(manifestStatus or (snapshot.ready and "ready" or "building")),
+        tostring(snapshot.dirtyAll),
+        snapshot.dirtyBlocks or 0,
+        tostring(snapshot.building),
+        tostring(snapshot.scheduled),
+        snapshot.serial or 0,
+        tostring(snapshot.lastReason or "none")
+    ))
     Addon:Print(string.format(
         "Manifest local=%s blocks=%d recipes=%d ownerBlocks=%d replicaBlocks=%d replicaOwners=%d staleMembers=%d",
         tostring(localKey),
@@ -630,7 +647,6 @@ function Data:DumpManifestSummary(opts)
         end
     end
 
-    local snapshot = self:GetManifestDebugSnapshot()
     local syncTel = Addon.Sync and Addon.Sync.telemetry or {}
     local trickle = Addon.TrickleSync
     local residentPeers = 0

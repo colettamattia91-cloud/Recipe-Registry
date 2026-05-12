@@ -7,6 +7,7 @@ local time = time
 local pairs = pairs
 local ipairs = ipairs
 local sort = table.sort
+local concat = table.concat
 local random = math.random
 local min = math.min
 local max = math.max
@@ -26,6 +27,37 @@ local MANIFEST_PUSH_COOLDOWN = Constants.MANIFEST_PUSH_COOLDOWN
 local MANIFEST_MERGE_ANNOUNCE_DEBOUNCE = Constants.MANIFEST_MERGE_ANNOUNCE_DEBOUNCE
 local MANIFEST_MERGE_ANNOUNCE_MAX_DELAY = Constants.MANIFEST_MERGE_ANNOUNCE_MAX_DELAY
 local MANIFEST_CATCHUP_DRAIN_DELAY = Constants.MANIFEST_CATCHUP_DRAIN_DELAY
+
+local function countKeys(tbl)
+    local count = 0
+    for _ in pairs(tbl or {}) do
+        count = count + 1
+    end
+    return count
+end
+
+local function countManifestBlocks(manifest)
+    if type(manifest) ~= "table" then return 0 end
+    local totals = manifest.totals
+    if type(totals) == "table" and type(totals.blocks) == "number" then
+        return totals.blocks
+    end
+    return countKeys(manifest.blocks)
+end
+
+local function buildSeqList(seqs, cap)
+    if type(seqs) ~= "table" or #seqs == 0 then
+        return "none"
+    end
+    local limit = max(1, cap or 8)
+    local values = {}
+    local shown = min(#seqs, limit)
+    for index = 1, shown do
+        values[#values + 1] = tostring(seqs[index])
+    end
+    local suffix = #seqs > shown and string.format(",...(+%d)", #seqs - shown) or ""
+    return concat(values, ",") .. suffix
+end
 
 function Sync:SendManifestToPeer(peerKey, why)
     if not peerKey or not Addon.TrickleSync then return end
@@ -65,7 +97,18 @@ function Sync:SendManifestToPeer(peerKey, why)
         self.telemetry.manifestUnchangedSkips = (self.telemetry.manifestUnchangedSkips or 0) + 1
         return
     end
-    self:QueueManifestChunks(peerKey, chunks, why)
+    local queued = self:QueueManifestChunks(peerKey, chunks, why)
+    if queued then
+        Addon:Debug(string.format(
+            "Manifest batch peer=%s manifestId=%s totalChunks=%d queuedChunks=%d sentChunks=%d reason=%s",
+            tostring(peerKey),
+            tostring(manifestId or "unknown"),
+            #chunks,
+            #chunks,
+            0,
+            tostring(why or "send")
+        ))
+    end
     self._lastManifestSentAt[peerKey] = time()
     if manifestId then
         self._lastManifestAnnouncedId[peerKey] = manifestId
@@ -112,7 +155,19 @@ end
 
 function Sync:ProcessPeerManifestComparison(senderKey, manifest)
     local _queuedBlocks, groupedRequests, compareStatus, comparison = Addon.TrickleSync:QueueMissingBlocksForPeer(senderKey, manifest)
+    local manifestId = manifest and manifest.manifestId or "unknown"
+    local blockCount = countManifestBlocks(manifest)
+    local missingHere = comparison and #(comparison.missingHere or {}) or 0
     if compareStatus == "building" or compareStatus == "deferred" then
+        Addon:Debug(string.format(
+            "Manifest compare peer=%s manifestId=%s blockCount=%d missingHere=%d queuedRequests=%d status=%s",
+            tostring(senderKey),
+            tostring(manifestId),
+            blockCount,
+            missingHere,
+            0,
+            tostring(compareStatus or "unknown")
+        ))
         self:QueuePendingManifestComparePeer(senderKey)
         return {
             changedLocalData = false,
@@ -154,6 +209,15 @@ function Sync:ProcessPeerManifestComparison(senderKey, manifest)
         self.telemetry.manifestRequestsAvoided = (self.telemetry.manifestRequestsAvoided or 0) + identicalBlocks
         self.telemetry.avoidedRequests = (self.telemetry.avoidedRequests or 0) + identicalBlocks
     end
+    Addon:Debug(string.format(
+        "Manifest compare peer=%s manifestId=%s blockCount=%d missingHere=%d queuedRequests=%d status=%s",
+        tostring(senderKey),
+        tostring(manifestId),
+        blockCount,
+        missingHere,
+        queuedRequests,
+        tostring(compareStatus or "ready")
+    ))
     return {
         changedLocalData = queuedRequests > 0 or deferredRequests > 0,
         queuedRequests = queuedRequests,
@@ -543,6 +607,20 @@ function Sync:HandleManifestChunk(payload)
             Addon:Debug("Ignored malformed manifest block", tostring(blockKey), "from", tostring(senderKey))
         end
     end
+    local missingSeqs = self.GetMissingSeqs and self:GetMissingSeqs(state) or {}
+    local age = 0
+    if type(state.builtAt) == "number" and state.builtAt > 0 then
+        age = max(0, time() - state.builtAt)
+    end
+    Addon:Debug(string.format(
+        "Manifest receive peer=%s manifestId=%s receivedSeqs=%d/%d missingSeqs=%s age=%ds",
+        tostring(senderKey),
+        tostring(payload.manifestId),
+        countKeys(state.seen),
+        state.total or 1,
+        buildSeqList(missingSeqs, 10),
+        age
+    ))
 
     local complete = true
     for seq = 1, (state.total or 1) do
@@ -555,6 +633,7 @@ function Sync:HandleManifestChunk(payload)
 
     local manifest = {
         builtAt = state.builtAt,
+        manifestId = payload.manifestId,
         memberKey = state.memberKey,
         totals = state.totals,
         blocks = state.blocks,

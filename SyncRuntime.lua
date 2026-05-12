@@ -1184,6 +1184,29 @@ function Sync:PrunePartialManifestReceives()
 
     for peerKey, manifests in pairs(self.partialManifestReceive or {}) do
         if not self:IsValidSyncMemberKey(peerKey) or type(manifests) ~= "table" then
+            if type(manifests) == "table" then
+                for manifestId, state in pairs(manifests) do
+                    local seenCount = type(state) == "table" and countKeys(state.seen) or 0
+                    local total = type(state) == "table" and (tonumber(state.total or 0) or 0) or 0
+                    Addon:Debug(string.format(
+                        "Manifest prune peer=%s manifestId=%s received=%d/%d reason=%s",
+                        tostring(peerKey),
+                        tostring(manifestId or "unknown"),
+                        seenCount,
+                        total,
+                        self:IsValidSyncMemberKey(peerKey) and "invalid-state" or "invalid-peer"
+                    ))
+                end
+            else
+                Addon:Debug(string.format(
+                    "Manifest prune peer=%s manifestId=%s received=%d/%d reason=%s",
+                    tostring(peerKey),
+                    "unknown",
+                    0,
+                    0,
+                    "invalid-peer"
+                ))
+            end
             removed = removed + math.max(1, countKeys(manifests))
             self.partialManifestReceive[peerKey] = nil
         else
@@ -1193,6 +1216,16 @@ function Sync:PrunePartialManifestReceives()
                     oldestAge = max(oldestAge, max(0, now - builtAt))
                 end
                 if type(state) ~= "table" or (builtAt > 0 and (now - builtAt) > SESSION_TIMEOUT) then
+                    local seenCount = type(state) == "table" and countKeys(state.seen) or 0
+                    local total = type(state) == "table" and (tonumber(state.total or 0) or 0) or 0
+                    Addon:Debug(string.format(
+                        "Manifest prune peer=%s manifestId=%s received=%d/%d reason=%s",
+                        tostring(peerKey),
+                        tostring(manifestId or "unknown"),
+                        seenCount,
+                        total,
+                        type(state) ~= "table" and "invalid-state" or "timeout"
+                    ))
                     manifests[manifestId] = nil
                     removed = removed + 1
                 end
