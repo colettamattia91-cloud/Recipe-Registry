@@ -7,6 +7,7 @@ local time = time
 local pairs = pairs
 local ipairs = ipairs
 local sort = table.sort
+local remove = table.remove
 local concat = table.concat
 local random = math.random
 local min = math.min
@@ -57,6 +58,80 @@ local function buildSeqList(seqs, cap)
     end
     local suffix = #seqs > shown and string.format(",...(+%d)", #seqs - shown) or ""
     return concat(values, ",") .. suffix
+end
+
+local function cloneNumberArray(values)
+    if type(values) ~= "table" or #values == 0 then
+        return {}
+    end
+    local out = {}
+    for index = 1, #values do
+        out[index] = values[index]
+    end
+    return out
+end
+
+local function ensureManifestBatchDiagnostics(self)
+    self._manifestBatchDiagnostics = self._manifestBatchDiagnostics or {
+        send = {},
+        receive = {},
+    }
+    return self._manifestBatchDiagnostics
+end
+
+local function getOrCreateManifestBatchDiagnostic(self, direction, peerKey, manifestId)
+    if not peerKey or not manifestId then return nil end
+    local diagnostics = ensureManifestBatchDiagnostics(self)
+    diagnostics[direction] = diagnostics[direction] or {}
+    diagnostics[direction][peerKey] = diagnostics[direction][peerKey] or {}
+    local batch = diagnostics[direction][peerKey][manifestId]
+    if not batch then
+        batch = {
+            peerKey = peerKey,
+            manifestId = manifestId,
+            totalChunks = 0,
+            queuedChunks = 0,
+            sendAttemptedChunks = 0,
+            sendSucceededChunks = 0,
+            sendFailedChunks = 0,
+            receivedSeqCount = 0,
+            missingSeqs = {},
+            completed = false,
+            pruned = false,
+            pruneReason = nil,
+            compareFired = false,
+            senderBuiltAt = 0,
+            firstReceivedAt = 0,
+            lastReceivedAt = 0,
+            lastProgressAt = 0,
+        }
+        diagnostics[direction][peerKey][manifestId] = batch
+    end
+    return batch
+end
+
+local function removeQueuedManifestBatch(queue, peerKey, manifestId)
+    if type(queue) ~= "table" or not peerKey or not manifestId then
+        return 0
+    end
+
+    local removed = 0
+    for index = #queue, 1, -1 do
+        local queued = queue[index]
+        local payload = queued and queued.payload or nil
+        if queued and queued.peer == peerKey and payload and payload.manifestId == manifestId then
+            remove(queue, index)
+            removed = removed + 1
+        end
+    end
+    return removed
+end
+
+function Sync:GetManifestBatchDiagnostics(peerKey, manifestId, direction)
+    local diagnostics = self._manifestBatchDiagnostics
+    local bucket = diagnostics and diagnostics[direction or "receive"] or nil
+    local peerRows = bucket and bucket[peerKey] or nil
+    return peerRows and peerRows[manifestId] or nil
 end
 
 function Sync:SendManifestToPeer(peerKey, why)
@@ -115,9 +190,17 @@ function Sync:SendManifestToPeer(peerKey, why)
     end
 end
 
-function Sync:QueueManifestChunks(peerKey, chunks, why)
+function Sync:QueueManifestChunks(peerKey, chunks, why, manifestId)
     if not peerKey or not chunks then return false end
     self.manifestChunkQueue = self.manifestChunkQueue or {}
+    manifestId = manifestId or getManifestAnnouncementId(chunks)
+    if manifestId then
+        local removed = removeQueuedManifestBatch(self.manifestChunkQueue, peerKey, manifestId)
+        if removed > 0 then
+            self.telemetry.manifestChunkBatchesCoalesced = (self.telemetry.manifestChunkBatchesCoalesced or 0) + 1
+        end
+    end
+
     local startAt = nowForPacing()
     if why ~= "force" and MANIFEST_INITIAL_JITTER > 0 then
         startAt = startAt + (random() * MANIFEST_INITIAL_JITTER)
@@ -133,6 +216,17 @@ function Sync:QueueManifestChunks(peerKey, chunks, why)
             readyAt = startAt + ((index - 1) * MANIFEST_CHUNK_DELAY),
         }
     end
+
+    local batch = getOrCreateManifestBatchDiagnostic(self, "send", peerKey, manifestId)
+    if batch then
+        batch.totalChunks = #chunks
+        batch.queuedChunks = #chunks
+        batch.completed = false
+        batch.pruned = false
+        batch.pruneReason = nil
+        batch.compareFired = false
+    end
+
     self.telemetry.manifestChunksQueued = (self.telemetry.manifestChunksQueued or 0) + #chunks
     if #self.manifestChunkQueue > (self.telemetry.manifestQueueMaxDepth or 0) then
         self.telemetry.manifestQueueMaxDepth = #self.manifestChunkQueue
@@ -573,6 +667,7 @@ function Sync:HandleManifestChunk(payload)
     if self:IsMockKey(payload.sender) and not self:ShouldAllowLocalMockTraffic(payload.sender, nil) then return end
     self.telemetry.manifestChunksReceived = (self.telemetry.manifestChunksReceived or 0) + 1
 
+    local now = time()
     local senderKey = payload.sender
     local manifestMemberKey = self:IsValidSyncMemberKey(payload.memberKey) and payload.memberKey or senderKey
     self.partialManifestReceive[senderKey] = self.partialManifestReceive[senderKey] or {}
@@ -580,18 +675,25 @@ function Sync:HandleManifestChunk(payload)
     if not state then
         state = {
             manifestId = payload.manifestId,
-            builtAt = payload.builtAt or time(),
+            builtAt = payload.builtAt or now,
+            senderBuiltAt = payload.builtAt or now,
             memberKey = manifestMemberKey,
             totals = payload.totals or {},
             total = payload.total or 1,
             seen = {},
             blocks = {},
+            firstReceivedAt = now,
+            lastReceivedAt = now,
+            lastProgressAt = now,
         }
         self.partialManifestReceive[senderKey][payload.manifestId] = state
     end
 
-    state.seen[payload.seq or 1] = true
+    local seq = payload.seq or 1
+    local progressed = not state.seen[seq]
+    state.seen[seq] = true
     state.total = payload.total or state.total or 1
+    state.lastReceivedAt = now
     for _, block in ipairs(payload.blocks or {}) do
         local blockKey = block and block.blockKey
         local ownerCharacter, professionKey = Addon.Data:ParseSyncBlockKey(blockKey)
@@ -600,6 +702,9 @@ function Sync:HandleManifestChunk(payload)
             and professionKey ~= ""
             and (not block.ownerCharacter or block.ownerCharacter == ownerCharacter)
             and (not block.professionKey or block.professionKey == professionKey) then
+            if not state.blocks[blockKey] then
+                progressed = true
+            end
             block.ownerCharacter = ownerCharacter
             block.professionKey = professionKey
             state.blocks[blockKey] = block
@@ -607,10 +712,26 @@ function Sync:HandleManifestChunk(payload)
             Addon:Debug("Ignored malformed manifest block", tostring(blockKey), "from", tostring(senderKey))
         end
     end
+    if progressed then
+        state.lastProgressAt = now
+    end
     local missingSeqs = self.GetMissingSeqs and self:GetMissingSeqs(state) or {}
+    local batch = getOrCreateManifestBatchDiagnostic(self, "receive", senderKey, payload.manifestId)
+    if batch then
+        batch.totalChunks = state.total or 1
+        batch.senderBuiltAt = tonumber(state.senderBuiltAt or state.builtAt or 0) or 0
+        batch.firstReceivedAt = tonumber(state.firstReceivedAt or now) or now
+        batch.lastReceivedAt = tonumber(state.lastReceivedAt or now) or now
+        batch.lastProgressAt = tonumber(state.lastProgressAt or now) or now
+        batch.receivedSeqCount = countKeys(state.seen)
+        batch.missingSeqs = cloneNumberArray(missingSeqs)
+        batch.completed = false
+        batch.pruned = false
+        batch.pruneReason = nil
+    end
     local age = 0
-    if type(state.builtAt) == "number" and state.builtAt > 0 then
-        age = max(0, time() - state.builtAt)
+    if type(state.firstReceivedAt) == "number" and state.firstReceivedAt > 0 then
+        age = max(0, now - state.firstReceivedAt)
     end
     Addon:Debug(string.format(
         "Manifest receive peer=%s manifestId=%s receivedSeqs=%d/%d missingSeqs=%s age=%ds",
@@ -632,7 +753,7 @@ function Sync:HandleManifestChunk(payload)
     if not complete then return end
 
     local manifest = {
-        builtAt = state.builtAt,
+        builtAt = state.senderBuiltAt or state.builtAt,
         manifestId = payload.manifestId,
         memberKey = state.memberKey,
         totals = state.totals,
@@ -667,6 +788,12 @@ function Sync:HandleManifestChunk(payload)
         self:PushOfflineDebugEvent("manifest", string.format("peer=%s owners=%d blocks=%d", tostring(senderKey), uniqueReplicaOwners, replicaBlocks))
     end
     local comparisonResult = self:ProcessPeerManifestComparison(senderKey, manifest)
+    if batch then
+        batch.receivedSeqCount = countKeys(state.seen)
+        batch.missingSeqs = {}
+        batch.completed = true
+        batch.compareFired = true
+    end
     if comparisonResult and comparisonResult.shouldRefreshUI then
         Addon:RequestRefresh("manifest")
     end
@@ -690,10 +817,31 @@ function Sync:SendNextManifestChunk()
         return false
     end
 
-    local queued = table.remove(self.manifestChunkQueue, candidateIndex)
-    self:SendDirectEnvelope("MANI", queued.payload, queued.peer, "NORMAL")
+    local queued = self.manifestChunkQueue[candidateIndex]
+    local batch = getOrCreateManifestBatchDiagnostic(self, "send", queued.peer, queued.payload and queued.payload.manifestId or nil)
+    self.telemetry.manifestChunkSendAttempts = (self.telemetry.manifestChunkSendAttempts or 0) + 1
+    if batch then
+        batch.sendAttemptedChunks = (batch.sendAttemptedChunks or 0) + 1
+    end
+
+    local sent = self:SendDirectEnvelope("MANI", queued.payload, queued.peer, "NORMAL")
+    if not sent then
+        queued.readyAt = now + MANIFEST_CHUNK_DELAY
+        self.telemetry.manifestChunkSendFailures = (self.telemetry.manifestChunkSendFailures or 0) + 1
+        if batch then
+            batch.sendFailedChunks = (batch.sendFailedChunks or 0) + 1
+        end
+        return false
+    end
+
+    table.remove(self.manifestChunkQueue, candidateIndex)
     self.peerPacing[queued.peer] = self.peerPacing[queued.peer] or {}
     self.peerPacing[queued.peer].lastSentAt = now
     self.telemetry.manifestChunksSent = (self.telemetry.manifestChunksSent or 0) + 1
+    if batch then
+        batch.sendSucceededChunks = (batch.sendSucceededChunks or 0) + 1
+        batch.queuedChunks = max(0, (batch.queuedChunks or 0) - 1)
+        batch.completed = batch.queuedChunks == 0 and batch.sendSucceededChunks >= (batch.totalChunks or 0)
+    end
     return true
 end

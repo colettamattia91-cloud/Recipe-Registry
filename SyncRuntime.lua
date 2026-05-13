@@ -52,6 +52,13 @@ local function countNestedEntries(groups)
     return total
 end
 
+local function manifestReceiveProgressStamp(state)
+    if type(state) ~= "table" then
+        return 0
+    end
+    return tonumber(state.lastProgressAt or state.lastReceivedAt or state.firstReceivedAt or state.builtAt or 0) or 0
+end
+
 function Sync:OnInitialize()
     self.onlineNodes = {}
     self.registry = {}
@@ -1091,7 +1098,7 @@ function Sync:EnforceRuntimeQueueCaps(_reason)
                 local oldestKey
                 local oldestStamp
                 for manifestId, state in pairs(manifests or {}) do
-                    local stamp = tonumber(state and state.builtAt or 0) or 0
+                    local stamp = manifestReceiveProgressStamp(state)
                     if not oldestKey or stamp < oldestStamp then
                         oldestKey = manifestId
                         oldestStamp = stamp
@@ -1216,23 +1223,41 @@ function Sync:PrunePartialManifestReceives()
             self.partialManifestReceive[peerKey] = nil
         else
             for manifestId, state in pairs(manifests) do
-                local builtAt = type(state) == "table" and (tonumber(state.builtAt or 0) or 0) or 0
-                if builtAt > 0 then
-                    oldestAge = max(oldestAge, max(0, now - builtAt))
+                local progressStamp = manifestReceiveProgressStamp(state)
+                if progressStamp > 0 then
+                    oldestAge = max(oldestAge, max(0, now - progressStamp))
                 end
-                if type(state) ~= "table" or (builtAt > 0 and (now - builtAt) > SESSION_TIMEOUT) then
+                if type(state) ~= "table" or (progressStamp > 0 and (now - progressStamp) > SESSION_TIMEOUT) then
                     local seenCount = type(state) == "table" and countKeys(state.seen) or 0
                     local total = type(state) == "table" and (tonumber(state.total or 0) or 0) or 0
+                    local reason = type(state) ~= "table" and "invalid-state" or "timeout"
+                    local missingSeqs = type(state) == "table" and self.GetMissingSeqs and self:GetMissingSeqs(state) or {}
+                    local diagnostics = self.GetManifestBatchDiagnostics and self:GetManifestBatchDiagnostics(peerKey, manifestId, "receive") or nil
+                    if diagnostics then
+                        diagnostics.receivedSeqCount = seenCount
+                        diagnostics.missingSeqs = missingSeqs
+                        diagnostics.pruned = true
+                        diagnostics.pruneReason = reason
+                    end
                     Addon:Debug(string.format(
                         "Manifest prune peer=%s manifestId=%s received=%d/%d reason=%s",
                         tostring(peerKey),
                         tostring(manifestId or "unknown"),
                         seenCount,
                         total,
-                        type(state) ~= "table" and "invalid-state" or "timeout"
+                        reason
                     ))
                     manifests[manifestId] = nil
                     removed = removed + 1
+                    if reason == "timeout"
+                        and seenCount > 0
+                        and total > seenCount
+                        and self:IsValidSyncMemberKey(peerKey) then
+                        self.telemetry.manifestPartialRecoveryRequests = (self.telemetry.manifestPartialRecoveryRequests or 0) + 1
+                        self:RequestManifestRefresh(peerKey, {
+                            reason = "manifest-partial-timeout",
+                        })
+                    end
                 end
             end
             if next(manifests) == nil then
