@@ -50,6 +50,17 @@ function Test.gte(actual, expected, message)
     end
 end
 
+function Test.lte(actual, expected, message)
+    if not (actual <= expected) then
+        fail(string.format(
+            "%s expected %s <= %s",
+            message or "value too large",
+            tostring(actual),
+            tostring(expected)
+        ), 2)
+    end
+end
+
 function Test.truthy(value, message)
     if not value then
         fail(message or "expected truthy value", 2)

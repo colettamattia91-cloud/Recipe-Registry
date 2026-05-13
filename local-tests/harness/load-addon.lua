@@ -50,7 +50,13 @@ end
 function Loader.Load(opts)
     opts = opts or {}
     if opts.reset ~= false then
-        Wow.Reset()
+        Wow.Reset({
+            payloadMode = opts.payloadMode,
+        })
+    elseif opts.payloadMode then
+        Wow.Configure({
+            payloadMode = opts.payloadMode,
+        })
     end
 
     local files = opts.files or Loader.BackendFiles

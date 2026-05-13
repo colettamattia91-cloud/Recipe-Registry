@@ -58,6 +58,7 @@ function Sync:OnInitialize()
     self.peerCaps = {}
     self.pendingRequests = {}
     self.partialReceive = {}
+    self.completedIncomingSessions = {}
     self.outgoingSessions = {}
     self.coordinatorKey = nil
     self.inFlightRequests = {}
@@ -74,6 +75,7 @@ function Sync:OnInitialize()
     self._lastManifestSentAt = {}
     self._lastManifestAnnouncedId = {}
     self._helloManifestRefreshRequested = {}
+    self._lastHelloSeenAt = {}
     self._lastManifestReceivedAt = {}
     self.pendingManifestPeers = {}
     self._warmupDeferredManifestPeers = {}
@@ -118,6 +120,7 @@ function Sync:ResetRuntimeQueues(reason, opts)
     end
     self.pendingRequests = {}
     self.partialReceive = {}
+    self.completedIncomingSessions = {}
     self.outgoingSessions = {}
     self.peerCaps = {}
     self.inFlightRequests = {}
@@ -129,6 +132,7 @@ function Sync:ResetRuntimeQueues(reason, opts)
     self.peerPacing = {}
     self.partialManifestReceive = {}
     self._helloManifestRefreshRequested = {}
+    self._lastHelloSeenAt = {}
     self._lastManifestReceivedAt = {}
     self.pendingManifestPeers = {}
     self._warmupDeferredManifestPeers = {}
@@ -1168,6 +1172,7 @@ function Sync:PruneOnlineNodes()
             self._lastManifestSentAt[key] = nil
             self._lastManifestAnnouncedId[key] = nil
             self._helloManifestRefreshRequested[key] = nil
+            self._lastHelloSeenAt[key] = nil
             self._lastManifestReceivedAt[key] = nil
             self.peerBackoffUntil[key] = nil
             if self.peerHealth then

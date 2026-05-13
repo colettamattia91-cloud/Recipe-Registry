@@ -309,7 +309,7 @@ Test.it("retries targeted manifest refreshes on later hello sessions until a man
         distribution = "GUILD",
     })
 
-    Test.eq(countCommKind(wow, "MREQ"), 1, "first hello should trigger one targeted manifest refresh request")
+    Test.eq(countCommKind(wow, "MREQ"), 0, "first hello should not trigger an immediate targeted manifest refresh")
 
     wow.DeliverComm(addon.Sync, {
         kind = "HELLO",
@@ -323,7 +323,7 @@ Test.it("retries targeted manifest refreshes on later hello sessions until a man
         distribution = "GUILD",
     })
 
-    Test.eq(countCommKind(wow, "MREQ"), 1, "repeat hellos inside the refresh cooldown should stay quiet")
+    Test.eq(countCommKind(wow, "MREQ"), 1, "the next hello without any manifest should trigger the first targeted refresh")
 
     wow.AdvanceTime(31)
     wow.DeliverComm(addon.Sync, {
@@ -338,7 +338,7 @@ Test.it("retries targeted manifest refreshes on later hello sessions until a man
         distribution = "GUILD",
     })
 
-    Test.eq(countCommKind(wow, "MREQ"), 2, "a later hello without any received manifest should retry the targeted refresh")
+    Test.eq(countCommKind(wow, "MREQ"), 2, "a later hello without any received manifest should retry the targeted refresh after cooldown")
 
     wow.DeliverComm(addon.Sync, {
         kind = "MANI",
@@ -386,7 +386,7 @@ Test.it("retries targeted manifest refreshes on later hello sessions until a man
         distribution = "GUILD",
     })
 
-    Test.eq(countCommKind(wow, "MREQ"), 3, "a new hello session after timeout should request a fresh manifest again")
+    Test.eq(countCommKind(wow, "MREQ"), 2, "the first hello of a new session should stay quiet until a later refresh is actually needed")
 end)
 
 Test.it("wiping the database clears sync session state and requests a fresh guild resync", function()

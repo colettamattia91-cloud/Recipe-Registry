@@ -292,7 +292,7 @@ Test.it("applies a lower-revision owner snapshot over a higher-revision replica 
     Test.eq(entry.professions.Blacksmithing.specialization, "Armorsmith", "owner specialization should repair the stale replica")
 end)
 
-Test.it("repairs a missing remote specialization after forcing a manifest refresh on first hello", function()
+Test.it("repairs a missing remote specialization after forcing a manifest refresh on a later hello", function()
     local addon, wow, data = freshAddon()
     local memberKey = "RemoteSpec-TestRealm"
     local blockKey = data:BuildSyncBlockKey(memberKey, "Alchemy")
@@ -332,8 +332,24 @@ Test.it("repairs a missing remote specialization after forcing a manifest refres
         distribution = "GUILD",
     })
 
+    local initialManifestRefresh = findSentCommKind(wow, "MREQ")
+    Test.falsy(initialManifestRefresh, "first hello should stay quiet before any targeted manifest refresh is needed")
+
+    wow.AdvanceTime(31)
+    wow.DeliverComm(addon.Sync, {
+        kind = "HELLO",
+        key = memberKey,
+        rev = 5,
+        updatedAt = 501,
+        sender = memberKey,
+        version = "1.6.0",
+    }, {
+        sender = memberKey,
+        distribution = "GUILD",
+    })
+
     local manifestRefresh = findSentCommKind(wow, "MREQ")
-    Test.truthy(manifestRefresh, "first hello should trigger a targeted manifest refresh request")
+    Test.truthy(manifestRefresh, "a later hello should trigger a targeted manifest refresh request when the manifest is still missing")
 
     wow.DeliverComm(addon.Sync, {
         kind = "MANI",

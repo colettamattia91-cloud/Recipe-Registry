@@ -131,6 +131,9 @@ end
 
 function Sync:HandleHello(payload)
     if not self:IsValidSyncMemberKey(payload.key) then return end
+    local sawHelloBefore = (self._lastHelloSeenAt and self._lastHelloSeenAt[payload.key] or 0) > 0
+    self._lastHelloSeenAt = self._lastHelloSeenAt or {}
+    self._lastHelloSeenAt[payload.key] = time()
     self:TouchNode(payload.key, payload.version)
     if self.MarkManifestPeerSuccess then
         self:MarkManifestPeerSuccess(payload.sender or payload.key)
@@ -147,7 +150,7 @@ function Sync:HandleHello(payload)
     else
         self:SendManifestToPeer(payload.key, "hello")
     end
-    if self:ShouldRequestManifestRefresh(payload.key) then
+    if sawHelloBefore and self:ShouldRequestManifestRefresh(payload.key) then
         if self:IsInWarmup() then
             Addon:Debug("Warmup deferring manifest refresh request", tostring(payload.key))
             self:QueueWarmupManifestRefresh(payload.key)

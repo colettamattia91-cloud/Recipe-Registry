@@ -94,6 +94,53 @@ local function normalizeBucketKey(event, ...)
     return first
 end
 
+local sortedKeys
+
+local function encodeLuaLiteral(value, seen)
+    local valueType = realType(value)
+    if valueType == "nil" then
+        return "nil"
+    end
+    if valueType == "boolean" or valueType == "number" then
+        return tostring(value)
+    end
+    if valueType == "string" then
+        return string.format("%q", value)
+    end
+    if valueType ~= "table" then
+        error("unsupported test serialization type: " .. tostring(valueType))
+    end
+
+    seen = seen or {}
+    if seen[value] then
+        error("cyclic table values are not supported by the test serializer")
+    end
+    seen[value] = true
+
+    local parts = {}
+    for _, key in ipairs(sortedKeys(value)) do
+        parts[#parts + 1] = "[" .. encodeLuaLiteral(key, seen) .. "]=" .. encodeLuaLiteral(value[key], seen)
+    end
+
+    seen[value] = nil
+    return "{" .. table.concat(parts, ",") .. "}"
+end
+
+local function decodeLuaLiteral(text)
+    if realType(text) ~= "string" then
+        return false, nil
+    end
+    local chunk, err = loadstring("return " .. text)
+    if not chunk then
+        return false, err
+    end
+    local ok, value = pcall(chunk)
+    if not ok then
+        return false, value
+    end
+    return true, value
+end
+
 local function registerSerializedValue(prefix, value)
     _G.__RecipeRegistrySerializedValues = _G.__RecipeRegistrySerializedValues or {}
     _G.__RecipeRegistrySerializedNextId = (_G.__RecipeRegistrySerializedNextId or 0) + 1
@@ -102,7 +149,7 @@ local function registerSerializedValue(prefix, value)
     return token
 end
 
-local function sortedKeys(tbl)
+sortedKeys = function(tbl)
     local keys = {}
     for key in pairs(tbl or {}) do
         keys[#keys + 1] = key
@@ -296,10 +343,47 @@ local function installLibStub()
 
     libs["AceSerializer-3.0"] = {
         Serialize = function(_, payload)
+            local mode = state and state.payloadMode or "table-fast"
+            if mode == "table-fast" then
+                return payload
+            end
+            if mode == "string-tokenized" then
+                local shape = stableDescribe(payload)
+                local token = registerSerializedValue("AS", payload)
+                return token .. "|" .. shape
+            end
+            if mode == "realistic-string" or mode == "corruptible-string" then
+                return "ASR|" .. encodeLuaLiteral(payload)
+            end
             return payload
         end,
         Deserialize = function(_, payload)
-            return true, payload
+            if realType(payload) == "table" then
+                return true, payload
+            end
+            if realType(payload) ~= "string" then
+                return false, nil
+            end
+
+            local token = payload:match("^(AS:%d+)|")
+            if token then
+                local value = _G.__RecipeRegistrySerializedValues and _G.__RecipeRegistrySerializedValues[token]
+                if not value then
+                    return false, nil
+                end
+                return true, deepcopy(value)
+            end
+
+            local literal = payload:match("^ASR|(.+)$")
+            if literal then
+                local ok, value = decodeLuaLiteral(literal)
+                if not ok or realType(value) ~= "table" then
+                    return false, nil
+                end
+                return true, value
+            end
+
+            return false, nil
         end,
     }
 
@@ -607,7 +691,8 @@ local function installWowGlobals()
     _G.CraftFrame_Update = function() end
 end
 
-function Wow.Reset()
+function Wow.Reset(opts)
+    opts = opts or {}
     state = {
         now = 1700000000,
         nextTimerId = 0,
@@ -647,6 +732,7 @@ function Wow.Reset()
             entries = {},
             nameFilter = "",
         },
+        payloadMode = opts.payloadMode or "table-fast",
     }
 
     _G.RecipeRegistry = nil
@@ -660,8 +746,20 @@ function Wow.Reset()
     return state
 end
 
+function Wow.Configure(opts)
+    opts = opts or {}
+    if opts.payloadMode then
+        state.payloadMode = opts.payloadMode
+    end
+    return state
+end
+
 function Wow.GetState()
     return state
+end
+
+function Wow.GetPayloadMode()
+    return state and state.payloadMode or "table-fast"
 end
 
 function Wow.UseState(nextState)

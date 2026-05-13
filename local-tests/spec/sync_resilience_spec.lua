@@ -246,7 +246,7 @@ Test.it("warmup defers manifest fan-out and targeted manifest refreshes until ex
         wow.AdvanceTime(1)
         addon.Performance:RunNextStep()
     end
-    Test.eq(countCommKind(wow, "MREQ"), 1, "warmup should flush the deferred targeted refresh once the grace window ends")
+    Test.eq(countCommKind(wow, "MREQ"), 0, "warmup should not turn a first hello into a targeted refresh storm once the grace window ends")
     Test.eq(countCommKind(wow, "MANI"), 1, "deferred manifest reply should send after warmup")
 end)
 

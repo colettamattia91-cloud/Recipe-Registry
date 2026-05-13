@@ -16,6 +16,17 @@ local shallowCopyTable = Private.shallowCopyTable
 local SESSION_TIMEOUT = Constants.SESSION_TIMEOUT
 local OUTGOING_CHUNK_DELAY = Constants.OUTGOING_CHUNK_DELAY
 local MANIFEST_CHUNK_DELAY = Constants.MANIFEST_CHUNK_DELAY
+local SNAPSHOT_SESSION_WINDOW = Constants.SNAPSHOT_SESSION_WINDOW or 8
+
+local function countQueuedChunksForSession(queue, sessionId)
+    local count = 0
+    for _, queued in ipairs(queue or {}) do
+        if queued and queued.block and queued.block.sessionId == sessionId then
+            count = count + 1
+        end
+    end
+    return count
+end
 
 local function isRetryableRejectReason(reason)
     return reason == "PAUSED_INSTANCE"
@@ -217,6 +228,7 @@ function Sync:HandleRequest(payload)
         acceptSnapCodec = payload.acceptSnapCodec,
         createdAt = time(),
         lastSentAt = 0,
+        nextSeqToQueue = 1,
     }
 
     self.lastSnapshotServedAt = time()
@@ -228,16 +240,38 @@ function Sync:SendOutgoingSession(sessionId, onlySeqs)
     local state = self.outgoingSessions[sessionId]
     if not state then return end
 
-    local seqs = {}
     if onlySeqs and #onlySeqs > 0 then
+        local seqs = {}
         for _, seq in ipairs(onlySeqs) do seqs[#seqs + 1] = seq end
         sort(seqs)
-    else
-        for seq = 1, state.total do seqs[#seqs + 1] = seq end
+        for _, seq in ipairs(seqs) do
+            local chunk = state.chunks[seq]
+            if chunk then
+                self:QueueOutboundBlock(state.targetKey, {
+                    sessionId = sessionId,
+                    key = state.memberKey,
+                    rev = chunk.rev,
+                    updatedAt = chunk.updatedAt,
+                    sourceType = chunk.sourceType,
+                    profession = chunk.profession,
+                    skillRank = chunk.skillRank,
+                    skillMaxRank = chunk.skillMaxRank,
+                    specialization = chunk.specialization,
+                    recipeKeys = chunk.recipeKeys,
+                    seq = seq,
+                    total = state.total,
+                })
+            end
+        end
+        return
     end
 
-    for _, seq in ipairs(seqs) do
+    state.nextSeqToQueue = state.nextSeqToQueue or 1
+    while state.nextSeqToQueue <= state.total
+        and countQueuedChunksForSession(self.outboundChunkQueue, sessionId) < SNAPSHOT_SESSION_WINDOW do
+        local seq = state.nextSeqToQueue
         local chunk = state.chunks[seq]
+        state.nextSeqToQueue = state.nextSeqToQueue + 1
         if chunk then
             self:QueueOutboundBlock(state.targetKey, {
                 sessionId = sessionId,
@@ -260,6 +294,13 @@ end
 function Sync:HandleSnapshotChunk(payload)
     if not self:IsValidSyncMemberKey(payload.key) or not self:IsValidSyncMemberKey(payload.sender) then return end
     if payload.key == self:GetSelfKey() and payload.sender == self:GetSelfKey() then return end
+    local completed = self.completedIncomingSessions and self.completedIncomingSessions[payload.key] or nil
+    if completed
+        and completed.sessionId == payload.sessionId
+        and completed.rev == payload.rev
+        and completed.sender == payload.sender then
+        return
+    end
 
     local state = self.partialReceive[payload.key]
     if not state or state.sessionId ~= payload.sessionId or state.rev ~= payload.rev then
@@ -300,6 +341,12 @@ function Sync:HandleSnapshotChunk(payload)
     end
 
     if complete then
+        self.completedIncomingSessions[payload.key] = {
+            sessionId = payload.sessionId,
+            rev = payload.rev,
+            sender = payload.sender,
+            completedAt = time(),
+        }
         self:ReleaseCompletedTransferState(payload.key, payload.sessionId, "snapshot-complete")
         self.inboundFinalizeQueue[#self.inboundFinalizeQueue + 1] = {
             memberKey = payload.key,
@@ -465,6 +512,7 @@ function Sync:SendNextSnapshotChunk()
 
     if session then
         session.lastSentAt = time()
+        self:SendOutgoingSession(block.sessionId)
     end
     return true
 end
