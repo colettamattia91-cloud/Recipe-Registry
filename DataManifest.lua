@@ -688,6 +688,19 @@ function Data:DumpManifestSummary(opts)
         syncTel.manifestForceReplies or 0
     ))
     Addon:Print(string.format(
+        "Manifest sync recovery=%d timeouts=%d prunes=%d recovered=%d completed=%d compareFired=%d sendFailures=%d sendRetries=%d coalesced=%d superseded=%d",
+        syncTel.manifestRecoveryRequests or 0,
+        syncTel.manifestPartialTimeouts or 0,
+        syncTel.manifestPartialPrunes or 0,
+        syncTel.manifestPartialRecovered or 0,
+        syncTel.manifestReceiveCompleted or 0,
+        syncTel.manifestCompareFired or 0,
+        syncTel.manifestChunkSendFailures or 0,
+        syncTel.manifestChunkSendRetries or 0,
+        syncTel.manifestChunkBatchesCoalesced or 0,
+        syncTel.manifestSuperseded or 0
+    ))
+    Addon:Print(string.format(
         "Manifest runtime residentPeers=%d queuedPeers=%d queuedBlocks=%d partialPeers=%d partialOpen=%d fallbackBuilds=%d deferred=%d",
         residentPeers,
         queuedPeers,

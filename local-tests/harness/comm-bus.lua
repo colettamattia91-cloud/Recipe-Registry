@@ -301,11 +301,45 @@ function CommBus:AddNode(name, opts)
     addon.Data:RebuildOnlineCache()
     addon.Sync:RegisterComm(addon.ADDON_PREFIX)
     addon.Sync:EnsureBackgroundWorkers()
+    if opts.runtimeTickers then
+        self:EnableRuntimeTickers(node, opts.runtimeTickers)
+    end
 
     self.nodes[#self.nodes + 1] = node
     self.nodeByKey[node.key] = node
     self.nodeByName[name] = node
     return node
+end
+
+function CommBus:EnableRuntimeTickers(node, opts)
+    if not node then return end
+    if opts == true then
+        opts = { prune = true }
+    else
+        opts = opts or {}
+    end
+
+    self:Activate(node)
+    local sync = node.addon.Sync
+    local constants = sync and sync._private and sync._private.constants or {}
+    if opts.prune ~= false and not sync.pruneTicker then
+        sync.pruneTicker = sync:ScheduleRepeatingTimer("PruneState", 5)
+    end
+    if opts.hello == true and not sync.helloTicker then
+        sync.helloTicker = sync:ScheduleRepeatingTimer("BroadcastHello", constants.HELLO_INTERVAL or 15)
+    end
+    if opts.autoSync == true and not sync.autoSyncTicker then
+        sync.autoSyncTicker = sync:ScheduleRepeatingTimer("AutoSyncTick", constants.AUTO_SYNC_INTERVAL or 30)
+    end
+    if opts.queue == true and not sync.queueTicker then
+        sync.queueTicker = sync:ScheduleRepeatingTimer("ProcessRequestQueue", 1)
+    end
+end
+
+function CommBus:EnableRuntimeTickersForAllNodes(opts)
+    for _, node in ipairs(self.nodes) do
+        self:EnableRuntimeTickers(node, opts)
+    end
 end
 
 function CommBus:SetRouteHook(fn)
@@ -1041,6 +1075,7 @@ function CommBus.CreatePeers(count, opts)
     for _, name in ipairs(names) do
         bus:AddNode(name, {
             payloadMode = opts.payloadMode,
+            runtimeTickers = opts.runtimeTickers,
         })
     end
     return bus, names

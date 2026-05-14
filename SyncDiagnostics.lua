@@ -652,6 +652,22 @@ function Sync:DumpStatus()
         tel.manifestRequestsAvoided or 0
     ))
     Addon:Print(string.format(
+        "Manifest recovery=%d timeouts=%d prunes=%d recovered=%d completed=%d compareFired=%d sendFailures=%d sendRetries=%d coalesced=%d superseded=%d lastPrune=%s lastRecovery=%s/%s",
+        tel.manifestRecoveryRequests or 0,
+        tel.manifestPartialTimeouts or 0,
+        tel.manifestPartialPrunes or 0,
+        tel.manifestPartialRecovered or 0,
+        tel.manifestReceiveCompleted or 0,
+        tel.manifestCompareFired or 0,
+        tel.manifestChunkSendFailures or 0,
+        tel.manifestChunkSendRetries or 0,
+        tel.manifestChunkBatchesCoalesced or 0,
+        tel.manifestSuperseded or 0,
+        tostring(tel.lastManifestPruneReason or "none"),
+        tostring(tel.lastManifestRecoveryPeer or "none"),
+        tostring(tel.lastManifestRecoveryId or "none")
+    ))
+    Addon:Print(string.format(
         "Requests oldestAge=%ds oldestSource=%s oldestWhy=%s activeReq=%d/%d inFlightAge=%ds inFlightAttempts=%d inFlightSource=%s inFlightWhy=%s requestId=%s peerBackoff=%d [%s] retries=%d drops=%d initialTO=%d progressTO=%d sessionTO=%d rejects=%d lastReject=%s/%s warmupDefers=%d transitionDefers=%d skippedHello=%d",
         oldestPending and max(0, time() - (oldestPending.queuedAt or time())) or 0,
         oldestPending and tostring(oldestPending.source) or "none",

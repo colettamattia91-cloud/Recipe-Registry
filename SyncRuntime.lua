@@ -1249,11 +1249,20 @@ function Sync:PrunePartialManifestReceives()
                     ))
                     manifests[manifestId] = nil
                     removed = removed + 1
+                    self.telemetry.manifestPartialPrunes = (self.telemetry.manifestPartialPrunes or 0) + 1
+                    self.telemetry.lastManifestPruneReason = reason
                     if reason == "timeout"
                         and seenCount > 0
                         and total > seenCount
                         and self:IsValidSyncMemberKey(peerKey) then
+                        self.telemetry.manifestPartialTimeouts = (self.telemetry.manifestPartialTimeouts or 0) + 1
                         self.telemetry.manifestPartialRecoveryRequests = (self.telemetry.manifestPartialRecoveryRequests or 0) + 1
+                        self.telemetry.manifestRecoveryRequests = (self.telemetry.manifestRecoveryRequests or 0) + 1
+                        self.telemetry.lastManifestRecoveryPeer = peerKey
+                        self.telemetry.lastManifestRecoveryId = manifestId
+                        if diagnostics then
+                            diagnostics.recoveryRequested = true
+                        end
                         self:RequestManifestRefresh(peerKey, {
                             reason = "manifest-partial-timeout",
                         })

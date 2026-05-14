@@ -100,6 +100,7 @@ local function getOrCreateManifestBatchDiagnostic(self, direction, peerKey, mani
             pruned = false,
             pruneReason = nil,
             compareFired = false,
+            recoveryRequested = false,
             senderBuiltAt = 0,
             firstReceivedAt = 0,
             lastReceivedAt = 0,
@@ -125,6 +126,32 @@ local function removeQueuedManifestBatch(queue, peerKey, manifestId)
         end
     end
     return removed
+end
+
+local function removeQueuedManifestBatchesForPeerExcept(queue, peerKey, manifestId)
+    if type(queue) ~= "table" or not peerKey then
+        return 0, {}
+    end
+
+    local removed = 0
+    local removedManifestIds = {}
+    for index = #queue, 1, -1 do
+        local queued = queue[index]
+        local payload = queued and queued.payload or nil
+        local queuedManifestId = payload and payload.manifestId or nil
+        if queued and queued.peer == peerKey and queuedManifestId and queuedManifestId ~= manifestId then
+            removed = removed + 1
+            removedManifestIds[queuedManifestId] = true
+            remove(queue, index)
+        end
+    end
+
+    local manifestIds = {}
+    for queuedManifestId in pairs(removedManifestIds) do
+        manifestIds[#manifestIds + 1] = queuedManifestId
+    end
+    sort(manifestIds)
+    return removed, manifestIds
 end
 
 function Sync:GetManifestBatchDiagnostics(peerKey, manifestId, direction)
@@ -172,7 +199,7 @@ function Sync:SendManifestToPeer(peerKey, why)
         self.telemetry.manifestUnchangedSkips = (self.telemetry.manifestUnchangedSkips or 0) + 1
         return
     end
-    local queued = self:QueueManifestChunks(peerKey, chunks, why)
+    local queued = self:QueueManifestChunks(peerKey, chunks, why, manifestId)
     if queued then
         Addon:Debug(string.format(
             "Manifest batch peer=%s manifestId=%s totalChunks=%d queuedChunks=%d sentChunks=%d reason=%s",
@@ -194,6 +221,20 @@ function Sync:QueueManifestChunks(peerKey, chunks, why, manifestId)
     if not peerKey or not chunks then return false end
     self.manifestChunkQueue = self.manifestChunkQueue or {}
     manifestId = manifestId or getManifestAnnouncementId(chunks)
+    if manifestId then
+        local supersededCount, supersededIds = removeQueuedManifestBatchesForPeerExcept(self.manifestChunkQueue, peerKey, manifestId)
+        if supersededCount > 0 then
+            self.telemetry.manifestSuperseded = (self.telemetry.manifestSuperseded or 0) + #supersededIds
+            for _, supersededId in ipairs(supersededIds) do
+                local superseded = getOrCreateManifestBatchDiagnostic(self, "send", peerKey, supersededId)
+                if superseded then
+                    superseded.pruned = true
+                    superseded.pruneReason = "superseded"
+                    superseded.completed = false
+                end
+            end
+        end
+    end
     if manifestId then
         local removed = removeQueuedManifestBatch(self.manifestChunkQueue, peerKey, manifestId)
         if removed > 0 then
@@ -794,6 +835,11 @@ function Sync:HandleManifestChunk(payload)
         batch.completed = true
         batch.compareFired = true
     end
+    self.telemetry.manifestReceiveCompleted = (self.telemetry.manifestReceiveCompleted or 0) + 1
+    self.telemetry.manifestCompareFired = (self.telemetry.manifestCompareFired or 0) + 1
+    if batch and batch.recoveryRequested then
+        self.telemetry.manifestPartialRecovered = (self.telemetry.manifestPartialRecovered or 0) + 1
+    end
     if comparisonResult and comparisonResult.shouldRefreshUI then
         Addon:RequestRefresh("manifest")
     end
@@ -819,6 +865,9 @@ function Sync:SendNextManifestChunk()
 
     local queued = self.manifestChunkQueue[candidateIndex]
     local batch = getOrCreateManifestBatchDiagnostic(self, "send", queued.peer, queued.payload and queued.payload.manifestId or nil)
+    if (queued.retryCount or 0) > 0 then
+        self.telemetry.manifestChunkSendRetries = (self.telemetry.manifestChunkSendRetries or 0) + 1
+    end
     self.telemetry.manifestChunkSendAttempts = (self.telemetry.manifestChunkSendAttempts or 0) + 1
     if batch then
         batch.sendAttemptedChunks = (batch.sendAttemptedChunks or 0) + 1
@@ -827,6 +876,7 @@ function Sync:SendNextManifestChunk()
     local sent = self:SendDirectEnvelope("MANI", queued.payload, queued.peer, "NORMAL")
     if not sent then
         queued.readyAt = now + MANIFEST_CHUNK_DELAY
+        queued.retryCount = (queued.retryCount or 0) + 1
         self.telemetry.manifestChunkSendFailures = (self.telemetry.manifestChunkSendFailures or 0) + 1
         if batch then
             batch.sendFailedChunks = (batch.sendFailedChunks or 0) + 1
