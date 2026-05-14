@@ -21,31 +21,35 @@ if (-not $allSpecs -or $allSpecs.Count -eq 0) {
     throw "No backend specs found in local-tests\spec"
 }
 
+$normalSoakSpec = "sync_soak_spec.lua"
+$heavySoakSpec = "sync_soak_heavy_spec.lua"
+$soakSpecs = @($normalSoakSpec, $heavySoakSpec)
+
 function Get-SuiteSpecs {
     param(
         [array]$Candidates,
         [string]$SuiteName
     )
 
-    $heavySoak = @($Candidates | Where-Object { $_.Name -eq "sync_soak_heavy_spec.lua" })
-
     switch ($SuiteName) {
         "all" {
-            return $Candidates | Where-Object { $_.Name -ne "sync_soak_heavy_spec.lua" }
+            # Default coverage keeps the controlled soak in-band, but reserves the heavy
+            # release-readiness soak for the explicit soak suite.
+            return $Candidates | Where-Object { $_.Name -ne $heavySoakSpec }
         }
         "quick" {
             return $Candidates | Where-Object {
-                $_.Name -notlike "*soak*_spec.lua" -and $_.Name -ne "manifest_comm_bus_spec.lua"
+                $_.Name -notin $soakSpecs -and $_.Name -ne "manifest_comm_bus_spec.lua"
             }
         }
         "sync" {
             return $Candidates | Where-Object {
-                $_.Name -match "(sync|manifest|snapshot|transport|chunk|runtime_queue_caps|transfer_identity)" -and $_.Name -ne "sync_soak_heavy_spec.lua"
+                $_.Name -match "(sync|manifest|snapshot|transport|chunk|runtime_queue_caps|transfer_identity)" -and $_.Name -ne $heavySoakSpec
             }
         }
         "soak" {
             return $Candidates | Where-Object {
-                $_.Name -like "*soak*_spec.lua"
+                $_.Name -in $soakSpecs
             }
         }
         default {
@@ -71,8 +75,18 @@ if (-not $specs -or $specs.Count -eq 0) {
     throw "No backend specs matched suite '$Suite'"
 }
 
+$suiteDescriptions = @{
+    all = "default/all includes the normal soak (`"$normalSoakSpec`") and excludes the heavy release-readiness soak (`"$heavySoakSpec`")."
+    quick = "quick excludes all soak specs and the broader manifest comm-bus coverage."
+    sync = "sync includes normal sync/manifest/transport coverage and excludes the heavy release-readiness soak."
+    soak = "soak runs both sync soak specs, including the heavy release-readiness soak."
+}
+
 Push-Location $repoRoot
 try {
+    if (-not ($PSBoundParameters.ContainsKey("Spec") -and $Spec)) {
+        Write-Host ("Selected suite '{0}' with {1} spec(s): {2}" -f $Suite, $specs.Count, $suiteDescriptions[$Suite])
+    }
     foreach ($spec in $specs) {
         $specName = if ($spec.PSObject.Properties["Name"]) { $spec.Name } else { Split-Path $spec -Leaf }
         $specPath = if ($spec.PSObject.Properties["FullName"]) { $spec.FullName } else { $spec }

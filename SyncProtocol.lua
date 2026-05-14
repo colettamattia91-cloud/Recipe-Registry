@@ -217,8 +217,27 @@ function Sync:HandleIndex(payload)
     if self:IsMockKey(payload.key) or self:IsMockKey(payload.sender) then return end
 
     local ownerKey = self:IsValidSyncMemberKey(payload.owner) and payload.owner or payload.key
+    local selfKey = self:GetSelfKey()
+    if ownerKey == selfKey then
+        self.telemetry.indexSkippedLocalOwners = (self.telemetry.indexSkippedLocalOwners or 0) + 1
+        return
+    end
+    if ownerKey ~= payload.sender then
+        local rosterFresh = self:IsRosterFresh()
+        if not rosterFresh then
+            self:EnsureFreshRoster("index-owner")
+            rosterFresh = self:IsRosterFresh()
+        end
+        local ownerOnline = rosterFresh and Addon.Data:IsMemberOnline(ownerKey) or false
+        -- Coordinator IDX hints can safely fan out direct owner requests, but offline-owner
+        -- replica paths must stay in manifest catch-up so they do not seed impossible REQs.
+        if not ownerOnline then
+            self.telemetry.indexSkippedImpossibleOwners = (self.telemetry.indexSkippedImpossibleOwners or 0) + 1
+            return
+        end
+    end
     self:RecordRevisionHint(payload.key, payload.rev, payload.updatedAt, ownerKey)
-    if payload.key == self:GetSelfKey() then
+    if payload.key == selfKey then
         return
     end
 
@@ -226,22 +245,6 @@ function Sync:HandleIndex(payload)
     local localRev = localEntry and localEntry.rev or 0
     local remoteRev = payload.rev or 0
     if remoteRev > localRev then
-        local sourceKey = ownerKey
-        local requestOpts
-        if ownerKey ~= payload.sender then
-            local rosterFresh = self:IsRosterFresh()
-            if not rosterFresh then
-                self:EnsureFreshRoster("index-owner")
-                rosterFresh = self:IsRosterFresh()
-            end
-            local ownerOnline = rosterFresh and Addon.Data:IsMemberOnline(ownerKey) or false
-            if not ownerOnline then
-                sourceKey = payload.sender
-                requestOpts = {
-                    allowReplicaSource = true,
-                }
-            end
-        end
-        self:QueueRequest(sourceKey, payload.key, remoteRev, "index", requestOpts)
+        self:QueueRequest(ownerKey, payload.key, remoteRev, "index")
     end
 end

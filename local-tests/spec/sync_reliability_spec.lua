@@ -36,6 +36,28 @@ local function printLogContains(wow, needle)
     return false
 end
 
+local function captureIdleRequestState(sync)
+    return {
+        pendingRequests = Test.countKeys(sync.pendingRequests),
+        activeRequests = sync:GetActiveRequestCount(),
+        inFlight = sync:GetInFlightRequest(),
+        requestTimeoutInitial = sync.telemetry.requestTimeoutInitial or 0,
+        requestTimeoutProgress = sync.telemetry.requestTimeoutProgress or 0,
+        requestTimeoutSession = sync.telemetry.requestTimeoutSession or 0,
+        peerBackoff = Test.countKeys(sync.peerBackoffUntil),
+    }
+end
+
+local function assertIdleRequestState(sync, before, label)
+    Test.eq(Test.countKeys(sync.pendingRequests), before.pendingRequests, label .. " should not add pending requests")
+    Test.eq(sync:GetActiveRequestCount(), before.activeRequests, label .. " should not add active requests")
+    Test.eq(sync:GetInFlightRequest(), before.inFlight, label .. " should not create an in-flight request")
+    Test.eq(sync.telemetry.requestTimeoutInitial or 0, before.requestTimeoutInitial, label .. " should not touch initial timeout telemetry")
+    Test.eq(sync.telemetry.requestTimeoutProgress or 0, before.requestTimeoutProgress, label .. " should not touch progress timeout telemetry")
+    Test.eq(sync.telemetry.requestTimeoutSession or 0, before.requestTimeoutSession, label .. " should not touch session timeout telemetry")
+    Test.eq(Test.countKeys(sync.peerBackoffUntil), before.peerBackoff, label .. " should not create peer backoff state")
+end
+
 local function seedProfession(data, memberKey, profession, recipeKey, opts)
     opts = opts or {}
     local entry = data:GetOrCreateMember(memberKey)
@@ -259,6 +281,62 @@ Test.it("queue dispatch skips oldest backoffed peer and continues with healthy p
     Test.eq(addon.Sync:GetInFlightRequest("Membertwo-TestRealm").source, healthyPeer, "healthy source should win")
     Test.eq(addon.Sync.pendingRequests["Memberone-TestRealm"], nil, "automatic backoff request should be purged")
     Test.eq(countCommKind(wow, "REQ"), 1, "only healthy REQ should be sent")
+end)
+
+Test.it("IDX skips self-owner hints without queuing direct request state", function()
+    local addon, wow, data = freshAddon()
+    local coordinatorKey = "Coordinator-TestRealm"
+    local selfKey = data:GetPlayerKey()
+    local before = captureIdleRequestState(addon.Sync)
+
+    wow.SetGuildRoster({ coordinatorKey })
+    data:RebuildOnlineCache()
+    addon.Sync.coordinatorKey = coordinatorKey
+
+    wow.DeliverComm(addon.Sync, {
+        kind = "IDX",
+        key = selfKey,
+        owner = selfKey,
+        rev = 9,
+        updatedAt = 900,
+        sender = coordinatorKey,
+    }, {
+        sender = coordinatorKey,
+        distribution = "GUILD",
+    })
+
+    assertIdleRequestState(addon.Sync, before, "self-owner IDX")
+    Test.eq(countCommKind(wow, "REQ"), 0, "self-owner IDX should not emit REQ traffic")
+    Test.eq(addon.Sync.telemetry.indexSkippedLocalOwners or 0, 1, "self-owner IDX should increment local-owner skip telemetry")
+    Test.eq(addon.Sync.telemetry.indexSkippedImpossibleOwners or 0, 0, "self-owner IDX should not increment impossible-owner telemetry")
+end)
+
+Test.it("IDX skips offline-owner replica hints without queuing impossible requests", function()
+    local addon, wow, data = freshAddon()
+    local coordinatorKey = "Coordinator-TestRealm"
+    local offlineOwner = "Offlineowner-TestRealm"
+    local before = captureIdleRequestState(addon.Sync)
+
+    wow.SetGuildRoster({ coordinatorKey })
+    data:RebuildOnlineCache()
+    addon.Sync.coordinatorKey = coordinatorKey
+
+    wow.DeliverComm(addon.Sync, {
+        kind = "IDX",
+        key = offlineOwner,
+        owner = offlineOwner,
+        rev = 11,
+        updatedAt = 1100,
+        sender = coordinatorKey,
+    }, {
+        sender = coordinatorKey,
+        distribution = "GUILD",
+    })
+
+    assertIdleRequestState(addon.Sync, before, "offline-owner IDX")
+    Test.eq(countCommKind(wow, "REQ"), 0, "offline-owner IDX should not emit REQ traffic")
+    Test.eq(addon.Sync.telemetry.indexSkippedLocalOwners or 0, 0, "offline-owner IDX should not increment local-owner telemetry")
+    Test.eq(addon.Sync.telemetry.indexSkippedImpossibleOwners or 0, 1, "offline-owner IDX should increment impossible-owner telemetry")
 end)
 
 Test.it("manifest health stays good while snapshot health is bad", function()

@@ -189,6 +189,8 @@ local function newSyncTelemetry()
         manifestCatchupQueued = 0,
         manifestCatchupDeferred = 0,
         manifestCatchupDrained = 0,
+        indexSkippedLocalOwners = 0,
+        indexSkippedImpossibleOwners = 0,
         manifestCatchupSkippedOnlineOwners = 0,
         manifestCatchupSkippedStaleOwners = 0,
         manifestCatchupMaxDeferred = 0,
