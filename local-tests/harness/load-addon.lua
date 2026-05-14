@@ -74,6 +74,11 @@ function Loader.Load(opts)
         error("RecipeRegistry addon was not created", 2)
     end
 
+    if opts.savedVariables then
+        _G.RecipeRegistryDB = opts.savedVariables.db or opts.savedVariables.global or {}
+        _G.RecipeRegistryCharDB = opts.savedVariables.charDB or opts.savedVariables.char or {}
+    end
+
     if opts.initialize ~= false then
         runAddonLifecycle(addon, "OnInitialize")
     end

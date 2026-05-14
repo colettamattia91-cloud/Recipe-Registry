@@ -27,9 +27,11 @@ function Get-SuiteSpecs {
         [string]$SuiteName
     )
 
+    $heavySoak = @($Candidates | Where-Object { $_.Name -eq "sync_soak_heavy_spec.lua" })
+
     switch ($SuiteName) {
         "all" {
-            return $Candidates
+            return $Candidates | Where-Object { $_.Name -ne "sync_soak_heavy_spec.lua" }
         }
         "quick" {
             return $Candidates | Where-Object {
@@ -38,7 +40,7 @@ function Get-SuiteSpecs {
         }
         "sync" {
             return $Candidates | Where-Object {
-                $_.Name -match "(sync|manifest|snapshot|transport|chunk|runtime_queue_caps|transfer_identity)"
+                $_.Name -match "(sync|manifest|snapshot|transport|chunk|runtime_queue_caps|transfer_identity)" -and $_.Name -ne "sync_soak_heavy_spec.lua"
             }
         }
         "soak" {

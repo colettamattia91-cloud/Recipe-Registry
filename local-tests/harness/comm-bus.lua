@@ -88,6 +88,45 @@ local function stableRecipeSignature(recipes)
     return table.concat(parts, ":")
 end
 
+local function collectKnownSpellIds(knownSpells)
+    local spellIDs = {}
+    for spellID, known in pairs(knownSpells or {}) do
+        if known then
+            spellIDs[#spellIDs + 1] = spellID
+        end
+    end
+    table.sort(spellIDs)
+    return spellIDs
+end
+
+local function countPartialManifestEntries(sync)
+    local total = 0
+    for _, manifests in pairs(sync.partialManifestReceive or {}) do
+        total = total + countKeys(manifests)
+    end
+    return total
+end
+
+local function snapshotNodeRuntime(node)
+    local state = node and node.state or {}
+    return {
+        now = state.now,
+        playerName = state.playerName,
+        realm = state.realm,
+        inGuild = state.inGuild,
+        inCombat = state.inCombat,
+        inRaid = state.inRaid,
+        inInstance = state.inInstance,
+        instanceType = state.instanceType,
+        guildRoster = deepcopy(state.guildRoster or {}),
+        skillLines = deepcopy(state.skillLines or {}),
+        knownSpells = collectKnownSpellIds(state.knownSpells or {}),
+        tradeSkill = deepcopy(state.tradeSkill or {}),
+        craftSkill = deepcopy(state.craftSkill or {}),
+        payloadMode = state.payloadMode or node.payloadMode or "table-fast",
+    }
+end
+
 local function makeRoster(names, realm)
     local rows = {}
     for index, name in ipairs(names or {}) do
@@ -143,6 +182,50 @@ local function hasNodeWork(node)
     if #(sync.manifestCatchupQueue or {}) > 0 then return true end
     if hasPartialReceives(sync) then return true end
     return false
+end
+
+local function describeNodeWork(node)
+    local sync = node and node.addon and node.addon.Sync or nil
+    if not sync then
+        return {}
+    end
+
+    local reasons = {}
+    if node.sentCursor < #(node.state.sentComm or {}) then
+        reasons[#reasons + 1] = "sentComm=" .. tostring(#(node.state.sentComm or {}) - node.sentCursor)
+    end
+    if countKeys(sync.pendingRequests or {}) > 0 then
+        reasons[#reasons + 1] = "pending=" .. tostring(countKeys(sync.pendingRequests or {}))
+    end
+    if sync.inFlight then
+        reasons[#reasons + 1] = "inFlight=1"
+    end
+    if countKeys(sync.outgoingSessions or {}) > 0 then
+        reasons[#reasons + 1] = "outgoingSessions=" .. tostring(countKeys(sync.outgoingSessions or {}))
+    end
+    if #(sync.outboundChunkQueue or {}) > 0 then
+        reasons[#reasons + 1] = "outbound=" .. tostring(#(sync.outboundChunkQueue or {}))
+    end
+    if #(sync.manifestChunkQueue or {}) > 0 then
+        reasons[#reasons + 1] = "manifestChunk=" .. tostring(#(sync.manifestChunkQueue or {}))
+    end
+    if #(sync.inboundChunkQueue or {}) > 0 then
+        reasons[#reasons + 1] = "inbound=" .. tostring(#(sync.inboundChunkQueue or {}))
+    end
+    if #(sync.inboundFinalizeQueue or {}) > 0 then
+        reasons[#reasons + 1] = "finalize=" .. tostring(#(sync.inboundFinalizeQueue or {}))
+    end
+    if #(sync.manifestCatchupQueue or {}) > 0 then
+        reasons[#reasons + 1] = "catchup=" .. tostring(#(sync.manifestCatchupQueue or {}))
+    end
+    if countKeys(sync.partialReceive or {}) > 0 then
+        reasons[#reasons + 1] = "partialSnap=" .. tostring(countKeys(sync.partialReceive or {}))
+    end
+    local partialManifests = countPartialManifestEntries(sync)
+    if partialManifests > 0 then
+        reasons[#reasons + 1] = "partialMani=" .. tostring(partialManifests)
+    end
+    return reasons
 end
 
 local function resolveTransportProfile(profile)
@@ -292,6 +375,7 @@ function CommBus:AddNode(name, opts)
         addon = addon,
         state = Wow.GetState(),
         payloadMode = opts.payloadMode or self.payloadMode,
+        runtimeTickers = opts.runtimeTickers,
         sentCursor = 0,
         index = #self.nodes + 1,
         online = opts.online ~= false,
@@ -342,6 +426,77 @@ function CommBus:EnableRuntimeTickersForAllNodes(opts)
     end
 end
 
+function CommBus:SnapshotSavedVariables(node)
+    self:Activate(node)
+    return {
+        db = deepcopy(_G.RecipeRegistryDB or node.addon.db or {}),
+        charDB = deepcopy(_G.RecipeRegistryCharDB or node.addon.charDB or {}),
+    }
+end
+
+function CommBus:RestoreSavedVariables(node, saved)
+    saved = saved or {}
+    self:Activate(node)
+    node.addon.db = deepcopy(saved.db or saved.global or {})
+    node.addon.charDB = deepcopy(saved.charDB or saved.char or {})
+    _G.RecipeRegistryDB = node.addon.db
+    _G.RecipeRegistryCharDB = node.addon.charDB
+    return node.addon.db, node.addon.charDB
+end
+
+function CommBus:ReloadNode(node, opts)
+    opts = opts or {}
+    self:Activate(node)
+    local saved = opts.savedVariables or self:SnapshotSavedVariables(node)
+    local runtime = snapshotNodeRuntime(node)
+    local previousKey = node.key
+
+    local addon = Loader.Load({
+        reset = true,
+        initialize = false,
+        payloadMode = node.payloadMode or self.payloadMode,
+        savedVariables = saved,
+    })
+
+    Wow.SetPlayer(runtime.playerName, runtime.realm)
+    Wow.SetGuildRoster(runtime.guildRoster)
+    Wow.SetCombat(runtime.inCombat)
+    Wow.SetRaid(runtime.inRaid)
+    Wow.SetInstance(runtime.inInstance, runtime.instanceType)
+    Wow.SetSkillLines(runtime.skillLines)
+    Wow.SetKnownSpells(runtime.knownSpells)
+    if runtime.tradeSkill and runtime.tradeSkill.title then
+        Wow.SetTradeSkill(runtime.tradeSkill.title, runtime.tradeSkill.entries, runtime.tradeSkill)
+    end
+    if runtime.craftSkill and runtime.craftSkill.title then
+        Wow.SetCraftSkill(runtime.craftSkill.title, runtime.craftSkill.entries, runtime.craftSkill)
+    end
+
+    local nextState = Wow.GetState()
+    nextState.now = runtime.now or nextState.now
+    nextState.inGuild = runtime.inGuild ~= false
+    Loader.Initialize(addon)
+
+    node.addon = addon
+    node.state = nextState
+    node.sentCursor = 0
+    self:Activate(node)
+    node.key = addon.Data:GetPlayerKey()
+    addon.Data:RebuildOnlineCache()
+    addon.Sync:RegisterComm(addon.ADDON_PREFIX)
+    addon.Sync:EnsureBackgroundWorkers()
+    if node.runtimeTickers then
+        self:EnableRuntimeTickers(node, node.runtimeTickers)
+    end
+
+    if previousKey and previousKey ~= node.key then
+        self.nodeByKey[previousKey] = nil
+    end
+    self.nodeByKey[node.key] = node
+    self.nodeByName[node.name] = node
+    return node
+end
+
 function CommBus:SetRouteHook(fn)
     self.routeHook = fn
 end
@@ -368,6 +523,11 @@ function CommBus:SetNodeOnline(node, online)
     for _, other in ipairs(self.nodes) do
         self:RefreshRosterForNode(other)
     end
+end
+
+function CommBus:SetNodeInstance(node, inInstance, instanceType)
+    self:Activate(node)
+    Wow.SetInstance(inInstance == true, instanceType or (inInstance and "party" or "none"))
 end
 
 function CommBus:SeedSelfProfession(node, opts)
@@ -618,6 +778,8 @@ function CommBus:BuildEventData(item, extra)
         sender = item and item.sender and item.sender.key or nil,
         target = item and item.target and item.target.key or nil,
         kind = payloadKind(payload),
+        memberKey = payload and payload.key or nil,
+        manifestId = payload and payload.manifestId or nil,
         requestId = metrics.requestId,
         sessionId = metrics.sessionId,
         seq = metrics.seq,
@@ -948,6 +1110,134 @@ end
 
 function CommBus:TransportIdle()
     return #(self.transport.queued or {}) == 0
+end
+
+function CommBus:NodeHasInFlightRequest(node)
+    if not (node and node.online) then
+        return false
+    end
+    self:Activate(node)
+    return node.addon.Sync.inFlight ~= nil
+end
+
+function CommBus:NodeHasZombieRequests(node)
+    if not node then
+        return false
+    end
+    self:Activate(node)
+    local sync = node.addon.Sync
+    return sync.inFlight ~= nil
+        or countKeys(sync.pendingRequests or {}) > 0
+        or countKeys(sync.partialReceive or {}) > 0
+        or countPartialManifestEntries(sync) > 0
+        or countKeys(sync.outgoingSessions or {}) > 0
+end
+
+function CommBus:AllQueuesIdleForNode(node)
+    if not node then
+        return true
+    end
+    return not hasNodeWork(node)
+end
+
+function CommBus:DescribeNodeWork(node)
+    if not node then
+        return ""
+    end
+    local reasons = describeNodeWork(node)
+    return table.concat(reasons, ", ")
+end
+
+function CommBus:NodesWithWork()
+    local rows = {}
+    for _, node in ipairs(self.nodes) do
+        if node.online and hasNodeWork(node) then
+            rows[#rows + 1] = {
+                node = node,
+                reasons = describeNodeWork(node),
+            }
+        end
+    end
+    table.sort(rows, function(a, b)
+        return tostring(a.node and a.node.name or "") < tostring(b.node and b.node.name or "")
+    end)
+    return rows
+end
+
+function CommBus:DescribeWorkSummary(limit)
+    local rows = self:NodesWithWork()
+    if #rows == 0 then
+        return "idle"
+    end
+    local parts = {}
+    local maxRows = math.min(#rows, limit or 8)
+    for index = 1, maxRows do
+        local row = rows[index]
+        parts[#parts + 1] = string.format(
+            "%s[%s]",
+            tostring(row.node and row.node.name or "?"),
+            table.concat(row.reasons or {}, ",")
+        )
+    end
+    if #rows > maxRows then
+        parts[#parts + 1] = string.format("+%d more", #rows - maxRows)
+    end
+    return table.concat(parts, " ")
+end
+
+function CommBus:CountInFlightRequests()
+    local total = 0
+    for _, node in ipairs(self.nodes) do
+        if node.online then
+            self:Activate(node)
+            total = total + countKeys(node.addon.Sync:GetInFlightRequests())
+        end
+    end
+    return total
+end
+
+function CommBus:CountPartialSnapshots()
+    local total = 0
+    for _, node in ipairs(self.nodes) do
+        if node.online then
+            self:Activate(node)
+            total = total + countKeys(node.addon.Sync.partialReceive or {})
+        end
+    end
+    return total
+end
+
+function CommBus:CountPartialManifests()
+    local total = 0
+    for _, node in ipairs(self.nodes) do
+        if node.online then
+            self:Activate(node)
+            total = total + countPartialManifestEntries(node.addon.Sync)
+        end
+    end
+    return total
+end
+
+function CommBus:CountManifestCatchupQueued()
+    local total = 0
+    for _, node in ipairs(self.nodes) do
+        if node.online then
+            self:Activate(node)
+            total = total + #(node.addon.Sync.manifestCatchupQueue or {})
+        end
+    end
+    return total
+end
+
+function CommBus:CountOutboundChunksQueued()
+    local total = 0
+    for _, node in ipairs(self.nodes) do
+        if node.online then
+            self:Activate(node)
+            total = total + #(node.addon.Sync.outboundChunkQueue or {})
+        end
+    end
+    return total
 end
 
 function CommBus:HasWork()

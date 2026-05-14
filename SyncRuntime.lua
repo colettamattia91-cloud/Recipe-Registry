@@ -1338,6 +1338,7 @@ function Sync:RecomputeCoordinator()
     local rosterFresh = self:IsRosterFresh()
     if not rosterFresh then
         self:EnsureFreshRoster("coordinator")
+        rosterFresh = self:IsRosterFresh()
     end
     local keys = {}
     for key in pairs(self.onlineNodes) do

@@ -218,11 +218,30 @@ function Sync:HandleIndex(payload)
 
     local ownerKey = self:IsValidSyncMemberKey(payload.owner) and payload.owner or payload.key
     self:RecordRevisionHint(payload.key, payload.rev, payload.updatedAt, ownerKey)
+    if payload.key == self:GetSelfKey() then
+        return
+    end
 
     local localEntry = Addon.Data:GetMember(payload.key)
     local localRev = localEntry and localEntry.rev or 0
     local remoteRev = payload.rev or 0
     if remoteRev > localRev then
-        self:QueueRequest(ownerKey, payload.key, remoteRev, "index")
+        local sourceKey = ownerKey
+        local requestOpts
+        if ownerKey ~= payload.sender then
+            local rosterFresh = self:IsRosterFresh()
+            if not rosterFresh then
+                self:EnsureFreshRoster("index-owner")
+                rosterFresh = self:IsRosterFresh()
+            end
+            local ownerOnline = rosterFresh and Addon.Data:IsMemberOnline(ownerKey) or false
+            if not ownerOnline then
+                sourceKey = payload.sender
+                requestOpts = {
+                    allowReplicaSource = true,
+                }
+            end
+        end
+        self:QueueRequest(sourceKey, payload.key, remoteRev, "index", requestOpts)
     end
 end

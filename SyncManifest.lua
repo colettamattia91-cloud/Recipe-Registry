@@ -495,11 +495,15 @@ function Sync:BuildManifestCatchupCandidates(senderKey, groupedRequests)
     local rosterFresh = self:IsRosterFresh()
     if not rosterFresh then
         self:EnsureFreshRoster("manifest-catchup")
+        rosterFresh = self:IsRosterFresh()
     end
     for ownerCharacter, request in pairs(groupedRequests or {}) do
         local blockKeys = cloneStringSet(request and request.blockKeys)
         if self:IsValidSyncMemberKey(ownerCharacter) and #blockKeys > 0 then
             seenCandidates = seenCandidates + 1
+            if ownerCharacter == self:GetSelfKey() then
+                self.telemetry.manifestCatchupSkippedLocalOwners = (self.telemetry.manifestCatchupSkippedLocalOwners or 0) + 1
+            else
             local ownerIsOnline = rosterFresh and Addon.Data:IsMemberOnline(ownerCharacter) or false
             local directOwner = ownerCharacter == senderKey
             if not directOwner and ownerIsOnline then
@@ -518,6 +522,7 @@ function Sync:BuildManifestCatchupCandidates(senderKey, groupedRequests)
                     sourceType = request and request.sourceType,
                     wasDeferred = request and request.wasDeferred == true or false,
                 }
+            end
             end
         end
     end

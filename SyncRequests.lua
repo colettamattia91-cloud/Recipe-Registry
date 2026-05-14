@@ -442,6 +442,7 @@ function Sync:IsRequestStillViable(request)
     local rosterFresh = self:IsRosterFresh()
     if not rosterFresh then
         self:EnsureFreshRoster("request-viability")
+        rosterFresh = self:IsRosterFresh()
     end
     if rosterFresh and Addon.Data and Addon.Data.GetGuildMemberMeta then
         local meta = Addon.Data:GetGuildMemberMeta(request.source)
