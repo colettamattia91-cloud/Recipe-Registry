@@ -80,6 +80,14 @@ function Sync:HandleRequestReject(payload)
 
     local retryable = payload.retryable == true
     local reason = tostring(payload.reason or "REJECT")
+    Addon:Trace("request", string.format(
+        "reject peer=%s member=%s reqId=%s reason=%s retryable=%s",
+        tostring(payload.sender or "?"),
+        tostring(payload.key or "?"),
+        tostring(payload.requestId or "none"),
+        reason,
+        tostring(retryable)
+    ))
     self.telemetry.rejectsTotal = (self.telemetry.rejectsTotal or 0) + 1
     self.telemetry.lastRejectPeer = tostring(payload.sender)
     self.telemetry.lastRejectReason = reason
@@ -137,6 +145,7 @@ function Sync:HandleRequest(payload)
     local targetKey = payload.sender
     if not self:IsValidSyncMemberKey(targetKey) then return end
     if not self:IsValidSyncMemberKey(payload.key) then
+        Addon:Trace("transfer", string.format("reject-send target=%s member=%s reason=INVALID_REQUEST", tostring(targetKey), tostring(payload.key)))
         self:SendRequestReject(targetKey, payload, "INVALID_REQUEST", { retryable = false })
         return
     end
@@ -144,6 +153,7 @@ function Sync:HandleRequest(payload)
 
     local pauseReason = Addon.SyncPausePolicy and Addon.SyncPausePolicy:GetProtocolPauseReason("REQ") or nil
     if pauseReason then
+        Addon:Trace("transfer", string.format("reject-send target=%s member=%s reason=%s", tostring(targetKey), tostring(payload.key), tostring(pauseReason)))
         self:SendRequestReject(targetKey, payload, pauseReason, {
             retryable = true,
             retryAfter = 15,
@@ -151,6 +161,7 @@ function Sync:HandleRequest(payload)
         return
     end
     if self:EstimateRuntimeQueuePressure() >= 90 then
+        Addon:Trace("transfer", string.format("reject-send target=%s member=%s reason=BUSY", tostring(targetKey), tostring(payload.key)))
         self:SendRequestReject(targetKey, payload, "BUSY", {
             retryable = true,
             retryAfter = 10,
@@ -160,10 +171,12 @@ function Sync:HandleRequest(payload)
 
     local entry = Addon.Data:GetMember(payload.key)
     if not entry then
+        Addon:Trace("transfer", string.format("reject-send target=%s member=%s reason=NO_ENTRY", tostring(targetKey), tostring(payload.key)))
         self:SendRequestReject(targetKey, payload, "NO_ENTRY", { retryable = false })
         return
     end
     if (entry.guildStatus or "active") ~= "active" then
+        Addon:Trace("transfer", string.format("reject-send target=%s member=%s reason=INACTIVE_ENTRY", tostring(targetKey), tostring(payload.key)))
         self:SendRequestReject(targetKey, payload, "INACTIVE_ENTRY", { retryable = false })
         return
     end
@@ -188,6 +201,7 @@ function Sync:HandleRequest(payload)
             end
         end
         if not hasRequestedBlock then
+            Addon:Trace("transfer", string.format("reject-send target=%s member=%s reason=NO_REQUESTED_BLOCK", tostring(targetKey), tostring(payload.key)))
             self:SendRequestReject(targetKey, payload, "NO_REQUESTED_BLOCK", { retryable = false })
             return
         end
@@ -196,6 +210,7 @@ function Sync:HandleRequest(payload)
     if payload.key ~= self:GetSelfKey()
         and payload.key ~= targetKey
         and Addon.Data:IsMemberOnline(payload.key) then
+        Addon:Trace("transfer", string.format("reject-send target=%s member=%s reason=NOT_SERVEABLE_REPLICA", tostring(targetKey), tostring(payload.key)))
         self:SendRequestReject(targetKey, payload, "NOT_SERVEABLE_REPLICA", { retryable = false })
         return
     end
@@ -205,9 +220,20 @@ function Sync:HandleRequest(payload)
         requestedBlocks = hasSpecificBlockRequest and requestedBlocks or nil,
     })
     if #chunks == 0 then
+        Addon:Trace("transfer", string.format("reject-send target=%s member=%s reason=EMPTY_SNAPSHOT", tostring(targetKey), tostring(payload.key)))
         self:SendRequestReject(targetKey, payload, "EMPTY_SNAPSHOT", { retryable = false })
         return
     end
+
+    Addon:Trace("transfer", string.format(
+        "serve target=%s member=%s session=%s chunks=%d requestedBlocks=%d replica=%s",
+        tostring(targetKey),
+        tostring(payload.key),
+        tostring(sessionId),
+        #chunks,
+        #(requestedBlocks or {}),
+        tostring(payload.key ~= self:GetSelfKey() and payload.key ~= targetKey)
+    ))
 
     if payload.requestedBlocks and #payload.requestedBlocks > 0
         and payload.key ~= self:GetSelfKey()
@@ -341,6 +367,14 @@ function Sync:HandleSnapshotChunk(payload)
     end
 
     if complete then
+        Addon:Trace("transfer", string.format(
+            "snapshot-complete sender=%s member=%s session=%s rev=%d total=%d",
+            tostring(payload.sender),
+            tostring(payload.key),
+            tostring(payload.sessionId or "none"),
+            payload.rev or 0,
+            payload.total or 0
+        ))
         self.completedIncomingSessions[payload.key] = {
             sessionId = payload.sessionId,
             rev = payload.rev,
@@ -584,6 +618,13 @@ function Sync:MergeChunkStep(item)
         isMock = self:IsMockKey(item.memberKey) or self:IsMockKey(item.sender),
     })
     if merged then
+        Addon:Trace(item.sender and item.sender ~= item.memberKey and "offline" or "transfer", string.format(
+            "applied member=%s sender=%s rev=%d sourceType=%s",
+            tostring(item.memberKey),
+            tostring(item.sender or item.memberKey),
+            item.rev or 0,
+            tostring(sourceType)
+        ))
         self.telemetry.appliedChunks = self.telemetry.appliedChunks + 1
         if item.sender and item.sender ~= item.memberKey and not Addon.Data:IsMemberOnline(item.memberKey) then
             self.telemetry.replicaOwnersApplied = self.telemetry.replicaOwnersApplied + 1

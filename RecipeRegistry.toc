@@ -5,7 +5,7 @@
 ## Version: 2.0.0
 ## X-Build-Channel: dev
 ## X-Build-ID: dev
-## SavedVariables: RecipeRegistryDB
+## SavedVariables: RecipeRegistryDB,RecipeRegistryLogDB
 ## SavedVariablesPerCharacter: RecipeRegistryCharDB
 ## X-Category: Guild
 ## OptionalDeps: AtlasLootClassic,AtlasLoot,TradeSkillMaster,Auctionator

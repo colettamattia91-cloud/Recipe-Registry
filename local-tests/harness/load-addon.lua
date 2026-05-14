@@ -80,6 +80,7 @@ function Loader.Load(opts)
     if opts.savedVariables then
         _G.RecipeRegistryDB = opts.savedVariables.db or opts.savedVariables.global or {}
         _G.RecipeRegistryCharDB = opts.savedVariables.charDB or opts.savedVariables.char or {}
+        _G.RecipeRegistryLogDB = opts.savedVariables.logDB or opts.savedVariables.log or {}
     end
 
     if opts.initialize ~= false then

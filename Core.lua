@@ -12,6 +12,160 @@ Addon.debugMode = false
 Addon.perfDebugMode = false
 Addon._refreshReasons = {}
 
+local time = time
+local max = math.max
+local min = math.min
+local remove = table.remove
+
+local DEBUG_LOG_DEFAULTS = {
+    enabled = false,
+    maxEntries = 400,
+    chatEcho = false,
+    scopes = {
+        manifest = true,
+        request = true,
+        transfer = true,
+        offline = true,
+        version = true,
+    },
+    entries = {},
+    nextSequence = 0,
+}
+
+local DEBUG_LOG_SCOPE_NAMES = {
+    manifest = true,
+    request = true,
+    transfer = true,
+    offline = true,
+    version = true,
+}
+
+local function cloneShallow(src)
+    local out = {}
+    for key, value in pairs(src or {}) do
+        out[key] = value
+    end
+    return out
+end
+
+local function initDebugLogDB()
+    if type(_G.RecipeRegistryLogDB) ~= "table" then
+        _G.RecipeRegistryLogDB = {}
+    end
+    local db = _G.RecipeRegistryLogDB
+    if type(db.enabled) ~= "boolean" then
+        db.enabled = DEBUG_LOG_DEFAULTS.enabled
+    end
+    if type(db.maxEntries) ~= "number" or db.maxEntries < 50 then
+        db.maxEntries = DEBUG_LOG_DEFAULTS.maxEntries
+    end
+    if type(db.chatEcho) ~= "boolean" then
+        db.chatEcho = DEBUG_LOG_DEFAULTS.chatEcho
+    end
+    if type(db.scopes) ~= "table" then
+        db.scopes = cloneShallow(DEBUG_LOG_DEFAULTS.scopes)
+    else
+        for scopeName in pairs(DEBUG_LOG_SCOPE_NAMES) do
+            if type(db.scopes[scopeName]) ~= "boolean" then
+                db.scopes[scopeName] = DEBUG_LOG_DEFAULTS.scopes[scopeName]
+            end
+        end
+    end
+    if type(db.entries) ~= "table" then
+        db.entries = {}
+    end
+    if type(db.nextSequence) ~= "number" then
+        db.nextSequence = 0
+    end
+    return db
+end
+
+function Addon:GetDebugLogDB()
+    return initDebugLogDB()
+end
+
+function Addon:IsDebugLogEnabled(scope)
+    local db = self:GetDebugLogDB()
+    if db.enabled ~= true then
+        return false
+    end
+    local normalizedScope = tostring(scope or ""):lower()
+    if normalizedScope == "" then
+        return true
+    end
+    return db.scopes[normalizedScope] == true
+end
+
+function Addon:WriteDebugLog(scope, message, fields)
+    local normalizedScope = tostring(scope or "general"):lower()
+    if not self:IsDebugLogEnabled(normalizedScope) then
+        return false
+    end
+
+    local db = self:GetDebugLogDB()
+    db.nextSequence = (db.nextSequence or 0) + 1
+
+    local entry = {
+        seq = db.nextSequence,
+        at = time(),
+        scope = normalizedScope,
+        message = tostring(message or ""),
+    }
+    if type(fields) == "table" then
+        for key, value in pairs(fields) do
+            entry[key] = value
+        end
+    end
+    if self.Data and self.Data.GetPlayerKey then
+        entry.localPlayer = self.Data:GetPlayerKey()
+    end
+
+    local entries = db.entries
+    entries[#entries + 1] = entry
+    local overflow = #entries - max(50, db.maxEntries or DEBUG_LOG_DEFAULTS.maxEntries)
+    if overflow > 0 then
+        for _ = 1, overflow do
+            remove(entries, 1)
+        end
+    end
+
+    if db.chatEcho == true and self.debugMode then
+        self:Print(string.format("|cff88ccff[trace:%s]|r %s", normalizedScope, entry.message))
+    end
+    return true
+end
+
+function Addon:Trace(scope, ...)
+    local parts = {}
+    for i = 1, select("#", ...) do
+        parts[#parts + 1] = tostring(select(i, ...))
+    end
+    return self:WriteDebugLog(scope, table.concat(parts, " "))
+end
+
+function Addon:GetDebugLogEntries(limit, scope)
+    local db = self:GetDebugLogDB()
+    local entries = db.entries or {}
+    local normalizedScope = tostring(scope or ""):lower()
+    local out = {}
+    for index = #entries, 1, -1 do
+        local entry = entries[index]
+        if normalizedScope == "" or tostring(entry.scope or "") == normalizedScope then
+            out[#out + 1] = entry
+            if limit and #out >= limit then
+                break
+            end
+        end
+    end
+    return out
+end
+
+function Addon:ClearDebugLog()
+    local db = self:GetDebugLogDB()
+    db.entries = {}
+    db.nextSequence = 0
+end
+
 local function safecall(fn, ...)
     if type(fn) == "function" then
         local ok, err = pcall(fn, ...)
@@ -89,12 +243,23 @@ local function splitCommand(text)
     return cmd or "", rest or ""
 end
 
+local function normalizeDebugLogScope(scope)
+    local normalized = trimInput(scope):lower()
+    if normalized == "" then
+        return nil
+    end
+    if DEBUG_LOG_SCOPE_NAMES[normalized] then
+        return normalized
+    end
+    return nil
+end
+
 local MOCK_SCENARIOS = "light, medium, heavy, burst, bootstrap, traffic, offline, offlinewipe, trafficburst, roster, rosterheavy, rosterbad, integrity"
 
 local function printMainHelp(self)
     self:Print("Commands:")
     self:Print("/rr - open or close the main window.")
-    self:Print("/rr options, /rr mini, /rr debug")
+    self:Print("/rr options, /rr mini, /rr debug, /rr debug log")
     self:Print("/rr rescan - queue a profession scan and scan active profession API data.")
     self:Print("/rr version, /rr versions, /rr dump, /rr self [profession], /rr sync, /rr offline, /rr manifest [target or verbose], /rr pull")
     self:Print("/rr perf [toggle, dump, reset, help]")
@@ -108,6 +273,13 @@ local function printPerfHelp(self)
     self:Print("/rr perf toggle - mostra o nasconde il pannello performance/debug.")
     self:Print("/rr perf dump - stampa scheduler, code, sync e diagnostica scan.")
     self:Print("/rr perf reset - azzera performance, sync e contatori scan.")
+end
+
+local function printDebugLogHelp(self)
+    self:Print("/rr debug - abilita o disabilita il debug in chat.")
+    self:Print("/rr debug log on|off|status|show [count] [scope]|clear")
+    self:Print("/rr debug log scope <manifest|request|transfer|offline|version> <on|off>")
+    self:Print("/rr debug log echo on|off - duplica il trace persistente anche in chat debug.")
 end
 
 local function printMockHelp(self)
@@ -130,6 +302,7 @@ end
 function Addon:OnInitialize()
     self:RegisterChatCommand("rr", "SlashHandler")
     self:RegisterChatCommand("reciperegistry", "SlashHandler")
+    initDebugLogDB()
     self.bucketTelemetry = {
         rosterEventsAbsorbed = 0,
         rosterBuckets = 0,
@@ -491,8 +664,112 @@ function Addon:SlashHandler(input)
     end
 
     if cmd == "debug" then
-        self.debugMode = not self.debugMode
-        self:Print("Debug " .. (self.debugMode and "enabled" or "disabled"))
+        local debugCmd, debugRest = splitCommand(rest)
+        debugCmd = debugCmd:lower()
+        if debugCmd == "" or debugCmd == "toggle" then
+            self.debugMode = not self.debugMode
+            self:Print("Debug " .. (self.debugMode and "enabled" or "disabled"))
+            return
+        end
+        if debugCmd == "help" then
+            printDebugLogHelp(self)
+            return
+        end
+        if debugCmd == "log" then
+            local logCmd, logRest = splitCommand(debugRest)
+            logCmd = logCmd:lower()
+            local db = self:GetDebugLogDB()
+            if logCmd == "" or logCmd == "status" then
+                local enabledScopes = {}
+                for scopeName in pairs(DEBUG_LOG_SCOPE_NAMES) do
+                    if db.scopes[scopeName] == true then
+                        enabledScopes[#enabledScopes + 1] = scopeName
+                    end
+                end
+                table.sort(enabledScopes)
+                self:Print(string.format(
+                    "Debug log %s entries=%d max=%d echo=%s scopes=%s",
+                    db.enabled and "enabled" or "disabled",
+                    #(db.entries or {}),
+                    db.maxEntries or DEBUG_LOG_DEFAULTS.maxEntries,
+                    db.chatEcho and "on" or "off",
+                    #enabledScopes > 0 and table.concat(enabledScopes, ",") or "none"
+                ))
+                return
+            end
+            if logCmd == "on" then
+                db.enabled = true
+                self:Print("Debug log enabled.")
+                return
+            end
+            if logCmd == "off" then
+                db.enabled = false
+                self:Print("Debug log disabled.")
+                return
+            end
+            if logCmd == "clear" or logCmd == "reset" then
+                self:ClearDebugLog()
+                self:Print("Debug log cleared.")
+                return
+            end
+            if logCmd == "echo" then
+                local echoMode = trimInput(logRest):lower()
+                if echoMode == "on" or echoMode == "off" then
+                    db.chatEcho = echoMode == "on"
+                    self:Print("Debug log echo " .. (db.chatEcho and "enabled" or "disabled") .. ".")
+                else
+                    self:Print("Usage: /rr debug log echo on|off")
+                end
+                return
+            end
+            if logCmd == "scope" then
+                local scopeToken, scopeRest = splitCommand(logRest)
+                local scopeName = normalizeDebugLogScope(scopeToken)
+                local scopeMode = trimInput(scopeRest):lower()
+                if not scopeName then
+                    self:Print("Usage: /rr debug log scope <manifest|request|transfer|offline|version> <on|off>")
+                    return
+                end
+                if scopeMode ~= "on" and scopeMode ~= "off" then
+                    self:Print("Usage: /rr debug log scope <manifest|request|transfer|offline|version> <on|off>")
+                    return
+                end
+                db.scopes[scopeName] = scopeMode == "on"
+                self:Print(string.format("Debug log scope %s %s.", scopeName, db.scopes[scopeName] and "enabled" or "disabled"))
+                return
+            end
+            if logCmd == "show" then
+                local firstToken, secondToken = splitCommand(logRest)
+                local limit = 20
+                local scopeName = nil
+                if tonumber(firstToken) then
+                    limit = min(200, max(1, tonumber(firstToken) or 20))
+                    scopeName = normalizeDebugLogScope(secondToken)
+                else
+                    scopeName = normalizeDebugLogScope(firstToken)
+                end
+                local entries = self:GetDebugLogEntries(limit, scopeName)
+                if #entries == 0 then
+                    self:Print("Debug log entries: none")
+                    return
+                end
+                self:Print(string.format("Debug log entries: %d%s", #entries, scopeName and (" scope=" .. scopeName) or ""))
+                for index = #entries, 1, -1 do
+                    local entry = entries[index]
+                    self:Print(string.format(
+                        "#%d t=%d scope=%s %s",
+                        entry.seq or 0,
+                        entry.at or 0,
+                        tostring(entry.scope or "?"),
+                        tostring(entry.message or "")
+                    ))
+                end
+                return
+            end
+            printDebugLogHelp(self)
+            return
+        end
+        printDebugLogHelp(self)
         return
     end
 

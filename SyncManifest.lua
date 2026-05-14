@@ -564,6 +564,14 @@ function Sync:ProcessPeerManifestComparison(senderKey, manifest)
     local blockCount = countManifestBlocks(manifest)
     local missingHere = comparison and #(comparison.missingHere or {}) or 0
     if compareStatus == "building" or compareStatus == "deferred" then
+        Addon:Trace("manifest", string.format(
+            "compare-deferred peer=%s manifestId=%s blockCount=%d missingHere=%d status=%s",
+            tostring(senderKey),
+            tostring(manifestId),
+            blockCount,
+            missingHere,
+            tostring(compareStatus or "unknown")
+        ))
         Addon:Debug(string.format(
             "Manifest compare peer=%s manifestId=%s blockCount=%d missingHere=%d queuedRequests=%d status=%s",
             tostring(senderKey),
@@ -616,6 +624,15 @@ function Sync:ProcessPeerManifestComparison(senderKey, manifest)
     end
     Addon:Debug(string.format(
         "Manifest compare peer=%s manifestId=%s blockCount=%d missingHere=%d queuedRequests=%d status=%s",
+        tostring(senderKey),
+        tostring(manifestId),
+        blockCount,
+        missingHere,
+        queuedRequests,
+        tostring(compareStatus or "ready")
+    ))
+    Addon:Trace("manifest", string.format(
+        "compare peer=%s manifestId=%s blockCount=%d missingHere=%d queuedRequests=%d status=%s",
         tostring(senderKey),
         tostring(manifestId),
         blockCount,

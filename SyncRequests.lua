@@ -296,6 +296,15 @@ function Sync:QueueRequest(sourceKey, memberKey, targetRev, why, opts)
     if self.EnforceRuntimeQueueCaps then
         self:EnforceRuntimeQueueCaps("queue-request")
     end
+    Addon:Trace("request", string.format(
+        "queued member=%s source=%s rev=%d why=%s blocks=%d purpose=%s",
+        tostring(memberKey),
+        tostring(sourceKey),
+        targetRev or 0,
+        tostring(why or ""),
+        #(opts.requestedBlocks or {}),
+        tostring(requestPurpose or "request")
+    ))
     Addon:Debug("Queued direct request", memberKey, "from", sourceKey, "rev", targetRev or 0, why or "")
     Addon:RequestRefresh("queue")
 end
@@ -408,6 +417,16 @@ function Sync:DispatchPendingRequest(memberKey, request)
         acceptSnapCodec = acceptSnapCodec,
         requestId = active.requestId,
     }, request.source, "ALERT")
+    Addon:Trace("request", string.format(
+        "dispatch member=%s source=%s reqId=%s rev=%d knownRev=%d blocks=%d sent=%s",
+        tostring(request.memberKey),
+        tostring(request.source),
+        tostring(active.requestId or "none"),
+        request.rev or 0,
+        knownRev or 0,
+        #(request.requestedBlocks or {}),
+        tostring(sent == true)
+    ))
     if not sent then
         self:FailInFlight(request.memberKey, true, "target-unavailable")
         return false
