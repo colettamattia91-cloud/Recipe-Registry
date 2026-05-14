@@ -614,6 +614,7 @@ function Sync:ClearPeerBackoff(sourceKey)
     if self.peerHealth and self.peerHealth[sourceKey] then
         self.peerHealth[sourceKey].backoffUntil = 0
         self.peerHealth[sourceKey].snapshotBackoffUntil = 0
+        self.peerHealth[sourceKey].snapshotQuarantineUntil = 0
     end
 end
 
@@ -834,11 +835,12 @@ function Sync:CanExchangeDataWithPeer(peerKey, purpose, request)
         return false, "offline"
     end
     local allowManual = Private.isManualReason(request.why)
-    if self:IsPeerBackoffActive(peerKey) and not allowManual then
+    local ignorePeerHealth = request.ignorePeerHealth == true
+    if self:IsPeerBackoffActive(peerKey) and not allowManual and not ignorePeerHealth then
         return false, "backoff"
     end
     local health = self.peerHealth and self.peerHealth[peerKey] or nil
-    if health and (health.snapshotQuarantineUntil or 0) > time() and not allowManual then
+    if health and (health.snapshotQuarantineUntil or 0) > time() and not allowManual and not ignorePeerHealth then
         return false, "quarantine"
     end
     local recentReject = self:GetRecentPeerReject(peerKey, request)
@@ -1268,17 +1270,37 @@ end
 
 function Sync:ShouldRequestManifestRefresh(peerKey, opts)
     opts = opts or {}
-    if not self:IsValidSyncMemberKey(peerKey) then return false end
-    if opts.force == true or opts.ignoreCooldown == true then return true end
+    if not self:IsValidSyncMemberKey(peerKey) then return false, "invalid-peer" end
+    if opts.force == true or opts.ignoreCooldown == true then return true, "forced" end
+
+    local manifests = self.partialManifestReceive and self.partialManifestReceive[peerKey] or nil
+    if type(manifests) == "table" then
+        for _, state in pairs(manifests) do
+            if type(state) == "table" then
+                local stamp = tonumber(state.lastProgressAt or state.lastReceivedAt or state.firstReceivedAt or 0) or 0
+                if stamp <= 0 or (time() - stamp) <= (SESSION_TIMEOUT * 2) then
+                    if (state.recoveryRequestedAt or 0) > 0 then
+                        return false, "partial-recovery"
+                    end
+                    return false, "partial-active"
+                end
+            else
+                return false, "partial-active"
+            end
+        end
+    end
 
     local now = time()
     local lastRequestAt = self._helloManifestRefreshRequested and self._helloManifestRefreshRequested[peerKey] or 0
     if lastRequestAt > 0 and (now - lastRequestAt) < MANIFEST_REFRESH_REQUEST_COOLDOWN then
-        return false
+        return false, "cooldown"
     end
 
     local lastManifestAt = self._lastManifestReceivedAt and self._lastManifestReceivedAt[peerKey] or 0
-    return lastManifestAt == 0 or (now - lastManifestAt) > NODE_TIMEOUT
+    if lastManifestAt > 0 and (now - lastManifestAt) <= NODE_TIMEOUT then
+        return false, "recent-manifest"
+    end
+    return true, "needed"
 end
 
 function Sync:RecordManifestRefreshRequest(peerKey)

@@ -98,6 +98,12 @@ Addon.CAPABILITIES = cloneTable(Addon.CAPABILITIES or {
     manifestShards = false,
 })
 
+-- Keep the first REQ open while we debug live guild sync. Progress/session
+-- watchdogs still guard stalled transfers; only the pre-session timeout is off.
+if Addon.INITIAL_REQ_TIMEOUTS_ENABLED == nil then
+    Addon.INITIAL_REQ_TIMEOUTS_ENABLED = false
+end
+
 function BuildInfo.GetLocalVersionInfo()
     return {
         addonVersion = Addon.ADDON_VERSION,

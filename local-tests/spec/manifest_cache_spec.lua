@@ -398,6 +398,67 @@ Test.it("retries targeted manifest refreshes on later hello sessions until a man
     Test.eq(countCommKind(wow, "MREQ"), 2, "the first hello of a new session should stay quiet until a later refresh is actually needed")
 end)
 
+Test.it("suppresses hello-driven manifest refreshes while a partial receive is already active", function()
+    local addon, wow, data = freshAddon()
+    local peerKey = "Peerone-Testrealm"
+    local blockKey = data:BuildSyncBlockKey(peerKey, "Alchemy")
+
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
+        kind = "HELLO",
+        key = peerKey,
+        rev = 5,
+        updatedAt = 500,
+        sender = peerKey,
+        version = "1.6.0",
+    }), {
+        sender = peerKey,
+        distribution = "GUILD",
+    })
+
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
+        kind = "MANI",
+        manifestId = "peer-manifest-partial",
+        builtAt = 510,
+        memberKey = peerKey,
+        sender = peerKey,
+        totals = { blocks = 2, recipes = 2 },
+        seq = 1,
+        total = 2,
+        blocks = {
+            {
+                blockKey = blockKey,
+                ownerCharacter = peerKey,
+                professionKey = "Alchemy",
+                revision = 5,
+                lastUpdatedAt = 500,
+                sourceType = "owner",
+                guildStatus = "active",
+                lastSeenInGuildAt = 500,
+                count = 1,
+                fingerprint = "peer-fingerprint",
+            },
+        },
+    }), {
+        sender = peerKey,
+        distribution = "WHISPER",
+    })
+
+    wow.AdvanceTime(31)
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
+        kind = "HELLO",
+        key = peerKey,
+        rev = 5,
+        updatedAt = 501,
+        sender = peerKey,
+        version = "1.6.0",
+    }), {
+        sender = peerKey,
+        distribution = "GUILD",
+    })
+
+    Test.eq(countCommKind(wow, "MREQ"), 0, "later hello should not request another manifest while a partial batch is still active")
+end)
+
 Test.it("wiping the database clears sync session state and requests a fresh guild resync", function()
     local addon, wow, data = freshAddon()
     local peerKey = "Peerone-Testrealm"

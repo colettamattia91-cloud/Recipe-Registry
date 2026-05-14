@@ -77,6 +77,12 @@ function Loader.Load(opts)
         error("RecipeRegistry addon was not created", 2)
     end
 
+    if opts.initialReqTimeoutsEnabled == nil then
+        addon.INITIAL_REQ_TIMEOUTS_ENABLED = true
+    else
+        addon.INITIAL_REQ_TIMEOUTS_ENABLED = opts.initialReqTimeoutsEnabled ~= false
+    end
+
     if opts.savedVariables then
         _G.RecipeRegistryDB = opts.savedVariables.db or opts.savedVariables.global or {}
         _G.RecipeRegistryCharDB = opts.savedVariables.charDB or opts.savedVariables.char or {}

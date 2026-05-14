@@ -25,6 +25,10 @@ local MAX_REQUEST_RETRIES = Constants.MAX_REQUEST_RETRIES
 local MAX_HELLO_AUTO_RETRIES = Constants.MAX_HELLO_AUTO_RETRIES
 local MAX_CONCURRENT_REQUESTS = Constants.MAX_CONCURRENT_REQUESTS
 
+local function initialReqTimeoutsEnabled()
+    return Addon.INITIAL_REQ_TIMEOUTS_ENABLED ~= false
+end
+
 local function isAutomaticRequestReason(why)
     local text = tostring(why or "")
     return not isManualReason(text)
@@ -482,7 +486,7 @@ function Sync:ProcessRequestQueue()
                 self:FailInFlight(memberKey, true, "session-timeout")
                 skipPendingMembers[memberKey] = true
             elseif not request.sessionId then
-                if (now - (request.startedAt or now)) > REQUEST_TIMEOUT then
+                if initialReqTimeoutsEnabled() and (now - (request.startedAt or now)) > REQUEST_TIMEOUT then
                     Addon:Debug("Initial request timeout", request.memberKey)
                     Addon:Trace("request", string.format(
                         "inflight-timeout member=%s source=%s reason=initial reqId=%s age=%d",
@@ -494,6 +498,14 @@ function Sync:ProcessRequestQueue()
                     self.telemetry.requestTimeoutInitial = (self.telemetry.requestTimeoutInitial or 0) + 1
                     self:FailInFlight(memberKey, true, "initial-timeout")
                     skipPendingMembers[memberKey] = true
+                elseif not initialReqTimeoutsEnabled() then
+                    Addon:Trace("request", string.format(
+                        "inflight-wait member=%s source=%s reason=initial-timeout-disabled reqId=%s age=%d",
+                        tostring(request.memberKey),
+                        tostring(request.source),
+                        tostring(request.requestId or "none"),
+                        max(0, now - (request.startedAt or now))
+                    ))
                 end
             elseif (now - (request.lastProgressAt or now)) > PROGRESS_TIMEOUT then
                 if (request.resumeAttempts or 0) < MAX_RESUME_ATTEMPTS then

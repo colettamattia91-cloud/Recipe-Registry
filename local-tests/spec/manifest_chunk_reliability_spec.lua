@@ -241,6 +241,49 @@ Test.it("uses receiver-side manifest progress timestamps for soft timeout recove
     Test.eq(diag and diag.pruneReason, "timeout", "hard prune reason should be recorded")
 end)
 
+Test.it("lets missing-seq manifest recovery bypass peer backoff and quarantine", function()
+    local addon, wow, _data = freshAddon()
+    local peerKey = "Peerone-Testrealm"
+    local manifestId = "Peerone-Testrealm:101:1:3"
+
+    addon.Sync.onlineNodes[peerKey] = { lastSeen = time(), version = addon.ADDON_VERSION }
+    addon.Sync.peerBackoffUntil[peerKey] = time() + 120
+    addon.Sync.peerHealth[peerKey] = addon.Sync.peerHealth[peerKey] or {}
+    addon.Sync.peerHealth[peerKey].snapshotQuarantineUntil = time() + 120
+
+    addon.Sync:HandleManifestChunk({
+        sender = peerKey,
+        manifestId = manifestId,
+        seq = 1,
+        total = 3,
+        builtAt = time() - 120,
+        memberKey = peerKey,
+        totals = { blocks = 3, recipes = 3 },
+        blocks = {
+            {
+                blockKey = "Peerone-Testrealm::Alchemy",
+                ownerCharacter = peerKey,
+                professionKey = "Alchemy",
+                revision = 11,
+                lastUpdatedAt = 101,
+                sourceType = "owner",
+                guildStatus = "active",
+                count = 1,
+                fingerprint = "fp-1",
+            },
+        },
+    })
+
+    wow.AdvanceTime(61)
+    addon.Sync:PrunePartialManifestReceives()
+
+    local mreqs = sentPayloadsByKind(wow, "MREQ")
+    Test.eq(#mreqs, 1, "soft timeout should still send a missing-seq recovery request while peer health is degraded")
+    Test.eq(mreqs[1] and mreqs[1].reason, "manifest-missing-seqs", "recovery request should keep the targeted missing-seqs reason")
+    Test.eq(addon.Sync.peerBackoffUntil[peerKey], nil, "targeted recovery should clear peer backoff so the reply path can resume")
+    Test.eq(addon.Sync.peerHealth[peerKey] and addon.Sync.peerHealth[peerKey].snapshotQuarantineUntil or 0, 0, "targeted recovery should clear snapshot quarantine")
+end)
+
 Test.it("requeues failed MANI sends and only counts successful chunk sends", function()
     local addon, wow, data = freshAddon()
     local peerKey = "Peerone-Testrealm"

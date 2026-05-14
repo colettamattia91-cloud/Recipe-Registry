@@ -205,7 +205,9 @@ function Sync:HandleHello(payload)
             Addon:Debug("Warmup deferring manifest refresh request", tostring(payload.key))
             self:QueueWarmupManifestRefresh(payload.key)
         else
-            self:RequestManifestRefresh(payload.key)
+            self:RequestManifestRefresh(payload.key, {
+                reason = "hello-auto",
+            })
         end
     end
 

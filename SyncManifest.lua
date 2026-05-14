@@ -386,6 +386,7 @@ function Sync:SendManifestToPeer(peerKey, why, opts)
         memberKey = peerKey,
         why = why or "manifest",
         allowOfflinePeer = why == "force",
+        ignorePeerHealth = opts.ignorePeerHealth == true,
     })
     if not eligible then
         if reason ~= "offline" then
@@ -708,11 +709,14 @@ function Sync:RequestManifestRefresh(peerKey, opts)
     opts = opts or {}
     if peerKey and peerKey ~= "" then
         if self:IsMockKey(peerKey) then return end
+        local ignorePeerHealth = opts.ignorePeerHealth == true
+            or opts.reason == "manifest-missing-seqs"
         local eligible, reason = self:CanExchangeDataWithPeer(peerKey, manifestPurposeFor(opts.reason), {
             source = peerKey,
             memberKey = peerKey,
             why = opts.reason or "manual",
             allowOfflinePeer = opts.force == true,
+            ignorePeerHealth = ignorePeerHealth,
         })
         if not eligible then
             if reason ~= "offline" then
@@ -742,15 +746,17 @@ function Sync:RequestManifestRefresh(peerKey, opts)
             ))
             return
         end
-        if not self:ShouldRequestManifestRefresh(peerKey, opts) then
+        local shouldRequest, skipReason = self:ShouldRequestManifestRefresh(peerKey, opts)
+        if not shouldRequest then
             Addon:Trace("manifest", string.format(
                 "refresh-skip peer=%s reason=cooldown why=%s",
                 tostring(peerKey),
+                tostring(skipReason or "cooldown"),
                 tostring(opts.reason or "manual")
             ))
             return
         end
-        if opts.clearBackoff then
+        if opts.clearBackoff or ignorePeerHealth then
             self:ClearPeerBackoff(peerKey)
         end
         self:RecordManifestRefreshRequest(peerKey)
@@ -826,11 +832,15 @@ end
 function Sync:HandleManifestRequest(payload)
     if not self:IsValidSyncMemberKey(payload.sender) or payload.sender == self:GetSelfKey() then return end
     if self:IsMockKey(payload.sender) then return end
+    local recoveryReason = tostring(payload.reason or payload.why or "")
+    local ignorePeerHealth = recoveryReason == "manifest-missing-seqs"
+        or recoveryReason == "manifest-missing-seqs-resend"
     local eligible = self:CanExchangeDataWithPeer(payload.sender, manifestPurposeFor(payload.why), {
         source = payload.sender,
         memberKey = payload.sender,
         why = payload.why or "force",
         allowOfflinePeer = payload.why == "force",
+        ignorePeerHealth = ignorePeerHealth,
     })
     if not eligible then
         Addon:Trace("manifest", string.format(
@@ -841,7 +851,6 @@ function Sync:HandleManifestRequest(payload)
         return
     end
     self.telemetry.manifestForceReplies = (self.telemetry.manifestForceReplies or 0) + 1
-    local recoveryReason = tostring(payload.reason or payload.why or "")
     local missingSeqs = cloneNumberArray(payload.missingSeqs)
     if payload.manifestId and recoveryReason == "manifest-missing-seqs" and #missingSeqs > 0 then
         if self:ResendManifestMissingSeqs(payload.sender, payload.manifestId, payload.manifestAttempt, missingSeqs) then
@@ -855,6 +864,7 @@ function Sync:HandleManifestRequest(payload)
         ))
         self:SendManifestToPeer(payload.sender, "force", {
             forceNewAttempt = true,
+            ignorePeerHealth = true,
         })
         return
     end
@@ -1425,11 +1435,13 @@ function Sync:SendNextManifestChunk()
     local candidateIndex
     for index = 1, #self.manifestChunkQueue do
         local queued = self.manifestChunkQueue[index]
+        local ignorePeerHealth = queued and queued.payload and queued.payload.why == "manifest-missing-seqs-resend"
         local eligible = self:CanExchangeDataWithPeer(queued.peer, manifestPurposeFor(queued.payload and queued.payload.why), {
             source = queued.peer,
             memberKey = queued.peer,
             why = queued.payload and queued.payload.why or "manifest",
             allowOfflinePeer = queued.payload and queued.payload.why == "force",
+            ignorePeerHealth = ignorePeerHealth,
         })
         if not eligible then
             local batch = getOrCreateManifestBatchDiagnostic(self, "send", queued.peer, queued.payload and queued.payload.manifestId or nil)
