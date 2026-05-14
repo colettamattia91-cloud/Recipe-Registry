@@ -777,6 +777,8 @@ function CommBus:BuildTransportRow(rawRow, payload, target)
         sessionId = payload and payload.sessionId or nil,
         seq = payload and payload.seq or nil,
         total = payload and payload.total or nil,
+        memberKey = payload and payload.key or nil,
+        manifestId = payload and payload.manifestId or nil,
         createdAtTick = self.stats.ticks,
         target = target and target.key or rawRow.target,
     }
@@ -788,20 +790,18 @@ function CommBus:BuildTransportRow(rawRow, payload, target)
         target = rawRow.target,
         priority = rawRow.priority,
         sender = rawRow.sender,
-        payload = deepcopy(payload),
         metrics = metrics,
     }
 end
 
 function CommBus:BuildEventData(item, extra)
     local metrics = item and item.row and item.row.metrics or {}
-    local payload = item and item.row and item.row.payload or nil
     local data = {
         sender = item and item.sender and item.sender.key or nil,
         target = item and item.target and item.target.key or nil,
-        kind = payloadKind(payload),
-        memberKey = payload and payload.key or nil,
-        manifestId = payload and payload.manifestId or nil,
+        kind = metrics.kind or "?",
+        memberKey = metrics.memberKey,
+        manifestId = metrics.manifestId,
         requestId = metrics.requestId,
         sessionId = metrics.sessionId,
         seq = metrics.seq,
@@ -863,7 +863,7 @@ function CommBus:EnqueueTransport(senderNode, target, rawRow, payload, extraDela
 end
 
 function CommBus:DeliverToTarget(senderNode, target, row)
-    local payload = row and row.payload or decodePayload(row and row.message)
+    local payload = decodePayload(row and row.message)
     local kind = payloadKind(payload)
 
     if not (senderNode and senderNode.online and target and target.online) then
@@ -886,7 +886,7 @@ function CommBus:DeliverToTarget(senderNode, target, row)
 end
 
 function CommBus:QueueDelayedDelivery(senderNode, target, row, delayTicks)
-    local payload = row and (row.payload or decodePayload(row.message)) or nil
+    local payload = row and decodePayload(row.message) or nil
     return self:EnqueueTransport(senderNode, target, row, payload, math.max(1, delayTicks or 1))
 end
 
