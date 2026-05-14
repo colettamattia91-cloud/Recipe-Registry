@@ -461,16 +461,36 @@ function Sync:ProcessRequestQueue()
                 self:ScheduleQueuePump()
             elseif not self:IsRequestStillViable(request) then
                 Addon:Debug("Dropping in-flight request; source unavailable", request.memberKey)
+                Addon:Trace("request", string.format(
+                    "inflight-fail member=%s source=%s reason=source-unavailable reqId=%s",
+                    tostring(request.memberKey),
+                    tostring(request.source),
+                    tostring(request.requestId or "none")
+                ))
                 self:FailInFlight(memberKey, true, "source-unavailable")
                 skipPendingMembers[memberKey] = true
             elseif (now - (request.startedAt or now)) > SESSION_TIMEOUT then
                 Addon:Debug("Request session timeout", request.memberKey)
+                Addon:Trace("request", string.format(
+                    "inflight-timeout member=%s source=%s reason=session reqId=%s age=%d",
+                    tostring(request.memberKey),
+                    tostring(request.source),
+                    tostring(request.requestId or "none"),
+                    max(0, now - (request.startedAt or now))
+                ))
                 self.telemetry.requestTimeoutSession = (self.telemetry.requestTimeoutSession or 0) + 1
                 self:FailInFlight(memberKey, true, "session-timeout")
                 skipPendingMembers[memberKey] = true
             elseif not request.sessionId then
                 if (now - (request.startedAt or now)) > REQUEST_TIMEOUT then
                     Addon:Debug("Initial request timeout", request.memberKey)
+                    Addon:Trace("request", string.format(
+                        "inflight-timeout member=%s source=%s reason=initial reqId=%s age=%d",
+                        tostring(request.memberKey),
+                        tostring(request.source),
+                        tostring(request.requestId or "none"),
+                        max(0, now - (request.startedAt or now))
+                    ))
                     self.telemetry.requestTimeoutInitial = (self.telemetry.requestTimeoutInitial or 0) + 1
                     self:FailInFlight(memberKey, true, "initial-timeout")
                     skipPendingMembers[memberKey] = true
@@ -480,9 +500,22 @@ function Sync:ProcessRequestQueue()
                     request.resumeAttempts = (request.resumeAttempts or 0) + 1
                     request.lastProgressAt = now
                     self.telemetry.requestTimeoutProgress = (self.telemetry.requestTimeoutProgress or 0) + 1
+                    Addon:Trace("request", string.format(
+                        "inflight-resume member=%s source=%s reqId=%s attempt=%d",
+                        tostring(request.memberKey),
+                        tostring(request.source),
+                        tostring(request.requestId or "none"),
+                        request.resumeAttempts or 0
+                    ))
                     self:SendResumeForInFlight(memberKey)
                 else
                     Addon:Debug("Resume exhausted", request.memberKey)
+                    Addon:Trace("request", string.format(
+                        "inflight-fail member=%s source=%s reason=resume-exhausted reqId=%s",
+                        tostring(request.memberKey),
+                        tostring(request.source),
+                        tostring(request.requestId or "none")
+                    ))
                     self:FailInFlight(memberKey, true, "resume-exhausted")
                 end
             end
@@ -536,6 +569,17 @@ function Sync:FailInFlight(memberKey, requeue, reason)
     if req and requeue and self:IsRequestShapeValid(req) and not self:IsRequestAlreadySatisfied(req) then
         local attempts = req.attempts or 1
         local maxAttempts = self:GetRequestMaxAttempts(req)
+        Addon:Trace("request", string.format(
+            "fail member=%s source=%s reqId=%s reason=%s requeue=%s attempts=%d/%d blocks=%d",
+            tostring(req.memberKey),
+            tostring(req.source),
+            tostring(req.requestId or "none"),
+            tostring(reason or "retry"),
+            tostring(requeue == true),
+            attempts,
+            maxAttempts,
+            #(req.requestedBlocks or {})
+        ))
         self:MarkPeerFailure(req.source, reason or "retry", req)
         if attempts >= maxAttempts then
             self.telemetry.requestDrops = (self.telemetry.requestDrops or 0) + 1
@@ -566,6 +610,14 @@ function Sync:FailInFlight(memberKey, requeue, reason)
                 self:EnforceRuntimeQueueCaps("retry-request")
             end
             self.telemetry.requestRetries = (self.telemetry.requestRetries or 0) + 1
+            Addon:Trace("request", string.format(
+                "requeued member=%s source=%s reason=%s attempts=%d/%d",
+                tostring(req.memberKey),
+                tostring(req.source),
+                tostring(reason or "retry"),
+                attempts,
+                maxAttempts
+            ))
         end
         if self:IsValidSyncMemberKey(req.source) and not self:IsMockKey(req.source) and not self:IsInWarmup() then
             self:RequestManifestRefresh(req.source, {

@@ -1700,6 +1700,15 @@ function Sync:PrunePartialManifestReceives()
                             total,
                             table.concat(missingSeqs, ",")
                         ))
+                        Addon:Trace("manifest", string.format(
+                            "soft-timeout peer=%s manifestId=%s received=%d/%d attempt=%s missing=%s",
+                            tostring(peerKey),
+                            tostring(manifestId or "unknown"),
+                            seenCount,
+                            total,
+                            tostring(state.manifestAttempt or 1),
+                            table.concat(missingSeqs, ",")
+                        ))
                         self:RequestManifestRefresh(peerKey, {
                             ignoreCooldown = true,
                             reason = "manifest-missing-seqs",
@@ -1723,6 +1732,15 @@ function Sync:PrunePartialManifestReceives()
                             seenCount,
                             total,
                             reason
+                        ))
+                        Addon:Trace("manifest", string.format(
+                            "hard-prune peer=%s manifestId=%s received=%d/%d attempt=%s reason=%s",
+                            tostring(peerKey),
+                            tostring(manifestId or "unknown"),
+                            seenCount,
+                            total,
+                            tostring(type(state) == "table" and state.manifestAttempt or "none"),
+                            tostring(reason)
                         ))
                         manifests[manifestId] = nil
                         if reason == "timeout" and self.MarkManifestReceiveAbandoned then

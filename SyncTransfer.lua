@@ -431,6 +431,13 @@ function Sync:SendResumeForInFlight(memberKey)
     local missing = self:GetMissingSeqs(partial)
     if #missing == 0 then return end
 
+    Addon:Trace("request", string.format(
+        "resume-request member=%s source=%s session=%s missing=%s",
+        tostring(partial.memberKey),
+        tostring(request.source),
+        tostring(partial.sessionId or "none"),
+        table.concat(missing, ",")
+    ))
     self:SendDirectEnvelope("RESUME", {
         sessionId = partial.sessionId,
         key = partial.memberKey,
@@ -449,6 +456,13 @@ function Sync:HandleResumeRequest(payload)
 
     local missing = shallowCopyArray(payload.missing or {})
     if #missing == 0 then return end
+    Addon:Trace("transfer", string.format(
+        "resume-serve target=%s member=%s session=%s missing=%s",
+        tostring(payload.sender),
+        tostring(payload.key),
+        tostring(payload.sessionId or "none"),
+        table.concat(missing, ",")
+    ))
     self:SendOutgoingSession(payload.sessionId, missing)
 end
 
@@ -537,9 +551,26 @@ function Sync:SendNextSnapshotChunk()
     end
     local sent = self:SendDirectEnvelope("SNAP", wireBlock, queued.peer, "BULK")
     if not sent then
+        Addon:Trace("transfer", string.format(
+            "snap-send-fail target=%s member=%s session=%s seq=%d/%d",
+            tostring(queued.peer),
+            tostring(block.key),
+            tostring(block.sessionId or "none"),
+            block.seq or 0,
+            block.total or 0
+        ))
         self:MarkPeerFailure(queued.peer, "target-unavailable")
         return false
     end
+    Addon:Trace(block.key ~= queued.peer and block.key ~= Addon.Data:GetPlayerKey() and "offline" or "transfer", string.format(
+        "snap-send target=%s member=%s session=%s seq=%d/%d codec=%s",
+        tostring(queued.peer),
+        tostring(block.key),
+        tostring(block.sessionId or "none"),
+        block.seq or 0,
+        block.total or 0,
+        tostring(wireBlock and wireBlock.codec or "legacy")
+    ))
     self.peerPacing[queued.peer] = self.peerPacing[queued.peer] or {}
     self.peerPacing[queued.peer].lastSentAt = nowForPacing()
     self.telemetry.sentChunks = self.telemetry.sentChunks + 1
@@ -572,6 +603,13 @@ function Sync:DecodeChunkStep(payload)
     if payload.codec and self.DecodeSnapshotBlockFromWire then
         local decoded, ok, reason = self:DecodeSnapshotBlockFromWire(payload)
         if not ok then
+            Addon:Trace("transfer", string.format(
+                "decode-drop member=%s sender=%s session=%s reason=%s",
+                tostring(payload.key or "?"),
+                tostring(payload.sender or "?"),
+                tostring(payload.sessionId or "none"),
+                tostring(reason or "codec-error")
+            ))
             self.telemetry.snapCodecDropped = (self.telemetry.snapCodecDropped or 0) + 1
             if payload.key and payload.sessionId and self.ReleaseCompletedTransferState then
                 self:ReleaseCompletedTransferState(payload.key, payload.sessionId, "codec-error")
@@ -584,6 +622,15 @@ function Sync:DecodeChunkStep(payload)
         payload = decoded
     end
     if not self:IsValidSyncMemberKey(payload.key) then return false end
+    Addon:Trace(payload.sender and payload.sender ~= payload.key and "offline" or "transfer", string.format(
+        "decode member=%s sender=%s session=%s seq=%d/%d sourceType=%s",
+        tostring(payload.key),
+        tostring(payload.sender or payload.key),
+        tostring(payload.sessionId or "none"),
+        payload.seq or 0,
+        payload.total or 0,
+        tostring(payload.sourceType or "replica")
+    ))
     Addon.Data:AppendIncomingChunk({
         memberKey = payload.key,
         rev = payload.rev,
@@ -606,6 +653,11 @@ function Sync:MergeChunkStep(item)
     if item.sender and item.sender ~= item.memberKey
         and localEntry
         and (localEntry.guildStatus or "active") ~= "active" then
+        Addon:Trace("offline", string.format(
+            "apply-skip member=%s sender=%s reason=local-stale",
+            tostring(item.memberKey),
+            tostring(item.sender)
+        ))
         if Addon.Data._incoming then
             Addon.Data._incoming[item.memberKey] = nil
         end
@@ -636,6 +688,13 @@ function Sync:MergeChunkStep(item)
         if self:IsCoordinator() then
             self:BroadcastIndex(item.memberKey, item.rev, item.updatedAt, item.memberKey, "snapshot-merged")
         end
+    else
+        Addon:Trace(item.sender and item.sender ~= item.memberKey and "offline" or "transfer", string.format(
+            "apply-skip member=%s sender=%s rev=%d reason=not-newer-or-equivalent",
+            tostring(item.memberKey),
+            tostring(item.sender or item.memberKey),
+            item.rev or 0
+        ))
     end
     return merged
 end

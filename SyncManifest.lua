@@ -391,6 +391,12 @@ function Sync:SendManifestToPeer(peerKey, why, opts)
         if reason ~= "offline" then
             self.telemetry.skippedNotDataEligible = (self.telemetry.skippedNotDataEligible or 0) + 1
         end
+        Addon:Trace("manifest", string.format(
+            "send-skip peer=%s reason=%s why=%s",
+            tostring(peerKey),
+            tostring(reason or "ineligible"),
+            tostring(why or "manifest")
+        ))
         return
     end
     if self:IsInWorldTransition() and why ~= "force" then
@@ -402,12 +408,23 @@ function Sync:SendManifestToPeer(peerKey, why, opts)
             why = why or "transition",
         })
         self:ScheduleTransitionDrain("manifest-peer")
+        Addon:Trace("manifest", string.format(
+            "send-deferred peer=%s reason=transition why=%s",
+            tostring(peerKey),
+            tostring(why or "manifest")
+        ))
         return
     end
     self.telemetry.manifestBuildRequests = (self.telemetry.manifestBuildRequests or 0) + 1
     local lastSentAt = self._lastManifestSentAt[peerKey] or 0
     if why ~= "force" and (time() - lastSentAt) < MANIFEST_PUSH_COOLDOWN then
         self.telemetry.manifestCooldownSkips = (self.telemetry.manifestCooldownSkips or 0) + 1
+        Addon:Trace("manifest", string.format(
+            "send-skip peer=%s reason=cooldown why=%s lastSentAge=%d",
+            tostring(peerKey),
+            tostring(why or "manifest"),
+            max(0, time() - lastSentAt)
+        ))
         return
     end
 
@@ -420,6 +437,11 @@ function Sync:SendManifestToPeer(peerKey, why, opts)
         self.pendingManifestPeers = self.pendingManifestPeers or {}
         self.pendingManifestPeers[peerKey] = why or "pending"
         self.telemetry.manifestDeferredSends = (self.telemetry.manifestDeferredSends or 0) + 1
+        Addon:Trace("manifest", string.format(
+            "send-deferred peer=%s reason=cache-building why=%s",
+            tostring(peerKey),
+            tostring(why or "pending")
+        ))
         return
     end
     local manifestId = getManifestAnnouncementId(chunks, manifest)
@@ -428,6 +450,12 @@ function Sync:SendManifestToPeer(peerKey, why, opts)
     })
     if why ~= "force" and manifestId and self._lastManifestAnnouncedId[peerKey] == manifestId then
         self.telemetry.manifestUnchangedSkips = (self.telemetry.manifestUnchangedSkips or 0) + 1
+        Addon:Trace("manifest", string.format(
+            "send-skip peer=%s reason=unchanged manifestId=%s why=%s",
+            tostring(peerKey),
+            tostring(manifestId),
+            tostring(why or "manifest")
+        ))
         return
     end
     local queued = self:QueueManifestChunks(peerKey, chunks, why, manifestId, {
@@ -435,6 +463,15 @@ function Sync:SendManifestToPeer(peerKey, why, opts)
         totalChunks = #chunks,
     })
     if queued then
+        Addon:Trace("manifest", string.format(
+            "send-queued peer=%s manifestId=%s attempt=%s chunks=%d why=%s forceNewAttempt=%s",
+            tostring(peerKey),
+            tostring(manifestId or "unknown"),
+            tostring(cacheEntry and cacheEntry.attempt or 1),
+            #chunks,
+            tostring(why or "send"),
+            tostring(opts.forceNewAttempt == true)
+        ))
         Addon:Debug(string.format(
             "Manifest batch peer=%s manifestId=%s totalChunks=%d queuedChunks=%d sentChunks=%d reason=%s",
             tostring(peerKey),
@@ -681,6 +718,12 @@ function Sync:RequestManifestRefresh(peerKey, opts)
             if reason ~= "offline" then
                 self.telemetry.skippedNotDataEligible = (self.telemetry.skippedNotDataEligible or 0) + 1
             end
+            Addon:Trace("manifest", string.format(
+                "refresh-skip peer=%s reason=%s why=%s",
+                tostring(peerKey),
+                tostring(reason or "ineligible"),
+                tostring(opts.reason or "manual")
+            ))
             return
         end
         if self:IsInWorldTransition() and not opts.force then
@@ -692,13 +735,33 @@ function Sync:RequestManifestRefresh(peerKey, opts)
                 reason = opts.reason or "transition",
             })
             self:ScheduleTransitionDrain("manifest-refresh")
+            Addon:Trace("manifest", string.format(
+                "refresh-deferred peer=%s reason=transition why=%s",
+                tostring(peerKey),
+                tostring(opts.reason or "transition")
+            ))
             return
         end
-        if not self:ShouldRequestManifestRefresh(peerKey, opts) then return end
+        if not self:ShouldRequestManifestRefresh(peerKey, opts) then
+            Addon:Trace("manifest", string.format(
+                "refresh-skip peer=%s reason=cooldown why=%s",
+                tostring(peerKey),
+                tostring(opts.reason or "manual")
+            ))
+            return
+        end
         if opts.clearBackoff then
             self:ClearPeerBackoff(peerKey)
         end
         self:RecordManifestRefreshRequest(peerKey)
+        Addon:Trace("manifest", string.format(
+            "refresh-request peer=%s why=%s manifestId=%s attempt=%s missingSeqs=%d",
+            tostring(peerKey),
+            tostring(opts.reason or "manual"),
+            tostring(opts.manifestId or "none"),
+            tostring(opts.manifestAttempt or "none"),
+            #(opts.missingSeqs or {})
+        ))
         self:SendDirectEnvelope("MREQ", {
             key = self:GetSelfKey(),
             why = opts.reason or "manual",
@@ -720,6 +783,14 @@ function Sync:ResendManifestMissingSeqs(peerKey, manifestId, manifestAttempt, mi
     local cacheEntry = self:GetManifestChunkBatchCache(manifestId)
     local requestedAttempt = normalizeManifestAttempt(manifestAttempt)
     if not cacheEntry or normalizeManifestAttempt(cacheEntry.attempt) ~= requestedAttempt then
+        Addon:Trace("manifest", string.format(
+            "missing-seqs-resend-unavailable peer=%s manifestId=%s requestedAttempt=%s cachedAttempt=%s missing=%d",
+            tostring(peerKey),
+            tostring(manifestId or "none"),
+            tostring(requestedAttempt),
+            tostring(cacheEntry and cacheEntry.attempt or "none"),
+            #(missingSeqs or {})
+        ))
         return false
     end
 
@@ -741,6 +812,14 @@ function Sync:ResendManifestMissingSeqs(peerKey, manifestId, manifestAttempt, mi
         seqs = missingSeqs,
         totalChunks = cacheEntry.totalChunks or #chunks,
     })
+    Addon:Trace("manifest", string.format(
+        "missing-seqs-resend peer=%s manifestId=%s attempt=%s chunks=%d missing=%s",
+        tostring(peerKey),
+        tostring(manifestId),
+        tostring(cacheEntry.attempt),
+        #chunks,
+        table.concat(missingSeqs or {}, ",")
+    ))
     return true
 end
 
@@ -754,6 +833,11 @@ function Sync:HandleManifestRequest(payload)
         allowOfflinePeer = payload.why == "force",
     })
     if not eligible then
+        Addon:Trace("manifest", string.format(
+            "request-ignore peer=%s why=%s reason=ineligible",
+            tostring(payload.sender),
+            tostring(payload.why or payload.reason or "force")
+        ))
         return
     end
     self.telemetry.manifestForceReplies = (self.telemetry.manifestForceReplies or 0) + 1
@@ -763,11 +847,23 @@ function Sync:HandleManifestRequest(payload)
         if self:ResendManifestMissingSeqs(payload.sender, payload.manifestId, payload.manifestAttempt, missingSeqs) then
             return
         end
+        Addon:Trace("manifest", string.format(
+            "request-fallback-full peer=%s manifestId=%s attempt=%s reason=missing-cache",
+            tostring(payload.sender),
+            tostring(payload.manifestId),
+            tostring(payload.manifestAttempt or "none")
+        ))
         self:SendManifestToPeer(payload.sender, "force", {
             forceNewAttempt = true,
         })
         return
     end
+    Addon:Trace("manifest", string.format(
+        "request-full peer=%s why=%s manifestId=%s",
+        tostring(payload.sender),
+        tostring(recoveryReason ~= "" and recoveryReason or payload.why or "force"),
+        tostring(payload.manifestId or "none")
+    ))
     self:SendManifestToPeer(payload.sender, "force")
 end
 
@@ -1114,6 +1210,14 @@ function Sync:HandleManifestChunk(payload)
     local completed = self:GetCompletedManifestReceive(senderKey, payload.manifestId)
     if completed and manifestAttempt <= normalizeManifestAttempt(completed.attempt) then
         self.telemetry.manifestDuplicateCompletedChunksIgnored = (self.telemetry.manifestDuplicateCompletedChunksIgnored or 0) + 1
+        Addon:Trace("manifest", string.format(
+            "duplicate-complete-ignore peer=%s manifestId=%s seq=%s attempt=%s completedAttempt=%s",
+            tostring(senderKey),
+            tostring(payload.manifestId),
+            tostring(payload.seq or "?"),
+            tostring(manifestAttempt),
+            tostring(completed.attempt or 1)
+        ))
         Addon:Debug(string.format(
             "Manifest duplicate-complete chunk ignored peer=%s manifestId=%s seq=%s attempt=%s",
             tostring(senderKey),
@@ -1129,6 +1233,14 @@ function Sync:HandleManifestChunk(payload)
     local abandoned = self:GetAbandonedManifestReceive(senderKey, payload.manifestId)
     if abandoned and manifestAttempt <= normalizeManifestAttempt(abandoned.attempt) then
         self.telemetry.manifestLateChunksIgnored = (self.telemetry.manifestLateChunksIgnored or 0) + 1
+        Addon:Trace("manifest", string.format(
+            "late-ignore peer=%s manifestId=%s seq=%s attempt=%s abandonedAttempt=%s",
+            tostring(senderKey),
+            tostring(payload.manifestId),
+            tostring(payload.seq or "?"),
+            tostring(manifestAttempt),
+            tostring(abandoned.attempt or 1)
+        ))
         Addon:Debug(string.format(
             "Manifest late chunk ignored peer=%s manifestId=%s seq=%s attempt=%s",
             tostring(senderKey),
@@ -1253,6 +1365,14 @@ function Sync:HandleManifestChunk(payload)
     self:MarkManifestReceiveCompleted(senderKey, payload.manifestId, state.manifestAttempt)
     self:ClearAbandonedManifestReceive(senderKey, payload.manifestId)
     self:RecordManifestReceived(senderKey)
+    Addon:Trace("manifest", string.format(
+        "receive-complete peer=%s manifestId=%s attempt=%s blocks=%d totalChunks=%d",
+        tostring(senderKey),
+        tostring(payload.manifestId),
+        tostring(state.manifestAttempt or 1),
+        countManifestBlocks({ blocks = state.blocks }),
+        state.total or 1
+    ))
     if self.MarkManifestPeerSuccess then
         self:MarkManifestPeerSuccess(senderKey)
     end
