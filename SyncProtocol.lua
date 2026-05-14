@@ -115,12 +115,12 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
 
     local peerKey = self:IsValidSyncMemberKey(payload.sender) and payload.sender or nil
     local allowed, dropReason, remoteChannel = self:IsInboundBuildChannelAllowed(payload, sender)
-    if peerKey and self.ObservePeerVersion then
-        self:ObservePeerVersion(peerKey, payload)
-    end
     if not allowed then
         self:RegisterBuildChannelDrop(peerKey or sender, payload, dropReason, remoteChannel)
         return
+    end
+    if peerKey and self.ObservePeerVersion then
+        self:ObservePeerVersion(peerKey, payload)
     end
     if payload.kind == "HELLO" and peerKey and self.MaybeNotifyPeerVersion then
         self:MaybeNotifyPeerVersion(peerKey)

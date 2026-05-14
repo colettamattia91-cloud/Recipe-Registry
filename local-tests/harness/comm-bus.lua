@@ -370,6 +370,9 @@ function CommBus:AddNode(name, opts)
     Wow.SetPlayer(name, self.realm)
     Wow.SetGuildRoster(self.roster)
     Loader.Initialize(addon)
+    if type(opts.addonSetup) == "function" then
+        opts.addonSetup(addon, Wow)
+    end
 
     local node = {
         name = name,
@@ -380,8 +383,9 @@ function CommBus:AddNode(name, opts)
         sentCursor = 0,
         index = #self.nodes + 1,
         online = opts.online ~= false,
+        addonSetup = opts.addonSetup,
         addonMetadata = deepcopy(opts.addonMetadata or {
-            Version = "1.8.1",
+            Version = "2.0.0",
             ["X-Build-Channel"] = "release",
             ["X-Build-ID"] = "bus-build",
         }),
@@ -483,10 +487,14 @@ function CommBus:ReloadNode(node, opts)
     nextState.now = runtime.now or nextState.now
     nextState.inGuild = runtime.inGuild ~= false
     Loader.Initialize(addon)
+    if type(opts.addonSetup or node.addonSetup) == "function" then
+        (opts.addonSetup or node.addonSetup)(addon, Wow)
+    end
 
     node.addon = addon
     node.state = nextState
     node.sentCursor = 0
+    node.addonSetup = opts.addonSetup or node.addonSetup
     node.addonMetadata = deepcopy(opts.addonMetadata or node.addonMetadata or {})
     self:Activate(node)
     node.key = addon.Data:GetPlayerKey()
@@ -638,6 +646,12 @@ function CommBus:BroadcastHelloPresence(opts)
             rev = opts.useSummary and summary.rev or opts.rev or 0,
             updatedAt = opts.useSummary and summary.updatedAt or opts.updatedAt or 0,
             version = opts.version or "comm-bus-test",
+            addonVersion = node.addon.ADDON_VERSION or node.addon.DISPLAY_VERSION,
+            wireVersion = node.addon.WIRE_VERSION,
+            buildChannel = node.addon.BUILD_CHANNEL,
+            buildId = node.addon.BUILD_ID,
+            capabilities = node.addon.CAPABILITIES,
+            caps = node.addon.Sync.GetLocalProtocolCaps and node.addon.Sync:GetLocalProtocolCaps() or nil,
         }, "ALERT")
     end)
 end
@@ -1370,10 +1384,13 @@ function CommBus.CreatePeers(count, opts)
         transportProfile = opts.transportProfile,
         payloadMode = opts.payloadMode,
     })
-    for _, name in ipairs(names) do
+    for index, name in ipairs(names) do
+        local nodeOpts = type(opts.nodeOptionsFactory) == "function" and (opts.nodeOptionsFactory(index, name) or {}) or {}
         bus:AddNode(name, {
-            payloadMode = opts.payloadMode,
-            runtimeTickers = opts.runtimeTickers,
+            payloadMode = nodeOpts.payloadMode or opts.payloadMode,
+            runtimeTickers = nodeOpts.runtimeTickers or opts.runtimeTickers,
+            addonMetadata = nodeOpts.addonMetadata or opts.addonMetadata,
+            addonSetup = nodeOpts.addonSetup,
         })
     end
     return bus, names

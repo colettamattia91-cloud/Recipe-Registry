@@ -17,6 +17,15 @@ local function countCommKind(wow, kind)
     return total
 end
 
+local function withModernVersion(addon, payload)
+    payload = payload or {}
+    payload.addonVersion = payload.addonVersion or addon.ADDON_VERSION
+    payload.wireVersion = payload.wireVersion or addon.WIRE_VERSION
+    payload.buildChannel = payload.buildChannel or addon.BUILD_CHANNEL
+    payload.caps = payload.caps or (addon.Sync.GetLocalProtocolCaps and addon.Sync:GetLocalProtocolCaps() or nil)
+    return payload
+end
+
 local function seedProfession(data, memberKey, profession, recipeKey, opts)
     opts = opts or {}
     local entry = data:GetOrCreateMember(memberKey)
@@ -97,7 +106,7 @@ Test.it("backfills the next queued request immediately when a bounded request sl
     Test.truthy(addon.Sync.pendingRequests[thirdPeer], "third peer should stay queued until a slot frees up")
     Test.eq(countCommKind(wow, "REQ"), 2, "two REQ messages should be sent immediately")
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "SNAP",
         sessionId = "session-1",
         key = firstPeer,
@@ -112,7 +121,7 @@ Test.it("backfills the next queued request immediately when a bounded request sl
         recipeKeys = { 91001 },
         seq = 1,
         total = 1,
-    }, {
+    }), {
         sender = firstPeer,
         distribution = "WHISPER",
     })
@@ -225,14 +234,14 @@ Test.it("warmup defers manifest fan-out and targeted manifest refreshes until ex
     addon.Sync:BroadcastManifestToOnlinePeers("auto-tick")
     Test.eq(#addon.Sync.manifestChunkQueue, 0, "warmup should defer manifest fan-out")
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "HELLO",
         key = peerKey,
         rev = 5,
         updatedAt = 500,
         sender = peerKey,
         version = "1.6.0",
-    }, {
+    }), {
         sender = peerKey,
         distribution = "GUILD",
     })

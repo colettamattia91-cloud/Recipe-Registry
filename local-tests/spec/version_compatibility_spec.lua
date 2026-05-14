@@ -3,7 +3,7 @@ local Test = dofile("local-tests/harness/test.lua")
 
 local function metadata(version, channel, buildId)
     return {
-        Version = version or "1.8.1",
+        Version = version or "2.0.0",
         ["X-Build-Channel"] = channel or "release",
         ["X-Build-ID"] = buildId or ((channel or "release") .. "-build"),
     }
@@ -41,7 +41,7 @@ local function deliverHello(addon, wow, peerKey, opts)
         kind = "HELLO",
         key = peerKey,
         sender = peerKey,
-        rev = opts.rev or 5,
+        rev = opts.rev or 0,
         updatedAt = opts.updatedAt or 200,
         addonVersion = opts.addonVersion,
         version = opts.version,
@@ -62,26 +62,29 @@ Test.it("compares semantic versions numerically", function()
     local addon = loadAddon("release")
 
     Test.eq(addon.BuildInfo.CompareSemver("1.10.0", "1.9.9"), 1, "1.10.0 should be newer than 1.9.9")
-    Test.eq(addon.BuildInfo.CompareSemver("1.8.3", "1.8.2"), 1, "1.8.3 should be newer than 1.8.2")
-    Test.eq(addon.BuildInfo.CompareSemver("1.8.1", "1.8.1"), 0, "same version compare")
-    Test.eq(addon.BuildInfo.CompareSemver("1.8.0", "1.8.1"), -1, "older version compare")
-    Test.eq(addon.BuildInfo.CompareSemver("not-a-version", "1.8.1"), nil, "invalid versions should not compare")
+    Test.eq(addon.BuildInfo.CompareSemver("2.0.2", "2.0.1"), 1, "2.0.2 should be newer than 2.0.1")
+    Test.eq(addon.BuildInfo.CompareSemver("2.0.0", "2.0.0"), 0, "same version compare")
+    Test.eq(addon.BuildInfo.CompareSemver("1.9.9", "2.0.0"), -1, "older version compare")
+    Test.eq(addon.BuildInfo.CompareSemver("not-a-version", "2.0.0"), nil, "invalid versions should not compare")
 end)
 
 Test.it("same addonVersion does not print update notices", function()
-    local addon, wow = loadAddon("release", "1.8.1")
+    local addon, wow = loadAddon("release", "2.0.0")
     local peerKey = "Sameversion-TestRealm"
 
     deliverHello(addon, wow, peerKey, {
-        addonVersion = "1.8.1",
+        addonVersion = "2.0.0",
         wireVersion = addon.WIRE_VERSION,
         buildChannel = "release",
         caps = {
             wireVersion = addon.WIRE_VERSION,
-            addonVersion = "1.8.1",
+            addonVersion = "2.0.0",
             buildChannel = "release",
             capabilities = {
+                chunkWindow = true,
                 maniReliable = true,
+                snapCodec = true,
+                manifestShards = false,
             },
         },
     })
@@ -90,20 +93,23 @@ Test.it("same addonVersion does not print update notices", function()
     Test.eq(addon.Sync.telemetry.newerVersionSeen or 0, 0, "same version should not increment update telemetry")
 end)
 
-Test.it("newer same-channel addonVersion prints one update notice", function()
-    local addon, wow = loadAddon("release", "1.8.1")
+Test.it("newer same-channel addonVersion prints one update notice without blocking compatible sync", function()
+    local addon, wow = loadAddon("release", "2.0.0")
     local peerKey = "Newversion-TestRealm"
 
     deliverHello(addon, wow, peerKey, {
-        addonVersion = "1.8.2",
+        addonVersion = "2.0.1",
         wireVersion = addon.WIRE_VERSION,
         buildChannel = "release",
         caps = {
             wireVersion = addon.WIRE_VERSION,
-            addonVersion = "1.8.2",
+            addonVersion = "2.0.1",
             buildChannel = "release",
             capabilities = {
+                chunkWindow = true,
                 maniReliable = true,
+                snapCodec = true,
+                manifestShards = false,
             },
         },
     })
@@ -111,24 +117,27 @@ Test.it("newer same-channel addonVersion prints one update notice", function()
     Test.truthy(printContains(wow, "Recipe Registry: a newer version was detected from " .. peerKey), "newer release peer should notify")
     Test.eq(addon.Sync.telemetry.newerVersionSeen or 0, 1, "newer version telemetry")
     Test.truthy(addon.Sync.onlineNodes[peerKey], "addonVersion difference alone should not block sync")
-    Test.eq(addon.Data:GetUpdateNoticeState().latestRemoteVersionSeen, "1.8.2", "latest remote version should be stored")
-    Test.eq(addon.Data:GetUpdateNoticeState().lastNoticedVersion, "1.8.2", "last noticed version should be stored")
+    Test.eq(addon.Data:GetUpdateNoticeState().latestRemoteVersionSeen, "2.0.1", "latest remote version should be stored")
+    Test.eq(addon.Data:GetUpdateNoticeState().lastNoticedVersion, "2.0.1", "last noticed version should be stored")
 end)
 
 Test.it("newer wireVersion is recorded for diagnostics but does not enter the sync peer pool", function()
-    local addon, wow = loadAddon("release", "1.8.1")
+    local addon, wow = loadAddon("release", "2.0.0")
     local peerKey = "Newprotocol-TestRealm"
 
     deliverHello(addon, wow, peerKey, {
-        addonVersion = "1.8.2",
+        addonVersion = "2.0.1",
         wireVersion = addon.WIRE_VERSION + 1,
         buildChannel = "release",
         caps = {
             wireVersion = addon.WIRE_VERSION + 1,
-            addonVersion = "1.8.2",
+            addonVersion = "2.0.1",
             buildChannel = "release",
             capabilities = {
+                chunkWindow = true,
                 maniReliable = true,
+                snapCodec = true,
+                manifestShards = false,
             },
         },
     })
@@ -139,31 +148,41 @@ Test.it("newer wireVersion is recorded for diagnostics but does not enter the sy
     Test.eq(Test.countKeys(addon.Sync.pendingRequests), 0, "newer wire peer should not queue requests")
 end)
 
-Test.it("older wireVersion can stay compatible when the local support window allows it", function()
-    local addon, wow = loadAddon("release", "1.8.1")
+Test.it("older wireVersion outside the support window stays diagnostic-only", function()
+    local addon, wow = loadAddon("release", "2.0.0")
     local peerKey = "Olderwire-TestRealm"
 
-    addon.MIN_SUPPORTED_WIRE_VERSION = addon.WIRE_VERSION - 1
     deliverHello(addon, wow, peerKey, {
-        addonVersion = "1.8.0",
+        addonVersion = "1.9.9",
         wireVersion = addon.WIRE_VERSION - 1,
         buildChannel = "release",
         caps = {
             wireVersion = addon.WIRE_VERSION - 1,
-            addonVersion = "1.8.0",
+            addonVersion = "1.9.9",
             buildChannel = "release",
             capabilities = {
+                chunkWindow = true,
                 maniReliable = true,
+                snapCodec = true,
+                manifestShards = false,
             },
         },
     })
 
-    Test.eq(addon.Sync.peerVersions[peerKey].compatibility, "compatible", "older wire should be compatible inside the support window")
-    Test.truthy(addon.Sync.onlineNodes[peerKey], "supported older wire should still be treated as online")
+    local eligible, reason = addon.Sync:CanExchangeDataWithPeer(peerKey, "manifest-large", {
+        source = peerKey,
+        memberKey = peerKey,
+        why = "hello",
+    })
+
+    Test.eq(addon.Sync.peerVersions[peerKey].compatibility, "remote-older-wire", "older wire should stay outside the 2.0.0 compatibility window")
+    Test.eq(addon.Sync.onlineNodes[peerKey], nil, "older wire peer should not be promoted to online sync state")
+    Test.falsy(eligible, "older wire peer should be ineligible for manifest exchange")
+    Test.eq(reason, "wire-mismatch", "older wire rejection reason")
 end)
 
-Test.it("missing version fields are tracked as legacy unknown peers", function()
-    local addon, wow = loadAddon("release", "1.8.1")
+Test.it("missing version metadata is tracked only as legacy diagnostics", function()
+    local addon, wow = loadAddon("release", "2.0.0")
     local peerKey = "Legacypeer-TestRealm"
 
     deliverHello(addon, wow, peerKey, {
@@ -173,13 +192,32 @@ Test.it("missing version fields are tracked as legacy unknown peers", function()
         caps = nil,
     })
 
-    Test.eq(addon.Sync.peerVersions[peerKey].compatibility, "legacy-unknown", "legacy compatibility state")
-    Test.truthy(addon.Sync.onlineNodes[peerKey], "legacy peers should still be tracked when release policy allows it")
-    Test.falsy(printContains(wow, "newer version detected"), "legacy unknown should not trigger a version notice")
+    local requestEligible, requestReason = addon.Sync:CanExchangeDataWithPeer(peerKey, "request", {
+        source = peerKey,
+        memberKey = peerKey,
+        why = "hello-auto",
+    })
+    local manifestEligible, manifestReason = addon.Sync:CanExchangeDataWithPeer(peerKey, "manifest-large", {
+        source = peerKey,
+        memberKey = peerKey,
+        why = "hello",
+    })
+
+    Test.eq(addon.Sync.peerVersions[peerKey].compatibility, "legacy", "legacy compatibility state")
+    Test.eq(addon.Sync.onlineNodes[peerKey], nil, "legacy peers should stay out of online sync state")
+    Test.falsy(printContains(wow, "newer version detected"), "legacy peers should not trigger update notices")
+    Test.falsy(requestEligible, "legacy peers should not be used for request traffic")
+    Test.eq(requestReason, "legacy-peer", "legacy request rejection reason")
+    Test.falsy(manifestEligible, "legacy peers should not be used for manifest traffic")
+    Test.eq(manifestReason, "legacy-peer", "legacy manifest rejection reason")
+    Test.eq(Test.countKeys(addon.Sync.pendingRequests), 0, "legacy peers should not seed pending requests")
+    Test.eq(addon.Sync:GetActiveRequestCount(), 0, "legacy peers should not seed active requests")
+    Test.eq(addon.Sync:GetInFlightRequest(), nil, "legacy peers should not seed in-flight requests")
+    Test.eq(Test.countKeys(addon.Sync.peerBackoffUntil), 0, "legacy peers should not create backoff state")
 end)
 
-Test.it("release clients ignore newer dev versions for user-facing alerts", function()
-    local addon, wow = loadAddon("release", "1.8.1")
+Test.it("release clients ignore dev versions for user-facing alerts", function()
+    local addon, wow = loadAddon("release", "2.0.0")
     local peerKey = "Devnewer-TestRealm"
 
     deliverHello(addon, wow, peerKey, {
@@ -191,17 +229,21 @@ Test.it("release clients ignore newer dev versions for user-facing alerts", func
             addonVersion = "9.9.9",
             buildChannel = "dev",
             capabilities = {
+                chunkWindow = true,
                 maniReliable = true,
+                snapCodec = true,
+                manifestShards = false,
             },
         },
     })
 
     Test.falsy(printContains(wow, "newer version detected"), "dev versions must not notify release users")
     Test.eq(addon.Sync.telemetry.buildChannelDrops or 0, 1, "dev payload should be dropped")
+    Test.eq(addon.Sync.peerVersions[peerKey], nil, "dev payload should not enter normal peerVersions")
 end)
 
 Test.it("invalid addon versions do not trigger update notices", function()
-    local addon, wow = loadAddon("release", "1.8.1")
+    local addon, wow = loadAddon("release", "2.0.0")
     local peerKey = "Invalidversion-TestRealm"
 
     deliverHello(addon, wow, peerKey, {
@@ -213,7 +255,10 @@ Test.it("invalid addon versions do not trigger update notices", function()
             addonVersion = "not-a-version",
             buildChannel = "release",
             capabilities = {
+                chunkWindow = true,
                 maniReliable = true,
+                snapCodec = true,
+                manifestShards = false,
             },
         },
     })
@@ -223,32 +268,38 @@ Test.it("invalid addon versions do not trigger update notices", function()
 end)
 
 Test.it("update notices are rate-limited per version but a newer version bypasses cooldown", function()
-    local addon, wow = loadAddon("release", "1.8.1")
+    local addon, wow = loadAddon("release", "2.0.0")
     local peerKey = "Ratelipeer-TestRealm"
 
     local firstPayload = {
-        addonVersion = "1.8.2",
+        addonVersion = "2.0.1",
         wireVersion = addon.WIRE_VERSION,
         buildChannel = "release",
         caps = {
             wireVersion = addon.WIRE_VERSION,
-            addonVersion = "1.8.2",
+            addonVersion = "2.0.1",
             buildChannel = "release",
             capabilities = {
+                chunkWindow = true,
                 maniReliable = true,
+                snapCodec = true,
+                manifestShards = false,
             },
         },
     }
     local secondPayload = {
-        addonVersion = "1.8.3",
+        addonVersion = "2.0.2",
         wireVersion = addon.WIRE_VERSION,
         buildChannel = "release",
         caps = {
             wireVersion = addon.WIRE_VERSION,
-            addonVersion = "1.8.3",
+            addonVersion = "2.0.2",
             buildChannel = "release",
             capabilities = {
+                chunkWindow = true,
                 maniReliable = true,
+                snapCodec = true,
+                manifestShards = false,
             },
         },
     }
@@ -258,24 +309,61 @@ Test.it("update notices are rate-limited per version but a newer version bypasse
 
     Test.eq(countPrinted(wow, "Recipe Registry: a newer version was detected from " .. peerKey), 2, "same version should stay suppressed but a newer one should bypass cooldown")
     Test.eq(addon.Sync.telemetry.newerVersionSeen or 0, 2, "newer version bypass should increment telemetry")
-    Test.eq(addon.Data:GetUpdateNoticeState().latestRemoteVersionSeen, "1.8.3", "latest remote version should advance")
-    Test.eq(addon.Data:GetUpdateNoticeState().lastNoticedVersion, "1.8.3", "last noticed version should advance")
+    Test.eq(addon.Data:GetUpdateNoticeState().latestRemoteVersionSeen, "2.0.2", "latest remote version should advance")
+    Test.eq(addon.Data:GetUpdateNoticeState().lastNoticedVersion, "2.0.2", "last noticed version should advance")
 end)
 
-Test.it("manifest-large eligibility requires maniReliable support", function()
-    local addon, wow = loadAddon("release", "1.8.1")
-    local peerKey = "Manipeer-TestRealm"
+Test.it("modern purposes require declared capabilities", function()
+    local addon, wow = loadAddon("release", "2.0.0")
+    local peerKey = "Caplesspeer-TestRealm"
 
     deliverHello(addon, wow, peerKey, {
-        addonVersion = "1.8.1",
+        addonVersion = "2.0.0",
         wireVersion = addon.WIRE_VERSION,
         buildChannel = "release",
         caps = {
             wireVersion = addon.WIRE_VERSION,
-            addonVersion = "1.8.1",
+            addonVersion = "2.0.0",
+            buildChannel = "release",
+            capabilities = {},
+        },
+    })
+
+    local manifestEligible, manifestReason = addon.Sync:CanExchangeDataWithPeer(peerKey, "manifest-large", {
+        source = peerKey,
+        memberKey = peerKey,
+        why = "hello",
+    })
+    local catchupEligible, catchupReason = addon.Sync:CanExchangeDataWithPeer(peerKey, "catchup-offline", {
+        source = peerKey,
+        memberKey = peerKey,
+        why = "manifest",
+    })
+
+    Test.falsy(manifestEligible, "capless peers should not qualify for modern manifest exchange")
+    Test.eq(manifestReason, "missing-required-capability", "manifest capability rejection")
+    Test.falsy(catchupEligible, "capless peers should not qualify for offline catch-up")
+    Test.eq(catchupReason, "missing-required-capability", "catch-up capability rejection")
+    Test.eq(addon.Sync.telemetry.skippedMissingCapability or 0, 3, "capability skips should include the opportunistic MANI path plus explicit checks")
+end)
+
+Test.it("manifest-large eligibility requires maniReliable support", function()
+    local addon, wow = loadAddon("release", "2.0.0")
+    local peerKey = "Manipeer-TestRealm"
+
+    deliverHello(addon, wow, peerKey, {
+        addonVersion = "2.0.0",
+        wireVersion = addon.WIRE_VERSION,
+        buildChannel = "release",
+        caps = {
+            wireVersion = addon.WIRE_VERSION,
+            addonVersion = "2.0.0",
             buildChannel = "release",
             capabilities = {
+                chunkWindow = true,
                 maniReliable = false,
+                snapCodec = true,
+                manifestShards = false,
             },
         },
     })
@@ -293,25 +381,28 @@ Test.it("manifest-large eligibility requires maniReliable support", function()
 
     Test.falsy(manifestEligible, "large manifest exchange should require maniReliable")
     Test.eq(manifestReason, "missing-mani-reliable", "manifest eligibility reason")
-    Test.truthy(requestEligible, "snapshot request path should remain available")
+    Test.truthy(requestEligible, "owner-direct request path should remain available")
 end)
 
 Test.it("slash diagnostics print local and peer version state", function()
-    local addon, wow = loadAddon("release", "1.8.1")
+    local addon, wow = loadAddon("release", "2.0.0")
     local peerKey = "Diagpeer-TestRealm"
 
     deliverHello(addon, wow, peerKey, {
-        addonVersion = "1.8.2",
+        addonVersion = "2.0.1",
         wireVersion = addon.WIRE_VERSION,
         buildChannel = "release",
         buildId = "release-peer",
         caps = {
             wireVersion = addon.WIRE_VERSION,
-            addonVersion = "1.8.2",
+            addonVersion = "2.0.1",
             buildChannel = "release",
             buildId = "release-peer",
             capabilities = {
+                chunkWindow = true,
                 maniReliable = true,
+                snapCodec = true,
+                manifestShards = false,
             },
         },
     })
@@ -319,9 +410,11 @@ Test.it("slash diagnostics print local and peer version state", function()
     addon:SlashHandler("version")
     addon:SlashHandler("versions")
 
-    Test.truthy(printContains(wow, "Recipe Registry: version=1.8.1 wire="), "local version output")
+    Test.truthy(printContains(wow, "Recipe Registry: version=2.0.0 wire="), "local version output")
     Test.truthy(printContains(wow, "channel=release"), "channel output")
     Test.truthy(printContains(wow, "prefix=RecipeRegistry"), "prefix output")
-    Test.truthy(printContains(wow, "latestRemoteVersionSeen=1.8.2"), "latest remote version output")
-    Test.truthy(printContains(wow, "- " .. peerKey .. " version=1.8.2"), "peer versions output")
+    Test.truthy(printContains(wow, "latestRemoteVersionSeen=2.0.1"), "latest remote version output")
+    Test.truthy(printContains(wow, "- " .. peerKey .. " version=2.0.1"), "peer versions output")
 end)
+
+io.write(string.format("Version compatibility: %d test(s) passed\n", Test.count))

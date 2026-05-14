@@ -25,6 +25,15 @@ local function findSentCommKind(wow, kind)
     return nil
 end
 
+local function withModernVersion(addon, payload)
+    payload = payload or {}
+    payload.addonVersion = payload.addonVersion or addon.ADDON_VERSION
+    payload.wireVersion = payload.wireVersion or addon.WIRE_VERSION
+    payload.buildChannel = payload.buildChannel or addon.BUILD_CHANNEL
+    payload.caps = payload.caps or (addon.Sync.GetLocalProtocolCaps and addon.Sync:GetLocalProtocolCaps() or nil)
+    return payload
+end
+
 io.write("Specialization sync\n")
 
 Test.it("discovers a local specialization once without bumping revision on every detect", function()
@@ -320,14 +329,14 @@ Test.it("repairs a missing remote specialization after forcing a manifest refres
         lastSeenInGuildAt = 500,
     })
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "HELLO",
         key = memberKey,
         rev = 5,
         updatedAt = 500,
         sender = memberKey,
         version = "1.6.0",
-    }, {
+    }), {
         sender = memberKey,
         distribution = "GUILD",
     })
@@ -336,14 +345,14 @@ Test.it("repairs a missing remote specialization after forcing a manifest refres
     Test.falsy(initialManifestRefresh, "first hello should stay quiet before any targeted manifest refresh is needed")
 
     wow.AdvanceTime(31)
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "HELLO",
         key = memberKey,
         rev = 5,
         updatedAt = 501,
         sender = memberKey,
         version = "1.6.0",
-    }, {
+    }), {
         sender = memberKey,
         distribution = "GUILD",
     })
@@ -351,7 +360,7 @@ Test.it("repairs a missing remote specialization after forcing a manifest refres
     local manifestRefresh = findSentCommKind(wow, "MREQ")
     Test.truthy(manifestRefresh, "a later hello should trigger a targeted manifest refresh request when the manifest is still missing")
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "MANI",
         manifestId = "spec-refresh",
         builtAt = 510,
@@ -377,7 +386,7 @@ Test.it("repairs a missing remote specialization after forcing a manifest refres
                 fingerprint = "95001|spec:Potion Master",
             },
         },
-    }, {
+    }), {
         sender = memberKey,
         distribution = "WHISPER",
     })
@@ -387,7 +396,7 @@ Test.it("repairs a missing remote specialization after forcing a manifest refres
     Test.truthy(request, "manifest refresh should lead to a direct block request")
     Test.eq(request.message.requestedBlocks[1], blockKey, "the specialization block should be requested")
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "SNAP",
         sessionId = "spec-refresh-session",
         key = memberKey,
@@ -402,7 +411,7 @@ Test.it("repairs a missing remote specialization after forcing a manifest refres
         recipeKeys = { 95001 },
         seq = 1,
         total = 1,
-    }, {
+    }), {
         sender = memberKey,
         distribution = "WHISPER",
     })

@@ -57,6 +57,50 @@ local function expectedFingerprintsCovered(existing, expected)
     return true
 end
 
+local function requestPurposeFor(request, dispatchPhase)
+    if type(request) ~= "table" then
+        return dispatchPhase and "dispatch" or "request"
+    end
+    if request.requestPurpose then
+        return tostring(request.requestPurpose)
+    end
+    local why = tostring(request.why or "")
+    if why == "auto-tick" then
+        return "auto-tick-modern"
+    end
+    if why == "post-wipe" or why == "database-wipe" then
+        return "post-wipe"
+    end
+    if request.allowReplicaSource == true then
+        return "offline-replica"
+    end
+    return dispatchPhase and "dispatch" or "request"
+end
+
+local function shouldDropReplicaRequest(self, request)
+    if type(request) ~= "table" then
+        return false
+    end
+    local purpose = tostring(request.requestPurpose or "")
+    if purpose ~= "catchup-offline" and purpose ~= "offline-replica" then
+        return false
+    end
+    if request.memberKey == self:GetSelfKey() then
+        return true
+    end
+    local directOwner = request.memberKey == request.source
+    if directOwner then
+        return false
+    end
+    if Addon.Data:IsMemberOnline(request.memberKey) then
+        return true
+    end
+    if self:IsLocallyStaleOwner(request.memberKey) then
+        return true
+    end
+    return false
+end
+
 function Sync:IsRequestShapeValid(request)
     return request
         and self:IsValidSyncMemberKey(request.memberKey)
@@ -197,12 +241,17 @@ function Sync:QueueRequest(sourceKey, memberKey, targetRev, why, opts)
         return
     end
 
-    local eligible, ineligibleReason = self:CanExchangeDataWithPeer(sourceKey, "request", {
+    local requestPurpose = opts.requestPurpose or requestPurposeFor({
+        why = why,
+        allowReplicaSource = opts.allowReplicaSource == true,
+    }, false)
+    local eligible, ineligibleReason = self:CanExchangeDataWithPeer(sourceKey, requestPurpose, {
         source = sourceKey,
         memberKey = memberKey,
         rev = targetRev or 0,
         why = why,
         requestedBlocks = opts.requestedBlocks,
+        requestPurpose = requestPurpose,
     })
     if not eligible and ineligibleReason ~= "offline" then
         if ineligibleReason == "backoff" then
@@ -226,6 +275,7 @@ function Sync:QueueRequest(sourceKey, memberKey, targetRev, why, opts)
             q.expectedFingerprints = mergeExpectedFingerprints(q.expectedFingerprints, opts.expectedFingerprints)
             q.allowReplicaSource = q.allowReplicaSource or opts.allowReplicaSource == true
             q.source = opts.allowReplicaSource and sourceKey or q.source
+            q.requestPurpose = q.requestPurpose or requestPurpose
         end
         return
     end
@@ -241,6 +291,7 @@ function Sync:QueueRequest(sourceKey, memberKey, targetRev, why, opts)
         allowReplicaSource = opts.allowReplicaSource == true,
         requestedBlocks = cloneStringSet(opts.requestedBlocks),
         expectedFingerprints = cloneFingerprintMap(opts.expectedFingerprints),
+        requestPurpose = requestPurpose,
     }
     if self.EnforceRuntimeQueueCaps then
         self:EnforceRuntimeQueueCaps("queue-request")
@@ -262,6 +313,8 @@ function Sync:SelectNextPendingRequest(skipMembers)
             if self:DoesRequestCover(self:GetInFlightRequest(memberKey), info.rev or 0, info.requestedBlocks, info.expectedFingerprints) then
                 self.pendingRequests[memberKey] = nil
             end
+        elseif shouldDropReplicaRequest(self, info) then
+            self.pendingRequests[memberKey] = nil
         elseif self:IsRequestAlreadySatisfied(info) then
             self.pendingRequests[memberKey] = nil
         else
@@ -272,7 +325,7 @@ function Sync:SelectNextPendingRequest(skipMembers)
                 elseif self:ShouldDeferRequestDispatch(info) then
                     sawWarmupDeferred = true
                 else
-                    local eligible, reason = self:CanExchangeDataWithPeer(info.source, "dispatch", info)
+                    local eligible, reason = self:CanExchangeDataWithPeer(info.source, requestPurposeFor(info, true), info)
                     if not eligible then
                         if reason == "backoff" and isAutomaticRequestReason(info.why) then
                             self.pendingRequests[memberKey] = nil
@@ -488,6 +541,7 @@ function Sync:FailInFlight(memberKey, requeue, reason)
                 allowReplicaSource = req.allowReplicaSource == true,
                 requestedBlocks = cloneStringSet(req.requestedBlocks),
                 expectedFingerprints = cloneFingerprintMap(req.expectedFingerprints),
+                requestPurpose = req.requestPurpose,
             }
             if self.EnforceRuntimeQueueCaps then
                 self:EnforceRuntimeQueueCaps("retry-request")

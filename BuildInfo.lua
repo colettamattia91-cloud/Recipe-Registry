@@ -1,4 +1,5 @@
 local Addon = _G.RecipeRegistry
+local Addon = _G.RecipeRegistry
 local BuildInfo = Addon.BuildInfo or {}
 
 Addon.BuildInfo = BuildInfo
@@ -16,9 +17,11 @@ end
 
 local function normalizeChannel(value)
     local channel = tostring(value or ""):lower()
-    if channel == "dev" or channel == "beta" then
-        return channel
+    if channel == "dev" then
+        return "dev"
     end
+    -- The 2.0.0 line only supports release/dev channels. Any legacy beta tag
+    -- is treated as release so it cannot drift into a half-supported channel.
     return "release"
 end
 
@@ -74,9 +77,9 @@ function BuildInfo.IsRemoteNewer(remoteVersion, localVersion)
     return cmp ~= nil and cmp > 0 or false
 end
 
-Addon.ADDON_VERSION = tostring(Addon.ADDON_VERSION or getMetadata("Version") or Addon.DISPLAY_VERSION or "0.0.0")
+Addon.ADDON_VERSION = tostring(Addon.ADDON_VERSION or getMetadata("Version") or Addon.DISPLAY_VERSION or "2.0.0")
 Addon.DISPLAY_VERSION = Addon.ADDON_VERSION
-Addon.WIRE_VERSION = tonumber(Addon.WIRE_VERSION) or 2
+Addon.WIRE_VERSION = tonumber(Addon.WIRE_VERSION) or 3
 Addon.MIN_SUPPORTED_WIRE_VERSION = tonumber(Addon.MIN_SUPPORTED_WIRE_VERSION) or Addon.WIRE_VERSION
 Addon.BUILD_CHANNEL = normalizeChannel(Addon.BUILD_CHANNEL or getMetadata("X-Build-Channel") or "release")
 Addon.BUILD_ID = Addon.BUILD_ID or getMetadata("X-Build-ID")

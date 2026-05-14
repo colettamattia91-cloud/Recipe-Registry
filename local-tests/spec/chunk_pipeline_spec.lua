@@ -79,6 +79,10 @@ Test.it("queues snapshot chunks in bounded windows per session", function()
         wantRev = 100,
         requestId = "req-window",
         sender = peerKey,
+        addonVersion = addon.ADDON_VERSION,
+        wireVersion = addon.WIRE_VERSION,
+        buildChannel = addon.BUILD_CHANNEL,
+        caps = addon.Sync.GetLocalProtocolCaps and addon.Sync:GetLocalProtocolCaps() or nil,
     }, {
         sender = peerKey,
         distribution = "WHISPER",

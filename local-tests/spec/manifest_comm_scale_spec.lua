@@ -42,17 +42,26 @@ local function makeRemote(data, index)
     }
 end
 
+local function withModernVersion(addon, payload)
+    payload = payload or {}
+    payload.addonVersion = payload.addonVersion or addon.ADDON_VERSION
+    payload.wireVersion = payload.wireVersion or addon.WIRE_VERSION
+    payload.buildChannel = payload.buildChannel or addon.BUILD_CHANNEL
+    payload.caps = payload.caps or (addon.Sync.GetLocalProtocolCaps and addon.Sync:GetLocalProtocolCaps() or nil)
+    return payload
+end
+
 local function deliverPeerAnnouncement(addon, wow, remote)
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "HELLO",
         sender = remote.peerKey,
         key = remote.peerKey,
         rev = 0,
         updatedAt = remote.updatedAt,
         version = "scale-test",
-    }, { sender = remote.peerKey, distribution = "GUILD" })
+    }), { sender = remote.peerKey, distribution = "GUILD" })
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "MANI",
         sender = remote.peerKey,
         manifestId = "scale:" .. remote.peerKey,
@@ -62,7 +71,7 @@ local function deliverPeerAnnouncement(addon, wow, remote)
         seq = 1,
         total = 1,
         blocks = { remote.block },
-    }, { sender = remote.peerKey, distribution = "WHISPER" })
+    }), { sender = remote.peerKey, distribution = "WHISPER" })
 end
 
 local function deliverSnapshotForRequest(addon, wow, remote, requestPayload)

@@ -57,11 +57,39 @@ local function normalizeBuildChannel(value)
         return nil
     end
     local lowered = value:lower()
-    if lowered == "release" or lowered == "dev" or lowered == "beta" then
-        return lowered
+    if lowered == "legacy" then
+        return nil
     end
-    return "unknown"
+    if lowered == "dev" then
+        return "dev"
+    end
+    if lowered == "release" or lowered == "beta" then
+        return "release"
+    end
+    return "unsupported"
 end
+
+local MODERN_ONLY_PURPOSES = {
+    ["manifest-large"] = true,
+    ["manifest-recovery"] = true,
+    ["post-wipe"] = true,
+    ["offline-replica"] = true,
+    ["catchup-offline"] = true,
+    ["snapshot-replica"] = true,
+    ["auto-tick-modern"] = true,
+}
+
+local MANI_RELIABLE_PURPOSES = {
+    ["manifest-large"] = true,
+    ["manifest-recovery"] = true,
+    ["post-wipe"] = true,
+}
+
+local CHUNK_WINDOW_PURPOSES = {
+    ["offline-replica"] = true,
+    ["catchup-offline"] = true,
+    ["snapshot-replica"] = true,
+}
 
 local function summarizeCapabilities(payload)
     local caps = {}
@@ -76,6 +104,20 @@ local function summarizeCapabilities(payload)
     if source.snapCodec ~= nil then caps.snapCodec = source.snapCodec == true end
     if source.manifestShards ~= nil then caps.manifestShards = source.manifestShards == true end
     return caps
+end
+
+local function getDeclaredCapabilities(versionInfo, capsInfo)
+    local capabilities = type(versionInfo) == "table" and type(versionInfo.capabilities) == "table" and cloneCapabilities(versionInfo.capabilities) or {}
+    if next(capabilities) == nil and type(capsInfo) == "table" then
+        if type(capsInfo.capabilities) == "table" then
+            capabilities = cloneCapabilities(capsInfo.capabilities)
+        end
+        if capsInfo.chunkWindow ~= nil then capabilities.chunkWindow = capsInfo.chunkWindow == true end
+        if capsInfo.maniReliable ~= nil then capabilities.maniReliable = capsInfo.maniReliable == true end
+        if capsInfo.snapCodecCap ~= nil then capabilities.snapCodec = capsInfo.snapCodecCap == true end
+        if capsInfo.manifestShards ~= nil then capabilities.manifestShards = capsInfo.manifestShards == true end
+    end
+    return next(capabilities) ~= nil and capabilities or nil
 end
 
 local function countNestedEntries(groups)
@@ -291,12 +333,12 @@ function Sync:ComputePeerCompatibility(peer)
             return "channel-mismatch"
         end
     else
-        if remoteChannel == "dev" or remoteChannel == "beta" then
+        if remoteChannel == "dev" or remoteChannel == "unsupported" then
             return "channel-mismatch"
         end
-        if not remoteChannel or remoteChannel == "unknown" then
+        if not remoteChannel then
             if localInfo.allowLegacyReleasePeers then
-                return "legacy-unknown"
+                return "legacy"
             end
             return "channel-mismatch"
         end
@@ -307,13 +349,13 @@ function Sync:ComputePeerCompatibility(peer)
 
     local wireVersion = tonumber(peer.wireVersion or 0) or 0
     if wireVersion <= 0 then
-        return "legacy-unknown"
+        return "legacy"
     end
     if wireVersion > (localInfo.wireVersion or Addon.WIRE_VERSION or 0) then
         return "remote-newer-wire"
     end
     if wireVersion < (localInfo.minSupportedWireVersion or Addon.MIN_SUPPORTED_WIRE_VERSION or Addon.WIRE_VERSION or 0) then
-        return "remote-legacy-wire"
+        return "remote-older-wire"
     end
     return "compatible"
 end
@@ -329,14 +371,14 @@ function Sync:IsInboundBuildChannelAllowed(payload, _sender)
         return false, remoteChannel and "channel-mismatch" or "missing-build-channel", remoteChannel or "unknown"
     end
 
-    if remoteChannel == "dev" or remoteChannel == "beta" then
+    if remoteChannel == "dev" or remoteChannel == "unsupported" then
         return false, "channel-mismatch", remoteChannel
     end
-    if not remoteChannel or remoteChannel == "unknown" then
+    if not remoteChannel then
         if localInfo.allowLegacyReleasePeers then
-            return true, "legacy-release", remoteChannel or "unknown"
+            return true, "legacy-release", "legacy"
         end
-        return false, "missing-build-channel", remoteChannel or "unknown"
+        return false, "missing-build-channel", "legacy"
     end
     if remoteChannel ~= localInfo.buildChannel then
         return false, "channel-mismatch", remoteChannel
@@ -372,7 +414,7 @@ function Sync:ObservePeerVersion(peerKey, payload)
 
     info.addonVersion = info.addonVersion or existing and existing.addonVersion or "unknown"
     info.wireVersion = tonumber(info.wireVersion or existing and existing.wireVersion or 0) or 0
-    info.buildChannel = normalizeBuildChannel(info.buildChannel or existing and existing.buildChannel) or "unknown"
+    info.buildChannel = normalizeBuildChannel(info.buildChannel or existing and existing.buildChannel) or "legacy"
     info.buildId = info.buildId or existing and existing.buildId or nil
     if next(info.capabilities) == nil and existing and type(existing.capabilities) == "table" then
         info.capabilities = cloneCapabilities(existing.capabilities)
@@ -441,7 +483,7 @@ end
 function Sync:ShouldAcceptInboundPayload(_payload, peerKey)
     local info = peerKey and self:GetPeerVersionInfo(peerKey) or nil
     local compatibility = info and (info.compatibility or self:ComputePeerCompatibility(info)) or "unknown"
-    if compatibility == "remote-newer-wire" or compatibility == "remote-legacy-wire" then
+    if compatibility == "legacy" or compatibility == "remote-newer-wire" or compatibility == "remote-older-wire" then
         return false
     end
     return compatibility ~= "channel-mismatch"
@@ -463,7 +505,7 @@ function Sync:MaybeNotifyPeerVersion(peerKey, info)
             return
         end
     else
-        if remoteChannel == "dev" or remoteChannel == "unknown" then
+        if remoteChannel == "dev" or remoteChannel == "legacy" or remoteChannel == "unsupported" then
             return
         end
     end
@@ -500,7 +542,7 @@ function Sync:MaybeNotifyPeerVersion(peerKey, info)
     if not Addon.BuildInfo.IsRemoteNewer(info.addonVersion, Addon.ADDON_VERSION or Addon.DISPLAY_VERSION) then
         return
     end
-    if info.compatibility ~= "compatible" and info.compatibility ~= "legacy-unknown" then
+    if info.compatibility ~= "compatible" then
         return
     end
     local noticedCmp = notice.lastNoticedVersion and compareSemver(info.addonVersion, notice.lastNoticedVersion) or nil
@@ -705,9 +747,59 @@ function Sync:CanExchangeDataWithPeer(peerKey, purpose, request)
     if self:IsMockKey(peerKey) and not self:ShouldAllowLocalMockTraffic(peerKey, request.memberKey or peerKey) then
         return false, "mock-peer"
     end
+    local peerVersion = self.GetPeerVersionInfo and self:GetPeerVersionInfo(peerKey) or nil
+    local caps = self.GetPeerCaps and self:GetPeerCaps(peerKey) or nil
+    if peerVersion then
+        local compatibility = peerVersion.compatibility or self:ComputePeerCompatibility(peerVersion)
+        if compatibility == "channel-mismatch" then
+            self:SetPeerIneligibleReason(peerKey, "channel-mismatch")
+            self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
+            self.telemetry.skippedVersionIncompatible = (self.telemetry.skippedVersionIncompatible or 0) + 1
+            return false, "channel-mismatch"
+        end
+        if compatibility == "legacy" and purpose ~= "diagnostics" then
+            self:SetPeerIneligibleReason(peerKey, "legacy")
+            self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
+            self.telemetry.skippedVersionIncompatible = (self.telemetry.skippedVersionIncompatible or 0) + 1
+            return false, "legacy-peer"
+        end
+        if compatibility == "remote-newer-wire" or compatibility == "remote-older-wire" then
+            self:SetPeerIneligibleReason(peerKey, compatibility)
+            self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
+            self.telemetry.skippedVersionIncompatible = (self.telemetry.skippedVersionIncompatible or 0) + 1
+            return false, "wire-mismatch"
+        end
+        if MODERN_ONLY_PURPOSES[purpose] then
+            local capabilities = getDeclaredCapabilities(peerVersion, caps)
+            local hasCapabilityDeclaration = caps ~= nil
+                or (type(peerVersion.capabilities) == "table" and next(peerVersion.capabilities) ~= nil)
+            if not capabilities then
+                if MANI_RELIABLE_PURPOSES[purpose] and not hasCapabilityDeclaration and compatibility == "compatible" then
+                    capabilities = nil
+                else
+                self:SetPeerIneligibleReason(peerKey, "missing-required-capability")
+                self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
+                self.telemetry.skippedMissingCapability = (self.telemetry.skippedMissingCapability or 0) + 1
+                return false, "missing-required-capability"
+                end
+            end
+            if capabilities and MANI_RELIABLE_PURPOSES[purpose] and capabilities.maniReliable ~= true then
+                self:SetPeerIneligibleReason(peerKey, "missing-mani-reliable")
+                self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
+                self.telemetry.skippedMissingCapability = (self.telemetry.skippedMissingCapability or 0) + 1
+                return false, "missing-mani-reliable"
+            end
+            if capabilities and CHUNK_WINDOW_PURPOSES[purpose] and capabilities.chunkWindow ~= true then
+                self:SetPeerIneligibleReason(peerKey, "missing-chunk-window")
+                self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
+                self.telemetry.skippedMissingCapability = (self.telemetry.skippedMissingCapability or 0) + 1
+                return false, "missing-chunk-window"
+            end
+        end
+    end
     local allowSpeculativeManifest = purpose == "manifest-large"
         and not request.allowOfflinePeer
-        and not (self.peerVersions and self.peerVersions[peerKey])
+        and not peerVersion
     if peerKey ~= self:GetSelfKey()
         and not request.allowOfflinePeer
         and not allowSpeculativeManifest
@@ -727,32 +819,6 @@ function Sync:CanExchangeDataWithPeer(peerKey, purpose, request)
         self:SetPeerIneligibleReason(peerKey, "recent-reject:" .. tostring(recentReject.reason or "reject"))
         return false, "recent-reject:" .. tostring(recentReject.reason or "reject")
     end
-    local peerVersion = self.GetPeerVersionInfo and self:GetPeerVersionInfo(peerKey) or nil
-    if peerVersion then
-        local compatibility = peerVersion.compatibility or self:ComputePeerCompatibility(peerVersion)
-        if compatibility == "channel-mismatch" then
-            self:SetPeerIneligibleReason(peerKey, "channel-mismatch")
-            self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
-            self.telemetry.skippedVersionIncompatible = (self.telemetry.skippedVersionIncompatible or 0) + 1
-            return false, "channel-mismatch"
-        end
-        if compatibility == "remote-newer-wire" or compatibility == "remote-legacy-wire" then
-            self:SetPeerIneligibleReason(peerKey, compatibility)
-            self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
-            self.telemetry.skippedVersionIncompatible = (self.telemetry.skippedVersionIncompatible or 0) + 1
-            return false, "wire-mismatch"
-        end
-        if purpose == "manifest-large"
-            and type(peerVersion.capabilities) == "table"
-            and next(peerVersion.capabilities) ~= nil
-            and peerVersion.capabilities.maniReliable ~= true then
-            self:SetPeerIneligibleReason(peerKey, "missing-mani-reliable")
-            self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
-            self.telemetry.skippedMissingCapability = (self.telemetry.skippedMissingCapability or 0) + 1
-            return false, "missing-mani-reliable"
-        end
-    end
-    local caps = self.GetPeerCaps and self:GetPeerCaps(peerKey) or nil
     if caps then
         if caps.isPausedForSync == true and not allowManual then
             self:SetPeerIneligibleReason(peerKey, "peer-paused")

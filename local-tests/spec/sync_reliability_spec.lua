@@ -36,6 +36,15 @@ local function printLogContains(wow, needle)
     return false
 end
 
+local function withModernVersion(addon, payload)
+    payload = payload or {}
+    payload.addonVersion = payload.addonVersion or addon.ADDON_VERSION
+    payload.wireVersion = payload.wireVersion or addon.WIRE_VERSION
+    payload.buildChannel = payload.buildChannel or addon.BUILD_CHANNEL
+    payload.caps = payload.caps or (addon.Sync.GetLocalProtocolCaps and addon.Sync:GetLocalProtocolCaps() or nil)
+    return payload
+end
+
 local function captureIdleRequestState(sync)
     return {
         pendingRequests = Test.countKeys(sync.pendingRequests),
@@ -108,14 +117,14 @@ Test.it("REQ received in instance returns RERR instead of timing out silently", 
     wow.SetInstance(true, "raid")
     addon.SyncPausePolicy:RefreshPauseState()
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "REQ",
         key = data:GetPlayerKey(),
         knownRev = 0,
         wantRev = 1,
         requestId = "req-instance",
         sender = peerKey,
-    }, {
+    }), {
         sender = peerKey,
         distribution = "WHISPER",
     })
@@ -130,14 +139,14 @@ Test.it("missing entry returns NO_ENTRY immediately", function()
     local addon, wow, _data = freshAddon()
     local peerKey = "Peerone-TestRealm"
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "REQ",
         key = "Missingone-TestRealm",
         knownRev = 0,
         wantRev = 5,
         requestId = "req-missing",
         sender = peerKey,
-    }, {
+    }), {
         sender = peerKey,
         distribution = "WHISPER",
     })
@@ -153,7 +162,7 @@ Test.it("missing requested block returns NO_REQUESTED_BLOCK", function()
     local selfKey = data:GetPlayerKey()
 
     seedProfession(data, selfKey, "Cooking", 99002, { sourceType = "owner" })
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "REQ",
         key = selfKey,
         knownRev = 0,
@@ -163,7 +172,7 @@ Test.it("missing requested block returns NO_REQUESTED_BLOCK", function()
             data:BuildSyncBlockKey(selfKey, "Alchemy"),
         },
         sender = peerKey,
-    }, {
+    }), {
         sender = peerKey,
         distribution = "WHISPER",
     })
@@ -184,14 +193,14 @@ Test.it("empty snapshot build returns EMPTY_SNAPSHOT", function()
         return {}
     end
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "REQ",
         key = selfKey,
         knownRev = 0,
         wantRev = 1,
         requestId = "req-empty",
         sender = peerKey,
-    }, {
+    }), {
         sender = peerKey,
         distribution = "WHISPER",
     })
@@ -217,14 +226,14 @@ Test.it("requester clears in-flight state on permanent RERR", function()
         requestId = "req-live",
     })
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "RERR",
         key = peerKey,
         requestId = "req-live",
         reason = "NO_ENTRY",
         retryable = false,
         sender = peerKey,
-    }, {
+    }), {
         sender = peerKey,
         distribution = "WHISPER",
     })
@@ -293,14 +302,14 @@ Test.it("IDX skips self-owner hints without queuing direct request state", funct
     data:RebuildOnlineCache()
     addon.Sync.coordinatorKey = coordinatorKey
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "IDX",
         key = selfKey,
         owner = selfKey,
         rev = 9,
         updatedAt = 900,
         sender = coordinatorKey,
-    }, {
+    }), {
         sender = coordinatorKey,
         distribution = "GUILD",
     })
@@ -321,14 +330,14 @@ Test.it("IDX skips offline-owner replica hints without queuing impossible reques
     data:RebuildOnlineCache()
     addon.Sync.coordinatorKey = coordinatorKey
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "IDX",
         key = offlineOwner,
         owner = offlineOwner,
         rev = 11,
         updatedAt = 1100,
         sender = coordinatorKey,
-    }, {
+    }), {
         sender = coordinatorKey,
         distribution = "GUILD",
     })

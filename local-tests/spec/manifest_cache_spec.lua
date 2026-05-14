@@ -37,6 +37,15 @@ local function seedProfession(data, memberKey, profession, recipeKey, opts)
     return entry.professions[profession]
 end
 
+local function withModernVersion(addon, payload)
+    payload = payload or {}
+    payload.addonVersion = payload.addonVersion or addon.ADDON_VERSION
+    payload.wireVersion = payload.wireVersion or addon.WIRE_VERSION
+    payload.buildChannel = payload.buildChannel or addon.BUILD_CHANNEL
+    payload.caps = payload.caps or (addon.Sync.GetLocalProtocolCaps and addon.Sync:GetLocalProtocolCaps() or nil)
+    return payload
+end
+
 io.write("Manifest cache\n")
 
 Test.it("builds and reuses cached manifest chunks", function()
@@ -125,7 +134,7 @@ Test.it("defers inline manifest compare fallback during warmup and replays it on
     addon.Sync:EnterWarmup("test", 12)
     addon.Sync.onlineNodes[peerKey] = { lastSeen = time(), version = "1.7.0" }
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "MANI",
         manifestId = "peer-manifest-1",
         builtAt = time(),
@@ -148,7 +157,7 @@ Test.it("defers inline manifest compare fallback during warmup and replays it on
                 fingerprint = "peer-fingerprint",
             },
         },
-    }, {
+    }), {
         sender = peerKey,
         distribution = "WHISPER",
     })
@@ -297,28 +306,28 @@ Test.it("retries targeted manifest refreshes on later hello sessions until a man
     local addon, wow, _data = freshAddon()
     local peerKey = "Peerone-Testrealm"
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "HELLO",
         key = peerKey,
         rev = 5,
         updatedAt = 500,
         sender = peerKey,
         version = "1.6.0",
-    }, {
+    }), {
         sender = peerKey,
         distribution = "GUILD",
     })
 
     Test.eq(countCommKind(wow, "MREQ"), 0, "first hello should not trigger an immediate targeted manifest refresh")
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "HELLO",
         key = peerKey,
         rev = 5,
         updatedAt = 501,
         sender = peerKey,
         version = "1.6.0",
-    }, {
+    }), {
         sender = peerKey,
         distribution = "GUILD",
     })
@@ -326,21 +335,21 @@ Test.it("retries targeted manifest refreshes on later hello sessions until a man
     Test.eq(countCommKind(wow, "MREQ"), 1, "the next hello without any manifest should trigger the first targeted refresh")
 
     wow.AdvanceTime(31)
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "HELLO",
         key = peerKey,
         rev = 5,
         updatedAt = 502,
         sender = peerKey,
         version = "1.6.0",
-    }, {
+    }), {
         sender = peerKey,
         distribution = "GUILD",
     })
 
     Test.eq(countCommKind(wow, "MREQ"), 2, "a later hello without any received manifest should retry the targeted refresh after cooldown")
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "MANI",
         manifestId = "peer-manifest-1",
         builtAt = 900,
@@ -350,20 +359,20 @@ Test.it("retries targeted manifest refreshes on later hello sessions until a man
         total = 1,
         blocks = {},
         sender = peerKey,
-    }, {
+    }), {
         sender = peerKey,
         distribution = "WHISPER",
     })
 
     wow.AdvanceTime(31)
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "HELLO",
         key = peerKey,
         rev = 5,
         updatedAt = 503,
         sender = peerKey,
         version = "1.6.0",
-    }, {
+    }), {
         sender = peerKey,
         distribution = "GUILD",
     })
@@ -374,14 +383,14 @@ Test.it("retries targeted manifest refreshes on later hello sessions until a man
     addon.Sync:PruneOnlineNodes()
     Test.falsy(addon.Sync.onlineNodes[peerKey], "peer should time out between hello sessions")
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "HELLO",
         key = peerKey,
         rev = 5,
         updatedAt = 504,
         sender = peerKey,
         version = "1.6.0",
-    }, {
+    }), {
         sender = peerKey,
         distribution = "GUILD",
     })

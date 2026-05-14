@@ -741,7 +741,7 @@ function Wow.Reset(opts)
         },
         payloadMode = opts.payloadMode or "table-fast",
         addonMetadata = deepcopy(opts.addonMetadata or {
-            Version = "1.8.1",
+            Version = "2.0.0",
             ["X-Build-Channel"] = "release",
             ["X-Build-ID"] = "test-build",
         }),

@@ -71,6 +71,35 @@ local function cloneNumberArray(values)
     return out
 end
 
+local function mergeDeferredBlockKeys(existingKeys, incomingKeys)
+    local merged = {}
+    local seen = {}
+    for _, blockKey in ipairs(existingKeys or {}) do
+        if blockKey and not seen[blockKey] then
+            seen[blockKey] = true
+            merged[#merged + 1] = blockKey
+        end
+    end
+    for _, blockKey in ipairs(incomingKeys or {}) do
+        if blockKey and not seen[blockKey] then
+            seen[blockKey] = true
+            merged[#merged + 1] = blockKey
+        end
+    end
+    return merged
+end
+
+local function manifestPurposeFor(why)
+    local reason = tostring(why or "")
+    if reason == "manifest-partial-timeout" or reason == "request-repair" then
+        return "manifest-recovery"
+    end
+    if reason == "post-wipe" or reason == "database-wipe" then
+        return "post-wipe"
+    end
+    return "manifest-large"
+end
+
 local function ensureManifestBatchDiagnostics(self)
     self._manifestBatchDiagnostics = self._manifestBatchDiagnostics or {
         send = {},
@@ -165,7 +194,7 @@ function Sync:SendManifestToPeer(peerKey, why)
     if not peerKey or not Addon.TrickleSync then return end
     if not self:IsValidSyncMemberKey(peerKey) then return end
     if self:IsMockKey(peerKey) then return end
-    local eligible, reason = self:CanExchangeDataWithPeer(peerKey, "manifest-large", {
+    local eligible, reason = self:CanExchangeDataWithPeer(peerKey, manifestPurposeFor(why), {
         source = peerKey,
         memberKey = peerKey,
         why = why or "manifest",
@@ -396,7 +425,7 @@ function Sync:RequestManifestRefresh(peerKey, opts)
     opts = opts or {}
     if peerKey and peerKey ~= "" then
         if self:IsMockKey(peerKey) then return end
-        local eligible, reason = self:CanExchangeDataWithPeer(peerKey, "manifest-large", {
+        local eligible, reason = self:CanExchangeDataWithPeer(peerKey, manifestPurposeFor(opts.reason), {
             source = peerKey,
             memberKey = peerKey,
             why = opts.reason or "manual",
@@ -440,7 +469,7 @@ end
 function Sync:HandleManifestRequest(payload)
     if not self:IsValidSyncMemberKey(payload.sender) or payload.sender == self:GetSelfKey() then return end
     if self:IsMockKey(payload.sender) then return end
-    local eligible = self:CanExchangeDataWithPeer(payload.sender, "manifest-large", {
+    local eligible = self:CanExchangeDataWithPeer(payload.sender, manifestPurposeFor(payload.why), {
         source = payload.sender,
         memberKey = payload.sender,
         why = payload.why or "force",
@@ -570,6 +599,21 @@ function Sync:DeferManifestCatchupCandidate(candidate)
     candidate.expectedFingerprints = sliceExpectedFingerprints(candidate.expectedFingerprints, candidate.blockKeys)
     if #candidate.blockKeys == 0 then return end
     self.manifestCatchupQueue = self.manifestCatchupQueue or {}
+    for _, queued in ipairs(self.manifestCatchupQueue) do
+        if queued
+            and queued.senderKey == candidate.senderKey
+            and queued.ownerCharacter == candidate.ownerCharacter then
+            queued.blockKeys = mergeDeferredBlockKeys(queued.blockKeys, candidate.blockKeys)
+            queued.expectedFingerprints = cloneFingerprintMap(queued.expectedFingerprints)
+            for blockKey, fingerprint in pairs(candidate.expectedFingerprints or {}) do
+                queued.expectedFingerprints[blockKey] = fingerprint
+            end
+            queued.revision = max(tonumber(queued.revision or 0) or 0, tonumber(candidate.revision or 0) or 0)
+            queued.offlineReplica = queued.offlineReplica or candidate.offlineReplica == true
+            queued.wasDeferred = true
+            return
+        end
+    end
     if not candidate.wasDeferred then
         self.telemetry.manifestCatchupDeferred = (self.telemetry.manifestCatchupDeferred or 0) + 1
     end
@@ -583,6 +627,29 @@ end
 function Sync:QueueManifestCatchupRequest(candidate)
     if not (candidate and self:IsValidSyncMemberKey(candidate.ownerCharacter) and self:IsValidSyncMemberKey(candidate.senderKey)) then
         return false, false
+    end
+    local directOwner = candidate.ownerCharacter == candidate.senderKey
+    if candidate.ownerCharacter == self:GetSelfKey() then
+        self.telemetry.manifestCatchupSkippedLocalOwners = (self.telemetry.manifestCatchupSkippedLocalOwners or 0) + 1
+        if candidate.wasDeferred then
+            self.telemetry.manifestCatchupDrained = (self.telemetry.manifestCatchupDrained or 0) + 1
+        end
+        return true, false
+    end
+    local ownerIsOnline = Addon.Data:IsMemberOnline(candidate.ownerCharacter)
+    if not directOwner and ownerIsOnline then
+        self.telemetry.manifestCatchupSkippedOnlineOwners = (self.telemetry.manifestCatchupSkippedOnlineOwners or 0) + 1
+        if candidate.wasDeferred then
+            self.telemetry.manifestCatchupDrained = (self.telemetry.manifestCatchupDrained or 0) + 1
+        end
+        return true, false
+    end
+    if not directOwner and self:IsLocallyStaleOwner(candidate.ownerCharacter) then
+        self.telemetry.manifestCatchupSkippedStaleOwners = (self.telemetry.manifestCatchupSkippedStaleOwners or 0) + 1
+        if candidate.wasDeferred then
+            self.telemetry.manifestCatchupDrained = (self.telemetry.manifestCatchupDrained or 0) + 1
+        end
+        return true, false
     end
     if self:IsRequestAlreadySatisfied({
         memberKey = candidate.ownerCharacter,
@@ -602,6 +669,7 @@ function Sync:QueueManifestCatchupRequest(candidate)
         allowReplicaSource = true,
         requestedBlocks = candidate.blockKeys,
         expectedFingerprints = candidate.expectedFingerprints,
+        requestPurpose = candidate.offlineReplica and "catchup-offline" or "request",
     })
     self.telemetry.manifestCatchupQueued = (self.telemetry.manifestCatchupQueued or 0) + 1
     if candidate.wasDeferred then
@@ -893,7 +961,7 @@ function Sync:SendNextManifestChunk()
     local candidateIndex
     for index = 1, #self.manifestChunkQueue do
         local queued = self.manifestChunkQueue[index]
-        local eligible = self:CanExchangeDataWithPeer(queued.peer, "manifest-large", {
+        local eligible = self:CanExchangeDataWithPeer(queued.peer, manifestPurposeFor(queued.payload and queued.payload.why), {
             source = queued.peer,
             memberKey = queued.peer,
             why = queued.payload and queued.payload.why or "manifest",

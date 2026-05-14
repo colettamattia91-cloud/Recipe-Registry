@@ -28,12 +28,21 @@ local function makeBlock(data, ownerKey, professionKey, revision, opts)
     }
 end
 
+local function withModernVersion(addon, payload)
+    payload = payload or {}
+    payload.addonVersion = payload.addonVersion or addon.ADDON_VERSION
+    payload.wireVersion = payload.wireVersion or addon.WIRE_VERSION
+    payload.buildChannel = payload.buildChannel or addon.BUILD_CHANNEL
+    payload.caps = payload.caps or (addon.Sync.GetLocalProtocolCaps and addon.Sync:GetLocalProtocolCaps() or nil)
+    return payload
+end
+
 local function deliverManifest(addon, wow, senderKey, blocks, manifestId)
     local totalRecipes = 0
     for _, block in ipairs(blocks or {}) do
         totalRecipes = totalRecipes + (block.count or 0)
     end
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "MANI",
         sender = senderKey,
         manifestId = manifestId or ("mani:" .. senderKey),
@@ -43,7 +52,7 @@ local function deliverManifest(addon, wow, senderKey, blocks, manifestId)
         seq = 1,
         total = 1,
         blocks = blocks or {},
-    }, { sender = senderKey, distribution = "WHISPER" })
+    }), { sender = senderKey, distribution = "WHISPER" })
 end
 
 local function runCatchupTick(addon, wow)

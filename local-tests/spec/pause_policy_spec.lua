@@ -30,6 +30,15 @@ local function seedProfession(data, memberKey, profession, recipeKey, opts)
     return entry
 end
 
+local function withModernVersion(addon, payload)
+    payload = payload or {}
+    payload.addonVersion = payload.addonVersion or addon.ADDON_VERSION
+    payload.wireVersion = payload.wireVersion or addon.WIRE_VERSION
+    payload.buildChannel = payload.buildChannel or addon.BUILD_CHANNEL
+    payload.caps = payload.caps or (addon.Sync.GetLocalProtocolCaps and addon.Sync:GetLocalProtocolCaps() or nil)
+    return payload
+end
+
 io.write("Pause policy\n")
 
 Test.it("does not pause sync just for a raid group outside instances", function()
@@ -75,14 +84,14 @@ Test.it("keeps protocol traffic active in raid groups outside instances", functi
     addon.Sync:BroadcastHello()
     Test.eq(#wow.GetSentComm(), 1, "hello should still be sent in a raid group outside instances")
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "HELLO",
         key = "Peerone-TestRealm",
         rev = 5,
         updatedAt = 500,
         sender = "Peerone-TestRealm",
         version = "1.6.0",
-    }, {
+    }), {
         sender = "Peerone-TestRealm",
         distribution = "GUILD",
     })
@@ -115,14 +124,14 @@ Test.it("halts protocol traffic and inbound sync handling while in instances", f
     Test.falsy(addon.Sync.inFlight, "request queue should not advance while paused")
     Test.eq(addon.Sync:GetActiveRequestCount(), 0, "bounded request concurrency should also stay blocked while paused")
 
-    wow.DeliverComm(addon.Sync, {
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
         kind = "HELLO",
         key = "Peerone-TestRealm",
         rev = 5,
         updatedAt = 500,
         sender = "Peerone-TestRealm",
         version = "1.6.0",
-    }, {
+    }), {
         sender = "Peerone-TestRealm",
         distribution = "GUILD",
     })
