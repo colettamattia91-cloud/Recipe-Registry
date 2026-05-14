@@ -11,6 +11,14 @@ local SNAP_CODEC_ENABLED = Constants.SNAP_CODEC_ENABLED
 local SNAP_CODEC_MIN_BYTES = Constants.SNAP_CODEC_MIN_BYTES
 local SNAP_CODEC_ID = Constants.SNAP_CODEC_ID
 
+local function cloneCapabilities(src)
+    local out = {}
+    for key, value in pairs(src or {}) do
+        out[key] = value == true
+    end
+    return out
+end
+
 local function nowMs()
     if type(debugprofilestop) == "function" then
         return debugprofilestop()
@@ -69,7 +77,14 @@ function Sync:GetLocalProtocolCaps()
     local protocolPaused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("REQ") or false
     return {
         wireVersion = Addon.WIRE_VERSION,
-        addonVersion = Addon.DISPLAY_VERSION,
+        addonVersion = Addon.ADDON_VERSION or Addon.DISPLAY_VERSION,
+        buildChannel = Addon.BUILD_CHANNEL,
+        buildId = Addon.BUILD_ID,
+        capabilities = cloneCapabilities(Addon.CAPABILITIES),
+        chunkWindow = Addon.CAPABILITIES and Addon.CAPABILITIES.chunkWindow == true or false,
+        maniReliable = Addon.CAPABILITIES and Addon.CAPABILITIES.maniReliable == true or false,
+        manifestShards = Addon.CAPABILITIES and Addon.CAPABILITIES.manifestShards == true or false,
+        snapCodecCap = Addon.CAPABILITIES and Addon.CAPABILITIES.snapCodec == true or false,
         canReceiveReq = not protocolPaused,
         canSendSnap = not protocolPaused,
         snapCodec = codecId,
@@ -95,6 +110,13 @@ function Sync:RecordPeerCaps(peerKey, caps)
     self.peerCaps[peerKey] = {
         wireVersion = caps.wireVersion,
         addonVersion = caps.addonVersion,
+        buildChannel = caps.buildChannel,
+        buildId = caps.buildId,
+        capabilities = cloneCapabilities(caps.capabilities),
+        chunkWindow = caps.chunkWindow,
+        maniReliable = caps.maniReliable,
+        manifestShards = caps.manifestShards,
+        snapCodecCap = caps.snapCodecCap,
         canReceiveReq = caps.canReceiveReq,
         canSendSnap = caps.canSendSnap,
         snapCodec = caps.snapCodec,

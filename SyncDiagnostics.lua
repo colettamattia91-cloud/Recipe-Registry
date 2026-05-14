@@ -249,6 +249,69 @@ function Sync:GetDebugSnapshot()
     }
 end
 
+function Sync:DumpVersionStatus()
+    local info = self:GetLocalVersionInfo()
+    local notice = Addon.Data and Addon.Data.GetUpdateNoticeState and Addon.Data:GetUpdateNoticeState() or {}
+    Addon:Print(string.format(
+        "Recipe Registry: version=%s wire=%s minWire=%s channel=%s prefix=%s build=%s",
+        tostring(info.addonVersion or "?"),
+        tostring(info.wireVersion or "?"),
+        tostring(info.minSupportedWireVersion or info.wireVersion or "?"),
+        tostring(info.buildChannel or "release"),
+        tostring(info.commPrefix or Addon.ADDON_PREFIX or "?"),
+        tostring(info.buildId or "n/a")
+    ))
+    Addon:Print(string.format(
+        "Capabilities: chunkWindow=%s maniReliable=%s snapCodec=%s manifestShards=%s latestRemoteVersionSeen=%s lastNoticedVersion=%s lastUpdateNoticeAt=%s",
+        tostring(info.capabilities and info.capabilities.chunkWindow == true),
+        tostring(info.capabilities and info.capabilities.maniReliable == true),
+        tostring(info.capabilities and info.capabilities.snapCodec == true),
+        tostring(info.capabilities and info.capabilities.manifestShards == true),
+        tostring(notice.latestRemoteVersionSeen or "none"),
+        tostring(notice.lastNoticedVersion or "none"),
+        tostring(notice.lastUpdateNoticeAt or 0)
+    ))
+end
+
+function Sync:DumpPeerVersions()
+    self:DumpVersionStatus()
+
+    local rows = {}
+    for peerKey, info in pairs(self.peerVersions or {}) do
+        if self:IsValidSyncMemberKey(peerKey) then
+            rows[#rows + 1] = {
+                peerKey = peerKey,
+                info = info,
+                relation = self:GetPeerVersionRelation(peerKey),
+            }
+        end
+    end
+    sort(rows, function(left, right)
+        return tostring(left.peerKey) < tostring(right.peerKey)
+    end)
+
+    if #rows == 0 then
+        Addon:Print("Peers: none")
+        return
+    end
+
+    Addon:Print("Peers:")
+    for _, row in ipairs(rows) do
+        local info = row.info or {}
+        Addon:Print(string.format(
+            "- %s version=%s wire=%s channel=%s status=%s relation=%s ineligible=%s build=%s",
+            tostring(row.peerKey),
+            tostring(info.addonVersion or "unknown"),
+            tostring(info.wireVersion or "unknown"),
+            tostring(info.buildChannel or "unknown"),
+            tostring(info.compatibility or "unknown"),
+            tostring(row.relation or "unknown"),
+            tostring(info.ineligibleReason or "none"),
+            tostring(info.buildId or "n/a")
+        ))
+    end
+end
+
 function Sync:DumpOfflineSyncStatus()
     local t = self.telemetry or {}
     local runtime = self:GetRuntimeObservabilitySnapshot()
@@ -607,8 +670,9 @@ function Sync:DumpStatus()
     local runtime = self:GetRuntimeObservabilitySnapshot()
     local primary = self:GetInFlightRequest()
     local eligibility = self.GetPeerEligibilityBreakdown and self:GetPeerEligibilityBreakdown() or {}
+    local localVersion = self:GetLocalVersionInfo()
     Addon:Print(string.format(
-        "Role=%s coordinator=%s onlineNodes=%d registry=%d queued=%d activeReq=%d inFlight=%s outgoing=%d outboundChunks=%d manifestChunks=%d inboundChunks=%d manifestPending=%d paused=%s warmup=%s transition=%s(%ds) isolated=%s",
+        "Role=%s coordinator=%s onlineNodes=%d registry=%d queued=%d activeReq=%d inFlight=%s outgoing=%d outboundChunks=%d manifestChunks=%d inboundChunks=%d manifestPending=%d paused=%s warmup=%s transition=%s(%ds) isolated=%s channel=%s prefix=%s wire=%s",
         role,
         tostring(self.coordinatorKey),
         countKeys(self.onlineNodes),
@@ -625,7 +689,10 @@ function Sync:DumpStatus()
         tostring(self:IsInWarmup()),
         tostring(runtime.transitionActive or false),
         runtime.transitionRemaining or 0,
-        tostring(self:IsRealTrafficSuppressed())
+        tostring(self:IsRealTrafficSuppressed()),
+        tostring(localVersion.buildChannel or "release"),
+        tostring(localVersion.commPrefix or Addon.ADDON_PREFIX or "?"),
+        tostring(localVersion.wireVersion or "?")
     ))
     local tel = self.telemetry or {}
     Addon:Print(string.format(
@@ -704,6 +771,24 @@ function Sync:DumpStatus()
         tel.queuedBackoff or 0,
         tel.purgedBackoffRequests or 0,
         tel.deferredBackoffRequests or 0
+    ))
+    Addon:Print(string.format(
+        "Version peers=%d channelDrops=%d ignoredPeers=%d ineligible=%d skippedVersion=%d skippedCapability=%d newerVersionSeen=%d newerProtocolSeen=%d activeCommPrefix=%s latestRemoteVersionSeen=%s lastNotice=%s/%s lastDrop=%s/%s/%s",
+        countKeys(self.peerVersions),
+        tel.buildChannelDrops or 0,
+        tel.ignoredBuildChannelPeers or 0,
+        tel.versionIneligiblePeers or 0,
+        tel.skippedVersionIncompatible or 0,
+        tel.skippedMissingCapability or 0,
+        tel.newerVersionSeen or 0,
+        tel.newerProtocolSeen or 0,
+        tostring(tel.activeCommPrefix or Addon.ADDON_PREFIX or "unknown"),
+        tostring(tel.latestRemoteVersionSeen or "none"),
+        tostring(tel.lastVersionNoticePeer or "none"),
+        tostring(tel.lastVersionNoticeRemote or "none"),
+        tostring(tel.lastBuildChannelDropPeer or "none"),
+        tostring(tel.lastBuildChannelDropRemote or "none"),
+        tostring(tel.lastBuildChannelDropReason or "none")
     ))
     Addon:Print(string.format(
         "Runtime partialRecv=%d partialAge=%ds partialManifestPeers=%d partialManifestOpen=%d partialManifestAge=%ds transitionQueue=%d pressure=%d tricklePeers=%d residentPeers=%d queuedPeers=%d queuedBlocks=%d maxPeerQueue=%d queueCap=%d/%d outgoingAge=%ds prunes=out:%d part:%d mani:%d partialManifest:%d trickle:%d/%d runtimeCap=%d fallbackBuilds=%d fallbackDefers=%d deferredManifest=%d",

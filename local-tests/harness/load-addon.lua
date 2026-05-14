@@ -10,6 +10,7 @@ local Wow = dofile(join(root, "local-tests", "harness", "wow.lua"))
 local Loader = {
     BackendFiles = {
         "Core.lua",
+        "BuildInfo.lua",
         "Performance.lua",
         "Data.lua",
         "DataAtlasLoot.lua",
@@ -52,10 +53,12 @@ function Loader.Load(opts)
     if opts.reset ~= false then
         Wow.Reset({
             payloadMode = opts.payloadMode,
+            addonMetadata = opts.addonMetadata,
         })
-    elseif opts.payloadMode then
+    elseif opts.payloadMode or opts.addonMetadata then
         Wow.Configure({
             payloadMode = opts.payloadMode,
+            addonMetadata = opts.addonMetadata,
         })
     end
 

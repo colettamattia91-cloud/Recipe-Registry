@@ -4,7 +4,7 @@ Addon.Sync = Sync
 local Private = Sync._private or {}
 Sync._private = Private
 
-local PREFIX = Addon.ADDON_PREFIX
+local PREFIX = Addon.COMM_PREFIX or Addon.ADDON_PREFIX
 local time = time
 local pairs = pairs
 local ipairs = ipairs
@@ -280,6 +280,20 @@ local function newSyncTelemetry()
         snapCodecMaxDecodeMs = 0,
         snapCodecTotalEncodeMs = 0,
         snapCodecTotalDecodeMs = 0,
+        buildChannelDrops = 0,
+        ignoredBuildChannelPeers = 0,
+        lastBuildChannelDropPeer = nil,
+        lastBuildChannelDropRemote = nil,
+        lastBuildChannelDropReason = nil,
+        activeCommPrefix = PREFIX,
+        versionIneligiblePeers = 0,
+        skippedVersionIncompatible = 0,
+        skippedMissingCapability = 0,
+        lastVersionNoticePeer = nil,
+        lastVersionNoticeRemote = nil,
+        latestRemoteVersionSeen = nil,
+        newerVersionSeen = 0,
+        newerProtocolSeen = 0,
     }
 end
 

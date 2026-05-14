@@ -521,6 +521,13 @@ local function installWowGlobals()
     _G.date = function(format, value) return realDate(format, value or math.floor(state.now)) end
 
     _G.GetRealmName = function() return state.realm end
+    _G.GetAddOnMetadata = function(addonName, field)
+        if addonName ~= "RecipeRegistry" then
+            return nil
+        end
+        local metadata = state.addonMetadata or {}
+        return metadata[field]
+    end
     _G.UnitFullName = function(unit)
         if unit == "player" then return state.playerName, state.realm end
         return nil
@@ -733,6 +740,11 @@ function Wow.Reset(opts)
             nameFilter = "",
         },
         payloadMode = opts.payloadMode or "table-fast",
+        addonMetadata = deepcopy(opts.addonMetadata or {
+            Version = "1.8.1",
+            ["X-Build-Channel"] = "release",
+            ["X-Build-ID"] = "test-build",
+        }),
     }
 
     _G.RecipeRegistry = nil
@@ -750,6 +762,9 @@ function Wow.Configure(opts)
     opts = opts or {}
     if opts.payloadMode then
         state.payloadMode = opts.payloadMode
+    end
+    if opts.addonMetadata then
+        state.addonMetadata = deepcopy(opts.addonMetadata)
     end
     return state
 end
@@ -789,6 +804,10 @@ end
 function Wow.SetPlayer(name, realm)
     state.playerName = name or state.playerName
     state.realm = realm or state.realm
+end
+
+function Wow.SetAddonMetadata(metadata)
+    state.addonMetadata = deepcopy(metadata or {})
 end
 
 function Wow.SetGuildRoster(rows)
@@ -903,7 +922,7 @@ function Wow.DeliverComm(module, payload, opts)
     end
     local serializer = LibStub("AceSerializer-3.0")
     local message = serializer:Serialize(deepcopy(payload or {}))
-    local prefix = opts.prefix or (_G.RecipeRegistry and _G.RecipeRegistry.ADDON_PREFIX) or "RRG1"
+    local prefix = opts.prefix or (_G.RecipeRegistry and _G.RecipeRegistry.ADDON_PREFIX) or "RecipeRegistry"
     local distribution = opts.distribution or "WHISPER"
     local sender = opts.sender or (payload and payload.sender) or state.playerName
     target:OnCommReceived(prefix, message, distribution, sender)

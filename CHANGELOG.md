@@ -4,12 +4,13 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 ### Added
-- Local backend coverage now includes reload recovery regressions plus a two-tier sync soak harness: a default controlled churn soak in the main backend suite and a heavier 50-peer soak in `-Suite soak`.
+- Local backend coverage now includes reload recovery regressions plus a two-tier sync soak harness with explicit suite selection: the default backend pass keeps the controlled churn soak, while the heavier 50-peer soak runs only in `-Suite soak`.
 
 ### Changed
 - Snapshot serving memory work is still under investigation and intentionally not part of `1.8.1`; any lighter `SNAP` session materialization changes remain deferred until they can be exercised against real peers.
 - The local sync harness can now snapshot and restore SavedVariables across simulated reloads, inspect residual queue state more directly, and assert true baseline stability before churn begins.
 - Manifest and index catch-up now avoid impossible replica/self-owner request paths that could leave idle-looking peers with undrained sync work after heavier churn.
+- Automatic profession scans now stay quiet on unchanged results, broad weapon/generic skill events no longer surface fake profession rescan output, and manual rescans still report user-visible changed or unchanged results.
 
 ## [1.8.1] - 2026-05-10
 ### Added

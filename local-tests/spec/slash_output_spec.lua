@@ -38,7 +38,7 @@ Test.it("prints the complete main command surface", function()
 
     Test.truthy(printLogContains(wow, "Commands:"), "main help header")
     Test.truthy(printLogContains(wow, "/rr rescan - queue a profession scan"), "rescan help")
-    Test.truthy(printLogContains(wow, "/rr dump, /rr self [profession], /rr sync, /rr offline, /rr manifest [target or verbose], /rr pull"), "diagnostic help")
+    Test.truthy(printLogContains(wow, "/rr version, /rr versions, /rr dump, /rr self [profession], /rr sync, /rr offline, /rr manifest [target or verbose], /rr pull"), "diagnostic help")
     Test.truthy(printLogContains(wow, "offlinewipe"), "offlinewipe scenario in help")
     Test.truthy(printLogContains(wow, "/rr options, /rr mini, /rr debug"), "debug command in help")
     Test.truthy(printLogContains(wow, "/rr clean [check], /rr wipe"), "maintenance commands in help")

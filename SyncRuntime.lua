@@ -13,6 +13,7 @@ local remove = table.remove
 local countKeys = Private.countKeys
 local isMockKey = Private.isMockKey
 local newSyncTelemetry = Private.newSyncTelemetry
+local compareSemver = Addon.BuildInfo and Addon.BuildInfo.CompareSemver or nil
 
 local NODE_TIMEOUT = Constants.NODE_TIMEOUT
 local SESSION_TIMEOUT = Constants.SESSION_TIMEOUT
@@ -41,6 +42,41 @@ local MAX_MANIFEST_CATCHUP_QUEUE = Constants.MAX_MANIFEST_CATCHUP_QUEUE
 local MAX_PENDING_REQUESTS = Constants.MAX_PENDING_REQUESTS
 
 local LIFECYCLE_DEBUG_LIMIT = 20
+local VERSION_NOTICE_COOLDOWN = 12 * 60 * 60
+
+local function cloneCapabilities(src)
+    local out = {}
+    for key, value in pairs(src or {}) do
+        out[key] = value == true
+    end
+    return out
+end
+
+local function normalizeBuildChannel(value)
+    if type(value) ~= "string" or value == "" then
+        return nil
+    end
+    local lowered = value:lower()
+    if lowered == "release" or lowered == "dev" or lowered == "beta" then
+        return lowered
+    end
+    return "unknown"
+end
+
+local function summarizeCapabilities(payload)
+    local caps = {}
+    local source = type(payload) == "table" and payload or {}
+    local nested = type(source.capabilities) == "table" and source.capabilities or {}
+    if nested.chunkWindow ~= nil then caps.chunkWindow = nested.chunkWindow == true end
+    if nested.maniReliable ~= nil then caps.maniReliable = nested.maniReliable == true end
+    if nested.snapCodec ~= nil then caps.snapCodec = nested.snapCodec == true end
+    if nested.manifestShards ~= nil then caps.manifestShards = nested.manifestShards == true end
+    if source.chunkWindow ~= nil then caps.chunkWindow = source.chunkWindow == true end
+    if source.maniReliable ~= nil then caps.maniReliable = source.maniReliable == true end
+    if source.snapCodec ~= nil then caps.snapCodec = source.snapCodec == true end
+    if source.manifestShards ~= nil then caps.manifestShards = source.manifestShards == true end
+    return caps
+end
 
 local function countNestedEntries(groups)
     local total = 0
@@ -63,6 +99,7 @@ function Sync:OnInitialize()
     self.onlineNodes = {}
     self.registry = {}
     self.peerCaps = {}
+    self.peerVersions = {}
     self.pendingRequests = {}
     self.partialReceive = {}
     self.completedIncomingSessions = {}
@@ -121,6 +158,7 @@ function Sync:ResetRuntimeQueues(reason, opts)
         self.onlineNodes = {}
         self.registry = {}
         self.peerCaps = {}
+        self.peerVersions = {}
         self.coordinatorKey = nil
         self.lastHelloAt = 0
         self._lastCoordinatorChangeAt = 0
@@ -130,6 +168,7 @@ function Sync:ResetRuntimeQueues(reason, opts)
     self.completedIncomingSessions = {}
     self.outgoingSessions = {}
     self.peerCaps = {}
+    self.peerVersions = {}
     self.inFlightRequests = {}
     self.inFlight = nil
     self.outboundChunkQueue = {}
@@ -222,6 +261,268 @@ function Sync:PushOfflineDebugEvent(kind, detail)
     while #self.offlineDebugLog > OFFLINE_DEBUG_LOG_LIMIT do
         table.remove(self.offlineDebugLog, 1)
     end
+end
+
+function Sync:GetLocalVersionInfo()
+    if Addon.BuildInfo and Addon.BuildInfo.GetLocalVersionInfo then
+        return Addon.BuildInfo.GetLocalVersionInfo()
+    end
+    return {
+        addonVersion = Addon.ADDON_VERSION or Addon.DISPLAY_VERSION,
+        wireVersion = Addon.WIRE_VERSION,
+        minSupportedWireVersion = Addon.MIN_SUPPORTED_WIRE_VERSION or Addon.WIRE_VERSION,
+        buildChannel = Addon.BUILD_CHANNEL or "release",
+        buildId = Addon.BUILD_ID,
+        commPrefix = Addon.COMM_PREFIX or Addon.ADDON_PREFIX,
+        capabilities = cloneCapabilities(Addon.CAPABILITIES),
+        allowLegacyReleasePeers = Addon.ALLOW_LEGACY_RELEASE_PEERS == true,
+    }
+end
+
+function Sync:ComputePeerCompatibility(peer)
+    if type(peer) ~= "table" then
+        return "unknown"
+    end
+
+    local localInfo = self:GetLocalVersionInfo()
+    local remoteChannel = normalizeBuildChannel(peer.buildChannel)
+    if localInfo.buildChannel == "dev" then
+        if remoteChannel ~= "dev" then
+            return "channel-mismatch"
+        end
+    else
+        if remoteChannel == "dev" or remoteChannel == "beta" then
+            return "channel-mismatch"
+        end
+        if not remoteChannel or remoteChannel == "unknown" then
+            if localInfo.allowLegacyReleasePeers then
+                return "legacy-unknown"
+            end
+            return "channel-mismatch"
+        end
+        if remoteChannel ~= localInfo.buildChannel then
+            return "channel-mismatch"
+        end
+    end
+
+    local wireVersion = tonumber(peer.wireVersion or 0) or 0
+    if wireVersion <= 0 then
+        return "legacy-unknown"
+    end
+    if wireVersion > (localInfo.wireVersion or Addon.WIRE_VERSION or 0) then
+        return "remote-newer-wire"
+    end
+    if wireVersion < (localInfo.minSupportedWireVersion or Addon.MIN_SUPPORTED_WIRE_VERSION or Addon.WIRE_VERSION or 0) then
+        return "remote-legacy-wire"
+    end
+    return "compatible"
+end
+
+function Sync:IsInboundBuildChannelAllowed(payload, _sender)
+    local localInfo = self:GetLocalVersionInfo()
+    local remoteChannel = normalizeBuildChannel(payload and payload.buildChannel)
+
+    if localInfo.buildChannel == "dev" then
+        if remoteChannel == "dev" then
+            return true, "allowed", remoteChannel
+        end
+        return false, remoteChannel and "channel-mismatch" or "missing-build-channel", remoteChannel or "unknown"
+    end
+
+    if remoteChannel == "dev" or remoteChannel == "beta" then
+        return false, "channel-mismatch", remoteChannel
+    end
+    if not remoteChannel or remoteChannel == "unknown" then
+        if localInfo.allowLegacyReleasePeers then
+            return true, "legacy-release", remoteChannel or "unknown"
+        end
+        return false, "missing-build-channel", remoteChannel or "unknown"
+    end
+    if remoteChannel ~= localInfo.buildChannel then
+        return false, "channel-mismatch", remoteChannel
+    end
+    return true, "allowed", remoteChannel
+end
+
+function Sync:RegisterBuildChannelDrop(peerKey, payload, reason, remoteChannel)
+    self.telemetry.buildChannelDrops = (self.telemetry.buildChannelDrops or 0) + 1
+    self.telemetry.ignoredBuildChannelPeers = (self.telemetry.ignoredBuildChannelPeers or 0) + 1
+    self.telemetry.lastBuildChannelDropPeer = tostring(peerKey or payload and payload.sender or "unknown")
+    self.telemetry.lastBuildChannelDropRemote = tostring(remoteChannel or payload and payload.buildChannel or "unknown")
+    self.telemetry.lastBuildChannelDropReason = tostring(reason or "channel-mismatch")
+end
+
+function Sync:ObservePeerVersion(peerKey, payload)
+    if not self:IsValidSyncMemberKey(peerKey) then
+        return nil
+    end
+
+    local caps = type(payload) == "table" and payload.caps or nil
+    local existing = self.peerVersions and self.peerVersions[peerKey] or nil
+    local info = {
+        peerKey = peerKey,
+        addonVersion = type(payload) == "table" and (payload.addonVersion or payload.version) or nil,
+        wireVersion = type(payload) == "table" and (payload.wireVersion or (type(caps) == "table" and caps.wireVersion or nil)) or nil,
+        buildChannel = type(payload) == "table" and (payload.buildChannel or (type(caps) == "table" and caps.buildChannel or nil)) or nil,
+        buildId = type(payload) == "table" and (payload.buildId or (type(caps) == "table" and caps.buildId or nil)) or nil,
+        capabilities = summarizeCapabilities(type(caps) == "table" and caps or payload),
+        firstSeenAt = existing and existing.firstSeenAt or time(),
+        lastSeenAt = time(),
+    }
+
+    info.addonVersion = info.addonVersion or existing and existing.addonVersion or "unknown"
+    info.wireVersion = tonumber(info.wireVersion or existing and existing.wireVersion or 0) or 0
+    info.buildChannel = normalizeBuildChannel(info.buildChannel or existing and existing.buildChannel) or "unknown"
+    info.buildId = info.buildId or existing and existing.buildId or nil
+    if next(info.capabilities) == nil and existing and type(existing.capabilities) == "table" then
+        info.capabilities = cloneCapabilities(existing.capabilities)
+    end
+    info.compatibility = self:ComputePeerCompatibility(info)
+    info.ineligibleReason = existing and existing.ineligibleReason or nil
+
+    self.peerVersions = self.peerVersions or {}
+    self.peerVersions[peerKey] = info
+    return info
+end
+
+function Sync:GetPeerVersionInfo(peerKey)
+    return self.peerVersions and self.peerVersions[peerKey] or nil
+end
+
+function Sync:GetPeerVersionRelation(peerKey)
+    local info = self:GetPeerVersionInfo(peerKey)
+    if not info or not compareSemver then
+        return "unknown"
+    end
+    local cmp = compareSemver(info.addonVersion, Addon.ADDON_VERSION or Addon.DISPLAY_VERSION)
+    if cmp == nil then
+        return "unknown"
+    end
+    if cmp > 0 then
+        return "newer-remote"
+    end
+    if cmp < 0 then
+        return "newer-local"
+    end
+    return "same-version"
+end
+
+function Sync:SetPeerIneligibleReason(peerKey, reason)
+    if not self:IsValidSyncMemberKey(peerKey) then
+        return
+    end
+    self.peerVersions = self.peerVersions or {}
+    local info = self.peerVersions[peerKey]
+    if not info then
+        return
+    end
+    info.ineligibleReason = reason and tostring(reason) or nil
+end
+
+function Sync:RecordLatestRemoteVersion(remoteVersion)
+    if not remoteVersion or not compareSemver then
+        return
+    end
+    if compareSemver(remoteVersion, remoteVersion) == nil then
+        return
+    end
+    local notice = Addon.Data and Addon.Data.GetUpdateNoticeState and Addon.Data:GetUpdateNoticeState() or nil
+    if not notice then
+        return
+    end
+    local current = notice.latestRemoteVersionSeen
+    local isNewer = current == nil or compareSemver(remoteVersion, current) == 1
+    if isNewer then
+        notice.latestRemoteVersionSeen = remoteVersion
+    end
+    self.telemetry.latestRemoteVersionSeen = tostring(notice.latestRemoteVersionSeen or remoteVersion)
+end
+
+function Sync:ShouldAcceptInboundPayload(_payload, peerKey)
+    local info = peerKey and self:GetPeerVersionInfo(peerKey) or nil
+    local compatibility = info and (info.compatibility or self:ComputePeerCompatibility(info)) or "unknown"
+    if compatibility == "remote-newer-wire" or compatibility == "remote-legacy-wire" then
+        return false
+    end
+    return compatibility ~= "channel-mismatch"
+end
+
+function Sync:MaybeNotifyPeerVersion(peerKey, info)
+    info = info or self:GetPeerVersionInfo(peerKey)
+    if type(info) ~= "table" then
+        return
+    end
+    local notice = Addon.Data and Addon.Data.GetUpdateNoticeState and Addon.Data:GetUpdateNoticeState() or nil
+    if not notice then
+        return
+    end
+    local localChannel = tostring(Addon.BUILD_CHANNEL or "release")
+    local remoteChannel = tostring(info.buildChannel or "unknown")
+    if localChannel == "dev" then
+        if remoteChannel ~= "dev" then
+            return
+        end
+    else
+        if remoteChannel == "dev" or remoteChannel == "unknown" then
+            return
+        end
+    end
+    if not compareSemver then
+        return
+    end
+
+    self:RecordLatestRemoteVersion(info.addonVersion)
+
+    local now = time()
+    if info.compatibility == "remote-newer-wire" then
+        local wireCmp = compareSemver(tostring(info.wireVersion or ""), tostring(notice.lastNoticedWireVersion or ""))
+        local isStrictlyNewerWire = notice.lastNoticedWireVersion == nil or wireCmp == 1
+        if isStrictlyNewerWire or (now - (notice.lastProtocolNoticeAt or 0)) >= VERSION_NOTICE_COOLDOWN then
+            Addon:Print(string.format(
+                "Recipe Registry: newer sync protocol detected from %s. Local wire=%s remote wire=%s.",
+                tostring(peerKey),
+                tostring(Addon.WIRE_VERSION or "?"),
+                tostring(info.wireVersion or "?")
+            ))
+            notice.lastProtocolNoticeAt = now
+            notice.lastNoticedPeer = tostring(peerKey)
+            notice.lastNoticedWireVersion = tostring(info.wireVersion or "")
+            self.telemetry.lastVersionNoticePeer = tostring(peerKey)
+            self.telemetry.lastVersionNoticeRemote = tostring(info.wireVersion or "")
+            self.telemetry.newerProtocolSeen = (self.telemetry.newerProtocolSeen or 0) + 1
+        end
+        return
+    end
+
+    if not (Addon.BuildInfo and Addon.BuildInfo.IsRemoteNewer) then
+        return
+    end
+    if not Addon.BuildInfo.IsRemoteNewer(info.addonVersion, Addon.ADDON_VERSION or Addon.DISPLAY_VERSION) then
+        return
+    end
+    if info.compatibility ~= "compatible" and info.compatibility ~= "legacy-unknown" then
+        return
+    end
+    local noticedCmp = notice.lastNoticedVersion and compareSemver(info.addonVersion, notice.lastNoticedVersion) or nil
+    local isStrictlyNewerNotice = notice.lastNoticedVersion == nil or noticedCmp == 1
+    if not isStrictlyNewerNotice and (now - (notice.lastUpdateNoticeAt or 0)) < VERSION_NOTICE_COOLDOWN then
+        return
+    end
+
+    Addon:Print(string.format(
+        "Recipe Registry: a newer version was detected from %s. You are using %s; latest seen is %s.",
+        tostring(peerKey),
+        tostring(Addon.ADDON_VERSION or Addon.DISPLAY_VERSION or "?"),
+        tostring(info.addonVersion or "unknown")
+    ))
+    notice.latestRemoteVersionSeen = info.addonVersion
+    notice.lastNoticedVersion = info.addonVersion
+    notice.lastUpdateNoticeAt = now
+    notice.lastNoticedPeer = tostring(peerKey)
+    self.telemetry.lastVersionNoticePeer = tostring(peerKey)
+    self.telemetry.lastVersionNoticeRemote = tostring(info.addonVersion or "unknown")
+    self.telemetry.latestRemoteVersionSeen = tostring(info.addonVersion or "unknown")
+    self.telemetry.newerVersionSeen = (self.telemetry.newerVersionSeen or 0) + 1
 end
 
 function Sync:GetPeerBackoffRemaining(sourceKey)
@@ -404,7 +705,13 @@ function Sync:CanExchangeDataWithPeer(peerKey, purpose, request)
     if self:IsMockKey(peerKey) and not self:ShouldAllowLocalMockTraffic(peerKey, request.memberKey or peerKey) then
         return false, "mock-peer"
     end
-    if peerKey ~= self:GetSelfKey() and not (self.onlineNodes and self.onlineNodes[peerKey]) then
+    local allowSpeculativeManifest = purpose == "manifest-large"
+        and not request.allowOfflinePeer
+        and not (self.peerVersions and self.peerVersions[peerKey])
+    if peerKey ~= self:GetSelfKey()
+        and not request.allowOfflinePeer
+        and not allowSpeculativeManifest
+        and not (self.onlineNodes and self.onlineNodes[peerKey]) then
         return false, "offline"
     end
     local allowManual = Private.isManualReason(request.why)
@@ -417,25 +724,58 @@ function Sync:CanExchangeDataWithPeer(peerKey, purpose, request)
     end
     local recentReject = self:GetRecentPeerReject(peerKey, request)
     if recentReject and recentReject.retryable ~= true then
+        self:SetPeerIneligibleReason(peerKey, "recent-reject:" .. tostring(recentReject.reason or "reject"))
         return false, "recent-reject:" .. tostring(recentReject.reason or "reject")
+    end
+    local peerVersion = self.GetPeerVersionInfo and self:GetPeerVersionInfo(peerKey) or nil
+    if peerVersion then
+        local compatibility = peerVersion.compatibility or self:ComputePeerCompatibility(peerVersion)
+        if compatibility == "channel-mismatch" then
+            self:SetPeerIneligibleReason(peerKey, "channel-mismatch")
+            self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
+            self.telemetry.skippedVersionIncompatible = (self.telemetry.skippedVersionIncompatible or 0) + 1
+            return false, "channel-mismatch"
+        end
+        if compatibility == "remote-newer-wire" or compatibility == "remote-legacy-wire" then
+            self:SetPeerIneligibleReason(peerKey, compatibility)
+            self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
+            self.telemetry.skippedVersionIncompatible = (self.telemetry.skippedVersionIncompatible or 0) + 1
+            return false, "wire-mismatch"
+        end
+        if purpose == "manifest-large"
+            and type(peerVersion.capabilities) == "table"
+            and next(peerVersion.capabilities) ~= nil
+            and peerVersion.capabilities.maniReliable ~= true then
+            self:SetPeerIneligibleReason(peerKey, "missing-mani-reliable")
+            self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
+            self.telemetry.skippedMissingCapability = (self.telemetry.skippedMissingCapability or 0) + 1
+            return false, "missing-mani-reliable"
+        end
     end
     local caps = self.GetPeerCaps and self:GetPeerCaps(peerKey) or nil
     if caps then
         if caps.isPausedForSync == true and not allowManual then
+            self:SetPeerIneligibleReason(peerKey, "peer-paused")
             return false, "peer-paused"
         end
-        if purpose == "request" or purpose == "dispatch" then
+        if purpose == "request" or purpose == "dispatch" or purpose == "manifest-large" then
             if caps.canReceiveReq == false then
+                self:SetPeerIneligibleReason(peerKey, "peer-cannot-receive-req")
                 return false, "peer-cannot-receive-req"
             end
-            if caps.canSendSnap == false then
+            if (purpose == "request" or purpose == "dispatch") and caps.canSendSnap == false then
+                self:SetPeerIneligibleReason(peerKey, "peer-cannot-send-snap")
                 return false, "peer-cannot-send-snap"
             end
-            if caps.wireVersion and caps.wireVersion ~= Addon.WIRE_VERSION then
+            if caps.wireVersion and (caps.wireVersion > Addon.WIRE_VERSION or caps.wireVersion < (Addon.MIN_SUPPORTED_WIRE_VERSION or Addon.WIRE_VERSION)) then
+                self:SetPeerIneligibleReason(peerKey, "wire-mismatch")
+                self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
+                self.telemetry.skippedVersionIncompatible = (self.telemetry.skippedVersionIncompatible or 0) + 1
                 return false, "wire-mismatch"
             end
         end
     end
+    self:SetPeerIneligibleReason(peerKey, nil)
     return true, "eligible"
 end
 
@@ -1161,7 +1501,7 @@ function Sync:TouchNode(key, version)
     self.onlineNodes[key].version = version or self.onlineNodes[key].version
 
     local selfKey = self:GetSelfKey()
-    self.onlineNodes[selfKey] = self.onlineNodes[selfKey] or { version = Addon.DISPLAY_VERSION }
+    self.onlineNodes[selfKey] = self.onlineNodes[selfKey] or { version = Addon.ADDON_VERSION or Addon.DISPLAY_VERSION }
     self.onlineNodes[selfKey].lastSeen = time()
 
     if self._recomputeTimer then return end
@@ -1182,6 +1522,7 @@ function Sync:PruneOnlineNodes()
             self._lastHelloSeenAt[key] = nil
             self._lastManifestReceivedAt[key] = nil
             self.peerBackoffUntil[key] = nil
+            self.peerVersions[key] = nil
             if self.peerHealth then
                 self.peerHealth[key] = nil
             end

@@ -3,6 +3,8 @@
 ## Notes: Lean guild profession tracker with owner-driven sync and AtlasLoot-assisted local resolution
 ## Author: OpenAI + User collaboration
 ## Version: 1.8.1
+## X-Build-Channel: release
+## X-Build-ID: public
 ## SavedVariables: RecipeRegistryDB
 ## SavedVariablesPerCharacter: RecipeRegistryCharDB
 ## X-Category: Guild
@@ -11,6 +13,7 @@
 Libs\embeds.xml
 
 Core.lua
+BuildInfo.lua
 Performance.lua
 Data.lua
 DataAtlasLoot.lua

@@ -365,6 +365,7 @@ function CommBus:AddNode(name, opts)
         reset = true,
         initialize = false,
         payloadMode = opts.payloadMode or self.payloadMode,
+        addonMetadata = opts.addonMetadata,
     })
     Wow.SetPlayer(name, self.realm)
     Wow.SetGuildRoster(self.roster)
@@ -379,6 +380,11 @@ function CommBus:AddNode(name, opts)
         sentCursor = 0,
         index = #self.nodes + 1,
         online = opts.online ~= false,
+        addonMetadata = deepcopy(opts.addonMetadata or {
+            Version = "1.8.1",
+            ["X-Build-Channel"] = "release",
+            ["X-Build-ID"] = "bus-build",
+        }),
     }
     self:Activate(node)
     node.key = addon.Data:GetPlayerKey()
@@ -456,6 +462,7 @@ function CommBus:ReloadNode(node, opts)
         initialize = false,
         payloadMode = node.payloadMode or self.payloadMode,
         savedVariables = saved,
+        addonMetadata = opts.addonMetadata or node.addonMetadata,
     })
 
     Wow.SetPlayer(runtime.playerName, runtime.realm)
@@ -480,6 +487,7 @@ function CommBus:ReloadNode(node, opts)
     node.addon = addon
     node.state = nextState
     node.sentCursor = 0
+    node.addonMetadata = deepcopy(opts.addonMetadata or node.addonMetadata or {})
     self:Activate(node)
     node.key = addon.Data:GetPlayerKey()
     addon.Data:RebuildOnlineCache()

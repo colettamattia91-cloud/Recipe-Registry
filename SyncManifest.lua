@@ -165,6 +165,18 @@ function Sync:SendManifestToPeer(peerKey, why)
     if not peerKey or not Addon.TrickleSync then return end
     if not self:IsValidSyncMemberKey(peerKey) then return end
     if self:IsMockKey(peerKey) then return end
+    local eligible, reason = self:CanExchangeDataWithPeer(peerKey, "manifest-large", {
+        source = peerKey,
+        memberKey = peerKey,
+        why = why or "manifest",
+        allowOfflinePeer = why == "force",
+    })
+    if not eligible then
+        if reason ~= "offline" then
+            self.telemetry.skippedNotDataEligible = (self.telemetry.skippedNotDataEligible or 0) + 1
+        end
+        return
+    end
     if self:IsInWorldTransition() and why ~= "force" then
         self.telemetry.transitionDeferredManifestPeers = (self.telemetry.transitionDeferredManifestPeers or 0) + 1
         self.telemetry.transitionDeferrals = (self.telemetry.transitionDeferrals or 0) + 1
@@ -384,6 +396,18 @@ function Sync:RequestManifestRefresh(peerKey, opts)
     opts = opts or {}
     if peerKey and peerKey ~= "" then
         if self:IsMockKey(peerKey) then return end
+        local eligible, reason = self:CanExchangeDataWithPeer(peerKey, "manifest-large", {
+            source = peerKey,
+            memberKey = peerKey,
+            why = opts.reason or "manual",
+            allowOfflinePeer = opts.force == true,
+        })
+        if not eligible then
+            if reason ~= "offline" then
+                self.telemetry.skippedNotDataEligible = (self.telemetry.skippedNotDataEligible or 0) + 1
+            end
+            return
+        end
         if self:IsInWorldTransition() and not opts.force then
             self.telemetry.transitionDeferredManifestPeers = (self.telemetry.transitionDeferredManifestPeers or 0) + 1
             self.telemetry.transitionDeferrals = (self.telemetry.transitionDeferrals or 0) + 1
@@ -416,6 +440,15 @@ end
 function Sync:HandleManifestRequest(payload)
     if not self:IsValidSyncMemberKey(payload.sender) or payload.sender == self:GetSelfKey() then return end
     if self:IsMockKey(payload.sender) then return end
+    local eligible = self:CanExchangeDataWithPeer(payload.sender, "manifest-large", {
+        source = payload.sender,
+        memberKey = payload.sender,
+        why = payload.why or "force",
+        allowOfflinePeer = payload.why == "force",
+    })
+    if not eligible then
+        return
+    end
     self.telemetry.manifestForceReplies = (self.telemetry.manifestForceReplies or 0) + 1
     self:SendManifestToPeer(payload.sender, "force")
 end
@@ -715,6 +748,7 @@ function Sync:HandleManifestChunk(payload)
 
     local now = time()
     local senderKey = payload.sender
+    self:TouchNode(senderKey, payload.addonVersion or payload.version)
     local manifestMemberKey = self:IsValidSyncMemberKey(payload.memberKey) and payload.memberKey or senderKey
     self.partialManifestReceive[senderKey] = self.partialManifestReceive[senderKey] or {}
     local state = self.partialManifestReceive[senderKey][payload.manifestId]
@@ -859,6 +893,22 @@ function Sync:SendNextManifestChunk()
     local candidateIndex
     for index = 1, #self.manifestChunkQueue do
         local queued = self.manifestChunkQueue[index]
+        local eligible = self:CanExchangeDataWithPeer(queued.peer, "manifest-large", {
+            source = queued.peer,
+            memberKey = queued.peer,
+            why = queued.payload and queued.payload.why or "manifest",
+            allowOfflinePeer = queued.payload and queued.payload.why == "force",
+        })
+        if not eligible then
+            local batch = getOrCreateManifestBatchDiagnostic(self, "send", queued.peer, queued.payload and queued.payload.manifestId or nil)
+            if batch then
+                batch.pruned = true
+                batch.pruneReason = "ineligible-peer"
+                batch.completed = false
+            end
+            table.remove(self.manifestChunkQueue, index)
+            return true
+        end
         if (queued.readyAt or 0) <= now and self:CanSendToPeer(queued.peer, MANIFEST_CHUNK_DELAY) then
             candidateIndex = index
             break

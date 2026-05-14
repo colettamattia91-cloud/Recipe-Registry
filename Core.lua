@@ -8,9 +8,6 @@ local Addon = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME,
 )
 
 _G.RecipeRegistry = Addon
-Addon.DISPLAY_VERSION = "1.8.1"
-Addon.WIRE_VERSION = 2
-Addon.ADDON_PREFIX = "RRG1"
 Addon.debugMode = false
 Addon.perfDebugMode = false
 Addon._refreshReasons = {}
@@ -99,7 +96,7 @@ local function printMainHelp(self)
     self:Print("/rr - open or close the main window.")
     self:Print("/rr options, /rr mini, /rr debug")
     self:Print("/rr rescan - queue a profession scan and scan active profession API data.")
-    self:Print("/rr dump, /rr self [profession], /rr sync, /rr offline, /rr manifest [target or verbose], /rr pull")
+    self:Print("/rr version, /rr versions, /rr dump, /rr self [profession], /rr sync, /rr offline, /rr manifest [target or verbose], /rr pull")
     self:Print("/rr perf [toggle, dump, reset, help]")
     self:Print("/rr mock [status, start <" .. MOCK_SCENARIOS .. ">, stop, cleanup, reset, help]")
     self:Print("/rr prices <item name or link>, /rr share [guild, party, raid, say]")
@@ -633,6 +630,31 @@ function Addon:SlashHandler(input)
             return
         end
         if self.Data then self.Data:DumpSummary() end
+        return
+    end
+
+    if cmd == "version" then
+        if self.Sync and self.Sync.DumpVersionStatus then
+            self.Sync:DumpVersionStatus()
+        else
+            self:Print(string.format(
+                "Recipe Registry: version=%s wire=%s channel=%s prefix=%s build=%s",
+                tostring(self.ADDON_VERSION or self.DISPLAY_VERSION or "?"),
+                tostring(self.WIRE_VERSION or "?"),
+                tostring(self.BUILD_CHANNEL or "release"),
+                tostring(self.COMM_PREFIX or self.ADDON_PREFIX or "?"),
+                tostring(self.BUILD_ID or "n/a")
+            ))
+        end
+        return
+    end
+
+    if cmd == "versions" then
+        if self.Sync and self.Sync.DumpPeerVersions then
+            self.Sync:DumpPeerVersions()
+        else
+            self:Print("Peer version diagnostics not available.")
+        end
         return
     end
 

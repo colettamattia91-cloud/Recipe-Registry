@@ -51,6 +51,14 @@ local DB_DEFAULTS = {
             lastWeeklyCleanupAt = 0,
             bootstrapCompletedAt = 0,
         },
+        updateNotice = {
+            latestRemoteVersionSeen = nil,
+            lastNoticedVersion = nil,
+            lastUpdateNoticeAt = 0,
+            lastProtocolNoticeAt = 0,
+            lastNoticedPeer = nil,
+            lastNoticedWireVersion = nil,
+        },
         members = {},
     },
     profile = {
@@ -801,6 +809,35 @@ end
 
 function Data:GetMembersDB()
     return self.db.global.members
+end
+
+function Data:GetUpdateNoticeState()
+    self.db.global.updateNotice = self.db.global.updateNotice or {}
+    if type(self.db.global.updateNotice.lastUpdateNoticeAt) ~= "number" then
+        self.db.global.updateNotice.lastUpdateNoticeAt = 0
+    end
+    if type(self.db.global.updateNotice.lastProtocolNoticeAt) ~= "number" then
+        self.db.global.updateNotice.lastProtocolNoticeAt = 0
+    end
+    if self.db.global.updateNotice.lastSeenVersion ~= nil and self.db.global.updateNotice.latestRemoteVersionSeen == nil then
+        self.db.global.updateNotice.latestRemoteVersionSeen = self.db.global.updateNotice.lastSeenVersion
+    end
+    if self.db.global.updateNotice.lastNoticeAt ~= nil and self.db.global.updateNotice.lastUpdateNoticeAt == 0 then
+        self.db.global.updateNotice.lastUpdateNoticeAt = tonumber(self.db.global.updateNotice.lastNoticeAt) or 0
+    end
+    if self.db.global.updateNotice.lastProtocolWarningAt ~= nil and self.db.global.updateNotice.lastProtocolNoticeAt == 0 then
+        self.db.global.updateNotice.lastProtocolNoticeAt = tonumber(self.db.global.updateNotice.lastProtocolWarningAt) or 0
+    end
+    if self.db.global.updateNotice.lastSeenVersion ~= nil then
+        self.db.global.updateNotice.lastSeenVersion = nil
+    end
+    if self.db.global.updateNotice.lastNoticeAt ~= nil then
+        self.db.global.updateNotice.lastNoticeAt = nil
+    end
+    if self.db.global.updateNotice.lastProtocolWarningAt ~= nil then
+        self.db.global.updateNotice.lastProtocolWarningAt = nil
+    end
+    return self.db.global.updateNotice
 end
 
 function Data:GetGlobalMeta()

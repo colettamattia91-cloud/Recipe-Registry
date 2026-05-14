@@ -18,7 +18,12 @@ function Sync:BroadcastHello()
         key = self:GetSelfKey(),
         rev = summary.rev,
         updatedAt = summary.updatedAt,
-        version = Addon.DISPLAY_VERSION,
+        version = Addon.ADDON_VERSION or Addon.DISPLAY_VERSION,
+        addonVersion = Addon.ADDON_VERSION or Addon.DISPLAY_VERSION,
+        wireVersion = Addon.WIRE_VERSION,
+        buildChannel = Addon.BUILD_CHANNEL,
+        buildId = Addon.BUILD_ID,
+        capabilities = Addon.CAPABILITIES,
         caps = self.GetLocalProtocolCaps and self:GetLocalProtocolCaps() or nil,
     }, "ALERT")
 end
@@ -38,6 +43,11 @@ function Sync:AdvertiseLocalRevision(reason)
         professions = summary.professions,
         recipes = summary.recipes,
         why = reason,
+        addonVersion = Addon.ADDON_VERSION or Addon.DISPLAY_VERSION,
+        wireVersion = Addon.WIRE_VERSION,
+        buildChannel = Addon.BUILD_CHANNEL,
+        buildId = Addon.BUILD_ID,
+        capabilities = Addon.CAPABILITIES,
         caps = self.GetLocalProtocolCaps and self:GetLocalProtocolCaps() or nil,
     }, "ALERT")
     self:BroadcastManifestToOnlinePeers(reason or "advertise")
@@ -56,6 +66,10 @@ function Sync:SendGuildEnvelope(kind, payload, priority)
     payload.kind = kind
     payload.sender = self:GetSelfKey()
     payload.sentAt = time()
+    payload.addonVersion = payload.addonVersion or Addon.ADDON_VERSION or Addon.DISPLAY_VERSION
+    payload.wireVersion = payload.wireVersion or Addon.WIRE_VERSION
+    payload.buildChannel = payload.buildChannel or Addon.BUILD_CHANNEL
+    payload.buildId = payload.buildId or Addon.BUILD_ID
     local msg = LibStub("AceSerializer-3.0"):Serialize(payload)
     if msg then
         self:SendCommMessage(PREFIX, msg, "GUILD", nil, priority or "NORMAL")
@@ -79,6 +93,10 @@ function Sync:SendDirectEnvelope(kind, payload, targetKey, priority)
     payload.kind = kind
     payload.sender = self:GetSelfKey()
     payload.sentAt = time()
+    payload.addonVersion = payload.addonVersion or Addon.ADDON_VERSION or Addon.DISPLAY_VERSION
+    payload.wireVersion = payload.wireVersion or Addon.WIRE_VERSION
+    payload.buildChannel = payload.buildChannel or Addon.BUILD_CHANNEL
+    payload.buildId = payload.buildId or Addon.BUILD_ID
     local msg = LibStub("AceSerializer-3.0"):Serialize(payload)
     if msg then
         self:SendCommMessage(PREFIX, msg, "WHISPER", target, priority or "NORMAL")
@@ -94,6 +112,23 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
     local ok, payload = LibStub("AceSerializer-3.0"):Deserialize(text)
     if not ok or type(payload) ~= "table" then return end
     if payload.sender == self:GetSelfKey() then return end
+
+    local peerKey = self:IsValidSyncMemberKey(payload.sender) and payload.sender or nil
+    local allowed, dropReason, remoteChannel = self:IsInboundBuildChannelAllowed(payload, sender)
+    if peerKey and self.ObservePeerVersion then
+        self:ObservePeerVersion(peerKey, payload)
+    end
+    if not allowed then
+        self:RegisterBuildChannelDrop(peerKey or sender, payload, dropReason, remoteChannel)
+        return
+    end
+    if payload.kind == "HELLO" and peerKey and self.MaybeNotifyPeerVersion then
+        self:MaybeNotifyPeerVersion(peerKey)
+    end
+    if peerKey and self.ShouldAcceptInboundPayload and not self:ShouldAcceptInboundPayload(payload, peerKey) then
+        return
+    end
+
     local pauseReason = Addon.SyncPausePolicy and Addon.SyncPausePolicy:GetProtocolPauseReason(payload.kind) or nil
     if pauseReason then
         if payload.kind == "REQ" and self.HandlePausedRequest then
@@ -103,7 +138,7 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
     end
 
     if payload.sender then
-        self:TouchNode(payload.sender, payload.version)
+        self:TouchNode(payload.sender, payload.addonVersion or payload.version)
     end
 
     if payload.kind == "HELLO" then
@@ -134,7 +169,7 @@ function Sync:HandleHello(payload)
     local sawHelloBefore = (self._lastHelloSeenAt and self._lastHelloSeenAt[payload.key] or 0) > 0
     self._lastHelloSeenAt = self._lastHelloSeenAt or {}
     self._lastHelloSeenAt[payload.key] = time()
-    self:TouchNode(payload.key, payload.version)
+    self:TouchNode(payload.key, payload.addonVersion or payload.version)
     if self.MarkManifestPeerSuccess then
         self:MarkManifestPeerSuccess(payload.sender or payload.key)
     end
@@ -173,7 +208,7 @@ end
 
 function Sync:HandleAdvertise(payload)
     if not self:IsValidSyncMemberKey(payload.key) or not self:IsValidSyncMemberKey(payload.sender) then return end
-    self:TouchNode(payload.sender)
+    self:TouchNode(payload.sender, payload.addonVersion or payload.version)
     if self.MarkManifestPeerSuccess then
         self:MarkManifestPeerSuccess(payload.sender)
     end
