@@ -684,6 +684,11 @@ local function newScanTelemetry()
         scansUnchanged = 0,
         scansSkipped = 0,
         scansFailed = 0,
+        scanAutoSuppressedUnchanged = 0,
+        scanSkippedWeaponSkill = 0,
+        scanSkippedGenericSkill = 0,
+        scanTriggeredRecipeLearned = 0,
+        scanTriggeredManual = 0,
         suspectedPartial = 0,
         invalidRecipesBlocked = 0,
         invalidRecipesSnapshot = 0,
@@ -695,6 +700,8 @@ local function newScanTelemetry()
         lastInvalidRecipeProfession = nil,
         lastProfession = nil,
         lastSkipReason = nil,
+        lastScanReason = nil,
+        lastScanNotifyMode = nil,
     }
 end
 

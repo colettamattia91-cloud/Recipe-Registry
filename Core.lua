@@ -57,14 +57,27 @@ local function scanResultChanged(result)
     return result == true
 end
 
-local function scanActiveProfessionData(self)
+local function scanActiveProfessionData(self, opts)
     if not self.Data then return false end
+    opts = opts or {}
     local changed = false
+    if opts.source == "trade" then
+        if self.Data.ScanTradeSkill then
+            changed = scanResultChanged(self.Data:ScanTradeSkill(opts)) or changed
+        end
+        return changed
+    end
+    if opts.source == "craft" then
+        if self.Data.ScanCraft then
+            changed = scanResultChanged(self.Data:ScanCraft(opts)) or changed
+        end
+        return changed
+    end
     if self.Data.ScanTradeSkill then
-        changed = scanResultChanged(self.Data:ScanTradeSkill()) or changed
+        changed = scanResultChanged(self.Data:ScanTradeSkill(opts)) or changed
     end
     if self.Data.ScanCraft then
-        changed = scanResultChanged(self.Data:ScanCraft()) or changed
+        changed = scanResultChanged(self.Data:ScanCraft(opts)) or changed
     end
     return changed
 end
@@ -136,8 +149,8 @@ function Addon:OnEnable()
     self:RegisterEvent("TRADE_SKILL_SHOW", "OnTradeSkillShow")
     self:RegisterEvent("CRAFT_SHOW", "OnCraftShow")
     self:RegisterEvent("NEW_RECIPE_LEARNED", "OnRecipeSignal")
-    self:RegisterEvent("SPELLS_CHANGED", "OnRecipeSignal")
-    self:RegisterEvent("SKILL_LINES_CHANGED", "OnRecipeSignal")
+    self:RegisterEvent("SPELLS_CHANGED", "OnSkillSignal")
+    self:RegisterEvent("SKILL_LINES_CHANGED", "OnSkillSignal")
     self:RegisterBucketEvent("GUILD_ROSTER_UPDATE", 1.5, "OnGuildRosterBucket")
     self:RegisterBucketEvent("GET_ITEM_INFO_RECEIVED", 0.75, "OnItemInfoBucket")
     self:ScheduleTimer(function()
@@ -231,7 +244,10 @@ function Addon:OnTradeSkillShow()
         self._tradeSkillScanTimer = nil
         if self.Data then
             local metadataChanged = self.Data:DetectProfessions() == true
-            local changed = scanResultChanged(self.Data:ScanTradeSkill()) or metadataChanged
+            local changed = scanResultChanged(self.Data:ScanTradeSkill({
+                reason = "profession-open",
+                notifyMode = "auto",
+            })) or metadataChanged
             if changed and self.Sync then
                 self.Sync:AdvertiseLocalRevision("trade-scan")
             end
@@ -247,7 +263,10 @@ function Addon:OnCraftShow()
         self._craftScanTimer = nil
         if self.Data then
             local metadataChanged = self.Data:DetectProfessions() == true
-            local changed = scanResultChanged(self.Data:ScanCraft()) or metadataChanged
+            local changed = scanResultChanged(self.Data:ScanCraft({
+                reason = "profession-open",
+                notifyMode = "auto",
+            })) or metadataChanged
             if changed and self.Sync then
                 self.Sync:AdvertiseLocalRevision("craft-scan")
             end
@@ -259,23 +278,72 @@ function Addon:OnRecipeSignal()
     if self._recipeSignalTimer then
         self:CancelTimer(self._recipeSignalTimer, true)
     end
-    self._recipeSignalTimer = self:ScheduleTimer("ProcessRecipeSignal", 1.0)
+    self._recipeSignalTimer = self:ScheduleTimer(function()
+        self:ProcessRecipeSignal("recipe-learned")
+    end, 1.0)
 end
 
-function Addon:ProcessRecipeSignal()
+function Addon:ProcessRecipeSignal(reason)
     self._recipeSignalTimer = nil
     if self.Data then
+        local scanReason = tostring(reason or "recipe-learned")
         local metadataChanged = self.Data:DetectProfessions() == true
-        -- A real recipe change happened: scan active API data now, or keep it pending.
         if self.Data.MarkScanNeeded then
-            self.Data:MarkScanNeeded(nil, "recipe-event")
+            self.Data:MarkScanNeeded(nil, scanReason)
         else
             self.Data._scanNeeded = true
         end
-        local changed = scanActiveProfessionData(self) or metadataChanged
+        local changed = scanActiveProfessionData(self, {
+            reason = scanReason,
+            notifyMode = "auto",
+        }) or metadataChanged
         if changed and self.Sync then
-            self.Sync:AdvertiseLocalRevision("recipe-event")
+            self.Sync:AdvertiseLocalRevision(scanReason)
         end
+    end
+end
+
+function Addon:OnSkillSignal(event)
+    self._lastSkillSignalEvent = event or self._lastSkillSignalEvent or "SPELLS_CHANGED"
+    if self._skillSignalTimer then
+        self:CancelTimer(self._skillSignalTimer, true)
+    end
+    self._skillSignalTimer = self:ScheduleTimer(function()
+        self:ProcessSkillSignal(self._lastSkillSignalEvent)
+    end, 1.0)
+end
+
+function Addon:ProcessSkillSignal(event)
+    self._skillSignalTimer = nil
+    local signal = tostring(event or self._lastSkillSignalEvent or "SPELLS_CHANGED")
+    self._lastSkillSignalEvent = nil
+    if not self.Data then
+        return
+    end
+
+    local profession, source
+    if self.Data.GetVisibleTrackedProfessionContext then
+        profession, source = self.Data:GetVisibleTrackedProfessionContext()
+    end
+    if not profession then
+        if signal == "SKILL_LINES_CHANGED" then
+            self.Data:RecordScanTelemetry("scanSkippedWeaponSkill")
+        else
+            self.Data:RecordScanTelemetry("scanSkippedGenericSkill")
+        end
+        return
+    end
+
+    local reason = signal == "SPELLS_CHANGED" and "spell-update" or "skill-event"
+    local metadataChanged = self.Data:DetectProfessions() == true
+    self.Data:MarkScanNeeded(profession, reason)
+    local changed = scanActiveProfessionData(self, {
+        reason = reason,
+        notifyMode = "auto",
+        source = source,
+    }) or metadataChanged
+    if changed and self.Sync then
+        self.Sync:AdvertiseLocalRevision(reason)
     end
 end
 
@@ -686,11 +754,14 @@ function Addon:SlashHandler(input)
         if self.Data then
             local metadataChanged = self.Data:DetectProfessions() == true
             if self.Data.MarkScanNeeded then
-                self.Data:MarkScanNeeded(nil, "manual-rescan")
+                self.Data:MarkScanNeeded(nil, "manual")
             else
                 self.Data._scanNeeded = true
             end
-            local changed = scanActiveProfessionData(self) or metadataChanged
+            local changed = scanActiveProfessionData(self, {
+                reason = "manual",
+                notifyMode = "manual",
+            }) or metadataChanged
             if changed and self.Sync then
                 self.Sync:AdvertiseLocalRevision("manual-rescan")
             end

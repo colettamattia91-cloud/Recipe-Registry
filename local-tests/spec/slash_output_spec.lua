@@ -149,8 +149,35 @@ Test.it("uses active TradeSkill API data during manual rescan", function()
     Test.eq(entry.professions.Alchemy.count, 1, "Alchemy recipe count")
     Test.hasKey(entry.professions.Alchemy.recipes, 91001, "Alchemy recipe key")
     Test.eq(countGuildCommKind(wow, "AD"), 1, "manual rescan should advertise changed data")
-    Test.truthy(printLogDoesNotContain(wow, "Scanned Alchemy: 1 recipe(s) found."), "scan result output should be hidden without debug")
+    Test.truthy(printLogContains(wow, "Scanned Alchemy: 1 recipe(s) found."), "manual changed scan should be visible")
     Test.truthy(printLogContains(wow, "Profession rescan completed for active profession data."), "completed rescan output")
+end)
+
+Test.it("prints unchanged scan feedback for manual rescans", function()
+    local addon, wow, data = freshAddon()
+    local localKey = data:GetPlayerKey()
+    local entry = data:GetOrCreateMember(localKey)
+
+    wow.SetSkillLines({
+        { name = "Alchemy", skillRank = 60, skillMaxRank = 75 },
+    })
+    wow.SetTradeSkill("Alchemy", {
+        { name = "Manual Stable Potion", itemID = 91003 },
+    }, { shown = false })
+    entry.professions.Alchemy = data:NormalizeProfessionBlock(entry, "Alchemy", {
+        recipes = { [91003] = true },
+        count = 1,
+        signature = tostring(91003),
+        sourceType = "owner",
+        guildStatus = "active",
+    })
+
+    addon:SlashHandler("rescan")
+
+    Test.truthy(printLogContains(wow, "Scanned Alchemy: unchanged (1 recipe(s))."), "manual unchanged scan should be visible")
+    Test.eq(data:GetScanTelemetry().scanTriggeredManual or 0, 1, "manual trigger telemetry")
+    Test.eq(data:GetScanTelemetry().lastScanReason, "manual", "last scan reason")
+    Test.eq(data:GetScanTelemetry().lastScanNotifyMode, "manual", "last scan notify mode")
 end)
 
 Test.it("prints scan details when debug is enabled", function()

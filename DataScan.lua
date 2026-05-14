@@ -37,6 +37,27 @@ local snapshotCraftFilters = Private.snapshotCraftFilters
 local snapshotTradeSkillFilters = Private.snapshotTradeSkillFilters
 local stableRecipeSignature = Private.stableRecipeSignature
 
+local function isManualScanReason(reason)
+    local text = tostring(reason or "")
+    return text == "manual" or text == "manual-rescan" or text == "manual-refresh"
+end
+
+local function resolveScanContext(opts)
+    opts = opts or {}
+    local reason = tostring(opts.reason or "manual")
+    local notifyMode = tostring(opts.notifyMode or (isManualScanReason(reason) and "manual" or "auto"))
+    return {
+        reason = reason,
+        notifyMode = notifyMode,
+    }
+end
+
+local function debugSuppressedScan(self, context, message)
+    if Addon.debugMode then
+        Addon:Debug("Suppressed scan", tostring(context.reason), tostring(context.notifyMode), message)
+    end
+end
+
 function Data:ApplyLocalProfessionMetadata(profession, metadata)
     local entry = self:GetOrCreateMember(self:GetPlayerKey())
     local prof = entry.professions[profession] or { recipes = {} }
@@ -138,15 +159,23 @@ end
 
 function Data:MarkScanNeeded(profession, reason)
     self:EnsureScanState()
+    local context = resolveScanContext({ reason = reason })
     local canonical = profession and self:GetCanonicalProfession(profession) or nil
     if canonical and TRACKED[canonical] then
-        self._scanNeededByProfession[canonical] = reason or true
+        self._scanNeededByProfession[canonical] = context.reason
     else
-        self._genericScanNeeded = reason or true
+        self._genericScanNeeded = context.reason
         self._genericScanAttempts = {}
     end
     self._scanNeeded = true
     self:RecordScanTelemetry("signals")
+    self._scanTelemetry.lastScanReason = context.reason
+    self._scanTelemetry.lastScanNotifyMode = context.notifyMode
+    if context.reason == "recipe-learned" then
+        self:RecordScanTelemetry("scanTriggeredRecipeLearned")
+    elseif isManualScanReason(context.reason) then
+        self:RecordScanTelemetry("scanTriggeredManual")
+    end
 end
 
 function Data:HasScanPending(profession)
@@ -186,7 +215,7 @@ function Data:CompleteScanAttempt(result)
     local genericReason = self._genericScanNeeded
     self._scanNeededByProfession[result.profession] = nil
     if hadGenericPending then
-        if result.changed or genericReason == "manual-rescan" or genericReason == nil then
+        if result.changed or isManualScanReason(genericReason) or genericReason == nil then
             self._genericScanNeeded = nil
             self._genericScanAttempts = {}
         else
@@ -203,22 +232,30 @@ function Data:MakeScanResult(profession, opts)
         changed = opts.changed == true,
         valid = opts.valid == true,
         skipped = opts.skipped == true,
+        failed = opts.failed == true,
         skipReason = opts.skipReason,
         count = opts.count or 0,
         previousCount = opts.previousCount or 0,
         suspectedPartial = opts.suspectedPartial == true,
+        reason = opts.reason,
+        notifyMode = opts.notifyMode,
     }
 end
 
-function Data:SkipScan(profession, reason, previousCount)
+function Data:SkipScan(profession, reason, previousCount, opts)
     self:EnsureScanState()
+    local context = resolveScanContext(opts)
     self:RecordScanTelemetry("scansSkipped")
     self._scanTelemetry.lastProfession = profession
     self._scanTelemetry.lastSkipReason = reason
+    self._scanTelemetry.lastScanReason = context.reason
+    self._scanTelemetry.lastScanNotifyMode = context.notifyMode
     return self:MakeScanResult(profession, {
         skipped = true,
         skipReason = reason,
         previousCount = previousCount or 0,
+        reason = context.reason,
+        notifyMode = context.notifyMode,
     })
 end
 
@@ -234,7 +271,7 @@ end
 function Data:DumpScanStatus()
     local scan = self:GetScanTelemetry()
     Addon:SystemPrint(string.format(
-        "Scan signals=%d started=%d changed=%d unchanged=%d skipped=%d failed=%d partial=%d invalid=%d pending=%s last=%s/%s",
+        "Scan signals=%d started=%d changed=%d unchanged=%d skipped=%d failed=%d partial=%d invalid=%d pending=%s last=%s/%s reason=%s notify=%s autoSuppressed=%d skillSkips=%d/%d",
         scan.signals or 0,
         scan.scansStarted or 0,
         scan.scansChanged or 0,
@@ -245,7 +282,12 @@ function Data:DumpScanStatus()
         scan.invalidRecipesBlocked or 0,
         tostring(self:HasAnyScanPending()),
         tostring(scan.lastProfession or "none"),
-        tostring(scan.lastSkipReason or "none")
+        tostring(scan.lastSkipReason or "none"),
+        tostring(scan.lastScanReason or "none"),
+        tostring(scan.lastScanNotifyMode or "none"),
+        scan.scanAutoSuppressedUnchanged or 0,
+        scan.scanSkippedWeaponSkill or 0,
+        scan.scanSkippedGenericSkill or 0
     ))
     if (scan.invalidRecipesBlocked or 0) > 0 then
         Addon:SystemPrint(string.format(
@@ -324,21 +366,48 @@ function Data:CanScanCraftData()
     return true, nil, canonical, numCrafts
 end
 
-function Data:ScanTradeSkill()
+function Data:GetVisibleTrackedProfessionContext()
+    local tradeFrame = _G.TradeSkillFrame
+    if tradeFrame and type(tradeFrame.IsShown) == "function" and tradeFrame:IsShown() then
+        local canonical, reason = self:GetActiveTradeSkillProfession()
+        if canonical and not reason then
+            return canonical, "trade", nil
+        end
+        return nil, "trade", reason or "trade-no-title"
+    end
+
+    local craftFrame = _G.CraftFrame
+    if craftFrame and type(craftFrame.IsShown) == "function" and craftFrame:IsShown() then
+        local canonical, reason = self:GetActiveCraftProfession()
+        if canonical and not reason then
+            return canonical, "craft", nil
+        end
+        return nil, "craft", reason or "craft-no-title"
+    end
+
+    return nil, nil, "no-visible-profession-frame"
+end
+
+function Data:ScanTradeSkill(opts)
     self:EnsureScanState()
+    local context = resolveScanContext(opts)
     local canScan, reason, canonical, initialNumSkills = self:CanScanTradeSkillData()
-    if not canScan then return self:SkipScan(canonical, reason or "trade-data-not-ready") end
+    if not canScan then
+        return self:SkipScan(canonical, reason or "trade-data-not-ready", nil, context)
+    end
 
     local entry = self:GetOrCreateMember(self:GetPlayerKey())
     local prof = entry.professions[canonical]
     local hasData = prof and prof.count and prof.count > 0
     if hasData and not self:HasScanPending(canonical) then
-        return self:SkipScan(canonical, "cached", prof.count or 0)
+        return self:SkipScan(canonical, "cached", prof.count or 0, context)
     end
 
     self:RecordScanTelemetry("scansStarted")
     self._scanTelemetry.lastProfession = canonical
     self._scanTelemetry.lastSkipReason = nil
+    self._scanTelemetry.lastScanReason = context.reason
+    self._scanTelemetry.lastScanNotifyMode = context.notifyMode
     local filterState = snapshotTradeSkillFilters()
     clearTradeSkillFilters()
 
@@ -386,38 +455,50 @@ function Data:ScanTradeSkill()
     restoreTradeSkillFilters(filterState)
 
     if not ok then
-        Addon:SystemPrint("Trade skill scan failed: " .. tostring(err))
         self:RecordScanTelemetry("scansFailed")
+        self._scanTelemetry.lastScanReason = context.reason
+        self._scanTelemetry.lastScanNotifyMode = context.notifyMode
+        if context.notifyMode == "manual" then
+            Addon:Print("Trade skill scan failed: " .. tostring(err))
+        else
+            Addon:Debug("Trade skill scan failed:", tostring(err), "reason:", context.reason)
+        end
         return self:MakeScanResult(canonical, {
             valid = false,
+            failed = true,
             skipReason = "trade-scan-failed",
             previousCount = prof and prof.count or 0,
+            reason = context.reason,
+            notifyMode = context.notifyMode,
         })
     end
 
-    return self:ApplyScanResult(canonical, recipes)
+    return self:ApplyScanResult(canonical, recipes, context)
 end
 
-function Data:ScanCraft()
+function Data:ScanCraft(opts)
     self:EnsureScanState()
+    local context = resolveScanContext(opts)
     local canScan, reason, canonical, initialNumCrafts = self:CanScanCraftData()
     if not canScan then
         if reason == "craft-not-enchanting" then
             Addon:Debug("ScanCraft skipped: CraftFrame shows", canonical or "nil")
         end
-        return self:SkipScan(canonical, reason or "craft-data-not-ready")
+        return self:SkipScan(canonical, reason or "craft-data-not-ready", nil, context)
     end
 
     local entry = self:GetOrCreateMember(self:GetPlayerKey())
     local prof = entry.professions[canonical]
     local hasData = prof and prof.count and prof.count > 0
     if hasData and not self:HasScanPending(canonical) then
-        return self:SkipScan(canonical, "cached", prof.count or 0)
+        return self:SkipScan(canonical, "cached", prof.count or 0, context)
     end
 
     self:RecordScanTelemetry("scansStarted")
     self._scanTelemetry.lastProfession = canonical
     self._scanTelemetry.lastSkipReason = nil
+    self._scanTelemetry.lastScanReason = context.reason
+    self._scanTelemetry.lastScanNotifyMode = context.notifyMode
     local filterState = snapshotCraftFilters()
     clearCraftFilters()
 
@@ -441,16 +522,25 @@ function Data:ScanCraft()
     restoreCraftFilters(filterState)
 
     if not ok then
-        Addon:SystemPrint("Craft scan failed: " .. tostring(err))
         self:RecordScanTelemetry("scansFailed")
+        self._scanTelemetry.lastScanReason = context.reason
+        self._scanTelemetry.lastScanNotifyMode = context.notifyMode
+        if context.notifyMode == "manual" then
+            Addon:Print("Craft scan failed: " .. tostring(err))
+        else
+            Addon:Debug("Craft scan failed:", tostring(err), "reason:", context.reason)
+        end
         return self:MakeScanResult(canonical, {
             valid = false,
+            failed = true,
             skipReason = "craft-scan-failed",
             previousCount = prof and prof.count or 0,
+            reason = context.reason,
+            notifyMode = context.notifyMode,
         })
     end
 
-    return self:ApplyScanResult(canonical, recipes)
+    return self:ApplyScanResult(canonical, recipes, context)
 end
 
 function Data:WarnSuspiciousScan(profession, previousCount, count)
@@ -470,7 +560,8 @@ function Data:WarnSuspiciousScan(profession, previousCount, count)
     end
 end
 
-function Data:ApplyScanResult(profession, recipeKeys)
+function Data:ApplyScanResult(profession, recipeKeys, opts)
+    local context = resolveScanContext(opts)
     local entry = self:GetOrCreateMember(self:GetPlayerKey())
     local prof = entry.professions[profession] or { recipes = {} }
     local oldSignature = prof.signature or ""
@@ -493,6 +584,8 @@ function Data:ApplyScanResult(profession, recipeKeys)
             previousCount = previousCount,
             suspectedPartial = true,
             skipReason = "suspected-partial",
+            reason = context.reason,
+            notifyMode = context.notifyMode,
         })
         self:CompleteScanAttempt(result)
         return result
@@ -505,7 +598,7 @@ function Data:ApplyScanResult(profession, recipeKeys)
     prof.signature = newSignature
     prof.count = count
     prof.lastScan = time()
-    prof.blockRevision = (entry.rev or 0) + (changed and 1 or 0)
+    prof.blockRevision = entry.rev or prof.blockRevision or 0
     prof.lastUpdatedAt = prof.lastScan
     prof.sourceType = "owner"
     prof.guildStatus = "active"
@@ -520,6 +613,8 @@ function Data:ApplyScanResult(profession, recipeKeys)
     local changed = recipeChanged or specializationChanged
 
     entry.professions[profession] = prof
+    self._scanTelemetry.lastScanReason = context.reason
+    self._scanTelemetry.lastScanNotifyMode = context.notifyMode
 
     if changed then
         self:RecordScanTelemetry("scansChanged")
@@ -535,7 +630,6 @@ function Data:ApplyScanResult(profession, recipeKeys)
         )
         if recipeChanged then
             Addon:Debug("Scan changed", profession, count, "recipe ids")
-            Addon:SystemPrint(string.format("Scanned %s: %d recipe(s) found.", profession, count))
         else
             Addon:Debug(
                 "Scan specialization changed",
@@ -544,15 +638,36 @@ function Data:ApplyScanResult(profession, recipeKeys)
                 "->",
                 tostring(prof.specialization or "none")
             )
-            Addon:SystemPrint(string.format(
-                "Scanned %s: specialization updated to %s.",
-                profession,
-                tostring(prof.specialization or "none")
+        end
+        if context.notifyMode == "manual" then
+            if recipeChanged then
+                Addon:Print(string.format("Scanned %s: %d recipe(s) found.", profession, count))
+            else
+                Addon:Print(string.format(
+                    "Scanned %s: specialization updated to %s.",
+                    profession,
+                    tostring(prof.specialization or "none")
+                ))
+            end
+        else
+            debugSuppressedScan(self, context, string.format(
+                "%s changed (%d recipe(s))",
+                tostring(profession),
+                count
             ))
         end
     else
         self:RecordScanTelemetry("scansUnchanged")
-        Addon:SystemPrint(string.format("Scanned %s: unchanged (%d recipe(s)).", profession, count))
+        if context.notifyMode == "manual" then
+            Addon:Print(string.format("Scanned %s: unchanged (%d recipe(s)).", profession, count))
+        else
+            self:RecordScanTelemetry("scanAutoSuppressedUnchanged")
+            debugSuppressedScan(self, context, string.format(
+                "%s unchanged (%d recipe(s))",
+                tostring(profession),
+                count
+            ))
+        end
     end
 
     self:InvalidateRecipeCaches()
@@ -562,6 +677,8 @@ function Data:ApplyScanResult(profession, recipeKeys)
         changed = changed,
         count = count,
         previousCount = previousCount,
+        reason = context.reason,
+        notifyMode = context.notifyMode,
     })
     self:CompleteScanAttempt(result)
     return result
