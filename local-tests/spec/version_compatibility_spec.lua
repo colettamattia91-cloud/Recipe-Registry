@@ -347,6 +347,69 @@ Test.it("modern purposes require declared capabilities", function()
     Test.eq(addon.Sync.telemetry.skippedMissingCapability or 0, 3, "capability skips should include the opportunistic MANI path plus explicit checks")
 end)
 
+Test.it("same-wire peers without capability metadata cannot do post-wipe, manifest-recovery, or offline-replica", function()
+    local addon, wow = loadAddon("release", "2.0.0")
+    local peerKey = "Nocapspeer-TestRealm"
+
+    deliverHello(addon, wow, peerKey, {
+        addonVersion = "2.0.0",
+        wireVersion = addon.WIRE_VERSION,
+        buildChannel = "release",
+        caps = nil,
+    })
+    local assumedBefore = addon.Sync.telemetry.assumedModernCapabilities or 0
+
+    local postWipeEligible, postWipeReason = addon.Sync:CanExchangeDataWithPeer(peerKey, "post-wipe", {
+        source = peerKey,
+        memberKey = peerKey,
+        why = "post-wipe",
+    })
+    local recoveryEligible, recoveryReason = addon.Sync:CanExchangeDataWithPeer(peerKey, "manifest-recovery", {
+        source = peerKey,
+        memberKey = peerKey,
+        why = "manifest-partial-timeout",
+    })
+    local replicaEligible, replicaReason = addon.Sync:CanExchangeDataWithPeer(peerKey, "offline-replica", {
+        source = peerKey,
+        memberKey = peerKey,
+        why = "hello-auto",
+        allowOfflinePeer = true,
+    })
+
+    Test.falsy(postWipeEligible, "same-wire peers without capability metadata should not qualify for post-wipe")
+    Test.eq(postWipeReason, "missing-required-capability", "post-wipe capability rejection")
+    Test.falsy(recoveryEligible, "same-wire peers without capability metadata should not qualify for manifest recovery")
+    Test.eq(recoveryReason, "missing-required-capability", "manifest recovery capability rejection")
+    Test.falsy(replicaEligible, "same-wire peers without capability metadata should not qualify for offline-replica")
+    Test.eq(replicaReason, "missing-required-capability", "offline-replica capability rejection")
+    Test.eq(addon.Sync.telemetry.assumedModernCapabilities or 0, assumedBefore, "strict purposes should not use assumed modern capability fallback")
+end)
+
+Test.it("same-wire peers without capability metadata only get provisional manifest-large eligibility", function()
+    local addon, wow = loadAddon("release", "2.0.0")
+    local peerKey = "Provisionalmani-TestRealm"
+
+    deliverHello(addon, wow, peerKey, {
+        addonVersion = "2.0.0",
+        wireVersion = addon.WIRE_VERSION,
+        buildChannel = "release",
+        caps = nil,
+    })
+    local assumedBefore = addon.Sync.telemetry.assumedModernCapabilities or 0
+
+    local manifestEligible, manifestReason = addon.Sync:CanExchangeDataWithPeer(peerKey, "manifest-large", {
+        source = peerKey,
+        memberKey = peerKey,
+        why = "hello",
+    })
+
+    Test.truthy(manifestEligible, "same-wire peers without capability metadata may keep provisional manifest-large eligibility")
+    Test.eq(manifestReason, "eligible", "provisional manifest-large path should stay eligible")
+    Test.eq(addon.Sync.telemetry.assumedModernCapabilities or 0, assumedBefore + 1, "provisional path should be tracked explicitly")
+    Test.eq(addon.Sync.telemetry.assumedModernCapabilityPeer, peerKey, "telemetry should remember the provisional peer")
+    Test.eq(addon.Sync.telemetry.assumedModernCapabilityPurpose, "manifest-large", "telemetry should remember the provisional purpose")
+end)
+
 Test.it("manifest-large eligibility requires maniReliable support", function()
     local addon, wow = loadAddon("release", "2.0.0")
     local peerKey = "Manipeer-TestRealm"

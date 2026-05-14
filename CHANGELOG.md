@@ -5,6 +5,7 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 ### Added
 - Local backend coverage now includes reload recovery regressions plus a two-tier sync soak harness with explicit suite selection: the default backend pass keeps the controlled churn soak, while the heavier 50-peer soak runs only in `-Suite soak`.
+- Release `2.0.0` notes now make the sync boundary explicit: pre-`2.0` clients are no longer considered modern sync peers, `dev` builds talk only on `RRDEV`, `release` builds talk only on `RecipeRegistry`, and guilds should update the addon line together for reliable sync.
 
 ### Changed
 - Snapshot serving memory work is still under investigation and intentionally not part of `1.8.1`; any lighter `SNAP` session materialization changes remain deferred until they can be exercised against real peers.

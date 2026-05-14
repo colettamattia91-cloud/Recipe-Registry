@@ -1,5 +1,4 @@
 local Addon = _G.RecipeRegistry
-local Addon = _G.RecipeRegistry
 local BuildInfo = Addon.BuildInfo or {}
 
 Addon.BuildInfo = BuildInfo

@@ -91,6 +91,21 @@ local CHUNK_WINDOW_PURPOSES = {
     ["snapshot-replica"] = true,
 }
 
+local function isAssumedModernCapabilityPurpose(purpose, request)
+    if purpose ~= "manifest-large" then
+        return false
+    end
+    request = request or {}
+    if request.allowOfflinePeer then
+        return false
+    end
+    local why = tostring(request.why or "")
+    return why ~= "manifest-partial-timeout"
+        and why ~= "request-repair"
+        and why ~= "post-wipe"
+        and why ~= "database-wipe"
+end
+
 local function summarizeCapabilities(payload)
     local caps = {}
     local source = type(payload) == "table" and payload or {}
@@ -774,13 +789,17 @@ function Sync:CanExchangeDataWithPeer(peerKey, purpose, request)
             local hasCapabilityDeclaration = caps ~= nil
                 or (type(peerVersion.capabilities) == "table" and next(peerVersion.capabilities) ~= nil)
             if not capabilities then
-                if MANI_RELIABLE_PURPOSES[purpose] and not hasCapabilityDeclaration and compatibility == "compatible" then
-                    capabilities = nil
+                if not hasCapabilityDeclaration
+                    and compatibility == "compatible"
+                    and isAssumedModernCapabilityPurpose(purpose, request) then
+                    self.telemetry.assumedModernCapabilities = (self.telemetry.assumedModernCapabilities or 0) + 1
+                    self.telemetry.assumedModernCapabilityPeer = peerKey
+                    self.telemetry.assumedModernCapabilityPurpose = purpose
                 else
-                self:SetPeerIneligibleReason(peerKey, "missing-required-capability")
-                self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
-                self.telemetry.skippedMissingCapability = (self.telemetry.skippedMissingCapability or 0) + 1
-                return false, "missing-required-capability"
+                    self:SetPeerIneligibleReason(peerKey, "missing-required-capability")
+                    self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
+                    self.telemetry.skippedMissingCapability = (self.telemetry.skippedMissingCapability or 0) + 1
+                    return false, "missing-required-capability"
                 end
             end
             if capabilities and MANI_RELIABLE_PURPOSES[purpose] and capabilities.maniReliable ~= true then
