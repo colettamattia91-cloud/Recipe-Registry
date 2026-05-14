@@ -173,6 +173,10 @@ function Sync:OnInitialize()
     self.inboundFinalizeQueue = {}
     self.peerPacing = {}
     self.partialManifestReceive = {}
+    self.abandonedManifestReceives = {}
+    self.completedManifestReceives = {}
+    self.manifestChunkSendCache = {}
+    self.manifestAttemptCounters = {}
     self._lastManifestSentAt = {}
     self._lastManifestAnnouncedId = {}
     self._helloManifestRefreshRequested = {}
@@ -234,6 +238,10 @@ function Sync:ResetRuntimeQueues(reason, opts)
     self.inboundFinalizeQueue = {}
     self.peerPacing = {}
     self.partialManifestReceive = {}
+    self.abandonedManifestReceives = {}
+    self.completedManifestReceives = {}
+    self.manifestChunkSendCache = {}
+    self.manifestAttemptCounters = {}
     self._helloManifestRefreshRequested = {}
     self._lastHelloSeenAt = {}
     self._lastManifestReceivedAt = {}
@@ -1261,7 +1269,7 @@ end
 function Sync:ShouldRequestManifestRefresh(peerKey, opts)
     opts = opts or {}
     if not self:IsValidSyncMemberKey(peerKey) then return false end
-    if opts.force == true then return true end
+    if opts.force == true or opts.ignoreCooldown == true then return true end
 
     local now = time()
     local lastRequestAt = self._helloManifestRefreshRequested and self._helloManifestRefreshRequested[peerKey] or 0
@@ -1606,6 +1614,8 @@ function Sync:PruneOnlineNodes()
             self._helloManifestRefreshRequested[key] = nil
             self._lastHelloSeenAt[key] = nil
             self._lastManifestReceivedAt[key] = nil
+            self.abandonedManifestReceives[key] = nil
+            self.completedManifestReceives[key] = nil
             self.peerBackoffUntil[key] = nil
             self.peerVersions[key] = nil
             if self.peerHealth then
@@ -1653,45 +1663,75 @@ function Sync:PrunePartialManifestReceives()
                 if progressStamp > 0 then
                     oldestAge = max(oldestAge, max(0, now - progressStamp))
                 end
-                if type(state) ~= "table" or (progressStamp > 0 and (now - progressStamp) > SESSION_TIMEOUT) then
+                local timedOut = progressStamp > 0 and (now - progressStamp) > SESSION_TIMEOUT
+                if type(state) ~= "table" or timedOut then
                     local seenCount = type(state) == "table" and countKeys(state.seen) or 0
                     local total = type(state) == "table" and (tonumber(state.total or 0) or 0) or 0
                     local reason = type(state) ~= "table" and "invalid-state" or "timeout"
                     local missingSeqs = type(state) == "table" and self.GetMissingSeqs and self:GetMissingSeqs(state) or {}
                     local diagnostics = self.GetManifestBatchDiagnostics and self:GetManifestBatchDiagnostics(peerKey, manifestId, "receive") or nil
-                    if diagnostics then
-                        diagnostics.receivedSeqCount = seenCount
-                        diagnostics.missingSeqs = missingSeqs
-                        diagnostics.pruned = true
-                        diagnostics.pruneReason = reason
-                    end
-                    Addon:Debug(string.format(
-                        "Manifest prune peer=%s manifestId=%s received=%d/%d reason=%s",
-                        tostring(peerKey),
-                        tostring(manifestId or "unknown"),
-                        seenCount,
-                        total,
-                        reason
-                    ))
-                    manifests[manifestId] = nil
-                    removed = removed + 1
-                    self.telemetry.manifestPartialPrunes = (self.telemetry.manifestPartialPrunes or 0) + 1
-                    self.telemetry.lastManifestPruneReason = reason
-                    if reason == "timeout"
+                    local canRecoverMissingSeqs = reason == "timeout"
                         and seenCount > 0
                         and total > seenCount
-                        and self:IsValidSyncMemberKey(peerKey) then
+                        and #missingSeqs > 0
+                        and self:IsValidSyncMemberKey(peerKey)
+                    if canRecoverMissingSeqs and not state.recoveryRequestedAt then
+                        state.recoveryRequestedAt = now
+                        state.recoveryReason = "manifest-missing-seqs"
+                        state.recoveryMissingSeqs = missingSeqs
+                        self.telemetry.manifestSoftTimeouts = (self.telemetry.manifestSoftTimeouts or 0) + 1
                         self.telemetry.manifestPartialTimeouts = (self.telemetry.manifestPartialTimeouts or 0) + 1
                         self.telemetry.manifestPartialRecoveryRequests = (self.telemetry.manifestPartialRecoveryRequests or 0) + 1
                         self.telemetry.manifestRecoveryRequests = (self.telemetry.manifestRecoveryRequests or 0) + 1
+                        self.telemetry.manifestMissingSeqRequests = (self.telemetry.manifestMissingSeqRequests or 0) + 1
                         self.telemetry.lastManifestRecoveryPeer = peerKey
                         self.telemetry.lastManifestRecoveryId = manifestId
                         if diagnostics then
+                            diagnostics.receivedSeqCount = seenCount
+                            diagnostics.missingSeqs = missingSeqs
                             diagnostics.recoveryRequested = true
+                            diagnostics.recoveryMode = "missing-seqs"
                         end
+                        Addon:Debug(string.format(
+                            "Manifest soft-timeout peer=%s manifestId=%s received=%d/%d missingSeqs=%s",
+                            tostring(peerKey),
+                            tostring(manifestId or "unknown"),
+                            seenCount,
+                            total,
+                            table.concat(missingSeqs, ",")
+                        ))
                         self:RequestManifestRefresh(peerKey, {
-                            reason = "manifest-partial-timeout",
+                            ignoreCooldown = true,
+                            reason = "manifest-missing-seqs",
+                            manifestId = manifestId,
+                            manifestAttempt = state.manifestAttempt,
+                            missingSeqs = missingSeqs,
                         })
+                    elseif not canRecoverMissingSeqs
+                        or not state.recoveryRequestedAt
+                        or (now - state.recoveryRequestedAt) > SESSION_TIMEOUT then
+                        if diagnostics then
+                            diagnostics.receivedSeqCount = seenCount
+                            diagnostics.missingSeqs = missingSeqs
+                            diagnostics.pruned = true
+                            diagnostics.pruneReason = reason
+                        end
+                        Addon:Debug(string.format(
+                            "Manifest prune peer=%s manifestId=%s received=%d/%d reason=%s",
+                            tostring(peerKey),
+                            tostring(manifestId or "unknown"),
+                            seenCount,
+                            total,
+                            reason
+                        ))
+                        manifests[manifestId] = nil
+                        if reason == "timeout" and self.MarkManifestReceiveAbandoned then
+                            self:MarkManifestReceiveAbandoned(peerKey, manifestId, state.manifestAttempt)
+                        end
+                        removed = removed + 1
+                        self.telemetry.manifestHardPrunes = (self.telemetry.manifestHardPrunes or 0) + 1
+                        self.telemetry.manifestPartialPrunes = (self.telemetry.manifestPartialPrunes or 0) + 1
+                        self.telemetry.lastManifestPruneReason = reason
                     end
                 end
             end
@@ -1755,6 +1795,9 @@ function Sync:PruneState()
     self:PruneOutgoingSessions()
     self:PrunePartialReceives()
     self:PrunePartialManifestReceives()
+    if self.PruneManifestRecoveryCaches then
+        self:PruneManifestRecoveryCaches()
+    end
     self:PruneTricklePeerState()
     self:EnforceRuntimeQueueCaps("prune")
     self:RecomputeCoordinator()

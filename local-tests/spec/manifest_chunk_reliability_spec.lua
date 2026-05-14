@@ -35,6 +35,23 @@ local function countCommKind(wow, kind)
     return count
 end
 
+local function sentPayloadsByKind(wow, kind)
+    local rows = {}
+    for _, row in ipairs(wow.GetSentComm()) do
+        local payload = row.message
+        if type(payload) == "string" then
+            local ok, decoded = LibStub("AceSerializer-3.0"):Deserialize(payload)
+            if ok and type(decoded) == "table" then
+                payload = decoded
+            end
+        end
+        if type(payload) == "table" and payload.kind == kind then
+            rows[#rows + 1] = payload
+        end
+    end
+    return rows
+end
+
 local function runOpts(overrides)
     local opts = {
         maxTicks = 1600,
@@ -156,7 +173,7 @@ end
 
 io.write("Manifest chunk reliability\n")
 
-Test.it("uses receiver-side manifest progress timestamps for prune timeout and requests recovery after timeout", function()
+Test.it("uses receiver-side manifest progress timestamps for soft timeout recovery before hard prune", function()
     local addon, wow, _data = freshAddon()
     local peerKey = "Peerone-Testrealm"
     local manifestId = "Peerone-Testrealm:100:1:3"
@@ -193,19 +210,35 @@ Test.it("uses receiver-side manifest progress timestamps for prune timeout and r
     addon.Sync:PrunePartialManifestReceives()
 
     local diag = addon.Sync:GetManifestBatchDiagnostics(peerKey, manifestId, "receive")
-    Test.falsy(addon.Sync.partialManifestReceive[peerKey], "stalled partial manifest should prune after receiver-side timeout")
-    Test.eq(countCommKind(wow, "MREQ"), 1, "timed-out partial manifests should request a fresh manifest")
-    Test.eq(addon.Sync.telemetry.manifestPartialPrunes or 0, 1, "partial manifest prune telemetry should increment")
+    local mreqs = sentPayloadsByKind(wow, "MREQ")
+    Test.truthy(addon.Sync.partialManifestReceive[peerKey] and addon.Sync.partialManifestReceive[peerKey][manifestId], "first timeout should keep the partial manifest open for missing-seq recovery")
+    Test.eq(countCommKind(wow, "MREQ"), 1, "timed-out partial manifests should emit one recovery request")
+    Test.eq(mreqs[1] and mreqs[1].reason, "manifest-missing-seqs", "recovery request should use the missing-seqs reason")
+    Test.eq(mreqs[1] and mreqs[1].manifestId, manifestId, "recovery request should include the manifestId")
+    Test.eq(mreqs[1] and #(mreqs[1].missingSeqs or {}), 2, "recovery request should include the missing sequences")
+    Test.eq(mreqs[1] and mreqs[1].missingSeqs[1], 2, "recovery request should ask for seq=2 first")
+    Test.eq(addon.Sync.telemetry.manifestSoftTimeouts or 0, 1, "soft timeout telemetry should increment")
     Test.eq(addon.Sync.telemetry.manifestPartialTimeouts or 0, 1, "partial manifest timeout telemetry should increment")
     Test.eq(addon.Sync.telemetry.manifestRecoveryRequests or 0, 1, "manifest recovery telemetry should increment")
-    Test.eq(addon.Sync.telemetry.lastManifestPruneReason, "timeout", "last prune reason telemetry should update")
+    Test.eq(addon.Sync.telemetry.manifestMissingSeqRequests or 0, 1, "missing seq request telemetry should increment")
+    Test.eq(addon.Sync.telemetry.lastManifestPruneReason, nil, "soft timeout should not record a prune reason yet")
     Test.eq(addon.Sync.telemetry.lastManifestRecoveryPeer, peerKey, "last recovery peer telemetry should update")
     Test.eq(addon.Sync.telemetry.lastManifestRecoveryId, manifestId, "last recovery manifest telemetry should update")
-    Test.truthy(diag and diag.pruned, "diagnostics should remember that the partial manifest was pruned")
-    Test.eq(diag and diag.pruneReason, "timeout", "prune reason should be recorded")
+    Test.falsy(diag and diag.pruned, "soft timeout should not mark the partial as pruned")
     Test.truthy(diag and diag.recoveryRequested, "diagnostics should remember that recovery was requested")
     Test.eq(diag and diag.receivedSeqCount, 1, "diagnostics should preserve received sequence count")
     Test.eq(diag and #(diag.missingSeqs or {}), 2, "diagnostics should preserve missing sequence information")
+
+    wow.AdvanceTime(61)
+    addon.Sync:PrunePartialManifestReceives()
+
+    diag = addon.Sync:GetManifestBatchDiagnostics(peerKey, manifestId, "receive")
+    Test.falsy(addon.Sync.partialManifestReceive[peerKey], "stalled partial manifest should hard-prune after recovery grace expires")
+    Test.eq(addon.Sync.telemetry.manifestHardPrunes or 0, 1, "hard prune telemetry should increment")
+    Test.eq(addon.Sync.telemetry.manifestPartialPrunes or 0, 1, "legacy partial prune telemetry should still increment on hard prune")
+    Test.eq(addon.Sync.telemetry.lastManifestPruneReason, "timeout", "hard prune should record timeout as the prune reason")
+    Test.truthy(diag and diag.pruned, "diagnostics should remember the eventual hard prune")
+    Test.eq(diag and diag.pruneReason, "timeout", "hard prune reason should be recorded")
 end)
 
 Test.it("requeues failed MANI sends and only counts successful chunk sends", function()
@@ -336,6 +369,85 @@ Test.it("records compare diagnostics after a manifest completes out of order", f
     Test.eq(diag and #(diag.missingSeqs or {}), 0, "completed manifest should no longer report missing sequences")
 end)
 
+Test.it("recovers a 12 chunk manifest by requesting and resending only the missing seq", function()
+    local blockCount = 288
+    local bus = CommBus.CreatePeers(2, {
+        prefix = "Targetedpeer",
+        transportProfile = "instant",
+        payloadMode = "realistic-string",
+        runtimeTickers = true,
+    })
+    local source = bus.nodes[1]
+    local requester = bus.nodes[2]
+    local droppedSeq2 = false
+    local recoveryRequest
+    local resentSeq2 = 0
+
+    bus:Activate(source)
+    seedReplicaManifestBlocks(source.addon.Data, blockCount, {
+        prefix = "Targetedowner",
+        realm = "TestRealm",
+        recipeBase = 342000,
+        reason = "targeted-missing-seq",
+    })
+
+    local chunks = source.addon.TrickleSync:BuildManifestChunks({
+        allowStale = false,
+        syncFallback = false,
+        reason = "targeted-missing-seq",
+    })
+    local manifestId = chunks[1].manifestId
+
+    Test.eq(#chunks, 12, "288 block manifest should produce exactly 12 MANI chunks")
+
+    bus:SetRouteHook(function(_bus, sender, target, _row, payload)
+        if sender == requester and target == source and payload.kind == "MREQ" and payload.manifestId == manifestId then
+            recoveryRequest = payload
+            return
+        end
+        if sender == source and target == requester and payload.kind == "MANI" and payload.manifestId == manifestId then
+            if payload.seq == 2 and not droppedSeq2 then
+                droppedSeq2 = true
+                return "drop"
+            end
+            if recoveryRequest and payload.seq == 2 then
+                resentSeq2 = resentSeq2 + 1
+            end
+        end
+    end)
+
+    bus:Activate(source)
+    source.addon.Sync:SendManifestToPeer(requester.key, "force")
+
+    local recovered = bus:RunUntil(function(current)
+        local diag = requester.addon.Sync:GetManifestBatchDiagnostics(source.key, manifestId, "receive")
+        return recoveryRequest
+            and resentSeq2 == 1
+            and diag
+            and diag.completed
+            and diag.compareFired
+            and diag.receivedSeqCount == #chunks
+            and #(diag.missingSeqs or {}) == 0
+            and (requester.addon.Sync.telemetry.manifestCatchupCandidates or 0) > 0
+    end, runOpts({
+        maxTicks = 1000,
+        tickSeconds = 0.5,
+    }))
+
+    Test.truthy(recovered, "receiver should recover the single missing manifest seq and complete the batch")
+    Test.truthy(recoveryRequest, "soft timeout should emit a targeted recovery request")
+    Test.eq(recoveryRequest and recoveryRequest.reason, "manifest-missing-seqs", "recovery request should use the missing-seqs reason")
+    Test.eq(recoveryRequest and recoveryRequest.manifestId, manifestId, "recovery request should target the same manifestId")
+    Test.eq(recoveryRequest and #(recoveryRequest.missingSeqs or {}), 1, "recovery request should ask for only one missing seq")
+    Test.eq(recoveryRequest and recoveryRequest.missingSeqs[1], 2, "recovery request should ask for seq=2")
+    Test.eq(resentSeq2, 1, "sender should resend only the requested missing seq")
+    Test.eq(requester.addon.Sync.telemetry.manifestSoftTimeouts or 0, 1, "soft timeout telemetry should increment once")
+    Test.eq(requester.addon.Sync.telemetry.manifestMissingSeqRequests or 0, 1, "missing seq request telemetry should increment once")
+    Test.eq(source.addon.Sync.telemetry.manifestMissingSeqChunksSent or 0, 1, "sender should count the targeted resend chunk")
+    Test.eq(requester.addon.Sync.telemetry.manifestMissingSeqRecovered or 0, 1, "targeted recovery should count as recovered")
+    Test.eq(requester.addon.Sync.telemetry.manifestRecoveryCompleted or 0, 1, "recovery completion telemetry should increment")
+end)
+
 Test.it("recovers large 17 chunk manifest after receiving only one chunk first", function()
     local blockCount = 385
     local bus = CommBus.CreatePeers(2, {
@@ -420,7 +532,7 @@ Test.it("recovers large 17 chunk manifest after receiving only one chunk first",
     local recovered = bus:RunUntil(function(current)
         local diag = requester.addon.Sync:GetManifestBatchDiagnostics(source.key, manifestId, "receive")
         return recoveryMreqs >= 1
-            and recoveryManifestChunks >= #chunks
+            and recoveryManifestChunks >= (#chunks - 1)
             and diag
             and diag.completed
             and diag.compareFired
@@ -440,10 +552,11 @@ Test.it("recovers large 17 chunk manifest after receiving only one chunk first",
     Test.truthy(recovered, "incomplete large MANI should recover, complete, and generate catch-up work")
     Test.eq(requester.addon.Sync.telemetry.manifestPartialTimeouts or 0, 1, "receiver-side timeout should be counted once")
     Test.eq(requester.addon.Sync.telemetry.manifestRecoveryRequests or 0, 1, "recovery MREQ should be counted once")
+    Test.eq(requester.addon.Sync.telemetry.manifestMissingSeqRequests or 0, 1, "large recovery should use one missing-seq request")
     Test.eq(requester.addon.Sync.telemetry.manifestPartialRecovered or 0, 1, "recovered manifest completion should be counted")
     Test.eq(requester.addon.Sync.telemetry.manifestReceiveCompleted or 0, 1, "manifest completion should be counted")
     Test.eq(requester.addon.Sync.telemetry.manifestCompareFired or 0, 1, "manifest compare should fire exactly once for the recovered manifest")
-    Test.eq(requester.addon.Sync.telemetry.lastManifestPruneReason, "timeout", "timeout should be recorded as the last prune reason")
+    Test.eq(requester.addon.Sync.telemetry.lastManifestPruneReason, nil, "soft recovery should complete without hard-pruning the partial")
     Test.eq(requester.addon.Sync.telemetry.lastManifestRecoveryPeer, source.key, "recovery telemetry should record the source peer")
     Test.eq(requester.addon.Sync.telemetry.lastManifestRecoveryId, manifestId, "recovery telemetry should record the manifestId")
     Test.eq(recoveryMreqs, 1, "recovery should emit only one targeted MREQ for the stalled manifest")
@@ -451,6 +564,136 @@ Test.it("recovers large 17 chunk manifest after receiving only one chunk first",
     Test.truthy(diag and diag.completed, "recovered manifest diagnostics should report completion")
     Test.truthy(diag and diag.compareFired, "recovered manifest diagnostics should report compare execution")
     Test.lte(bus.stats.sentKinds.MANI or 0, (#chunks * 2) + 1, "recovery should not loop into unbounded MANI re-announces")
+end)
+
+Test.it("late duplicate chunks for a completed manifestId do not reopen partial state or rerun compare", function()
+    local blockCount = 288
+    local bus = CommBus.CreatePeers(2, {
+        prefix = "Completedpeer",
+        transportProfile = "instant",
+        payloadMode = "realistic-string",
+        runtimeTickers = true,
+    })
+    local source = bus.nodes[1]
+    local requester = bus.nodes[2]
+
+    bus:Activate(source)
+    seedReplicaManifestBlocks(source.addon.Data, blockCount, {
+        prefix = "Completedowner",
+        realm = "TestRealm",
+        recipeBase = 343000,
+        reason = "completed-duplicate",
+    })
+
+    local chunks = source.addon.TrickleSync:BuildManifestChunks({
+        allowStale = false,
+        syncFallback = false,
+        reason = "completed-duplicate",
+    })
+    local manifestId = chunks[1].manifestId
+
+    source.addon.Sync:SendManifestToPeer(requester.key, "force")
+
+    local completed = bus:RunUntil(function(current)
+        local diag = requester.addon.Sync:GetManifestBatchDiagnostics(source.key, manifestId, "receive")
+        return diag
+            and diag.completed
+            and diag.compareFired
+            and countPartialManifestOpen(requester.addon.Sync, source.key) == 0
+            and current:AllQueuesIdle()
+            and current:TransportIdle()
+    end, runOpts({
+        maxTicks = 600,
+        tickSeconds = 0.25,
+    }))
+
+    Test.truthy(completed, "baseline manifest should complete before duplicate chunks are injected")
+    local compareBefore = requester.addon.Sync.telemetry.manifestCompareFired or 0
+    local recoveryBefore = requester.addon.Sync.telemetry.manifestRecoveryRequests or 0
+    local pruneBefore = requester.addon.Sync.telemetry.manifestHardPrunes or 0
+
+    bus:Activate(requester)
+    requester.addon.Sync:HandleManifestChunk({
+        sender = source.key,
+        manifestId = manifestId,
+        manifestAttempt = 1,
+        seq = 3,
+        total = #chunks,
+        builtAt = chunks[3].builtAt,
+        memberKey = chunks[3].memberKey,
+        totals = chunks[3].totals,
+        blocks = chunks[3].blocks,
+    })
+
+    Test.eq(countPartialManifestOpen(requester.addon.Sync, source.key), 0, "duplicate chunks for a completed manifest should not reopen partial state")
+    Test.eq(requester.addon.Sync.telemetry.manifestCompareFired or 0, compareBefore, "compare should not rerun for duplicate completed chunks")
+    Test.eq(requester.addon.Sync.telemetry.manifestRecoveryRequests or 0, recoveryBefore, "duplicate completed chunks should not trigger recovery")
+    Test.eq(requester.addon.Sync.telemetry.manifestHardPrunes or 0, pruneBefore, "duplicate completed chunks should not schedule later prunes")
+    Test.eq(requester.addon.Sync.telemetry.manifestDuplicateCompletedChunksIgnored or 0, 1, "duplicate completed chunk telemetry should increment")
+end)
+
+Test.it("late chunks from a hard-pruned manifestId do not reopen a zombie partial", function()
+    local addon, wow, _data = freshAddon()
+    local peerKey = "Latepeer-Testrealm"
+    local manifestId = "Latepeer-Testrealm:400:9:3"
+
+    addon.Sync:HandleManifestChunk({
+        sender = peerKey,
+        manifestId = manifestId,
+        manifestAttempt = 1,
+        seq = 1,
+        total = 3,
+        builtAt = 400,
+        memberKey = peerKey,
+        totals = { blocks = 3, recipes = 3 },
+        blocks = {
+            {
+                blockKey = "Latepeer-Testrealm::Alchemy",
+                ownerCharacter = peerKey,
+                professionKey = "Alchemy",
+                revision = 10,
+                lastUpdatedAt = 400,
+                sourceType = "owner",
+                guildStatus = "active",
+                count = 1,
+                fingerprint = "late-1",
+            },
+        },
+    })
+
+    wow.AdvanceTime(61)
+    addon.Sync:PrunePartialManifestReceives()
+    wow.AdvanceTime(61)
+    addon.Sync:PrunePartialManifestReceives()
+
+    Test.falsy(addon.Sync.partialManifestReceive[peerKey], "partial manifest should be fully hard-pruned before late chunks arrive")
+
+    addon.Sync:HandleManifestChunk({
+        sender = peerKey,
+        manifestId = manifestId,
+        manifestAttempt = 1,
+        seq = 2,
+        total = 3,
+        builtAt = 400,
+        memberKey = peerKey,
+        totals = { blocks = 3, recipes = 3 },
+        blocks = {
+            {
+                blockKey = "Latepeer-Testrealm::Cooking",
+                ownerCharacter = peerKey,
+                professionKey = "Cooking",
+                revision = 11,
+                lastUpdatedAt = 401,
+                sourceType = "owner",
+                guildStatus = "active",
+                count = 1,
+                fingerprint = "late-2",
+            },
+        },
+    })
+
+    Test.falsy(addon.Sync.partialManifestReceive[peerKey], "late chunk from the abandoned attempt should not reopen a zombie partial")
+    Test.eq(addon.Sync.telemetry.manifestLateChunksIgnored or 0, 1, "late ignored telemetry should increment")
 end)
 
 Test.it("retries intermittent MANI send failures across specific large-manifest seq values", function()

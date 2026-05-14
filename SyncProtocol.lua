@@ -7,6 +7,13 @@ local time = time
 
 local PREFIX = Constants.PREFIX
 
+local function shouldAttachProtocolCaps(kind)
+    return kind == "HELLO"
+        or kind == "AD"
+        or kind == "MANI"
+        or kind == "MREQ"
+end
+
 function Sync:BroadcastHello()
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic() then
         return
@@ -70,6 +77,10 @@ function Sync:SendGuildEnvelope(kind, payload, priority)
     payload.wireVersion = payload.wireVersion or Addon.WIRE_VERSION
     payload.buildChannel = payload.buildChannel or Addon.BUILD_CHANNEL
     payload.buildId = payload.buildId or Addon.BUILD_ID
+    if shouldAttachProtocolCaps(kind) then
+        payload.capabilities = payload.capabilities or Addon.CAPABILITIES
+        payload.caps = payload.caps or (self.GetLocalProtocolCaps and self:GetLocalProtocolCaps() or nil)
+    end
     local msg = LibStub("AceSerializer-3.0"):Serialize(payload)
     if msg then
         self:SendCommMessage(PREFIX, msg, "GUILD", nil, priority or "NORMAL")
@@ -97,6 +108,10 @@ function Sync:SendDirectEnvelope(kind, payload, targetKey, priority)
     payload.wireVersion = payload.wireVersion or Addon.WIRE_VERSION
     payload.buildChannel = payload.buildChannel or Addon.BUILD_CHANNEL
     payload.buildId = payload.buildId or Addon.BUILD_ID
+    if shouldAttachProtocolCaps(kind) then
+        payload.capabilities = payload.capabilities or Addon.CAPABILITIES
+        payload.caps = payload.caps or (self.GetLocalProtocolCaps and self:GetLocalProtocolCaps() or nil)
+    end
     local msg = LibStub("AceSerializer-3.0"):Serialize(payload)
     if msg then
         self:SendCommMessage(PREFIX, msg, "WHISPER", target, priority or "NORMAL")

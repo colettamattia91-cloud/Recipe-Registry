@@ -28,6 +28,10 @@ local MANIFEST_PUSH_COOLDOWN = Constants.MANIFEST_PUSH_COOLDOWN
 local MANIFEST_MERGE_ANNOUNCE_DEBOUNCE = Constants.MANIFEST_MERGE_ANNOUNCE_DEBOUNCE
 local MANIFEST_MERGE_ANNOUNCE_MAX_DELAY = Constants.MANIFEST_MERGE_ANNOUNCE_MAX_DELAY
 local MANIFEST_CATCHUP_DRAIN_DELAY = Constants.MANIFEST_CATCHUP_DRAIN_DELAY
+local SESSION_TIMEOUT = Constants.SESSION_TIMEOUT
+local MANIFEST_CHUNK_CACHE_TTL = SESSION_TIMEOUT * 3
+local MANIFEST_RECEIVE_STATE_TTL = SESSION_TIMEOUT * 3
+local CATCHUP_DEFERRAL_LOG_INTERVAL = 5
 
 local function countKeys(tbl)
     local count = 0
@@ -91,13 +95,45 @@ end
 
 local function manifestPurposeFor(why)
     local reason = tostring(why or "")
-    if reason == "manifest-partial-timeout" or reason == "request-repair" then
+    if reason == "manifest-partial-timeout"
+        or reason == "request-repair"
+        or reason == "manifest-missing-seqs"
+        or reason == "manifest-missing-seqs-resend" then
         return "manifest-recovery"
     end
     if reason == "post-wipe" or reason == "database-wipe" then
         return "post-wipe"
     end
     return "manifest-large"
+end
+
+local function normalizeManifestAttempt(value)
+    local attempt = tonumber(value or 1) or 1
+    if attempt < 1 then
+        return 1
+    end
+    return math.floor(attempt)
+end
+
+local function cloneManifestChunkPayload(chunk, manifestAttempt)
+    local payload = shallowCopyTable(chunk)
+    payload.manifestAttempt = normalizeManifestAttempt(manifestAttempt)
+    return payload
+end
+
+local function buildSeqSet(values)
+    local set = {}
+    for _, value in ipairs(values or {}) do
+        local seq = tonumber(value)
+        if seq and seq >= 1 then
+            set[math.floor(seq)] = true
+        end
+    end
+    return set
+end
+
+local function countManifestBatchSeen(state)
+    return type(state) == "table" and countKeys(state.seen) or 0
 end
 
 local function ensureManifestBatchDiagnostics(self)
@@ -190,7 +226,158 @@ function Sync:GetManifestBatchDiagnostics(peerKey, manifestId, direction)
     return peerRows and peerRows[manifestId] or nil
 end
 
-function Sync:SendManifestToPeer(peerKey, why)
+function Sync:CacheManifestChunkBatch(manifestId, chunks, opts)
+    if not manifestId or type(chunks) ~= "table" or #chunks == 0 then
+        return nil
+    end
+    opts = opts or {}
+    self.manifestChunkSendCache = self.manifestChunkSendCache or {}
+    self.manifestAttemptCounters = self.manifestAttemptCounters or {}
+
+    local existing = self.manifestChunkSendCache[manifestId]
+    local attempt = existing and existing.attempt or nil
+    if opts.forceNewAttempt or not attempt then
+        attempt = (self.manifestAttemptCounters[manifestId] or 0) + 1
+        self.manifestAttemptCounters[manifestId] = attempt
+    end
+
+    local chunksBySeq = {}
+    for index = 1, #chunks do
+        local payload = cloneManifestChunkPayload(chunks[index], attempt)
+        chunksBySeq[payload.seq or index] = payload
+    end
+
+    local entry = {
+        manifestId = manifestId,
+        attempt = attempt,
+        totalChunks = #chunks,
+        chunksBySeq = chunksBySeq,
+        cachedAt = time(),
+        lastTouchedAt = time(),
+    }
+    self.manifestChunkSendCache[manifestId] = entry
+    return entry
+end
+
+function Sync:GetManifestChunkBatchCache(manifestId)
+    local entry = self.manifestChunkSendCache and self.manifestChunkSendCache[manifestId] or nil
+    if entry then
+        entry.lastTouchedAt = time()
+    end
+    return entry
+end
+
+function Sync:MarkManifestReceiveAbandoned(peerKey, manifestId, manifestAttempt)
+    if not (self:IsValidSyncMemberKey(peerKey) and manifestId) then
+        return
+    end
+    self.abandonedManifestReceives = self.abandonedManifestReceives or {}
+    self.abandonedManifestReceives[peerKey] = self.abandonedManifestReceives[peerKey] or {}
+    self.abandonedManifestReceives[peerKey][manifestId] = {
+        attempt = normalizeManifestAttempt(manifestAttempt),
+        markedAt = time(),
+        expiresAt = time() + MANIFEST_RECEIVE_STATE_TTL,
+    }
+end
+
+function Sync:GetAbandonedManifestReceive(peerKey, manifestId)
+    local peerRows = self.abandonedManifestReceives and self.abandonedManifestReceives[peerKey] or nil
+    return peerRows and peerRows[manifestId] or nil
+end
+
+function Sync:ClearAbandonedManifestReceive(peerKey, manifestId)
+    local peerRows = self.abandonedManifestReceives and self.abandonedManifestReceives[peerKey] or nil
+    if not peerRows then
+        return
+    end
+    peerRows[manifestId] = nil
+    if next(peerRows) == nil then
+        self.abandonedManifestReceives[peerKey] = nil
+    end
+end
+
+function Sync:MarkManifestReceiveCompleted(peerKey, manifestId, manifestAttempt)
+    if not (self:IsValidSyncMemberKey(peerKey) and manifestId) then
+        return
+    end
+    self.completedManifestReceives = self.completedManifestReceives or {}
+    self.completedManifestReceives[peerKey] = self.completedManifestReceives[peerKey] or {}
+    self.completedManifestReceives[peerKey][manifestId] = {
+        attempt = normalizeManifestAttempt(manifestAttempt),
+        completedAt = time(),
+        expiresAt = time() + MANIFEST_RECEIVE_STATE_TTL,
+    }
+end
+
+function Sync:GetCompletedManifestReceive(peerKey, manifestId)
+    local peerRows = self.completedManifestReceives and self.completedManifestReceives[peerKey] or nil
+    return peerRows and peerRows[manifestId] or nil
+end
+
+function Sync:ClearCompletedManifestReceive(peerKey, manifestId)
+    local peerRows = self.completedManifestReceives and self.completedManifestReceives[peerKey] or nil
+    if not peerRows then
+        return
+    end
+    peerRows[manifestId] = nil
+    if next(peerRows) == nil then
+        self.completedManifestReceives[peerKey] = nil
+    end
+end
+
+function Sync:PruneManifestRecoveryCaches()
+    local now = time()
+
+    for manifestId, entry in pairs(self.manifestChunkSendCache or {}) do
+        local stamp = tonumber(entry and entry.lastTouchedAt or entry and entry.cachedAt or 0) or 0
+        if stamp <= 0 or (now - stamp) > MANIFEST_CHUNK_CACHE_TTL then
+            self.manifestChunkSendCache[manifestId] = nil
+        end
+    end
+
+    for _, groupName in ipairs({ "abandonedManifestReceives", "completedManifestReceives" }) do
+        local groups = self[groupName] or {}
+        for peerKey, manifests in pairs(groups) do
+            for manifestId, info in pairs(manifests or {}) do
+                local expiresAt = tonumber(info and info.expiresAt or 0) or 0
+                if expiresAt <= 0 or expiresAt <= now then
+                    manifests[manifestId] = nil
+                end
+            end
+            if next(manifests or {}) == nil then
+                groups[peerKey] = nil
+            end
+        end
+    end
+end
+
+function Sync:LogManifestCatchupDeferral(reason)
+    self._manifestCatchupDeferralLog = self._manifestCatchupDeferralLog or {
+        reason = nil,
+        count = 0,
+        lastLogAt = 0,
+    }
+    local state = self._manifestCatchupDeferralLog
+    local now = time()
+    local sameReason = state.reason == reason
+    if sameReason and (now - (state.lastLogAt or 0)) < CATCHUP_DEFERRAL_LOG_INTERVAL then
+        state.count = (state.count or 0) + 1
+        return
+    end
+
+    local repeats = sameReason and ((state.count or 0) + 1) or 1
+    Addon:Debug(string.format(
+        "Manifest catch-up deferral reason=%s repeats=%d",
+        tostring(reason or "unknown"),
+        repeats
+    ))
+    state.reason = reason
+    state.count = 0
+    state.lastLogAt = now
+end
+
+function Sync:SendManifestToPeer(peerKey, why, opts)
+    opts = opts or {}
     if not peerKey or not Addon.TrickleSync then return end
     if not self:IsValidSyncMemberKey(peerKey) then return end
     if self:IsMockKey(peerKey) then return end
@@ -236,11 +423,17 @@ function Sync:SendManifestToPeer(peerKey, why)
         return
     end
     local manifestId = getManifestAnnouncementId(chunks, manifest)
+    local cacheEntry = self:CacheManifestChunkBatch(manifestId, chunks, {
+        forceNewAttempt = opts.forceNewAttempt == true,
+    })
     if why ~= "force" and manifestId and self._lastManifestAnnouncedId[peerKey] == manifestId then
         self.telemetry.manifestUnchangedSkips = (self.telemetry.manifestUnchangedSkips or 0) + 1
         return
     end
-    local queued = self:QueueManifestChunks(peerKey, chunks, why, manifestId)
+    local queued = self:QueueManifestChunks(peerKey, chunks, why, manifestId, {
+        manifestAttempt = cacheEntry and cacheEntry.attempt or 1,
+        totalChunks = #chunks,
+    })
     if queued then
         Addon:Debug(string.format(
             "Manifest batch peer=%s manifestId=%s totalChunks=%d queuedChunks=%d sentChunks=%d reason=%s",
@@ -258,11 +451,38 @@ function Sync:SendManifestToPeer(peerKey, why)
     end
 end
 
-function Sync:QueueManifestChunks(peerKey, chunks, why, manifestId)
+local function removeQueuedManifestChunkSeqs(queue, peerKey, manifestId, seqSet, manifestAttempt)
+    if type(queue) ~= "table" or not peerKey or not manifestId then
+        return 0
+    end
+
+    local removed = 0
+    local expectedAttempt = normalizeManifestAttempt(manifestAttempt)
+    for index = #queue, 1, -1 do
+        local queued = queue[index]
+        local payload = queued and queued.payload or nil
+        local seq = payload and tonumber(payload.seq or 0) or 0
+        local queuedAttempt = payload and normalizeManifestAttempt(payload.manifestAttempt) or 1
+        if queued
+            and queued.peer == peerKey
+            and payload
+            and payload.manifestId == manifestId
+            and queuedAttempt == expectedAttempt
+            and seqSet[seq] then
+            remove(queue, index)
+            removed = removed + 1
+        end
+    end
+    return removed
+end
+
+function Sync:QueueManifestChunks(peerKey, chunks, why, manifestId, opts)
     if not peerKey or not chunks then return false end
+    opts = opts or {}
     self.manifestChunkQueue = self.manifestChunkQueue or {}
     manifestId = manifestId or getManifestAnnouncementId(chunks)
-    if manifestId then
+    local manifestAttempt = normalizeManifestAttempt(opts.manifestAttempt)
+    if manifestId and not opts.appendOnly then
         local supersededCount, supersededIds = removeQueuedManifestBatchesForPeerExcept(self.manifestChunkQueue, peerKey, manifestId)
         if supersededCount > 0 then
             self.telemetry.manifestSuperseded = (self.telemetry.manifestSuperseded or 0) + #supersededIds
@@ -276,20 +496,29 @@ function Sync:QueueManifestChunks(peerKey, chunks, why, manifestId)
             end
         end
     end
-    if manifestId then
+    if manifestId and not opts.appendOnly then
         local removed = removeQueuedManifestBatch(self.manifestChunkQueue, peerKey, manifestId)
         if removed > 0 then
             self.telemetry.manifestChunkBatchesCoalesced = (self.telemetry.manifestChunkBatchesCoalesced or 0) + 1
         end
     end
+    if manifestId and opts.appendOnly then
+        removeQueuedManifestChunkSeqs(
+            self.manifestChunkQueue,
+            peerKey,
+            manifestId,
+            buildSeqSet(opts.seqs or {}),
+            manifestAttempt
+        )
+    end
 
     local startAt = nowForPacing()
-    if why ~= "force" and MANIFEST_INITIAL_JITTER > 0 then
+    if not opts.appendOnly and why ~= "force" and MANIFEST_INITIAL_JITTER > 0 then
         startAt = startAt + (random() * MANIFEST_INITIAL_JITTER)
     end
 
     for index = 1, #chunks do
-        local payload = shallowCopyTable(chunks[index])
+        local payload = cloneManifestChunkPayload(chunks[index], manifestAttempt)
         payload.why = why
         self.manifestChunkQueue[#self.manifestChunkQueue + 1] = {
             peer = peerKey,
@@ -301,8 +530,8 @@ function Sync:QueueManifestChunks(peerKey, chunks, why, manifestId)
 
     local batch = getOrCreateManifestBatchDiagnostic(self, "send", peerKey, manifestId)
     if batch then
-        batch.totalChunks = #chunks
-        batch.queuedChunks = #chunks
+        batch.totalChunks = max(batch.totalChunks or 0, tonumber(opts.totalChunks or #chunks) or #chunks)
+        batch.queuedChunks = opts.appendOnly and ((batch.queuedChunks or 0) + #chunks) or #chunks
         batch.completed = false
         batch.pruned = false
         batch.pruneReason = nil
@@ -369,7 +598,7 @@ function Sync:ProcessPeerManifestComparison(senderKey, manifest)
     local queuedBefore = self.telemetry.manifestCatchupQueued or 0
     if deferReason then
         self.telemetry.warmupDeferrals = (self.telemetry.warmupDeferrals or 0) + 1
-        Addon:Debug("Deferring manifest catch-up batch", tostring(senderKey), tostring(deferReason))
+        self:LogManifestCatchupDeferral(deferReason)
         for _, candidate in ipairs(catchupCandidates) do
             self:DeferManifestCatchupCandidate(candidate)
             deferredRequests = deferredRequests + 1
@@ -456,6 +685,10 @@ function Sync:RequestManifestRefresh(peerKey, opts)
         self:SendDirectEnvelope("MREQ", {
             key = self:GetSelfKey(),
             why = opts.reason or "manual",
+            reason = opts.reason or "manual",
+            manifestId = opts.manifestId,
+            manifestAttempt = opts.manifestAttempt,
+            missingSeqs = cloneNumberArray(opts.missingSeqs),
         }, peerKey, "NORMAL")
         return
     end
@@ -464,6 +697,34 @@ function Sync:RequestManifestRefresh(peerKey, opts)
         key = self:GetSelfKey(),
         why = "manual-all",
     }, "NORMAL")
+end
+
+function Sync:ResendManifestMissingSeqs(peerKey, manifestId, manifestAttempt, missingSeqs)
+    local cacheEntry = self:GetManifestChunkBatchCache(manifestId)
+    local requestedAttempt = normalizeManifestAttempt(manifestAttempt)
+    if not cacheEntry or normalizeManifestAttempt(cacheEntry.attempt) ~= requestedAttempt then
+        return false
+    end
+
+    local chunks = {}
+    for _, seq in ipairs(missingSeqs or {}) do
+        local chunk = cacheEntry.chunksBySeq and cacheEntry.chunksBySeq[tonumber(seq or 0) or 0] or nil
+        if not chunk then
+            return false
+        end
+        chunks[#chunks + 1] = chunk
+    end
+    if #chunks == 0 then
+        return false
+    end
+
+    self:QueueManifestChunks(peerKey, chunks, "manifest-missing-seqs-resend", manifestId, {
+        appendOnly = true,
+        manifestAttempt = cacheEntry.attempt,
+        seqs = missingSeqs,
+        totalChunks = cacheEntry.totalChunks or #chunks,
+    })
+    return true
 end
 
 function Sync:HandleManifestRequest(payload)
@@ -479,6 +740,17 @@ function Sync:HandleManifestRequest(payload)
         return
     end
     self.telemetry.manifestForceReplies = (self.telemetry.manifestForceReplies or 0) + 1
+    local recoveryReason = tostring(payload.reason or payload.why or "")
+    local missingSeqs = cloneNumberArray(payload.missingSeqs)
+    if payload.manifestId and recoveryReason == "manifest-missing-seqs" and #missingSeqs > 0 then
+        if self:ResendManifestMissingSeqs(payload.sender, payload.manifestId, payload.manifestAttempt, missingSeqs) then
+            return
+        end
+        self:SendManifestToPeer(payload.sender, "force", {
+            forceNewAttempt = true,
+        })
+        return
+    end
     self:SendManifestToPeer(payload.sender, "force")
 end
 
@@ -760,7 +1032,7 @@ function Sync:DrainManifestCatchupQueue()
     local deferReason = self:ShouldDeferManifestCatchup()
     if deferReason then
         self.telemetry.catchupDrainDeferrals = (self.telemetry.catchupDrainDeferrals or 0) + 1
-        Addon:Debug("Deferring catch-up drain", tostring(deferReason))
+        self:LogManifestCatchupDeferral(deferReason)
         return true
     end
     local pending = self.manifestCatchupQueue
@@ -775,8 +1047,11 @@ function Sync:ScheduleManifestCatchupDrain()
     if not (Addon.Performance and Addon.Performance.ScheduleJob) then
         self._manifestCatchupJobActive = true
         self:ScheduleTimer(function()
+            local keepGoing = self:DrainManifestCatchupQueue()
             self._manifestCatchupJobActive = false
-            self:DrainManifestCatchupQueue()
+            if keepGoing then
+                self:ScheduleManifestCatchupDrain()
+            end
         end, MANIFEST_CATCHUP_DRAIN_DELAY)
         return
     end
@@ -790,7 +1065,7 @@ function Sync:ScheduleManifestCatchupDrain()
         local deferReason, nextDelay = self:ShouldDeferManifestCatchup()
         if deferReason then
             self.telemetry.catchupDrainDeferrals = (self.telemetry.catchupDrainDeferrals or 0) + 1
-            Addon:Debug("Warmup/busy deferring catch-up drain", tostring(deferReason))
+            self:LogManifestCatchupDeferral(deferReason)
             state.nextRunAt = nowForPacing() + max(MANIFEST_CATCHUP_DRAIN_DELAY, nextDelay or MANIFEST_CATCHUP_DRAIN_DELAY)
             return true, state
         end
@@ -816,13 +1091,51 @@ function Sync:HandleManifestChunk(payload)
 
     local now = time()
     local senderKey = payload.sender
+    local manifestAttempt = normalizeManifestAttempt(payload.manifestAttempt)
     self:TouchNode(senderKey, payload.addonVersion or payload.version)
     local manifestMemberKey = self:IsValidSyncMemberKey(payload.memberKey) and payload.memberKey or senderKey
+    local completed = self:GetCompletedManifestReceive(senderKey, payload.manifestId)
+    if completed and manifestAttempt <= normalizeManifestAttempt(completed.attempt) then
+        self.telemetry.manifestDuplicateCompletedChunksIgnored = (self.telemetry.manifestDuplicateCompletedChunksIgnored or 0) + 1
+        Addon:Debug(string.format(
+            "Manifest duplicate-complete chunk ignored peer=%s manifestId=%s seq=%s attempt=%s",
+            tostring(senderKey),
+            tostring(payload.manifestId),
+            tostring(payload.seq or "?"),
+            tostring(manifestAttempt)
+        ))
+        return
+    elseif completed then
+        self:ClearCompletedManifestReceive(senderKey, payload.manifestId)
+    end
+
+    local abandoned = self:GetAbandonedManifestReceive(senderKey, payload.manifestId)
+    if abandoned and manifestAttempt <= normalizeManifestAttempt(abandoned.attempt) then
+        self.telemetry.manifestLateChunksIgnored = (self.telemetry.manifestLateChunksIgnored or 0) + 1
+        Addon:Debug(string.format(
+            "Manifest late chunk ignored peer=%s manifestId=%s seq=%s attempt=%s",
+            tostring(senderKey),
+            tostring(payload.manifestId),
+            tostring(payload.seq or "?"),
+            tostring(manifestAttempt)
+        ))
+        return
+    elseif abandoned then
+        self:ClearAbandonedManifestReceive(senderKey, payload.manifestId)
+    end
+
     self.partialManifestReceive[senderKey] = self.partialManifestReceive[senderKey] or {}
     local state = self.partialManifestReceive[senderKey][payload.manifestId]
-    if not state then
+    local startedFreshState = false
+    if state and manifestAttempt < normalizeManifestAttempt(state.manifestAttempt) then
+        self.telemetry.manifestLateChunksIgnored = (self.telemetry.manifestLateChunksIgnored or 0) + 1
+        return
+    end
+    if not state or manifestAttempt > normalizeManifestAttempt(state.manifestAttempt) then
+        startedFreshState = true
         state = {
             manifestId = payload.manifestId,
+            manifestAttempt = manifestAttempt,
             builtAt = payload.builtAt or now,
             senderBuiltAt = payload.builtAt or now,
             memberKey = manifestMemberKey,
@@ -862,6 +1175,9 @@ function Sync:HandleManifestChunk(payload)
     end
     if progressed then
         state.lastProgressAt = now
+        state.recoveryRequestedAt = nil
+        state.recoveryReason = nil
+        state.recoveryMissingSeqs = nil
     end
     local missingSeqs = self.GetMissingSeqs and self:GetMissingSeqs(state) or {}
     local batch = getOrCreateManifestBatchDiagnostic(self, "receive", senderKey, payload.manifestId)
@@ -876,6 +1192,11 @@ function Sync:HandleManifestChunk(payload)
         batch.completed = false
         batch.pruned = false
         batch.pruneReason = nil
+        if startedFreshState then
+            batch.recoveryRequested = false
+            batch.recoveryMode = nil
+        end
+        batch.recoveryMode = batch.recoveryRequested and batch.recoveryMode or nil
     end
     local age = 0
     if type(state.firstReceivedAt) == "number" and state.firstReceivedAt > 0 then
@@ -885,7 +1206,7 @@ function Sync:HandleManifestChunk(payload)
         "Manifest receive peer=%s manifestId=%s receivedSeqs=%d/%d missingSeqs=%s age=%ds",
         tostring(senderKey),
         tostring(payload.manifestId),
-        countKeys(state.seen),
+        countManifestBatchSeen(state),
         state.total or 1,
         buildSeqList(missingSeqs, 10),
         age
@@ -912,6 +1233,8 @@ function Sync:HandleManifestChunk(payload)
     if next(self.partialManifestReceive[senderKey]) == nil then
         self.partialManifestReceive[senderKey] = nil
     end
+    self:MarkManifestReceiveCompleted(senderKey, payload.manifestId, state.manifestAttempt)
+    self:ClearAbandonedManifestReceive(senderKey, payload.manifestId)
     self:RecordManifestReceived(senderKey)
     if self.MarkManifestPeerSuccess then
         self:MarkManifestPeerSuccess(senderKey)
@@ -937,7 +1260,7 @@ function Sync:HandleManifestChunk(payload)
     end
     local comparisonResult = self:ProcessPeerManifestComparison(senderKey, manifest)
     if batch then
-        batch.receivedSeqCount = countKeys(state.seen)
+        batch.receivedSeqCount = countManifestBatchSeen(state)
         batch.missingSeqs = {}
         batch.completed = true
         batch.compareFired = true
@@ -945,7 +1268,11 @@ function Sync:HandleManifestChunk(payload)
     self.telemetry.manifestReceiveCompleted = (self.telemetry.manifestReceiveCompleted or 0) + 1
     self.telemetry.manifestCompareFired = (self.telemetry.manifestCompareFired or 0) + 1
     if batch and batch.recoveryRequested then
+        self.telemetry.manifestRecoveryCompleted = (self.telemetry.manifestRecoveryCompleted or 0) + 1
         self.telemetry.manifestPartialRecovered = (self.telemetry.manifestPartialRecovered or 0) + 1
+        if batch.recoveryMode == "missing-seqs" then
+            self.telemetry.manifestMissingSeqRecovered = (self.telemetry.manifestMissingSeqRecovered or 0) + 1
+        end
     end
     if comparisonResult and comparisonResult.shouldRefreshUI then
         Addon:RequestRefresh("manifest")
@@ -1011,6 +1338,9 @@ function Sync:SendNextManifestChunk()
     self.peerPacing[queued.peer] = self.peerPacing[queued.peer] or {}
     self.peerPacing[queued.peer].lastSentAt = now
     self.telemetry.manifestChunksSent = (self.telemetry.manifestChunksSent or 0) + 1
+    if queued.payload and queued.payload.why == "manifest-missing-seqs-resend" then
+        self.telemetry.manifestMissingSeqChunksSent = (self.telemetry.manifestMissingSeqChunksSent or 0) + 1
+    end
     if batch then
         batch.sendSucceededChunks = (batch.sendSucceededChunks or 0) + 1
         batch.queuedChunks = max(0, (batch.queuedChunks or 0) - 1)
