@@ -1297,8 +1297,13 @@ function Sync:ShouldRequestManifestRefresh(peerKey, opts)
     end
 
     local lastManifestAt = self._lastManifestReceivedAt and self._lastManifestReceivedAt[peerKey] or 0
-    if lastManifestAt > 0 and (now - lastManifestAt) <= NODE_TIMEOUT then
-        return false, "recent-manifest"
+    if lastManifestAt > 0 then
+        if not (Private.isManualReason and Private.isManualReason(opts.reason)) then
+            return false, "manifest-known"
+        end
+        if (now - lastManifestAt) <= NODE_TIMEOUT then
+            return false, "recent-manifest"
+        end
     end
     return true, "needed"
 end

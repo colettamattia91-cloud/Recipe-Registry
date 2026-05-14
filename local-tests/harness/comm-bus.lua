@@ -7,6 +7,7 @@ CommBus.__index = CommBus
 
 local realType = type
 local mathHuge = math.huge
+local SENT_COMM_COMPACT_THRESHOLD = 512
 
 local PROFESSIONS = {
     "Alchemy",
@@ -960,6 +961,17 @@ function CommBus:DrainComm(maxRows, flushThreshold)
                 if self.transport.profileName == "instant" or #(self.transport.queued or {}) >= flushThreshold then
                     madeProgress = self:ProcessTransportQueue() or madeProgress
                 end
+            end
+            if node.sentCursor >= SENT_COMM_COMPACT_THRESHOLD then
+                local sentCount = #sent
+                local remaining = sentCount - node.sentCursor
+                for index = 1, remaining do
+                    sent[index] = sent[node.sentCursor + index]
+                end
+                for index = sentCount, remaining + 1, -1 do
+                    sent[index] = nil
+                end
+                node.sentCursor = 0
             end
         end
     end

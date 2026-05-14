@@ -167,17 +167,32 @@ Test.it("prints structured manifest batch, receive, and compare diagnostics in d
     Test.truthy(printLogContains(wow, "queuedRequests="), "compare diagnostics should include queued request count")
 end)
 
-Test.it("counts manifest force replies", function()
+Test.it("distinguishes automatic manifest replies from manual force replies", function()
     local addon, _wow, data = freshAddon()
     local localKey = data:GetPlayerKey()
     seedProfession(data, localKey, "Alchemy", 95030, { sourceType = "owner" })
     data:BuildManifestCacheNow("initial")
 
     Test.eq(addon.Sync.telemetry.manifestForceReplies, 0, "no force replies initially")
+    Test.eq(addon.Sync.telemetry.manifestAutoReplies or 0, 0, "no automatic replies initially")
 
-    addon.Sync:HandleManifestRequest({ sender = "Peerone-Testrealm" })
-    Test.eq(addon.Sync.telemetry.manifestForceReplies, 1, "one force reply")
-    Test.eq(addon.Sync.telemetry.manifestBuildRequests, 1, "force reply triggers build request")
+    addon.Sync:HandleManifestRequest({
+        sender = "Peerone-Testrealm",
+        why = "hello-auto",
+        reason = "hello-auto",
+    })
+    Test.eq(addon.Sync.telemetry.manifestForceReplies, 0, "automatic reply should not count as force")
+    Test.eq(addon.Sync.telemetry.manifestAutoReplies or 0, 1, "automatic reply should be counted")
+    Test.eq(addon.Sync.telemetry.manifestBuildRequests, 1, "automatic reply triggers build request")
+
+    addon.Sync:HandleManifestRequest({
+        sender = "Peerone-Testrealm",
+        why = "manual",
+        reason = "manual",
+    })
+    Test.eq(addon.Sync.telemetry.manifestForceReplies, 1, "manual reply should count as force")
+    Test.eq(addon.Sync.telemetry.manifestAutoReplies or 0, 1, "manual reply should not increment auto replies")
+    Test.eq(addon.Sync.telemetry.manifestBuildRequests, 2, "manual force reply triggers another build request")
 end)
 
 Test.it("counts manifest chunks received", function()

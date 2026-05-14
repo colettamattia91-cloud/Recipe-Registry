@@ -107,6 +107,26 @@ local function manifestPurposeFor(why)
     return "manifest-large"
 end
 
+local function shouldForceFullManifestReply(reason)
+    reason = tostring(reason or "")
+    return reason == "manual"
+        or reason == "manual-all"
+        or reason == "post-wipe"
+        or reason == "database-wipe"
+        or reason == "force"
+end
+
+local function manifestReplyWhy(reason)
+    reason = tostring(reason or "")
+    if shouldForceFullManifestReply(reason) then
+        return "force"
+    end
+    if reason == "" then
+        return "mreq"
+    end
+    return reason
+end
+
 local function normalizeManifestAttempt(value)
     local attempt = tonumber(value or 1) or 1
     if attempt < 1 then
@@ -711,6 +731,7 @@ function Sync:RequestManifestRefresh(peerKey, opts)
         if self:IsMockKey(peerKey) then return end
         local ignorePeerHealth = opts.ignorePeerHealth == true
             or opts.reason == "manifest-missing-seqs"
+            or opts.reason == "request-repair"
         local eligible, reason = self:CanExchangeDataWithPeer(peerKey, manifestPurposeFor(opts.reason), {
             source = peerKey,
             memberKey = peerKey,
@@ -749,7 +770,7 @@ function Sync:RequestManifestRefresh(peerKey, opts)
         local shouldRequest, skipReason = self:ShouldRequestManifestRefresh(peerKey, opts)
         if not shouldRequest then
             Addon:Trace("manifest", string.format(
-                "refresh-skip peer=%s reason=cooldown why=%s",
+                "refresh-skip peer=%s reason=%s why=%s",
                 tostring(peerKey),
                 tostring(skipReason or "cooldown"),
                 tostring(opts.reason or "manual")
@@ -835,11 +856,13 @@ function Sync:HandleManifestRequest(payload)
     local recoveryReason = tostring(payload.reason or payload.why or "")
     local ignorePeerHealth = recoveryReason == "manifest-missing-seqs"
         or recoveryReason == "manifest-missing-seqs-resend"
-    local eligible = self:CanExchangeDataWithPeer(payload.sender, manifestPurposeFor(payload.why), {
+        or recoveryReason == "request-repair"
+    local replyWhy = manifestReplyWhy(recoveryReason ~= "" and recoveryReason or payload.why)
+    local eligible = self:CanExchangeDataWithPeer(payload.sender, manifestPurposeFor(replyWhy), {
         source = payload.sender,
         memberKey = payload.sender,
-        why = payload.why or "force",
-        allowOfflinePeer = payload.why == "force",
+        why = replyWhy,
+        allowOfflinePeer = replyWhy == "force",
         ignorePeerHealth = ignorePeerHealth,
     })
     if not eligible then
@@ -850,7 +873,11 @@ function Sync:HandleManifestRequest(payload)
         ))
         return
     end
-    self.telemetry.manifestForceReplies = (self.telemetry.manifestForceReplies or 0) + 1
+    if replyWhy == "force" then
+        self.telemetry.manifestForceReplies = (self.telemetry.manifestForceReplies or 0) + 1
+    else
+        self.telemetry.manifestAutoReplies = (self.telemetry.manifestAutoReplies or 0) + 1
+    end
     local missingSeqs = cloneNumberArray(payload.missingSeqs)
     if payload.manifestId and recoveryReason == "manifest-missing-seqs" and #missingSeqs > 0 then
         if self:ResendManifestMissingSeqs(payload.sender, payload.manifestId, payload.manifestAttempt, missingSeqs) then
@@ -869,12 +896,15 @@ function Sync:HandleManifestRequest(payload)
         return
     end
     Addon:Trace("manifest", string.format(
-        "request-full peer=%s why=%s manifestId=%s",
+        "request-full peer=%s why=%s sendWhy=%s manifestId=%s",
         tostring(payload.sender),
         tostring(recoveryReason ~= "" and recoveryReason or payload.why or "force"),
+        tostring(replyWhy),
         tostring(payload.manifestId or "none")
     ))
-    self:SendManifestToPeer(payload.sender, "force")
+    self:SendManifestToPeer(payload.sender, replyWhy, {
+        ignorePeerHealth = ignorePeerHealth,
+    })
 end
 
 function Sync:ScheduleCoalescedManifestAnnounce(reason)

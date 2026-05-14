@@ -1,8 +1,8 @@
 local Loader = dofile("local-tests/harness/load-addon.lua")
 local Test = dofile("local-tests/harness/test.lua")
 
-local function freshAddon()
-    local addon, wow = Loader.Load()
+local function freshAddon(opts)
+    local addon, wow = Loader.Load(opts)
     addon.Sync:EnsureBackgroundWorkers()
     return addon, wow, addon.Data
 end
@@ -44,6 +44,17 @@ local function withModernVersion(addon, payload)
     payload.buildChannel = payload.buildChannel or addon.BUILD_CHANNEL
     payload.caps = payload.caps or (addon.Sync.GetLocalProtocolCaps and addon.Sync:GetLocalProtocolCaps() or nil)
     return payload
+end
+
+local function markModernPeer(addon, peerKey)
+    addon.Sync.onlineNodes[peerKey] = { lastSeen = time(), version = addon.ADDON_VERSION }
+    addon.Sync.peerVersions[peerKey] = {
+        addonVersion = addon.ADDON_VERSION,
+        wireVersion = addon.WIRE_VERSION,
+        buildChannel = addon.BUILD_CHANNEL,
+        capabilities = addon.Sync:GetLocalProtocolCaps(),
+        compatibility = "compatible",
+    }
 end
 
 io.write("Manifest cache\n")
@@ -396,6 +407,115 @@ Test.it("retries targeted manifest refreshes on later hello sessions until a man
     })
 
     Test.eq(countCommKind(wow, "MREQ"), 2, "the first hello of a new session should stay quiet until a later refresh is actually needed")
+end)
+
+Test.it("does not treat a completed manifest as stale for later hello-auto refreshes", function()
+    local addon, wow, _data = freshAddon()
+    local peerKey = "Peerone-Testrealm"
+    local nodeTimeout = addon.Sync._private.constants.NODE_TIMEOUT
+
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
+        kind = "HELLO",
+        key = peerKey,
+        rev = 5,
+        updatedAt = 500,
+        sender = peerKey,
+        version = "1.6.0",
+    }), {
+        sender = peerKey,
+        distribution = "GUILD",
+    })
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
+        kind = "MANI",
+        manifestId = "peer-manifest-known",
+        builtAt = 900,
+        memberKey = peerKey,
+        totals = { blocks = 0, recipes = 0 },
+        seq = 1,
+        total = 1,
+        blocks = {},
+        sender = peerKey,
+    }), {
+        sender = peerKey,
+        distribution = "WHISPER",
+    })
+
+    local before = countCommKind(wow, "MREQ")
+    wow.AdvanceTime(nodeTimeout + 1)
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
+        kind = "HELLO",
+        key = peerKey,
+        rev = 5,
+        updatedAt = 901,
+        sender = peerKey,
+        version = "1.6.0",
+    }), {
+        sender = peerKey,
+        distribution = "GUILD",
+    })
+
+    Test.eq(countCommKind(wow, "MREQ"), before, "known completed manifest should not become auto-stale inside the same online epoch")
+end)
+
+Test.it("answers automatic full MANI requests idempotently instead of forcing unchanged resends", function()
+    local addon, wow, data = freshAddon()
+    local localKey = data:GetPlayerKey()
+    local peerKey = "Peerone-Testrealm"
+    local cooldown = addon.Sync._private.constants.MANIFEST_PUSH_COOLDOWN
+    seedProfession(data, localKey, "Alchemy", 94101, { sourceType = "owner" })
+    data:BuildManifestCacheNow("auto-reply")
+    markModernPeer(addon, peerKey)
+
+    addon.Sync:HandleManifestRequest(withModernVersion(addon, {
+        sender = peerKey,
+        key = peerKey,
+        why = "hello-auto",
+        reason = "hello-auto",
+    }))
+    Test.eq(#addon.Sync.manifestChunkQueue, 1, "first automatic MANI request should queue the manifest")
+
+    addon.Sync.manifestChunkQueue = {}
+    wow.AdvanceTime(cooldown + 1)
+    addon.Sync:HandleManifestRequest(withModernVersion(addon, {
+        sender = peerKey,
+        key = peerKey,
+        why = "hello-auto",
+        reason = "hello-auto",
+    }))
+
+    Test.eq(#addon.Sync.manifestChunkQueue, 0, "unchanged automatic MANI request should not requeue the same manifestId")
+    Test.eq(addon.Sync.telemetry.manifestUnchangedSkips or 0, 1, "unchanged auto reply should be counted")
+    Test.eq(addon.Sync.telemetry.manifestAutoReplies or 0, 2, "automatic replies should be tracked separately from force replies")
+end)
+
+Test.it("does not force request-repair MANI replies for unchanged manifests", function()
+    local addon, wow, data = freshAddon()
+    local localKey = data:GetPlayerKey()
+    local peerKey = "Peerone-Testrealm"
+    local cooldown = addon.Sync._private.constants.MANIFEST_PUSH_COOLDOWN
+    seedProfession(data, localKey, "Alchemy", 94111, { sourceType = "owner" })
+    data:BuildManifestCacheNow("repair-reply")
+    markModernPeer(addon, peerKey)
+
+    addon.Sync:HandleManifestRequest(withModernVersion(addon, {
+        sender = peerKey,
+        key = peerKey,
+        why = "request-repair",
+        reason = "request-repair",
+    }))
+    Test.eq(#addon.Sync.manifestChunkQueue, 1, "first repair request can send a manifest when the peer has none")
+
+    addon.Sync.manifestChunkQueue = {}
+    wow.AdvanceTime(cooldown + 1)
+    addon.Sync:HandleManifestRequest(withModernVersion(addon, {
+        sender = peerKey,
+        key = peerKey,
+        why = "request-repair",
+        reason = "request-repair",
+    }))
+
+    Test.eq(#addon.Sync.manifestChunkQueue, 0, "unchanged request-repair should not force a repeat full MANI")
+    Test.eq(addon.Sync.telemetry.manifestUnchangedSkips or 0, 1, "repair duplicate should use unchanged suppression")
 end)
 
 Test.it("suppresses hello-driven manifest refreshes while a partial receive is already active", function()

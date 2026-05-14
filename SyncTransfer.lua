@@ -350,8 +350,12 @@ function Sync:HandleSnapshotChunk(payload)
 
     local request = self:GetInFlightRequest(payload.key)
     if request then
+        local now = time()
+        if request.sessionId ~= payload.sessionId then
+            request.sessionStartedAt = now
+        end
         request.sessionId = payload.sessionId
-        request.lastProgressAt = time()
+        request.lastProgressAt = now
         request.source = payload.sender or request.source
         self:RefreshPrimaryInFlight()
     end

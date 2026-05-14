@@ -34,6 +34,21 @@ local function isAutomaticRequestReason(why)
     return not isManualReason(text)
 end
 
+local function shouldPenalizePeerForRequestFailure(reason)
+    reason = tostring(reason or "")
+    -- These failures belong to a single requested snapshot/member. Escalating
+    -- them into peer backoff/quarantine was starving unrelated replica transfers
+    -- from otherwise healthy modern peers.
+    return reason ~= "session-timeout" and reason ~= "partial-timeout"
+end
+
+local function shouldRequestManifestRepairForFailure(reason)
+    reason = tostring(reason or "")
+    -- Failed SNAP delivery should retry the REQ. Forcing MANI repair here makes
+    -- unchanged manifests loop and does not help a slow chunk stream.
+    return reason == "manifest-stale" or reason == "manifest-missing"
+end
+
 local function requestBlocksCovered(existing, expected)
     if type(expected) ~= "table" or #expected == 0 then
         return true
@@ -373,6 +388,7 @@ function Sync:DispatchPendingRequest(memberKey, request)
         why = request.why,
         dispatchOrder = self._requestDispatchCounter,
         startedAt = time(),
+        sessionStartedAt = nil,
         lastProgressAt = time(),
         attempts = (request.attempts or 0) + 1,
         resumeAttempts = 0,
@@ -472,18 +488,6 @@ function Sync:ProcessRequestQueue()
                     tostring(request.requestId or "none")
                 ))
                 self:FailInFlight(memberKey, true, "source-unavailable")
-                skipPendingMembers[memberKey] = true
-            elseif (now - (request.startedAt or now)) > SESSION_TIMEOUT then
-                Addon:Debug("Request session timeout", request.memberKey)
-                Addon:Trace("request", string.format(
-                    "inflight-timeout member=%s source=%s reason=session reqId=%s age=%d",
-                    tostring(request.memberKey),
-                    tostring(request.source),
-                    tostring(request.requestId or "none"),
-                    max(0, now - (request.startedAt or now))
-                ))
-                self.telemetry.requestTimeoutSession = (self.telemetry.requestTimeoutSession or 0) + 1
-                self:FailInFlight(memberKey, true, "session-timeout")
                 skipPendingMembers[memberKey] = true
             elseif not request.sessionId then
                 if initialReqTimeoutsEnabled() and (now - (request.startedAt or now)) > REQUEST_TIMEOUT then
@@ -592,7 +596,18 @@ function Sync:FailInFlight(memberKey, requeue, reason)
             maxAttempts,
             #(req.requestedBlocks or {})
         ))
-        self:MarkPeerFailure(req.source, reason or "retry", req)
+        if shouldPenalizePeerForRequestFailure(reason) then
+            self:MarkPeerFailure(req.source, reason or "retry", req)
+        else
+            self.telemetry.requestPeerPenaltySuppressed = (self.telemetry.requestPeerPenaltySuppressed or 0) + 1
+            self.telemetry.lastRequestPeerPenaltySuppressedReason = reason or "unknown"
+            Addon:Trace("request", string.format(
+                "peer-penalty-skip member=%s source=%s reason=%s",
+                tostring(req.memberKey),
+                tostring(req.source),
+                tostring(reason or "unknown")
+            ))
+        end
         if attempts >= maxAttempts then
             self.telemetry.requestDrops = (self.telemetry.requestDrops or 0) + 1
             Addon:Debug(
@@ -631,9 +646,14 @@ function Sync:FailInFlight(memberKey, requeue, reason)
                 maxAttempts
             ))
         end
-        if self:IsValidSyncMemberKey(req.source) and not self:IsMockKey(req.source) and not self:IsInWarmup() then
+        if shouldRequestManifestRepairForFailure(reason)
+            and self:IsValidSyncMemberKey(req.source)
+            and not self:IsMockKey(req.source)
+            and not self:IsInWarmup()
+        then
             self:RequestManifestRefresh(req.source, {
                 force = true,
+                ignorePeerHealth = true,
                 reason = "request-repair",
             })
         end

@@ -1,8 +1,8 @@
 local Loader = dofile("local-tests/harness/load-addon.lua")
 local Test = dofile("local-tests/harness/test.lua")
 
-local function freshAddon()
-    local addon, wow = Loader.Load()
+local function freshAddon(opts)
+    local addon, wow = Loader.Load(opts)
     addon.Sync:EnsureBackgroundWorkers()
     return addon, wow, addon.Data
 end
@@ -24,6 +24,17 @@ local function withModernVersion(addon, payload)
     payload.buildChannel = payload.buildChannel or addon.BUILD_CHANNEL
     payload.caps = payload.caps or (addon.Sync.GetLocalProtocolCaps and addon.Sync:GetLocalProtocolCaps() or nil)
     return payload
+end
+
+local function markModernPeer(addon, peerKey)
+    addon.Sync.onlineNodes[peerKey] = { lastSeen = time(), version = addon.ADDON_VERSION }
+    addon.Sync.peerVersions[peerKey] = {
+        addonVersion = addon.ADDON_VERSION,
+        wireVersion = addon.WIRE_VERSION,
+        buildChannel = addon.BUILD_CHANNEL,
+        capabilities = addon.Sync:GetLocalProtocolCaps(),
+        compatibility = "compatible",
+    }
 end
 
 local function seedProfession(data, memberKey, profession, recipeKey, opts)
@@ -185,6 +196,158 @@ Test.it("hello-auto fails fast and stays blocked until peer backoff expires", fu
     addon.Sync:ProcessRequestQueue()
     Test.truthy(addon.Sync.inFlight, "request should dispatch again after backoff expires")
     Test.eq(addon.Sync.inFlight.source, peerKey, "same peer can be retried after backoff")
+end)
+
+Test.it("keeps a pre-session REQ open when initial timeouts are disabled", function()
+    local addon, wow, _data = freshAddon({ initialReqTimeoutsEnabled = false })
+    local peerKey = "Slowpeer-TestRealm"
+    local waitTime = addon.Sync._private.constants.SESSION_TIMEOUT + 20
+    markModernPeer(addon, peerKey)
+
+    addon.Sync:QueueRequest(peerKey, peerKey, 8, "index")
+    addon.Sync:ProcessRequestQueue()
+    Test.truthy(addon.Sync:GetInFlightRequest(peerKey), "request should dispatch")
+
+    wow.AdvanceTime(waitTime)
+    addon.Sync:ProcessRequestQueue()
+
+    Test.truthy(addon.Sync:GetInFlightRequest(peerKey), "waiting for first SNAP should not become a session timeout")
+    Test.eq(addon.Sync.telemetry.requestTimeoutSession or 0, 0, "pre-session wait should not count as session timeout")
+    Test.eq(addon.Sync.telemetry.requestTimeoutInitial or 0, 0, "disabled initial timeout should stay disabled")
+    Test.eq(countCommKind(wow, "REQ"), 1, "request should not be retried while still waiting for first SNAP")
+end)
+
+Test.it("starts REQ session timing from the first SNAP instead of dispatch time", function()
+    local addon, wow, _data = freshAddon({ initialReqTimeoutsEnabled = false })
+    local peerKey = "Latestsnap-TestRealm"
+    local constants = addon.Sync._private.constants
+    markModernPeer(addon, peerKey)
+
+    addon.Sync:QueueRequest(peerKey, peerKey, 9, "index")
+    addon.Sync:ProcessRequestQueue()
+    local dispatchedAt = addon.Sync:GetInFlightRequest(peerKey).startedAt
+
+    wow.AdvanceTime(constants.SESSION_TIMEOUT - 1)
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
+        kind = "SNAP",
+        sessionId = "late-session-1",
+        key = peerKey,
+        rev = 9,
+        updatedAt = 900,
+        sender = peerKey,
+        sourceType = "owner",
+        profession = "Alchemy",
+        skillRank = 300,
+        skillMaxRank = 300,
+        recipeKeys = { 99001 },
+        seq = 1,
+        total = 2,
+    }), {
+        sender = peerKey,
+        distribution = "WHISPER",
+    })
+
+    local request = addon.Sync:GetInFlightRequest(peerKey)
+    Test.truthy(request, "partial SNAP should keep the request active")
+    Test.truthy((request.sessionStartedAt or 0) > dispatchedAt, "first SNAP should record sessionStartedAt")
+
+    wow.AdvanceTime(2)
+    addon.Sync:ProcessRequestQueue()
+    Test.truthy(addon.Sync:GetInFlightRequest(peerKey), "request should not fail immediately because dispatch age passed session timeout")
+    Test.eq(addon.Sync.telemetry.requestTimeoutSession or 0, 0, "dispatch-age timeout should not fire after first SNAP")
+end)
+
+Test.it("lets a long multi-chunk SNAP complete while progress continues", function()
+    local addon, wow, _data = freshAddon({ initialReqTimeoutsEnabled = false })
+    local peerKey = "Slowchunks-TestRealm"
+    local constants = addon.Sync._private.constants
+    markModernPeer(addon, peerKey)
+
+    addon.Sync:QueueRequest(peerKey, peerKey, 10, "index")
+    addon.Sync:ProcessRequestQueue()
+
+    for seq = 1, 10 do
+        wow.DeliverComm(addon.Sync, withModernVersion(addon, {
+            kind = "SNAP",
+            sessionId = "slow-session-1",
+            key = peerKey,
+            rev = 10,
+            updatedAt = 1000,
+            sender = peerKey,
+            sourceType = "owner",
+            profession = "Alchemy",
+            skillRank = 300,
+            skillMaxRank = 300,
+            recipeKeys = { 99000 + seq },
+            seq = seq,
+            total = 10,
+        }), {
+            sender = peerKey,
+            distribution = "WHISPER",
+        })
+        wow.AdvanceTime(constants.PROGRESS_TIMEOUT - 1)
+        addon.Sync:ProcessRequestQueue()
+    end
+
+    Test.falsy(addon.Sync:GetInFlightRequest(peerKey), "completed SNAP should clear in-flight request")
+    Test.eq(addon.Sync.telemetry.requestTimeoutSession or 0, 0, "long progressing session should not hit a hard session timeout")
+    Test.falsy(addon.Sync:IsPeerBackoffActive(peerKey), "progressing transfer should not back off the peer")
+end)
+
+Test.it("still sends RESUME when SNAP progress stops after a session starts", function()
+    local addon, wow, _data = freshAddon({ initialReqTimeoutsEnabled = false })
+    local peerKey = "Pausechunks-TestRealm"
+    local constants = addon.Sync._private.constants
+    markModernPeer(addon, peerKey)
+
+    addon.Sync:QueueRequest(peerKey, peerKey, 11, "index")
+    addon.Sync:ProcessRequestQueue()
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
+        kind = "SNAP",
+        sessionId = "paused-session-1",
+        key = peerKey,
+        rev = 11,
+        updatedAt = 1100,
+        sender = peerKey,
+        sourceType = "owner",
+        profession = "Alchemy",
+        skillRank = 300,
+        skillMaxRank = 300,
+        recipeKeys = { 99101 },
+        seq = 1,
+        total = 3,
+    }), {
+        sender = peerKey,
+        distribution = "WHISPER",
+    })
+
+    wow.AdvanceTime(constants.PROGRESS_TIMEOUT + 1)
+    addon.Sync:ProcessRequestQueue()
+
+    Test.eq(countCommKind(wow, "RESUME"), 1, "stalled session should request missing SNAP sequences")
+    Test.truthy(addon.Sync:GetInFlightRequest(peerKey), "request should remain active while RESUME attempts are available")
+end)
+
+Test.it("does not create peer backoff or MANI repair for one slow session timeout", function()
+    local addon, wow, data = freshAddon()
+    local sourceKey = "Aldergar-TestRealm"
+    local ownerKey = "Offlineone-TestRealm"
+    markModernPeer(addon, sourceKey)
+
+    addon.Sync:QueueRequest(sourceKey, ownerKey, 12, "manifest", {
+        allowReplicaSource = true,
+        requestPurpose = "catchup-offline",
+        requestedBlocks = { data:BuildSyncBlockKey(ownerKey, "Alchemy") },
+    })
+    addon.Sync:ProcessRequestQueue()
+    Test.truthy(addon.Sync:GetInFlightRequest(ownerKey), "replica request should dispatch")
+
+    addon.Sync:FailInFlight(ownerKey, true, "session-timeout")
+
+    Test.falsy(addon.Sync:IsPeerBackoffActive(sourceKey), "single session timeout should not exile the source peer")
+    Test.eq(addon.Sync.telemetry.requestPeerPenaltySuppressed or 0, 1, "suppressed peer penalty should be counted")
+    Test.truthy(addon.Sync.pendingRequests[ownerKey], "member request should retry instead of punishing the peer")
+    Test.eq(countCommKind(wow, "MREQ"), 0, "ordinary session timeout should not force request-repair MANI")
 end)
 
 Test.it("stale roster metadata does not veto a live sync source and triggers a refresh", function()

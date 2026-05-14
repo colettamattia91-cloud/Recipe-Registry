@@ -365,7 +365,7 @@ Test.it("manifest health stays good while snapshot health is bad", function()
     Test.eq(breakdown.manifestOnly, 1, "manifest-only count")
 end)
 
-Test.it("stale partial manifests are pruned with telemetry", function()
+Test.it("stale partial manifests soft-timeout before hard prune", function()
     local addon, wow, _data = freshAddon()
     addon.debugMode = true
 
@@ -379,6 +379,15 @@ Test.it("stale partial manifests are pruned with telemetry", function()
         },
     }
 
+    addon.Sync:PrunePartialManifestReceives()
+
+    local softState = addon.Sync.partialManifestReceive["Peerone-TestRealm"]
+        and addon.Sync.partialManifestReceive["Peerone-TestRealm"]["manifest-1"]
+    Test.truthy(softState, "first timeout with received chunks should keep the partial open for recovery")
+    Test.truthy(softState.recoveryRequestedAt, "soft timeout should mark recovery request state")
+    Test.eq(addon.Sync.telemetry.manifestSoftTimeouts or 0, 1, "soft timeout telemetry")
+
+    wow.AdvanceTime(addon.Sync._private.constants.SESSION_TIMEOUT + 1)
     addon.Sync:PrunePartialManifestReceives()
 
     Test.eq(addon.Sync.partialManifestReceive["Peerone-TestRealm"], nil, "stale partial manifest should be pruned")
