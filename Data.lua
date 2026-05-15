@@ -64,6 +64,7 @@ local DB_DEFAULTS = {
     profile = {
         selectedProfession = nil,
         sortMode = "alpha",
+        searchMode = "recipe",
         mainFrame = {
             point = "CENTER",
             relativePoint = "CENTER",

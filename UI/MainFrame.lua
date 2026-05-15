@@ -378,6 +378,10 @@ end
 function UI:OnInitialize()
     self.selectedProfession = Addon.db and Addon.db.profile and Addon.db.profile.selectedProfession or nil
     self.sortMode = (Addon.db and Addon.db.profile and Addon.db.profile.sortMode) or "alpha"
+    self.searchMode = (Addon.db and Addon.db.profile and Addon.db.profile.searchMode) or "recipe"
+    if self.searchMode ~= "materials" then
+        self.searchMode = "recipe"
+    end
     self.selectedRecipeKey = nil
     self.searchText = ""
 end
@@ -526,20 +530,22 @@ function UI:GetDegradedModeReason()
     if not Addon.Data then
         return "data-unavailable"
     end
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseHeavyUI() then
-        local hasCachedData = false
-        for memberKey, entry in pairs(Addon.Data:GetMembersDB() or {}) do
-            if Addon.Data:IsUserVisibleMember(memberKey, entry, true) and next(entry.professions or {}) ~= nil then
-                hasCachedData = true
-                break
-            end
+    local hasCachedData = false
+    for memberKey, entry in pairs(Addon.Data:GetMembersDB() or {}) do
+        if Addon.Data:IsUserVisibleMember(memberKey, entry, true) and next(entry.professions or {}) ~= nil then
+            hasCachedData = true
+            break
         end
+    end
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseHeavyUI() then
         if not hasCachedData then
             return "sensitive-context"
         end
     end
     if Addon.Sync and Addon.Sync.IsInWarmup and Addon.Sync:IsInWarmup() then
-        return "warmup"
+        if not hasCachedData then
+            return "warmup"
+        end
     end
     if Addon.Sync and Addon.Sync.IsInWorldTransition and Addon.Sync:IsInWorldTransition() then
         return "world-transition"
@@ -808,8 +814,39 @@ function UI:CreateMainFrame()
     end)
     f.searchFocusWatcher = searchFocusWatcher
 
+    local searchScopeLabel = left:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    searchScopeLabel:SetPoint("TOPLEFT", searchBox, "BOTTOMLEFT", 2, -12)
+    searchScopeLabel:SetText("Search scope")
+    f.searchScopeLabel = searchScopeLabel
+
+    local searchRecipes = createCardStyleButton(left, 103, 24)
+    searchRecipes:SetPoint("TOPLEFT", searchBox, "BOTTOMLEFT", 0, -30)
+    searchRecipes:SetLabel("Recipes")
+    searchRecipes:SetScript("OnClick", function()
+        UI.searchMode = "recipe"
+        if Addon.db and Addon.db.profile then Addon.db.profile.searchMode = UI.searchMode end
+        UI.selectedRecipeKey = nil
+        searchRecipes:SetSelected(true)
+        searchMaterials:SetSelected(false)
+        UI:ApplySearchNow()
+    end)
+    f.searchRecipes = searchRecipes
+
+    local searchMaterials = createCardStyleButton(left, 107, 24)
+    searchMaterials:SetPoint("LEFT", searchRecipes, "RIGHT", 6, 0)
+    searchMaterials:SetLabel("+ Materials")
+    searchMaterials:SetScript("OnClick", function()
+        UI.searchMode = "materials"
+        if Addon.db and Addon.db.profile then Addon.db.profile.searchMode = UI.searchMode end
+        UI.selectedRecipeKey = nil
+        searchRecipes:SetSelected(false)
+        searchMaterials:SetSelected(true)
+        UI:ApplySearchNow()
+    end)
+    f.searchMaterials = searchMaterials
+
     local profLabel = left:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    profLabel:SetPoint("TOPLEFT", searchBox, "BOTTOMLEFT", 2, -12)
+    profLabel:SetPoint("TOPLEFT", searchRecipes, "BOTTOMLEFT", 2, -14)
     profLabel:SetText("Profession filter")
 
     f.profButtons = {}
@@ -817,7 +854,7 @@ function UI:CreateMainFrame()
     for i, profName in ipairs(PROF_ORDER) do
         local b = createCardStyleButton(left, 216, 24)
         if i == 1 then
-            b:SetPoint("TOPLEFT", searchBox, "BOTTOMLEFT", 0, -30)
+            b:SetPoint("TOPLEFT", searchRecipes, "BOTTOMLEFT", 0, -32)
         else
             b:SetPoint("TOPLEFT", lastProf, "BOTTOMLEFT", 0, -6)
         end
@@ -1392,6 +1429,12 @@ function UI:RefreshProfessionButtons()
         end
         button:SetSelected(self.selectedProfession == profName)
     end
+    if self.frame.searchRecipes then
+        self.frame.searchRecipes:SetSelected(self.searchMode ~= "materials")
+    end
+    if self.frame.searchMaterials then
+        self.frame.searchMaterials:SetSelected(self.searchMode == "materials")
+    end
 end
 
 function UI:RefreshRecipeList()
@@ -1404,7 +1447,7 @@ function UI:RefreshRecipeList()
     local canRunGlobalSearch = globalSearch and string.len(self.searchText or "") >= GLOBAL_SEARCH_MIN_CHARS
     local rows = {}
     if self.selectedProfession == "Favorites" or self.selectedProfession ~= nil or canRunGlobalSearch then
-        rows = Addon.Data:GetRecipeList(effectiveProfession, self.searchText, self.sortMode)
+        rows = Addon.Data:GetRecipeList(effectiveProfession, self.searchText, self.sortMode, self.searchMode)
     end
     
     -- Filter by favorites if selected

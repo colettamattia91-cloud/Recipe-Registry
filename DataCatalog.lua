@@ -94,6 +94,10 @@ local function refreshDetailAssets(info)
             info.createdItemName or "",
             info.recipeItemName or "",
         }
+        info.recipeSearchText = lowerSafe(table.concat(parts, " "))
+        for _, reagent in ipairs(info.reagents or {}) do
+            parts[#parts + 1] = reagent.name or ""
+        end
         info.searchText = lowerSafe(table.concat(parts, " "))
     end
 end
@@ -431,8 +435,8 @@ function Data:GetRecipeDisplayInfo(recipeKey)
         info.spellName or "",
         info.createdItemName or "",
         info.recipeItemName or "",
-        info.professionName or "",
     }
+    info.recipeSearchText = lowerSafe(table.concat(parts, " "))
     for _, reagent in ipairs(info.reagents) do
         parts[#parts + 1] = reagent.name or ""
     end
@@ -448,9 +452,10 @@ function Data:GetRecipeDisplayInfo(recipeKey)
     return info
 end
 
-function Data:GetRecipeList(profName, query, sortMode)
+function Data:GetRecipeList(profName, query, sortMode, searchMode)
     sortMode = sortMode or "alpha"
-    local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode)
+    searchMode = searchMode == "materials" and "materials" or "recipe"
+    local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode) .. "\t" .. searchMode
     self._recipeListCache = self._recipeListCache or {}
     self._recipeListCacheOrder = self._recipeListCacheOrder or {}
     if self._recipeListCache[cacheKey] then
@@ -479,7 +484,12 @@ function Data:GetRecipeList(profName, query, sortMode)
                 row.professionList[#row.professionList + 1] = currentProfName
             end
             sort(row.professionList)
-            local searchText = row.detail and row.detail.searchText or lowerSafe(row.label)
+            local searchText
+            if searchMode == "materials" then
+                searchText = row.detail and row.detail.searchText or lowerSafe(row.label)
+            else
+                searchText = row.detail and row.detail.recipeSearchText or lowerSafe(row.label)
+            end
             if q == "" or searchText:find(q, 1, true) then
                 out[#out + 1] = row
             end

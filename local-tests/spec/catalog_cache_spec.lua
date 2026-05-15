@@ -70,4 +70,48 @@ Test.it("bounds recipe detail cache across many lookups", function()
     Test.gte(128, #(data._recipeDetailCacheOrder or {}), "recipe detail cache order should stay bounded")
 end)
 
+Test.it("searches recipe names by default and materials only when requested", function()
+    local _addon, data = freshAddon()
+    local previousAtlas = _G.AtlasLoot
+    _G.AtlasLoot = {
+        Data = {
+            Recipe = {},
+            Profession = {
+                GetCraftSpellForCreatedItem = function(itemID)
+                    return itemID == 98001 and 47001 or nil
+                end,
+                GetProfessionData = function(spellID)
+                    if spellID ~= 47001 then return nil end
+                    return {
+                        98001,
+                        1,
+                        300,
+                        300,
+                        375,
+                        { 24001 },
+                        { 2 },
+                        1,
+                    }
+                end,
+                GetProfessionName = function(professionID)
+                    return professionID == 1 and "Alchemy" or nil
+                end,
+            },
+        },
+    }
+    local state = Loader.Wow.GetState()
+    state.items[98001] = { name = "Arcane Widget", quality = 2, icon = "widget-icon" }
+    state.items[24001] = { name = "Primal Mooncloth", quality = 3, icon = "cloth-icon" }
+    seedMember(data, "Searchone-TestRealm", "Alchemy", { [98001] = true }, {
+        sourceType = "replica",
+        count = 1,
+    })
+
+    Test.eq(#data:GetRecipeList("Alchemy", "widget", "alpha"), 1, "default search should match recipe names")
+    Test.eq(#data:GetRecipeList("Alchemy", "mooncloth", "alpha"), 0, "default search should ignore material names")
+    Test.eq(#data:GetRecipeList("Alchemy", "mooncloth", "alpha", "materials"), 1, "materials search should include reagent names")
+
+    _G.AtlasLoot = previousAtlas
+end)
+
 io.write(string.format("Catalog cache: %d test(s) passed\n", Test.count))
