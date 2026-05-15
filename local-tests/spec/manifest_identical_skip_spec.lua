@@ -30,7 +30,7 @@ end
 
 io.write("Manifest identical skip\n")
 
-Test.it("equivalent peer manifest block avoids catch-up requests and UI refresh", function()
+Test.it("equivalent peer manifest block ignores revision and source-only drift", function()
     local addon, _wow, data = freshAddon()
     local localKey = data:GetPlayerKey()
     local peerKey = "Peerone-TestRealm"
@@ -48,9 +48,9 @@ Test.it("equivalent peer manifest block avoids catch-up requests and UI refresh"
                 blockKey = blockKey,
                 ownerCharacter = localBlock.ownerCharacter,
                 professionKey = localBlock.professionKey,
-                revision = localBlock.revision,
-                lastUpdatedAt = localBlock.lastUpdatedAt,
-                sourceType = localBlock.sourceType,
+                revision = (localBlock.revision or 0) + 11,
+                lastUpdatedAt = (localBlock.lastUpdatedAt or 0) + 77,
+                sourceType = "replica",
                 guildStatus = localBlock.guildStatus,
                 count = localBlock.count,
                 fingerprint = localBlock.fingerprint,

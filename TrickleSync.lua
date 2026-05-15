@@ -168,19 +168,10 @@ function TrickleSync:IsPeerBlockEquivalentToLocal(peerBlock, localBlock)
     if peerBlock.professionKey ~= localBlock.professionKey then
         return false
     end
-    if (peerBlock.revision or 0) ~= (localBlock.revision or 0) then
-        return false
-    end
     if (peerBlock.count or 0) ~= (localBlock.count or 0) then
         return false
     end
     if (peerBlock.fingerprint or "") ~= (localBlock.fingerprint or "") then
-        return false
-    end
-
-    local peerSource = peerBlock.sourceType or "replica"
-    local localSource = localBlock.sourceType or "replica"
-    if peerSource ~= localSource and not (peerSource ~= "owner" and localSource ~= "owner") then
         return false
     end
 
@@ -235,12 +226,9 @@ function TrickleSync:ComparePeerManifest(peerManifest, opts)
             elseif self:IsPeerBlockEquivalentToLocal(peerBlock, localBlock) then
                 comparison.identicalBlocks[#comparison.identicalBlocks + 1] = blockKey
             else
-                local peerRevision = peerBlock.revision or 0
-                local localRevision = localBlock.revision or 0
                 local peerFingerprint = peerBlock.fingerprint or ""
                 local localFingerprint = localBlock.fingerprint or ""
                 local peerSource = peerBlock.sourceType or "replica"
-                local localSource = localBlock.sourceType or "replica"
                 local localCount = localBlock.count or 0
                 local peerCount = peerBlock.count or 0
 
@@ -248,16 +236,10 @@ function TrickleSync:ComparePeerManifest(peerManifest, opts)
                     if includeRemoteDiffs then
                         comparison.outdatedThere[#comparison.outdatedThere + 1] = blockKey
                     end
-                elseif peerSource == "owner"
-                    and localSource ~= "owner"
-                    and peerFingerprint ~= localFingerprint then
+                elseif peerFingerprint ~= localFingerprint or peerCount ~= localCount then
                     comparison.outdatedHere[#comparison.outdatedHere + 1] = blockKey
-                elseif peerRevision > localRevision then
-                    comparison.outdatedHere[#comparison.outdatedHere + 1] = blockKey
-                elseif peerFingerprint ~= localFingerprint then
-                    comparison.outdatedHere[#comparison.outdatedHere + 1] = blockKey
-                elseif includeRemoteDiffs and peerRevision < localRevision then
-                        comparison.outdatedThere[#comparison.outdatedThere + 1] = blockKey
+                elseif includeRemoteDiffs then
+                    comparison.outdatedThere[#comparison.outdatedThere + 1] = blockKey
                 end
             end
         end

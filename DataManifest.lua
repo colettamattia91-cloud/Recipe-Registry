@@ -12,7 +12,7 @@ local byte = string.byte
 local tostring = tostring
 
 local MANIFEST_BUILD_BLOCKS_PER_STEP = Private.MANIFEST_BUILD_BLOCKS_PER_STEP
-local buildManifestFingerprint = Private.buildManifestFingerprint
+local buildBlockContentFingerprint = Private.buildBlockContentFingerprint or Private.buildManifestFingerprint
 local cloneManifestForUpdate = Private.cloneManifestForUpdate
 local countKeys = Private.countKeys
 local countRecipeKeys = Private.countRecipeKeys
@@ -87,10 +87,7 @@ function Data:GetSyncBlock(memberKey, professionKey)
     local blockKey = self:BuildSyncBlockKey(memberKey, professionKey)
     if not blockKey then return nil end
 
-    local recipeCount = profession.count
-    if type(recipeCount) ~= "number" then
-        recipeCount = countRecipeKeys(profession.recipes)
-    end
+    local recipeCount = countRecipeKeys(profession.recipes)
 
     return {
         blockKey = blockKey,
@@ -102,7 +99,7 @@ function Data:GetSyncBlock(memberKey, professionKey)
         guildStatus = profession.guildStatus or entry.guildStatus or "active",
         lastSeenInGuildAt = profession.lastSeenInGuildAt or entry.lastSeenInGuildAt or entry.updatedAt or 0,
         count = recipeCount,
-        fingerprint = buildManifestFingerprint(profession),
+        fingerprint = buildBlockContentFingerprint(profession),
         skillRank = profession.skillRank or 0,
         skillMaxRank = profession.skillMaxRank or 0,
     }
@@ -231,6 +228,26 @@ local function foldManifestHash(hash, text)
     return hash
 end
 
+local function getManifestFingerprintRowParts(data, blockKey, row)
+    if type(row) ~= "table" or (row.guildStatus or "active") ~= "active" then
+        return nil
+    end
+
+    local ownerCharacter = row.ownerCharacter
+    local professionKey = row.professionKey
+    if (not ownerCharacter or not professionKey) and type(blockKey) == "string" then
+        ownerCharacter, professionKey = data:ParseSyncBlockKey(blockKey)
+    end
+    if not data:IsValidMemberKey(ownerCharacter) then
+        return nil
+    end
+    if type(professionKey) ~= "string" or professionKey == "" then
+        return nil
+    end
+
+    return ownerCharacter, professionKey, tonumber(row.count or 0) or 0, type(row.fingerprint) == "string" and row.fingerprint or ""
+end
+
 function Data:BuildManifestContentFingerprint(manifest)
     if type(manifest) ~= "table" then return nil end
     local blocks = manifest.blocks or {}
@@ -240,22 +257,29 @@ function Data:BuildManifestContentFingerprint(manifest)
     end
     sort(blockKeys)
 
-    local totals = manifest.totals or {}
     local hash = 5381
-    hash = foldManifestHash(hash, tonumber(totals.blocks or #blockKeys) or #blockKeys)
-    hash = foldManifestHash(hash, tonumber(totals.recipes or 0) or 0)
+    local activeBlockCount = 0
+    local activeRecipeCount = 0
+
     for _, blockKey in ipairs(blockKeys) do
         local row = blocks[blockKey] or {}
-        hash = foldManifestHash(hash, blockKey)
-        hash = foldManifestHash(hash, row.revision or 0)
-        hash = foldManifestHash(hash, row.count or 0)
-        hash = foldManifestHash(hash, row.fingerprint or "")
+        local ownerCharacter, professionKey, recipeCount, fingerprint = getManifestFingerprintRowParts(self, blockKey, row)
+        if ownerCharacter then
+            activeBlockCount = activeBlockCount + 1
+            activeRecipeCount = activeRecipeCount + recipeCount
+            hash = foldManifestHash(hash, ownerCharacter)
+            hash = foldManifestHash(hash, professionKey)
+            hash = foldManifestHash(hash, recipeCount)
+            hash = foldManifestHash(hash, fingerprint)
+        end
     end
 
+    -- HELLO manifest fingerprints are active content-only. They intentionally
+    -- ignore revision, timestamps, source metadata, and stale rows.
     return string.format(
-        "mf1:%d:%d:%d",
-        tonumber(totals.blocks or #blockKeys) or #blockKeys,
-        tonumber(totals.recipes or 0) or 0,
+        "mf2:%d:%d:%d",
+        activeBlockCount,
+        activeRecipeCount,
         hash
     )
 end

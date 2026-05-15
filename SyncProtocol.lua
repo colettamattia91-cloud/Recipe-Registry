@@ -23,6 +23,20 @@ local function getLocalManifestFingerprint(reason)
     return nil, "unavailable"
 end
 
+local function isComparableManifestContentFingerprint(fingerprint)
+    if type(fingerprint) ~= "string" then return false end
+    return fingerprint:match("^mf2:%d+:%d+:%d+$") ~= nil
+end
+
+local function compareManifestContentFingerprints(localFingerprint, remoteFingerprint)
+    local comparable = isComparableManifestContentFingerprint(localFingerprint)
+        and isComparableManifestContentFingerprint(remoteFingerprint)
+    if not comparable then
+        return false, false
+    end
+    return localFingerprint == remoteFingerprint, true
+end
+
 function Sync:BroadcastHello()
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic() then
         return
@@ -213,9 +227,10 @@ function Sync:HandleHello(payload)
     if self:IsMockKey(payload.key) then return end
     local localManifestFingerprint = getLocalManifestFingerprint("hello-compare")
     local remoteManifestFingerprint = type(payload.manifestFingerprint) == "string" and payload.manifestFingerprint or nil
-    local manifestFingerprintsMatch = localManifestFingerprint
-        and remoteManifestFingerprint
-        and localManifestFingerprint == remoteManifestFingerprint
+    local manifestFingerprintsMatch, comparableManifestFingerprints = compareManifestContentFingerprints(
+        localManifestFingerprint,
+        remoteManifestFingerprint
+    )
     if manifestFingerprintsMatch then
         self:RecordManifestReceived(payload.key)
         if self.RecordManifestFingerprintReceived then
@@ -226,7 +241,7 @@ function Sync:HandleHello(payload)
     local localEntry = Addon.Data:GetMember(payload.key)
     local localRev = localEntry and localEntry.rev or 0
     local remoteRev = payload.rev or 0
-    local directOwnerRefreshPending = remoteRev > localRev
+    local directOwnerRefreshPending = not manifestFingerprintsMatch and remoteRev > localRev
 
     local shouldSendManifest = not manifestFingerprintsMatch
     if self:IsInWarmup() and shouldSendManifest then
@@ -243,10 +258,10 @@ function Sync:HandleHello(payload)
         ))
     end
     local manifestFingerprintAlreadyHandled = remoteManifestFingerprint
+        and comparableManifestFingerprints
         and ((self._lastManifestFingerprintReceived and self._lastManifestFingerprintReceived[payload.key] == remoteManifestFingerprint)
             or (self.HasRecentlyRequestedManifestFingerprint and self:HasRecentlyRequestedManifestFingerprint(payload.key, remoteManifestFingerprint)))
-    local manifestFingerprintMismatch = localManifestFingerprint
-        and remoteManifestFingerprint
+    local manifestFingerprintMismatch = comparableManifestFingerprints
         and localManifestFingerprint ~= remoteManifestFingerprint
         and not manifestFingerprintAlreadyHandled
     local manifestRefreshOpts = {
@@ -271,7 +286,7 @@ function Sync:HandleHello(payload)
         end
     end
 
-    if remoteRev > localRev then
+    if remoteRev > localRev and not manifestFingerprintsMatch then
         if self:IsCoordinator() then
             self:BroadcastIndex(payload.key, remoteRev, payload.updatedAt, payload.key, "hello")
         end
