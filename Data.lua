@@ -65,6 +65,8 @@ local DB_DEFAULTS = {
         selectedProfession = nil,
         sortMode = "alpha",
         searchMode = "recipe",
+        defaultSearchMode = "recipe",
+        useRecipeCategories = true,
         mainFrame = {
             point = "CENTER",
             relativePoint = "CENTER",
@@ -780,6 +782,15 @@ function Data:OnInitialize()
                 self.db.profile.minimap.minimapPos = 220
             end
         end
+    end
+    if self.db.profile.searchMode ~= "materials" then
+        self.db.profile.searchMode = "recipe"
+    end
+    if self.db.profile.defaultSearchMode ~= "materials" then
+        self.db.profile.defaultSearchMode = "recipe"
+    end
+    if self.db.profile.useRecipeCategories == nil then
+        self.db.profile.useRecipeCategories = true
     end
     self._onlineCache = {}
     self._guildMetaCache = {}

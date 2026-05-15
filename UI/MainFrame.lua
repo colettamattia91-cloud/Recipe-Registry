@@ -378,7 +378,7 @@ end
 function UI:OnInitialize()
     self.selectedProfession = Addon.db and Addon.db.profile and Addon.db.profile.selectedProfession or nil
     self.sortMode = (Addon.db and Addon.db.profile and Addon.db.profile.sortMode) or "alpha"
-    self.searchMode = (Addon.db and Addon.db.profile and Addon.db.profile.searchMode) or "recipe"
+    self.searchMode = (Addon.db and Addon.db.profile and (Addon.db.profile.defaultSearchMode or Addon.db.profile.searchMode)) or "recipe"
     if self.searchMode ~= "materials" then
         self.searchMode = "recipe"
     end
@@ -824,7 +824,6 @@ function UI:CreateMainFrame()
     searchRecipes:SetLabel("Recipes")
     searchRecipes:SetScript("OnClick", function()
         UI.searchMode = "recipe"
-        if Addon.db and Addon.db.profile then Addon.db.profile.searchMode = UI.searchMode end
         UI.selectedRecipeKey = nil
         searchRecipes:SetSelected(true)
         searchMaterials:SetSelected(false)
@@ -837,7 +836,6 @@ function UI:CreateMainFrame()
     searchMaterials:SetLabel("+ Materials")
     searchMaterials:SetScript("OnClick", function()
         UI.searchMode = "materials"
-        if Addon.db and Addon.db.profile then Addon.db.profile.searchMode = UI.searchMode end
         UI.selectedRecipeKey = nil
         searchRecipes:SetSelected(false)
         searchMaterials:SetSelected(true)
