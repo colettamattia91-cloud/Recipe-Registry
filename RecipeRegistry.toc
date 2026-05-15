@@ -8,7 +8,7 @@
 ## SavedVariables: RecipeRegistryDB,RecipeRegistryLogDB
 ## SavedVariablesPerCharacter: RecipeRegistryCharDB
 ## X-Category: Guild
-## OptionalDeps: AtlasLootClassic,AtlasLoot,TradeSkillMaster,Auctionator
+## OptionalDeps: AtlasLootClassic,AtlasLootClassic_Crafting,AtlasLoot,TradeSkillMaster,Auctionator
 
 Libs\embeds.xml
 

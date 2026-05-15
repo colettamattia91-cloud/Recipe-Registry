@@ -601,6 +601,9 @@ function Sync:QueueManifestChunks(peerKey, chunks, why, manifestId, opts)
         self.telemetry.manifestQueueMaxDepth = #self.manifestChunkQueue
     end
     self:EnforceRuntimeQueueCaps("manifest-queue")
+    if self.ScheduleOutboundPump then
+        self:ScheduleOutboundPump()
+    end
     return true
 end
 
@@ -789,7 +792,7 @@ function Sync:RequestManifestRefresh(peerKey, opts)
             tostring(opts.manifestAttempt or "none"),
             #(opts.missingSeqs or {})
         ))
-        self:SendDirectEnvelope("MREQ", {
+        local sent = self:SendDirectEnvelope("MREQ", {
             key = self:GetSelfKey(),
             why = opts.reason or "manual",
             reason = opts.reason or "manual",
@@ -797,6 +800,13 @@ function Sync:RequestManifestRefresh(peerKey, opts)
             manifestAttempt = opts.manifestAttempt,
             missingSeqs = cloneNumberArray(opts.missingSeqs),
         }, peerKey, "NORMAL")
+        if sent and type(opts.remoteManifestFingerprint) == "string" and opts.remoteManifestFingerprint ~= "" then
+            self._helloManifestFingerprintRequested = self._helloManifestFingerprintRequested or {}
+            self._helloManifestFingerprintRequested[peerKey] = {
+                fingerprint = opts.remoteManifestFingerprint,
+                at = time(),
+            }
+        end
         return
     end
 
@@ -1405,6 +1415,9 @@ function Sync:HandleManifestChunk(payload)
     self:MarkManifestReceiveCompleted(senderKey, payload.manifestId, state.manifestAttempt)
     self:ClearAbandonedManifestReceive(senderKey, payload.manifestId)
     self:RecordManifestReceived(senderKey)
+    if Addon.Data and Addon.Data.BuildManifestContentFingerprint and self.RecordManifestFingerprintReceived then
+        self:RecordManifestFingerprintReceived(senderKey, Addon.Data:BuildManifestContentFingerprint(manifest))
+    end
     Addon:Trace("manifest", string.format(
         "receive-complete peer=%s manifestId=%s attempt=%s blocks=%d totalChunks=%d",
         tostring(senderKey),

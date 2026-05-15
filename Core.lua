@@ -1040,9 +1040,8 @@ function Addon:SlashHandler(input)
     end
 
     if cmd == "options" or cmd == "opt" or cmd == "config" then
-        if InterfaceOptionsFrame_OpenToCategory and self.Options and self.Options.panel then
-            InterfaceOptionsFrame_OpenToCategory(self.Options.panel)
-            InterfaceOptionsFrame_OpenToCategory(self.Options.panel)
+        if self.Options and self.Options.Open and self.Options:Open() then
+            self:Print("Opening Recipe Registry options.")
         else
             self:Print("Options panel not available yet.")
         end

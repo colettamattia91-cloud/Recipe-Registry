@@ -4,6 +4,45 @@ Addon.Options = Options
 
 local ICON_TEXTURE = "Interface\\Icons\\INV_Misc_Book_11"
 
+local function getCategoryID(category)
+    if type(category) ~= "table" then return nil end
+    if type(category.GetID) == "function" then
+        local ok, id = pcall(category.GetID, category)
+        if ok and id then return id end
+    end
+    return category.ID or category.id
+end
+
+local function registerOptionsPanel(module, panel)
+    if not panel then return false end
+    if module._optionsRegistered then return true end
+
+    if type(Settings) == "table" and type(Settings.RegisterCanvasLayoutCategory) == "function" then
+        local ok, category = pcall(Settings.RegisterCanvasLayoutCategory, panel, panel.name)
+        if ok and category then
+            module.settingsCategory = category
+            module.settingsCategoryID = getCategoryID(category)
+            if type(Settings.RegisterAddOnCategory) == "function" then
+                pcall(Settings.RegisterAddOnCategory, category)
+            end
+            module._optionsRegistered = true
+            return true
+        end
+    end
+
+    if type(InterfaceOptions_AddCategory) == "function" then
+        pcall(InterfaceOptions_AddCategory, panel)
+        module._optionsRegistered = true
+        return true
+    end
+    if type(InterfaceOptionsFrame_AddCategory) == "function" then
+        pcall(InterfaceOptionsFrame_AddCategory, panel)
+        module._optionsRegistered = true
+        return true
+    end
+    return false
+end
+
 local function getProfile()
     if not (Addon.db and Addon.db.profile) then return nil end
     local profile = Addon.db.profile
@@ -125,17 +164,14 @@ function Options:RefreshControls()
     end
 end
 
-function Options:OnEnable()
-    if self.panel then return end
+function Options:EnsurePanel()
+    if self.panel then
+        registerOptionsPanel(self, self.panel)
+        return self.panel
+    end
 
     local panel = CreateFrame("Frame", "RecipeRegistryOptionsPanel", InterfaceOptionsFramePanelContainer)
     panel.name = "Recipe Registry"
-
-    if type(InterfaceOptions_AddCategory) == "function" then
-        InterfaceOptions_AddCategory(panel)
-    elseif type(InterfaceOptionsFrame_AddCategory) == "function" then
-        InterfaceOptionsFrame_AddCategory(panel)
-    end
 
     local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
     title:SetPoint("TOPLEFT", 16, -16)
@@ -248,5 +284,34 @@ function Options:OnEnable()
     end
 
     self.panel = panel
+    registerOptionsPanel(self, panel)
     self:RefreshControls()
+    return panel
+end
+
+function Options:Open()
+    local panel = self:EnsurePanel()
+    if not panel then return false end
+
+    if type(Settings) == "table" and type(Settings.OpenToCategory) == "function" then
+        local categoryID = self.settingsCategoryID or getCategoryID(self.settingsCategory)
+        if categoryID then
+            local ok = pcall(Settings.OpenToCategory, categoryID)
+            if ok then return true end
+        end
+        local ok = pcall(Settings.OpenToCategory, panel.name)
+        if ok then return true end
+    end
+
+    if type(InterfaceOptionsFrame_OpenToCategory) == "function" then
+        pcall(InterfaceOptionsFrame_OpenToCategory, panel)
+        pcall(InterfaceOptionsFrame_OpenToCategory, panel)
+        return true
+    end
+
+    return false
+end
+
+function Options:OnEnable()
+    self:EnsurePanel()
 end

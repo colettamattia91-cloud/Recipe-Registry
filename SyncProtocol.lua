@@ -14,14 +14,26 @@ local function shouldAttachProtocolCaps(kind)
         or kind == "MREQ"
 end
 
+local function getLocalManifestFingerprint(reason)
+    if Addon.Data and Addon.Data.GetPreparedManifestContentFingerprint then
+        return Addon.Data:GetPreparedManifestContentFingerprint({
+            reason = reason or "hello-fingerprint",
+        })
+    end
+    return nil, "unavailable"
+end
+
 function Sync:BroadcastHello()
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic() then
         return
     end
+    local firstHello = (self.lastHelloAt or 0) <= 0
     self.lastHelloAt = time()
     local summary = Addon.Data:GetLocalSummary()
     self:RecordRevisionHint(summary.memberKey, summary.rev, summary.updatedAt, summary.memberKey)
-    self:SendGuildEnvelope("HELLO", {
+    local requestManifest = firstHello or self._nextHelloRequestsManifest == true
+    local manifestFingerprint = getLocalManifestFingerprint("hello")
+    local sent = self:SendGuildEnvelope("HELLO", {
         key = self:GetSelfKey(),
         rev = summary.rev,
         updatedAt = summary.updatedAt,
@@ -32,7 +44,13 @@ function Sync:BroadcastHello()
         buildId = Addon.BUILD_ID,
         capabilities = Addon.CAPABILITIES,
         caps = self.GetLocalProtocolCaps and self:GetLocalProtocolCaps() or nil,
+        manifestPushMode = "requested",
+        manifestRequest = requestManifest,
+        manifestFingerprint = manifestFingerprint,
     }, "ALERT")
+    if sent then
+        self._nextHelloRequestsManifest = false
+    end
 end
 
 function Sync:AdvertiseLocalRevision(reason)
@@ -193,27 +211,65 @@ function Sync:HandleHello(payload)
     end
     self:RecordRevisionHint(payload.key, payload.rev, payload.updatedAt, payload.key)
     if self:IsMockKey(payload.key) then return end
-    if self:IsInWarmup() then
-        self.telemetry.warmupDeferrals = (self.telemetry.warmupDeferrals or 0) + 1
-        Addon:Debug("Warmup deferring manifest reply", tostring(payload.key))
-        self:QueueWarmupManifestPeer(payload.key, "hello")
-    else
-        self:SendManifestToPeer(payload.key, "hello")
-    end
-    if sawHelloBefore and self:ShouldRequestManifestRefresh(payload.key) then
-        if self:IsInWarmup() then
-            Addon:Debug("Warmup deferring manifest refresh request", tostring(payload.key))
-            self:QueueWarmupManifestRefresh(payload.key)
-        else
-            self:RequestManifestRefresh(payload.key, {
-                reason = "hello-auto",
-            })
+    local localManifestFingerprint = getLocalManifestFingerprint("hello-compare")
+    local remoteManifestFingerprint = type(payload.manifestFingerprint) == "string" and payload.manifestFingerprint or nil
+    local manifestFingerprintsMatch = localManifestFingerprint
+        and remoteManifestFingerprint
+        and localManifestFingerprint == remoteManifestFingerprint
+    if manifestFingerprintsMatch then
+        self:RecordManifestReceived(payload.key)
+        if self.RecordManifestFingerprintReceived then
+            self:RecordManifestFingerprintReceived(payload.key, remoteManifestFingerprint)
         end
     end
 
     local localEntry = Addon.Data:GetMember(payload.key)
     local localRev = localEntry and localEntry.rev or 0
     local remoteRev = payload.rev or 0
+    local directOwnerRefreshPending = remoteRev > localRev
+
+    local shouldSendManifest = not manifestFingerprintsMatch
+    if self:IsInWarmup() and shouldSendManifest then
+        self.telemetry.warmupDeferrals = (self.telemetry.warmupDeferrals or 0) + 1
+        Addon:Debug("Warmup deferring manifest reply", tostring(payload.key))
+        self:QueueWarmupManifestPeer(payload.key, "hello")
+    elseif shouldSendManifest then
+        self:SendManifestToPeer(payload.key, "hello")
+    else
+        Addon:Trace("manifest", string.format(
+            "send-skip peer=%s reason=%s why=hello",
+            tostring(payload.key),
+            manifestFingerprintsMatch and "hello-fingerprint-match" or "hello-not-requested"
+        ))
+    end
+    local manifestFingerprintAlreadyHandled = remoteManifestFingerprint
+        and ((self._lastManifestFingerprintReceived and self._lastManifestFingerprintReceived[payload.key] == remoteManifestFingerprint)
+            or (self.HasRecentlyRequestedManifestFingerprint and self:HasRecentlyRequestedManifestFingerprint(payload.key, remoteManifestFingerprint)))
+    local manifestFingerprintMismatch = localManifestFingerprint
+        and remoteManifestFingerprint
+        and localManifestFingerprint ~= remoteManifestFingerprint
+        and not manifestFingerprintAlreadyHandled
+    local manifestRefreshOpts = {
+        reason = "hello-auto",
+        manifestFingerprintMismatch = manifestFingerprintMismatch == true,
+        remoteManifestFingerprint = remoteManifestFingerprint,
+    }
+    local canRequestFingerprintMismatch = not manifestFingerprintMismatch
+        or self:IsCoordinator()
+        or (self.coordinatorKey and payload.key == self.coordinatorKey)
+    if sawHelloBefore
+        and not manifestFingerprintsMatch
+        and not manifestFingerprintAlreadyHandled
+        and not (manifestFingerprintMismatch and directOwnerRefreshPending)
+        and canRequestFingerprintMismatch
+        and self:ShouldRequestManifestRefresh(payload.key, manifestRefreshOpts) then
+        if self:IsInWarmup() then
+            Addon:Debug("Warmup deferring manifest refresh request", tostring(payload.key))
+            self:QueueWarmupManifestRefresh(payload.key)
+        else
+            self:RequestManifestRefresh(payload.key, manifestRefreshOpts)
+        end
+    end
 
     if remoteRev > localRev then
         if self:IsCoordinator() then

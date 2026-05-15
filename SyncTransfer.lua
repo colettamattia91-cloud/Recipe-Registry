@@ -516,6 +516,9 @@ function Sync:QueueOutboundBlock(peer, block)
         queuedAt = time(),
     }
     self:EnforceRuntimeQueueCaps("outbound")
+    if self.ScheduleOutboundPump then
+        self:ScheduleOutboundPump()
+    end
     return true
 end
 

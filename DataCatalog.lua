@@ -452,10 +452,11 @@ function Data:GetRecipeDisplayInfo(recipeKey)
     return info
 end
 
-function Data:GetRecipeList(profName, query, sortMode, searchMode)
+function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName)
     sortMode = sortMode or "alpha"
     searchMode = searchMode == "materials" and "materials" or "recipe"
-    local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode) .. "\t" .. searchMode
+    local categoryFilter = categoryName and categoryName ~= "" and categoryName ~= "All" and categoryName or nil
+    local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode) .. "\t" .. searchMode .. "\t" .. tostring(categoryFilter or "")
     self._recipeListCache = self._recipeListCache or {}
     self._recipeListCacheOrder = self._recipeListCacheOrder or {}
     if self._recipeListCache[cacheKey] then
@@ -469,6 +470,9 @@ function Data:GetRecipeList(profName, query, sortMode, searchMode)
         local include = (not profName or profName == "All")
         if not include and indexed.profNames[profName] then
             include = true
+        end
+        if include and categoryFilter and profName and profName ~= "All" then
+            include = self:GetRecipeCategory(recipeKey, profName) == categoryFilter
         end
         if include then
             local detail = self:GetRecipeDisplayInfo(recipeKey)

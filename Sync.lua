@@ -24,6 +24,7 @@ local HELLO_INTERVAL = 30
 local AUTO_SYNC_INTERVAL = 20
 local OUTGOING_CHUNK_DELAY = 0.20
 local MANIFEST_CHUNK_DELAY = 0.12
+local OUTBOUND_PUMP_DELAY = 0.05
 local MANIFEST_INITIAL_JITTER = 0.35
 local MAX_RESUME_ATTEMPTS = 3
 local COORDINATOR_RECOMPUTE_DELAY = 0.35
@@ -391,6 +392,7 @@ Private.constants = {
     AUTO_SYNC_INTERVAL = AUTO_SYNC_INTERVAL,
     OUTGOING_CHUNK_DELAY = OUTGOING_CHUNK_DELAY,
     MANIFEST_CHUNK_DELAY = MANIFEST_CHUNK_DELAY,
+    OUTBOUND_PUMP_DELAY = OUTBOUND_PUMP_DELAY,
     MANIFEST_INITIAL_JITTER = MANIFEST_INITIAL_JITTER,
     MAX_RESUME_ATTEMPTS = MAX_RESUME_ATTEMPTS,
     COORDINATOR_RECOMPUTE_DELAY = COORDINATOR_RECOMPUTE_DELAY,
@@ -449,6 +451,7 @@ Private.isMockKey = isMockKey
 function Sync:Startup()
     self:RegisterComm(PREFIX)
     self:EnterWarmup("startup", POST_WORLD_GRACE_SECONDS)
+    self._nextHelloRequestsManifest = true
     self:ScheduleHello(1)
     self.helloTicker = self:ScheduleRepeatingTimer("BroadcastHello", HELLO_INTERVAL)
     self.queueTicker = self:ScheduleRepeatingTimer("ProcessRequestQueue", 1)

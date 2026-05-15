@@ -8,6 +8,7 @@ local ipairs = ipairs
 local sort = table.sort
 local min = math.min
 local max = math.max
+local byte = string.byte
 local tostring = tostring
 
 local MANIFEST_BUILD_BLOCKS_PER_STEP = Private.MANIFEST_BUILD_BLOCKS_PER_STEP
@@ -220,6 +221,54 @@ function Data:BuildSyncManifest(includeStale)
     end
 
     return manifest
+end
+
+local function foldManifestHash(hash, text)
+    text = tostring(text or "")
+    for index = 1, #text do
+        hash = ((hash * 33) + byte(text, index)) % 2147483647
+    end
+    return hash
+end
+
+function Data:BuildManifestContentFingerprint(manifest)
+    if type(manifest) ~= "table" then return nil end
+    local blocks = manifest.blocks or {}
+    local blockKeys = {}
+    for blockKey in pairs(blocks) do
+        blockKeys[#blockKeys + 1] = blockKey
+    end
+    sort(blockKeys)
+
+    local totals = manifest.totals or {}
+    local hash = 5381
+    hash = foldManifestHash(hash, tonumber(totals.blocks or #blockKeys) or #blockKeys)
+    hash = foldManifestHash(hash, tonumber(totals.recipes or 0) or 0)
+    for _, blockKey in ipairs(blockKeys) do
+        local row = blocks[blockKey] or {}
+        hash = foldManifestHash(hash, blockKey)
+        hash = foldManifestHash(hash, row.revision or 0)
+        hash = foldManifestHash(hash, row.count or 0)
+        hash = foldManifestHash(hash, row.fingerprint or "")
+    end
+
+    return string.format(
+        "mf1:%d:%d:%d",
+        tonumber(totals.blocks or #blockKeys) or #blockKeys,
+        tonumber(totals.recipes or 0) or 0,
+        hash
+    )
+end
+
+function Data:GetPreparedManifestContentFingerprint(opts)
+    opts = opts or {}
+    local manifest, status = self:GetPreparedSyncManifest({
+        allowStale = opts.allowStale == true,
+        syncFallback = false,
+        reason = opts.reason or "manifest-fingerprint",
+    })
+    if not manifest then return nil, status or "building" end
+    return self:BuildManifestContentFingerprint(manifest), status or "ready"
 end
 
 function Data:ApplyManifestDirtyBlock(manifest, blockKey)

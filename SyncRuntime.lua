@@ -30,6 +30,7 @@ local POST_INSTANCE_GRACE_SECONDS = Constants.POST_INSTANCE_GRACE_SECONDS
 local POST_RELOAD_IN_INSTANCE_GRACE_SECONDS = Constants.POST_RELOAD_IN_INSTANCE_GRACE_SECONDS
 local HELLO_INTERVAL = Constants.HELLO_INTERVAL
 local AUTO_SYNC_INTERVAL = Constants.AUTO_SYNC_INTERVAL
+local OUTBOUND_PUMP_DELAY = Constants.OUTBOUND_PUMP_DELAY or 0.05
 local COORDINATOR_RECOMPUTE_DELAY = Constants.COORDINATOR_RECOMPUTE_DELAY
 local MAX_OUTBOUND_CHUNKS = Constants.MAX_OUTBOUND_CHUNKS
 local MAX_MANIFEST_CHUNKS = Constants.MAX_MANIFEST_CHUNKS
@@ -180,8 +181,11 @@ function Sync:OnInitialize()
     self._lastManifestSentAt = {}
     self._lastManifestAnnouncedId = {}
     self._helloManifestRefreshRequested = {}
+    self._helloManifestFingerprintRequested = {}
     self._lastHelloSeenAt = {}
     self._lastManifestReceivedAt = {}
+    self._lastManifestFingerprintReceived = {}
+    self._nextHelloRequestsManifest = false
     self.pendingManifestPeers = {}
     self._warmupDeferredManifestPeers = {}
     self._warmupDeferredManifestRefreshPeers = {}
@@ -243,8 +247,11 @@ function Sync:ResetRuntimeQueues(reason, opts)
     self.manifestChunkSendCache = {}
     self.manifestAttemptCounters = {}
     self._helloManifestRefreshRequested = {}
+    self._helloManifestFingerprintRequested = {}
     self._lastHelloSeenAt = {}
     self._lastManifestReceivedAt = {}
+    self._lastManifestFingerprintReceived = {}
+    self._nextHelloRequestsManifest = opts.requestManifestOnNextHello == true
     self.pendingManifestPeers = {}
     self._warmupDeferredManifestPeers = {}
     self._warmupDeferredManifestRefreshPeers = {}
@@ -315,6 +322,7 @@ function Sync:ResetRuntimeStateForDatabaseWipe()
 end
 
 function Sync:KickoffDatabaseResync()
+    self._nextHelloRequestsManifest = true
     self:RequestManifestRefresh()
     self:ScheduleHello(0.5)
 end
@@ -1053,6 +1061,29 @@ function Sync:ScheduleQueuePump(delay)
     end, delay or 0.05)
 end
 
+local function hasQueuedOutboundChunks(self)
+    return #(self.outboundChunkQueue or {}) > 0 or #(self.manifestChunkQueue or {}) > 0
+end
+
+function Sync:ScheduleOutboundPump(delay)
+    if self._outboundPumpTimer then return end
+    self._outboundPumpTimer = self:ScheduleTimer(function()
+        self._outboundPumpTimer = nil
+        if not hasQueuedOutboundChunks(self) then
+            return
+        end
+        if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseOutbound() then
+            self:ScheduleOutboundPump(0.5)
+            return
+        end
+
+        self:SendNextLowPriorityChunk()
+        if hasQueuedOutboundChunks(self) then
+            self:ScheduleOutboundPump(OUTBOUND_PUMP_DELAY)
+        end
+    end, delay or OUTBOUND_PUMP_DELAY)
+end
+
 function Sync:EnterWarmup(reason, seconds)
     local duration = max(1, tonumber(seconds) or POST_WORLD_GRACE_SECONDS)
     local untilAt = time() + duration
@@ -1297,7 +1328,11 @@ function Sync:ShouldRequestManifestRefresh(peerKey, opts)
     end
 
     local lastManifestAt = self._lastManifestReceivedAt and self._lastManifestReceivedAt[peerKey] or 0
+    local manifestFingerprintMismatch = opts.manifestFingerprintMismatch == true
     if lastManifestAt > 0 then
+        if manifestFingerprintMismatch then
+            return true, "fingerprint-mismatch"
+        end
         if not (Private.isManualReason and Private.isManualReason(opts.reason)) then
             return false, "manifest-known"
         end
@@ -1318,6 +1353,24 @@ function Sync:RecordManifestReceived(peerKey)
     if not self:IsValidSyncMemberKey(peerKey) then return end
     self._lastManifestReceivedAt = self._lastManifestReceivedAt or {}
     self._lastManifestReceivedAt[peerKey] = time()
+end
+
+function Sync:RecordManifestFingerprintReceived(peerKey, fingerprint)
+    if not self:IsValidSyncMemberKey(peerKey) or type(fingerprint) ~= "string" or fingerprint == "" then return end
+    self._lastManifestFingerprintReceived = self._lastManifestFingerprintReceived or {}
+    self._lastManifestFingerprintReceived[peerKey] = fingerprint
+end
+
+function Sync:HasRecentlyRequestedManifestFingerprint(peerKey, fingerprint)
+    if not self:IsValidSyncMemberKey(peerKey) or type(fingerprint) ~= "string" or fingerprint == "" then
+        return false
+    end
+    local rows = self._helloManifestFingerprintRequested or {}
+    local row = rows[peerKey]
+    if not row or row.fingerprint ~= fingerprint then
+        return false
+    end
+    return (time() - (row.at or 0)) < NODE_TIMEOUT
 end
 
 function Sync:HandleWarmupExpired()

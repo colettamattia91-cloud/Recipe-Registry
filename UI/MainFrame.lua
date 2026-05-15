@@ -383,6 +383,7 @@ function UI:OnInitialize()
         self.searchMode = "recipe"
     end
     self.selectedRecipeKey = nil
+    self.selectedCategory = nil
     self.searchText = ""
 end
 
@@ -819,7 +820,8 @@ function UI:CreateMainFrame()
     searchScopeLabel:SetText("Search scope")
     f.searchScopeLabel = searchScopeLabel
 
-    local searchRecipes = createCardStyleButton(left, 103, 24)
+    local searchRecipes, searchMaterials
+    searchRecipes = createCardStyleButton(left, 103, 24)
     searchRecipes:SetPoint("TOPLEFT", searchBox, "BOTTOMLEFT", 0, -30)
     searchRecipes:SetLabel("Recipes")
     searchRecipes:SetScript("OnClick", function()
@@ -831,7 +833,7 @@ function UI:CreateMainFrame()
     end)
     f.searchRecipes = searchRecipes
 
-    local searchMaterials = createCardStyleButton(left, 107, 24)
+    searchMaterials = createCardStyleButton(left, 107, 24)
     searchMaterials:SetPoint("LEFT", searchRecipes, "RIGHT", 6, 0)
     searchMaterials:SetLabel("+ Materials")
     searchMaterials:SetScript("OnClick", function()
@@ -847,15 +849,20 @@ function UI:CreateMainFrame()
     profLabel:SetPoint("TOPLEFT", searchRecipes, "BOTTOMLEFT", 2, -14)
     profLabel:SetText("Profession filter")
 
+    local profScroll = CreateFrame("ScrollFrame", nil, left, "UIPanelScrollFrameTemplate")
+    profScroll:SetPoint("TOPLEFT", profLabel, "BOTTOMLEFT", -2, -8)
+    profScroll:SetPoint("BOTTOMRIGHT", -28, 58)
+    local profContent = CreateFrame("Frame", nil, profScroll)
+    profContent:SetSize(216, 1)
+    profScroll:SetScrollChild(profContent)
+    f.profScroll = profScroll
+    f.profContent = profContent
+
     f.profButtons = {}
-    local lastProf
+    f.categoryButtons = {}
     for i, profName in ipairs(PROF_ORDER) do
-        local b = createCardStyleButton(left, 216, 24)
-        if i == 1 then
-            b:SetPoint("TOPLEFT", searchRecipes, "BOTTOMLEFT", 0, -32)
-        else
-            b:SetPoint("TOPLEFT", lastProf, "BOTTOMLEFT", 0, -6)
-        end
+        local b = createCardStyleButton(profContent, 216, 24)
+        b:SetPoint("TOPLEFT", 0, -((i - 1) * 30))
         b:SetScript("OnClick", function()
             if UI.selectedProfession == profName then
                 UI.selectedProfession = nil
@@ -864,10 +871,10 @@ function UI:CreateMainFrame()
             end
             if Addon.db and Addon.db.profile then Addon.db.profile.selectedProfession = UI.selectedProfession end
             UI.selectedRecipeKey = nil
+            UI.selectedCategory = nil
             UI:Refresh()
         end)
         f.profButtons[profName] = b
-        lastProf = b
     end
 
     local hint = left:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
@@ -1070,6 +1077,20 @@ function UI:CreateMainFrame()
 
     self.frame = f
     self:RefreshDebugVisibility()
+end
+
+function UI:EnsureCategoryButton(index)
+    local button = self.frame.categoryButtons[index]
+    if button then return button end
+
+    button = createCardStyleButton(self.frame.profContent, 198, 20)
+    button:SetScript("OnClick", function(self)
+        UI.selectedCategory = self.categoryName
+        UI.selectedRecipeKey = nil
+        UI:Refresh()
+    end)
+    self.frame.categoryButtons[index] = button
+    return button
 end
 
 function UI:EnsureRecipeRow(index)
@@ -1418,6 +1439,17 @@ end
 
 function UI:RefreshProfessionButtons()
     local summary = Addon.Data:GetProfessionSummary()
+    local useCategories = Addon.db and Addon.db.profile and Addon.db.profile.useRecipeCategories ~= false
+    local yOffset = 0
+    local categoryButtonIndex = 0
+
+    local function placeButton(button, indent, height, gap)
+        button:ClearAllPoints()
+        button:SetPoint("TOPLEFT", indent or 0, -yOffset)
+        setShownIfChanged(button, true)
+        yOffset = yOffset + (height or 24) + (gap or 6)
+    end
+
     for _, profName in ipairs(PROF_ORDER) do
         local button = self.frame.profButtons[profName]
         if profName == "Favorites" then
@@ -1426,6 +1458,47 @@ function UI:RefreshProfessionButtons()
             button:SetLabel(profName, getProfessionIcon(profName))
         end
         button:SetSelected(self.selectedProfession == profName)
+        placeButton(button, 0, 24, 6)
+
+        if useCategories and self.selectedProfession == profName and profName ~= "Favorites" then
+            local categories = Addon.Data.GetRecipeCategories and Addon.Data:GetRecipeCategories(profName, true) or {}
+            local selectedCategoryExists = self.selectedCategory == nil
+            for _, categoryName in ipairs(categories) do
+                if categoryName == self.selectedCategory then
+                    selectedCategoryExists = true
+                    break
+                end
+            end
+            if not selectedCategoryExists then
+                self.selectedCategory = nil
+            end
+            if #categories > 0 then
+                categoryButtonIndex = categoryButtonIndex + 1
+                local allButton = self:EnsureCategoryButton(categoryButtonIndex)
+                allButton.categoryName = nil
+                allButton:SetLabel("All")
+                allButton:SetSelected(self.selectedCategory == nil)
+                placeButton(allButton, 14, 20, 4)
+
+                for _, categoryName in ipairs(categories) do
+                    categoryButtonIndex = categoryButtonIndex + 1
+                    local categoryButton = self:EnsureCategoryButton(categoryButtonIndex)
+                    categoryButton.categoryName = categoryName
+                    categoryButton:SetLabel(categoryName)
+                    categoryButton:SetSelected(self.selectedCategory == categoryName)
+                    placeButton(categoryButton, 14, 20, 4)
+                end
+                yOffset = yOffset + 2
+            end
+        elseif self.selectedProfession == profName then
+            self.selectedCategory = nil
+        end
+    end
+    for i = categoryButtonIndex + 1, #(self.frame.categoryButtons or {}) do
+        setShownIfChanged(self.frame.categoryButtons[i], false)
+    end
+    if self.frame.profContent then
+        self.frame.profContent:SetHeight(math.max(1, yOffset + 4))
     end
     if self.frame.searchRecipes then
         self.frame.searchRecipes:SetSelected(self.searchMode ~= "materials")
@@ -1441,11 +1514,16 @@ function UI:RefreshRecipeList()
     if effectiveProfession == "Favorites" then
         effectiveProfession = nil
     end
+    local categoryFilter
+    if Addon.db and Addon.db.profile and Addon.db.profile.useRecipeCategories ~= false
+        and self.selectedProfession and self.selectedProfession ~= "Favorites" then
+        categoryFilter = self.selectedCategory
+    end
     local globalSearch = (self.selectedProfession == nil and self.searchText and self.searchText ~= "")
     local canRunGlobalSearch = globalSearch and string.len(self.searchText or "") >= GLOBAL_SEARCH_MIN_CHARS
     local rows = {}
     if self.selectedProfession == "Favorites" or self.selectedProfession ~= nil or canRunGlobalSearch then
-        rows = Addon.Data:GetRecipeList(effectiveProfession, self.searchText, self.sortMode, self.searchMode)
+        rows = Addon.Data:GetRecipeList(effectiveProfession, self.searchText, self.sortMode, self.searchMode, categoryFilter)
     end
     
     -- Filter by favorites if selected
@@ -1463,6 +1541,8 @@ function UI:RefreshRecipeList()
     local headerText
     if self.selectedProfession == "Favorites" then
         headerText = "Favorite recipes"
+    elseif self.selectedProfession and categoryFilter then
+        headerText = self.selectedProfession .. ": " .. tostring(categoryFilter)
     elseif self.selectedProfession then
         headerText = self.selectedProfession .. " recipes"
     elseif globalSearch and not canRunGlobalSearch then

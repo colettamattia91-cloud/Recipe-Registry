@@ -211,6 +211,116 @@ Test.it("paces queued manifest chunks for the same peer", function()
     Test.eq(#addon.Sync.manifestChunkQueue, 0, "manifest queue should drain")
 end)
 
+Test.it("answers modern HELLO with MANI when no matching fingerprint is available", function()
+    local addon, wow, data = freshAddon()
+    local localKey = data:GetPlayerKey()
+    local peerKey = "Peerone-Testrealm"
+    local cooldown = addon.Sync._private.constants.MANIFEST_PUSH_COOLDOWN
+    seedProfession(data, localKey, "Alchemy", 94121, { sourceType = "owner" })
+    data:BuildManifestCacheNow("hello-pull")
+
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
+        kind = "HELLO",
+        key = peerKey,
+        rev = 0,
+        updatedAt = 101,
+        sender = peerKey,
+        manifestPushMode = "requested",
+        manifestRequest = false,
+    }), {
+        sender = peerKey,
+        distribution = "GUILD",
+    })
+
+    Test.eq(#addon.Sync.manifestChunkQueue, 1, "modern HELLO without a fingerprint should still queue a compatibility MANI reply")
+    addon.Sync.manifestChunkQueue = {}
+    wow.AdvanceTime(cooldown + 1)
+
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
+        kind = "HELLO",
+        key = peerKey,
+        rev = 0,
+        updatedAt = 102,
+        sender = peerKey,
+        manifestPushMode = "requested",
+        manifestRequest = true,
+    }), {
+        sender = peerKey,
+        distribution = "GUILD",
+    })
+
+    Test.eq(#addon.Sync.manifestChunkQueue, 0, "unchanged manifestRequest should still be idempotent after the same manifest was announced")
+end)
+
+Test.it("skips HELLO-driven MANI and MREQ when manifest fingerprints already match", function()
+    local addon, wow, data = freshAddon()
+    local localKey = data:GetPlayerKey()
+    local peerKey = "Peerone-Testrealm"
+    seedProfession(data, localKey, "Alchemy", 94122, { sourceType = "owner" })
+    data:BuildManifestCacheNow("hello-fingerprint")
+    local manifestFingerprint = data:GetPreparedManifestContentFingerprint({
+        reason = "test-fingerprint",
+    })
+
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
+        kind = "HELLO",
+        key = peerKey,
+        rev = 1,
+        updatedAt = 201,
+        sender = peerKey,
+        manifestPushMode = "requested",
+        manifestRequest = true,
+        manifestFingerprint = manifestFingerprint,
+    }), {
+        sender = peerKey,
+        distribution = "GUILD",
+    })
+    Test.eq(#addon.Sync.manifestChunkQueue, 0, "matching manifest fingerprint should suppress automatic MANI even when requested")
+
+    wow.AdvanceTime(31)
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
+        kind = "HELLO",
+        key = peerKey,
+        rev = 1,
+        updatedAt = 202,
+        sender = peerKey,
+        manifestPushMode = "requested",
+        manifestRequest = true,
+        manifestFingerprint = manifestFingerprint,
+    }), {
+        sender = peerKey,
+        distribution = "GUILD",
+    })
+    Test.eq(countCommKind(wow, "MREQ"), 0, "matching manifest fingerprint should also suppress hello-auto MREQ")
+end)
+
+Test.it("requests a fresh manifest when HELLO fingerprint differs from local content", function()
+    local addon, wow, data = freshAddon()
+    local localKey = data:GetPlayerKey()
+    local peerKey = "Peerone-Testrealm"
+    seedProfession(data, localKey, "Alchemy", 94123, { sourceType = "owner" })
+    data:BuildManifestCacheNow("hello-fingerprint-mismatch")
+    addon.Sync.coordinatorKey = addon.Sync:GetSelfKey()
+    addon.Sync._lastHelloSeenAt[peerKey] = time() - 40
+    addon.Sync._lastManifestReceivedAt[peerKey] = time() - 10
+
+    wow.DeliverComm(addon.Sync, withModernVersion(addon, {
+        kind = "HELLO",
+        key = peerKey,
+        rev = 0,
+        updatedAt = 301,
+        sender = peerKey,
+        manifestPushMode = "requested",
+        manifestRequest = false,
+        manifestFingerprint = "mf1:999:999:12345",
+    }), {
+        sender = peerKey,
+        distribution = "GUILD",
+    })
+
+    Test.eq(countCommKind(wow, "MREQ"), 1, "fingerprint mismatch should bypass manifest-known and request a fresh MANI")
+end)
+
 Test.it("caps trickle outbound diagnostics instead of appending forever across repeated compares", function()
     local addon, _wow, data = freshAddon()
     local peerKey = "Peerone-Testrealm"
