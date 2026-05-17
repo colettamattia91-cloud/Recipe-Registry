@@ -177,6 +177,132 @@ Test.it("requester does not ask for block N+1 before block N snapshot is merged"
     Test.eq(countSentKind(requester.state.sentComm, "BLOCK_PULL_REQUEST"), 2, "second pull should be sent only after first merge completes")
 end)
 
+Test.it("INDEX_DIFF_REQUEST and BLOCK_PULL_REQUEST stay minimal on the wire", function()
+    local bus = CommBus.New({
+        names = { "MinimalRequester", "MinimalSeed" },
+    })
+    local requester = bus:AddNode("MinimalRequester")
+    local seed = bus:AddNode("MinimalSeed")
+
+    bus:SeedSelfProfession(requester, {
+        profession = "Alchemy",
+        recipeCount = 1,
+        baseRecipe = 6100,
+    })
+    bus:SeedSelfProfession(seed, {
+        profession = "Alchemy",
+        recipeCount = 3,
+        baseRecipe = 7100,
+    })
+    requester.addon.Data:MarkSyncIndexDirty("minimal-requester")
+    seed.addon.Data:MarkSyncIndexDirty("minimal-seed")
+
+    bus:Activate(requester)
+    requester.addon.Sync:BroadcastHello()
+
+    local sentPull = bus:RunUntil(function()
+        return countSentKind(requester.state.sentComm, "BLOCK_PULL_REQUEST") >= 1
+    end, {
+        maxTicks = 200,
+    })
+
+    Test.truthy(sentPull, "requester should reach the block pull stage")
+
+    local diffPayload
+    local pullPayload
+    for _, row in ipairs(requester.state.sentComm or {}) do
+        local message = row.message
+        if type(message) == "table" and message.kind == "INDEX_DIFF_REQUEST" then
+            diffPayload = message
+        elseif type(message) == "table" and message.kind == "BLOCK_PULL_REQUEST" then
+            pullPayload = message
+            break
+        end
+    end
+
+    Test.truthy(diffPayload, "index diff request payload should be captured")
+    Test.truthy(type(diffPayload.requestId) == "string" and diffPayload.requestId ~= "", "index diff request id")
+    Test.truthy(type(diffPayload.blocks) == "table", "index diff request should carry block digests")
+    Test.eq(diffPayload.sessionId, nil, "index diff request should not carry sessionId")
+    Test.eq(diffPayload.helloId, nil, "index diff request should not carry helloId")
+    Test.eq(diffPayload.cycleId, nil, "index diff request should not carry cycleId")
+    Test.eq(diffPayload.globalFingerprint, nil, "index diff request should not carry global fingerprint")
+    Test.eq(diffPayload.activeOwnerCount, nil, "index diff request should not carry owner counts")
+    Test.eq(diffPayload.activeBlockCount, nil, "index diff request should not carry block counts")
+    Test.eq(diffPayload.activeContentCount, nil, "index diff request should not carry content counts")
+    Test.eq(diffPayload.recipeKeys, nil, "index diff request should not carry recipe payload")
+    Test.eq(diffPayload.metadata, nil, "index diff request should not carry metadata payload")
+
+    Test.truthy(pullPayload, "block pull request payload should be captured")
+    Test.truthy(type(pullPayload.requestId) == "string" and pullPayload.requestId ~= "", "block pull request id")
+    Test.truthy(type(pullPayload.blockKey) == "string" and pullPayload.blockKey ~= "", "block pull request block key")
+    Test.eq(pullPayload.expectedFingerprint, nil, "block pull request should not carry expectedFingerprint")
+    Test.eq(pullPayload.offeredFingerprint, nil, "block pull request should not carry offeredFingerprint")
+    Test.eq(pullPayload.knownFingerprint, nil, "block pull request should not carry knownFingerprint")
+    Test.eq(pullPayload.knownRev, nil, "block pull request should not carry knownRev")
+    Test.eq(pullPayload.wantRev, nil, "block pull request should not carry wantRev")
+    Test.eq(pullPayload.sessionId, nil, "block pull request should not carry sessionId")
+    Test.eq(pullPayload.helloId, nil, "block pull request should not carry helloId")
+    Test.eq(pullPayload.cycleId, nil, "block pull request should not carry cycleId")
+    Test.eq(pullPayload.metadata, nil, "block pull request should not carry metadata")
+end)
+
+Test.it("next block pull is scheduled after the internal delay once a block merge completes", function()
+    local bus = CommBus.New({
+        names = { "PacingRequester", "PacingSeed" },
+    })
+    local requester = bus:AddNode("PacingRequester")
+    local seed = bus:AddNode("PacingSeed")
+
+    bus:SeedSelfProfession(requester, {
+        profession = "Alchemy",
+        recipeCount = 1,
+        baseRecipe = 8100,
+    })
+    bus:SeedSelfProfession(seed, {
+        profession = "Alchemy",
+        recipeCount = 3,
+        baseRecipe = 9100,
+    })
+    bus:Activate(seed)
+    seedProfession(seed.addon.Data, seed.key, "Tailoring", { 9201, 9202 }, {
+        sourceType = "owner",
+        professionSourceType = "owner",
+        reason = "pacing-tailoring",
+    })
+    requester.addon.Data:MarkSyncIndexDirty("pacing-requester")
+    seed.addon.Data:MarkSyncIndexDirty("pacing-seed")
+
+    bus:Activate(requester)
+    requester.addon.Sync:BroadcastHello()
+
+    local scheduled = bus:RunUntil(function()
+        local session = requester.addon.Sync.outboundSeedSession
+        return session
+            and session.state == "waiting-next-block-delay"
+            and session.nextBlockTimer ~= nil
+    end, {
+        maxTicks = 200,
+    })
+
+    local session = requester.addon.Sync.outboundSeedSession or {}
+    Test.truthy(scheduled, "next block pull should enter the paced delay state")
+    Test.eq(requester.addon.Sync._private.constants.BLOCK_PULL_DELAY_SECONDS, 1.0, "internal block pull delay constant")
+    Test.truthy(type(session.nextBlockReadyAt) == "number" and session.nextBlockReadyAt > time(), "next block ready timestamp")
+    Test.eq(countSentKind(requester.state.sentComm, "BLOCK_PULL_REQUEST"), 1, "second block pull should not be sent inline with the merge")
+
+    local completed = bus:RunUntil(function()
+        local currentSession = requester.addon.Sync.outboundSeedSession
+        return currentSession and currentSession.state == "completed"
+    end, {
+        maxTicks = 240,
+    })
+
+    Test.truthy(completed, "paced block pull session should still complete")
+    Test.eq(requester.addon.Sync.telemetry.blockPullDelayed or 0, 1, "delay telemetry should record the scheduled follow-up")
+    Test.eq(countSentKind(requester.state.sentComm, "BLOCK_PULL_REQUEST"), 2, "second block pull should be sent after the delay")
+end)
+
 Test.it("index diff does not offer a lower-count block back to a richer requester", function()
     local addon, wow = Loader.Load()
     local data = addon.Data
@@ -194,9 +320,8 @@ Test.it("index diff does not offer a lower-count block back to a richer requeste
     local blockKey = data:BuildSyncBlockKey(ownerKey, "Alchemy")
 
     local response = data:BuildIndexDiffResponse({
-        rows = {
-            {
-                blockKey = blockKey,
+        blocks = {
+            [blockKey] = {
                 count = 2,
                 fingerprint = "different-fingerprint",
             },

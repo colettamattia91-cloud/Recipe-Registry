@@ -73,13 +73,13 @@ function SyncPausePolicy:RefreshPauseState()
         if protocolPaused then
             Addon.Performance:PauseCategory("sync-outbound")
             Addon.Performance:PauseCategory("sync-inbound")
-            Addon.Performance:PauseCategory("sync-manifest")
+            Addon.Performance:PauseCategory("sync-runtime")
             Addon.Performance:PauseCategory("bootstrap")
             Addon.Performance:PauseCategory("maintenance")
         else
             Addon.Performance:ResumeCategory("sync-outbound")
             Addon.Performance:ResumeCategory("sync-inbound")
-            Addon.Performance:ResumeCategory("sync-manifest")
+            Addon.Performance:ResumeCategory("sync-runtime")
             Addon.Performance:ResumeCategory("bootstrap")
             Addon.Performance:ResumeCategory("maintenance")
         end

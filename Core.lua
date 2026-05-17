@@ -22,7 +22,7 @@ local DEBUG_LOG_DEFAULTS = {
     maxEntries = 400,
     chatEcho = false,
     scopes = {
-        manifest = true,
+        sync = true,
         request = true,
         transfer = true,
         offline = true,
@@ -33,7 +33,7 @@ local DEBUG_LOG_DEFAULTS = {
 }
 
 local DEBUG_LOG_SCOPE_NAMES = {
-    manifest = true,
+    sync = true,
     request = true,
     transfer = true,
     offline = true,
@@ -270,7 +270,7 @@ local function printMainHelp(self)
     self:Print("/rr - open or close the main window.")
     self:Print("/rr options, /rr mini, /rr debug, /rr debug log")
     self:Print("/rr rescan - queue a profession scan and scan active profession API data.")
-    self:Print("/rr version, /rr versions, /rr dump, /rr self [profession], /rr sync, /rr offline, /rr manifest [verbose], /rr pull")
+    self:Print("/rr version, /rr versions, /rr dump, /rr self [profession], /rr sync, /rr offline, /rr pull")
     self:Print("/rr perf [toggle, dump, reset, help]")
     self:Print("/rr mock [status, start <" .. MOCK_SCENARIOS .. ">, stop, cleanup, reset, help]")
     self:Print("/rr prices <item name or link>, /rr share [guild, party, raid, say]")
@@ -287,7 +287,7 @@ end
 local function printDebugLogHelp(self)
     self:Print("/rr debug - abilita o disabilita il debug in chat.")
     self:Print("/rr debug log on|off|status|show [count] [scope]|clear")
-    self:Print("/rr debug log scope <request|transfer|offline|version> <on|off>")
+    self:Print("/rr debug log scope <sync|request|transfer|offline|version> <on|off>")
     self:Print("/rr debug log echo on|off - duplica il trace persistente anche in chat debug.")
 end
 
@@ -736,11 +736,11 @@ function Addon:SlashHandler(input)
                 local scopeName = normalizeDebugLogScope(scopeToken)
                 local scopeMode = trimInput(scopeRest):lower()
                 if not scopeName then
-                    self:Print("Usage: /rr debug log scope <request|transfer|offline|version> <on|off>")
+                    self:Print("Usage: /rr debug log scope <sync|request|transfer|offline|version> <on|off>")
                     return
                 end
                 if scopeMode ~= "on" and scopeMode ~= "off" then
-                    self:Print("Usage: /rr debug log scope <request|transfer|offline|version> <on|off>")
+                    self:Print("Usage: /rr debug log scope <sync|request|transfer|offline|version> <on|off>")
                     return
                 end
                 db.scopes[scopeName] = scopeMode == "on"
@@ -823,8 +823,8 @@ function Addon:SlashHandler(input)
                     tostring(diagnostics.lastDuplicateMemberKey or "none")
                 ))
             end
-            if self.Data and self.Data.DumpManifestCacheStatus then
-                self.Data:DumpManifestCacheStatus()
+            if self.Data and self.Data.DumpSyncIndexStatus then
+                self.Data:DumpSyncIndexStatus()
             end
             return
         end
@@ -841,14 +841,11 @@ function Addon:SlashHandler(input)
             if self.Data and self.Data.ResetScanTelemetry then
                 self.Data:ResetScanTelemetry()
             end
-            if self.Data and self.Data.ResetManifestTelemetry then
-                self.Data:ResetManifestTelemetry()
-            end
             if self.Data and self.Data.ResetCatalogDiagnostics then
                 self.Data:ResetCatalogDiagnostics()
             end
             self:RequestRefresh("perf")
-            self:Print("Performance, sync, scan, and manifest counters reset.")
+            self:Print("Performance, sync, scan, and cache counters reset.")
             return
         end
         self:Print("Usage: /rr perf [toggle, dump, reset, help]")
@@ -984,7 +981,6 @@ function Addon:SlashHandler(input)
         if self.Sync and self.Sync.ResetRuntimeQueues then
             self.Sync:ResetRuntimeQueues("slash", {
                 clearDiscovery = false,
-                clearManifestPeerState = true,
                 kickoffResync = true,
                 userVisible = true,
             })
@@ -1006,29 +1002,6 @@ function Addon:SlashHandler(input)
         end
         if self.Sync and self.Sync.DumpOfflineSyncStatus then
             self.Sync:DumpOfflineSyncStatus()
-        end
-        return
-    end
-
-    if cmd == "manifest" or cmd == "publish" then
-        local target = trimInput(rest)
-        local mode = target:lower()
-        if (mode == "verbose" or mode == "details" or mode == "detail") and self.Data and self.Data.DumpManifestSummary then
-            if not self.debugMode then
-                return
-            end
-            self.Data:DumpManifestSummary({ verbose = true })
-            return
-        end
-        if target ~= "" then
-            self:Print("Targeted manifest refresh was removed. Use /rr pull or wait for the next hello cycle.")
-            return
-        end
-        if self.Data and self.Data.DumpManifestSummary then
-            if not self.debugMode then
-                return
-            end
-            self.Data:DumpManifestSummary({ verbose = false })
         end
         return
     end

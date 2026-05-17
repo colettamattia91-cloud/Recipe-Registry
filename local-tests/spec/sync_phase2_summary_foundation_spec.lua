@@ -52,14 +52,12 @@ local function seedProfession(data, memberKey, professionKey, recipeKeys, opts)
     entry.guildStatus = opts.guildStatus or entry.guildStatus or "active"
     entry.sourceType = opts.sourceType or entry.sourceType or data:GetMemberSourceType(memberKey)
     entry.updatedAt = opts.updatedAt or entry.updatedAt or 100
-    entry.rev = opts.rev or entry.rev or 1
     entry.lastSeenInGuildAt = opts.lastSeenInGuildAt or entry.lastSeenInGuildAt or entry.updatedAt
     entry.professions[professionKey] = {
         recipes = recipes,
         skillRank = opts.skillRank or 75,
         skillMaxRank = opts.skillMaxRank or 150,
         specialization = opts.specialization,
-        blockRevision = opts.blockRevision or entry.rev,
         lastUpdatedAt = opts.lastUpdatedAt or entry.updatedAt,
         sourceType = opts.professionSourceType or entry.sourceType,
         guildStatus = opts.professionGuildStatus or entry.guildStatus,
@@ -85,7 +83,7 @@ end
 
 io.write("Sync phase 2 summary foundation\n")
 
-Test.it("DataIndex fingerprints ignore revision and metadata-only fields", function()
+Test.it("DataIndex fingerprints ignore non-content metadata fields", function()
     local addon, _wow, data = freshAddon()
     local ownerKey = data:GetPlayerKey()
     Loader.Wow.SetGuildRoster({
@@ -94,9 +92,7 @@ Test.it("DataIndex fingerprints ignore revision and metadata-only fields", funct
     data:RebuildOnlineCache()
 
     seedProfession(data, ownerKey, "Alchemy", { 1001, 1002 }, {
-        rev = 5,
         updatedAt = 500,
-        blockRevision = 7,
         lastUpdatedAt = 700,
         sourceType = "owner",
         professionSourceType = "owner",
@@ -111,11 +107,9 @@ Test.it("DataIndex fingerprints ignore revision and metadata-only fields", funct
     }).globalFingerprint
 
     local entry = data:GetMember(ownerKey)
-    entry.rev = 999
     entry.updatedAt = 9999
     entry.sourceType = "bootstrap"
     entry.lastSeenInGuildAt = 42
-    entry.professions.Alchemy.blockRevision = 12345
     entry.professions.Alchemy.lastUpdatedAt = 54321
     entry.professions.Alchemy.sourceType = "replica"
     entry.professions.Alchemy.guildStatus = "stale"
@@ -131,8 +125,8 @@ Test.it("DataIndex fingerprints ignore revision and metadata-only fields", funct
         reason = "fingerprint-b",
     }).globalFingerprint
 
-    Test.eq(blockFingerprintA, blockFingerprintB, "block fingerprint should ignore revision and metadata")
-    Test.eq(globalFingerprintA, globalFingerprintB, "global fingerprint should ignore revision and metadata")
+    Test.eq(blockFingerprintA, blockFingerprintB, "block fingerprint should ignore non-content metadata")
+    Test.eq(globalFingerprintA, globalFingerprintB, "global fingerprint should ignore non-content metadata")
 end)
 
 Test.it("synthetic specialization keys affect fingerprints without being persisted as recipes", function()
@@ -193,6 +187,56 @@ Test.it("trusted-roster gating excludes uncertain owners without deleting persis
     Test.truthy(data:GetMember(remoteKey), "untrusted roster must not delete persisted remote owners")
 end)
 
+Test.it("runtime sync index cache reuses hits and rebuilds only dirty blocks", function()
+    local _addon, _wow, data = freshAddon()
+    local ownerKey = data:GetPlayerKey()
+    Loader.Wow.SetGuildRoster({
+        { name = ownerKey, online = true, rankName = "Member", rankIndex = 5, level = 70, classDisplayName = "Mage", classFileName = "MAGE" },
+    })
+    data:RebuildOnlineCache()
+
+    seedProfession(data, ownerKey, "Alchemy", { 4101, 4102 }, {
+        sourceType = "owner",
+        professionSourceType = "owner",
+        reason = "cache-alchemy",
+    })
+    seedProfession(data, ownerKey, "Tailoring", { 4201, 4202 }, {
+        sourceType = "owner",
+        professionSourceType = "owner",
+        reason = "cache-tailoring",
+    })
+
+    data:BuildLocalSummary({
+        reason = "cache-first-build",
+    })
+    local first = data:GetSyncIndexDebugState()
+
+    data:BuildLocalSummary({
+        reason = "cache-second-build",
+    })
+    local second = data:GetSyncIndexDebugState()
+
+    local alchemyBlockKey = data:BuildSyncBlockKey(ownerKey, "Alchemy")
+    local entry = data:GetMember(ownerKey)
+    entry.professions.Alchemy.recipes[4103] = true
+    entry.professions.Alchemy.count = 3
+    entry.professions.Alchemy.signature = "4101:4102:4103"
+    data:MarkSyncIndexDirty("cache-alchemy-dirty", alchemyBlockKey)
+    local dirtyCount = data._syncIndexCache and data._syncIndexCache.dirtyBlockCount or 0
+    data:BuildLocalSummary({
+        reason = "cache-dirty-build",
+    })
+    local third = data:GetSyncIndexDebugState()
+
+    Test.eq(first.cache.stats.fullRebuild or 0, 1, "first build should perform one full rebuild")
+    Test.eq(second.cache.stats.fullRebuild or 0, 1, "second build should reuse the existing cache")
+    Test.truthy((second.cache.stats.hits or 0) >= 1, "second build should record a cache hit")
+    Test.eq(dirtyCount, 1, "one local profession change should dirty exactly one block")
+    Test.eq(third.cache.stats.fullRebuild or 0, 1, "dirty block rebuild should avoid another full rebuild")
+    Test.truthy((third.cache.stats.blockRebuilt or 0) >= 1, "dirty block rebuild should update the affected block")
+    Test.falsy(third.globalFingerprintDirty, "rebuilding the dirty block should recompute the live global fingerprint")
+end)
+
 Test.it("HELLO publishes the new summary fields only", function()
     local addon, wow, data = freshAddon()
     local ownerKey = data:GetPlayerKey()
@@ -210,7 +254,7 @@ Test.it("HELLO publishes the new summary fields only", function()
     local payload = row and row.message or nil
     Test.truthy(payload, "hello payload should exist")
     Test.eq(payload.kind, "HELLO", "expected HELLO")
-    Test.eq(payload.wireVersion, 3, "hello wire version")
+    Test.eq(payload.wireVersion, addon.WIRE_VERSION, "hello wire version")
     Test.eq(payload.syncModel, "index-diff-block-pull", "hello sync model")
     Test.eq(payload.indexStatus, "ready", "hello index status")
     Test.truthy(type(payload.helloId) == "string" and payload.helloId ~= "", "hello should carry a correlation id")

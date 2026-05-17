@@ -499,7 +499,7 @@ local function buildRefreshPlan(reasons)
     end
 
     for reason in pairs(reasons) do
-        if reason == "coordinator" or reason == "queue" then
+        if reason == "queue" then
             plan.status = true
         elseif reason == "roster" then
             plan.status = true

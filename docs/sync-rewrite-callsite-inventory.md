@@ -1,427 +1,219 @@
 # Recipe Registry — Sync Rewrite Call-Site Migration Inventory
 
-**Status:** preserved call-site inventory compiled from the chat-approved inventory.  
-**Purpose:** protect the rewrite from dangling references while migrating away from manifest/coordinator/revision sync.  
-**Rule:** do not replace this with a phase-specific plan. Update only when new call-sites are discovered.
+**Status:** refreshed from the working tree on 2026-05-17.  
+**Purpose:** track what legacy sync migration work is complete, what remains intentionally quarantined, and what stale non-focused test coverage still needs rewrite.  
+**Rule:** this remains the migration inventory source of truth. `docs/sync-rewrite-roadmap.md` remains the architecture source of truth.
 
 ---
 
-## 1. Inventory summary
+## 1. Current migration summary
 
-The live manifest/coordinator/revision sync surface must be migrated before legacy modules are removed from `.toc` or from the local test loader.
+Completed in active runtime code:
 
-Primary legacy modules:
+- `DataManifest.lua` removed
+- `SyncManifest.lua` removed
+- `TrickleSync.lua` removed
+- no manifest send/receive path
+- no coordinator state
+- no revision-driven routing
+- no `QueueRequest(..., rev, ...)`
+- no manifest slash/debug command surface
 
-- `DataManifest.lua` — delete after migration pass.
-- `SyncManifest.lua` — delete after migration pass; Phase 1 may keep inert compatibility stubs.
-- `TrickleSync.lua` — delete after migration pass.
+Remaining intentional legacy surface:
 
-Primary replacement direction:
+- `SyncProtocol.lua` still recognizes inbound `AD`, `IDX`, `MANI`, and `MREQ`
+- those kinds go directly to a removed-message quarantine path
+- the quarantine increments telemetry only and performs no work, replies, merge, transfer, request, or seed state mutation
 
-- `DataIndex.lua` for active-owner index, content-only fingerprints, summaries, and index diff support.
-- `SyncProtocol.lua` for HELLO, SUMMARY, INDEX_DIFF, BLOCK_PULL and legacy no-op routing.
-- `SyncRequests.lua` for one-seed wanted-block orchestration.
-- `SyncTransfer.lua` for live block snapshot serving and immediate block apply.
+Remaining migration work outside the focused hardening pass:
 
----
-
-## 2. Legacy module inventory
-
-### DataManifest.lua — delete
-
-Still loaded by:
-
-- `RecipeRegistry.toc`;
-- `local-tests/harness/load-addon.lua`.
-
-Runtime callers / dependents:
-
-- `Core.lua` via `DumpManifestCacheStatus`, `DumpManifestSummary`;
-- `BootstrapSync.lua` bootstrap completeness helpers;
-- `SyncProtocol.lua` manifest fingerprint path;
-- `TrickleSync.lua` manifest build/cache;
-- manifest-era specs.
-
-Target disposition:
-
-- delete after call-site migration;
-- no active runtime behavior should depend on it after migration.
-
-### SyncManifest.lua — delete after migration
-
-Still loaded by:
-
-- `RecipeRegistry.toc`;
-- `local-tests/harness/load-addon.lua`.
-
-Live callers / dependents:
-
-- `SyncProtocol.lua` for `MANI/MREQ` dispatch;
-- `SyncRuntime.lua` for `SendManifestToPeer`, `RequestManifestRefresh`, `ShouldRequestManifestRefresh`;
-- `SyncRequests.lua`;
-- `Core.lua` slash commands;
-- `MockSync.lua`;
-- manifest tests.
-
-Target disposition:
-
-- Phase 1: keep loaded with inert no-op compatibility stubs.
-- Later: delete after all call-sites are migrated.
-
-### TrickleSync.lua — delete
-
-Still loaded by:
-
-- `RecipeRegistry.toc`;
-- `local-tests/harness/load-addon.lua`.
-
-Live callers / dependents:
-
-- `DataManifest.lua`;
-- `SyncManifest.lua`;
-- `SyncDiagnostics.lua`;
-- `SyncRuntime.lua`;
-- `MockSync.lua`;
-- `p2_integrity_spec.lua`;
-- manifest specs.
-
-Target disposition:
-
-- remove manifest comparison, manifest chunk generation, peer manifest state, and manifest-based missing-block detection.
+- non-focused backend specs and harness helpers that still assert removed manifest/revision behavior
+- broad comm-bus and chunk-pipeline suites
+- optional historical docs cleanup beyond the rewrite governance files
 
 ---
 
-## 3. Message handler inventory
+## 2. Runtime module status
 
-### AD / IDX handlers in SyncProtocol.lua
+### Data layer
 
-Current behavior:
+Current active files:
 
-- legacy advertise/index routing;
-- `BroadcastIndex` and related index/coordinator fan-out;
-- revision hint routing;
-- potential request seeding.
+- `Data.lua`
+- `DataScan.lua`
+- `DataSnapshot.lua`
+- `DataCatalog.lua`
+- `DataIndex.lua`
+- `DataCleanup.lua`
 
-Current producers:
+Resolved migration points:
 
-- `Core.lua` scan/rescan flows;
-- `Sync.lua` startup;
-- `BroadcastIndex`.
+- active member/profession sync state no longer uses manifest helpers
+- active sync behavior no longer uses `rev` or `blockRevision`
+- sync-facing indexing lives in `DataIndex.lua`
+- additive block apply lives in `DataSnapshot.lua`
 
-Current consumers:
+Remaining notes:
 
-- `SyncProtocol.lua`;
-- `sync_reliability_spec.lua` and related tests.
+- historical revision fields may still exist in old SavedVariables, but active sync code does not read them for routing or equality
 
-Target disposition:
+### Sync runtime
 
-- outbound delete;
-- inbound deprecated no-op;
-- increment `legacyMessageIgnored` or equivalent;
-- never enqueue work or send replies.
+Current active files:
 
-### MANI / MREQ handlers
+- `Sync.lua`
+- `SyncRuntime.lua`
+- `SyncProtocol.lua`
+- `SyncCodec.lua`
+- `SyncRequests.lua`
+- `SyncTransfer.lua`
+- `SyncDiagnostics.lua`
+- `SyncPausePolicy.lua`
 
-Current behavior:
+Resolved migration points:
 
-- manifest send/receive/retry/recovery/catch-up;
-- partial manifest state;
-- comparison and request generation.
+- one selected outbound seed per cycle
+- `HELLO` / `SUMMARY` discovery
+- `INDEX_DIFF_REQUEST` / `INDEX_DIFF_RESPONSE`
+- sequential `BLOCK_PULL_REQUEST` / `BLOCK_SNAPSHOT`
+- immediate additive merge
+- runtime sync index cache telemetry and diagnostics
+- build-channel / wire-version compatibility preserved
 
-Current producers:
+Resolved legacy removals:
 
-- `SyncRuntime.lua`;
-- `SyncRequests.lua`;
-- `Core.lua`;
-- `MockSync.lua`.
-
-Current consumers:
-
-- `SyncManifest.lua`;
-- `SyncProtocol.lua` dispatch;
-- manifest-era specs;
-- reliability/reload tests.
-
-Target disposition:
-
-- outbound delete;
-- inbound deprecated no-op;
-- no recovery, no refresh, no partial reopen, no request generation.
-
----
-
-## 4. Coordinator inventory
-
-Coordinator logic appears in or affects:
-
-- `SyncRuntime.lua`;
-- `SyncProtocol.lua`;
-- `SyncDiagnostics.lua`;
-- `SyncTransfer.lua`;
-- manifest comm-bus tests;
-- soak tests.
-
-Legacy functions/state to remove:
-
-- `RecomputeCoordinator`;
-- `IsCoordinator`;
-- `coordinatorKey`;
-- coordinator-gated `IDX`;
-- coordinator churn expectations.
-
-Target disposition:
-
-- delete from active sync behavior;
-- no seed election may depend on old coordinator state;
-- new seed election is local and per-cycle.
+- `RecomputeCoordinator`
+- `IsCoordinator`
+- `coordinatorKey`
+- `AdvertiseLocalRevision`
+- `BroadcastIndex`
+- legacy request queues
+- manifest refresh/send/compare paths
 
 ---
 
-## 5. Revision-driven inventory
+## 3. Load order status
 
-Revision-driven helpers appear across:
+### Addon load order
 
-- `SyncRuntime.lua`;
-- `SyncProtocol.lua`;
-- `SyncRequests.lua`;
-- `SyncTransfer.lua`;
-- `DataSnapshot.lua`;
-- `MergeEngine.lua`;
-- `MockSync.lua`;
-- `SyncCodec.lua`.
+Current `.toc` load order includes:
 
-Legacy fields/functions:
+- `DataIndex.lua`
+- no `DataManifest.lua`
+- no `SyncManifest.lua`
+- no `TrickleSync.lua`
 
-```text
-RecordRevisionHint
-GetKnownRevision
-localRev
-remoteRev
-knownRev
-wantRev
-ownerRevision
-blockRevision
-revision-derived merge/session logic
+### Test harness load order
+
+`local-tests/harness/load-addon.lua` now includes:
+
+- `DataIndex.lua`
+- no `DataManifest.lua`
+- no `SyncManifest.lua`
+- no `TrickleSync.lua`
+
+---
+
+## 4. Slash, diagnostics, and mock status
+
+### Core slash surface
+
+Resolved:
+
+- `/rr manifest` removed as an active command
+- `/rr publish` removed as an active command
+- perf/debug output now reports sync-index/runtime state instead of manifest state
+- `/rr pull` now schedules the modern hello/index-diff path only
+
+### Diagnostics
+
+Resolved:
+
+- runtime diagnostics no longer report coordinator state
+- runtime diagnostics no longer report manifest queues or manifest caches
+- debug log scopes now use `sync`, `request`, `transfer`, `offline`, and `version`
+
+### MockSync
+
+Resolved:
+
+- no manifest message synthesis
+- no revision hint recording
+- no `TrickleSync` pruning logic
+- scenarios now seed mock data and modern discovery state only
+
+---
+
+## 5. Compatibility guardrails still required
+
+These must remain active and are intentionally not legacy:
+
+- `BuildInfo.CompareSemver`
+- `BuildInfo.IsRemoteNewer`
+- `BuildInfo.GetLocalVersionInfo`
+- `Addon.ADDON_VERSION`
+- `Addon.DISPLAY_VERSION`
+- `Addon.WIRE_VERSION`
+- `Addon.MIN_SUPPORTED_WIRE_VERSION`
+- `Addon.BUILD_CHANNEL`
+- `Addon.BUILD_ID`
+- `Addon.COMM_PREFIX`
+- `Sync:GetLocalVersionInfo`
+- `Sync:ComputePeerCompatibility`
+- `Sync:IsInboundBuildChannelAllowed`
+- `Sync:RegisterBuildChannelDrop`
+- `Sync:ObservePeerVersion`
+- `Sync:GetPeerVersionInfo`
+- `Sync:GetPeerVersionRelation`
+- `Sync:RecordLatestRemoteVersion`
+- `Sync:ShouldAcceptInboundPayload`
+- `Sync:MaybeNotifyPeerVersion`
+- `Data:GetUpdateNoticeState`
+
+Capability cleanup completed:
+
+- `maniReliable` removed from active local capability advertisement
+- `manifestShards` removed from active local capability advertisement
+- compatibility decisions now depend on real modern capabilities only
+
+---
+
+## 6. Focused migration gate status
+
+Passing focused gate:
+
+- `sync_phase1_legacy_noop_spec.lua`
+- `sync_phase2_summary_foundation_spec.lua`
+- `sync_phase34_block_pull_spec.lua`
+- `sync_legacy_grep_gate_spec.lua`
+- `build_channel_isolation_spec.lua`
+- `p4_scan_opportunistic_spec.lua`
+- `slash_output_spec.lua`
+
+The focused grep gate now proves:
+
+- deleted legacy modules are absent
+- active runtime code is free of removed manifest/revision/coordinator symbols
+- removed inbound message handling remains isolated to the protocol quarantine path
+
+---
+
+## 7. Remaining non-focused blockers
+
+The broader backend runner is not yet fully migrated.
+
+Current first failing broad-suite command:
+
+```powershell
+.\local-tests\run-backend-tests.ps1 -Suite sync
 ```
 
-Target disposition:
+Current first failing spec:
 
-- rewrite or delete;
-- no active sync behavior may read revision to decide routing, equality, priority, merge precedence, freshness, retry, or diagnostics that affect behavior.
+- `chunk_pipeline_spec.lua`
 
----
+Current first failure:
 
-## 6. QueueRequest inventory
+- `attempt to call method 'ComputeRecipeSignature' (a nil value)`
 
-Legacy behavior:
-
-```text
-QueueRequest(..., rev, ...)
-```
-
-Current call-sites include:
-
-- `SyncRequests.lua`;
-- `SyncProtocol.lua`;
-- `SyncManifest.lua`;
-- `SyncRuntime.lua`;
-- tests.
-
-Target disposition:
-
-- delete behavior;
-- replace with selected seed plus ordered wanted-`blockKey` queue;
-- Phase 1 may convert to deprecated no-op that creates no pending work.
-
----
-
-## 7. Slash command inventory
-
-`Core.lua` requires rewrite.
-
-Legacy or affected surfaces:
-
-- `/rr manifest`;
-- `/rr publish`;
-- `/rr pull`;
-- `/rr rescan`;
-- help text;
-- debug scopes;
-- manifest counter reset text;
-- `syncreset` manifest-state clearing.
-
-Target disposition:
-
-- `/rr rescan` remains a local scan/rescan command;
-- after rescan, mark sync index dirty and schedule HELLO path;
-- stop calling `AdvertiseLocalRevision` or manifest/revision/coordinator paths;
-- manifest/pull surfaces become new index/sync diagnostics or deprecated aliases.
-
----
-
-## 8. Diagnostics inventory
-
-Affected files:
-
-- `SyncDiagnostics.lua`;
-- `Core.lua`.
-
-Legacy diagnostics still report:
-
-- manifest queues;
-- partial manifest receive state;
-- trickle state;
-- coordinator role;
-- manifest capabilities;
-- manifest recovery telemetry.
-
-Target disposition:
-
-- rewrite to hello/summary/index-diff/block-pull/session diagnostics;
-- include trusted roster state;
-- distinguish dirty live global state from committed published global fingerprint;
-- include `legacyMessageIgnored` and `revisionPathRemoved` or equivalent.
-
----
-
-## 9. Mock and harness inventory
-
-### MockSync.lua — rewrite
-
-Current legacy behavior:
-
-- emits `MANI`;
-- records revision hints;
-- synthesizes manifest blocks;
-- checks `knownRev`;
-- prunes `TrickleSync` runtime.
-
-Target disposition:
-
-- simulate HELLO;
-- simulate direct SUMMARY;
-- simulate explicit `INDEX_DIFF_REQUEST/RESPONSE`;
-- simulate sequential `BLOCK_PULL_REQUEST/BLOCK_SNAPSHOT`;
-- remove manifest and revision paths.
-
-### local-tests/harness/load-addon.lua — rewrite
-
-Current risk:
-
-- hard-loads `DataManifest.lua`, `TrickleSync.lua`, and `SyncManifest.lua`.
-
-Target disposition:
-
-- add `DataIndex.lua`;
-- stop loading removed modules only after final call-site migration.
-
-### local-tests/harness/comm-bus.lua — rewrite
-
-Current legacy metrics:
-
-- `MANI/MREQ/IDX`;
-- coordinator convergence;
-- manifest catch-up state.
-
-Target disposition:
-
-- count explicit new message kinds;
-- expose one-seed cycle state;
-- expose sequential block-pull metrics;
-- expose live inbound service behavior.
-
-### Soak helpers — rewrite
-
-Replace manifest-loop and catch-up assumptions with:
-
-- SUMMARY storm checks;
-- single-seed cycles;
-- sequential block pulls;
-- immediate block apply;
-- trusted-roster behavior;
-- no mid-cycle HELLO publication.
-
----
-
-## 10. Test migration inventory
-
-### Delete and replace
-
-```text
-local-tests/spec/manifest_*
-manifest_comm_bus_spec.lua
-manifest_transport_pressure_spec.lua
-p3_manifest_diagnostics_spec.lua
-```
-
-### Rewrite
-
-```text
-p2_integrity_spec.lua
-p4_scan_opportunistic_spec.lua
-build_channel_isolation_spec.lua
-version_compatibility_spec.lua
-sync_reliability_spec.lua
-sync_resilience_spec.lua
-reload_recovery_spec.lua
-slash_output_spec.lua
-specialization_sync_spec.lua
-chunk_pipeline_spec.lua
-transfer_identity_spec.lua
-snapshot_identical_metadata_spec.lua
-support/sync-soak-helpers.lua
-sync_soak_spec.lua
-sync_soak_heavy_spec.lua
-```
-
-### Neutral reuse
-
-Non-sync UI/catalog specs may remain, except for shared fixture/helper adjustments.
-
-### Add
-
-```text
-sync_massive_spec.lua
-sync_legacy_grep_gate_spec.lua or equivalent
-```
-
----
-
-## 11. Documentation inventory
-
-Rewrite:
-
-- `README.md`;
-- `local-tests/README.md`;
-- `docs/CODEBASE_ANALYSIS.local.md`.
-
-Keep canonical:
-
-- `docs/sync-rewrite-roadmap.md`.
-
-Archive or rewrite duplicate root roadmap/plan docs to avoid drift.
-
----
-
-## 12. Risky dangling references before `.toc` removal
-
-Do not remove `DataManifest.lua`, `SyncManifest.lua`, or `TrickleSync.lua` from `.toc` until these are addressed:
-
-- `RecipeRegistry.toc` and `local-tests/harness/load-addon.lua` still hard-load legacy modules.
-- `Core.lua` still calls legacy manifest/revision/debug APIs unless migrated.
-- `SyncProtocol.lua` still dispatches real `AD`, `IDX`, `MANI`, and `MREQ` unless converted to no-op.
-- `SyncRuntime.lua` still owns coordinator recompute, manifest refresh/send paths, and revision auto-tick request generation unless cut.
-- `SyncTransfer.lua` still uses `knownRev/wantRev`, revision-keyed sessions, `FinalizeIncomingSnapshot(..., rev, ...)`, and post-merge `BroadcastIndex` unless rewritten.
-- `SyncDiagnostics.lua` still traverses manifest queues, partial manifests, trickle resident manifests, and coordinator role unless migrated.
-- `MockSync.lua` and manifest-era specs still invoke removed APIs/message kinds unless rewritten.
-
----
-
-## 13. Locked assumptions
-
-- `INDEX_DIFF_REQUEST` and `INDEX_DIFF_RESPONSE` are new explicit kinds; legacy `IDX` is never reused.
-- Fingerprints are discovery-only.
-- Wanted-block state is `blockKey`-driven.
-- `BLOCK_PULL_REQUEST` stays `blockKey`-only.
-- Inbound seed service serves live working block data even while `globalFingerprintDirty` is true.
-- Revision-bearing fields may remain in SavedVariables as ignored historical metadata only.
+This is a stale legacy-suite migration issue, not an active runtime regression in the focused rewrite path.

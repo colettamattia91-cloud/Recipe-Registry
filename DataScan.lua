@@ -77,16 +77,19 @@ function Data:ApplyLocalProfessionMetadata(profession, metadata)
         return false, oldSpecialization, newSpecialization
     end
 
-    local newRev = self:TouchLocalRevision("specialization:" .. tostring(profession))
     prof = entry.professions[profession]
-    prof.blockRevision = newRev or prof.blockRevision
-    prof.lastUpdatedAt = entry.updatedAt or time()
+    local changedAt = time()
+    entry.updatedAt = changedAt
+    prof.lastUpdatedAt = changedAt
     prof.lastSeenInGuildAt = entry.lastSeenInGuildAt or prof.lastUpdatedAt
     prof.sourceType = "owner"
     prof.guildStatus = "active"
     entry.professions[profession] = self:NormalizeProfessionBlock(entry, profession, prof)
     if self.MarkSyncIndexDirty then
-        self:MarkSyncIndexDirty("specialization")
+        self:MarkSyncIndexDirty(
+            "specialization",
+            self:BuildSyncBlockKey(self:GetPlayerKey(), profession)
+        )
     end
     Addon:Debug(
         "Specialization changed",
@@ -118,7 +121,10 @@ function Data:DetectProfessions()
                 local changed = self:ApplyLocalProfessionMetadata(canonical, self._currentProfs[canonical])
                 metadataChanged = changed or metadataChanged
                 if wasNewProfession and self.MarkSyncIndexDirty then
-                    self:MarkSyncIndexDirty("detect-profession")
+                    self:MarkSyncIndexDirty(
+                        "detect-profession",
+                        self:BuildSyncBlockKey(self:GetPlayerKey(), canonical)
+                    )
                 end
             end
         end
@@ -600,7 +606,6 @@ function Data:ApplyScanResult(profession, recipeKeys, opts)
     prof.signature = newSignature
     prof.count = count
     prof.lastScan = time()
-    prof.blockRevision = entry.rev or prof.blockRevision or 0
     prof.lastUpdatedAt = prof.lastScan
     prof.sourceType = "owner"
     prof.guildStatus = "active"
@@ -620,14 +625,12 @@ function Data:ApplyScanResult(profession, recipeKeys, opts)
 
     if changed then
         self:RecordScanTelemetry("scansChanged")
-        if specializationChanged and not recipeChanged then
-            self:TouchLocalRevision("specialization-scan:" .. profession)
-        else
-            self:TouchLocalRevision("scan:" .. profession)
-        end
-        prof.blockRevision = entry.rev or prof.blockRevision
+        entry.updatedAt = prof.lastScan
         if self.MarkSyncIndexDirty then
-            self:MarkSyncIndexDirty(specializationChanged and not recipeChanged and "specialization-scan" or "scan")
+            self:MarkSyncIndexDirty(
+                specializationChanged and not recipeChanged and "specialization-scan" or "scan",
+                self:BuildSyncBlockKey(self:GetPlayerKey(), profession)
+            )
         end
         if recipeChanged then
             Addon:Debug("Scan changed", profession, count, "recipe ids")

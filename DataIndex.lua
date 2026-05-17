@@ -24,23 +24,23 @@ local function cloneArray(values)
     return out
 end
 
-local function cloneSummary(summary)
-    if type(summary) ~= "table" then
-        return nil
-    end
+local function cloneTable(src)
     local out = {}
-    for key, value in pairs(summary) do
+    for key, value in pairs(src or {}) do
         if type(value) == "table" then
-            local nested = {}
-            for nestedKey, nestedValue in pairs(value) do
-                nested[nestedKey] = nestedValue
-            end
-            out[key] = nested
+            out[key] = cloneTable(value)
         else
             out[key] = value
         end
     end
     return out
+end
+
+local function sortStrings(values)
+    sort(values, function(left, right)
+        return tostring(left) < tostring(right)
+    end)
+    return values
 end
 
 local function countKeys(tbl)
@@ -51,41 +51,20 @@ local function countKeys(tbl)
     return total
 end
 
-local function sortStrings(values)
-    sort(values, function(left, right)
-        return tostring(left) < tostring(right)
-    end)
-    return values
-end
-
-local function ensureSyncIndexState(self)
-    self._syncIndexState = self._syncIndexState or {
-        dirty = false,
-        lastDirtyReason = nil,
-        lastDirtyAt = 0,
-        lastClearedReason = nil,
-        lastClearedAt = 0,
-        lastBuiltAt = 0,
-        lastBuildReason = nil,
-        lastRosterState = nil,
-        lastSummary = nil,
-        committedSummary = nil,
-        committedGlobalFingerprint = nil,
-        lastCommittedAt = 0,
-        lastCommittedReason = nil,
-        lastDiffDigest = nil,
-        lastDiffDigestAt = 0,
-        lastLiveIndex = nil,
-    }
-    return self._syncIndexState
-end
-
-local function bumpSyncTelemetry(counter)
+local function bumpSyncTelemetry(counter, amount)
     local sync = Addon.Sync
     if not (sync and sync.telemetry) then
         return
     end
-    sync.telemetry[counter] = (sync.telemetry[counter] or 0) + 1
+    sync.telemetry[counter] = (sync.telemetry[counter] or 0) + (amount or 1)
+end
+
+local function setSyncTelemetry(counter, value)
+    local sync = Addon.Sync
+    if not (sync and sync.telemetry) then
+        return
+    end
+    sync.telemetry[counter] = value
 end
 
 local function buildSpecializationContentKey(specialization)
@@ -107,10 +86,19 @@ local function normalizeContentKey(recipeKey)
     return tostring(recipeKey)
 end
 
-local function buildFingerprint(prefix, contentKeys)
-    local keys = cloneArray(contentKeys)
-    sortStrings(keys)
-    return string.format("%s:%d:%s", prefix, #keys, table.concat(keys, "|"))
+local function hashString(text)
+    local hash = 5381
+    for index = 1, #text do
+        hash = ((hash * 33) + string.byte(text, index)) % 4294967296
+    end
+    return string.format("%08x", hash)
+end
+
+-- `bf3`/`gf3` denote the current internal fingerprint schema revision.
+-- They are local convergence identifiers, not compatibility markers for the
+-- removed manifest/revision protocol.
+local function buildFingerprint(prefix, content)
+    return string.format("%s:%s", prefix, hashString(content))
 end
 
 local function getRosterFreshnessMaxAge()
@@ -183,6 +171,23 @@ local function buildRosterState(self, reason)
     }
 end
 
+local function rosterSignature(rosterState)
+    if type(rosterState) ~= "table" then
+        return "missing"
+    end
+    local parts = {
+        tostring(rosterState.trusted == true),
+        tostring(rosterState.reason or "unknown"),
+    }
+    local snapshotKeys = {}
+    for memberKey in pairs(rosterState.snapshot or {}) do
+        snapshotKeys[#snapshotKeys + 1] = memberKey
+    end
+    sortStrings(snapshotKeys)
+    parts[#parts + 1] = table.concat(snapshotKeys, "|")
+    return table.concat(parts, "::")
+end
+
 local function shouldPublishOwner(self, rosterState, memberKey, entry, selfKey)
     if not memberKey or not entry then
         return false
@@ -219,6 +224,67 @@ local function buildContentKeysForProfession(profession)
     return sortStrings(contentKeys)
 end
 
+local function buildBlockRecord(self, memberKey, professionKey, profession)
+    local blockKey = self:BuildSyncBlockKey(memberKey, professionKey)
+    if not blockKey then
+        return nil
+    end
+    local contentKeys = buildContentKeysForProfession(profession)
+    local joined = table.concat(contentKeys, "|")
+    return {
+        blockKey = blockKey,
+        ownerCharacter = memberKey,
+        professionKey = professionKey,
+        sortedContentKeys = contentKeys,
+        contentCount = #contentKeys,
+        blockFingerprint = string.format("bf3:%d:%s", #contentKeys, buildFingerprint("bf3", joined)),
+        builtAt = time(),
+    }
+end
+
+local function ensureSyncIndexState(self)
+    self._syncIndexState = self._syncIndexState or {
+        committedSummary = nil,
+        committedGlobalFingerprint = nil,
+        lastCommittedAt = 0,
+        lastCommittedReason = nil,
+        lastSummary = nil,
+        lastDirtyReason = nil,
+        lastDirtyAt = 0,
+        lastClearedReason = nil,
+        lastClearedAt = 0,
+    }
+    self._syncIndexCache = self._syncIndexCache or {
+        dirtyAll = true,
+        dirtyBlocks = {},
+        dirtyBlockCount = 0,
+        blocks = {},
+        blockKeys = {},
+        activeOwnerCount = 0,
+        activeBlockCount = 0,
+        activeContentCount = 0,
+        globalFingerprint = nil,
+        trustedRosterState = nil,
+        indexStatus = "missing",
+        ready = false,
+        globalDirty = true,
+        rosterSignature = nil,
+        builtAt = 0,
+        lastBuildReason = nil,
+        lastDirtyReason = nil,
+        lastDirtyAt = 0,
+        lastFullBuildAt = 0,
+        stats = {
+            hits = 0,
+            misses = 0,
+            blockRebuilt = 0,
+            fullRebuild = 0,
+            globalRecomputed = 0,
+        },
+    }
+    return self._syncIndexState, self._syncIndexCache
+end
+
 local function isOutboundSessionActive()
     local sync = Addon.Sync
     local session = sync and sync.outboundSeedSession or nil
@@ -229,83 +295,196 @@ local function isOutboundSessionActive()
     return state ~= "" and state ~= "completed" and state ~= "aborted" and state ~= "idle"
 end
 
-local function buildLiveIndex(self, opts)
-    opts = opts or {}
-    local rosterState = buildRosterState(self, opts.reason or "sync-index")
+local function syncTelemetryStats(cache)
+    local stats = cache and cache.stats or {}
+    setSyncTelemetry("syncIndexCacheHit", stats.hits or 0)
+    setSyncTelemetry("syncIndexCacheMiss", stats.misses or 0)
+    setSyncTelemetry("syncIndexBlockRebuilt", stats.blockRebuilt or 0)
+    setSyncTelemetry("syncIndexFullRebuild", stats.fullRebuild or 0)
+    setSyncTelemetry("syncIndexGlobalRecomputed", stats.globalRecomputed or 0)
+    setSyncTelemetry("syncIndexDirtyBlockCount", cache and cache.dirtyBlockCount or 0)
+end
+
+local function recalcAggregateState(cache)
+    local blockKeys = {}
+    local owners = {}
+    local contentCount = 0
+    for blockKey, block in pairs(cache.blocks or {}) do
+        if type(block) == "table" then
+            blockKeys[#blockKeys + 1] = blockKey
+            owners[block.ownerCharacter] = true
+            contentCount = contentCount + (tonumber(block.contentCount or 0) or 0)
+        end
+    end
+    sortStrings(blockKeys)
+    cache.blockKeys = blockKeys
+    cache.activeOwnerCount = countKeys(owners)
+    cache.activeBlockCount = #blockKeys
+    cache.activeContentCount = contentCount
+end
+
+local function rebuildGlobalFingerprint(cache)
+    local parts = {}
+    for _, blockKey in ipairs(cache.blockKeys or {}) do
+        local block = cache.blocks and cache.blocks[blockKey] or nil
+        parts[#parts + 1] = string.format("%s=%s", tostring(blockKey), tostring(block and block.blockFingerprint or ""))
+    end
+    local payload = table.concat(parts, "|")
+    cache.globalFingerprint = string.format(
+        "gf3:%d:%d:%d:%s",
+        tonumber(cache.activeOwnerCount or 0) or 0,
+        tonumber(cache.activeBlockCount or 0) or 0,
+        tonumber(cache.activeContentCount or 0) or 0,
+        buildFingerprint("gf3", payload)
+    )
+    cache.globalDirty = false
+    cache.stats.globalRecomputed = (cache.stats.globalRecomputed or 0) + 1
+    bumpSyncTelemetry("syncIndexGlobalRecomputed")
+    Addon:Trace("sync", string.format(
+        "global-fingerprint-recomputed owners=%d blocks=%d content=%d fingerprint=%s",
+        cache.activeOwnerCount or 0,
+        cache.activeBlockCount or 0,
+        cache.activeContentCount or 0,
+        tostring(cache.globalFingerprint or "none")
+    ))
+end
+
+local function rebuildAllBlocks(self, cache, rosterState, reason)
     local memberKeys = self:GetSortedMemberKeys(true)
     local selfKey = self:GetPlayerKey()
     local blocks = {}
-    local blockKeys = {}
-    local activeOwnerCount = 0
-    local activeContentCount = 0
 
     for _, memberKey in ipairs(memberKeys) do
         local entry = self:GetMember(memberKey)
         if shouldPublishOwner(self, rosterState, memberKey, entry, selfKey) then
-            local ownerBlockCount = 0
             local professionKeys = {}
             for professionKey in pairs(entry.professions or {}) do
                 professionKeys[#professionKeys + 1] = professionKey
             end
             sortStrings(professionKeys)
-
             for _, professionKey in ipairs(professionKeys) do
                 local profession = entry.professions and entry.professions[professionKey] or nil
-                local contentKeys = buildContentKeysForProfession(profession)
-                if #contentKeys > 0 then
-                    local blockKey = self:BuildSyncBlockKey(memberKey, professionKey)
-                    if blockKey then
-                        local blockFingerprint = buildFingerprint("bf1", contentKeys)
-                        blocks[blockKey] = {
-                            blockKey = blockKey,
-                            ownerCharacter = memberKey,
-                            professionKey = professionKey,
-                            contentKeys = contentKeys,
-                            blockFingerprint = blockFingerprint,
-                            contentCount = #contentKeys,
-                        }
-                        blockKeys[#blockKeys + 1] = blockKey
-                        activeContentCount = activeContentCount + #contentKeys
-                        ownerBlockCount = ownerBlockCount + 1
-                    end
+                local block = buildBlockRecord(self, memberKey, professionKey, profession)
+                if block and block.contentCount > 0 then
+                    blocks[block.blockKey] = block
                 end
-            end
-
-            if ownerBlockCount > 0 then
-                activeOwnerCount = activeOwnerCount + 1
             end
         end
     end
 
-    sortStrings(blockKeys)
+    cache.blocks = blocks
+    cache.trustedRosterState = cloneTable(rosterState)
+    cache.indexStatus = rosterState.trusted == true and "ready" or tostring(rosterState.reason or "not-ready")
+    cache.ready = rosterState.trusted == true
+    cache.lastBuildReason = tostring(reason or "full-rebuild")
+    cache.lastFullBuildAt = time()
+    cache.dirtyAll = false
+    cache.dirtyBlocks = {}
+    cache.dirtyBlockCount = 0
+    recalcAggregateState(cache)
+    cache.globalDirty = true
+    cache.stats.fullRebuild = (cache.stats.fullRebuild or 0) + 1
+    bumpSyncTelemetry("syncIndexFullRebuild")
+    Addon:Trace("sync", string.format(
+        "sync-index-full-rebuild reason=%s ready=%s roster=%s",
+        tostring(reason or "full-rebuild"),
+        tostring(cache.ready == true),
+        tostring(cache.indexStatus or "unknown")
+    ))
+end
 
-    local globalParts = {}
-    for _, blockKey in ipairs(blockKeys) do
-        local block = blocks[blockKey]
-        globalParts[#globalParts + 1] = string.format("%s=%s", tostring(blockKey), tostring(block and block.blockFingerprint or ""))
+local function rebuildDirtyBlocks(self, cache, rosterState, reason)
+    if cache.dirtyAll then
+        rebuildAllBlocks(self, cache, rosterState, reason)
+        return
+    end
+    if cache.rosterSignature ~= rosterSignature(rosterState) then
+        rebuildAllBlocks(self, cache, rosterState, reason or "roster-changed")
+        return
     end
 
-    return {
+    local rebuilt = 0
+    for blockKey in pairs(cache.dirtyBlocks or {}) do
+        local ownerCharacter, professionKey = self:ParseSyncBlockKey(blockKey)
+        local entry = ownerCharacter and self:GetMember(ownerCharacter) or nil
+        local publish = ownerCharacter and entry and shouldPublishOwner(self, rosterState, ownerCharacter, entry, self:GetPlayerKey()) or false
+        local profession = publish and entry.professions and entry.professions[professionKey] or nil
+        local block = profession and buildBlockRecord(self, ownerCharacter, professionKey, profession) or nil
+        if block and block.contentCount > 0 then
+            cache.blocks[blockKey] = block
+        else
+            cache.blocks[blockKey] = nil
+        end
+        rebuilt = rebuilt + 1
+        cache.stats.blockRebuilt = (cache.stats.blockRebuilt or 0) + 1
+        bumpSyncTelemetry("syncIndexBlockRebuilt")
+        Addon:Trace("sync", string.format(
+            "sync-index-block-rebuilt reason=%s block=%s",
+            tostring(reason or "dirty-block"),
+            tostring(blockKey)
+        ))
+    end
+    cache.dirtyBlocks = {}
+    cache.dirtyBlockCount = 0
+    recalcAggregateState(cache)
+    cache.trustedRosterState = cloneTable(rosterState)
+    cache.indexStatus = rosterState.trusted == true and "ready" or tostring(rosterState.reason or "not-ready")
+    cache.ready = rosterState.trusted == true
+    cache.lastBuildReason = tostring(reason or "dirty-block")
+    cache.globalDirty = cache.globalDirty or rebuilt > 0
+end
+
+local function ensureLiveIndex(self, reason)
+    local state, cache = ensureSyncIndexState(self)
+    local rosterState = buildRosterState(self, reason or "sync-index")
+    local nextRosterSignature = rosterSignature(rosterState)
+
+    local hasCache = cache.builtAt > 0 and next(cache.blocks or {}) ~= nil or cache.ready == false and cache.rosterSignature ~= nil
+    if not hasCache then
+        cache.stats.misses = (cache.stats.misses or 0) + 1
+        bumpSyncTelemetry("syncIndexCacheMiss")
+        rebuildAllBlocks(self, cache, rosterState, reason or "cache-miss")
+    elseif cache.dirtyAll or cache.rosterSignature ~= nextRosterSignature then
+        cache.stats.misses = (cache.stats.misses or 0) + 1
+        bumpSyncTelemetry("syncIndexCacheMiss")
+        if cache.rosterSignature ~= nextRosterSignature and not cache.dirtyAll then
+            rebuildAllBlocks(self, cache, rosterState, reason or "roster-changed")
+        else
+            rebuildDirtyBlocks(self, cache, rosterState, reason or "dirty")
+        end
+    elseif cache.dirtyBlockCount > 0 or cache.globalDirty then
+        cache.stats.misses = (cache.stats.misses or 0) + 1
+        bumpSyncTelemetry("syncIndexCacheMiss")
+        rebuildDirtyBlocks(self, cache, rosterState, reason or "dirty")
+    else
+        cache.stats.hits = (cache.stats.hits or 0) + 1
+        bumpSyncTelemetry("syncIndexCacheHit")
+    end
+
+    cache.rosterSignature = nextRosterSignature
+    cache.builtAt = time()
+    if cache.globalDirty then
+        rebuildGlobalFingerprint(cache)
+    end
+    syncTelemetryStats(cache)
+
+    local summary = {
         syncModel = SYNC_MODEL,
-        ready = rosterState.trusted == true,
-        indexStatus = rosterState.trusted == true and "ready" or tostring(rosterState.reason or "not-ready"),
+        ready = cache.ready == true,
+        indexStatus = cache.indexStatus,
         trustedRoster = rosterState.trusted == true,
         trustedRosterReason = rosterState.reason,
-        activeOwnerCount = activeOwnerCount,
-        activeBlockCount = #blockKeys,
-        activeContentCount = activeContentCount,
-        globalFingerprint = string.format(
-            "gf1:%d:%d:%d:%s",
-            activeOwnerCount,
-            #blockKeys,
-            activeContentCount,
-            table.concat(globalParts, "|")
-        ),
-        blocks = blocks,
-        blockKeys = blockKeys,
+        activeOwnerCount = cache.activeOwnerCount or 0,
+        activeBlockCount = cache.activeBlockCount or 0,
+        activeContentCount = cache.activeContentCount or 0,
+        globalFingerprint = cache.globalFingerprint,
+        blocks = cache.blocks,
+        blockKeys = cache.blockKeys,
         rosterState = rosterState,
-        builtAt = time(),
+        builtAt = cache.builtAt,
     }
+    state.lastSummary = cloneTable(summary)
+    return state, cache, summary
 end
 
 function Data:BuildSyncBlockKey(ownerCharacter, professionKey)
@@ -338,23 +517,19 @@ function Data:IsValidSyncBlockKey(blockKey)
 end
 
 function Data:GetSyncBlock(memberKey, professionKey)
-    local blockKey = self:BuildSyncBlockKey(memberKey, professionKey)
-    if not blockKey then
-        return nil
-    end
     local entry = self:GetMember(memberKey)
     local profession = entry and entry.professions and entry.professions[professionKey] or nil
-    if not entry or not profession then
+    local block = profession and buildBlockRecord(self, memberKey, professionKey, profession) or nil
+    if not block then
         return nil
     end
-    local contentKeys = buildContentKeysForProfession(profession)
     return {
-        blockKey = blockKey,
-        ownerCharacter = memberKey,
-        professionKey = professionKey,
-        contentKeys = contentKeys,
-        count = #contentKeys,
-        fingerprint = buildFingerprint("bf1", contentKeys),
+        blockKey = block.blockKey,
+        ownerCharacter = block.ownerCharacter,
+        professionKey = block.professionKey,
+        contentKeys = cloneArray(block.sortedContentKeys),
+        count = block.contentCount,
+        fingerprint = block.blockFingerprint,
         skillRank = profession.skillRank or 0,
         skillMaxRank = profession.skillMaxRank or 0,
         specialization = profession.specialization,
@@ -364,69 +539,64 @@ function Data:GetSyncBlock(memberKey, professionKey)
     }
 end
 
-local function buildDigestRows(index)
-    local rows = {}
-    for _, blockKey in ipairs(index and index.blockKeys or {}) do
-        local block = index and index.blocks and index.blocks[blockKey] or nil
-        rows[#rows + 1] = {
-            blockKey = blockKey,
-            count = tonumber(block and block.contentCount or 0) or 0,
-            fingerprint = block and block.blockFingerprint or nil,
-        }
-    end
-    return rows
-end
+function Data:MarkSyncIndexDirty(reason, blockKey, opts)
+    local state, cache = ensureSyncIndexState(self)
+    opts = type(opts) == "table" and opts or {}
+    cache.lastDirtyReason = tostring(reason or "unspecified")
+    cache.lastDirtyAt = time()
+    state.lastDirtyReason = cache.lastDirtyReason
+    state.lastDirtyAt = cache.lastDirtyAt
 
-local function cloneDigestRows(rows)
-    local out = {}
-    for index = 1, #(rows or {}) do
-        local row = rows[index]
-        out[index] = {
-            blockKey = row and row.blockKey or nil,
-            count = tonumber(row and row.count or 0) or 0,
-            fingerprint = row and row.fingerprint or nil,
-        }
+    if opts.full == true or not blockKey then
+        cache.dirtyAll = true
+        cache.dirtyBlocks = {}
+        cache.dirtyBlockCount = 0
+    else
+        cache.dirtyBlocks = cache.dirtyBlocks or {}
+        if not cache.dirtyBlocks[blockKey] then
+            cache.dirtyBlocks[blockKey] = true
+            cache.dirtyBlockCount = cache.dirtyBlockCount + 1
+        end
     end
-    return out
-end
 
-function Data:MarkSyncIndexDirty(reason)
-    local state = ensureSyncIndexState(self)
-    local wasDirty = state.dirty == true
-    state.dirty = true
-    state.lastDirtyReason = tostring(reason or "unspecified")
-    state.lastDirtyAt = time()
-    if not wasDirty then
-        bumpSyncTelemetry("globalFingerprintDirty")
-    end
+    cache.globalDirty = true
+    syncTelemetryStats(cache)
+    bumpSyncTelemetry("globalFingerprintDirty")
+    Addon:Trace("sync", string.format(
+        "global-fingerprint-dirty reason=%s block=%s full=%s dirtyBlocks=%d",
+        tostring(reason or "unspecified"),
+        tostring(blockKey or "none"),
+        tostring(cache.dirtyAll == true),
+        cache.dirtyBlockCount or 0
+    ))
     return true
 end
 
 function Data:IsSyncIndexDirty()
-    local state = ensureSyncIndexState(self)
-    return state.dirty == true
+    local _, cache = ensureSyncIndexState(self)
+    return cache.dirtyAll == true or (cache.dirtyBlockCount or 0) > 0 or cache.globalDirty == true
 end
 
 function Data:ClearSyncIndexDirty(reason)
-    local state = ensureSyncIndexState(self)
-    state.dirty = false
+    local state, cache = ensureSyncIndexState(self)
+    cache.dirtyAll = false
+    cache.dirtyBlocks = {}
+    cache.dirtyBlockCount = 0
+    cache.globalDirty = false
     state.lastClearedReason = tostring(reason or "unspecified")
     state.lastClearedAt = time()
+    syncTelemetryStats(cache)
     return true
 end
 
 function Data:GetRosterTrustState()
-    local state = ensureSyncIndexState(self)
-    if type(state.lastRosterState) ~= "table" then
-        state.lastRosterState = buildRosterState(self, "sync-index-debug")
-    end
-    return cloneSummary(state.lastRosterState)
+    local _, _, summary = ensureLiveIndex(self, "sync-index-debug")
+    return cloneTable(summary.rosterState)
 end
 
 function Data:EnsureTrustedRosterForSync(reason)
-    local state = ensureSyncIndexState(self)
-    state.lastRosterState = buildRosterState(self, reason or "sync-index")
-    return cloneSummary(state.lastRosterState)
+    local _, _, summary = ensureLiveIndex(self, reason or "sync-index")
+    return cloneTable(summary.rosterState)
 end
 
 function Data:BuildSyntheticContentKeys(profession)
@@ -445,7 +615,7 @@ end
 
 function Data:BuildBlockFingerprint(blockKey)
     local contentKeys = self:BuildBlockContentKeys(blockKey)
-    return buildFingerprint("bf1", contentKeys)
+    return string.format("bf3:%d:%s", #contentKeys, buildFingerprint("bf3", table.concat(contentKeys, "|")))
 end
 
 function Data:BuildGlobalFingerprint(index)
@@ -458,68 +628,58 @@ function Data:BuildGlobalFingerprint(index)
         parts[#parts + 1] = string.format("%s=%s", tostring(blockKey), tostring(block and block.blockFingerprint or ""))
     end
     return string.format(
-        "gf1:%d:%d:%d:%s",
+        "gf3:%d:%d:%d:%s",
         tonumber(index and index.activeOwnerCount or 0) or 0,
         #blockKeys,
         tonumber(index and index.activeContentCount or 0) or 0,
-        table.concat(parts, "|")
+        buildFingerprint("gf3", table.concat(parts, "|"))
     )
 end
 
 function Data:BuildLocalSummary(opts)
     opts = opts or {}
-    local state = ensureSyncIndexState(self)
-    local summary = buildLiveIndex(self, opts)
+    local state, _, summary = ensureLiveIndex(self, opts.reason or "summary")
 
-    summary.globalFingerprint = self:BuildGlobalFingerprint(summary)
-    state.lastBuiltAt = summary.builtAt or time()
-    state.lastBuildReason = tostring(opts.reason or "summary")
-    state.lastRosterState = cloneSummary(summary.rosterState)
-    state.lastSummary = cloneSummary(summary)
-    state.lastLiveIndex = cloneSummary(summary)
-
-    if summary.ready then
-        local changed = state.dirty == true
-            or state.committedGlobalFingerprint ~= summary.globalFingerprint
-            or type(state.committedSummary) ~= "table"
-        if changed and not isOutboundSessionActive() then
-            state.committedGlobalFingerprint = summary.globalFingerprint
-            state.committedSummary = cloneSummary(summary)
-            state.lastCommittedAt = time()
-            state.lastCommittedReason = tostring(opts.reason or "summary")
-            self:ClearSyncIndexDirty("commit:" .. tostring(opts.reason or "summary"))
-            bumpSyncTelemetry("globalFingerprintCommitted")
-        end
+    if summary.ready and not state.committedGlobalFingerprint then
+        state.committedGlobalFingerprint = summary.globalFingerprint
+        state.committedSummary = cloneTable(summary)
+        state.lastCommittedAt = time()
+        state.lastCommittedReason = "initial-summary"
     end
 
-    summary.globalFingerprintCommitted = state.committedGlobalFingerprint
-    summary.globalFingerprintDirty = state.dirty == true
-    summary.professions = summary.activeBlockCount
-    summary.recipes = summary.activeContentCount
-    summary.memberKey = self:GetPlayerKey()
-    summary.blocks = nil
-    summary.blockKeys = nil
-    summary.rosterState = nil
-    return summary
+    local out = {
+        syncModel = summary.syncModel,
+        ready = summary.ready,
+        indexStatus = summary.indexStatus,
+        trustedRoster = summary.trustedRoster,
+        trustedRosterReason = summary.trustedRosterReason,
+        activeOwnerCount = summary.activeOwnerCount or 0,
+        activeBlockCount = summary.activeBlockCount or 0,
+        activeContentCount = summary.activeContentCount or 0,
+        globalFingerprint = summary.globalFingerprint,
+        globalFingerprintCommitted = state.committedGlobalFingerprint,
+        globalFingerprintDirty = self:IsSyncIndexDirty(),
+        professions = summary.activeBlockCount or 0,
+        recipes = summary.activeContentCount or 0,
+        memberKey = self:GetPlayerKey(),
+        builtAt = summary.builtAt,
+    }
+    state.lastSummary = cloneTable(out)
+    return out
 end
 
 function Data:CommitGlobalFingerprint(reason)
-    local state = ensureSyncIndexState(self)
-    local summary = buildLiveIndex(self, {
-        reason = reason or "manual-commit",
-    })
-    summary.globalFingerprint = self:BuildGlobalFingerprint(summary)
-    state.lastBuiltAt = summary.builtAt or time()
-    state.lastBuildReason = tostring(reason or "manual-commit")
-    state.lastRosterState = cloneSummary(summary.rosterState)
-    state.lastSummary = cloneSummary(summary)
-    state.lastLiveIndex = cloneSummary(summary)
+    local state, cache, summary = ensureLiveIndex(self, reason or "manual-commit")
     if summary.ready then
         state.committedGlobalFingerprint = summary.globalFingerprint
-        state.committedSummary = cloneSummary(summary)
+        state.committedSummary = cloneTable(summary)
         state.lastCommittedAt = time()
         state.lastCommittedReason = tostring(reason or "manual-commit")
-        self:ClearSyncIndexDirty("commit:" .. tostring(reason or "manual-commit"))
+        cache.dirtyAll = false
+        cache.dirtyBlocks = {}
+        cache.dirtyBlockCount = 0
+        cache.globalDirty = false
+        syncTelemetryStats(cache)
         bumpSyncTelemetry("globalFingerprintCommitted")
     end
     return state.committedGlobalFingerprint
@@ -532,17 +692,34 @@ function Data:GetLocalSummary()
 end
 
 function Data:GetLiveSyncIndex(opts)
-    local state = ensureSyncIndexState(self)
-    local index = buildLiveIndex(self, opts or {})
-    index.globalFingerprint = self:BuildGlobalFingerprint(index)
-    state.lastLiveIndex = cloneSummary(index)
-    return index
+    local _, _, summary = ensureLiveIndex(self, opts and opts.reason or "live-index")
+    return {
+        syncModel = summary.syncModel,
+        ready = summary.ready,
+        indexStatus = summary.indexStatus,
+        trustedRoster = summary.trustedRoster,
+        trustedRosterReason = summary.trustedRosterReason,
+        activeOwnerCount = summary.activeOwnerCount,
+        activeBlockCount = summary.activeBlockCount,
+        activeContentCount = summary.activeContentCount,
+        globalFingerprint = summary.globalFingerprint,
+        blocks = cloneTable(summary.blocks),
+        blockKeys = cloneArray(summary.blockKeys),
+        builtAt = summary.builtAt,
+    }
 end
 
 function Data:BuildRequesterIndexDigest(opts)
-    local state = ensureSyncIndexState(self)
-    local index = self:GetLiveSyncIndex(opts or {})
-    local digest = {
+    local _, _, index = ensureLiveIndex(self, opts and opts.reason or "requester-digest")
+    local blocks = {}
+    for _, blockKey in ipairs(index.blockKeys or {}) do
+        local block = index.blocks and index.blocks[blockKey] or nil
+        blocks[blockKey] = {
+            count = tonumber(block and block.contentCount or 0) or 0,
+            fingerprint = block and block.blockFingerprint or nil,
+        }
+    end
+    return {
         syncModel = index.syncModel,
         indexStatus = index.indexStatus,
         ready = index.ready == true,
@@ -550,42 +727,19 @@ function Data:BuildRequesterIndexDigest(opts)
         activeBlockCount = index.activeBlockCount or 0,
         activeContentCount = index.activeContentCount or 0,
         globalFingerprint = index.globalFingerprint,
-        rows = buildDigestRows(index),
+        blocks = blocks,
     }
-    state.lastDiffDigest = {
-        syncModel = digest.syncModel,
-        indexStatus = digest.indexStatus,
-        ready = digest.ready,
-        activeOwnerCount = digest.activeOwnerCount,
-        activeBlockCount = digest.activeBlockCount,
-        activeContentCount = digest.activeContentCount,
-        globalFingerprint = digest.globalFingerprint,
-        rows = cloneDigestRows(digest.rows),
-    }
-    state.lastDiffDigestAt = time()
-    return digest
 end
 
 function Data:BuildIndexDiffResponse(requesterDigest, opts)
-    opts = opts or {}
-    local liveIndex = self:GetLiveSyncIndex({
-        reason = opts.reason or "index-diff",
-    })
-    local requesterRows = {}
-    for _, row in ipairs(type(requesterDigest) == "table" and requesterDigest.rows or {}) do
-        if type(row) == "table" and type(row.blockKey) == "string" and row.blockKey ~= "" then
-            requesterRows[row.blockKey] = {
-                count = tonumber(row.count or 0) or 0,
-                fingerprint = row.fingerprint,
-            }
-        end
-    end
-
+    local _, _, liveIndex = ensureLiveIndex(self, opts and opts.reason or "index-diff")
+    local requesterBlocks = type(requesterDigest) == "table" and requesterDigest.blocks or {}
     local offered = {}
+
     for _, blockKey in ipairs(liveIndex.blockKeys or {}) do
         local localBlock = liveIndex.blocks and liveIndex.blocks[blockKey] or nil
         if localBlock then
-            local remoteRow = requesterRows[blockKey]
+            local remoteRow = requesterBlocks and requesterBlocks[blockKey] or nil
             local localCount = tonumber(localBlock.contentCount or 0) or 0
             local localFingerprint = localBlock.blockFingerprint
             local shouldOffer = false
@@ -630,10 +784,6 @@ function Data:BuildIndexDiffResponse(requesterDigest, opts)
         syncModel = liveIndex.syncModel,
         indexStatus = liveIndex.indexStatus,
         ready = liveIndex.ready == true,
-        activeOwnerCount = liveIndex.activeOwnerCount or 0,
-        activeBlockCount = liveIndex.activeBlockCount or 0,
-        activeContentCount = liveIndex.activeContentCount or 0,
-        globalFingerprint = liveIndex.globalFingerprint,
         offeredBlocks = offered,
     }
 end
@@ -674,33 +824,27 @@ function Data:BuildBlockSnapshot(blockKey, opts)
             ownerUpdatedAt = entry.updatedAt,
             professionUpdatedAt = profession.lastUpdatedAt,
         },
-        contentCount = #self:BuildBlockContentKeys(blockKey),
-        fingerprint = self:BuildBlockFingerprint(blockKey),
         builtAt = time(),
         snapshotKind = opts.snapshotKind or "live-block",
     }
 end
 
 function Data:GetSyncIndexDebugState()
-    local state = ensureSyncIndexState(self)
-    local summary = state.lastSummary or self:BuildLocalSummary({
-        reason = "sync-index-debug",
-    })
-    local rosterState = state.lastRosterState or {}
+    local state, cache, summary = ensureLiveIndex(self, "sync-index-debug")
     return {
-        dirty = state.dirty == true,
+        dirty = self:IsSyncIndexDirty(),
         lastDirtyReason = state.lastDirtyReason,
         lastDirtyAt = state.lastDirtyAt or 0,
         lastClearedReason = state.lastClearedReason,
         lastClearedAt = state.lastClearedAt or 0,
-        lastBuiltAt = state.lastBuiltAt or 0,
-        lastBuildReason = state.lastBuildReason,
+        lastBuiltAt = summary and summary.builtAt or 0,
+        lastBuildReason = cache.lastBuildReason,
         lastCommittedAt = state.lastCommittedAt or 0,
         lastCommittedReason = state.lastCommittedReason,
-        trustedRoster = rosterState.trusted == true,
-        trustedRosterReason = rosterState.reason,
-        snapshotCount = tonumber(rosterState.snapshotCount or 0) or 0,
-        knownActive = tonumber(rosterState.knownActive or 0) or 0,
+        trustedRoster = summary and summary.trustedRoster == true or false,
+        trustedRosterReason = summary and summary.trustedRosterReason or "unknown",
+        snapshotCount = summary and summary.rosterState and summary.rosterState.snapshotCount or 0,
+        knownActive = summary and summary.rosterState and summary.rosterState.knownActive or 0,
         indexReady = summary and summary.ready == true or false,
         indexStatus = summary and summary.indexStatus or "unknown",
         activeOwnerCount = summary and summary.activeOwnerCount or 0,
@@ -708,77 +852,36 @@ function Data:GetSyncIndexDebugState()
         activeContentCount = summary and summary.activeContentCount or 0,
         globalFingerprint = summary and summary.globalFingerprint or nil,
         committedGlobalFingerprint = state.committedGlobalFingerprint,
-        globalFingerprintDirty = state.dirty == true,
+        globalFingerprintDirty = self:IsSyncIndexDirty(),
         syncModel = summary and summary.syncModel or SYNC_MODEL,
         memberCount = countKeys(self:GetMembersDB()),
-    }
-end
-
-function Data:MarkManifestDirty(_blockKey, reason)
-    return self:MarkSyncIndexDirty(reason or "legacy-manifest-dirty")
-end
-
-function Data:MarkManifestMemberDirty(_memberKey, _entry, reason)
-    return self:MarkSyncIndexDirty(reason or "legacy-manifest-member-dirty")
-end
-
-function Data:BuildManifestCacheNow(reason)
-    self:BuildLocalSummary({
-        reason = reason or "legacy-manifest-build",
-    })
-    return {
-        memberKey = self:GetPlayerKey(),
-        builtAt = time(),
-        totals = {
-            blocks = 0,
-            recipes = 0,
-        },
-        blocks = {},
-    }
-end
-
-function Data:GetPreparedSyncManifest(_opts)
-    return self:BuildManifestCacheNow("legacy-manifest-prepared"), "deprecated-noop"
-end
-
-function Data:GetManifestDebugSnapshot()
-    local debugState = self:GetSyncIndexDebugState()
-    return {
-        ready = debugState.indexReady == true,
-        hasManifest = false,
-        dirtyAll = debugState.globalFingerprintDirty == true,
-        dirtyBlocks = 0,
-        building = false,
-        scheduled = false,
-        serial = 0,
-        blocks = debugState.activeBlockCount or 0,
-        recipes = debugState.activeContentCount or 0,
-        telemetry = {
-            syncFallbackBuilds = 0,
-            syncFallbackDeferrals = 0,
-            deferredRequests = 0,
+        cache = {
+            dirtyAll = cache.dirtyAll == true,
+            dirtyBlockCount = cache.dirtyBlockCount or 0,
+            builtAt = cache.builtAt or 0,
+            lastBuildReason = cache.lastBuildReason,
+            lastDirtyReason = cache.lastDirtyReason,
+            lastDirtyAt = cache.lastDirtyAt or 0,
+            stats = cloneTable(cache.stats or {}),
         },
     }
 end
 
-function Data:DumpManifestCacheStatus()
-    Addon:Print("Manifest cache was removed. Use /rr sync for index-diff diagnostics.")
-end
-
-function Data:ResetManifestTelemetry()
-    return true
-end
-
-function Data:DumpManifestSummary(_opts)
-    local summary = self:BuildLocalSummary({
-        reason = "legacy-manifest-summary",
-    })
+function Data:DumpSyncIndexStatus()
+    local snapshot = self:GetSyncIndexDebugState()
     Addon:Print(string.format(
-        "Local summary ready=%s owners=%d blocks=%d content=%d fingerprint=%s",
-        tostring(summary.ready == true),
-        tonumber(summary.activeOwnerCount or 0) or 0,
-        tonumber(summary.activeBlockCount or 0) or 0,
-        tonumber(summary.activeContentCount or 0) or 0,
-        tostring(summary.globalFingerprint or "none")
+        "Sync index ready=%s status=%s owners=%d blocks=%d content=%d dirty=%s committed=%s hits=%d misses=%d blockRebuilt=%d fullRebuild=%d globalRecomputed=%d",
+        tostring(snapshot.indexReady == true),
+        tostring(snapshot.indexStatus or "unknown"),
+        tonumber(snapshot.activeOwnerCount or 0) or 0,
+        tonumber(snapshot.activeBlockCount or 0) or 0,
+        tonumber(snapshot.activeContentCount or 0) or 0,
+        tostring(snapshot.globalFingerprintDirty == true),
+        tostring(snapshot.committedGlobalFingerprint or "none"),
+        snapshot.cache.stats.hits or 0,
+        snapshot.cache.stats.misses or 0,
+        snapshot.cache.stats.blockRebuilt or 0,
+        snapshot.cache.stats.fullRebuild or 0,
+        snapshot.cache.stats.globalRecomputed or 0
     ))
 end

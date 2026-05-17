@@ -559,12 +559,14 @@ function Data:DumpSummary()
     end
     local s = self:GetLocalSummary()
     Addon:SystemPrint(string.format(
-        "Members=%d Professions=%d Recipes=%d | Local rev=%d updated=%d",
+        "Members=%d Professions=%d Recipes=%d | Local owners=%d blocks=%d content=%d updated=%d",
         totalMembers,
         totalProfs,
         totalRecipes,
-        s.rev,
-        s.updatedAt
+        s.activeOwnerCount or 0,
+        s.activeBlockCount or 0,
+        s.activeContentCount or 0,
+        s.builtAt or 0
     ))
     local diagnostics = self:GetCatalogDiagnostics()
     Addon:SystemPrint(string.format(

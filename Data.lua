@@ -82,8 +82,6 @@ local DB_DEFAULTS = {
     },
 }
 
-local MANIFEST_BUILD_BLOCKS_PER_STEP = 32
-
 local TRACKED = {
     ["Alchemy"] = true,
     ["Blacksmithing"] = true,
@@ -186,27 +184,6 @@ local function cloneTableShallow(src)
     return out
 end
 
-local function cloneManifestBlock(block)
-    return cloneTableShallow(block)
-end
-
-local function cloneManifestForUpdate(manifest)
-    local copy = {
-        builtAt = manifest and manifest.builtAt or time(),
-        memberKey = manifest and manifest.memberKey,
-        manifestSerial = manifest and manifest.manifestSerial or 0,
-        blocks = {},
-        totals = {
-            blocks = manifest and manifest.totals and manifest.totals.blocks or 0,
-            recipes = manifest and manifest.totals and manifest.totals.recipes or 0,
-        },
-    }
-    for blockKey, block in pairs(manifest and manifest.blocks or {}) do
-        copy.blocks[blockKey] = cloneManifestBlock(block)
-    end
-    return copy
-end
-
 local function nowMs()
     if type(debugprofilestop) == "function" then
         return debugprofilestop()
@@ -217,49 +194,10 @@ local function nowMs()
     return 0
 end
 
-local function newManifestTelemetry()
-    return {
-        buildsStarted = 0,
-        buildsCompleted = 0,
-        fullBuilds = 0,
-        deltaBuilds = 0,
-        buildSteps = 0,
-        blocksProcessed = 0,
-        dirtyBlocksMarked = 0,
-        fullInvalidations = 0,
-        schedules = 0,
-        cacheHits = 0,
-        syncFallbackBuilds = 0,
-        syncFallbackDeferrals = 0,
-        deferredRequests = 0,
-        totalBuildCostMs = 0,
-        maxBuildCostMs = 0,
-        lastBuildCostMs = 0,
-    }
-end
-
-local function newManifestCache()
-    return {
-        manifest = nil,
-        dirtyAll = true,
-        dirtyBlocks = {},
-        building = false,
-        scheduled = false,
-        dirtyDuringBuild = false,
-        serial = 0,
-        lastReason = "init",
-        telemetry = newManifestTelemetry(),
-    }
-end
-
-Private.MANIFEST_BUILD_BLOCKS_PER_STEP = MANIFEST_BUILD_BLOCKS_PER_STEP
 Private.countRecipeKeys = countRecipeKeys
 Private.countKeys = countKeys
 Private.cloneTableShallow = cloneTableShallow
-Private.cloneManifestForUpdate = cloneManifestForUpdate
 Private.nowMs = nowMs
-Private.newManifestTelemetry = newManifestTelemetry
-Private.newManifestCache = newManifestCache
 
 local function cloneAtlasInfo(info)
     if type(info) ~= "table" then return info end
@@ -461,13 +399,8 @@ local function buildBlockContentFingerprint(profession)
     return string.format("%s|spec:%s", tostring(recipeSignature or ""), tostring(specialization or ""))
 end
 
-local function buildManifestFingerprint(profession)
-    return buildBlockContentFingerprint(profession)
-end
-
 Private.stableRecipeSignature = stableRecipeSignature
 Private.buildBlockContentFingerprint = buildBlockContentFingerprint
-Private.buildManifestFingerprint = buildManifestFingerprint
 
 local function lowerSafe(v)
     if v == nil then return "" end
@@ -763,7 +696,6 @@ function Data:OnInitialize()
     self._scanNeededByProfession = {}
     self._genericScanAttempts = {}
     self._scanTelemetry = newScanTelemetry()
-    self._manifestCache = newManifestCache()
     -- Deprecated compatibility mirror. New code tracks pending scan work by
     -- profession plus a generic fallback for recipe events that do not identify
     -- the changed profession.
@@ -899,7 +831,6 @@ function Data:GetOrCreateMember(memberKey)
     if not db[memberKey] then
         db[memberKey] = {
             owner = memberKey,
-            rev = 0,
             updatedAt = 0,
             sourceType = self:GetMemberSourceType(memberKey),
             guildStatus = "active",
@@ -919,7 +850,6 @@ function Data:NormalizeProfessionBlock(entry, professionKey, prof)
     prof.skillRank = prof.skillRank or 0
     prof.skillMaxRank = prof.skillMaxRank or 0
     prof.specialization = prof.specialization or nil
-    prof.blockRevision = type(prof.blockRevision) == "number" and prof.blockRevision or (entry.rev or 0)
     prof.lastUpdatedAt = type(prof.lastUpdatedAt) == "number" and prof.lastUpdatedAt or (entry.updatedAt or 0)
     prof.sourceType = prof.sourceType or entry.sourceType or self:GetMemberSourceType(entry.owner)
     prof.guildStatus = prof.guildStatus or entry.guildStatus or "active"
@@ -930,13 +860,13 @@ end
 function Data:NormalizeMemberEntry(entry, memberKey)
     if type(entry) ~= "table" then return nil end
     entry.owner = entry.owner or memberKey
-    entry.rev = entry.rev or 0
     entry.updatedAt = entry.updatedAt or 0
     entry.sourceType = entry.sourceType or self:GetMemberSourceType(memberKey)
     entry.guildStatus = entry.guildStatus or "active"
     entry.lastSeenInGuildAt = type(entry.lastSeenInGuildAt) == "number" and entry.lastSeenInGuildAt or (entry.updatedAt or 0)
     entry.staleAt = type(entry.staleAt) == "number" and entry.staleAt or 0
     entry.professions = entry.professions or {}
+    entry.rev = nil
     for professionKey, prof in pairs(entry.professions) do
         entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, prof)
     end
@@ -961,7 +891,6 @@ function Data:MigrateDatabase()
             end
             entry.guildStatus = entry.guildStatus or "active"
             for professionKey, prof in pairs(entry.professions or {}) do
-                prof.blockRevision = prof.blockRevision or entry.rev or 0
                 prof.lastUpdatedAt = prof.lastUpdatedAt or entry.updatedAt or now
                 prof.sourceType = prof.sourceType or entry.sourceType
                 prof.guildStatus = prof.guildStatus or entry.guildStatus
@@ -969,6 +898,7 @@ function Data:MigrateDatabase()
                 entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, prof)
             end
         end
+        entry.rev = nil
     end
 
     meta.schemaVersion = 2
@@ -1108,17 +1038,6 @@ function Data:DeleteMockMembers()
         end
     end
     return removed
-end
-
-function Data:TouchLocalRevision(reason)
-    local entry = self:GetOrCreateMember(self:GetPlayerKey())
-    entry.rev = (entry.rev or 0) + 1
-    entry.updatedAt = time()
-    entry.lastReason = reason
-    entry.sourceType = "owner"
-    entry.guildStatus = "active"
-    entry.lastSeenInGuildAt = entry.updatedAt
-    return entry.rev
 end
 
 function Data:RebuildOnlineCache()

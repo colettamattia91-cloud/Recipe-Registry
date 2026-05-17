@@ -137,7 +137,7 @@ function Data:ApplyIncomingBlockAdditive(blockKey, snapshot, opts)
     self.db.global.members[ownerCharacter] = self:NormalizeMemberEntry(entry, ownerCharacter)
 
     if self.MarkSyncIndexDirty then
-        self:MarkSyncIndexDirty("block-merge:" .. tostring(blockKey))
+        self:MarkSyncIndexDirty("block-merge:" .. tostring(blockKey), blockKey)
     end
     self:InvalidateRecipeCaches("metadata")
     if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then

@@ -60,10 +60,9 @@ Test.it("scans TradeSkill API data after TRADE_SKILL_SHOW even if the frame is a
     wow.RunTimers(5)
 
     local entry = data:GetMember(data:GetPlayerKey())
-
     Test.falsy(_G.TradeSkillFrame:IsShown(), "test fixture frame should remain hidden")
     Test.truthy(entry, "hidden-frame scan should create local owner entry")
-    Test.eq(entry.rev, 1, "hidden-frame scan should advance owner revision")
+    Test.truthy((entry.updatedAt or 0) > 0, "hidden-frame scan should stamp owner update time")
     Test.eq(entry.professions.Alchemy.count, 1, "Alchemy recipe count")
     Test.hasKey(entry.professions.Alchemy.recipes, 90001, "Alchemy recipe should be stored")
     Test.eq(countLegacyGuildComm(wow), 0, "trade scan should not emit legacy sync traffic")
@@ -164,9 +163,8 @@ Test.it("uses recipe events to scan active hidden TradeSkill data and clear gene
     addon:ProcessRecipeSignal()
 
     local entry = data:GetMember(data:GetPlayerKey())
-
     Test.falsy(data:HasAnyScanPending(), "changed opportunistic scan should clear generic pending")
-    Test.eq(entry.rev, 1, "owner revision")
+    Test.truthy((entry.updatedAt or 0) > 0, "owner update time")
     Test.eq(entry.professions.Alchemy.count, 1, "Alchemy count")
     Test.eq(entry.professions.Alchemy.skillRank, 55, "skill rank should come from DetectProfessions")
     Test.hasKey(entry.professions.Alchemy.recipes, 90011, "recipe should be stored")
@@ -285,10 +283,9 @@ Test.it("scans Enchanting Craft API data after CRAFT_SHOW even if the frame is h
     wow.RunTimers(5)
 
     local entry = data:GetMember(data:GetPlayerKey())
-
     Test.falsy(_G.CraftFrame:IsShown(), "test fixture frame should remain hidden")
     Test.truthy(entry, "hidden craft scan should create local owner entry")
-    Test.eq(entry.rev, 1, "hidden craft scan should advance owner revision")
+    Test.truthy((entry.updatedAt or 0) > 0, "hidden craft scan should stamp owner update time")
     Test.eq(entry.professions.Enchanting.count, 1, "Enchanting recipe count")
     Test.hasKey(entry.professions.Enchanting.recipes, -90031, "Enchanting spell recipe should be stored")
     Test.eq(countLegacyGuildComm(wow), 0, "craft scan should not emit legacy sync traffic")

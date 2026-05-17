@@ -7,25 +7,7 @@ local time = time
 local max = math.max
 
 local SESSION_TIMEOUT = Constants.SESSION_TIMEOUT
-
-function Sync:IsRequestShapeValid(_request)
-    return false
-end
-
-function Sync:IsRequestAlreadySatisfied(_request)
-    return false
-end
-
-function Sync:QueueRequest(sourceKey, memberKey, _legacyVersion, why, _opts)
-    self.telemetry.legacyQueueRequestsIgnored = (self.telemetry.legacyQueueRequestsIgnored or 0) + 1
-    Addon:Trace("request", string.format(
-        "legacy-queue-noop member=%s source=%s why=%s",
-        tostring(memberKey or "unknown"),
-        tostring(sourceKey or "unknown"),
-        tostring(why or "")
-    ))
-    return false
-end
+local BLOCK_PULL_DELAY_SECONDS = Constants.BLOCK_PULL_DELAY_SECONDS or 1.0
 
 function Sync:BuildWantedBlockOrder(offeredBlocks)
     local rows = {}
@@ -49,19 +31,6 @@ function Sync:BuildWantedBlockOrder(offeredBlocks)
     return rows
 end
 
-function Sync:QueueWantedBlock(blockKey, reason)
-    local session = self.outboundSeedSession
-    if type(session) ~= "table" or type(blockKey) ~= "string" or blockKey == "" then
-        return false
-    end
-    session.wantedBlocks = session.wantedBlocks or {}
-    session.wantedBlocks[#session.wantedBlocks + 1] = {
-        blockKey = blockKey,
-        reason = reason,
-    }
-    return true
-end
-
 function Sync:ClearSeedPendingState(_seedKey, reason)
     local session = self.outboundSeedSession
     if type(session) ~= "table" then
@@ -76,8 +45,7 @@ function Sync:ClearSeedPendingState(_seedKey, reason)
     return true
 end
 
-function Sync:RequestIndexDiff(seedKey, opts)
-    opts = opts or {}
+function Sync:RequestIndexDiff(seedKey)
     local session = self.outboundSeedSession
     if not (type(session) == "table" and session.seedKey == seedKey) then
         return false
@@ -97,25 +65,21 @@ function Sync:RequestIndexDiff(seedKey, opts)
     session.diffSentAt = time()
     session.lastProgressAt = session.diffSentAt
     session.state = "waiting-index-diff"
-    session.digest = digest
 
     local sent = self:SendDirectEnvelope("INDEX_DIFF_REQUEST", {
-        sessionId = session.sessionId,
         requestId = session.diffRequestId,
-        helloId = opts.helloId or session.helloId,
-        cycleId = opts.cycleId or session.cycleId,
-        syncModel = digest.syncModel,
-        indexStatus = digest.indexStatus,
-        activeOwnerCount = digest.activeOwnerCount or 0,
-        activeBlockCount = digest.activeBlockCount or 0,
-        activeContentCount = digest.activeContentCount or 0,
-        globalFingerprint = digest.globalFingerprint,
-        rows = digest.rows,
+        blocks = digest.blocks,
     }, seedKey, "ALERT")
     if sent then
         self.telemetry.indexDiffRequestSent = (self.telemetry.indexDiffRequestSent or 0) + 1
         self.telemetry.lastIndexDiffSeed = tostring(seedKey)
         self.telemetry.lastIndexDiffRequestId = session.diffRequestId
+        Addon:Trace("sync", string.format(
+            "index-diff-request-sent peer=%s requestId=%s blocks=%d",
+            tostring(seedKey),
+            tostring(session.diffRequestId),
+            tonumber(digest.activeBlockCount or 0) or 0
+        ))
         return true
     end
 
@@ -136,21 +100,27 @@ function Sync:SendIndexDiffResponse(targetKey, requestPayload)
         return false
     end
     local sent = self:SendDirectEnvelope("INDEX_DIFF_RESPONSE", {
-        sessionId = requestPayload and requestPayload.sessionId or nil,
         requestId = requestPayload and requestPayload.requestId or nil,
-        helloId = requestPayload and requestPayload.helloId or nil,
-        cycleId = requestPayload and requestPayload.cycleId or nil,
-        syncModel = response.syncModel,
-        indexStatus = response.indexStatus,
-        activeOwnerCount = response.activeOwnerCount or 0,
-        activeBlockCount = response.activeBlockCount or 0,
-        activeContentCount = response.activeContentCount or 0,
-        globalFingerprint = response.globalFingerprint,
         offeredBlocks = response.offeredBlocks,
     }, targetKey, "ALERT")
     if sent then
+        local reasons = {}
+        for index = 1, #(response.offeredBlocks or {}) do
+            local row = response.offeredBlocks[index]
+            if row and row.reason then
+                reasons[#reasons + 1] = tostring(row.reason)
+            end
+        end
         self.telemetry.indexDiffResponseSent = (self.telemetry.indexDiffResponseSent or 0) + 1
         self.telemetry.blocksOffered = (self.telemetry.blocksOffered or 0) + #(response.offeredBlocks or {})
+        self.telemetry.lastBlockOfferReasons = table.concat(reasons, ",")
+        Addon:Trace("sync", string.format(
+            "index-diff-response-sent peer=%s requestId=%s offered=%d reasons=%s",
+            tostring(targetKey),
+            tostring(requestPayload and requestPayload.requestId or "none"),
+            #(response.offeredBlocks or {}),
+            self.telemetry.lastBlockOfferReasons ~= "" and self.telemetry.lastBlockOfferReasons or "none"
+        ))
     end
     return sent
 end
@@ -177,7 +147,22 @@ function Sync:HandleReceivedIndexDiffResponse(payload)
     session.nextWantedIndex = 1
     self.telemetry.indexDiffResponseReceived = (self.telemetry.indexDiffResponseReceived or 0) + 1
     self.telemetry.blocksOffered = (self.telemetry.blocksOffered or 0) + #(session.offeredBlocks or {})
-    self.telemetry.wantedBlocksBuilt = (self.telemetry.wantedBlocksBuilt or 0) + #(session.wantedBlocks or {})
+
+    local reasons = {}
+    for index = 1, #(session.offeredBlocks or {}) do
+        local row = session.offeredBlocks[index]
+        if row and row.reason then
+            reasons[#reasons + 1] = tostring(row.reason)
+        end
+    end
+    self.telemetry.lastBlockOfferReasons = table.concat(reasons, ",")
+    Addon:Trace("sync", string.format(
+        "index-diff-response-received peer=%s requestId=%s offered=%d reasons=%s",
+        tostring(payload.sender or "unknown"),
+        tostring(payload.requestId or "none"),
+        #(session.offeredBlocks or {}),
+        self.telemetry.lastBlockOfferReasons ~= "" and self.telemetry.lastBlockOfferReasons or "none"
+    ))
 
     if #(session.wantedBlocks or {}) == 0 then
         if self.CompleteOutboundSeedSession then
@@ -186,10 +171,7 @@ function Sync:HandleReceivedIndexDiffResponse(payload)
         return true
     end
 
-    if self.RequestNextWantedBlock then
-        self:RequestNextWantedBlock()
-    end
-    return true
+    return self:RequestNextWantedBlock()
 end
 
 function Sync:RequestNextWantedBlock()
@@ -219,14 +201,20 @@ function Sync:RequestNextWantedBlock()
     session.lastProgressAt = session.blockRequestedAt
 
     local sent = self:SendDirectEnvelope("BLOCK_PULL_REQUEST", {
-        sessionId = session.sessionId,
         requestId = requestId,
-        helloId = session.helloId,
-        cycleId = session.cycleId,
         blockKey = row.blockKey,
     }, session.seedKey, "ALERT")
     if sent then
         self.telemetry.blockPullRequestSent = (self.telemetry.blockPullRequestSent or 0) + 1
+        self.telemetry.blockPullStarted = (self.telemetry.blockPullStarted or 0) + 1
+        self.telemetry.lastBlockPullBlockKey = tostring(row.blockKey)
+        Addon:Trace("sync", string.format(
+            "block-pull-start peer=%s requestId=%s block=%s reason=%s",
+            tostring(session.seedKey),
+            tostring(requestId),
+            tostring(row.blockKey),
+            tostring(row.reason or "unknown")
+        ))
         return true
     end
 
@@ -236,6 +224,36 @@ function Sync:RequestNextWantedBlock()
         self:AbortOutboundSeedSession("block-pull-send-failed")
     end
     return false
+end
+
+function Sync:ScheduleNextWantedBlock()
+    local session = self.outboundSeedSession
+    if type(session) ~= "table" or session.state == "completed" or session.state == "aborted" then
+        return false
+    end
+    if session.nextBlockTimer then
+        self:CancelTimer(session.nextBlockTimer, true)
+        session.nextBlockTimer = nil
+    end
+    session.state = "waiting-next-block-delay"
+    session.nextBlockReadyAt = time() + BLOCK_PULL_DELAY_SECONDS
+    self.telemetry.blockPullDelayed = (self.telemetry.blockPullDelayed or 0) + 1
+    session.nextBlockTimer = self:ScheduleTimer(function()
+        if session.nextBlockTimer then
+            self:CancelTimer(session.nextBlockTimer, true)
+        end
+        session.nextBlockTimer = nil
+        if session.state == "waiting-next-block-delay" then
+            session.state = "request-next-block"
+            self:RequestNextWantedBlock()
+        end
+    end, BLOCK_PULL_DELAY_SECONDS)
+    Addon:Trace("sync", string.format(
+        "block-pull-delay peer=%s nextDelay=%.1f",
+        tostring(session.seedKey or "unknown"),
+        BLOCK_PULL_DELAY_SECONDS
+    ))
+    return true
 end
 
 function Sync:ProcessRequestQueue()
@@ -254,7 +272,6 @@ function Sync:ProcessRequestQueue()
     local now = time()
     local age = max(0, now - (session.lastProgressAt or session.startedAt or now))
     if age > SESSION_TIMEOUT then
-        self.telemetry.requestTimeoutSession = (self.telemetry.requestTimeoutSession or 0) + 1
         if self.AbortOutboundSeedSession then
             self:AbortOutboundSeedSession("session-timeout")
         end
@@ -262,26 +279,20 @@ function Sync:ProcessRequestQueue()
     end
 
     if session.state == "seed-selected" then
-        self:RequestIndexDiff(session.seedKey, {
-            cycleId = session.cycleId,
-            helloId = session.helloId,
-            sessionId = session.sessionId,
-        })
+        self:RequestIndexDiff(session.seedKey)
         return
     end
 
-    if session.state == "index-diff-ready" or session.state == "request-next-block" then
+    if session.state == "request-next-block" then
         self:RequestNextWantedBlock()
     end
 end
 
-function Sync:FailInFlight(_memberKey, _requeue, _reason)
-    return false
-end
-
 function Sync:RequestGuildCatchup(memberKey, silent)
     if Addon.Data and Addon.Data.MarkSyncIndexDirty then
-        Addon.Data:MarkSyncIndexDirty(memberKey and memberKey ~= "" and "manual-pull-targeted" or "manual-pull")
+        Addon.Data:MarkSyncIndexDirty(memberKey and memberKey ~= "" and "manual-pull-targeted" or "manual-pull", nil, {
+            full = true,
+        })
     end
     if self.ScheduleHelloCycle then
         self:ScheduleHelloCycle(memberKey and memberKey ~= "" and "manual-pull-targeted" or "manual-pull", 0.5)
@@ -289,8 +300,4 @@ function Sync:RequestGuildCatchup(memberKey, silent)
     if not silent then
         Addon:Print("Scheduled a hello cycle for index-diff sync.")
     end
-end
-
-function Sync:GetOldestPendingRequest()
-    return nil
 end

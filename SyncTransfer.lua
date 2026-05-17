@@ -1,16 +1,16 @@
 local Addon = _G.RecipeRegistry
 local Sync = Addon.Sync
-local Private = Sync._private
 
 local time = time
 
-local function recordLegacyTransferNoop(self, kind, detail)
+local function recordRemovedInbound(self, kind, senderKey)
     self.telemetry.legacyMessagesIgnored = (self.telemetry.legacyMessagesIgnored or 0) + 1
-    self.telemetry.lastLegacyMessageIgnored = tostring(kind or "legacy")
-    Addon:Trace("transfer", string.format(
-        "legacy-transfer-noop kind=%s detail=%s",
-        tostring(kind or "legacy"),
-        tostring(detail or "none")
+    self.telemetry.ignoredRemovedInbound = (self.telemetry.ignoredRemovedInbound or 0) + 1
+    self.telemetry.lastLegacyMessageIgnored = tostring(kind or "unknown")
+    Addon:Trace("sync", string.format(
+        "removed-transfer kind=%s sender=%s",
+        tostring(kind or "unknown"),
+        tostring(senderKey or "unknown")
     ))
 end
 
@@ -19,11 +19,11 @@ function Sync:SendRequestReject(_targetKey, _requestPayload, _reason, _opts)
 end
 
 function Sync:HandlePausedRequest(payload, _pauseReason)
-    recordLegacyTransferNoop(self, "REQ", payload and payload.sender)
+    recordRemovedInbound(self, "REQ", payload and payload.sender)
 end
 
 function Sync:HandleRequestReject(payload)
-    recordLegacyTransferNoop(self, "RERR", payload and payload.sender)
+    recordRemovedInbound(self, "RERR", payload and payload.sender)
 end
 
 function Sync:SendBlockSnapshot(targetKey, requestPayload)
@@ -37,24 +37,28 @@ function Sync:SendBlockSnapshot(targetKey, requestPayload)
         return false
     end
     local sent = self:SendDirectEnvelope("BLOCK_SNAPSHOT", {
-        sessionId = requestPayload.sessionId,
         requestId = requestPayload.requestId,
-        helloId = requestPayload.helloId,
-        cycleId = requestPayload.cycleId,
         blockKey = snapshot.blockKey,
-        ownerCharacter = snapshot.ownerCharacter,
-        professionKey = snapshot.professionKey,
-        recipeKeys = snapshot.recipeKeys,
-        specialization = snapshot.specialization,
-        skillRank = snapshot.skillRank,
-        skillMaxRank = snapshot.skillMaxRank,
-        metadata = snapshot.metadata,
-        contentCount = snapshot.contentCount,
-        fingerprint = snapshot.fingerprint,
+        blockPayload = {
+            ownerCharacter = snapshot.ownerCharacter,
+            professionKey = snapshot.professionKey,
+            recipeKeys = snapshot.recipeKeys,
+            specialization = snapshot.specialization,
+            skillRank = snapshot.skillRank,
+            skillMaxRank = snapshot.skillMaxRank,
+            metadata = snapshot.metadata,
+        },
     }, targetKey, "BULK")
     if sent then
         self.telemetry.blockSnapshotSent = (self.telemetry.blockSnapshotSent or 0) + 1
         self.lastSnapshotServedAt = time()
+        Addon:Trace("sync", string.format(
+            "block-snapshot-sent peer=%s requestId=%s block=%s recipes=%d",
+            tostring(targetKey or "unknown"),
+            tostring(requestPayload.requestId or "none"),
+            tostring(snapshot.blockKey or "none"),
+            #(snapshot.recipeKeys or {})
+        ))
     end
     return sent
 end
@@ -79,12 +83,31 @@ function Sync:HandleReceivedBlockSnapshot(payload)
 
     session.lastProgressAt = time()
     self.telemetry.blockSnapshotReceived = (self.telemetry.blockSnapshotReceived or 0) + 1
+    Addon:Trace("sync", string.format(
+        "block-snapshot-received peer=%s requestId=%s block=%s",
+        tostring(payload.sender or "unknown"),
+        tostring(payload.requestId or "none"),
+        tostring(payload.blockKey or "none")
+    ))
 
     local applied = false
     local result = nil
+    local incomingPayload = payload.blockPayload or payload
+    if type(incomingPayload) == "table" and incomingPayload.blockKey == nil then
+        incomingPayload = {
+            blockKey = payload.blockKey,
+            ownerCharacter = incomingPayload.ownerCharacter,
+            professionKey = incomingPayload.professionKey,
+            recipeKeys = incomingPayload.recipeKeys,
+            specialization = incomingPayload.specialization,
+            skillRank = incomingPayload.skillRank,
+            skillMaxRank = incomingPayload.skillMaxRank,
+            metadata = incomingPayload.metadata,
+        }
+    end
     if Addon.Data and Addon.Data.ApplyIncomingBlockAdditive then
-        applied, result = Addon.Data:ApplyIncomingBlockAdditive(payload.blockKey, payload, {
-            sourceType = payload.sender == payload.ownerCharacter and "owner" or "replica",
+        applied, result = Addon.Data:ApplyIncomingBlockAdditive(payload.blockKey, incomingPayload, {
+            sourceType = payload.sender == ((payload.blockPayload and payload.blockPayload.ownerCharacter) or payload.ownerCharacter) and "owner" or "replica",
         })
     end
     if not applied then
@@ -99,34 +122,46 @@ function Sync:HandleReceivedBlockSnapshot(payload)
         or nil
     self.telemetry.blockMergedImmediate = (self.telemetry.blockMergedImmediate or 0) + 1
     self.telemetry.blockFingerprintRecomputed = (self.telemetry.blockFingerprintRecomputed or 0) + 1
+    self.telemetry.lastMergedBlockKey = tostring(payload.blockKey)
+    self.telemetry.lastMergedBlockFingerprint = fingerprint
+    Addon:Trace("sync", string.format(
+        "block-merge-complete block=%s fingerprint=%s",
+        tostring(payload.blockKey or "none"),
+        tostring(fingerprint or "none")
+    ))
+
     session.lastMergedBlockFingerprint = fingerprint
     session.activeBlockKey = nil
     session.activeBlockRequestId = nil
     session.nextWantedIndex = (session.nextWantedIndex or 1) + 1
-    session.state = "request-next-block"
     self.lastSnapshotSuccessAt = time()
     self:MarkPeerSuccess(payload.sender)
-
-    if self.RequestNextWantedBlock then
-        self:RequestNextWantedBlock()
+    if not (session.wantedBlocks and session.wantedBlocks[session.nextWantedIndex]) then
+        if self.CompleteOutboundSeedSession then
+            self:CompleteOutboundSeedSession("all-blocks-complete")
+        end
+        return result or true
+    end
+    if self.ScheduleNextWantedBlock then
+        self:ScheduleNextWantedBlock()
     end
     return result or true
 end
 
 function Sync:HandleRequest(payload)
-    recordLegacyTransferNoop(self, "REQ", payload and payload.sender)
+    recordRemovedInbound(self, "REQ", payload and payload.sender)
 end
 
 function Sync:HandleSnapshotChunk(payload)
-    recordLegacyTransferNoop(self, "SNAP", payload and payload.sender)
+    recordRemovedInbound(self, "SNAP", payload and payload.sender)
 end
 
 function Sync:HandleResumeRequest(payload)
-    recordLegacyTransferNoop(self, "RESUME", payload and payload.sender)
+    recordRemovedInbound(self, "RESUME", payload and payload.sender)
 end
 
 function Sync:HandleTransferDone(payload)
-    recordLegacyTransferNoop(self, "DONE", payload and payload.sender)
+    recordRemovedInbound(self, "DONE", payload and payload.sender)
 end
 
 function Sync:PruneOutgoingSessions()

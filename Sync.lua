@@ -8,66 +8,34 @@ local PREFIX = Addon.COMM_PREFIX or Addon.ADDON_PREFIX
 local time = time
 local pairs = pairs
 local ipairs = ipairs
-local sort = table.sort
-local random = math.random
-local tinsert = table.insert
-local tremove = table.remove
 local min = math.min
-local max = math.max
 local GetTime = GetTime
 
 local REQUEST_TIMEOUT = 25
-local PROGRESS_TIMEOUT = 8
 local SESSION_TIMEOUT = 60
 local NODE_TIMEOUT = 95
 local HELLO_INTERVAL = 30
 local AUTO_SYNC_INTERVAL = 20
-local OUTGOING_CHUNK_DELAY = 0.20
-local MANIFEST_CHUNK_DELAY = 0.12
 local OUTBOUND_PUMP_DELAY = 0.05
-local MANIFEST_INITIAL_JITTER = 0.35
-local MAX_RESUME_ATTEMPTS = 3
-local COORDINATOR_RECOMPUTE_DELAY = 0.35
-local MANIFEST_PUSH_COOLDOWN = 20
-local MANIFEST_CATCHUP_OWNER_CAP_PER_FLUSH = 8
-local MANIFEST_CATCHUP_BLOCK_CAP_PER_FLUSH = 32
-local MANIFEST_CATCHUP_DRAIN_DELAY = 0.20
-local MAX_REQUEST_RETRIES = 3
-local MAX_HELLO_AUTO_RETRIES = 1
-local MAX_CONCURRENT_REQUESTS = 2
-local ROSTER_FRESHNESS_MAX_AGE = 20
-local ROSTER_REFRESH_REQUEST_COOLDOWN = 8
 local PEER_BACKOFF_SECONDS = 45
-local HELLO_AUTO_BACKOFF_SECONDS = 20
-local PEER_BACKOFF_FAILURE_THRESHOLD = 2
-local MANIFEST_REFRESH_REQUEST_COOLDOWN = 30
 local POST_WORLD_GRACE_SECONDS = 12
 local POST_INSTANCE_GRACE_SECONDS = 15
 local POST_RELOAD_IN_INSTANCE_GRACE_SECONDS = 30
 local POST_COMBAT_GRACE_SECONDS = 6
-local MANIFEST_MERGE_ANNOUNCE_DEBOUNCE = 8
-local MANIFEST_MERGE_ANNOUNCE_MAX_DELAY = 25
-local OFFLINE_DEBUG_LOG_LIMIT = 12
-local SNAPSHOT_SESSION_WINDOW = 8
-local MAX_OUTBOUND_CHUNKS = 320
-local MAX_MANIFEST_CHUNKS = 256
-local MAX_INBOUND_CHUNKS = 320
-local MAX_INBOUND_FINALIZE_QUEUE = 96
-local MAX_PARTIAL_RECEIVES = 24
-local MAX_PARTIAL_MANIFESTS_TOTAL = 64
-local MAX_PARTIAL_MANIFESTS_PER_PEER = 8
-local MAX_MANIFEST_CATCHUP_QUEUE = 256
-local MAX_PENDING_REQUESTS = 64
+local ROSTER_FRESHNESS_MAX_AGE = 20
 local SNAP_CODEC_ENABLED = true
 local SNAP_CODEC_MIN_BYTES = 768
 local SNAP_CODEC_ID = "snap.lsd1"
 local SUMMARY_COLLECTION_WINDOW = 0.75
 local SUMMARY_SATURATION_THRESHOLD = 80
+local BLOCK_PULL_DELAY_SECONDS = 1.0
 
 local function countKeys(tbl)
-    local n = 0
-    for _ in pairs(tbl or {}) do n = n + 1 end
-    return n
+    local total = 0
+    for _ in pairs(tbl or {}) do
+        total = total + 1
+    end
+    return total
 end
 
 local function nowForPacing()
@@ -79,7 +47,9 @@ end
 
 local function shallowCopyArray(src)
     local out = {}
-    for i = 1, #(src or {}) do out[i] = src[i] end
+    for index = 1, #(src or {}) do
+        out[index] = src[index]
+    end
     return out
 end
 
@@ -91,38 +61,11 @@ local function shallowCopyTable(src)
     return out
 end
 
-local function getManifestAnnouncementId(chunks, manifest)
-    if type(chunks) == "table" and chunks[1] and chunks[1].manifestId then
-        return tostring(chunks[1].manifestId)
-    end
-    if type(manifest) ~= "table" then return nil end
-    local totals = manifest.totals or {}
-    return string.format(
-        "%s:%d:%d:%d",
-        tostring(manifest.memberKey or "unknown"),
-        tonumber(manifest.builtAt or 0) or 0,
-        tonumber(manifest.manifestSerial or 0) or 0,
-        tonumber(totals.blocks or 0) or 0
-    )
-end
-
-local function countArrayUnique(values)
-    local seen = {}
-    local count = 0
-    for _, value in ipairs(values or {}) do
-        if value and not seen[value] then
-            seen[value] = true
-            count = count + 1
-        end
-    end
-    return count
-end
-
 local function cloneStringSet(src)
     local out = {}
-    for _, value in ipairs(src or {}) do
-        if value then
-            out[#out + 1] = value
+    for index = 1, #(src or {}) do
+        if src[index] then
+            out[#out + 1] = src[index]
         end
     end
     return out
@@ -148,21 +91,25 @@ local function addRetrySuffix(why)
     return text .. ":retry"
 end
 
+local function isMockKey(memberKey)
+    return type(memberKey) == "string"
+        and (memberKey:find("__RRMockPeer", 1, true) == 1 or memberKey:find("__RRMockOwner", 1, true) == 1)
+end
+
 local function newSyncTelemetry()
     return {
-        sentChunks = 0,
-        receivedChunks = 0,
-        appliedChunks = 0,
         helloSent = 0,
         summarySent = 0,
         summaryReceived = 0,
         seedSelected = 0,
         indexDiffRequestSent = 0,
+        indexDiffRequestReceived = 0,
         indexDiffResponseSent = 0,
         indexDiffResponseReceived = 0,
         blocksOffered = 0,
-        wantedBlocksBuilt = 0,
         blockPullRequestSent = 0,
+        blockPullStarted = 0,
+        blockPullDelayed = 0,
         blockSnapshotSent = 0,
         blockSnapshotReceived = 0,
         blockMergedImmediate = 0,
@@ -170,152 +117,22 @@ local function newSyncTelemetry()
         outboundSessionCompleted = 0,
         outboundSessionAborted = 0,
         legacyMessagesIgnored = 0,
+        ignoredRemovedInbound = 0,
         globalFingerprintDirty = 0,
         globalFingerprintCommitted = 0,
-        skippedEquivalentMerges = 0,
         pausedSyncCycles = 0,
-        busySeedRejections = 0,
-        replicaManifestOwnersSeen = 0,
-        replicaManifestBlocksSeen = 0,
-        replicaRequestsQueued = 0,
-        replicaRequestsServed = 0,
-        replicaOwnersApplied = 0,
-        replicaNewOwnersApplied = 0,
-        manifestChunksSent = 0,
-        manifestChunksQueued = 0,
-        manifestChunksDelivered = 0,
-        manifestChunksReceived = 0,
-        manifestChunkSendAttempts = 0,
-        manifestChunkSendFailures = 0,
-        manifestChunkSendRetries = 0,
-        manifestChunkBatchesCoalesced = 0,
-        manifestSuperseded = 0,
-        manifestPartialRecoveryRequests = 0,
-        manifestRecoveryRequests = 0,
-        manifestMissingSeqRequests = 0,
-        manifestMissingSeqChunksSent = 0,
-        manifestMissingSeqRecovered = 0,
-        manifestSoftTimeouts = 0,
-        manifestHardPrunes = 0,
-        manifestLateChunksIgnored = 0,
-        manifestRecoveryCompleted = 0,
-        manifestDuplicateCompletedChunksIgnored = 0,
-        manifestPartialTimeouts = 0,
-        manifestPartialPrunes = 0,
-        manifestPartialRecovered = 0,
-        manifestReceiveCompleted = 0,
-        manifestCompareFired = 0,
-        lastManifestPruneReason = nil,
-        lastManifestRecoveryPeer = nil,
-        lastManifestRecoveryId = nil,
-        manifestCooldownSkips = 0,
-        manifestUnchangedSkips = 0,
-        manifestDeferredSends = 0,
-        manifestPendingFlushes = 0,
-        manifestQueueMaxDepth = 0,
-        manifestBuildRequests = 0,
-        manifestForceReplies = 0,
-        manifestCatchupCandidates = 0,
-        manifestCatchupQueued = 0,
-        manifestCatchupDeferred = 0,
-        manifestCatchupDrained = 0,
-        indexSkippedLocalOwners = 0,
-        indexSkippedImpossibleOwners = 0,
-        manifestCatchupSkippedOnlineOwners = 0,
-        manifestCatchupSkippedStaleOwners = 0,
-        manifestCatchupMaxDeferred = 0,
-        peerBackoffSkips = 0,
-        peerBackoffApplied = 0,
-        requestRetries = 0,
-        requestDrops = 0,
-        requestDispatches = 0,
-        requestConcurrencyMax = 0,
-        requestTimeoutInitial = 0,
-        requestTimeoutProgress = 0,
-        requestTimeoutSession = 0,
-        rejectsTotal = 0,
-        rejectsRetryable = 0,
-        rejectsPermanent = 0,
-        lastRejectPeer = nil,
-        lastRejectReason = nil,
-        skippedNotDataEligible = 0,
-        queuedBackoff = 0,
-        purgedBackoffRequests = 0,
-        deferredBackoffRequests = 0,
-        requestIdActive = nil,
-        lastSelectedPeer = nil,
-        lastSelectedReason = nil,
-        rosterRefreshRequests = 0,
-        manifestCompareDeferred = 0,
-        warmupDeferrals = 0,
-        transitionDeferrals = 0,
-        transitionDrainSteps = 0,
-        transitionSkippedHello = 0,
-        transitionSkippedRosterRefresh = 0,
-        transitionDeferredUI = 0,
-        transitionDeferredTooltip = 0,
-        transitionDeferredManifestPeers = 0,
-        transitionDeferredCatchup = 0,
-        coalescedManifestSchedules = 0,
-        coalescedManifestFlushes = 0,
-        catchupDrainDeferrals = 0,
-        rosterEventsSeen = 0,
-        rosterEventsCoalesced = 0,
-        rosterPresenceOnlyUpdates = 0,
-        rosterHeavyUpdates = 0,
-        manifestIdenticalBlockSkips = 0,
-        manifestEquivalentPeerSkips = 0,
-        manifestRequestsAvoided = 0,
-        snapshotIdenticalSkips = 0,
-        snapshotMetadataOnlyApplies = 0,
-        snapshotHeavyApplies = 0,
-        cacheInvalidationsAvoided = 0,
-        avoidedRequests = 0,
-        avoidedCacheInvalidations = 0,
-        releasedIncomingStates = 0,
-        queueCapPrunes = 0,
-        outboundChunkQueueMax = 0,
-        manifestChunkQueueMax = 0,
-        inboundChunkQueueMax = 0,
-        inboundFinalizeQueueMax = 0,
-        partialReceiveMax = 0,
-        partialManifestReceiveMax = 0,
-        pendingRequestMax = 0,
-        runtimeQueuePressure = 0,
-        prunedOutgoingSessions = 0,
-        prunedPartialReceives = 0,
-        prunedPartialManifestReceives = 0,
-        partialManifestPruned = 0,
-        prunedTricklePeerState = 0,
-        prunedTrickleOutboundQueues = 0,
-        duplicateCrafterRowsDetected = 0,
-        duplicateCrafterRowsCollapsed = 0,
-        lastDuplicateRecipeKey = nil,
-        lastDuplicateMemberKey = nil,
-        snapCodecEncoded = 0,
-        snapCodecDecoded = 0,
-        snapCodecSkippedSmall = 0,
-        snapCodecFallbackNoLib = 0,
-        snapCodecFallbackNoPeerCap = 0,
-        snapCodecCompressErrors = 0,
-        snapCodecEncodeErrors = 0,
-        snapCodecDecodeNoLib = 0,
-        snapCodecDecodeErrors = 0,
-        snapCodecDecompressErrors = 0,
-        snapCodecDeserializeErrors = 0,
-        snapCodecDropped = 0,
-        snapCodecRawBytes = 0,
-        snapCodecEncodedBytes = 0,
-        snapCodecMaxEncodeMs = 0,
-        snapCodecMaxDecodeMs = 0,
-        snapCodecTotalEncodeMs = 0,
-        snapCodecTotalDecodeMs = 0,
+        skippedEquivalentMerges = 0,
+        syncIndexCacheHit = 0,
+        syncIndexCacheMiss = 0,
+        syncIndexBlockRebuilt = 0,
+        syncIndexFullRebuild = 0,
+        syncIndexGlobalRecomputed = 0,
+        syncIndexDirtyBlockCount = 0,
         buildChannelDrops = 0,
         ignoredBuildChannelPeers = 0,
         lastBuildChannelDropPeer = nil,
         lastBuildChannelDropRemote = nil,
         lastBuildChannelDropReason = nil,
-        activeCommPrefix = PREFIX,
         versionIneligiblePeers = 0,
         skippedVersionIncompatible = 0,
         skippedMissingCapability = 0,
@@ -327,154 +144,58 @@ local function newSyncTelemetry()
         latestRemoteVersionSeen = nil,
         newerVersionSeen = 0,
         newerProtocolSeen = 0,
+        activeCommPrefix = PREFIX,
+        lastSelectedPeer = nil,
+        lastSelectedReason = nil,
+        lastLegacyMessageIgnored = nil,
+        lastAbortReason = nil,
+        lastSummaryPeer = nil,
+        lastIndexDiffSeed = nil,
+        lastIndexDiffRequestId = nil,
+        lastBlockPullBlockKey = nil,
+        lastMergedBlockKey = nil,
+        lastMergedBlockFingerprint = nil,
+        lastBlockOfferReasons = nil,
+        lastSessionCompleteReason = nil,
     }
-end
-
-local function mergeRequestedBlocks(existing, incoming)
-    if type(existing) ~= "table" or #existing == 0 then
-        return cloneStringSet(incoming)
-    end
-    if type(incoming) ~= "table" or #incoming == 0 then
-        return cloneStringSet(existing)
-    end
-
-    local seen = {}
-    local merged = {}
-    for _, blockKey in ipairs(existing) do
-        if blockKey and not seen[blockKey] then
-            seen[blockKey] = true
-            merged[#merged + 1] = blockKey
-        end
-    end
-    for _, blockKey in ipairs(incoming) do
-        if blockKey and not seen[blockKey] then
-            seen[blockKey] = true
-            merged[#merged + 1] = blockKey
-        end
-    end
-    sort(merged)
-    return merged
-end
-
-local function cloneFingerprintMap(src)
-    local out = {}
-    for blockKey, fingerprint in pairs(src or {}) do
-        if blockKey and fingerprint ~= nil then
-            out[blockKey] = fingerprint
-        end
-    end
-    return out
-end
-
-local function mergeExpectedFingerprints(existing, incoming)
-    local merged = cloneFingerprintMap(existing)
-    for blockKey, fingerprint in pairs(incoming or {}) do
-        if blockKey and fingerprint ~= nil then
-            merged[blockKey] = fingerprint
-        end
-    end
-    return merged
-end
-
-local function sliceExpectedFingerprints(src, blockKeys)
-    local out = {}
-    for _, blockKey in ipairs(blockKeys or {}) do
-        local fingerprint = src and src[blockKey] or nil
-        if fingerprint ~= nil then
-            out[blockKey] = fingerprint
-        end
-    end
-    return out
-end
-
-local function cloneStringRange(src, firstIndex, lastIndex)
-    local out = {}
-    local finalIndex = min(lastIndex or #(src or {}), #(src or {}))
-    for index = firstIndex or 1, finalIndex do
-        if src[index] then
-            out[#out + 1] = src[index]
-        end
-    end
-    return out
-end
-
-local function isMockKey(memberKey)
-    return type(memberKey) == "string"
-        and (memberKey:find("__RRMockPeer", 1, true) == 1 or memberKey:find("__RRMockOwner", 1, true) == 1)
 end
 
 Private.constants = {
     PREFIX = PREFIX,
     REQUEST_TIMEOUT = REQUEST_TIMEOUT,
-    PROGRESS_TIMEOUT = PROGRESS_TIMEOUT,
     SESSION_TIMEOUT = SESSION_TIMEOUT,
     NODE_TIMEOUT = NODE_TIMEOUT,
     HELLO_INTERVAL = HELLO_INTERVAL,
     AUTO_SYNC_INTERVAL = AUTO_SYNC_INTERVAL,
-    OUTGOING_CHUNK_DELAY = OUTGOING_CHUNK_DELAY,
-    MANIFEST_CHUNK_DELAY = MANIFEST_CHUNK_DELAY,
     OUTBOUND_PUMP_DELAY = OUTBOUND_PUMP_DELAY,
-    MANIFEST_INITIAL_JITTER = MANIFEST_INITIAL_JITTER,
-    MAX_RESUME_ATTEMPTS = MAX_RESUME_ATTEMPTS,
-    COORDINATOR_RECOMPUTE_DELAY = COORDINATOR_RECOMPUTE_DELAY,
-    MANIFEST_PUSH_COOLDOWN = MANIFEST_PUSH_COOLDOWN,
-    MANIFEST_CATCHUP_OWNER_CAP_PER_FLUSH = MANIFEST_CATCHUP_OWNER_CAP_PER_FLUSH,
-    MANIFEST_CATCHUP_BLOCK_CAP_PER_FLUSH = MANIFEST_CATCHUP_BLOCK_CAP_PER_FLUSH,
-    MANIFEST_CATCHUP_DRAIN_DELAY = MANIFEST_CATCHUP_DRAIN_DELAY,
-    MAX_REQUEST_RETRIES = MAX_REQUEST_RETRIES,
-    MAX_HELLO_AUTO_RETRIES = MAX_HELLO_AUTO_RETRIES,
-    MAX_CONCURRENT_REQUESTS = MAX_CONCURRENT_REQUESTS,
-    ROSTER_FRESHNESS_MAX_AGE = ROSTER_FRESHNESS_MAX_AGE,
-    ROSTER_REFRESH_REQUEST_COOLDOWN = ROSTER_REFRESH_REQUEST_COOLDOWN,
     PEER_BACKOFF_SECONDS = PEER_BACKOFF_SECONDS,
-    HELLO_AUTO_BACKOFF_SECONDS = HELLO_AUTO_BACKOFF_SECONDS,
-    PEER_BACKOFF_FAILURE_THRESHOLD = PEER_BACKOFF_FAILURE_THRESHOLD,
-    MANIFEST_REFRESH_REQUEST_COOLDOWN = MANIFEST_REFRESH_REQUEST_COOLDOWN,
     POST_WORLD_GRACE_SECONDS = POST_WORLD_GRACE_SECONDS,
     POST_INSTANCE_GRACE_SECONDS = POST_INSTANCE_GRACE_SECONDS,
     POST_RELOAD_IN_INSTANCE_GRACE_SECONDS = POST_RELOAD_IN_INSTANCE_GRACE_SECONDS,
     POST_COMBAT_GRACE_SECONDS = POST_COMBAT_GRACE_SECONDS,
-    MANIFEST_MERGE_ANNOUNCE_DEBOUNCE = MANIFEST_MERGE_ANNOUNCE_DEBOUNCE,
-    MANIFEST_MERGE_ANNOUNCE_MAX_DELAY = MANIFEST_MERGE_ANNOUNCE_MAX_DELAY,
-    OFFLINE_DEBUG_LOG_LIMIT = OFFLINE_DEBUG_LOG_LIMIT,
-    SNAPSHOT_SESSION_WINDOW = SNAPSHOT_SESSION_WINDOW,
-    MAX_OUTBOUND_CHUNKS = MAX_OUTBOUND_CHUNKS,
-    MAX_MANIFEST_CHUNKS = MAX_MANIFEST_CHUNKS,
-    MAX_INBOUND_CHUNKS = MAX_INBOUND_CHUNKS,
-    MAX_INBOUND_FINALIZE_QUEUE = MAX_INBOUND_FINALIZE_QUEUE,
-    MAX_PARTIAL_RECEIVES = MAX_PARTIAL_RECEIVES,
-    MAX_PARTIAL_MANIFESTS_TOTAL = MAX_PARTIAL_MANIFESTS_TOTAL,
-    MAX_PARTIAL_MANIFESTS_PER_PEER = MAX_PARTIAL_MANIFESTS_PER_PEER,
-    MAX_MANIFEST_CATCHUP_QUEUE = MAX_MANIFEST_CATCHUP_QUEUE,
-    MAX_PENDING_REQUESTS = MAX_PENDING_REQUESTS,
+    ROSTER_FRESHNESS_MAX_AGE = ROSTER_FRESHNESS_MAX_AGE,
     SNAP_CODEC_ENABLED = SNAP_CODEC_ENABLED,
     SNAP_CODEC_MIN_BYTES = SNAP_CODEC_MIN_BYTES,
     SNAP_CODEC_ID = SNAP_CODEC_ID,
     SUMMARY_COLLECTION_WINDOW = SUMMARY_COLLECTION_WINDOW,
     SUMMARY_SATURATION_THRESHOLD = SUMMARY_SATURATION_THRESHOLD,
+    BLOCK_PULL_DELAY_SECONDS = BLOCK_PULL_DELAY_SECONDS,
+    MAX_CONCURRENT_REQUESTS = 1,
 }
 Private.countKeys = countKeys
 Private.nowForPacing = nowForPacing
 Private.shallowCopyArray = shallowCopyArray
 Private.shallowCopyTable = shallowCopyTable
-Private.getManifestAnnouncementId = getManifestAnnouncementId
-Private.countArrayUnique = countArrayUnique
 Private.cloneStringSet = cloneStringSet
 Private.isHelloAutoReason = isHelloAutoReason
 Private.isManualReason = isManualReason
 Private.addRetrySuffix = addRetrySuffix
 Private.newSyncTelemetry = newSyncTelemetry
-Private.mergeRequestedBlocks = mergeRequestedBlocks
-Private.cloneFingerprintMap = cloneFingerprintMap
-Private.mergeExpectedFingerprints = mergeExpectedFingerprints
-Private.sliceExpectedFingerprints = sliceExpectedFingerprints
-Private.cloneStringRange = cloneStringRange
 Private.isMockKey = isMockKey
 
 function Sync:Startup()
     self:RegisterComm(PREFIX)
     self:EnterWarmup("startup", POST_WORLD_GRACE_SECONDS)
-    self._nextHelloRequestsManifest = false
     self:ScheduleHello(1)
     self.helloTicker = self:ScheduleRepeatingTimer("BroadcastHello", HELLO_INTERVAL)
     self.queueTicker = self:ScheduleRepeatingTimer("ProcessRequestQueue", 1)
@@ -489,7 +210,9 @@ function Sync:GetSelfKey()
 end
 
 function Sync:GetWhisperTarget(memberKey)
-    if not memberKey then return nil end
+    if not memberKey then
+        return nil
+    end
     local name = memberKey:match("^([^%-]+)")
     return name or memberKey
 end
@@ -502,15 +225,14 @@ function Sync:IsRealTrafficSuppressed()
 end
 
 function Sync:IsMockKey(memberKey)
-    if isMockKey(memberKey) then return true end
-    local row = memberKey and self.registry and self.registry[memberKey] or nil
+    if isMockKey(memberKey) then
+        return true
+    end
+    local row = memberKey and self.onlineNodes and self.onlineNodes[memberKey] or nil
     return row and row.isMock == true or false
 end
 
 function Sync:IsValidSyncMemberKey(memberKey)
-    if Addon.Data and Addon.Data.IsValidMemberKey then
-        return Addon.Data:IsValidMemberKey(memberKey)
-    end
     return type(memberKey) == "string"
         and memberKey ~= ""
         and not memberKey:find(":", 1, true)

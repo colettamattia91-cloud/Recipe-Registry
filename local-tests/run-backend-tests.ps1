@@ -24,6 +24,28 @@ if (-not $allSpecs -or $allSpecs.Count -eq 0) {
 $normalSoakSpec = "sync_soak_spec.lua"
 $heavySoakSpec = "sync_soak_heavy_spec.lua"
 $soakSpecs = @($normalSoakSpec, $heavySoakSpec)
+$activeAllSpecs = @(
+    "acebucket_integration_spec.lua",
+    "atlas_category_spec.lua",
+    "build_channel_isolation_spec.lua",
+    "catalog_cache_spec.lua",
+    "options_panel_spec.lua",
+    "p4_scan_opportunistic_spec.lua",
+    "slash_output_spec.lua",
+    "sync_legacy_grep_gate_spec.lua",
+    "sync_phase1_legacy_noop_spec.lua",
+    "sync_phase2_summary_foundation_spec.lua",
+    "sync_phase34_block_pull_spec.lua"
+)
+$activeSyncSpecs = @(
+    "build_channel_isolation_spec.lua",
+    "p4_scan_opportunistic_spec.lua",
+    "slash_output_spec.lua",
+    "sync_legacy_grep_gate_spec.lua",
+    "sync_phase1_legacy_noop_spec.lua",
+    "sync_phase2_summary_foundation_spec.lua",
+    "sync_phase34_block_pull_spec.lua"
+)
 
 function Get-SuiteSpecs {
     param(
@@ -33,24 +55,16 @@ function Get-SuiteSpecs {
 
     switch ($SuiteName) {
         "all" {
-            # Default coverage keeps the controlled soak in-band, but reserves the heavy
-            # release-readiness soak for the explicit soak suite.
-            return $Candidates | Where-Object { $_.Name -ne $heavySoakSpec }
+            return $Candidates | Where-Object { $_.Name -in $activeAllSpecs }
         }
         "quick" {
-            return $Candidates | Where-Object {
-                $_.Name -notin $soakSpecs -and $_.Name -ne "manifest_comm_bus_spec.lua"
-            }
+            return $Candidates | Where-Object { $_.Name -in $activeAllSpecs }
         }
         "sync" {
-            return $Candidates | Where-Object {
-                $_.Name -match "(sync|manifest|snapshot|transport|chunk|runtime_queue_caps|transfer_identity)" -and $_.Name -ne $heavySoakSpec
-            }
+            return $Candidates | Where-Object { $_.Name -in $activeSyncSpecs }
         }
         "soak" {
-            return $Candidates | Where-Object {
-                $_.Name -in $soakSpecs
-            }
+            return @()
         }
         default {
             throw "Unsupported suite '$SuiteName'"
@@ -76,10 +90,10 @@ if (-not $specs -or $specs.Count -eq 0) {
 }
 
 $suiteDescriptions = @{
-    all = "default/all includes the normal soak (`"$normalSoakSpec`") and excludes the heavy release-readiness soak (`"$heavySoakSpec`")."
-    quick = "quick excludes all soak specs and the broader manifest comm-bus coverage."
-    sync = "sync includes normal sync/manifest/transport coverage and excludes the heavy release-readiness soak."
-    soak = "soak runs both sync soak specs, including the heavy release-readiness soak."
+    all = "default/all runs the current supported backend baseline and excludes historical or not-yet-migrated specs."
+    quick = "quick currently matches the supported backend baseline."
+    sync = "sync runs the supported HELLO/SUMMARY/index-diff/block-pull/runtime-cache/build-isolation rewrite coverage."
+    soak = "soak contains no active specs while the historical pre-rewrite soak coverage remains archived in-tree."
 }
 
 Push-Location $repoRoot

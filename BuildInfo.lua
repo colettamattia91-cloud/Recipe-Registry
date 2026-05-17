@@ -19,8 +19,6 @@ local function normalizeChannel(value)
     if channel == "dev" then
         return "dev"
     end
-    -- The 2.0.0 line only supports release/dev channels. Any legacy beta tag
-    -- is treated as release so it cannot drift into a half-supported channel.
     return "release"
 end
 
@@ -93,15 +91,10 @@ end
 
 Addon.CAPABILITIES = cloneTable(Addon.CAPABILITIES or {
     chunkWindow = true,
-    maniReliable = true,
-    snapCodec = true,
     indexDiffSync = true,
     blockPullSync = true,
-    manifestShards = false,
 })
 
--- Keep the first REQ open while we debug live guild sync. Progress/session
--- watchdogs still guard stalled transfers; only the pre-session timeout is off.
 if Addon.INITIAL_REQ_TIMEOUTS_ENABLED == nil then
     Addon.INITIAL_REQ_TIMEOUTS_ENABLED = false
 end

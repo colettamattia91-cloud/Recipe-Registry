@@ -35,6 +35,14 @@ local function countSentKind(node, kind)
     return total
 end
 
+local function modernCaps(addon, extras)
+    local caps = addon.Sync.GetLocalProtocolCaps and addon.Sync:GetLocalProtocolCaps() or {}
+    for key, value in pairs(extras or {}) do
+        caps[key] = value
+    end
+    return caps
+end
+
 local function printContains(wow, needle)
     for _, line in ipairs(wow.GetPrints()) do
         if tostring(line):find(needle, 1, true) then
@@ -63,7 +71,7 @@ Test.it("normalizes beta metadata to the release channel", function()
     Test.eq(addon.ADDON_PREFIX, "RecipeRegistry", "normalized beta should use the release prefix")
 end)
 
-Test.it("dev peers exchange HELLO only on the dev prefix during Phase 1", function()
+Test.it("dev peers exchange HELLO only on the dev prefix", function()
     local bus = CommBus.New()
     local left = bus:AddNode("Devleft", {
         addonMetadata = metadata("2.0.0", "dev", "dev-left"),
@@ -87,10 +95,10 @@ Test.it("dev peers exchange HELLO only on the dev prefix during Phase 1", functi
     Test.eq(right.addon.ADDON_PREFIX, "RRDEV", "right dev prefix")
     Test.eq(right.addon.Sync.peerVersions[left.key].compatibility, "compatible", "dev peer compatibility")
     Test.eq(right.addon.Sync.telemetry.buildChannelDrops or 0, 0, "dev peers should not drop same-channel traffic")
-    Test.eq(countSentKind(right, "MANI"), 0, "dev phase 1 should not reply with MANI")
+    Test.eq(countSentKind(right, "SUMMARY"), 0, "dev hello should not force summary when no ready delta exists")
 end)
 
-Test.it("release peers exchange HELLO only on the release prefix during Phase 1", function()
+Test.it("release peers exchange HELLO only on the release prefix", function()
     local bus = CommBus.New()
     local left = bus:AddNode("Releaseleft", {
         addonMetadata = metadata("2.0.0", "release", "release-left"),
@@ -114,7 +122,7 @@ Test.it("release peers exchange HELLO only on the release prefix during Phase 1"
     Test.eq(right.addon.ADDON_PREFIX, "RecipeRegistry", "right release prefix")
     Test.eq(right.addon.Sync.peerVersions[left.key].compatibility, "compatible", "release peer compatibility")
     Test.eq(right.addon.Sync.telemetry.buildChannelDrops or 0, 0, "release peers should not drop same-channel traffic")
-    Test.eq(countSentKind(right, "MANI"), 0, "release phase 1 should not reply with MANI")
+    Test.eq(countSentKind(right, "SUMMARY"), 0, "release hello should not force summary when no ready delta exists")
 end)
 
 Test.it("mixed dev and release peers stay isolated at the comm prefix layer", function()
@@ -138,8 +146,8 @@ Test.it("mixed dev and release peers stay isolated at the comm prefix layer", fu
 
     Test.eq(countKeys(devNode.addon.Sync.peerVersions), 0, "dev should not learn release peers on the other prefix")
     Test.eq(countKeys(releaseNode.addon.Sync.peerVersions), 0, "release should not learn dev peers on the other prefix")
-    Test.eq(countSentKind(devNode, "MANI"), 0, "dev should not send manifest traffic to release")
-    Test.eq(countSentKind(releaseNode, "MANI"), 0, "release should not send manifest traffic to dev")
+    Test.eq(countSentKind(devNode, "HELLO"), 1, "dev should still send hello on its own prefix")
+    Test.eq(countSentKind(releaseNode, "HELLO"), 1, "release should still send hello on its own prefix")
     Test.eq(countKeys(devNode.addon.Sync.pendingRequests), 0, "dev should keep request queue idle")
     Test.eq(countKeys(releaseNode.addon.Sync.pendingRequests), 0, "release should keep request queue idle")
     Test.eq(devNode.addon.Sync.telemetry.buildChannelDrops or 0, 0, "prefix isolation should stop mixed traffic before payload guards")
@@ -154,22 +162,13 @@ Test.it("dev drops release payloads before they create sync or peer version stat
         kind = "HELLO",
         key = peerKey,
         sender = peerKey,
-        rev = 4,
-        updatedAt = 100,
         addonVersion = "2.0.1",
         wireVersion = addon.WIRE_VERSION,
         buildChannel = "release",
-        caps = {
-            wireVersion = addon.WIRE_VERSION,
+        caps = modernCaps(addon, {
             addonVersion = "2.0.1",
             buildChannel = "release",
-            capabilities = {
-                chunkWindow = true,
-                maniReliable = true,
-                snapCodec = true,
-                manifestShards = false,
-            },
-        },
+        }),
     }, {
         prefix = addon.ADDON_PREFIX,
         distribution = "GUILD",
@@ -196,22 +195,13 @@ Test.it("release drops dev payloads without showing update notices or peer versi
         kind = "HELLO",
         key = peerKey,
         sender = peerKey,
-        rev = 6,
-        updatedAt = 100,
         addonVersion = "9.9.9",
         wireVersion = addon.WIRE_VERSION,
         buildChannel = "dev",
-        caps = {
-            wireVersion = addon.WIRE_VERSION,
+        caps = modernCaps(addon, {
             addonVersion = "9.9.9",
             buildChannel = "dev",
-            capabilities = {
-                chunkWindow = true,
-                maniReliable = true,
-                snapCodec = true,
-                manifestShards = false,
-            },
-        },
+        }),
     }, {
         prefix = addon.ADDON_PREFIX,
         distribution = "GUILD",
@@ -232,22 +222,13 @@ Test.it("beta payloads are normalized to release instead of becoming a third sup
         kind = "HELLO",
         key = peerKey,
         sender = peerKey,
-        rev = 0,
-        updatedAt = 100,
         addonVersion = "2.0.0",
         wireVersion = addon.WIRE_VERSION,
         buildChannel = "beta",
-        caps = {
-            wireVersion = addon.WIRE_VERSION,
+        caps = modernCaps(addon, {
             addonVersion = "2.0.0",
             buildChannel = "beta",
-            capabilities = {
-                chunkWindow = true,
-                maniReliable = true,
-                snapCodec = true,
-                manifestShards = false,
-            },
-        },
+        }),
     }, {
         prefix = addon.ADDON_PREFIX,
         distribution = "GUILD",
@@ -269,18 +250,7 @@ Test.it("missing buildChannel is rejected by dev but tracked only as legacy diag
         kind = "HELLO",
         key = legacyDevPeer,
         sender = legacyDevPeer,
-        rev = 2,
-        updatedAt = 100,
         wireVersion = devAddon.WIRE_VERSION,
-        caps = {
-            wireVersion = devAddon.WIRE_VERSION,
-            capabilities = {
-                chunkWindow = true,
-                maniReliable = true,
-                snapCodec = true,
-                manifestShards = false,
-            },
-        },
     }, {
         prefix = devAddon.ADDON_PREFIX,
         distribution = "GUILD",
@@ -298,18 +268,7 @@ Test.it("missing buildChannel is rejected by dev but tracked only as legacy diag
         kind = "HELLO",
         key = releasePeer,
         sender = releasePeer,
-        rev = 2,
-        updatedAt = 100,
         wireVersion = releaseAddon.WIRE_VERSION,
-        caps = {
-            wireVersion = releaseAddon.WIRE_VERSION,
-            capabilities = {
-                chunkWindow = true,
-                maniReliable = true,
-                snapCodec = true,
-                manifestShards = false,
-            },
-        },
     }, {
         prefix = releaseAddon.ADDON_PREFIX,
         distribution = "GUILD",
@@ -321,6 +280,124 @@ Test.it("missing buildChannel is rejected by dev but tracked only as legacy diag
     Test.eq(releaseAddon.Sync.onlineNodes[releasePeer], nil, "legacy peers should stay out of active sync state")
     Test.eq(countKeys(releaseAddon.Sync.pendingRequests), 0, "legacy peers should not queue requests")
     Test.eq(countKeys(releaseAddon.Sync.peerBackoffUntil), 0, "legacy peers should not create backoff state")
+end)
+
+Test.it("release rejects a remote newer wire and shows a protocol notice", function()
+    local addon, wow = loadAddon("release")
+    local peerKey = "Newerwire-TestRealm"
+
+    wow.DeliverComm(addon.Sync, {
+        kind = "HELLO",
+        key = peerKey,
+        sender = peerKey,
+        addonVersion = "2.0.1",
+        wireVersion = (addon.WIRE_VERSION or 0) + 1,
+        buildChannel = "release",
+        caps = modernCaps(addon, {
+            wireVersion = (addon.WIRE_VERSION or 0) + 1,
+            addonVersion = "2.0.1",
+            buildChannel = "release",
+        }),
+    }, {
+        prefix = addon.ADDON_PREFIX,
+        distribution = "GUILD",
+        sender = peerKey,
+    })
+
+    Test.eq(addon.Sync.peerVersions[peerKey].compatibility, "remote-newer-wire", "newer wire compatibility state")
+    Test.eq(addon.Sync.onlineNodes[peerKey], nil, "newer wire peers should not enter active sync state")
+    Test.truthy(printContains(wow, "newer sync protocol detected from " .. peerKey), "newer wire should print a protocol notice")
+end)
+
+Test.it("release rejects a remote older wire", function()
+    local addon, wow = loadAddon("release")
+    local peerKey = "Olderwire-TestRealm"
+
+    wow.DeliverComm(addon.Sync, {
+        kind = "HELLO",
+        key = peerKey,
+        sender = peerKey,
+        addonVersion = "1.0.0",
+        wireVersion = math.max(1, (addon.MIN_SUPPORTED_WIRE_VERSION or addon.WIRE_VERSION) - 1),
+        buildChannel = "release",
+        caps = modernCaps(addon, {
+            wireVersion = math.max(1, (addon.MIN_SUPPORTED_WIRE_VERSION or addon.WIRE_VERSION) - 1),
+            addonVersion = "1.0.0",
+            buildChannel = "release",
+        }),
+    }, {
+        prefix = addon.ADDON_PREFIX,
+        distribution = "GUILD",
+        sender = peerKey,
+    })
+
+    Test.eq(addon.Sync.peerVersions[peerKey].compatibility, "remote-older-wire", "older wire compatibility state")
+    Test.eq(addon.Sync.onlineNodes[peerKey], nil, "older wire peers should not enter active sync state")
+end)
+
+Test.it("newer compatible addon versions still produce update notices", function()
+    local addon, wow = loadAddon("release", "2.0.0")
+    local peerKey = "Newerversion-TestRealm"
+
+    wow.DeliverComm(addon.Sync, {
+        kind = "HELLO",
+        key = peerKey,
+        sender = peerKey,
+        addonVersion = "2.1.0",
+        wireVersion = addon.WIRE_VERSION,
+        buildChannel = "release",
+        caps = modernCaps(addon, {
+            addonVersion = "2.1.0",
+            buildChannel = "release",
+        }),
+    }, {
+        prefix = addon.ADDON_PREFIX,
+        distribution = "GUILD",
+        sender = peerKey,
+    })
+
+    Test.eq(addon.Sync.peerVersions[peerKey].compatibility, "compatible", "compatible newer addon should stay eligible")
+    Test.truthy(printContains(wow, "a newer version was detected from " .. peerKey .. " (2.1.0)."), "newer compatible addon should print an update notice")
+end)
+
+Test.it("removed legacy capabilities do not affect compatibility decisions", function()
+    local addon = loadAddon("release")
+    local peerKey = "Capabilitypeer-TestRealm"
+
+    addon.Sync:ObservePeerVersion(peerKey, {
+        sender = peerKey,
+        addonVersion = addon.ADDON_VERSION,
+        wireVersion = addon.WIRE_VERSION,
+        buildChannel = "release",
+        caps = modernCaps(addon, {
+            capabilities = {
+                chunkWindow = true,
+                snapCodec = true,
+                indexDiffSync = true,
+                blockPullSync = true,
+                maniReliable = false,
+                manifestShards = false,
+            },
+        }),
+    })
+    addon.Sync:RecordPeerCaps(peerKey, modernCaps(addon, {
+        capabilities = {
+            chunkWindow = true,
+            snapCodec = true,
+            indexDiffSync = true,
+            blockPullSync = true,
+            maniReliable = false,
+            manifestShards = false,
+        },
+    }))
+
+    local eligible, reason = addon.Sync:CanExchangeDataWithPeer(peerKey, "dispatch", {
+        source = peerKey,
+        memberKey = peerKey,
+    })
+
+    Test.truthy(eligible, "modern peers should stay eligible even if removed legacy flags are present")
+    Test.eq(reason, "eligible", "compatibility reason should ignore removed legacy flags")
 end)
 
 io.write(string.format("Build channel isolation: %d test(s) passed\n", Test.count))
