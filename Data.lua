@@ -735,10 +735,12 @@ function Data:OnInitialize()
     self._guildRosterRefreshRequestedAt = 0
     self._currentProfs = {}
     self:MigrateDatabase()
-    if Addon.Sync then
+    if Addon.MarkSavedVariablesReady then
+        Addon:MarkSavedVariablesReady("addon-initialize")
+    elseif Addon.Sync then
         Addon.Sync._savedVariablesReadyBootstrap = true
         if Addon.Sync.SetSavedVariablesReady then
-            Addon.Sync:SetSavedVariablesReady("addon-loaded")
+            Addon.Sync:SetSavedVariablesReady("addon-initialize")
         end
     end
 end

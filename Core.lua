@@ -329,6 +329,15 @@ function Addon:OnInitialize()
     }
 end
 
+function Addon:MarkSavedVariablesReady(reason)
+    if self.Sync and self.Sync.SetSavedVariablesReady then
+        self.Sync._savedVariablesReadyBootstrap = true
+        self.Sync:SetSavedVariablesReady(reason or "addon-initialize")
+        return true
+    end
+    return false
+end
+
 function Addon:OnEnable()
     self:RegisterEvent("PLAYER_LOGIN", "OnPlayerLogin")
     self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnPlayerEnteringWorld")

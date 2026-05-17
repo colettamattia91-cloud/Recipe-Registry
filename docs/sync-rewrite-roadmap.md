@@ -104,8 +104,10 @@ Fingerprints are for discovery/diff only.
 
 - `globalFingerprint` indicates whether peers appear aligned or disaligned.
 - `blockFingerprint` indicates whether a block appears equal or different.
+- There is exactly one `globalFingerprint`; there is no committed/published/current split.
 - `BLOCK_PULL_REQUEST` must not contain `expectedFingerprint`, `offeredFingerprint`, `knownFingerprint`, or equivalent transfer contracts.
 - After receiving `BLOCK_SNAPSHOT`, the receiver merges additively, recomputes the local block fingerprint, marks global dirty, and continues.
+- HELLO and SUMMARY are the only protocol publication points for the current local `globalFingerprint`.
 
 ### 2.6 Metadata
 
@@ -412,7 +414,7 @@ Rules:
 
 The runtime keeps one `globalFingerprint` value plus dirty/cache state. HELLO is the publication mechanism; it carries the current `globalFingerprint` at send time.
 
-Passive diagnostics such as `lastGlobalFingerprintAt` or `lastGlobalFingerprintReason` are allowed only for debug output and tests. They must not affect readiness, routing, retry, merge, equality, or seed selection.
+Passive diagnostics such as `lastGlobalFingerprintAt` or `lastGlobalFingerprintReason` are allowed only for debug output and tests. They must not affect readiness, HELLO eligibility, routing, retry, merge, equality, or seed selection.
 
 ---
 
@@ -432,6 +434,8 @@ If a HELLO completes its SUMMARY collection window without any useful ready summ
 2. do not start a pull session;
 3. do not apply heavy peer cooldown;
 4. schedule a future HELLO through progressive retry backoff.
+
+The periodic HELLO interval may remain as a watchdog only. It must not override or short-circuit discovery retry backoff after a real discovery miss.
 
 Initial target values:
 
@@ -762,8 +766,8 @@ This is a final rewrite completion gate, not necessarily a Phase 1 gate.
 ### Phase 5 — timeouts, reset, diagnostics, soak/massive tests
 
 - Implement abort/reset behavior.
-- Commit global fingerprint on complete/abort.
-- Schedule post-sync HELLO when needed.
+- Refresh the single globalFingerprint on completion or partial-abort when local sync changed data.
+- Schedule post-sync HELLO through the delayed/coalesced scheduler when needed.
 - Rewrite diagnostics and runtime status.
 - Stabilize soak/heavy/massive tests.
 

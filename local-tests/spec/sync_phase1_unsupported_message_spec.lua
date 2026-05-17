@@ -88,6 +88,7 @@ Test.it("saved variables become ready at addon init without sending sync traffic
     local addon, wow = freshAddon()
 
     Test.truthy(addon.Sync.savedVariablesReady, "saved variables should be ready immediately after addon init")
+    Test.eq(addon.Sync.lastSavedVariablesReadyReason, "addon-initialize", "saved variables should be wired through addon initialization")
     Test.falsy(addon.Sync.playerReady, "player readiness should still wait for PLAYER_LOGIN")
     Test.falsy(addon.Sync.syncReady, "sync should stay gated before player/world/roster/index readiness")
     Test.eq(countCommKind(wow, "HELLO"), 0, "addon init should not emit hello traffic")
