@@ -16,6 +16,13 @@ local function countGuildCommKind(wow, kind)
     return total
 end
 
+local function countLegacyGuildComm(wow)
+    return countGuildCommKind(wow, "AD")
+        + countGuildCommKind(wow, "IDX")
+        + countGuildCommKind(wow, "MANI")
+        + countGuildCommKind(wow, "MREQ")
+end
+
 local function printLogContains(wow, needle)
     for _, line in ipairs(wow.GetPrints()) do
         if tostring(line):find(needle, 1, true) then
@@ -59,7 +66,7 @@ Test.it("scans TradeSkill API data after TRADE_SKILL_SHOW even if the frame is a
     Test.eq(entry.rev, 1, "hidden-frame scan should advance owner revision")
     Test.eq(entry.professions.Alchemy.count, 1, "Alchemy recipe count")
     Test.hasKey(entry.professions.Alchemy.recipes, 90001, "Alchemy recipe should be stored")
-    Test.eq(countGuildCommKind(wow, "AD"), 1, "trade scan should advertise local revision")
+    Test.eq(countLegacyGuildComm(wow), 0, "trade scan should not emit legacy sync traffic")
 end)
 
 Test.it("blocks impossible positive item IDs during local TradeSkill scans", function()
@@ -100,7 +107,7 @@ Test.it("keeps generic recipe pending when no profession API has active data", f
     Test.truthy(data:HasAnyScanPending(), "generic pending should remain")
     Test.eq(scan.scansSkipped, 2, "both trade and craft scans should report skipped")
     Test.eq(scan.lastSkipReason, "craft-no-title", "last skip should come from Craft API")
-    Test.eq(countGuildCommKind(wow, "AD"), 0, "no changed scan should advertise")
+    Test.eq(countLegacyGuildComm(wow), 0, "no changed scan should stay free of legacy sync traffic")
 end)
 
 Test.it("weapon skill-up does not print an unchanged profession scan message", function()
@@ -141,7 +148,7 @@ Test.it("weapon skill-up does not trigger a profession scan without a valid open
 
     Test.eq(data:GetScanTelemetry().scansStarted or 0, 0, "weapon skill-up should not start a profession scan")
     Test.falsy(data:GetMember(data:GetPlayerKey()), "weapon skill-up should not create local profession data")
-    Test.eq(countGuildCommKind(wow, "AD"), 0, "weapon skill-up should not advertise")
+    Test.eq(countLegacyGuildComm(wow), 0, "weapon skill-up should not emit legacy sync traffic")
 end)
 
 Test.it("uses recipe events to scan active hidden TradeSkill data and clear generic pending", function()
@@ -163,7 +170,7 @@ Test.it("uses recipe events to scan active hidden TradeSkill data and clear gene
     Test.eq(entry.professions.Alchemy.count, 1, "Alchemy count")
     Test.eq(entry.professions.Alchemy.skillRank, 55, "skill rank should come from DetectProfessions")
     Test.hasKey(entry.professions.Alchemy.recipes, 90011, "recipe should be stored")
-    Test.eq(countGuildCommKind(wow, "AD"), 1, "recipe event should advertise changed scan")
+    Test.eq(countLegacyGuildComm(wow), 0, "recipe event should not emit legacy sync traffic")
 end)
 
 Test.it("automatic unchanged scans stay silent while keeping telemetry", function()
@@ -206,7 +213,7 @@ Test.it("does not consume recipe pending or store Enchanting when CraftFrame con
     Test.truthy(data:HasAnyScanPending(), "non-Enchanting craft data should not consume generic pending")
     Test.eq(data:GetScanTelemetry().lastSkipReason, "craft-not-enchanting", "skip reason")
     Test.falsy(entry and entry.professions and entry.professions.Enchanting, "non-Enchanting craft data should not create Enchanting")
-    Test.eq(countGuildCommKind(wow, "AD"), 0, "non-Enchanting skip should not advertise")
+    Test.eq(countLegacyGuildComm(wow), 0, "non-Enchanting skip should not emit legacy sync traffic")
 end)
 
 Test.it("recipe-learned trigger can scan the relevant profession", function()
@@ -226,7 +233,7 @@ Test.it("recipe-learned trigger can scan the relevant profession", function()
     Test.truthy(entry and entry.professions and entry.professions.Alchemy, "recipe-learned should scan Alchemy")
     Test.hasKey(entry.professions.Alchemy.recipes, 90022, "learned recipe should be stored")
     Test.eq(data:GetScanTelemetry().scanTriggeredRecipeLearned or 0, 1, "recipe-learn trigger telemetry")
-    Test.eq(countGuildCommKind(wow, "AD"), 1, "recipe-learned scan should advertise changed data")
+    Test.eq(countLegacyGuildComm(wow), 0, "recipe-learned scan should not emit legacy sync traffic")
 end)
 
 Test.it("generic SPELLS_CHANGED and SKILL_LINES_CHANGED do not spam scans or chat", function()
@@ -284,7 +291,7 @@ Test.it("scans Enchanting Craft API data after CRAFT_SHOW even if the frame is h
     Test.eq(entry.rev, 1, "hidden craft scan should advance owner revision")
     Test.eq(entry.professions.Enchanting.count, 1, "Enchanting recipe count")
     Test.hasKey(entry.professions.Enchanting.recipes, -90031, "Enchanting spell recipe should be stored")
-    Test.eq(countGuildCommKind(wow, "AD"), 1, "craft scan should advertise local revision")
+    Test.eq(countLegacyGuildComm(wow), 0, "craft scan should not emit legacy sync traffic")
 end)
 
 io.write(string.format("P4 opportunistic scan: %d test(s) passed\n", Test.count))

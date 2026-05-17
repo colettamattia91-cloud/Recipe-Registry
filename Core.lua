@@ -233,6 +233,15 @@ local function scanActiveProfessionData(self, opts)
     return changed
 end
 
+local function markSyncIndexDirtyAndScheduleHello(self, reason, delay)
+    if self.Data and self.Data.MarkSyncIndexDirty then
+        self.Data:MarkSyncIndexDirty(reason)
+    end
+    if self.Sync and self.Sync.ScheduleHelloCycle then
+        self.Sync:ScheduleHelloCycle(reason, delay or 0.5)
+    end
+end
+
 local function splitCommand(text)
     local trimmed = trimInput(text)
     if trimmed == "" then
@@ -261,7 +270,7 @@ local function printMainHelp(self)
     self:Print("/rr - open or close the main window.")
     self:Print("/rr options, /rr mini, /rr debug, /rr debug log")
     self:Print("/rr rescan - queue a profession scan and scan active profession API data.")
-    self:Print("/rr version, /rr versions, /rr dump, /rr self [profession], /rr sync, /rr offline, /rr manifest [target or verbose], /rr pull")
+    self:Print("/rr version, /rr versions, /rr dump, /rr self [profession], /rr sync, /rr offline, /rr manifest [verbose], /rr pull")
     self:Print("/rr perf [toggle, dump, reset, help]")
     self:Print("/rr mock [status, start <" .. MOCK_SCENARIOS .. ">, stop, cleanup, reset, help]")
     self:Print("/rr prices <item name or link>, /rr share [guild, party, raid, say]")
@@ -278,7 +287,7 @@ end
 local function printDebugLogHelp(self)
     self:Print("/rr debug - abilita o disabilita il debug in chat.")
     self:Print("/rr debug log on|off|status|show [count] [scope]|clear")
-    self:Print("/rr debug log scope <manifest|request|transfer|offline|version> <on|off>")
+    self:Print("/rr debug log scope <request|transfer|offline|version> <on|off>")
     self:Print("/rr debug log echo on|off - duplica il trace persistente anche in chat debug.")
 end
 
@@ -286,7 +295,7 @@ local function printMockHelp(self)
     self:Print("/rr mock status - stato attuale del mock e ultimi contatori.")
     self:Print("/rr mock start light, medium, heavy, burst - carico snapshot diretto crescente.")
     self:Print("/rr mock start bootstrap - trasferimento pesante in stile bootstrap.")
-    self:Print("/rr mock start traffic - test completo HELLO/MANI/REQ/SNAP.")
+    self:Print("/rr mock start traffic - test completo HELLO/SUMMARY/INDEX_DIFF/BLOCK_PULL.")
     self:Print("/rr mock start offline - convergenza di owner offline via peer replica.")
     self:Print("/rr mock start offlinewipe - simula wipe locale + owner offline sconosciuti via replica.")
     self:Print("/rr mock start trafficburst - stress test del traffico replica.")
@@ -418,8 +427,8 @@ function Addon:OnTradeSkillShow()
                 reason = "profession-open",
                 notifyMode = "auto",
             })) or metadataChanged
-            if changed and self.Sync then
-                self.Sync:AdvertiseLocalRevision("trade-scan")
+            if changed then
+                markSyncIndexDirtyAndScheduleHello(self, "trade-scan", 0.5)
             end
         end
     end, 0.3)
@@ -437,8 +446,8 @@ function Addon:OnCraftShow()
                 reason = "profession-open",
                 notifyMode = "auto",
             })) or metadataChanged
-            if changed and self.Sync then
-                self.Sync:AdvertiseLocalRevision("craft-scan")
+            if changed then
+                markSyncIndexDirtyAndScheduleHello(self, "craft-scan", 0.5)
             end
         end
     end, 0.3)
@@ -467,8 +476,8 @@ function Addon:ProcessRecipeSignal(reason)
             reason = scanReason,
             notifyMode = "auto",
         }) or metadataChanged
-        if changed and self.Sync then
-            self.Sync:AdvertiseLocalRevision(scanReason)
+        if changed then
+            markSyncIndexDirtyAndScheduleHello(self, scanReason, 0.5)
         end
     end
 end
@@ -512,8 +521,8 @@ function Addon:ProcessSkillSignal(event)
         notifyMode = "auto",
         source = source,
     }) or metadataChanged
-    if changed and self.Sync then
-        self.Sync:AdvertiseLocalRevision(reason)
+    if changed then
+        markSyncIndexDirtyAndScheduleHello(self, reason, 0.5)
     end
 end
 
@@ -727,11 +736,11 @@ function Addon:SlashHandler(input)
                 local scopeName = normalizeDebugLogScope(scopeToken)
                 local scopeMode = trimInput(scopeRest):lower()
                 if not scopeName then
-                    self:Print("Usage: /rr debug log scope <manifest|request|transfer|offline|version> <on|off>")
+                    self:Print("Usage: /rr debug log scope <request|transfer|offline|version> <on|off>")
                     return
                 end
                 if scopeMode ~= "on" and scopeMode ~= "off" then
-                    self:Print("Usage: /rr debug log scope <manifest|request|transfer|offline|version> <on|off>")
+                    self:Print("Usage: /rr debug log scope <request|transfer|offline|version> <on|off>")
                     return
                 end
                 db.scopes[scopeName] = scopeMode == "on"
@@ -1011,13 +1020,8 @@ function Addon:SlashHandler(input)
             self.Data:DumpManifestSummary({ verbose = true })
             return
         end
-        if target ~= "" and self.Sync and self.Sync.RequestManifestRefresh then
-            self.Sync:RequestManifestRefresh(target, {
-                force = true,
-                clearBackoff = true,
-                reason = "manual",
-            })
-            self:Print("Requested fresh manifest from " .. target .. ".")
+        if target ~= "" then
+            self:Print("Targeted manifest refresh was removed. Use /rr pull or wait for the next hello cycle.")
             return
         end
         if self.Data and self.Data.DumpManifestSummary then
@@ -1060,9 +1064,7 @@ function Addon:SlashHandler(input)
                 reason = "manual",
                 notifyMode = "manual",
             }) or metadataChanged
-            if changed and self.Sync then
-                self.Sync:AdvertiseLocalRevision("manual-rescan")
-            end
+            markSyncIndexDirtyAndScheduleHello(self, "manual-rescan", 0.5)
             if self.Data.HasAnyScanPending and self.Data:HasAnyScanPending() then
                 self:Print("Profession rescan queued. Open or refresh a profession to complete pending scans.")
             else

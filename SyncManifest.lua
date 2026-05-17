@@ -397,6 +397,15 @@ function Sync:LogManifestCatchupDeferral(reason)
 end
 
 function Sync:SendManifestToPeer(peerKey, why, opts)
+    if true then
+        self.telemetry.legacyOutboundManifestSuppressed = (self.telemetry.legacyOutboundManifestSuppressed or 0) + 1
+        Addon:Trace("manifest", string.format(
+            "legacy-send-suppressed peer=%s why=%s",
+            tostring(peerKey or "unknown"),
+            tostring(why or "manifest")
+        ))
+        return false
+    end
     opts = opts or {}
     if not peerKey or not Addon.TrickleSync then return end
     if not self:IsValidSyncMemberKey(peerKey) then return end
@@ -620,6 +629,15 @@ function Sync:OnManifestCacheReady(reason)
 end
 
 function Sync:ProcessPeerManifestComparison(senderKey, manifest)
+    if true then
+        self.telemetry.legacyMessagesIgnored = (self.telemetry.legacyMessagesIgnored or 0) + 1
+        Addon:Trace("manifest", string.format(
+            "legacy-compare-noop peer=%s manifestId=%s",
+            tostring(senderKey or "unknown"),
+            tostring(manifest and manifest.manifestId or "unknown")
+        ))
+        return nil
+    end
     local _queuedBlocks, groupedRequests, compareStatus, comparison = Addon.TrickleSync:QueueMissingBlocksForPeer(senderKey, manifest)
     local manifestId = manifest and manifest.manifestId or "unknown"
     local blockCount = countManifestBlocks(manifest)
@@ -729,6 +747,15 @@ function Sync:FlushPendingManifestComparePeers(_reason)
 end
 
 function Sync:RequestManifestRefresh(peerKey, opts)
+    if true then
+        self.telemetry.legacyOutboundManifestSuppressed = (self.telemetry.legacyOutboundManifestSuppressed or 0) + 1
+        Addon:Trace("manifest", string.format(
+            "legacy-refresh-suppressed peer=%s why=%s",
+            tostring(peerKey or "guild"),
+            tostring(opts and opts.reason or "manual")
+        ))
+        return false
+    end
     opts = opts or {}
     if peerKey and peerKey ~= "" then
         if self:IsMockKey(peerKey) then return end
@@ -861,6 +888,14 @@ function Sync:ResendManifestMissingSeqs(peerKey, manifestId, manifestAttempt, mi
 end
 
 function Sync:HandleManifestRequest(payload)
+    if true then
+        self.telemetry.legacyMessagesIgnored = (self.telemetry.legacyMessagesIgnored or 0) + 1
+        Addon:Trace("manifest", string.format(
+            "legacy-request-noop peer=%s",
+            tostring(payload and payload.sender or "unknown")
+        ))
+        return
+    end
     if not self:IsValidSyncMemberKey(payload.sender) or payload.sender == self:GetSelfKey() then return end
     if self:IsMockKey(payload.sender) then return end
     local recoveryReason = tostring(payload.reason or payload.why or "")
@@ -946,6 +981,14 @@ function Sync:ScheduleCoalescedManifestAnnounce(reason)
 end
 
 function Sync:BroadcastManifestToOnlinePeers(why, opts)
+    if true then
+        self.telemetry.legacyOutboundManifestSuppressed = (self.telemetry.legacyOutboundManifestSuppressed or 0) + 1
+        Addon:Trace("manifest", string.format(
+            "legacy-broadcast-suppressed why=%s",
+            tostring(why or "broadcast")
+        ))
+        return false
+    end
     opts = opts or {}
     if self:IsInWarmup() and not opts.ignoreWarmup then
         self.telemetry.warmupDeferrals = (self.telemetry.warmupDeferrals or 0) + 1
@@ -1247,6 +1290,15 @@ function Sync:ScheduleManifestCatchupDrain()
 end
 
 function Sync:HandleManifestChunk(payload)
+    if true then
+        self.telemetry.legacyMessagesIgnored = (self.telemetry.legacyMessagesIgnored or 0) + 1
+        Addon:Trace("manifest", string.format(
+            "legacy-chunk-noop peer=%s manifestId=%s",
+            tostring(payload and payload.sender or "unknown"),
+            tostring(payload and payload.manifestId or "none")
+        ))
+        return
+    end
     if not self:IsValidSyncMemberKey(payload.sender) or payload.sender == self:GetSelfKey() then return end
     if not payload.manifestId then return end
     if self:IsMockKey(payload.sender) and not self:ShouldAllowLocalMockTraffic(payload.sender, nil) then return end

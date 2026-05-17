@@ -95,6 +95,8 @@ Addon.CAPABILITIES = cloneTable(Addon.CAPABILITIES or {
     chunkWindow = true,
     maniReliable = true,
     snapCodec = true,
+    indexDiffSync = true,
+    blockPullSync = true,
     manifestShards = false,
 })
 

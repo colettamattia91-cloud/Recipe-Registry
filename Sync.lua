@@ -61,6 +61,8 @@ local MAX_PENDING_REQUESTS = 64
 local SNAP_CODEC_ENABLED = true
 local SNAP_CODEC_MIN_BYTES = 768
 local SNAP_CODEC_ID = "snap.lsd1"
+local SUMMARY_COLLECTION_WINDOW = 0.75
+local SUMMARY_SATURATION_THRESHOLD = 80
 
 local function countKeys(tbl)
     local n = 0
@@ -151,6 +153,25 @@ local function newSyncTelemetry()
         sentChunks = 0,
         receivedChunks = 0,
         appliedChunks = 0,
+        helloSent = 0,
+        summarySent = 0,
+        summaryReceived = 0,
+        seedSelected = 0,
+        indexDiffRequestSent = 0,
+        indexDiffResponseSent = 0,
+        indexDiffResponseReceived = 0,
+        blocksOffered = 0,
+        wantedBlocksBuilt = 0,
+        blockPullRequestSent = 0,
+        blockSnapshotSent = 0,
+        blockSnapshotReceived = 0,
+        blockMergedImmediate = 0,
+        blockFingerprintRecomputed = 0,
+        outboundSessionCompleted = 0,
+        outboundSessionAborted = 0,
+        legacyMessagesIgnored = 0,
+        globalFingerprintDirty = 0,
+        globalFingerprintCommitted = 0,
         skippedEquivalentMerges = 0,
         pausedSyncCycles = 0,
         busySeedRejections = 0,
@@ -429,6 +450,8 @@ Private.constants = {
     SNAP_CODEC_ENABLED = SNAP_CODEC_ENABLED,
     SNAP_CODEC_MIN_BYTES = SNAP_CODEC_MIN_BYTES,
     SNAP_CODEC_ID = SNAP_CODEC_ID,
+    SUMMARY_COLLECTION_WINDOW = SUMMARY_COLLECTION_WINDOW,
+    SUMMARY_SATURATION_THRESHOLD = SUMMARY_SATURATION_THRESHOLD,
 }
 Private.countKeys = countKeys
 Private.nowForPacing = nowForPacing
@@ -451,18 +474,14 @@ Private.isMockKey = isMockKey
 function Sync:Startup()
     self:RegisterComm(PREFIX)
     self:EnterWarmup("startup", POST_WORLD_GRACE_SECONDS)
-    self._nextHelloRequestsManifest = true
+    self._nextHelloRequestsManifest = false
     self:ScheduleHello(1)
     self.helloTicker = self:ScheduleRepeatingTimer("BroadcastHello", HELLO_INTERVAL)
     self.queueTicker = self:ScheduleRepeatingTimer("ProcessRequestQueue", 1)
     self.pruneTicker = self:ScheduleRepeatingTimer("PruneState", 5)
     self.autoSyncTicker = self:ScheduleRepeatingTimer("AutoSyncTick", AUTO_SYNC_INTERVAL)
     self:ScheduleTimer("AutoSyncTick", 6)
-    self:AdvertiseLocalRevision("startup")
     self:EnsureBackgroundWorkers()
-    if Addon.Data and Addon.Data.ScheduleManifestBuild then
-        Addon.Data:ScheduleManifestBuild("startup")
-    end
 end
 
 function Sync:GetSelfKey()

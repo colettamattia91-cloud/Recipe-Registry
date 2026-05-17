@@ -163,11 +163,14 @@ end
 
 local function commitCorruptClean(data, stats, dirtyAll, dirtyBlocks, reason)
     if not hasCorruptCleanChanges(stats) then return false end
-    if dirtyAll then
-        data:MarkManifestDirty(nil, reason or "clean-corrupt")
-    else
-        for blockKey in pairs(dirtyBlocks or {}) do
-            data:MarkManifestDirty(blockKey, reason or "clean-corrupt")
+    if data.MarkSyncIndexDirty then
+        if dirtyAll then
+            data:MarkSyncIndexDirty(reason or "clean-corrupt")
+        else
+            for _blockKey in pairs(dirtyBlocks or {}) do
+                data:MarkSyncIndexDirty(reason or "clean-corrupt")
+                break
+            end
         end
     end
     data:InvalidateRecipeCaches()
@@ -296,7 +299,9 @@ function Data:WipeDatabase()
     self._incoming = {}
     self._currentProfs = {}
     self:GetGlobalMeta().bootstrapCompletedAt = 0
-    self:MarkManifestDirty(nil, "wipe")
+    if self.MarkSyncIndexDirty then
+        self:MarkSyncIndexDirty("wipe")
+    end
 
     if Addon.Sync then
         Addon.Sync:ResetRuntimeStateForDatabaseWipe()

@@ -139,6 +139,9 @@ function Sync:GetRuntimeObservabilitySnapshot()
     local trickle = getTrickleRuntimeSummary()
     local manifestDebug = Addon.Data and Addon.Data.GetManifestDebugSnapshot and Addon.Data:GetManifestDebugSnapshot() or nil
     local manifestTelemetry = manifestDebug and manifestDebug.telemetry or {}
+    local indexDebug = Addon.Data and Addon.Data.GetSyncIndexDebugState and Addon.Data:GetSyncIndexDebugState() or {}
+    local cycle = self.activeHelloCycle or {}
+    local session = self.outboundSeedSession or {}
 
     return {
         partialReceives = countKeys(self.partialReceive),
@@ -163,6 +166,33 @@ function Sync:GetRuntimeObservabilitySnapshot()
         manifestFallbackDeferrals = manifestTelemetry.syncFallbackDeferrals or 0,
         manifestDeferredRequests = manifestTelemetry.deferredRequests or 0,
         runtimeQueuePressure = self.telemetry and self.telemetry.runtimeQueuePressure or 0,
+        indexReady = indexDebug.indexReady == true,
+        indexStatus = indexDebug.indexStatus,
+        trustedRoster = indexDebug.trustedRoster == true,
+        trustedRosterReason = indexDebug.trustedRosterReason,
+        localSummary = {
+            syncModel = indexDebug.syncModel,
+            activeOwnerCount = indexDebug.activeOwnerCount or 0,
+            activeBlockCount = indexDebug.activeBlockCount or 0,
+            activeContentCount = indexDebug.activeContentCount or 0,
+            globalFingerprint = indexDebug.globalFingerprint,
+            committedGlobalFingerprint = indexDebug.committedGlobalFingerprint,
+            globalFingerprintDirty = indexDebug.globalFingerprintDirty == true,
+        },
+        activeHelloId = cycle.helloId,
+        selectedSeedKey = cycle.selectedSeedKey or self.lastSelectedSeed and self.lastSelectedSeed.peerKey or nil,
+        outboundSession = {
+            sessionId = session.sessionId,
+            state = session.state,
+            seedKey = session.seedKey,
+            diffRequestId = session.diffRequestId,
+            activeBlockKey = session.activeBlockKey,
+            wantedBlocks = #(session.wantedBlocks or {}),
+            nextWantedIndex = session.nextWantedIndex or 1,
+            startedAt = session.startedAt or 0,
+            lastProgressAt = session.lastProgressAt or 0,
+            abortReason = session.abortReason,
+        },
     }
 end
 
@@ -172,8 +202,8 @@ function Sync:GetUiState()
     local runtime = self:GetRuntimeObservabilitySnapshot()
     local primary = self:GetInFlightRequest()
     return {
-        role = self:IsCoordinator() and "Coordinator" or "Client",
-        coordinatorKey = self.coordinatorKey,
+        role = "IndexDiffBlockPullClient",
+        coordinatorKey = nil,
         onlineNodes = countKeys(self.onlineNodes),
         registry = countKeys(self.registry),
         queued = countKeys(self.pendingRequests),
@@ -192,6 +222,13 @@ function Sync:GetUiState()
         partialReceives = runtime.partialReceives,
         partialManifestOpen = runtime.partialManifestOpen,
         trickleQueuedBlocks = runtime.trickleQueuedBlocks,
+        indexReady = runtime.indexReady,
+        indexStatus = runtime.indexStatus,
+        trustedRoster = runtime.trustedRoster,
+        trustedRosterReason = runtime.trustedRosterReason,
+        localSummary = runtime.localSummary,
+        selectedSeedKey = runtime.selectedSeedKey,
+        outboundSession = runtime.outboundSession,
         telemetry = self.telemetry,
     }
 end
@@ -222,6 +259,13 @@ function Sync:GetDebugSnapshot()
         isolated = self:IsRealTrafficSuppressed(),
         peerBackoffCount = backoffCount,
         peerBackoffList = backoffList,
+        indexReady = runtime.indexReady,
+        indexStatus = runtime.indexStatus,
+        trustedRoster = runtime.trustedRoster,
+        trustedRosterReason = runtime.trustedRosterReason,
+        localSummary = runtime.localSummary,
+        selectedSeedKey = runtime.selectedSeedKey,
+        outboundSession = runtime.outboundSession,
         oldestPendingAge = oldestPending and max(0, time() - (oldestPending.queuedAt or time())) or 0,
         oldestPendingSource = oldestPending and oldestPending.source or nil,
         oldestPendingWhy = oldestPending and oldestPending.why or nil,

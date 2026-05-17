@@ -173,6 +173,10 @@ end
 local function hasNodeWork(node)
     local sync = node.addon.Sync
     if node.sentCursor < #(node.state.sentComm or {}) then return true end
+    local session = sync.outboundSeedSession
+    if type(session) == "table" and session.state and session.state ~= "completed" and session.state ~= "aborted" then
+        return true
+    end
     if countKeys(sync.pendingRequests) > 0 then return true end
     if sync.inFlight then return true end
     if countKeys(sync.outgoingSessions) > 0 then return true end
@@ -194,6 +198,10 @@ local function describeNodeWork(node)
     local reasons = {}
     if node.sentCursor < #(node.state.sentComm or {}) then
         reasons[#reasons + 1] = "sentComm=" .. tostring(#(node.state.sentComm or {}) - node.sentCursor)
+    end
+    local session = sync.outboundSeedSession
+    if type(session) == "table" and session.state and session.state ~= "completed" and session.state ~= "aborted" then
+        reasons[#reasons + 1] = "seedSession=" .. tostring(session.state)
     end
     if countKeys(sync.pendingRequests or {}) > 0 then
         reasons[#reasons + 1] = "pending=" .. tostring(countKeys(sync.pendingRequests or {}))
@@ -581,8 +589,12 @@ function CommBus:SeedSelfProfession(node, opts)
         lastSeenInGuildAt = entry.updatedAt,
     }
     data:NormalizeMemberEntry(entry, memberKey)
-    data:MarkManifestDirty(data:BuildSyncBlockKey(memberKey, profession), "comm-bus-seed")
-    data:BuildManifestCacheNow("comm-bus-seed")
+    if data.MarkSyncIndexDirty then
+        data:MarkSyncIndexDirty("comm-bus-seed")
+    end
+    if data.BuildLocalSummary then
+        data:BuildLocalSummary({ reason = "comm-bus-seed" })
+    end
     return entry
 end
 
@@ -625,8 +637,12 @@ function CommBus:SeedReplicaProfession(node, ownerKey, profession, recipeKeys, o
         lastSeenInGuildAt = opts.lastSeenInGuildAt or entry.lastSeenInGuildAt,
     }
     data:NormalizeMemberEntry(entry, ownerKey)
-    data:MarkManifestDirty(data:BuildSyncBlockKey(ownerKey, profession), "comm-bus-replica")
-    data:BuildManifestCacheNow("comm-bus-replica")
+    if data.MarkSyncIndexDirty then
+        data:MarkSyncIndexDirty("comm-bus-replica")
+    end
+    if data.BuildLocalSummary then
+        data:BuildLocalSummary({ reason = "comm-bus-replica" })
+    end
     return entry
 end
 

@@ -29,6 +29,13 @@ local function countGuildCommKind(wow, kind)
     return total
 end
 
+local function countLegacyGuildComm(wow)
+    return countGuildCommKind(wow, "AD")
+        + countGuildCommKind(wow, "IDX")
+        + countGuildCommKind(wow, "MANI")
+        + countGuildCommKind(wow, "MREQ")
+end
+
 io.write("Slash command output\n")
 
 Test.it("prints the complete main command surface", function()
@@ -143,10 +150,13 @@ Test.it("queues manual rescan when no profession API data is active", function()
     })
 
     addon:SlashHandler("rescan")
+    wow.RunTimers(5)
 
     Test.truthy(data:HasAnyScanPending(), "manual rescan should remain pending")
     Test.eq(data:GetScanTelemetry().signals, 1, "manual rescan should record a scan signal")
     Test.eq(data:GetScanTelemetry().scansSkipped, 2, "inactive trade/craft APIs should be skipped")
+    Test.eq(countLegacyGuildComm(wow), 0, "manual rescan should not emit legacy sync traffic")
+    Test.eq(countGuildCommKind(wow, "HELLO"), 1, "manual rescan should schedule a hello cycle")
     Test.truthy(printLogContains(wow, "Profession rescan queued. Open or refresh a profession to complete pending scans."), "queued rescan output")
 end)
 
@@ -161,6 +171,7 @@ Test.it("uses active TradeSkill API data during manual rescan", function()
     }, { shown = false })
 
     addon:SlashHandler("rescan")
+    wow.RunTimers(5)
 
     local entry = data:GetMember(data:GetPlayerKey())
     Test.falsy(_G.TradeSkillFrame:IsShown(), "TradeSkillFrame should not need to be visible")
@@ -168,7 +179,8 @@ Test.it("uses active TradeSkill API data during manual rescan", function()
     Test.truthy(entry and entry.professions and entry.professions.Alchemy, "Alchemy should be stored")
     Test.eq(entry.professions.Alchemy.count, 1, "Alchemy recipe count")
     Test.hasKey(entry.professions.Alchemy.recipes, 91001, "Alchemy recipe key")
-    Test.eq(countGuildCommKind(wow, "AD"), 1, "manual rescan should advertise changed data")
+    Test.eq(countLegacyGuildComm(wow), 0, "manual rescan should not emit legacy sync traffic")
+    Test.eq(countGuildCommKind(wow, "HELLO"), 1, "manual rescan should schedule a hello cycle")
     Test.truthy(printLogContains(wow, "Scanned Alchemy: 1 recipe(s) found."), "manual changed scan should be visible")
     Test.truthy(printLogContains(wow, "Profession rescan completed for active profession data."), "completed rescan output")
 end)

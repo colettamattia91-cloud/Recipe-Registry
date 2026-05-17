@@ -85,7 +85,9 @@ function Data:ApplyLocalProfessionMetadata(profession, metadata)
     prof.sourceType = "owner"
     prof.guildStatus = "active"
     entry.professions[profession] = self:NormalizeProfessionBlock(entry, profession, prof)
-    self:MarkManifestDirty(self:BuildSyncBlockKey(entry.owner or self:GetPlayerKey(), profession), "specialization")
+    if self.MarkSyncIndexDirty then
+        self:MarkSyncIndexDirty("specialization")
+    end
     Addon:Debug(
         "Specialization changed",
         profession,
@@ -115,8 +117,8 @@ function Data:DetectProfessions()
                 entry.professions[canonical] = entry.professions[canonical] or { recipes = {} }
                 local changed = self:ApplyLocalProfessionMetadata(canonical, self._currentProfs[canonical])
                 metadataChanged = changed or metadataChanged
-                if wasNewProfession then
-                    self:MarkManifestDirty(self:BuildSyncBlockKey(entry.owner or self:GetPlayerKey(), canonical), "detect-profession")
+                if wasNewProfession and self.MarkSyncIndexDirty then
+                    self:MarkSyncIndexDirty("detect-profession")
                 end
             end
         end
@@ -624,10 +626,9 @@ function Data:ApplyScanResult(profession, recipeKeys, opts)
             self:TouchLocalRevision("scan:" .. profession)
         end
         prof.blockRevision = entry.rev or prof.blockRevision
-        self:MarkManifestDirty(
-            self:BuildSyncBlockKey(entry.owner or self:GetPlayerKey(), profession),
-            specializationChanged and not recipeChanged and "specialization-scan" or "scan"
-        )
+        if self.MarkSyncIndexDirty then
+            self:MarkSyncIndexDirty(specializationChanged and not recipeChanged and "specialization-scan" or "scan")
+        end
         if recipeChanged then
             Addon:Debug("Scan changed", profession, count, "recipe ids")
         else

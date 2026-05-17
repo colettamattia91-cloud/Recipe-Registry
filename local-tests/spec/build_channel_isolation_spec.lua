@@ -63,7 +63,7 @@ Test.it("normalizes beta metadata to the release channel", function()
     Test.eq(addon.ADDON_PREFIX, "RecipeRegistry", "normalized beta should use the release prefix")
 end)
 
-Test.it("dev peers exchange HELLO and MANI only on the dev prefix", function()
+Test.it("dev peers exchange HELLO only on the dev prefix during Phase 1", function()
     local bus = CommBus.New()
     local left = bus:AddNode("Devleft", {
         addonMetadata = metadata("2.0.0", "dev", "dev-left"),
@@ -78,19 +78,19 @@ Test.it("dev peers exchange HELLO and MANI only on the dev prefix", function()
     local settled = bus:RunUntil(function()
         return right.addon.Sync.peerVersions[left.key] ~= nil
             and right.addon.Sync.onlineNodes[left.key] ~= nil
-            and countSentKind(right, "MANI") >= 1
     end, {
         maxTicks = 80,
     })
 
-    Test.truthy(settled, "dev peers should complete hello/manifest exchange")
+    Test.truthy(settled, "dev peers should complete hello observation")
     Test.eq(left.addon.ADDON_PREFIX, "RRDEV", "left dev prefix")
     Test.eq(right.addon.ADDON_PREFIX, "RRDEV", "right dev prefix")
     Test.eq(right.addon.Sync.peerVersions[left.key].compatibility, "compatible", "dev peer compatibility")
     Test.eq(right.addon.Sync.telemetry.buildChannelDrops or 0, 0, "dev peers should not drop same-channel traffic")
+    Test.eq(countSentKind(right, "MANI"), 0, "dev phase 1 should not reply with MANI")
 end)
 
-Test.it("release peers exchange HELLO and MANI only on the release prefix", function()
+Test.it("release peers exchange HELLO only on the release prefix during Phase 1", function()
     local bus = CommBus.New()
     local left = bus:AddNode("Releaseleft", {
         addonMetadata = metadata("2.0.0", "release", "release-left"),
@@ -105,16 +105,16 @@ Test.it("release peers exchange HELLO and MANI only on the release prefix", func
     local settled = bus:RunUntil(function()
         return right.addon.Sync.peerVersions[left.key] ~= nil
             and right.addon.Sync.onlineNodes[left.key] ~= nil
-            and countSentKind(right, "MANI") >= 1
     end, {
         maxTicks = 80,
     })
 
-    Test.truthy(settled, "release peers should complete hello/manifest exchange")
+    Test.truthy(settled, "release peers should complete hello observation")
     Test.eq(left.addon.ADDON_PREFIX, "RecipeRegistry", "left release prefix")
     Test.eq(right.addon.ADDON_PREFIX, "RecipeRegistry", "right release prefix")
     Test.eq(right.addon.Sync.peerVersions[left.key].compatibility, "compatible", "release peer compatibility")
     Test.eq(right.addon.Sync.telemetry.buildChannelDrops or 0, 0, "release peers should not drop same-channel traffic")
+    Test.eq(countSentKind(right, "MANI"), 0, "release phase 1 should not reply with MANI")
 end)
 
 Test.it("mixed dev and release peers stay isolated at the comm prefix layer", function()

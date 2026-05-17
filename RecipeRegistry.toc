@@ -17,14 +17,13 @@ BuildInfo.lua
 Performance.lua
 Data.lua
 DataAtlasLoot.lua
-DataManifest.lua
 DataScan.lua
 DataSnapshot.lua
 DataCatalog.lua
+DataIndex.lua
 DataCleanup.lua
 MergeEngine.lua
 BootstrapSync.lua
-TrickleSync.lua
 SyncPausePolicy.lua
 GuildLifecycleMaintenance.lua
 MockSync.lua
@@ -35,7 +34,6 @@ SyncProtocol.lua
 SyncCodec.lua
 SyncRequests.lua
 SyncTransfer.lua
-SyncManifest.lua
 SyncDiagnostics.lua
 Tooltip.lua
 MinimapButton.lua

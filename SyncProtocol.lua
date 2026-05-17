@@ -9,48 +9,53 @@ local PREFIX = Constants.PREFIX
 
 local function shouldAttachProtocolCaps(kind)
     return kind == "HELLO"
-        or kind == "AD"
-        or kind == "MANI"
-        or kind == "MREQ"
 end
 
-local function getLocalManifestFingerprint(reason)
-    if Addon.Data and Addon.Data.GetPreparedManifestContentFingerprint then
-        return Addon.Data:GetPreparedManifestContentFingerprint({
-            reason = reason or "hello-fingerprint",
-        })
+local function recordLegacyProtocolNoop(self, kind, detail)
+    self.telemetry.legacyMessagesIgnored = (self.telemetry.legacyMessagesIgnored or 0) + 1
+    self.telemetry.lastLegacyMessageIgnored = tostring(kind or "unknown")
+    Addon:Trace("manifest", string.format(
+        "legacy-noop kind=%s detail=%s",
+        tostring(kind or "unknown"),
+        tostring(detail or "none")
+    ))
+end
+
+local function shouldSendSummaryForHello(self, helloPayload, localSummary)
+    if type(localSummary) ~= "table" then
+        return false
     end
-    return nil, "unavailable"
-end
-
-local function isComparableManifestContentFingerprint(fingerprint)
-    if type(fingerprint) ~= "string" then return false end
-    return fingerprint:match("^mf2:%d+:%d+:%d+$") ~= nil
-end
-
-local function compareManifestContentFingerprints(localFingerprint, remoteFingerprint)
-    local comparable = isComparableManifestContentFingerprint(localFingerprint)
-        and isComparableManifestContentFingerprint(remoteFingerprint)
-    if not comparable then
-        return false, false
+    if tostring(localSummary.indexStatus or "") ~= "ready" then
+        return false
     end
-    return localFingerprint == remoteFingerprint, true
+    if tostring(helloPayload and helloPayload.indexStatus or "") ~= "ready" then
+        return false
+    end
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("SUMMARY") then
+        return false
+    end
+    if self.IsSummarySaturated and self:IsSummarySaturated() then
+        return false
+    end
+    return tostring(localSummary.globalFingerprint or "") ~= tostring(helloPayload and helloPayload.globalFingerprint or "")
 end
 
 function Sync:BroadcastHello()
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic() then
         return
     end
-    local firstHello = (self.lastHelloAt or 0) <= 0
+    local session = self.outboundSeedSession
+    if type(session) == "table" and session.state and session.state ~= "completed" and session.state ~= "aborted" then
+        return
+    end
+    local cycle = self.BeginHelloCycle and self:BeginHelloCycle(self._pendingHelloCycleReason or "hello") or nil
     self.lastHelloAt = time()
-    local summary = Addon.Data:GetLocalSummary()
-    self:RecordRevisionHint(summary.memberKey, summary.rev, summary.updatedAt, summary.memberKey)
-    local requestManifest = firstHello or self._nextHelloRequestsManifest == true
-    local manifestFingerprint = getLocalManifestFingerprint("hello")
+    local summary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
+        reason = "hello",
+    }) or {}
     local sent = self:SendGuildEnvelope("HELLO", {
         key = self:GetSelfKey(),
-        rev = summary.rev,
-        updatedAt = summary.updatedAt,
+        helloId = cycle and cycle.helloId or nil,
         version = Addon.ADDON_VERSION or Addon.DISPLAY_VERSION,
         addonVersion = Addon.ADDON_VERSION or Addon.DISPLAY_VERSION,
         wireVersion = Addon.WIRE_VERSION,
@@ -58,38 +63,30 @@ function Sync:BroadcastHello()
         buildId = Addon.BUILD_ID,
         capabilities = Addon.CAPABILITIES,
         caps = self.GetLocalProtocolCaps and self:GetLocalProtocolCaps() or nil,
-        manifestPushMode = "requested",
-        manifestRequest = requestManifest,
-        manifestFingerprint = manifestFingerprint,
+        syncModel = summary.syncModel,
+        indexStatus = summary.indexStatus,
+        activeOwnerCount = summary.activeOwnerCount or 0,
+        activeBlockCount = summary.activeBlockCount or 0,
+        activeContentCount = summary.activeContentCount or 0,
+        globalFingerprint = summary.globalFingerprint,
     }, "ALERT")
     if sent then
+        self.telemetry.helloSent = (self.telemetry.helloSent or 0) + 1
         self._nextHelloRequestsManifest = false
+        self._pendingHelloCycleReason = nil
+        if self._helloCycleTimer then
+            self:CancelTimer(self._helloCycleTimer, true)
+            self._helloCycleTimer = nil
+        end
+        if cycle then
+            self._helloCycleTimer = self:ScheduleTimer(function()
+                self._helloCycleTimer = nil
+                if self.SelectOutboundSeed then
+                    self:SelectOutboundSeed(cycle.cycleId)
+                end
+            end, Constants.SUMMARY_COLLECTION_WINDOW or 0.75)
+        end
     end
-end
-
-function Sync:AdvertiseLocalRevision(reason)
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic() then
-        return
-    end
-    local summary = Addon.Data:GetLocalSummary()
-    if self.lastAdvertisedRev == summary.rev and reason ~= "startup" then return end
-    self.lastAdvertisedRev = summary.rev
-    self:RecordRevisionHint(summary.memberKey, summary.rev, summary.updatedAt, summary.memberKey)
-    self:SendGuildEnvelope("AD", {
-        key = summary.memberKey,
-        rev = summary.rev,
-        updatedAt = summary.updatedAt,
-        professions = summary.professions,
-        recipes = summary.recipes,
-        why = reason,
-        addonVersion = Addon.ADDON_VERSION or Addon.DISPLAY_VERSION,
-        wireVersion = Addon.WIRE_VERSION,
-        buildChannel = Addon.BUILD_CHANNEL,
-        buildId = Addon.BUILD_ID,
-        capabilities = Addon.CAPABILITIES,
-        caps = self.GetLocalProtocolCaps and self:GetLocalProtocolCaps() or nil,
-    }, "ALERT")
-    self:BroadcastManifestToOnlinePeers(reason or "advertise")
 end
 
 function Sync:SendGuildEnvelope(kind, payload, priority)
@@ -190,6 +187,16 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
 
     if payload.kind == "HELLO" then
         self:HandleHello(payload, distribution, sender)
+    elseif payload.kind == "SUMMARY" then
+        self:HandleSummary(payload, distribution, sender)
+    elseif payload.kind == "INDEX_DIFF_REQUEST" then
+        self:HandleIndexDiffRequest(payload, distribution, sender)
+    elseif payload.kind == "INDEX_DIFF_RESPONSE" then
+        self:HandleIndexDiffResponse(payload, distribution, sender)
+    elseif payload.kind == "BLOCK_PULL_REQUEST" then
+        self:HandleBlockPullRequest(payload, distribution, sender)
+    elseif payload.kind == "BLOCK_SNAPSHOT" then
+        self:HandleBlockSnapshot(payload, distribution, sender)
     elseif payload.kind == "AD" then
         self:HandleAdvertise(payload, distribution, sender)
     elseif payload.kind == "IDX" then
@@ -213,161 +220,103 @@ end
 
 function Sync:HandleHello(payload)
     if not self:IsValidSyncMemberKey(payload.key) then return end
-    local sawHelloBefore = (self._lastHelloSeenAt and self._lastHelloSeenAt[payload.key] or 0) > 0
     self._lastHelloSeenAt = self._lastHelloSeenAt or {}
     self._lastHelloSeenAt[payload.key] = time()
-    self:TouchNode(payload.key, payload.addonVersion or payload.version)
-    if self.MarkManifestPeerSuccess then
-        self:MarkManifestPeerSuccess(payload.sender or payload.key)
-    end
     if self.RecordPeerCaps then
         self:RecordPeerCaps(payload.sender or payload.key, payload.caps)
     end
-    self:RecordRevisionHint(payload.key, payload.rev, payload.updatedAt, payload.key)
-    if self:IsMockKey(payload.key) then return end
-    local localManifestFingerprint = getLocalManifestFingerprint("hello-compare")
-    local remoteManifestFingerprint = type(payload.manifestFingerprint) == "string" and payload.manifestFingerprint or nil
-    local manifestFingerprintsMatch, comparableManifestFingerprints = compareManifestContentFingerprints(
-        localManifestFingerprint,
-        remoteManifestFingerprint
-    )
-    if manifestFingerprintsMatch then
-        self:RecordManifestReceived(payload.key)
-        if self.RecordManifestFingerprintReceived then
-            self:RecordManifestFingerprintReceived(payload.key, remoteManifestFingerprint)
+    local localSummary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
+        reason = "hello-response",
+    }) or nil
+    if shouldSendSummaryForHello(self, payload, localSummary) then
+        self:SendSummary(payload.sender or payload.key, payload.helloId)
+    end
+end
+
+function Sync:SendSummary(targetKey, helloId)
+    local summary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
+        reason = "summary-send",
+    }) or nil
+    if type(summary) ~= "table" or tostring(summary.indexStatus or "") ~= "ready" then
+        return false
+    end
+    local sent = self:SendDirectEnvelope("SUMMARY", {
+        helloId = helloId,
+        syncModel = summary.syncModel,
+        indexStatus = summary.indexStatus,
+        activeOwnerCount = summary.activeOwnerCount or 0,
+        activeBlockCount = summary.activeBlockCount or 0,
+        activeContentCount = summary.activeContentCount or 0,
+        globalFingerprint = summary.globalFingerprint,
+    }, targetKey, "ALERT")
+    if sent then
+        self.telemetry.summarySent = (self.telemetry.summarySent or 0) + 1
+        self.telemetry.lastSummaryPeer = tostring(targetKey or "unknown")
+    end
+    return sent
+end
+
+function Sync:HandleSummary(payload)
+    local peerKey = self:IsValidSyncMemberKey(payload.sender) and payload.sender or nil
+    if not peerKey then
+        return
+    end
+    if self.RecordSummary then
+        self:RecordSummary(peerKey, payload)
+    end
+end
+
+function Sync:HandleIndexDiffRequest(payload)
+    if not (payload and self:IsValidSyncMemberKey(payload.sender)) then
+        return
+    end
+    if self.CanServeInboundSeed then
+        local allowed = self:CanServeInboundSeed(payload.sender)
+        if not allowed then
+            return
         end
     end
-
-    local localEntry = Addon.Data:GetMember(payload.key)
-    local localRev = localEntry and localEntry.rev or 0
-    local remoteRev = payload.rev or 0
-    local directOwnerRefreshPending = not manifestFingerprintsMatch and remoteRev > localRev
-
-    local shouldSendManifest = not manifestFingerprintsMatch
-    if self:IsInWarmup() and shouldSendManifest then
-        self.telemetry.warmupDeferrals = (self.telemetry.warmupDeferrals or 0) + 1
-        Addon:Debug("Warmup deferring manifest reply", tostring(payload.key))
-        self:QueueWarmupManifestPeer(payload.key, "hello")
-    elseif shouldSendManifest then
-        self:SendManifestToPeer(payload.key, "hello")
-    else
-        Addon:Trace("manifest", string.format(
-            "send-skip peer=%s reason=%s why=hello",
-            tostring(payload.key),
-            manifestFingerprintsMatch and "hello-fingerprint-match" or "hello-not-requested"
-        ))
+    if self.SendIndexDiffResponse then
+        self:SendIndexDiffResponse(payload.sender, payload)
     end
-    local manifestFingerprintAlreadyHandled = remoteManifestFingerprint
-        and comparableManifestFingerprints
-        and ((self._lastManifestFingerprintReceived and self._lastManifestFingerprintReceived[payload.key] == remoteManifestFingerprint)
-            or (self.HasRecentlyRequestedManifestFingerprint and self:HasRecentlyRequestedManifestFingerprint(payload.key, remoteManifestFingerprint)))
-    local manifestFingerprintMismatch = comparableManifestFingerprints
-        and localManifestFingerprint ~= remoteManifestFingerprint
-        and not manifestFingerprintAlreadyHandled
-    local manifestRefreshOpts = {
-        reason = "hello-auto",
-        manifestFingerprintMismatch = manifestFingerprintMismatch == true,
-        remoteManifestFingerprint = remoteManifestFingerprint,
-    }
-    local canRequestFingerprintMismatch = not manifestFingerprintMismatch
-        or self:IsCoordinator()
-        or (self.coordinatorKey and payload.key == self.coordinatorKey)
-    if sawHelloBefore
-        and not manifestFingerprintsMatch
-        and not manifestFingerprintAlreadyHandled
-        and not (manifestFingerprintMismatch and directOwnerRefreshPending)
-        and canRequestFingerprintMismatch
-        and self:ShouldRequestManifestRefresh(payload.key, manifestRefreshOpts) then
-        if self:IsInWarmup() then
-            Addon:Debug("Warmup deferring manifest refresh request", tostring(payload.key))
-            self:QueueWarmupManifestRefresh(payload.key)
-        else
-            self:RequestManifestRefresh(payload.key, manifestRefreshOpts)
+end
+
+function Sync:HandleIndexDiffResponse(payload)
+    if self.HandleReceivedIndexDiffResponse then
+        self:HandleReceivedIndexDiffResponse(payload)
+    end
+end
+
+function Sync:HandleBlockPullRequest(payload)
+    if self.CanServeInboundSeed then
+        local allowed = self:CanServeInboundSeed(payload and payload.sender)
+        if not allowed then
+            return
         end
     end
+    if self.SendBlockSnapshot then
+        self:SendBlockSnapshot(payload and payload.sender, payload)
+    end
+end
 
-    if remoteRev > localRev and not manifestFingerprintsMatch then
-        if self:IsCoordinator() then
-            self:BroadcastIndex(payload.key, remoteRev, payload.updatedAt, payload.key, "hello")
-        end
-        self:QueueRequest(payload.key, payload.key, remoteRev, "hello-auto")
+function Sync:HandleBlockSnapshot(payload)
+    if self.HandleReceivedBlockSnapshot then
+        self:HandleReceivedBlockSnapshot(payload)
     end
 end
 
 function Sync:HandleAdvertise(payload)
-    if not self:IsValidSyncMemberKey(payload.key) or not self:IsValidSyncMemberKey(payload.sender) then return end
-    self:TouchNode(payload.sender, payload.addonVersion or payload.version)
-    if self.MarkManifestPeerSuccess then
-        self:MarkManifestPeerSuccess(payload.sender)
-    end
-    if self.RecordPeerCaps then
-        self:RecordPeerCaps(payload.sender, payload.caps)
-    end
-    self:RecordRevisionHint(payload.key, payload.rev, payload.updatedAt, payload.key)
-    if self:IsMockKey(payload.key) or self:IsMockKey(payload.sender) then return end
-
-    local localEntry = Addon.Data:GetMember(payload.key)
-    local localRev = localEntry and localEntry.rev or 0
-    local remoteRev = payload.rev or 0
-
-    if remoteRev > localRev then
-        if self:IsCoordinator() then
-            self:BroadcastIndex(payload.key, remoteRev, payload.updatedAt, payload.key, "advertise")
-        end
-        self:QueueRequest(payload.key, payload.key, remoteRev, "advertise-auto")
-    end
-end
-
-function Sync:BroadcastIndex(memberKey, rev, updatedAt, owner, why)
-    if not self:IsValidSyncMemberKey(memberKey) then return end
-    if owner and not self:IsValidSyncMemberKey(owner) then owner = memberKey end
-    if self:IsMockKey(memberKey) or self:IsMockKey(owner) then return end
-    self:RecordRevisionHint(memberKey, rev, updatedAt, owner)
-    self:SendGuildEnvelope("IDX", {
-        key = memberKey,
-        rev = rev,
-        updatedAt = updatedAt,
-        owner = owner or memberKey,
-        why = why,
-    }, "ALERT")
+    recordLegacyProtocolNoop(self, "AD", payload and payload.sender)
 end
 
 function Sync:HandleIndex(payload)
-    if not self:IsValidSyncMemberKey(payload.key) or not self:IsValidSyncMemberKey(payload.sender) then return end
-    self:TouchNode(payload.sender)
-    if self:IsCoordinator() then return end
-    if self.coordinatorKey and payload.sender ~= self.coordinatorKey then return end
-    if self:IsMockKey(payload.key) or self:IsMockKey(payload.sender) then return end
+    recordLegacyProtocolNoop(self, "IDX", payload and payload.sender)
+end
 
-    local ownerKey = self:IsValidSyncMemberKey(payload.owner) and payload.owner or payload.key
-    local selfKey = self:GetSelfKey()
-    if ownerKey == selfKey then
-        self.telemetry.indexSkippedLocalOwners = (self.telemetry.indexSkippedLocalOwners or 0) + 1
-        return
-    end
-    if ownerKey ~= payload.sender then
-        local rosterFresh = self:IsRosterFresh()
-        if not rosterFresh then
-            self:EnsureFreshRoster("index-owner")
-            rosterFresh = self:IsRosterFresh()
-        end
-        local ownerOnline = rosterFresh and Addon.Data:IsMemberOnline(ownerKey) or false
-        -- Coordinator IDX hints can safely fan out direct owner requests, but offline-owner
-        -- replica paths must stay in manifest catch-up so they do not seed impossible REQs.
-        if not ownerOnline then
-            self.telemetry.indexSkippedImpossibleOwners = (self.telemetry.indexSkippedImpossibleOwners or 0) + 1
-            return
-        end
-    end
-    self:RecordRevisionHint(payload.key, payload.rev, payload.updatedAt, ownerKey)
-    if payload.key == selfKey then
-        return
-    end
+function Sync:HandleManifestChunk(payload)
+    recordLegacyProtocolNoop(self, "MANI", payload and payload.sender)
+end
 
-    local localEntry = Addon.Data:GetMember(payload.key)
-    local localRev = localEntry and localEntry.rev or 0
-    local remoteRev = payload.rev or 0
-    if remoteRev > localRev then
-        self:QueueRequest(ownerKey, payload.key, remoteRev, "index")
-    end
+function Sync:HandleManifestRequest(payload)
+    recordLegacyProtocolNoop(self, "MREQ", payload and payload.sender)
 end

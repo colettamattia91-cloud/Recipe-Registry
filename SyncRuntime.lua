@@ -114,10 +114,14 @@ local function summarizeCapabilities(payload)
     if nested.chunkWindow ~= nil then caps.chunkWindow = nested.chunkWindow == true end
     if nested.maniReliable ~= nil then caps.maniReliable = nested.maniReliable == true end
     if nested.snapCodec ~= nil then caps.snapCodec = nested.snapCodec == true end
+    if nested.indexDiffSync ~= nil then caps.indexDiffSync = nested.indexDiffSync == true end
+    if nested.blockPullSync ~= nil then caps.blockPullSync = nested.blockPullSync == true end
     if nested.manifestShards ~= nil then caps.manifestShards = nested.manifestShards == true end
     if source.chunkWindow ~= nil then caps.chunkWindow = source.chunkWindow == true end
     if source.maniReliable ~= nil then caps.maniReliable = source.maniReliable == true end
     if source.snapCodec ~= nil then caps.snapCodec = source.snapCodec == true end
+    if source.indexDiffSync ~= nil then caps.indexDiffSync = source.indexDiffSync == true end
+    if source.blockPullSync ~= nil then caps.blockPullSync = source.blockPullSync == true end
     if source.manifestShards ~= nil then caps.manifestShards = source.manifestShards == true end
     return caps
 end
@@ -131,6 +135,8 @@ local function getDeclaredCapabilities(versionInfo, capsInfo)
         if capsInfo.chunkWindow ~= nil then capabilities.chunkWindow = capsInfo.chunkWindow == true end
         if capsInfo.maniReliable ~= nil then capabilities.maniReliable = capsInfo.maniReliable == true end
         if capsInfo.snapCodecCap ~= nil then capabilities.snapCodec = capsInfo.snapCodecCap == true end
+        if capsInfo.indexDiffSync ~= nil then capabilities.indexDiffSync = capsInfo.indexDiffSync == true end
+        if capsInfo.blockPullSync ~= nil then capabilities.blockPullSync = capsInfo.blockPullSync == true end
         if capsInfo.manifestShards ~= nil then capabilities.manifestShards = capsInfo.manifestShards == true end
     end
     return next(capabilities) ~= nil and capabilities or nil
@@ -196,6 +202,11 @@ function Sync:OnInitialize()
     self.peerBackoffUntil = {}
     self.peerHealth = {}
     self.recentRejects = {}
+    self.helloCycleCounter = 0
+    self.activeHelloCycle = nil
+    self.lastSelectedSeed = nil
+    self.outboundSeedSession = nil
+    self._seedSessionCounter = 0
     self.warmupUntil = 0
     self.warmupReason = nil
     self.worldTransitionUntil = 0
@@ -262,6 +273,15 @@ function Sync:ResetRuntimeQueues(reason, opts)
     self.peerBackoffUntil = {}
     self.peerHealth = {}
     self.recentRejects = {}
+    self.helloCycleCounter = 0
+    self.lastSelectedSeed = nil
+    self.outboundSeedSession = nil
+    self._seedSessionCounter = 0
+    if self._helloCycleTimer then
+        self:CancelTimer(self._helloCycleTimer, true)
+        self._helloCycleTimer = nil
+    end
+    self.activeHelloCycle = nil
     self.warmupUntil = 0
     self.warmupReason = nil
     self.worldTransitionUntil = 0
@@ -322,9 +342,11 @@ function Sync:ResetRuntimeStateForDatabaseWipe()
 end
 
 function Sync:KickoffDatabaseResync()
-    self._nextHelloRequestsManifest = true
-    self:RequestManifestRefresh()
-    self:ScheduleHello(0.5)
+    if Addon.Data and Addon.Data.MarkSyncIndexDirty then
+        Addon.Data:MarkSyncIndexDirty("database-resync")
+    end
+    self._nextHelloRequestsManifest = false
+    self:ScheduleHelloCycle("database-resync", 0.5)
 end
 
 function Sync:PushOfflineDebugEvent(kind, detail)
@@ -722,7 +744,7 @@ function Sync:BuildRequestRejectKey(peerKey, request)
     return table.concat({
         tostring(peerKey or ""),
         tostring(request and request.memberKey or ""),
-        tostring(request and request.rev or 0),
+        tostring(request and request.sessionId or request and request.requestId or ""),
         table.concat(requestedBlocks, "\030"),
     }, "\031")
 end
@@ -938,6 +960,9 @@ end
 function Sync:OnGuildRosterUpdate()
     self:PruneOnlineNodes()
     self:RecomputeCoordinator()
+    if Addon.Data and Addon.Data.MarkSyncIndexDirty then
+        Addon.Data:MarkSyncIndexDirty("guild-roster-update")
+    end
 end
 
 function Sync:IsRosterFresh(maxAge)
@@ -1041,6 +1066,11 @@ function Sync:ClearInFlightRequest(memberKey)
 end
 
 function Sync:ScheduleHello(delay)
+    local session = self.outboundSeedSession
+    if type(session) == "table" and session.state and session.state ~= "completed" and session.state ~= "aborted" then
+        self.telemetry.transitionSkippedHello = (self.telemetry.transitionSkippedHello or 0) + 1
+        return
+    end
     if self:ShouldDeferHeavyLifecycleWork("hello") then
         self.telemetry.transitionSkippedHello = (self.telemetry.transitionSkippedHello or 0) + 1
         self.telemetry.transitionDeferrals = (self.telemetry.transitionDeferrals or 0) + 1
@@ -1051,6 +1081,214 @@ function Sync:ScheduleHello(delay)
         return
     end
     self:ScheduleTimer("BroadcastHello", delay or 0.5)
+end
+
+function Sync:ScheduleHelloCycle(reason, delay)
+    self.lastHelloCycleReason = tostring(reason or "unspecified")
+    self.lastHelloCycleScheduledAt = time()
+    self._pendingHelloCycleReason = self.lastHelloCycleReason
+    self:ScheduleHello(delay)
+end
+
+function Sync:BeginHelloCycle(reason)
+    self.helloCycleCounter = (self.helloCycleCounter or 0) + 1
+    local helloId = string.format("%s:%d:%d", tostring(self:GetSelfKey() or "unknown"), tonumber(time() or 0) or 0, self.helloCycleCounter)
+    if self._helloCycleTimer then
+        self:CancelTimer(self._helloCycleTimer, true)
+        self._helloCycleTimer = nil
+    end
+    self.activeHelloCycle = {
+        cycleId = self.helloCycleCounter,
+        helloId = helloId,
+        reason = tostring(reason or self._pendingHelloCycleReason or "hello"),
+        startedAt = time(),
+        summaries = {},
+        selectedSeedKey = nil,
+        selectedSeed = nil,
+        selectionCompletedAt = 0,
+    }
+    return self.activeHelloCycle
+end
+
+function Sync:IsSummarySaturated()
+    local pressure = self:EstimateRuntimeQueuePressure()
+    return pressure >= (Constants.SUMMARY_SATURATION_THRESHOLD or 80)
+end
+
+function Sync:RecordSummary(peerKey, payload)
+    if not self:IsValidSyncMemberKey(peerKey) then
+        return false
+    end
+    local cycle = self.activeHelloCycle
+    if type(cycle) ~= "table" then
+        return false
+    end
+    if payload.helloId and cycle.helloId and payload.helloId ~= cycle.helloId then
+        return false
+    end
+    cycle.summaries[peerKey] = {
+        peerKey = peerKey,
+        helloId = payload.helloId,
+        activeOwnerCount = tonumber(payload.activeOwnerCount or 0) or 0,
+        activeBlockCount = tonumber(payload.activeBlockCount or 0) or 0,
+        activeContentCount = tonumber(payload.activeContentCount or 0) or 0,
+        globalFingerprint = payload.globalFingerprint,
+        indexStatus = payload.indexStatus,
+        receivedAt = time(),
+    }
+    self.telemetry.summaryReceived = (self.telemetry.summaryReceived or 0) + 1
+    return true
+end
+
+function Sync:SelectOutboundSeed(cycleId)
+    local cycle = self.activeHelloCycle
+    if type(cycle) ~= "table" then
+        return nil
+    end
+    if cycleId and cycle.cycleId ~= cycleId then
+        return nil
+    end
+    if cycle.selectedSeedKey then
+        return cycle.selectedSeedKey
+    end
+
+    local localSummary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
+        reason = "seed-selection",
+    }) or nil
+    local rows = {}
+    for peerKey, summary in pairs(cycle.summaries or {}) do
+        if self:IsValidSyncMemberKey(peerKey)
+            and type(summary) == "table"
+            and tostring(summary.indexStatus or "") == "ready"
+            and tostring(summary.globalFingerprint or "") ~= tostring(localSummary and localSummary.globalFingerprint or "") then
+            rows[#rows + 1] = summary
+        end
+    end
+
+    table.sort(rows, function(left, right)
+        if (left.activeContentCount or 0) ~= (right.activeContentCount or 0) then
+            return (left.activeContentCount or 0) > (right.activeContentCount or 0)
+        end
+        if (left.activeBlockCount or 0) ~= (right.activeBlockCount or 0) then
+            return (left.activeBlockCount or 0) > (right.activeBlockCount or 0)
+        end
+        if (left.activeOwnerCount or 0) ~= (right.activeOwnerCount or 0) then
+            return (left.activeOwnerCount or 0) > (right.activeOwnerCount or 0)
+        end
+        local leftBackoff = self:IsPeerBackoffActive(left.peerKey) and 1 or 0
+        local rightBackoff = self:IsPeerBackoffActive(right.peerKey) and 1 or 0
+        if leftBackoff ~= rightBackoff then
+            return leftBackoff < rightBackoff
+        end
+        local leftHealth = self.GetPeerHealthScore and self:GetPeerHealthScore(left.peerKey) or 0
+        local rightHealth = self.GetPeerHealthScore and self:GetPeerHealthScore(right.peerKey) or 0
+        if leftHealth ~= rightHealth then
+            return leftHealth > rightHealth
+        end
+        return tostring(left.peerKey) < tostring(right.peerKey)
+    end)
+
+    local selected = rows[1] or nil
+    cycle.selectedSeed = selected
+    cycle.selectedSeedKey = selected and selected.peerKey or nil
+    cycle.selectionCompletedAt = time()
+    self.lastSelectedSeed = selected
+    if selected then
+        self.telemetry.seedSelected = (self.telemetry.seedSelected or 0) + 1
+        self.telemetry.lastSelectedPeer = selected.peerKey
+        self.telemetry.lastSelectedReason = "summary-window"
+        if self.BeginOutboundSeedSession then
+            self:BeginOutboundSeedSession(selected.peerKey, selected, cycle)
+        end
+    end
+    return cycle.selectedSeedKey
+end
+
+function Sync:BeginOutboundSeedSession(seedKey, summary, cycle)
+    if not self:IsValidSyncMemberKey(seedKey) then
+        return nil, "invalid-seed"
+    end
+    local existing = self.outboundSeedSession
+    if type(existing) == "table" and existing.state and existing.state ~= "completed" and existing.state ~= "aborted" then
+        return existing, "session-active"
+    end
+
+    self._seedSessionCounter = (self._seedSessionCounter or 0) + 1
+    local session = {
+        sessionId = string.format("seed:%s:%d:%d", tostring(seedKey), tonumber(time() or 0) or 0, self._seedSessionCounter),
+        cycleId = cycle and cycle.cycleId or nil,
+        helloId = cycle and cycle.helloId or nil,
+        seedKey = seedKey,
+        summary = summary,
+        state = "seed-selected",
+        startedAt = time(),
+        lastProgressAt = time(),
+        diffRequestId = nil,
+        diffSentAt = 0,
+        offeredBlocks = {},
+        wantedBlocks = {},
+        nextWantedIndex = 1,
+        activeBlockKey = nil,
+        activeBlockRequestId = nil,
+        completedAt = 0,
+        abortedAt = 0,
+        abortReason = nil,
+    }
+    self.outboundSeedSession = session
+    if self.RequestIndexDiff then
+        self:RequestIndexDiff(seedKey, {
+            cycleId = session.cycleId,
+            helloId = session.helloId,
+            sessionId = session.sessionId,
+        })
+    end
+    return session
+end
+
+function Sync:AbortOutboundSeedSession(reason)
+    local session = self.outboundSeedSession
+    if type(session) ~= "table" then
+        return false
+    end
+    session.state = "aborted"
+    session.abortReason = tostring(reason or "aborted")
+    session.abortedAt = time()
+    session.lastProgressAt = session.abortedAt
+    if Addon.Data and Addon.Data.CommitGlobalFingerprint then
+        Addon.Data:CommitGlobalFingerprint("seed-session-abort:" .. session.abortReason)
+    end
+    self.telemetry.outboundSessionAborted = (self.telemetry.outboundSessionAborted or 0) + 1
+    self.telemetry.lastAbortReason = session.abortReason
+    return true
+end
+
+function Sync:CompleteOutboundSeedSession(reason)
+    local session = self.outboundSeedSession
+    if type(session) ~= "table" then
+        return false
+    end
+    session.state = "completed"
+    session.completedAt = time()
+    session.lastProgressAt = session.completedAt
+    session.completedReason = tostring(reason or "complete")
+    if Addon.Data and Addon.Data.CommitGlobalFingerprint then
+        Addon.Data:CommitGlobalFingerprint("seed-session-complete:" .. session.completedReason)
+    end
+    self.telemetry.outboundSessionCompleted = (self.telemetry.outboundSessionCompleted or 0) + 1
+    return true
+end
+
+function Sync:CanServeInboundSeed(peerKey)
+    if not self:IsValidSyncMemberKey(peerKey) then
+        return false, "invalid-peer"
+    end
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("BLOCK_SNAPSHOT") then
+        return false, "paused"
+    end
+    if self:EstimateRuntimeQueuePressure() >= 95 then
+        return false, "saturated"
+    end
+    return true, "ready"
 end
 
 function Sync:ScheduleQueuePump(delay)
@@ -1219,19 +1457,8 @@ function Sync:RunTransitionDrainStep(state, _budget)
     self.telemetry.transitionDrainSteps = (self.telemetry.transitionDrainSteps or 0) + 1
     self:PushLifecycleEvent("TRANSITION_DRAIN_STEP", tostring(item.kind))
 
-    if item.kind == "manifest-peer" then
-        if item.peerKey and self.onlineNodes and self.onlineNodes[item.peerKey] then
-            self:SendManifestToPeer(item.peerKey, item.why or "transition")
-        end
-    elseif item.kind == "manifest-refresh" then
-        if item.peerKey and self.onlineNodes and self.onlineNodes[item.peerKey] then
-            self:RequestManifestRefresh(item.peerKey, { reason = item.reason or "transition" })
-        end
-    elseif item.kind == "broadcast-manifest" then
-        self:BroadcastManifestToOnlinePeers(item.why or "transition", {
-            ignoreWarmup = true,
-            ignoreTransition = true,
-        })
+    if item.kind == "manifest-peer" or item.kind == "manifest-refresh" or item.kind == "broadcast-manifest" then
+        return true, state
     elseif item.kind == "manifest-compare-flush" then
         self:FlushPendingManifestComparePeers(item.reason or "transition")
     elseif item.kind == "catchup" then
@@ -1299,7 +1526,7 @@ function Sync:QueueWarmupManifestRefresh(peerKey)
     self._warmupDeferredManifestRefreshPeers[peerKey] = true
 end
 
-function Sync:ShouldRequestManifestRefresh(peerKey, opts)
+function Sync:ShouldRequestLegacyRefresh(peerKey, opts)
     opts = opts or {}
     if not self:IsValidSyncMemberKey(peerKey) then return false, "invalid-peer" end
     if opts.force == true or opts.ignoreCooldown == true then return true, "forced" end
@@ -1789,13 +2016,7 @@ function Sync:PrunePartialManifestReceives()
                             tostring(state.manifestAttempt or 1),
                             table.concat(missingSeqs, ",")
                         ))
-                        self:RequestManifestRefresh(peerKey, {
-                            ignoreCooldown = true,
-                            reason = "manifest-missing-seqs",
-                            manifestId = manifestId,
-                            manifestAttempt = state.manifestAttempt,
-                            missingSeqs = missingSeqs,
-                        })
+                        self.telemetry.manifestDeferredSends = (self.telemetry.manifestDeferredSends or 0) + 1
                     elseif not canRecoverMissingSeqs
                         or not state.recoveryRequestedAt
                         or (now - state.recoveryRequestedAt) > SESSION_TIMEOUT then
@@ -1902,53 +2123,15 @@ function Sync:PruneState()
 end
 
 function Sync:RecomputeCoordinator()
-    local rosterFresh = self:IsRosterFresh()
-    if not rosterFresh then
-        self:EnsureFreshRoster("coordinator")
-        rosterFresh = self:IsRosterFresh()
-    end
-    local keys = {}
-    for key in pairs(self.onlineNodes) do
-        if self:IsValidSyncMemberKey(key)
-            and not self:IsMockKey(key)
-            and ((not rosterFresh) or Addon.Data:IsMemberOnline(key) or key == self:GetSelfKey()) then
-            keys[#keys + 1] = key
-        end
-    end
-    if #keys == 0 then
-        keys[1] = self:GetSelfKey()
-    end
-    sort(keys)
-    local nextCoordinator = keys[1]
-    if nextCoordinator ~= self.coordinatorKey then
-        self.coordinatorKey = nextCoordinator
-        self._lastCoordinatorChangeAt = time()
-        Addon:Debug("Coordinator changed to", tostring(nextCoordinator))
-        Addon:RequestRefresh("coordinator")
-    end
+    self.coordinatorKey = nil
 end
 
 function Sync:IsCoordinator()
-    return self.coordinatorKey == self:GetSelfKey()
+    return false
 end
 
-function Sync:RecordRevisionHint(memberKey, rev, updatedAt, owner, meta)
-    if not self:IsValidSyncMemberKey(memberKey) then return end
-    if owner and not self:IsValidSyncMemberKey(owner) then owner = memberKey end
-    meta = meta or {}
-    local row = self.registry[memberKey] or { owner = owner or memberKey, rev = 0, updatedAt = 0 }
-    if owner then row.owner = owner end
-    if (rev or 0) >= (row.rev or 0) then
-        row.rev = rev or row.rev or 0
-        row.updatedAt = updatedAt or row.updatedAt or 0
-    end
-    if meta.isMock ~= nil then
-        row.isMock = meta.isMock and true or false
-    elseif row.isMock == nil and isMockKey(memberKey) then
-        row.isMock = true
-    end
-    row.lastSeen = time()
-    self.registry[memberKey] = row
+function Sync:RecordLegacyHint(memberKey, versionHint, updatedAt, owner, meta)
+    return false
 end
 
 function Sync:GetKnownOwner(memberKey)
@@ -1957,9 +2140,8 @@ function Sync:GetKnownOwner(memberKey)
     return memberKey
 end
 
-function Sync:GetKnownRevision(memberKey)
-    local row = self.registry[memberKey]
-    return row and (row.rev or 0) or 0
+function Sync:GetLegacyKnownValue(memberKey)
+    return 0
 end
 
 function Sync:GetManifestCatchupOutstandingCost()
@@ -2016,17 +2198,7 @@ function Sync:AutoSyncTick()
         return
     end
 
-    if self:GetActiveRequestCount() < self:GetMaxConcurrentRequests() and not self:IsInWarmup() then
-        for key, hint in pairs(self.registry) do
-            if not self:IsMockKey(key) and not self:IsMockKey(hint.owner) then
-                local localEntry = Addon.Data:GetMember(key)
-                local localRev = localEntry and localEntry.rev or 0
-                if (hint.rev or 0) > localRev then
-                    self:QueueRequest(hint.owner or key, key, hint.rev or 0, "auto-tick")
-                end
-            end
-        end
-    elseif self:IsInWarmup() then
+    if self:IsInWarmup() then
         self.telemetry.warmupDeferrals = (self.telemetry.warmupDeferrals or 0) + 1
     end
 

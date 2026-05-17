@@ -1045,7 +1045,9 @@ function Data:MarkMemberActive(memberKey, seenAt)
         prof.lastSeenInGuildAt = entry.lastSeenInGuildAt
         entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, prof)
     end
-    self:MarkManifestMemberDirty(memberKey, entry, "member-active")
+    if self.MarkSyncIndexDirty then
+        self:MarkSyncIndexDirty("member-active")
+    end
     return true
 end
 
@@ -1059,15 +1061,19 @@ function Data:MarkMemberStale(memberKey, staleAt)
         prof.guildStatus = "stale"
         entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, prof)
     end
-    self:MarkManifestMemberDirty(memberKey, entry, "member-stale")
+    if self.MarkSyncIndexDirty then
+        self:MarkSyncIndexDirty("member-stale")
+    end
     self:InvalidateRecipeCaches("presence")
     return true
 end
 
 function Data:DeleteMember(memberKey)
     if not memberKey then return false end
-    self:MarkManifestMemberDirty(memberKey, self:GetMember(memberKey), "member-delete")
     self.db.global.members[memberKey] = nil
+    if self.MarkSyncIndexDirty then
+        self:MarkSyncIndexDirty("member-delete")
+    end
     self:InvalidateRecipeCaches("presence")
     if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
         Addon.Tooltip:InvalidateIndex()
@@ -1093,7 +1099,9 @@ function Data:DeleteMockMembers()
         end
     end
     if removed > 0 then
-        self:MarkManifestDirty(nil, "mock-cleanup")
+        if self.MarkSyncIndexDirty then
+            self:MarkSyncIndexDirty("mock-cleanup")
+        end
         self:InvalidateRecipeCaches("presence")
         if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
             Addon.Tooltip:InvalidateIndex()
