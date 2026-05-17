@@ -26,6 +26,9 @@ local POST_RELOAD_IN_INSTANCE_GRACE_SECONDS = Constants.POST_RELOAD_IN_INSTANCE_
 
 local LIFECYCLE_DEBUG_LIMIT = 20
 local VERSION_NOTICE_COOLDOWN = 12 * 60 * 60
+local DISCOVERY_RETRY_INITIAL_SECONDS = Constants.DISCOVERY_RETRY_INITIAL_SECONDS or 20
+local DISCOVERY_RETRY_STEP_SECONDS = Constants.DISCOVERY_RETRY_STEP_SECONDS or 20
+local DISCOVERY_RETRY_MAX_SECONDS = Constants.DISCOVERY_RETRY_MAX_SECONDS or 300
 
 local function cloneCapabilities(src)
     local out = {}
@@ -41,6 +44,22 @@ local function cloneTable(src)
         out[key] = value
     end
     return out
+end
+
+local function isDiscoveryReason(reason)
+    local text = tostring(reason or "")
+    return text:find("^discovery%-") ~= nil
+end
+
+local function shouldResetDiscoveryRetry(reason)
+    local text = tostring(reason or "")
+    if text == "" then
+        return false
+    end
+    if text:find("^deferred:") or text:find("^retry:") or text:find("^hello%-auto") then
+        return false
+    end
+    return not isDiscoveryReason(text)
 end
 
 local function normalizeBuildChannel(value)
@@ -113,6 +132,19 @@ function Sync:OnInitialize()
     self.warmupReason = nil
     self.worldTransitionUntil = 0
     self.worldTransitionReason = nil
+    self.savedVariablesReady = self._savedVariablesReadyBootstrap == true
+    self.playerReady = false
+    self.rosterPreflightReady = false
+    self.rosterPreflightReason = "not-ready"
+    self.indexReady = false
+    self.indexStatus = "missing"
+    self.syncReady = false
+    self.lastSyncReadyChangeAt = 0
+    self.lastSyncReadyReason = "boot"
+    self.lastSyncNotReadyReason = "saved-variables"
+    self.discoveryRetryDelay = DISCOVERY_RETRY_INITIAL_SECONDS
+    self.discoveryRetryMisses = 0
+    self.lastDiscoveryRetryReason = nil
     self.telemetry = newSyncTelemetry()
 end
 
@@ -147,6 +179,7 @@ function Sync:ResetRuntimeQueues(reason, opts)
     self.warmupReason = nil
     self.worldTransitionUntil = 0
     self.worldTransitionReason = nil
+    self:ResetDiscoveryRetry("runtime-reset")
     if self._helloCycleTimer then
         self:CancelTimer(self._helloCycleTimer, true)
         self._helloCycleTimer = nil
@@ -170,6 +203,7 @@ function Sync:ResetRuntimeQueues(reason, opts)
     if opts.kickoffResync then
         self:KickoffDatabaseResync()
     end
+    self:RefreshSyncReadyState(reason or "runtime-reset")
     Addon:RequestRefresh("queue")
     if opts.userVisible then
         Addon:Print("Sync runtime reset. Saved recipes were kept and a fresh hello cycle was scheduled.")
@@ -205,12 +239,159 @@ function Sync:ResetRuntimeStateForDatabaseWipe()
     })
 end
 
+function Sync:SetSavedVariablesReady(reason)
+    self.savedVariablesReady = true
+    self.lastSavedVariablesReadyReason = tostring(reason or "saved-variables")
+    return self:RefreshSyncReadyState("saved-variables-ready")
+end
+
+function Sync:SetPlayerReady(reason)
+    self.playerReady = true
+    self.lastPlayerReadyReason = tostring(reason or "player-login")
+    return self:RefreshSyncReadyState("player-ready")
+end
+
+function Sync:ResetDiscoveryRetry(reason)
+    self.discoveryRetryDelay = DISCOVERY_RETRY_INITIAL_SECONDS
+    self.discoveryRetryMisses = 0
+    self.lastDiscoveryRetryReason = tostring(reason or "reset")
+    return true
+end
+
+function Sync:GetNextDiscoveryRetryDelay()
+    local delay = tonumber(self.discoveryRetryDelay or DISCOVERY_RETRY_INITIAL_SECONDS) or DISCOVERY_RETRY_INITIAL_SECONDS
+    if delay < DISCOVERY_RETRY_INITIAL_SECONDS then
+        delay = DISCOVERY_RETRY_INITIAL_SECONDS
+    end
+    if delay > DISCOVERY_RETRY_MAX_SECONDS then
+        delay = DISCOVERY_RETRY_MAX_SECONDS
+    end
+    return delay
+end
+
+function Sync:ScheduleDiscoveryRetry(reason)
+    local session = self.outboundSeedSession
+    if type(session) == "table" and session.state and session.state ~= "completed" and session.state ~= "aborted" then
+        return false, "outbound-session-active"
+    end
+    if self._helloTimer then
+        return false, "hello-already-scheduled"
+    end
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("HELLO") then
+        return false, "paused"
+    end
+    self:RefreshSyncReadyState(reason or "discovery-retry")
+    if self.syncReady ~= true then
+        return false, self.lastSyncNotReadyReason or "not-ready"
+    end
+
+    local delay = self:GetNextDiscoveryRetryDelay()
+    self.discoveryRetryMisses = (self.discoveryRetryMisses or 0) + 1
+    self.discoveryRetryDelay = min(DISCOVERY_RETRY_MAX_SECONDS, delay + DISCOVERY_RETRY_STEP_SECONDS)
+    self.telemetry.discoveryRetryScheduled = (self.telemetry.discoveryRetryScheduled or 0) + 1
+    self.telemetry.lastDiscoveryRetryDelay = delay
+    self.telemetry.lastDiscoveryRetryReason = tostring(reason or "discovery-retry")
+    return self:ScheduleHello(
+        tostring(reason or "discovery-retry"),
+        delay + (random() * (Constants.HELLO_RESCHEDULE_JITTER_SECONDS or 0))
+    )
+end
+
+function Sync:RefreshSyncReadyState(reason)
+    if not self.telemetry then
+        self.telemetry = newSyncTelemetry()
+    end
+    local rosterState = Addon.Data and Addon.Data.GetRosterTrustState and Addon.Data:GetRosterTrustState() or nil
+    self.rosterPreflightReady = type(rosterState) == "table" and rosterState.trusted == true or false
+    self.rosterPreflightReason = type(rosterState) == "table" and tostring(rosterState.reason or "unknown") or "unavailable"
+
+    local indexState = Addon.Data and Addon.Data.GetSyncIndexReadiness and Addon.Data:GetSyncIndexReadiness({
+        reason = reason or "sync-ready",
+        schedule = true,
+        delay = 0.5,
+    }) or nil
+    local session = self.outboundSeedSession
+    local sessionActive = type(session) == "table"
+        and session.state
+        and session.state ~= "completed"
+        and session.state ~= "aborted"
+    self.indexReady = type(indexState) == "table"
+        and (indexState.ready == true or (sessionActive and indexState.indexStatus == "dirty"))
+        or false
+    self.indexStatus = type(indexState) == "table" and tostring(indexState.indexStatus or "unknown") or "missing"
+
+    local paused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("HELLO") or false
+    local saturated = self:EstimateRuntimeQueuePressure() >= 95
+    local worldReady = not self:IsInWarmup() and not self:IsInWorldTransition()
+    local nextReady = self.savedVariablesReady == true
+        and self.playerReady == true
+        and worldReady
+        and self.rosterPreflightReady == true
+        and self.indexReady == true
+        and not paused
+        and not saturated
+
+    local previous = self.syncReady == true
+    self.syncReady = nextReady == true
+    self.lastSyncReadyChangeAt = time()
+    self.lastSyncReadyReason = tostring(reason or "sync-ready")
+
+    if self.syncReady then
+        self.lastSyncNotReadyReason = nil
+        if not previous then
+            self:ResetDiscoveryRetry("sync-ready")
+            self:ScheduleHello("sync-ready")
+        end
+    else
+        if self.savedVariablesReady ~= true then
+            self.lastSyncNotReadyReason = "saved-variables"
+        elseif self.playerReady ~= true then
+            self.lastSyncNotReadyReason = "player"
+        elseif not worldReady then
+            self.lastSyncNotReadyReason = self:IsInWorldTransition() and "world-transition" or "warmup"
+        elseif self.rosterPreflightReady ~= true then
+            self.lastSyncNotReadyReason = self.rosterPreflightReason or "roster-unready"
+        elseif self.indexReady ~= true then
+            self.lastSyncNotReadyReason = self.indexStatus or "index-not-ready"
+        elseif paused then
+            self.lastSyncNotReadyReason = "paused"
+        else
+            self.lastSyncNotReadyReason = "runtime-saturated"
+        end
+    end
+
+    self.telemetry.syncReadyTransitions = (self.telemetry.syncReadyTransitions or 0) + (previous ~= self.syncReady and 1 or 0)
+    self.telemetry.lastSyncReadyState = self.syncReady == true and "ready" or "not-ready"
+    self.telemetry.lastSyncReadyReason = self.syncReady == true and self.lastSyncReadyReason or self.lastSyncNotReadyReason
+    return self.syncReady, self.syncReady and "ready" or self.lastSyncNotReadyReason
+end
+
+function Sync:IsSyncReady()
+    return self.syncReady == true
+end
+
+function Sync:CanRunSyncProtocol(kind)
+    self:RefreshSyncReadyState("protocol:" .. tostring(kind or "sync"))
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic(kind) then
+        return false, "paused"
+    end
+    if self.syncReady ~= true then
+        return false, self.lastSyncNotReadyReason or "not-ready"
+    end
+    return true, "ready"
+end
+
 function Sync:KickoffDatabaseResync()
     if Addon.Data and Addon.Data.MarkSyncIndexDirty then
         Addon.Data:MarkSyncIndexDirty("database-resync", nil, {
             full = true,
         })
     end
+    if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then
+        Addon.Data:ScheduleSyncIndexPrepare("database-resync", 0.5)
+    end
+    self:ResetDiscoveryRetry("database-resync")
+    self:RefreshSyncReadyState("database-resync")
     self:ScheduleHello("database-resync")
 end
 
@@ -612,6 +793,11 @@ function Sync:OnGuildRosterUpdate()
             full = true,
         })
     end
+    if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then
+        Addon.Data:ScheduleSyncIndexPrepare("roster-update", 0.5)
+    end
+    self:ResetDiscoveryRetry("roster-update")
+    self:RefreshSyncReadyState("roster-update")
     self:ScheduleHello("roster-update")
 end
 
@@ -673,31 +859,22 @@ function Sync:ClearPendingHello(reason)
 end
 
 function Sync:ShouldDeferHelloBroadcast()
+    local ready, readyReason = self:CanRunSyncProtocol("HELLO")
+    if not ready then
+        return true, readyReason or "not-ready"
+    end
     local session = self.outboundSeedSession
     if type(session) == "table" and session.state and session.state ~= "completed" and session.state ~= "aborted" then
         return true, "outbound-session-active"
-    end
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("HELLO") then
-        return true, "paused"
-    end
-    if self:IsInWarmup() then
-        return true, "warmup"
-    end
-    if self:IsInWorldTransition() then
-        return true, "world-transition"
-    end
-    if self:ShouldDeferHeavyLifecycleWork("hello") then
-        return true, "runtime-saturated"
-    end
-    local trust = Addon.Data and Addon.Data.EnsureTrustedRosterForSync and Addon.Data:EnsureTrustedRosterForSync("hello-ready") or nil
-    if type(trust) == "table" and trust.trusted ~= true then
-        return true, tostring(trust.reason or "roster-unready")
     end
     return false, "ready"
 end
 
 function Sync:ScheduleHello(reason, delay)
     local helloReason = tostring(reason or "hello")
+    if shouldResetDiscoveryRetry(helloReason) then
+        self:ResetDiscoveryRetry(helloReason)
+    end
     self._pendingHelloReasons = self._pendingHelloReasons or {}
     self._pendingHelloReasons[helloReason] = true
     self._pendingHelloCycleReason = self:GetPendingHelloReason()
@@ -790,6 +967,16 @@ function Sync:RecordSummary(peerKey, payload)
         globalFingerprint = payload.globalFingerprint,
         receivedAt = time(),
     }
+    local localSummary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
+        reason = "summary-received",
+        allowDeferred = true,
+    }) or nil
+    if type(localSummary) == "table"
+        and tostring(localSummary.indexStatus or "") == "ready"
+        and tostring(payload.globalFingerprint or "") ~= tostring(localSummary.globalFingerprint or "")
+    then
+        self:ResetDiscoveryRetry("useful-summary")
+    end
     self.telemetry.summaryReceived = (self.telemetry.summaryReceived or 0) + 1
     Addon:Trace("sync", string.format(
         "summary-received peer=%s helloId=%s owners=%d blocks=%d content=%d fingerprint=%s",
@@ -817,6 +1004,7 @@ function Sync:SelectOutboundSeed(cycleId)
 
     local localSummary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
         reason = "seed-selection",
+        allowDeferred = true,
     }) or nil
     local rows = {}
     for peerKey, summary in pairs(cycle.summaries or {}) do
@@ -854,14 +1042,17 @@ function Sync:SelectOutboundSeed(cycleId)
 
     cycle.selectionCompletedAt = time()
     if #rows == 0 then
+        self.telemetry.discoveryMisses = (self.telemetry.discoveryMisses or 0) + 1
         Addon:Trace("sync", string.format(
             "seed-selection-none helloId=%s reason=no-different-ready-summary",
             tostring(cycle.helloId or "none")
         ))
+        self:ScheduleDiscoveryRetry("discovery-miss")
         return nil
     end
 
     local selected = rows[1]
+    self:ResetDiscoveryRetry("seed-selected")
     cycle.selectedSeedKey = selected.peerKey
     cycle.selectedSeed = selected
     self.lastSelectedSeed = cloneTable(selected)
@@ -920,6 +1111,12 @@ function Sync:AbortOutboundSeedSession(reason)
         tostring(session.seedKey or "unknown"),
         tostring(session.abortReason)
     ))
+    if (session.successfulBlockMerges or 0) > 0 then
+        self:ResetDiscoveryRetry("seed-session-abort-partial")
+    else
+        self:ResetDiscoveryRetry("seed-session-abort-retry")
+    end
+    self:RefreshSyncReadyState(session.abortReason)
     self:ScheduleHello((session.successfulBlockMerges or 0) > 0 and "seed-session-abort-partial" or "seed-session-abort-retry")
     return true
 end
@@ -948,6 +1145,8 @@ function Sync:CompleteOutboundSeedSession(reason)
         tostring(session.completedReason)
     ))
     if (session.successfulBlockMerges or 0) > 0 then
+        self:ResetDiscoveryRetry("seed-session-complete")
+        self:RefreshSyncReadyState(session.completedReason)
         self:ScheduleHello("seed-session-complete")
     end
     return true
@@ -1029,6 +1228,7 @@ function Sync:RegisterInboundSeedSession(requesterKey, requestId, offeredBlocks)
         state = "ready",
     }
     session.offeredBlocks = offeredBlockSet
+    session.offeredBlockCount = countKeys(offeredBlockSet)
     session.lastActivity = time()
     session.state = "ready"
     existingSessions[requestId] = session
@@ -1064,6 +1264,9 @@ function Sync:CanServeInboundSeed(peerKey)
     if not eligible then
         return false, "ineligible"
     end
+    if self:IsSyncReady() ~= true then
+        return false, self.lastSyncNotReadyReason or "not-ready"
+    end
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("BLOCK_SNAPSHOT") then
         return false, "paused"
     end
@@ -1087,11 +1290,16 @@ function Sync:EnterWarmup(reason, seconds)
     self.warmupReason = tostring(reason or "warmup")
     self.warmupUntil = time() + max(0, tonumber(seconds or POST_WORLD_GRACE_SECONDS) or POST_WORLD_GRACE_SECONDS)
     self:ClearInboundSeedSessions("warmup")
+    self:RefreshSyncReadyState(self.warmupReason)
     if self._warmupTimer then
         self:CancelTimer(self._warmupTimer, true)
     end
     self._warmupTimer = self:ScheduleTimer(function()
         self._warmupTimer = nil
+        if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then
+            Addon.Data:ScheduleSyncIndexPrepare("warmup-recovery", 0.5)
+        end
+        self:RefreshSyncReadyState("warmup-recovery")
         self:ScheduleHello("warmup-recovery")
     end, max(0, self.warmupUntil - time()))
 end
@@ -1111,11 +1319,16 @@ function Sync:EnterWorldTransition(reason, seconds)
     self.worldTransitionReason = tostring(reason or "transition")
     self.worldTransitionUntil = time() + max(0, tonumber(seconds or POST_WORLD_GRACE_SECONDS) or POST_WORLD_GRACE_SECONDS)
     self:ClearInboundSeedSessions("world-transition")
+    self:RefreshSyncReadyState(self.worldTransitionReason)
     if self._transitionTimer then
         self:CancelTimer(self._transitionTimer, true)
     end
     self._transitionTimer = self:ScheduleTimer(function()
         self._transitionTimer = nil
+        if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then
+            Addon.Data:ScheduleSyncIndexPrepare("world-transition-recovery", 0.5)
+        end
+        self:RefreshSyncReadyState("world-transition-recovery")
         self:ScheduleHello("world-transition-recovery")
     end, max(0, self.worldTransitionUntil - time()))
 end
@@ -1132,6 +1345,9 @@ function Sync:GetWorldTransitionRemaining()
 end
 
 function Sync:EstimateRuntimeQueuePressure()
+    if not self.telemetry then
+        self.telemetry = newSyncTelemetry()
+    end
     local pressure = 0
     local session = self.outboundSeedSession
     if type(session) == "table" and session.state and session.state ~= "completed" and session.state ~= "aborted" then
@@ -1210,11 +1426,12 @@ function Sync:AutoSyncTick()
     if type(IsInGuild) == "function" and not IsInGuild() then
         return
     end
+    self:RefreshSyncReadyState("auto-sync")
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("HELLO") then
         self.telemetry.pausedSyncCycles = (self.telemetry.pausedSyncCycles or 0) + 1
         return
     end
-    if self:IsInWorldTransition() then
+    if self.syncReady ~= true then
         return
     end
     if countKeys(self.onlineNodes) == 0 then

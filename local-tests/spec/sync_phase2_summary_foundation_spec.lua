@@ -7,6 +7,31 @@ local function freshAddon()
     return addon, wow, addon.Data
 end
 
+local function primeSyncReady(addon, wow, data, reason)
+    local ownerKey = data:GetPlayerKey()
+    Loader.Wow.SetGuildRoster({
+        { name = ownerKey, online = true, rankName = "Member", rankIndex = 5, level = 70, classDisplayName = "Mage", classFileName = "MAGE" },
+    })
+    data:RebuildOnlineCache()
+    Loader.PrimeSyncReady(addon, {
+        reason = reason or "phase2-prime",
+        runTimers = false,
+    })
+end
+
+local function refreshSyncNode(node, reason)
+    local addon = node and node.addon or nil
+    if not addon then
+        return
+    end
+    if addon.Data and addon.Data.PrepareSyncIndexNow then
+        addon.Data:PrepareSyncIndexNow(reason or "phase2-refresh")
+    end
+    if addon.Sync and addon.Sync.RefreshSyncReadyState then
+        addon.Sync:RefreshSyncReadyState(reason or "phase2-refresh")
+    end
+end
+
 local function countSentKind(rows, kind)
     local total = 0
     for _, row in ipairs(rows or {}) do
@@ -253,11 +278,8 @@ end)
 
 Test.it("ScheduleHello coalesces multiple local-change reasons into one delayed HELLO", function()
     local addon, wow, data = freshAddon()
+    primeSyncReady(addon, wow, data, "phase2-hello-coalesce")
     local ownerKey = data:GetPlayerKey()
-    Loader.Wow.SetGuildRoster({
-        { name = ownerKey, online = true, rankName = "Member", rankIndex = 5, level = 70, classDisplayName = "Mage", classFileName = "MAGE" },
-    })
-    data:RebuildOnlineCache()
     seedProfession(data, ownerKey, "Alchemy", { 4401, 4402 }, {
         sourceType = "owner",
         professionSourceType = "owner",
@@ -279,16 +301,21 @@ Test.it("ScheduleHello coalesces multiple local-change reasons into one delayed 
     Test.eq(countWowKind(wow, "HELLO"), 1, "coalesced scheduling should emit one hello when the timer fires")
 end)
 
+Test.it("summary collection window matches the modern 6 second discovery window", function()
+    local addon, _wow, _data = freshAddon()
+
+    Test.eq(addon.Sync._private.constants.SUMMARY_COLLECTION_WINDOW, 6, "summary collection window should match the roadmap target")
+end)
+
 Test.it("HELLO publishes the new summary fields only", function()
     local addon, wow, data = freshAddon()
+    primeSyncReady(addon, wow, data, "phase2-hello-publish")
     local ownerKey = data:GetPlayerKey()
-    Loader.Wow.SetGuildRoster({
-        { name = ownerKey, online = true, rankName = "Member", rankIndex = 5, level = 70, classDisplayName = "Mage", classFileName = "MAGE" },
-    })
-    data:RebuildOnlineCache()
     seedProfession(data, ownerKey, "Alchemy", { 5001, 5002, 5003 }, {
         reason = "hello-summary",
     })
+    data:PrepareSyncIndexNow("hello-summary")
+    addon.Sync:RefreshSyncReadyState("hello-summary")
 
     addon.Sync:BroadcastHello()
 
@@ -310,6 +337,32 @@ Test.it("HELLO publishes the new summary fields only", function()
     Test.eq(payload.manifestFingerprint, nil, "hello should not publish manifestFingerprint")
 end)
 
+Test.it("discovery miss schedules a progressive retry instead of starting a pull", function()
+    local addon, wow, data = freshAddon()
+    primeSyncReady(addon, wow, data, "phase2-discovery-retry")
+    local ownerKey = data:GetPlayerKey()
+    seedProfession(data, ownerKey, "Alchemy", { 5501, 5502 }, {
+        reason = "discovery-retry-local",
+    })
+    data:PrepareSyncIndexNow("discovery-retry-local")
+    addon.Sync:RefreshSyncReadyState("discovery-retry-local")
+    if addon.Sync._helloTimer then
+        addon.Sync:CancelTimer(addon.Sync._helloTimer, true)
+        addon.Sync._helloTimer = nil
+    end
+    addon.Sync:ClearPendingHello("test-reset")
+
+    addon.Sync:BroadcastHello()
+    wow.AdvanceTime(6)
+    wow.RunTimers(20)
+
+    Test.eq(addon.Sync.telemetry.discoveryMisses or 0, 1, "empty summary window should count as a discovery miss")
+    Test.truthy(addon.Sync._helloTimer ~= nil, "discovery miss should schedule a retry hello")
+    Test.truthy(type(addon.Sync._helloScheduledFor) == "number", "retry hello should record a scheduled fire time")
+    Test.eq(addon.Sync.telemetry.lastDiscoveryRetryDelay, 20, "first discovery retry should start from the 20 second base delay")
+    Test.eq(addon.Sync.outboundSeedSession, nil, "discovery miss should not start an outbound pull session")
+end)
+
 Test.it("HELLO triggers SUMMARY only when both peers are ready and fingerprints differ", function()
     local bus = CommBus.New({
         names = { "Summleft", "Summright" },
@@ -329,6 +382,8 @@ Test.it("HELLO triggers SUMMARY only when both peers are ready and fingerprints 
     })
     left.addon.Data:MarkSyncIndexDirty("left-seed")
     right.addon.Data:MarkSyncIndexDirty("right-seed")
+    refreshSyncNode(left, "left-seed")
+    refreshSyncNode(right, "right-seed")
 
     bus:Activate(left)
     left.addon.Sync:BroadcastHello()
@@ -337,7 +392,7 @@ Test.it("HELLO triggers SUMMARY only when both peers are ready and fingerprints 
         local cycle = left.addon.Sync.activeHelloCycle
         return cycle and cycle.summaries and cycle.summaries[right.key] ~= nil
     end, {
-        maxTicks = 80,
+        maxTicks = 180,
     })
 
     Test.truthy(settled, "different ready peers should exchange SUMMARY")
@@ -354,6 +409,10 @@ Test.it("HELLO triggers SUMMARY only when both peers are ready and fingerprints 
     data:RebuildOnlineCache()
     seedProfession(data, ownerKey, "Alchemy", { 8001, 8002 }, {
         reason = "same-fingerprint",
+    })
+    Loader.PrimeSyncReady(addon, {
+        reason = "phase2-same-fingerprint",
+        runTimers = false,
     })
     local localSummary = data:BuildLocalSummary({
         reason = "same-fingerprint-summary",
@@ -398,6 +457,8 @@ Test.it("HELLO triggers SUMMARY only when both peers are ready and fingerprints 
     })
     unreadyLeft.addon.Data:MarkSyncIndexDirty("unready-left")
     unreadyRight.addon.Data:MarkSyncIndexDirty("unready-right")
+    refreshSyncNode(unreadyLeft, "unready-left")
+    refreshSyncNode(unreadyRight, "unready-right")
     unreadyRight.addon.Sync.warmupUntil = time() + 30
 
     busUnready:Activate(unreadyLeft)
@@ -405,7 +466,7 @@ Test.it("HELLO triggers SUMMARY only when both peers are ready and fingerprints 
     busUnready:RunUntil(function(current)
         return not current:HasWork()
     end, {
-        maxTicks = 60,
+        maxTicks = 180,
     })
 
     Test.eq(countNodeKind(unreadyRight, "SUMMARY"), 0, "unready peers should not send SUMMARY")
@@ -430,6 +491,8 @@ Test.it("HELLO and SUMMARY stay on the modern wire and never fall back to legacy
     })
     left.addon.Data:MarkSyncIndexDirty("phase2-left")
     right.addon.Data:MarkSyncIndexDirty("phase2-right")
+    refreshSyncNode(left, "phase2-left")
+    refreshSyncNode(right, "phase2-right")
 
     bus:Activate(left)
     left.addon.Sync:BroadcastHello()
@@ -437,7 +500,7 @@ Test.it("HELLO and SUMMARY stay on the modern wire and never fall back to legacy
         local cycle = left.addon.Sync.activeHelloCycle
         return cycle and cycle.selectionCompletedAt and cycle.selectionCompletedAt > 0 and not current:HasWork()
     end, {
-        maxTicks = 120,
+        maxTicks = 220,
     })
 
     Test.truthy(countSentKind(left.state.sentComm, "INDEX_DIFF_REQUEST") >= 1, "left should continue on the modern diff path")
@@ -481,6 +544,10 @@ Test.it("seed election selects at most one outbound seed using counts and determ
     peerA.addon.Data:MarkSyncIndexDirty("alpha")
     peerB.addon.Data:MarkSyncIndexDirty("bravo")
     peerC.addon.Data:MarkSyncIndexDirty("charlie")
+    refreshSyncNode(localNode, "chooser")
+    refreshSyncNode(peerA, "alpha")
+    refreshSyncNode(peerB, "bravo")
+    refreshSyncNode(peerC, "charlie")
 
     bus:Activate(localNode)
     localNode.addon.Sync:BroadcastHello()
@@ -489,7 +556,7 @@ Test.it("seed election selects at most one outbound seed using counts and determ
         local cycle = localNode.addon.Sync.activeHelloCycle
         return cycle and cycle.selectedSeedKey ~= nil
     end, {
-        maxTicks = 120,
+        maxTicks = 220,
     })
 
     local cycle = localNode.addon.Sync.activeHelloCycle or {}

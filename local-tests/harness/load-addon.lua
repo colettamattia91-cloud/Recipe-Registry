@@ -105,6 +105,34 @@ function Loader.Enable(addon)
     runAddonLifecycle(addon or _G.RecipeRegistry, "OnEnable")
 end
 
+function Loader.PrimeSyncReady(addon, opts)
+    addon = addon or _G.RecipeRegistry
+    opts = opts or {}
+
+    if addon.Sync and addon.Sync.Startup then
+        addon.Sync:Startup()
+    end
+    if addon.Sync and addon.Sync.SetSavedVariablesReady then
+        addon.Sync:SetSavedVariablesReady(opts.reason or "test-prime")
+    end
+    if addon.Sync and addon.Sync.SetPlayerReady then
+        addon.Sync:SetPlayerReady(opts.reason or "test-prime")
+    end
+    if addon.Data and addon.Data.RebuildOnlineCache then
+        addon.Data:RebuildOnlineCache()
+    end
+    if addon.Data and addon.Data.PrepareSyncIndexNow then
+        addon.Data:PrepareSyncIndexNow(opts.reason or "test-prime")
+    end
+    if addon.Sync and addon.Sync.RefreshSyncReadyState then
+        addon.Sync:RefreshSyncReadyState(opts.reason or "test-prime")
+    end
+    if opts.runTimers ~= false then
+        Wow.RunDueTimers(20)
+    end
+    return addon
+end
+
 Loader.Wow = Wow
 
 return Loader

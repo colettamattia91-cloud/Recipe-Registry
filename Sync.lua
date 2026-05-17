@@ -22,12 +22,15 @@ local POST_INSTANCE_GRACE_SECONDS = 15
 local POST_RELOAD_IN_INSTANCE_GRACE_SECONDS = 30
 local POST_COMBAT_GRACE_SECONDS = 6
 local ROSTER_FRESHNESS_MAX_AGE = 20
-local SUMMARY_COLLECTION_WINDOW = 0.75
+local SUMMARY_COLLECTION_WINDOW = 6
 local SUMMARY_SATURATION_THRESHOLD = 80
 local BLOCK_PULL_DELAY_SECONDS = 1.0
 local HELLO_RESCHEDULE_DELAY_SECONDS = 5
-local HELLO_RESCHEDULE_JITTER_SECONDS = 5
+local HELLO_RESCHEDULE_JITTER_SECONDS = 10
 local POST_SYNC_HELLO_COOLDOWN_SECONDS = 30
+local DISCOVERY_RETRY_INITIAL_SECONDS = 20
+local DISCOVERY_RETRY_STEP_SECONDS = 20
+local DISCOVERY_RETRY_MAX_SECONDS = 300
 local MAX_INBOUND_SEED_SESSIONS = 4
 local MAX_INBOUND_SEED_SESSIONS_PER_PEER = 1
 
@@ -178,6 +181,9 @@ Private.constants = {
     HELLO_RESCHEDULE_DELAY_SECONDS = HELLO_RESCHEDULE_DELAY_SECONDS,
     HELLO_RESCHEDULE_JITTER_SECONDS = HELLO_RESCHEDULE_JITTER_SECONDS,
     POST_SYNC_HELLO_COOLDOWN_SECONDS = POST_SYNC_HELLO_COOLDOWN_SECONDS,
+    DISCOVERY_RETRY_INITIAL_SECONDS = DISCOVERY_RETRY_INITIAL_SECONDS,
+    DISCOVERY_RETRY_STEP_SECONDS = DISCOVERY_RETRY_STEP_SECONDS,
+    DISCOVERY_RETRY_MAX_SECONDS = DISCOVERY_RETRY_MAX_SECONDS,
     MAX_INBOUND_SEED_SESSIONS = MAX_INBOUND_SEED_SESSIONS,
     MAX_INBOUND_SEED_SESSIONS_PER_PEER = MAX_INBOUND_SEED_SESSIONS_PER_PEER,
     MAX_CONCURRENT_REQUESTS = 1,
@@ -194,14 +200,17 @@ Private.newSyncTelemetry = newSyncTelemetry
 Private.isMockKey = isMockKey
 
 function Sync:Startup()
+    if self._startupInitialized then
+        return true
+    end
+    self._startupInitialized = true
     self:RegisterComm(PREFIX)
-    self:EnterWarmup("startup", POST_WORLD_GRACE_SECONDS)
-    self:ScheduleHello("startup", 1)
-    self.queueTicker = self:ScheduleRepeatingTimer("ProcessRequestQueue", 1)
-    self.pruneTicker = self:ScheduleRepeatingTimer("PruneState", 5)
-    self.autoSyncTicker = self:ScheduleRepeatingTimer("AutoSyncTick", AUTO_SYNC_INTERVAL)
+    self.queueTicker = self.queueTicker or self:ScheduleRepeatingTimer("ProcessRequestQueue", 1)
+    self.pruneTicker = self.pruneTicker or self:ScheduleRepeatingTimer("PruneState", 5)
+    self.autoSyncTicker = self.autoSyncTicker or self:ScheduleRepeatingTimer("AutoSyncTick", AUTO_SYNC_INTERVAL)
     self:ScheduleTimer("AutoSyncTick", 6)
     self:EnsureBackgroundWorkers()
+    return true
 end
 
 function Sync:GetSelfKey()

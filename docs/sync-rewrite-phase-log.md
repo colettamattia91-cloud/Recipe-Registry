@@ -34,7 +34,9 @@ Active runtime shape:
 
 - one `globalFingerprint` value
 - dirty-block runtime sync index cache
+- event-driven `syncReady` lifecycle
 - delayed/coalesced `ScheduleHello(reason, delay?)`
+- progressive discovery retry (`20s +20s`, capped at `300s`, with jitter)
 - capped `inboundSeedSessions`
 - build-channel / wire compatibility preserved
 
@@ -72,7 +74,7 @@ Completed.
 
 ### Test results
 
-- `sync_phase2_summary_foundation_spec.lua`: 10 passed
+- `sync_phase2_summary_foundation_spec.lua`: 12 passed
 - `sync_phase34_block_pull_spec.lua`: 10 passed
 
 ### Deviations from the roadmap
@@ -173,7 +175,7 @@ Completed for the supported rewrite path.
 
 ### Test results
 
-- `sync_phase2_summary_foundation_spec.lua`: 10 passed
+- `sync_phase2_summary_foundation_spec.lua`: 12 passed
 - `sync_phase34_block_pull_spec.lua`: 10 passed
 - `p4_scan_opportunistic_spec.lua`: 13 passed
 - `slash_output_spec.lua`: 9 passed
@@ -291,3 +293,63 @@ Completed for the requested scope on 2026-05-17.
 ### Remaining blockers
 
 - None for the active rewrite baseline.
+
+---
+
+## Lifecycle hardening pass
+
+### Status
+
+Completed for the requested scope on 2026-05-17.
+
+### Changed files
+
+- `Core.lua`
+- `Data.lua`
+- `DataIndex.lua`
+- `Sync.lua`
+- `SyncPausePolicy.lua`
+- `SyncProtocol.lua`
+- `SyncRequests.lua`
+- `SyncRuntime.lua`
+- `SyncTransfer.lua`
+- `local-tests/harness/load-addon.lua`
+- `local-tests/harness/comm-bus.lua`
+- `local-tests/spec/sync_phase1_unsupported_message_spec.lua`
+- `local-tests/spec/sync_phase2_summary_foundation_spec.lua`
+- `local-tests/spec/sync_phase34_block_pull_spec.lua`
+- `docs/sync-rewrite-roadmap.md`
+- `docs/sync-rewrite-phase-log.md`
+- `local-tests/README.md`
+
+### Behavior implemented
+
+- Startup/readiness is now event-driven instead of driven by a fixed login/reload delay.
+- `syncReady` gates all outbound sync protocol traffic.
+- Sync-index preparation is deferred/coalesced for readiness checks and startup recovery.
+- `SUMMARY_COLLECTION_WINDOW` is aligned to 6 seconds.
+- HELLO publication is delayed/coalesced and reused for sync-ready, local-change, pause-recovery, completion, abort, and reset flows.
+- Discovery retry now uses progressive backoff starting at 20 seconds and capping at 300 seconds.
+- Inbound seed sessions remain capped and are cleared on pause/world-transition safety boundaries.
+
+### Tests added or updated
+
+- `sync_phase1_unsupported_message_spec.lua`
+- `sync_phase2_summary_foundation_spec.lua`
+- `sync_phase34_block_pull_spec.lua`
+
+### Test results
+
+- `sync_phase1_unsupported_message_spec.lua`: 4 passed
+- `sync_phase2_summary_foundation_spec.lua`: 12 passed
+- `sync_phase34_block_pull_spec.lua`: 10 passed
+- `.\local-tests\run-syntax.ps1`: passed
+- `.\local-tests\run-backend-tests.ps1 -Suite sync`: passed
+
+### Deviations from the roadmap
+
+- The runtime still uses the existing timer/worker primitives for deferred index preparation rather than introducing a separate new background worker subsystem.
+
+### Remaining blockers
+
+- None in the active backend baseline.

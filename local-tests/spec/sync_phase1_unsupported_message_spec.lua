@@ -6,6 +6,18 @@ local function freshAddon()
     return addon, wow, addon.Data
 end
 
+local function primeSyncReady(addon, wow, data, reason)
+    local ownerKey = data:GetPlayerKey()
+    wow.SetGuildRoster({
+        { name = ownerKey, online = true, rankName = "Member", rankIndex = 5, level = 70, classDisplayName = "Mage", classFileName = "MAGE" },
+    })
+    data:RebuildOnlineCache()
+    Loader.PrimeSyncReady(addon, {
+        reason = reason or "phase1-prime",
+        runTimers = false,
+    })
+end
+
 local function countCommKind(wow, kind)
     local total = 0
     for _, row in ipairs(wow.GetSentComm()) do
@@ -72,15 +84,64 @@ Test.it("ignores unknown inbound kinds without mutating runtime sync state", fun
     Test.eq(addon.Sync.telemetry.lastUnsupportedMessageKind, "UNSUPPORTED_KIND", "unsupported message kind telemetry")
 end)
 
-Test.it("startup still sends one HELLO on the modern wire", function()
+Test.it("saved variables become ready at addon init without sending sync traffic", function()
     local addon, wow = freshAddon()
 
-    addon.Sync:Startup()
-    wow.RunTimers(10)
+    Test.truthy(addon.Sync.savedVariablesReady, "saved variables should be ready immediately after addon init")
+    Test.falsy(addon.Sync.playerReady, "player readiness should still wait for PLAYER_LOGIN")
+    Test.falsy(addon.Sync.syncReady, "sync should stay gated before player/world/roster/index readiness")
+    Test.eq(countCommKind(wow, "HELLO"), 0, "addon init should not emit hello traffic")
+end)
 
-    Test.truthy(addon.Sync._helloTimer ~= nil or type(addon.Sync.lastHelloScheduleReason) == "string", "startup should schedule one delayed hello")
-    Test.eq(countCommKind(wow, "HELLO"), 0, "startup should not bypass the delayed hello path")
-    Test.eq(addon.Sync.telemetry.unsupportedMessagesIgnored or 0, 0, "startup should not touch unsupported telemetry")
+Test.it("PLAYER_LOGIN and PLAYER_ENTERING_WORLD keep sync quiet until the full readiness gate is satisfied", function()
+    local addon, wow, data = freshAddon()
+    Loader.Enable(addon)
+
+    addon:OnPlayerLogin()
+    Test.truthy(addon.Sync.playerReady, "PLAYER_LOGIN should mark player readiness")
+    Test.eq(countCommKind(wow, "HELLO"), 0, "PLAYER_LOGIN should not broadcast hello inline")
+
+    addon:OnPlayerEnteringWorld(nil, true, false)
+    Test.truthy(addon.Sync:IsInWorldTransition(), "PLAYER_ENTERING_WORLD should enter world transition gating")
+    Test.eq(countCommKind(wow, "HELLO"), 0, "PLAYER_ENTERING_WORLD should not broadcast hello inline")
+
+    local ownerKey = data:GetPlayerKey()
+    wow.SetGuildRoster({
+        { name = ownerKey, online = true, rankName = "Member", rankIndex = 5, level = 70, classDisplayName = "Mage", classFileName = "MAGE" },
+    })
+    data:RebuildOnlineCache()
+    addon.Sync.worldTransitionUntil = 0
+    data:PrepareSyncIndexNow("phase1-ready")
+    addon.Sync:RefreshSyncReadyState("phase1-ready")
+
+    Test.truthy(addon.Sync.syncReady, "syncReady should transition only after roster/index/world gates are satisfied")
+    Test.truthy(addon.Sync._helloTimer ~= nil, "syncReady transition should schedule hello through the delayed path")
+    Test.eq(countCommKind(wow, "HELLO"), 0, "syncReady transition should not broadcast hello inline")
+end)
+
+Test.it("paused runtime blocks sync traffic while keeping local data accessible", function()
+    local addon, wow, data = freshAddon()
+    primeSyncReady(addon, wow, data, "phase1-pause")
+    local ownerKey = data:GetPlayerKey()
+    local entry = data:GetOrCreateMember(ownerKey)
+    entry.professions.Alchemy = entry.professions.Alchemy or {
+        recipes = { [1001] = true },
+        count = 1,
+        signature = "1001",
+        skillRank = 1,
+        skillMaxRank = 75,
+    }
+    data:NormalizeMemberEntry(entry, ownerKey)
+    data:PrepareSyncIndexNow("phase1-pause-index")
+
+    wow.SetInstance(true, "party")
+    addon.SyncPausePolicy:RefreshPauseState()
+    local helloBefore = countCommKind(wow, "HELLO")
+    local sent = addon.Sync:BroadcastHello()
+
+    Test.falsy(sent, "paused runtime should refuse direct hello broadcast attempts")
+    Test.eq(countCommKind(wow, "HELLO"), helloBefore, "paused runtime should not emit new hello traffic")
+    Test.truthy(data:GetMember(ownerKey) ~= nil, "paused runtime should still expose local saved-variable data")
 end)
 
 io.write(string.format("Sync phase 1 unsupported message: %d test(s) passed\n", Test.count))

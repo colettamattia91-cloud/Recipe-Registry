@@ -46,6 +46,31 @@ local function seedProfession(data, memberKey, professionKey, recipeKeys, opts)
     return entry
 end
 
+local function refreshSyncNode(node, reason)
+    local addon = node and node.addon or nil
+    if not addon then
+        return
+    end
+    if addon.Data and addon.Data.PrepareSyncIndexNow then
+        addon.Data:PrepareSyncIndexNow(reason or "phase34-refresh")
+    end
+    if addon.Sync and addon.Sync.RefreshSyncReadyState then
+        addon.Sync:RefreshSyncReadyState(reason or "phase34-refresh")
+    end
+end
+
+local function primeStandaloneSync(addon, wow, data, reason)
+    local ownerKey = data:GetPlayerKey()
+    wow.SetGuildRoster({
+        { name = ownerKey, online = true, rankName = "Member", rankIndex = 5, level = 70, classDisplayName = "Mage", classFileName = "MAGE" },
+    })
+    data:RebuildOnlineCache()
+    Loader.PrimeSyncReady(addon, {
+        reason = reason or "phase34-prime",
+        runTimers = false,
+    })
+end
+
 io.write("Sync phase 3/4 block pull\n")
 
 Test.it("selected seed exchanges INDEX_DIFF and sequential BLOCK_PULL/BLOCK_SNAPSHOT only", function()
@@ -72,6 +97,7 @@ Test.it("selected seed exchanges INDEX_DIFF and sequential BLOCK_PULL/BLOCK_SNAP
         professionSourceType = "owner",
         reason = "seed-tailoring",
     })
+    refreshSyncNode(seed, "seed-tailoring")
     bus:SeedSelfProfession(smaller, {
         profession = "Alchemy",
         recipeCount = 2,
@@ -81,6 +107,9 @@ Test.it("selected seed exchanges INDEX_DIFF and sequential BLOCK_PULL/BLOCK_SNAP
     requester.addon.Data:MarkSyncIndexDirty("requester-start")
     seed.addon.Data:MarkSyncIndexDirty("seed-start")
     smaller.addon.Data:MarkSyncIndexDirty("smaller-start")
+    refreshSyncNode(requester, "requester-start")
+    refreshSyncNode(seed, "seed-start")
+    refreshSyncNode(smaller, "smaller-start")
 
     bus:Activate(requester)
     requester.addon.Sync:BroadcastHello()
@@ -140,6 +169,7 @@ Test.it("requester does not ask for block N+1 before block N snapshot is merged"
         professionSourceType = "owner",
         reason = "delay-tailoring",
     })
+    refreshSyncNode(seed, "delay-tailoring")
     delayedBlockKey = seed.addon.Data:BuildSyncBlockKey(seed.key, "Alchemy")
 
     bus:Activate(requester)
@@ -148,7 +178,7 @@ Test.it("requester does not ask for block N+1 before block N snapshot is merged"
     local sawFirstPull = bus:RunUntil(function()
         return countSentKind(requester.state.sentComm, "BLOCK_PULL_REQUEST") >= 1
     end, {
-        maxTicks = 120,
+        maxTicks = 220,
     })
 
     Test.truthy(sawFirstPull, "first block pull should be sent")
@@ -184,6 +214,8 @@ Test.it("INDEX_DIFF_REQUEST and BLOCK_PULL_REQUEST stay minimal on the wire", fu
     })
     requester.addon.Data:MarkSyncIndexDirty("minimal-requester")
     seed.addon.Data:MarkSyncIndexDirty("minimal-seed")
+    refreshSyncNode(requester, "minimal-requester")
+    refreshSyncNode(seed, "minimal-seed")
 
     bus:Activate(requester)
     requester.addon.Sync:BroadcastHello()
@@ -191,7 +223,7 @@ Test.it("INDEX_DIFF_REQUEST and BLOCK_PULL_REQUEST stay minimal on the wire", fu
     local sentPull = bus:RunUntil(function()
         return countSentKind(requester.state.sentComm, "BLOCK_PULL_REQUEST") >= 1
     end, {
-        maxTicks = 200,
+        maxTicks = 300,
     })
 
     Test.truthy(sentPull, "requester should reach the block pull stage")
@@ -258,8 +290,11 @@ Test.it("next block pull is scheduled after the internal delay once a block merg
         professionSourceType = "owner",
         reason = "pacing-tailoring",
     })
+    refreshSyncNode(seed, "pacing-tailoring")
     requester.addon.Data:MarkSyncIndexDirty("pacing-requester")
     seed.addon.Data:MarkSyncIndexDirty("pacing-seed")
+    refreshSyncNode(requester, "pacing-requester")
+    refreshSyncNode(seed, "pacing-seed")
 
     bus:Activate(requester)
     requester.addon.Sync:BroadcastHello()
@@ -270,7 +305,7 @@ Test.it("next block pull is scheduled after the internal delay once a block merg
             and session.state == "waiting-next-block-delay"
             and session.nextBlockTimer ~= nil
     end, {
-        maxTicks = 200,
+        maxTicks = 300,
     })
 
     local session = requester.addon.Sync.outboundSeedSession or {}
@@ -367,10 +402,7 @@ Test.it("session timeout abort keeps partial merged progress and schedules a del
     local addon, wow = Loader.Load()
     local data = addon.Data
     local ownerKey = data:GetPlayerKey()
-    wow.SetGuildRoster({
-        { name = ownerKey, online = true, rankName = "Member", rankIndex = 5, level = 70, classDisplayName = "Mage", classFileName = "MAGE" },
-    })
-    data:RebuildOnlineCache()
+    primeStandaloneSync(addon, wow, data, "phase34-timeout-partial")
 
     seedProfession(data, ownerKey, "Alchemy", { 8001 }, {
         sourceType = "owner",
@@ -415,10 +447,7 @@ Test.it("abort before any successful pull does not publish a new fingerprint", f
     local addon, wow = Loader.Load()
     local data = addon.Data
     local ownerKey = data:GetPlayerKey()
-    wow.SetGuildRoster({
-        { name = ownerKey, online = true, rankName = "Member", rankIndex = 5, level = 70, classDisplayName = "Mage", classFileName = "MAGE" },
-    })
-    data:RebuildOnlineCache()
+    primeStandaloneSync(addon, wow, data, "phase34-timeout-empty")
 
     seedProfession(data, ownerKey, "Alchemy", { 16001 }, {
         sourceType = "owner",
@@ -494,6 +523,7 @@ end)
 
 Test.it("paused seed clears inbound sessions and timeout recovery schedules a retry HELLO", function()
     local addon, wow = Loader.Load()
+    primeStandaloneSync(addon, wow, addon.Data, "phase34-paused-seed")
     local peerKey = "Pausedseed-TestRealm"
     local caps = addon.Sync:GetLocalProtocolCaps()
 
@@ -518,6 +548,8 @@ Test.it("paused seed clears inbound sessions and timeout recovery schedules a re
 
     wow.SetInstance(false, "none")
     addon.SyncPausePolicy:RefreshPauseState()
+    addon.Sync.warmupUntil = 0
+    addon.Sync:RefreshSyncReadyState("phase34-paused-seed-recovery")
 
     addon.Sync.outboundSeedSession = {
         state = "waiting-block",

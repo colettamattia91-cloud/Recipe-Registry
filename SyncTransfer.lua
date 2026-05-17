@@ -4,6 +4,13 @@ local Sync = Addon.Sync
 local time = time
 
 function Sync:SendBlockSnapshot(targetKey, requestPayload)
+    local allowed = true
+    if self.CanRunSyncProtocol then
+        allowed = self:CanRunSyncProtocol("BLOCK_SNAPSHOT")
+    end
+    if not allowed then
+        return false
+    end
     if not (type(requestPayload) == "table" and type(requestPayload.blockKey) == "string") then
         return false
     end

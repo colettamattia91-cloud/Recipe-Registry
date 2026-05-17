@@ -46,6 +46,13 @@ function Sync:ClearSeedPendingState(_seedKey, reason)
 end
 
 function Sync:RequestIndexDiff(seedKey)
+    local allowed = true
+    if self.CanRunSyncProtocol then
+        allowed = self:CanRunSyncProtocol("INDEX_DIFF_REQUEST")
+    end
+    if not allowed then
+        return false
+    end
     local session = self.outboundSeedSession
     if not (type(session) == "table" and session.seedKey == seedKey) then
         return false
@@ -56,6 +63,7 @@ function Sync:RequestIndexDiff(seedKey)
 
     local digest = Addon.Data and Addon.Data.BuildRequesterIndexDigest and Addon.Data:BuildRequesterIndexDigest({
         reason = "index-diff-request",
+        allowDeferred = true,
     }) or nil
     if type(digest) ~= "table" or digest.ready ~= true then
         return false
@@ -90,11 +98,19 @@ function Sync:RequestIndexDiff(seedKey)
 end
 
 function Sync:SendIndexDiffResponse(targetKey, requestPayload)
+    local allowed = true
+    if self.CanRunSyncProtocol then
+        allowed = self:CanRunSyncProtocol("INDEX_DIFF_RESPONSE")
+    end
+    if not allowed then
+        return false, nil
+    end
     if not self:IsValidSyncMemberKey(targetKey) then
         return false, nil
     end
     local response = Addon.Data and Addon.Data.BuildIndexDiffResponse and Addon.Data:BuildIndexDiffResponse(requestPayload, {
         reason = "index-diff-response",
+        allowDeferred = true,
     }) or nil
     if type(response) ~= "table" or response.ready ~= true then
         return false, response
@@ -175,6 +191,13 @@ function Sync:HandleReceivedIndexDiffResponse(payload)
 end
 
 function Sync:RequestNextWantedBlock()
+    local allowed = true
+    if self.CanRunSyncProtocol then
+        allowed = self:CanRunSyncProtocol("BLOCK_PULL_REQUEST")
+    end
+    if not allowed then
+        return false
+    end
     local session = self.outboundSeedSession
     if type(session) ~= "table" then
         return false
@@ -257,7 +280,11 @@ function Sync:ScheduleNextWantedBlock()
 end
 
 function Sync:ProcessRequestQueue()
+    self:RefreshSyncReadyState("request-queue")
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic() then
+        return
+    end
+    if self.syncReady ~= true then
         return
     end
 
@@ -293,6 +320,15 @@ function Sync:StartManualSyncPull(memberKey, silent)
         Addon.Data:MarkSyncIndexDirty(memberKey and memberKey ~= "" and "manual-pull-targeted" or "manual-pull", nil, {
             full = true,
         })
+    end
+    if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then
+        Addon.Data:ScheduleSyncIndexPrepare(memberKey and memberKey ~= "" and "manual-pull-targeted" or "manual-pull", 0.2)
+    end
+    if self.ResetDiscoveryRetry then
+        self:ResetDiscoveryRetry(memberKey and memberKey ~= "" and "manual-pull-targeted" or "manual-pull")
+    end
+    if self.RefreshSyncReadyState then
+        self:RefreshSyncReadyState(memberKey and memberKey ~= "" and "manual-pull-targeted" or "manual-pull")
     end
     if self.ScheduleHello then
         self:ScheduleHello(memberKey and memberKey ~= "" and "manual-pull-targeted" or "manual-pull", 0.5)

@@ -735,6 +735,12 @@ function Data:OnInitialize()
     self._guildRosterRefreshRequestedAt = 0
     self._currentProfs = {}
     self:MigrateDatabase()
+    if Addon.Sync then
+        Addon.Sync._savedVariablesReadyBootstrap = true
+        if Addon.Sync.SetSavedVariablesReady then
+            Addon.Sync:SetSavedVariablesReady("addon-loaded")
+        end
+    end
 end
 
 function Data:GetCanonicalProfession(name)

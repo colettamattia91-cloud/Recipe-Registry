@@ -41,7 +41,11 @@ local function shouldSendSummaryForHello(self, helloPayload, localSummary)
 end
 
 function Sync:BroadcastHello()
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("HELLO") then
+    local allowed = true
+    if self.CanRunSyncProtocol then
+        allowed = self:CanRunSyncProtocol("HELLO")
+    end
+    if not allowed then
         return false
     end
     local session = self.outboundSeedSession
@@ -49,10 +53,20 @@ function Sync:BroadcastHello()
         return false
     end
 
-    local cycle = self.BeginHelloCycle and self:BeginHelloCycle(self._pendingHelloCycleReason or "hello") or nil
     local summary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
         reason = "hello",
+        allowDeferred = true,
     }) or {}
+    if tostring(summary.indexStatus or "") ~= "ready" then
+        if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then
+            Addon.Data:ScheduleSyncIndexPrepare("hello-not-ready", 0.5)
+        end
+        if self.RefreshSyncReadyState then
+            self:RefreshSyncReadyState("hello-not-ready")
+        end
+        return false
+    end
+    local cycle = self.BeginHelloCycle and self:BeginHelloCycle(self._pendingHelloCycleReason or "hello") or nil
     local sent = self:SendGuildEnvelope("HELLO", {
         key = self:GetSelfKey(),
         helloId = cycle and cycle.helloId or nil,
@@ -100,7 +114,11 @@ function Sync:BroadcastHello()
 end
 
 function Sync:SendGuildEnvelope(kind, payload, priority)
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic(kind) then
+    local allowed = true
+    if self.CanRunSyncProtocol then
+        allowed = self:CanRunSyncProtocol(kind)
+    end
+    if not allowed then
         return false
     end
     if self:IsRealTrafficSuppressed() then
@@ -129,7 +147,11 @@ function Sync:SendGuildEnvelope(kind, payload, priority)
 end
 
 function Sync:SendDirectEnvelope(kind, payload, targetKey, priority)
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic(kind) then
+    local allowed = true
+    if self.CanRunSyncProtocol then
+        allowed = self:CanRunSyncProtocol(kind)
+    end
+    if not allowed then
         return false
     end
     if self:IsRealTrafficSuppressed() then
@@ -234,8 +256,16 @@ function Sync:HandleHello(payload)
     if self.RecordPeerCaps then
         self:RecordPeerCaps(payload.sender or payload.key, payload.caps)
     end
+    local ready = true
+    if self.CanRunSyncProtocol then
+        ready = self:CanRunSyncProtocol("SUMMARY")
+    end
+    if not ready then
+        return
+    end
     local localSummary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
         reason = "hello-response",
+        allowDeferred = true,
     }) or nil
     if shouldSendSummaryForHello(self, payload, localSummary) then
         self:SendSummary(payload.sender or payload.key, payload.helloId)
@@ -243,8 +273,16 @@ function Sync:HandleHello(payload)
 end
 
 function Sync:SendSummary(targetKey, helloId)
+    local allowed = true
+    if self.CanRunSyncProtocol then
+        allowed = self:CanRunSyncProtocol("SUMMARY")
+    end
+    if not allowed then
+        return false
+    end
     local summary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
         reason = "summary-send",
+        allowDeferred = true,
     }) or nil
     if type(summary) ~= "table" or tostring(summary.indexStatus or "") ~= "ready" then
         return false
@@ -331,6 +369,13 @@ function Sync:HandleIndexDiffResponse(payload)
 end
 
 function Sync:HandleBlockPullRequest(payload)
+    local allowed = true
+    if self.CanRunSyncProtocol then
+        allowed = self:CanRunSyncProtocol("BLOCK_SNAPSHOT")
+    end
+    if not allowed then
+        return
+    end
     if self.CanServeInboundSeed then
         local allowed = self:CanServeInboundSeed(payload and payload.sender)
         if not allowed then

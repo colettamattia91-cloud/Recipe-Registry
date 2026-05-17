@@ -236,9 +236,15 @@ end
 local function markSyncIndexDirtyAndScheduleHello(self, reason, delay)
     if self.Data and self.Data.MarkSyncIndexDirty then
         self.Data:MarkSyncIndexDirty(reason)
+        if self.Data.ScheduleSyncIndexPrepare then
+            self.Data:ScheduleSyncIndexPrepare(reason, 0.2)
+        end
     end
     if self.Sync and self.Sync.ScheduleHello then
         self.Sync:ScheduleHello(reason, delay or 0.5)
+        if self.Sync.RefreshSyncReadyState then
+            self.Sync:RefreshSyncReadyState(reason)
+        end
     end
 end
 
@@ -324,6 +330,7 @@ function Addon:OnInitialize()
 end
 
 function Addon:OnEnable()
+    self:RegisterEvent("PLAYER_LOGIN", "OnPlayerLogin")
     self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnPlayerEnteringWorld")
     self:RegisterEvent("TRADE_SKILL_SHOW", "OnTradeSkillShow")
     self:RegisterEvent("CRAFT_SHOW", "OnCraftShow")
@@ -336,6 +343,28 @@ function Addon:OnEnable()
         if self.MinimapButton then self.MinimapButton:Refresh() end
         if self.UI then self.UI:CreateMainFrame() end
     end, 0.2)
+end
+
+function Addon:OnPlayerLogin()
+    if self.Sync and self.Sync.Startup then
+        self.Sync:Startup()
+    end
+    if self.Sync and self.Sync.SetPlayerReady then
+        self.Sync:SetPlayerReady("player-login")
+    end
+    if self.Data then
+        self.Data:DetectProfessions()
+        if self.Data.ScheduleSyncIndexPrepare then
+            self.Data:ScheduleSyncIndexPrepare("player-login", 0.2)
+        end
+    end
+    if self.Data and self.Data.ScheduleSafeAutoClean then
+        self:ScheduleTimer(function()
+            self.Data:ScheduleSafeAutoClean({ maxMembersPerStep = 8 })
+        end, 8)
+    end
+    self:ScheduleTimer("OnLoginReady", 10)
+    self:RequestRefresh("login")
 end
 
 function Addon:OnPlayerEnteringWorld(_event, isLogin, isReload)
@@ -371,12 +400,23 @@ function Addon:OnPlayerEnteringWorld(_event, isLogin, isReload)
         end
     end
 
-    if isLogin or isReload then
-        self:ScheduleTimer("OnLoginReady", 4)
-    else
-        if self.Sync then
-            self.Sync:ScheduleHello("player-entering-world", 2)
-        end
+    if self.Data and self.Data.ScheduleSyncIndexPrepare then
+        self.Data:ScheduleSyncIndexPrepare("player-entering-world", 1)
+    end
+    if self.Sync and self.Sync.RefreshSyncReadyState then
+        self.Sync:RefreshSyncReadyState("player-entering-world")
+    end
+    if not (isLogin or isReload) and self.Sync then
+        self.Sync:ScheduleHello("player-entering-world", 2)
+    end
+end
+
+function Addon:OnLoginReady()
+    if self.Sync and self.Sync.RefreshSyncReadyState then
+        self.Sync:RefreshSyncReadyState("login-watchdog")
+    end
+    if self.Data and self.Data.ScheduleSyncIndexPrepare then
+        self.Data:ScheduleSyncIndexPrepare("login-watchdog", 0.5)
     end
 end
 
@@ -390,28 +430,6 @@ local function countBucketEvents(events)
         end
     end
     return total
-end
-
-function Addon:OnLoginReady()
-    if self.Sync and self.Sync.ShouldDeferHeavyLifecycleWork then
-        local shouldDefer = self.Sync:ShouldDeferHeavyLifecycleWork("login")
-        if shouldDefer then
-            self:ScheduleTimer("OnLoginReady", 2)
-            return
-        end
-    end
-    if self.Data then
-        self.Data:DetectProfessions()
-    end
-    if self.Sync then
-        self.Sync:Startup()
-    end
-    if self.Data and self.Data.ScheduleSafeAutoClean then
-        self:ScheduleTimer(function()
-            self.Data:ScheduleSafeAutoClean({ maxMembersPerStep = 8 })
-        end, 8)
-    end
-    self:RequestRefresh("login")
 end
 
 function Addon:OnTradeSkillShow()

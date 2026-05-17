@@ -22,6 +22,8 @@ HELLO
 → immediate local block fingerprint recompute
 → global fingerprint marked dirty
 → single globalFingerprint recomputed when needed and refreshed at outbound completion or abort
+→ delayed/coalesced HELLO scheduling after readiness or sync-state changes
+→ progressive HELLO discovery retry when no useful seed is found
 ```
 
 The new sync model must be:
@@ -222,6 +224,8 @@ HELLO:
 
 HELLO must not trigger `AD`, `IDX`, `MANI`, `MREQ`, revision requests, coordinator fan-out, manifest refresh, or legacy request queues.
 
+HELLO is the publication mechanism for the single local `globalFingerprint`. Peers only learn the current fingerprint from HELLO/SUMMARY payloads.
+
 ### 5.2 SUMMARY
 
 Direct response to the HELLO sender.
@@ -418,17 +422,43 @@ If the seed does not respond within the timeout, or responds as paused/unavailab
 4. recompute the single globalFingerprint if sync changed local data;
 5. schedule a delayed/coalesced future HELLO through the common scheduling path.
 
+If a HELLO completes its SUMMARY collection window without any useful ready summary:
+
+1. treat that outcome as a discovery miss, not as an error;
+2. do not start a pull session;
+3. do not apply heavy peer cooldown;
+4. schedule a future HELLO through progressive retry backoff.
+
 Initial target values:
 
 ```text
 BLOCK_PULL_RESPONSE_TIMEOUT = 15-30 seconds
 POST_SYNC_HELLO_JITTER = 5-15 seconds
 POST_SYNC_HELLO_COOLDOWN = 30-60 seconds
+DISCOVERY_RETRY = 20s +20s per miss, capped at 300s, with jitter
 ```
 
 ---
 
-## 10. Concurrency
+## 10. Startup readiness
+
+Network sync readiness is event-driven, not driven by a fixed login/reload timer.
+
+`syncReady` becomes true only when all of the following are satisfied:
+
+- SavedVariables are initialized;
+- player identity is ready;
+- world transition / warmup has completed;
+- trusted-roster preflight is ready;
+- the runtime sync index is ready;
+- protocol pause policy is inactive;
+- runtime pressure is below the sync saturation gate.
+
+When `syncReady` transitions from false to true, schedule one delayed/coalesced HELLO through the common scheduling path. Do not broadcast HELLO inline from login, reload, world entry, local scan, sync completion, sync abort, or reset handlers.
+
+---
+
+## 11. Concurrency
 
 Each peer may have:
 
@@ -446,7 +476,7 @@ Rules:
 
 ---
 
-## 11. File-by-file target plan
+## 12. File-by-file target plan
 
 ### BuildInfo.lua — rewrite
 

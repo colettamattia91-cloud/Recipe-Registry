@@ -402,8 +402,17 @@ function CommBus:AddNode(name, opts)
     self:Activate(node)
     node.key = addon.Data:GetPlayerKey()
     addon.Data:RebuildOnlineCache()
-    addon.Sync:RegisterComm(addon.ADDON_PREFIX)
-    addon.Sync:EnsureBackgroundWorkers()
+    Loader.PrimeSyncReady(addon, {
+        reason = "comm-bus-node",
+        runTimers = false,
+    })
+    if addon.Sync._helloTimer then
+        addon.Sync:CancelTimer(addon.Sync._helloTimer, true)
+        addon.Sync._helloTimer = nil
+    end
+    if addon.Sync.ClearPendingHello then
+        addon.Sync:ClearPendingHello("comm-bus-node")
+    end
     if opts.runtimeTickers then
         self:EnableRuntimeTickers(node, opts.runtimeTickers)
     end
@@ -592,8 +601,11 @@ function CommBus:SeedSelfProfession(node, opts)
     if data.MarkSyncIndexDirty then
         data:MarkSyncIndexDirty("comm-bus-seed")
     end
-    if data.BuildLocalSummary then
-        data:BuildLocalSummary({ reason = "comm-bus-seed" })
+    if data.PrepareSyncIndexNow then
+        data:PrepareSyncIndexNow("comm-bus-seed")
+    end
+    if node.addon.Sync and node.addon.Sync.RefreshSyncReadyState then
+        node.addon.Sync:RefreshSyncReadyState("comm-bus-seed")
     end
     return entry
 end
@@ -640,8 +652,11 @@ function CommBus:SeedReplicaProfession(node, ownerKey, profession, recipeKeys, o
     if data.MarkSyncIndexDirty then
         data:MarkSyncIndexDirty("comm-bus-replica")
     end
-    if data.BuildLocalSummary then
-        data:BuildLocalSummary({ reason = "comm-bus-replica" })
+    if data.PrepareSyncIndexNow then
+        data:PrepareSyncIndexNow("comm-bus-replica")
+    end
+    if node.addon.Sync and node.addon.Sync.RefreshSyncReadyState then
+        node.addon.Sync:RefreshSyncReadyState("comm-bus-replica")
     end
     return entry
 end

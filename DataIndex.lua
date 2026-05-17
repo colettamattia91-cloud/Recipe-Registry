@@ -302,6 +302,34 @@ local function syncTelemetryStats(cache)
     setSyncTelemetry("syncIndexDirtyBlockCount", cache and cache.dirtyBlockCount or 0)
 end
 
+local function buildSummaryFromCache(cache, rosterState, builtAt)
+    local ready = cache.ready == true
+        and rosterState
+        and rosterState.trusted == true
+        and cache.dirtyAll ~= true
+        and (cache.dirtyBlockCount or 0) == 0
+        and cache.globalFingerprintDirty ~= true
+    local indexStatus = ready and "ready"
+        or (rosterState and rosterState.trusted ~= true and tostring(rosterState.reason or "not-ready"))
+        or "not-ready"
+
+    return {
+        syncModel = SYNC_MODEL,
+        ready = ready,
+        indexStatus = indexStatus,
+        trustedRoster = rosterState and rosterState.trusted == true or false,
+        trustedRosterReason = rosterState and rosterState.reason or "unknown",
+        activeOwnerCount = cache.activeOwnerCount or 0,
+        activeBlockCount = cache.activeBlockCount or 0,
+        activeContentCount = cache.activeContentCount or 0,
+        globalFingerprint = ready and cache.globalFingerprint or nil,
+        blocks = cache.blocks,
+        blockKeys = cache.blockKeys,
+        rosterState = rosterState,
+        builtAt = builtAt or cache.builtAt or 0,
+    }
+end
+
 local function recalcAggregateState(cache)
     local blockKeys = {}
     local owners = {}
@@ -433,12 +461,44 @@ local function rebuildDirtyBlocks(self, cache, rosterState, reason)
     cache.globalFingerprintDirty = cache.globalFingerprintDirty or rebuilt > 0
 end
 
-local function ensureLiveIndex(self, reason)
+local function shouldDeferFullRebuild(reason)
+    local sync = Addon.Sync
+    if not sync then
+        return false
+    end
+    if sync.ShouldDeferHeavyLifecycleWork and sync:ShouldDeferHeavyLifecycleWork(reason or "sync-index") then
+        return true
+    end
+    if sync.IsInWarmup and sync:IsInWarmup() then
+        return true
+    end
+    if sync.IsInWorldTransition and sync:IsInWorldTransition() then
+        return true
+    end
+    return false
+end
+
+local function ensureLiveIndex(self, reason, opts)
+    opts = type(opts) == "table" and opts or {}
     local state, cache = ensureSyncIndexState(self)
     local rosterState = buildRosterState(self, reason or "sync-index")
     local nextRosterSignature = rosterSignature(rosterState)
 
     local hasCache = cache.builtAt > 0 and next(cache.blocks or {}) ~= nil or cache.ready == false and cache.rosterSignature ~= nil
+    local needsFullRebuild = not hasCache or cache.dirtyAll or cache.rosterSignature ~= nextRosterSignature
+    if needsFullRebuild and opts.allowDeferred == true and shouldDeferFullRebuild(reason or "sync-index") then
+        cache.ready = false
+        cache.indexStatus = rosterState.trusted == true and "not-ready" or tostring(rosterState.reason or "not-ready")
+        cache.lastBuildReason = tostring(reason or "deferred")
+        syncTelemetryStats(cache)
+        local summary = buildSummaryFromCache(cache, rosterState, cache.builtAt)
+        state.lastSummary = cloneTable(summary)
+        if self.ScheduleSyncIndexPrepare then
+            self:ScheduleSyncIndexPrepare(reason or "sync-index", opts.prepareDelay)
+        end
+        return state, cache, summary
+    end
+
     if not hasCache then
         cache.stats.misses = (cache.stats.misses or 0) + 1
         bumpSyncTelemetry("syncIndexCacheMiss")
@@ -467,21 +527,7 @@ local function ensureLiveIndex(self, reason)
     end
     syncTelemetryStats(cache)
 
-    local summary = {
-        syncModel = SYNC_MODEL,
-        ready = cache.ready == true,
-        indexStatus = cache.indexStatus,
-        trustedRoster = rosterState.trusted == true,
-        trustedRosterReason = rosterState.reason,
-        activeOwnerCount = cache.activeOwnerCount or 0,
-        activeBlockCount = cache.activeBlockCount or 0,
-        activeContentCount = cache.activeContentCount or 0,
-        globalFingerprint = cache.globalFingerprint,
-        blocks = cache.blocks,
-        blockKeys = cache.blockKeys,
-        rosterState = rosterState,
-        builtAt = cache.builtAt,
-    }
+    local summary = buildSummaryFromCache(cache, rosterState, cache.builtAt)
     state.lastSummary = cloneTable(summary)
     return state, cache, summary
 end
@@ -578,6 +624,71 @@ function Data:IsSyncIndexDirty()
         or cache.globalFingerprintDirty == true
 end
 
+function Data:ScheduleSyncIndexPrepare(reason, delay)
+    local _, cache = ensureSyncIndexState(self)
+    cache.pendingPrepareReason = tostring(reason or cache.pendingPrepareReason or "sync-index")
+    if self._syncIndexPrepareTimer then
+        return true
+    end
+
+    local nextDelay = tonumber(delay)
+    if nextDelay == nil then
+        nextDelay = 0.5
+    end
+
+    self._syncIndexPrepareTimer = self:ScheduleTimer(function()
+        self._syncIndexPrepareTimer = nil
+        local sync = Addon.Sync
+        if shouldDeferFullRebuild(cache.pendingPrepareReason or "sync-index-prepare") then
+            self:ScheduleSyncIndexPrepare(cache.pendingPrepareReason or "sync-index-prepare", 2)
+            return
+        end
+        self:PrepareSyncIndexNow(cache.pendingPrepareReason or "sync-index-prepare")
+    end, nextDelay)
+    return true
+end
+
+function Data:PrepareSyncIndexNow(reason)
+    local state, cache, summary = ensureLiveIndex(self, reason or "sync-index-prepare", {
+        allowDeferred = false,
+    })
+    if Addon.Sync and Addon.Sync.RefreshSyncReadyState then
+        Addon.Sync:RefreshSyncReadyState(reason or "sync-index-prepare")
+    end
+    return {
+        state = cloneTable(state),
+        cache = cloneTable(cache),
+        summary = cloneTable(summary),
+    }
+end
+
+function Data:GetSyncIndexReadiness(opts)
+    opts = type(opts) == "table" and opts or {}
+    local _, cache = ensureSyncIndexState(self)
+    local rosterState = buildRosterState(self, opts.reason or "sync-index-readiness")
+    local nextRosterSignature = rosterSignature(rosterState)
+    local dirty = cache.dirtyAll == true or (cache.dirtyBlockCount or 0) > 0 or cache.globalFingerprintDirty == true
+    local ready = rosterState.trusted == true
+        and cache.ready == true
+        and cache.builtAt > 0
+        and cache.rosterSignature == nextRosterSignature
+        and not dirty
+    if not ready and opts.schedule ~= false then
+        self:ScheduleSyncIndexPrepare(opts.reason or "sync-index-readiness", opts.delay)
+    end
+    return {
+        ready = ready,
+        indexStatus = ready and "ready"
+            or (rosterState.trusted ~= true and tostring(rosterState.reason or "not-ready"))
+            or (dirty and "dirty" or "not-ready"),
+        trustedRoster = rosterState.trusted == true,
+        trustedRosterReason = rosterState.reason,
+        globalFingerprint = ready and cache.globalFingerprint or nil,
+        builtAt = cache.builtAt or 0,
+        dirty = dirty,
+    }
+end
+
 function Data:ClearSyncIndexDirty(reason)
     local state, cache = ensureSyncIndexState(self)
     cache.dirtyAll = false
@@ -591,13 +702,15 @@ function Data:ClearSyncIndexDirty(reason)
 end
 
 function Data:GetRosterTrustState()
-    local _, _, summary = ensureLiveIndex(self, "sync-index-debug")
-    return cloneTable(summary.rosterState)
+    return cloneTable(buildRosterState(self, "sync-index-roster"))
 end
 
 function Data:EnsureTrustedRosterForSync(reason)
-    local _, _, summary = ensureLiveIndex(self, reason or "sync-index")
-    return cloneTable(summary.rosterState)
+    local rosterState = buildRosterState(self, reason or "sync-index")
+    if rosterState.trusted == true then
+        self:ScheduleSyncIndexPrepare(reason or "sync-index", 0.5)
+    end
+    return cloneTable(rosterState)
 end
 
 function Data:BuildSyntheticContentKeys(profession)
@@ -665,7 +778,10 @@ end
 
 function Data:BuildLocalSummary(opts)
     opts = opts or {}
-    local state, _, summary = ensureLiveIndex(self, opts.reason or "summary")
+    local state, _, summary = ensureLiveIndex(self, opts.reason or "summary", {
+        allowDeferred = opts.allowDeferred == true,
+        prepareDelay = opts.prepareDelay,
+    })
 
     local out = {
         syncModel = summary.syncModel,
@@ -688,7 +804,9 @@ function Data:BuildLocalSummary(opts)
 end
 
 function Data:RefreshGlobalFingerprint(reason)
-    local _, _, summary = ensureLiveIndex(self, reason or "global-fingerprint")
+    local _, _, summary = ensureLiveIndex(self, reason or "global-fingerprint", {
+        allowDeferred = false,
+    })
     return summary and summary.globalFingerprint or nil
 end
 
@@ -699,7 +817,10 @@ function Data:GetLocalSummary()
 end
 
 function Data:GetLiveSyncIndex(opts)
-    local _, _, summary = ensureLiveIndex(self, opts and opts.reason or "live-index")
+    local _, _, summary = ensureLiveIndex(self, opts and opts.reason or "live-index", {
+        allowDeferred = opts and opts.allowDeferred == true or false,
+        prepareDelay = opts and opts.prepareDelay or nil,
+    })
     return {
         syncModel = summary.syncModel,
         ready = summary.ready,
@@ -717,7 +838,10 @@ function Data:GetLiveSyncIndex(opts)
 end
 
 function Data:BuildRequesterIndexDigest(opts)
-    local _, _, index = ensureLiveIndex(self, opts and opts.reason or "requester-digest")
+    local _, _, index = ensureLiveIndex(self, opts and opts.reason or "requester-digest", {
+        allowDeferred = opts and opts.allowDeferred == true or false,
+        prepareDelay = opts and opts.prepareDelay or nil,
+    })
     local blocks = {}
     for _, blockKey in ipairs(index.blockKeys or {}) do
         local block = index.blocks and index.blocks[blockKey] or nil
@@ -739,7 +863,10 @@ function Data:BuildRequesterIndexDigest(opts)
 end
 
 function Data:BuildIndexDiffResponse(requesterDigest, opts)
-    local _, _, liveIndex = ensureLiveIndex(self, opts and opts.reason or "index-diff")
+    local _, _, liveIndex = ensureLiveIndex(self, opts and opts.reason or "index-diff", {
+        allowDeferred = opts and opts.allowDeferred == true or false,
+        prepareDelay = opts and opts.prepareDelay or nil,
+    })
     local requesterBlocks = type(requesterDigest) == "table" and requesterDigest.blocks or {}
     local offered = {}
 

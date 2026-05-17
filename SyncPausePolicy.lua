@@ -89,6 +89,12 @@ function SyncPausePolicy:RefreshPauseState()
     if protocolPaused and Addon.Sync and Addon.Sync.ClearInboundSeedSessions then
         Addon.Sync:ClearInboundSeedSessions(inInstance and "instance-pause" or "protocol-pause")
     end
+    if protocolPaused and Addon.Sync and Addon.Sync.AbortOutboundSeedSession then
+        local session = Addon.Sync.outboundSeedSession
+        if type(session) == "table" and session.state and session.state ~= "completed" and session.state ~= "aborted" then
+            Addon.Sync:AbortOutboundSeedSession(inInstance and "instance-pause" or "protocol-pause")
+        end
+    end
     if self._wasPaused and not heavyUiPaused and Addon.Sync and Addon.Sync.EnterWarmup then
         if self._wasInstance then
             Addon.Sync:EnterWarmup("instance-exit", 15)
@@ -96,8 +102,20 @@ function SyncPausePolicy:RefreshPauseState()
             Addon.Sync:EnterWarmup("combat-exit", 6)
         end
     end
+    if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then
+        if protocolPaused then
+            Addon.Data:ScheduleSyncIndexPrepare(inInstance and "instance-pause" or "protocol-pause", 1)
+        elseif self._wasPaused then
+            Addon.Data:ScheduleSyncIndexPrepare("pause-recovery", 0.5)
+        end
+    end
     if self._wasPaused and not protocolPaused and Addon.Sync and Addon.Sync.ScheduleHello then
+        if Addon.Sync.RefreshSyncReadyState then
+            Addon.Sync:RefreshSyncReadyState("pause-recovery")
+        end
         Addon.Sync:ScheduleHello("pause-recovery")
+    elseif Addon.Sync and Addon.Sync.RefreshSyncReadyState then
+        Addon.Sync:RefreshSyncReadyState(protocolPaused and "paused" or "pause-state")
     end
     if Addon.Sync and Addon.Sync.RecordPauseCycle then
         Addon.Sync:RecordPauseCycle(heavyUiPaused)

@@ -55,7 +55,9 @@ Legacy runtime modules are no longer loaded:
 ## Current focused coverage
 
 - generic unsupported inbound message ignore path
+- event-driven startup/readiness gating for network sync
 - HELLO / SUMMARY discovery
+- 6 second SUMMARY collection window
 - seed selection
 - INDEX_DIFF minimal payloads
 - sequential BLOCK_PULL / BLOCK_SNAPSHOT flow
@@ -63,6 +65,7 @@ Legacy runtime modules are no longer loaded:
 - runtime sync index cache behavior
 - single globalFingerprint lifecycle
 - delayed / coalesced HELLO scheduling
+- progressive discovery retry backoff (`20s +20s`, capped at `300s`, with jitter)
 - inbound seed session caps and pause clearing
 - build-channel and wire compatibility isolation
 - opportunistic profession scans
@@ -84,6 +87,13 @@ Current supported sync suite coverage is the rewrite path only:
 - runtime cache / diagnostics / compatibility gates
 
 Legacy sync compatibility is intentionally removed from the active runtime baseline. Unknown inbound kinds are ignored generically; the supported suites no longer expect explicit `AD` / `IDX` / `MANI` / `MREQ` handling, manifest/revision/coordinator state, or published/current fingerprint split behavior.
+
+The active runtime baseline also assumes:
+
+- exactly one `globalFingerprint`;
+- event-driven `syncReady` gating for all sync network traffic;
+- deferred/coalesced sync-index preparation;
+- delayed/coalesced HELLO publication and discovery retry.
 
 Historical specs that still target removed runtime concepts are not part of the active `all`, `quick`, or `sync` suites until they are either rewritten or formally archived elsewhere.
 
