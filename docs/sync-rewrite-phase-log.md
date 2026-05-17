@@ -1,13 +1,13 @@
 # Recipe Registry — Sync Rewrite Phase Log
 
-**Status:** refreshed from actual code and test inspection on 2026-05-17.  
+**Status:** refreshed from actual code and active test inspection on 2026-05-17.  
 **Rule:** this is a phase report, not the architecture source of truth. `docs/sync-rewrite-roadmap.md` remains canonical.
 
 ---
 
 ## Current implementation state
 
-The completed rewrite now runs on the modern wire-3 model only:
+The active runtime now supports only the modern protocol:
 
 ```text
 HELLO
@@ -19,16 +19,24 @@ HELLO
 -> BLOCK_SNAPSHOT
 -> immediate additive merge
 -> immediate local block fingerprint recompute
--> committed global fingerprint recompute on complete or abort
+-> delayed/coalesced HELLO scheduling after sync/local-change recovery
 ```
 
-The old manifest, revision, and coordinator sync system has been removed from active runtime code. Legacy inbound `AD`, `IDX`, `MANI`, and `MREQ` remain only as a quarantined no-op path in `SyncProtocol.lua`.
+The legacy manifest/revision/coordinator protocol is intentionally removed from active runtime code. Unknown inbound message kinds are ignored generically; there is no explicit legacy-message quarantine path.
 
 Deleted runtime files:
 
 - `DataManifest.lua`
 - `SyncManifest.lua`
 - `TrickleSync.lua`
+
+Active runtime shape:
+
+- one `globalFingerprint` value
+- dirty-block runtime sync index cache
+- delayed/coalesced `ScheduleHello(reason, delay?)`
+- capped `inboundSeedSessions`
+- build-channel / wire compatibility preserved
 
 ---
 
@@ -51,11 +59,10 @@ Completed.
 
 ### Behavior implemented
 
-- `INDEX_DIFF_REQUEST` uses the new explicit kind and sends only `requestId` plus requester block digests.
-- `INDEX_DIFF_RESPONSE` uses the new explicit kind and returns only `requestId` plus offered blocks.
-- Seed selection is local and summary-driven; no coordinator or revision registry participates.
+- `INDEX_DIFF_REQUEST` sends only `requestId` plus requester block digests.
+- `INDEX_DIFF_RESPONSE` sends only `requestId` plus `offeredBlocks`.
+- Seed selection is summary-driven and local; there is no coordinator.
 - Requester digests compare `blockKey -> { count, fingerprint }` only.
-- Equal-count fingerprint mismatches offer the seed block.
 - Lower-count local blocks are not offered back to a richer requester.
 
 ### Tests added or updated
@@ -65,16 +72,16 @@ Completed.
 
 ### Test results
 
-- `sync_phase2_summary_foundation_spec.lua`: 8 passed
-- `sync_phase34_block_pull_spec.lua`: 6 passed
+- `sync_phase2_summary_foundation_spec.lua`: 10 passed
+- `sync_phase34_block_pull_spec.lua`: 10 passed
 
 ### Deviations from the roadmap
 
-- The requester now accepts a `SUMMARY` that matches its active `helloId` even before the peer has emitted its own `HELLO`, then primes provisional peer version/capability state from the local build metadata so the current cycle can continue. This keeps the payload minimal while preserving the one-hello summary flow.
+- `SUMMARY` can still arrive before the peer emits its own `HELLO`; the runtime primes provisional peer metadata from local build information so the active cycle can continue without widening payloads.
 
 ### Remaining blockers
 
-- No active Phase 3 blockers remain in the supported backend suites.
+- None in the active backend baseline.
 
 ---
 
@@ -91,17 +98,19 @@ Completed.
 - `SyncRequests.lua`
 - `SyncTransfer.lua`
 - `SyncProtocol.lua`
+- `SyncRuntime.lua`
 - `local-tests/spec/sync_phase34_block_pull_spec.lua`
 
 ### Behavior implemented
 
 - `BLOCK_PULL_REQUEST` is `requestId + blockKey` only.
-- `BLOCK_SNAPSHOT` serves live block data and carries only block payload fields needed for merge.
+- `BLOCK_SNAPSHOT` carries only block payload data needed for merge.
 - Every received block is normalized and merged additively immediately.
-- Local block fingerprint is recomputed immediately after merge.
-- Global fingerprint is marked dirty after each block-level change.
-- Block N+1 is never requested before block N is fully merged and recomputed.
-- Final block completion no longer waits on an unnecessary extra delay tick.
+- The pulled block fingerprint is recomputed immediately after merge.
+- The in-memory block index is refreshed for the merged block.
+- `globalFingerprintDirty` is set after block-level sync changes.
+- Block `N+1` is never requested before block `N` is merged and recomputed.
+- Final block completion does not wait on an unnecessary extra delay tick.
 
 ### Tests added or updated
 
@@ -109,28 +118,29 @@ Completed.
 
 ### Test results
 
-- `sync_phase34_block_pull_spec.lua`: 6 passed
+- `sync_phase34_block_pull_spec.lua`: 10 passed
 
 ### Deviations from the roadmap
 
-- `BLOCK_SNAPSHOT` still carries non-authoritative metadata for UI completeness inside `blockPayload.metadata`, but that metadata does not participate in diffing, equality, routing, or merge precedence.
+- `blockPayload.metadata` is still carried for UI/data completeness, but it remains non-authoritative and does not participate in diffing, equality, routing, or merge precedence.
 
 ### Remaining blockers
 
-- No active Phase 4 blockers remain in the supported backend suites.
+- None in the active backend baseline.
 
 ---
 
-## Phase 5 — timeouts, diagnostics, reset, pacing, runtime cache hardening
+## Phase 5 — runtime cache, timeout, pacing, diagnostics
 
 ### Status
 
-Completed for the rewrite path.
+Completed for the supported rewrite path.
 
 ### Changed files
 
 - `DataIndex.lua`
 - `DataScan.lua`
+- `DataSnapshot.lua`
 - `Sync.lua`
 - `SyncRuntime.lua`
 - `SyncRequests.lua`
@@ -138,25 +148,20 @@ Completed for the rewrite path.
 - `SyncDiagnostics.lua`
 - `SyncPausePolicy.lua`
 - `Core.lua`
+- `MockSync.lua`
 - `local-tests/spec/p4_scan_opportunistic_spec.lua`
 - `local-tests/spec/slash_output_spec.lua`
+- `local-tests/spec/sync_phase2_summary_foundation_spec.lua`
+- `local-tests/spec/sync_phase34_block_pull_spec.lua`
 
 ### Behavior implemented
 
 - Added in-memory runtime sync index caching with block-scoped dirtiness.
-- Full rebuilds now happen only on cache miss, full invalidation, or trusted-roster state changes.
 - Dirty block rebuilds update only affected blocks when possible.
-- Added telemetry:
-  - `syncIndexCacheHit`
-  - `syncIndexCacheMiss`
-  - `syncIndexBlockRebuilt`
-  - `syncIndexFullRebuild`
-  - `syncIndexGlobalRecomputed`
-  - `syncIndexDirtyBlockCount`
-- Added internal pacing constant:
-  - `BLOCK_PULL_DELAY_SECONDS = 1.0`
-- The next block pull is scheduled only after the previous block is merged and recomputed.
-- Committed global fingerprint updates only on outbound session completion or abort.
+- The runtime keeps exactly one `globalFingerprint`.
+- `BuildLocalSummary()` is read-only from a sync lifecycle perspective.
+- `BLOCK_PULL_DELAY_SECONDS = 1.0` paces sequential block pulls.
+- Post-sync, post-abort, post-scan, reset, and recovery HELLOs flow through delayed/coalesced scheduling.
 - Diagnostics and slash output now report sync-index/cache/runtime state instead of manifest/coordinator state.
 
 ### Tests added or updated
@@ -168,18 +173,18 @@ Completed for the rewrite path.
 
 ### Test results
 
-- `sync_phase2_summary_foundation_spec.lua`: 8 passed
-- `sync_phase34_block_pull_spec.lua`: 6 passed
+- `sync_phase2_summary_foundation_spec.lua`: 10 passed
+- `sync_phase34_block_pull_spec.lua`: 10 passed
 - `p4_scan_opportunistic_spec.lua`: 13 passed
 - `slash_output_spec.lua`: 9 passed
 
 ### Deviations from the roadmap
 
-- Runtime cache rebuilds are still synchronous in backend tests. The worker/timer-based deferral requirement for expensive full rebuilds remains a practical in-game follow-up rather than a blocker for the current backend hardening pass.
+- Full rebuild deferral still relies on existing timer/scheduler behavior rather than a separate new worker design. That is acceptable for the current backend baseline because the runtime no longer forces full rebuilds on every protocol step.
 
 ### Remaining blockers
 
-- The expensive in-game full-rebuild deferral path is still intentionally documented as a follow-up implementation concern rather than a backend-test blocker.
+- None in the active backend baseline.
 
 ---
 
@@ -187,54 +192,56 @@ Completed for the rewrite path.
 
 ### Status
 
-Completed for active runtime code and the supported backend suite surface.
+Completed for active runtime code and active backend suites.
 
 ### Changed files
 
-- `Data.lua`
+- `BuildInfo.lua`
 - `Core.lua`
+- `Data.lua`
 - `MockSync.lua`
+- `SyncCodec.lua`
 - `SyncProtocol.lua`
 - `SyncRuntime.lua`
-- `BuildInfo.lua`
-- `RecipeRegistry.toc`
-- `local-tests/harness/load-addon.lua`
-- `local-tests/spec/sync_phase1_legacy_noop_spec.lua`
-- `local-tests/spec/sync_legacy_grep_gate_spec.lua`
+- `SyncTransfer.lua`
+- `local-tests/harness/comm-bus.lua`
 - `local-tests/spec/build_channel_isolation_spec.lua`
+- `local-tests/spec/sync_legacy_grep_gate_spec.lua`
+- `local-tests/spec/sync_phase1_unsupported_message_spec.lua`
+- `local-tests/run-backend-tests.ps1`
 
 ### Behavior implemented
 
 - Removed active manifest/revision/coordinator runtime code from the sync path.
-- Removed `maniReliable` and `manifestShards` from active capability advertisement.
-- Removed manifest slash/debug surfaces from `Core.lua`.
-- Replaced the old mock sync implementation with a smaller modern-only helper.
-- Deleted the old legacy sync files physically from the repository.
-- Added a hard grep gate for active runtime code and load order.
+- Removed explicit legacy sync-kind handling from active runtime dispatch.
+- Removed `maniReliable`, `manifestShards`, `chunkWindow`, and old snapshot-codec surfaces from active capability advertisement.
+- Removed old outbound pump / chunk remnants from active runtime.
+- Added a hard grep gate for active runtime code.
+- Replaced legacy-noop coverage with generic unsupported-message coverage.
 
 ### Tests added or updated
 
-- `sync_phase1_legacy_noop_spec.lua`
+- `sync_phase1_unsupported_message_spec.lua`
 - `sync_legacy_grep_gate_spec.lua`
 - `build_channel_isolation_spec.lua`
 
 ### Test results
 
-- `sync_phase1_legacy_noop_spec.lua`: 4 passed
+- `sync_phase1_unsupported_message_spec.lua`: 2 passed
 - `sync_legacy_grep_gate_spec.lua`: 3 passed
 - `build_channel_isolation_spec.lua`: 13 passed
 
 ### Deviations from the roadmap
 
-- Historical backend specs that still assert removed manifest/revision/coordinator behavior remain in-tree for reference, but they are no longer part of the active backend suite definitions.
+- Historical pre-rewrite specs remain in-tree for reference but are excluded from the active `all`, `quick`, and `sync` baselines.
 
 ### Remaining blockers
 
-- No active Phase 6 blockers remain in the supported backend suites.
+- None in the active backend baseline.
 
 ---
 
-## Final hardening pass
+## Final correction pass
 
 ### Status
 
@@ -244,11 +251,7 @@ Completed for the requested scope on 2026-05-17.
 
 - `BuildInfo.lua`
 - `Core.lua`
-- `Data.lua`
-- `DataCatalog.lua`
 - `DataIndex.lua`
-- `DataScan.lua`
-- `DataSnapshot.lua`
 - `MockSync.lua`
 - `Sync.lua`
 - `SyncCodec.lua`
@@ -258,48 +261,33 @@ Completed for the requested scope on 2026-05-17.
 - `SyncRequests.lua`
 - `SyncRuntime.lua`
 - `SyncTransfer.lua`
-- `UI/MainFrame.lua`
+- `local-tests/harness/comm-bus.lua`
 - `local-tests/spec/build_channel_isolation_spec.lua`
-- `local-tests/spec/p4_scan_opportunistic_spec.lua`
 - `local-tests/spec/slash_output_spec.lua`
 - `local-tests/spec/sync_legacy_grep_gate_spec.lua`
-- `local-tests/spec/sync_phase1_legacy_noop_spec.lua`
+- `local-tests/spec/sync_phase1_unsupported_message_spec.lua`
 - `local-tests/spec/sync_phase2_summary_foundation_spec.lua`
 - `local-tests/spec/sync_phase34_block_pull_spec.lua`
-
-### Behavior implemented
-
-- Removed dead legacy sync surfaces from active runtime code.
-- Removed coordinator state entirely.
-- Reduced `INDEX_DIFF_REQUEST` and `BLOCK_PULL_REQUEST` payloads to the minimum live fields.
-- Kept debug/telemetry local instead of adding debug-only wire fields.
-- Removed inactive snapshot-codec capability advertisement from the active wire capability set.
-- Added paced block-pull sequencing with a one-second internal delay.
-- Replaced repeated live index rebuilds with an in-memory runtime cache.
-- Standardized the internal fingerprint schema on `bf3` / `gf3`.
-- Preserved build/version/build-channel compatibility logic and notices.
-
-### Documentation updated
-
+- `docs/sync-rewrite-roadmap.md`
 - `docs/sync-rewrite-phase-log.md`
 - `docs/recipe_registry_shard_sync_rewrite_plan.md`
 - `docs/CODEBASE_ANALYSIS.local.historical.md`
 - `local-tests/README.md`
-- `local-tests/run-backend-tests.ps1`
 
-### Focused test results
+### Behavior implemented
+
+- Active runtime has no explicit legacy protocol compatibility code.
+- Active runtime uses exactly one `globalFingerprint`.
+- HELLO scheduling is delayed/coalesced and no longer fires inline after local changes or sync completion/abort.
+- Inbound seed sessions are tracked, capped, and cleared on pause-sensitive state changes.
+- Abort-before-merge schedules retry discovery without treating the session as a data-changing sync result.
+- Abort-after-partial-merge keeps merged data, refreshes `globalFingerprint`, and schedules recovery HELLO.
+
+### Focused verification
 
 - `.\local-tests\run-syntax.ps1`: passed
-- `.\local-tests\run-backend-tests.ps1`: passed after updating the active backend runner to an explicit supported-spec baseline
-- `sync_phase1_legacy_noop_spec.lua`: 4 passed
-- `sync_phase2_summary_foundation_spec.lua`: 8 passed
-- `sync_phase34_block_pull_spec.lua`: 6 passed
-- `sync_legacy_grep_gate_spec.lua`: 3 passed
-- `build_channel_isolation_spec.lua`: 13 passed
-- `p4_scan_opportunistic_spec.lua`: 13 passed
-- `slash_output_spec.lua`: 9 passed
+- `.\local-tests\run-backend-tests.ps1 -Suite sync`: passed
 
 ### Remaining blockers
 
-- No active blocker remains for the requested hardening scope.
-- Historical pre-rewrite sync specs still exist in-tree and should be either rewritten against the modern protocol or moved to a dedicated historical location in a later cleanup pass.
+- None for the active rewrite baseline.

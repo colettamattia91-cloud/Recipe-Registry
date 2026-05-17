@@ -196,7 +196,6 @@ Test.it("runtime sync index cache reuses hits and rebuilds only dirty blocks", f
     data:BuildLocalSummary({
         reason = "cache-first-build",
     })
-    data:CommitGlobalFingerprint("cache-first-publish")
     local first = data:GetSyncIndexDebugState()
 
     data:BuildLocalSummary({
@@ -222,11 +221,11 @@ Test.it("runtime sync index cache reuses hits and rebuilds only dirty blocks", f
     Test.eq(dirtyCount, 1, "one local profession change should dirty exactly one block")
     Test.eq(third.cache.stats.fullRebuild or 0, 1, "dirty block rebuild should avoid another full rebuild")
     Test.truthy((third.cache.stats.blockRebuilt or 0) >= 1, "dirty block rebuild should update the affected block")
-    Test.truthy(third.globalFingerprintDirty, "rebuilding the dirty block should keep the published fingerprint marked dirty")
-    Test.ne(third.currentGlobalFingerprint, third.publishedGlobalFingerprint, "published fingerprint should remain stale until an explicit publish")
+    Test.falsy(third.globalFingerprintDirty, "rebuilding the dirty block should leave one valid global fingerprint")
+    Test.ne(third.globalFingerprint, first.globalFingerprint, "dirty block rebuild should refresh the global fingerprint")
 end)
 
-Test.it("BuildLocalSummary computes live state without publishing as a side effect", function()
+Test.it("BuildLocalSummary keeps one global fingerprint without creating publish-side variants", function()
     local _addon, _wow, data = freshAddon()
     local ownerKey = data:GetPlayerKey()
     Loader.Wow.SetGuildRoster({
@@ -245,18 +244,39 @@ Test.it("BuildLocalSummary computes live state without publishing as a side effe
     })
     local state = data:GetSyncIndexDebugState()
 
-    Test.truthy(type(summary.currentGlobalFingerprint) == "string" and summary.currentGlobalFingerprint ~= "", "summary should compute a live fingerprint")
-    Test.eq(summary.publishedGlobalFingerprint, nil, "summary should not publish the fingerprint by itself")
-    Test.truthy(summary.globalFingerprintDirty, "summary should report the unpublished fingerprint as dirty")
-    Test.eq(state.publishedGlobalFingerprint, nil, "debug state should confirm no published fingerprint yet")
+    Test.truthy(type(summary.globalFingerprint) == "string" and summary.globalFingerprint ~= "", "summary should compute the live fingerprint")
+    Test.eq(summary.currentGlobalFingerprint, nil, "summary should not expose a second current fingerprint field")
+    Test.eq(summary.publishedGlobalFingerprint, nil, "summary should not expose a published fingerprint field")
+    Test.eq(state.globalFingerprint, summary.globalFingerprint, "debug state should reflect the same single fingerprint")
+    Test.falsy(summary.globalFingerprintDirty, "BuildLocalSummary should leave the fingerprint valid")
+end)
 
-    local publishedFingerprint = data:CommitGlobalFingerprint("summary-explicit-publish")
-    local afterPublish = data:BuildLocalSummary({
-        reason = "summary-after-publish",
+Test.it("ScheduleHello coalesces multiple local-change reasons into one delayed HELLO", function()
+    local addon, wow, data = freshAddon()
+    local ownerKey = data:GetPlayerKey()
+    Loader.Wow.SetGuildRoster({
+        { name = ownerKey, online = true, rankName = "Member", rankIndex = 5, level = 70, classDisplayName = "Mage", classFileName = "MAGE" },
+    })
+    data:RebuildOnlineCache()
+    seedProfession(data, ownerKey, "Alchemy", { 4401, 4402 }, {
+        sourceType = "owner",
+        professionSourceType = "owner",
+        reason = "hello-coalesce-seed",
     })
 
-    Test.eq(publishedFingerprint, afterPublish.publishedGlobalFingerprint, "explicit publish should set the stable fingerprint")
-    Test.falsy(afterPublish.globalFingerprintDirty, "explicit publish should clear the published-dirty state")
+    addon.Sync:ScheduleHello("local-change-a", 0.2)
+    addon.Sync:ScheduleHello("local-change-b", 0.2)
+
+    Test.truthy(addon.Sync._helloTimer ~= nil, "a delayed hello timer should be pending")
+    Test.truthy(type(addon.Sync.lastHelloScheduleReason) == "string", "coalesced reason should be tracked")
+    Test.truthy(addon.Sync.lastHelloScheduleReason:find("local%-change%-a", 1, false) ~= nil, "first reason should be preserved")
+    Test.truthy(addon.Sync.lastHelloScheduleReason:find("local%-change%-b", 1, false) ~= nil, "second reason should be coalesced")
+    Test.eq(countWowKind(wow, "HELLO"), 0, "ScheduleHello should not send inline")
+
+    Loader.Wow.AdvanceTime(1)
+    Loader.Wow.RunTimers(10)
+
+    Test.eq(countWowKind(wow, "HELLO"), 1, "coalesced scheduling should emit one hello when the timer fires")
 end)
 
 Test.it("HELLO publishes the new summary fields only", function()

@@ -129,11 +129,3 @@ function Sync:HandleReceivedBlockSnapshot(payload)
     end
     return result or true
 end
-
-function Sync:SendNextLowPriorityChunk()
-    return false
-end
-
-function Sync:ProcessInboundQueue()
-    return true
-end

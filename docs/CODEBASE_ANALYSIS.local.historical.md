@@ -6,7 +6,7 @@
 Use these documents instead:
 
 - `docs/sync-rewrite-roadmap.md` for architecture
-- `docs/sync-rewrite-callsite-inventory.md` for migration coverage
+- `docs/sync-rewrite-roadmap.md` for the canonical active architecture
 - `docs/sync-rewrite-phase-log.md` for the implemented Phase 3-6 and hardening status
 
 The active codebase now uses the wire-3 summary/index-diff/block-pull model with:

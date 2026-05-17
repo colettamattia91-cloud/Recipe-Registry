@@ -54,13 +54,16 @@ Legacy runtime modules are no longer loaded:
 
 ## Current focused coverage
 
-- legacy inbound `AD` / `IDX` / `MANI` / `MREQ` quarantine
+- generic unsupported inbound message ignore path
 - HELLO / SUMMARY discovery
 - seed selection
 - INDEX_DIFF minimal payloads
 - sequential BLOCK_PULL / BLOCK_SNAPSHOT flow
 - block-pull pacing
 - runtime sync index cache behavior
+- single globalFingerprint lifecycle
+- delayed / coalesced HELLO scheduling
+- inbound seed session caps and pause clearing
 - build-channel and wire compatibility isolation
 - opportunistic profession scans
 - slash/debug/perf output for the modern sync path
@@ -79,6 +82,8 @@ Current supported sync suite coverage is the rewrite path only:
 - sequential `BLOCK_PULL_REQUEST`
 - `BLOCK_SNAPSHOT`
 - runtime cache / diagnostics / compatibility gates
+
+Legacy sync compatibility is intentionally removed from the active runtime baseline. Unknown inbound kinds are ignored generically; the supported suites no longer expect explicit `AD` / `IDX` / `MANI` / `MREQ` handling, manifest/revision/coordinator state, or published/current fingerprint split behavior.
 
 Historical specs that still target removed runtime concepts are not part of the active `all`, `quick`, or `sync` suites until they are either rewritten or formally archived elsewhere.
 

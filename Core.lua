@@ -237,8 +237,8 @@ local function markSyncIndexDirtyAndScheduleHello(self, reason, delay)
     if self.Data and self.Data.MarkSyncIndexDirty then
         self.Data:MarkSyncIndexDirty(reason)
     end
-    if self.Sync and self.Sync.ScheduleHelloCycle then
-        self.Sync:ScheduleHelloCycle(reason, delay or 0.5)
+    if self.Sync and self.Sync.ScheduleHello then
+        self.Sync:ScheduleHello(reason, delay or 0.5)
     end
 end
 
@@ -375,7 +375,7 @@ function Addon:OnPlayerEnteringWorld(_event, isLogin, isReload)
         self:ScheduleTimer("OnLoginReady", 4)
     else
         if self.Sync then
-            self.Sync:ScheduleHello(2)
+            self.Sync:ScheduleHello("player-entering-world", 2)
         end
     end
 end

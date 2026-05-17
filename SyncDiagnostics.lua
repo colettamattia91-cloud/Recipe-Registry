@@ -66,9 +66,7 @@ function Sync:GetRuntimeObservabilitySnapshot()
             activeOwnerCount = indexDebug.activeOwnerCount or 0,
             activeBlockCount = indexDebug.activeBlockCount or 0,
             activeContentCount = indexDebug.activeContentCount or 0,
-            globalFingerprint = indexDebug.publishedGlobalFingerprint or indexDebug.currentGlobalFingerprint,
-            currentGlobalFingerprint = indexDebug.currentGlobalFingerprint,
-            publishedGlobalFingerprint = indexDebug.publishedGlobalFingerprint,
+            globalFingerprint = indexDebug.globalFingerprint,
             globalFingerprintDirty = indexDebug.globalFingerprintDirty == true,
         },
         cache = indexDebug.cache or {},
@@ -101,8 +99,6 @@ function Sync:GetUiState()
         activeRequests = self:GetActiveRequestCount(),
         inFlight = nil,
         outgoing = 0,
-        outboundChunks = 0,
-        inboundChunks = 0,
         autoSync = true,
         paused = pauseState,
         warmup = self:IsInWarmup(),
@@ -164,8 +160,7 @@ function Sync:DumpVersionStatus()
         tostring(info.buildId or "n/a")
     ))
     Addon:Print(string.format(
-        "Capabilities: chunkWindow=%s indexDiffSync=%s blockPullSync=%s latestRemoteVersionSeen=%s lastNoticedVersion=%s lastUpdateNoticeAt=%s",
-        tostring(info.capabilities and info.capabilities.chunkWindow == true),
+        "Capabilities: indexDiffSync=%s blockPullSync=%s latestRemoteVersionSeen=%s lastNoticedVersion=%s lastUpdateNoticeAt=%s",
         tostring(info.capabilities and info.capabilities.indexDiffSync == true),
         tostring(info.capabilities and info.capabilities.blockPullSync == true),
         tostring(notice.latestRemoteVersionSeen or "none"),
@@ -362,7 +357,7 @@ function Sync:DumpStatus()
         tostring(runtime.trustedRosterReason or "unknown")
     ))
     Addon:Print(string.format(
-        "Session state=%s seed=%s wanted=%d next=%d abort=%s complete=%s globalDirty=%s publishedFingerprint=%s",
+        "Session state=%s seed=%s wanted=%d next=%d abort=%s complete=%s globalDirty=%s globalFingerprint=%s",
         tostring(runtime.outboundSession.state or "idle"),
         tostring(runtime.outboundSession.seedKey or "none"),
         runtime.outboundSession.wantedBlocks or 0,
@@ -370,7 +365,7 @@ function Sync:DumpStatus()
         tostring(runtime.outboundSession.abortReason or "none"),
         tostring(runtime.outboundSession.completedReason or "none"),
         tostring(runtime.localSummary.globalFingerprintDirty or false),
-        tostring(runtime.localSummary.publishedGlobalFingerprint or "none")
+        tostring(runtime.localSummary.globalFingerprint or "none")
     ))
     Addon:Print(string.format(
         "Version peers=%d eligible=%d ineligible=%d channelDrops=%d versionSkips=%d capSkips=%d newerVersionSeen=%d newerProtocolSeen=%d backoff=%d [%s]",

@@ -21,7 +21,7 @@ HELLO
 → immediate additive merge per block
 → immediate local block fingerprint recompute
 → global fingerprint marked dirty
-→ committed global fingerprint recomputed only when the outbound cycle completes or aborts
+→ single globalFingerprint recomputed when needed and refreshed at outbound completion or abort
 ```
 
 The new sync model must be:
@@ -60,7 +60,7 @@ Addon.CAPABILITIES.indexDiffSync = true
 Addon.CAPABILITIES.blockPullSync = true
 ```
 
-`manifestShards` may remain temporarily only as a deprecated inert alias. It must never route traffic or imply manifest behavior.
+Do not advertise removed legacy capabilities such as `manifestShards` or `maniReliable`.
 
 ### 2.3 Legacy message kinds
 
@@ -74,7 +74,7 @@ BLOCK_PULL_REQUEST
 BLOCK_SNAPSHOT
 ```
 
-Legacy `IDX` must not be reused for new index-diff traffic. Legacy `AD`, `IDX`, `MANI`, and `MREQ` remain only as deprecated inbound no-op handlers with telemetry/debug counters.
+Legacy `IDX` must not be reused for new index-diff traffic. Active runtime code must not explicitly recognize or quarantine legacy sync kinds. Unknown inbound kinds are ignored generically.
 
 ### 2.4 Revision model removal
 
@@ -321,7 +321,7 @@ BLOCK_SNAPSHOT:
   blockPayload
 ```
 
-The seed must serve from current live block data / working block index, not from stale committed summary state.
+The seed must serve from current live block data / working block index, not from stale cached summary state.
 
 A peer with `globalFingerprintDirty = true` may still serve updated live block content inbound.
 
@@ -404,7 +404,7 @@ Rules:
 7. Mark global fingerprint dirty.
 8. Request the next block only after the current block has been applied and recomputed.
 
-Committed global fingerprint is recomputed only when the outbound session completes or aborts.
+The runtime keeps one `globalFingerprint` value plus dirty/cache state. HELLO is the publication mechanism; it carries the current `globalFingerprint` at send time.
 
 ---
 
@@ -415,8 +415,8 @@ If the seed does not respond within the timeout, or responds as paused/unavailab
 1. abort/reset the session toward that seed;
 2. clear pending requests toward that seed;
 3. keep already applied blocks;
-4. recompute committed global fingerprint;
-5. schedule a future HELLO if fingerprint changed.
+4. recompute the single globalFingerprint if sync changed local data;
+5. schedule a delayed/coalesced future HELLO through the common scheduling path.
 
 Initial target values:
 
@@ -450,23 +450,23 @@ Rules:
 
 ### BuildInfo.lua — rewrite
 
-Keep `WIRE_VERSION = 3` and `MIN_SUPPORTED_WIRE_VERSION = 3`; advertise `indexDiffSync` and `blockPullSync`; keep `manifestShards` only as inert deprecated alias if temporarily retained.
+Keep `WIRE_VERSION = 3` and `MIN_SUPPORTED_WIRE_VERSION = 3`; advertise `indexDiffSync` and `blockPullSync`; do not advertise removed legacy capability aliases.
 
 ### RecipeRegistry.toc — rewrite
 
-Add `DataIndex.lua`. Keep legacy modules until call-site migration is complete. Remove `DataManifest.lua`, `SyncManifest.lua`, and `TrickleSync.lua` only after runtime, slash, diagnostics, mock, harness, and tests are clean.
+Add `DataIndex.lua`. Remove `DataManifest.lua`, `SyncManifest.lua`, and `TrickleSync.lua` from active load order once runtime, slash, diagnostics, mock, harness, and tests are clean.
 
 ### Data.lua — rewrite
 
-Move sync-facing truth away from manifest/revision helpers. Keep persisted revision fields only as ignored historical metadata. Add sync-facing helpers for trusted roster state, active owner filtering, committed-global dirty state, and metadata storage that cannot influence sync behavior.
+Move sync-facing truth away from manifest/revision helpers. Keep persisted historical metadata ignored by active sync logic. Add sync-facing helpers for trusted roster state, active owner filtering, single-global-fingerprint dirty/cache state, and metadata storage that cannot influence sync behavior.
 
 ### DataIndex.lua — add
 
-Own trusted-roster-gated active index construction, runtime-only synthetic specialization keys, content-only block/global fingerprints, local summary generation, requester index export, and optional paging/chunking for large `INDEX_DIFF_RESPONSE` payloads.
+Own trusted-roster-gated active index construction, runtime-only synthetic specialization keys, content-only block/global fingerprints, local summary generation, requester index export, and in-memory dirty-block cache management.
 
 ### DataSnapshot.lua — rewrite
 
-Replace whole-owner snapshot flow with block-scoped snapshot build/apply. Apply each received block immediately, merge additively, recompute local block fingerprint immediately, and mark committed global state dirty. No transfer or merge step may consult revision fields.
+Replace whole-owner snapshot flow with block-scoped snapshot build/apply. Apply each received block immediately, merge additively, recompute local block fingerprint immediately, and mark global fingerprint dirty. No transfer or merge step may consult revision fields.
 
 ### DataCleanup.lua — neutral-reuse
 
@@ -498,11 +498,11 @@ Replace manifest/coordinator/request-revision state with hello-cycle state, summ
 
 ### SyncRuntime.lua — rewrite
 
-Keep version/build-channel eligibility, online peer tracking, pause/warmup handling, queue caps, and worker orchestration. Remove coordinator state, revision registry behavior, manifest catch-up queues, and auto-tick revision pulls. Enforce one outbound seed per cycle and no committed global publication mid-cycle.
+Keep version/build-channel eligibility, online peer tracking, pause/warmup handling, queue caps, and worker orchestration. Remove coordinator state, revision registry behavior, manifest catch-up queues, and auto-tick revision pulls. Enforce one outbound seed per cycle, delayed/coalesced HELLO scheduling, and capped inbound seed session tracking.
 
 ### SyncProtocol.lua — rewrite
 
-Broadcast HELLO, whisper SUMMARY, handle `INDEX_DIFF_REQUEST`, `INDEX_DIFF_RESPONSE`, `BLOCK_PULL_REQUEST`, and `BLOCK_SNAPSHOT`. Keep legacy `IDX`, `AD`, `MANI`, and `MREQ` as deprecated inbound no-ops with telemetry only.
+Broadcast HELLO, whisper SUMMARY, handle `INDEX_DIFF_REQUEST`, `INDEX_DIFF_RESPONSE`, `BLOCK_PULL_REQUEST`, and `BLOCK_SNAPSHOT`. Unknown inbound message kinds are ignored generically with no reply and no sync side effects.
 
 ### SyncRequests.lua — rewrite
 
@@ -510,11 +510,11 @@ Remove `QueueRequest(..., rev, ...)` and all member/revision queues. Replace wit
 
 ### SyncTransfer.lua — rewrite
 
-Serve `BLOCK_SNAPSHOT` from current live block data / working block index, not from last committed global fingerprint or stale committed summary. Remove `knownRev`, `wantRev`, revision-derived identities, and expected/offered fingerprint semantics. Keep neutral chunking/compression/resume only if still needed.
+Serve `BLOCK_SNAPSHOT` from current live block data / working block index, not from stale summary state. Remove `knownRev`, `wantRev`, revision-derived identities, expected/offered fingerprint semantics, and old chunk-pipeline remnants.
 
 ### SyncCodec.lua — neutral-reuse / rewrite
 
-Reuse serializer/deflate/codec helpers for `INDEX_DIFF_RESPONSE` pages and `BLOCK_SNAPSHOT` payloads. Update capability parsing to prefer `indexDiffSync` and `blockPullSync`. Remove revision-bearing sync schemas when new messages are implemented.
+Keep only transport-neutral serializer helpers actually used by the modern protocol. Remove legacy snapshot-codec naming and capability surfaces that no longer participate in `INDEX_DIFF_RESPONSE` or `BLOCK_SNAPSHOT`.
 
 ### SyncManifest.lua — delete after migration pass
 
@@ -522,7 +522,7 @@ Remove `MANI/MREQ` send, receive, retry, cache, recovery, and catch-up logic aft
 
 ### SyncDiagnostics.lua — rewrite
 
-Replace manifest/coordinator/revision diagnostics with hello/summary/index-diff/block-pull/session diagnostics. Add counters such as `helloSent`, `summaryReceived`, `seedSelected`, `blocksOffered`, `blockMergedImmediate`, `blockFingerprintRecomputed`, `globalFingerprintDirty`, `globalFingerprintCommitted`, `legacyMessageIgnored`, `revisionPathRemoved`, and trusted-roster state diagnostics.
+Replace manifest/coordinator/revision diagnostics with hello/summary/index-diff/block-pull/session diagnostics. Add counters such as `helloSent`, `summaryReceived`, `seedSelected`, `blocksOffered`, `blockMergedImmediate`, `blockFingerprintRecomputed`, `globalFingerprintDirty`, `unsupportedMessagesIgnored`, and trusted-roster state diagnostics.
 
 ### SyncPausePolicy.lua — neutral-reuse
 
@@ -632,7 +632,7 @@ ownerRevision
 any revision-derived retry, priority, equality, or freshness logic
 ```
 
-Keep inbound handlers for `IDX`, `AD`, `MANI`, and `MREQ` only as deprecated no-ops that increment `legacyMessageIgnored` or equivalent and never enqueue sync work.
+Do not keep explicit inbound handlers for `IDX`, `AD`, `MANI`, or `MREQ`. Unknown inbound message kinds are ignored generically and must not enqueue sync work.
 
 ---
 
@@ -666,8 +666,7 @@ ProcessPeerManifestComparison
 Allowed exceptions must be isolated to:
 
 - SavedVariables historical metadata migration;
-- deprecated legacy no-op handlers;
-- tests proving legacy paths are ignored;
+- tests proving unknown kinds are ignored generically;
 - documentation explaining removed behavior.
 
 This is a final rewrite completion gate, not necessarily a Phase 1 gate.
@@ -678,10 +677,10 @@ This is a final rewrite completion gate, not necessarily a Phase 1 gate.
 
 - Additive merge is intentionally non-destructive; downward convergence requires a future tombstone/reset design and must not be smuggled into this rewrite.
 - Runtime-only specialization keys must never leak into persisted recipe sets or UI/export code paths.
-- Deprecated `manifestShards` can confuse tests and diagnostics unless clearly treated as inert.
+- Removed legacy capability names can confuse tests and diagnostics unless they are eliminated from active capability advertisement.
 - Deleting manifest modules too early risks dangling slash/debug/mock/test references, so call-site migration must precede `.toc` removal.
 - Trusted-roster gating must be conservative; unstable roster state must not cause destructive purge.
-- Diagnostics must distinguish live dirty state from committed published global fingerprint.
+- Diagnostics must distinguish dirty cache state from the single live `globalFingerprint`.
 
 ---
 
@@ -691,7 +690,7 @@ This is a final rewrite completion gate, not necessarily a Phase 1 gate.
 
 - Add `DataIndex.lua` skeleton and wire it into load order.
 - Keep `DataManifest.lua`, `SyncManifest.lua`, and `TrickleSync.lua` loaded.
-- Convert inbound `AD`, `IDX`, `MANI`, and `MREQ` to deprecated no-op handlers.
+- Remove explicit inbound legacy-kind handling and keep only generic unsupported-message ignore behavior.
 - Stop outbound legacy traffic.
 - Cut revision/coordinator request seeding.
 - Keep `/rr rescan` local, then mark sync index dirty and schedule HELLO path.

@@ -9,6 +9,7 @@ local sort = table.sort
 local max = math.max
 local min = math.min
 local remove = table.remove
+local random = math.random
 
 local countKeys = Private.countKeys
 local isMockKey = Private.isMockKey
@@ -18,7 +19,6 @@ local compareSemver = Addon.BuildInfo and Addon.BuildInfo.CompareSemver or nil
 local NODE_TIMEOUT = Constants.NODE_TIMEOUT
 local HELLO_INTERVAL = Constants.HELLO_INTERVAL
 local AUTO_SYNC_INTERVAL = Constants.AUTO_SYNC_INTERVAL
-local OUTBOUND_PUMP_DELAY = Constants.OUTBOUND_PUMP_DELAY or 0.05
 local PEER_BACKOFF_SECONDS = Constants.PEER_BACKOFF_SECONDS or 45
 local POST_WORLD_GRACE_SECONDS = Constants.POST_WORLD_GRACE_SECONDS or 12
 local POST_INSTANCE_GRACE_SECONDS = Constants.POST_INSTANCE_GRACE_SECONDS or 15
@@ -48,9 +48,6 @@ local function normalizeBuildChannel(value)
         return nil
     end
     local lowered = value:lower()
-    if lowered == "legacy" then
-        return nil
-    end
     if lowered == "dev" then
         return "dev"
     end
@@ -64,10 +61,8 @@ local function summarizeCapabilities(payload)
     local caps = {}
     local source = type(payload) == "table" and payload or {}
     local nested = type(source.capabilities) == "table" and source.capabilities or {}
-    if nested.chunkWindow ~= nil then caps.chunkWindow = nested.chunkWindow == true end
     if nested.indexDiffSync ~= nil then caps.indexDiffSync = nested.indexDiffSync == true end
     if nested.blockPullSync ~= nil then caps.blockPullSync = nested.blockPullSync == true end
-    if source.chunkWindow ~= nil then caps.chunkWindow = source.chunkWindow == true end
     if source.indexDiffSync ~= nil then caps.indexDiffSync = source.indexDiffSync == true end
     if source.blockPullSync ~= nil then caps.blockPullSync = source.blockPullSync == true end
     return caps
@@ -79,7 +74,6 @@ local function getDeclaredCapabilities(versionInfo, capsInfo)
         if type(capsInfo.capabilities) == "table" then
             capabilities = cloneCapabilities(capsInfo.capabilities)
         end
-        if capsInfo.chunkWindow ~= nil then capabilities.chunkWindow = capsInfo.chunkWindow == true end
         if capsInfo.indexDiffSync ~= nil then capabilities.indexDiffSync = capsInfo.indexDiffSync == true end
         if capsInfo.blockPullSync ~= nil then capabilities.blockPullSync = capsInfo.blockPullSync == true end
     end
@@ -106,6 +100,7 @@ function Sync:OnInitialize()
     self.inFlight = nil
     self.outgoingSessions = {}
     self.partialReceive = {}
+    self.inboundSeedSessions = {}
     self.lifecycleDebugLog = {}
     self.offlineDebugLog = {}
     self.helloCycleCounter = 0
@@ -142,6 +137,7 @@ function Sync:ResetRuntimeQueues(reason, opts)
     self.inFlight = nil
     self.outgoingSessions = {}
     self.partialReceive = {}
+    self.inboundSeedSessions = {}
     self.activeHelloCycle = nil
     self.lastSelectedSeed = nil
     self.outboundSeedSession = nil
@@ -162,10 +158,6 @@ function Sync:ResetRuntimeQueues(reason, opts)
     if self._queuePumpTimer then
         self:CancelTimer(self._queuePumpTimer, true)
         self._queuePumpTimer = nil
-    end
-    if self._outboundPumpTimer then
-        self:CancelTimer(self._outboundPumpTimer, true)
-        self._outboundPumpTimer = nil
     end
     if self._warmupTimer then
         self:CancelTimer(self._warmupTimer, true)
@@ -219,7 +211,7 @@ function Sync:KickoffDatabaseResync()
             full = true,
         })
     end
-    self:ScheduleHelloCycle("database-resync", 0.5)
+    self:ScheduleHello("database-resync")
 end
 
 function Sync:GetLocalVersionInfo()
@@ -234,7 +226,6 @@ function Sync:GetLocalVersionInfo()
         buildId = Addon.BUILD_ID,
         commPrefix = Addon.COMM_PREFIX or Addon.ADDON_PREFIX,
         capabilities = cloneCapabilities(Addon.CAPABILITIES),
-        allowLegacyReleasePeers = Addon.ALLOW_LEGACY_RELEASE_PEERS == true,
     }
 end
 
@@ -254,9 +245,6 @@ function Sync:ComputePeerCompatibility(peer)
             return "channel-mismatch"
         end
         if not remoteChannel then
-            if localInfo.allowLegacyReleasePeers then
-                return "legacy"
-            end
             return "channel-mismatch"
         end
         if remoteChannel ~= localInfo.buildChannel then
@@ -266,7 +254,7 @@ function Sync:ComputePeerCompatibility(peer)
 
     local wireVersion = tonumber(peer.wireVersion or 0) or 0
     if wireVersion <= 0 then
-        return "legacy"
+        return "remote-older-wire"
     end
     if wireVersion > (localInfo.wireVersion or Addon.WIRE_VERSION or 0) then
         return "remote-newer-wire"
@@ -292,10 +280,7 @@ function Sync:IsInboundBuildChannelAllowed(payload, _sender)
         return false, "channel-mismatch", remoteChannel
     end
     if not remoteChannel then
-        if localInfo.allowLegacyReleasePeers then
-            return true, "legacy-release", "legacy"
-        end
-        return false, "missing-build-channel", "legacy"
+        return false, "missing-build-channel", "unknown"
     end
     if remoteChannel ~= localInfo.buildChannel then
         return false, "channel-mismatch", remoteChannel
@@ -331,7 +316,7 @@ function Sync:ObservePeerVersion(peerKey, payload)
 
     info.addonVersion = info.addonVersion or existing and existing.addonVersion or "unknown"
     info.wireVersion = tonumber(info.wireVersion or existing and existing.wireVersion or 0) or 0
-    info.buildChannel = normalizeBuildChannel(info.buildChannel or existing and existing.buildChannel) or "legacy"
+    info.buildChannel = normalizeBuildChannel(info.buildChannel or existing and existing.buildChannel) or "unknown"
     info.buildId = info.buildId or existing and existing.buildId or nil
     if next(info.capabilities) == nil and existing and type(existing.capabilities) == "table" then
         info.capabilities = cloneCapabilities(existing.capabilities)
@@ -426,7 +411,7 @@ function Sync:ShouldAcceptInboundPayload(payload, peerKey)
         return false
     end
     local compatibility = info.compatibility or self:ComputePeerCompatibility(info)
-    if compatibility == "legacy" or compatibility == "remote-newer-wire" or compatibility == "remote-older-wire" then
+    if compatibility == "remote-newer-wire" or compatibility == "remote-older-wire" then
         return false
     end
     return compatibility ~= "channel-mismatch"
@@ -448,7 +433,7 @@ function Sync:MaybeNotifyPeerVersion(peerKey, info)
             return
         end
     else
-        if remoteChannel == "dev" or remoteChannel == "legacy" or remoteChannel == "unsupported" then
+        if remoteChannel == "dev" or remoteChannel == "unsupported" or remoteChannel == "unknown" then
             return
         end
     end
@@ -553,12 +538,6 @@ function Sync:CanExchangeDataWithPeer(peerKey, purpose, request)
         self.telemetry.skippedVersionIncompatible = (self.telemetry.skippedVersionIncompatible or 0) + 1
         return false, "channel-mismatch"
     end
-    if compatibility == "legacy" and purpose ~= "diagnostics" then
-        self:SetPeerIneligibleReason(peerKey, "legacy")
-        self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
-        self.telemetry.skippedVersionIncompatible = (self.telemetry.skippedVersionIncompatible or 0) + 1
-        return false, "legacy-peer"
-    end
     if compatibility == "remote-newer-wire" or compatibility == "remote-older-wire" then
         self:SetPeerIneligibleReason(peerKey, compatibility)
         self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
@@ -633,7 +612,7 @@ function Sync:OnGuildRosterUpdate()
             full = true,
         })
     end
-    self:ScheduleHelloCycle("roster-update", 0.5)
+    self:ScheduleHello("roster-update")
 end
 
 function Sync:GetInFlightRequests()
@@ -673,29 +652,97 @@ function Sync:ClearInFlightRequest(memberKey)
     return nil
 end
 
-function Sync:ScheduleHello(delay)
-    local session = self.outboundSeedSession
-    if type(session) == "table" and session.state and session.state ~= "completed" and session.state ~= "aborted" then
-        self.telemetry.transitionSkippedHello = (self.telemetry.transitionSkippedHello or 0) + 1
-        return
+function Sync:GetPendingHelloReason()
+    local reasons = {}
+    for reason in pairs(self._pendingHelloReasons or {}) do
+        reasons[#reasons + 1] = tostring(reason)
     end
-    if self:ShouldDeferHeavyLifecycleWork("hello") then
-        return
+    if #reasons == 0 then
+        return "hello"
     end
-    if self._helloTimer then
-        return
-    end
-    self._helloTimer = self:ScheduleTimer(function()
-        self._helloTimer = nil
-        self:BroadcastHello()
-    end, delay or 0.5)
+    sort(reasons)
+    return table.concat(reasons, ",")
 end
 
-function Sync:ScheduleHelloCycle(reason, delay)
-    self.lastHelloCycleReason = tostring(reason or "unspecified")
-    self.lastHelloCycleScheduledAt = time()
-    self._pendingHelloCycleReason = self.lastHelloCycleReason
-    self:ScheduleHello(delay)
+function Sync:ClearPendingHello(reason)
+    self._pendingHelloReasons = {}
+    self._pendingHelloCycleReason = nil
+    self.lastHelloScheduleReason = nil
+    self.lastHelloScheduleClearedAt = time()
+    self.lastHelloScheduleClearReason = tostring(reason or "sent")
+end
+
+function Sync:ShouldDeferHelloBroadcast()
+    local session = self.outboundSeedSession
+    if type(session) == "table" and session.state and session.state ~= "completed" and session.state ~= "aborted" then
+        return true, "outbound-session-active"
+    end
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("HELLO") then
+        return true, "paused"
+    end
+    if self:IsInWarmup() then
+        return true, "warmup"
+    end
+    if self:IsInWorldTransition() then
+        return true, "world-transition"
+    end
+    if self:ShouldDeferHeavyLifecycleWork("hello") then
+        return true, "runtime-saturated"
+    end
+    local trust = Addon.Data and Addon.Data.EnsureTrustedRosterForSync and Addon.Data:EnsureTrustedRosterForSync("hello-ready") or nil
+    if type(trust) == "table" and trust.trusted ~= true then
+        return true, tostring(trust.reason or "roster-unready")
+    end
+    return false, "ready"
+end
+
+function Sync:ScheduleHello(reason, delay)
+    local helloReason = tostring(reason or "hello")
+    self._pendingHelloReasons = self._pendingHelloReasons or {}
+    self._pendingHelloReasons[helloReason] = true
+    self._pendingHelloCycleReason = self:GetPendingHelloReason()
+    self.lastHelloScheduleReason = self._pendingHelloCycleReason
+    self.lastHelloScheduledAt = time()
+
+    if self._helloTimer then
+        self.telemetry.coalescedHelloSchedules = (self.telemetry.coalescedHelloSchedules or 0) + 1
+        return true
+    end
+
+    local nextDelay = tonumber(delay)
+    if nextDelay == nil then
+        nextDelay = Constants.HELLO_RESCHEDULE_DELAY_SECONDS or 5
+        local jitterWindow = tonumber(Constants.HELLO_RESCHEDULE_JITTER_SECONDS or 0) or 0
+        if jitterWindow > 0 then
+            nextDelay = nextDelay + (random() * jitterWindow)
+        end
+    end
+    if (self.lastHelloAt or 0) > 0 then
+        local cooldown = tonumber(Constants.POST_SYNC_HELLO_COOLDOWN_SECONDS or 0) or 0
+        local remaining = max(0, cooldown - max(0, time() - (self.lastHelloAt or 0)))
+        if remaining > nextDelay then
+            nextDelay = remaining
+        end
+    end
+
+    self._helloScheduledFor = time() + max(0, nextDelay)
+    self._helloTimer = self:ScheduleTimer(function()
+        self._helloTimer = nil
+        self._helloScheduledFor = nil
+        local deferSend, deferReason = self:ShouldDeferHelloBroadcast()
+        if deferSend then
+            self.telemetry.deferredHelloSchedules = (self.telemetry.deferredHelloSchedules or 0) + 1
+            self:ScheduleHello("deferred:" .. tostring(deferReason or "unknown"))
+            return
+        end
+        local sent = self:BroadcastHello()
+        if sent then
+            self:ClearPendingHello("sent")
+        else
+            self:ScheduleHello("retry:hello-send-failed")
+        end
+    end, max(0, nextDelay))
+    return true
 end
 
 function Sync:BeginHelloCycle(reason)
@@ -859,12 +906,12 @@ function Sync:AbortOutboundSeedSession(reason)
     session.abortReason = tostring(reason or "aborted")
     session.abortedAt = time()
     session.lastProgressAt = session.abortedAt
-    local fingerprintChanged = false
-    if Addon.Data and Addon.Data.CommitGlobalFingerprint then
-        local _, changed = Addon.Data:CommitGlobalFingerprint("seed-session-abort:" .. session.abortReason, {
-            publishIfChanged = (session.successfulBlockMerges or 0) > 0,
-        })
-        fingerprintChanged = changed == true
+    if Addon.Data and Addon.Data.RefreshGlobalFingerprint then
+        if (session.successfulBlockMerges or 0) > 0 then
+            Addon.Data:RefreshGlobalFingerprint("seed-session-abort:" .. session.abortReason)
+        elseif Addon.Data.IsSyncIndexDirty and Addon.Data:IsSyncIndexDirty() then
+            Addon.Data:RefreshGlobalFingerprint("seed-session-abort-local-dirty:" .. session.abortReason)
+        end
     end
     self.telemetry.outboundSessionAborted = (self.telemetry.outboundSessionAborted or 0) + 1
     self.telemetry.lastAbortReason = session.abortReason
@@ -873,9 +920,7 @@ function Sync:AbortOutboundSeedSession(reason)
         tostring(session.seedKey or "unknown"),
         tostring(session.abortReason)
     ))
-    if fingerprintChanged and self.ScheduleHelloCycle then
-        self:ScheduleHelloCycle("seed-session-abort-publish", 0.5)
-    end
+    self:ScheduleHello((session.successfulBlockMerges or 0) > 0 and "seed-session-abort-partial" or "seed-session-abort-retry")
     return true
 end
 
@@ -892,12 +937,8 @@ function Sync:CompleteOutboundSeedSession(reason)
     session.completedAt = time()
     session.lastProgressAt = session.completedAt
     session.completedReason = tostring(reason or "complete")
-    local fingerprintChanged = false
-    if Addon.Data and Addon.Data.CommitGlobalFingerprint and (session.successfulBlockMerges or 0) > 0 then
-        local _, changed = Addon.Data:CommitGlobalFingerprint("seed-session-complete:" .. session.completedReason, {
-            publishIfChanged = true,
-        })
-        fingerprintChanged = changed == true
+    if Addon.Data and Addon.Data.RefreshGlobalFingerprint and (session.successfulBlockMerges or 0) > 0 then
+        Addon.Data:RefreshGlobalFingerprint("seed-session-complete:" .. session.completedReason)
     end
     self.telemetry.outboundSessionCompleted = (self.telemetry.outboundSessionCompleted or 0) + 1
     self.telemetry.lastSessionCompleteReason = session.completedReason
@@ -906,16 +947,116 @@ function Sync:CompleteOutboundSeedSession(reason)
         tostring(session.seedKey or "unknown"),
         tostring(session.completedReason)
     ))
-    if fingerprintChanged and self.ScheduleHelloCycle then
-        self:ScheduleHelloCycle("seed-session-complete-publish", 0.5)
+    if (session.successfulBlockMerges or 0) > 0 then
+        self:ScheduleHello("seed-session-complete")
     end
     return true
+end
+
+function Sync:GetInboundSeedSessionCount()
+    local total = 0
+    for _, sessions in pairs(self.inboundSeedSessions or {}) do
+        total = total + countKeys(sessions)
+    end
+    return total
+end
+
+function Sync:PruneInboundSeedSessions()
+    local timeout = Constants.SESSION_TIMEOUT or 60
+    for requesterKey, sessions in pairs(self.inboundSeedSessions or {}) do
+        for requestId, session in pairs(sessions or {}) do
+            local lastActivity = tonumber(session and session.lastActivity or session and session.createdAt or 0) or 0
+            if lastActivity > 0 and (time() - lastActivity) > timeout then
+                sessions[requestId] = nil
+            end
+        end
+        if next(sessions or {}) == nil then
+            self.inboundSeedSessions[requesterKey] = nil
+        end
+    end
+    self.telemetry.inboundSeedSessionsActive = self:GetInboundSeedSessionCount()
+end
+
+function Sync:ClearInboundSeedSessions(reason)
+    local cleared = self:GetInboundSeedSessionCount()
+    self.inboundSeedSessions = {}
+    self.telemetry.inboundSeedSessionsActive = 0
+    if cleared > 0 then
+        self.telemetry.inboundSeedSessionsCleared = (self.telemetry.inboundSeedSessionsCleared or 0) + cleared
+        Addon:Trace("sync", string.format(
+            "inbound-seed-sessions-cleared reason=%s cleared=%d",
+            tostring(reason or "unspecified"),
+            cleared
+        ))
+    end
+    return cleared
+end
+
+function Sync:RegisterInboundSeedSession(requesterKey, requestId, offeredBlocks)
+    if not self:IsValidSyncMemberKey(requesterKey) or type(requestId) ~= "string" or requestId == "" then
+        return nil, "invalid"
+    end
+
+    self:PruneInboundSeedSessions()
+    local existingSessions = self.inboundSeedSessions[requesterKey] or {}
+    local existing = existingSessions[requestId]
+    if not existing then
+        local peerCap = Constants.MAX_INBOUND_SEED_SESSIONS_PER_PEER or 1
+        if countKeys(existingSessions) >= peerCap and peerCap > 0 then
+            self.telemetry.inboundSeedSessionsRejected = (self.telemetry.inboundSeedSessionsRejected or 0) + 1
+            return nil, "per-requester-cap"
+        end
+        local globalCap = Constants.MAX_INBOUND_SEED_SESSIONS or 4
+        if self:GetInboundSeedSessionCount() >= globalCap and globalCap > 0 then
+            self.telemetry.inboundSeedSessionsRejected = (self.telemetry.inboundSeedSessionsRejected or 0) + 1
+            return nil, "global-cap"
+        end
+    end
+
+    local offeredBlockSet = {}
+    for index = 1, #(offeredBlocks or {}) do
+        local row = offeredBlocks[index]
+        if type(row) == "table" and type(row.blockKey) == "string" and row.blockKey ~= "" then
+            offeredBlockSet[row.blockKey] = true
+        end
+    end
+
+    local session = existing or {
+        requesterKey = requesterKey,
+        requestId = requestId,
+        servedBlocks = 0,
+        createdAt = time(),
+        state = "ready",
+    }
+    session.offeredBlocks = offeredBlockSet
+    session.lastActivity = time()
+    session.state = "ready"
+    existingSessions[requestId] = session
+    self.inboundSeedSessions[requesterKey] = existingSessions
+    self.telemetry.inboundSeedSessionsActive = self:GetInboundSeedSessionCount()
+    return session, "ready"
+end
+
+function Sync:GetInboundSeedSession(requesterKey)
+    if not self:IsValidSyncMemberKey(requesterKey) then
+        return nil
+    end
+    self:PruneInboundSeedSessions()
+    local sessions = self.inboundSeedSessions and self.inboundSeedSessions[requesterKey] or nil
+    local newest = nil
+    for _, session in pairs(sessions or {}) do
+        if newest == nil or (session.lastActivity or 0) > (newest.lastActivity or 0) then
+            newest = session
+        end
+    end
+    return newest
 end
 
 function Sync:CanServeInboundSeed(peerKey)
     if not self:IsValidSyncMemberKey(peerKey) then
         return false, "invalid-peer"
     end
+    self:PruneInboundSeedSessions()
     local eligible = self:CanExchangeDataWithPeer(peerKey, "serve", {
         source = peerKey,
         memberKey = peerKey,
@@ -942,27 +1083,16 @@ function Sync:ScheduleQueuePump(delay)
     end, delay or 0.05)
 end
 
-function Sync:ScheduleOutboundPump(delay)
-    if self._outboundPumpTimer then
-        return
-    end
-    self._outboundPumpTimer = self:ScheduleTimer(function()
-        self._outboundPumpTimer = nil
-        self:SendNextLowPriorityChunk()
-        if self:SendNextLowPriorityChunk() then
-            self:ScheduleOutboundPump(OUTBOUND_PUMP_DELAY)
-        end
-    end, delay or OUTBOUND_PUMP_DELAY)
-end
-
 function Sync:EnterWarmup(reason, seconds)
     self.warmupReason = tostring(reason or "warmup")
     self.warmupUntil = time() + max(0, tonumber(seconds or POST_WORLD_GRACE_SECONDS) or POST_WORLD_GRACE_SECONDS)
+    self:ClearInboundSeedSessions("warmup")
     if self._warmupTimer then
         self:CancelTimer(self._warmupTimer, true)
     end
     self._warmupTimer = self:ScheduleTimer(function()
         self._warmupTimer = nil
+        self:ScheduleHello("warmup-recovery")
     end, max(0, self.warmupUntil - time()))
 end
 
@@ -980,11 +1110,13 @@ end
 function Sync:EnterWorldTransition(reason, seconds)
     self.worldTransitionReason = tostring(reason or "transition")
     self.worldTransitionUntil = time() + max(0, tonumber(seconds or POST_WORLD_GRACE_SECONDS) or POST_WORLD_GRACE_SECONDS)
+    self:ClearInboundSeedSessions("world-transition")
     if self._transitionTimer then
         self:CancelTimer(self._transitionTimer, true)
     end
     self._transitionTimer = self:ScheduleTimer(function()
         self._transitionTimer = nil
+        self:ScheduleHello("world-transition-recovery")
     end, max(0, self.worldTransitionUntil - time()))
 end
 
@@ -1087,32 +1219,15 @@ function Sync:AutoSyncTick()
     end
     if countKeys(self.onlineNodes) == 0 then
         if (time() - (self.lastHelloAt or 0)) > 10 then
-            self:BroadcastHello()
+            self:ScheduleHello("hello-auto-empty", 0.5)
         end
         return
     end
     if (time() - (self.lastHelloAt or 0)) > HELLO_INTERVAL then
-        self:BroadcastHello()
+        self:ScheduleHello("hello-auto-interval", 0.5)
     end
 end
 
 function Sync:EnsureBackgroundWorkers()
-    if self._workersReady or not Addon.Performance then
-        return
-    end
     self._workersReady = true
-    Addon.Performance:ScheduleJob("sync-outbound-loop", function()
-        return self:SendNextLowPriorityChunk()
-    end, {
-        category = "sync-outbound",
-        label = "sync-outbound-loop",
-        budgetMs = 2,
-    })
-    Addon.Performance:ScheduleJob("sync-inbound-loop", function()
-        return self:ProcessInboundQueue()
-    end, {
-        category = "sync-inbound",
-        label = "sync-inbound-loop",
-        budgetMs = 2,
-    })
 end

@@ -78,7 +78,8 @@ Test.it("startup still sends one HELLO on the modern wire", function()
     addon.Sync:Startup()
     wow.RunTimers(10)
 
-    Test.eq(countCommKind(wow, "HELLO"), 1, "startup should still schedule one hello")
+    Test.truthy(addon.Sync._helloTimer ~= nil or type(addon.Sync.lastHelloScheduleReason) == "string", "startup should schedule one delayed hello")
+    Test.eq(countCommKind(wow, "HELLO"), 0, "startup should not bypass the delayed hello path")
     Test.eq(addon.Sync.telemetry.unsupportedMessagesIgnored or 0, 0, "startup should not touch unsupported telemetry")
 end)
 

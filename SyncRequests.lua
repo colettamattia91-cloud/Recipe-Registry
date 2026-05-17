@@ -91,13 +91,13 @@ end
 
 function Sync:SendIndexDiffResponse(targetKey, requestPayload)
     if not self:IsValidSyncMemberKey(targetKey) then
-        return false
+        return false, nil
     end
     local response = Addon.Data and Addon.Data.BuildIndexDiffResponse and Addon.Data:BuildIndexDiffResponse(requestPayload, {
         reason = "index-diff-response",
     }) or nil
     if type(response) ~= "table" or response.ready ~= true then
-        return false
+        return false, response
     end
     local sent = self:SendDirectEnvelope("INDEX_DIFF_RESPONSE", {
         requestId = requestPayload and requestPayload.requestId or nil,
@@ -122,7 +122,7 @@ function Sync:SendIndexDiffResponse(targetKey, requestPayload)
             self.telemetry.lastBlockOfferReasons ~= "" and self.telemetry.lastBlockOfferReasons or "none"
         ))
     end
-    return sent
+    return sent, response
 end
 
 function Sync:HandleReceivedIndexDiffResponse(payload)
@@ -294,8 +294,8 @@ function Sync:StartManualSyncPull(memberKey, silent)
             full = true,
         })
     end
-    if self.ScheduleHelloCycle then
-        self:ScheduleHelloCycle(memberKey and memberKey ~= "" and "manual-pull-targeted" or "manual-pull", 0.5)
+    if self.ScheduleHello then
+        self:ScheduleHello(memberKey and memberKey ~= "" and "manual-pull-targeted" or "manual-pull", 0.5)
     end
     if not silent then
         Addon:Print("Scheduled a hello cycle for index-diff sync.")

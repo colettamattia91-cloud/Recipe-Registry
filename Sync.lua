@@ -16,7 +16,6 @@ local SESSION_TIMEOUT = 60
 local NODE_TIMEOUT = 95
 local HELLO_INTERVAL = 30
 local AUTO_SYNC_INTERVAL = 20
-local OUTBOUND_PUMP_DELAY = 0.05
 local PEER_BACKOFF_SECONDS = 45
 local POST_WORLD_GRACE_SECONDS = 12
 local POST_INSTANCE_GRACE_SECONDS = 15
@@ -26,6 +25,11 @@ local ROSTER_FRESHNESS_MAX_AGE = 20
 local SUMMARY_COLLECTION_WINDOW = 0.75
 local SUMMARY_SATURATION_THRESHOLD = 80
 local BLOCK_PULL_DELAY_SECONDS = 1.0
+local HELLO_RESCHEDULE_DELAY_SECONDS = 5
+local HELLO_RESCHEDULE_JITTER_SECONDS = 5
+local POST_SYNC_HELLO_COOLDOWN_SECONDS = 30
+local MAX_INBOUND_SEED_SESSIONS = 4
+local MAX_INBOUND_SEED_SESSIONS_PER_PEER = 1
 
 local function countKeys(tbl)
     local total = 0
@@ -115,7 +119,6 @@ local function newSyncTelemetry()
         outboundSessionAborted = 0,
         unsupportedMessagesIgnored = 0,
         globalFingerprintDirty = 0,
-        globalFingerprintCommitted = 0,
         pausedSyncCycles = 0,
         skippedEquivalentMerges = 0,
         syncIndexCacheHit = 0,
@@ -163,7 +166,6 @@ Private.constants = {
     NODE_TIMEOUT = NODE_TIMEOUT,
     HELLO_INTERVAL = HELLO_INTERVAL,
     AUTO_SYNC_INTERVAL = AUTO_SYNC_INTERVAL,
-    OUTBOUND_PUMP_DELAY = OUTBOUND_PUMP_DELAY,
     PEER_BACKOFF_SECONDS = PEER_BACKOFF_SECONDS,
     POST_WORLD_GRACE_SECONDS = POST_WORLD_GRACE_SECONDS,
     POST_INSTANCE_GRACE_SECONDS = POST_INSTANCE_GRACE_SECONDS,
@@ -173,6 +175,11 @@ Private.constants = {
     SUMMARY_COLLECTION_WINDOW = SUMMARY_COLLECTION_WINDOW,
     SUMMARY_SATURATION_THRESHOLD = SUMMARY_SATURATION_THRESHOLD,
     BLOCK_PULL_DELAY_SECONDS = BLOCK_PULL_DELAY_SECONDS,
+    HELLO_RESCHEDULE_DELAY_SECONDS = HELLO_RESCHEDULE_DELAY_SECONDS,
+    HELLO_RESCHEDULE_JITTER_SECONDS = HELLO_RESCHEDULE_JITTER_SECONDS,
+    POST_SYNC_HELLO_COOLDOWN_SECONDS = POST_SYNC_HELLO_COOLDOWN_SECONDS,
+    MAX_INBOUND_SEED_SESSIONS = MAX_INBOUND_SEED_SESSIONS,
+    MAX_INBOUND_SEED_SESSIONS_PER_PEER = MAX_INBOUND_SEED_SESSIONS_PER_PEER,
     MAX_CONCURRENT_REQUESTS = 1,
 }
 Private.countKeys = countKeys
@@ -189,8 +196,7 @@ Private.isMockKey = isMockKey
 function Sync:Startup()
     self:RegisterComm(PREFIX)
     self:EnterWarmup("startup", POST_WORLD_GRACE_SECONDS)
-    self:ScheduleHello(1)
-    self.helloTicker = self:ScheduleRepeatingTimer("BroadcastHello", HELLO_INTERVAL)
+    self:ScheduleHello("startup", 1)
     self.queueTicker = self:ScheduleRepeatingTimer("ProcessRequestQueue", 1)
     self.pruneTicker = self:ScheduleRepeatingTimer("PruneState", 5)
     self.autoSyncTicker = self:ScheduleRepeatingTimer("AutoSyncTick", AUTO_SYNC_INTERVAL)

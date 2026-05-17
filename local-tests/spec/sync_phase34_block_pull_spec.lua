@@ -321,7 +321,7 @@ Test.it("index diff does not offer a lower-count block back to a richer requeste
     Test.eq(#(response.offeredBlocks or {}), 0, "seed should not offer a lower-count block back to the requester")
 end)
 
-Test.it("session completion publishes the merged fingerprint and schedules a follow-up HELLO", function()
+Test.it("session completion refreshes the merged fingerprint and schedules a delayed follow-up HELLO", function()
     local bus = CommBus.New({
         names = { "PublishRequester", "PublishSeed" },
     })
@@ -333,8 +333,9 @@ Test.it("session completion publishes the merged fingerprint and schedules a fol
         recipeCount = 1,
         baseRecipe = 15000,
     })
-    requester.addon.Data:CommitGlobalFingerprint("publish-baseline")
-    local baseline = requester.addon.Data:GetSyncIndexDebugState().publishedGlobalFingerprint
+    local baseline = requester.addon.Data:BuildLocalSummary({
+        reason = "publish-baseline",
+    }).globalFingerprint
 
     bus:SeedSelfProfession(seed, {
         profession = "Alchemy",
@@ -354,14 +355,15 @@ Test.it("session completion publishes the merged fingerprint and schedules a fol
 
     Test.truthy(settled, "requester should complete the modern pull session")
     local state = requester.addon.Data:GetSyncIndexDebugState()
-    Test.ne(state.publishedGlobalFingerprint, baseline, "completion should publish the merged fingerprint")
-    Test.falsy(state.globalFingerprintDirty, "published fingerprint should no longer be dirty after completion")
-    Test.truthy(type(requester.addon.Sync.lastHelloCycleReason) == "string"
-        and requester.addon.Sync.lastHelloCycleReason:find("seed%-session%-complete%-publish", 1, false) ~= nil,
-        "completion should schedule a follow-up hello cycle")
+    Test.ne(state.globalFingerprint, baseline, "completion should refresh the merged fingerprint")
+    Test.falsy(state.globalFingerprintDirty, "completion should leave the single global fingerprint valid")
+    Test.truthy(requester.addon.Sync._helloTimer ~= nil, "completion should schedule a delayed hello instead of sending inline")
+    Test.truthy(type(requester.addon.Sync.lastHelloScheduleReason) == "string"
+        and requester.addon.Sync.lastHelloScheduleReason:find("seed%-session%-complete", 1, false) ~= nil,
+        "completion should schedule a follow-up hello")
 end)
 
-Test.it("session timeout abort publishes merged partial progress only after a successful block merge", function()
+Test.it("session timeout abort keeps partial merged progress and schedules a delayed HELLO", function()
     local addon, wow = Loader.Load()
     local data = addon.Data
     local ownerKey = data:GetPlayerKey()
@@ -375,11 +377,9 @@ Test.it("session timeout abort publishes merged partial progress only after a su
         professionSourceType = "owner",
         reason = "baseline",
     })
-    local baseline = data:BuildLocalSummary({
+    local publishedBefore = data:BuildLocalSummary({
         reason = "baseline-summary",
-    })
-    data:CommitGlobalFingerprint("baseline-publish")
-    local publishedBefore = data:GetSyncIndexDebugState().publishedGlobalFingerprint
+    }).globalFingerprint
 
     seedProfession(data, ownerKey, "Alchemy", { 8001, 8002 }, {
         sourceType = "owner",
@@ -403,11 +403,12 @@ Test.it("session timeout abort publishes merged partial progress only after a su
     local state = data:GetSyncIndexDebugState()
     Test.eq(addon.Sync.outboundSeedSession.state, "aborted", "session should abort on timeout")
     Test.ne(publishedBefore, liveFingerprint, "test setup should change the live fingerprint")
-    Test.eq(state.publishedGlobalFingerprint, liveFingerprint, "abort should publish the pending merged fingerprint")
-    Test.falsy(state.globalFingerprintDirty, "abort commit should clear dirty state")
-    Test.truthy(type(addon.Sync.lastHelloCycleReason) == "string"
-        and addon.Sync.lastHelloCycleReason:find("seed%-session%-abort%-publish", 1, false) ~= nil,
-        "abort after merged progress should schedule a follow-up hello cycle")
+    Test.eq(state.globalFingerprint, liveFingerprint, "abort should keep the merged partial local fingerprint")
+    Test.falsy(state.globalFingerprintDirty, "abort should leave the single global fingerprint valid")
+    Test.truthy(addon.Sync._helloTimer ~= nil, "abort after merged progress should schedule a delayed hello")
+    Test.truthy(type(addon.Sync.lastHelloScheduleReason) == "string"
+        and addon.Sync.lastHelloScheduleReason:find("seed%-session%-abort%-partial", 1, false) ~= nil,
+        "abort after merged progress should schedule a follow-up hello")
 end)
 
 Test.it("abort before any successful pull does not publish a new fingerprint", function()
@@ -424,8 +425,9 @@ Test.it("abort before any successful pull does not publish a new fingerprint", f
         professionSourceType = "owner",
         reason = "abort-baseline",
     })
-    data:CommitGlobalFingerprint("abort-baseline-publish")
-    local publishedBefore = data:GetSyncIndexDebugState().publishedGlobalFingerprint
+    local publishedBefore = data:BuildLocalSummary({
+        reason = "abort-baseline-publish",
+    }).globalFingerprint
 
     addon.Sync.outboundSeedSession = {
         state = "waiting-index-diff",
@@ -440,8 +442,98 @@ Test.it("abort before any successful pull does not publish a new fingerprint", f
 
     local state = data:GetSyncIndexDebugState()
     Test.eq(addon.Sync.outboundSeedSession.state, "aborted", "session should abort on timeout")
-    Test.eq(state.publishedGlobalFingerprint, publishedBefore, "abort without merged blocks should keep the published fingerprint")
-    Test.falsy(state.globalFingerprintDirty, "abort without merged blocks should not dirty the published fingerprint")
+    Test.eq(state.globalFingerprint, publishedBefore, "abort without merged blocks should keep the single fingerprint unchanged")
+    Test.falsy(state.globalFingerprintDirty, "abort without merged blocks should not leave the fingerprint dirty")
+    Test.truthy(addon.Sync._helloTimer ~= nil, "abort before any merge should still schedule a retry hello")
+    Test.truthy(type(addon.Sync.lastHelloScheduleReason) == "string"
+        and addon.Sync.lastHelloScheduleReason:find("seed%-session%-abort%-retry", 1, false) ~= nil,
+        "abort before any merge should schedule a retry hello")
+end)
+
+Test.it("inbound seed sessions are capped and ignore overflow safely", function()
+    local addon, _wow = Loader.Load()
+    local maxInbound = addon.Sync._private.constants.MAX_INBOUND_SEED_SESSIONS or 1
+
+    for index = 1, maxInbound do
+        local peerKey = string.format("Inboundcap%02d-TestRealm", index)
+        local caps = addon.Sync:GetLocalProtocolCaps()
+        addon.Sync:ObservePeerVersion(peerKey, {
+            sender = peerKey,
+            addonVersion = addon.ADDON_VERSION,
+            wireVersion = addon.WIRE_VERSION,
+            buildChannel = addon.BUILD_CHANNEL,
+            caps = caps,
+        })
+        addon.Sync:RecordPeerCaps(peerKey, caps)
+        local session, reason = addon.Sync:RegisterInboundSeedSession(peerKey, string.format("REQ:%02d", index), {
+            { blockKey = string.format("%s::Alchemy", peerKey) },
+        })
+        Test.truthy(session ~= nil, "inbound session within cap should be registered")
+        Test.eq(reason, "ready", "inbound session within cap reason")
+    end
+
+    local overflowPeer = "Inboundoverflow-TestRealm"
+    local overflowCaps = addon.Sync:GetLocalProtocolCaps()
+    addon.Sync:ObservePeerVersion(overflowPeer, {
+        sender = overflowPeer,
+        addonVersion = addon.ADDON_VERSION,
+        wireVersion = addon.WIRE_VERSION,
+        buildChannel = addon.BUILD_CHANNEL,
+        caps = overflowCaps,
+    })
+    addon.Sync:RecordPeerCaps(overflowPeer, overflowCaps)
+
+    local overflowSession, overflowReason = addon.Sync:RegisterInboundSeedSession(overflowPeer, "REQ:overflow", {
+        { blockKey = "overflow::Alchemy" },
+    })
+
+    Test.eq(overflowSession, nil, "overflow inbound session should be ignored")
+    Test.eq(overflowReason, "global-cap", "overflow inbound session reason")
+    Test.eq(addon.Sync:GetInboundSeedSessionCount(), maxInbound, "inbound seed session count should stay capped")
+end)
+
+Test.it("paused seed clears inbound sessions and timeout recovery schedules a retry HELLO", function()
+    local addon, wow = Loader.Load()
+    local peerKey = "Pausedseed-TestRealm"
+    local caps = addon.Sync:GetLocalProtocolCaps()
+
+    addon.Sync:ObservePeerVersion(peerKey, {
+        sender = peerKey,
+        addonVersion = addon.ADDON_VERSION,
+        wireVersion = addon.WIRE_VERSION,
+        buildChannel = addon.BUILD_CHANNEL,
+        caps = caps,
+    })
+    addon.Sync:RecordPeerCaps(peerKey, caps)
+    local session = addon.Sync:RegisterInboundSeedSession(peerKey, "REQ:paused", {
+        { blockKey = "Pausedseed-TestRealm::Alchemy" },
+    })
+
+    Test.truthy(session ~= nil, "seed should register one inbound session before pause")
+    Test.eq(addon.Sync:GetInboundSeedSessionCount(), 1, "one inbound session should be active before pause")
+
+    wow.SetInstance(true, "party")
+    addon.SyncPausePolicy:RefreshPauseState()
+    Test.eq(addon.Sync:GetInboundSeedSessionCount(), 0, "pause should clear inbound seed sessions")
+
+    wow.SetInstance(false, "none")
+    addon.SyncPausePolicy:RefreshPauseState()
+
+    addon.Sync.outboundSeedSession = {
+        state = "waiting-block",
+        seedKey = peerKey,
+        sessionId = "paused-timeout",
+        startedAt = time() - 100,
+        lastProgressAt = time() - 100,
+        successfulBlockMerges = 0,
+    }
+    addon.Sync:ProcessRequestQueue()
+
+    Test.eq(addon.Sync.outboundSeedSession.state, "aborted", "requester side should abort after the missing response timeout")
+    Test.truthy(addon.Sync._helloTimer ~= nil, "requester recovery should schedule a retry hello")
+    Test.truthy(type(addon.Sync.lastHelloScheduleReason) == "string"
+        and addon.Sync.lastHelloScheduleReason:find("seed%-session%-abort%-retry", 1, false) ~= nil,
+        "requester recovery should use the retry hello path")
 end)
 
 io.write(string.format("Sync phase 3/4 block pull: %d test(s) passed\n", Test.count))

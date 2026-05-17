@@ -42,18 +42,14 @@ end
 
 function Sync:BroadcastHello()
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("HELLO") then
-        return
+        return false
     end
     local session = self.outboundSeedSession
     if type(session) == "table" and session.state and session.state ~= "completed" and session.state ~= "aborted" then
-        return
+        return false
     end
 
     local cycle = self.BeginHelloCycle and self:BeginHelloCycle(self._pendingHelloCycleReason or "hello") or nil
-    self.lastHelloAt = time()
-    if Addon.Data and Addon.Data.CommitGlobalFingerprint then
-        Addon.Data:CommitGlobalFingerprint("hello-publish")
-    end
     local summary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
         reason = "hello",
     }) or {}
@@ -75,6 +71,7 @@ function Sync:BroadcastHello()
         globalFingerprint = summary.globalFingerprint,
     }, "ALERT")
     if sent then
+        self.lastHelloAt = time()
         self.telemetry.helloSent = (self.telemetry.helloSent or 0) + 1
         self._pendingHelloCycleReason = nil
         Addon:Trace("sync", string.format(
@@ -97,7 +94,9 @@ function Sync:BroadcastHello()
                 end
             end, Constants.SUMMARY_COLLECTION_WINDOW or 0.75)
         end
+        return true
     end
+    return false
 end
 
 function Sync:SendGuildEnvelope(kind, payload, priority)
@@ -244,12 +243,6 @@ function Sync:HandleHello(payload)
 end
 
 function Sync:SendSummary(targetKey, helloId)
-    local session = self.outboundSeedSession
-    if not (type(session) == "table" and session.state and session.state ~= "completed" and session.state ~= "aborted")
-        and Addon.Data and Addon.Data.CommitGlobalFingerprint
-    then
-        Addon.Data:CommitGlobalFingerprint("summary-publish")
-    end
     local summary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
         reason = "summary-send",
     }) or nil
@@ -324,7 +317,10 @@ function Sync:HandleIndexDiffRequest(payload)
         end
     end
     if self.SendIndexDiffResponse then
-        self:SendIndexDiffResponse(payload.sender, payload)
+        local sent, response = self:SendIndexDiffResponse(payload.sender, payload)
+        if sent and self.RegisterInboundSeedSession then
+            self:RegisterInboundSeedSession(payload.sender, payload.requestId, response and response.offeredBlocks or nil)
+        end
     end
 end
 
@@ -341,8 +337,22 @@ function Sync:HandleBlockPullRequest(payload)
             return
         end
     end
+    local inboundSession = self.GetInboundSeedSession and self:GetInboundSeedSession(payload and payload.sender) or nil
+    if not inboundSession then
+        return
+    end
+    if type(inboundSession.offeredBlocks) == "table" and inboundSession.offeredBlocks[payload and payload.blockKey] ~= true then
+        return
+    end
+    inboundSession.lastActivity = time()
+    inboundSession.servedBlocks = tonumber(inboundSession.servedBlocks or 0) or 0
     if self.SendBlockSnapshot then
-        self:SendBlockSnapshot(payload and payload.sender, payload)
+        local sent = self:SendBlockSnapshot(payload and payload.sender, payload)
+        if sent then
+            inboundSession.servedBlocks = inboundSession.servedBlocks + 1
+            inboundSession.lastActivity = time()
+            inboundSession.state = "serving"
+        end
     end
 end
 

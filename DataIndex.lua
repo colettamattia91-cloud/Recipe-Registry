@@ -243,11 +243,8 @@ end
 
 local function ensureSyncIndexState(self)
     self._syncIndexState = self._syncIndexState or {
-        publishedSummary = nil,
-        publishedGlobalFingerprint = nil,
-        publishedFingerprintDirty = false,
-        lastPublishedAt = 0,
-        lastPublishedReason = nil,
+        lastGlobalFingerprintAt = 0,
+        lastGlobalFingerprintReason = nil,
         lastSummary = nil,
         lastDirtyReason = nil,
         lastDirtyAt = 0,
@@ -263,11 +260,11 @@ local function ensureSyncIndexState(self)
         activeOwnerCount = 0,
         activeBlockCount = 0,
         activeContentCount = 0,
-        currentGlobalFingerprint = nil,
+        globalFingerprint = nil,
         trustedRosterState = nil,
         indexStatus = "missing",
         ready = false,
-        currentFingerprintDirty = true,
+        globalFingerprintDirty = true,
         rosterSignature = nil,
         builtAt = 0,
         lastBuildReason = nil,
@@ -323,22 +320,23 @@ local function recalcAggregateState(cache)
     cache.activeContentCount = contentCount
 end
 
-local function rebuildGlobalFingerprint(state, cache)
+local function rebuildGlobalFingerprint(state, cache, reason)
     local parts = {}
     for _, blockKey in ipairs(cache.blockKeys or {}) do
         local block = cache.blocks and cache.blocks[blockKey] or nil
         parts[#parts + 1] = string.format("%s=%s", tostring(blockKey), tostring(block and block.blockFingerprint or ""))
     end
     local payload = table.concat(parts, "|")
-    cache.currentGlobalFingerprint = string.format(
+    cache.globalFingerprint = string.format(
         "gf3:%d:%d:%d:%s",
         tonumber(cache.activeOwnerCount or 0) or 0,
         tonumber(cache.activeBlockCount or 0) or 0,
         tonumber(cache.activeContentCount or 0) or 0,
         buildFingerprint("gf3", payload)
     )
-    cache.currentFingerprintDirty = false
-    state.publishedFingerprintDirty = tostring(state.publishedGlobalFingerprint or "") ~= tostring(cache.currentGlobalFingerprint or "")
+    cache.globalFingerprintDirty = false
+    state.lastGlobalFingerprintAt = time()
+    state.lastGlobalFingerprintReason = tostring(reason or "global-fingerprint")
     cache.stats.globalRecomputed = (cache.stats.globalRecomputed or 0) + 1
     bumpSyncTelemetry("syncIndexGlobalRecomputed")
     Addon:Trace("sync", string.format(
@@ -346,7 +344,7 @@ local function rebuildGlobalFingerprint(state, cache)
         cache.activeOwnerCount or 0,
         cache.activeBlockCount or 0,
         cache.activeContentCount or 0,
-        tostring(cache.currentGlobalFingerprint or "none")
+        tostring(cache.globalFingerprint or "none")
     ))
 end
 
@@ -383,7 +381,7 @@ local function rebuildAllBlocks(self, cache, rosterState, reason)
     cache.dirtyBlocks = {}
     cache.dirtyBlockCount = 0
     recalcAggregateState(cache)
-    cache.currentFingerprintDirty = true
+    cache.globalFingerprintDirty = true
     cache.stats.fullRebuild = (cache.stats.fullRebuild or 0) + 1
     bumpSyncTelemetry("syncIndexFullRebuild")
     Addon:Trace("sync", string.format(
@@ -432,7 +430,7 @@ local function rebuildDirtyBlocks(self, cache, rosterState, reason)
     cache.indexStatus = rosterState.trusted == true and "ready" or tostring(rosterState.reason or "not-ready")
     cache.ready = rosterState.trusted == true
     cache.lastBuildReason = tostring(reason or "dirty-block")
-    cache.currentFingerprintDirty = cache.currentFingerprintDirty or rebuilt > 0
+    cache.globalFingerprintDirty = cache.globalFingerprintDirty or rebuilt > 0
 end
 
 local function ensureLiveIndex(self, reason)
@@ -453,7 +451,7 @@ local function ensureLiveIndex(self, reason)
         else
             rebuildDirtyBlocks(self, cache, rosterState, reason or "dirty")
         end
-    elseif cache.dirtyBlockCount > 0 or cache.currentFingerprintDirty then
+    elseif cache.dirtyBlockCount > 0 or cache.globalFingerprintDirty then
         cache.stats.misses = (cache.stats.misses or 0) + 1
         bumpSyncTelemetry("syncIndexCacheMiss")
         rebuildDirtyBlocks(self, cache, rosterState, reason or "dirty")
@@ -464,11 +462,9 @@ local function ensureLiveIndex(self, reason)
 
     cache.rosterSignature = nextRosterSignature
     cache.builtAt = time()
-    if cache.currentFingerprintDirty then
-        rebuildGlobalFingerprint(state, cache)
+    if cache.globalFingerprintDirty then
+        rebuildGlobalFingerprint(state, cache, reason or "live-index")
     end
-    state.publishedFingerprintDirty = state.publishedFingerprintDirty == true
-        or tostring(state.publishedGlobalFingerprint or "") ~= tostring(cache.currentGlobalFingerprint or "")
     syncTelemetryStats(cache)
 
     local summary = {
@@ -480,7 +476,7 @@ local function ensureLiveIndex(self, reason)
         activeOwnerCount = cache.activeOwnerCount or 0,
         activeBlockCount = cache.activeBlockCount or 0,
         activeContentCount = cache.activeContentCount or 0,
-        currentGlobalFingerprint = cache.currentGlobalFingerprint,
+        globalFingerprint = cache.globalFingerprint,
         blocks = cache.blocks,
         blockKeys = cache.blockKeys,
         rosterState = rosterState,
@@ -562,8 +558,7 @@ function Data:MarkSyncIndexDirty(reason, blockKey, opts)
         end
     end
 
-    cache.currentFingerprintDirty = true
-    state.publishedFingerprintDirty = true
+    cache.globalFingerprintDirty = true
     syncTelemetryStats(cache)
     bumpSyncTelemetry("globalFingerprintDirty")
     Addon:Trace("sync", string.format(
@@ -577,11 +572,10 @@ function Data:MarkSyncIndexDirty(reason, blockKey, opts)
 end
 
 function Data:IsSyncIndexDirty()
-    local state, cache = ensureSyncIndexState(self)
+    local _, cache = ensureSyncIndexState(self)
     return cache.dirtyAll == true
         or (cache.dirtyBlockCount or 0) > 0
-        or cache.currentFingerprintDirty == true
-        or state.publishedFingerprintDirty == true
+        or cache.globalFingerprintDirty == true
 end
 
 function Data:ClearSyncIndexDirty(reason)
@@ -589,8 +583,7 @@ function Data:ClearSyncIndexDirty(reason)
     cache.dirtyAll = false
     cache.dirtyBlocks = {}
     cache.dirtyBlockCount = 0
-    cache.currentFingerprintDirty = false
-    state.publishedFingerprintDirty = false
+    cache.globalFingerprintDirty = false
     state.lastClearedReason = tostring(reason or "unspecified")
     state.lastClearedAt = time()
     syncTelemetryStats(cache)
@@ -627,7 +620,7 @@ function Data:BuildBlockFingerprint(blockKey)
 end
 
 function Data:RefreshSyncBlockRecord(blockKey, reason)
-    local state, cache = ensureSyncIndexState(self)
+    local _, cache = ensureSyncIndexState(self)
     local rosterState = buildRosterState(self, reason or "block-refresh")
     local nextRosterSignature = rosterSignature(rosterState)
 
@@ -646,8 +639,6 @@ function Data:RefreshSyncBlockRecord(blockKey, reason)
 
     cache.rosterSignature = nextRosterSignature
     cache.builtAt = time()
-    state.publishedFingerprintDirty = state.publishedFingerprintDirty == true
-        or tostring(state.publishedGlobalFingerprint or "") ~= tostring(cache.currentGlobalFingerprint or "")
     syncTelemetryStats(cache)
 
     local block = cache.blocks and cache.blocks[blockKey] or nil
@@ -685,10 +676,8 @@ function Data:BuildLocalSummary(opts)
         activeOwnerCount = summary.activeOwnerCount or 0,
         activeBlockCount = summary.activeBlockCount or 0,
         activeContentCount = summary.activeContentCount or 0,
-        globalFingerprint = state.publishedGlobalFingerprint or summary.currentGlobalFingerprint,
-        currentGlobalFingerprint = summary.currentGlobalFingerprint,
-        publishedGlobalFingerprint = state.publishedGlobalFingerprint,
-        globalFingerprintDirty = state.publishedFingerprintDirty == true,
+        globalFingerprint = summary.globalFingerprint,
+        globalFingerprintDirty = self:IsSyncIndexDirty(),
         professions = summary.activeBlockCount or 0,
         recipes = summary.activeContentCount or 0,
         memberKey = self:GetPlayerKey(),
@@ -698,33 +687,9 @@ function Data:BuildLocalSummary(opts)
     return out
 end
 
-function Data:CommitGlobalFingerprint(reason)
-    local state, cache, summary = ensureLiveIndex(self, reason or "manual-commit")
-    local changed = false
-    if summary.ready then
-        local current = summary.currentGlobalFingerprint
-        if current and tostring(current) ~= tostring(state.publishedGlobalFingerprint or "") then
-            state.publishedGlobalFingerprint = current
-            state.publishedSummary = cloneTable(summary)
-            state.lastPublishedAt = time()
-            state.lastPublishedReason = tostring(reason or "manual-commit")
-            state.publishedFingerprintDirty = false
-            cache.dirtyAll = false
-            cache.dirtyBlocks = {}
-            cache.dirtyBlockCount = 0
-            syncTelemetryStats(cache)
-            bumpSyncTelemetry("globalFingerprintCommitted")
-            changed = true
-        elseif state.publishedGlobalFingerprint == nil and current then
-            state.publishedGlobalFingerprint = current
-            state.publishedSummary = cloneTable(summary)
-            state.lastPublishedAt = time()
-            state.lastPublishedReason = tostring(reason or "manual-commit")
-            state.publishedFingerprintDirty = false
-            changed = true
-        end
-    end
-    return state.publishedGlobalFingerprint, changed
+function Data:RefreshGlobalFingerprint(reason)
+    local _, _, summary = ensureLiveIndex(self, reason or "global-fingerprint")
+    return summary and summary.globalFingerprint or nil
 end
 
 function Data:GetLocalSummary()
@@ -744,8 +709,7 @@ function Data:GetLiveSyncIndex(opts)
         activeOwnerCount = summary.activeOwnerCount,
         activeBlockCount = summary.activeBlockCount,
         activeContentCount = summary.activeContentCount,
-        globalFingerprint = summary.currentGlobalFingerprint,
-        currentGlobalFingerprint = summary.currentGlobalFingerprint,
+        globalFingerprint = summary.globalFingerprint,
         blocks = cloneTable(summary.blocks),
         blockKeys = cloneArray(summary.blockKeys),
         builtAt = summary.builtAt,
@@ -769,7 +733,7 @@ function Data:BuildRequesterIndexDigest(opts)
         activeOwnerCount = index.activeOwnerCount or 0,
         activeBlockCount = index.activeBlockCount or 0,
         activeContentCount = index.activeContentCount or 0,
-        globalFingerprint = index.currentGlobalFingerprint,
+        globalFingerprint = index.globalFingerprint,
         blocks = blocks,
     }
 end
@@ -882,8 +846,8 @@ function Data:GetSyncIndexDebugState()
         lastClearedAt = state.lastClearedAt or 0,
         lastBuiltAt = summary and summary.builtAt or 0,
         lastBuildReason = cache.lastBuildReason,
-        lastPublishedAt = state.lastPublishedAt or 0,
-        lastPublishedReason = state.lastPublishedReason,
+        lastGlobalFingerprintAt = state.lastGlobalFingerprintAt or 0,
+        lastGlobalFingerprintReason = state.lastGlobalFingerprintReason,
         trustedRoster = summary and summary.trustedRoster == true or false,
         trustedRosterReason = summary and summary.trustedRosterReason or "unknown",
         snapshotCount = summary and summary.rosterState and summary.rosterState.snapshotCount or 0,
@@ -893,9 +857,8 @@ function Data:GetSyncIndexDebugState()
         activeOwnerCount = summary and summary.activeOwnerCount or 0,
         activeBlockCount = summary and summary.activeBlockCount or 0,
         activeContentCount = summary and summary.activeContentCount or 0,
-        currentGlobalFingerprint = summary and summary.currentGlobalFingerprint or nil,
-        publishedGlobalFingerprint = state.publishedGlobalFingerprint,
-        globalFingerprintDirty = state.publishedFingerprintDirty == true,
+        globalFingerprint = summary and summary.globalFingerprint or nil,
+        globalFingerprintDirty = cache.globalFingerprintDirty == true,
         syncModel = summary and summary.syncModel or SYNC_MODEL,
         memberCount = countKeys(self:GetMembersDB()),
         cache = {
@@ -905,7 +868,7 @@ function Data:GetSyncIndexDebugState()
             lastBuildReason = cache.lastBuildReason,
             lastDirtyReason = cache.lastDirtyReason,
             lastDirtyAt = cache.lastDirtyAt or 0,
-            currentFingerprintDirty = cache.currentFingerprintDirty == true,
+            globalFingerprintDirty = cache.globalFingerprintDirty == true,
             stats = cloneTable(cache.stats or {}),
         },
     }
@@ -914,14 +877,14 @@ end
 function Data:DumpSyncIndexStatus()
     local snapshot = self:GetSyncIndexDebugState()
     Addon:Print(string.format(
-        "Sync index ready=%s status=%s owners=%d blocks=%d content=%d dirty=%s committed=%s hits=%d misses=%d blockRebuilt=%d fullRebuild=%d globalRecomputed=%d",
+        "Sync index ready=%s status=%s owners=%d blocks=%d content=%d dirty=%s globalFingerprint=%s hits=%d misses=%d blockRebuilt=%d fullRebuild=%d globalRecomputed=%d",
         tostring(snapshot.indexReady == true),
         tostring(snapshot.indexStatus or "unknown"),
         tonumber(snapshot.activeOwnerCount or 0) or 0,
         tonumber(snapshot.activeBlockCount or 0) or 0,
         tonumber(snapshot.activeContentCount or 0) or 0,
         tostring(snapshot.globalFingerprintDirty == true),
-        tostring(snapshot.publishedGlobalFingerprint or "none"),
+        tostring(snapshot.globalFingerprint or "none"),
         snapshot.cache.stats.hits or 0,
         snapshot.cache.stats.misses or 0,
         snapshot.cache.stats.blockRebuilt or 0,

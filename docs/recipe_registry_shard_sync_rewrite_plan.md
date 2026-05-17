@@ -6,7 +6,6 @@
 Canonical documents:
 
 - `docs/sync-rewrite-roadmap.md`
-- `docs/sync-rewrite-callsite-inventory.md`
 - `docs/sync-rewrite-phase-log.md`
 
 This file is retained only as historical context for the earlier shard-plan discussion. The implemented rewrite no longer follows this document as an execution plan.

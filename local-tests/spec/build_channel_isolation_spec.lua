@@ -242,7 +242,7 @@ Test.it("beta payloads are normalized to release instead of becoming a third sup
     Test.falsy(printContains(wow, "newer version detected"), "equal beta-normalized version should not trigger notices")
 end)
 
-Test.it("missing buildChannel is rejected by dev but tracked only as legacy diagnostics for release", function()
+Test.it("missing buildChannel is rejected on both dev and release channels", function()
     local devAddon = loadAddon("dev")
     local legacyDevPeer = "Legacydev-TestRealm"
 
@@ -259,7 +259,7 @@ Test.it("missing buildChannel is rejected by dev but tracked only as legacy diag
 
     Test.eq(devAddon.Sync.telemetry.buildChannelDrops or 0, 1, "dev should reject missing buildChannel")
     Test.eq(devAddon.Sync.peerVersions[legacyDevPeer], nil, "dev should not register missing-channel peers")
-    Test.eq(devAddon.Sync.onlineNodes[legacyDevPeer], nil, "dev should not accept legacy peers")
+    Test.eq(devAddon.Sync.onlineNodes[legacyDevPeer], nil, "dev should not accept missing-channel peers")
 
     local releaseAddon = loadAddon("release")
     local releasePeer = "Legacyrelease-TestRealm"
@@ -275,11 +275,11 @@ Test.it("missing buildChannel is rejected by dev but tracked only as legacy diag
         sender = releasePeer,
     })
 
-    Test.eq(releaseAddon.Sync.telemetry.buildChannelDrops or 0, 0, "release should keep the explicit legacy policy")
-    Test.eq(releaseAddon.Sync.peerVersions[releasePeer].compatibility, "legacy", "release legacy compatibility state")
-    Test.eq(releaseAddon.Sync.onlineNodes[releasePeer], nil, "legacy peers should stay out of active sync state")
-    Test.eq(countKeys(releaseAddon.Sync.pendingRequests), 0, "legacy peers should not queue requests")
-    Test.eq(countKeys(releaseAddon.Sync.peerBackoffUntil), 0, "legacy peers should not create backoff state")
+    Test.eq(releaseAddon.Sync.telemetry.buildChannelDrops or 0, 1, "release should reject missing buildChannel")
+    Test.eq(releaseAddon.Sync.peerVersions[releasePeer], nil, "release should not register missing-channel peers")
+    Test.eq(releaseAddon.Sync.onlineNodes[releasePeer], nil, "release should keep missing-channel peers out of active sync state")
+    Test.eq(countKeys(releaseAddon.Sync.pendingRequests), 0, "missing-channel peers should not queue requests")
+    Test.eq(countKeys(releaseAddon.Sync.peerBackoffUntil), 0, "missing-channel peers should not create backoff state")
 end)
 
 Test.it("release rejects a remote newer wire and shows a protocol notice", function()
@@ -371,7 +371,6 @@ Test.it("removed legacy capabilities do not affect compatibility decisions", fun
         buildChannel = "release",
         caps = modernCaps(addon, {
             capabilities = {
-                chunkWindow = true,
                 indexDiffSync = true,
                 blockPullSync = true,
                 maniReliable = false,
@@ -381,7 +380,6 @@ Test.it("removed legacy capabilities do not affect compatibility decisions", fun
     })
     addon.Sync:RecordPeerCaps(peerKey, modernCaps(addon, {
         capabilities = {
-            chunkWindow = true,
             indexDiffSync = true,
             blockPullSync = true,
             maniReliable = false,

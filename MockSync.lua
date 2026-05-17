@@ -289,8 +289,8 @@ function MockSync:SeedScenario(name, config)
             full = true,
         })
     end
-    if Addon.Sync and Addon.Sync.ScheduleHelloCycle then
-        Addon.Sync:ScheduleHelloCycle("mock-seed", 0.2)
+    if Addon.Sync and Addon.Sync.ScheduleHello then
+        Addon.Sync:ScheduleHello("mock-seed", 0.2)
     end
 
     self.active = false

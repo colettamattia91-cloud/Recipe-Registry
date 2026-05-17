@@ -86,12 +86,18 @@ function SyncPausePolicy:RefreshPauseState()
             Addon.Performance:ResumeCategory("ui")
         end
     end
+    if protocolPaused and Addon.Sync and Addon.Sync.ClearInboundSeedSessions then
+        Addon.Sync:ClearInboundSeedSessions(inInstance and "instance-pause" or "protocol-pause")
+    end
     if self._wasPaused and not heavyUiPaused and Addon.Sync and Addon.Sync.EnterWarmup then
         if self._wasInstance then
             Addon.Sync:EnterWarmup("instance-exit", 15)
         elseif self._wasCombat then
             Addon.Sync:EnterWarmup("combat-exit", 6)
         end
+    end
+    if self._wasPaused and not protocolPaused and Addon.Sync and Addon.Sync.ScheduleHello then
+        Addon.Sync:ScheduleHello("pause-recovery")
     end
     if Addon.Sync and Addon.Sync.RecordPauseCycle then
         Addon.Sync:RecordPauseCycle(heavyUiPaused)

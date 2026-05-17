@@ -1129,8 +1129,10 @@ function CommBus:Step(opts)
                 node.addon.Performance:RunNextStep()
             end
             node.addon.Sync:ProcessRequestQueue()
-            for _ = 1, inboundRuns do
-                node.addon.Sync:ProcessInboundQueue()
+            if node.addon.Sync.ProcessInboundQueue then
+                for _ = 1, inboundRuns do
+                    node.addon.Sync:ProcessInboundQueue()
+                end
             end
             self:RecordNodeMetrics(node)
         end

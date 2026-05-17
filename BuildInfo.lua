@@ -85,12 +85,7 @@ Addon.DEV_COMM_PREFIX = Addon.DEV_COMM_PREFIX or "RRDEV"
 Addon.COMM_PREFIX = Addon.BUILD_CHANNEL == "dev" and Addon.DEV_COMM_PREFIX or Addon.RELEASE_COMM_PREFIX
 Addon.ADDON_PREFIX = Addon.COMM_PREFIX
 
-if Addon.ALLOW_LEGACY_RELEASE_PEERS == nil then
-    Addon.ALLOW_LEGACY_RELEASE_PEERS = Addon.BUILD_CHANNEL == "release"
-end
-
 Addon.CAPABILITIES = cloneTable(Addon.CAPABILITIES or {
-    chunkWindow = true,
     indexDiffSync = true,
     blockPullSync = true,
 })
@@ -108,6 +103,5 @@ function BuildInfo.GetLocalVersionInfo()
         buildId = Addon.BUILD_ID,
         commPrefix = Addon.COMM_PREFIX,
         capabilities = cloneTable(Addon.CAPABILITIES),
-        allowLegacyReleasePeers = Addon.ALLOW_LEGACY_RELEASE_PEERS == true,
     }
 end
