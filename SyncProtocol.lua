@@ -14,6 +14,14 @@ end
 local function recordUnsupportedMessage(self, kind, senderKey)
     self.telemetry.unsupportedMessagesIgnored = (self.telemetry.unsupportedMessagesIgnored or 0) + 1
     self.telemetry.lastUnsupportedMessageKind = tostring(kind or "unknown")
+    self.telemetry.lastUnsupportedMessageSender = tostring(senderKey or "unknown")
+    self.telemetry.lastUnsupportedMessageAt = time()
+    if self.RecordSyncEvent then
+        self:RecordSyncEvent("unsupportedMessageIgnored", {
+            reason = tostring(kind or "unknown"),
+            peer = senderKey,
+        })
+    end
     Addon:Trace("sync", string.format(
         "unsupported-message kind=%s sender=%s",
         tostring(kind or "unknown"),
@@ -90,7 +98,17 @@ function Sync:BroadcastHello()
     if sent then
         self.lastHelloAt = time()
         self.telemetry.helloSent = (self.telemetry.helloSent or 0) + 1
+        self.telemetry.lastHelloSentAt = self.lastHelloAt
+        self.telemetry.lastHelloId = cycle and cycle.helloId or nil
+        self.telemetry.lastHelloFingerprint = summary.globalFingerprint
         self._pendingHelloCycleReason = nil
+        if self.RecordSyncEvent then
+            self:RecordSyncEvent("helloSent", {
+                reason = cycle and cycle.reason or "hello",
+                requestId = cycle and cycle.helloId or nil,
+                extra = tostring(summary.globalFingerprint or "none"),
+            })
+        end
         Addon:Trace("sync", string.format(
             "hello-sent helloId=%s owners=%d blocks=%d content=%d fingerprint=%s",
             tostring(cycle and cycle.helloId or "none"),
@@ -106,10 +124,11 @@ function Sync:BroadcastHello()
         if cycle then
             self._helloCycleTimer = self:ScheduleTimer(function()
                 self._helloCycleTimer = nil
+                self.telemetry.summaryCollectionTimeouts = (self.telemetry.summaryCollectionTimeouts or 0) + 1
                 if self.SelectOutboundSeed then
                     self:SelectOutboundSeed(cycle.cycleId)
                 end
-            end, Constants.SUMMARY_COLLECTION_WINDOW or 0.75)
+            end, Constants.SUMMARY_COLLECTION_WINDOW or 6)
         end
         return true
     end
@@ -300,6 +319,13 @@ function Sync:SendSummary(targetKey, helloId)
     if sent then
         self.telemetry.summarySent = (self.telemetry.summarySent or 0) + 1
         self.telemetry.lastSummaryPeer = tostring(targetKey or "unknown")
+        if self.RecordSyncEvent then
+            self:RecordSyncEvent("summarySent", {
+                peer = targetKey,
+                requestId = helloId,
+                extra = tostring(summary.globalFingerprint or "none"),
+            })
+        end
         Addon:Trace("sync", string.format(
             "summary-sent peer=%s helloId=%s owners=%d blocks=%d content=%d fingerprint=%s",
             tostring(targetKey or "unknown"),
@@ -345,6 +371,13 @@ function Sync:HandleIndexDiffRequest(payload)
         return
     end
     self.telemetry.indexDiffRequestReceived = (self.telemetry.indexDiffRequestReceived or 0) + 1
+    if self.RecordSyncEvent then
+        self:RecordSyncEvent("indexDiffRequestReceived", {
+            peer = payload.sender,
+            requestId = payload.requestId,
+            extra = string.format("blocks=%d", type(payload.blocks) == "table" and Private.countKeys(payload.blocks) or 0),
+        })
+    end
     Addon:Trace("sync", string.format(
         "index-diff-request-received peer=%s requestId=%s blocks=%d",
         tostring(payload.sender or "unknown"),
@@ -387,9 +420,27 @@ function Sync:HandleBlockPullRequest(payload)
     end
     local inboundSession = self.GetInboundSeedSession and self:GetInboundSeedSession(payload and payload.sender) or nil
     if not inboundSession then
+        self.telemetry.inboundBlockPullRejectedUnknownRequest = (self.telemetry.inboundBlockPullRejectedUnknownRequest or 0) + 1
+        if self.RecordSyncEvent then
+            self:RecordSyncEvent("inboundSeedSessionRejected", {
+                peer = payload and payload.sender,
+                requestId = payload and payload.requestId,
+                reason = "unknown-request",
+                blockKey = payload and payload.blockKey,
+            })
+        end
         return
     end
     if type(inboundSession.offeredBlocks) == "table" and inboundSession.offeredBlocks[payload and payload.blockKey] ~= true then
+        self.telemetry.inboundBlockPullRejectedNotOffered = (self.telemetry.inboundBlockPullRejectedNotOffered or 0) + 1
+        if self.RecordSyncEvent then
+            self:RecordSyncEvent("inboundSeedSessionRejected", {
+                peer = payload and payload.sender,
+                requestId = payload and payload.requestId,
+                reason = "block-not-offered",
+                blockKey = payload and payload.blockKey,
+            })
+        end
         return
     end
     inboundSession.lastActivity = time()
@@ -400,6 +451,9 @@ function Sync:HandleBlockPullRequest(payload)
             inboundSession.servedBlocks = inboundSession.servedBlocks + 1
             inboundSession.lastActivity = time()
             inboundSession.state = "serving"
+            self.telemetry.lastInboundRequester = payload and payload.sender or self.telemetry.lastInboundRequester
+            self.telemetry.lastInboundRequestId = payload and payload.requestId or self.telemetry.lastInboundRequestId
+            self.telemetry.lastInboundServedBlockKey = payload and payload.blockKey or self.telemetry.lastInboundServedBlockKey
         end
     end
 end

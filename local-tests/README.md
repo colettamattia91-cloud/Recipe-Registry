@@ -70,6 +70,25 @@ Legacy runtime modules are no longer loaded:
 - build-channel and wire compatibility isolation
 - opportunistic profession scans
 - slash/debug/perf output for the modern sync path
+- runtime observability snapshots and alpha-debug export coverage
+- bounded recent sync event log coverage
+- inbound seed session debug counters and pause clearing diagnostics
+
+## Alpha tester workflow
+
+For alpha sync reports, ask testers for:
+
+1. Screenshot or copy of:
+   - `/rr sync`
+   - `/rr sync debug`
+   - `/rr version`
+2. `RecipeRegistry.lua` only if the compact debug output is not enough.
+3. Repro steps:
+   - login or reload
+   - wait 2 minutes
+   - open `/rr sync`
+   - if no sync progress appears, run `/rr sync debug`
+   - if sync stalls during block pulls, run `/rr sync sessions`
 
 ## Backend suite governance
 

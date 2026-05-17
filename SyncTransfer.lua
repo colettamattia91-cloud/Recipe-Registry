@@ -36,6 +36,14 @@ function Sync:SendBlockSnapshot(targetKey, requestPayload)
     if sent then
         self.telemetry.blockSnapshotSent = (self.telemetry.blockSnapshotSent or 0) + 1
         self.lastSnapshotServedAt = time()
+        if self.RecordSyncEvent then
+            self:RecordSyncEvent("blockSnapshotSent", {
+                peer = targetKey,
+                requestId = requestPayload.requestId,
+                blockKey = snapshot.blockKey,
+                extra = string.format("recipes=%d", #(snapshot.recipeKeys or {})),
+            })
+        end
         Addon:Trace("sync", string.format(
             "block-snapshot-sent peer=%s requestId=%s block=%s recipes=%d",
             tostring(targetKey or "unknown"),
@@ -67,6 +75,14 @@ function Sync:HandleReceivedBlockSnapshot(payload)
 
     session.lastProgressAt = time()
     self.telemetry.blockSnapshotReceived = (self.telemetry.blockSnapshotReceived or 0) + 1
+    self.telemetry.lastBlockSnapshotReceivedAt = session.lastProgressAt
+    if self.RecordSyncEvent then
+        self:RecordSyncEvent("blockSnapshotReceived", {
+            peer = payload.sender,
+            requestId = payload.requestId,
+            blockKey = payload.blockKey,
+        })
+    end
     Addon:Trace("sync", string.format(
         "block-snapshot-received peer=%s requestId=%s block=%s",
         tostring(payload.sender or "unknown"),
@@ -112,6 +128,19 @@ function Sync:HandleReceivedBlockSnapshot(payload)
     self.telemetry.blockFingerprintRecomputed = (self.telemetry.blockFingerprintRecomputed or 0) + 1
     self.telemetry.lastMergedBlockKey = tostring(payload.blockKey)
     self.telemetry.lastMergedBlockFingerprint = fingerprint
+    self.telemetry.successfulBlockMerges = (session.successfulBlockMerges or 0) + 1
+    if self.RecordSyncEvent then
+        self:RecordSyncEvent("blockMerged", {
+            peer = payload.sender,
+            requestId = payload.requestId,
+            blockKey = payload.blockKey,
+        })
+        self:RecordSyncEvent("blockFingerprintRecomputed", {
+            reason = "block-merge",
+            blockKey = payload.blockKey,
+            extra = tostring(fingerprint or "none"),
+        })
+    end
     Addon:Trace("sync", string.format(
         "block-merge-complete block=%s fingerprint=%s",
         tostring(payload.blockKey or "none"),
@@ -123,6 +152,9 @@ function Sync:HandleReceivedBlockSnapshot(payload)
     session.activeBlockKey = nil
     session.activeBlockRequestId = nil
     session.nextWantedIndex = (session.nextWantedIndex or 1) + 1
+    if self.RefreshSyncReadyState then
+        self:RefreshSyncReadyState("block-merge")
+    end
     self.lastSnapshotSuccessAt = time()
     self:MarkPeerSuccess(payload.sender)
     if not (session.wantedBlocks and session.wantedBlocks[session.nextWantedIndex]) then

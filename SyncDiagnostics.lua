@@ -4,12 +4,88 @@ local Private = Sync._private
 
 local time = time
 local pairs = pairs
+local ipairs = ipairs
 local sort = table.sort
 local min = math.min
 local max = math.max
+local concat = table.concat
 
 local countKeys = Private.countKeys
 local shallowCopyArray = Private.shallowCopyArray
+
+local function secondsRemaining(untilAt)
+    local dueAt = tonumber(untilAt or 0) or 0
+    if dueAt <= 0 then
+        return 0
+    end
+    return max(0, dueAt - time())
+end
+
+local function boolText(value)
+    return value == true and "true" or "false"
+end
+
+local function sortedReasonKeys(set)
+    local rows = {}
+    for reason in pairs(set or {}) do
+        rows[#rows + 1] = tostring(reason)
+    end
+    sort(rows)
+    return rows
+end
+
+local function summarizeInboundSessions(sync)
+    local rows = {}
+    for requesterKey, sessions in pairs(sync.inboundSeedSessions or {}) do
+        for requestId, session in pairs(sessions or {}) do
+            rows[#rows + 1] = {
+                requesterKey = requesterKey,
+                requestId = requestId,
+                offeredBlocks = tonumber(session.offeredBlockCount or countKeys(session.offeredBlocks)) or 0,
+                servedBlocks = tonumber(session.servedBlocks or 0) or 0,
+                lastActivityAge = max(0, time() - (tonumber(session.lastActivity or session.createdAt or 0) or 0)),
+                state = tostring(session.state or "ready"),
+            }
+        end
+    end
+    sort(rows, function(left, right)
+        if left.requesterKey ~= right.requesterKey then
+            return tostring(left.requesterKey) < tostring(right.requesterKey)
+        end
+        return tostring(left.requestId) < tostring(right.requestId)
+    end)
+    return rows
+end
+
+local function shallowCopyRows(rows)
+    local out = {}
+    for index = 1, #(rows or {}) do
+        local row = rows[index]
+        out[index] = {}
+        for key, value in pairs(row or {}) do
+            out[index][key] = value
+        end
+    end
+    return out
+end
+
+local function summarizePeerVersions(sync)
+    local rows = {}
+    for peerKey, info in pairs(sync.peerVersions or {}) do
+        rows[#rows + 1] = {
+            peerKey = peerKey,
+            addonVersion = info.addonVersion,
+            wireVersion = info.wireVersion,
+            buildChannel = info.buildChannel,
+            compatibility = info.compatibility,
+            ineligibleReason = info.ineligibleReason,
+        }
+    end
+    sort(rows, function(left, right)
+        return tostring(left.peerKey) < tostring(right.peerKey)
+    end)
+    return rows
+end
 
 function Sync:RecordPauseCycle(paused)
     if paused then
@@ -50,40 +126,212 @@ end
 
 function Sync:GetRuntimeObservabilitySnapshot()
     local indexDebug = Addon.Data and Addon.Data.GetSyncIndexDebugState and Addon.Data:GetSyncIndexDebugState() or {}
+    local tel = self.telemetry or {}
     local cycle = self.activeHelloCycle or {}
     local session = self.outboundSeedSession or {}
+    local pause = Addon.SyncPausePolicy and Addon.SyncPausePolicy.GetDebugState and Addon.SyncPausePolicy:GetDebugState() or {}
+    local transitionActive = self.IsInWorldTransition and self:IsInWorldTransition() or false
+    local transitionRemaining = self.GetWorldTransitionRemaining and self:GetWorldTransitionRemaining() or 0
+    local warmupActive = self.IsInWarmup and self:IsInWarmup() or false
+    local warmupRemaining = self.GetWarmupRemaining and self:GetWarmupRemaining() or 0
+    local worldReady = not transitionActive and not warmupActive
+    local pendingReasons = sortedReasonKeys(self._pendingHelloReasons)
+    local summaryActive = type(cycle) == "table" and cycle.helloId ~= nil and (cycle.selectionCompletedAt or 0) <= 0
+    local inboundRows = summarizeInboundSessions(self)
+    local blocksRemaining = max(0, #(session.wantedBlocks or {}) - max(0, (session.nextWantedIndex or 1) - 1))
+    local lastProgressAt = tonumber(session.lastProgressAt or session.startedAt or 0) or 0
+    local timeoutRemaining = lastProgressAt > 0 and max(0, (Private.constants.SESSION_TIMEOUT or 60) - (time() - lastProgressAt)) or 0
+    local eligibility = self.GetPeerEligibilityBreakdown and self:GetPeerEligibilityBreakdown() or {}
+    local peerRows = summarizePeerVersions(self)
+
     return {
-        transitionActive = self.IsInWorldTransition and self:IsInWorldTransition() or false,
-        transitionReason = self.worldTransitionReason,
-        transitionRemaining = self.GetWorldTransitionRemaining and self:GetWorldTransitionRemaining() or 0,
-        runtimeQueuePressure = self.telemetry and self.telemetry.runtimeQueuePressure or 0,
-        indexReady = indexDebug.indexReady == true,
-        indexStatus = indexDebug.indexStatus,
-        trustedRoster = indexDebug.trustedRoster == true,
-        trustedRosterReason = indexDebug.trustedRosterReason,
-        localSummary = {
-            syncModel = indexDebug.syncModel,
+        readiness = {
+            syncReady = self.syncReady == true,
+            savedVariablesReady = self.savedVariablesReady == true,
+            playerReady = self.playerReady == true,
+            worldReady = worldReady,
+            worldTransitionActive = transitionActive,
+            worldTransitionReason = self.worldTransitionReason,
+            worldTransitionRemaining = transitionRemaining,
+            warmupActive = warmupActive,
+            warmupReason = self.warmupReason,
+            warmupRemaining = warmupRemaining,
+            rosterPreflightReady = self.rosterPreflightReady == true,
+            rosterPreflightReason = self.rosterPreflightReason,
+            indexReady = self.indexReady == true,
+            indexStatus = self.indexStatus,
+            notReadyReason = self.lastSyncNotReadyReason,
+            pauseActive = pause.pauseActive == true,
+            pauseReason = pause.pauseReason,
+            inInstance = pause.inInstance == true,
+            inRaid = pause.inRaid == true,
+            inCombat = pause.inCombat == true,
+            runtimeSaturated = (tel.runtimeQueuePressure or 0) >= 95,
+            runtimeQueuePressure = tel.runtimeQueuePressure or 0,
+            lastReadinessGateFailure = tel.lastReadinessGateFailure,
+        },
+        hello = {
+            pending = self._helloTimer ~= nil,
+            dueAt = self._helloScheduledFor or 0,
+            remaining = secondsRemaining(self._helloScheduledFor),
+            reason = self.lastHelloScheduleReason,
+            coalescedReasons = pendingReasons,
+            lastHelloId = tel.lastHelloId,
+            lastHelloSentAt = tel.lastHelloSentAt or 0,
+            lastHelloFingerprint = tel.lastHelloFingerprint,
+            activeHelloId = cycle.helloId,
+            sent = tel.helloSent or 0,
+            deferredReason = tel.helloDeferredReason,
+            deferredPaused = tel.helloDeferredPaused or 0,
+            deferredNotReady = tel.helloDeferredNotReady or 0,
+            deferredOutboundActive = tel.helloDeferredOutboundActive or 0,
+        },
+        summaryCollection = {
+            active = summaryActive,
+            helloId = cycle.helloId,
+            startedAt = cycle.startedAt or 0,
+            closesAt = cycle.closesAt or 0,
+            remaining = summaryActive and secondsRemaining(cycle.closesAt) or 0,
+            receivedCount = countKeys(cycle.summaries or {}),
+            candidateCount = tel.lastSeedCandidateCount or 0,
+        },
+        discoveryRetry = {
+            misses = self.discoveryRetryMisses or 0,
+            currentDelay = tel.discoveryRetryDelay or 0,
+            nextAt = tel.discoveryRetryNextAt or 0,
+            remaining = secondsRemaining(tel.discoveryRetryNextAt),
+            capSeconds = Private.constants.DISCOVERY_RETRY_MAX_SECONDS or 300,
+            capHit = (tel.discoveryRetryDelay or 0) >= (Private.constants.DISCOVERY_RETRY_MAX_SECONDS or 300)
+                or (tel.discoveryRetryCapHits or 0) > 0,
+            lastReason = tel.lastDiscoveryRetryReason,
+        },
+        seedSelection = {
+            selectedPeer = tel.lastSelectedPeer,
+            selectedReason = tel.lastSelectedReason,
+            candidateCount = tel.lastSeedCandidateCount or 0,
+            rejectReasons = tel.lastSeedRejectReasons,
+            lastNoSeedReason = tel.lastNoSeedReason,
+            activeHelloId = cycle.helloId,
+        },
+        outboundSession = {
+            active = self.HasActiveOutboundSeedSession and self:HasActiveOutboundSeedSession() or false,
+            sessionId = session.sessionId,
+            state = session.state or "idle",
+            seedKey = session.seedKey,
+            diffRequestId = session.diffRequestId,
+            activeBlockKey = session.activeBlockKey,
+            activeRequestId = session.activeBlockRequestId,
+            wantedBlocks = #(session.wantedBlocks or {}),
+            nextWantedIndex = session.nextWantedIndex or 1,
+            blocksRemaining = blocksRemaining,
+            successfulBlockMerges = session.successfulBlockMerges or 0,
+            startedAt = session.startedAt or 0,
+            lastProgressAt = lastProgressAt,
+            timeoutRemaining = timeoutRemaining,
+            abortReason = session.abortReason or tel.lastAbortReason,
+            completedReason = session.completedReason or tel.lastSessionCompleteReason,
+            lastPulledBlockKey = tel.lastBlockPullBlockKey,
+            lastMergedBlockKey = tel.lastMergedBlockKey,
+            lastMergedBlockFingerprint = tel.lastMergedBlockFingerprint,
+            indexDirtyAllowedForActivePull = self.indexUsableForActivePull == true and (self:HasActiveOutboundSeedSession() == true),
+        },
+        inboundSeed = {
+            activeCount = self.GetInboundSeedSessionCount and self:GetInboundSeedSessionCount() or 0,
+            maxCount = Private.constants.MAX_INBOUND_SEED_SESSIONS or 4,
+            perPeerMax = Private.constants.MAX_INBOUND_SEED_SESSIONS_PER_PEER or 1,
+            sessionsSummary = inboundRows,
+            rejectedCap = tel.inboundSeedSessionsRejectedCap or 0,
+            rejectedPaused = tel.inboundSeedSessionsRejectedPaused or 0,
+            rejectedNotReady = tel.inboundSeedSessionsRejectedNotReady or 0,
+            rejectedUnknownRequest = tel.inboundBlockPullRejectedUnknownRequest or 0,
+            rejectedNotOffered = tel.inboundBlockPullRejectedNotOffered or 0,
+            clearedPause = tel.inboundSeedSessionsClearedPause or 0,
+        },
+        index = {
+            indexReady = indexDebug.indexReady == true,
+            indexStatus = indexDebug.indexStatus,
+            indexUsableForActivePull = indexDebug.indexUsableForActivePull == true,
+            trustedRoster = indexDebug.trustedRoster == true,
+            trustedRosterReason = indexDebug.trustedRosterReason,
             activeOwnerCount = indexDebug.activeOwnerCount or 0,
             activeBlockCount = indexDebug.activeBlockCount or 0,
             activeContentCount = indexDebug.activeContentCount or 0,
             globalFingerprint = indexDebug.globalFingerprint,
             globalFingerprintDirty = indexDebug.globalFingerprintDirty == true,
+            dirtyBlockCount = indexDebug.cache and indexDebug.cache.dirtyBlockCount or 0,
+            lastGlobalFingerprintAt = indexDebug.lastGlobalFingerprintAt or 0,
+            lastGlobalFingerprintReason = indexDebug.lastGlobalFingerprintReason,
+            lastDirtyBlockKey = indexDebug.lastDirtyBlockKey,
+            lastRebuiltBlockKey = indexDebug.lastRebuiltBlockKey,
+            cache = {
+                hits = indexDebug.cache and indexDebug.cache.stats and indexDebug.cache.stats.hits or 0,
+                misses = indexDebug.cache and indexDebug.cache.stats and indexDebug.cache.stats.misses or 0,
+                blockRebuilt = indexDebug.cache and indexDebug.cache.stats and indexDebug.cache.stats.blockRebuilt or 0,
+                fullRebuild = indexDebug.cache and indexDebug.cache.stats and indexDebug.cache.stats.fullRebuild or 0,
+                globalRecomputed = indexDebug.cache and indexDebug.cache.stats and indexDebug.cache.stats.globalRecomputed or 0,
+                builtAt = indexDebug.cache and indexDebug.cache.builtAt or 0,
+                lastBuildReason = indexDebug.cache and indexDebug.cache.lastBuildReason or nil,
+                lastDirtyReason = indexDebug.cache and indexDebug.cache.lastDirtyReason or nil,
+            },
         },
-        cache = indexDebug.cache or {},
-        activeHelloId = cycle.helloId,
-        selectedSeedKey = cycle.selectedSeedKey or self.lastSelectedSeed and self.lastSelectedSeed.peerKey or nil,
-        outboundSession = {
-            sessionId = session.sessionId,
-            state = session.state,
-            seedKey = session.seedKey,
-            diffRequestId = session.diffRequestId,
-            activeBlockKey = session.activeBlockKey,
-            wantedBlocks = #(session.wantedBlocks or {}),
-            nextWantedIndex = session.nextWantedIndex or 1,
-            startedAt = session.startedAt or 0,
-            lastProgressAt = session.lastProgressAt or 0,
-            abortReason = session.abortReason,
-            completedReason = session.completedReason,
+        pause = {
+            active = pause.pauseActive == true,
+            reason = pause.pauseReason,
+            inInstance = pause.inInstance == true,
+            inRaid = pause.inRaid == true,
+            inCombat = pause.inCombat == true,
+            worldTransitionActive = transitionActive,
+            worldTransitionRemaining = transitionRemaining,
+            warmupActive = warmupActive,
+            warmupReason = self.warmupReason,
+            warmupRemaining = warmupRemaining,
+            lastPauseReason = tel.lastPauseReason,
+            lastPauseEnterReason = tel.lastPauseEnterReason,
+            lastPauseExitReason = tel.lastPauseExitReason,
+            sessionsAbortedPause = tel.outboundSessionsAbortedPause or 0,
+            inboundClearedPause = tel.inboundSeedSessionsClearedPause or 0,
+        },
+        compatibility = {
+            peerVersionsCount = countKeys(self.peerVersions),
+            eligiblePeers = eligibility.eligible or 0,
+            ineligiblePeers = eligibility.ineligible or 0,
+            buildChannelDrops = tel.buildChannelDrops or 0,
+            skippedVersionIncompatible = tel.skippedVersionIncompatible or 0,
+            skippedMissingCapability = tel.skippedMissingCapability or 0,
+            newerVersionSeen = tel.newerVersionSeen or 0,
+            newerProtocolSeen = tel.newerProtocolSeen or 0,
+            peers = peerRows,
+        },
+        protocol = {
+            helloSent = tel.helloSent or 0,
+            summarySent = tel.summarySent or 0,
+            summaryReceived = tel.summaryReceived or 0,
+            indexDiffRequestSent = tel.indexDiffRequestSent or 0,
+            indexDiffRequestReceived = tel.indexDiffRequestReceived or 0,
+            indexDiffResponseSent = tel.indexDiffResponseSent or 0,
+            indexDiffResponseReceived = tel.indexDiffResponseReceived or 0,
+            lastIndexDiffRequestId = tel.lastIndexDiffRequestId,
+            lastIndexDiffTarget = tel.lastIndexDiffTarget,
+            lastIndexDiffLocalBlockCount = tel.lastIndexDiffLocalBlockCount or 0,
+            lastIndexDiffOfferedCount = tel.lastIndexDiffOfferedCount or 0,
+            lastIndexDiffNoOfferReason = tel.lastIndexDiffNoOfferReason,
+            blockPullRequestSent = tel.blockPullRequestSent or 0,
+            blockSnapshotReceived = tel.blockSnapshotReceived or 0,
+            blockMergedImmediate = tel.blockMergedImmediate or 0,
+            successfulBlockMerges = tel.successfulBlockMerges or 0,
+        },
+        unsupported = {
+            ignored = tel.unsupportedMessagesIgnored or 0,
+            lastKind = tel.lastUnsupportedMessageKind,
+            lastSender = tel.lastUnsupportedMessageSender,
+            lastAt = tel.lastUnsupportedMessageAt or 0,
+        },
+        lastBlockers = {
+            noSeedReason = tel.lastNoSeedReason,
+            helloDeferredReason = tel.helloDeferredReason,
+            abortReason = tel.lastAbortReason,
+            timeoutReason = tel.lastBlockPullTimeoutReason,
+            readinessFailure = tel.lastReadinessGateFailure,
         },
     }
 end
@@ -101,49 +349,60 @@ function Sync:GetUiState()
         outgoing = 0,
         autoSync = true,
         paused = pauseState,
-        warmup = self:IsInWarmup(),
-        transition = runtime.transitionActive,
-        transitionRemaining = runtime.transitionRemaining,
+        warmup = runtime.readiness.warmupActive,
+        transition = runtime.readiness.worldTransitionActive,
+        transitionRemaining = runtime.readiness.worldTransitionRemaining,
         bootstrap = bootstrapState,
-        indexReady = runtime.indexReady,
-        indexStatus = runtime.indexStatus,
-        trustedRoster = runtime.trustedRoster,
-        trustedRosterReason = runtime.trustedRosterReason,
-        localSummary = runtime.localSummary,
-        selectedSeedKey = runtime.selectedSeedKey,
+        indexReady = runtime.index.indexReady,
+        indexStatus = runtime.index.indexStatus,
+        trustedRoster = runtime.index.trustedRoster,
+        trustedRosterReason = runtime.index.trustedRosterReason,
+        localSummary = {
+            syncModel = "index-diff-block-pull",
+            activeOwnerCount = runtime.index.activeOwnerCount,
+            activeBlockCount = runtime.index.activeBlockCount,
+            activeContentCount = runtime.index.activeContentCount,
+            globalFingerprint = runtime.index.globalFingerprint,
+            globalFingerprintDirty = runtime.index.globalFingerprintDirty,
+        },
+        selectedSeedKey = runtime.seedSelection.selectedPeer,
         outboundSession = runtime.outboundSession,
         telemetry = self.telemetry,
     }
 end
 
 function Sync:GetDebugSnapshot()
-    local backoffCount, backoffList = self:GetPeerBackoffSummary(3)
+    local snapshot = self:GetAlphaDebugSnapshot()
+    snapshot.lifecycleDebugLog = shallowCopyArray(self.lifecycleDebugLog)
+    snapshot.offlineDebugLog = shallowCopyArray(self.offlineDebugLog)
+    return snapshot
+end
+
+function Sync:GetAlphaDebugSnapshot()
     local runtime = self:GetRuntimeObservabilitySnapshot()
+    local info = self:GetLocalVersionInfo()
+    local recent = self.GetRecentSyncEvents and self:GetRecentSyncEvents(Private.constants.RECENT_SYNC_EVENTS_LIMIT or 50) or {}
     return {
-        onlineNodes = countKeys(self.onlineNodes),
-        pendingRequests = 0,
-        activeRequests = self:GetActiveRequestCount(),
-        paused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() or false,
-        warmup = self:IsInWarmup(),
-        warmupRemaining = self:GetWarmupRemaining(),
-        warmupReason = self.warmupReason,
-        transition = runtime.transitionActive,
-        transitionRemaining = runtime.transitionRemaining,
-        transitionReason = runtime.transitionReason,
-        isolated = self:IsRealTrafficSuppressed(),
-        peerBackoffCount = backoffCount,
-        peerBackoffList = backoffList,
-        indexReady = runtime.indexReady,
-        indexStatus = runtime.indexStatus,
-        trustedRoster = runtime.trustedRoster,
-        trustedRosterReason = runtime.trustedRosterReason,
-        localSummary = runtime.localSummary,
-        cache = runtime.cache,
-        selectedSeedKey = runtime.selectedSeedKey,
+        addonVersion = info.addonVersion,
+        wireVersion = info.wireVersion,
+        minSupportedWireVersion = info.minSupportedWireVersion,
+        buildChannel = info.buildChannel,
+        buildId = info.buildId,
+        commPrefix = info.commPrefix,
+        readiness = runtime.readiness,
+        hello = runtime.hello,
+        summaryCollection = runtime.summaryCollection,
+        discoveryRetry = runtime.discoveryRetry,
+        seedSelection = runtime.seedSelection,
         outboundSession = runtime.outboundSession,
-        telemetry = self.telemetry,
-        lifecycleDebugLog = shallowCopyArray(self.lifecycleDebugLog),
-        offlineDebugLog = shallowCopyArray(self.offlineDebugLog),
+        inboundSeed = runtime.inboundSeed,
+        index = runtime.index,
+        pause = runtime.pause,
+        compatibility = runtime.compatibility,
+        protocol = runtime.protocol,
+        unsupported = runtime.unsupported,
+        lastBlockers = runtime.lastBlockers,
+        recentEventLog = shallowCopyRows(recent),
     }
 end
 
@@ -293,91 +552,164 @@ function Sync:CleanCorruptState(opts)
     return stats
 end
 
-function Sync:DumpStatus()
-    local backoffCount, backoffList = self:GetPeerBackoffSummary(3)
+local function dumpRecentSyncLog(self, limit)
+    local rows = self.GetRecentSyncEvents and self:GetRecentSyncEvents(limit or 10) or {}
+    if #rows == 0 then
+        Addon:Print("Sync log: none")
+        return
+    end
+    Addon:Print(string.format("Sync log entries=%d", #rows))
+    for index = 1, #rows do
+        local row = rows[index]
+        Addon:Print(string.format(
+            "%d %s reason=%s peer=%s req=%s block=%s extra=%s",
+            tonumber(row.t or 0) or 0,
+            tostring(row.event or "event"),
+            tostring(row.reason or "none"),
+            tostring(row.peer or "none"),
+            tostring(row.requestId or "none"),
+            tostring(row.blockKey or "none"),
+            tostring(row.extra or "none")
+        ))
+    end
+end
+
+function Sync:DumpStatus(mode)
+    mode = tostring(mode or "summary"):lower()
+    if mode == "peers" then
+        self:DumpPeerVersions()
+        return
+    end
+    if mode == "log" then
+        dumpRecentSyncLog(self, 12)
+        return
+    end
+
     local runtime = self:GetRuntimeObservabilitySnapshot()
-    local eligibility = self:GetPeerEligibilityBreakdown() or {}
     local localVersion = self:GetLocalVersionInfo()
     local tel = self.telemetry or {}
     Addon:Print(string.format(
-        "Role=Client onlineNodes=%d queued=%d activeReq=%d paused=%s warmup=%s transition=%s(%ds) isolated=%s channel=%s prefix=%s wire=%s",
-        countKeys(self.onlineNodes),
-        0,
-        self:GetActiveRequestCount(),
-        tostring(Addon.SyncPausePolicy and Addon.SyncPausePolicy:IsSensitiveSyncContext() or false),
-        tostring(self:IsInWarmup()),
-        tostring(runtime.transitionActive or false),
-        runtime.transitionRemaining or 0,
-        tostring(self:IsRealTrafficSuppressed()),
-        tostring(localVersion.buildChannel or "release"),
-        tostring(localVersion.commPrefix or Addon.ADDON_PREFIX or "?"),
-        tostring(localVersion.wireVersion or "?")
+        "RR Sync Ready: %s reason=%s",
+        boolText(runtime.readiness.syncReady),
+        tostring(runtime.readiness.notReadyReason or "ready")
     ))
     Addon:Print(string.format(
-        "HELLO/SUMMARY helloSent=%d summarySent=%d summaryReceived=%d seedSelected=%d selectedPeer=%s selectedReason=%s",
-        tel.helloSent or 0,
-        tel.summarySent or 0,
-        tel.summaryReceived or 0,
-        tel.seedSelected or 0,
-        tostring(tel.lastSelectedPeer or "none"),
-        tostring(tel.lastSelectedReason or "none")
+        "saved=%s player=%s world=%s roster=%s index=%s paused=%s transition=%s warmup=%s",
+        boolText(runtime.readiness.savedVariablesReady),
+        boolText(runtime.readiness.playerReady),
+        boolText(runtime.readiness.worldReady),
+        boolText(runtime.readiness.rosterPreflightReady),
+        boolText(runtime.readiness.indexReady),
+        boolText(runtime.readiness.pauseActive),
+        boolText(runtime.readiness.worldTransitionActive),
+        boolText(runtime.readiness.warmupActive)
     ))
     Addon:Print(string.format(
-        "INDEX_DIFF reqSent=%d reqRecv=%d respSent=%d respRecv=%d offered=%d reasons=%s",
-        tel.indexDiffRequestSent or 0,
-        tel.indexDiffRequestReceived or 0,
-        tel.indexDiffResponseSent or 0,
-        tel.indexDiffResponseReceived or 0,
-        tel.blocksOffered or 0,
-        tostring(tel.lastBlockOfferReasons or "none")
+        "HELLO sent=%d pending=%s due=%ds reason=%s retryMisses=%d retryDelay=%ds cap=%ds summaryWindow=%s closes=%ds received=%d",
+        runtime.hello.sent or 0,
+        boolText(runtime.hello.pending),
+        math.floor(runtime.hello.remaining or 0),
+        tostring(runtime.hello.reason or "none"),
+        runtime.discoveryRetry.misses or 0,
+        runtime.discoveryRetry.currentDelay or 0,
+        runtime.discoveryRetry.capSeconds or 300,
+        runtime.summaryCollection.active and "active" or "idle",
+        math.floor(runtime.summaryCollection.remaining or 0),
+        runtime.summaryCollection.receivedCount or 0
     ))
     Addon:Print(string.format(
-        "BLOCK_PULL sent=%d started=%d delayed=%d snapSent=%d snapRecv=%d merged=%d recomputed=%d lastBlock=%s lastFingerprint=%s",
-        tel.blockPullRequestSent or 0,
-        tel.blockPullStarted or 0,
-        tel.blockPullDelayed or 0,
-        tel.blockSnapshotSent or 0,
-        tel.blockSnapshotReceived or 0,
-        tel.blockMergedImmediate or 0,
-        tel.blockFingerprintRecomputed or 0,
-        tostring(tel.lastMergedBlockKey or "none"),
-        tostring(tel.lastMergedBlockFingerprint or "none")
-    ))
-    Addon:Print(string.format(
-        "Cache hit=%d miss=%d blockRebuilt=%d fullRebuild=%d globalRecomputed=%d dirtyBlocks=%d ready=%s status=%s trustedRoster=%s reason=%s",
-        tel.syncIndexCacheHit or 0,
-        tel.syncIndexCacheMiss or 0,
-        tel.syncIndexBlockRebuilt or 0,
-        tel.syncIndexFullRebuild or 0,
-        tel.syncIndexGlobalRecomputed or 0,
-        tel.syncIndexDirtyBlockCount or 0,
-        tostring(runtime.indexReady),
-        tostring(runtime.indexStatus or "unknown"),
-        tostring(runtime.trustedRoster),
-        tostring(runtime.trustedRosterReason or "unknown")
-    ))
-    Addon:Print(string.format(
-        "Session state=%s seed=%s wanted=%d next=%d abort=%s complete=%s globalDirty=%s globalFingerprint=%s",
-        tostring(runtime.outboundSession.state or "idle"),
+        "Outbound seed=%s state=%s wanted=%d next=%d activeBlock=%s merges=%d dirty=%s dirtyAllowed=%s timeout=%ds",
         tostring(runtime.outboundSession.seedKey or "none"),
+        tostring(runtime.outboundSession.state or "idle"),
         runtime.outboundSession.wantedBlocks or 0,
         runtime.outboundSession.nextWantedIndex or 1,
-        tostring(runtime.outboundSession.abortReason or "none"),
-        tostring(runtime.outboundSession.completedReason or "none"),
-        tostring(runtime.localSummary.globalFingerprintDirty or false),
-        tostring(runtime.localSummary.globalFingerprint or "none")
+        tostring(runtime.outboundSession.activeBlockKey or "none"),
+        runtime.outboundSession.successfulBlockMerges or 0,
+        boolText(runtime.index.globalFingerprintDirty),
+        boolText(runtime.outboundSession.indexDirtyAllowedForActivePull),
+        math.floor(runtime.outboundSession.timeoutRemaining or 0)
     ))
     Addon:Print(string.format(
-        "Version peers=%d eligible=%d ineligible=%d channelDrops=%d versionSkips=%d capSkips=%d newerVersionSeen=%d newerProtocolSeen=%d backoff=%d [%s]",
-        countKeys(self.peerVersions),
-        eligibility.eligible or 0,
-        eligibility.ineligible or 0,
-        tel.buildChannelDrops or 0,
-        tel.skippedVersionIncompatible or 0,
-        tel.skippedMissingCapability or 0,
-        tel.newerVersionSeen or 0,
-        tel.newerProtocolSeen or 0,
-        backoffCount or 0,
-        backoffList or "none"
+        "Inbound seed sessions=%d/%d rejectedCap=%d rejectedPaused=%d rejectedNotReady=%d clearedPause=%d",
+        runtime.inboundSeed.activeCount or 0,
+        runtime.inboundSeed.maxCount or 0,
+        runtime.inboundSeed.rejectedCap or 0,
+        runtime.inboundSeed.rejectedPaused or 0,
+        runtime.inboundSeed.rejectedNotReady or 0,
+        runtime.inboundSeed.clearedPause or 0
     ))
+    Addon:Print(string.format(
+        "Index status=%s ready=%s activePullUsable=%s owners=%d blocks=%d content=%d dirtyBlocks=%d gf=%s lastReason=%s",
+        tostring(runtime.index.indexStatus or "unknown"),
+        boolText(runtime.index.indexReady),
+        boolText(runtime.index.indexUsableForActivePull),
+        runtime.index.activeOwnerCount or 0,
+        runtime.index.activeBlockCount or 0,
+        runtime.index.activeContentCount or 0,
+        runtime.index.dirtyBlockCount or 0,
+        tostring(runtime.index.globalFingerprint or "none"),
+        tostring(runtime.index.lastGlobalFingerprintReason or "none")
+    ))
+    Addon:Print(string.format(
+        "HELLO %d / SUMMARY sent=%d recv=%d / INDEX req=%d resp=%d offered=%d / BLOCK pull=%d snapRecv=%d merged=%d",
+        runtime.protocol.helloSent or 0,
+        runtime.protocol.summarySent or 0,
+        runtime.protocol.summaryReceived or 0,
+        runtime.protocol.indexDiffRequestSent or 0,
+        runtime.protocol.indexDiffResponseReceived or 0,
+        runtime.protocol.lastIndexDiffOfferedCount or 0,
+        runtime.protocol.blockPullRequestSent or 0,
+        runtime.protocol.blockSnapshotReceived or 0,
+        runtime.protocol.successfulBlockMerges or 0
+    ))
+    Addon:Print(string.format(
+        "Last noSeed=%s defer=%s abort=%s unsupported=%d",
+        tostring(runtime.lastBlockers.noSeedReason or "none"),
+        tostring(runtime.lastBlockers.helloDeferredReason or "none"),
+        tostring(runtime.lastBlockers.abortReason or "none"),
+        runtime.unsupported.ignored or 0
+    ))
+
+    if mode == "debug" or mode == "diag" then
+        Addon:Print(string.format(
+            "Version addon=%s wire=%s channel=%s prefix=%s peers=%d eligible=%d ineligible=%d",
+            tostring(localVersion.addonVersion or "?"),
+            tostring(localVersion.wireVersion or "?"),
+            tostring(localVersion.buildChannel or "release"),
+            tostring(localVersion.commPrefix or Addon.ADDON_PREFIX or "?"),
+            runtime.compatibility.peerVersionsCount or 0,
+            runtime.compatibility.eligiblePeers or 0,
+            runtime.compatibility.ineligiblePeers or 0
+        ))
+        Addon:Print(string.format(
+            "Seed selected=%s reason=%s candidates=%d reject=%s",
+            tostring(runtime.seedSelection.selectedPeer or "none"),
+            tostring(runtime.seedSelection.selectedReason or "none"),
+            runtime.seedSelection.candidateCount or 0,
+            tostring(runtime.seedSelection.rejectReasons or "none")
+        ))
+        Addon:Print(string.format(
+            "Last HELLO id=%s sentAt=%d fingerprint=%s pendingReasons=%s",
+            tostring(runtime.hello.lastHelloId or "none"),
+            runtime.hello.lastHelloSentAt or 0,
+            tostring(runtime.hello.lastHelloFingerprint or "none"),
+            (#(runtime.hello.coalescedReasons or {}) > 0) and concat(runtime.hello.coalescedReasons, ",") or "none"
+        ))
+    end
+
+    if mode == "sessions" then
+        for index = 1, #(runtime.inboundSeed.sessionsSummary or {}) do
+            local row = runtime.inboundSeed.sessionsSummary[index]
+            Addon:Print(string.format(
+                "Inbound[%d] peer=%s req=%s offered=%d served=%d age=%ds state=%s",
+                index,
+                tostring(row.requesterKey or "none"),
+                tostring(row.requestId or "none"),
+                row.offeredBlocks or 0,
+                row.servedBlocks or 0,
+                math.floor(row.lastActivityAge or 0),
+                tostring(row.state or "ready")
+            ))
+        end
+    end
 end

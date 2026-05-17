@@ -23,6 +23,7 @@ local PEER_BACKOFF_SECONDS = Constants.PEER_BACKOFF_SECONDS or 45
 local POST_WORLD_GRACE_SECONDS = Constants.POST_WORLD_GRACE_SECONDS or 12
 local POST_INSTANCE_GRACE_SECONDS = Constants.POST_INSTANCE_GRACE_SECONDS or 15
 local POST_RELOAD_IN_INSTANCE_GRACE_SECONDS = Constants.POST_RELOAD_IN_INSTANCE_GRACE_SECONDS or 30
+local RECENT_SYNC_EVENTS_LIMIT = Constants.RECENT_SYNC_EVENTS_LIMIT or 50
 
 local LIFECYCLE_DEBUG_LIMIT = 20
 local VERSION_NOTICE_COOLDOWN = 12 * 60 * 60
@@ -122,6 +123,7 @@ function Sync:OnInitialize()
     self.inboundSeedSessions = {}
     self.lifecycleDebugLog = {}
     self.offlineDebugLog = {}
+    self.recentSyncEvents = {}
     self.helloCycleCounter = 0
     self.activeHelloCycle = nil
     self.lastSelectedSeed = nil
@@ -152,6 +154,7 @@ function Sync:ResetTelemetry()
     self.telemetry = newSyncTelemetry()
     self.lifecycleDebugLog = {}
     self.offlineDebugLog = {}
+    self.recentSyncEvents = {}
 end
 
 function Sync:ResetRuntimeQueues(reason, opts)
@@ -222,6 +225,50 @@ function Sync:PushLifecycleEvent(kind, detail)
     end
 end
 
+function Sync:RecordSyncEvent(event, fields)
+    local row = {
+        t = time(),
+        event = tostring(event or "event"),
+    }
+    if type(fields) == "table" then
+        if fields.reason ~= nil then row.reason = tostring(fields.reason) end
+        if fields.peer ~= nil then row.peer = tostring(fields.peer) end
+        if fields.requestId ~= nil then row.requestId = tostring(fields.requestId) end
+        if fields.blockKey ~= nil then row.blockKey = tostring(fields.blockKey) end
+        if fields.extra ~= nil then row.extra = tostring(fields.extra) end
+    end
+    self.recentSyncEvents = self.recentSyncEvents or {}
+    self.recentSyncEvents[#self.recentSyncEvents + 1] = row
+    while #self.recentSyncEvents > RECENT_SYNC_EVENTS_LIMIT do
+        remove(self.recentSyncEvents, 1)
+    end
+    self:PushLifecycleEvent(row.event, row.reason or row.extra or "")
+    return row
+end
+
+function Sync:GetRecentSyncEvents(limit)
+    local rows = {}
+    local source = self.recentSyncEvents or {}
+    local maxRows = tonumber(limit or #source) or #source
+    if maxRows < 0 then
+        maxRows = 0
+    end
+    local startIndex = max(1, #source - maxRows + 1)
+    for index = startIndex, #source do
+        local row = source[index]
+        rows[#rows + 1] = {
+            t = row.t,
+            event = row.event,
+            reason = row.reason,
+            peer = row.peer,
+            requestId = row.requestId,
+            blockKey = row.blockKey,
+            extra = row.extra,
+        }
+    end
+    return rows
+end
+
 function Sync:PushOfflineDebugEvent(kind, detail)
     local stamp = date and date("%H:%M:%S") or tostring(time())
     local line = string.format("%s %s %s", tostring(stamp), tostring(kind or "event"), tostring(detail or ""))
@@ -240,21 +287,43 @@ function Sync:ResetRuntimeStateForDatabaseWipe()
 end
 
 function Sync:SetSavedVariablesReady(reason)
+    if not self.telemetry then
+        self.telemetry = newSyncTelemetry()
+    end
     self.savedVariablesReady = true
     self.lastSavedVariablesReadyReason = tostring(reason or "saved-variables")
+    self.telemetry.savedVariablesReadyAt = time()
+    self:RecordSyncEvent("savedVariablesReady", {
+        reason = self.lastSavedVariablesReadyReason,
+    })
     return self:RefreshSyncReadyState("saved-variables-ready")
 end
 
 function Sync:SetPlayerReady(reason)
+    if not self.telemetry then
+        self.telemetry = newSyncTelemetry()
+    end
     self.playerReady = true
     self.lastPlayerReadyReason = tostring(reason or "player-login")
+    self.telemetry.playerReadyAt = time()
+    self:RecordSyncEvent("playerReady", {
+        reason = self.lastPlayerReadyReason,
+    })
     return self:RefreshSyncReadyState("player-ready")
 end
 
 function Sync:ResetDiscoveryRetry(reason)
+    if not self.telemetry then
+        self.telemetry = newSyncTelemetry()
+    end
     self.discoveryRetryDelay = DISCOVERY_RETRY_INITIAL_SECONDS
     self.discoveryRetryMisses = 0
     self.lastDiscoveryRetryReason = tostring(reason or "reset")
+    self.telemetry.discoveryRetryReset = (self.telemetry.discoveryRetryReset or 0) + 1
+    self.telemetry.discoveryRetryMisses = 0
+    self.telemetry.discoveryRetryDelay = self.discoveryRetryDelay
+    self.telemetry.discoveryRetryNextAt = 0
+    self.telemetry.lastDiscoveryRetryReason = self.lastDiscoveryRetryReason
     return true
 end
 
@@ -297,23 +366,41 @@ function Sync:ScheduleDiscoveryRetry(reason)
     local delay = self:GetNextDiscoveryRetryDelay()
     self.discoveryRetryMisses = (self.discoveryRetryMisses or 0) + 1
     self.discoveryRetryDelay = min(DISCOVERY_RETRY_MAX_SECONDS, delay + DISCOVERY_RETRY_STEP_SECONDS)
+    if delay >= DISCOVERY_RETRY_MAX_SECONDS then
+        self.telemetry.discoveryRetryCapHits = (self.telemetry.discoveryRetryCapHits or 0) + 1
+    end
     self.telemetry.discoveryRetryScheduled = (self.telemetry.discoveryRetryScheduled or 0) + 1
+    self.telemetry.discoveryRetryMisses = self.discoveryRetryMisses
+    self.telemetry.discoveryRetryDelay = delay
     self.telemetry.lastDiscoveryRetryDelay = delay
     self.telemetry.lastDiscoveryRetryReason = tostring(reason or "discovery-retry")
-    return self:ScheduleHello(
+    local scheduled = self:ScheduleHello(
         tostring(reason or "discovery-retry"),
         delay + (random() * (Constants.HELLO_RESCHEDULE_JITTER_SECONDS or 0))
     )
+    self.telemetry.discoveryRetryNextAt = self._helloScheduledFor or 0
+    self:RecordSyncEvent("discoveryRetryScheduled", {
+        reason = tostring(reason or "discovery-retry"),
+        extra = string.format("misses=%d delay=%d", self.discoveryRetryMisses or 0, delay),
+    })
+    return scheduled
 end
 
 function Sync:RefreshSyncReadyState(reason)
     if not self.telemetry then
         self.telemetry = newSyncTelemetry()
     end
+    local previousRosterReady = self.rosterPreflightReady == true
+    local previousRosterReason = self.rosterPreflightReason
+    local previousIndexReady = self.indexReady == true
+    local previousIndexStatus = self.indexStatus
     local sessionActive = self:HasActiveOutboundSeedSession()
     local rosterState = Addon.Data and Addon.Data.GetRosterTrustState and Addon.Data:GetRosterTrustState() or nil
     self.rosterPreflightReady = type(rosterState) == "table" and rosterState.trusted == true or false
     self.rosterPreflightReason = type(rosterState) == "table" and tostring(rosterState.reason or "unknown") or "unavailable"
+    if self.rosterPreflightReady then
+        self.telemetry.rosterPreflightReadyAt = time()
+    end
 
     local indexState = Addon.Data and Addon.Data.GetSyncIndexReadiness and Addon.Data:GetSyncIndexReadiness({
         reason = reason or "sync-ready",
@@ -322,6 +409,21 @@ function Sync:RefreshSyncReadyState(reason)
     }) or nil
     self.indexReady = type(indexState) == "table" and indexState.ready == true or false
     self.indexStatus = type(indexState) == "table" and tostring(indexState.indexStatus or "unknown") or "missing"
+    if self.indexReady then
+        self.telemetry.indexReadyAt = time()
+    end
+    if previousRosterReady ~= self.rosterPreflightReady or previousRosterReason ~= self.rosterPreflightReason then
+        self:RecordSyncEvent(self.rosterPreflightReady and "rosterPreflightReady" or "rosterPreflightNotReady", {
+            reason = self.rosterPreflightReason,
+        })
+    end
+    if previousIndexReady ~= self.indexReady or previousIndexStatus ~= self.indexStatus then
+        local indexEvent = self.indexReady and "indexReady"
+            or (self.indexStatus == "dirty" and "indexDirty" or "indexNotReady")
+        self:RecordSyncEvent(indexEvent, {
+            reason = self.indexStatus,
+        })
+    end
 
     local paused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("HELLO") or false
     local saturated = self:EstimateRuntimeQueuePressure() >= 95
@@ -352,6 +454,10 @@ function Sync:RefreshSyncReadyState(reason)
         if not previous then
             self:ResetDiscoveryRetry("sync-ready")
             self:ScheduleHello("sync-ready")
+            self:RecordSyncEvent("syncReady", {
+                reason = self.lastSyncReadyReason,
+                extra = "true",
+            })
         end
     else
         if self.savedVariablesReady ~= true then
@@ -369,11 +475,20 @@ function Sync:RefreshSyncReadyState(reason)
         else
             self.lastSyncNotReadyReason = "runtime-saturated"
         end
+        self.telemetry.lastReadinessGateFailure = self.lastSyncNotReadyReason
+        if previous or self.telemetry.lastSyncNotReadyReason ~= self.lastSyncNotReadyReason then
+            self:RecordSyncEvent("syncReady", {
+                reason = self.lastSyncNotReadyReason,
+                extra = "false",
+            })
+        end
     end
 
     self.telemetry.syncReadyTransitions = (self.telemetry.syncReadyTransitions or 0) + (previous ~= self.syncReady and 1 or 0)
     self.telemetry.lastSyncReadyState = self.syncReady == true and "ready" or "not-ready"
+    self.telemetry.lastSyncReady = self.syncReady == true
     self.telemetry.lastSyncReadyReason = self.syncReady == true and self.lastSyncReadyReason or self.lastSyncNotReadyReason
+    self.telemetry.lastSyncNotReadyReason = self.lastSyncNotReadyReason
     return self.syncReady, self.syncReady and "ready" or self.lastSyncNotReadyReason
 end
 
@@ -898,9 +1013,12 @@ function Sync:ScheduleHello(reason, delay)
     self._pendingHelloCycleReason = self:GetPendingHelloReason()
     self.lastHelloScheduleReason = self._pendingHelloCycleReason
     self.lastHelloScheduledAt = time()
+    self.telemetry.helloScheduled = (self.telemetry.helloScheduled or 0) + 1
 
     if self._helloTimer then
         self.telemetry.coalescedHelloSchedules = (self.telemetry.coalescedHelloSchedules or 0) + 1
+        self.telemetry.helloScheduleCoalesced = (self.telemetry.helloScheduleCoalesced or 0) + 1
+        self.telemetry.lastHelloScheduledReason = self.lastHelloScheduleReason
         return true
     end
 
@@ -921,12 +1039,30 @@ function Sync:ScheduleHello(reason, delay)
     end
 
     self._helloScheduledFor = time() + max(0, nextDelay)
+    self.telemetry.lastHelloScheduledReason = self.lastHelloScheduleReason
+    self.telemetry.lastHelloScheduledDelay = nextDelay
+    self.telemetry.lastHelloDueAt = self._helloScheduledFor
+    self:RecordSyncEvent("helloScheduled", {
+        reason = self.lastHelloScheduleReason,
+        extra = string.format("delay=%.1f", nextDelay),
+    })
     self._helloTimer = self:ScheduleTimer(function()
         self._helloTimer = nil
         self._helloScheduledFor = nil
         local deferSend, deferReason = self:ShouldDeferHelloBroadcast()
         if deferSend then
             self.telemetry.deferredHelloSchedules = (self.telemetry.deferredHelloSchedules or 0) + 1
+            self.telemetry.helloDeferredReason = tostring(deferReason or "unknown")
+            if deferReason == "paused" then
+                self.telemetry.helloDeferredPaused = (self.telemetry.helloDeferredPaused or 0) + 1
+            elseif deferReason == "outbound-session-active" then
+                self.telemetry.helloDeferredOutboundActive = (self.telemetry.helloDeferredOutboundActive or 0) + 1
+            else
+                self.telemetry.helloDeferredNotReady = (self.telemetry.helloDeferredNotReady or 0) + 1
+            end
+            self:RecordSyncEvent("helloDeferred", {
+                reason = deferReason,
+            })
             self:ScheduleHello("deferred:" .. tostring(deferReason or "unknown"))
             return
         end
@@ -956,7 +1092,13 @@ function Sync:BeginHelloCycle(reason)
         selectedSeedKey = nil,
         selectedSeed = nil,
         selectionCompletedAt = 0,
+        closesAt = time() + (Constants.SUMMARY_COLLECTION_WINDOW or 0),
     }
+    self.telemetry.summaryWindowOpened = (self.telemetry.summaryWindowOpened or 0) + 1
+    self:RecordSyncEvent("summaryWindowOpened", {
+        reason = tostring(reason or self._pendingHelloCycleReason or "hello"),
+        requestId = helloId,
+    })
     return self.activeHelloCycle
 end
 
@@ -996,6 +1138,12 @@ function Sync:RecordSummary(peerKey, payload)
         self:ResetDiscoveryRetry("useful-summary")
     end
     self.telemetry.summaryReceived = (self.telemetry.summaryReceived or 0) + 1
+    self.telemetry.lastSummaryCount = countKeys(cycle.summaries)
+    self:RecordSyncEvent("summaryReceived", {
+        peer = peerKey,
+        requestId = payload.helloId,
+        extra = string.format("count=%d", self.telemetry.lastSummaryCount or 0),
+    })
     Addon:Trace("sync", string.format(
         "summary-received peer=%s helloId=%s owners=%d blocks=%d content=%d fingerprint=%s",
         tostring(peerKey),
@@ -1025,20 +1173,39 @@ function Sync:SelectOutboundSeed(cycleId)
         allowDeferred = true,
     }) or nil
     local rows = {}
+    local rejectReasons = {}
+    local candidateCount = 0
     for peerKey, summary in pairs(cycle.summaries or {}) do
-        if self:IsValidSyncMemberKey(peerKey)
-            and type(summary) == "table"
-            and tostring(summary.globalFingerprint or "") ~= tostring(localSummary and localSummary.globalFingerprint or "")
-        then
-            local eligible = self:CanExchangeDataWithPeer(peerKey, "dispatch", {
-                source = peerKey,
-                memberKey = peerKey,
-            })
-            if eligible then
-                rows[#rows + 1] = summary
+        if self:IsValidSyncMemberKey(peerKey) and type(summary) == "table" then
+            candidateCount = candidateCount + 1
+            local rejectReason = nil
+            if tostring(summary.globalFingerprint or "") == tostring(localSummary and localSummary.globalFingerprint or "") then
+                rejectReason = "same-global-fingerprint"
+            else
+                local eligible, eligibleReason = self:CanExchangeDataWithPeer(peerKey, "dispatch", {
+                    source = peerKey,
+                    memberKey = peerKey,
+                })
+                if eligible then
+                    rows[#rows + 1] = summary
+                else
+                    rejectReason = tostring(eligibleReason or "ineligible")
+                end
+            end
+            if rejectReason then
+                rejectReasons[rejectReason] = (rejectReasons[rejectReason] or 0) + 1
             end
         end
     end
+    self.telemetry.seedCandidatesSeen = (self.telemetry.seedCandidatesSeen or 0) + candidateCount
+    self.telemetry.seedCandidatesRejected = (self.telemetry.seedCandidatesRejected or 0) + (candidateCount - #rows)
+    self.telemetry.lastSeedCandidateCount = candidateCount
+    local rejectParts = {}
+    for rejectReason, count in pairs(rejectReasons) do
+        rejectParts[#rejectParts + 1] = string.format("%s=%d", tostring(rejectReason), tonumber(count or 0) or 0)
+    end
+    sort(rejectParts)
+    self.telemetry.lastSeedRejectReasons = #rejectParts > 0 and table.concat(rejectParts, ",") or "none"
 
     table.sort(rows, function(left, right)
         if (left.activeContentCount or 0) ~= (right.activeContentCount or 0) then
@@ -1059,12 +1226,26 @@ function Sync:SelectOutboundSeed(cycleId)
     end)
 
     cycle.selectionCompletedAt = time()
+    self.telemetry.summaryWindowClosed = (self.telemetry.summaryWindowClosed or 0) + 1
+    self.telemetry.lastSummaryWindowCloseAt = cycle.selectionCompletedAt
+    self.telemetry.lastSummaryCount = countKeys(cycle.summaries or {})
+    self:RecordSyncEvent("summaryWindowClosed", {
+        requestId = cycle.helloId,
+        extra = string.format("received=%d candidates=%d", self.telemetry.lastSummaryCount or 0, candidateCount),
+    })
     if #rows == 0 then
         self.telemetry.discoveryMisses = (self.telemetry.discoveryMisses or 0) + 1
+        self.telemetry.lastNoSeedReason = candidateCount == 0 and "no-summary" or "no-useful-seed"
+        self.telemetry.lastNoSummaryAt = time()
         Addon:Trace("sync", string.format(
             "seed-selection-none helloId=%s reason=no-different-ready-summary",
             tostring(cycle.helloId or "none")
         ))
+        self:RecordSyncEvent("noSeed", {
+            reason = self.telemetry.lastNoSeedReason,
+            requestId = cycle.helloId,
+            extra = self.telemetry.lastSeedRejectReasons,
+        })
         self:ScheduleDiscoveryRetry("discovery-miss")
         return nil
     end
@@ -1077,6 +1258,11 @@ function Sync:SelectOutboundSeed(cycleId)
     self.telemetry.seedSelected = (self.telemetry.seedSelected or 0) + 1
     self.telemetry.lastSelectedPeer = selected.peerKey
     self.telemetry.lastSelectedReason = "highest-content"
+    self:RecordSyncEvent("seedSelected", {
+        peer = selected.peerKey,
+        requestId = cycle.helloId,
+        reason = "highest-content",
+    })
     Addon:Trace("sync", string.format(
         "seed-selected peer=%s reason=highest-content owners=%d blocks=%d content=%d",
         tostring(selected.peerKey),
@@ -1124,6 +1310,7 @@ function Sync:AbortOutboundSeedSession(reason)
     end
     self.telemetry.outboundSessionAborted = (self.telemetry.outboundSessionAborted or 0) + 1
     self.telemetry.lastAbortReason = session.abortReason
+    self.telemetry.successfulBlockMerges = session.successfulBlockMerges or 0
     Addon:Trace("sync", string.format(
         "session-abort peer=%s reason=%s",
         tostring(session.seedKey or "unknown"),
@@ -1136,6 +1323,12 @@ function Sync:AbortOutboundSeedSession(reason)
     end
     self:RefreshSyncReadyState(session.abortReason)
     self:ScheduleHello((session.successfulBlockMerges or 0) > 0 and "seed-session-abort-partial" or "seed-session-abort-retry")
+    self:RecordSyncEvent("outboundSessionAborted", {
+        peer = session.seedKey,
+        reason = session.abortReason,
+        requestId = session.diffRequestId,
+        blockKey = session.activeBlockKey,
+    })
     return true
 end
 
@@ -1157,6 +1350,7 @@ function Sync:CompleteOutboundSeedSession(reason)
     end
     self.telemetry.outboundSessionCompleted = (self.telemetry.outboundSessionCompleted or 0) + 1
     self.telemetry.lastSessionCompleteReason = session.completedReason
+    self.telemetry.successfulBlockMerges = session.successfulBlockMerges or 0
     Addon:Trace("sync", string.format(
         "session-complete peer=%s reason=%s",
         tostring(session.seedKey or "unknown"),
@@ -1167,6 +1361,11 @@ function Sync:CompleteOutboundSeedSession(reason)
         self:RefreshSyncReadyState(session.completedReason)
         self:ScheduleHello("seed-session-complete")
     end
+    self:RecordSyncEvent("outboundSessionCompleted", {
+        peer = session.seedKey,
+        reason = session.completedReason,
+        requestId = session.diffRequestId,
+    })
     return true
 end
 
@@ -1200,11 +1399,18 @@ function Sync:ClearInboundSeedSessions(reason)
     self.telemetry.inboundSeedSessionsActive = 0
     if cleared > 0 then
         self.telemetry.inboundSeedSessionsCleared = (self.telemetry.inboundSeedSessionsCleared or 0) + cleared
+        if tostring(reason or ""):find("pause", 1, true) then
+            self.telemetry.inboundSeedSessionsClearedPause = (self.telemetry.inboundSeedSessionsClearedPause or 0) + cleared
+        end
         Addon:Trace("sync", string.format(
             "inbound-seed-sessions-cleared reason=%s cleared=%d",
             tostring(reason or "unspecified"),
             cleared
         ))
+        self:RecordSyncEvent("inboundSeedSessionCleared", {
+            reason = reason,
+            extra = string.format("cleared=%d", cleared),
+        })
     end
     return cleared
 end
@@ -1221,11 +1427,23 @@ function Sync:RegisterInboundSeedSession(requesterKey, requestId, offeredBlocks)
         local peerCap = Constants.MAX_INBOUND_SEED_SESSIONS_PER_PEER or 1
         if countKeys(existingSessions) >= peerCap and peerCap > 0 then
             self.telemetry.inboundSeedSessionsRejected = (self.telemetry.inboundSeedSessionsRejected or 0) + 1
+            self.telemetry.inboundSeedSessionsRejectedCap = (self.telemetry.inboundSeedSessionsRejectedCap or 0) + 1
+            self:RecordSyncEvent("inboundSeedSessionRejected", {
+                peer = requesterKey,
+                requestId = requestId,
+                reason = "per-requester-cap",
+            })
             return nil, "per-requester-cap"
         end
         local globalCap = Constants.MAX_INBOUND_SEED_SESSIONS or 4
         if self:GetInboundSeedSessionCount() >= globalCap and globalCap > 0 then
             self.telemetry.inboundSeedSessionsRejected = (self.telemetry.inboundSeedSessionsRejected or 0) + 1
+            self.telemetry.inboundSeedSessionsRejectedCap = (self.telemetry.inboundSeedSessionsRejectedCap or 0) + 1
+            self:RecordSyncEvent("inboundSeedSessionRejected", {
+                peer = requesterKey,
+                requestId = requestId,
+                reason = "global-cap",
+            })
             return nil, "global-cap"
         end
     end
@@ -1252,6 +1470,14 @@ function Sync:RegisterInboundSeedSession(requesterKey, requestId, offeredBlocks)
     existingSessions[requestId] = session
     self.inboundSeedSessions[requesterKey] = existingSessions
     self.telemetry.inboundSeedSessionsActive = self:GetInboundSeedSessionCount()
+    self.telemetry.inboundSeedSessionsMax = Constants.MAX_INBOUND_SEED_SESSIONS or 4
+    self.telemetry.lastInboundRequester = requesterKey
+    self.telemetry.lastInboundRequestId = requestId
+    self:RecordSyncEvent("inboundSeedSessionOpened", {
+        peer = requesterKey,
+        requestId = requestId,
+        extra = string.format("offered=%d", session.offeredBlockCount or 0),
+    })
     return session, "ready"
 end
 
@@ -1283,12 +1509,26 @@ function Sync:CanServeInboundSeed(peerKey)
         return false, "ineligible"
     end
     if self:IsSyncReady() ~= true then
+        self.telemetry.inboundSeedSessionsRejectedNotReady = (self.telemetry.inboundSeedSessionsRejectedNotReady or 0) + 1
+        self:RecordSyncEvent("inboundSeedSessionRejected", {
+            peer = peerKey,
+            reason = self.lastSyncNotReadyReason or "not-ready",
+        })
         return false, self.lastSyncNotReadyReason or "not-ready"
     end
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("BLOCK_SNAPSHOT") then
+        self.telemetry.inboundSeedSessionsRejectedPaused = (self.telemetry.inboundSeedSessionsRejectedPaused or 0) + 1
+        self:RecordSyncEvent("inboundSeedSessionRejected", {
+            peer = peerKey,
+            reason = "paused",
+        })
         return false, "paused"
     end
     if self:EstimateRuntimeQueuePressure() >= 95 then
+        self:RecordSyncEvent("inboundSeedSessionRejected", {
+            peer = peerKey,
+            reason = "saturated",
+        })
         return false, "saturated"
     end
     return true, "ready"
@@ -1308,6 +1548,9 @@ function Sync:EnterWarmup(reason, seconds)
     self.warmupReason = tostring(reason or "warmup")
     self.warmupUntil = time() + max(0, tonumber(seconds or POST_WORLD_GRACE_SECONDS) or POST_WORLD_GRACE_SECONDS)
     self:ClearInboundSeedSessions("warmup")
+    self:RecordSyncEvent("warmupEnter", {
+        reason = self.warmupReason,
+    })
     self:RefreshSyncReadyState(self.warmupReason)
     if self._warmupTimer then
         self:CancelTimer(self._warmupTimer, true)
@@ -1319,6 +1562,9 @@ function Sync:EnterWarmup(reason, seconds)
         end
         self:RefreshSyncReadyState("warmup-recovery")
         self:ScheduleHello("warmup-recovery")
+        self:RecordSyncEvent("warmupExit", {
+            reason = "warmup-recovery",
+        })
     end, max(0, self.warmupUntil - time()))
 end
 
@@ -1337,6 +1583,9 @@ function Sync:EnterWorldTransition(reason, seconds)
     self.worldTransitionReason = tostring(reason or "transition")
     self.worldTransitionUntil = time() + max(0, tonumber(seconds or POST_WORLD_GRACE_SECONDS) or POST_WORLD_GRACE_SECONDS)
     self:ClearInboundSeedSessions("world-transition")
+    self:RecordSyncEvent("worldTransitionEnter", {
+        reason = self.worldTransitionReason,
+    })
     self:RefreshSyncReadyState(self.worldTransitionReason)
     if self._transitionTimer then
         self:CancelTimer(self._transitionTimer, true)
@@ -1348,6 +1597,9 @@ function Sync:EnterWorldTransition(reason, seconds)
         end
         self:RefreshSyncReadyState("world-transition-recovery")
         self:ScheduleHello("world-transition-recovery")
+        self:RecordSyncEvent("worldTransitionExit", {
+            reason = "world-transition-recovery",
+        })
     end, max(0, self.worldTransitionUntil - time()))
 end
 

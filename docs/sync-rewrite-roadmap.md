@@ -562,7 +562,7 @@ Remove `MANI/MREQ` send, receive, retry, cache, recovery, and catch-up logic aft
 
 ### SyncDiagnostics.lua — rewrite
 
-Replace manifest/coordinator/revision diagnostics with hello/summary/index-diff/block-pull/session diagnostics. Add counters such as `helloSent`, `summaryReceived`, `seedSelected`, `blocksOffered`, `blockMergedImmediate`, `blockFingerprintRecomputed`, `globalFingerprintDirty`, `unsupportedMessagesIgnored`, and trusted-roster state diagnostics.
+Replace manifest/coordinator/revision diagnostics with hello/summary/index-diff/block-pull/session diagnostics. Add bounded runtime observability for readiness gates, HELLO scheduling, SUMMARY collection, discovery retry, seed selection, outbound pull progress, inbound seed session caps, cache/fingerprint state, compatibility skips, and generic unsupported-message counts. `lastGlobalFingerprintAt` and `lastGlobalFingerprintReason` remain passive diagnostics only and must not affect runtime behavior.
 
 ### SyncPausePolicy.lua — neutral-reuse
 
@@ -768,7 +768,7 @@ This is a final rewrite completion gate, not necessarily a Phase 1 gate.
 - Implement abort/reset behavior.
 - Refresh the single globalFingerprint on completion or partial-abort when local sync changed data.
 - Schedule post-sync HELLO through the delayed/coalesced scheduler when needed.
-- Rewrite diagnostics and runtime status.
+- Rewrite diagnostics and runtime status around readiness, HELLO scheduling, discovery retry, inbound/outbound sessions, and cache/fingerprint observability.
 - Stabilize soak/heavy/massive tests.
 
 ### Phase 6 — legacy module removal and final gate

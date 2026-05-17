@@ -358,3 +358,58 @@ Completed for the requested scope on 2026-05-17.
 ### Remaining blockers
 
 - None in the active backend baseline.
+
+---
+
+## Diagnostics hardening pass
+
+### Status
+
+Completed for the requested alpha-debug scope on 2026-05-17.
+
+### Changed files
+
+- `Core.lua`
+- `DataIndex.lua`
+- `SyncDiagnostics.lua`
+- `SyncPausePolicy.lua`
+- `SyncProtocol.lua`
+- `SyncRequests.lua`
+- `SyncRuntime.lua`
+- `SyncTransfer.lua`
+- `local-tests/README.md`
+- `local-tests/run-backend-tests.ps1`
+- `local-tests/spec/diagnostics_snapshot_spec.lua`
+- `local-tests/spec/discovery_debug_spec.lua`
+- `local-tests/spec/dirty_active_pull_debug_spec.lua`
+- `local-tests/spec/inbound_seed_debug_spec.lua`
+- `local-tests/spec/slash_output_spec.lua`
+- `local-tests/spec/sync_debug_output_spec.lua`
+- `local-tests/spec/sync_event_log_spec.lua`
+
+### Behavior implemented
+
+- Added bounded runtime telemetry for readiness, HELLO scheduling, discovery retry, seed selection, outbound pull progress, inbound seed sessions, cache/fingerprint state, compatibility skips, and unsupported messages.
+- Added `GetRuntimeObservabilitySnapshot()` sections for readiness, HELLO, SUMMARY collection, discovery retry, outbound session, inbound seed, index, pause, compatibility, protocol counters, and last blockers.
+- Added `GetAlphaDebugSnapshot()` with compact export-friendly version/build/runtime state plus a bounded recent event log.
+- Added bounded in-memory recent sync event logging with no payload or recipe-table persistence.
+- Reworked `/rr sync` output for alpha diagnosis and added verbose subcommands: `debug`, `diag`, `peers`, `sessions`, and `log`.
+- Kept diagnostics modern-only with no explicit legacy sync terminology restored.
+
+### Tests added or updated
+
+- `diagnostics_snapshot_spec.lua`
+- `sync_debug_output_spec.lua`
+- `sync_event_log_spec.lua`
+- `discovery_debug_spec.lua`
+- `dirty_active_pull_debug_spec.lua`
+- `inbound_seed_debug_spec.lua`
+- `slash_output_spec.lua`
+
+### Test results
+
+- covered in the active `sync` and `all` backend baselines
+
+### Remaining blockers
+
+- None in the active backend baseline.

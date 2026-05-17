@@ -276,7 +276,7 @@ local function printMainHelp(self)
     self:Print("/rr - open or close the main window.")
     self:Print("/rr options, /rr mini, /rr debug, /rr debug log")
     self:Print("/rr rescan - queue a profession scan and scan active profession API data.")
-    self:Print("/rr version, /rr versions, /rr dump, /rr self [profession], /rr sync, /rr offline, /rr pull")
+    self:Print("/rr version, /rr versions, /rr dump, /rr self [profession], /rr sync [debug, diag, peers, sessions, log], /rr offline, /rr pull")
     self:Print("/rr perf [toggle, dump, reset, help]")
     self:Print("/rr mock [status, start <" .. MOCK_SCENARIOS .. ">, stop, cleanup, reset, help]")
     self:Print("/rr prices <item name or link>, /rr share [guild, party, raid, say]")
@@ -1015,10 +1015,16 @@ function Addon:SlashHandler(input)
     end
 
     if cmd == "sync" or cmd == "comms" then
-        if not self.debugMode then
-            return
+        local syncCmd = trimInput(rest):lower()
+        if self.Sync then
+            if syncCmd == "" then
+                self.Sync:DumpStatus("summary")
+            elseif syncCmd == "debug" or syncCmd == "diag" or syncCmd == "peers" or syncCmd == "sessions" or syncCmd == "log" then
+                self.Sync:DumpStatus(syncCmd)
+            else
+                self:Print("Usage: /rr sync [debug, diag, peers, sessions, log]")
+            end
         end
-        if self.Sync then self.Sync:DumpStatus() end
         return
     end
 

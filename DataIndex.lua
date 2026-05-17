@@ -248,6 +248,7 @@ local function ensureSyncIndexState(self)
         lastSummary = nil,
         lastDirtyReason = nil,
         lastDirtyAt = 0,
+        lastDirtyBlockKey = nil,
         lastClearedReason = nil,
         lastClearedAt = 0,
     }
@@ -270,6 +271,8 @@ local function ensureSyncIndexState(self)
         lastBuildReason = nil,
         lastDirtyReason = nil,
         lastDirtyAt = 0,
+        lastDirtyBlockKey = nil,
+        lastRebuiltBlockKey = nil,
         lastFullBuildAt = 0,
         stats = {
             hits = 0,
@@ -366,8 +369,16 @@ local function rebuildGlobalFingerprint(state, cache, reason)
     cache.globalFingerprintDirty = false
     state.lastGlobalFingerprintAt = time()
     state.lastGlobalFingerprintReason = tostring(reason or "global-fingerprint")
+    setSyncTelemetry("lastGlobalFingerprintAt", state.lastGlobalFingerprintAt)
+    setSyncTelemetry("lastGlobalFingerprintReason", state.lastGlobalFingerprintReason)
     cache.stats.globalRecomputed = (cache.stats.globalRecomputed or 0) + 1
     bumpSyncTelemetry("syncIndexGlobalRecomputed")
+    if Addon.Sync and Addon.Sync.RecordSyncEvent then
+        Addon.Sync:RecordSyncEvent("globalFingerprintRefreshed", {
+            reason = state.lastGlobalFingerprintReason,
+            extra = tostring(cache.globalFingerprint or "none"),
+        })
+    end
     Addon:Trace("sync", string.format(
         "global-fingerprint-recomputed owners=%d blocks=%d content=%d fingerprint=%s",
         cache.activeOwnerCount or 0,
@@ -406,6 +417,8 @@ local function rebuildAllBlocks(self, cache, rosterState, reason)
     cache.ready = rosterState.trusted == true
     cache.lastBuildReason = tostring(reason or "full-rebuild")
     cache.lastFullBuildAt = time()
+    cache.lastRebuiltBlockKey = "*full*"
+    setSyncTelemetry("lastRebuiltBlockKey", cache.lastRebuiltBlockKey)
     cache.dirtyAll = false
     cache.dirtyBlocks = {}
     cache.dirtyBlockCount = 0
@@ -444,6 +457,8 @@ local function rebuildDirtyBlocks(self, cache, rosterState, reason)
             cache.blocks[blockKey] = nil
         end
         rebuilt = rebuilt + 1
+        cache.lastRebuiltBlockKey = blockKey
+        setSyncTelemetry("lastRebuiltBlockKey", blockKey)
         cache.stats.blockRebuilt = (cache.stats.blockRebuilt or 0) + 1
         bumpSyncTelemetry("syncIndexBlockRebuilt")
         Addon:Trace("sync", string.format(
@@ -590,8 +605,11 @@ function Data:MarkSyncIndexDirty(reason, blockKey, opts)
     opts = type(opts) == "table" and opts or {}
     cache.lastDirtyReason = tostring(reason or "unspecified")
     cache.lastDirtyAt = time()
+    cache.lastDirtyBlockKey = blockKey
     state.lastDirtyReason = cache.lastDirtyReason
     state.lastDirtyAt = cache.lastDirtyAt
+    state.lastDirtyBlockKey = blockKey
+    setSyncTelemetry("lastDirtyBlockKey", blockKey)
 
     if opts.full == true or not blockKey then
         cache.dirtyAll = true
@@ -608,6 +626,13 @@ function Data:MarkSyncIndexDirty(reason, blockKey, opts)
     cache.globalFingerprintDirty = true
     syncTelemetryStats(cache)
     bumpSyncTelemetry("globalFingerprintDirty")
+    if Addon.Sync and Addon.Sync.RecordSyncEvent then
+        Addon.Sync:RecordSyncEvent("indexDirty", {
+            reason = tostring(reason or "unspecified"),
+            blockKey = blockKey,
+            extra = string.format("dirtyBlocks=%d", cache.dirtyBlockCount or 0),
+        })
+    end
     Addon:Trace("sync", string.format(
         "global-fingerprint-dirty reason=%s block=%s full=%s dirtyBlocks=%d",
         tostring(reason or "unspecified"),
@@ -660,6 +685,11 @@ function Data:PrepareSyncIndexNow(reason)
     })
     if Addon.Sync and Addon.Sync.RefreshSyncReadyState then
         Addon.Sync:RefreshSyncReadyState(reason or "sync-index-prepare")
+    end
+    if Addon.Sync and Addon.Sync.RecordSyncEvent then
+        Addon.Sync:RecordSyncEvent(summary and summary.ready and "indexReady" or "indexNotReady", {
+            reason = summary and summary.indexStatus or "unknown",
+        })
     end
     return {
         state = cloneTable(state),
@@ -974,26 +1004,34 @@ end
 
 function Data:GetSyncIndexDebugState()
     local state, cache, summary = ensureLiveIndex(self, "sync-index-debug")
+    local activePullUsable = Addon.Sync
+        and Addon.Sync.CanAdvanceOutboundPullSession
+        and Addon.Sync:CanAdvanceOutboundPullSession()
+        or false
     return {
         dirty = self:IsSyncIndexDirty(),
         lastDirtyReason = state.lastDirtyReason,
         lastDirtyAt = state.lastDirtyAt or 0,
+        lastDirtyBlockKey = state.lastDirtyBlockKey,
         lastClearedReason = state.lastClearedReason,
         lastClearedAt = state.lastClearedAt or 0,
         lastBuiltAt = summary and summary.builtAt or 0,
         lastBuildReason = cache.lastBuildReason,
         lastGlobalFingerprintAt = state.lastGlobalFingerprintAt or 0,
         lastGlobalFingerprintReason = state.lastGlobalFingerprintReason,
+        lastDirtyBlockKey = state.lastDirtyBlockKey,
+        lastRebuiltBlockKey = cache.lastRebuiltBlockKey,
         trustedRoster = summary and summary.trustedRoster == true or false,
         trustedRosterReason = summary and summary.trustedRosterReason or "unknown",
         snapshotCount = summary and summary.rosterState and summary.rosterState.snapshotCount or 0,
         knownActive = summary and summary.rosterState and summary.rosterState.knownActive or 0,
         indexReady = summary and summary.ready == true or false,
         indexStatus = summary and summary.indexStatus or "unknown",
+        indexUsableForActivePull = activePullUsable,
         activeOwnerCount = summary and summary.activeOwnerCount or 0,
         activeBlockCount = summary and summary.activeBlockCount or 0,
         activeContentCount = summary and summary.activeContentCount or 0,
-        globalFingerprint = summary and summary.globalFingerprint or nil,
+        globalFingerprint = cache.globalFingerprint,
         globalFingerprintDirty = cache.globalFingerprintDirty == true,
         syncModel = summary and summary.syncModel or SYNC_MODEL,
         memberCount = countKeys(self:GetMembersDB()),
@@ -1004,6 +1042,8 @@ function Data:GetSyncIndexDebugState()
             lastBuildReason = cache.lastBuildReason,
             lastDirtyReason = cache.lastDirtyReason,
             lastDirtyAt = cache.lastDirtyAt or 0,
+            lastDirtyBlockKey = cache.lastDirtyBlockKey,
+            lastRebuiltBlockKey = cache.lastRebuiltBlockKey,
             globalFingerprintDirty = cache.globalFingerprintDirty == true,
             stats = cloneTable(cache.stats or {}),
         },

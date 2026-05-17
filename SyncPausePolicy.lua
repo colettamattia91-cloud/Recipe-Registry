@@ -22,6 +22,9 @@ function SyncPausePolicy:OnEnable()
     self._wasPaused = false
     self._wasInstance = false
     self._wasCombat = false
+    self.lastPauseReason = nil
+    self.lastPauseEnterReason = nil
+    self.lastPauseExitReason = nil
     self:RefreshPauseState()
 end
 
@@ -66,6 +69,7 @@ function SyncPausePolicy:RefreshPauseState()
     local inInstance = isInSensitiveInstance()
     local protocolPaused = inInstance
     local heavyUiPaused = inCombat or inInstance
+    local pauseReason = inInstance and "instance" or (inCombat and "combat" or nil)
     if Addon.Performance then
         if protocolPaused then
             Addon.Performance:PauseCategory("sync-outbound")
@@ -92,6 +96,9 @@ function SyncPausePolicy:RefreshPauseState()
     if protocolPaused and Addon.Sync and Addon.Sync.AbortOutboundSeedSession then
         local session = Addon.Sync.outboundSeedSession
         if type(session) == "table" and session.state and session.state ~= "completed" and session.state ~= "aborted" then
+            if Addon.Sync.telemetry then
+                Addon.Sync.telemetry.outboundSessionsAbortedPause = (Addon.Sync.telemetry.outboundSessionsAbortedPause or 0) + 1
+            end
             Addon.Sync:AbortOutboundSeedSession(inInstance and "instance-pause" or "protocol-pause")
         end
     end
@@ -120,8 +127,51 @@ function SyncPausePolicy:RefreshPauseState()
     if Addon.Sync and Addon.Sync.RecordPauseCycle then
         Addon.Sync:RecordPauseCycle(heavyUiPaused)
     end
+    if Addon.Sync and Addon.Sync.telemetry then
+        Addon.Sync.telemetry.lastPauseReason = pauseReason
+    end
+    if not self._wasPaused and heavyUiPaused then
+        self.lastPauseEnterReason = pauseReason
+        self.lastPauseReason = pauseReason
+        if Addon.Sync and Addon.Sync.telemetry then
+            Addon.Sync.telemetry.lastPauseEnterReason = pauseReason
+        end
+        if Addon.Sync and Addon.Sync.RecordSyncEvent then
+            Addon.Sync:RecordSyncEvent("pauseEnter", {
+                reason = pauseReason,
+            })
+        end
+    elseif self._wasPaused and not heavyUiPaused then
+        local exitReason = self._wasInstance and "instance-exit" or (self._wasCombat and "combat-exit" or "pause-exit")
+        self.lastPauseExitReason = exitReason
+        self.lastPauseReason = nil
+        if Addon.Sync and Addon.Sync.telemetry then
+            Addon.Sync.telemetry.lastPauseExitReason = exitReason
+        end
+        if Addon.Sync and Addon.Sync.RecordSyncEvent then
+            Addon.Sync:RecordSyncEvent("pauseExit", {
+                reason = exitReason,
+            })
+        end
+    end
     self._wasPaused = heavyUiPaused
     self._wasInstance = inInstance
     self._wasCombat = inCombat
     Addon:RequestRefresh("sync-pause")
+end
+
+function SyncPausePolicy:GetDebugState()
+    local inCombat = isInCombat()
+    local inInstance = isInSensitiveInstance()
+    return {
+        pauseActive = inInstance,
+        pauseReason = inInstance and "instance" or nil,
+        heavyUiPaused = inCombat or inInstance,
+        inCombat = inCombat,
+        inInstance = inInstance,
+        inRaid = type(IsInRaid) == "function" and IsInRaid() == true or false,
+        lastPauseReason = self.lastPauseReason,
+        lastPauseEnterReason = self.lastPauseEnterReason,
+        lastPauseExitReason = self.lastPauseExitReason,
+    }
 end

@@ -82,6 +82,15 @@ function Sync:RequestIndexDiff(seedKey)
         self.telemetry.indexDiffRequestSent = (self.telemetry.indexDiffRequestSent or 0) + 1
         self.telemetry.lastIndexDiffSeed = tostring(seedKey)
         self.telemetry.lastIndexDiffRequestId = session.diffRequestId
+        self.telemetry.lastIndexDiffTarget = tostring(seedKey)
+        self.telemetry.lastIndexDiffLocalBlockCount = tonumber(digest.activeBlockCount or 0) or 0
+        if self.RecordSyncEvent then
+            self:RecordSyncEvent("indexDiffRequestSent", {
+                peer = seedKey,
+                requestId = session.diffRequestId,
+                extra = string.format("blocks=%d", self.telemetry.lastIndexDiffLocalBlockCount or 0),
+            })
+        end
         Addon:Trace("sync", string.format(
             "index-diff-request-sent peer=%s requestId=%s blocks=%d",
             tostring(seedKey),
@@ -129,7 +138,16 @@ function Sync:SendIndexDiffResponse(targetKey, requestPayload)
         end
         self.telemetry.indexDiffResponseSent = (self.telemetry.indexDiffResponseSent or 0) + 1
         self.telemetry.blocksOffered = (self.telemetry.blocksOffered or 0) + #(response.offeredBlocks or {})
+        self.telemetry.lastIndexDiffOfferedCount = #(response.offeredBlocks or {})
+        self.telemetry.lastIndexDiffNoOfferReason = (#(response.offeredBlocks or {}) == 0) and "no-diff" or nil
         self.telemetry.lastBlockOfferReasons = table.concat(reasons, ",")
+        if self.RecordSyncEvent then
+            self:RecordSyncEvent("indexDiffResponseSent", {
+                peer = targetKey,
+                requestId = requestPayload and requestPayload.requestId or nil,
+                extra = string.format("offered=%d", self.telemetry.lastIndexDiffOfferedCount or 0),
+            })
+        end
         Addon:Trace("sync", string.format(
             "index-diff-response-sent peer=%s requestId=%s offered=%d reasons=%s",
             tostring(targetKey),
@@ -163,6 +181,8 @@ function Sync:HandleReceivedIndexDiffResponse(payload)
     session.nextWantedIndex = 1
     self.telemetry.indexDiffResponseReceived = (self.telemetry.indexDiffResponseReceived or 0) + 1
     self.telemetry.blocksOffered = (self.telemetry.blocksOffered or 0) + #(session.offeredBlocks or {})
+    self.telemetry.lastIndexDiffOfferedCount = #(session.offeredBlocks or {})
+    self.telemetry.lastIndexDiffNoOfferReason = (#(session.offeredBlocks or {}) == 0) and "no-diff" or nil
 
     local reasons = {}
     for index = 1, #(session.offeredBlocks or {}) do
@@ -172,6 +192,13 @@ function Sync:HandleReceivedIndexDiffResponse(payload)
         end
     end
     self.telemetry.lastBlockOfferReasons = table.concat(reasons, ",")
+    if self.RecordSyncEvent then
+        self:RecordSyncEvent("indexDiffResponseReceived", {
+            peer = payload.sender,
+            requestId = payload.requestId,
+            extra = string.format("offered=%d", self.telemetry.lastIndexDiffOfferedCount or 0),
+        })
+    end
     Addon:Trace("sync", string.format(
         "index-diff-response-received peer=%s requestId=%s offered=%d reasons=%s",
         tostring(payload.sender or "unknown"),
@@ -231,6 +258,16 @@ function Sync:RequestNextWantedBlock()
         self.telemetry.blockPullRequestSent = (self.telemetry.blockPullRequestSent or 0) + 1
         self.telemetry.blockPullStarted = (self.telemetry.blockPullStarted or 0) + 1
         self.telemetry.lastBlockPullBlockKey = tostring(row.blockKey)
+        self.telemetry.lastBlockPullRequestId = requestId
+        self.telemetry.lastBlockPullSentAt = session.blockRequestedAt
+        if self.RecordSyncEvent then
+            self:RecordSyncEvent("blockPullRequestSent", {
+                peer = session.seedKey,
+                requestId = requestId,
+                blockKey = row.blockKey,
+                reason = row.reason,
+            })
+        end
         Addon:Trace("sync", string.format(
             "block-pull-start peer=%s requestId=%s block=%s reason=%s",
             tostring(session.seedKey),
@@ -301,6 +338,8 @@ function Sync:ProcessRequestQueue()
     local now = time()
     local age = max(0, now - (session.lastProgressAt or session.startedAt or now))
     if age > SESSION_TIMEOUT then
+        self.telemetry.lastBlockPullTimeoutAt = now
+        self.telemetry.lastBlockPullTimeoutReason = "session-timeout"
         if self.AbortOutboundSeedSession then
             self:AbortOutboundSeedSession("session-timeout")
         end
