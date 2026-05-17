@@ -652,7 +652,12 @@ function Addon:ProcessCoalescedGuildRosterUpdate(reason)
         elseif self.Sync.telemetry then
             self.Sync.telemetry.rosterHeavyUpdates = (self.Sync.telemetry.rosterHeavyUpdates or 0) + 1
         end
-        self.Sync:OnGuildRosterUpdate()
+        self.Sync:OnGuildRosterUpdate({
+            reason = reason or "roster",
+            delta = delta,
+            heavyUpdate = heavyUpdate,
+            presenceOnly = presenceOnly,
+        })
     end
     if heavyUpdate or presenceOnly then
         self:RequestRefresh(reason or "roster")

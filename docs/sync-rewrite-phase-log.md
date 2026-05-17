@@ -413,3 +413,51 @@ Completed for the requested alpha-debug scope on 2026-05-17.
 ### Remaining blockers
 
 - None in the active backend baseline.
+
+---
+
+## Roster invalidation hardening pass
+
+### Status
+
+Completed for the requested scope on 2026-05-17.
+
+### Changed files
+
+- `Core.lua`
+- `Data.lua`
+- `DataIndex.lua`
+- `GuildLifecycleMaintenance.lua`
+- `Sync.lua`
+- `SyncRuntime.lua`
+- `local-tests/run-backend-tests.ps1`
+- `local-tests/spec/sync_roster_invalidation_spec.lua`
+- `docs/sync-rewrite-roadmap.md`
+- `docs/sync-rewrite-phase-log.md`
+- `local-tests/README.md`
+
+### Behavior implemented
+
+- `GUILD_ROSTER_UPDATE` no longer causes unconditional full sync-index dirtying.
+- Presence-only roster changes update UI/presence state without dirtying the sync fingerprint.
+- Sync-relevant roster signatures now track known Recipe Registry owners instead of the entire guild roster.
+- Unknown guild members with no stored addon data are ignored for sync fingerprint invalidation.
+- Known owner active-set changes dirty affected block keys when possible instead of forcing global full-dirty invalidation.
+- Trusted-roster-ready transitions schedule index preparation without repeatedly re-dirtying the index.
+- Trusted-roster cleanup is throttled to once per 24 hours and evaluates known addon owners only.
+- Repeated no-op roster events no longer spam `global-fingerprint-dirty` diagnostics.
+
+### Tests added or updated
+
+- `sync_roster_invalidation_spec.lua`
+
+### Test results
+
+- `sync_roster_invalidation_spec.lua`: 6 passed
+- `.\local-tests\run-syntax.ps1`: passed
+- `.\local-tests\run-backend-tests.ps1 -Suite sync`: passed
+- `.\local-tests\run-backend-tests.ps1`: passed
+
+### Remaining blockers
+
+- None in the active backend baseline.

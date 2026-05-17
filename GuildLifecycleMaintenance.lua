@@ -146,8 +146,26 @@ function GuildLifecycleMaintenance:RunCleanupStep(state)
             knownActive = state.knownActive or 0,
             mock = state.mock == true,
         }
+        local changedOwners = (state.keptActive or 0) + (state.markedStale or 0) + (state.pruned or 0)
+        if Addon.Sync and Addon.Sync.telemetry then
+            Addon.Sync.telemetry.rosterCleanupChangedOwners = (Addon.Sync.telemetry.rosterCleanupChangedOwners or 0) + changedOwners
+        end
         if state.updateLastRunAt ~= false then
             Addon.Data:SetLastWeeklyCleanupAt(now)
+        end
+        if changedOwners > 0 then
+            if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then
+                Addon.Data:ScheduleSyncIndexPrepare("trusted-roster-cleanup", 0.5)
+            end
+            if Addon.Sync and Addon.Sync.ResetDiscoveryRetry then
+                Addon.Sync:ResetDiscoveryRetry("trusted-roster-cleanup")
+            end
+            if Addon.Sync and Addon.Sync.RefreshSyncReadyState then
+                Addon.Sync:RefreshSyncReadyState("trusted-roster-cleanup")
+            end
+            if Addon.Sync and Addon.Sync.ScheduleHello then
+                Addon.Sync:ScheduleHello("trusted-roster-cleanup")
+            end
         end
         Addon:RequestRefresh("guild-cleanup")
         return false, state

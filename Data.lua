@@ -49,6 +49,7 @@ local DB_DEFAULTS = {
         meta = {
             schemaVersion = 2,
             lastWeeklyCleanupAt = 0,
+            lastTrustedRosterCleanupAt = 0,
             bootstrapCompletedAt = 0,
         },
         updateNotice = {
@@ -805,6 +806,9 @@ function Data:GetGlobalMeta()
     if type(self.db.global.meta.lastWeeklyCleanupAt) ~= "number" then
         self.db.global.meta.lastWeeklyCleanupAt = 0
     end
+    if type(self.db.global.meta.lastTrustedRosterCleanupAt) ~= "number" then
+        self.db.global.meta.lastTrustedRosterCleanupAt = 0
+    end
     if type(self.db.global.meta.bootstrapCompletedAt) ~= "number" then
         self.db.global.meta.bootstrapCompletedAt = 0
     end
@@ -817,6 +821,10 @@ end
 
 function Data:SetLastWeeklyCleanupAt(ts)
     self:GetGlobalMeta().lastWeeklyCleanupAt = ts or time()
+end
+
+function Data:SetLastTrustedRosterCleanupAt(ts)
+    self:GetGlobalMeta().lastTrustedRosterCleanupAt = ts or time()
 end
 
 function Data:MarkBootstrapCompleted(ts)
@@ -910,6 +918,63 @@ function Data:MigrateDatabase()
     meta.schemaVersion = 2
 end
 
+function Data:GetMemberProfessionBlockKeys(memberKey)
+    local entry = self:GetMember(memberKey)
+    local blockKeys = {}
+    for professionKey in pairs(entry and entry.professions or {}) do
+        local blockKey = self:BuildSyncBlockKey(memberKey, professionKey)
+        if blockKey then
+            blockKeys[#blockKeys + 1] = blockKey
+        end
+    end
+    sort(blockKeys)
+    return blockKeys
+end
+
+function Data:MarkOwnerSyncBlocksDirty(memberKey, reason)
+    local blockKeys = self:GetMemberProfessionBlockKeys(memberKey)
+    if #blockKeys == 0 then
+        return false, {}
+    end
+    for index = 1, #blockKeys do
+        self:MarkSyncIndexDirty(reason or "owner-dirty", blockKeys[index])
+    end
+    return true, blockKeys
+end
+
+function Data:GetKnownSyncOwnerKeys()
+    local keys = {}
+    local selfKey = self:GetPlayerKey()
+    for memberKey, entry in pairs(self:GetMembersDB()) do
+        if not self:IsMockMember(memberKey, entry) then
+            local hasProfessionData = false
+            for professionKey, profession in pairs(entry.professions or {}) do
+                if professionKey and countRecipeKeys(profession and profession.recipes or {}) >= 0 then
+                    hasProfessionData = true
+                    break
+                end
+            end
+            if hasProfessionData or memberKey == selfKey then
+                keys[#keys + 1] = memberKey
+            end
+        end
+    end
+    sort(keys)
+    return keys
+end
+
+function Data:BuildCachedGuildRosterSnapshot()
+    local snapshot = {}
+    local count = 0
+    for memberKey in pairs(self._guildMetaCache or {}) do
+        if not snapshot[memberKey] then
+            snapshot[memberKey] = true
+            count = count + 1
+        end
+    end
+    return snapshot, count
+end
+
 function Data:InvalidateRecipeCaches(scope)
     if scope == "list" then
         self._recipeListCache = nil
@@ -973,16 +1038,23 @@ end
 function Data:MarkMemberActive(memberKey, seenAt)
     local entry = self:GetMember(memberKey)
     if not entry then return false end
+    local changed = (entry.guildStatus or "active") ~= "active" or (entry.staleAt or 0) > 0
     entry.guildStatus = "active"
     entry.lastSeenInGuildAt = seenAt or time()
     entry.staleAt = 0
     for professionKey, prof in pairs(entry.professions or {}) do
+        if (prof.guildStatus or "active") ~= "active" then
+            changed = true
+        end
         prof.guildStatus = "active"
         prof.lastSeenInGuildAt = entry.lastSeenInGuildAt
         entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, prof)
     end
-    if self.MarkSyncIndexDirty then
-        self:MarkSyncIndexDirty("member-active")
+    if not changed then
+        return false
+    end
+    if self.MarkOwnerSyncBlocksDirty then
+        self:MarkOwnerSyncBlocksDirty(memberKey, "member-active")
     end
     return true
 end
@@ -997,8 +1069,8 @@ function Data:MarkMemberStale(memberKey, staleAt)
         prof.guildStatus = "stale"
         entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, prof)
     end
-    if self.MarkSyncIndexDirty then
-        self:MarkSyncIndexDirty("member-stale")
+    if self.MarkOwnerSyncBlocksDirty then
+        self:MarkOwnerSyncBlocksDirty(memberKey, "member-stale")
     end
     self:InvalidateRecipeCaches("presence")
     return true
@@ -1006,9 +1078,16 @@ end
 
 function Data:DeleteMember(memberKey)
     if not memberKey then return false end
+    local blockKeys = self:GetMemberProfessionBlockKeys(memberKey)
     self.db.global.members[memberKey] = nil
     if self.MarkSyncIndexDirty then
-        self:MarkSyncIndexDirty("member-delete")
+        if #blockKeys > 0 then
+            for index = 1, #blockKeys do
+                self:MarkSyncIndexDirty("member-delete", blockKeys[index])
+            end
+        else
+            self:MarkSyncIndexDirty("member-delete")
+        end
     end
     self:InvalidateRecipeCaches("presence")
     if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
@@ -1030,14 +1109,21 @@ function Data:DeleteMockMembers()
     local removed = 0
     for memberKey, entry in pairs(self:GetMembersDB()) do
         if self:IsMockMember(memberKey, entry) then
+            local blockKeys = self:GetMemberProfessionBlockKeys(memberKey)
             self.db.global.members[memberKey] = nil
             removed = removed + 1
+            if self.MarkSyncIndexDirty then
+                if #blockKeys > 0 then
+                    for index = 1, #blockKeys do
+                        self:MarkSyncIndexDirty("mock-cleanup", blockKeys[index])
+                    end
+                else
+                    self:MarkSyncIndexDirty("mock-cleanup")
+                end
+            end
         end
     end
     if removed > 0 then
-        if self.MarkSyncIndexDirty then
-            self:MarkSyncIndexDirty("mock-cleanup")
-        end
         self:InvalidateRecipeCaches("presence")
         if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
             Addon.Tooltip:InvalidateIndex()

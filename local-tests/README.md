@@ -67,6 +67,8 @@ Legacy runtime modules are no longer loaded:
 - delayed / coalesced HELLO scheduling
 - progressive discovery retry backoff (`20s +20s`, capped at `300s`, with jitter)
 - inbound seed session caps and pause clearing
+- roster invalidation scoped to known sync owners only
+- trusted-roster cleanup throttle and roster no-op coverage
 - build-channel and wire compatibility isolation
 - opportunistic profession scans
 - slash/debug/perf output for the modern sync path

@@ -34,6 +34,7 @@ local DISCOVERY_RETRY_MAX_SECONDS = 300
 local MAX_INBOUND_SEED_SESSIONS = 4
 local MAX_INBOUND_SEED_SESSIONS_PER_PEER = 1
 local RECENT_SYNC_EVENTS_LIMIT = 50
+local TRUSTED_ROSTER_CLEANUP_INTERVAL_SECONDS = 86400
 
 local function countKeys(tbl)
     local total = 0
@@ -228,6 +229,17 @@ local function newSyncTelemetry()
         lastPauseExitReason = nil,
         outboundSessionsAbortedPause = 0,
         lastNoSummaryAt = 0,
+        rosterSyncRelevantUpdates = 0,
+        rosterSyncNoopUpdates = 0,
+        rosterUpdateIgnoredForSync = 0,
+        rosterIndexDirtySkipped = 0,
+        rosterKnownOwnersChecked = 0,
+        rosterUnknownMembersIgnored = 0,
+        rosterCleanupRuns = 0,
+        rosterCleanupSkippedThrottle = 0,
+        rosterCleanupChangedOwners = 0,
+        lastRosterSyncSignature = nil,
+        lastRosterSyncRelevantReason = nil,
     }
 end
 
@@ -256,6 +268,7 @@ Private.constants = {
     MAX_INBOUND_SEED_SESSIONS = MAX_INBOUND_SEED_SESSIONS,
     MAX_INBOUND_SEED_SESSIONS_PER_PEER = MAX_INBOUND_SEED_SESSIONS_PER_PEER,
     RECENT_SYNC_EVENTS_LIMIT = RECENT_SYNC_EVENTS_LIMIT,
+    TRUSTED_ROSTER_CLEANUP_INTERVAL_SECONDS = TRUSTED_ROSTER_CLEANUP_INTERVAL_SECONDS,
     MAX_CONCURRENT_REQUESTS = 1,
 }
 Private.countKeys = countKeys

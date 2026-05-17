@@ -41,7 +41,8 @@ $activeAllSpecs = @(
     "sync_legacy_grep_gate_spec.lua",
     "sync_phase1_unsupported_message_spec.lua",
     "sync_phase2_summary_foundation_spec.lua",
-    "sync_phase34_block_pull_spec.lua"
+    "sync_phase34_block_pull_spec.lua",
+    "sync_roster_invalidation_spec.lua"
 )
 $activeSyncSpecs = @(
     "build_channel_isolation_spec.lua",
@@ -56,7 +57,8 @@ $activeSyncSpecs = @(
     "sync_legacy_grep_gate_spec.lua",
     "sync_phase1_unsupported_message_spec.lua",
     "sync_phase2_summary_foundation_spec.lua",
-    "sync_phase34_block_pull_spec.lua"
+    "sync_phase34_block_pull_spec.lua",
+    "sync_roster_invalidation_spec.lua"
 )
 
 function Get-SuiteSpecs {

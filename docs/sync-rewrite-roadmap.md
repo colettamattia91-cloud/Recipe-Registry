@@ -196,6 +196,9 @@ Rules:
 - In uncertain roster states, owners may be excluded from active publication if needed, but persisted data must not be deleted.
 - Do not use `lastSeen` as the primary criterion when a trusted current roster is available.
 - If the WoW API exposes reliable last-online data for members still in roster, a 14-day absence gate may be evaluated later, but must be tested in-game before destructive use.
+- Presence-only roster updates and changes to guild members with no stored Recipe Registry data must not dirty the sync index or the global fingerprint.
+- Sync-relevant roster signatures must be based on known Recipe Registry owners plus their trusted active/inactive membership state, not on the full guild roster population.
+- Trusted-roster cleanup must be throttled and must evaluate known addon owners only unless a broader roster snapshot is already available cheaply.
 
 ---
 

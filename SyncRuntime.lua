@@ -920,18 +920,70 @@ function Sync:GetPeerEligibilityBreakdown()
     }
 end
 
-function Sync:OnGuildRosterUpdate()
-    if Addon.Data and Addon.Data.MarkSyncIndexDirty then
-        Addon.Data:MarkSyncIndexDirty("roster-update", nil, {
+function Sync:OnGuildRosterUpdate(context)
+    context = type(context) == "table" and context or {}
+    local reason = tostring(context.reason or "roster-update")
+    local plan = Addon.Data and Addon.Data.GetRosterSyncUpdatePlan and Addon.Data:GetRosterSyncUpdatePlan({
+        reason = reason,
+        presenceOnly = context.presenceOnly == true,
+        heavyUpdate = context.heavyUpdate == true,
+        delta = context.delta,
+    }) or nil
+
+    local telemetry = self.telemetry or {}
+    if plan then
+        telemetry.rosterKnownOwnersChecked = (telemetry.rosterKnownOwnersChecked or 0) + (plan.knownOwnersChecked or 0)
+        telemetry.rosterUnknownMembersIgnored = (telemetry.rosterUnknownMembersIgnored or 0) + (plan.unknownMembersIgnored or 0)
+        telemetry.lastRosterSyncSignature = plan.currentSignature
+    end
+
+    self:RefreshSyncReadyState(reason)
+
+    if Addon.Data and Addon.Data.MaybeRunTrustedRosterCleanup and plan and plan.rosterState and plan.rosterState.trusted == true then
+        local cleanupStarted = Addon.Data:MaybeRunTrustedRosterCleanup("trusted-roster-cleanup", {
+            rosterState = plan.rosterState,
+            memberKeys = plan.knownOwnerKeys,
+        })
+        if cleanupStarted then
+            telemetry.lastRosterSyncRelevantReason = "trusted-roster-cleanup"
+        end
+    end
+
+    if not plan or plan.syncRelevant ~= true then
+        telemetry.rosterSyncNoopUpdates = (telemetry.rosterSyncNoopUpdates or 0) + 1
+        telemetry.rosterUpdateIgnoredForSync = (telemetry.rosterUpdateIgnoredForSync or 0) + 1
+        return false
+    end
+
+    telemetry.rosterSyncRelevantUpdates = (telemetry.rosterSyncRelevantUpdates or 0) + 1
+    telemetry.lastRosterSyncRelevantReason = plan.reason
+
+    local dirtied = false
+    if plan.knownOwnerEligibilityChanged and #((plan and plan.affectedBlockKeys) or {}) > 0 and Addon.Data and Addon.Data.MarkSyncIndexDirty then
+        for index = 1, #(plan.affectedBlockKeys or {}) do
+            Addon.Data:MarkSyncIndexDirty(plan.reason, plan.affectedBlockKeys[index])
+        end
+        dirtied = true
+    elseif plan.knownOwnerEligibilityChanged and plan.fullDirty and Addon.Data and Addon.Data.MarkSyncIndexDirty then
+        Addon.Data:MarkSyncIndexDirty(plan.reason, nil, {
             full = true,
         })
+        dirtied = true
+    else
+        telemetry.rosterIndexDirtySkipped = (telemetry.rosterIndexDirtySkipped or 0) + 1
     end
+
     if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then
-        Addon.Data:ScheduleSyncIndexPrepare("roster-update", 0.5)
+        Addon.Data:ScheduleSyncIndexPrepare(plan.reason, 0.5)
     end
-    self:ResetDiscoveryRetry("roster-update")
-    self:RefreshSyncReadyState("roster-update")
-    self:ScheduleHello("roster-update")
+    if dirtied then
+        self:ResetDiscoveryRetry(plan.reason)
+        self:ScheduleHello(plan.reason)
+    elseif plan.trustedReadyTransition then
+        self:ResetDiscoveryRetry(plan.reason)
+        self:ScheduleHello(plan.reason)
+    end
+    return true
 end
 
 function Sync:GetInFlightRequests()

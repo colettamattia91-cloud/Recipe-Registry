@@ -8,6 +8,7 @@ local ipairs = ipairs
 local sort = table.sort
 local type = type
 local tostring = tostring
+local max = math.max
 
 local countRecipeKeys = Private.countRecipeKeys
 local isValidRecipeKey = Private.isValidRecipeKey
@@ -15,6 +16,7 @@ local lowerSafe = Private.lowerSafe
 
 local DEFAULT_ROSTER_FRESHNESS_MAX_AGE = 20
 local SYNC_MODEL = "index-diff-block-pull"
+local shouldPublishOwner
 
 local function cloneArray(values)
     local out = {}
@@ -170,24 +172,67 @@ local function buildRosterState(self, reason)
     }
 end
 
-local function rosterSignature(rosterState)
-    if type(rosterState) ~= "table" then
-        return "missing"
-    end
+local function buildSyncRelevantRosterView(self, rosterState, knownOwnerKeys)
+    local selfKey = self:GetPlayerKey()
+    local view = {}
     local parts = {
-        tostring(rosterState.trusted == true),
-        tostring(rosterState.reason or "unknown"),
+        tostring(rosterState and rosterState.trusted == true),
     }
-    local snapshotKeys = {}
-    for memberKey in pairs(rosterState.snapshot or {}) do
-        snapshotKeys[#snapshotKeys + 1] = memberKey
+    local guildCount = countKeys(self._guildMetaCache or {})
+    for _, memberKey in ipairs(knownOwnerKeys or {}) do
+        local entry = self:GetMember(memberKey)
+        local inRoster = rosterState and type(rosterState.snapshot) == "table" and rosterState.snapshot[memberKey] == true or false
+        local publishActive = shouldPublishOwner(self, rosterState, memberKey, entry, selfKey)
+        local row = {
+            memberKey = memberKey,
+            inRoster = inRoster,
+            publishActive = publishActive,
+            guildStatus = entry and entry.guildStatus or "missing",
+        }
+        view[memberKey] = row
+        parts[#parts + 1] = string.format(
+            "%s=%s:%s:%s",
+            tostring(memberKey),
+            inRoster and "1" or "0",
+            publishActive and "1" or "0",
+            tostring(row.guildStatus or "missing")
+        )
     end
-    sortStrings(snapshotKeys)
-    parts[#parts + 1] = table.concat(snapshotKeys, "|")
-    return table.concat(parts, "::")
+    sortStrings(parts)
+    return {
+        signature = table.concat(parts, "::"),
+        view = view,
+        knownOwnersChecked = #(knownOwnerKeys or {}),
+        unknownMembersIgnored = max(0, guildCount - #(knownOwnerKeys or {})),
+    }
 end
 
-local function shouldPublishOwner(self, rosterState, memberKey, entry, selfKey)
+local function buildChangedRosterOwners(previousView, currentView)
+    local changed = {}
+    local seen = {}
+    for memberKey in pairs(previousView or {}) do
+        seen[memberKey] = true
+    end
+    for memberKey in pairs(currentView or {}) do
+        seen[memberKey] = true
+    end
+    for memberKey in pairs(seen) do
+        local previous = previousView and previousView[memberKey] or nil
+        local current = currentView and currentView[memberKey] or nil
+        local changedState = not previous
+            or not current
+            or (previous.inRoster == true) ~= (current.inRoster == true)
+            or (previous.publishActive == true) ~= (current.publishActive == true)
+            or tostring(previous.guildStatus or "missing") ~= tostring(current.guildStatus or "missing")
+        if changedState then
+            changed[#changed + 1] = memberKey
+        end
+    end
+    sortStrings(changed)
+    return changed
+end
+
+shouldPublishOwner = function(self, rosterState, memberKey, entry, selfKey)
     if not memberKey or not entry then
         return false
     end
@@ -251,6 +296,10 @@ local function ensureSyncIndexState(self)
         lastDirtyBlockKey = nil,
         lastClearedReason = nil,
         lastClearedAt = 0,
+        lastObservedRosterSyncSignature = nil,
+        lastObservedRosterSyncView = {},
+        lastObservedRosterTrusted = false,
+        lastRosterSyncRelevantReason = nil,
     }
     self._syncIndexCache = self._syncIndexCache or {
         dirtyAll = true,
@@ -267,6 +316,7 @@ local function ensureSyncIndexState(self)
         ready = false,
         globalFingerprintDirty = true,
         rosterSignature = nil,
+        rosterSyncView = {},
         builtAt = 0,
         lastBuildReason = nil,
         lastDirtyReason = nil,
@@ -439,7 +489,9 @@ local function rebuildDirtyBlocks(self, cache, rosterState, reason)
         rebuildAllBlocks(self, cache, rosterState, reason)
         return
     end
-    if cache.rosterSignature ~= rosterSignature(rosterState) then
+    local knownOwnerKeys = self.GetKnownSyncOwnerKeys and self:GetKnownSyncOwnerKeys() or {}
+    local rosterSync = buildSyncRelevantRosterView(self, rosterState, knownOwnerKeys)
+    if cache.rosterSignature ~= rosterSync.signature then
         rebuildAllBlocks(self, cache, rosterState, reason or "roster-changed")
         return
     end
@@ -498,7 +550,9 @@ local function ensureLiveIndex(self, reason, opts)
     opts = type(opts) == "table" and opts or {}
     local state, cache = ensureSyncIndexState(self)
     local rosterState = buildRosterState(self, reason or "sync-index")
-    local nextRosterSignature = rosterSignature(rosterState)
+    local knownOwnerKeys = self.GetKnownSyncOwnerKeys and self:GetKnownSyncOwnerKeys() or {}
+    local rosterSync = buildSyncRelevantRosterView(self, rosterState, knownOwnerKeys)
+    local nextRosterSignature = rosterSync.signature
 
     local hasCache = (cache.builtAt or 0) > 0 and cache.rosterSignature ~= nil
     local needsFullRebuild = not hasCache or cache.dirtyAll or cache.rosterSignature ~= nextRosterSignature
@@ -537,7 +591,11 @@ local function ensureLiveIndex(self, reason, opts)
     end
 
     cache.rosterSignature = nextRosterSignature
+    cache.rosterSyncView = cloneTable(rosterSync.view)
     cache.builtAt = time()
+    state.lastObservedRosterSyncSignature = nextRosterSignature
+    state.lastObservedRosterSyncView = cloneTable(rosterSync.view)
+    state.lastObservedRosterTrusted = rosterState.trusted == true
     if cache.globalFingerprintDirty and opts.recomputeGlobalFingerprint == true then
         rebuildGlobalFingerprint(state, cache, reason or "live-index")
     end
@@ -702,7 +760,8 @@ function Data:GetSyncIndexReadiness(opts)
     opts = type(opts) == "table" and opts or {}
     local _, cache = ensureSyncIndexState(self)
     local rosterState = buildRosterState(self, opts.reason or "sync-index-readiness")
-    local nextRosterSignature = rosterSignature(rosterState)
+    local knownOwnerKeys = self.GetKnownSyncOwnerKeys and self:GetKnownSyncOwnerKeys() or {}
+    local nextRosterSignature = buildSyncRelevantRosterView(self, rosterState, knownOwnerKeys).signature
     local dirty = cache.dirtyAll == true or (cache.dirtyBlockCount or 0) > 0 or cache.globalFingerprintDirty == true
     local ready = rosterState.trusted == true
         and cache.ready == true
@@ -723,6 +782,101 @@ function Data:GetSyncIndexReadiness(opts)
         builtAt = cache.builtAt or 0,
         dirty = dirty,
     }
+end
+
+function Data:GetRosterSyncUpdatePlan(opts)
+    opts = type(opts) == "table" and opts or {}
+    local state = ensureSyncIndexState(self)
+    local rosterState = buildRosterState(self, opts.reason or "roster-update")
+    local knownOwnerKeys = self.GetKnownSyncOwnerKeys and self:GetKnownSyncOwnerKeys() or {}
+    local rosterSync = buildSyncRelevantRosterView(self, rosterState, knownOwnerKeys)
+    local previousSignature = state.lastObservedRosterSyncSignature
+    local previousView = state.lastObservedRosterSyncView or {}
+    local previousTrusted = state.lastObservedRosterTrusted == true
+    local currentTrusted = rosterState.trusted == true
+    local changedOwners = buildChangedRosterOwners(previousView, rosterSync.view)
+    local affectedBlockKeys = {}
+    local seenBlocks = {}
+    for index = 1, #changedOwners do
+        local memberKey = changedOwners[index]
+        for _, blockKey in ipairs(self:GetMemberProfessionBlockKeys(memberKey)) do
+            if not seenBlocks[blockKey] then
+                seenBlocks[blockKey] = true
+                affectedBlockKeys[#affectedBlockKeys + 1] = blockKey
+            end
+        end
+    end
+    sortStrings(affectedBlockKeys)
+
+    local trustedReadyTransition = previousTrusted ~= true and currentTrusted == true
+    local knownOwnerEligibilityChanged = previousSignature ~= nil and currentTrusted == true and #changedOwners > 0
+    local syncRelevant = trustedReadyTransition or knownOwnerEligibilityChanged
+    local reason = syncRelevant and (trustedReadyTransition and "trusted-roster-ready" or "known-owner-active-set-changed")
+        or (opts.presenceOnly and "presence-only" or "roster-sync-noop")
+
+    state.lastObservedRosterSyncSignature = rosterSync.signature
+    state.lastObservedRosterSyncView = cloneTable(rosterSync.view)
+    state.lastObservedRosterTrusted = currentTrusted
+    state.lastRosterSyncRelevantReason = syncRelevant and reason or state.lastRosterSyncRelevantReason
+    setSyncTelemetry("lastRosterSyncSignature", rosterSync.signature)
+    setSyncTelemetry("lastRosterSyncRelevantReason", syncRelevant and reason or nil)
+
+    return {
+        syncRelevant = syncRelevant,
+        trustedReadyTransition = trustedReadyTransition,
+        knownOwnerEligibilityChanged = knownOwnerEligibilityChanged,
+        affectedBlockKeys = affectedBlockKeys,
+        fullDirty = syncRelevant and #affectedBlockKeys == 0 and trustedReadyTransition ~= true,
+        reason = reason,
+        rosterState = cloneTable(rosterState),
+        knownOwnerKeys = cloneArray(knownOwnerKeys),
+        knownOwnersChecked = rosterSync.knownOwnersChecked,
+        unknownMembersIgnored = rosterSync.unknownMembersIgnored,
+        previousSignature = previousSignature,
+        currentSignature = rosterSync.signature,
+        presenceOnly = opts.presenceOnly == true,
+        changedOwners = cloneArray(changedOwners),
+    }
+end
+
+function Data:MaybeRunTrustedRosterCleanup(reason, opts)
+    opts = type(opts) == "table" and opts or {}
+    local lifecycle = Addon.GuildLifecycleMaintenance
+    if not lifecycle or not lifecycle.StartCleanup then
+        return false, "unavailable"
+    end
+    if opts.rosterState and opts.rosterState.trusted ~= true then
+        return false, "not-trusted"
+    end
+    if lifecycle.IsCleanupRunning and lifecycle:IsCleanupRunning() then
+        return false, "already-running"
+    end
+    local interval = Addon.Sync and Addon.Sync._private and Addon.Sync._private.constants and Addon.Sync._private.constants.TRUSTED_ROSTER_CLEANUP_INTERVAL_SECONDS or 86400
+    local meta = self:GetGlobalMeta()
+    local lastRun = tonumber(meta.lastTrustedRosterCleanupAt or 0) or 0
+    if lastRun > 0 and (time() - lastRun) < interval then
+        bumpSyncTelemetry("rosterCleanupSkippedThrottle")
+        return false, "throttled"
+    end
+    local memberKeys = opts.memberKeys or self:GetKnownSyncOwnerKeys()
+    local snapshot, snapshotCount = self:BuildCachedGuildRosterSnapshot()
+    local ok, cleanupReason = lifecycle:StartCleanup({
+        force = true,
+        updateLastRunAt = false,
+        snapshot = snapshot,
+        memberKeys = memberKeys,
+        label = tostring(reason or "trusted-roster-cleanup"),
+    })
+    if ok then
+        self:SetLastTrustedRosterCleanupAt(time())
+        bumpSyncTelemetry("rosterCleanupRuns")
+        bumpSyncTelemetry("rosterKnownOwnersChecked", #memberKeys)
+        return true, "started", {
+            snapshotCount = snapshotCount,
+            memberKeys = #memberKeys,
+        }
+    end
+    return false, cleanupReason or "cleanup-failed"
 end
 
 function Data:ClearSyncIndexDirty(reason)
@@ -771,7 +925,8 @@ end
 function Data:RefreshSyncBlockRecord(blockKey, reason)
     local _, cache = ensureSyncIndexState(self)
     local rosterState = buildRosterState(self, reason or "block-refresh")
-    local nextRosterSignature = rosterSignature(rosterState)
+    local knownOwnerKeys = self.GetKnownSyncOwnerKeys and self:GetKnownSyncOwnerKeys() or {}
+    local nextRosterSignature = buildSyncRelevantRosterView(self, rosterState, knownOwnerKeys).signature
 
     if cache.dirtyAll or cache.rosterSignature ~= nextRosterSignature then
         rebuildAllBlocks(self, cache, rosterState, reason or "block-refresh-full")
