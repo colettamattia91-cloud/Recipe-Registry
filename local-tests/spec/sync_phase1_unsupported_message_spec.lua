@@ -94,6 +94,25 @@ Test.it("saved variables become ready at addon init without sending sync traffic
     Test.eq(countCommKind(wow, "HELLO"), 0, "addon init should not emit hello traffic")
 end)
 
+Test.it("normal addon lifecycle sets savedVariablesReady before PLAYER_LOGIN", function()
+    local addon, wow, data = freshAddon()
+    Loader.Enable(addon)
+
+    Test.truthy(addon.db ~= nil, "AceDB should be initialized during Data:OnInitialize")
+    Test.truthy(data.db ~= nil, "Data:OnInitialize should attach the AceDB handle")
+    Test.truthy(addon.Sync.savedVariablesReady, "savedVariablesReady should already be true before PLAYER_LOGIN")
+    Test.eq(addon.Sync.lastSavedVariablesReadyReason, "addon-initialize", "savedVariables readiness reason should come from addon initialization")
+    Test.falsy(addon.Sync.playerReady, "PLAYER_LOGIN should still be required for playerReady")
+
+    addon:OnPlayerLogin()
+
+    Test.truthy(addon.Sync.savedVariablesReady, "PLAYER_LOGIN should not be required to set savedVariablesReady")
+    Test.eq(addon.Sync.lastSavedVariablesReadyReason, "addon-initialize", "PLAYER_LOGIN should not rewrite the SavedVariables readiness reason")
+    Test.truthy(addon.Sync.playerReady, "PLAYER_LOGIN should set playerReady")
+    Test.truthy(addon.Sync._startupInitialized, "PLAYER_LOGIN should start the sync runtime")
+    Test.eq(countCommKind(wow, "HELLO"), 0, "PLAYER_LOGIN should not emit hello traffic while readiness is still incomplete")
+end)
+
 Test.it("PLAYER_LOGIN and PLAYER_ENTERING_WORLD keep sync quiet until the full readiness gate is satisfied", function()
     local addon, wow, data = freshAddon()
     Loader.Enable(addon)
