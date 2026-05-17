@@ -1048,7 +1048,7 @@ function Addon:SlashHandler(input)
     end
 
     if cmd == "pull" then
-        if self.Sync then self.Sync:RequestGuildCatchup(rest, false) end
+        if self.Sync then self.Sync:StartManualSyncPull(rest, false) end
         return
     end
 

@@ -66,8 +66,9 @@ function Sync:GetRuntimeObservabilitySnapshot()
             activeOwnerCount = indexDebug.activeOwnerCount or 0,
             activeBlockCount = indexDebug.activeBlockCount or 0,
             activeContentCount = indexDebug.activeContentCount or 0,
-            globalFingerprint = indexDebug.globalFingerprint,
-            committedGlobalFingerprint = indexDebug.committedGlobalFingerprint,
+            globalFingerprint = indexDebug.publishedGlobalFingerprint or indexDebug.currentGlobalFingerprint,
+            currentGlobalFingerprint = indexDebug.currentGlobalFingerprint,
+            publishedGlobalFingerprint = indexDebug.publishedGlobalFingerprint,
             globalFingerprintDirty = indexDebug.globalFingerprintDirty == true,
         },
         cache = indexDebug.cache or {},
@@ -361,7 +362,7 @@ function Sync:DumpStatus()
         tostring(runtime.trustedRosterReason or "unknown")
     ))
     Addon:Print(string.format(
-        "Session state=%s seed=%s wanted=%d next=%d abort=%s complete=%s globalDirty=%s committedFingerprint=%s",
+        "Session state=%s seed=%s wanted=%d next=%d abort=%s complete=%s globalDirty=%s publishedFingerprint=%s",
         tostring(runtime.outboundSession.state or "idle"),
         tostring(runtime.outboundSession.seedKey or "none"),
         runtime.outboundSession.wantedBlocks or 0,
@@ -369,7 +370,7 @@ function Sync:DumpStatus()
         tostring(runtime.outboundSession.abortReason or "none"),
         tostring(runtime.outboundSession.completedReason or "none"),
         tostring(runtime.localSummary.globalFingerprintDirty or false),
-        tostring(runtime.localSummary.committedGlobalFingerprint or "none")
+        tostring(runtime.localSummary.publishedGlobalFingerprint or "none")
     ))
     Addon:Print(string.format(
         "Version peers=%d eligible=%d ineligible=%d channelDrops=%d versionSkips=%d capSkips=%d newerVersionSeen=%d newerProtocolSeen=%d backoff=%d [%s]",

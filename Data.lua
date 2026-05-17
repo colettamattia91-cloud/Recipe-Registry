@@ -866,7 +866,6 @@ function Data:NormalizeMemberEntry(entry, memberKey)
     entry.lastSeenInGuildAt = type(entry.lastSeenInGuildAt) == "number" and entry.lastSeenInGuildAt or (entry.updatedAt or 0)
     entry.staleAt = type(entry.staleAt) == "number" and entry.staleAt or 0
     entry.professions = entry.professions or {}
-    entry.rev = nil
     for professionKey, prof in pairs(entry.professions) do
         entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, prof)
     end
@@ -898,7 +897,6 @@ function Data:MigrateDatabase()
                 entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, prof)
             end
         end
-        entry.rev = nil
     end
 
     meta.schemaVersion = 2

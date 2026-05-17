@@ -372,7 +372,6 @@ Test.it("removed legacy capabilities do not affect compatibility decisions", fun
         caps = modernCaps(addon, {
             capabilities = {
                 chunkWindow = true,
-                snapCodec = true,
                 indexDiffSync = true,
                 blockPullSync = true,
                 maniReliable = false,
@@ -383,7 +382,6 @@ Test.it("removed legacy capabilities do not affect compatibility decisions", fun
     addon.Sync:RecordPeerCaps(peerKey, modernCaps(addon, {
         capabilities = {
             chunkWindow = true,
-            snapCodec = true,
             indexDiffSync = true,
             blockPullSync = true,
             maniReliable = false,

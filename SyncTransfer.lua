@@ -3,29 +3,6 @@ local Sync = Addon.Sync
 
 local time = time
 
-local function recordRemovedInbound(self, kind, senderKey)
-    self.telemetry.legacyMessagesIgnored = (self.telemetry.legacyMessagesIgnored or 0) + 1
-    self.telemetry.ignoredRemovedInbound = (self.telemetry.ignoredRemovedInbound or 0) + 1
-    self.telemetry.lastLegacyMessageIgnored = tostring(kind or "unknown")
-    Addon:Trace("sync", string.format(
-        "removed-transfer kind=%s sender=%s",
-        tostring(kind or "unknown"),
-        tostring(senderKey or "unknown")
-    ))
-end
-
-function Sync:SendRequestReject(_targetKey, _requestPayload, _reason, _opts)
-    return false
-end
-
-function Sync:HandlePausedRequest(payload, _pauseReason)
-    recordRemovedInbound(self, "REQ", payload and payload.sender)
-end
-
-function Sync:HandleRequestReject(payload)
-    recordRemovedInbound(self, "RERR", payload and payload.sender)
-end
-
 function Sync:SendBlockSnapshot(targetKey, requestPayload)
     if not (type(requestPayload) == "table" and type(requestPayload.blockKey) == "string") then
         return false
@@ -90,8 +67,6 @@ function Sync:HandleReceivedBlockSnapshot(payload)
         tostring(payload.blockKey or "none")
     ))
 
-    local applied = false
-    local result = nil
     local incomingPayload = payload.blockPayload or payload
     if type(incomingPayload) == "table" and incomingPayload.blockKey == nil then
         incomingPayload = {
@@ -105,6 +80,9 @@ function Sync:HandleReceivedBlockSnapshot(payload)
             metadata = incomingPayload.metadata,
         }
     end
+
+    local applied = false
+    local result = nil
     if Addon.Data and Addon.Data.ApplyIncomingBlockAdditive then
         applied, result = Addon.Data:ApplyIncomingBlockAdditive(payload.blockKey, incomingPayload, {
             sourceType = payload.sender == ((payload.blockPayload and payload.blockPayload.ownerCharacter) or payload.ownerCharacter) and "owner" or "replica",
@@ -117,9 +95,12 @@ function Sync:HandleReceivedBlockSnapshot(payload)
         return false
     end
 
-    local fingerprint = Addon.Data and Addon.Data.RecomputeLocalBlockFingerprint
-        and Addon.Data:RecomputeLocalBlockFingerprint(payload.blockKey)
-        or nil
+    local fingerprint = type(result) == "table" and result.blockFingerprint or nil
+    if not fingerprint and Addon.Data and Addon.Data.RecomputeLocalBlockFingerprint then
+        fingerprint = Addon.Data:RecomputeLocalBlockFingerprint(payload.blockKey, {
+            reason = "block-merge",
+        })
+    end
     self.telemetry.blockMergedImmediate = (self.telemetry.blockMergedImmediate or 0) + 1
     self.telemetry.blockFingerprintRecomputed = (self.telemetry.blockFingerprintRecomputed or 0) + 1
     self.telemetry.lastMergedBlockKey = tostring(payload.blockKey)
@@ -130,6 +111,7 @@ function Sync:HandleReceivedBlockSnapshot(payload)
         tostring(fingerprint or "none")
     ))
 
+    session.successfulBlockMerges = (session.successfulBlockMerges or 0) + 1
     session.lastMergedBlockFingerprint = fingerprint
     session.activeBlockKey = nil
     session.activeBlockRequestId = nil
@@ -148,51 +130,7 @@ function Sync:HandleReceivedBlockSnapshot(payload)
     return result or true
 end
 
-function Sync:HandleRequest(payload)
-    recordRemovedInbound(self, "REQ", payload and payload.sender)
-end
-
-function Sync:HandleSnapshotChunk(payload)
-    recordRemovedInbound(self, "SNAP", payload and payload.sender)
-end
-
-function Sync:HandleResumeRequest(payload)
-    recordRemovedInbound(self, "RESUME", payload and payload.sender)
-end
-
-function Sync:HandleTransferDone(payload)
-    recordRemovedInbound(self, "DONE", payload and payload.sender)
-end
-
-function Sync:PruneOutgoingSessions()
-    return 0
-end
-
-function Sync:PrunePartialReceives()
-    return 0
-end
-
-function Sync:QueueOutboundBlock(_peer, _block)
-    return false
-end
-
-function Sync:CanSendToPeer(_peer, _delay)
-    return false
-end
-
 function Sync:SendNextLowPriorityChunk()
-    return true
-end
-
-function Sync:EnqueueReceivedChunk(_payload)
-    return false
-end
-
-function Sync:DecodeChunkStep(_payload)
-    return false
-end
-
-function Sync:MergeChunkStep(_item)
     return false
 end
 

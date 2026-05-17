@@ -33,7 +33,7 @@ $activeAllSpecs = @(
     "p4_scan_opportunistic_spec.lua",
     "slash_output_spec.lua",
     "sync_legacy_grep_gate_spec.lua",
-    "sync_phase1_legacy_noop_spec.lua",
+    "sync_phase1_unsupported_message_spec.lua",
     "sync_phase2_summary_foundation_spec.lua",
     "sync_phase34_block_pull_spec.lua"
 )
@@ -42,7 +42,7 @@ $activeSyncSpecs = @(
     "p4_scan_opportunistic_spec.lua",
     "slash_output_spec.lua",
     "sync_legacy_grep_gate_spec.lua",
-    "sync_phase1_legacy_noop_spec.lua",
+    "sync_phase1_unsupported_message_spec.lua",
     "sync_phase2_summary_foundation_spec.lua",
     "sync_phase34_block_pull_spec.lua"
 )

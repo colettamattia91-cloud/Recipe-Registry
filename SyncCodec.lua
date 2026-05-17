@@ -20,8 +20,8 @@ function Sync:GetLocalProtocolCaps()
         chunkWindow = Addon.CAPABILITIES and Addon.CAPABILITIES.chunkWindow == true or false,
         indexDiffSync = Addon.CAPABILITIES and Addon.CAPABILITIES.indexDiffSync == true or false,
         blockPullSync = Addon.CAPABILITIES and Addon.CAPABILITIES.blockPullSync == true or false,
-        canReceiveReq = not protocolPaused,
-        canSendSnap = not protocolPaused,
+        canReceiveBlockPull = not protocolPaused,
+        canSendBlockSnapshot = not protocolPaused,
         isPausedForSync = protocolPaused,
     }
 end
@@ -44,8 +44,8 @@ function Sync:RecordPeerCaps(peerKey, caps)
         chunkWindow = caps.chunkWindow == true,
         indexDiffSync = caps.indexDiffSync == true,
         blockPullSync = caps.blockPullSync == true,
-        canReceiveReq = caps.canReceiveReq ~= false,
-        canSendSnap = caps.canSendSnap ~= false,
+        canReceiveBlockPull = caps.canReceiveBlockPull ~= false,
+        canSendBlockSnapshot = caps.canSendBlockSnapshot ~= false,
         isPausedForSync = caps.isPausedForSync == true,
     }
 end

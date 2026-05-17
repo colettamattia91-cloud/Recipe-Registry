@@ -11,12 +11,11 @@ local function shouldAttachProtocolCaps(kind)
     return kind == "HELLO"
 end
 
-local function recordRemovedInbound(self, kind, senderKey)
-    self.telemetry.legacyMessagesIgnored = (self.telemetry.legacyMessagesIgnored or 0) + 1
-    self.telemetry.ignoredRemovedInbound = (self.telemetry.ignoredRemovedInbound or 0) + 1
-    self.telemetry.lastLegacyMessageIgnored = tostring(kind or "unknown")
+local function recordUnsupportedMessage(self, kind, senderKey)
+    self.telemetry.unsupportedMessagesIgnored = (self.telemetry.unsupportedMessagesIgnored or 0) + 1
+    self.telemetry.lastUnsupportedMessageKind = tostring(kind or "unknown")
     Addon:Trace("sync", string.format(
-        "removed-inbound kind=%s sender=%s",
+        "unsupported-message kind=%s sender=%s",
         tostring(kind or "unknown"),
         tostring(senderKey or "unknown")
     ))
@@ -52,6 +51,9 @@ function Sync:BroadcastHello()
 
     local cycle = self.BeginHelloCycle and self:BeginHelloCycle(self._pendingHelloCycleReason or "hello") or nil
     self.lastHelloAt = time()
+    if Addon.Data and Addon.Data.CommitGlobalFingerprint then
+        Addon.Data:CommitGlobalFingerprint("hello-publish")
+    end
     local summary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
         reason = "hello",
     }) or {}
@@ -219,17 +221,8 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
         self:HandleBlockPullRequest(payload, distribution, sender)
     elseif payload.kind == "BLOCK_SNAPSHOT" then
         self:HandleBlockSnapshot(payload, distribution, sender)
-    elseif payload.kind == "AD"
-        or payload.kind == "IDX"
-        or payload.kind == "MANI"
-        or payload.kind == "MREQ"
-        or payload.kind == "REQ"
-        or payload.kind == "SNAP"
-        or payload.kind == "RESUME"
-        or payload.kind == "DONE"
-        or payload.kind == "RERR"
-    then
-        recordRemovedInbound(self, payload.kind, payload.sender)
+    else
+        recordUnsupportedMessage(self, payload.kind, payload.sender)
     end
 end
 
@@ -251,6 +244,12 @@ function Sync:HandleHello(payload)
 end
 
 function Sync:SendSummary(targetKey, helloId)
+    local session = self.outboundSeedSession
+    if not (type(session) == "table" and session.state and session.state ~= "completed" and session.state ~= "aborted")
+        and Addon.Data and Addon.Data.CommitGlobalFingerprint
+    then
+        Addon.Data:CommitGlobalFingerprint("summary-publish")
+    end
     local summary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
         reason = "summary-send",
     }) or nil
@@ -311,6 +310,13 @@ function Sync:HandleIndexDiffRequest(payload)
     if not (payload and self:IsValidSyncMemberKey(payload.sender)) then
         return
     end
+    self.telemetry.indexDiffRequestReceived = (self.telemetry.indexDiffRequestReceived or 0) + 1
+    Addon:Trace("sync", string.format(
+        "index-diff-request-received peer=%s requestId=%s blocks=%d",
+        tostring(payload.sender or "unknown"),
+        tostring(payload.requestId or "none"),
+        type(payload.blocks) == "table" and Private.countKeys(payload.blocks) or 0
+    ))
     if self.CanServeInboundSeed then
         local allowed = self:CanServeInboundSeed(payload.sender)
         if not allowed then

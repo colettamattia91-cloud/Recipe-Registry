@@ -4,25 +4,10 @@ local Private = Data._private
 
 local time = time
 local pairs = pairs
-local sort = table.sort
 local tostring = tostring
 
 local countRecipeKeys = Private.countRecipeKeys
 local stableRecipeSignature = Private.stableRecipeSignature
-local isValidRecipeKey = Private.isValidRecipeKey
-
-local function sortedRecipeKeys(recipes)
-    local keys = {}
-    for recipeKey in pairs(recipes or {}) do
-        if isValidRecipeKey(recipeKey) then
-            keys[#keys + 1] = tonumber(recipeKey) or recipeKey
-        end
-    end
-    sort(keys, function(left, right)
-        return tostring(left) < tostring(right)
-    end)
-    return keys
-end
 
 function Data:GetLocalSummary()
     if self.BuildLocalSummary then
@@ -35,49 +20,6 @@ function Data:GetLocalSummary()
         professions = 0,
         recipes = 0,
     }
-end
-
-function Data:BuildSnapshotChunks(memberKey, opts)
-    opts = opts or {}
-    local requestedBlocks = {}
-    for _, blockKey in ipairs(opts.requestedBlocks or {}) do
-        requestedBlocks[#requestedBlocks + 1] = blockKey
-    end
-    sort(requestedBlocks)
-
-    if #requestedBlocks == 0 then
-        local entry = self:GetMember(memberKey)
-        for professionKey in pairs(entry and entry.professions or {}) do
-            local blockKey = self:BuildSyncBlockKey(memberKey, professionKey)
-            if blockKey then
-                requestedBlocks[#requestedBlocks + 1] = blockKey
-            end
-        end
-        sort(requestedBlocks)
-    end
-
-    local chunks = {}
-    for index = 1, #requestedBlocks do
-        local snapshot = self.BuildBlockSnapshot and self:BuildBlockSnapshot(requestedBlocks[index], {
-            snapshotKind = "legacy-compat",
-        }) or nil
-        if snapshot then
-            chunks[#chunks + 1] = snapshot
-        end
-    end
-    return chunks
-end
-
-function Data:BeginIncomingSnapshot(_memberKey, _legacyVersion, _updatedAt)
-    return true
-end
-
-function Data:AppendIncomingChunk(_chunk)
-    return true
-end
-
-function Data:FinalizeIncomingSnapshot(_memberKey, _legacyVersion, _opts)
-    return false
 end
 
 function Data:ApplyIncomingBlockAdditive(blockKey, snapshot, opts)
@@ -144,7 +86,9 @@ function Data:ApplyIncomingBlockAdditive(blockKey, snapshot, opts)
         Addon.Tooltip:InvalidateIndex("block-merge")
     end
 
-    local fingerprint = self.BuildBlockFingerprint and self:BuildBlockFingerprint(blockKey) or nil
+    local fingerprint = self.RecomputeLocalBlockFingerprint and self:RecomputeLocalBlockFingerprint(blockKey, {
+        reason = "block-merge",
+    }) or nil
     return true, {
         blockKey = blockKey,
         ownerCharacter = ownerCharacter,
@@ -156,11 +100,12 @@ function Data:ApplyIncomingBlockAdditive(blockKey, snapshot, opts)
     }
 end
 
-function Data:RecomputeLocalBlockFingerprint(blockKey)
-    if not blockKey or not self.BuildBlockFingerprint then
-        return nil
+function Data:RecomputeLocalBlockFingerprint(blockKey, opts)
+    opts = opts or {}
+    if self.RefreshSyncBlockRecord then
+        return self:RefreshSyncBlockRecord(blockKey, opts.reason or "block-fingerprint")
     end
-    return self:BuildBlockFingerprint(blockKey)
+    return self.BuildBlockFingerprint and self:BuildBlockFingerprint(blockKey) or nil
 end
 
 function Data:DumpLocalSyncStatus(professionFilter)
@@ -173,7 +118,7 @@ function Data:DumpLocalSyncStatus(professionFilter)
         professionKeys[#professionKeys + 1] = profName
         totalRecipes = totalRecipes + (prof.count or countRecipeKeys(prof.recipes))
     end
-    sort(professionKeys)
+    table.sort(professionKeys)
 
     Addon:SystemPrint(string.format(
         "Local sync owner=%s professions=%d recipes=%d",
@@ -203,6 +148,13 @@ function Data:DumpLocalSyncStatus(professionFilter)
 
     for _, profName in ipairs(professionKeys) do
         local prof = entry.professions[profName]
+        local recipeList = {}
+        for recipeKey in pairs(prof and prof.recipes or {}) do
+            recipeList[#recipeList + 1] = tonumber(recipeKey) or recipeKey
+        end
+        table.sort(recipeList, function(left, right)
+            return tostring(left) < tostring(right)
+        end)
         Addon:SystemPrint(string.format(
             "  %s count=%d skill=%d/%d spec=%s recipes=%s",
             tostring(profName),
@@ -210,7 +162,7 @@ function Data:DumpLocalSyncStatus(professionFilter)
             prof and (prof.skillRank or 0) or 0,
             prof and (prof.skillMaxRank or 0) or 0,
             tostring(prof and prof.specialization or "none"),
-            table.concat(sortedRecipeKeys(prof and prof.recipes or {}), ",")
+            table.concat(recipeList, ",")
         ))
     end
 end

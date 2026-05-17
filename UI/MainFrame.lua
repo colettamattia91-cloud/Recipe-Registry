@@ -1810,7 +1810,7 @@ function UI:RefreshDetailPanel()
             end
             lines[#lines + 1] = string.format("%s %s", state, nameText)
             if (not selfKey or crafter.memberKey ~= selfKey)
-                and not (Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("REQ")) then
+                and not (Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("BLOCK_PULL_REQUEST")) then
                 lineMeta[#lines] = {
                     canRequest = true,
                     memberKey = crafter.memberKey,

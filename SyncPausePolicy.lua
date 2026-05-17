@@ -31,9 +31,6 @@ end
 
 function SyncPausePolicy:GetProtocolPauseReason(kind)
     kind = tostring(kind or "")
-    if kind == "RERR" then
-        return nil
-    end
     if isInSensitiveInstance() then
         return "PAUSED_INSTANCE"
     end

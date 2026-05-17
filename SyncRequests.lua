@@ -61,7 +61,7 @@ function Sync:RequestIndexDiff(seedKey)
         return false
     end
 
-    session.diffRequestId = string.format("IDXREQ:%s:%d", tostring(seedKey), tonumber(time() or 0) or 0)
+    session.diffRequestId = string.format("DIFFREQ:%s:%d", tostring(seedKey), tonumber(time() or 0) or 0)
     session.diffSentAt = time()
     session.lastProgressAt = session.diffSentAt
     session.state = "waiting-index-diff"
@@ -193,7 +193,7 @@ function Sync:RequestNextWantedBlock()
         return false
     end
 
-    local requestId = string.format("BLKREQ:%s:%s:%d", tostring(session.seedKey), tostring(row.blockKey), tonumber(time() or 0) or 0)
+    local requestId = string.format("BLOCKREQ:%s:%s:%d", tostring(session.seedKey), tostring(row.blockKey), tonumber(time() or 0) or 0)
     session.activeBlockKey = row.blockKey
     session.activeBlockRequestId = requestId
     session.state = "waiting-block"
@@ -288,7 +288,7 @@ function Sync:ProcessRequestQueue()
     end
 end
 
-function Sync:RequestGuildCatchup(memberKey, silent)
+function Sync:StartManualSyncPull(memberKey, silent)
     if Addon.Data and Addon.Data.MarkSyncIndexDirty then
         Addon.Data:MarkSyncIndexDirty(memberKey and memberKey ~= "" and "manual-pull-targeted" or "manual-pull", nil, {
             full = true,

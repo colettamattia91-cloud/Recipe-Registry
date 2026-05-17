@@ -20,15 +20,6 @@ local function countKinds(rows, kinds)
     return total
 end
 
-local function activeLegacyKinds()
-    return {
-        "AD",
-        "IDX",
-        "MANI",
-        "MREQ",
-    }
-end
-
 local function seedProfession(data, memberKey, professionKey, recipeKeys, opts)
     opts = opts or {}
     local entry = data:GetOrCreateMember(memberKey)
@@ -108,9 +99,6 @@ Test.it("selected seed exchanges INDEX_DIFF and sequential BLOCK_PULL/BLOCK_SNAP
     Test.eq(countSentKind(smaller.state.sentComm, "INDEX_DIFF_RESPONSE"), 0, "non-selected peer should not send index diff response")
     Test.eq(countSentKind(requester.state.sentComm, "BLOCK_PULL_REQUEST"), 2, "requester should pull two offered blocks")
     Test.eq(countSentKind(seed.state.sentComm, "BLOCK_SNAPSHOT"), 2, "selected seed should send one snapshot per offered block")
-    Test.eq(countKinds(requester.state.sentComm, activeLegacyKinds()), 0, "requester should not emit legacy traffic")
-    Test.eq(countKinds(seed.state.sentComm, activeLegacyKinds()), 0, "seed should not emit legacy traffic")
-
     local replica = requester.addon.Data:GetMember(seed.key)
     Test.truthy(replica, "requester should store pulled seed owner")
     Test.truthy(replica.professions.Alchemy, "alchemy block should be merged")
@@ -333,7 +321,47 @@ Test.it("index diff does not offer a lower-count block back to a richer requeste
     Test.eq(#(response.offeredBlocks or {}), 0, "seed should not offer a lower-count block back to the requester")
 end)
 
-Test.it("session timeout abort commits the pending global fingerprint", function()
+Test.it("session completion publishes the merged fingerprint and schedules a follow-up HELLO", function()
+    local bus = CommBus.New({
+        names = { "PublishRequester", "PublishSeed" },
+    })
+    local requester = bus:AddNode("PublishRequester")
+    local seed = bus:AddNode("PublishSeed")
+
+    bus:SeedSelfProfession(requester, {
+        profession = "Alchemy",
+        recipeCount = 1,
+        baseRecipe = 15000,
+    })
+    requester.addon.Data:CommitGlobalFingerprint("publish-baseline")
+    local baseline = requester.addon.Data:GetSyncIndexDebugState().publishedGlobalFingerprint
+
+    bus:SeedSelfProfession(seed, {
+        profession = "Alchemy",
+        recipeCount = 3,
+        baseRecipe = 15100,
+    })
+
+    bus:Activate(requester)
+    requester.addon.Sync:BroadcastHello()
+
+    local settled = bus:RunUntil(function()
+        local session = requester.addon.Sync.outboundSeedSession
+        return session and session.state == "completed"
+    end, {
+        maxTicks = 220,
+    })
+
+    Test.truthy(settled, "requester should complete the modern pull session")
+    local state = requester.addon.Data:GetSyncIndexDebugState()
+    Test.ne(state.publishedGlobalFingerprint, baseline, "completion should publish the merged fingerprint")
+    Test.falsy(state.globalFingerprintDirty, "published fingerprint should no longer be dirty after completion")
+    Test.truthy(type(requester.addon.Sync.lastHelloCycleReason) == "string"
+        and requester.addon.Sync.lastHelloCycleReason:find("seed%-session%-complete%-publish", 1, false) ~= nil,
+        "completion should schedule a follow-up hello cycle")
+end)
+
+Test.it("session timeout abort publishes merged partial progress only after a successful block merge", function()
     local addon, wow = Loader.Load()
     local data = addon.Data
     local ownerKey = data:GetPlayerKey()
@@ -350,6 +378,8 @@ Test.it("session timeout abort commits the pending global fingerprint", function
     local baseline = data:BuildLocalSummary({
         reason = "baseline-summary",
     })
+    data:CommitGlobalFingerprint("baseline-publish")
+    local publishedBefore = data:GetSyncIndexDebugState().publishedGlobalFingerprint
 
     seedProfession(data, ownerKey, "Alchemy", { 8001, 8002 }, {
         sourceType = "owner",
@@ -365,15 +395,53 @@ Test.it("session timeout abort commits the pending global fingerprint", function
         sessionId = "timeout-session",
         startedAt = time() - 100,
         lastProgressAt = time() - 100,
+        successfulBlockMerges = 1,
     }
 
     addon.Sync:ProcessRequestQueue()
 
     local state = data:GetSyncIndexDebugState()
     Test.eq(addon.Sync.outboundSeedSession.state, "aborted", "session should abort on timeout")
-    Test.ne(baseline.globalFingerprintCommitted, liveFingerprint, "test setup should change the live fingerprint")
-    Test.eq(state.committedGlobalFingerprint, liveFingerprint, "abort should commit the pending global fingerprint")
+    Test.ne(publishedBefore, liveFingerprint, "test setup should change the live fingerprint")
+    Test.eq(state.publishedGlobalFingerprint, liveFingerprint, "abort should publish the pending merged fingerprint")
     Test.falsy(state.globalFingerprintDirty, "abort commit should clear dirty state")
+    Test.truthy(type(addon.Sync.lastHelloCycleReason) == "string"
+        and addon.Sync.lastHelloCycleReason:find("seed%-session%-abort%-publish", 1, false) ~= nil,
+        "abort after merged progress should schedule a follow-up hello cycle")
+end)
+
+Test.it("abort before any successful pull does not publish a new fingerprint", function()
+    local addon, wow = Loader.Load()
+    local data = addon.Data
+    local ownerKey = data:GetPlayerKey()
+    wow.SetGuildRoster({
+        { name = ownerKey, online = true, rankName = "Member", rankIndex = 5, level = 70, classDisplayName = "Mage", classFileName = "MAGE" },
+    })
+    data:RebuildOnlineCache()
+
+    seedProfession(data, ownerKey, "Alchemy", { 16001 }, {
+        sourceType = "owner",
+        professionSourceType = "owner",
+        reason = "abort-baseline",
+    })
+    data:CommitGlobalFingerprint("abort-baseline-publish")
+    local publishedBefore = data:GetSyncIndexDebugState().publishedGlobalFingerprint
+
+    addon.Sync.outboundSeedSession = {
+        state = "waiting-index-diff",
+        seedKey = "Abortpeer-TestRealm",
+        sessionId = "abort-session",
+        startedAt = time() - 100,
+        lastProgressAt = time() - 100,
+        successfulBlockMerges = 0,
+    }
+
+    addon.Sync:ProcessRequestQueue()
+
+    local state = data:GetSyncIndexDebugState()
+    Test.eq(addon.Sync.outboundSeedSession.state, "aborted", "session should abort on timeout")
+    Test.eq(state.publishedGlobalFingerprint, publishedBefore, "abort without merged blocks should keep the published fingerprint")
+    Test.falsy(state.globalFingerprintDirty, "abort without merged blocks should not dirty the published fingerprint")
 end)
 
 io.write(string.format("Sync phase 3/4 block pull: %d test(s) passed\n", Test.count))

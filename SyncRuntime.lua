@@ -587,14 +587,14 @@ function Sync:CanExchangeDataWithPeer(peerKey, purpose, request)
                 return false, "peer-paused"
             end
             if purpose == "dispatch" or purpose == "index-diff" or purpose == "block-pull" then
-                if caps.canReceiveReq == false then
-                    self:SetPeerIneligibleReason(peerKey, "peer-cannot-receive-req")
-                    return false, "peer-cannot-receive-req"
+                if caps.canReceiveBlockPull == false then
+                    self:SetPeerIneligibleReason(peerKey, "peer-cannot-receive-block-pull")
+                    return false, "peer-cannot-receive-block-pull"
                 end
             end
-            if purpose == "serve" and caps.canSendSnap == false then
-                self:SetPeerIneligibleReason(peerKey, "peer-cannot-send-snap")
-                return false, "peer-cannot-send-snap"
+            if purpose == "serve" and caps.canSendBlockSnapshot == false then
+                self:SetPeerIneligibleReason(peerKey, "peer-cannot-send-block-snapshot")
+                return false, "peer-cannot-send-block-snapshot"
             end
         end
     end
@@ -859,8 +859,12 @@ function Sync:AbortOutboundSeedSession(reason)
     session.abortReason = tostring(reason or "aborted")
     session.abortedAt = time()
     session.lastProgressAt = session.abortedAt
+    local fingerprintChanged = false
     if Addon.Data and Addon.Data.CommitGlobalFingerprint then
-        Addon.Data:CommitGlobalFingerprint("seed-session-abort:" .. session.abortReason)
+        local _, changed = Addon.Data:CommitGlobalFingerprint("seed-session-abort:" .. session.abortReason, {
+            publishIfChanged = (session.successfulBlockMerges or 0) > 0,
+        })
+        fingerprintChanged = changed == true
     end
     self.telemetry.outboundSessionAborted = (self.telemetry.outboundSessionAborted or 0) + 1
     self.telemetry.lastAbortReason = session.abortReason
@@ -869,6 +873,9 @@ function Sync:AbortOutboundSeedSession(reason)
         tostring(session.seedKey or "unknown"),
         tostring(session.abortReason)
     ))
+    if fingerprintChanged and self.ScheduleHelloCycle then
+        self:ScheduleHelloCycle("seed-session-abort-publish", 0.5)
+    end
     return true
 end
 
@@ -885,8 +892,12 @@ function Sync:CompleteOutboundSeedSession(reason)
     session.completedAt = time()
     session.lastProgressAt = session.completedAt
     session.completedReason = tostring(reason or "complete")
-    if Addon.Data and Addon.Data.CommitGlobalFingerprint then
-        Addon.Data:CommitGlobalFingerprint("seed-session-complete:" .. session.completedReason)
+    local fingerprintChanged = false
+    if Addon.Data and Addon.Data.CommitGlobalFingerprint and (session.successfulBlockMerges or 0) > 0 then
+        local _, changed = Addon.Data:CommitGlobalFingerprint("seed-session-complete:" .. session.completedReason, {
+            publishIfChanged = true,
+        })
+        fingerprintChanged = changed == true
     end
     self.telemetry.outboundSessionCompleted = (self.telemetry.outboundSessionCompleted or 0) + 1
     self.telemetry.lastSessionCompleteReason = session.completedReason
@@ -895,6 +906,9 @@ function Sync:CompleteOutboundSeedSession(reason)
         tostring(session.seedKey or "unknown"),
         tostring(session.completedReason)
     ))
+    if fingerprintChanged and self.ScheduleHelloCycle then
+        self:ScheduleHelloCycle("seed-session-complete-publish", 0.5)
+    end
     return true
 end
 

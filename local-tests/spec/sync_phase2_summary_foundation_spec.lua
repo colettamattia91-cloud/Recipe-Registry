@@ -68,19 +68,6 @@ local function seedProfession(data, memberKey, professionKey, recipeKeys, opts)
     return entry
 end
 
-local function legacyAndPhase3Kinds()
-    return {
-        "AD",
-        "IDX",
-        "MANI",
-        "MREQ",
-        "INDEX_DIFF_REQUEST",
-        "INDEX_DIFF_RESPONSE",
-        "BLOCK_PULL_REQUEST",
-        "BLOCK_SNAPSHOT",
-    }
-end
-
 io.write("Sync phase 2 summary foundation\n")
 
 Test.it("DataIndex fingerprints ignore non-content metadata fields", function()
@@ -209,6 +196,7 @@ Test.it("runtime sync index cache reuses hits and rebuilds only dirty blocks", f
     data:BuildLocalSummary({
         reason = "cache-first-build",
     })
+    data:CommitGlobalFingerprint("cache-first-publish")
     local first = data:GetSyncIndexDebugState()
 
     data:BuildLocalSummary({
@@ -234,7 +222,41 @@ Test.it("runtime sync index cache reuses hits and rebuilds only dirty blocks", f
     Test.eq(dirtyCount, 1, "one local profession change should dirty exactly one block")
     Test.eq(third.cache.stats.fullRebuild or 0, 1, "dirty block rebuild should avoid another full rebuild")
     Test.truthy((third.cache.stats.blockRebuilt or 0) >= 1, "dirty block rebuild should update the affected block")
-    Test.falsy(third.globalFingerprintDirty, "rebuilding the dirty block should recompute the live global fingerprint")
+    Test.truthy(third.globalFingerprintDirty, "rebuilding the dirty block should keep the published fingerprint marked dirty")
+    Test.ne(third.currentGlobalFingerprint, third.publishedGlobalFingerprint, "published fingerprint should remain stale until an explicit publish")
+end)
+
+Test.it("BuildLocalSummary computes live state without publishing as a side effect", function()
+    local _addon, _wow, data = freshAddon()
+    local ownerKey = data:GetPlayerKey()
+    Loader.Wow.SetGuildRoster({
+        { name = ownerKey, online = true, rankName = "Member", rankIndex = 5, level = 70, classDisplayName = "Mage", classFileName = "MAGE" },
+    })
+    data:RebuildOnlineCache()
+
+    seedProfession(data, ownerKey, "Alchemy", { 4301, 4302 }, {
+        sourceType = "owner",
+        professionSourceType = "owner",
+        reason = "summary-no-publish",
+    })
+
+    local summary = data:BuildLocalSummary({
+        reason = "summary-without-publish",
+    })
+    local state = data:GetSyncIndexDebugState()
+
+    Test.truthy(type(summary.currentGlobalFingerprint) == "string" and summary.currentGlobalFingerprint ~= "", "summary should compute a live fingerprint")
+    Test.eq(summary.publishedGlobalFingerprint, nil, "summary should not publish the fingerprint by itself")
+    Test.truthy(summary.globalFingerprintDirty, "summary should report the unpublished fingerprint as dirty")
+    Test.eq(state.publishedGlobalFingerprint, nil, "debug state should confirm no published fingerprint yet")
+
+    local publishedFingerprint = data:CommitGlobalFingerprint("summary-explicit-publish")
+    local afterPublish = data:BuildLocalSummary({
+        reason = "summary-after-publish",
+    })
+
+    Test.eq(publishedFingerprint, afterPublish.publishedGlobalFingerprint, "explicit publish should set the stable fingerprint")
+    Test.falsy(afterPublish.globalFingerprintDirty, "explicit publish should clear the published-dirty state")
 end)
 
 Test.it("HELLO publishes the new summary fields only", function()
@@ -300,7 +322,8 @@ Test.it("HELLO triggers SUMMARY only when both peers are ready and fingerprints 
 
     Test.truthy(settled, "different ready peers should exchange SUMMARY")
     Test.eq(countNodeKind(right, "SUMMARY"), 1, "right should send exactly one SUMMARY")
-    Test.eq(countKinds(right.state.sentComm, legacyAndPhase3Kinds()), 0, "summary response should not emit legacy or phase 3 traffic")
+    Test.eq(countNodeKind(right, "INDEX_DIFF_REQUEST"), 0, "summary response should not skip directly into index diff traffic")
+    Test.eq(countNodeKind(right, "BLOCK_PULL_REQUEST"), 0, "summary response should not skip directly into block pull traffic")
 
     local addon, wow, data = freshAddon()
     local ownerKey = data:GetPlayerKey()
@@ -397,8 +420,6 @@ Test.it("HELLO and SUMMARY stay on the modern wire and never fall back to legacy
         maxTicks = 120,
     })
 
-    Test.eq(countKinds(left.state.sentComm, { "AD", "IDX", "MANI", "MREQ" }), 0, "left should not emit legacy traffic")
-    Test.eq(countKinds(right.state.sentComm, { "AD", "IDX", "MANI", "MREQ" }), 0, "right should not emit legacy traffic")
     Test.truthy(countSentKind(left.state.sentComm, "INDEX_DIFF_REQUEST") >= 1, "left should continue on the modern diff path")
     Test.truthy(countSentKind(right.state.sentComm, "INDEX_DIFF_RESPONSE") >= 1, "right should answer on the modern diff path")
     Test.eq(Test.countKeys(left.addon.Sync.pendingRequests), 0, "left should not queue requests")
@@ -455,7 +476,6 @@ Test.it("seed election selects at most one outbound seed using counts and determ
     Test.truthy(selected, "a seed should be selected after the summary window")
     Test.eq(localNode.addon.Sync.telemetry.seedSelected or 0, 1, "exactly one seed should be selected")
     Test.eq(cycle.selectedSeedKey, peerB.key, "deterministic tie-break should pick the alphabetically earlier equal peer")
-    Test.eq(countKinds(localNode.state.sentComm, { "AD", "IDX", "MANI", "MREQ" }), 0, "seed selection should not emit legacy traffic")
     Test.truthy(countSentKind(localNode.state.sentComm, "INDEX_DIFF_REQUEST") >= 1, "seed selection should continue into index diff on the modern path")
 end)
 
