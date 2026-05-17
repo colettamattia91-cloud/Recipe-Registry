@@ -72,7 +72,9 @@ Test.it("normalizes beta metadata to the release channel", function()
 end)
 
 Test.it("dev peers exchange HELLO only on the dev prefix", function()
-    local bus = CommBus.New()
+    local bus = CommBus.New({
+        names = { "Devleft", "Devright" },
+    })
     local left = bus:AddNode("Devleft", {
         addonMetadata = metadata("2.0.0", "dev", "dev-left"),
     })
@@ -99,7 +101,9 @@ Test.it("dev peers exchange HELLO only on the dev prefix", function()
 end)
 
 Test.it("release peers exchange HELLO only on the release prefix", function()
-    local bus = CommBus.New()
+    local bus = CommBus.New({
+        names = { "Releaseleft", "Releaseright" },
+    })
     local left = bus:AddNode("Releaseleft", {
         addonMetadata = metadata("2.0.0", "release", "release-left"),
     })
@@ -126,7 +130,9 @@ Test.it("release peers exchange HELLO only on the release prefix", function()
 end)
 
 Test.it("mixed dev and release peers stay isolated at the comm prefix layer", function()
-    local bus = CommBus.New()
+    local bus = CommBus.New({
+        names = { "Devsolo", "Releasesolo" },
+    })
     local devNode = bus:AddNode("Devsolo", {
         addonMetadata = metadata("2.0.0", "dev", "dev-solo"),
     })

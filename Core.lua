@@ -363,6 +363,8 @@ function Addon:OnPlayerLogin()
             self.Data:ScheduleSafeAutoClean({ maxMembersPerStep = 8 })
         end, 8)
     end
+    -- Keep one watchdog for pathological reload/login paths, but readiness comes
+    -- from PLAYER_LOGIN / PLAYER_ENTERING_WORLD / GUILD_ROSTER_UPDATE + index prep.
     self:ScheduleTimer("OnLoginReady", 10)
     self:RequestRefresh("login")
 end
@@ -405,9 +407,6 @@ function Addon:OnPlayerEnteringWorld(_event, isLogin, isReload)
     end
     if self.Sync and self.Sync.RefreshSyncReadyState then
         self.Sync:RefreshSyncReadyState("player-entering-world")
-    end
-    if not (isLogin or isReload) and self.Sync then
-        self.Sync:ScheduleHello("player-entering-world", 2)
     end
 end
 

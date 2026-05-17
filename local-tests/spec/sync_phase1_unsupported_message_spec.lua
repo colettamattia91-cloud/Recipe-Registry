@@ -109,14 +109,15 @@ Test.it("PLAYER_LOGIN and PLAYER_ENTERING_WORLD keep sync quiet until the full r
     wow.SetGuildRoster({
         { name = ownerKey, online = true, rankName = "Member", rankIndex = 5, level = 70, classDisplayName = "Mage", classFileName = "MAGE" },
     })
-    data:RebuildOnlineCache()
     addon.Sync.worldTransitionUntil = 0
+    addon:OnGuildRosterUpdate()
     data:PrepareSyncIndexNow("phase1-ready")
     addon.Sync:RefreshSyncReadyState("phase1-ready")
 
     Test.truthy(addon.Sync.syncReady, "syncReady should transition only after roster/index/world gates are satisfied")
     Test.truthy(addon.Sync._helloTimer ~= nil, "syncReady transition should schedule hello through the delayed path")
     Test.eq(countCommKind(wow, "HELLO"), 0, "syncReady transition should not broadcast hello inline")
+    Test.eq(addon.Sync.lastSyncReadyReason, "phase1-ready", "fixed watchdog timer should not be required for readiness correctness")
 end)
 
 Test.it("paused runtime blocks sync traffic while keeping local data accessible", function()

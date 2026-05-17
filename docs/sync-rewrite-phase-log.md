@@ -39,6 +39,7 @@ Active runtime shape:
 - progressive discovery retry (`20s +20s`, capped at `300s`, with jitter)
 - capped `inboundSeedSessions`
 - build-channel / wire compatibility preserved
+- passive-only `lastGlobalFingerprintAt` / `lastGlobalFingerprintReason` diagnostics
 
 ---
 
@@ -161,7 +162,7 @@ Completed for the supported rewrite path.
 - Added in-memory runtime sync index caching with block-scoped dirtiness.
 - Dirty block rebuilds update only affected blocks when possible.
 - The runtime keeps exactly one `globalFingerprint`.
-- `BuildLocalSummary()` is read-only from a sync lifecycle perspective.
+- `BuildLocalSummary()` is read-only from a sync lifecycle perspective and does not silently republish a dirty global fingerprint.
 - `BLOCK_PULL_DELAY_SECONDS = 1.0` paces sequential block pulls.
 - Post-sync, post-abort, post-scan, reset, and recovery HELLOs flow through delayed/coalesced scheduling.
 - Diagnostics and slash output now report sync-index/cache/runtime state instead of manifest/coordinator state.
@@ -325,12 +326,16 @@ Completed for the requested scope on 2026-05-17.
 ### Behavior implemented
 
 - Startup/readiness is now event-driven instead of driven by a fixed login/reload delay.
+- `ADDON_LOADED` / addon initialization establishes SavedVariables readiness; `PLAYER_LOGIN` establishes player readiness; `PLAYER_ENTERING_WORLD` drives world-transition gating; `GUILD_ROSTER_UPDATE` drives roster preflight.
 - `syncReady` gates all outbound sync protocol traffic.
 - Sync-index preparation is deferred/coalesced for readiness checks and startup recovery.
 - `SUMMARY_COLLECTION_WINDOW` is aligned to 6 seconds.
 - HELLO publication is delayed/coalesced and reused for sync-ready, local-change, pause-recovery, completion, abort, and reset flows.
 - Discovery retry now uses progressive backoff starting at 20 seconds and capping at 300 seconds.
 - Inbound seed sessions remain capped and are cleared on pause/world-transition safety boundaries.
+- Fixed timers remain watchdogs only; they are not the source of truth for startup readiness.
+- Dirty index state during an active outbound pull can continue the current block-to-block session, but it no longer counts as general `syncReady` and it cannot publish HELLO.
+- `AutoSyncTick` no longer bypasses discovery retry backoff with short-delay HELLO scheduling.
 
 ### Tests added or updated
 

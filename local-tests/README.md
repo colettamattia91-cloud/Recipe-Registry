@@ -91,9 +91,12 @@ Legacy sync compatibility is intentionally removed from the active runtime basel
 The active runtime baseline also assumes:
 
 - exactly one `globalFingerprint`;
+- passive-only `lastGlobalFingerprintAt` / `lastGlobalFingerprintReason` diagnostics;
 - event-driven `syncReady` gating for all sync network traffic;
 - deferred/coalesced sync-index preparation;
-- delayed/coalesced HELLO publication and discovery retry.
+- delayed/coalesced HELLO publication and discovery retry;
+- dirty active outbound pull sessions may continue block-to-block without republishing HELLO;
+- fixed startup timers are watchdogs only, not readiness source of truth.
 
 Historical specs that still target removed runtime concepts are not part of the active `all`, `quick`, or `sync` suites until they are either rewritten or formally archived elsewhere.
 

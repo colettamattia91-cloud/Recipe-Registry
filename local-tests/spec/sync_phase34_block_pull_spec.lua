@@ -309,10 +309,15 @@ Test.it("next block pull is scheduled after the internal delay once a block merg
     })
 
     local session = requester.addon.Sync.outboundSeedSession or {}
+    local state = requester.addon.Data:GetSyncIndexDebugState()
     Test.truthy(scheduled, "next block pull should enter the paced delay state")
     Test.eq(requester.addon.Sync._private.constants.BLOCK_PULL_DELAY_SECONDS, 1.0, "internal block pull delay constant")
     Test.truthy(type(session.nextBlockReadyAt) == "number" and session.nextBlockReadyAt > time(), "next block ready timestamp")
+    Test.truthy(state.globalFingerprintDirty, "block merge should dirty the global fingerprint while the pull session is still active")
     Test.eq(countSentKind(requester.state.sentComm, "BLOCK_PULL_REQUEST"), 1, "second block pull should not be sent inline with the merge")
+    local helloBefore = countSentKind(requester.state.sentComm, "HELLO")
+    Test.falsy(requester.addon.Sync:BroadcastHello(), "dirty active pull should refuse HELLO publication")
+    Test.eq(countSentKind(requester.state.sentComm, "HELLO"), helloBefore, "dirty active pull should not emit HELLO while the session is active")
 
     local completed = bus:RunUntil(function()
         local currentSession = requester.addon.Sync.outboundSeedSession
@@ -368,6 +373,7 @@ Test.it("session completion refreshes the merged fingerprint and schedules a del
         recipeCount = 1,
         baseRecipe = 15000,
     })
+    refreshSyncNode(requester, "publish-baseline")
     local baseline = requester.addon.Data:BuildLocalSummary({
         reason = "publish-baseline",
     }).globalFingerprint
@@ -409,6 +415,7 @@ Test.it("session timeout abort keeps partial merged progress and schedules a del
         professionSourceType = "owner",
         reason = "baseline",
     })
+    data:PrepareSyncIndexNow("baseline-summary")
     local publishedBefore = data:BuildLocalSummary({
         reason = "baseline-summary",
     }).globalFingerprint
@@ -418,9 +425,9 @@ Test.it("session timeout abort keeps partial merged progress and schedules a del
         professionSourceType = "owner",
         reason = "changed-before-timeout",
     })
-    local liveFingerprint = data:GetLiveSyncIndex({
+    local liveFingerprint = data:BuildGlobalFingerprint(data:GetLiveSyncIndex({
         reason = "live-before-timeout",
-    }).globalFingerprint
+    }))
     addon.Sync.outboundSeedSession = {
         state = "waiting-index-diff",
         seedKey = "Timeoutpeer-TestRealm",
@@ -454,6 +461,7 @@ Test.it("abort before any successful pull does not publish a new fingerprint", f
         professionSourceType = "owner",
         reason = "abort-baseline",
     })
+    data:PrepareSyncIndexNow("abort-baseline-publish")
     local publishedBefore = data:BuildLocalSummary({
         reason = "abort-baseline-publish",
     }).globalFingerprint

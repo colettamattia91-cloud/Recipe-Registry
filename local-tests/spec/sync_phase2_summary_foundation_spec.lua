@@ -114,6 +114,7 @@ Test.it("DataIndex fingerprints ignore non-content metadata fields", function()
 
     local blockKey = data:BuildSyncBlockKey(ownerKey, "Alchemy")
     local blockFingerprintA = data:BuildBlockFingerprint(blockKey)
+    data:PrepareSyncIndexNow("fingerprint-a")
     local globalFingerprintA = data:BuildLocalSummary({
         reason = "fingerprint-a",
     }).globalFingerprint
@@ -133,6 +134,7 @@ Test.it("DataIndex fingerprints ignore non-content metadata fields", function()
     data:MarkSyncIndexDirty("metadata-only-change")
 
     local blockFingerprintB = data:BuildBlockFingerprint(blockKey)
+    data:PrepareSyncIndexNow("fingerprint-b")
     local globalFingerprintB = data:BuildLocalSummary({
         reason = "fingerprint-b",
     }).globalFingerprint
@@ -218,9 +220,7 @@ Test.it("runtime sync index cache reuses hits and rebuilds only dirty blocks", f
         reason = "cache-tailoring",
     })
 
-    data:BuildLocalSummary({
-        reason = "cache-first-build",
-    })
+    data:PrepareSyncIndexNow("cache-first-build")
     local first = data:GetSyncIndexDebugState()
 
     data:BuildLocalSummary({
@@ -235,15 +235,17 @@ Test.it("runtime sync index cache reuses hits and rebuilds only dirty blocks", f
     entry.professions.Alchemy.signature = "4101:4102:4103"
     data:MarkSyncIndexDirty("cache-alchemy-dirty", alchemyBlockKey)
     local dirtyCount = data._syncIndexCache and data._syncIndexCache.dirtyBlockCount or 0
-    data:BuildLocalSummary({
+    local dirtySummary = data:BuildLocalSummary({
         reason = "cache-dirty-build",
     })
+    data:PrepareSyncIndexNow("cache-dirty-build")
     local third = data:GetSyncIndexDebugState()
 
     Test.eq(first.cache.stats.fullRebuild or 0, 1, "first build should perform one full rebuild")
     Test.eq(second.cache.stats.fullRebuild or 0, 1, "second build should reuse the existing cache")
     Test.truthy((second.cache.stats.hits or 0) >= 1, "second build should record a cache hit")
     Test.eq(dirtyCount, 1, "one local profession change should dirty exactly one block")
+    Test.eq(dirtySummary.indexStatus, "dirty", "dirty local changes should not silently republish the global fingerprint")
     Test.eq(third.cache.stats.fullRebuild or 0, 1, "dirty block rebuild should avoid another full rebuild")
     Test.truthy((third.cache.stats.blockRebuilt or 0) >= 1, "dirty block rebuild should update the affected block")
     Test.falsy(third.globalFingerprintDirty, "rebuilding the dirty block should leave one valid global fingerprint")
@@ -263,6 +265,7 @@ Test.it("BuildLocalSummary keeps one global fingerprint without creating publish
         professionSourceType = "owner",
         reason = "summary-no-publish",
     })
+    data:PrepareSyncIndexNow("summary-without-publish")
 
     local summary = data:BuildLocalSummary({
         reason = "summary-without-publish",
@@ -299,6 +302,31 @@ Test.it("ScheduleHello coalesces multiple local-change reasons into one delayed 
     Loader.Wow.RunTimers(10)
 
     Test.eq(countWowKind(wow, "HELLO"), 1, "coalesced scheduling should emit one hello when the timer fires")
+end)
+
+Test.it("dirty local index blocks direct HELLO publication and reschedules instead", function()
+    local addon, wow, data = freshAddon()
+    primeSyncReady(addon, wow, data, "phase2-hello-dirty")
+    local ownerKey = data:GetPlayerKey()
+    seedProfession(data, ownerKey, "Alchemy", { 4451, 4452 }, {
+        sourceType = "owner",
+        professionSourceType = "owner",
+        reason = "hello-dirty-seed",
+    })
+    data:PrepareSyncIndexNow("hello-dirty-seed")
+    addon.Sync:RefreshSyncReadyState("hello-dirty-seed")
+
+    local entry = data:GetMember(ownerKey)
+    entry.professions.Alchemy.recipes[4453] = true
+    data:NormalizeMemberEntry(entry, ownerKey)
+    data:MarkSyncIndexDirty("hello-dirty-change", data:BuildSyncBlockKey(ownerKey, "Alchemy"))
+    addon.Sync:RefreshSyncReadyState("hello-dirty-change")
+
+    local sent = addon.Sync:BroadcastHello()
+
+    Test.falsy(sent, "dirty index should block direct hello publication")
+    Test.eq(countWowKind(wow, "HELLO"), 0, "dirty index should not emit HELLO")
+    Test.truthy(addon.Sync._helloTimer ~= nil, "dirty hello publish attempt should reschedule through ScheduleHello")
 end)
 
 Test.it("summary collection window matches the modern 6 second discovery window", function()
@@ -361,6 +389,36 @@ Test.it("discovery miss schedules a progressive retry instead of starting a pull
     Test.truthy(type(addon.Sync._helloScheduledFor) == "number", "retry hello should record a scheduled fire time")
     Test.eq(addon.Sync.telemetry.lastDiscoveryRetryDelay, 20, "first discovery retry should start from the 20 second base delay")
     Test.eq(addon.Sync.outboundSeedSession, nil, "discovery miss should not start an outbound pull session")
+end)
+
+Test.it("auto sync watchdog respects discovery retry backoff instead of scheduling short inline HELLOs", function()
+    local addon, wow, data = freshAddon()
+    primeSyncReady(addon, wow, data, "phase2-auto-watchdog")
+    local ownerKey = data:GetPlayerKey()
+    seedProfession(data, ownerKey, "Alchemy", { 5601, 5602 }, {
+        reason = "auto-watchdog-local",
+    })
+    data:PrepareSyncIndexNow("auto-watchdog-local")
+    addon.Sync:RefreshSyncReadyState("auto-watchdog-local")
+
+    addon.Sync:BroadcastHello()
+    wow.AdvanceTime(6)
+    wow.RunTimers(20)
+
+    local missesBeforeWatchdog = addon.Sync.telemetry.discoveryMisses or 0
+    local helloCountBeforeWatchdog = countWowKind(wow, "HELLO")
+    Test.truthy(missesBeforeWatchdog >= 1, "setup should record at least one discovery miss")
+    Test.truthy(addon.Sync._helloTimer ~= nil, "discovery retry should already be pending")
+
+    addon.Sync:CancelTimer(addon.Sync._helloTimer, true)
+    addon.Sync._helloTimer = nil
+    addon.Sync._helloScheduledFor = nil
+    addon.Sync.lastHelloAt = time()
+    addon.Sync:AutoSyncTick()
+
+    Test.eq(countWowKind(wow, "HELLO"), helloCountBeforeWatchdog, "watchdog should not emit an extra immediate hello")
+    Test.eq(addon.Sync._helloTimer, nil, "watchdog should not bypass the retry backoff before it expires")
+    Test.truthy((addon.Sync.telemetry.discoveryMisses or 0) >= missesBeforeWatchdog, "watchdog should not roll discovery miss telemetry backward")
 end)
 
 Test.it("HELLO triggers SUMMARY only when both peers are ready and fingerprints differ", function()

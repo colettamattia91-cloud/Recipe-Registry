@@ -21,7 +21,9 @@ HELLO
 → immediate additive merge per block
 → immediate local block fingerprint recompute
 → global fingerprint marked dirty
-→ single globalFingerprint recomputed when needed and refreshed at outbound completion or abort
+→ single globalFingerprint recomputed only through explicit lifecycle refresh points
+→ dirty index may continue one active outbound pull session but cannot publish HELLO
+→ single globalFingerprint refreshed at outbound completion, partial-abort, or HELLO send-time validation
 → delayed/coalesced HELLO scheduling after readiness or sync-state changes
 → progressive HELLO discovery retry when no useful seed is found
 ```
@@ -410,6 +412,8 @@ Rules:
 
 The runtime keeps one `globalFingerprint` value plus dirty/cache state. HELLO is the publication mechanism; it carries the current `globalFingerprint` at send time.
 
+Passive diagnostics such as `lastGlobalFingerprintAt` or `lastGlobalFingerprintReason` are allowed only for debug output and tests. They must not affect readiness, routing, retry, merge, equality, or seed selection.
+
 ---
 
 ## 9. Timeout, reset, and cycle completion
@@ -442,7 +446,7 @@ DISCOVERY_RETRY = 20s +20s per miss, capped at 300s, with jitter
 
 ## 10. Startup readiness
 
-Network sync readiness is event-driven, not driven by a fixed login/reload timer.
+Network sync readiness is event-driven, not driven by a fixed login/reload timer. In this addon lifecycle, SavedVariables readiness is established from addon initialization, player readiness from `PLAYER_LOGIN`, and world-transition gating from `PLAYER_ENTERING_WORLD`; fixed timers remain watchdogs only.
 
 `syncReady` becomes true only when all of the following are satisfied:
 
@@ -455,6 +459,8 @@ Network sync readiness is event-driven, not driven by a fixed login/reload timer
 - runtime pressure is below the sync saturation gate.
 
 When `syncReady` transitions from false to true, schedule one delayed/coalesced HELLO through the common scheduling path. Do not broadcast HELLO inline from login, reload, world entry, local scan, sync completion, sync abort, or reset handlers.
+
+During an active outbound pull session, a dirty index may remain usable only for continuing the already-selected seed session from block `N` to block `N+1`. That dirty state must not count as general `syncReady`, must not publish HELLO, and must not start unrelated seed selection or inbound seed service.
 
 ---
 

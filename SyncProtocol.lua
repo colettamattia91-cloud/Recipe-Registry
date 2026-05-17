@@ -64,6 +64,9 @@ function Sync:BroadcastHello()
         if self.RefreshSyncReadyState then
             self:RefreshSyncReadyState("hello-not-ready")
         end
+        if self.ScheduleHello then
+            self:ScheduleHello("deferred:hello-not-ready")
+        end
         return false
     end
     local cycle = self.BeginHelloCycle and self:BeginHelloCycle(self._pendingHelloCycleReason or "hello") or nil

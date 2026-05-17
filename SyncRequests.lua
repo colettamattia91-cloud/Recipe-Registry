@@ -284,15 +284,17 @@ function Sync:ProcessRequestQueue()
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic() then
         return
     end
-    if self.syncReady ~= true then
-        return
-    end
 
     local session = self.outboundSeedSession
     if type(session) ~= "table" then
         return
     end
     if session.state == "completed" or session.state == "aborted" then
+        return
+    end
+
+    local allowActivePullAdvance = self.CanAdvanceOutboundPullSession and self:CanAdvanceOutboundPullSession() or false
+    if self.syncReady ~= true and not allowActivePullAdvance then
         return
     end
 
@@ -306,6 +308,9 @@ function Sync:ProcessRequestQueue()
     end
 
     if session.state == "seed-selected" then
+        if self.syncReady ~= true then
+            return
+        end
         self:RequestIndexDiff(session.seedKey)
         return
     end

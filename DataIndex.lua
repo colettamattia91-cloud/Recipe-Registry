@@ -303,15 +303,16 @@ local function syncTelemetryStats(cache)
 end
 
 local function buildSummaryFromCache(cache, rosterState, builtAt)
+    local dirty = cache.dirtyAll == true
+        or (cache.dirtyBlockCount or 0) > 0
+        or cache.globalFingerprintDirty == true
     local ready = cache.ready == true
         and rosterState
         and rosterState.trusted == true
-        and cache.dirtyAll ~= true
-        and (cache.dirtyBlockCount or 0) == 0
-        and cache.globalFingerprintDirty ~= true
+        and not dirty
     local indexStatus = ready and "ready"
         or (rosterState and rosterState.trusted ~= true and tostring(rosterState.reason or "not-ready"))
-        or "not-ready"
+        or (dirty and "dirty" or "not-ready")
 
     return {
         syncModel = SYNC_MODEL,
@@ -484,7 +485,7 @@ local function ensureLiveIndex(self, reason, opts)
     local rosterState = buildRosterState(self, reason or "sync-index")
     local nextRosterSignature = rosterSignature(rosterState)
 
-    local hasCache = cache.builtAt > 0 and next(cache.blocks or {}) ~= nil or cache.ready == false and cache.rosterSignature ~= nil
+    local hasCache = (cache.builtAt or 0) > 0 and cache.rosterSignature ~= nil
     local needsFullRebuild = not hasCache or cache.dirtyAll or cache.rosterSignature ~= nextRosterSignature
     if needsFullRebuild and opts.allowDeferred == true and shouldDeferFullRebuild(reason or "sync-index") then
         cache.ready = false
@@ -522,7 +523,7 @@ local function ensureLiveIndex(self, reason, opts)
 
     cache.rosterSignature = nextRosterSignature
     cache.builtAt = time()
-    if cache.globalFingerprintDirty then
+    if cache.globalFingerprintDirty and opts.recomputeGlobalFingerprint == true then
         rebuildGlobalFingerprint(state, cache, reason or "live-index")
     end
     syncTelemetryStats(cache)
@@ -649,8 +650,13 @@ function Data:ScheduleSyncIndexPrepare(reason, delay)
 end
 
 function Data:PrepareSyncIndexNow(reason)
+    local activePull = Addon.Sync
+        and Addon.Sync.HasActiveOutboundSeedSession
+        and Addon.Sync:HasActiveOutboundSeedSession()
+        or false
     local state, cache, summary = ensureLiveIndex(self, reason or "sync-index-prepare", {
         allowDeferred = false,
+        recomputeGlobalFingerprint = not activePull,
     })
     if Addon.Sync and Addon.Sync.RefreshSyncReadyState then
         Addon.Sync:RefreshSyncReadyState(reason or "sync-index-prepare")
@@ -781,6 +787,7 @@ function Data:BuildLocalSummary(opts)
     local state, _, summary = ensureLiveIndex(self, opts.reason or "summary", {
         allowDeferred = opts.allowDeferred == true,
         prepareDelay = opts.prepareDelay,
+        recomputeGlobalFingerprint = opts.recomputeGlobalFingerprint == true,
     })
 
     local out = {
@@ -806,6 +813,7 @@ end
 function Data:RefreshGlobalFingerprint(reason)
     local _, _, summary = ensureLiveIndex(self, reason or "global-fingerprint", {
         allowDeferred = false,
+        recomputeGlobalFingerprint = true,
     })
     return summary and summary.globalFingerprint or nil
 end
@@ -820,6 +828,7 @@ function Data:GetLiveSyncIndex(opts)
     local _, _, summary = ensureLiveIndex(self, opts and opts.reason or "live-index", {
         allowDeferred = opts and opts.allowDeferred == true or false,
         prepareDelay = opts and opts.prepareDelay or nil,
+        recomputeGlobalFingerprint = opts and opts.recomputeGlobalFingerprint == true or false,
     })
     return {
         syncModel = summary.syncModel,

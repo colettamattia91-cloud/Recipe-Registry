@@ -258,6 +258,15 @@ function Sync:ResetDiscoveryRetry(reason)
     return true
 end
 
+function Sync:HasActiveOutboundSeedSession()
+    local session = self.outboundSeedSession
+    if type(session) ~= "table" then
+        return false
+    end
+    local state = tostring(session.state or "")
+    return state ~= "" and state ~= "completed" and state ~= "aborted"
+end
+
 function Sync:GetNextDiscoveryRetryDelay()
     local delay = tonumber(self.discoveryRetryDelay or DISCOVERY_RETRY_INITIAL_SECONDS) or DISCOVERY_RETRY_INITIAL_SECONDS
     if delay < DISCOVERY_RETRY_INITIAL_SECONDS then
@@ -301,28 +310,30 @@ function Sync:RefreshSyncReadyState(reason)
     if not self.telemetry then
         self.telemetry = newSyncTelemetry()
     end
+    local sessionActive = self:HasActiveOutboundSeedSession()
     local rosterState = Addon.Data and Addon.Data.GetRosterTrustState and Addon.Data:GetRosterTrustState() or nil
     self.rosterPreflightReady = type(rosterState) == "table" and rosterState.trusted == true or false
     self.rosterPreflightReason = type(rosterState) == "table" and tostring(rosterState.reason or "unknown") or "unavailable"
 
     local indexState = Addon.Data and Addon.Data.GetSyncIndexReadiness and Addon.Data:GetSyncIndexReadiness({
         reason = reason or "sync-ready",
-        schedule = true,
+        schedule = not sessionActive,
         delay = 0.5,
     }) or nil
-    local session = self.outboundSeedSession
-    local sessionActive = type(session) == "table"
-        and session.state
-        and session.state ~= "completed"
-        and session.state ~= "aborted"
-    self.indexReady = type(indexState) == "table"
-        and (indexState.ready == true or (sessionActive and indexState.indexStatus == "dirty"))
-        or false
+    self.indexReady = type(indexState) == "table" and indexState.ready == true or false
     self.indexStatus = type(indexState) == "table" and tostring(indexState.indexStatus or "unknown") or "missing"
 
     local paused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("HELLO") or false
     local saturated = self:EstimateRuntimeQueuePressure() >= 95
     local worldReady = not self:IsInWarmup() and not self:IsInWorldTransition()
+    self.indexUsableForActivePull = sessionActive
+        and self.savedVariablesReady == true
+        and self.playerReady == true
+        and worldReady
+        and self.rosterPreflightReady == true
+        and self.indexStatus == "dirty"
+        and not paused
+        and not saturated
     local nextReady = self.savedVariablesReady == true
         and self.playerReady == true
         and worldReady
@@ -370,12 +381,19 @@ function Sync:IsSyncReady()
     return self.syncReady == true
 end
 
+function Sync:CanAdvanceOutboundPullSession()
+    return self.indexUsableForActivePull == true and self:HasActiveOutboundSeedSession()
+end
+
 function Sync:CanRunSyncProtocol(kind)
     self:RefreshSyncReadyState("protocol:" .. tostring(kind or "sync"))
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic(kind) then
         return false, "paused"
     end
     if self.syncReady ~= true then
+        if kind == "BLOCK_PULL_REQUEST" and self:CanAdvanceOutboundPullSession() then
+            return true, "active-pull-dirty-index"
+        end
         return false, self.lastSyncNotReadyReason or "not-ready"
     end
     return true, "ready"
@@ -1434,14 +1452,30 @@ function Sync:AutoSyncTick()
     if self.syncReady ~= true then
         return
     end
-    if countKeys(self.onlineNodes) == 0 then
-        if (time() - (self.lastHelloAt or 0)) > 10 then
-            self:ScheduleHello("hello-auto-empty", 0.5)
+    if self._helloTimer or self:HasActiveOutboundSeedSession() then
+        return
+    end
+    local cycle = self.activeHelloCycle
+    if type(cycle) == "table" and (cycle.selectionCompletedAt or 0) <= 0 then
+        return
+    end
+
+    local sinceLastHello = time() - (self.lastHelloAt or 0)
+    if (self.discoveryRetryMisses or 0) > 0 then
+        if sinceLastHello >= self:GetNextDiscoveryRetryDelay() then
+            self:ScheduleDiscoveryRetry("hello-auto-watchdog")
         end
         return
     end
-    if (time() - (self.lastHelloAt or 0)) > HELLO_INTERVAL then
-        self:ScheduleHello("hello-auto-interval", 0.5)
+
+    if countKeys(self.onlineNodes) == 0 then
+        if sinceLastHello >= HELLO_INTERVAL then
+            self:ScheduleHello("hello-auto-empty")
+        end
+        return
+    end
+    if sinceLastHello >= HELLO_INTERVAL then
+        self:ScheduleHello("hello-auto-interval")
     end
 end
 
