@@ -118,6 +118,16 @@ function Loader.PrimeSyncReady(addon, opts)
     if addon.Sync and addon.Sync.SetPlayerReady then
         addon.Sync:SetPlayerReady(opts.reason or "test-prime")
     end
+    if addon.Data and addon.Data.RequestRosterSnapshot then
+        addon.Data:RequestRosterSnapshot(opts.reason or "test-prime", {
+            source = "test-prime",
+        })
+        addon.Data:ProcessPendingRosterSnapshot(opts.reason or "test-prime", {
+            force = true,
+            allowFallback = true,
+            source = "test-prime",
+        })
+    end
     if addon.Data and addon.Data.RebuildOnlineCache then
         addon.Data:RebuildOnlineCache()
     end

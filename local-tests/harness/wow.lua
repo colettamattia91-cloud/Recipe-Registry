@@ -496,6 +496,17 @@ local function normalizeRosterEntry(entry)
     return entry or {}
 end
 
+local function normalizeLastOnlineValue(row, key, legacyKey)
+    local value = row[key]
+    if value == nil and legacyKey then
+        value = row[legacyKey]
+    end
+    if value == nil and realType(row.lastOnline) == "table" then
+        value = row.lastOnline[key]
+    end
+    return value
+end
+
 local function installWowGlobals()
     _G.DEFAULT_CHAT_FRAME = {
         AddMessage = function(_, message)
@@ -561,6 +572,17 @@ local function installWowGlobals()
             row.online,
             row.status,
             row.classFileName
+    end
+    _G.GetGuildRosterLastOnline = function(index)
+        if state.guildRosterLastOnlineAvailable == false then
+            return nil
+        end
+        local row = normalizeRosterEntry(state.guildRoster[index])
+        if not row then return nil end
+        return normalizeLastOnlineValue(row, "yearsOffline", "years"),
+            normalizeLastOnlineValue(row, "monthsOffline", "months"),
+            normalizeLastOnlineValue(row, "daysOffline", "days"),
+            normalizeLastOnlineValue(row, "hoursOffline", "hours")
     end
 
     _G.GetNumSkillLines = function()
@@ -717,6 +739,7 @@ function Wow.Reset(opts)
         instanceType = "none",
         guildRosterRequested = 0,
         guildRoster = {},
+        guildRosterLastOnlineAvailable = true,
         skillLines = {},
         items = {},
         spells = {},
@@ -812,6 +835,10 @@ end
 
 function Wow.SetGuildRoster(rows)
     state.guildRoster = deepcopy(rows or {})
+end
+
+function Wow.SetGuildRosterLastOnlineAvailable(value)
+    state.guildRosterLastOnlineAvailable = value ~= false
 end
 
 function Wow.SetCombat(value)

@@ -401,14 +401,11 @@ function Addon:OnPlayerEnteringWorld(_event, isLogin, isReload)
         )
     end
 
-    if self.Data and self.Data.RequestGuildRosterRefresh then
-        local requested = self.Data:RequestGuildRosterRefresh("player-entering-world", {
-            force = isLogin or isReload,
-            cooldown = (isLogin or isReload) and 0 or 4,
+    if (isLogin or isReload) and self.Data and self.Data.RequestRosterSnapshot then
+        self.Data:RequestRosterSnapshot(isReload and "reload" or "login", {
+            cooldown = 0,
+            source = "player-entering-world",
         })
-        if not requested and self.Sync and self.Sync.telemetry then
-            self.Sync.telemetry.transitionSkippedRosterRefresh = (self.Sync.telemetry.transitionSkippedRosterRefresh or 0) + 1
-        end
     end
 
     if self.Data and self.Data.ScheduleSyncIndexPrepare then
@@ -420,11 +417,11 @@ function Addon:OnPlayerEnteringWorld(_event, isLogin, isReload)
 end
 
 function Addon:OnLoginReady()
+    if self.Sync and self.Sync.OnRosterPreflightWatchdog then
+        self.Sync:OnRosterPreflightWatchdog("login-watchdog")
+    end
     if self.Sync and self.Sync.RefreshSyncReadyState then
         self.Sync:RefreshSyncReadyState("login-watchdog")
-    end
-    if self.Data and self.Data.ScheduleSyncIndexPrepare then
-        self.Data:ScheduleSyncIndexPrepare("login-watchdog", 0.5)
     end
 end
 

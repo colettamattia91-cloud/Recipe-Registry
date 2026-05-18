@@ -920,69 +920,84 @@ function Sync:GetPeerEligibilityBreakdown()
     }
 end
 
-function Sync:OnGuildRosterUpdate(context)
-    context = type(context) == "table" and context or {}
-    local reason = tostring(context.reason or "roster-update")
-    local plan = Addon.Data and Addon.Data.GetRosterSyncUpdatePlan and Addon.Data:GetRosterSyncUpdatePlan({
-        reason = reason,
-        presenceOnly = context.presenceOnly == true,
-        heavyUpdate = context.heavyUpdate == true,
-        delta = context.delta,
-    }) or nil
-
+local function applyRosterSnapshotOutcome(self, outcome)
+    outcome = type(outcome) == "table" and outcome or {}
     local telemetry = self.telemetry or {}
-    if plan then
-        telemetry.rosterKnownOwnersChecked = (telemetry.rosterKnownOwnersChecked or 0) + (plan.knownOwnersChecked or 0)
-        telemetry.rosterUnknownMembersIgnored = (telemetry.rosterUnknownMembersIgnored or 0) + (plan.unknownMembersIgnored or 0)
-        telemetry.lastRosterSyncSignature = plan.currentSignature
-    end
 
-    self:RefreshSyncReadyState(reason)
+    telemetry.rosterKnownOwnersChecked = (telemetry.rosterKnownOwnersChecked or 0) + (outcome.knownOwnersChecked or 0)
+    telemetry.rosterUnknownMembersIgnored = (telemetry.rosterUnknownMembersIgnored or 0) + (outcome.unknownMembersIgnored or 0)
 
-    if Addon.Data and Addon.Data.MaybeRunTrustedRosterCleanup and plan and plan.rosterState and plan.rosterState.trusted == true then
-        local cleanupStarted = Addon.Data:MaybeRunTrustedRosterCleanup("trusted-roster-cleanup", {
-            rosterState = plan.rosterState,
-            memberKeys = plan.knownOwnerKeys,
-        })
-        if cleanupStarted then
-            telemetry.lastRosterSyncRelevantReason = "trusted-roster-cleanup"
-        end
-    end
-
-    if not plan or plan.syncRelevant ~= true then
-        telemetry.rosterSyncNoopUpdates = (telemetry.rosterSyncNoopUpdates or 0) + 1
-        telemetry.rosterUpdateIgnoredForSync = (telemetry.rosterUpdateIgnoredForSync or 0) + 1
+    if not outcome.knownOwnerEligibilityChanged then
         return false
     end
 
-    telemetry.rosterSyncRelevantUpdates = (telemetry.rosterSyncRelevantUpdates or 0) + 1
-    telemetry.lastRosterSyncRelevantReason = plan.reason
-
     local dirtied = false
-    if plan.knownOwnerEligibilityChanged and #((plan and plan.affectedBlockKeys) or {}) > 0 and Addon.Data and Addon.Data.MarkSyncIndexDirty then
-        for index = 1, #(plan.affectedBlockKeys or {}) do
-            Addon.Data:MarkSyncIndexDirty(plan.reason, plan.affectedBlockKeys[index])
-        end
-        dirtied = true
-    elseif plan.knownOwnerEligibilityChanged and plan.fullDirty and Addon.Data and Addon.Data.MarkSyncIndexDirty then
-        Addon.Data:MarkSyncIndexDirty(plan.reason, nil, {
+    if outcome.fullDirty and Addon.Data and Addon.Data.MarkSyncIndexDirty then
+        Addon.Data:MarkSyncIndexDirty("known-owner-eligibility-change", nil, {
             full = true,
         })
         dirtied = true
     else
-        telemetry.rosterIndexDirtySkipped = (telemetry.rosterIndexDirtySkipped or 0) + 1
+        dirtied = #((outcome and outcome.affectedBlockKeys) or {}) > 0
     end
 
     if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then
-        Addon.Data:ScheduleSyncIndexPrepare(plan.reason, 0.5)
+        Addon.Data:ScheduleSyncIndexPrepare("known-owner-eligibility-change", 0.5)
     end
     if dirtied then
-        self:ResetDiscoveryRetry(plan.reason)
-        self:ScheduleHello(plan.reason)
-    elseif plan.trustedReadyTransition then
-        self:ResetDiscoveryRetry(plan.reason)
-        self:ScheduleHello(plan.reason)
+        self:ResetDiscoveryRetry("known-owner-eligibility-change")
+        self:ScheduleHello("known-owner-eligibility-change")
     end
+    return dirtied
+end
+
+function Sync:OnRosterPreflightWatchdog(reason)
+    local rosterPending = Addon.Data and Addon.Data.IsRosterSnapshotPending and Addon.Data:IsRosterSnapshotPending() or false
+    if not rosterPending then
+        return false, "not-pending"
+    end
+
+    local ok, status, outcome = Addon.Data:ProcessPendingRosterSnapshot(reason or "login-watchdog", {
+        allowFallback = true,
+        source = "watchdog",
+    })
+    if not ok then
+        return false, status or "failed"
+    end
+
+    applyRosterSnapshotOutcome(self, outcome)
+    self:RefreshSyncReadyState(reason or "login-watchdog")
+    return true, status or "processed"
+end
+
+function Sync:OnGuildRosterUpdate(context)
+    context = type(context) == "table" and context or {}
+    local reason = tostring(context.reason or "roster-update")
+    local telemetry = self.telemetry or {}
+    local rosterPending = Addon.Data and Addon.Data.IsRosterSnapshotPending and Addon.Data:IsRosterSnapshotPending() or false
+
+    if not rosterPending then
+        telemetry.rosterSyncNoopUpdates = (telemetry.rosterSyncNoopUpdates or 0) + 1
+        telemetry.rosterUpdateIgnoredForSync = (telemetry.rosterUpdateIgnoredForSync or 0) + 1
+        Addon:Trace("sync", "roster-update-ignored reason=not-pending")
+        return false
+    end
+
+    local ok, status, outcome = Addon.Data:ProcessPendingRosterSnapshot(reason, {
+        allowFallback = false,
+        source = "event",
+    })
+    if not ok then
+        if status == "not-usable" then
+            telemetry.rosterUpdateIgnoredForSync = (telemetry.rosterUpdateIgnoredForSync or 0) + 1
+        end
+        return false
+    end
+
+    telemetry.rosterSyncRelevantUpdates = (telemetry.rosterSyncRelevantUpdates or 0) + 1
+    telemetry.lastRosterSyncRelevantReason = outcome and outcome.reason or reason
+    applyRosterSnapshotOutcome(self, outcome)
+    self:RefreshSyncReadyState(reason)
     return true
 end
 

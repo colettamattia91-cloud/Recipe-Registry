@@ -122,52 +122,19 @@ local function getSyncWarmupReason()
 end
 
 local function buildRosterState(self, reason)
-    local snapshot = nil
-    local snapshotCount = 0
-    local knownActive = 0
-    local trusted = false
-    local rosterReason = "unavailable"
-
-    local transitionReason = getSyncWarmupReason()
-    if transitionReason then
-        rosterReason = transitionReason
-    elseif type(IsInGuild) == "function" and not IsInGuild() then
-        trusted = true
-        rosterReason = "not-in-guild"
-    elseif self.NeedsGuildRosterRefresh and self:NeedsGuildRosterRefresh(getRosterFreshnessMaxAge()) then
-        rosterReason = "roster-stale"
-        if self.RequestGuildRosterRefresh then
-            self:RequestGuildRosterRefresh(reason or "sync-index", {
-                cooldown = getRosterFreshnessMaxAge(),
-            })
-        end
-    else
-        local lifecycle = Addon.GuildLifecycleMaintenance
-        if lifecycle and lifecycle.BuildGuildRosterSnapshot and lifecycle.ValidateRosterSnapshot then
-            snapshot, snapshotCount = lifecycle:BuildGuildRosterSnapshot()
-            local memberKeys = self:GetSortedMemberKeys(true)
-            local valid, validateReason, finalSnapshotCount, finalKnownActive =
-                lifecycle:ValidateRosterSnapshot(snapshot, snapshotCount, memberKeys, {})
-            snapshotCount = finalSnapshotCount or snapshotCount or 0
-            knownActive = finalKnownActive or 0
-            if valid then
-                trusted = true
-                rosterReason = "trusted"
-            else
-                rosterReason = validateReason or "roster-untrusted"
-            end
-        else
-            trusted = true
-            rosterReason = "trusted-no-lifecycle"
-        end
+    local state = self.GetRosterPreflightState and self:GetRosterPreflightState() or nil
+    if type(state) == "table" then
+        state.reason = tostring(state.reason or reason or "roster")
+        return state
     end
-
     return {
-        trusted = trusted,
-        reason = rosterReason,
-        snapshot = snapshot,
-        snapshotCount = snapshotCount or 0,
-        knownActive = knownActive or 0,
+        trusted = false,
+        reason = tostring(reason or "unavailable"),
+        snapshot = nil,
+        snapshotCount = 0,
+        knownActive = 0,
+        knownOwnersChecked = 0,
+        changedOwners = 0,
         evaluatedAt = time(),
     }
 end
@@ -178,7 +145,7 @@ local function buildSyncRelevantRosterView(self, rosterState, knownOwnerKeys)
     local parts = {
         tostring(rosterState and rosterState.trusted == true),
     }
-    local guildCount = countKeys(self._guildMetaCache or {})
+    local guildCount = tonumber(rosterState and rosterState.snapshotCount or 0) or 0
     for _, memberKey in ipairs(knownOwnerKeys or {}) do
         local entry = self:GetMember(memberKey)
         local inRoster = rosterState and type(rosterState.snapshot) == "table" and rosterState.snapshot[memberKey] == true or false

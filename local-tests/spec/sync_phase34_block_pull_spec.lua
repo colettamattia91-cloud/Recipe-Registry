@@ -51,6 +51,12 @@ local function refreshSyncNode(node, reason)
     if not addon then
         return
     end
+    if node and node.state then
+        Loader.Wow.UseState(node.state)
+        _G.RecipeRegistry = addon
+        _G.RecipeRegistryDB = addon.db
+        _G.RecipeRegistryCharDB = addon.charDB
+    end
     if addon.Data and addon.Data.PrepareSyncIndexNow then
         addon.Data:PrepareSyncIndexNow(reason or "phase34-refresh")
     end
@@ -104,8 +110,11 @@ Test.it("selected seed exchanges INDEX_DIFF and sequential BLOCK_PULL/BLOCK_SNAP
         baseRecipe = 4000,
     })
 
+    bus:Activate(requester)
     requester.addon.Data:MarkSyncIndexDirty("requester-start")
+    bus:Activate(seed)
     seed.addon.Data:MarkSyncIndexDirty("seed-start")
+    bus:Activate(smaller)
     smaller.addon.Data:MarkSyncIndexDirty("smaller-start")
     refreshSyncNode(requester, "requester-start")
     refreshSyncNode(seed, "seed-start")
@@ -212,7 +221,9 @@ Test.it("INDEX_DIFF_REQUEST and BLOCK_PULL_REQUEST stay minimal on the wire", fu
         recipeCount = 3,
         baseRecipe = 7100,
     })
+    bus:Activate(requester)
     requester.addon.Data:MarkSyncIndexDirty("minimal-requester")
+    bus:Activate(seed)
     seed.addon.Data:MarkSyncIndexDirty("minimal-seed")
     refreshSyncNode(requester, "minimal-requester")
     refreshSyncNode(seed, "minimal-seed")
@@ -291,7 +302,9 @@ Test.it("next block pull is scheduled after the internal delay once a block merg
         reason = "pacing-tailoring",
     })
     refreshSyncNode(seed, "pacing-tailoring")
+    bus:Activate(requester)
     requester.addon.Data:MarkSyncIndexDirty("pacing-requester")
+    bus:Activate(seed)
     seed.addon.Data:MarkSyncIndexDirty("pacing-seed")
     refreshSyncNode(requester, "pacing-requester")
     refreshSyncNode(seed, "pacing-seed")

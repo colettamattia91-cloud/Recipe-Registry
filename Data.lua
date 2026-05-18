@@ -35,6 +35,7 @@ local GetCraftItemNameFilter = GetCraftItemNameFilter
 local SetCraftItemNameFilter = SetCraftItemNameFilter
 local GetNumGuildMembers = GetNumGuildMembers
 local GetGuildRosterInfo = GetGuildRosterInfo
+local GetGuildRosterLastOnline = GetGuildRosterLastOnline
 local GetItemInfo = GetItemInfo
 local GetSpellInfo = GetSpellInfo
 local time = time
@@ -43,6 +44,8 @@ local ipairs = ipairs
 local sort = table.sort
 local concat = table.concat
 local tostring = tostring
+
+local KNOWN_OWNER_OFFLINE_STALE_DAYS = 14
 
 local DB_DEFAULTS = {
     global = {
@@ -734,6 +737,20 @@ function Data:OnInitialize()
     self._guildMetaCache = {}
     self._guildRosterBuiltAt = 0
     self._guildRosterRefreshRequestedAt = 0
+    self._rosterPreflightState = {
+        pending = false,
+        trusted = false,
+        reason = "not-requested",
+        snapshot = nil,
+        snapshotCount = 0,
+        knownActive = 0,
+        knownOwnersChecked = 0,
+        changedOwners = 0,
+        evaluatedAt = 0,
+        requestedAt = 0,
+        requestReason = nil,
+        source = nil,
+    }
     self._currentProfs = {}
     self:MigrateDatabase()
     if Addon.MarkSavedVariablesReady then
@@ -744,6 +761,280 @@ function Data:OnInitialize()
             Addon.Sync:SetSavedVariablesReady("addon-initialize")
         end
     end
+end
+
+local function normalizeGuildRosterMemberKey(fullName)
+    if type(fullName) ~= "string" or fullName == "" then
+        return nil
+    end
+    local name, realm = fullName:match("^([^%-]+)%-(.+)$")
+    if not name then
+        name = fullName
+        realm = GetRealmName() or "UnknownRealm"
+    end
+    realm = (realm or "UnknownRealm"):gsub("[%s%-]", "")
+    return string.format("%s-%s", name, realm)
+end
+
+local function computeOfflineDays(yearsOffline, monthsOffline, daysOffline, hoursOffline)
+    if yearsOffline == nil and monthsOffline == nil and daysOffline == nil and hoursOffline == nil then
+        return nil
+    end
+    return (tonumber(yearsOffline) or 0) * 365
+        + (tonumber(monthsOffline) or 0) * 30
+        + (tonumber(daysOffline) or 0)
+        + ((tonumber(hoursOffline) or 0) / 24)
+end
+
+local function cloneRosterSnapshot(snapshot)
+    local out = {}
+    for memberKey, present in pairs(snapshot or {}) do
+        if present == true then
+            out[memberKey] = true
+        end
+    end
+    return out
+end
+
+local function buildLiveGuildRosterSnapshot()
+    local snapshot = {}
+    local details = {}
+    local snapshotCount = 0
+    local lastOnlineSupported = type(GetGuildRosterLastOnline) == "function"
+    local lastOnlineUnavailable = false
+    local total = GetNumGuildMembers and (GetNumGuildMembers() or 0) or 0
+    for index = 1, total do
+        local fullName, _, _, _, _, _, _, _, online = GetGuildRosterInfo and GetGuildRosterInfo(index)
+        local memberKey = normalizeGuildRosterMemberKey(fullName)
+        if memberKey and not snapshot[memberKey] then
+            snapshot[memberKey] = true
+            snapshotCount = snapshotCount + 1
+            local offlineDays = nil
+            local offlineKnown = false
+            if online then
+                offlineDays = 0
+                offlineKnown = true
+            elseif lastOnlineSupported then
+                offlineDays = computeOfflineDays(GetGuildRosterLastOnline(index))
+                offlineKnown = offlineDays ~= nil
+                if not offlineKnown then
+                    lastOnlineUnavailable = true
+                end
+            else
+                lastOnlineUnavailable = true
+            end
+            details[memberKey] = {
+                online = online == true,
+                offlineDays = offlineDays,
+                offlineKnown = offlineKnown,
+            }
+        end
+    end
+    return snapshot, details, snapshotCount, {
+        lastOnlineSupported = lastOnlineSupported,
+        lastOnlineUnavailable = lastOnlineUnavailable,
+    }
+end
+
+function Data:GetRosterPreflightState()
+    if type(IsInGuild) == "function" and not IsInGuild() then
+        return {
+            pending = false,
+            trusted = true,
+            reason = "not-in-guild",
+            snapshot = nil,
+            snapshotCount = 0,
+            knownActive = 0,
+            knownOwnersChecked = 0,
+            changedOwners = 0,
+            evaluatedAt = time(),
+            requestedAt = 0,
+            requestReason = nil,
+            source = "not-in-guild",
+        }
+    end
+
+    local state = self._rosterPreflightState or {}
+    return {
+        pending = state.pending == true,
+        trusted = state.trusted == true,
+        reason = tostring(state.reason or "not-requested"),
+        snapshot = state.snapshot and cloneRosterSnapshot(state.snapshot) or nil,
+        snapshotCount = tonumber(state.snapshotCount or 0) or 0,
+        knownActive = tonumber(state.knownActive or 0) or 0,
+        knownOwnersChecked = tonumber(state.knownOwnersChecked or 0) or 0,
+        changedOwners = tonumber(state.changedOwners or 0) or 0,
+        evaluatedAt = tonumber(state.evaluatedAt or 0) or 0,
+        requestedAt = tonumber(state.requestedAt or 0) or 0,
+        requestReason = state.requestReason,
+        source = state.source,
+    }
+end
+
+function Data:IsRosterSnapshotPending()
+    local state = self._rosterPreflightState or {}
+    return state.pending == true
+end
+
+function Data:RequestRosterSnapshot(reason, opts)
+    opts = opts or {}
+    local requestReason = tostring(reason or "login")
+    local state = self._rosterPreflightState or {}
+    if state.pending == true and not opts.force then
+        return false, "already-pending"
+    end
+
+    local now = time()
+    self._rosterPreflightState = {
+        pending = true,
+        trusted = false,
+        reason = "pending",
+        snapshot = nil,
+        snapshotCount = 0,
+        knownActive = 0,
+        knownOwnersChecked = 0,
+        changedOwners = 0,
+        evaluatedAt = 0,
+        requestedAt = now,
+        requestReason = requestReason,
+        source = tostring(opts.source or "startup"),
+    }
+
+    Addon:Trace("sync", string.format("roster-snapshot-requested reason=%s", requestReason))
+    local requested = self:RequestGuildRosterRefresh(requestReason, {
+        force = true,
+        cooldown = tonumber(opts.cooldown or 0) or 0,
+    })
+    return requested, requested and "requested" or "request-unavailable"
+end
+
+function Data:ProcessPendingRosterSnapshot(reason, opts)
+    opts = opts or {}
+    local state = self._rosterPreflightState or {}
+    if state.pending ~= true and opts.force ~= true then
+        return false, "not-pending"
+    end
+
+    local knownOwnerKeys = self:GetKnownSyncOwnerKeys()
+    local now = time()
+    local snapshot, details, snapshotCount, capability = buildLiveGuildRosterSnapshot()
+    local usable = snapshotCount > 0 or (#knownOwnerKeys == 0)
+    if not usable and opts.allowFallback ~= true then
+        return false, "not-usable"
+    end
+
+    Addon:Trace("sync", string.format(
+        "roster-snapshot-received members=%d knownOwners=%d",
+        snapshotCount,
+        #knownOwnerKeys
+    ))
+
+    local affectedBlockKeys = {}
+    local changedOwners = {}
+    local seenBlocks = {}
+    local membershipFallbackUsed = false
+    local selfKey = self:GetPlayerKey()
+
+    for index = 1, #knownOwnerKeys do
+        local ownerKey = knownOwnerKeys[index]
+        local inGuild = snapshot[ownerKey] == true
+        local detail = details[ownerKey] or {}
+        local offlineDays = detail.offlineKnown == true and detail.offlineDays or nil
+        local keepEligible = ownerKey == selfKey
+        local staleReason = nil
+
+        if ownerKey ~= selfKey then
+            if usable and inGuild ~= true then
+                keepEligible = false
+                staleReason = "no-longer-in-guild"
+            elseif usable and detail.offlineKnown == true then
+                keepEligible = (detail.offlineDays or 0) <= KNOWN_OWNER_OFFLINE_STALE_DAYS
+                if not keepEligible then
+                    staleReason = "offline-14d"
+                end
+            else
+                membershipFallbackUsed = true
+                keepEligible = inGuild == true
+                if not keepEligible then
+                    staleReason = "no-longer-in-guild"
+                end
+            end
+        end
+
+        Addon:Trace("sync", string.format(
+            "roster-known-owner-check owner=%s inGuild=%s offlineDays=%s",
+            tostring(ownerKey),
+            tostring(inGuild == true or ownerKey == selfKey),
+            offlineDays and tostring(math.floor(offlineDays)) or "unknown"
+        ))
+
+        local changed = false
+        if keepEligible then
+            changed = self:MarkMemberActive(ownerKey, now, "known-owner-eligibility-change")
+        else
+            changed = self:MarkMemberStale(ownerKey, now, "known-owner-eligibility-change")
+            Addon:Trace("sync", string.format(
+                "roster-owner-stale owner=%s reason=%s",
+                tostring(ownerKey),
+                tostring(staleReason or "unknown")
+            ))
+        end
+
+        if changed then
+            changedOwners[#changedOwners + 1] = ownerKey
+            for _, blockKey in ipairs(self:GetMemberProfessionBlockKeys(ownerKey)) do
+                if not seenBlocks[blockKey] then
+                    seenBlocks[blockKey] = true
+                    affectedBlockKeys[#affectedBlockKeys + 1] = blockKey
+                end
+            end
+        end
+    end
+
+    if membershipFallbackUsed or (usable and capability.lastOnlineSupported ~= true) then
+        Addon:Trace("sync", "roster-last-online-unavailable fallback=membership-only")
+    end
+
+    local knownActive = 0
+    for index = 1, #knownOwnerKeys do
+        local entry = self:GetMember(knownOwnerKeys[index])
+        if knownOwnerKeys[index] == selfKey or (entry and (entry.guildStatus or "active") == "active") then
+            knownActive = knownActive + 1
+        end
+    end
+
+    self._rosterPreflightState = {
+        pending = false,
+        trusted = true,
+        reason = usable and "trusted" or "fallback-membership-only",
+        snapshot = usable and cloneRosterSnapshot(snapshot) or nil,
+        snapshotCount = usable and snapshotCount or 0,
+        knownActive = knownActive,
+        knownOwnersChecked = #knownOwnerKeys,
+        changedOwners = #changedOwners,
+        evaluatedAt = now,
+        requestedAt = state.requestedAt or now,
+        requestReason = state.requestReason or tostring(reason or "roster-update"),
+        source = tostring(opts.source or (usable and "event" or "watchdog")),
+    }
+
+    Addon:Trace("sync", string.format(
+        "roster-preflight-ready changedOwners=%d",
+        #changedOwners
+    ))
+
+    return true, "processed", {
+        reason = #changedOwners > 0 and "known-owner-eligibility-change" or tostring(reason or "roster-preflight"),
+        changedOwners = changedOwners,
+        affectedBlockKeys = affectedBlockKeys,
+        knownOwnerEligibilityChanged = #changedOwners > 0,
+        fullDirty = #changedOwners > 0 and #affectedBlockKeys == 0,
+        snapshotCount = usable and snapshotCount or 0,
+        knownOwnersChecked = #knownOwnerKeys,
+        unknownMembersIgnored = math.max(0, snapshotCount - #knownOwnerKeys),
+        membershipFallbackUsed = membershipFallbackUsed,
+        usableSnapshot = usable,
+    }
 end
 
 function Data:GetCanonicalProfession(name)
@@ -945,19 +1236,15 @@ end
 function Data:GetKnownSyncOwnerKeys()
     local keys = {}
     local selfKey = self:GetPlayerKey()
+    local seen = {}
     for memberKey, entry in pairs(self:GetMembersDB()) do
-        if not self:IsMockMember(memberKey, entry) then
-            local hasProfessionData = false
-            for professionKey, profession in pairs(entry.professions or {}) do
-                if professionKey and countRecipeKeys(profession and profession.recipes or {}) >= 0 then
-                    hasProfessionData = true
-                    break
-                end
-            end
-            if hasProfessionData or memberKey == selfKey then
-                keys[#keys + 1] = memberKey
-            end
+        if not self:IsMockMember(memberKey, entry) and not seen[memberKey] then
+            seen[memberKey] = true
+            keys[#keys + 1] = memberKey
         end
+    end
+    if not seen[selfKey] then
+        keys[#keys + 1] = selfKey
     end
     sort(keys)
     return keys
@@ -1035,7 +1322,7 @@ function Data:GetSortedMemberKeys(includeStale)
     return keys
 end
 
-function Data:MarkMemberActive(memberKey, seenAt)
+function Data:MarkMemberActive(memberKey, seenAt, dirtyReason)
     local entry = self:GetMember(memberKey)
     if not entry then return false end
     local changed = (entry.guildStatus or "active") ~= "active" or (entry.staleAt or 0) > 0
@@ -1054,12 +1341,12 @@ function Data:MarkMemberActive(memberKey, seenAt)
         return false
     end
     if self.MarkOwnerSyncBlocksDirty then
-        self:MarkOwnerSyncBlocksDirty(memberKey, "member-active")
+        self:MarkOwnerSyncBlocksDirty(memberKey, dirtyReason or "member-active")
     end
     return true
 end
 
-function Data:MarkMemberStale(memberKey, staleAt)
+function Data:MarkMemberStale(memberKey, staleAt, dirtyReason)
     local entry = self:GetMember(memberKey)
     if not entry or entry.owner == self:GetPlayerKey() then return false end
     if entry.guildStatus == "stale" then return false end
@@ -1070,7 +1357,7 @@ function Data:MarkMemberStale(memberKey, staleAt)
         entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, prof)
     end
     if self.MarkOwnerSyncBlocksDirty then
-        self:MarkOwnerSyncBlocksDirty(memberKey, "member-stale")
+        self:MarkOwnerSyncBlocksDirty(memberKey, dirtyReason or "member-stale")
     end
     self:InvalidateRecipeCaches("presence")
     return true
