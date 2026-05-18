@@ -88,10 +88,30 @@ local function normalizeContentKey(recipeKey)
     return tostring(recipeKey)
 end
 
+-- djb2 hash, unrolled in chunks of 8 bytes. Each string.byte(s, i, j) call has
+-- non-trivial overhead in Lua 5.1; pulling 8 bytes per call cuts the per-call
+-- cost by 8x on a ~15 KB global-fingerprint payload. The output is byte-for-
+-- byte identical to the naive loop — same algorithm, same mod step per byte,
+-- just fewer C-side calls.
 local function hashString(text)
     local hash = 5381
-    for index = 1, #text do
-        hash = ((hash * 33) + string.byte(text, index)) % 4294967296
+    local len = #text
+    local i = 1
+    while i + 7 <= len do
+        local b1, b2, b3, b4, b5, b6, b7, b8 = string.byte(text, i, i + 7)
+        hash = ((hash * 33) + b1) % 4294967296
+        hash = ((hash * 33) + b2) % 4294967296
+        hash = ((hash * 33) + b3) % 4294967296
+        hash = ((hash * 33) + b4) % 4294967296
+        hash = ((hash * 33) + b5) % 4294967296
+        hash = ((hash * 33) + b6) % 4294967296
+        hash = ((hash * 33) + b7) % 4294967296
+        hash = ((hash * 33) + b8) % 4294967296
+        i = i + 8
+    end
+    while i <= len do
+        hash = ((hash * 33) + string.byte(text, i)) % 4294967296
+        i = i + 1
     end
     return string.format("%08x", hash)
 end
@@ -1158,7 +1178,6 @@ function Data:GetSyncIndexDebugState()
         lastBuildReason = cache.lastBuildReason,
         lastGlobalFingerprintAt = state.lastGlobalFingerprintAt or 0,
         lastGlobalFingerprintReason = state.lastGlobalFingerprintReason,
-        lastDirtyBlockKey = state.lastDirtyBlockKey,
         lastRebuiltBlockKey = cache.lastRebuiltBlockKey,
         trustedRoster = summary and summary.trustedRoster == true or false,
         trustedRosterReason = summary and summary.trustedRosterReason or "unknown",
