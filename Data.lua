@@ -1,6 +1,6 @@
 local _, _ns = ...
 local Addon = _G.RecipeRegistry
-local Data = Addon:NewModule("Data")
+local Data = Addon:NewModule("Data", "AceTimer-3.0")
 Addon.Data = Data
 local Private = Data._private or {}
 Data._private = Private
