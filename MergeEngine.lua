@@ -4,7 +4,6 @@ Addon.MergeEngine = MergeEngine
 
 local pairs = pairs
 local tostring = tostring
-local sort = table.sort
 local max = math.max
 
 local function cloneRecipes(recipes)
@@ -48,20 +47,6 @@ function MergeEngine:NormalizeIncomingBlockPayload(payload)
         skillMaxRank = payload.skillMaxRank or 0,
         metadata = type(payload.metadata) == "table" and payload.metadata or {},
     }
-end
-
-function MergeEngine:ExtractContentKeysForMerge(block)
-    local keys = {}
-    for recipeKey in pairs(block and block.recipes or {}) do
-        keys[#keys + 1] = recipeKey
-    end
-    if block and block.specialization ~= nil and tostring(block.specialization) ~= "" then
-        keys[#keys + 1] = "spec:" .. tostring(block.specialization):lower()
-    end
-    sort(keys, function(left, right)
-        return tostring(left) < tostring(right)
-    end)
-    return keys
 end
 
 function MergeEngine:MergeBlockAdditive(localBlock, incomingBlock)

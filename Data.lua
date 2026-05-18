@@ -397,14 +397,7 @@ local function stableRecipeSignature(recipeKeys)
     return concat(keys, ":")
 end
 
-local function buildBlockContentFingerprint(profession)
-    local recipeSignature = stableRecipeSignature(profession and profession.recipes)
-    local specialization = profession and profession.specialization or ""
-    return string.format("%s|spec:%s", tostring(recipeSignature or ""), tostring(specialization or ""))
-end
-
 Private.stableRecipeSignature = stableRecipeSignature
-Private.buildBlockContentFingerprint = buildBlockContentFingerprint
 
 local function lowerSafe(v)
     if v == nil then return "" end

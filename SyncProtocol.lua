@@ -65,6 +65,22 @@ function Sync:BroadcastHello()
         reason = "hello",
         allowDeferred = true,
     }) or {}
+    -- If the index is merely dirty (cache populated, fingerprint not yet
+    -- recomputed) try a synchronous prepare before giving up. This avoids the
+    -- failure mode where the prepare timer was cancelled or never scheduled,
+    -- which would otherwise leave HELLO permanently deferred.
+    if tostring(summary.indexStatus or "") ~= "ready"
+        and Addon.Data
+        and Addon.Data.IsSyncIndexDirty
+        and Addon.Data:IsSyncIndexDirty()
+        and Addon.Data.PrepareSyncIndexNow
+    then
+        Addon.Data:PrepareSyncIndexNow("hello-sync-prepare")
+        summary = Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
+            reason = "hello-after-prepare",
+            allowDeferred = false,
+        }) or summary
+    end
     if tostring(summary.indexStatus or "") ~= "ready" then
         if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then
             Addon.Data:ScheduleSyncIndexPrepare("hello-not-ready", 0.5)
@@ -160,7 +176,7 @@ function Sync:SendGuildEnvelope(kind, payload, priority)
         payload.capabilities = payload.capabilities or Addon.CAPABILITIES
         payload.caps = payload.caps or (self.GetLocalProtocolCaps and self:GetLocalProtocolCaps() or nil)
     end
-    local msg = LibStub("AceSerializer-3.0"):Serialize(payload)
+    local msg = self:EncodeWirePayload(payload)
     if msg then
         self:SendCommMessage(PREFIX, msg, "GUILD", nil, priority or "NORMAL")
         return true
@@ -197,7 +213,7 @@ function Sync:SendDirectEnvelope(kind, payload, targetKey, priority)
         payload.capabilities = payload.capabilities or Addon.CAPABILITIES
         payload.caps = payload.caps or (self.GetLocalProtocolCaps and self:GetLocalProtocolCaps() or nil)
     end
-    local msg = LibStub("AceSerializer-3.0"):Serialize(payload)
+    local msg = self:EncodeWirePayload(payload)
     if msg then
         self:SendCommMessage(PREFIX, msg, "WHISPER", target, priority or "NORMAL")
         return true
@@ -213,8 +229,8 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
         return
     end
 
-    local ok, payload = LibStub("AceSerializer-3.0"):Deserialize(text)
-    if not ok or type(payload) ~= "table" then
+    local payload = self:DecodeWirePayload(text)
+    if type(payload) ~= "table" then
         return
     end
     if payload.sender == self:GetSelfKey() then

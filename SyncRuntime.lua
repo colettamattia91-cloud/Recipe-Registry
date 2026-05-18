@@ -426,7 +426,8 @@ function Sync:RefreshSyncReadyState(reason)
     end
 
     local paused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("HELLO") or false
-    local saturated = self:EstimateRuntimeQueuePressure() >= 95
+    local saturationThreshold = Constants.SUMMARY_SATURATION_THRESHOLD or 80
+    local saturated = self:EstimateRuntimeQueuePressure() >= saturationThreshold
     local worldReady = not self:IsInWarmup() and not self:IsInWorldTransition()
     self.indexUsableForActivePull = sessionActive
         and self.savedVariablesReady == true

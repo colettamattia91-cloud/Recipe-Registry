@@ -36,7 +36,24 @@ function Data:ApplyIncomingBlockAdditive(blockKey, snapshot, opts)
         return false, "invalid-block-key"
     end
 
+    -- Membership classification (`guildStatus`) is owned by the trusted-roster
+    -- preflight, not by the inbound sync merge. Receiving recipe data for an
+    -- owner says nothing about whether that owner is still in our guild — only
+    -- the roster snapshot can decide that. Consult the current roster state to
+    -- decide whether to refresh `active`, preserve an existing classification,
+    -- or leave a fresh entry pending until the next preflight runs.
+    local rosterState = self.GetRosterPreflightState and self:GetRosterPreflightState() or nil
+    local rosterTrusted = type(rosterState) == "table" and rosterState.trusted == true
+    local rosterSnapshot
+    if rosterTrusted and type(rosterState) == "table" and type(rosterState.snapshot) == "table" then
+        rosterSnapshot = rosterState.snapshot
+    end
+    local rosterHasOwnerEvidence = rosterSnapshot ~= nil
+    local ownerInTrustedGuild = rosterSnapshot and rosterSnapshot[ownerCharacter] == true or false
+
+    local existingEntry = self:GetMember(ownerCharacter)
     local entry = self:GetOrCreateMember(ownerCharacter)
+    local entryIsNew = existingEntry == nil
     local currentProf = entry.professions and entry.professions[professionKey] or nil
     local localBlock = {
         recipes = currentProf and currentProf.recipes or {},
@@ -64,16 +81,46 @@ function Data:ApplyIncomingBlockAdditive(blockKey, snapshot, opts)
     profession.skillRank = merged.skillRank or profession.skillRank or 0
     profession.skillMaxRank = merged.skillMaxRank or profession.skillMaxRank or 0
     profession.sourceType = profession.sourceType or entry.sourceType or opts.sourceType or "replica"
-    profession.guildStatus = "active"
-    profession.lastSeenInGuildAt = time()
     profession.lastUpdatedAt = time()
     profession.count = countRecipeKeys(profession.recipes)
     profession.signature = stableRecipeSignature(profession.recipes)
 
     entry.owner = ownerCharacter
     entry.sourceType = entry.sourceType or opts.sourceType or self:GetMemberSourceType(ownerCharacter)
-    entry.guildStatus = "active"
-    entry.lastSeenInGuildAt = profession.lastSeenInGuildAt
+
+    if rosterHasOwnerEvidence and ownerInTrustedGuild then
+        -- Trusted snapshot confirms this owner is in our guild: refresh active.
+        profession.guildStatus = "active"
+        profession.lastSeenInGuildAt = time()
+        entry.guildStatus = "active"
+        entry.lastSeenInGuildAt = profession.lastSeenInGuildAt
+        entry.staleAt = 0
+    elseif rosterHasOwnerEvidence and not ownerInTrustedGuild then
+        -- Trusted snapshot is positive evidence the owner is NOT in our guild:
+        -- preserve persisted data but don't reactivate. New entries default to
+        -- stale; pre-existing classification is left alone so a previous
+        -- preflight verdict survives the merge.
+        if entryIsNew then
+            entry.guildStatus = "stale"
+            entry.staleAt = entry.staleAt or time()
+        end
+        if not profession.guildStatus then
+            profession.guildStatus = entry.guildStatus or "active"
+        end
+    else
+        -- No roster evidence (untrusted state, fallback mode, or warming up):
+        -- do not classify. Preserve existing status; let the next preflight
+        -- decide. Default new entries to active so they remain visible until
+        -- the roster proves otherwise, matching the conservative "no
+        -- destructive purge in uncertain roster states" rule.
+        if entryIsNew and not entry.guildStatus then
+            entry.guildStatus = "active"
+        end
+        if not profession.guildStatus then
+            profession.guildStatus = entry.guildStatus or "active"
+        end
+    end
+
     entry.professions = entry.professions or {}
     entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, profession)
     self.db.global.members[ownerCharacter] = self:NormalizeMemberEntry(entry, ownerCharacter)

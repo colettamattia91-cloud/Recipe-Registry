@@ -8,6 +8,7 @@ local max = math.max
 
 local SESSION_TIMEOUT = Constants.SESSION_TIMEOUT
 local BLOCK_PULL_DELAY_SECONDS = Constants.BLOCK_PULL_DELAY_SECONDS or 1.0
+local BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS = Constants.BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS or 20
 
 function Sync:BuildWantedBlockOrder(offeredBlocks)
     local rows = {}
@@ -344,6 +345,18 @@ function Sync:ProcessRequestQueue()
             self:AbortOutboundSeedSession("session-timeout")
         end
         return
+    end
+
+    if session.state == "waiting-block" and session.blockRequestedAt then
+        local blockAge = max(0, now - session.blockRequestedAt)
+        if blockAge > BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS then
+            self.telemetry.lastBlockPullTimeoutAt = now
+            self.telemetry.lastBlockPullTimeoutReason = "block-response-timeout"
+            if self.AbortOutboundSeedSession then
+                self:AbortOutboundSeedSession("block-response-timeout")
+            end
+            return
+        end
     end
 
     if session.state == "seed-selected" then
