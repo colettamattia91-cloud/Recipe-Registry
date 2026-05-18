@@ -233,7 +233,16 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
     if type(payload) ~= "table" then
         return
     end
-    if payload.sender == self:GetSelfKey() then
+    -- Guild-channel broadcasts loop the sender's own message back to them.
+    -- Filter on BOTH `sender` and (for HELLO) `key`: HandleHello uses
+    -- payload.key as the canonical identity, so a self-HELLO with a missing
+    -- or mangled `sender` field but a correct `key` would still slip
+    -- through and trigger a SUMMARY whisper back to ourselves.
+    local selfKey = self:GetSelfKey()
+    if payload.sender == selfKey then
+        return
+    end
+    if payload.kind == "HELLO" and payload.key == selfKey then
         return
     end
 
@@ -363,6 +372,14 @@ function Sync:HandleHello(payload)
 end
 
 function Sync:SendSummary(targetKey, helloId)
+    -- Never whisper a SUMMARY to ourselves. The HELLO self-filter in
+    -- OnCommReceived should already prevent reaching this path with
+    -- targetKey == self, but keep the check here as defense-in-depth: a
+    -- self-loop here would burn a whisper, log a "summary-suppressed
+    -- fingerprints-match" on the receive side, and waste a hello cycle.
+    if targetKey == self:GetSelfKey() then
+        return false
+    end
     local allowed = true
     if self.CanRunSyncProtocol then
         allowed = self:CanRunSyncProtocol("SUMMARY")
