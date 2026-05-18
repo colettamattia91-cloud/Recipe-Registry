@@ -4,7 +4,7 @@ Addon.UI = UI
 
 local SEARCH_DEBOUNCE = 0.15
 local GLOBAL_SEARCH_DEBOUNCE = 0.35
-local GLOBAL_SEARCH_MIN_CHARS = 2
+local GLOBAL_SEARCH_MIN_CHARS = 3
 
 local PROF_ORDER = {
     "Favorites", "Alchemy", "Blacksmithing", "Cooking", "Enchanting", "Engineering",
@@ -434,6 +434,9 @@ function UI:ClearSearch()
         self.frame.searchBox:SetText("")
         self.frame.searchBox:ClearFocus()
     end
+    if self.frame and self.frame.searchClearButton then
+        self.frame.searchClearButton:Hide()
+    end
     self:CancelSearchTimer()
 end
 
@@ -758,7 +761,8 @@ function UI:CreateMainFrame()
     searchBox:SetPoint("TOPRIGHT", -10, -30)
     searchBox:SetHeight(24)
     searchBox:SetAutoFocus(false)
-    searchBox:SetTextInsets(6, 6, 0, 0)
+    -- Right inset reserves space for the clear-button overlay below.
+    searchBox:SetTextInsets(6, 22, 0, 0)
     searchBox:SetScript("OnEscapePressed", function()
         UI:ClearSearchFocus()
     end)
@@ -767,9 +771,38 @@ function UI:CreateMainFrame()
         UI:ClearSearchFocus()
         UI:OpenChatAfterSearch()
     end)
+    f.searchBox = searchBox
+
+    -- Small ✕ clear button overlaid on the right edge of the search box.
+    -- Only visible when there's text to clear.
+    local clearButton = CreateFrame("Button", nil, searchBox)
+    clearButton:SetSize(14, 14)
+    clearButton:SetPoint("RIGHT", -4, 0)
+    clearButton:SetNormalTexture("Interface\\Buttons\\UI-StopButton")
+    if clearButton.GetNormalTexture then
+        local tex = clearButton:GetNormalTexture()
+        if tex and tex.SetVertexColor then
+            tex:SetVertexColor(0.85, 0.85, 0.85, 0.85)
+        end
+    end
+    clearButton:SetHighlightTexture("Interface\\Buttons\\UI-StopButton", "ADD")
+    clearButton:Hide()
+    clearButton:SetScript("OnClick", function()
+        UI:ClearSearch()
+        UI:RefreshRecipeList()
+        UI:RefreshDetailPanel()
+        UI:RefreshSummaryCards()
+    end)
+    f.searchClearButton = clearButton
+
     searchBox:SetScript("OnTextChanged", function(box)
         UI.searchText = box:GetText() or ""
         UI.selectedRecipeKey = nil
+        if UI.searchText ~= "" then
+            clearButton:Show()
+        else
+            clearButton:Hide()
+        end
         UI:CancelSearchTimer()
         local delay = SEARCH_DEBOUNCE
         if UI.selectedProfession == nil and UI.searchText ~= "" then
@@ -783,13 +816,15 @@ function UI:CreateMainFrame()
             UI:RefreshSummaryCards()
         end, delay)
     end)
-    f.searchBox = searchBox
 
     local searchFocusWatcher = CreateFrame("Frame", nil, f)
     searchFocusWatcher:Hide()
+    -- Polled at ~5 Hz: just needs to catch "user clicked outside the frame
+    -- to defocus the search box". 20 Hz was overkill — no perceptible UX
+    -- difference at 200ms but 4x less work while the box is focused.
     searchFocusWatcher:SetScript("OnUpdate", function(self, elapsed)
         self._elapsed = (self._elapsed or 0) + (elapsed or 0)
-        if self._elapsed < 0.05 then return end
+        if self._elapsed < 0.2 then return end
         self._elapsed = 0
         if not (f.searchBox and f.searchBox.HasFocus and f.searchBox:HasFocus()) then
             self._mouseDown = nil
@@ -1618,11 +1653,6 @@ function UI:RefreshRecipeList()
         if self.selectedProfession == nil and rowData.professionList and #rowData.professionList > 0 then
             metaParts[#metaParts + 1] = table.concat(rowData.professionList, ", ")
         end
-        row.meta:SetText(table.concat(metaParts, "  •  "))
-        metaParts = {}
-        if self.selectedProfession == nil and rowData.professionList and #rowData.professionList > 0 then
-            metaParts[#metaParts + 1] = table.concat(rowData.professionList, ", ")
-        end
         setTextIfChanged(row.meta, table.concat(metaParts, " - "))
         if self.selectedRecipeKey == rowData.recipeKey then
             setBackdropColorsIfChanged(row, COLOR_ROW_SELECTED[1], COLOR_ROW_SELECTED[2], COLOR_ROW_SELECTED[3], COLOR_ROW_SELECTED[4], 1, 0.82, 0, 0.95)
@@ -1741,6 +1771,7 @@ function UI:RefreshDetailPanel()
     local lineMeta = {}
     if not self.selectedRecipeKey then
         self.currentDetail = nil
+        self._lastDetailSignature = nil
         setTextIfChanged(self.frame.detailTitle, "Recipe details")
         setTextIfChanged(self.frame.detailSub, "Select a recipe to see materials and available crafters.")
         self.frame.detailFavoriteButton.recipeKey = nil
@@ -1758,6 +1789,34 @@ function UI:RefreshDetailPanel()
     local detail = Addon.Data:GetRecipeDetail(self.selectedRecipeKey)
     self.currentDetail = detail
     local isFavorite = self:IsFavorite(self.selectedRecipeKey)
+
+    -- Cheap visibility-only signature: if nothing visible has changed since
+    -- the last render, skip the full rebuild. Catches the common "roster
+    -- update fired but the open recipe is unaffected" case where we'd
+    -- otherwise rebuild the entire crafters+materials+cost block from
+    -- scratch on every periodic refresh.
+    local onlineCount = 0
+    if detail.crafters then
+        for _, c in ipairs(detail.crafters) do
+            if c.online then onlineCount = onlineCount + 1 end
+        end
+    end
+    local signature = string.format(
+        "%s|%s|%d|%d|%s|%s|%s|%s",
+        tostring(self.selectedRecipeKey),
+        isFavorite and "1" or "0",
+        tonumber(detail.crafterCount) or 0,
+        onlineCount,
+        tostring(detail.cost and detail.cost.total or ""),
+        tostring(detail.cost and detail.cost.missingCount or 0),
+        tostring(detail.cost and detail.cost.source or ""),
+        tostring(self._offlineCraftersExpanded)
+    )
+    if self._lastDetailSignature == signature then
+        return
+    end
+    self._lastDetailSignature = signature
+
     local iconTagText = textureTag(detail.createdItemIcon or detail.recipeItemIcon or detail.spellIcon, 18)
     local titleItemID = detail.createdItemID or detail.recipeItemID
     local titleText = detail.label or tostring(self.selectedRecipeKey)
