@@ -501,6 +501,40 @@ function Sync:CanAdvanceOutboundPullSession()
     return self.indexUsableForActivePull == true and self:HasActiveOutboundSeedSession()
 end
 
+-- Inbound serving (BLOCK_SNAPSHOT, INDEX_DIFF_RESPONSE, CanServeInboundSeed)
+-- must stay alive while our own globalFingerprint is being recomputed. The
+-- cached block data + live DB are valid even when indexStatus="dirty" (e.g.,
+-- after a roster eligibility change or after we just merged a block). Refusing
+-- to serve in that brief window stalls peers with block-response-timeout and
+-- breaks the architecture's promise of concurrent seeders.
+function Sync:CanServeCachedBlocks()
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("BLOCK_SNAPSHOT") then
+        return false, "paused"
+    end
+    if self.savedVariablesReady ~= true then
+        return false, "saved-variables"
+    end
+    if self.playerReady ~= true then
+        return false, "player"
+    end
+    if self:IsInWarmup() then
+        return false, "warmup"
+    end
+    if self:IsInWorldTransition() then
+        return false, "world-transition"
+    end
+    if self.rosterPreflightReady ~= true then
+        return false, self.rosterPreflightReason or "roster-unready"
+    end
+    if self.indexStatus ~= "ready" and self.indexStatus ~= "dirty" then
+        return false, self.indexStatus or "index-not-ready"
+    end
+    if self:EstimateRuntimeQueuePressure() >= 95 then
+        return false, "saturated"
+    end
+    return true, "serving-allowed"
+end
+
 function Sync:CanRunSyncProtocol(kind)
     self:RefreshSyncReadyState("protocol:" .. tostring(kind or "sync"))
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic(kind) then
@@ -509,6 +543,13 @@ function Sync:CanRunSyncProtocol(kind)
     if self.syncReady ~= true then
         if kind == "BLOCK_PULL_REQUEST" and self:CanAdvanceOutboundPullSession() then
             return true, "active-pull-dirty-index"
+        end
+        if kind == "BLOCK_SNAPSHOT" or kind == "INDEX_DIFF_RESPONSE" then
+            local allowed, servingReason = self:CanServeCachedBlocks()
+            if allowed then
+                return true, "serving-cached-blocks"
+            end
+            return false, servingReason or self.lastSyncNotReadyReason or "not-ready"
         end
         return false, self.lastSyncNotReadyReason or "not-ready"
     end
@@ -1636,28 +1677,20 @@ function Sync:CanServeInboundSeed(peerKey)
     if not eligible then
         return false, "ineligible"
     end
-    if self:IsSyncReady() ~= true then
-        self.telemetry.inboundSeedSessionsRejectedNotReady = (self.telemetry.inboundSeedSessionsRejectedNotReady or 0) + 1
+    local allowed, reason = self:CanServeCachedBlocks()
+    if not allowed then
+        if reason == "paused" then
+            self.telemetry.inboundSeedSessionsRejectedPaused = (self.telemetry.inboundSeedSessionsRejectedPaused or 0) + 1
+        elseif reason == "saturated" then
+            -- counter recorded via event below
+        else
+            self.telemetry.inboundSeedSessionsRejectedNotReady = (self.telemetry.inboundSeedSessionsRejectedNotReady or 0) + 1
+        end
         self:RecordSyncEvent("inboundSeedSessionRejected", {
             peer = peerKey,
-            reason = self.lastSyncNotReadyReason or "not-ready",
+            reason = reason or self.lastSyncNotReadyReason or "not-ready",
         })
-        return false, self.lastSyncNotReadyReason or "not-ready"
-    end
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("BLOCK_SNAPSHOT") then
-        self.telemetry.inboundSeedSessionsRejectedPaused = (self.telemetry.inboundSeedSessionsRejectedPaused or 0) + 1
-        self:RecordSyncEvent("inboundSeedSessionRejected", {
-            peer = peerKey,
-            reason = "paused",
-        })
-        return false, "paused"
-    end
-    if self:EstimateRuntimeQueuePressure() >= 95 then
-        self:RecordSyncEvent("inboundSeedSessionRejected", {
-            peer = peerKey,
-            reason = "saturated",
-        })
-        return false, "saturated"
+        return false, reason or self.lastSyncNotReadyReason or "not-ready"
     end
     return true, "ready"
 end
