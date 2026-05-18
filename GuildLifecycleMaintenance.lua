@@ -182,17 +182,17 @@ function GuildLifecycleMaintenance:StartCleanup(opts)
         return false, "not-due"
     end
     if not Addon.Performance then return false end
-    if C_GuildInfo and C_GuildInfo.GuildRoster then
-        C_GuildInfo.GuildRoster()
-    elseif GuildRoster then
-        GuildRoster()
-    end
 
     local snapshot, snapshotCount
     if opts.snapshot then
         snapshot = opts.snapshot
         snapshotCount = self:CountSnapshotMembers(snapshot)
     else
+        if C_GuildInfo and C_GuildInfo.GuildRoster then
+            C_GuildInfo.GuildRoster()
+        elseif GuildRoster then
+            GuildRoster()
+        end
         snapshot, snapshotCount = self:BuildGuildRosterSnapshot()
     end
     local memberKeys = opts.memberKeys or Addon.Data:GetSortedMemberKeys(true)

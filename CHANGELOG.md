@@ -12,6 +12,7 @@ All notable changes to this project are documented in this file.
 - The local sync harness can now snapshot and restore SavedVariables across simulated reloads, inspect residual queue state more directly, and assert true baseline stability before churn begins.
 - Manifest and index catch-up now avoid impossible replica/self-owner request paths that could leave idle-looking peers with undrained sync work after heavier churn.
 - Automatic profession scans now stay quiet on unchanged results, broad weapon/generic skill events no longer surface fake profession rescan output, and manual rescans still report user-visible changed or unchanged results.
+- Guild roster preflight now remains a login/reload readiness gate only: ongoing roster updates do not invalidate the sync index, and trusted cleanup reuses a supplied roster snapshot instead of requesting a fresh guild roster unless it needs a fallback view.
 
 ## [1.8.1] - 2026-05-10
 ### Added

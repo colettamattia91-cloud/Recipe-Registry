@@ -62,6 +62,15 @@ local function cancelSyncTimers(addon)
     end
 end
 
+local function runMaintenanceJobs(addon, maxSteps)
+    for _ = 1, (maxSteps or 10) do
+        addon.Performance:RunNextStep()
+        if not addon.Performance:HasPendingJobs("maintenance") then
+            break
+        end
+    end
+end
+
 local function countDebugLogLines(addon, needle)
     local total = 0
     for _, entry in ipairs(addon:GetDebugLogEntries(500, "sync")) do
@@ -152,6 +161,8 @@ Test.it("roster_update_after_snapshot_ignored_spec ignores follow-up roster upda
     Test.eq(prepareCalls, 0, "follow-up roster updates should not schedule index preparation")
     Test.eq(resetCalls, 0, "follow-up roster updates should not reset discovery retry")
     Test.eq(helloCalls, 0, "follow-up roster updates should not schedule hello")
+    Test.truthy((addon.Sync.telemetry.rosterUpdateIgnoredForSync or 0) >= 1, "follow-up roster updates should be classified as ignored for sync")
+    Test.truthy((addon.Sync.telemetry.rosterSyncNoopUpdates or 0) >= 1, "follow-up roster updates should count as sync noops")
 end)
 
 Test.it("roster_update_no_index_dirty_spec keeps the fingerprint stable when the snapshot changes no known-owner eligibility", function()
@@ -179,6 +190,122 @@ Test.it("roster_update_no_index_dirty_spec keeps the fingerprint stable when the
     local state = data:GetSyncIndexDebugState()
     Test.falsy(state.globalFingerprintDirty, "snapshot without eligibility changes should not dirty the global fingerprint")
     Test.eq(addon.Data._syncIndexPrepareTimer, nil, "snapshot without eligibility changes should not schedule a rebuild")
+end)
+
+Test.it("cleanup_snapshot_supplied_spec uses the provided snapshot without requesting a fresh guild roster", function()
+    local addon, wow, data = freshAddon()
+    local ownerKeys = {}
+
+    for index = 1, 8 do
+        local ownerKey = string.format("Cleanup%02d-TestRealm", index)
+        ownerKeys[#ownerKeys + 1] = ownerKey
+        seedProfession(data, ownerKey, "Alchemy", { 10000 + index }, {
+            reason = "cleanup-snapshot-seed-" .. tostring(index),
+            sourceType = "replica",
+            professionSourceType = "replica",
+        })
+    end
+
+    wow.SetGuildRoster({
+        rosterRow("Cleanup01-TestRealm"),
+        rosterRow("Cleanup02-TestRealm"),
+        rosterRow("Cleanup03-TestRealm"),
+        rosterRow("Cleanup04-TestRealm"),
+        rosterRow("Cleanup05-TestRealm"),
+        rosterRow("Cleanup06-TestRealm"),
+        rosterRow("Cleanup07-TestRealm"),
+        rosterRow("Cleanup08-TestRealm"),
+    })
+
+    local snapshot = {
+        ["Cleanup01-TestRealm"] = true,
+        ["Cleanup02-TestRealm"] = true,
+    }
+    local beforeRequests = wow.GetState().guildRosterRequested
+    local started, reason = addon.GuildLifecycleMaintenance:StartCleanup({
+        force = true,
+        label = "cleanup-snapshot-supplied",
+        snapshot = snapshot,
+        memberKeys = ownerKeys,
+        updateLastRunAt = false,
+    })
+    local info = addon.GuildLifecycleMaintenance:GetLastRunInfo()
+
+    Test.falsy(started, "cleanup should reject an implausibly small supplied snapshot")
+    Test.eq(reason, "roster-too-small", "supplied snapshot reason")
+    Test.eq(wow.GetState().guildRosterRequested, beforeRequests, "supplied snapshots should not request the guild roster again")
+    Test.truthy(info and info.snapshotCount == 2, "cleanup should use the supplied snapshot counts")
+end)
+
+Test.it("cleanup_snapshot_fallback_spec may request a guild roster when no snapshot is supplied", function()
+    local addon, wow, data = freshAddon()
+    local ownerKey = "Cleanupfallback-TestRealm"
+
+    seedProfession(data, ownerKey, "Alchemy", { 11001 }, {
+        reason = "cleanup-fallback-seed",
+        sourceType = "replica",
+        professionSourceType = "replica",
+    })
+    wow.SetGuildRoster({
+        rosterRow(ownerKey),
+    })
+
+    local beforeRequests = wow.GetState().guildRosterRequested
+    local started, reason = addon.GuildLifecycleMaintenance:StartCleanup({
+        force = true,
+        label = "cleanup-snapshot-fallback",
+        memberKeys = { ownerKey },
+        updateLastRunAt = false,
+    })
+
+    Test.truthy(started, "cleanup should start on the fallback path")
+    Test.eq(reason, nil, "fallback cleanup reason")
+    Test.eq(wow.GetState().guildRosterRequested, beforeRequests + 1, "fallback cleanup may request the guild roster")
+
+    runMaintenanceJobs(addon, 10)
+
+    Test.falsy(addon.GuildLifecycleMaintenance:IsCleanupRunning(), "fallback cleanup should complete")
+    Test.eq(addon.Sync and addon.Sync._helloTimer or nil, nil, "cleanup without mutations should not start a new sync cycle")
+end)
+
+Test.it("roster_telemetry_classification_spec counts presence, heavy, and noop roster updates separately", function()
+    local addon, wow, data = freshAddon()
+    local ownerKey = data:GetPlayerKey()
+
+    primeSyncReady(addon, wow, data, {
+        rosterRow(ownerKey),
+    }, "telemetry-prime")
+
+    addon.Sync:ResetTelemetry()
+
+    wow.SetGuildRoster({
+        rosterRow(ownerKey, { online = false }),
+    })
+    addon:ProcessCoalescedGuildRosterUpdate("telemetry-presence")
+    Test.eq(addon.Sync.telemetry.rosterPresenceOnlyUpdates or 0, 1, "presence-only updates should increment only the presence counter")
+    Test.eq(addon.Sync.telemetry.rosterHeavyUpdates or 0, 0, "presence-only updates should not increment the heavy counter")
+
+    wow.SetGuildRoster({
+        rosterRow(ownerKey, { online = false }),
+        rosterRow("Heavypeer-TestRealm", {
+            classDisplayName = "Priest",
+            classFileName = "PRIEST",
+        }),
+    })
+    addon:ProcessCoalescedGuildRosterUpdate("telemetry-heavy")
+    Test.eq(addon.Sync.telemetry.rosterPresenceOnlyUpdates or 0, 1, "heavy updates should not backfill the presence counter")
+    Test.eq(addon.Sync.telemetry.rosterHeavyUpdates or 0, 1, "heavy updates should increment the heavy counter exactly once")
+
+    wow.SetGuildRoster({
+        rosterRow(ownerKey, { online = false }),
+        rosterRow("Heavypeer-TestRealm", {
+            classDisplayName = "Priest",
+            classFileName = "PRIEST",
+        }),
+    })
+    addon:ProcessCoalescedGuildRosterUpdate("telemetry-noop")
+    Test.eq(addon.Sync.telemetry.rosterPresenceOnlyUpdates or 0, 1, "noop updates should not increment the presence counter")
+    Test.eq(addon.Sync.telemetry.rosterHeavyUpdates or 0, 1, "noop updates should not increment the heavy counter")
 end)
 
 Test.it("known_owners_only_spec evaluates only known Recipe Registry owners even against a large roster", function()
