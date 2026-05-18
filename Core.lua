@@ -15,7 +15,6 @@ Addon._refreshReasons = {}
 local time = time
 local max = math.max
 local min = math.min
-local remove = table.remove
 
 local DEBUG_LOG_DEFAULTS = {
     enabled = false,
@@ -122,11 +121,19 @@ function Addon:WriteDebugLog(scope, message, fields)
 
     local entries = db.entries
     entries[#entries + 1] = entry
-    local overflow = #entries - max(50, db.maxEntries or DEBUG_LOG_DEFAULTS.maxEntries)
-    if overflow > 0 then
-        for _ = 1, overflow do
-            remove(entries, 1)
+    -- Batched trim: instead of paying O(N) on every append once the buffer is
+    -- full (table.remove(t, 1) shifts everything), let the buffer grow to ~2x
+    -- the cap, then compact in one walk. Amortized O(1) per append; trim
+    -- happens once every ~maxEntries traces.
+    local cap = max(50, db.maxEntries or DEBUG_LOG_DEFAULTS.maxEntries)
+    local count = #entries
+    if count > cap * 2 then
+        local startIndex = count - cap + 1
+        local kept = {}
+        for i = startIndex, count do
+            kept[#kept + 1] = entries[i]
         end
+        db.entries = kept
     end
 
     if db.chatEcho == true and self.debugMode then
@@ -136,11 +143,35 @@ function Addon:WriteDebugLog(scope, message, fields)
 end
 
 function Addon:Trace(scope, ...)
+    -- Early gate before tostring/concat — the formatted args still get
+    -- evaluated by the caller (Lua arg semantics), but at least we skip the
+    -- parts/tostring/concat work when the scope is disabled. Hot-path callers
+    -- should prefer Addon:Tracef which gates BEFORE the format string runs.
+    if not self:IsDebugLogEnabled(scope) then
+        return false
+    end
     local parts = {}
     for i = 1, select("#", ...) do
         parts[#parts + 1] = tostring(select(i, ...))
     end
     return self:WriteDebugLog(scope, table.concat(parts, " "))
+end
+
+-- Lazy-formatting trace: skips string.format entirely when the scope is
+-- disabled. Use this in hot paths (protocol dispatch, block-pull handlers,
+-- merge, rebuild) where the trace arguments include tostring() calls or
+-- format strings that would otherwise run unconditionally.
+function Addon:Tracef(scope, fmt, ...)
+    if not self:IsDebugLogEnabled(scope) then
+        return false
+    end
+    local message
+    if select("#", ...) > 0 then
+        message = string.format(tostring(fmt or ""), ...)
+    else
+        message = tostring(fmt or "")
+    end
+    return self:WriteDebugLog(scope, message)
 end
 
 function Addon:GetDebugLogEntries(limit, scope)

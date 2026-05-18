@@ -129,12 +129,12 @@ function Sync:RequestIndexDiff(seedKey)
                 extra = string.format("blocks=%d", self.telemetry.lastIndexDiffLocalBlockCount or 0),
             })
         end
-        Addon:Trace("sync", string.format(
+        Addon:Tracef("sync",
             "index-diff-request-sent peer=%s requestId=%s blocks=%d",
             tostring(seedKey),
             tostring(session.diffRequestId),
             tonumber(digest.activeBlockCount or 0) or 0
-        ))
+        )
         return true
     end
 
@@ -182,7 +182,7 @@ function Sync:SendIndexDiffResponse(targetKey, requestPayload)
                 extra = string.format("offered=%d", self.telemetry.lastIndexDiffOfferedCount or 0),
             })
         end
-        Addon:Trace("sync", string.format(
+        Addon:Tracef("sync",
             "index-diff-response-sent peer=%s requestId=%s offered=%d byProfession=[%s] reasons=[%s] blocks=[%s]",
             tostring(targetKey),
             tostring(requestPayload and requestPayload.requestId or "none"),
@@ -190,7 +190,7 @@ function Sync:SendIndexDiffResponse(targetKey, requestPayload)
             profsSummary ~= "" and profsSummary or "none",
             reasonsSummary ~= "" and reasonsSummary or "none",
             blockKeysCompact ~= "" and blockKeysCompact or "none"
-        ))
+        )
     end
     return sent, response
 end
@@ -231,7 +231,7 @@ function Sync:HandleReceivedIndexDiffResponse(payload)
             extra = string.format("offered=%d", self.telemetry.lastIndexDiffOfferedCount or 0),
         })
     end
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "index-diff-response-received peer=%s requestId=%s offered=%d byProfession=[%s] reasons=[%s] blocks=[%s]",
         tostring(payload.sender or "unknown"),
         tostring(payload.requestId or "none"),
@@ -239,7 +239,7 @@ function Sync:HandleReceivedIndexDiffResponse(payload)
         profsSummary ~= "" and profsSummary or "none",
         reasonsSummary ~= "" and reasonsSummary or "none",
         blockKeysCompact ~= "" and blockKeysCompact or "none"
-    ))
+    )
 
     if #(session.wantedBlocks or {}) == 0 then
         if self.CompleteOutboundSeedSession then
@@ -302,13 +302,13 @@ function Sync:RequestNextWantedBlock()
                 reason = row.reason,
             })
         end
-        Addon:Trace("sync", string.format(
+        Addon:Tracef("sync",
             "block-pull-start peer=%s requestId=%s block=%s reason=%s",
             tostring(session.seedKey),
             tostring(requestId),
             tostring(row.blockKey),
             tostring(row.reason or "unknown")
-        ))
+        )
         return true
     end
 
@@ -342,11 +342,11 @@ function Sync:ScheduleNextWantedBlock()
             self:RequestNextWantedBlock()
         end
     end, BLOCK_PULL_DELAY_SECONDS)
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "block-pull-delay peer=%s nextDelay=%.1f",
         tostring(session.seedKey or "unknown"),
         BLOCK_PULL_DELAY_SECONDS
-    ))
+    )
     return true
 end
 

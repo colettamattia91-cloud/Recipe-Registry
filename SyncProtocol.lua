@@ -22,11 +22,11 @@ local function recordUnsupportedMessage(self, kind, senderKey)
             peer = senderKey,
         })
     end
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "unsupported-message kind=%s sender=%s",
         tostring(kind or "unknown"),
         tostring(senderKey or "unknown")
-    ))
+    )
 end
 
 local function shouldSendSummaryForHello(self, helloPayload, localSummary)
@@ -125,14 +125,14 @@ function Sync:BroadcastHello()
                 extra = tostring(summary.globalFingerprint or "none"),
             })
         end
-        Addon:Trace("sync", string.format(
+        Addon:Tracef("sync",
             "hello-sent helloId=%s owners=%d blocks=%d content=%d fingerprint=%s",
             tostring(cycle and cycle.helloId or "none"),
             tonumber(summary.activeOwnerCount or 0) or 0,
             tonumber(summary.activeBlockCount or 0) or 0,
             tonumber(summary.activeContentCount or 0) or 0,
             tostring(summary.globalFingerprint or "none")
-        ))
+        )
         if self._helloCycleTimer then
             self:CancelTimer(self._helloCycleTimer, true)
             self._helloCycleTimer = nil
@@ -251,32 +251,32 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
             self:MaybeNotifyPeerVersion(peerKey)
         end
         if peerKey and self.ShouldAcceptInboundPayload and not self:ShouldAcceptInboundPayload(payload, peerKey) then
-            Addon:Trace("sync", string.format(
+            Addon:Tracef("sync",
                 "inbound-dropped kind=%s peer=%s reason=should-accept-rejected",
                 tostring(payload.kind or "unknown"),
                 tostring(peerKey or "unknown")
-            ))
+            )
             return
         end
     else
         if peerKey and self.ShouldAcceptInboundPayload and not self:ShouldAcceptInboundPayload(payload, peerKey) then
-            Addon:Trace("sync", string.format(
+            Addon:Tracef("sync",
                 "inbound-dropped kind=%s peer=%s reason=should-accept-rejected",
                 tostring(payload.kind or "unknown"),
                 tostring(peerKey or "unknown")
-            ))
+            )
             return
         end
     end
 
     local pauseReason = Addon.SyncPausePolicy and Addon.SyncPausePolicy:GetProtocolPauseReason(payload.kind) or nil
     if pauseReason then
-        Addon:Trace("sync", string.format(
+        Addon:Tracef("sync",
             "inbound-dropped kind=%s peer=%s reason=paused:%s",
             tostring(payload.kind or "unknown"),
             tostring(peerKey or payload.sender or "unknown"),
             tostring(pauseReason)
-        ))
+        )
         return
     end
 
@@ -310,7 +310,7 @@ function Sync:HandleHello(payload)
     if self.RecordPeerCaps then
         self:RecordPeerCaps(payload.sender or payload.key, payload.caps)
     end
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "hello-received peer=%s helloId=%s owners=%d blocks=%d content=%d fingerprint=%s",
         tostring(payload.sender or payload.key or "unknown"),
         tostring(payload.helloId or "none"),
@@ -318,17 +318,17 @@ function Sync:HandleHello(payload)
         tonumber(payload.activeBlockCount or 0) or 0,
         tonumber(payload.activeContentCount or 0) or 0,
         tostring(payload.globalFingerprint or "none")
-    ))
+    )
     local ready, readyReason = true, "ready"
     if self.CanRunSyncProtocol then
         ready, readyReason = self:CanRunSyncProtocol("SUMMARY")
     end
     if not ready then
-        Addon:Trace("sync", string.format(
+        Addon:Tracef("sync",
             "summary-suppressed peer=%s reason=%s",
             tostring(payload.sender or payload.key or "unknown"),
             tostring(readyReason or "not-ready")
-        ))
+        )
         return
     end
     local localSummary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
@@ -352,13 +352,13 @@ function Sync:HandleHello(payload)
         elseif tostring(localSummary.globalFingerprint or "") == tostring(payload.globalFingerprint or "") then
             suppressReason = "fingerprints-match"
         end
-        Addon:Trace("sync", string.format(
+        Addon:Tracef("sync",
             "summary-suppressed peer=%s reason=%s localFp=%s remoteFp=%s",
             tostring(payload.sender or payload.key or "unknown"),
             suppressReason,
             tostring(localSummary and localSummary.globalFingerprint or "nil"),
             tostring(payload.globalFingerprint or "nil")
-        ))
+        )
     end
 end
 
@@ -394,7 +394,7 @@ function Sync:SendSummary(targetKey, helloId)
                 extra = tostring(summary.globalFingerprint or "none"),
             })
         end
-        Addon:Trace("sync", string.format(
+        Addon:Tracef("sync",
             "summary-sent peer=%s helloId=%s owners=%d blocks=%d content=%d fingerprint=%s",
             tostring(targetKey or "unknown"),
             tostring(helloId or "none"),
@@ -402,7 +402,7 @@ function Sync:SendSummary(targetKey, helloId)
             tonumber(summary.activeBlockCount or 0) or 0,
             tonumber(summary.activeContentCount or 0) or 0,
             tostring(summary.globalFingerprint or "none")
-        ))
+        )
     end
     return sent
 end
@@ -446,12 +446,12 @@ function Sync:HandleIndexDiffRequest(payload)
             extra = string.format("blocks=%d", type(payload.blocks) == "table" and Private.countKeys(payload.blocks) or 0),
         })
     end
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "index-diff-request-received peer=%s requestId=%s blocks=%d",
         tostring(payload.sender or "unknown"),
         tostring(payload.requestId or "none"),
         type(payload.blocks) == "table" and Private.countKeys(payload.blocks) or 0
-    ))
+    )
     if self.CanServeInboundSeed then
         local allowed = self:CanServeInboundSeed(payload.sender)
         if not allowed then
@@ -481,25 +481,25 @@ function Sync:HandleBlockPullRequest(payload)
         protoAllowed, protoReason = self:CanRunSyncProtocol("BLOCK_SNAPSHOT")
     end
     if not protoAllowed then
-        Addon:Trace("sync", string.format(
+        Addon:Tracef("sync",
             "block-pull-rejected peer=%s block=%s requestId=%s reason=protocol-gate:%s",
             tostring(senderKey or "unknown"),
             tostring(blockKey or "none"),
             tostring(requestId or "none"),
             tostring(protoReason or "not-ready")
-        ))
+        )
         return
     end
     if self.CanServeInboundSeed then
         local serveAllowed, serveReason = self:CanServeInboundSeed(senderKey)
         if not serveAllowed then
-            Addon:Trace("sync", string.format(
+            Addon:Tracef("sync",
                 "block-pull-rejected peer=%s block=%s requestId=%s reason=serve-gate:%s",
                 tostring(senderKey or "unknown"),
                 tostring(blockKey or "none"),
                 tostring(requestId or "none"),
                 tostring(serveReason or "not-ready")
-            ))
+            )
             return
         end
     end
@@ -514,12 +514,12 @@ function Sync:HandleBlockPullRequest(payload)
                 blockKey = blockKey,
             })
         end
-        Addon:Trace("sync", string.format(
+        Addon:Tracef("sync",
             "block-pull-rejected peer=%s block=%s requestId=%s reason=unknown-request",
             tostring(senderKey or "unknown"),
             tostring(blockKey or "none"),
             tostring(requestId or "none")
-        ))
+        )
         return
     end
     if type(inboundSession.offeredBlocks) == "table" and inboundSession.offeredBlocks[blockKey] ~= true then
@@ -532,13 +532,13 @@ function Sync:HandleBlockPullRequest(payload)
                 blockKey = blockKey,
             })
         end
-        Addon:Trace("sync", string.format(
+        Addon:Tracef("sync",
             "block-pull-rejected peer=%s block=%s requestId=%s reason=block-not-offered offered=%d",
             tostring(senderKey or "unknown"),
             tostring(blockKey or "none"),
             tostring(requestId or "none"),
             tonumber(inboundSession.offeredBlockCount or 0) or 0
-        ))
+        )
         return
     end
     inboundSession.lastActivity = time()

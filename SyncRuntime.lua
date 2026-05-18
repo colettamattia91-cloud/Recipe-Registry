@@ -1021,12 +1021,12 @@ function Sync:EnsureRosterPreflightRequested(reason, opts)
         cooldown = tonumber(opts.cooldown or 0) or 0,
         source = opts.source or "auto-bootstrap",
     })
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "roster-preflight-bootstrap reason=%s issued=%s status=%s",
         tostring(reason or "unknown"),
         tostring(ok == true),
         tostring(status or "n/a")
-    ))
+    )
     return ok == true, status
 end
 
@@ -1088,11 +1088,11 @@ function Sync:OnGuildRosterUpdate(context)
         if status == "not-usable" then
             telemetry.rosterUpdateIgnoredForSync = (telemetry.rosterUpdateIgnoredForSync or 0) + 1
         end
-        Addon:Trace("sync", string.format(
+        Addon:Tracef("sync",
             "roster-update-process-failed reason=%s status=%s",
             tostring(reason),
             tostring(status or "unknown")
-        ))
+        )
         return false
     end
 
@@ -1313,7 +1313,7 @@ function Sync:RecordSummary(peerKey, payload)
         requestId = payload.helloId,
         extra = string.format("count=%d", self.telemetry.lastSummaryCount or 0),
     })
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "summary-received peer=%s helloId=%s owners=%d blocks=%d content=%d fingerprint=%s",
         tostring(peerKey),
         tostring(payload.helloId or "none"),
@@ -1321,7 +1321,7 @@ function Sync:RecordSummary(peerKey, payload)
         tonumber(payload.activeBlockCount or 0) or 0,
         tonumber(payload.activeContentCount or 0) or 0,
         tostring(payload.globalFingerprint or "none")
-    ))
+    )
     return true
 end
 
@@ -1406,10 +1406,10 @@ function Sync:SelectOutboundSeed(cycleId)
         self.telemetry.discoveryMisses = (self.telemetry.discoveryMisses or 0) + 1
         self.telemetry.lastNoSeedReason = candidateCount == 0 and "no-summary" or "no-useful-seed"
         self.telemetry.lastNoSummaryAt = time()
-        Addon:Trace("sync", string.format(
+        Addon:Tracef("sync",
             "seed-selection-none helloId=%s reason=no-different-ready-summary",
             tostring(cycle.helloId or "none")
-        ))
+        )
         self:RecordSyncEvent("noSeed", {
             reason = self.telemetry.lastNoSeedReason,
             requestId = cycle.helloId,
@@ -1432,13 +1432,13 @@ function Sync:SelectOutboundSeed(cycleId)
         requestId = cycle.helloId,
         reason = "highest-content",
     })
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "seed-selected peer=%s reason=highest-content owners=%d blocks=%d content=%d",
         tostring(selected.peerKey),
         tonumber(selected.activeOwnerCount or 0) or 0,
         tonumber(selected.activeBlockCount or 0) or 0,
         tonumber(selected.activeContentCount or 0) or 0
-    ))
+    )
 
     self._seedSessionCounter = (self._seedSessionCounter or 0) + 1
     self.outboundSeedSession = {
@@ -1480,11 +1480,11 @@ function Sync:AbortOutboundSeedSession(reason)
     self.telemetry.outboundSessionAborted = (self.telemetry.outboundSessionAborted or 0) + 1
     self.telemetry.lastAbortReason = session.abortReason
     self.telemetry.successfulBlockMerges = session.successfulBlockMerges or 0
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "session-abort peer=%s reason=%s",
         tostring(session.seedKey or "unknown"),
         tostring(session.abortReason)
-    ))
+    )
     if (session.successfulBlockMerges or 0) > 0 then
         self:ResetDiscoveryRetry("seed-session-abort-partial")
     else
@@ -1520,11 +1520,11 @@ function Sync:CompleteOutboundSeedSession(reason)
     self.telemetry.outboundSessionCompleted = (self.telemetry.outboundSessionCompleted or 0) + 1
     self.telemetry.lastSessionCompleteReason = session.completedReason
     self.telemetry.successfulBlockMerges = session.successfulBlockMerges or 0
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "session-complete peer=%s reason=%s",
         tostring(session.seedKey or "unknown"),
         tostring(session.completedReason)
-    ))
+    )
     if (session.successfulBlockMerges or 0) > 0 then
         self:ResetDiscoveryRetry("seed-session-complete")
         self:RefreshSyncReadyState(session.completedReason)
@@ -1571,11 +1571,11 @@ function Sync:ClearInboundSeedSessions(reason)
         if tostring(reason or ""):find("pause", 1, true) then
             self.telemetry.inboundSeedSessionsClearedPause = (self.telemetry.inboundSeedSessionsClearedPause or 0) + cleared
         end
-        Addon:Trace("sync", string.format(
+        Addon:Tracef("sync",
             "inbound-seed-sessions-cleared reason=%s cleared=%d",
             tostring(reason or "unspecified"),
             cleared
-        ))
+        )
         self:RecordSyncEvent("inboundSeedSessionCleared", {
             reason = reason,
             extra = string.format("cleared=%d", cleared),

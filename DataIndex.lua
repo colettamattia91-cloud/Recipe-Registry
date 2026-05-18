@@ -278,7 +278,6 @@ local function ensureSyncIndexState(self)
         activeBlockCount = 0,
         activeContentCount = 0,
         globalFingerprint = nil,
-        trustedRosterState = nil,
         indexStatus = "missing",
         ready = false,
         globalFingerprintDirty = true,
@@ -396,13 +395,13 @@ local function rebuildGlobalFingerprint(state, cache, reason)
             extra = tostring(cache.globalFingerprint or "none"),
         })
     end
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "global-fingerprint-recomputed owners=%d blocks=%d content=%d fingerprint=%s",
         cache.activeOwnerCount or 0,
         cache.activeBlockCount or 0,
         cache.activeContentCount or 0,
         tostring(cache.globalFingerprint or "none")
-    ))
+    )
 end
 
 local function rebuildAllBlocks(self, cache, rosterState, reason)
@@ -449,7 +448,6 @@ local function rebuildAllBlocks(self, cache, rosterState, reason)
     end
 
     cache.blocks = blocks
-    cache.trustedRosterState = cloneTable(rosterState)
     cache.indexStatus = rosterState.trusted == true and "ready" or tostring(rosterState.reason or "not-ready")
     cache.ready = rosterState.trusted == true
     cache.lastBuildReason = tostring(reason or "full-rebuild")
@@ -463,7 +461,7 @@ local function rebuildAllBlocks(self, cache, rosterState, reason)
     cache.globalFingerprintDirty = true
     cache.stats.fullRebuild = (cache.stats.fullRebuild or 0) + 1
     bumpSyncTelemetry("syncIndexFullRebuild")
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "sync-index-full-rebuild reason=%s ready=%s roster=%s built=%d skippedOwners=%d skippedEmptyBlocks=%d skippedOwnerSamples=[%s] skippedEmptyBlockSamples=[%s]",
         tostring(reason or "full-rebuild"),
         tostring(cache.ready == true),
@@ -473,7 +471,7 @@ local function rebuildAllBlocks(self, cache, rosterState, reason)
         skippedEmptyBlockCount,
         table.concat(skippedOwnerSamples, ","),
         table.concat(skippedEmptyBlockSamples, ",")
-    ))
+    )
 end
 
 local function rebuildDirtyBlocks(self, cache, rosterState, reason)
@@ -505,16 +503,15 @@ local function rebuildDirtyBlocks(self, cache, rosterState, reason)
         setSyncTelemetry("lastRebuiltBlockKey", blockKey)
         cache.stats.blockRebuilt = (cache.stats.blockRebuilt or 0) + 1
         bumpSyncTelemetry("syncIndexBlockRebuilt")
-        Addon:Trace("sync", string.format(
+        Addon:Tracef("sync",
             "sync-index-block-rebuilt reason=%s block=%s",
             tostring(reason or "dirty-block"),
             tostring(blockKey)
-        ))
+        )
     end
     cache.dirtyBlocks = {}
     cache.dirtyBlockCount = 0
     recalcAggregateState(cache)
-    cache.trustedRosterState = cloneTable(rosterState)
     cache.indexStatus = rosterState.trusted == true and "ready" or tostring(rosterState.reason or "not-ready")
     cache.ready = rosterState.trusted == true
     cache.lastBuildReason = tostring(reason or "dirty-block")
@@ -683,13 +680,13 @@ function Data:MarkSyncIndexDirty(reason, blockKey, opts)
             extra = string.format("dirtyBlocks=%d", cache.dirtyBlockCount or 0),
         })
     end
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "global-fingerprint-dirty reason=%s block=%s full=%s dirtyBlocks=%d",
         tostring(reason or "unspecified"),
         tostring(blockKey or "none"),
         tostring(cache.dirtyAll == true),
         cache.dirtyBlockCount or 0
-    ))
+    )
     return true
 end
 
@@ -729,7 +726,7 @@ function Data:PrepareSyncIndexNow(reason)
         and Addon.Sync.HasActiveOutboundSeedSession
         and Addon.Sync:HasActiveOutboundSeedSession()
         or false
-    local state, cache, summary = ensureLiveIndex(self, reason or "sync-index-prepare", {
+    local _, _, summary = ensureLiveIndex(self, reason or "sync-index-prepare", {
         allowDeferred = false,
         recomputeGlobalFingerprint = not activePull,
     })
@@ -741,11 +738,6 @@ function Data:PrepareSyncIndexNow(reason)
             reason = summary and summary.indexStatus or "unknown",
         })
     end
-    return {
-        state = cloneTable(state),
-        cache = cloneTable(cache),
-        summary = cloneTable(summary),
-    }
 end
 
 function Data:GetSyncIndexReadiness(opts)

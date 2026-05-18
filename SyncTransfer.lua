@@ -44,13 +44,13 @@ function Sync:SendBlockSnapshot(targetKey, requestPayload)
                 extra = string.format("recipes=%d", #(snapshot.recipeKeys or {})),
             })
         end
-        Addon:Trace("sync", string.format(
+        Addon:Tracef("sync",
             "block-snapshot-sent peer=%s requestId=%s block=%s recipes=%d",
             tostring(targetKey or "unknown"),
             tostring(requestPayload.requestId or "none"),
             tostring(snapshot.blockKey or "none"),
             #(snapshot.recipeKeys or {})
-        ))
+        )
     end
     return sent
 end
@@ -83,12 +83,12 @@ function Sync:HandleReceivedBlockSnapshot(payload)
             blockKey = payload.blockKey,
         })
     end
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "block-snapshot-received peer=%s requestId=%s block=%s",
         tostring(payload.sender or "unknown"),
         tostring(payload.requestId or "none"),
         tostring(payload.blockKey or "none")
-    ))
+    )
 
     local incomingPayload = payload.blockPayload or payload
     if type(incomingPayload) == "table" and incomingPayload.blockKey == nil then
@@ -145,7 +145,7 @@ function Sync:HandleReceivedBlockSnapshot(payload)
     local specChanged = type(result) == "table" and result.specializationChanged == true
     local incomingRecipeCount = type(incomingPayload) == "table" and incomingPayload.recipeKeys
         and #incomingPayload.recipeKeys or 0
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "block-merge-complete block=%s peer=%s incomingRecipes=%d addedRecipes=%d specChanged=%s fingerprint=%s",
         tostring(payload.blockKey or "none"),
         tostring(payload.sender or "unknown"),
@@ -153,7 +153,7 @@ function Sync:HandleReceivedBlockSnapshot(payload)
         addedRecipes,
         tostring(specChanged),
         tostring(fingerprint or "none")
-    ))
+    )
 
     session.successfulBlockMerges = (session.successfulBlockMerges or 0) + 1
     session.lastMergedBlockFingerprint = fingerprint

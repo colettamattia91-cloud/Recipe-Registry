@@ -893,7 +893,7 @@ function Data:RequestRosterSnapshot(reason, opts)
         source = tostring(opts.source or "startup"),
     }
 
-    Addon:Trace("sync", string.format("roster-snapshot-requested reason=%s", requestReason))
+    Addon:Tracef("sync","roster-snapshot-requested reason=%s", requestReason)
     local requested = self:RequestGuildRosterRefresh(requestReason, {
         force = true,
         cooldown = tonumber(opts.cooldown or 0) or 0,
@@ -916,11 +916,11 @@ function Data:ProcessPendingRosterSnapshot(reason, opts)
         return false, "not-usable"
     end
 
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "roster-snapshot-received members=%d knownOwners=%d",
         snapshotCount,
         #knownOwnerKeys
-    ))
+    )
 
     local affectedBlockKeys = {}
     local changedOwners = {}
@@ -954,23 +954,23 @@ function Data:ProcessPendingRosterSnapshot(reason, opts)
             end
         end
 
-        Addon:Trace("sync", string.format(
+        Addon:Tracef("sync",
             "roster-known-owner-check owner=%s inGuild=%s offlineDays=%s",
             tostring(ownerKey),
             tostring(inGuild == true or ownerKey == selfKey),
             offlineDays and tostring(math.floor(offlineDays)) or "unknown"
-        ))
+        )
 
         local changed = false
         if keepEligible then
             changed = self:MarkMemberActive(ownerKey, now, "known-owner-eligibility-change")
         else
             changed = self:MarkMemberStale(ownerKey, now, "known-owner-eligibility-change")
-            Addon:Trace("sync", string.format(
+            Addon:Tracef("sync",
                 "roster-owner-stale owner=%s reason=%s",
                 tostring(ownerKey),
                 tostring(staleReason or "unknown")
-            ))
+            )
         end
 
         if changed then
@@ -1011,10 +1011,10 @@ function Data:ProcessPendingRosterSnapshot(reason, opts)
         source = tostring(opts.source or (usable and "event" or "watchdog")),
     }
 
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "roster-preflight-ready changedOwners=%d",
         #changedOwners
-    ))
+    )
 
     return true, "processed", {
         reason = #changedOwners > 0 and "known-owner-eligibility-change" or tostring(reason or "roster-preflight"),
@@ -1333,12 +1333,12 @@ function Data:MarkMemberActive(memberKey, seenAt, dirtyReason)
     if not changed then
         return false
     end
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "member-marked-active owner=%s reason=%s professions=%d",
         tostring(memberKey),
         tostring(dirtyReason or "member-active"),
         countKeys(entry.professions)
-    ))
+    )
     if self.MarkOwnerSyncBlocksDirty then
         self:MarkOwnerSyncBlocksDirty(memberKey, dirtyReason or "member-active")
     end
@@ -1355,12 +1355,12 @@ function Data:MarkMemberStale(memberKey, staleAt, dirtyReason)
         prof.guildStatus = "stale"
         entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, prof)
     end
-    Addon:Trace("sync", string.format(
+    Addon:Tracef("sync",
         "member-marked-stale owner=%s reason=%s professions=%d",
         tostring(memberKey),
         tostring(dirtyReason or "member-stale"),
         countKeys(entry.professions)
-    ))
+    )
     if self.MarkOwnerSyncBlocksDirty then
         self:MarkOwnerSyncBlocksDirty(memberKey, dirtyReason or "member-stale")
     end
