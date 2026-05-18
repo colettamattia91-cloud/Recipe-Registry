@@ -963,7 +963,16 @@ function UI:CreateMainFrame()
     recipeScroll:SetScrollChild(recipeContent)
     f.recipeScroll = recipeScroll
     f.recipeContent = recipeContent
+    -- Pool of recycled row frames. Index = pool slot, not recipe-list index.
+    -- The pool grows on demand to (visible rows + buffer); rebinding happens
+    -- per scroll tick via UI:RenderVisibleRecipeRows.
     f.recipeRows = {}
+    recipeScroll:HookScript("OnVerticalScroll", function()
+        UI:RenderVisibleRecipeRows()
+    end)
+    recipeScroll:HookScript("OnSizeChanged", function()
+        UI:RenderVisibleRecipeRows()
+    end)
 
     local right = CreateFrame("Frame", nil, f, "BackdropTemplate")
     right:SetPoint("TOPLEFT", center, "TOPRIGHT", 10, 0)
@@ -1543,6 +1552,106 @@ function UI:RefreshProfessionButtons()
     end
 end
 
+local RECIPE_ROW_HEIGHT = 70
+local RECIPE_ROW_BUFFER = 2
+
+function UI:BindRecipeRow(row, recipeIdx, rowData)
+    row:SetPoint("TOPLEFT", 0, -((recipeIdx - 1) * RECIPE_ROW_HEIGHT))
+    row.recipeKey = rowData.recipeKey
+
+    local isFav = self:IsFavorite(rowData.recipeKey)
+    row.favoriteButton.isFavorite = isFav
+    row.favoriteButton.recipeKey = rowData.recipeKey
+    setFavoriteButtonState(row.favoriteButton, isFav)
+
+    local detail = rowData.detail or {}
+    local colorItemID = detail.createdItemID or detail.recipeItemID
+    local tooltipLink = (detail.createdItemID and ("item:" .. detail.createdItemID))
+        or (detail.recipeItemID and ("item:" .. detail.recipeItemID))
+        or (detail.spellID and ("spell:" .. detail.spellID))
+        or nil
+    row.tooltipLink = tooltipLink
+    local titleText = rowData.label
+    local rowIcon = detail.createdItemIcon or detail.recipeItemIcon or detail.spellIcon or getItemIcon(colorItemID)
+    if rowIcon then
+        setTextureIfChanged(row.icon, rowIcon)
+        setShownIfChanged(row.icon, true)
+    else
+        setTextureIfChanged(row.icon, "Interface\\Icons\\INV_Misc_QuestionMark")
+        setShownIfChanged(row.icon, true)
+    end
+    if colorItemID then
+        titleText = getItemColorizedName(colorItemID, rowData.label)
+        local sr, sg, sb = getQualityColor(getItemQuality(colorItemID) or 1)
+        setVertexColorIfChanged(row.stripe, sr, sg, sb, 1)
+    else
+        setVertexColorIfChanged(row.stripe, 0.42, 0.42, 0.42, 1)
+    end
+    setTextIfChanged(row.title, titleText)
+
+    local statsParts = {
+        string.format("%d crafter(s)", rowData.crafterCount or 0),
+    }
+    if (rowData.onlineCount or 0) > 0 then
+        statsParts[#statsParts + 1] = string.format("|cff55d66b%d online|r", rowData.onlineCount or 0)
+    end
+    setTextIfChanged(row.stats, table.concat(statsParts, "\n"))
+
+    local metaParts = {}
+    if self.selectedProfession == nil and rowData.professionList and #rowData.professionList > 0 then
+        metaParts[#metaParts + 1] = table.concat(rowData.professionList, ", ")
+    end
+    setTextIfChanged(row.meta, table.concat(metaParts, " - "))
+
+    if self.selectedRecipeKey == rowData.recipeKey then
+        setBackdropColorsIfChanged(row, COLOR_ROW_SELECTED[1], COLOR_ROW_SELECTED[2], COLOR_ROW_SELECTED[3], COLOR_ROW_SELECTED[4], 1, 0.82, 0, 0.95)
+    else
+        setBackdropColorsIfChanged(row, COLOR_ROW[1], COLOR_ROW[2], COLOR_ROW[3], COLOR_ROW[4], 0.22, 0.22, 0.22, 1)
+    end
+    setShownIfChanged(row, true)
+end
+
+-- Virtualized rendering: only the rows that fall in the visible scroll
+-- window (plus a small buffer above/below) are bound to recipe data. The
+-- pool grows on demand and never shrinks below the largest window ever
+-- needed, so swapping a 5-row Favorites tab for a 2000-row global search
+-- keeps the pool size at ~ visibleRows + buffer (typically 10-15).
+function UI:RenderVisibleRecipeRows()
+    if not self.frame or not self.currentRecipeRows then return end
+    local rows = self.currentRecipeRows
+    local total = #rows
+    local pool = self.frame.recipeRows
+    if total == 0 then
+        for i = 1, #pool do
+            setShownIfChanged(pool[i], false)
+        end
+        return
+    end
+
+    local scrollFrame = self.frame.recipeScroll
+    local offset = (scrollFrame and scrollFrame.GetVerticalScroll and scrollFrame:GetVerticalScroll()) or 0
+    local viewHeight = (scrollFrame and scrollFrame:GetHeight()) or 0
+    if viewHeight <= 0 then
+        -- Frame hasn't been laid out yet (first paint). Fall back to a
+        -- conservative initial window so we don't render nothing.
+        viewHeight = 600
+    end
+
+    local firstIdx = math.max(1, math.floor(offset / RECIPE_ROW_HEIGHT) + 1 - RECIPE_ROW_BUFFER)
+    local lastIdx = math.min(total, math.ceil((offset + viewHeight) / RECIPE_ROW_HEIGHT) + RECIPE_ROW_BUFFER)
+    local visibleCount = math.max(0, lastIdx - firstIdx + 1)
+
+    local poolSlot = 0
+    for recipeIdx = firstIdx, lastIdx do
+        poolSlot = poolSlot + 1
+        local row = self:EnsureRecipeRow(poolSlot)
+        self:BindRecipeRow(row, recipeIdx, rows[recipeIdx])
+    end
+    for i = visibleCount + 1, #pool do
+        setShownIfChanged(pool[i], false)
+    end
+end
+
 function UI:RefreshRecipeList()
     if not self.frame then return end
     local effectiveProfession = self.selectedProfession
@@ -1560,7 +1669,7 @@ function UI:RefreshRecipeList()
     if self.selectedProfession == "Favorites" or self.selectedProfession ~= nil or canRunGlobalSearch then
         rows = Addon.Data:GetRecipeList(effectiveProfession, self.searchText, self.sortMode, self.searchMode, categoryFilter)
     end
-    
+
     -- Filter by favorites if selected
     if self.selectedProfession == "Favorites" then
         local filteredRows = {}
@@ -1571,7 +1680,7 @@ function UI:RefreshRecipeList()
         end
         rows = filteredRows
     end
-    
+
     self.currentRecipeRows = rows
     local headerText
     if self.selectedProfession == "Favorites" then
@@ -1607,115 +1716,32 @@ function UI:RefreshRecipeList()
         self.selectedRecipeKey = nil
     end
 
-    for i, rowData in ipairs(rows) do
-        local row = self:EnsureRecipeRow(i)
-        row:SetPoint("TOPLEFT", 0, -((i - 1) * 70))
-        row.recipeKey = rowData.recipeKey
-        
-        -- Update favorite button appearance
-        local isFav = self:IsFavorite(rowData.recipeKey)
-        row.favoriteButton.isFavorite = isFav
-        row.favoriteButton.recipeKey = rowData.recipeKey
-        setFavoriteButtonState(row.favoriteButton, isFav)
-        
-        local detail = rowData.detail or {}
-        local colorItemID = detail.createdItemID or detail.recipeItemID
-        local tooltipLink = (detail.createdItemID and ("item:" .. detail.createdItemID))
-            or (detail.recipeItemID and ("item:" .. detail.recipeItemID))
-            or (detail.spellID and ("spell:" .. detail.spellID))
-            or nil
-        row.tooltipLink = tooltipLink
-        local titleText = rowData.label
-        local rowIcon = detail.createdItemIcon or detail.recipeItemIcon or detail.spellIcon or getItemIcon(colorItemID)
-        if rowIcon then
-            setTextureIfChanged(row.icon, rowIcon)
-            setShownIfChanged(row.icon, true)
-        else
-            setTextureIfChanged(row.icon, "Interface\\Icons\\INV_Misc_QuestionMark")
-            setShownIfChanged(row.icon, true)
-        end
-        if colorItemID then
-            titleText = getItemColorizedName(colorItemID, rowData.label)
-            local sr, sg, sb = getQualityColor(getItemQuality(colorItemID) or 1)
-            setVertexColorIfChanged(row.stripe, sr, sg, sb, 1)
-        else
-            setVertexColorIfChanged(row.stripe, 0.42, 0.42, 0.42, 1)
-        end
-        setTextIfChanged(row.title, titleText)
-        local statsParts = {
-            string.format("%d crafter(s)", rowData.crafterCount or 0),
-        }
-        if (rowData.onlineCount or 0) > 0 then
-            statsParts[#statsParts + 1] = string.format("|cff55d66b%d online|r", rowData.onlineCount or 0)
-        end
-        setTextIfChanged(row.stats, table.concat(statsParts, "\n"))
-        local metaParts = {}
-        if self.selectedProfession == nil and rowData.professionList and #rowData.professionList > 0 then
-            metaParts[#metaParts + 1] = table.concat(rowData.professionList, ", ")
-        end
-        setTextIfChanged(row.meta, table.concat(metaParts, " - "))
-        if self.selectedRecipeKey == rowData.recipeKey then
-            setBackdropColorsIfChanged(row, COLOR_ROW_SELECTED[1], COLOR_ROW_SELECTED[2], COLOR_ROW_SELECTED[3], COLOR_ROW_SELECTED[4], 1, 0.82, 0, 0.95)
-        else
-            setBackdropColorsIfChanged(row, COLOR_ROW[1], COLOR_ROW[2], COLOR_ROW[3], COLOR_ROW[4], 0.22, 0.22, 0.22, 1)
-        end
-        setShownIfChanged(row, true)
-    end
-    for i = #rows + 1, #self.frame.recipeRows do
-        setShownIfChanged(self.frame.recipeRows[i], false)
-    end
-    local contentHeight = math.max(1, #rows * 70 + 10)
+    local contentHeight = math.max(1, #rows * RECIPE_ROW_HEIGHT + 10)
     if self.frame.recipeContent._rrHeight ~= contentHeight then
         self.frame.recipeContent._rrHeight = contentHeight
         self.frame.recipeContent:SetHeight(contentHeight)
     end
+
+    self:RenderVisibleRecipeRows()
     self:RefreshSummaryCards()
 end
 
+-- Reuse the pooled render: when item info arrives or assets change, the
+-- visible-window walk in BindRecipeRow already picks up the new icons,
+-- colors, and labels via the same code path.
 function UI:RefreshVisibleRecipeRowAssets()
     if not self.frame or not self.currentRecipeRows then
         return
     end
 
-    for i, rowData in ipairs(self.currentRecipeRows) do
-        local row = self.frame.recipeRows[i]
-        if not row or row._rrShown == false then
-            break
-        end
-
+    -- Refresh detail snapshots for visible rows (item info may have arrived).
+    local rows = self.currentRecipeRows
+    for _, rowData in ipairs(rows) do
         local detail = Addon.Data:GetRecipeDisplayInfo(rowData.recipeKey) or rowData.detail or {}
         rowData.detail = detail
         rowData.label = (detail and detail.label) or rowData.label or tostring(rowData.recipeKey)
-
-        local colorItemID = detail.createdItemID or detail.recipeItemID
-        local titleText = rowData.label
-        if colorItemID then
-            titleText = getItemColorizedName(colorItemID, rowData.label)
-        end
-        setTextIfChanged(row.title, titleText)
-
-        local tooltipLink = (detail.createdItemID and ("item:" .. detail.createdItemID))
-            or (detail.recipeItemID and ("item:" .. detail.recipeItemID))
-            or (detail.spellID and ("spell:" .. detail.spellID))
-            or nil
-        row.tooltipLink = tooltipLink
-
-        local rowIcon = detail.createdItemIcon or detail.recipeItemIcon or detail.spellIcon or getItemIcon(colorItemID)
-        if rowIcon then
-            setTextureIfChanged(row.icon, rowIcon)
-            setShownIfChanged(row.icon, true)
-        else
-            setTextureIfChanged(row.icon, "Interface\\Icons\\INV_Misc_QuestionMark")
-            setShownIfChanged(row.icon, true)
-        end
-
-        if colorItemID then
-            local sr, sg, sb = getQualityColor(getItemQuality(colorItemID) or 1)
-            setVertexColorIfChanged(row.stripe, sr, sg, sb, 1)
-        else
-            setVertexColorIfChanged(row.stripe, 0.42, 0.42, 0.42, 1)
-        end
     end
+    self:RenderVisibleRecipeRows()
 end
 
 function UI:RenderDetailLines(lines, lineLinks, lineMeta)
