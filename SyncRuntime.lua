@@ -952,8 +952,52 @@ local function applyRosterSnapshotOutcome(self, outcome)
     return dirtied
 end
 
+-- Bootstrap the roster preflight if it was never requested. This handles the
+-- common race where PLAYER_ENTERING_WORLD fires with IsInGuild()==false (guild
+-- data not yet loaded), Core.lua bails out, and no RequestRosterSnapshot is
+-- ever issued. Without this, the sync stays stuck forever even though the
+-- guild becomes available a few frames later. Returns true if a fresh request
+-- was issued (caller may then reconsult IsRosterSnapshotPending).
+function Sync:EnsureRosterPreflightRequested(reason, opts)
+    opts = type(opts) == "table" and opts or {}
+    local data = Addon.Data
+    if not (data and data.GetRosterPreflightState and data.RequestRosterSnapshot) then
+        return false, "data-unavailable"
+    end
+    local inGuild = type(IsInGuild) == "function" and IsInGuild() == true or false
+    if not inGuild then
+        return false, "not-in-guild"
+    end
+    local state = data:GetRosterPreflightState() or {}
+    if state.trusted == true then
+        return false, "already-trusted"
+    end
+    if state.pending == true then
+        return false, "already-pending"
+    end
+    local ok, status = data:RequestRosterSnapshot("auto-bootstrap:" .. tostring(reason or "unknown"), {
+        force = false,
+        cooldown = tonumber(opts.cooldown or 0) or 0,
+        source = opts.source or "auto-bootstrap",
+    })
+    Addon:Trace("sync", string.format(
+        "roster-preflight-bootstrap reason=%s issued=%s status=%s",
+        tostring(reason or "unknown"),
+        tostring(ok == true),
+        tostring(status or "n/a")
+    ))
+    return ok == true, status
+end
+
 function Sync:OnRosterPreflightWatchdog(reason)
     local rosterPending = Addon.Data and Addon.Data.IsRosterSnapshotPending and Addon.Data:IsRosterSnapshotPending() or false
+
+    if not rosterPending then
+        local bootstrapped = self:EnsureRosterPreflightRequested(reason or "login-watchdog")
+        if bootstrapped then
+            rosterPending = Addon.Data.IsRosterSnapshotPending and Addon.Data:IsRosterSnapshotPending() or false
+        end
+    end
     if not rosterPending then
         return false, "not-pending"
     end
@@ -978,9 +1022,20 @@ function Sync:OnGuildRosterUpdate(context)
     local rosterPending = Addon.Data and Addon.Data.IsRosterSnapshotPending and Addon.Data:IsRosterSnapshotPending() or false
 
     if not rosterPending then
+        -- Try to bootstrap if the preflight was never requested. This is the
+        -- recovery path for the IsInGuild()==false race at PLAYER_ENTERING_WORLD.
+        local bootstrapped = self:EnsureRosterPreflightRequested(reason)
+        if bootstrapped and Addon.Data.IsRosterSnapshotPending then
+            rosterPending = Addon.Data:IsRosterSnapshotPending()
+        end
+    end
+
+    if not rosterPending then
+        -- Pure noop: roster already trusted or we're not in guild. Bump counters
+        -- but do NOT emit a per-event trace — GUILD_ROSTER_UPDATE fires often
+        -- and floods the log with no actionable signal.
         telemetry.rosterSyncNoopUpdates = (telemetry.rosterSyncNoopUpdates or 0) + 1
         telemetry.rosterUpdateIgnoredForSync = (telemetry.rosterUpdateIgnoredForSync or 0) + 1
-        Addon:Trace("sync", "roster-update-ignored reason=not-pending")
         return false
     end
 
@@ -992,6 +1047,11 @@ function Sync:OnGuildRosterUpdate(context)
         if status == "not-usable" then
             telemetry.rosterUpdateIgnoredForSync = (telemetry.rosterUpdateIgnoredForSync or 0) + 1
         end
+        Addon:Trace("sync", string.format(
+            "roster-update-process-failed reason=%s status=%s",
+            tostring(reason),
+            tostring(status or "unknown")
+        ))
         return false
     end
 

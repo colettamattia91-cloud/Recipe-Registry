@@ -294,11 +294,25 @@ function Sync:HandleHello(payload)
     if self.RecordPeerCaps then
         self:RecordPeerCaps(payload.sender or payload.key, payload.caps)
     end
-    local ready = true
+    Addon:Trace("sync", string.format(
+        "hello-received peer=%s helloId=%s owners=%d blocks=%d content=%d fingerprint=%s",
+        tostring(payload.sender or payload.key or "unknown"),
+        tostring(payload.helloId or "none"),
+        tonumber(payload.activeOwnerCount or 0) or 0,
+        tonumber(payload.activeBlockCount or 0) or 0,
+        tonumber(payload.activeContentCount or 0) or 0,
+        tostring(payload.globalFingerprint or "none")
+    ))
+    local ready, readyReason = true, "ready"
     if self.CanRunSyncProtocol then
-        ready = self:CanRunSyncProtocol("SUMMARY")
+        ready, readyReason = self:CanRunSyncProtocol("SUMMARY")
     end
     if not ready then
+        Addon:Trace("sync", string.format(
+            "summary-suppressed peer=%s reason=%s",
+            tostring(payload.sender or payload.key or "unknown"),
+            tostring(readyReason or "not-ready")
+        ))
         return
     end
     local localSummary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
@@ -307,6 +321,28 @@ function Sync:HandleHello(payload)
     }) or nil
     if shouldSendSummaryForHello(self, payload, localSummary) then
         self:SendSummary(payload.sender or payload.key, payload.helloId)
+    else
+        local suppressReason = "unknown"
+        if type(localSummary) ~= "table" then
+            suppressReason = "local-summary-unavailable"
+        elseif tostring(localSummary.indexStatus or "") ~= "ready" then
+            suppressReason = "local-index-not-ready:" .. tostring(localSummary.indexStatus or "unknown")
+        elseif tostring(payload.indexStatus or "") ~= "ready" then
+            suppressReason = "remote-index-not-ready:" .. tostring(payload.indexStatus or "unknown")
+        elseif Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("SUMMARY") then
+            suppressReason = "paused"
+        elseif self.IsSummarySaturated and self:IsSummarySaturated() then
+            suppressReason = "saturated"
+        elseif tostring(localSummary.globalFingerprint or "") == tostring(payload.globalFingerprint or "") then
+            suppressReason = "fingerprints-match"
+        end
+        Addon:Trace("sync", string.format(
+            "summary-suppressed peer=%s reason=%s localFp=%s remoteFp=%s",
+            tostring(payload.sender or payload.key or "unknown"),
+            suppressReason,
+            tostring(localSummary and localSummary.globalFingerprint or "nil"),
+            tostring(payload.globalFingerprint or "nil")
+        ))
     end
 end
 

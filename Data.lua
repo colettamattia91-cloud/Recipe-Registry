@@ -1333,6 +1333,12 @@ function Data:MarkMemberActive(memberKey, seenAt, dirtyReason)
     if not changed then
         return false
     end
+    Addon:Trace("sync", string.format(
+        "member-marked-active owner=%s reason=%s professions=%d",
+        tostring(memberKey),
+        tostring(dirtyReason or "member-active"),
+        countKeys(entry.professions)
+    ))
     if self.MarkOwnerSyncBlocksDirty then
         self:MarkOwnerSyncBlocksDirty(memberKey, dirtyReason or "member-active")
     end
@@ -1349,6 +1355,12 @@ function Data:MarkMemberStale(memberKey, staleAt, dirtyReason)
         prof.guildStatus = "stale"
         entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, prof)
     end
+    Addon:Trace("sync", string.format(
+        "member-marked-stale owner=%s reason=%s professions=%d",
+        tostring(memberKey),
+        tostring(dirtyReason or "member-stale"),
+        countKeys(entry.professions)
+    ))
     if self.MarkOwnerSyncBlocksDirty then
         self:MarkOwnerSyncBlocksDirty(memberKey, dirtyReason or "member-stale")
     end

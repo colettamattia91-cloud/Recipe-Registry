@@ -141,9 +141,17 @@ function Sync:HandleReceivedBlockSnapshot(payload)
             extra = tostring(fingerprint or "none"),
         })
     end
+    local addedRecipes = type(result) == "table" and tonumber(result.addedRecipes or 0) or 0
+    local specChanged = type(result) == "table" and result.specializationChanged == true
+    local incomingRecipeCount = type(incomingPayload) == "table" and incomingPayload.recipeKeys
+        and #incomingPayload.recipeKeys or 0
     Addon:Trace("sync", string.format(
-        "block-merge-complete block=%s fingerprint=%s",
+        "block-merge-complete block=%s peer=%s incomingRecipes=%d addedRecipes=%d specChanged=%s fingerprint=%s",
         tostring(payload.blockKey or "none"),
+        tostring(payload.sender or "unknown"),
+        incomingRecipeCount,
+        addedRecipes,
+        tostring(specChanged),
         tostring(fingerprint or "none")
     ))
 

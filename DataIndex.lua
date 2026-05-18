@@ -409,6 +409,11 @@ local function rebuildAllBlocks(self, cache, rosterState, reason)
     local memberKeys = self:GetSortedMemberKeys(true)
     local selfKey = self:GetPlayerKey()
     local blocks = {}
+    local builtBlockCount = 0
+    local skippedOwnerCount = 0
+    local skippedEmptyBlockCount = 0
+    local skippedOwnerSamples = {}
+    local skippedEmptyBlockSamples = {}
 
     for _, memberKey in ipairs(memberKeys) do
         local entry = self:GetMember(memberKey)
@@ -423,7 +428,22 @@ local function rebuildAllBlocks(self, cache, rosterState, reason)
                 local block = buildBlockRecord(self, memberKey, professionKey, profession)
                 if block and block.contentCount > 0 then
                     blocks[block.blockKey] = block
+                    builtBlockCount = builtBlockCount + 1
+                else
+                    skippedEmptyBlockCount = skippedEmptyBlockCount + 1
+                    if #skippedEmptyBlockSamples < 5 and block then
+                        skippedEmptyBlockSamples[#skippedEmptyBlockSamples + 1] = block.blockKey
+                    end
                 end
+            end
+        else
+            skippedOwnerCount = skippedOwnerCount + 1
+            if #skippedOwnerSamples < 5 then
+                skippedOwnerSamples[#skippedOwnerSamples + 1] = string.format(
+                    "%s(%s)",
+                    tostring(memberKey),
+                    tostring(entry and entry.guildStatus or "missing")
+                )
             end
         end
     end
@@ -444,10 +464,15 @@ local function rebuildAllBlocks(self, cache, rosterState, reason)
     cache.stats.fullRebuild = (cache.stats.fullRebuild or 0) + 1
     bumpSyncTelemetry("syncIndexFullRebuild")
     Addon:Trace("sync", string.format(
-        "sync-index-full-rebuild reason=%s ready=%s roster=%s",
+        "sync-index-full-rebuild reason=%s ready=%s roster=%s built=%d skippedOwners=%d skippedEmptyBlocks=%d skippedOwnerSamples=[%s] skippedEmptyBlockSamples=[%s]",
         tostring(reason or "full-rebuild"),
         tostring(cache.ready == true),
-        tostring(cache.indexStatus or "unknown")
+        tostring(cache.indexStatus or "unknown"),
+        builtBlockCount,
+        skippedOwnerCount,
+        skippedEmptyBlockCount,
+        table.concat(skippedOwnerSamples, ","),
+        table.concat(skippedEmptyBlockSamples, ",")
     ))
 end
 

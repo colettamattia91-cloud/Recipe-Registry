@@ -10,6 +10,43 @@ local SESSION_TIMEOUT = Constants.SESSION_TIMEOUT
 local BLOCK_PULL_DELAY_SECONDS = Constants.BLOCK_PULL_DELAY_SECONDS or 1.0
 local BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS = Constants.BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS or 20
 
+-- Summarize an offered-blocks list into compact, human-readable strings for
+-- traces. Repeating "missing,missing,missing..." 164 times across the offered
+-- count carries no signal. Grouping by profession and by reason is much more
+-- diagnosable — you can tell at a glance whether a profession (e.g. Mining) is
+-- present in the offered set without grepping through hundreds of keys.
+-- Returns (reasonsSummary, byProfessionSummary, blockKeysCompact).
+local function summarizeOfferedBlocks(offeredBlocks)
+    local reasonCounts = {}
+    local profCounts = {}
+    local blockKeys = {}
+    for index = 1, #(offeredBlocks or {}) do
+        local row = offeredBlocks[index]
+        if type(row) == "table" then
+            if row.reason then
+                local key = tostring(row.reason)
+                reasonCounts[key] = (reasonCounts[key] or 0) + 1
+            end
+            if type(row.blockKey) == "string" and row.blockKey ~= "" then
+                blockKeys[#blockKeys + 1] = row.blockKey
+                local prof = row.blockKey:match("^.-::(.+)$")
+                if prof and prof ~= "" then
+                    profCounts[prof] = (profCounts[prof] or 0) + 1
+                end
+            end
+        end
+    end
+    local function flattenSorted(map)
+        local parts = {}
+        for k, v in pairs(map) do
+            parts[#parts + 1] = string.format("%s:%d", tostring(k), tonumber(v) or 0)
+        end
+        table.sort(parts)
+        return table.concat(parts, ",")
+    end
+    return flattenSorted(reasonCounts), flattenSorted(profCounts), table.concat(blockKeys, ",")
+end
+
 function Sync:BuildWantedBlockOrder(offeredBlocks)
     local rows = {}
     for index = 1, #(offeredBlocks or {}) do
@@ -130,18 +167,14 @@ function Sync:SendIndexDiffResponse(targetKey, requestPayload)
         offeredBlocks = response.offeredBlocks,
     }, targetKey, "ALERT")
     if sent then
-        local reasons = {}
-        for index = 1, #(response.offeredBlocks or {}) do
-            local row = response.offeredBlocks[index]
-            if row and row.reason then
-                reasons[#reasons + 1] = tostring(row.reason)
-            end
-        end
+        local reasonsSummary, profsSummary, blockKeysCompact = summarizeOfferedBlocks(response.offeredBlocks)
         self.telemetry.indexDiffResponseSent = (self.telemetry.indexDiffResponseSent or 0) + 1
         self.telemetry.blocksOffered = (self.telemetry.blocksOffered or 0) + #(response.offeredBlocks or {})
         self.telemetry.lastIndexDiffOfferedCount = #(response.offeredBlocks or {})
         self.telemetry.lastIndexDiffNoOfferReason = (#(response.offeredBlocks or {}) == 0) and "no-diff" or nil
-        self.telemetry.lastBlockOfferReasons = table.concat(reasons, ",")
+        self.telemetry.lastBlockOfferReasons = reasonsSummary
+        self.telemetry.lastBlockOfferProfessions = profsSummary
+        self.telemetry.lastBlockOfferKeys = blockKeysCompact
         if self.RecordSyncEvent then
             self:RecordSyncEvent("indexDiffResponseSent", {
                 peer = targetKey,
@@ -150,11 +183,13 @@ function Sync:SendIndexDiffResponse(targetKey, requestPayload)
             })
         end
         Addon:Trace("sync", string.format(
-            "index-diff-response-sent peer=%s requestId=%s offered=%d reasons=%s",
+            "index-diff-response-sent peer=%s requestId=%s offered=%d byProfession=[%s] reasons=[%s] blocks=[%s]",
             tostring(targetKey),
             tostring(requestPayload and requestPayload.requestId or "none"),
             #(response.offeredBlocks or {}),
-            self.telemetry.lastBlockOfferReasons ~= "" and self.telemetry.lastBlockOfferReasons or "none"
+            profsSummary ~= "" and profsSummary or "none",
+            reasonsSummary ~= "" and reasonsSummary or "none",
+            blockKeysCompact ~= "" and blockKeysCompact or "none"
         ))
     end
     return sent, response
@@ -185,14 +220,10 @@ function Sync:HandleReceivedIndexDiffResponse(payload)
     self.telemetry.lastIndexDiffOfferedCount = #(session.offeredBlocks or {})
     self.telemetry.lastIndexDiffNoOfferReason = (#(session.offeredBlocks or {}) == 0) and "no-diff" or nil
 
-    local reasons = {}
-    for index = 1, #(session.offeredBlocks or {}) do
-        local row = session.offeredBlocks[index]
-        if row and row.reason then
-            reasons[#reasons + 1] = tostring(row.reason)
-        end
-    end
-    self.telemetry.lastBlockOfferReasons = table.concat(reasons, ",")
+    local reasonsSummary, profsSummary, blockKeysCompact = summarizeOfferedBlocks(session.offeredBlocks)
+    self.telemetry.lastBlockOfferReasons = reasonsSummary
+    self.telemetry.lastBlockOfferProfessions = profsSummary
+    self.telemetry.lastBlockOfferKeys = blockKeysCompact
     if self.RecordSyncEvent then
         self:RecordSyncEvent("indexDiffResponseReceived", {
             peer = payload.sender,
@@ -201,11 +232,13 @@ function Sync:HandleReceivedIndexDiffResponse(payload)
         })
     end
     Addon:Trace("sync", string.format(
-        "index-diff-response-received peer=%s requestId=%s offered=%d reasons=%s",
+        "index-diff-response-received peer=%s requestId=%s offered=%d byProfession=[%s] reasons=[%s] blocks=[%s]",
         tostring(payload.sender or "unknown"),
         tostring(payload.requestId or "none"),
         #(session.offeredBlocks or {}),
-        self.telemetry.lastBlockOfferReasons ~= "" and self.telemetry.lastBlockOfferReasons or "none"
+        profsSummary ~= "" and profsSummary or "none",
+        reasonsSummary ~= "" and reasonsSummary or "none",
+        blockKeysCompact ~= "" and blockKeysCompact or "none"
     ))
 
     if #(session.wantedBlocks or {}) == 0 then
