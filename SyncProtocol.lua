@@ -251,16 +251,32 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
             self:MaybeNotifyPeerVersion(peerKey)
         end
         if peerKey and self.ShouldAcceptInboundPayload and not self:ShouldAcceptInboundPayload(payload, peerKey) then
+            Addon:Trace("sync", string.format(
+                "inbound-dropped kind=%s peer=%s reason=should-accept-rejected",
+                tostring(payload.kind or "unknown"),
+                tostring(peerKey or "unknown")
+            ))
             return
         end
     else
         if peerKey and self.ShouldAcceptInboundPayload and not self:ShouldAcceptInboundPayload(payload, peerKey) then
+            Addon:Trace("sync", string.format(
+                "inbound-dropped kind=%s peer=%s reason=should-accept-rejected",
+                tostring(payload.kind or "unknown"),
+                tostring(peerKey or "unknown")
+            ))
             return
         end
     end
 
     local pauseReason = Addon.SyncPausePolicy and Addon.SyncPausePolicy:GetProtocolPauseReason(payload.kind) or nil
     if pauseReason then
+        Addon:Trace("sync", string.format(
+            "inbound-dropped kind=%s peer=%s reason=paused:%s",
+            tostring(payload.kind or "unknown"),
+            tostring(peerKey or payload.sender or "unknown"),
+            tostring(pauseReason)
+        ))
         return
     end
 
@@ -457,42 +473,72 @@ function Sync:HandleIndexDiffResponse(payload)
 end
 
 function Sync:HandleBlockPullRequest(payload)
-    local allowed = true
+    local senderKey = payload and payload.sender
+    local blockKey = payload and payload.blockKey
+    local requestId = payload and payload.requestId
+    local protoAllowed, protoReason = true, "ready"
     if self.CanRunSyncProtocol then
-        allowed = self:CanRunSyncProtocol("BLOCK_SNAPSHOT")
+        protoAllowed, protoReason = self:CanRunSyncProtocol("BLOCK_SNAPSHOT")
     end
-    if not allowed then
+    if not protoAllowed then
+        Addon:Trace("sync", string.format(
+            "block-pull-rejected peer=%s block=%s requestId=%s reason=protocol-gate:%s",
+            tostring(senderKey or "unknown"),
+            tostring(blockKey or "none"),
+            tostring(requestId or "none"),
+            tostring(protoReason or "not-ready")
+        ))
         return
     end
     if self.CanServeInboundSeed then
-        local allowed = self:CanServeInboundSeed(payload and payload.sender)
-        if not allowed then
+        local serveAllowed, serveReason = self:CanServeInboundSeed(senderKey)
+        if not serveAllowed then
+            Addon:Trace("sync", string.format(
+                "block-pull-rejected peer=%s block=%s requestId=%s reason=serve-gate:%s",
+                tostring(senderKey or "unknown"),
+                tostring(blockKey or "none"),
+                tostring(requestId or "none"),
+                tostring(serveReason or "not-ready")
+            ))
             return
         end
     end
-    local inboundSession = self.GetInboundSeedSession and self:GetInboundSeedSession(payload and payload.sender) or nil
+    local inboundSession = self.GetInboundSeedSession and self:GetInboundSeedSession(senderKey) or nil
     if not inboundSession then
         self.telemetry.inboundBlockPullRejectedUnknownRequest = (self.telemetry.inboundBlockPullRejectedUnknownRequest or 0) + 1
         if self.RecordSyncEvent then
             self:RecordSyncEvent("inboundSeedSessionRejected", {
-                peer = payload and payload.sender,
-                requestId = payload and payload.requestId,
+                peer = senderKey,
+                requestId = requestId,
                 reason = "unknown-request",
-                blockKey = payload and payload.blockKey,
+                blockKey = blockKey,
             })
         end
+        Addon:Trace("sync", string.format(
+            "block-pull-rejected peer=%s block=%s requestId=%s reason=unknown-request",
+            tostring(senderKey or "unknown"),
+            tostring(blockKey or "none"),
+            tostring(requestId or "none")
+        ))
         return
     end
-    if type(inboundSession.offeredBlocks) == "table" and inboundSession.offeredBlocks[payload and payload.blockKey] ~= true then
+    if type(inboundSession.offeredBlocks) == "table" and inboundSession.offeredBlocks[blockKey] ~= true then
         self.telemetry.inboundBlockPullRejectedNotOffered = (self.telemetry.inboundBlockPullRejectedNotOffered or 0) + 1
         if self.RecordSyncEvent then
             self:RecordSyncEvent("inboundSeedSessionRejected", {
-                peer = payload and payload.sender,
-                requestId = payload and payload.requestId,
+                peer = senderKey,
+                requestId = requestId,
                 reason = "block-not-offered",
-                blockKey = payload and payload.blockKey,
+                blockKey = blockKey,
             })
         end
+        Addon:Trace("sync", string.format(
+            "block-pull-rejected peer=%s block=%s requestId=%s reason=block-not-offered offered=%d",
+            tostring(senderKey or "unknown"),
+            tostring(blockKey or "none"),
+            tostring(requestId or "none"),
+            tonumber(inboundSession.offeredBlockCount or 0) or 0
+        ))
         return
     end
     inboundSession.lastActivity = time()
