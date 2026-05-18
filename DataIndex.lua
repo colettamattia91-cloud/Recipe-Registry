@@ -10,11 +10,9 @@ local type = type
 local tostring = tostring
 local max = math.max
 
-local countRecipeKeys = Private.countRecipeKeys
 local isValidRecipeKey = Private.isValidRecipeKey
 local lowerSafe = Private.lowerSafe
 
-local DEFAULT_ROSTER_FRESHNESS_MAX_AGE = 20
 local SYNC_MODEL = "index-diff-block-pull"
 local shouldPublishOwner
 
@@ -120,25 +118,6 @@ end
 -- They identify the live block/global hashing layout used by the modern sync path.
 local function buildFingerprint(prefix, content)
     return string.format("%s:%s", prefix, hashString(content))
-end
-
-local function getRosterFreshnessMaxAge()
-    local constants = Addon.Sync and Addon.Sync._private and Addon.Sync._private.constants or nil
-    return constants and constants.ROSTER_FRESHNESS_MAX_AGE or DEFAULT_ROSTER_FRESHNESS_MAX_AGE
-end
-
-local function getSyncWarmupReason()
-    local sync = Addon.Sync
-    if not sync then
-        return nil
-    end
-    if sync.IsInWarmup and sync:IsInWarmup() then
-        return "warmup"
-    end
-    if sync.IsInWorldTransition and sync:IsInWorldTransition() then
-        return "world-transition"
-    end
-    return nil
 end
 
 local function buildRosterState(self, reason)
@@ -319,16 +298,6 @@ local function ensureSyncIndexState(self)
         },
     }
     return self._syncIndexState, self._syncIndexCache
-end
-
-local function isOutboundSessionActive()
-    local sync = Addon.Sync
-    local session = sync and sync.outboundSeedSession or nil
-    if type(session) ~= "table" then
-        return false
-    end
-    local state = tostring(session.state or "")
-    return state ~= "" and state ~= "completed" and state ~= "aborted" and state ~= "idle"
 end
 
 local function syncTelemetryStats(cache)
@@ -731,7 +700,6 @@ function Data:ScheduleSyncIndexPrepare(reason, delay)
 
     self._syncIndexPrepareTimer = self:ScheduleTimer(function()
         self._syncIndexPrepareTimer = nil
-        local sync = Addon.Sync
         if shouldDeferFullRebuild(cache.pendingPrepareReason or "sync-index-prepare") then
             self:ScheduleSyncIndexPrepare(cache.pendingPrepareReason or "sync-index-prepare", 2)
             return
