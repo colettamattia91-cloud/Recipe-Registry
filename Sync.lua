@@ -15,6 +15,14 @@ local REQUEST_TIMEOUT = 25
 local SESSION_TIMEOUT = 60
 local NODE_TIMEOUT = 95
 local HELLO_INTERVAL = 30
+-- Stretch the auto-HELLO cadence once our published fingerprint stops
+-- changing AND we have established peers in onlineNodes. Two aligned
+-- peers used to HELLO every 30s forever just to assert liveness; the
+-- receiver then suppressed the SUMMARY for `fingerprints-match`,
+-- producing pure background traffic. Stable-state HELLOs at 75s still
+-- arrive within NODE_TIMEOUT (95s) so peers don't prune us, with a
+-- comfortable margin for ChatThrottleLib jitter.
+local HELLO_INTERVAL_STABLE = 75
 local AUTO_SYNC_INTERVAL = 20
 local PEER_BACKOFF_SECONDS = 45
 -- Grace periods after entering the world. Sync stays paused (no HELLO
@@ -32,7 +40,14 @@ local POST_COMBAT_GRACE_SECONDS = 6
 local ROSTER_FRESHNESS_MAX_AGE = 20
 local SUMMARY_COLLECTION_WINDOW = 6
 local SUMMARY_SATURATION_THRESHOLD = 80
-local BLOCK_PULL_DELAY_SECONDS = 1.0
+-- Time between BLOCK_PULL_REQUESTs. Bumped from 1.0 to 2.5 to give the
+-- requester's Lua VM time to GC the per-merge transients (cloned recipe
+-- maps, decompression buffers, intermediate tables, trace strings)
+-- before the next snapshot lands. Receivers observed memory climbing
+-- to ~150 MB and visible stutter during massive pulls at the old
+-- cadence. The total wall-clock for a full sync increases (e.g., 100
+-- blocks: 100s -> 250s) but the per-frame budget breathes.
+local BLOCK_PULL_DELAY_SECONDS = 2.5
 -- Per-block response window. AceComm BULK priority is rate-limited by
 -- ChatThrottleLib (~800 bytes/sec shared across all BULK queues). A
 -- typical BLOCK_SNAPSHOT compressed is 1-3 KB; a seeder serving multiple
@@ -266,6 +281,7 @@ Private.constants = {
     SESSION_TIMEOUT = SESSION_TIMEOUT,
     NODE_TIMEOUT = NODE_TIMEOUT,
     HELLO_INTERVAL = HELLO_INTERVAL,
+    HELLO_INTERVAL_STABLE = HELLO_INTERVAL_STABLE,
     AUTO_SYNC_INTERVAL = AUTO_SYNC_INTERVAL,
     PEER_BACKOFF_SECONDS = PEER_BACKOFF_SECONDS,
     POST_LOGIN_GRACE_SECONDS = POST_LOGIN_GRACE_SECONDS,

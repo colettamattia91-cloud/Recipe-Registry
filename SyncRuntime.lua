@@ -18,6 +18,7 @@ local compareSemver = Addon.BuildInfo and Addon.BuildInfo.CompareSemver or nil
 
 local NODE_TIMEOUT = Constants.NODE_TIMEOUT
 local HELLO_INTERVAL = Constants.HELLO_INTERVAL
+local HELLO_INTERVAL_STABLE = Constants.HELLO_INTERVAL_STABLE or HELLO_INTERVAL
 local AUTO_SYNC_INTERVAL = Constants.AUTO_SYNC_INTERVAL
 local PEER_BACKOFF_SECONDS = Constants.PEER_BACKOFF_SECONDS or 45
 local POST_WORLD_GRACE_SECONDS = Constants.POST_WORLD_GRACE_SECONDS or 12
@@ -1938,13 +1939,36 @@ function Sync:AutoSyncTick()
     end
 
     if countKeys(self.onlineNodes) == 0 then
+        -- No known peers yet: keep beating at the normal cadence so we
+        -- get discovered. Stable interval only applies when at least one
+        -- peer is already in our graph.
         if sinceLastHello >= HELLO_INTERVAL then
             self:ScheduleHello("hello-auto-empty")
         end
         return
     end
-    if sinceLastHello >= HELLO_INTERVAL then
-        self:ScheduleHello("hello-auto-interval")
+
+    -- Steady-state suppression: when our last broadcast fingerprint is
+    -- identical to what we'd publish now, peers already know our state.
+    -- They will suppress the SUMMARY for "fingerprints-match" anyway, so
+    -- HELLOing every 30s is pure background noise. Stretch the interval
+    -- to HELLO_INTERVAL_STABLE (still safely under NODE_TIMEOUT) while
+    -- nothing changes; the first scan/merge that bumps our fingerprint
+    -- drops the cooldown back to HELLO_INTERVAL automatically because
+    -- the lastHelloFingerprint will then differ from the live summary.
+    local interval = HELLO_INTERVAL
+    local summary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
+        reason = "hello-interval",
+        allowDeferred = true,
+    }) or nil
+    local currentFingerprint = summary and summary.globalFingerprint or nil
+    local lastBroadcast = self.telemetry and self.telemetry.lastHelloFingerprint or nil
+    if currentFingerprint and lastBroadcast and currentFingerprint == lastBroadcast then
+        interval = HELLO_INTERVAL_STABLE
+    end
+
+    if sinceLastHello >= interval then
+        self:ScheduleHello(interval == HELLO_INTERVAL_STABLE and "hello-auto-stable" or "hello-auto-interval")
     end
 end
 

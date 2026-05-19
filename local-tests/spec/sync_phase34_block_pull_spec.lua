@@ -324,7 +324,7 @@ Test.it("next block pull is scheduled after the internal delay once a block merg
     local session = requester.addon.Sync.outboundSeedSession or {}
     local state = requester.addon.Data:GetSyncIndexDebugState()
     Test.truthy(scheduled, "next block pull should enter the paced delay state")
-    Test.eq(requester.addon.Sync._private.constants.BLOCK_PULL_DELAY_SECONDS, 1.0, "internal block pull delay constant")
+    Test.eq(requester.addon.Sync._private.constants.BLOCK_PULL_DELAY_SECONDS, 2.5, "internal block pull delay constant")
     Test.truthy(type(session.nextBlockReadyAt) == "number" and session.nextBlockReadyAt > time(), "next block ready timestamp")
     Test.truthy(state.globalFingerprintDirty, "block merge should dirty the global fingerprint while the pull session is still active")
     Test.eq(countSentKind(requester.state.sentComm, "BLOCK_PULL_REQUEST"), 1, "second block pull should not be sent inline with the merge")
