@@ -42,7 +42,6 @@ local time = time
 local pairs = pairs
 local ipairs = ipairs
 local sort = table.sort
-local concat = table.concat
 local tostring = tostring
 
 local KNOWN_OWNER_OFFLINE_STALE_DAYS = 14
@@ -387,17 +386,6 @@ local function buildLocaleMap()
     end
     localeMap["Smelting"] = "Mining"
 end
-
-local function stableRecipeSignature(recipeKeys)
-    local keys = {}
-    for recipeKey in pairs(recipeKeys or {}) do
-        keys[#keys + 1] = tonumber(recipeKey) or recipeKey
-    end
-    sort(keys, function(a, b) return tostring(a) < tostring(b) end)
-    return concat(keys, ":")
-end
-
-Private.stableRecipeSignature = stableRecipeSignature
 
 local function lowerSafe(v)
     if v == nil then return "" end
@@ -1146,7 +1134,9 @@ function Data:NormalizeProfessionBlock(entry, professionKey, prof)
     prof = prof or {}
     prof.recipes = prof.recipes or {}
     prof.count = countRecipeKeys(prof.recipes)
-    prof.signature = stableRecipeSignature(prof.recipes)
+    -- Legacy `signature` field is no longer used (scan now does set-diff
+    -- inline). Strip it on normalize so SavedVariables shed it next save.
+    prof.signature = nil
     prof.skillRank = prof.skillRank or 0
     prof.skillMaxRank = prof.skillMaxRank or 0
     prof.specialization = prof.specialization or nil

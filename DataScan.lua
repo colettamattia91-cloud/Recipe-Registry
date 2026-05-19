@@ -35,7 +35,28 @@ local restoreCraftFilters = Private.restoreCraftFilters
 local restoreTradeSkillFilters = Private.restoreTradeSkillFilters
 local snapshotCraftFilters = Private.snapshotCraftFilters
 local snapshotTradeSkillFilters = Private.snapshotTradeSkillFilters
-local stableRecipeSignature = Private.stableRecipeSignature
+-- Set-difference compare on two recipe-key maps. Used by ApplyScanResult to
+-- decide whether a scan actually altered the local recipe set; the old code
+-- stored a pre-joined `prof.signature` in SavedVariables for the same
+-- purpose, but that string was pure duplicated data and cost ~100s of KB
+-- written to disk on every logout for medium guilds. Comparing the two key
+-- sets directly is a few hundred hashtable lookups — negligible.
+local function recipeSetDiffers(currentRecipes, nextRecipeKeys)
+    if not currentRecipes then
+        return next(nextRecipeKeys or {}) ~= nil
+    end
+    for key in pairs(nextRecipeKeys or {}) do
+        if not currentRecipes[key] then
+            return true
+        end
+    end
+    for key in pairs(currentRecipes) do
+        if not (nextRecipeKeys and nextRecipeKeys[key]) then
+            return true
+        end
+    end
+    return false
+end
 
 local function isManualScanReason(reason)
     local text = tostring(reason or "")
@@ -572,9 +593,7 @@ function Data:ApplyScanResult(profession, recipeKeys, opts)
     local context = resolveScanContext(opts)
     local entry = self:GetOrCreateMember(self:GetPlayerKey())
     local prof = entry.professions[profession] or { recipes = {} }
-    local oldSignature = prof.signature or ""
-    local newSignature = stableRecipeSignature(recipeKeys)
-    local recipeChanged = (oldSignature ~= newSignature)
+    local recipeChanged = recipeSetDiffers(prof.recipes, recipeKeys)
     local previousCount = prof.count or countRecipeKeys(prof.recipes)
     local count = countRecipeKeys(recipeKeys)
     local oldSpecialization = prof.specialization
@@ -603,7 +622,7 @@ function Data:ApplyScanResult(profession, recipeKeys, opts)
     for recipeKey in pairs(recipeKeys or {}) do
         prof.recipes[recipeKey] = true
     end
-    prof.signature = newSignature
+    prof.signature = nil  -- legacy field; nil-out so SavedVariables sheds it on next save
     prof.count = count
     prof.lastScan = time()
     prof.lastUpdatedAt = prof.lastScan

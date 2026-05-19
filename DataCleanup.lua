@@ -10,7 +10,6 @@ local sort = table.sort
 local cloneTableShallow = Private.cloneTableShallow
 local countRecipeKeys = Private.countRecipeKeys
 local isValidRecipeKey = Private.isValidRecipeKey
-local stableRecipeSignature = Private.stableRecipeSignature
 
 local function newCorruptCleanStats()
     return {
@@ -137,12 +136,13 @@ local function cleanCorruptMember(data, memberKey, entry, opts, stats, dirtyBloc
                 end
             end
 
-            local actualSignature = stableRecipeSignature(recipesForStats)
-            if prof.signature ~= actualSignature then
+            -- `prof.signature` is a legacy field; if leftover from older
+            -- saves, strip it so the entry is canonical on next write.
+            if prof.signature ~= nil then
                 stats.repairedSignatures = stats.repairedSignatures + 1
                 blockDirty = true
                 if not dryRun then
-                    prof.signature = actualSignature
+                    prof.signature = nil
                 end
             end
 

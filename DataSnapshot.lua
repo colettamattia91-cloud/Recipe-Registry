@@ -7,7 +7,6 @@ local pairs = pairs
 local tostring = tostring
 
 local countRecipeKeys = Private.countRecipeKeys
-local stableRecipeSignature = Private.stableRecipeSignature
 
 function Data:GetLocalSummary()
     if self.BuildLocalSummary then
@@ -83,7 +82,7 @@ function Data:ApplyIncomingBlockAdditive(blockKey, snapshot, opts)
     profession.sourceType = profession.sourceType or entry.sourceType or opts.sourceType or "replica"
     profession.lastUpdatedAt = time()
     profession.count = countRecipeKeys(profession.recipes)
-    profession.signature = stableRecipeSignature(profession.recipes)
+    profession.signature = nil  -- legacy field; drop on merge so SavedVariables sheds it
 
     entry.owner = ownerCharacter
     entry.sourceType = entry.sourceType or opts.sourceType or self:GetMemberSourceType(ownerCharacter)
