@@ -17,6 +17,14 @@ local NODE_TIMEOUT = 95
 local HELLO_INTERVAL = 30
 local AUTO_SYNC_INTERVAL = 20
 local PEER_BACKOFF_SECONDS = 45
+-- Grace periods after entering the world. Sync stays paused (no HELLO
+-- broadcast, no inbound serving) for this long so the addon doesn't
+-- compete with WoW's load/reload/zone-change for frame time. Login and
+-- reload have their own values because those events do far more work
+-- (item cache priming, guild roster fetch, AtlasLoot warmup, full
+-- profession scan) than a plain zone change.
+local POST_LOGIN_GRACE_SECONDS = 30
+local POST_RELOAD_GRACE_SECONDS = 25
 local POST_WORLD_GRACE_SECONDS = 12
 local POST_INSTANCE_GRACE_SECONDS = 15
 local POST_RELOAD_IN_INSTANCE_GRACE_SECONDS = 30
@@ -260,6 +268,8 @@ Private.constants = {
     HELLO_INTERVAL = HELLO_INTERVAL,
     AUTO_SYNC_INTERVAL = AUTO_SYNC_INTERVAL,
     PEER_BACKOFF_SECONDS = PEER_BACKOFF_SECONDS,
+    POST_LOGIN_GRACE_SECONDS = POST_LOGIN_GRACE_SECONDS,
+    POST_RELOAD_GRACE_SECONDS = POST_RELOAD_GRACE_SECONDS,
     POST_WORLD_GRACE_SECONDS = POST_WORLD_GRACE_SECONDS,
     POST_INSTANCE_GRACE_SECONDS = POST_INSTANCE_GRACE_SECONDS,
     POST_RELOAD_IN_INSTANCE_GRACE_SECONDS = POST_RELOAD_IN_INSTANCE_GRACE_SECONDS,

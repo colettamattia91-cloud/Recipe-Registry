@@ -418,10 +418,21 @@ function Addon:OnPlayerEnteringWorld(_event, isLogin, isReload)
     if self.Sync and self.Sync.EnterWorldTransition then
         local syncConstants = self.Sync._private and self.Sync._private.constants or {}
         local inInstance = IsInInstance and select(1, IsInInstance()) or false
-        local duration = inInstance and (syncConstants.POST_INSTANCE_GRACE_SECONDS or 15)
-            or (syncConstants.POST_WORLD_GRACE_SECONDS or 12)
-        if (isLogin or isReload) and inInstance then
-            duration = syncConstants.POST_RELOAD_IN_INSTANCE_GRACE_SECONDS or duration
+        -- Pick the longest applicable grace for the event we're handling.
+        -- Login and reload do a lot more work than a zone change (item
+        -- cache priming, full guild roster fetch, AtlasLoot warmup,
+        -- profession scan), so they get their own dedicated values.
+        local duration
+        if inInstance and (isLogin or isReload) then
+            duration = syncConstants.POST_RELOAD_IN_INSTANCE_GRACE_SECONDS or 30
+        elseif isLogin then
+            duration = syncConstants.POST_LOGIN_GRACE_SECONDS or 30
+        elseif isReload then
+            duration = syncConstants.POST_RELOAD_GRACE_SECONDS or 25
+        elseif inInstance then
+            duration = syncConstants.POST_INSTANCE_GRACE_SECONDS or 15
+        else
+            duration = syncConstants.POST_WORLD_GRACE_SECONDS or 12
         end
         self.Sync:EnterWorldTransition(
             isLogin and "login"
