@@ -292,11 +292,22 @@ local function openWhisperWindow(target)
     end
 end
 
+-- Shift-click routing for an item link. HandleModifiedItemClick is WoW's
+-- canonical entry point that dispatches the link to whatever currently
+-- has focus: chat edit boxes, the auction house search field, dressing
+-- room, profession windows, etc. Falls back to ChatEdit_InsertLink only
+-- if the routing helper is unavailable (very old clients).
 local function insertLinkInChat(link)
     if not link then return false end
-    if type(ChatEdit_InsertLink) ~= "function" then return false end
-    local ok = ChatEdit_InsertLink(link)
-    return ok and true or false
+    if type(HandleModifiedItemClick) == "function" then
+        local ok = HandleModifiedItemClick(link)
+        if ok then return true end
+    end
+    if type(ChatEdit_InsertLink) == "function" then
+        local ok = ChatEdit_InsertLink(link)
+        return ok and true or false
+    end
+    return false
 end
 
 local function createStatCard(parent, label, width)
@@ -1782,12 +1793,18 @@ function UI:RenderDetailLines(lines, lineLinks, lineMeta)
         line:ClearAllPoints()
         line:SetPoint("TOPLEFT", 0, -yOffset)
         line:SetWidth(420)
-        if meta and meta.canRequest and meta.memberKey then
+        -- requestTarget drives the left-click whisper-open (always
+        -- available for non-self crafters). actionButton is the "request
+        -- this craft" affordance which sends a whisper from the addon —
+        -- gated by canRequest so it stays hidden while the sync pause
+        -- policy is active (raid/instance/combat).
+        if meta and meta.memberKey and (meta.canWhisper or meta.canRequest) then
             line.requestTarget = whisperTargetFromMemberKey(meta.memberKey)
-            setShownIfChanged(line.actionButton, true)
+            local showActionButton = meta.canRequest == true
+            setShownIfChanged(line.actionButton, showActionButton)
             line.text:ClearAllPoints()
             line.text:SetPoint("TOPLEFT", 0, 0)
-            line.text:SetPoint("TOPRIGHT", -24, 0)
+            line.text:SetPoint("TOPRIGHT", showActionButton and -24 or -4, 0)
         else
             setShownIfChanged(line.actionButton, false)
             line.text:ClearAllPoints()
@@ -1920,10 +1937,18 @@ function UI:RefreshDetailPanel()
                 nameText = nameText .. " " .. colorText("[" .. crafter.specialization .. "]", unpackColor(MUTED))
             end
             lines[#lines + 1] = string.format("%s %s", state, nameText)
-            if (not selfKey or crafter.memberKey ~= selfKey)
-                and not (Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("BLOCK_PULL_REQUEST")) then
+            if not selfKey or crafter.memberKey ~= selfKey then
+                -- canWhisper is a local UI action (opens a chat window) and
+                -- has no sync implications, so it stays enabled even when
+                -- SyncPausePolicy pauses protocol traffic (raids,
+                -- instances, combat). canRequest gates the "request a
+                -- craft" action button, which DOES send a whisper from
+                -- the addon — kept under the sync-pause gate so we don't
+                -- emit chat messages while the player is busy.
+                local canRequest = not (Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("BLOCK_PULL_REQUEST"))
                 lineMeta[#lines] = {
-                    canRequest = true,
+                    canRequest = canRequest,
+                    canWhisper = true,
                     memberKey = crafter.memberKey,
                 }
             end

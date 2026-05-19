@@ -139,7 +139,7 @@ local function createSlider(parent, label, low, high, step, valueFormat, onValue
     _sliderCounter = _sliderCounter + 1
     local name = "RecipeRegistryOptionsSlider" .. _sliderCounter
     local slider = CreateFrame("Slider", name, parent, "OptionsSliderTemplate")
-    slider:SetWidth(220)
+    slider:SetWidth(260)
     slider:SetHeight(16)
     slider:SetMinMaxValues(low, high)
     slider:SetValueStep(step or 1)
@@ -147,30 +147,34 @@ local function createSlider(parent, label, low, high, step, valueFormat, onValue
         slider:SetObeyStepOnDrag(true)
     end
 
-    local labelText = _G[name .. "Text"]
-    if labelText then labelText:SetText(label or "") end
-    local lowLabel = _G[name .. "Low"]
-    if lowLabel then lowLabel:SetText(string.format(valueFormat or "%s", low)) end
-    local highLabel = _G[name .. "High"]
-    if highLabel then highLabel:SetText(string.format(valueFormat or "%s", high)) end
+    local fmt = valueFormat or "%s"
 
-    local current = parent:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    current:SetPoint("LEFT", slider, "RIGHT", 12, 0)
-    current:SetJustifyH("LEFT")
-    slider.current = current
-    slider.valueFormat = valueFormat or "%s"
+    -- OptionsSliderTemplate places low/high labels below the slider's
+    -- bottom-left and bottom-right corners. Putting the current value to
+    -- the right of the slider (the previous layout) caused it to overlap
+    -- the "high" label on shorter values. Fold the current value into
+    -- the title text instead — single source of truth, no collisions.
+    local titleText = _G[name .. "Text"]
+    local function applyTitle(value)
+        if not titleText then return end
+        titleText:SetText(string.format("%s: %s", label or "", string.format(fmt, value)))
+    end
+
+    local lowLabel = _G[name .. "Low"]
+    if lowLabel then lowLabel:SetText(string.format(fmt, low)) end
+    local highLabel = _G[name .. "High"]
+    if highLabel then highLabel:SetText(string.format(fmt, high)) end
+
+    slider.valueFormat = fmt
+    slider.applyTitle = applyTitle
 
     function slider:SetDisplayValue(value)
         self:SetValue(value)
-        if self.current then
-            self.current:SetText(string.format(self.valueFormat, value))
-        end
+        applyTitle(value)
     end
 
     slider:SetScript("OnValueChanged", function(self, value, userInput)
-        if self.current then
-            self.current:SetText(string.format(self.valueFormat, value))
-        end
+        applyTitle(value)
         if userInput and onValueChanged then
             onValueChanged(value)
         end
@@ -312,13 +316,19 @@ function Options:EnsurePanel()
     end)
     openButton:SetPoint("TOPLEFT", minimapCheck, "BOTTOMLEFT", 2, -10)
 
-    local tuningHeader = createHeader(panel, "Sync Tuning", openButton, -22)
+    local tuningHeader = createHeader(panel, "Sync Tuning", openButton, -28)
     local tuningHelp = createText(panel,
         "Advanced. Defaults work for most setups; lower the pull delay only on fast PCs, raise it if you see stutter during massive syncs.")
     tuningHelp:SetPoint("TOPLEFT", tuningHeader, "BOTTOMLEFT", 0, -6)
 
+    -- Each slider needs ~16px slider body + ~12-14px below for the
+    -- low/high tick labels rendered by OptionsSliderTemplate. The next
+    -- anchor below has to leave room for both, otherwise the next
+    -- slider's title text overlaps the previous slider's tick labels.
+    local SLIDER_VERTICAL_GAP = 56
+
     local pullDelaySlider = createSlider(panel,
-        "Pull cadence (seconds between block requests)",
+        "Pull cadence",
         TUNING_BOUNDS.blockPullDelaySeconds.min,
         TUNING_BOUNDS.blockPullDelaySeconds.max,
         0.5,
@@ -327,11 +337,11 @@ function Options:EnsurePanel()
             setTuning("blockPullDelaySeconds", value)
         end
     )
-    pullDelaySlider:SetPoint("TOPLEFT", tuningHelp, "BOTTOMLEFT", 6, -24)
+    pullDelaySlider:SetPoint("TOPLEFT", tuningHelp, "BOTTOMLEFT", 6, -28)
     self.pullDelaySlider = pullDelaySlider
 
     local maxSeedSlider = createSlider(panel,
-        "Max peers served in parallel (inbound seed cap)",
+        "Max peers served in parallel",
         TUNING_BOUNDS.maxInboundSeedSessions.min,
         TUNING_BOUNDS.maxInboundSeedSessions.max,
         1,
@@ -340,11 +350,11 @@ function Options:EnsurePanel()
             setTuning("maxInboundSeedSessions", value)
         end
     )
-    maxSeedSlider:SetPoint("TOPLEFT", pullDelaySlider, "BOTTOMLEFT", 0, -34)
+    maxSeedSlider:SetPoint("TOPLEFT", pullDelaySlider, "BOTTOMLEFT", 0, -SLIDER_VERTICAL_GAP)
     self.maxSeedSlider = maxSeedSlider
 
     local pullTimeoutSlider = createSlider(panel,
-        "Block pull response timeout (seconds)",
+        "Block pull response timeout",
         TUNING_BOUNDS.blockPullResponseTimeoutSeconds.min,
         TUNING_BOUNDS.blockPullResponseTimeoutSeconds.max,
         5,
@@ -353,10 +363,10 @@ function Options:EnsurePanel()
             setTuning("blockPullResponseTimeoutSeconds", value)
         end
     )
-    pullTimeoutSlider:SetPoint("TOPLEFT", maxSeedSlider, "BOTTOMLEFT", 0, -34)
+    pullTimeoutSlider:SetPoint("TOPLEFT", maxSeedSlider, "BOTTOMLEFT", 0, -SLIDER_VERTICAL_GAP)
     self.pullTimeoutSlider = pullTimeoutSlider
 
-    local toolsHeader = createHeader(panel, "Tools", pullTimeoutSlider, -28)
+    local toolsHeader = createHeader(panel, "Tools", pullTimeoutSlider, -44)
     local priceDiagButton = createButton(panel, "Price Providers Status", 180, function()
         if Addon.Market and Addon.Market.DumpStatus then
             Addon.Market:DumpStatus("")
