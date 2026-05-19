@@ -3,13 +3,25 @@ local BuildInfo = Addon.BuildInfo or {}
 
 Addon.BuildInfo = BuildInfo
 
+-- WoW renamed GetAddOnMetadata into the C_AddOns namespace over time
+-- (deprecated as a global in retail 10.2; Classic clients are migrating
+-- on their own schedule). On a client where only the C_AddOns variant
+-- exists, the global is nil and reading metadata via it silently fails.
+-- Falling through to BuildInfo's hardcoded "2.0.0" then poisoned the
+-- runtime ADDON_VERSION even when the TOC said otherwise, breaking the
+-- version-notice path. Try both APIs.
 local function getMetadata(field)
-    if type(GetAddOnMetadata) ~= "function" then
-        return nil
+    if type(C_AddOns) == "table" and type(C_AddOns.GetAddOnMetadata) == "function" then
+        local ok, value = pcall(C_AddOns.GetAddOnMetadata, "RecipeRegistry", field)
+        if ok and type(value) == "string" and value ~= "" then
+            return value
+        end
     end
-    local ok, value = pcall(GetAddOnMetadata, "RecipeRegistry", field)
-    if ok and type(value) == "string" and value ~= "" then
-        return value
+    if type(GetAddOnMetadata) == "function" then
+        local ok, value = pcall(GetAddOnMetadata, "RecipeRegistry", field)
+        if ok and type(value) == "string" and value ~= "" then
+            return value
+        end
     end
     return nil
 end
