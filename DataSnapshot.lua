@@ -53,6 +53,7 @@ function Data:ApplyIncomingBlockAdditive(blockKey, snapshot, opts)
     local existingEntry = self:GetMember(ownerCharacter)
     local entry = self:GetOrCreateMember(ownerCharacter)
     local entryIsNew = existingEntry == nil
+    local previousGuildStatus = entry.guildStatus or "active"
     local currentProf = entry.professions and entry.professions[professionKey] or nil
     local localBlock = {
         recipes = currentProf and currentProf.recipes or {},
@@ -124,7 +125,16 @@ function Data:ApplyIncomingBlockAdditive(blockKey, snapshot, opts)
     entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, profession)
     self.db.global.members[ownerCharacter] = self:NormalizeMemberEntry(entry, ownerCharacter)
 
-    if self.MarkSyncIndexDirty then
+    -- If the merge flipped the owner from stale to active, the entry's
+    -- OTHER professions were previously excluded from the sync index by
+    -- shouldPublishOwner and need to be re-added. Marking only the
+    -- merged block dirty would leave those other professions invisible
+    -- until the next full rebuild. Touch them all so rebuildDirtyBlocks
+    -- picks them up incrementally.
+    local statusFlippedToActive = previousGuildStatus ~= "active" and (entry.guildStatus or "active") == "active"
+    if statusFlippedToActive and self.MarkOwnerSyncBlocksDirty then
+        self:MarkOwnerSyncBlocksDirty(ownerCharacter, "block-merge:stale-to-active")
+    elseif self.MarkSyncIndexDirty then
         self:MarkSyncIndexDirty("block-merge:" .. tostring(blockKey), blockKey)
     end
     self:InvalidateRecipeCaches("metadata")

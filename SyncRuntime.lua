@@ -776,24 +776,31 @@ end
 function Sync:MaybeNotifyPeerVersion(peerKey, info)
     info = info or self:GetPeerVersionInfo(peerKey)
     if type(info) ~= "table" then
+        Addon:Tracef("sync", "version-notice-skip peer=%s reason=no-peer-info", tostring(peerKey or "unknown"))
         return
     end
     local notice = Addon.Data and Addon.Data.GetUpdateNoticeState and Addon.Data:GetUpdateNoticeState() or nil
     if not notice then
+        Addon:Tracef("sync", "version-notice-skip peer=%s reason=no-notice-state", tostring(peerKey or "unknown"))
         return
     end
     local localChannel = tostring(Addon.BUILD_CHANNEL or "release")
     local remoteChannel = tostring(info.buildChannel or "unknown")
     if localChannel == "dev" then
         if remoteChannel ~= "dev" then
+            Addon:Tracef("sync", "version-notice-skip peer=%s reason=channel-mismatch local=%s remote=%s",
+                tostring(peerKey or "unknown"), localChannel, remoteChannel)
             return
         end
     else
         if remoteChannel == "dev" or remoteChannel == "unsupported" or remoteChannel == "unknown" then
+            Addon:Tracef("sync", "version-notice-skip peer=%s reason=channel-mismatch local=%s remote=%s",
+                tostring(peerKey or "unknown"), localChannel, remoteChannel)
             return
         end
     end
     if not compareSemver then
+        Addon:Tracef("sync", "version-notice-skip peer=%s reason=no-comparator", tostring(peerKey or "unknown"))
         return
     end
 
@@ -815,17 +822,35 @@ function Sync:MaybeNotifyPeerVersion(peerKey, info)
             self.telemetry.lastVersionNoticePeer = peerKey
             self.telemetry.lastVersionNoticeRemote = tostring(info.wireVersion or "unknown")
             self.telemetry.newerProtocolSeen = (self.telemetry.newerProtocolSeen or 0) + 1
+            Addon:Tracef("sync", "version-notice-protocol peer=%s remoteWire=%s",
+                tostring(peerKey or "unknown"), tostring(info.wireVersion or "?"))
+        else
+            Addon:Tracef("sync", "version-notice-skip peer=%s reason=wire-cooldown", tostring(peerKey or "unknown"))
         end
         return
     end
 
-    local cmp = compareSemver(info.addonVersion, Addon.ADDON_VERSION or Addon.DISPLAY_VERSION)
+    local localAddonVersion = Addon.ADDON_VERSION or Addon.DISPLAY_VERSION
+    local cmp = compareSemver(info.addonVersion, localAddonVersion)
     if cmp == nil or cmp <= 0 then
+        Addon:Tracef("sync",
+            "version-notice-skip peer=%s reason=not-newer local=%s remote=%s cmp=%s",
+            tostring(peerKey or "unknown"),
+            tostring(localAddonVersion or "?"),
+            tostring(info.addonVersion or "?"),
+            tostring(cmp)
+        )
         return
     end
     local sameVersionCooldown = tostring(notice.lastNoticedVersion or "") == tostring(info.addonVersion or "")
         and (now - (notice.lastUpdateNoticeAt or 0)) < VERSION_NOTICE_COOLDOWN
     if sameVersionCooldown then
+        Addon:Tracef("sync",
+            "version-notice-skip peer=%s reason=cooldown remote=%s ageSec=%d",
+            tostring(peerKey or "unknown"),
+            tostring(info.addonVersion or "?"),
+            now - (notice.lastUpdateNoticeAt or 0)
+        )
         return
     end
 
@@ -840,6 +865,12 @@ function Sync:MaybeNotifyPeerVersion(peerKey, info)
     self.telemetry.lastVersionNoticePeer = peerKey
     self.telemetry.lastVersionNoticeRemote = tostring(info.addonVersion or "unknown")
     self.telemetry.newerVersionSeen = (self.telemetry.newerVersionSeen or 0) + 1
+    Addon:Tracef("sync",
+        "version-notice-fired peer=%s local=%s remote=%s",
+        tostring(peerKey or "unknown"),
+        tostring(localAddonVersion or "?"),
+        tostring(info.addonVersion or "?")
+    )
 end
 
 function Sync:ShouldAllowLocalMockTraffic(sourceKey, memberKey)
@@ -979,8 +1010,19 @@ local function applyRosterSnapshotOutcome(self, outcome)
             full = true,
         })
         dirtied = true
-    else
-        dirtied = #((outcome and outcome.affectedBlockKeys) or {}) > 0
+    elseif Addon.Data and Addon.Data.MarkSyncIndexDirty then
+        -- Explicitly mark each affected block dirty. Previously the index
+        -- cache caught this via the rosterSignature gate, but that signature
+        -- now intentionally ignores knownOwnerKeys (so block merges of new
+        -- owners don't force a full rebuild). When the preflight detects
+        -- per-owner eligibility changes that DON'T move the in-guild snapshot
+        -- keys, we have to mark the affected blocks ourselves so
+        -- rebuildDirtyBlocks picks them up incrementally.
+        local affected = (outcome and outcome.affectedBlockKeys) or {}
+        for i = 1, #affected do
+            Addon.Data:MarkSyncIndexDirty("known-owner-eligibility-change", affected[i])
+        end
+        dirtied = #affected > 0
     end
 
     if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then

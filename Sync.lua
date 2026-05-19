@@ -25,7 +25,15 @@ local ROSTER_FRESHNESS_MAX_AGE = 20
 local SUMMARY_COLLECTION_WINDOW = 6
 local SUMMARY_SATURATION_THRESHOLD = 80
 local BLOCK_PULL_DELAY_SECONDS = 1.0
-local BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS = 20
+-- Per-block response window. AceComm BULK priority is rate-limited by
+-- ChatThrottleLib (~800 bytes/sec shared across all BULK queues). A
+-- typical BLOCK_SNAPSHOT compressed is 1-3 KB; a seeder serving multiple
+-- peers can take 10-15s to push a single snapshot out the door. 20s left
+-- no headroom and produced spurious block-response-timeout aborts
+-- mid-pull, forcing the requester to start over and pull everything
+-- again on the next cycle. The 60s SESSION_TIMEOUT still bounds total
+-- stall in case the seeder truly stops responding.
+local BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS = 60
 local HELLO_RESCHEDULE_DELAY_SECONDS = 5
 local HELLO_RESCHEDULE_JITTER_SECONDS = 10
 local POST_SYNC_HELLO_COOLDOWN_SECONDS = 30

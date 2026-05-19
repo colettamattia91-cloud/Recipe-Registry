@@ -138,6 +138,17 @@ local function buildRosterState(self, reason)
     }
 end
 
+-- Two signatures are produced, with different invalidation semantics:
+--   `signature` — full view (every known owner with inRoster/publishActive/
+--     guildStatus). Changes any time a new owner appears via block merge or
+--     a status flips. Used by GetRosterSyncUpdatePlan to compute which
+--     specific owners changed between two snapshots.
+--   `snapshotSignature` — trusted state + the in-guild keys reported by the
+--     roster preflight. Independent of `knownOwnerKeys`, so a block merge
+--     that introduces a brand-new owner does NOT change it. This is what
+--     the index cache gates on: a new owner's block is already in
+--     cache.dirtyBlocks, so rebuildDirtyBlocks adds it without paying for
+--     a full rebuild over all existing owners.
 local function buildSyncRelevantRosterView(self, rosterState, knownOwnerKeys)
     local selfKey = self:GetPlayerKey()
     local view = {}
@@ -165,8 +176,20 @@ local function buildSyncRelevantRosterView(self, rosterState, knownOwnerKeys)
         )
     end
     sortStrings(parts)
+
+    local snapshotParts = {
+        tostring(rosterState and rosterState.trusted == true),
+    }
+    if rosterState and type(rosterState.snapshot) == "table" then
+        for memberKey in pairs(rosterState.snapshot) do
+            snapshotParts[#snapshotParts + 1] = tostring(memberKey)
+        end
+    end
+    sortStrings(snapshotParts)
+
     return {
         signature = table.concat(parts, "::"),
+        snapshotSignature = table.concat(snapshotParts, "::"),
         view = view,
         knownOwnersChecked = #(knownOwnerKeys or {}),
         unknownMembersIgnored = max(0, guildCount - #(knownOwnerKeys or {})),
@@ -470,7 +493,7 @@ local function rebuildDirtyBlocks(self, cache, rosterState, reason)
     end
     local knownOwnerKeys = self.GetKnownSyncOwnerKeys and self:GetKnownSyncOwnerKeys() or {}
     local rosterSync = buildSyncRelevantRosterView(self, rosterState, knownOwnerKeys)
-    if cache.rosterSignature ~= rosterSync.signature then
+    if cache.rosterSignature ~= rosterSync.snapshotSignature then
         rebuildAllBlocks(self, cache, rosterState, reason or "roster-changed")
         return
     end
@@ -530,10 +553,16 @@ local function ensureLiveIndex(self, reason, opts)
     local rosterState = buildRosterState(self, reason or "sync-index")
     local knownOwnerKeys = self.GetKnownSyncOwnerKeys and self:GetKnownSyncOwnerKeys() or {}
     local rosterSync = buildSyncRelevantRosterView(self, rosterState, knownOwnerKeys)
-    local nextRosterSignature = rosterSync.signature
+    -- Cache gating uses the SNAPSHOT signature (in-guild keys + trusted
+    -- state). The full view signature is kept on `state` for
+    -- GetRosterSyncUpdatePlan, which compares views to find which owners
+    -- changed eligibility. Adding a new known owner via block merge
+    -- mutates the view signature but NOT the snapshot signature, so the
+    -- merge no longer forces a full rebuild over all existing owners.
+    local nextSnapshotSignature = rosterSync.snapshotSignature
 
     local hasCache = (cache.builtAt or 0) > 0 and cache.rosterSignature ~= nil
-    local needsFullRebuild = not hasCache or cache.dirtyAll or cache.rosterSignature ~= nextRosterSignature
+    local needsFullRebuild = not hasCache or cache.dirtyAll or cache.rosterSignature ~= nextSnapshotSignature
     if needsFullRebuild and opts.allowDeferred == true and shouldDeferFullRebuild(reason or "sync-index") then
         cache.ready = false
         cache.indexStatus = rosterState.trusted == true and "not-ready" or tostring(rosterState.reason or "not-ready")
@@ -551,10 +580,10 @@ local function ensureLiveIndex(self, reason, opts)
         cache.stats.misses = (cache.stats.misses or 0) + 1
         bumpSyncTelemetry("syncIndexCacheMiss")
         rebuildAllBlocks(self, cache, rosterState, reason or "cache-miss")
-    elseif cache.dirtyAll or cache.rosterSignature ~= nextRosterSignature then
+    elseif cache.dirtyAll or cache.rosterSignature ~= nextSnapshotSignature then
         cache.stats.misses = (cache.stats.misses or 0) + 1
         bumpSyncTelemetry("syncIndexCacheMiss")
-        if cache.rosterSignature ~= nextRosterSignature and not cache.dirtyAll then
+        if cache.rosterSignature ~= nextSnapshotSignature and not cache.dirtyAll then
             rebuildAllBlocks(self, cache, rosterState, reason or "roster-changed")
         else
             rebuildDirtyBlocks(self, cache, rosterState, reason or "dirty")
@@ -568,10 +597,10 @@ local function ensureLiveIndex(self, reason, opts)
         bumpSyncTelemetry("syncIndexCacheHit")
     end
 
-    cache.rosterSignature = nextRosterSignature
+    cache.rosterSignature = nextSnapshotSignature
     cache.rosterSyncView = cloneTable(rosterSync.view)
     cache.builtAt = time()
-    state.lastObservedRosterSyncSignature = nextRosterSignature
+    state.lastObservedRosterSyncSignature = rosterSync.signature
     state.lastObservedRosterSyncView = cloneTable(rosterSync.view)
     state.lastObservedRosterTrusted = rosterState.trusted == true
     if cache.globalFingerprintDirty and opts.recomputeGlobalFingerprint == true then
@@ -733,12 +762,12 @@ function Data:GetSyncIndexReadiness(opts)
     local _, cache = ensureSyncIndexState(self)
     local rosterState = buildRosterState(self, opts.reason or "sync-index-readiness")
     local knownOwnerKeys = self.GetKnownSyncOwnerKeys and self:GetKnownSyncOwnerKeys() or {}
-    local nextRosterSignature = buildSyncRelevantRosterView(self, rosterState, knownOwnerKeys).signature
+    local nextSnapshotSignature = buildSyncRelevantRosterView(self, rosterState, knownOwnerKeys).snapshotSignature
     local dirty = cache.dirtyAll == true or (cache.dirtyBlockCount or 0) > 0 or cache.globalFingerprintDirty == true
     local ready = rosterState.trusted == true
         and cache.ready == true
         and cache.builtAt > 0
-        and cache.rosterSignature == nextRosterSignature
+        and cache.rosterSignature == nextSnapshotSignature
         and not dirty
     if not ready and opts.schedule ~= false then
         self:ScheduleSyncIndexPrepare(opts.reason or "sync-index-readiness", opts.delay)
@@ -898,9 +927,9 @@ function Data:RefreshSyncBlockRecord(blockKey, reason)
     local _, cache = ensureSyncIndexState(self)
     local rosterState = buildRosterState(self, reason or "block-refresh")
     local knownOwnerKeys = self.GetKnownSyncOwnerKeys and self:GetKnownSyncOwnerKeys() or {}
-    local nextRosterSignature = buildSyncRelevantRosterView(self, rosterState, knownOwnerKeys).signature
+    local nextSnapshotSignature = buildSyncRelevantRosterView(self, rosterState, knownOwnerKeys).snapshotSignature
 
-    if cache.dirtyAll or cache.rosterSignature ~= nextRosterSignature then
+    if cache.dirtyAll or cache.rosterSignature ~= nextSnapshotSignature then
         rebuildAllBlocks(self, cache, rosterState, reason or "block-refresh-full")
     else
         if type(blockKey) == "string" and blockKey ~= "" then
@@ -913,7 +942,7 @@ function Data:RefreshSyncBlockRecord(blockKey, reason)
         rebuildDirtyBlocks(self, cache, rosterState, reason or "block-refresh")
     end
 
-    cache.rosterSignature = nextRosterSignature
+    cache.rosterSignature = nextSnapshotSignature
     cache.builtAt = time()
     syncTelemetryStats(cache)
 
