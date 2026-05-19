@@ -1,10 +1,7 @@
 local Addon = _G.RecipeRegistry
-local Market = Addon:NewModule("Market")
+local Market = Addon:NewModule("Market", "AceEvent-3.0")
 Addon.Market = Market
 
-local time = time
-
-local PRICE_CACHE_TTL = 30
 local TSM_SOURCES = { "dbmarket", "dbminbuyout" }
 
 local function itemStringFromID(itemID)
@@ -80,6 +77,30 @@ function Market:OnInitialize()
     self.priceCache = {}
 end
 
+function Market:OnEnable()
+    -- TSM and Auctionator refresh their price data when the player runs
+    -- an auction-house scan. The cleanest moment to drop our derived
+    -- cache is when the AH window closes — by then the upstream scan
+    -- (if any) has finished writing. We also invalidate the recipe
+    -- detail cache so an open recipe panel recomputes its cost block
+    -- on next refresh.
+    self:RegisterEvent("AUCTION_HOUSE_CLOSED", "OnAuctionHouseClosed")
+end
+
+function Market:OnAuctionHouseClosed()
+    self:InvalidatePriceCache("auction-house-closed")
+end
+
+function Market:InvalidatePriceCache(reason)
+    self.priceCache = {}
+    if Addon.Data and Addon.Data.InvalidateRecipeCaches then
+        Addon.Data:InvalidateRecipeCaches("metadata")
+    end
+    if Addon.RequestRefresh then
+        Addon:RequestRefresh(reason or "prices")
+    end
+end
+
 function Market:GetPriceFromTSM(itemID)
     local api = _G.TSM_API
     local itemString = itemStringFromID(itemID)
@@ -147,12 +168,17 @@ function Market:GetPriceFromAuctionator(itemID, itemLink)
     return nil
 end
 
+-- Price cache lifetime is event-driven, not time-gated: the underlying
+-- TSM/Auctionator data only changes when the user runs an auction-house
+-- scan, so we wipe the cache on AUCTION_HOUSE_CLOSED instead of expiring
+-- entries at an arbitrary clock interval. People who scan once a day (or
+-- once a week) would otherwise pay a TSM/Auctionator query per material
+-- per detail render every 30 seconds for the same stale numbers.
 function Market:GetMaterialCost(itemID, itemLink)
     if not itemID then return nil, nil end
 
-    local now = time()
     local cached = self.priceCache[itemID]
-    if cached and (now - (cached.at or 0)) < PRICE_CACHE_TTL then
+    if cached then
         return cached.price, cached.source
     end
 
@@ -164,7 +190,6 @@ function Market:GetMaterialCost(itemID, itemLink)
     self.priceCache[itemID] = {
         price = price,
         source = source,
-        at = now,
     }
 
     return price, source
@@ -290,10 +315,14 @@ function Market:DumpStatus(rest)
         and (type(_G.Auctionator.API.v1.GetAuctionPriceByItemID) == "function"
             or type(_G.Auctionator.API.v1.GetAuctionPriceByItemLink) == "function")
 
-    Addon:Print(string.format("Price providers: TSM=%s Auctionator=%s cacheTTL=%ds",
+    local cached = 0
+    for _ in pairs(self.priceCache or {}) do
+        cached = cached + 1
+    end
+    Addon:Print(string.format("Price providers: TSM=%s Auctionator=%s cached=%d (invalidated on AH close)",
         hasTSM and "yes" or "no",
         hasAuctionator and "yes" or "no",
-        PRICE_CACHE_TTL
+        cached
     ))
 
     local query = tostring(rest or ""):gsub("^%s+", ""):gsub("%s+$", "")

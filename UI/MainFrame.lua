@@ -1616,6 +1616,18 @@ end
 -- pool grows on demand and never shrinks below the largest window ever
 -- needed, so swapping a 5-row Favorites tab for a 2000-row global search
 -- keeps the pool size at ~ visibleRows + buffer (typically 10-15).
+--
+-- OnVerticalScroll fires per pixel during a scroll gesture but the actual
+-- visible window only changes every RECIPE_ROW_HEIGHT pixels. We cache the
+-- last bound window and skip rebind when neither bound has moved. The
+-- cache is cleared by RefreshRecipeList/RefreshVisibleRecipeRowAssets,
+-- which are the entry points where the underlying data (or selection)
+-- can change while the window stays the same.
+function UI:InvalidateRecipeWindowCache()
+    self._lastRenderedFirstIdx = nil
+    self._lastRenderedLastIdx = nil
+end
+
 function UI:RenderVisibleRecipeRows()
     if not self.frame or not self.currentRecipeRows then return end
     local rows = self.currentRecipeRows
@@ -1625,6 +1637,7 @@ function UI:RenderVisibleRecipeRows()
         for i = 1, #pool do
             setShownIfChanged(pool[i], false)
         end
+        self:InvalidateRecipeWindowCache()
         return
     end
 
@@ -1639,6 +1652,11 @@ function UI:RenderVisibleRecipeRows()
 
     local firstIdx = math.max(1, math.floor(offset / RECIPE_ROW_HEIGHT) + 1 - RECIPE_ROW_BUFFER)
     local lastIdx = math.min(total, math.ceil((offset + viewHeight) / RECIPE_ROW_HEIGHT) + RECIPE_ROW_BUFFER)
+
+    if self._lastRenderedFirstIdx == firstIdx and self._lastRenderedLastIdx == lastIdx then
+        return
+    end
+
     local visibleCount = math.max(0, lastIdx - firstIdx + 1)
 
     local poolSlot = 0
@@ -1650,6 +1668,9 @@ function UI:RenderVisibleRecipeRows()
     for i = visibleCount + 1, #pool do
         setShownIfChanged(pool[i], false)
     end
+
+    self._lastRenderedFirstIdx = firstIdx
+    self._lastRenderedLastIdx = lastIdx
 end
 
 function UI:RefreshRecipeList()
@@ -1722,6 +1743,9 @@ function UI:RefreshRecipeList()
         self.frame.recipeContent:SetHeight(contentHeight)
     end
 
+    -- Data and/or selection just changed: force a re-bind even if the
+    -- visible window indices match the previous render.
+    self:InvalidateRecipeWindowCache()
     self:RenderVisibleRecipeRows()
     self:RefreshSummaryCards()
 end
@@ -1741,6 +1765,8 @@ function UI:RefreshVisibleRecipeRowAssets()
         rowData.detail = detail
         rowData.label = (detail and detail.label) or rowData.label or tostring(rowData.recipeKey)
     end
+    -- Per-row data refreshed: force re-bind on the same window.
+    self:InvalidateRecipeWindowCache()
     self:RenderVisibleRecipeRows()
 end
 
