@@ -128,8 +128,8 @@ Test.it("hides perf dump diagnostics unless debug is enabled", function()
     }
 
     addon:SlashHandler("perf help")
-    Test.truthy(printLogContains(wow, "diagnostica scan"), "perf help should mention scan diagnostics")
-    Test.truthy(printLogContains(wow, "contatori scan"), "perf help should mention scan counters")
+    Test.truthy(printLogContains(wow, "scan diagnostics"), "perf help should mention scan diagnostics")
+    Test.truthy(printLogContains(wow, "scan counters"), "perf help should mention scan counters")
 
     addon:SlashHandler("perf dump")
     Test.truthy(printLogDoesNotContain(wow, "Perf steps="), "perf dump should be hidden without debug")
