@@ -1264,13 +1264,34 @@ function UI:EnsureDetailLine(index)
         line.text:SetWordWrap(true)
     end
 
-    line.actionButton = CreateFrame("Button", nil, line)
-    line.actionButton:SetSize(16, 16)
+    -- Compact text button matching the addon's gold/dark theme. The
+    -- previous icon-only square (a 16x16 tinted FriendsList chat sprite)
+    -- read as visual noise rather than an obvious action affordance —
+    -- the user reported it as "proprio brutto". This version reads as
+    -- a real button: dark fill, gold edge, "Ask" label, hover lift.
+    line.actionButton = CreateFrame("Button", nil, line, "BackdropTemplate")
+    line.actionButton:SetSize(36, 16)
     line.actionButton:SetPoint("RIGHT", -2, 0)
-    line.actionButton.icon = line.actionButton:CreateTexture(nil, "ARTWORK")
-    line.actionButton.icon:SetAllPoints()
-    line.actionButton.icon:SetTexture("Interface\\FriendsFrame\\UI-FriendsList-Small-Up")
-    line.actionButton.icon:SetVertexColor(0.8, 1.0, 0.8, 1)
+    if line.actionButton.SetBackdrop then
+        line.actionButton:SetBackdrop({
+            bgFile   = "Interface\\Buttons\\WHITE8x8",
+            edgeFile = "Interface\\Buttons\\WHITE8x8",
+            edgeSize = 1,
+        })
+        line.actionButton:SetBackdropColor(0.13, 0.11, 0.08, 0.95)
+        line.actionButton:SetBackdropBorderColor(1, 0.82, 0, 0.75)
+    end
+    line.actionButton.label = line.actionButton:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    line.actionButton.label:SetPoint("LEFT", 2, 0)
+    line.actionButton.label:SetPoint("RIGHT", -2, 0)
+    line.actionButton.label:SetJustifyH("CENTER")
+    line.actionButton.label:SetText("Ask")
+    line.actionButton.label:SetTextColor(1.0, 0.92, 0.75)
+    line.actionButton:SetHighlightTexture("Interface\\Buttons\\WHITE8x8", "ADD")
+    local hi = line.actionButton:GetHighlightTexture()
+    if hi and hi.SetVertexColor then
+        hi:SetVertexColor(1, 0.82, 0, 0.18)
+    end
     line.actionButton:SetScript("OnClick", function(self, button)
         if button ~= "LeftButton" then return end
         local parent = self:GetParent()
@@ -1809,7 +1830,9 @@ function UI:RenderDetailLines(lines, lineLinks, lineMeta)
             setShownIfChanged(line.actionButton, showActionButton)
             line.text:ClearAllPoints()
             line.text:SetPoint("TOPLEFT", 0, 0)
-            line.text:SetPoint("TOPRIGHT", showActionButton and -24 or -4, 0)
+            -- Reserve room for the 36px-wide Ask button + 4px breathing
+            -- room. -4 still applies when the button is hidden.
+            line.text:SetPoint("TOPRIGHT", showActionButton and -44 or -4, 0)
         else
             setShownIfChanged(line.actionButton, false)
             line.text:ClearAllPoints()
