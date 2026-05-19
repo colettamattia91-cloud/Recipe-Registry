@@ -247,6 +247,17 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
     end
 
     local peerKey = self:IsValidSyncMemberKey(payload.sender) and payload.sender or nil
+
+    -- Refresh lastSeen on every inbound from a known peer, not just HELLO.
+    -- PruneState runs every 5s and wipes onlineNodes + peerVersions for
+    -- peers not seen in NODE_TIMEOUT (95s). During a long pull the
+    -- requester only sends BLOCK_PULL_REQUEST, never re-HELLOs — so the
+    -- seeder used to prune them mid-pull and then reject subsequent
+    -- pulls via ShouldAcceptInboundPayload (no peer info -> drop).
+    if peerKey and payload.kind ~= "HELLO" then
+        self:TouchNode(peerKey, nil)
+    end
+
     if payload.kind == "HELLO" then
         local allowed, dropReason, remoteChannel = self:IsInboundBuildChannelAllowed(payload, sender)
         if not allowed then

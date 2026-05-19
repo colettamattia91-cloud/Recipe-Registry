@@ -764,6 +764,20 @@ function Sync:ShouldAcceptInboundPayload(payload, peerKey)
                 return true
             end
         end
+        -- Belt-and-suspenders for the seeder side: if peerVersions was
+        -- pruned mid-pull (long sessions exceed NODE_TIMEOUT before the
+        -- requester re-HELLOs), an active inbound seed session is still
+        -- authoritative — we established the relationship via the HELLO
+        -- handshake, so subsequent INDEX_DIFF_REQUEST/BLOCK_PULL_REQUEST
+        -- from that same peer should keep flowing even if the version
+        -- cache expired.
+        if (payload.kind == "BLOCK_PULL_REQUEST" or payload.kind == "INDEX_DIFF_REQUEST")
+            and peerKey
+            and self.GetInboundSeedSession
+            and self:GetInboundSeedSession(peerKey) ~= nil
+        then
+            return true
+        end
         return false
     end
     local compatibility = info.compatibility or self:ComputePeerCompatibility(info)
