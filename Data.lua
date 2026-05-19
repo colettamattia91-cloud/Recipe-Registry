@@ -1261,9 +1261,13 @@ function Data:InvalidateRecipeCaches(scope)
         return
     end
     if scope == "presence" then
+        -- Presence is no longer materialized inside _recipeIndex — online
+        -- flags and onlineCount are derived live from _onlineCache when
+        -- GetRecipeCrafters / GetRecipeList run. Roster presence flips
+        -- therefore don't invalidate the content index; we only need to
+        -- drop the list cache because its sort uses live onlineCount.
         self._recipeListCache = nil
         self._recipeListCacheOrder = nil
-        self._recipeIndex = nil
         if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
             Addon.Tooltip:InvalidateIndex("presence")
         end
