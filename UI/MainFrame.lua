@@ -940,30 +940,33 @@ function UI:CreateMainFrame()
     f.center = center
     hookFocusRelease(center)
 
+    -- Single segmented switch replaces the two side-by-side sort buttons.
+    -- The original layout let the header text overlap the buttons whenever
+    -- the header string grew (e.g., "Status only while Recipe Registry
+    -- stabilizes"). The switch is narrower and the header is now bounded
+    -- on its right edge so the two never collide.
+    local sortSwitch = createCardStyleButton(center, 130, 24)
+    sortSwitch:SetPoint("TOPRIGHT", -8, -8)
+    sortSwitch:SetLabel("Sort: Alphabetical")
+    sortSwitch:SetScript("OnClick", function()
+        UI.sortMode = (UI.sortMode == "alpha") and "rarity" or "alpha"
+        if Addon.db and Addon.db.profile then Addon.db.profile.sortMode = UI.sortMode end
+        UI:Refresh()
+    end)
+    f.sortSwitch = sortSwitch
+
     local recipeHeader = center:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     recipeHeader:SetPoint("TOPLEFT", 12, -12)
+    recipeHeader:SetPoint("TOPRIGHT", sortSwitch, "TOPLEFT", -10, -4)
+    recipeHeader:SetJustifyH("LEFT")
+    if recipeHeader.SetWordWrap then
+        recipeHeader:SetWordWrap(false)
+    end
+    if recipeHeader.SetMaxLines then
+        recipeHeader:SetMaxLines(1)
+    end
     recipeHeader:SetText("Recipes")
     f.recipeHeader = recipeHeader
-
-    local sortAlpha = createCardStyleButton(center, 96, 24)
-    sortAlpha:SetPoint("TOPRIGHT", -112, -8)
-    sortAlpha:SetLabel("Alphabetical")
-    sortAlpha:SetScript("OnClick", function()
-        UI.sortMode = "alpha"
-        if Addon.db and Addon.db.profile then Addon.db.profile.sortMode = UI.sortMode end
-        UI:Refresh()
-    end)
-    f.sortAlpha = sortAlpha
-
-    local sortRarity = createCardStyleButton(center, 86, 24)
-    sortRarity:SetPoint("LEFT", sortAlpha, "RIGHT", 6, 0)
-    sortRarity:SetLabel("Rarity")
-    sortRarity:SetScript("OnClick", function()
-        UI.sortMode = "rarity"
-        if Addon.db and Addon.db.profile then Addon.db.profile.sortMode = UI.sortMode end
-        UI:Refresh()
-    end)
-    f.sortRarity = sortRarity
 
 
     local recipeScroll = CreateFrame("ScrollFrame", nil, center, "UIPanelScrollFrameTemplate")
@@ -1729,8 +1732,10 @@ function UI:RefreshRecipeList()
         headerText = "Select a profession or search"
     end
     setTextIfChanged(self.frame.recipeHeader, headerText)
-    self.frame.sortAlpha:SetSelected(self.sortMode == "alpha")
-    self.frame.sortRarity:SetSelected(self.sortMode == "rarity")
+    if self.frame.sortSwitch then
+        local sortLabel = self.sortMode == "rarity" and "Sort: Rarity" or "Sort: Alphabetical"
+        self.frame.sortSwitch:SetLabel(sortLabel)
+    end
 
     local selectedExists = false
     if self.selectedRecipeKey then

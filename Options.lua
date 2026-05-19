@@ -134,13 +134,37 @@ local function createRadio(parent, label, onClick)
     return radio
 end
 
+local SLIDER_BACKDROP = {
+    bgFile   = "Interface\\Buttons\\UI-SliderBar-Background",
+    edgeFile = "Interface\\Buttons\\UI-SliderBar-Border",
+    tile     = true,
+    tileSize = 8,
+    edgeSize = 8,
+    insets   = { left = 3, right = 3, top = 6, bottom = 6 },
+}
+
 local _sliderCounter = 0
 local function createSlider(parent, label, low, high, step, valueFormat, onValueChanged)
     _sliderCounter = _sliderCounter + 1
     local name = "RecipeRegistryOptionsSlider" .. _sliderCounter
-    local slider = CreateFrame("Slider", name, parent, "OptionsSliderTemplate")
+    -- TBC Classic 2.5.x ships OptionsSliderTemplate with a backdrop in
+    -- XML, but on some clients the trough texture doesn't render unless
+    -- the frame also pulls in BackdropTemplate. We try the combined
+    -- template first; if the client rejects the inheritance string we
+    -- fall back to the plain template and apply SetBackdrop manually so
+    -- the user still sees the slider track and not just the thumb.
+    local slider
+    local ok, frame = pcall(CreateFrame, "Slider", name, parent, "OptionsSliderTemplate,BackdropTemplate")
+    if ok and frame then
+        slider = frame
+    else
+        slider = CreateFrame("Slider", name, parent, "OptionsSliderTemplate")
+    end
+    if type(slider.SetBackdrop) == "function" then
+        slider:SetBackdrop(SLIDER_BACKDROP)
+    end
     slider:SetWidth(260)
-    slider:SetHeight(16)
+    slider:SetHeight(18)
     slider:SetMinMaxValues(low, high)
     slider:SetValueStep(step or 1)
     if slider.SetObeyStepOnDrag then
@@ -257,67 +281,89 @@ function Options:EnsurePanel()
     local panel = CreateFrame("Frame", "RecipeRegistryOptionsPanel", InterfaceOptionsFramePanelContainer)
     panel.name = "Recipe Registry"
 
-    local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+    -- The InterfaceOptions panel container clips its children to the
+    -- visible area. With the Sync Tuning sliders + Tools buttons the
+    -- content height now exceeds the visible area on some screen sizes,
+    -- so the tail of the panel disappears below the bottom. Wrapping
+    -- everything in a ScrollFrame lets the user scroll to reach the
+    -- buttons regardless of resolution.
+    local scrollFrame
+    if type(CreateFrame) == "function" then
+        local ok, frame = pcall(CreateFrame, "ScrollFrame", "RecipeRegistryOptionsScroll", panel, "UIPanelScrollFrameTemplate")
+        if ok then scrollFrame = frame end
+    end
+    local content
+    if scrollFrame then
+        scrollFrame:SetPoint("TOPLEFT", 0, 0)
+        scrollFrame:SetPoint("BOTTOMRIGHT", -28, 0)
+        content = CreateFrame("Frame", nil, scrollFrame)
+        content:SetSize(560, 720)
+        scrollFrame:SetScrollChild(content)
+    else
+        content = panel
+    end
+
+    local title = content:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
     title:SetPoint("TOPLEFT", 16, -16)
     title:SetText("Recipe Registry")
 
-    local icon = panel:CreateTexture(nil, "ARTWORK")
+    local icon = content:CreateTexture(nil, "ARTWORK")
     icon:SetSize(20, 20)
     icon:SetPoint("LEFT", title, "RIGHT", 8, 0)
     icon:SetTexture(ICON_TEXTURE)
 
-    local subtitle = createText(panel, "Guild crafting directory settings", "GameFontHighlightSmall")
+    local subtitle = createText(content, "Guild crafting directory settings", "GameFontHighlightSmall")
     subtitle:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -8)
 
-    local version = createText(panel, "Version: " .. tostring(Addon.DISPLAY_VERSION or "?"))
+    local version = createText(content, "Version: " .. tostring(Addon.DISPLAY_VERSION or "?"))
     version:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -8)
 
-    local layoutHeader = createHeader(panel, "Directory Layout", version, -18)
-    local categoryCheck = createCheck(panel, "Show AtlasLoot recipe categories when available", function(self)
+    local layoutHeader = createHeader(content, "Directory Layout", version, -18)
+    local categoryCheck = createCheck(content, "Show AtlasLoot recipe categories when available", function(self)
         setRecipeCategoriesEnabled(self:GetChecked() and true or false)
         Options:RefreshControls()
     end)
     categoryCheck:SetPoint("TOPLEFT", layoutHeader, "BOTTOMLEFT", -2, -8)
     self.categoryCheck = categoryCheck
 
-    local categoryHelp = createText(panel, "When enabled, selecting a profession can expand into All plus AtlasLoot categories.")
+    local categoryHelp = createText(content, "When enabled, selecting a profession can expand into All plus AtlasLoot categories.")
     categoryHelp:SetPoint("TOPLEFT", categoryCheck, "BOTTOMLEFT", 28, 0)
 
-    local searchHeader = createHeader(panel, "Search Defaults", categoryHelp, -18)
-    local recipeSearchRadio = createRadio(panel, "Recipe names only", function()
+    local searchHeader = createHeader(content, "Search Defaults", categoryHelp, -18)
+    local recipeSearchRadio = createRadio(content, "Recipe names only", function()
         setSearchMode("recipe")
         Options:RefreshControls()
     end)
     recipeSearchRadio:SetPoint("TOPLEFT", searchHeader, "BOTTOMLEFT", -2, -8)
     self.recipeSearchRadio = recipeSearchRadio
 
-    local materialSearchRadio = createRadio(panel, "Recipe names and materials", function()
+    local materialSearchRadio = createRadio(content, "Recipe names and materials", function()
         setSearchMode("materials")
         Options:RefreshControls()
     end)
     materialSearchRadio:SetPoint("TOPLEFT", recipeSearchRadio, "BOTTOMLEFT", 0, -2)
     self.materialSearchRadio = materialSearchRadio
 
-    local searchHelp = createText(panel, "This sets the default scope. The search bar can still be changed quickly while browsing.")
+    local searchHelp = createText(content, "This sets the default scope. The search bar can still be changed quickly while browsing.")
     searchHelp:SetPoint("TOPLEFT", materialSearchRadio, "BOTTOMLEFT", 28, 0)
 
-    local accessHeader = createHeader(panel, "Access", searchHelp, -18)
-    local minimapCheck = createCheck(panel, "Show minimap button", function(self)
+    local accessHeader = createHeader(content, "Access", searchHelp, -18)
+    local minimapCheck = createCheck(content, "Show minimap button", function(self)
         setMinimapShown(self:GetChecked() and true or false)
         Options:RefreshControls()
     end)
     minimapCheck:SetPoint("TOPLEFT", accessHeader, "BOTTOMLEFT", -2, -8)
     self.minimapCheck = minimapCheck
 
-    local openButton = createButton(panel, "Open Recipe Registry", 180, function()
+    local openButton = createButton(content, "Open Recipe Registry", 180, function()
         if Addon.UI then
             Addon.UI:Toggle()
         end
     end)
     openButton:SetPoint("TOPLEFT", minimapCheck, "BOTTOMLEFT", 2, -10)
 
-    local tuningHeader = createHeader(panel, "Sync Tuning", openButton, -28)
-    local tuningHelp = createText(panel,
+    local tuningHeader = createHeader(content, "Sync Tuning", openButton, -28)
+    local tuningHelp = createText(content,
         "Advanced. Defaults work for most setups; lower the pull delay only on fast PCs, raise it if you see stutter during massive syncs.")
     tuningHelp:SetPoint("TOPLEFT", tuningHeader, "BOTTOMLEFT", 0, -6)
 
@@ -327,7 +373,7 @@ function Options:EnsurePanel()
     -- slider's title text overlaps the previous slider's tick labels.
     local SLIDER_VERTICAL_GAP = 56
 
-    local pullDelaySlider = createSlider(panel,
+    local pullDelaySlider = createSlider(content,
         "Pull cadence",
         TUNING_BOUNDS.blockPullDelaySeconds.min,
         TUNING_BOUNDS.blockPullDelaySeconds.max,
@@ -340,7 +386,7 @@ function Options:EnsurePanel()
     pullDelaySlider:SetPoint("TOPLEFT", tuningHelp, "BOTTOMLEFT", 6, -28)
     self.pullDelaySlider = pullDelaySlider
 
-    local maxSeedSlider = createSlider(panel,
+    local maxSeedSlider = createSlider(content,
         "Max peers served in parallel",
         TUNING_BOUNDS.maxInboundSeedSessions.min,
         TUNING_BOUNDS.maxInboundSeedSessions.max,
@@ -353,7 +399,7 @@ function Options:EnsurePanel()
     maxSeedSlider:SetPoint("TOPLEFT", pullDelaySlider, "BOTTOMLEFT", 0, -SLIDER_VERTICAL_GAP)
     self.maxSeedSlider = maxSeedSlider
 
-    local pullTimeoutSlider = createSlider(panel,
+    local pullTimeoutSlider = createSlider(content,
         "Block pull response timeout",
         TUNING_BOUNDS.blockPullResponseTimeoutSeconds.min,
         TUNING_BOUNDS.blockPullResponseTimeoutSeconds.max,
@@ -366,25 +412,25 @@ function Options:EnsurePanel()
     pullTimeoutSlider:SetPoint("TOPLEFT", maxSeedSlider, "BOTTOMLEFT", 0, -SLIDER_VERTICAL_GAP)
     self.pullTimeoutSlider = pullTimeoutSlider
 
-    local toolsHeader = createHeader(panel, "Tools", pullTimeoutSlider, -44)
-    local priceDiagButton = createButton(panel, "Price Providers Status", 180, function()
+    local toolsHeader = createHeader(content, "Tools", pullTimeoutSlider, -44)
+    local priceDiagButton = createButton(content, "Price Providers Status", 180, function()
         if Addon.Market and Addon.Market.DumpStatus then
             Addon.Market:DumpStatus("")
         end
     end)
     priceDiagButton:SetPoint("TOPLEFT", toolsHeader, "BOTTOMLEFT", -6, -8)
 
-    local perfButton = createButton(panel, "Toggle Perf Debug", 180, function()
+    local perfButton = createButton(content, "Toggle Perf Debug", 180, function()
         Addon:SlashHandler("perf toggle")
     end)
     perfButton:SetPoint("TOPLEFT", priceDiagButton, "BOTTOMLEFT", 0, -8)
 
-    local perfDumpButton = createButton(panel, "Dump Perf Status", 180, function()
+    local perfDumpButton = createButton(content, "Dump Perf Status", 180, function()
         Addon:SlashHandler("perf dump")
     end)
     perfDumpButton:SetPoint("TOPLEFT", perfButton, "BOTTOMLEFT", 0, -8)
 
-    local help = createText(panel, "Slash commands: /rr, /rr options, /rr perf [toggle|dump|reset], /rr prices <item name|item link>, /rr share [guild|party|raid|say].")
+    local help = createText(content, "Slash commands: /rr, /rr options, /rr perf [toggle|dump|reset], /rr prices <item name|item link>, /rr share [guild|party|raid|say].")
     help:SetPoint("TOPLEFT", perfDumpButton, "BOTTOMLEFT", 0, -14)
 
     panel.refresh = function()

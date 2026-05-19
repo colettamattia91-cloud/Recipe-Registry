@@ -63,6 +63,10 @@ local function makeFrame()
     function frame:GetValue()
         return self.value
     end
+    -- ScrollFrame surface used by the options panel wrapper.
+    function frame:SetScrollChild(child)
+        self.scrollChild = child
+    end
     function frame:CreateFontString()
         local child = makeFrame()
         self.children[#self.children + 1] = child
