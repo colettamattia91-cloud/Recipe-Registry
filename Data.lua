@@ -82,6 +82,16 @@ local DB_DEFAULTS = {
             hide = false,
             minimapPos = 220,
         },
+        -- User-tunable sync knobs. Defaults mirror the internal constants in
+        -- Sync.lua and are clamped at read time by Sync:GetBlockPullDelay /
+        -- :GetMaxInboundSeedSessions / :GetBlockPullResponseTimeout so a bad
+        -- SavedVariables value (or a stale config from an old version) can't
+        -- push the sync engine outside safe bounds.
+        tuning = {
+            blockPullDelaySeconds = 2.5,
+            maxInboundSeedSessions = 4,
+            blockPullResponseTimeoutSeconds = 60,
+        },
     },
 }
 

@@ -318,6 +318,33 @@ Private.addRetrySuffix = addRetrySuffix
 Private.newSyncTelemetry = newSyncTelemetry
 Private.isMockKey = isMockKey
 
+-- User-tunable sync knobs resolve through these helpers so a bogus
+-- SavedVariables value (or a missing profile during early init) can never
+-- push the sync engine outside the safe operating range. The clamps also
+-- shield us from a future refactor that bumps the constants without
+-- updating the slider min/max in Options.lua.
+local function readTuning(field, fallback, minValue, maxValue)
+    local profile = Addon.db and Addon.db.profile or nil
+    local value = profile and profile.tuning and tonumber(profile.tuning[field])
+    if value == nil then return fallback end
+    if value < minValue then return minValue end
+    if value > maxValue then return maxValue end
+    return value
+end
+
+function Sync:GetBlockPullDelay()
+    return readTuning("blockPullDelaySeconds", BLOCK_PULL_DELAY_SECONDS, 1.0, 5.0)
+end
+
+function Sync:GetMaxInboundSeedSessions()
+    local value = readTuning("maxInboundSeedSessions", MAX_INBOUND_SEED_SESSIONS, 1, 4)
+    return math.floor(value + 0.5)
+end
+
+function Sync:GetBlockPullResponseTimeout()
+    return readTuning("blockPullResponseTimeoutSeconds", BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS, 30, 120)
+end
+
 function Sync:Startup()
     if self._startupInitialized then
         return true

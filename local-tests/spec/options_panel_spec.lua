@@ -14,6 +14,9 @@ local function makeFrame()
     function frame:SetWidth(width)
         self.width = width
     end
+    function frame:SetHeight(height)
+        self.height = height
+    end
     function frame:SetPoint(...)
         self.point = { ... }
     end
@@ -43,6 +46,22 @@ local function makeFrame()
     end
     function frame:Hide()
         self.shown = false
+    end
+    -- Slider template surface used by createSlider in Options.lua.
+    function frame:SetMinMaxValues(low, high)
+        self.minValue, self.maxValue = low, high
+    end
+    function frame:SetValueStep(step)
+        self.valueStep = step
+    end
+    function frame:SetObeyStepOnDrag(flag)
+        self.obeyStep = flag == true
+    end
+    function frame:SetValue(value)
+        self.value = value
+    end
+    function frame:GetValue()
+        return self.value
     end
     function frame:CreateFontString()
         local child = makeFrame()

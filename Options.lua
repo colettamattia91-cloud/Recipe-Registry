@@ -43,6 +43,21 @@ local function registerOptionsPanel(module, panel)
     return false
 end
 
+local TUNING_BOUNDS = {
+    blockPullDelaySeconds          = { default = 2.5, min = 1.0, max = 5.0 },
+    maxInboundSeedSessions         = { default = 4,   min = 1,   max = 4   },
+    blockPullResponseTimeoutSeconds = { default = 60,  min = 30,  max = 120 },
+}
+
+local function clampTuning(field, value)
+    local bounds = TUNING_BOUNDS[field]
+    if not bounds then return value end
+    value = tonumber(value) or bounds.default
+    if value < bounds.min then return bounds.min end
+    if value > bounds.max then return bounds.max end
+    return value
+end
+
 local function getProfile()
     if not (Addon.db and Addon.db.profile) then return nil end
     local profile = Addon.db.profile
@@ -61,7 +76,19 @@ local function getProfile()
     if profile.minimap.hide == nil then
         profile.minimap.hide = false
     end
+    if type(profile.tuning) ~= "table" then
+        profile.tuning = {}
+    end
+    for field, bounds in pairs(TUNING_BOUNDS) do
+        profile.tuning[field] = clampTuning(field, profile.tuning[field] or bounds.default)
+    end
     return profile
+end
+
+local function setTuning(field, value)
+    local profile = getProfile()
+    if not profile then return end
+    profile.tuning[field] = clampTuning(field, value)
 end
 
 local function createButton(parent, text, width, onClick)
@@ -105,6 +132,50 @@ local function createRadio(parent, label, onClick)
     radio.text:SetText(label or "")
     radio:SetScript("OnClick", onClick)
     return radio
+end
+
+local _sliderCounter = 0
+local function createSlider(parent, label, low, high, step, valueFormat, onValueChanged)
+    _sliderCounter = _sliderCounter + 1
+    local name = "RecipeRegistryOptionsSlider" .. _sliderCounter
+    local slider = CreateFrame("Slider", name, parent, "OptionsSliderTemplate")
+    slider:SetWidth(220)
+    slider:SetHeight(16)
+    slider:SetMinMaxValues(low, high)
+    slider:SetValueStep(step or 1)
+    if slider.SetObeyStepOnDrag then
+        slider:SetObeyStepOnDrag(true)
+    end
+
+    local labelText = _G[name .. "Text"]
+    if labelText then labelText:SetText(label or "") end
+    local lowLabel = _G[name .. "Low"]
+    if lowLabel then lowLabel:SetText(string.format(valueFormat or "%s", low)) end
+    local highLabel = _G[name .. "High"]
+    if highLabel then highLabel:SetText(string.format(valueFormat or "%s", high)) end
+
+    local current = parent:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    current:SetPoint("LEFT", slider, "RIGHT", 12, 0)
+    current:SetJustifyH("LEFT")
+    slider.current = current
+    slider.valueFormat = valueFormat or "%s"
+
+    function slider:SetDisplayValue(value)
+        self:SetValue(value)
+        if self.current then
+            self.current:SetText(string.format(self.valueFormat, value))
+        end
+    end
+
+    slider:SetScript("OnValueChanged", function(self, value, userInput)
+        if self.current then
+            self.current:SetText(string.format(self.valueFormat, value))
+        end
+        if userInput and onValueChanged then
+            onValueChanged(value)
+        end
+    end)
+    return slider
 end
 
 local function refreshOpenDirectory()
@@ -161,6 +232,15 @@ function Options:RefreshControls()
     end
     if self.minimapCheck then
         self.minimapCheck:SetChecked(not profile.minimap.hide)
+    end
+    if self.pullDelaySlider then
+        self.pullDelaySlider:SetDisplayValue(profile.tuning.blockPullDelaySeconds)
+    end
+    if self.maxSeedSlider then
+        self.maxSeedSlider:SetDisplayValue(profile.tuning.maxInboundSeedSessions)
+    end
+    if self.pullTimeoutSlider then
+        self.pullTimeoutSlider:SetDisplayValue(profile.tuning.blockPullResponseTimeoutSeconds)
     end
 end
 
@@ -232,13 +312,57 @@ function Options:EnsurePanel()
     end)
     openButton:SetPoint("TOPLEFT", minimapCheck, "BOTTOMLEFT", 2, -10)
 
-    local toolsHeader = createHeader(panel, "Tools", openButton, -18)
+    local tuningHeader = createHeader(panel, "Sync Tuning", openButton, -22)
+    local tuningHelp = createText(panel,
+        "Advanced. Defaults work for most setups; lower the pull delay only on fast PCs, raise it if you see stutter during massive syncs.")
+    tuningHelp:SetPoint("TOPLEFT", tuningHeader, "BOTTOMLEFT", 0, -6)
+
+    local pullDelaySlider = createSlider(panel,
+        "Pull cadence (seconds between block requests)",
+        TUNING_BOUNDS.blockPullDelaySeconds.min,
+        TUNING_BOUNDS.blockPullDelaySeconds.max,
+        0.5,
+        "%.1fs",
+        function(value)
+            setTuning("blockPullDelaySeconds", value)
+        end
+    )
+    pullDelaySlider:SetPoint("TOPLEFT", tuningHelp, "BOTTOMLEFT", 6, -24)
+    self.pullDelaySlider = pullDelaySlider
+
+    local maxSeedSlider = createSlider(panel,
+        "Max peers served in parallel (inbound seed cap)",
+        TUNING_BOUNDS.maxInboundSeedSessions.min,
+        TUNING_BOUNDS.maxInboundSeedSessions.max,
+        1,
+        "%d",
+        function(value)
+            setTuning("maxInboundSeedSessions", value)
+        end
+    )
+    maxSeedSlider:SetPoint("TOPLEFT", pullDelaySlider, "BOTTOMLEFT", 0, -34)
+    self.maxSeedSlider = maxSeedSlider
+
+    local pullTimeoutSlider = createSlider(panel,
+        "Block pull response timeout (seconds)",
+        TUNING_BOUNDS.blockPullResponseTimeoutSeconds.min,
+        TUNING_BOUNDS.blockPullResponseTimeoutSeconds.max,
+        5,
+        "%ds",
+        function(value)
+            setTuning("blockPullResponseTimeoutSeconds", value)
+        end
+    )
+    pullTimeoutSlider:SetPoint("TOPLEFT", maxSeedSlider, "BOTTOMLEFT", 0, -34)
+    self.pullTimeoutSlider = pullTimeoutSlider
+
+    local toolsHeader = createHeader(panel, "Tools", pullTimeoutSlider, -28)
     local priceDiagButton = createButton(panel, "Price Providers Status", 180, function()
         if Addon.Market and Addon.Market.DumpStatus then
             Addon.Market:DumpStatus("")
         end
     end)
-    priceDiagButton:SetPoint("TOPLEFT", toolsHeader, "BOTTOMLEFT", 0, -8)
+    priceDiagButton:SetPoint("TOPLEFT", toolsHeader, "BOTTOMLEFT", -6, -8)
 
     local perfButton = createButton(panel, "Toggle Perf Debug", 180, function()
         Addon:SlashHandler("perf toggle")
@@ -250,13 +374,8 @@ function Options:EnsurePanel()
     end)
     perfDumpButton:SetPoint("TOPLEFT", perfButton, "BOTTOMLEFT", 0, -8)
 
-    local mockButton = createButton(panel, "Start Mock Sync", 180, function()
-        Addon:SlashHandler("mock start medium")
-    end)
-    mockButton:SetPoint("TOPLEFT", perfDumpButton, "BOTTOMLEFT", 0, -8)
-
-    local help = createText(panel, "Slash commands: /rr, /rr options, /rr perf [toggle|dump|reset], /rr mock [status|start <light|medium|heavy|burst|bootstrap>|stop|reset], /rr prices <item name|item link>, /rr share [guild|party|raid|say].")
-    help:SetPoint("TOPLEFT", mockButton, "BOTTOMLEFT", 0, -14)
+    local help = createText(panel, "Slash commands: /rr, /rr options, /rr perf [toggle|dump|reset], /rr prices <item name|item link>, /rr share [guild|party|raid|say].")
+    help:SetPoint("TOPLEFT", perfDumpButton, "BOTTOMLEFT", 0, -14)
 
     panel.refresh = function()
         Options:RefreshControls()
@@ -271,6 +390,10 @@ function Options:EnsurePanel()
             profile.minimap = { hide = false, minimapPos = 220 }
         else
             profile.minimap.hide = false
+        end
+        profile.tuning = profile.tuning or {}
+        for field, bounds in pairs(TUNING_BOUNDS) do
+            profile.tuning[field] = bounds.default
         end
         if Addon.UI then
             Addon.UI.searchMode = "recipe"

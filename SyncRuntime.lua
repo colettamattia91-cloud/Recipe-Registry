@@ -1661,7 +1661,7 @@ function Sync:RegisterInboundSeedSession(requesterKey, requestId, offeredBlocks)
             })
             return nil, "per-requester-cap"
         end
-        local globalCap = Constants.MAX_INBOUND_SEED_SESSIONS or 4
+        local globalCap = self:GetMaxInboundSeedSessions()
         if self:GetInboundSeedSessionCount() >= globalCap and globalCap > 0 then
             self.telemetry.inboundSeedSessionsRejected = (self.telemetry.inboundSeedSessionsRejected or 0) + 1
             self.telemetry.inboundSeedSessionsRejectedCap = (self.telemetry.inboundSeedSessionsRejectedCap or 0) + 1
@@ -1696,7 +1696,7 @@ function Sync:RegisterInboundSeedSession(requesterKey, requestId, offeredBlocks)
     existingSessions[requestId] = session
     self.inboundSeedSessions[requesterKey] = existingSessions
     self.telemetry.inboundSeedSessionsActive = self:GetInboundSeedSessionCount()
-    self.telemetry.inboundSeedSessionsMax = Constants.MAX_INBOUND_SEED_SESSIONS or 4
+    self.telemetry.inboundSeedSessionsMax = self:GetMaxInboundSeedSessions()
     self.telemetry.lastInboundRequester = requesterKey
     self.telemetry.lastInboundRequestId = requestId
     self:RecordSyncEvent("inboundSeedSessionOpened", {

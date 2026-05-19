@@ -7,8 +7,10 @@ local time = time
 local max = math.max
 
 local SESSION_TIMEOUT = Constants.SESSION_TIMEOUT
-local BLOCK_PULL_DELAY_SECONDS = Constants.BLOCK_PULL_DELAY_SECONDS or 1.0
-local BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS = Constants.BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS or 20
+-- BLOCK_PULL_DELAY_SECONDS and BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS now
+-- resolve via Sync:GetBlockPullDelay() / :GetBlockPullResponseTimeout()
+-- so the user-tunable values from the options panel take effect without
+-- needing a /reload.
 
 -- Summarize an offered-blocks list into compact, human-readable strings for
 -- traces. Repeating "missing,missing,missing..." 164 times across the offered
@@ -329,8 +331,9 @@ function Sync:ScheduleNextWantedBlock()
         self:CancelTimer(session.nextBlockTimer, true)
         session.nextBlockTimer = nil
     end
+    local pullDelay = self:GetBlockPullDelay()
     session.state = "waiting-next-block-delay"
-    session.nextBlockReadyAt = time() + BLOCK_PULL_DELAY_SECONDS
+    session.nextBlockReadyAt = time() + pullDelay
     self.telemetry.blockPullDelayed = (self.telemetry.blockPullDelayed or 0) + 1
     session.nextBlockTimer = self:ScheduleTimer(function()
         if session.nextBlockTimer then
@@ -341,11 +344,11 @@ function Sync:ScheduleNextWantedBlock()
             session.state = "request-next-block"
             self:RequestNextWantedBlock()
         end
-    end, BLOCK_PULL_DELAY_SECONDS)
+    end, pullDelay)
     Addon:Tracef("sync",
         "block-pull-delay peer=%s nextDelay=%.1f",
         tostring(session.seedKey or "unknown"),
-        BLOCK_PULL_DELAY_SECONDS
+        pullDelay
     )
     return true
 end
@@ -382,7 +385,7 @@ function Sync:ProcessRequestQueue()
 
     if session.state == "waiting-block" and session.blockRequestedAt then
         local blockAge = max(0, now - session.blockRequestedAt)
-        if blockAge > BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS then
+        if blockAge > self:GetBlockPullResponseTimeout() then
             self.telemetry.lastBlockPullTimeoutAt = now
             self.telemetry.lastBlockPullTimeoutReason = "block-response-timeout"
             if self.AbortOutboundSeedSession then
