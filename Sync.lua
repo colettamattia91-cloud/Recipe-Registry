@@ -65,6 +65,7 @@ local DISCOVERY_RETRY_STEP_SECONDS = 20
 local DISCOVERY_RETRY_MAX_SECONDS = 300
 local MAX_INBOUND_SEED_SESSIONS = 4
 local MAX_INBOUND_SEED_SESSIONS_PER_PEER = 1
+local SEED_SELECTION_TOP_BAND_RATIO = 0.95
 local RECENT_SYNC_EVENTS_LIMIT = 50
 local TRUSTED_ROSTER_CLEANUP_INTERVAL_SECONDS = 86400
 
@@ -144,6 +145,8 @@ local function newSyncTelemetry()
         indexDiffRequestReceived = 0,
         indexDiffResponseSent = 0,
         indexDiffResponseReceived = 0,
+        indexDiffBusySent = 0,
+        indexDiffBusyReceived = 0,
         blocksOffered = 0,
         blockPullRequestSent = 0,
         blockPullStarted = 0,
@@ -186,6 +189,12 @@ local function newSyncTelemetry()
         activeCommPrefix = PREFIX,
         lastSelectedPeer = nil,
         lastSelectedReason = nil,
+        lastSeedSelectionHash = nil,
+        lastSeedSelectionBand = nil,
+        seedSelectionHashed = 0,
+        seedFallbackSelected = 0,
+        seedBusyReceived = 0,
+        seedBusyNoFallback = 0,
         lastAbortReason = nil,
         lastSummaryPeer = nil,
         lastIndexDiffSeed = nil,
@@ -194,6 +203,8 @@ local function newSyncTelemetry()
         lastIndexDiffLocalBlockCount = 0,
         lastIndexDiffOfferedCount = 0,
         lastIndexDiffNoOfferReason = nil,
+        lastIndexDiffBusyPeer = nil,
+        lastIndexDiffBusyReason = nil,
         lastBlockPullBlockKey = nil,
         lastBlockPullRequestId = nil,
         lastBlockPullSentAt = 0,
@@ -247,8 +258,10 @@ local function newSyncTelemetry()
         inboundSeedSessionsRejectedPaused = 0,
         inboundSeedSessionsRejectedNotReady = 0,
         inboundSeedSessionsClearedPause = 0,
+        inboundSeedSessionsCompleted = 0,
         inboundBlockPullRejectedUnknownRequest = 0,
         inboundBlockPullRejectedNotOffered = 0,
+        summarySuppressedAtCap = 0,
         lastInboundRequester = nil,
         lastInboundRequestId = nil,
         lastInboundServedBlockKey = nil,
@@ -303,6 +316,7 @@ Private.constants = {
     DISCOVERY_RETRY_MAX_SECONDS = DISCOVERY_RETRY_MAX_SECONDS,
     MAX_INBOUND_SEED_SESSIONS = MAX_INBOUND_SEED_SESSIONS,
     MAX_INBOUND_SEED_SESSIONS_PER_PEER = MAX_INBOUND_SEED_SESSIONS_PER_PEER,
+    SEED_SELECTION_TOP_BAND_RATIO = SEED_SELECTION_TOP_BAND_RATIO,
     RECENT_SYNC_EVENTS_LIMIT = RECENT_SYNC_EVENTS_LIMIT,
     TRUSTED_ROSTER_CLEANUP_INTERVAL_SECONDS = TRUSTED_ROSTER_CLEANUP_INTERVAL_SECONDS,
     MAX_CONCURRENT_REQUESTS = 1,

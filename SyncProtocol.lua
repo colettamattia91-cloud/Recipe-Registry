@@ -398,6 +398,30 @@ function Sync:SendSummary(targetKey, helloId)
     if not allowed then
         return false
     end
+    -- Don't advertise as a seed candidate when our inbound session table is
+    -- already at the cap. The requester would just elect us, send
+    -- INDEX_DIFF_REQUEST + BLOCK_PULL_REQUESTs, hit RegisterInboundSeedSession
+    -- with a "global-cap" rejection, and burn a full cycle on both sides
+    -- waiting for a snapshot that will never arrive. Stay silent until a
+    -- slot frees; the requester's discoveryRetry timer (or its next natural
+    -- HELLO) brings it back later when we can actually serve.
+    if self.PruneInboundSeedSessions then
+        self:PruneInboundSeedSessions()
+    end
+    local inboundCap = self.GetMaxInboundSeedSessions and self:GetMaxInboundSeedSessions() or 0
+    local inboundActive = self.GetInboundSeedSessionCount and self:GetInboundSeedSessionCount() or 0
+    if inboundCap > 0 and inboundActive >= inboundCap then
+        self.telemetry.summarySuppressedAtCap = (self.telemetry.summarySuppressedAtCap or 0) + 1
+        if self.RecordSyncEvent then
+            self:RecordSyncEvent("summarySuppressed", {
+                peer = targetKey,
+                requestId = helloId,
+                reason = "inbound-cap",
+                extra = string.format("active=%d/%d", inboundActive, inboundCap),
+            })
+        end
+        return false
+    end
     local summary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
         reason = "summary-send",
         allowDeferred = true,
@@ -486,10 +510,29 @@ function Sync:HandleIndexDiffRequest(payload)
             return
         end
     end
-    if self.SendIndexDiffResponse then
-        local sent, response = self:SendIndexDiffResponse(payload.sender, payload)
-        if sent and self.RegisterInboundSeedSession then
-            self:RegisterInboundSeedSession(payload.sender, payload.requestId, response and response.offeredBlocks or nil)
+
+    local response = self.BuildIndexDiffResponseForRequest and self:BuildIndexDiffResponseForRequest(payload) or nil
+    if type(response) ~= "table" or response.ready ~= true then
+        return
+    end
+
+    local offeredBlocks = response.offeredBlocks or {}
+    local reserved = false
+    if #offeredBlocks > 0 and self.RegisterInboundSeedSession then
+        local session, reserveReason = self:RegisterInboundSeedSession(payload.sender, payload.requestId, offeredBlocks)
+        if not session then
+            if self.SendIndexDiffBusy then
+                self:SendIndexDiffBusy(payload.sender, payload, reserveReason or "seed-busy")
+            end
+            return
+        end
+        reserved = true
+    end
+
+    if self.SendPreparedIndexDiffResponse then
+        local sent = self:SendPreparedIndexDiffResponse(payload.sender, payload, response)
+        if not sent and reserved and self.ClearInboundSeedSession then
+            self:ClearInboundSeedSession(payload.sender, payload.requestId, "index-diff-send-failed")
         end
     end
 end
@@ -580,6 +623,35 @@ function Sync:HandleBlockPullRequest(payload)
             self.telemetry.lastInboundRequester = payload and payload.sender or self.telemetry.lastInboundRequester
             self.telemetry.lastInboundRequestId = payload and payload.requestId or self.telemetry.lastInboundRequestId
             self.telemetry.lastInboundServedBlockKey = payload and payload.blockKey or self.telemetry.lastInboundServedBlockKey
+            -- The session has served every block it ever offered: it's
+            -- finished. Free the cap slot immediately instead of waiting
+            -- for the 60s inactivity prune. The natural session timeout
+            -- stays in place as a safety net for requesters that abandon
+            -- mid-pull (we never clear sessions whose servedBlocks is
+            -- still short of offeredBlockCount).
+            local offered = tonumber(inboundSession.offeredBlockCount or 0) or 0
+            if offered > 0 and inboundSession.servedBlocks >= offered then
+                inboundSession.state = "completed"
+                inboundSession.completedAt = time()
+                local sessions = self.inboundSeedSessions and self.inboundSeedSessions[senderKey] or nil
+                if sessions then
+                    sessions[inboundSession.requestId] = nil
+                    if next(sessions) == nil then
+                        self.inboundSeedSessions[senderKey] = nil
+                    end
+                end
+                if self.GetInboundSeedSessionCount then
+                    self.telemetry.inboundSeedSessionsActive = self:GetInboundSeedSessionCount()
+                end
+                self.telemetry.inboundSeedSessionsCompleted = (self.telemetry.inboundSeedSessionsCompleted or 0) + 1
+                if self.RecordSyncEvent then
+                    self:RecordSyncEvent("inboundSeedSessionCompleted", {
+                        peer = senderKey,
+                        requestId = inboundSession.requestId,
+                        extra = string.format("served=%d/%d", inboundSession.servedBlocks, offered),
+                    })
+                end
+            end
         end
     end
 end

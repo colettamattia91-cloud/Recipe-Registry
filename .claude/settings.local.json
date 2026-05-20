@@ -10,7 +10,8 @@
       "Bash(git stash *)",
       "Bash(pwsh -NoProfile -Command \"& { .\\\\local-tests\\\\run-backend-tests.ps1 -Spec sync_phase34_block_pull_spec.lua 2>&1 | Out-File c:/tmp/rrtest_baseline.log -Encoding utf8 }\")",
       "Bash(pwsh -NoProfile -Command \"& { .\\\\local-tests\\\\run-backend-tests.ps1 2>&1 | Out-File c:/tmp/rrtest_all.log -Encoding utf8 }\")",
-      "Bash(pwsh -NoProfile -Command \".\\\\local-tests\\\\run-syntax.ps1\")"
+      "Bash(pwsh -NoProfile -Command \".\\\\local-tests\\\\run-syntax.ps1\")",
+      "Bash(\"/c/Program Files \\(x86\\)/Lua/5.1/lua.exe\" local-tests/spec/soak_hello_storm_spec.lua)"
     ]
   }
 }

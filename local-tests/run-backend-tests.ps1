@@ -43,7 +43,11 @@ $activeAllSpecs = @(
     "sync_phase1_unsupported_message_spec.lua",
     "sync_phase2_summary_foundation_spec.lua",
     "sync_phase34_block_pull_spec.lua",
-    "sync_roster_invalidation_spec.lua"
+    "sync_roster_invalidation_spec.lua",
+    "soak_block_pull_saturation_spec.lua",
+    "soak_discovery_backoff_churn_spec.lua",
+    "soak_hello_storm_spec.lua",
+    "soak_seed_election_crowd_spec.lua"
 )
 $activeSyncSpecs = @(
     "build_channel_isolation_spec.lua",
@@ -59,7 +63,11 @@ $activeSyncSpecs = @(
     "sync_phase1_unsupported_message_spec.lua",
     "sync_phase2_summary_foundation_spec.lua",
     "sync_phase34_block_pull_spec.lua",
-    "sync_roster_invalidation_spec.lua"
+    "sync_roster_invalidation_spec.lua",
+    "soak_block_pull_saturation_spec.lua",
+    "soak_discovery_backoff_churn_spec.lua",
+    "soak_hello_storm_spec.lua",
+    "soak_seed_election_crowd_spec.lua"
 )
 
 function Get-SuiteSpecs {

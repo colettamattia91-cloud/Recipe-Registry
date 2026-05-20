@@ -21,6 +21,7 @@ local HELLO_INTERVAL = Constants.HELLO_INTERVAL
 local HELLO_INTERVAL_STABLE = Constants.HELLO_INTERVAL_STABLE or HELLO_INTERVAL
 local AUTO_SYNC_INTERVAL = Constants.AUTO_SYNC_INTERVAL
 local PEER_BACKOFF_SECONDS = Constants.PEER_BACKOFF_SECONDS or 45
+local SEED_SELECTION_TOP_BAND_RATIO = Constants.SEED_SELECTION_TOP_BAND_RATIO or 0.95
 local POST_WORLD_GRACE_SECONDS = Constants.POST_WORLD_GRACE_SECONDS or 12
 local POST_INSTANCE_GRACE_SECONDS = Constants.POST_INSTANCE_GRACE_SECONDS or 15
 local POST_RELOAD_IN_INSTANCE_GRACE_SECONDS = Constants.POST_RELOAD_IN_INSTANCE_GRACE_SECONDS or 30
@@ -1382,6 +1383,139 @@ function Sync:RecordSummary(peerKey, payload)
     return true
 end
 
+local SEED_SELECTION_HASH_MOD = 2147483647
+
+local function stableSeedSelectionHash(selfKey, helloId, peerKey)
+    local text = tostring(selfKey or "") .. "|" .. tostring(helloId or "") .. "|" .. tostring(peerKey or "")
+    local hash = 0
+    for index = 1, #text do
+        hash = ((hash * 131) + text:byte(index)) % SEED_SELECTION_HASH_MOD
+    end
+    return hash
+end
+
+local function compareSeedContentRank(left, right)
+    if (left.activeContentCount or 0) ~= (right.activeContentCount or 0) then
+        return (left.activeContentCount or 0) > (right.activeContentCount or 0)
+    end
+    if (left.activeBlockCount or 0) ~= (right.activeBlockCount or 0) then
+        return (left.activeBlockCount or 0) > (right.activeBlockCount or 0)
+    end
+    if (left.activeOwnerCount or 0) ~= (right.activeOwnerCount or 0) then
+        return (left.activeOwnerCount or 0) > (right.activeOwnerCount or 0)
+    end
+    return nil
+end
+
+local function prepareSeedCandidateOrder(self, cycle, rows)
+    local maxContent = 0
+    for index = 1, #rows do
+        maxContent = max(maxContent, tonumber(rows[index].activeContentCount or 0) or 0)
+    end
+
+    local threshold = maxContent * SEED_SELECTION_TOP_BAND_RATIO
+    local topBandCount = 0
+    local selfKey = self:GetSelfKey()
+    local helloId = cycle and cycle.helloId or nil
+    for index = 1, #rows do
+        local row = rows[index]
+        local content = tonumber(row.activeContentCount or 0) or 0
+        row.selectionHash = stableSeedSelectionHash(selfKey, helloId, row.peerKey)
+        row.inTopBand = maxContent <= 0 or content >= threshold
+        row.selectionBand = row.inTopBand and "top" or "lower"
+        if row.inTopBand then
+            topBandCount = topBandCount + 1
+        end
+    end
+
+    sort(rows, function(left, right)
+        if (left.inTopBand == true) ~= (right.inTopBand == true) then
+            return left.inTopBand == true
+        end
+
+        local leftBackoff = self:IsPeerBackoffActive(left.peerKey) and 1 or 0
+        local rightBackoff = self:IsPeerBackoffActive(right.peerKey) and 1 or 0
+        if leftBackoff ~= rightBackoff then
+            return leftBackoff < rightBackoff
+        end
+
+        if left.inTopBand == true and right.inTopBand == true then
+            if (left.selectionHash or 0) ~= (right.selectionHash or 0) then
+                return (left.selectionHash or 0) < (right.selectionHash or 0)
+            end
+        end
+
+        local contentRank = compareSeedContentRank(left, right)
+        if contentRank ~= nil then
+            return contentRank
+        end
+        return tostring(left.peerKey or "") < tostring(right.peerKey or "")
+    end)
+
+    return topBandCount, maxContent
+end
+
+function Sync:StartOutboundSeedSession(cycle, selected, reason)
+    if type(cycle) ~= "table" or type(selected) ~= "table" or not self:IsValidSyncMemberKey(selected.peerKey) then
+        return nil
+    end
+
+    local selectionReason = tostring(reason or "hashed-top-band")
+    self:ResetDiscoveryRetry(selectionReason)
+    cycle.selectedSeedKey = selected.peerKey
+    cycle.selectedSeed = selected
+    self.lastSelectedSeed = cloneTable(selected)
+    self.telemetry.seedSelected = (self.telemetry.seedSelected or 0) + 1
+    self.telemetry.lastSelectedPeer = selected.peerKey
+    self.telemetry.lastSelectedReason = selectionReason
+    self.telemetry.lastSeedSelectionHash = selected.selectionHash
+    self.telemetry.lastSeedSelectionBand = selected.selectionBand or (selected.inTopBand and "top" or "lower")
+    if selected.inTopBand == true then
+        self.telemetry.seedSelectionHashed = (self.telemetry.seedSelectionHashed or 0) + 1
+    end
+    self:RecordSyncEvent("seedSelected", {
+        peer = selected.peerKey,
+        requestId = cycle.helloId,
+        reason = selectionReason,
+        extra = string.format("hash=%s band=%s", tostring(selected.selectionHash or "n/a"), tostring(self.telemetry.lastSeedSelectionBand or "n/a")),
+    })
+    Addon:Tracef("sync",
+        "seed-selected peer=%s reason=%s owners=%d blocks=%d content=%d hash=%s band=%s",
+        tostring(selected.peerKey),
+        selectionReason,
+        tonumber(selected.activeOwnerCount or 0) or 0,
+        tonumber(selected.activeBlockCount or 0) or 0,
+        tonumber(selected.activeContentCount or 0) or 0,
+        tostring(selected.selectionHash or "n/a"),
+        tostring(self.telemetry.lastSeedSelectionBand or "n/a")
+    )
+
+    local previous = self.outboundSeedSession
+    if type(previous) == "table" and previous.nextBlockTimer then
+        self:CancelTimer(previous.nextBlockTimer, true)
+        previous.nextBlockTimer = nil
+    end
+
+    self._seedSessionCounter = (self._seedSessionCounter or 0) + 1
+    self.outboundSeedSession = {
+        sessionId = string.format("%s:%d:%d", tostring(self:GetSelfKey() or "unknown"), tonumber(time() or 0) or 0, self._seedSessionCounter),
+        seedKey = selected.peerKey,
+        cycleId = cycle.cycleId,
+        helloId = cycle.helloId,
+        state = "seed-selected",
+        startedAt = time(),
+        lastProgressAt = time(),
+        wantedBlocks = {},
+        offeredBlocks = {},
+        nextWantedIndex = 1,
+        candidateIndex = cycle.seedCandidateCursor,
+        selectionHash = selected.selectionHash,
+        selectionBand = selected.selectionBand,
+    }
+    self:ScheduleQueuePump(0)
+    return selected.peerKey
+end
+
 function Sync:SelectOutboundSeed(cycleId)
     local cycle = self.activeHelloCycle
     if type(cycle) ~= "table" then
@@ -1413,7 +1547,9 @@ function Sync:SelectOutboundSeed(cycleId)
                     memberKey = peerKey,
                 })
                 if eligible then
-                    rows[#rows + 1] = summary
+                    local row = cloneTable(summary)
+                    row.peerKey = row.peerKey or peerKey
+                    rows[#rows + 1] = row
                 else
                     rejectReason = tostring(eligibleReason or "ineligible")
                 end
@@ -1433,23 +1569,11 @@ function Sync:SelectOutboundSeed(cycleId)
     sort(rejectParts)
     self.telemetry.lastSeedRejectReasons = #rejectParts > 0 and table.concat(rejectParts, ",") or "none"
 
-    table.sort(rows, function(left, right)
-        if (left.activeContentCount or 0) ~= (right.activeContentCount or 0) then
-            return (left.activeContentCount or 0) > (right.activeContentCount or 0)
-        end
-        if (left.activeBlockCount or 0) ~= (right.activeBlockCount or 0) then
-            return (left.activeBlockCount or 0) > (right.activeBlockCount or 0)
-        end
-        if (left.activeOwnerCount or 0) ~= (right.activeOwnerCount or 0) then
-            return (left.activeOwnerCount or 0) > (right.activeOwnerCount or 0)
-        end
-        local leftBackoff = self:IsPeerBackoffActive(left.peerKey) and 1 or 0
-        local rightBackoff = self:IsPeerBackoffActive(right.peerKey) and 1 or 0
-        if leftBackoff ~= rightBackoff then
-            return leftBackoff < rightBackoff
-        end
-        return tostring(left.peerKey or "") < tostring(right.peerKey or "")
-    end)
+    local topBandCount = prepareSeedCandidateOrder(self, cycle, rows)
+    cycle.seedCandidates = rows
+    cycle.seedCandidateCursor = nil
+    cycle.busySeedKeys = {}
+    cycle.seedTopBandCount = topBandCount
 
     cycle.selectionCompletedAt = time()
     self.telemetry.summaryWindowClosed = (self.telemetry.summaryWindowClosed or 0) + 1
@@ -1476,42 +1600,64 @@ function Sync:SelectOutboundSeed(cycleId)
         return nil
     end
 
-    local selected = rows[1]
-    self:ResetDiscoveryRetry("seed-selected")
-    cycle.selectedSeedKey = selected.peerKey
-    cycle.selectedSeed = selected
-    self.lastSelectedSeed = cloneTable(selected)
-    self.telemetry.seedSelected = (self.telemetry.seedSelected or 0) + 1
-    self.telemetry.lastSelectedPeer = selected.peerKey
-    self.telemetry.lastSelectedReason = "highest-content"
-    self:RecordSyncEvent("seedSelected", {
-        peer = selected.peerKey,
-        requestId = cycle.helloId,
-        reason = "highest-content",
-    })
-    Addon:Tracef("sync",
-        "seed-selected peer=%s reason=highest-content owners=%d blocks=%d content=%d",
-        tostring(selected.peerKey),
-        tonumber(selected.activeOwnerCount or 0) or 0,
-        tonumber(selected.activeBlockCount or 0) or 0,
-        tonumber(selected.activeContentCount or 0) or 0
-    )
+    cycle.seedCandidateCursor = 1
+    return self:StartOutboundSeedSession(cycle, rows[1], "hashed-top-band")
+end
 
-    self._seedSessionCounter = (self._seedSessionCounter or 0) + 1
-    self.outboundSeedSession = {
-        sessionId = string.format("%s:%d:%d", tostring(self:GetSelfKey() or "unknown"), tonumber(time() or 0) or 0, self._seedSessionCounter),
-        seedKey = selected.peerKey,
-        cycleId = cycle.cycleId,
-        helloId = cycle.helloId,
-        state = "seed-selected",
-        startedAt = time(),
-        lastProgressAt = time(),
-        wantedBlocks = {},
-        offeredBlocks = {},
-        nextWantedIndex = 1,
-    }
-    self:ScheduleQueuePump(0)
-    return selected.peerKey
+function Sync:HandleSeedBusy(seedKey, reason)
+    local cycle = self.activeHelloCycle
+    local busyKey = tostring(seedKey or "")
+    local busyReason = tostring(reason or "seed-busy")
+    if type(cycle) ~= "table" then
+        return false
+    end
+
+    cycle.busySeedKeys = cycle.busySeedKeys or {}
+    if busyKey ~= "" then
+        cycle.busySeedKeys[busyKey] = true
+    end
+
+    local previous = self.outboundSeedSession
+    if type(previous) == "table" then
+        if previous.nextBlockTimer then
+            self:CancelTimer(previous.nextBlockTimer, true)
+            previous.nextBlockTimer = nil
+        end
+        previous.state = "aborted"
+        previous.abortReason = busyReason
+        previous.abortedAt = time()
+        previous.lastProgressAt = previous.abortedAt
+    end
+
+    local candidates = cycle.seedCandidates or {}
+    for index = 1, #candidates do
+        local candidate = candidates[index]
+        if candidate
+            and candidate.inTopBand == true
+            and candidate.peerKey ~= busyKey
+            and not cycle.busySeedKeys[candidate.peerKey]
+        then
+            local eligible = self:CanExchangeDataWithPeer(candidate.peerKey, "dispatch", {
+                source = candidate.peerKey,
+                memberKey = candidate.peerKey,
+            })
+            if eligible then
+                cycle.seedCandidateCursor = index
+                self.telemetry.seedFallbackSelected = (self.telemetry.seedFallbackSelected or 0) + 1
+                return self:StartOutboundSeedSession(cycle, candidate, "seed-busy-fallback")
+            end
+            cycle.busySeedKeys[candidate.peerKey] = true
+        end
+    end
+
+    self.telemetry.seedBusyNoFallback = (self.telemetry.seedBusyNoFallback or 0) + 1
+    self:RecordSyncEvent("seedBusyNoFallback", {
+        peer = busyKey,
+        requestId = cycle.helloId,
+        reason = busyReason,
+    })
+    self:ScheduleDiscoveryRetry("seed-busy")
+    return false
 end
 
 function Sync:AbortOutboundSeedSession(reason)
@@ -1639,6 +1785,28 @@ function Sync:ClearInboundSeedSessions(reason)
         })
     end
     return cleared
+end
+
+function Sync:ClearInboundSeedSession(requesterKey, requestId, reason)
+    if not self:IsValidSyncMemberKey(requesterKey) or type(requestId) ~= "string" or requestId == "" then
+        return false
+    end
+    local sessions = self.inboundSeedSessions and self.inboundSeedSessions[requesterKey] or nil
+    if type(sessions) ~= "table" or not sessions[requestId] then
+        return false
+    end
+    sessions[requestId] = nil
+    if next(sessions) == nil then
+        self.inboundSeedSessions[requesterKey] = nil
+    end
+    self.telemetry.inboundSeedSessionsActive = self:GetInboundSeedSessionCount()
+    self.telemetry.inboundSeedSessionsCleared = (self.telemetry.inboundSeedSessionsCleared or 0) + 1
+    self:RecordSyncEvent("inboundSeedSessionCleared", {
+        peer = requesterKey,
+        requestId = requestId,
+        reason = reason or "single-clear",
+    })
+    return true
 end
 
 function Sync:RegisterInboundSeedSession(requesterKey, requestId, offeredBlocks)

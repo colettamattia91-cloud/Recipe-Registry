@@ -146,7 +146,14 @@ function Sync:RequestIndexDiff(seedKey)
     return false
 end
 
-function Sync:SendIndexDiffResponse(targetKey, requestPayload)
+function Sync:BuildIndexDiffResponseForRequest(requestPayload)
+    return Addon.Data and Addon.Data.BuildIndexDiffResponse and Addon.Data:BuildIndexDiffResponse(requestPayload, {
+        reason = "index-diff-response",
+        allowDeferred = true,
+    }) or nil
+end
+
+function Sync:SendPreparedIndexDiffResponse(targetKey, requestPayload, response)
     local allowed = true
     if self.CanRunSyncProtocol then
         allowed = self:CanRunSyncProtocol("INDEX_DIFF_RESPONSE")
@@ -157,10 +164,6 @@ function Sync:SendIndexDiffResponse(targetKey, requestPayload)
     if not self:IsValidSyncMemberKey(targetKey) then
         return false, nil
     end
-    local response = Addon.Data and Addon.Data.BuildIndexDiffResponse and Addon.Data:BuildIndexDiffResponse(requestPayload, {
-        reason = "index-diff-response",
-        allowDeferred = true,
-    }) or nil
     if type(response) ~= "table" or response.ready ~= true then
         return false, response
     end
@@ -197,6 +200,48 @@ function Sync:SendIndexDiffResponse(targetKey, requestPayload)
     return sent, response
 end
 
+function Sync:SendIndexDiffResponse(targetKey, requestPayload)
+    local response = self:BuildIndexDiffResponseForRequest(requestPayload)
+    return self:SendPreparedIndexDiffResponse(targetKey, requestPayload, response)
+end
+
+function Sync:SendIndexDiffBusy(targetKey, requestPayload, reason)
+    local allowed = true
+    if self.CanRunSyncProtocol then
+        allowed = self:CanRunSyncProtocol("INDEX_DIFF_RESPONSE")
+    end
+    if not allowed or not self:IsValidSyncMemberKey(targetKey) then
+        return false
+    end
+
+    local busyReason = tostring(reason or "busy")
+    local sent = self:SendDirectEnvelope("INDEX_DIFF_RESPONSE", {
+        requestId = requestPayload and requestPayload.requestId or nil,
+        busy = true,
+        reason = busyReason,
+    }, targetKey, "ALERT")
+    if sent then
+        self.telemetry.indexDiffBusySent = (self.telemetry.indexDiffBusySent or 0) + 1
+        self.telemetry.lastIndexDiffBusyPeer = targetKey
+        self.telemetry.lastIndexDiffBusyReason = busyReason
+        self.telemetry.lastIndexDiffNoOfferReason = busyReason
+        if self.RecordSyncEvent then
+            self:RecordSyncEvent("indexDiffBusySent", {
+                peer = targetKey,
+                requestId = requestPayload and requestPayload.requestId or nil,
+                reason = busyReason,
+            })
+        end
+        Addon:Tracef("sync",
+            "index-diff-busy-sent peer=%s requestId=%s reason=%s",
+            tostring(targetKey),
+            tostring(requestPayload and requestPayload.requestId or "none"),
+            busyReason
+        )
+    end
+    return sent
+end
+
 function Sync:HandleReceivedIndexDiffResponse(payload)
     local session = self.outboundSeedSession
     if type(session) ~= "table" then
@@ -210,6 +255,33 @@ function Sync:HandleReceivedIndexDiffResponse(payload)
     end
     if payload.requestId and session.diffRequestId and payload.requestId ~= session.diffRequestId then
         return false
+    end
+
+    if payload.busy == true then
+        local busyReason = tostring(payload.reason or "seed-busy")
+        session.lastProgressAt = time()
+        self.telemetry.indexDiffBusyReceived = (self.telemetry.indexDiffBusyReceived or 0) + 1
+        self.telemetry.seedBusyReceived = (self.telemetry.seedBusyReceived or 0) + 1
+        self.telemetry.lastIndexDiffBusyPeer = payload.sender
+        self.telemetry.lastIndexDiffBusyReason = busyReason
+        self.telemetry.lastIndexDiffNoOfferReason = busyReason
+        if self.RecordSyncEvent then
+            self:RecordSyncEvent("indexDiffBusyReceived", {
+                peer = payload.sender,
+                requestId = payload.requestId,
+                reason = busyReason,
+            })
+        end
+        Addon:Tracef("sync",
+            "index-diff-busy-received peer=%s requestId=%s reason=%s",
+            tostring(payload.sender or "unknown"),
+            tostring(payload.requestId or "none"),
+            busyReason
+        )
+        if self.HandleSeedBusy then
+            self:HandleSeedBusy(payload.sender, busyReason)
+        end
+        return true
     end
 
     session.lastProgressAt = time()
