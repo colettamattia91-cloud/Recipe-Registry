@@ -381,6 +381,15 @@ function Addon:OnEnable()
     self:RegisterEvent("SKILL_LINES_CHANGED", "OnSkillSignal")
     self:RegisterBucketEvent("GUILD_ROSTER_UPDATE", 1.5, "OnGuildRosterBucket")
     self:RegisterBucketEvent("GET_ITEM_INFO_RECEIVED", 0.75, "OnItemInfoBucket")
+    -- ApplyIncomingBlockAdditive fires RR_BLOCK_MERGE_POST after each merge
+    -- and returns without recomputing the block fingerprint. The bucket
+    -- coalesces bursts (e.g. if BLOCK_PULL_DELAY_SECONDS is later reduced
+    -- or a peer is fed by multiple sessions) into a single dirty-block
+    -- rebuild per window. 0.5s matches the SUMMARY collection cadence:
+    -- short enough that the fingerprint is fresh before the next SUMMARY
+    -- needs it, long enough that several back-to-back merges share one
+    -- rebuild.
+    self:RegisterBucketMessage("RR_BLOCK_MERGE_POST", 0.5, "OnBlockMergePostBucket")
     self:ScheduleTimer(function()
         if self.MinimapButton then self.MinimapButton:Refresh() end
         if self.UI then self.UI:CreateMainFrame() end
@@ -662,6 +671,27 @@ function Addon:OnItemInfoBucket(events)
         self.Data:InvalidateRecipeCaches("list")
     end
     self:RequestRefresh("item-cache")
+end
+
+-- Deferred fingerprint recompute for blocks merged via
+-- Data:ApplyIncomingBlockAdditive. The blocks are already marked dirty
+-- inline by the merge; this handler walks the dirty set once per bucket
+-- window and rebuilds the affected fingerprints. A single call covers
+-- every key that came in during the window because RefreshSyncBlockRecord
+-- drains the dirty queue regardless of which blockKey is passed in.
+function Addon:OnBlockMergePostBucket(events)
+    local absorbed = countBucketEvents(events)
+    self.bucketTelemetry = self.bucketTelemetry or {}
+    self.bucketTelemetry.blockMergeBuckets = (self.bucketTelemetry.blockMergeBuckets or 0) + 1
+    self.bucketTelemetry.blockMergeEventsAbsorbed = (self.bucketTelemetry.blockMergeEventsAbsorbed or 0) + absorbed
+    self.bucketTelemetry.lastBlockMergeBucketAt = time()
+    if not (self.Data and self.Data.RefreshSyncBlockRecord) then
+        return
+    end
+    self.Data:RefreshSyncBlockRecord(nil, "block-merge-bucket")
+    if self.Sync and self.Sync.telemetry then
+        self.Sync.telemetry.blockFingerprintRecomputed = (self.Sync.telemetry.blockFingerprintRecomputed or 0) + absorbed
+    end
 end
 
 function Addon:ScheduleRosterUpdate(reason)

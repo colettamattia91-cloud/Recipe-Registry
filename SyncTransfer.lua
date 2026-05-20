@@ -118,16 +118,17 @@ function Sync:HandleReceivedBlockSnapshot(payload)
         return false
     end
 
-    local fingerprint = type(result) == "table" and result.blockFingerprint or nil
-    if not fingerprint and Addon.Data and Addon.Data.RecomputeLocalBlockFingerprint then
-        fingerprint = Addon.Data:RecomputeLocalBlockFingerprint(payload.blockKey, {
-            reason = "block-merge",
-        })
-    end
+    -- The fingerprint recompute has been deferred to the RR_BLOCK_MERGE_POST
+    -- bucket handler in Core. The merge result no longer carries it, and we
+    -- deliberately do NOT recompute it synchronously here: that would defeat
+    -- the deferral and re-introduce the per-merge stutter we were trying to
+    -- avoid. Per-block fingerprint telemetry is intentionally cleared here:
+    -- the deferred bucket drains all dirty blocks at once and the authoritative
+    -- sync state is finalized by the global fingerprint refresh when the pull
+    -- session completes.
     self.telemetry.blockMergedImmediate = (self.telemetry.blockMergedImmediate or 0) + 1
-    self.telemetry.blockFingerprintRecomputed = (self.telemetry.blockFingerprintRecomputed or 0) + 1
     self.telemetry.lastMergedBlockKey = tostring(payload.blockKey)
-    self.telemetry.lastMergedBlockFingerprint = fingerprint
+    self.telemetry.lastMergedBlockFingerprint = nil
     self.telemetry.successfulBlockMerges = (session.successfulBlockMerges or 0) + 1
     if self.RecordSyncEvent then
         self:RecordSyncEvent("blockMerged", {
@@ -135,28 +136,22 @@ function Sync:HandleReceivedBlockSnapshot(payload)
             requestId = payload.requestId,
             blockKey = payload.blockKey,
         })
-        self:RecordSyncEvent("blockFingerprintRecomputed", {
-            reason = "block-merge",
-            blockKey = payload.blockKey,
-            extra = tostring(fingerprint or "none"),
-        })
     end
     local addedRecipes = type(result) == "table" and tonumber(result.addedRecipes or 0) or 0
     local specChanged = type(result) == "table" and result.specializationChanged == true
     local incomingRecipeCount = type(incomingPayload) == "table" and incomingPayload.recipeKeys
         and #incomingPayload.recipeKeys or 0
     Addon:Tracef("sync",
-        "block-merge-complete block=%s peer=%s incomingRecipes=%d addedRecipes=%d specChanged=%s fingerprint=%s",
+        "block-merge-complete block=%s peer=%s incomingRecipes=%d addedRecipes=%d specChanged=%s fingerprint=deferred",
         tostring(payload.blockKey or "none"),
         tostring(payload.sender or "unknown"),
         incomingRecipeCount,
         addedRecipes,
-        tostring(specChanged),
-        tostring(fingerprint or "none")
+        tostring(specChanged)
     )
 
     session.successfulBlockMerges = (session.successfulBlockMerges or 0) + 1
-    session.lastMergedBlockFingerprint = fingerprint
+    session.lastMergedBlockFingerprint = nil
     session.activeBlockKey = nil
     session.activeBlockRequestId = nil
     session.nextWantedIndex = (session.nextWantedIndex or 1) + 1

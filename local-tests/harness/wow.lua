@@ -248,6 +248,30 @@ local function embedBaseMethods(target)
         }
     end
 
+    -- AceBucket-3.0 also exposes RegisterBucketMessage for AceEvent custom
+    -- messages. Specs that rely on bucket flushes still use the event
+    -- variant; this stub keeps Addon:OnEnable from crashing when it
+    -- registers a message bucket, without actually scheduling deferred
+    -- runs. SendMessage is mocked to a no-op below for the same reason.
+    function target:RegisterBucketMessage(message, interval, method)
+        self.__bucketMessages = self.__bucketMessages or {}
+        self.__bucketMessages[message] = {
+            interval = interval or 0,
+            method = method or message,
+        }
+    end
+
+    function target:SendMessage(_message, ...)
+        -- no-op: the harness does not route AceEvent custom messages.
+        -- Bucket message handlers registered via RegisterBucketMessage
+        -- therefore never fire during tests; callers that depend on the
+        -- side effect must drive it explicitly instead.
+    end
+
+    function target:RegisterMessage(_message, _method)
+        -- no-op companion of SendMessage above.
+    end
+
     function target:UnregisterEvent(event)
         if self.__events then self.__events[event] = nil end
     end
