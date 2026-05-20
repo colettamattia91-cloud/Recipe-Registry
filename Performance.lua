@@ -55,7 +55,10 @@ function Performance:OnInitialize()
         uiRefreshOverBudget = 0,
         averageStepCostMs = 0,
         maxStepCostMs = 0,
+        maxStepJobType = nil,
         overBudgetSteps = 0,
+        lastOverBudgetJobType = nil,
+        lastOverBudgetMs = 0,
     }
     self._jobSequence = 0
     self._queueCursor = 0
@@ -78,7 +81,10 @@ function Performance:ResetTelemetry()
         uiRefreshOverBudget = 0,
         averageStepCostMs = 0,
         maxStepCostMs = 0,
+        maxStepJobType = nil,
         overBudgetSteps = 0,
+        lastOverBudgetJobType = nil,
+        lastOverBudgetMs = 0,
     }
 end
 
@@ -179,9 +185,20 @@ function Performance:RunJobStep(job, budgetMs)
     self.telemetry.averageStepCostMs = ((self.telemetry.averageStepCostMs * (n - 1)) + elapsed) / n
     if elapsed > (self.telemetry.maxStepCostMs or 0) then
         self.telemetry.maxStepCostMs = elapsed
+        self.telemetry.maxStepJobType = tostring(job.type or job.id or job.category or "unknown")
     end
     if elapsed > stepBudget then
         self.telemetry.overBudgetSteps = (self.telemetry.overBudgetSteps or 0) + 1
+        self.telemetry.lastOverBudgetJobType = tostring(job.type or job.id or job.category or "unknown")
+        self.telemetry.lastOverBudgetMs = elapsed
+        if elapsed > 16 then
+            Addon:Tracef("perf",
+                "scheduler-step-slow job=%s category=%s elapsed=%.2fms budget=%.2fms",
+                tostring(job.type or job.id or "unknown"),
+                tostring(job.category or "unknown"),
+                elapsed,
+                stepBudget)
+        end
     end
 
     if newState ~= nil then
@@ -315,11 +332,14 @@ function Performance:DumpDebugStatus()
     end
     table.sort(queueParts)
     Addon:SystemPrint(string.format(
-        "Perf steps=%d avg=%.2fms max=%.2fms overBudget=%d uiFlush=%d uiMarks=%d uiLast=%.2fms uiMax=%.2fms uiOverBudget=%d queues=%s",
+        "Perf steps=%d avg=%.2fms max=%.2fms(%s) overBudget=%d lastOver=%s(%.2fms) uiFlush=%d uiMarks=%d uiLast=%.2fms uiMax=%.2fms uiOverBudget=%d queues=%s",
         telemetry.jobSteps or 0,
         telemetry.averageStepCostMs or 0,
         telemetry.maxStepCostMs or 0,
+        tostring(telemetry.maxStepJobType or "?"),
         telemetry.overBudgetSteps or 0,
+        tostring(telemetry.lastOverBudgetJobType or "none"),
+        telemetry.lastOverBudgetMs or 0,
         telemetry.uiRefreshFlushes or 0,
         telemetry.uiRefreshMarks or 0,
         telemetry.uiRefreshLastMs or 0,
@@ -327,4 +347,24 @@ function Performance:DumpDebugStatus()
         telemetry.uiRefreshOverBudget or 0,
         #queueParts > 0 and table.concat(queueParts, ", ") or "none"
     ))
+    local syncTel = Addon.Sync and Addon.Sync.telemetry or nil
+    if syncTel then
+        local mergeSamples = syncTel.mergeSamples or 0
+        local mergeAvg = mergeSamples > 0 and ((syncTel.mergeTotalMs or 0) / mergeSamples) or 0
+        local bucketSamples = syncTel.mergeBucketSamples or 0
+        local bucketAvg = bucketSamples > 0 and ((syncTel.mergeBucketTotalMs or 0) / bucketSamples) or 0
+        Addon:SystemPrint(string.format(
+            "Merge samples=%d avg=%.2fms last=%.2fms max=%.2fms overBudget=%d | bucket samples=%d avg=%.2fms last=%.2fms max=%.2fms overBudget=%d",
+            mergeSamples,
+            mergeAvg,
+            syncTel.mergeLastMs or 0,
+            syncTel.mergeMaxMs or 0,
+            syncTel.mergeOverBudget or 0,
+            bucketSamples,
+            bucketAvg,
+            syncTel.mergeBucketLastMs or 0,
+            syncTel.mergeBucketMaxMs or 0,
+            syncTel.mergeBucketOverBudget or 0
+        ))
+    end
 end

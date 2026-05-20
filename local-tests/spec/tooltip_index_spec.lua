@@ -70,7 +70,7 @@ end
 
 io.write("Tooltip index\n")
 
-Test.it("keeps hover reads on the stale index while rebuilding asynchronously", function()
+Test.it("hover triggers the background rebuild while serving stale rows", function()
     local addon, _wow, data, tooltip = freshAddon()
     local memberKey = "Crafterone-TestRealm"
     seedMember(data, memberKey, "Alchemy", recipeSet({ [95001] = true }), {
@@ -88,16 +88,25 @@ Test.it("keeps hover reads on the stale index while rebuilding asynchronously", 
     entry.professions.Alchemy.recipes[95002] = true
     entry.professions.Alchemy.count = 2
     entry.professions.Alchemy.signature = "95001,95002"
-    data:InvalidateRecipeCaches("presence")
+    data:InvalidateRecipeCaches("metadata")
 
-    local queues = addon.Performance:GetQueueLengths()
-    Test.eq(queues.ui or 0, 1, "invalidate should schedule a background tooltip rebuild")
+    -- Tooltip is a secondary view: InvalidateIndex now only marks dirty.
+    -- The rebuild is deferred to the next lifecycle moment (session-complete)
+    -- or to the next idle hover, whichever comes first.
+    local queuesAfterInvalidate = addon.Performance:GetQueueLengths()
+    Test.eq(queuesAfterInvalidate.ui or 0, 0,
+        "invalidate alone should not schedule a tooltip rebuild")
+    Test.truthy(tooltip.indexDirty, "invalidate should mark the tooltip index dirty")
 
     local staleRows = tooltip:GetRowsForKey("item:95001")
     local missingRows = tooltip:GetRowsForKey("item:95002")
     Test.eq(#(staleRows or {}), 1, "stale index should still serve previous rows during rebuild")
     Test.eq(#(missingRows or {}), 0, "new rows should not appear before the rebuild job runs")
     Test.eq(tooltip.indexVersion, initialVersion, "hover path should not rebuild synchronously")
+
+    local queuesAfterHover = addon.Performance:GetQueueLengths()
+    Test.eq(queuesAfterHover.ui or 0, 1,
+        "hover on a dirty index in idle state should schedule the background rebuild")
 
     runUntilIdle(addon)
 
@@ -114,7 +123,11 @@ Test.it("restarts the tooltip rebuild when data changes again during an active b
         count = 500,
     })
 
-    data:InvalidateRecipeCaches("presence")
+    data:InvalidateRecipeCaches("metadata")
+    -- InvalidateIndex no longer schedules a rebuild on its own; trigger one
+    -- explicitly the same way Sync:CompleteOutboundSeedSession would after
+    -- a successful pull, or a tooltip hover would.
+    tooltip:EnsureIndexBuildScheduled()
     addon.Performance:RunNextStep()
     Test.truthy(tooltip._indexBuildJobActive, "large tooltip index should still be rebuilding after one scheduler tick")
 
@@ -122,7 +135,11 @@ Test.it("restarts the tooltip rebuild when data changes again during an active b
     entry.professions.Alchemy.recipes[97001] = true
     entry.professions.Alchemy.count = 501
     entry.professions.Alchemy.signature = "many+97001"
-    data:InvalidateRecipeCaches("presence")
+    data:InvalidateRecipeCaches("metadata")
+    -- The previous build's generation is now stale; the next scheduler tick
+    -- will abort it. Trigger a fresh build that picks up the new data —
+    -- this models the explicit retrigger on the next lifecycle moment.
+    tooltip:EnsureIndexBuildScheduled()
 
     runUntilIdle(addon, 40)
 
