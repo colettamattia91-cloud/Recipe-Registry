@@ -21,9 +21,13 @@ if (-not $allSpecs -or $allSpecs.Count -eq 0) {
     throw "No backend specs found in local-tests\spec"
 }
 
-$normalSoakSpec = "sync_soak_spec.lua"
-$heavySoakSpec = "sync_soak_heavy_spec.lua"
-$soakSpecs = @($normalSoakSpec, $heavySoakSpec)
+$activeSoakSpecs = @(
+    "soak_block_pull_saturation_spec.lua",
+    "soak_discovery_backoff_churn_spec.lua",
+    "soak_hello_storm_spec.lua",
+    "soak_memory_bound_spec.lua",
+    "soak_seed_election_crowd_spec.lua"
+)
 $activeAllSpecs = @(
     "acebucket_integration_spec.lua",
     "atlas_category_spec.lua",
@@ -44,9 +48,11 @@ $activeAllSpecs = @(
     "sync_phase2_summary_foundation_spec.lua",
     "sync_phase34_block_pull_spec.lua",
     "sync_roster_invalidation_spec.lua",
+    "ui_cached_consultation_spec.lua",
     "soak_block_pull_saturation_spec.lua",
     "soak_discovery_backoff_churn_spec.lua",
     "soak_hello_storm_spec.lua",
+    "soak_memory_bound_spec.lua",
     "soak_seed_election_crowd_spec.lua"
 )
 $activeSyncSpecs = @(
@@ -67,6 +73,7 @@ $activeSyncSpecs = @(
     "soak_block_pull_saturation_spec.lua",
     "soak_discovery_backoff_churn_spec.lua",
     "soak_hello_storm_spec.lua",
+    "soak_memory_bound_spec.lua",
     "soak_seed_election_crowd_spec.lua"
 )
 
@@ -87,7 +94,7 @@ function Get-SuiteSpecs {
             return $Candidates | Where-Object { $_.Name -in $activeSyncSpecs }
         }
         "soak" {
-            return @()
+            return $Candidates | Where-Object { $_.Name -in $activeSoakSpecs }
         }
         default {
             throw "Unsupported suite '$SuiteName'"
@@ -116,7 +123,7 @@ $suiteDescriptions = @{
     all = "default/all runs the current supported backend baseline and excludes historical or not-yet-migrated specs."
     quick = "quick currently matches the supported backend baseline."
     sync = "sync runs the supported HELLO/SUMMARY/index-diff/block-pull/runtime-cache/build-isolation rewrite coverage."
-    soak = "soak contains no active specs while the historical pre-rewrite soak coverage remains archived in-tree."
+    soak = "soak runs active HELLO storm, seed election, block-pull saturation, discovery backoff, and memory-bounds coverage."
 }
 
 Push-Location $repoRoot

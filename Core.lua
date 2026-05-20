@@ -309,7 +309,9 @@ local function printMainHelp(self)
     self:Print("/rr rescan - queue a profession scan and scan active profession API data.")
     self:Print("/rr version, /rr versions, /rr dump, /rr self [profession], /rr sync [debug, diag, peers, sessions, log], /rr offline, /rr pull")
     self:Print("/rr perf [toggle, dump, reset, help]")
-    self:Print("/rr mock [status, start <" .. MOCK_SCENARIOS .. ">, stop, cleanup, reset, help]")
+    if self.MockSync then
+        self:Print("/rr mock [status, start <" .. MOCK_SCENARIOS .. ">, stop, cleanup, reset, help]")
+    end
     self:Print("/rr prices <item name or link>, /rr share [guild, party, raid, say]")
     self:Print("/rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID>")
     self:Print("/rr clean [check], /rr wipe")

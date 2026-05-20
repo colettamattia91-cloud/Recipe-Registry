@@ -1,6 +1,6 @@
 # Local Recipe Registry Tests
 
-This folder is intentionally excluded through `.git/info/exclude`.
+This folder contains the local Lua harness and is excluded from release zips through `.pkgmeta`.
 
 ## Commands
 
@@ -20,6 +20,12 @@ Focused spec:
 
 ```powershell
 .\local-tests\run-backend-tests.ps1 -Spec sync_phase34_block_pull_spec.lua
+```
+
+Active soak coverage:
+
+```powershell
+.\local-tests\run-backend-tests.ps1 -Suite soak
 ```
 
 ## Current backend load order
@@ -75,6 +81,8 @@ Legacy runtime modules are no longer loaded:
 - runtime observability snapshots and alpha-debug export coverage
 - bounded recent sync event log coverage
 - inbound seed session debug counters and pause clearing diagnostics
+- cached recipe consultation during warm-up and instance pause
+- active soak coverage for HELLO storms, seed election, block-pull saturation, and discovery backoff
 
 ## Alpha tester workflow
 
@@ -125,4 +133,10 @@ If you need to exercise only the active rewrite path explicitly, use:
 
 ```powershell
 .\local-tests\run-backend-tests.ps1 -Suite sync
+```
+
+If you need the focused active soak checks only, use:
+
+```powershell
+.\local-tests\run-backend-tests.ps1 -Suite soak
 ```

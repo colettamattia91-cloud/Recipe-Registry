@@ -6,6 +6,17 @@ local function freshAddon()
     return addon, wow, addon.Data
 end
 
+local function freshReleaseAddon()
+    local files = {}
+    for _, file in ipairs(Loader.BackendFiles) do
+        if file ~= "MockSync.lua" then
+            files[#files + 1] = file
+        end
+    end
+    local addon, wow = Loader.Load({ files = files })
+    return addon, wow, addon.Data
+end
+
 local function printLogContains(wow, needle)
     for _, line in ipairs(wow.GetPrints()) do
         if tostring(line):find(needle, 1, true) then
@@ -91,6 +102,16 @@ Test.it("prints the same main help for unknown and removed manifest commands", f
     Test.truthy(printLogContains(wow, "/rr self [profession]"), "fallback self help")
     Test.truthy(printLogContains(wow, "offlinewipe"), "fallback mock scenario help")
     Test.truthy(printLogDoesNotContain(wow, "Manifest local="), "removed manifest command should not print legacy diagnostics")
+end)
+
+Test.it("hides mock commands from release help when the mock module is absent", function()
+    local addon, wow = freshReleaseAddon()
+
+    addon:SlashHandler("help")
+    Test.truthy(printLogDoesNotContain(wow, "/rr mock"), "release help should not advertise unavailable mock tooling")
+
+    addon:SlashHandler("mock help")
+    Test.truthy(printLogContains(wow, "Mock sync module not available."), "hidden mock command should fail safely if invoked")
 end)
 
 Test.it("manages persistent debug log commands with the sync scope", function()

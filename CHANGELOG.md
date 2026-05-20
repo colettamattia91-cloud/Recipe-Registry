@@ -11,9 +11,11 @@ All notable changes to this project are documented in this file.
 - More helpful sync status and troubleshooting output when debug tools are enabled, while normal play stays quiet.
 
 ### Changed
+- Important: `2.0.0` uses a new guild sync model and does not exchange sync data with Recipe Registry `1.x`. Existing saved recipe data is preserved, but guildmates should update together for guild sharing to work.
 - Background sync now waits for safer moments around login, reloads, combat, instances, and busy roster loading instead of trying to do everything at once.
 - Startup, reload, update, and database-wipe recovery now handle guild data sharing more smoothly, with less need for manual refreshes.
 - Recipe data requests are more tolerant of slow or unavailable guildmates and version changes during sync.
+- When many guildmates refresh around the same time, sync now spreads requests across good sources more evenly and backs off cleanly from already-busy peers.
 - Recipe lists, searches, tooltips, and Auction House lookups are smoother in larger guild databases and reuse more work instead of rebuilding the same view repeatedly.
 - Profession scans are quieter: automatic checks no longer announce unchanged or unrelated skill events, while manual refreshes still tell you what happened.
 - Guildmate presence is handled more conservatively during startup, so active players are less likely to disappear from recipe results while the roster is still warming up.

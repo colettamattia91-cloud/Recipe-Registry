@@ -1951,6 +1951,9 @@ function Sync:EnterWarmup(reason, seconds)
         self:RecordSyncEvent("warmupExit", {
             reason = "warmup-recovery",
         })
+        if Addon.UI and Addon.UI.TryResumeFullRefresh then
+            Addon.UI:TryResumeFullRefresh()
+        end
     end, max(0, self.warmupUntil - time()))
 end
 
@@ -1986,6 +1989,9 @@ function Sync:EnterWorldTransition(reason, seconds)
         self:RecordSyncEvent("worldTransitionExit", {
             reason = "world-transition-recovery",
         })
+        if Addon.UI and Addon.UI.TryResumeFullRefresh then
+            Addon.UI:TryResumeFullRefresh()
+        end
     end, max(0, self.worldTransitionUntil - time()))
 end
 

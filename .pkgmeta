@@ -1,2 +1,9 @@
 package-as: RecipeRegistry
 manual-changelog: CHANGELOG.md
+ignore:
+  - .claude
+  - .gitignore
+  - CLAUDE.md
+  - MockSync.lua
+  - docs
+  - local-tests

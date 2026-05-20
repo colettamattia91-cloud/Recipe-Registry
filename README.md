@@ -105,7 +105,7 @@ If TradeSkillMaster or Auctionator is installed, Recipe Registry can show materi
 - Built for WoW TBC Anniversary / The Burning Crusade Classic 2.5.x
 - Core browsing and guild sync work without optional addons
 - Optional addons improve recipe detail and market pricing
-- For the smoothest guild sync, guildmates should keep Recipe Registry on the same major release line
+- Important for `2.0.0`: guild sync uses a new model that is not compatible with Recipe Registry `1.x` sync. Your own saved recipes remain safe, but guildmates should update to `2.0.0` or newer to share data with you.
 
 ## Installation
 
