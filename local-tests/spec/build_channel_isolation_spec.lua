@@ -366,7 +366,7 @@ Test.it("newer compatible addon versions still produce update notices", function
     Test.truthy(printContains(wow, "a newer version was detected from " .. peerKey .. " (2.1.0)."), "newer compatible addon should print an update notice")
 end)
 
-Test.it("removed legacy capabilities do not affect compatibility decisions", function()
+Test.it("unknown extra capabilities do not affect compatibility decisions", function()
     local addon = loadAddon("release")
     local peerKey = "Capabilitypeer-TestRealm"
 
@@ -379,27 +379,27 @@ Test.it("removed legacy capabilities do not affect compatibility decisions", fun
             capabilities = {
                 indexDiffSync = true,
                 blockPullSync = true,
-                maniReliable = false,
-                manifestShards = false,
+                futureOptionalFlag = false,
+                unrelatedDiagnosticFlag = true,
             },
         }),
     })
     addon.Sync:RecordPeerCaps(peerKey, modernCaps(addon, {
-        capabilities = {
-            indexDiffSync = true,
-            blockPullSync = true,
-            maniReliable = false,
-            manifestShards = false,
-        },
-    }))
+            capabilities = {
+                indexDiffSync = true,
+                blockPullSync = true,
+                futureOptionalFlag = false,
+                unrelatedDiagnosticFlag = true,
+            },
+        }))
 
     local eligible, reason = addon.Sync:CanExchangeDataWithPeer(peerKey, "dispatch", {
         source = peerKey,
         memberKey = peerKey,
     })
 
-    Test.truthy(eligible, "modern peers should stay eligible even if removed legacy flags are present")
-    Test.eq(reason, "eligible", "compatibility reason should ignore removed legacy flags")
+    Test.truthy(eligible, "modern peers should stay eligible when extra capability flags are present")
+    Test.eq(reason, "eligible", "compatibility reason should ignore unknown extra flags")
 end)
 
 io.write(string.format("Build channel isolation: %d test(s) passed\n", Test.count))

@@ -100,14 +100,6 @@ local function collectKnownSpellIds(knownSpells)
     return spellIDs
 end
 
-local function countPartialManifestEntries(sync)
-    local total = 0
-    for _, manifests in pairs(sync.partialManifestReceive or {}) do
-        total = total + countKeys(manifests)
-    end
-    return total
-end
-
 local function snapshotNodeRuntime(node)
     local state = node and node.state or {}
     return {
@@ -144,16 +136,14 @@ local function makeRoster(names, realm)
     return rows
 end
 
-local function outstandingCost(sync, manifestOnly)
+local function outstandingCost(sync)
     local owners = 0
     local blocks = 0
     for _, request in pairs(sync.pendingRequests or {}) do
-        if not manifestOnly or request.why == "manifest" then
-            owners = owners + 1
-            blocks = blocks + math.max(1, #(request.requestedBlocks or {}))
-        end
+        owners = owners + 1
+        blocks = blocks + math.max(1, #(request.requestedBlocks or {}))
     end
-    if sync.inFlight and (not manifestOnly or sync.inFlight.why == "manifest") then
+    if sync.inFlight then
         owners = owners + 1
         blocks = blocks + math.max(1, #(sync.inFlight.requestedBlocks or {}))
     end
@@ -162,11 +152,6 @@ end
 
 local function hasPartialReceives(sync)
     for _ in pairs(sync.partialReceive or {}) do return true end
-    for _, manifests in pairs(sync.partialManifestReceive or {}) do
-        if next(manifests or {}) ~= nil then
-            return true
-        end
-    end
     return false
 end
 
@@ -181,10 +166,8 @@ local function hasNodeWork(node)
     if sync.inFlight then return true end
     if countKeys(sync.outgoingSessions) > 0 then return true end
     if #(sync.outboundChunkQueue or {}) > 0 then return true end
-    if #(sync.manifestChunkQueue or {}) > 0 then return true end
     if #(sync.inboundChunkQueue or {}) > 0 then return true end
     if #(sync.inboundFinalizeQueue or {}) > 0 then return true end
-    if #(sync.manifestCatchupQueue or {}) > 0 then return true end
     if hasPartialReceives(sync) then return true end
     return false
 end
@@ -215,24 +198,14 @@ local function describeNodeWork(node)
     if #(sync.outboundChunkQueue or {}) > 0 then
         reasons[#reasons + 1] = "outbound=" .. tostring(#(sync.outboundChunkQueue or {}))
     end
-    if #(sync.manifestChunkQueue or {}) > 0 then
-        reasons[#reasons + 1] = "manifestChunk=" .. tostring(#(sync.manifestChunkQueue or {}))
-    end
     if #(sync.inboundChunkQueue or {}) > 0 then
         reasons[#reasons + 1] = "inbound=" .. tostring(#(sync.inboundChunkQueue or {}))
     end
     if #(sync.inboundFinalizeQueue or {}) > 0 then
         reasons[#reasons + 1] = "finalize=" .. tostring(#(sync.inboundFinalizeQueue or {}))
     end
-    if #(sync.manifestCatchupQueue or {}) > 0 then
-        reasons[#reasons + 1] = "catchup=" .. tostring(#(sync.manifestCatchupQueue or {}))
-    end
     if countKeys(sync.partialReceive or {}) > 0 then
         reasons[#reasons + 1] = "partialSnap=" .. tostring(countKeys(sync.partialReceive or {}))
-    end
-    local partialManifests = countPartialManifestEntries(sync)
-    if partialManifests > 0 then
-        reasons[#reasons + 1] = "partialMani=" .. tostring(partialManifests)
     end
     return reasons
 end
@@ -338,11 +311,7 @@ function CommBus.New(opts)
             droppedKinds = {},
             maxOutstandingOwners = 0,
             maxOutstandingBlocks = 0,
-            maxManifestOutstandingOwners = 0,
-            maxManifestOutstandingBlocks = 0,
             maxCatchupDeferred = 0,
-            maxManifestCatchupQueue = 0,
-            maxManifestChunkQueue = 0,
             maxOutboundChunkQueue = 0,
             maxInboundChunkQueue = 0,
             maxInboundFinalizeQueue = 0,
@@ -580,7 +549,6 @@ function CommBus:SeedSelfProfession(node, opts)
     end
 
     entry.owner = memberKey
-    entry.rev = opts.rev or (5000 + node.index)
     entry.updatedAt = opts.updatedAt or (7000 + node.index)
     entry.sourceType = "owner"
     entry.guildStatus = "active"
@@ -591,7 +559,6 @@ function CommBus:SeedSelfProfession(node, opts)
         signature = stableRecipeSignature(recipes),
         skillRank = opts.skillRank or 375,
         skillMaxRank = opts.skillMaxRank or 375,
-        blockRevision = entry.rev,
         lastUpdatedAt = entry.updatedAt,
         sourceType = "owner",
         guildStatus = "active",
@@ -630,8 +597,7 @@ function CommBus:SeedReplicaProfession(node, ownerKey, profession, recipeKeys, o
     end
 
     entry.owner = ownerKey
-    entry.rev = opts.rev or entry.rev or 1
-    entry.updatedAt = opts.updatedAt or entry.updatedAt or entry.rev or 1
+    entry.updatedAt = opts.updatedAt or entry.updatedAt or 1
     entry.sourceType = opts.sourceType or "replica"
     entry.guildStatus = opts.guildStatus or "active"
     entry.lastSeenInGuildAt = opts.lastSeenInGuildAt or entry.updatedAt
@@ -642,7 +608,6 @@ function CommBus:SeedReplicaProfession(node, ownerKey, profession, recipeKeys, o
         skillRank = opts.skillRank or 375,
         skillMaxRank = opts.skillMaxRank or 375,
         specialization = opts.specialization,
-        blockRevision = opts.blockRevision or entry.rev,
         lastUpdatedAt = opts.updatedAt or entry.updatedAt,
         sourceType = opts.sourceType or "replica",
         guildStatus = opts.guildStatus or "active",
@@ -672,11 +637,8 @@ function CommBus:BroadcastHelloPresence(opts)
     opts = opts or {}
     self:ForEachNode(function(node)
         if not node.online then return end
-        local summary = node.addon.Data:GetLocalSummary()
         node.addon.Sync:SendGuildEnvelope("HELLO", {
             key = node.key,
-            rev = opts.useSummary and summary.rev or opts.rev or 0,
-            updatedAt = opts.useSummary and summary.updatedAt or opts.updatedAt or 0,
             version = opts.version or "comm-bus-test",
             addonVersion = node.addon.ADDON_VERSION or node.addon.DISPLAY_VERSION,
             wireVersion = node.addon.WIRE_VERSION,
@@ -810,7 +772,6 @@ function CommBus:BuildTransportRow(rawRow, payload, target)
         seq = payload and payload.seq or nil,
         total = payload and payload.total or nil,
         memberKey = payload and payload.key or nil,
-        manifestId = payload and payload.manifestId or nil,
         createdAtTick = self.stats.ticks,
         target = target and target.key or rawRow.target,
     }
@@ -833,7 +794,6 @@ function CommBus:BuildEventData(item, extra)
         target = item and item.target and item.target.key or nil,
         kind = metrics.kind or "?",
         memberKey = metrics.memberKey,
-        manifestId = metrics.manifestId,
         requestId = metrics.requestId,
         sessionId = metrics.sessionId,
         seq = metrics.seq,
@@ -1082,13 +1042,10 @@ end
 
 function CommBus:RecordNodeMetrics(node)
     local sync = node.addon.Sync
-    local owners, blocks = outstandingCost(sync, false)
-    local manifestOwners, manifestBlocks = outstandingCost(sync, true)
+    local owners, blocks = outstandingCost(sync)
     local outboundChunkQueue = #(sync.outboundChunkQueue or {})
     local inboundChunkQueue = #(sync.inboundChunkQueue or {})
     local inboundFinalizeQueue = #(sync.inboundFinalizeQueue or {})
-    local manifestCatchupQueue = #(sync.manifestCatchupQueue or {})
-    local manifestChunkQueue = #(sync.manifestChunkQueue or {})
     local pendingRequests = countKeys(sync.pendingRequests or {})
     local activeRequests = sync.inFlight and 1 or 0
 
@@ -1098,27 +1055,15 @@ function CommBus:RecordNodeMetrics(node)
     if blocks > self.stats.maxOutstandingBlocks then
         self.stats.maxOutstandingBlocks = blocks
     end
-    if manifestOwners > self.stats.maxManifestOutstandingOwners then
-        self.stats.maxManifestOutstandingOwners = manifestOwners
-    end
-    if manifestBlocks > self.stats.maxManifestOutstandingBlocks then
-        self.stats.maxManifestOutstandingBlocks = manifestBlocks
-    end
-
     self.stats.maxOutboundChunkQueue = math.max(self.stats.maxOutboundChunkQueue, outboundChunkQueue)
     self.stats.maxInboundChunkQueue = math.max(self.stats.maxInboundChunkQueue, inboundChunkQueue)
     self.stats.maxInboundFinalizeQueue = math.max(self.stats.maxInboundFinalizeQueue, inboundFinalizeQueue)
-    self.stats.maxManifestCatchupQueue = math.max(self.stats.maxManifestCatchupQueue, manifestCatchupQueue)
-    self.stats.maxManifestChunkQueue = math.max(self.stats.maxManifestChunkQueue, manifestChunkQueue)
     self.stats.maxPendingRequests = math.max(self.stats.maxPendingRequests, pendingRequests)
     self.stats.maxActiveRequests = math.max(self.stats.maxActiveRequests, activeRequests)
-    self.stats.maxCatchupDeferred = self.stats.maxManifestCatchupQueue
 
     self:RecordQueueDepth("outboundChunkQueue", outboundChunkQueue)
     self:RecordQueueDepth("inboundChunkQueue", inboundChunkQueue)
     self:RecordQueueDepth("inboundFinalizeQueue", inboundFinalizeQueue)
-    self:RecordQueueDepth("manifestCatchupQueue", manifestCatchupQueue)
-    self:RecordQueueDepth("manifestChunkQueue", manifestChunkQueue)
     self:RecordQueueDepth("pendingRequests", pendingRequests)
     self:RecordQueueDepth("activeRequests", activeRequests)
 end
@@ -1196,7 +1141,6 @@ function CommBus:NodeHasZombieRequests(node)
     return sync.inFlight ~= nil
         or countKeys(sync.pendingRequests or {}) > 0
         or countKeys(sync.partialReceive or {}) > 0
-        or countPartialManifestEntries(sync) > 0
         or countKeys(sync.outgoingSessions or {}) > 0
 end
 
@@ -1269,28 +1213,6 @@ function CommBus:CountPartialSnapshots()
         if node.online then
             self:Activate(node)
             total = total + countKeys(node.addon.Sync.partialReceive or {})
-        end
-    end
-    return total
-end
-
-function CommBus:CountPartialManifests()
-    local total = 0
-    for _, node in ipairs(self.nodes) do
-        if node.online then
-            self:Activate(node)
-            total = total + countPartialManifestEntries(node.addon.Sync)
-        end
-    end
-    return total
-end
-
-function CommBus:CountManifestCatchupQueued()
-    local total = 0
-    for _, node in ipairs(self.nodes) do
-        if node.online then
-            self:Activate(node)
-            total = total + #(node.addon.Sync.manifestCatchupQueue or {})
         end
     end
     return total

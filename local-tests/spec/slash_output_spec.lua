@@ -40,11 +40,14 @@ local function countGuildCommKind(wow, kind)
     return total
 end
 
-local function countLegacyGuildComm(wow)
-    return countGuildCommKind(wow, "AD")
-        + countGuildCommKind(wow, "IDX")
-        + countGuildCommKind(wow, "MANI")
-        + countGuildCommKind(wow, "MREQ")
+local function countAddonComm(wow)
+    local total = 0
+    for _, row in ipairs(wow.GetSentComm()) do
+        if type(row.message) == "table" and type(row.message.kind) == "string" then
+            total = total + 1
+        end
+    end
+    return total
 end
 
 local function seedLocalProfession(data, professionKey, recipeKeys, opts)
@@ -186,7 +189,7 @@ Test.it("queues manual rescan when no profession API data is active", function()
     Test.truthy(data:HasAnyScanPending(), "manual rescan should remain pending")
     Test.eq(data:GetScanTelemetry().signals, 1, "manual rescan should record a scan signal")
     Test.eq(data:GetScanTelemetry().scansSkipped, 2, "inactive trade/craft APIs should be skipped")
-    Test.eq(countLegacyGuildComm(wow), 0, "manual rescan should not emit legacy sync traffic")
+    Test.eq(countAddonComm(wow), 0, "manual rescan should not emit inline sync traffic")
     Test.truthy(addon.Sync._helloTimer ~= nil or type(addon.Sync.lastHelloScheduleReason) == "string", "manual rescan should schedule a delayed hello")
     Test.eq(countGuildCommKind(wow, "HELLO"), 0, "manual rescan should not broadcast hello inline")
     Test.truthy(printLogContains(wow, "Profession rescan queued. Open or refresh a profession to complete pending scans."), "queued rescan output")
