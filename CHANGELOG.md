@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.0.2] - 2026-05-20
+### Changed
+- Recipe Registry is smoother while guild recipe data is syncing, especially when the addon window is open.
+- Recipe tooltips now refresh their guild crafter data more calmly after sync activity, reducing small pauses during larger updates.
+
 ## [2.0.1] - 2026-05-20
 ### Changed
 - Guild recipe sync is smoother when receiving several recipe groups in a row, reducing short pauses while your local recipe database catches up.

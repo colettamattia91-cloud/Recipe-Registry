@@ -90,20 +90,21 @@ function Tooltip:HookTooltip(tooltip)
 end
 
 function Tooltip:InvalidateIndex(_reason)
+    -- The tooltip is a secondary feature: the cost of rebuilding the full
+    -- recipe index (100+ ms on a large guild database) is too high to pay
+    -- on every block merge or roster update. We just mark dirty here and
+    -- bump the generation so any in-flight rebuild aborts on its next
+    -- step check. The actual rebuild fires at well-defined lifecycle
+    -- moments:
+    --   - Sync:CompleteOutboundSeedSession on successful pull
+    --   - Sync:AbortOutboundSeedSession with partial merges
+    --   - Tooltip:GetRowsForKey lazily on user consultation when idle
     self._indexBuildGeneration = (self._indexBuildGeneration or 0) + 1
     self.indexDirty = true
     if self._timer then
         self:CancelTimer(self._timer, true)
         self._timer = nil
     end
-    if Addon.Sync and Addon.Sync.ShouldDeferHeavyLifecycleWork then
-        local shouldDefer = Addon.Sync:ShouldDeferHeavyLifecycleWork("tooltip")
-        if shouldDefer then
-            Addon.Sync.telemetry.transitionDeferredTooltip = (Addon.Sync.telemetry.transitionDeferredTooltip or 0) + 1
-            return
-        end
-    end
-    self:EnsureIndexBuildScheduled()
 end
 
 function Tooltip:BuildIndexState(state)
@@ -288,12 +289,29 @@ end
 function Tooltip:GetRowsForKey(key)
     if not key then return nil end
     if self.indexDirty then
+        -- Serve stale (or empty) rows when we can't safely rebuild right
+        -- now: combat lockdown, an active sync pull, warmup, or anything
+        -- else that flags heavy lifecycle work as deferred. The index will
+        -- be rebuilt at the next lifecycle moment (session-complete,
+        -- session-abort with partial merges) and the user sees fresh data
+        -- on the next hover.
+        local mustServeStale = false
+        if InCombatLockdown and InCombatLockdown() then
+            mustServeStale = true
+        elseif Addon.Sync and Addon.Sync.ShouldDeferHeavyLifecycleWork
+            and Addon.Sync:ShouldDeferHeavyLifecycleWork("tooltip-lookup") then
+            mustServeStale = true
+        end
+        if mustServeStale then
+            local staleBucket = self.index and self.index[key]
+            return self:ResolveBucketRows(staleBucket)
+        end
+        -- Idle path: schedule a chunked background rebuild and serve stale
+        -- this round. The next hover after the build finishes will see
+        -- fresh data. We avoid the synchronous RebuildIndex fallback
+        -- because that pays the full 100+ ms cost on the hover frame.
         self:EnsureIndexBuildScheduled()
         if not self._indexBuildJobActive then
-            if InCombatLockdown and InCombatLockdown() then
-                local staleBucket = self.index and self.index[key]
-                return self:ResolveBucketRows(staleBucket)
-            end
             self:RebuildIndex()
         end
     end

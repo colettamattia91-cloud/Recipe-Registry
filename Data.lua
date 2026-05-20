@@ -1319,6 +1319,30 @@ function Data:GetSortedMemberKeys(includeStale)
     return keys
 end
 
+function Data:GetUiStatusSnapshot(includeStale)
+    local members = 0
+    local updatedAt = 0
+    for memberKey, entry in pairs(self:GetMembersDB()) do
+        if self:IsUserVisibleMember(memberKey, entry, includeStale) then
+            members = members + 1
+            local entryUpdatedAt = tonumber(entry.updatedAt or 0) or 0
+            if entryUpdatedAt > updatedAt then
+                updatedAt = entryUpdatedAt
+            end
+            for _, prof in pairs(entry.professions or {}) do
+                local profUpdatedAt = tonumber(prof.lastUpdatedAt or prof.lastScan or 0) or 0
+                if profUpdatedAt > updatedAt then
+                    updatedAt = profUpdatedAt
+                end
+            end
+        end
+    end
+    return {
+        members = members,
+        updatedAt = updatedAt,
+    }
+end
+
 function Data:MarkMemberActive(memberKey, seenAt, dirtyReason)
     local entry = self:GetMember(memberKey)
     if not entry then return false end

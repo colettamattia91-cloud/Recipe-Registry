@@ -1690,6 +1690,13 @@ function Sync:AbortOutboundSeedSession(reason)
     )
     if (session.successfulBlockMerges or 0) > 0 then
         self:ResetDiscoveryRetry("seed-session-abort-partial")
+        -- Mirror the tooltip rebuild trigger from CompleteOutboundSeedSession
+        -- so a session that aborted mid-pull still gets the deferred tooltip
+        -- index rebuilt once. Without this the rebuild would only happen on
+        -- the next unrelated invalidation, potentially leaving stale data.
+        if Addon.Tooltip and Addon.Tooltip.EnsureIndexBuildScheduled then
+            Addon.Tooltip:EnsureIndexBuildScheduled()
+        end
     else
         self:ResetDiscoveryRetry("seed-session-abort-retry")
     end
@@ -1732,6 +1739,13 @@ function Sync:CompleteOutboundSeedSession(reason)
         self:ResetDiscoveryRetry("seed-session-complete")
         self:RefreshSyncReadyState(session.completedReason)
         self:ScheduleHello("seed-session-complete")
+        -- The tooltip index was deferred while the session was active (see
+        -- ShouldDeferHeavyLifecycleWork). Trigger a single rebuild now that
+        -- we're done so it picks up everything we pulled in one shot
+        -- instead of paying the cost N times during the session.
+        if Addon.Tooltip and Addon.Tooltip.EnsureIndexBuildScheduled then
+            Addon.Tooltip:EnsureIndexBuildScheduled()
+        end
     end
     self:RecordSyncEvent("outboundSessionCompleted", {
         peer = session.seedKey,
@@ -2033,6 +2047,16 @@ function Sync:ShouldDeferHeavyLifecycleWork(_reason)
         return true
     end
     if self:IsInWorldTransition() then
+        return true
+    end
+    -- While an outbound seed session is actively pulling, every block merge
+    -- invalidates the tooltip index and re-schedules its background rebuild.
+    -- The rebuild's first step iterates Data:GetRecipeIndex(), which can
+    -- cost 100+ms on large guild databases (10k+ recipes) — and the next
+    -- merge aborts the half-built job, so it pays the cost again. Defer
+    -- heavy lifecycle work until the session completes; the completion
+    -- path explicitly retriggers a single rebuild.
+    if self:HasActiveOutboundSeedSession() then
         return true
     end
     return self:EstimateRuntimeQueuePressure() >= 70
