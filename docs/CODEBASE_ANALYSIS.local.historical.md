@@ -1,6 +1,6 @@
 # Historical Local Codebase Analysis
 
-**Status:** archived on 2026-05-17.  
+**Status:** archived on 2026-05-17.
 **Reason:** the old local analysis described the removed manifest/revision/coordinator sync system and is no longer accurate for the active codebase.
 
 Use these documents instead:

@@ -1,8 +1,8 @@
 # Recipe Registry — Wire-3 Summary / Index-Diff / Block-Pull Rewrite Roadmap
 
-**Status:** canonical rewrite roadmap compiled from the chat-approved v3 plan and later clarifications.  
-**Branch target:** `develop`.  
-**Protocol decision:** keep `WIRE_VERSION = 3`; break semantic compatibility with the old manifest/revision/coordinator sync behavior.  
+**Status:** canonical rewrite roadmap compiled from the chat-approved v3 plan and later clarifications.
+**Branch target:** `develop`.
+**Protocol decision:** keep `WIRE_VERSION = 3`; break semantic compatibility with the old manifest/revision/coordinator sync behavior.
 **Rule:** this document is the canonical source of truth. Do not overwrite it with phase-specific plans.
 
 ---

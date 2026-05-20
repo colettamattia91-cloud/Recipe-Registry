@@ -1,6 +1,6 @@
 # Historical Sync Rewrite Plan
 
-**Status:** superseded on 2026-05-17.  
+**Status:** superseded on 2026-05-17.
 **Do not use this file as source of truth for the active rewrite.**
 
 Canonical documents:

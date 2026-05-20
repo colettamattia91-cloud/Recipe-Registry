@@ -1,6 +1,6 @@
 # Recipe Registry — Sync Rewrite Phase Log
 
-**Status:** refreshed from actual code and active test inspection on 2026-05-17.  
+**Status:** refreshed from actual code and active test inspection on 2026-05-17.
 **Rule:** this is a phase report, not the architecture source of truth. `docs/sync-rewrite-roadmap.md` remains canonical.
 
 ---
