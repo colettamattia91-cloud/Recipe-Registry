@@ -27,6 +27,7 @@ $soakSpecs = @($normalSoakSpec, $heavySoakSpec)
 $activeAllSpecs = @(
     "acebucket_integration_spec.lua",
     "atlas_category_spec.lua",
+    "block_merge_list_cache_invalidation_spec.lua",
     "build_channel_isolation_spec.lua",
     "catalog_cache_spec.lua",
     "diagnostics_snapshot_spec.lua",

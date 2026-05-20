@@ -138,6 +138,17 @@ function Data:ApplyIncomingBlockAdditive(blockKey, snapshot, opts)
         self:MarkSyncIndexDirty("block-merge:" .. tostring(blockKey), blockKey)
     end
     self:InvalidateRecipeCaches("metadata")
+    -- The "metadata" scope intentionally preserves _recipeListCache so that
+    -- skill-rank/spec-only refreshes don't blow away precomputed list rows.
+    -- A block merge that ADDS recipes, introduces a new owner, or flips an
+    -- owner back to active changes which rows appear in those cached lists
+    -- (and their crafterCount / professionList), so drop the list cache too.
+    -- Pure metadata-only merges (addedRecipes == 0, no new owner, no status
+    -- flip) still keep the list cache hot.
+    local contentChanged = (merged.addedRecipes or 0) > 0 or entryIsNew or statusFlippedToActive
+    if contentChanged then
+        self:InvalidateRecipeCaches("list")
+    end
     if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
         Addon.Tooltip:InvalidateIndex("block-merge")
     end
