@@ -49,6 +49,10 @@ function Performance:OnInitialize()
         deferredUIRefreshCount = 0,
         uiRefreshFlushes = 0,
         uiRefreshMarks = 0,
+        uiRefreshTotalMs = 0,
+        uiRefreshLastMs = 0,
+        uiRefreshMaxMs = 0,
+        uiRefreshOverBudget = 0,
         averageStepCostMs = 0,
         maxStepCostMs = 0,
         overBudgetSteps = 0,
@@ -68,6 +72,10 @@ function Performance:ResetTelemetry()
         deferredUIRefreshCount = 0,
         uiRefreshFlushes = 0,
         uiRefreshMarks = 0,
+        uiRefreshTotalMs = 0,
+        uiRefreshLastMs = 0,
+        uiRefreshMaxMs = 0,
+        uiRefreshOverBudget = 0,
         averageStepCostMs = 0,
         maxStepCostMs = 0,
         overBudgetSteps = 0,
@@ -251,7 +259,17 @@ function Performance:FlushDeferredUIRefresh(force)
     self._uiFlushQueued = false
     self.telemetry.deferredUIRefreshCount = self.telemetry.deferredUIRefreshCount + countKeys(scopes)
     self.telemetry.uiRefreshFlushes = self.telemetry.uiRefreshFlushes + 1
+    local startedAt = nowMs()
     safeCall(ui.Refresh, ui, scopes)
+    local elapsed = nowMs() - startedAt
+    self.telemetry.uiRefreshLastMs = elapsed
+    self.telemetry.uiRefreshTotalMs = (self.telemetry.uiRefreshTotalMs or 0) + elapsed
+    if elapsed > (self.telemetry.uiRefreshMaxMs or 0) then
+        self.telemetry.uiRefreshMaxMs = elapsed
+    end
+    if elapsed > DEFAULT_BUDGET_MS then
+        self.telemetry.uiRefreshOverBudget = (self.telemetry.uiRefreshOverBudget or 0) + 1
+    end
     return true
 end
 
@@ -297,13 +315,16 @@ function Performance:DumpDebugStatus()
     end
     table.sort(queueParts)
     Addon:SystemPrint(string.format(
-        "Perf steps=%d avg=%.2fms max=%.2fms overBudget=%d uiFlush=%d uiMarks=%d queues=%s",
+        "Perf steps=%d avg=%.2fms max=%.2fms overBudget=%d uiFlush=%d uiMarks=%d uiLast=%.2fms uiMax=%.2fms uiOverBudget=%d queues=%s",
         telemetry.jobSteps or 0,
         telemetry.averageStepCostMs or 0,
         telemetry.maxStepCostMs or 0,
         telemetry.overBudgetSteps or 0,
         telemetry.uiRefreshFlushes or 0,
         telemetry.uiRefreshMarks or 0,
+        telemetry.uiRefreshLastMs or 0,
+        telemetry.uiRefreshMaxMs or 0,
+        telemetry.uiRefreshOverBudget or 0,
         #queueParts > 0 and table.concat(queueParts, ", ") or "none"
     ))
 end

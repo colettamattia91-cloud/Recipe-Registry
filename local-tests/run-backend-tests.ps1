@@ -132,8 +132,16 @@ try {
         Write-Host ("Selected suite '{0}' with {1} spec(s): {2}" -f $Suite, $specs.Count, $suiteDescriptions[$Suite])
     }
     foreach ($spec in $specs) {
-        $specName = if ($spec.PSObject.Properties["Name"]) { $spec.Name } else { Split-Path $spec -Leaf }
-        $specPath = if ($spec.PSObject.Properties["FullName"]) { $spec.FullName } else { $spec }
+        $specName = if ($spec.Name) { $spec.Name } else { Split-Path ([string]$spec) -Leaf }
+        if ($spec.FullName -and (Test-Path $spec.FullName)) {
+            $specPath = $spec.FullName
+        }
+        elseif (Test-Path ([string]$spec)) {
+            $specPath = (Resolve-Path ([string]$spec)).Path
+        }
+        else {
+            $specPath = Join-Path (Join-Path $PSScriptRoot "spec") $specName
+        }
         Write-Host "Running $specName"
         & $lua $specPath
         if ($LASTEXITCODE -ne 0) {

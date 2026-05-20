@@ -57,17 +57,17 @@ end)
 
 Test.it("bounds recipe detail cache across many lookups", function()
     local _addon, data = freshAddon()
-    seedMember(data, "Cachetwo-TestRealm", "Enchanting", recipeSet(99001, 99150), {
+    seedMember(data, "Cachetwo-TestRealm", "Enchanting", recipeSet(99001, 99300), {
         sourceType = "replica",
-        count = 150,
+        count = 300,
     })
 
-    for recipeKey = 99001, 99150 do
+    for recipeKey = 99001, 99300 do
         data:GetRecipeDisplayInfo(recipeKey)
     end
 
-    Test.gte(128, Test.countKeys(data._recipeDetailCache), "recipe detail cache should stay bounded")
-    Test.gte(128, #(data._recipeDetailCacheOrder or {}), "recipe detail cache order should stay bounded")
+    Test.gte(256, Test.countKeys(data._recipeDetailCache), "recipe detail cache should stay bounded")
+    Test.gte(256, #(data._recipeDetailCacheOrder or {}), "recipe detail cache order should stay bounded")
 end)
 
 Test.it("searches recipe names by default and materials only when requested", function()

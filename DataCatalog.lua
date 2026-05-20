@@ -19,7 +19,7 @@ local safeGetSpellName = Private.safeGetSpellName
 local shouldRefreshItemName = Private.shouldRefreshItemName
 
 local MAX_RECIPE_LIST_CACHE_ENTRIES = 12
-local MAX_RECIPE_DETAIL_CACHE_ENTRIES = 128
+local MAX_RECIPE_DETAIL_CACHE_ENTRIES = 256
 
 local function refreshDetailAssets(info)
     if not info then return end

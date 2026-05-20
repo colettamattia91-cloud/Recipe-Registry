@@ -1371,7 +1371,8 @@ end
 function UI:RefreshStatusBar()
     local sync = Addon.Sync
     local state = sync and sync.GetUiState and sync:GetUiState() or nil
-    local summary = Addon.Data and Addon.Data.GetLocalSummary and Addon.Data:GetLocalSummary() or {
+    local statusSnapshot = Addon.Data and Addon.Data.GetUiStatusSnapshot and Addon.Data:GetUiStatusSnapshot(false) or {
+        members = 0,
         updatedAt = 0,
     }
     local bootstrap = state and state.bootstrap or nil
@@ -1379,12 +1380,7 @@ function UI:RefreshStatusBar()
     local cleanupRunning = Addon.GuildLifecycleMaintenance and Addon.GuildLifecycleMaintenance.IsCleanupRunning
         and Addon.GuildLifecycleMaintenance:IsCleanupRunning() or false
 
-    local members = 0
-    if Addon.Data and Addon.Data.GetSortedMemberKeys then
-        for _ in ipairs(Addon.Data:GetSortedMemberKeys(false)) do
-            members = members + 1
-        end
-    end
+    local members = statusSnapshot.members or 0
 
     local onlineNodes = state and state.onlineNodes or 0
     local queued = state and state.queued or 0
@@ -1443,7 +1439,7 @@ function UI:RefreshStatusBar()
 
     setTextIfChanged(self.frame.cards.members.value, tostring(members))
     setTextIfChanged(self.frame.cards.network.value, string.format("%d / %d", onlineNodes, state and state.registry or 0))
-    setTextIfChanged(self.frame.cards.updated.value, ageText(summary.updatedAt))
+    setTextIfChanged(self.frame.cards.updated.value, ageText(statusSnapshot.updatedAt))
     setTextIfChanged(self.frame.cards.updated.text, "Last local update")
     if self.frame.cleanupButton then
         self.frame.cleanupButton:SetText(cleanupRunning and "Cleaning..." or "Roster Cleanup")
@@ -1490,6 +1486,7 @@ function UI:RefreshDebugPanel()
         string.format("Scheduler avg/max: %.2f / %.2f ms", perfTelemetry.averageStepCostMs or 0, perfTelemetry.maxStepCostMs or 0),
         string.format("Steps: %d  Over budget: %d", perfTelemetry.jobSteps or 0, perfTelemetry.overBudgetSteps or 0),
         string.format("UI marks/flushes: %d / %d", perfTelemetry.uiRefreshMarks or 0, perfTelemetry.uiRefreshFlushes or 0),
+        string.format("UI refresh last/max: %.2f / %.2f ms", perfTelemetry.uiRefreshLastMs or 0, perfTelemetry.uiRefreshMaxMs or 0),
         string.format("Outbound sent: %d  Inbound recv/applied: %d / %d", syncTelemetry.sentChunks or 0, syncTelemetry.receivedChunks or 0, syncTelemetry.appliedChunks or 0),
         string.format("Queues req/out/in/final: %d / %d / %d / %d", sync and sync.pendingRequests or 0, sync and sync.outboundChunks or 0, sync and sync.inboundChunks or 0, sync and sync.inboundFinalize or 0),
         string.format("Paused cycles: %d  Eq skips: %d", syncTelemetry.pausedSyncCycles or 0, syncTelemetry.skippedEquivalentMerges or 0),
@@ -1590,7 +1587,38 @@ end
 local RECIPE_ROW_HEIGHT = 70
 local RECIPE_ROW_BUFFER = 2
 
+local function getVisibleRecipeWindow(ui, total)
+    if total <= 0 then
+        return 1, 0
+    end
+
+    local frame = ui and ui.frame
+    local scrollFrame = frame and frame.recipeScroll
+    local offset = (scrollFrame and scrollFrame.GetVerticalScroll and scrollFrame:GetVerticalScroll()) or 0
+    local viewHeight = (scrollFrame and scrollFrame:GetHeight()) or 0
+    if viewHeight <= 0 then
+        -- Frame hasn't been laid out yet (first paint). Fall back to a
+        -- conservative initial window so we don't render nothing.
+        viewHeight = 600
+    end
+
+    local firstIdx = math.max(1, math.floor(offset / RECIPE_ROW_HEIGHT) + 1 - RECIPE_ROW_BUFFER)
+    local lastIdx = math.min(total, math.ceil((offset + viewHeight) / RECIPE_ROW_HEIGHT) + RECIPE_ROW_BUFFER)
+    return firstIdx, lastIdx
+end
+
+function UI:RefreshRecipeRowAssets(rowData)
+    if not (rowData and rowData.recipeKey and Addon.Data and Addon.Data.GetRecipeDisplayInfo) then
+        return rowData
+    end
+    local detail = Addon.Data:GetRecipeDisplayInfo(rowData.recipeKey) or rowData.detail or {}
+    rowData.detail = detail
+    rowData.label = (detail and detail.label) or rowData.label or tostring(rowData.recipeKey)
+    return rowData
+end
+
 function UI:BindRecipeRow(row, recipeIdx, rowData)
+    rowData = self:RefreshRecipeRowAssets(rowData) or rowData
     row:SetPoint("TOPLEFT", 0, -((recipeIdx - 1) * RECIPE_ROW_HEIGHT))
     row.recipeKey = rowData.recipeKey
 
@@ -1676,17 +1704,7 @@ function UI:RenderVisibleRecipeRows()
         return
     end
 
-    local scrollFrame = self.frame.recipeScroll
-    local offset = (scrollFrame and scrollFrame.GetVerticalScroll and scrollFrame:GetVerticalScroll()) or 0
-    local viewHeight = (scrollFrame and scrollFrame:GetHeight()) or 0
-    if viewHeight <= 0 then
-        -- Frame hasn't been laid out yet (first paint). Fall back to a
-        -- conservative initial window so we don't render nothing.
-        viewHeight = 600
-    end
-
-    local firstIdx = math.max(1, math.floor(offset / RECIPE_ROW_HEIGHT) + 1 - RECIPE_ROW_BUFFER)
-    local lastIdx = math.min(total, math.ceil((offset + viewHeight) / RECIPE_ROW_HEIGHT) + RECIPE_ROW_BUFFER)
+    local firstIdx, lastIdx = getVisibleRecipeWindow(self, total)
 
     if self._lastRenderedFirstIdx == firstIdx and self._lastRenderedLastIdx == lastIdx then
         return
@@ -1795,14 +1813,8 @@ function UI:RefreshVisibleRecipeRowAssets()
         return
     end
 
-    -- Refresh detail snapshots for visible rows (item info may have arrived).
-    local rows = self.currentRecipeRows
-    for _, rowData in ipairs(rows) do
-        local detail = Addon.Data:GetRecipeDisplayInfo(rowData.recipeKey) or rowData.detail or {}
-        rowData.detail = detail
-        rowData.label = (detail and detail.label) or rowData.label or tostring(rowData.recipeKey)
-    end
-    -- Per-row data refreshed: force re-bind on the same window.
+    -- Item-cache events can arrive in bursts; only re-bind the current
+    -- virtualized window and let off-screen rows refresh lazily on scroll.
     self:InvalidateRecipeWindowCache()
     self:RenderVisibleRecipeRows()
 end
