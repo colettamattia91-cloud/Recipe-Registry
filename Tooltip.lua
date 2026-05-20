@@ -89,12 +89,19 @@ function Tooltip:HookTooltip(tooltip)
     end
 end
 
-function Tooltip:InvalidateIndex()
+function Tooltip:InvalidateIndex(_reason)
     self._indexBuildGeneration = (self._indexBuildGeneration or 0) + 1
     self.indexDirty = true
     if self._timer then
         self:CancelTimer(self._timer, true)
         self._timer = nil
+    end
+    if Addon.Sync and Addon.Sync.ShouldDeferHeavyLifecycleWork then
+        local shouldDefer = Addon.Sync:ShouldDeferHeavyLifecycleWork("tooltip")
+        if shouldDefer then
+            Addon.Sync.telemetry.transitionDeferredTooltip = (Addon.Sync.telemetry.transitionDeferredTooltip or 0) + 1
+            return
+        end
     end
     self:EnsureIndexBuildScheduled()
 end
@@ -211,6 +218,12 @@ function Tooltip:EnsureIndexBuildScheduled()
     if Addon.Sync and Addon.Sync.IsInWarmup and Addon.Sync:IsInWarmup() then
         return
     end
+    if Addon.Sync and Addon.Sync.IsInWorldTransition and Addon.Sync:IsInWorldTransition() then
+        return
+    end
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseTooltipRebuild() then
+        return
+    end
 
     self._indexBuildJobActive = true
     local generation = self._indexBuildGeneration or 0
@@ -236,6 +249,9 @@ function Tooltip:EnsureIndexBuildScheduled()
 end
 
 function Tooltip:OnSyncWarmupEnded()
+    if Addon.Sync and Addon.Sync.IsInWorldTransition and Addon.Sync:IsInWorldTransition() then
+        return
+    end
     if self.indexDirty then
         self:EnsureIndexBuildScheduled()
     end

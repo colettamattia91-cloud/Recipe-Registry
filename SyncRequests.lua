@@ -4,481 +4,501 @@ local Private = Sync._private
 local Constants = Private.constants
 
 local time = time
-local pairs = pairs
-local ipairs = ipairs
-local random = math.random
 local max = math.max
 
-local addRetrySuffix = Private.addRetrySuffix
-local cloneFingerprintMap = Private.cloneFingerprintMap
-local cloneStringSet = Private.cloneStringSet
-local isHelloAutoReason = Private.isHelloAutoReason
-local isManualReason = Private.isManualReason
-local mergeExpectedFingerprints = Private.mergeExpectedFingerprints
-local mergeRequestedBlocks = Private.mergeRequestedBlocks
-
-local REQUEST_TIMEOUT = Constants.REQUEST_TIMEOUT
-local PROGRESS_TIMEOUT = Constants.PROGRESS_TIMEOUT
 local SESSION_TIMEOUT = Constants.SESSION_TIMEOUT
-local MAX_RESUME_ATTEMPTS = Constants.MAX_RESUME_ATTEMPTS
-local MAX_REQUEST_RETRIES = Constants.MAX_REQUEST_RETRIES
-local MAX_HELLO_AUTO_RETRIES = Constants.MAX_HELLO_AUTO_RETRIES
-local MAX_CONCURRENT_REQUESTS = Constants.MAX_CONCURRENT_REQUESTS
+-- BLOCK_PULL_DELAY_SECONDS and BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS now
+-- resolve via Sync:GetBlockPullDelay() / :GetBlockPullResponseTimeout()
+-- so the user-tunable values from the options panel take effect without
+-- needing a /reload.
 
-local function requestBlocksCovered(existing, expected)
-    if type(expected) ~= "table" or #expected == 0 then
-        return true
-    end
-    local seen = {}
-    for _, blockKey in ipairs(existing or {}) do
-        if blockKey then
-            seen[blockKey] = true
-        end
-    end
-    for _, blockKey in ipairs(expected) do
-        if blockKey and not seen[blockKey] then
-            return false
-        end
-    end
-    return true
-end
-
-local function expectedFingerprintsCovered(existing, expected)
-    for blockKey, fingerprint in pairs(expected or {}) do
-        if (existing and existing[blockKey] or nil) ~= fingerprint then
-            return false
-        end
-    end
-    return true
-end
-
-function Sync:IsRequestShapeValid(request)
-    return request
-        and self:IsValidSyncMemberKey(request.memberKey)
-        and self:IsValidSyncMemberKey(request.source)
-end
-
-function Sync:IsRequestAlreadySatisfied(request)
-    if not request or not self:IsValidSyncMemberKey(request.memberKey) then return false end
-    local entry = Addon.Data:GetMember(request.memberKey)
-    if not entry then return false end
-
-    local targetRev = request.rev or 0
-    if (entry.rev or 0) < targetRev then
-        return false
-    end
-
-    local requestedBlocks = request.requestedBlocks or {}
-    local expectedFingerprints = request.expectedFingerprints or {}
-    if type(requestedBlocks) ~= "table" or #requestedBlocks == 0 then
-        return true
-    end
-
-    for _, blockKey in ipairs(requestedBlocks) do
-        local ownerCharacter, professionKey = Addon.Data:ParseSyncBlockKey(blockKey)
-        if ownerCharacter ~= request.memberKey or not professionKey then
-            return false
-        end
-        local prof = entry.professions and entry.professions[professionKey]
-        if not prof or (prof.guildStatus or entry.guildStatus or "active") ~= "active" then
-            return false
-        end
-        local expectedFingerprint = expectedFingerprints[blockKey]
-        if expectedFingerprint ~= nil then
-            local localBlock = Addon.Data:GetSyncBlock(request.memberKey, professionKey)
-            local localFingerprint = localBlock and localBlock.fingerprint or nil
-            if localFingerprint ~= expectedFingerprint then
-                return false
+-- Summarize an offered-blocks list into compact, human-readable strings for
+-- traces. Repeating "missing,missing,missing..." 164 times across the offered
+-- count carries no signal. Grouping by profession and by reason is much more
+-- diagnosable — you can tell at a glance whether a profession (e.g. Mining) is
+-- present in the offered set without grepping through hundreds of keys.
+-- Returns (reasonsSummary, byProfessionSummary, blockKeysCompact).
+local function summarizeOfferedBlocks(offeredBlocks)
+    local reasonCounts = {}
+    local profCounts = {}
+    local blockKeys = {}
+    for index = 1, #(offeredBlocks or {}) do
+        local row = offeredBlocks[index]
+        if type(row) == "table" then
+            if row.reason then
+                local key = tostring(row.reason)
+                reasonCounts[key] = (reasonCounts[key] or 0) + 1
             end
-        end
-    end
-    return true
-end
-
-function Sync:GetRequestMaxAttempts(request)
-    if isHelloAutoReason(request and request.why) then
-        return MAX_HELLO_AUTO_RETRIES
-    end
-    return MAX_REQUEST_RETRIES
-end
-
-function Sync:DoesRequestCover(request, targetRev, requestedBlocks, expectedFingerprints)
-    if not request then return false end
-    if (request.rev or 0) < (targetRev or 0) then return false end
-    return requestBlocksCovered(request.requestedBlocks, requestedBlocks)
-        and expectedFingerprintsCovered(request.expectedFingerprints, expectedFingerprints)
-end
-
-function Sync:GetRequestPriorityBucket(request)
-    local why = tostring(request and request.why or "")
-    if why == "manual" or why == "manual-all" then return 0 end
-    if why == "manifest" then return 1 end
-    if why == "index" then return 2 end
-    if why == "advertise-auto" or why == "auto-tick" then return 3 end
-    if isHelloAutoReason(why) then return 4 end
-    return 2
-end
-
-function Sync:IsBetterPendingRequest(candidate, best)
-    if not best then return true end
-    local candidatePriority = self:GetRequestPriorityBucket(candidate)
-    local bestPriority = self:GetRequestPriorityBucket(best)
-    if candidatePriority ~= bestPriority then
-        return candidatePriority < bestPriority
-    end
-
-    local candidateScore = self:GetPeerHealthScore(candidate.source)
-    local bestScore = self:GetPeerHealthScore(best.source)
-    if candidateScore ~= bestScore then
-        return candidateScore > bestScore
-    end
-
-    if (candidate.rev or 0) ~= (best.rev or 0) then
-        return (candidate.rev or 0) > (best.rev or 0)
-    end
-
-    return (candidate.queuedAt or 0) < (best.queuedAt or 0)
-end
-
-function Sync:ShouldAllowLocalMockTraffic(sourceKey, memberKey)
-    if not (Addon.MockSync and Addon.MockSync.IsLocalTrafficEnabled) then
-        return false
-    end
-    return Addon.MockSync:IsLocalTrafficEnabled(sourceKey, memberKey)
-end
-
-function Sync:ShouldDeferRequestDispatch(request)
-    if not self:IsInWarmup() then return false end
-    return not isManualReason(request and request.why)
-end
-
-function Sync:QueueRequest(sourceKey, memberKey, targetRev, why, opts)
-    if not sourceKey or not memberKey then return end
-    if not self:IsValidSyncMemberKey(memberKey) then
-        Addon:Debug("Skipped malformed sync request", tostring(memberKey), "from", tostring(sourceKey), why or "")
-        return
-    end
-    if not self:IsValidSyncMemberKey(sourceKey) then
-        sourceKey = self:GetKnownOwner(memberKey)
-    end
-    if not self:IsValidSyncMemberKey(sourceKey) then
-        Addon:Debug("Skipped sync request with malformed source", tostring(memberKey), "from", tostring(sourceKey), why or "")
-        return
-    end
-    local allowLocalMock = self:ShouldAllowLocalMockTraffic(sourceKey, memberKey)
-    if (self:IsMockKey(sourceKey) or self:IsMockKey(memberKey)) and not allowLocalMock then return end
-    opts = opts or {}
-
-    local knownOwner = self:GetKnownOwner(memberKey)
-    if not opts.allowReplicaSource and sourceKey ~= knownOwner and knownOwner then
-        sourceKey = knownOwner
-    end
-
-    if self:IsRequestAlreadySatisfied({
-        memberKey = memberKey,
-        rev = targetRev or 0,
-        requestedBlocks = opts.requestedBlocks,
-        expectedFingerprints = opts.expectedFingerprints,
-    }) then
-        Addon:Debug("Skipped satisfied sync request", memberKey, "from", sourceKey, "rev", targetRev or 0, why or "")
-        return
-    end
-
-    local active = self:GetInFlightRequest(memberKey)
-    if self:DoesRequestCover(active, targetRev or 0, opts.requestedBlocks, opts.expectedFingerprints) then
-        Addon:Debug("Skipped covered sync request", memberKey, "from", sourceKey, "rev", targetRev or 0, why or "")
-        return
-    end
-
-    local q = self.pendingRequests[memberKey]
-    if q and (q.rev or 0) >= (targetRev or 0) then
-        if opts.requestedBlocks and #opts.requestedBlocks > 0 then
-            q.requestedBlocks = mergeRequestedBlocks(q.requestedBlocks, opts.requestedBlocks)
-            q.expectedFingerprints = mergeExpectedFingerprints(q.expectedFingerprints, opts.expectedFingerprints)
-            q.allowReplicaSource = q.allowReplicaSource or opts.allowReplicaSource == true
-            q.source = opts.allowReplicaSource and sourceKey or q.source
-        end
-        return
-    end
-
-    self.pendingRequests[memberKey] = {
-        source = sourceKey,
-        memberKey = memberKey,
-        rev = targetRev or 0,
-        why = why,
-        queuedAt = time(),
-        attempts = q and q.attempts or 0,
-        resumeAttempts = 0,
-        allowReplicaSource = opts.allowReplicaSource == true,
-        requestedBlocks = cloneStringSet(opts.requestedBlocks),
-        expectedFingerprints = cloneFingerprintMap(opts.expectedFingerprints),
-    }
-    Addon:Debug("Queued direct request", memberKey, "from", sourceKey, "rev", targetRev or 0, why or "")
-    Addon:RequestRefresh("queue")
-end
-
-function Sync:SelectNextPendingRequest(skipMembers)
-    local bestKey, best
-    local sawWarmupDeferred = false
-
-    for memberKey, info in pairs(self.pendingRequests) do
-        if skipMembers and skipMembers[memberKey] then
-            -- Keep same-pass retries queued so another owner can use the freed slot first.
-        elseif not self:IsRequestShapeValid(info) then
-            self.pendingRequests[memberKey] = nil
-        elseif self:GetInFlightRequest(memberKey) then
-            if self:DoesRequestCover(self:GetInFlightRequest(memberKey), info.rev or 0, info.requestedBlocks, info.expectedFingerprints) then
-                self.pendingRequests[memberKey] = nil
-            end
-        elseif self:IsRequestAlreadySatisfied(info) then
-            self.pendingRequests[memberKey] = nil
-        else
-            local allowLocalMock = self:ShouldAllowLocalMockTraffic(info and info.source, memberKey)
-            if not self:IsRealTrafficSuppressed() or allowLocalMock then
-                if self:IsPeerBackoffActive(info.source) and not isManualReason(info.why) then
-                    self.telemetry.peerBackoffSkips = (self.telemetry.peerBackoffSkips or 0) + 1
-                elseif self:ShouldDeferRequestDispatch(info) then
-                    sawWarmupDeferred = true
-                elseif not best or self:IsBetterPendingRequest(info, best) then
-                    best = info
-                    bestKey = memberKey
+            if type(row.blockKey) == "string" and row.blockKey ~= "" then
+                blockKeys[#blockKeys + 1] = row.blockKey
+                local prof = row.blockKey:match("^.-::(.+)$")
+                if prof and prof ~= "" then
+                    profCounts[prof] = (profCounts[prof] or 0) + 1
                 end
             end
         end
     end
-
-    return bestKey, best, sawWarmupDeferred
+    local function flattenSorted(map)
+        local parts = {}
+        for k, v in pairs(map) do
+            parts[#parts + 1] = string.format("%s:%d", tostring(k), tonumber(v) or 0)
+        end
+        table.sort(parts)
+        return table.concat(parts, ",")
+    end
+    return flattenSorted(reasonCounts), flattenSorted(profCounts), table.concat(blockKeys, ",")
 end
 
-function Sync:DispatchPendingRequest(memberKey, request)
-    if not (memberKey and request) then return false end
+function Sync:BuildWantedBlockOrder(offeredBlocks)
+    local rows = {}
+    for index = 1, #(offeredBlocks or {}) do
+        local row = offeredBlocks[index]
+        if type(row) == "table" and type(row.blockKey) == "string" and row.blockKey ~= "" then
+            rows[#rows + 1] = {
+                blockKey = row.blockKey,
+                count = tonumber(row.count or 0) or 0,
+                fingerprint = row.fingerprint,
+                reason = row.reason,
+            }
+        end
+    end
+    table.sort(rows, function(left, right)
+        if (left.count or 0) ~= (right.count or 0) then
+            return (left.count or 0) > (right.count or 0)
+        end
+        return tostring(left.blockKey or "") < tostring(right.blockKey or "")
+    end)
+    return rows
+end
 
-    self.pendingRequests[memberKey] = nil
-    self._requestDispatchCounter = (self._requestDispatchCounter or 0) + 1
-    local active = {
-        memberKey = request.memberKey,
-        source = request.source,
-        rev = request.rev,
-        why = request.why,
-        dispatchOrder = self._requestDispatchCounter,
-        startedAt = time(),
-        lastProgressAt = time(),
-        attempts = (request.attempts or 0) + 1,
-        resumeAttempts = 0,
-        allowReplicaSource = request.allowReplicaSource == true,
-        requestedBlocks = cloneStringSet(request.requestedBlocks),
-        expectedFingerprints = cloneFingerprintMap(request.expectedFingerprints),
-    }
-    self:SetInFlightRequest(active)
-    self.telemetry.requestDispatches = (self.telemetry.requestDispatches or 0) + 1
-    if self:GetActiveRequestCount() > (self.telemetry.requestConcurrencyMax or 0) then
-        self.telemetry.requestConcurrencyMax = self:GetActiveRequestCount()
+function Sync:ClearSeedPendingState(_seedKey, reason)
+    local session = self.outboundSeedSession
+    if type(session) ~= "table" then
+        return false
+    end
+    session.offeredBlocks = {}
+    session.wantedBlocks = {}
+    session.nextWantedIndex = 1
+    session.activeBlockKey = nil
+    session.activeBlockRequestId = nil
+    session.lastCleanupReason = tostring(reason or "clear")
+    return true
+end
+
+function Sync:RequestIndexDiff(seedKey)
+    local allowed = true
+    if self.CanRunSyncProtocol then
+        allowed = self:CanRunSyncProtocol("INDEX_DIFF_REQUEST")
+    end
+    if not allowed then
+        return false
+    end
+    local session = self.outboundSeedSession
+    if not (type(session) == "table" and session.seedKey == seedKey) then
+        return false
+    end
+    if session.state == "waiting-index-diff" or session.state == "completed" or session.state == "aborted" then
+        return false
     end
 
-    local localEntry = Addon.Data:GetMember(request.memberKey)
-    local knownRev = localEntry and localEntry.rev or 0
-    if self:ShouldAllowLocalMockTraffic(request.source, request.memberKey) then
-        if not (Addon.MockSync and Addon.MockSync.HandleLocalRequest) then
-            self:FailInFlight(request.memberKey, false, "mock-unavailable")
-            return false
+    local digest = Addon.Data and Addon.Data.BuildRequesterIndexDigest and Addon.Data:BuildRequesterIndexDigest({
+        reason = "index-diff-request",
+        allowDeferred = true,
+    }) or nil
+    if type(digest) ~= "table" or digest.ready ~= true then
+        return false
+    end
+
+    session.diffRequestId = string.format("DIFFREQ:%s:%d", tostring(seedKey), tonumber(time() or 0) or 0)
+    session.diffSentAt = time()
+    session.lastProgressAt = session.diffSentAt
+    session.state = "waiting-index-diff"
+
+    local sent = self:SendDirectEnvelope("INDEX_DIFF_REQUEST", {
+        requestId = session.diffRequestId,
+        blocks = digest.blocks,
+    }, seedKey, "ALERT")
+    if sent then
+        self.telemetry.indexDiffRequestSent = (self.telemetry.indexDiffRequestSent or 0) + 1
+        self.telemetry.lastIndexDiffSeed = tostring(seedKey)
+        self.telemetry.lastIndexDiffRequestId = session.diffRequestId
+        self.telemetry.lastIndexDiffTarget = tostring(seedKey)
+        self.telemetry.lastIndexDiffLocalBlockCount = tonumber(digest.activeBlockCount or 0) or 0
+        if self.RecordSyncEvent then
+            self:RecordSyncEvent("indexDiffRequestSent", {
+                peer = seedKey,
+                requestId = session.diffRequestId,
+                extra = string.format("blocks=%d", self.telemetry.lastIndexDiffLocalBlockCount or 0),
+            })
         end
-        local accepted = Addon.MockSync:HandleLocalRequest({
-            source = request.source,
-            memberKey = request.memberKey,
-            knownRev = knownRev,
-            wantRev = request.rev or 0,
-            allowReplicaSource = request.allowReplicaSource == true,
-            requestedBlocks = cloneStringSet(request.requestedBlocks),
-        })
-        if not accepted then
-            self:FailInFlight(request.memberKey, false, "mock-rejected")
-            return false
+        Addon:Tracef("sync",
+            "index-diff-request-sent peer=%s requestId=%s blocks=%d",
+            tostring(seedKey),
+            tostring(session.diffRequestId),
+            tonumber(digest.activeBlockCount or 0) or 0
+        )
+        return true
+    end
+
+    if self.AbortOutboundSeedSession then
+        self:AbortOutboundSeedSession("index-diff-send-failed")
+    end
+    return false
+end
+
+function Sync:BuildIndexDiffResponseForRequest(requestPayload)
+    return Addon.Data and Addon.Data.BuildIndexDiffResponse and Addon.Data:BuildIndexDiffResponse(requestPayload, {
+        reason = "index-diff-response",
+        allowDeferred = true,
+    }) or nil
+end
+
+function Sync:SendPreparedIndexDiffResponse(targetKey, requestPayload, response)
+    local allowed = true
+    if self.CanRunSyncProtocol then
+        allowed = self:CanRunSyncProtocol("INDEX_DIFF_RESPONSE")
+    end
+    if not allowed then
+        return false, nil
+    end
+    if not self:IsValidSyncMemberKey(targetKey) then
+        return false, nil
+    end
+    if type(response) ~= "table" or response.ready ~= true then
+        return false, response
+    end
+    local sent = self:SendDirectEnvelope("INDEX_DIFF_RESPONSE", {
+        requestId = requestPayload and requestPayload.requestId or nil,
+        offeredBlocks = response.offeredBlocks,
+    }, targetKey, "ALERT")
+    if sent then
+        local reasonsSummary, profsSummary, blockKeysCompact = summarizeOfferedBlocks(response.offeredBlocks)
+        self.telemetry.indexDiffResponseSent = (self.telemetry.indexDiffResponseSent or 0) + 1
+        self.telemetry.blocksOffered = (self.telemetry.blocksOffered or 0) + #(response.offeredBlocks or {})
+        self.telemetry.lastIndexDiffOfferedCount = #(response.offeredBlocks or {})
+        self.telemetry.lastIndexDiffNoOfferReason = (#(response.offeredBlocks or {}) == 0) and "no-diff" or nil
+        self.telemetry.lastBlockOfferReasons = reasonsSummary
+        self.telemetry.lastBlockOfferProfessions = profsSummary
+        self.telemetry.lastBlockOfferKeys = blockKeysCompact
+        if self.RecordSyncEvent then
+            self:RecordSyncEvent("indexDiffResponseSent", {
+                peer = targetKey,
+                requestId = requestPayload and requestPayload.requestId or nil,
+                extra = string.format("offered=%d", self.telemetry.lastIndexDiffOfferedCount or 0),
+            })
+        end
+        Addon:Tracef("sync",
+            "index-diff-response-sent peer=%s requestId=%s offered=%d byProfession=[%s] reasons=[%s] blocks=[%s]",
+            tostring(targetKey),
+            tostring(requestPayload and requestPayload.requestId or "none"),
+            #(response.offeredBlocks or {}),
+            profsSummary ~= "" and profsSummary or "none",
+            reasonsSummary ~= "" and reasonsSummary or "none",
+            blockKeysCompact ~= "" and blockKeysCompact or "none"
+        )
+    end
+    return sent, response
+end
+
+function Sync:SendIndexDiffResponse(targetKey, requestPayload)
+    local response = self:BuildIndexDiffResponseForRequest(requestPayload)
+    return self:SendPreparedIndexDiffResponse(targetKey, requestPayload, response)
+end
+
+function Sync:SendIndexDiffBusy(targetKey, requestPayload, reason)
+    local allowed = true
+    if self.CanRunSyncProtocol then
+        allowed = self:CanRunSyncProtocol("INDEX_DIFF_RESPONSE")
+    end
+    if not allowed or not self:IsValidSyncMemberKey(targetKey) then
+        return false
+    end
+
+    local busyReason = tostring(reason or "busy")
+    local sent = self:SendDirectEnvelope("INDEX_DIFF_RESPONSE", {
+        requestId = requestPayload and requestPayload.requestId or nil,
+        busy = true,
+        reason = busyReason,
+    }, targetKey, "ALERT")
+    if sent then
+        self.telemetry.indexDiffBusySent = (self.telemetry.indexDiffBusySent or 0) + 1
+        self.telemetry.lastIndexDiffBusyPeer = targetKey
+        self.telemetry.lastIndexDiffBusyReason = busyReason
+        self.telemetry.lastIndexDiffNoOfferReason = busyReason
+        if self.RecordSyncEvent then
+            self:RecordSyncEvent("indexDiffBusySent", {
+                peer = targetKey,
+                requestId = requestPayload and requestPayload.requestId or nil,
+                reason = busyReason,
+            })
+        end
+        Addon:Tracef("sync",
+            "index-diff-busy-sent peer=%s requestId=%s reason=%s",
+            tostring(targetKey),
+            tostring(requestPayload and requestPayload.requestId or "none"),
+            busyReason
+        )
+    end
+    return sent
+end
+
+function Sync:HandleReceivedIndexDiffResponse(payload)
+    local session = self.outboundSeedSession
+    if type(session) ~= "table" then
+        return false
+    end
+    if session.state ~= "waiting-index-diff" then
+        return false
+    end
+    if payload.sender ~= session.seedKey then
+        return false
+    end
+    if payload.requestId and session.diffRequestId and payload.requestId ~= session.diffRequestId then
+        return false
+    end
+
+    if payload.busy == true then
+        local busyReason = tostring(payload.reason or "seed-busy")
+        session.lastProgressAt = time()
+        self.telemetry.indexDiffBusyReceived = (self.telemetry.indexDiffBusyReceived or 0) + 1
+        self.telemetry.seedBusyReceived = (self.telemetry.seedBusyReceived or 0) + 1
+        self.telemetry.lastIndexDiffBusyPeer = payload.sender
+        self.telemetry.lastIndexDiffBusyReason = busyReason
+        self.telemetry.lastIndexDiffNoOfferReason = busyReason
+        if self.RecordSyncEvent then
+            self:RecordSyncEvent("indexDiffBusyReceived", {
+                peer = payload.sender,
+                requestId = payload.requestId,
+                reason = busyReason,
+            })
+        end
+        Addon:Tracef("sync",
+            "index-diff-busy-received peer=%s requestId=%s reason=%s",
+            tostring(payload.sender or "unknown"),
+            tostring(payload.requestId or "none"),
+            busyReason
+        )
+        if self.HandleSeedBusy then
+            self:HandleSeedBusy(payload.sender, busyReason)
         end
         return true
     end
 
-    self:SendDirectEnvelope("REQ", {
-        key = request.memberKey,
-        knownRev = knownRev,
-        wantRev = request.rev or 0,
-        requestedBlocks = cloneStringSet(request.requestedBlocks),
-    }, request.source, "ALERT")
+    session.lastProgressAt = time()
+    session.state = "index-diff-ready"
+    session.offeredBlocks = self:BuildWantedBlockOrder(payload.offeredBlocks or {})
+    session.wantedBlocks = self:BuildWantedBlockOrder(payload.offeredBlocks or {})
+    session.nextWantedIndex = 1
+    self.telemetry.indexDiffResponseReceived = (self.telemetry.indexDiffResponseReceived or 0) + 1
+    self.telemetry.blocksOffered = (self.telemetry.blocksOffered or 0) + #(session.offeredBlocks or {})
+    self.telemetry.lastIndexDiffOfferedCount = #(session.offeredBlocks or {})
+    self.telemetry.lastIndexDiffNoOfferReason = (#(session.offeredBlocks or {}) == 0) and "no-diff" or nil
+
+    local reasonsSummary, profsSummary, blockKeysCompact = summarizeOfferedBlocks(session.offeredBlocks)
+    self.telemetry.lastBlockOfferReasons = reasonsSummary
+    self.telemetry.lastBlockOfferProfessions = profsSummary
+    self.telemetry.lastBlockOfferKeys = blockKeysCompact
+    if self.RecordSyncEvent then
+        self:RecordSyncEvent("indexDiffResponseReceived", {
+            peer = payload.sender,
+            requestId = payload.requestId,
+            extra = string.format("offered=%d", self.telemetry.lastIndexDiffOfferedCount or 0),
+        })
+    end
+    Addon:Tracef("sync",
+        "index-diff-response-received peer=%s requestId=%s offered=%d byProfession=[%s] reasons=[%s] blocks=[%s]",
+        tostring(payload.sender or "unknown"),
+        tostring(payload.requestId or "none"),
+        #(session.offeredBlocks or {}),
+        profsSummary ~= "" and profsSummary or "none",
+        reasonsSummary ~= "" and reasonsSummary or "none",
+        blockKeysCompact ~= "" and blockKeysCompact or "none"
+    )
+
+    if #(session.wantedBlocks or {}) == 0 then
+        if self.CompleteOutboundSeedSession then
+            self:CompleteOutboundSeedSession("index-diff-empty")
+        end
+        return true
+    end
+
+    return self:RequestNextWantedBlock()
+end
+
+function Sync:RequestNextWantedBlock()
+    local allowed = true
+    if self.CanRunSyncProtocol then
+        allowed = self:CanRunSyncProtocol("BLOCK_PULL_REQUEST")
+    end
+    if not allowed then
+        return false
+    end
+    local session = self.outboundSeedSession
+    if type(session) ~= "table" then
+        return false
+    end
+    if session.state == "completed" or session.state == "aborted" then
+        return false
+    end
+    if session.activeBlockKey or session.activeBlockRequestId then
+        return false
+    end
+    local row = session.wantedBlocks and session.wantedBlocks[session.nextWantedIndex] or nil
+    if not row then
+        if self.CompleteOutboundSeedSession then
+            self:CompleteOutboundSeedSession("all-blocks-complete")
+        end
+        return false
+    end
+
+    local requestId = string.format("BLOCKREQ:%s:%s:%d", tostring(session.seedKey), tostring(row.blockKey), tonumber(time() or 0) or 0)
+    session.activeBlockKey = row.blockKey
+    session.activeBlockRequestId = requestId
+    session.state = "waiting-block"
+    session.blockRequestedAt = time()
+    session.lastProgressAt = session.blockRequestedAt
+
+    local sent = self:SendDirectEnvelope("BLOCK_PULL_REQUEST", {
+        requestId = requestId,
+        blockKey = row.blockKey,
+    }, session.seedKey, "ALERT")
+    if sent then
+        self.telemetry.blockPullRequestSent = (self.telemetry.blockPullRequestSent or 0) + 1
+        self.telemetry.blockPullStarted = (self.telemetry.blockPullStarted or 0) + 1
+        self.telemetry.lastBlockPullBlockKey = tostring(row.blockKey)
+        self.telemetry.lastBlockPullRequestId = requestId
+        self.telemetry.lastBlockPullSentAt = session.blockRequestedAt
+        if self.RecordSyncEvent then
+            self:RecordSyncEvent("blockPullRequestSent", {
+                peer = session.seedKey,
+                requestId = requestId,
+                blockKey = row.blockKey,
+                reason = row.reason,
+            })
+        end
+        Addon:Tracef("sync",
+            "block-pull-start peer=%s requestId=%s block=%s reason=%s",
+            tostring(session.seedKey),
+            tostring(requestId),
+            tostring(row.blockKey),
+            tostring(row.reason or "unknown")
+        )
+        return true
+    end
+
+    session.activeBlockKey = nil
+    session.activeBlockRequestId = nil
+    if self.AbortOutboundSeedSession then
+        self:AbortOutboundSeedSession("block-pull-send-failed")
+    end
+    return false
+end
+
+function Sync:ScheduleNextWantedBlock()
+    local session = self.outboundSeedSession
+    if type(session) ~= "table" or session.state == "completed" or session.state == "aborted" then
+        return false
+    end
+    if session.nextBlockTimer then
+        self:CancelTimer(session.nextBlockTimer, true)
+        session.nextBlockTimer = nil
+    end
+    local pullDelay = self:GetBlockPullDelay()
+    session.state = "waiting-next-block-delay"
+    session.nextBlockReadyAt = time() + pullDelay
+    self.telemetry.blockPullDelayed = (self.telemetry.blockPullDelayed or 0) + 1
+    session.nextBlockTimer = self:ScheduleTimer(function()
+        if session.nextBlockTimer then
+            self:CancelTimer(session.nextBlockTimer, true)
+        end
+        session.nextBlockTimer = nil
+        if session.state == "waiting-next-block-delay" then
+            session.state = "request-next-block"
+            self:RequestNextWantedBlock()
+        end
+    end, pullDelay)
+    Addon:Tracef("sync",
+        "block-pull-delay peer=%s nextDelay=%.1f",
+        tostring(session.seedKey or "unknown"),
+        pullDelay
+    )
     return true
 end
 
 function Sync:ProcessRequestQueue()
+    self:RefreshSyncReadyState("request-queue")
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic() then
         return
     end
-    local now = time()
-    local skipPendingMembers = {}
-    local activeKeys = {}
-    for memberKey in pairs(self:GetInFlightRequests()) do
-        activeKeys[#activeKeys + 1] = memberKey
-    end
 
-    for _, memberKey in ipairs(activeKeys) do
-        local request = self:GetInFlightRequest(memberKey)
-        if request then
-            if not self:IsRequestShapeValid(request) then
-                Addon:Debug("Dropping malformed in-flight request", tostring(request.memberKey), "from", tostring(request.source))
-                self:FailInFlight(memberKey, false, "malformed")
-                skipPendingMembers[memberKey] = true
-            elseif self:IsRequestAlreadySatisfied(request) then
-                Addon:Debug("Dropping satisfied in-flight request", request.memberKey)
-                self.partialReceive[request.memberKey] = nil
-                self:ClearInFlightRequest(request.memberKey)
-                skipPendingMembers[memberKey] = true
-                Addon:RequestRefresh("queue")
-                self:ScheduleQueuePump()
-            elseif not self:IsRequestStillViable(request) then
-                Addon:Debug("Dropping in-flight request; source unavailable", request.memberKey)
-                self:FailInFlight(memberKey, true, "source-unavailable")
-                skipPendingMembers[memberKey] = true
-            elseif (now - (request.startedAt or now)) > SESSION_TIMEOUT then
-                Addon:Debug("Request session timeout", request.memberKey)
-                self:FailInFlight(memberKey, true, "session-timeout")
-                skipPendingMembers[memberKey] = true
-            elseif not request.sessionId then
-                if (now - (request.startedAt or now)) > REQUEST_TIMEOUT then
-                    Addon:Debug("Initial request timeout", request.memberKey)
-                    self:FailInFlight(memberKey, true, "initial-timeout")
-                    skipPendingMembers[memberKey] = true
-                end
-            elseif (now - (request.lastProgressAt or now)) > PROGRESS_TIMEOUT then
-                if (request.resumeAttempts or 0) < MAX_RESUME_ATTEMPTS then
-                    request.resumeAttempts = (request.resumeAttempts or 0) + 1
-                    request.lastProgressAt = now
-                    self:SendResumeForInFlight(memberKey)
-                else
-                    Addon:Debug("Resume exhausted", request.memberKey)
-                    self:FailInFlight(memberKey, true, "resume-exhausted")
-                end
-            end
-        end
+    local session = self.outboundSeedSession
+    if type(session) ~= "table" then
+        return
     end
-
-    while self:GetActiveRequestCount() < MAX_CONCURRENT_REQUESTS do
-        local nextKey, nextRequest, sawWarmupDeferred = self:SelectNextPendingRequest(skipPendingMembers)
-        if not nextRequest then
-            if sawWarmupDeferred then
-                self.telemetry.warmupDeferrals = (self.telemetry.warmupDeferrals or 0) + 1
-            end
-            return
-        end
-
-        if self:IsRequestAlreadySatisfied(nextRequest) then
-            self.pendingRequests[nextKey] = nil
-        elseif not self:IsRequestStillViable(nextRequest) then
-            self.pendingRequests[nextKey] = nil
-        else
-            self:DispatchPendingRequest(nextKey, nextRequest)
-        end
-    end
-end
-
-function Sync:IsRequestStillViable(request)
-    if not self:IsRequestShapeValid(request) then return false end
-    if request.source == self:GetSelfKey() then return true end
-    local rosterFresh = self:IsRosterFresh()
-    if not rosterFresh then
-        self:EnsureFreshRoster("request-viability")
-    end
-    if rosterFresh and Addon.Data and Addon.Data.GetGuildMemberMeta then
-        local meta = Addon.Data:GetGuildMemberMeta(request.source)
-        if meta and meta.online == false then
-            return false
-        end
-    end
-    return self.onlineNodes[request.source] ~= nil
-end
-
-function Sync:FailInFlight(memberKey, requeue, reason)
-    if type(memberKey) == "boolean" or memberKey == nil then
-        reason = requeue
-        requeue = memberKey
-        memberKey = self.inFlight and self.inFlight.memberKey or nil
-    end
-
-    local req = memberKey and self:GetInFlightRequest(memberKey) or self:GetInFlightRequest()
-    if req and requeue and self:IsRequestShapeValid(req) and not self:IsRequestAlreadySatisfied(req) then
-        local attempts = req.attempts or 1
-        local maxAttempts = self:GetRequestMaxAttempts(req)
-        self:MarkPeerFailure(req.source, reason or "retry", req)
-        if attempts >= maxAttempts then
-            self.telemetry.requestDrops = (self.telemetry.requestDrops or 0) + 1
-            Addon:Debug(
-                "Dropping failed request after retries",
-                tostring(req.memberKey),
-                "from",
-                tostring(req.source),
-                tostring(req.why or ""),
-                "attempts",
-                tostring(attempts)
-            )
-        else
-            self.pendingRequests[req.memberKey] = {
-                source = req.source,
-                memberKey = req.memberKey,
-                rev = req.rev,
-                why = addRetrySuffix(req.why),
-                queuedAt = time() + random(),
-                attempts = attempts,
-                resumeAttempts = req.resumeAttempts or 0,
-                allowReplicaSource = req.allowReplicaSource == true,
-                requestedBlocks = cloneStringSet(req.requestedBlocks),
-                expectedFingerprints = cloneFingerprintMap(req.expectedFingerprints),
-            }
-            self.telemetry.requestRetries = (self.telemetry.requestRetries or 0) + 1
-        end
-        if self:IsValidSyncMemberKey(req.source) and not self:IsMockKey(req.source) and not self:IsInWarmup() then
-            self:RequestManifestRefresh(req.source, {
-                force = true,
-                reason = "request-repair",
-            })
-        end
-    end
-    if req and req.memberKey then
-        self.partialReceive[req.memberKey] = nil
-    end
-    self:ClearInFlightRequest(req and req.memberKey or memberKey)
-    Addon:RequestRefresh("queue")
-    self:ScheduleQueuePump()
-end
-
-function Sync:RequestGuildCatchup(memberKey, silent)
-    if memberKey and memberKey ~= "" then
-        if self:IsMockKey(memberKey) then return end
-        local remoteRev = self:GetKnownRevision(memberKey)
-        if remoteRev == 0 then
-            local localEntry = Addon.Data:GetMember(memberKey)
-            remoteRev = (localEntry and localEntry.rev or 0) + 1
-        end
-        self:QueueRequest(self:GetKnownOwner(memberKey), memberKey, remoteRev, "manual")
+    if session.state == "completed" or session.state == "aborted" then
         return
     end
 
-    for key, hint in pairs(self.registry) do
-        if not self:IsMockKey(key) and not self:IsMockKey(hint.owner) then
-            local localEntry = Addon.Data:GetMember(key)
-            local localRev = localEntry and localEntry.rev or 0
-            if (hint.rev or 0) > localRev then
-                self:QueueRequest(hint.owner or key, key, hint.rev or 0, "manual-all")
+    local allowActivePullAdvance = self.CanAdvanceOutboundPullSession and self:CanAdvanceOutboundPullSession() or false
+    if self.syncReady ~= true and not allowActivePullAdvance then
+        return
+    end
+
+    local now = time()
+    local age = max(0, now - (session.lastProgressAt or session.startedAt or now))
+    if age > SESSION_TIMEOUT then
+        self.telemetry.lastBlockPullTimeoutAt = now
+        self.telemetry.lastBlockPullTimeoutReason = "session-timeout"
+        if self.AbortOutboundSeedSession then
+            self:AbortOutboundSeedSession("session-timeout")
+        end
+        return
+    end
+
+    if session.state == "waiting-block" and session.blockRequestedAt then
+        local blockAge = max(0, now - session.blockRequestedAt)
+        if blockAge > self:GetBlockPullResponseTimeout() then
+            self.telemetry.lastBlockPullTimeoutAt = now
+            self.telemetry.lastBlockPullTimeoutReason = "block-response-timeout"
+            if self.AbortOutboundSeedSession then
+                self:AbortOutboundSeedSession("block-response-timeout")
             end
+            return
         end
     end
-    self:RequestManifestRefresh()
-    if not silent then
-        Addon:Print("Queued direct catch-up requests and requested fresh manifests from online peers.")
+
+    if session.state == "seed-selected" then
+        if self.syncReady ~= true then
+            return
+        end
+        self:RequestIndexDiff(session.seedKey)
+        return
+    end
+
+    if session.state == "request-next-block" then
+        self:RequestNextWantedBlock()
     end
 end
 
-function Sync:GetOldestPendingRequest()
-    local oldest
-    for _, request in pairs(self.pendingRequests or {}) do
-        if self:IsRequestShapeValid(request) and (not oldest or (request.queuedAt or 0) < (oldest.queuedAt or 0)) then
-            oldest = request
-        end
+function Sync:StartManualSyncPull(memberKey, silent)
+    if Addon.Data and Addon.Data.MarkSyncIndexDirty then
+        Addon.Data:MarkSyncIndexDirty(memberKey and memberKey ~= "" and "manual-pull-targeted" or "manual-pull", nil, {
+            full = true,
+        })
     end
-    return oldest
+    if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then
+        Addon.Data:ScheduleSyncIndexPrepare(memberKey and memberKey ~= "" and "manual-pull-targeted" or "manual-pull", 0.2)
+    end
+    if self.ResetDiscoveryRetry then
+        self:ResetDiscoveryRetry(memberKey and memberKey ~= "" and "manual-pull-targeted" or "manual-pull")
+    end
+    if self.RefreshSyncReadyState then
+        self:RefreshSyncReadyState(memberKey and memberKey ~= "" and "manual-pull-targeted" or "manual-pull")
+    end
+    if self.ScheduleHello then
+        self:ScheduleHello(memberKey and memberKey ~= "" and "manual-pull-targeted" or "manual-pull", 0.5)
+    end
+    if not silent then
+        Addon:Print("Scheduled a hello cycle for index-diff sync.")
+    end
 end

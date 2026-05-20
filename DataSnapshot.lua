@@ -4,289 +4,175 @@ local Private = Data._private
 
 local time = time
 local pairs = pairs
-local ipairs = ipairs
-local sort = table.sort
 local tostring = tostring
-local max = math.max
 
-local cloneTableShallow = Private.cloneTableShallow
 local countRecipeKeys = Private.countRecipeKeys
-local isSubsetOf = Private.isSubsetOf
-local isValidRecipeKey = Private.isValidRecipeKey
-local lowerSafe = Private.lowerSafe
-local stableRecipeSignature = Private.stableRecipeSignature
 
 function Data:GetLocalSummary()
-    local entry = self:GetOrCreateMember(self:GetPlayerKey())
-    local profCount, recipeCount = 0, 0
-    for _, prof in pairs(entry.professions or {}) do
-        profCount = profCount + 1
-        recipeCount = recipeCount + (prof.count or 0)
+    if self.BuildLocalSummary then
+        return self:BuildLocalSummary({
+            reason = "local-summary",
+        })
     end
     return {
         memberKey = self:GetPlayerKey(),
-        rev = entry.rev or 0,
-        updatedAt = entry.updatedAt or 0,
-        professions = profCount,
-        recipes = recipeCount,
+        professions = 0,
+        recipes = 0,
     }
 end
 
-function Data:BuildSnapshotChunks(memberKey, opts)
-    local entry = self:GetMember(memberKey)
-    if not entry then return {} end
+function Data:ApplyIncomingBlockAdditive(blockKey, snapshot, opts)
     opts = opts or {}
-
-    local requestedProfessions = nil
-    if type(opts.requestedBlocks) == "table" and #opts.requestedBlocks > 0 then
-        requestedProfessions = {}
-        for _, blockKey in ipairs(opts.requestedBlocks) do
-            local ownerCharacter, professionKey = self:ParseSyncBlockKey(blockKey)
-            if ownerCharacter == memberKey and professionKey then
-                requestedProfessions[professionKey] = true
-            end
-        end
+    local normalized = Addon.MergeEngine and Addon.MergeEngine.NormalizeIncomingBlockPayload
+        and Addon.MergeEngine:NormalizeIncomingBlockPayload(snapshot)
+        or nil
+    if not normalized or normalized.blockKey ~= blockKey then
+        return false, "invalid-block-snapshot"
     end
 
-    local chunks = {}
-    local chunkSize = 120
-    local profNames = {}
-    for profName in pairs(entry.professions or {}) do
-        if not requestedProfessions or requestedProfessions[profName] then
-            profNames[#profNames + 1] = profName
-        end
-    end
-    sort(profNames)
-
-    for _, profName in ipairs(profNames) do
-        local prof = entry.professions[profName]
-        local pending = {}
-        local count = 0
-        local recipeKeys = {}
-        for recipeKey in pairs(prof.recipes or {}) do
-            if isValidRecipeKey(recipeKey) then
-                recipeKeys[#recipeKeys + 1] = recipeKey
-            else
-                self:RecordInvalidRecipeKey(recipeKey, "snapshot", memberKey, profName)
-            end
-        end
-        sort(recipeKeys, function(a, b) return tostring(a) < tostring(b) end)
-
-        for _, recipeKey in ipairs(recipeKeys) do
-            pending[#pending + 1] = recipeKey
-            count = count + 1
-            if count >= chunkSize then
-                chunks[#chunks + 1] = {
-                    memberKey = memberKey,
-                    rev = entry.rev or 0,
-                    updatedAt = entry.updatedAt or 0,
-                    sourceType = entry.sourceType or self:GetMemberSourceType(memberKey),
-                    profession = profName,
-                    skillRank = prof.skillRank or 0,
-                    skillMaxRank = prof.skillMaxRank or 0,
-                    specialization = prof.specialization or nil,
-                    recipeKeys = pending,
-                    partial = true,
-                }
-                pending = {}
-                count = 0
-            end
-        end
-
-        chunks[#chunks + 1] = {
-            memberKey = memberKey,
-            rev = entry.rev or 0,
-            updatedAt = entry.updatedAt or 0,
-            sourceType = entry.sourceType or self:GetMemberSourceType(memberKey),
-            profession = profName,
-            skillRank = prof.skillRank or 0,
-            skillMaxRank = prof.skillMaxRank or 0,
-            specialization = prof.specialization or nil,
-            recipeKeys = pending,
-            partial = false,
-        }
+    local ownerCharacter, professionKey = self:ParseSyncBlockKey(blockKey)
+    if not ownerCharacter or not professionKey then
+        return false, "invalid-block-key"
     end
 
-    if #chunks == 0 and not requestedProfessions then
-        chunks[1] = {
-            memberKey = memberKey,
-            rev = entry.rev or 0,
-            updatedAt = entry.updatedAt or 0,
-            sourceType = entry.sourceType or self:GetMemberSourceType(memberKey),
-            profession = nil,
-            recipeKeys = {},
-            partial = false,
-        }
+    -- Membership classification (`guildStatus`) is owned by the trusted-roster
+    -- preflight, not by the inbound sync merge. Receiving recipe data for an
+    -- owner says nothing about whether that owner is still in our guild — only
+    -- the roster snapshot can decide that. Consult the current roster state to
+    -- decide whether to refresh `active`, preserve an existing classification,
+    -- or leave a fresh entry pending until the next preflight runs.
+    local rosterState = self.GetRosterPreflightState and self:GetRosterPreflightState() or nil
+    local rosterTrusted = type(rosterState) == "table" and rosterState.trusted == true
+    local rosterSnapshot
+    if rosterTrusted and type(rosterState) == "table" and type(rosterState.snapshot) == "table" then
+        rosterSnapshot = rosterState.snapshot
     end
+    local rosterHasOwnerEvidence = rosterSnapshot ~= nil
+    local ownerInTrustedGuild = rosterSnapshot and rosterSnapshot[ownerCharacter] == true or false
 
-    return chunks
-end
-
-function Data:BeginIncomingSnapshot(memberKey, rev, updatedAt)
-    self._incoming = self._incoming or {}
-    self._incoming[memberKey] = {
-        memberKey = memberKey,
-        rev = rev,
-        updatedAt = updatedAt,
-        professions = {},
-    }
-end
-
-function Data:AppendIncomingChunk(chunk)
-    if not chunk or not chunk.memberKey then return end
-    self._incoming = self._incoming or {}
-    local state = self._incoming[chunk.memberKey]
-    if not state or state.rev ~= chunk.rev then
-        self:BeginIncomingSnapshot(chunk.memberKey, chunk.rev, chunk.updatedAt)
-        state = self._incoming[chunk.memberKey]
-    end
-
-    if chunk.profession then
-        local prof = state.professions[chunk.profession] or {
-            skillRank = chunk.skillRank or 0,
-            skillMaxRank = chunk.skillMaxRank or 0,
-            specialization = chunk.specialization or nil,
-            recipes = {},
-            sourceType = chunk.sourceType or "replica",
-        }
-        for _, recipeKey in ipairs(chunk.recipeKeys or {}) do
-            if isValidRecipeKey(recipeKey) then
-                prof.recipes[recipeKey] = true
-            else
-                self:RecordInvalidRecipeKey(recipeKey, "inbound", chunk.memberKey, chunk.profession)
-                Addon:Debug("Blocked invalid recipe from sync:", recipeKey, "profession:", chunk.profession, "from:", chunk.memberKey)
-            end
-        end
-        prof.skillRank = chunk.skillRank or prof.skillRank or 0
-        prof.skillMaxRank = chunk.skillMaxRank or prof.skillMaxRank or 0
-        if chunk.specialization ~= nil then
-            prof.specialization = chunk.specialization
-        end
-        prof.lastUpdatedAt = chunk.updatedAt or state.updatedAt or time()
-        prof.sourceType = chunk.sourceType or prof.sourceType or "replica"
-        state.professions[chunk.profession] = prof
-    end
-end
-
-function Data:FinalizeIncomingSnapshot(memberKey, rev, opts)
-    if not self._incoming or not self._incoming[memberKey] then return false end
-    local state = self._incoming[memberKey]
-    if state.rev ~= rev then return false end
-    opts = opts or {}
-
-    local current = self:GetMember(memberKey)
-
-    local finalEntry = {
-        owner = memberKey,
-        rev = rev,
-        updatedAt = state.updatedAt or time(),
-        sourceType = opts.sourceType or state.sourceType or "replica",
-        guildStatus = "active",
-        lastSeenInGuildAt = time(),
-        isMock = opts.isMock == true,
-        professions = {},
+    local existingEntry = self:GetMember(ownerCharacter)
+    local entry = self:GetOrCreateMember(ownerCharacter)
+    local entryIsNew = existingEntry == nil
+    local previousGuildStatus = entry.guildStatus or "active"
+    local currentProf = entry.professions and entry.professions[professionKey] or nil
+    local localBlock = {
+        recipes = currentProf and currentProf.recipes or {},
+        specialization = currentProf and currentProf.specialization or nil,
+        metadata = {
+            skillRank = currentProf and currentProf.skillRank or 0,
+            skillMaxRank = currentProf and currentProf.skillMaxRank or 0,
+            ownerSourceType = entry.sourceType,
+            professionSourceType = currentProf and currentProf.sourceType or nil,
+            ownerUpdatedAt = entry.updatedAt,
+            professionUpdatedAt = currentProf and currentProf.lastUpdatedAt or nil,
+        },
     }
 
-    for profName, prof in pairs(state.professions or {}) do
-        local incomingRecipes = prof.recipes or {}
-        local count = 0
-        for _ in pairs(incomingRecipes) do count = count + 1 end
-
-        local currentProf = current and current.professions and current.professions[profName] or nil
-        local currentCount = currentProf and (currentProf.count or countRecipeKeys(currentProf.recipes)) or 0
-        local protectedPartial = false
-        if currentProf and currentProf.recipes and currentCount > count then
-            local incomingRank = prof.skillRank or 0
-            local currentRank = currentProf.skillRank or 0
-            if incomingRank >= currentRank and isSubsetOf(incomingRecipes, currentProf.recipes) then
-                local incomingCount = count
-                local merged = {}
-                for recipeKey in pairs(currentProf.recipes) do merged[recipeKey] = true end
-                for recipeKey in pairs(incomingRecipes) do merged[recipeKey] = true end
-                incomingRecipes = merged
-                count = 0
-                for _ in pairs(incomingRecipes) do count = count + 1 end
-                protectedPartial = true
-                Addon:SystemPrint(string.format(
-                    "Protected %s %s from a partial remote overwrite (%d -> %d kept, source=%s).",
-                    memberKey,
-                    profName,
-                    incomingCount,
-                    currentCount,
-                    tostring(prof.sourceType or finalEntry.sourceType or "replica")
-                ))
-            end
-        end
-
-        local skillRank = prof.skillRank or 0
-        local skillMaxRank = prof.skillMaxRank or 0
-        local specialization = prof.specialization or nil
-        local blockRevision = rev
-        local lastUpdatedAt = state.updatedAt or time()
-        local sourceType = prof.sourceType or finalEntry.sourceType
-        if protectedPartial and currentProf then
-            skillRank = max(currentProf.skillRank or 0, skillRank)
-            skillMaxRank = max(currentProf.skillMaxRank or 0, skillMaxRank)
-            specialization = specialization or currentProf.specialization
-            blockRevision = currentProf.blockRevision or blockRevision
-            lastUpdatedAt = currentProf.lastUpdatedAt or lastUpdatedAt
-            sourceType = currentProf.sourceType or sourceType
-        end
-
-        finalEntry.professions[profName] = {
-            skillRank = skillRank,
-            skillMaxRank = skillMaxRank,
-            specialization = specialization,
-            recipes = incomingRecipes,
-            count = count,
-            signature = stableRecipeSignature(incomingRecipes),
-            lastScan = state.updatedAt or time(),
-            blockRevision = blockRevision,
-            lastUpdatedAt = lastUpdatedAt,
-            sourceType = sourceType,
-            guildStatus = "active",
-            lastSeenInGuildAt = finalEntry.lastSeenInGuildAt,
-        }
+    local merged = Addon.MergeEngine and Addon.MergeEngine.MergeBlockAdditive
+        and Addon.MergeEngine:MergeBlockAdditive(localBlock, normalized)
+        or nil
+    if not merged then
+        return false, "merge-failed"
     end
 
-    if current and finalEntry.sourceType ~= "owner" then
-        local preserved = 0
-        for profName, currentProf in pairs(current.professions or {}) do
-            if not finalEntry.professions[profName] then
-                local clone = cloneTableShallow(currentProf)
-                clone.recipes = {}
-                for recipeKey in pairs(currentProf.recipes or {}) do
-                    clone.recipes[recipeKey] = true
-                end
-                finalEntry.professions[profName] = clone
-                preserved = preserved + 1
-            end
+    local profession = currentProf or {}
+    profession.recipes = merged.recipes or {}
+    profession.specialization = merged.specialization
+    profession.skillRank = merged.skillRank or profession.skillRank or 0
+    profession.skillMaxRank = merged.skillMaxRank or profession.skillMaxRank or 0
+    profession.sourceType = profession.sourceType or entry.sourceType or opts.sourceType or "replica"
+    profession.lastUpdatedAt = time()
+    profession.count = countRecipeKeys(profession.recipes)
+    profession.signature = nil  -- legacy field; drop on merge so SavedVariables sheds it
+
+    entry.owner = ownerCharacter
+    entry.sourceType = entry.sourceType or opts.sourceType or self:GetMemberSourceType(ownerCharacter)
+
+    if rosterHasOwnerEvidence and ownerInTrustedGuild then
+        -- Trusted snapshot confirms this owner is in our guild: refresh active.
+        profession.guildStatus = "active"
+        profession.lastSeenInGuildAt = time()
+        entry.guildStatus = "active"
+        entry.lastSeenInGuildAt = profession.lastSeenInGuildAt
+        entry.staleAt = 0
+    elseif rosterHasOwnerEvidence and not ownerInTrustedGuild then
+        -- Trusted snapshot is positive evidence the owner is NOT in our guild:
+        -- preserve persisted data but don't reactivate. New entries default to
+        -- stale; pre-existing classification is left alone so a previous
+        -- preflight verdict survives the merge.
+        if entryIsNew then
+            entry.guildStatus = "stale"
+            entry.staleAt = entry.staleAt or time()
         end
-        if preserved > 0 then
-            Addon:Debug("Preserved", preserved, "profession block(s) missing from incoming snapshot for", memberKey)
+        if not profession.guildStatus then
+            profession.guildStatus = entry.guildStatus or "active"
+        end
+    else
+        -- No roster evidence (untrusted state, fallback mode, or warming up):
+        -- do not classify. Preserve existing status; let the next preflight
+        -- decide. Default new entries to active so they remain visible until
+        -- the roster proves otherwise, matching the conservative "no
+        -- destructive purge in uncertain roster states" rule.
+        if entryIsNew and not entry.guildStatus then
+            entry.guildStatus = "active"
+        end
+        if not profession.guildStatus then
+            profession.guildStatus = entry.guildStatus or "active"
         end
     end
 
-    local applied, reason, resolved = Addon.MergeEngine:ApplyIfNewer(current, finalEntry, {
-        preserveOwner = memberKey == self:GetPlayerKey(),
-    })
-    self._incoming[memberKey] = nil
+    entry.professions = entry.professions or {}
+    entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, profession)
+    self.db.global.members[ownerCharacter] = self:NormalizeMemberEntry(entry, ownerCharacter)
 
-    if not applied then
-        if Addon.Sync and Addon.Sync.RecordMergeSkip then
-            Addon.Sync:RecordMergeSkip(reason)
-        end
-        return false
+    -- If the merge flipped the owner from stale to active, the entry's
+    -- OTHER professions were previously excluded from the sync index by
+    -- shouldPublishOwner and need to be re-added. Marking only the
+    -- merged block dirty would leave those other professions invisible
+    -- until the next full rebuild. Touch them all so rebuildDirtyBlocks
+    -- picks them up incrementally.
+    local statusFlippedToActive = previousGuildStatus ~= "active" and (entry.guildStatus or "active") == "active"
+    if statusFlippedToActive and self.MarkOwnerSyncBlocksDirty then
+        self:MarkOwnerSyncBlocksDirty(ownerCharacter, "block-merge:stale-to-active")
+    elseif self.MarkSyncIndexDirty then
+        self:MarkSyncIndexDirty("block-merge:" .. tostring(blockKey), blockKey)
     end
-
-    self.db.global.members[memberKey] = self:NormalizeMemberEntry(resolved, memberKey)
-    self:MarkManifestMemberDirty(memberKey, self.db.global.members[memberKey], "snapshot-merge")
-    self:InvalidateRecipeCaches()
-    Addon:RequestRefresh("snapshot-merge")
+    self:InvalidateRecipeCaches("metadata")
+    -- The "metadata" scope intentionally preserves _recipeListCache so that
+    -- skill-rank/spec-only refreshes don't blow away precomputed list rows.
+    -- A block merge that ADDS recipes, introduces a new owner, or flips an
+    -- owner back to active changes which rows appear in those cached lists
+    -- (and their crafterCount / professionList), so drop the list cache too.
+    -- Pure metadata-only merges (addedRecipes == 0, no new owner, no status
+    -- flip) still keep the list cache hot.
+    local contentChanged = (merged.addedRecipes or 0) > 0 or entryIsNew or statusFlippedToActive
+    if contentChanged then
+        self:InvalidateRecipeCaches("list")
+    end
     if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
-        Addon.Tooltip:InvalidateIndex()
+        Addon.Tooltip:InvalidateIndex("block-merge")
     end
-    return true
+
+    local fingerprint = self.RecomputeLocalBlockFingerprint and self:RecomputeLocalBlockFingerprint(blockKey, {
+        reason = "block-merge",
+    }) or nil
+    return true, {
+        blockKey = blockKey,
+        ownerCharacter = ownerCharacter,
+        professionKey = professionKey,
+        changed = merged.changed == true,
+        addedRecipes = merged.addedRecipes or 0,
+        specializationChanged = merged.specializationChanged == true,
+        blockFingerprint = fingerprint,
+    }
+end
+
+function Data:RecomputeLocalBlockFingerprint(blockKey, opts)
+    opts = opts or {}
+    if self.RefreshSyncBlockRecord then
+        return self:RefreshSyncBlockRecord(blockKey, opts.reason or "block-fingerprint")
+    end
+    return self.BuildBlockFingerprint and self:BuildBlockFingerprint(blockKey) or nil
 end
 
 function Data:DumpLocalSyncStatus(professionFilter)
@@ -299,21 +185,14 @@ function Data:DumpLocalSyncStatus(professionFilter)
         professionKeys[#professionKeys + 1] = profName
         totalRecipes = totalRecipes + (prof.count or countRecipeKeys(prof.recipes))
     end
-    sort(professionKeys)
+    table.sort(professionKeys)
 
     Addon:SystemPrint(string.format(
-        "Local sync owner=%s rev=%d updated=%d professions=%d recipes=%d",
+        "Local sync owner=%s professions=%d recipes=%d",
         tostring(memberKey),
-        entry.rev or 0,
-        entry.updatedAt or 0,
         #professionKeys,
         totalRecipes
     ))
-
-    if #professionKeys == 0 then
-        Addon:SystemPrint("Local sync professions: none")
-        return
-    end
 
     local requestedProfession = tostring(professionFilter or ""):match("^%s*(.-)%s*$") or ""
     if requestedProfession ~= "" then
@@ -321,7 +200,7 @@ function Data:DumpLocalSyncStatus(professionFilter)
         local resolved = entry.professions[canonical] and canonical or nil
         if not resolved then
             for _, profName in ipairs(professionKeys) do
-                if lowerSafe(profName) == lowerSafe(canonical) or lowerSafe(profName) == lowerSafe(requestedProfession) then
+                if tostring(profName):lower() == tostring(canonical):lower() then
                     resolved = profName
                     break
                 end
@@ -336,16 +215,21 @@ function Data:DumpLocalSyncStatus(professionFilter)
 
     for _, profName in ipairs(professionKeys) do
         local prof = entry.professions[profName]
+        local recipeList = {}
+        for recipeKey in pairs(prof and prof.recipes or {}) do
+            recipeList[#recipeList + 1] = tonumber(recipeKey) or recipeKey
+        end
+        table.sort(recipeList, function(left, right)
+            return tostring(left) < tostring(right)
+        end)
         Addon:SystemPrint(string.format(
-            "  %s count=%d skill=%d/%d spec=%s blockRev=%d source=%s updated=%d",
+            "  %s count=%d skill=%d/%d spec=%s recipes=%s",
             tostring(profName),
             prof and (prof.count or countRecipeKeys(prof.recipes)) or 0,
             prof and (prof.skillRank or 0) or 0,
             prof and (prof.skillMaxRank or 0) or 0,
             tostring(prof and prof.specialization or "none"),
-            prof and (prof.blockRevision or 0) or 0,
-            tostring(prof and prof.sourceType or "owner"),
-            prof and (prof.lastUpdatedAt or 0) or 0
+            table.concat(recipeList, ",")
         ))
     end
 end

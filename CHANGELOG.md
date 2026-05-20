@@ -2,9 +2,25 @@
 
 All notable changes to this project are documented in this file.
 
-## [Unreleased]
+## [2.0.0] - 2026-05-20
+### Added
+- A redesigned guild sync experience for `2.0.0`: guildmates can share recipe data more reliably after login, reloads, database wipes, and addon updates.
+- Clearer update boundaries: regular release builds now sync only with compatible release builds, while development and test builds stay isolated from live guild data.
+- New recipe browser controls, including an easier sort switch, improved search clearing, material-search control, and a more readable options panel.
+- A quicker way to ask guildmates for a craft, with better whisper behavior when you are in a raid.
+- More helpful sync status and troubleshooting output when debug tools are enabled, while normal play stays quiet.
+
 ### Changed
-- Snapshot serving memory work is still under investigation and intentionally not part of `1.8.1`; any lighter `SNAP` session materialization changes remain deferred until they can be exercised against real peers.
+- Important: `2.0.0` uses a new guild sync model and does not exchange sync data with Recipe Registry `1.x`. Existing saved recipe data is preserved, but guildmates should update together for guild sharing to work.
+- Background sync now waits for safer moments around login, reloads, combat, instances, and busy roster loading instead of trying to do everything at once.
+- Startup, reload, update, and database-wipe recovery now handle guild data sharing more smoothly, with less need for manual refreshes.
+- Recipe data requests are more tolerant of slow or unavailable guildmates and version changes during sync.
+- When many guildmates refresh around the same time, sync now spreads requests across good sources more evenly and backs off cleanly from already-busy peers.
+- Recipe lists, searches, tooltips, and Auction House lookups are smoother in larger guild databases and reuse more work instead of rebuilding the same view repeatedly.
+- Profession scans are quieter: automatic checks no longer announce unchanged or unrelated skill events, while manual refreshes still tell you what happened.
+- Guildmate presence is handled more conservatively during startup, so active players are less likely to disappear from recipe results while the roster is still warming up.
+- Large data sharing remains deliberately paced to avoid stalls or memory spikes in real guild use.
+- Remaining in-game help text and option labels have been cleaned up for a more consistent addon experience.
 
 ## [1.8.1] - 2026-05-10
 ### Added

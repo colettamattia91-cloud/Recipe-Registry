@@ -3,12 +3,8 @@ local MergeEngine = Addon:NewModule("MergeEngine")
 Addon.MergeEngine = MergeEngine
 
 local pairs = pairs
-
-local AUTHORITY_SCORE = {
-    bootstrap = 1,
-    replica = 2,
-    owner = 3,
-}
+local tostring = tostring
+local max = math.max
 
 local function cloneRecipes(recipes)
     local out = {}
@@ -18,121 +14,73 @@ local function cloneRecipes(recipes)
     return out
 end
 
-function MergeEngine:GetAuthorityScore(sourceType)
-    return AUTHORITY_SCORE[sourceType or "replica"] or AUTHORITY_SCORE.replica
+function MergeEngine:MergeTransportMetadataNonAuthoritative(localBlock, incomingBlock)
+    localBlock = localBlock or {}
+    incomingBlock = incomingBlock or {}
+    return {
+        skillRank = max(tonumber(localBlock.skillRank or 0) or 0, tonumber(incomingBlock.skillRank or 0) or 0),
+        skillMaxRank = max(tonumber(localBlock.skillMaxRank or 0) or 0, tonumber(incomingBlock.skillMaxRank or 0) or 0),
+        ownerSourceType = incomingBlock.ownerSourceType or localBlock.ownerSourceType,
+        professionSourceType = incomingBlock.professionSourceType or localBlock.professionSourceType,
+        ownerUpdatedAt = incomingBlock.ownerUpdatedAt or localBlock.ownerUpdatedAt,
+        professionUpdatedAt = incomingBlock.professionUpdatedAt or localBlock.professionUpdatedAt,
+    }
 end
 
-function MergeEngine:ResolveRecordAuthority(localEntry, incomingEntry)
-    local localScore = self:GetAuthorityScore(localEntry and localEntry.sourceType)
-    local incomingScore = self:GetAuthorityScore(incomingEntry and incomingEntry.sourceType)
-    if incomingScore ~= localScore then
-        return incomingScore > localScore and "incoming" or "local"
+function MergeEngine:NormalizeIncomingBlockPayload(payload)
+    if type(payload) ~= "table" then
+        return nil
     end
-    local localRev = localEntry and (localEntry.rev or 0) or 0
-    local incomingRev = incomingEntry and (incomingEntry.rev or 0) or 0
-    if incomingRev ~= localRev then
-        return incomingRev > localRev and "incoming" or "local"
+    local recipeSet = {}
+    for _, recipeKey in ipairs(payload.recipeKeys or {}) do
+        if recipeKey ~= nil then
+            recipeSet[recipeKey] = true
+        end
     end
-    local localUpdated = localEntry and (localEntry.updatedAt or 0) or 0
-    local incomingUpdated = incomingEntry and (incomingEntry.updatedAt or 0) or 0
-    if incomingUpdated ~= localUpdated then
-        return incomingUpdated > localUpdated and "incoming" or "local"
-    end
-    return "equal"
+    return {
+        blockKey = payload.blockKey,
+        ownerCharacter = payload.ownerCharacter,
+        professionKey = payload.professionKey,
+        recipes = recipeSet,
+        specialization = payload.specialization,
+        skillRank = payload.skillRank or 0,
+        skillMaxRank = payload.skillMaxRank or 0,
+        metadata = type(payload.metadata) == "table" and payload.metadata or {},
+    }
 end
 
-function MergeEngine:IgnoreEquivalent(localEntry, incomingEntry)
-    if not localEntry or not incomingEntry then return false end
-    if (localEntry.rev or 0) ~= (incomingEntry.rev or 0) then return false end
-    if (localEntry.updatedAt or 0) ~= (incomingEntry.updatedAt or 0) then return false end
-    if (localEntry.sourceType or "replica") ~= (incomingEntry.sourceType or "replica") then return false end
-
-    local localProfs = localEntry.professions or {}
-    local incomingProfs = incomingEntry.professions or {}
-    for profName, localProf in pairs(localProfs) do
-        local incomingProf = incomingProfs[profName]
-        if not incomingProf then return false end
-        if (localProf.count or 0) ~= (incomingProf.count or 0) then return false end
-        if (localProf.skillRank or 0) ~= (incomingProf.skillRank or 0) then return false end
-        if (localProf.skillMaxRank or 0) ~= (incomingProf.skillMaxRank or 0) then return false end
-        -- A missing specialization from an old client should not clear richer
-        -- local metadata, but an incoming non-nil specialization should be
-        -- allowed to upgrade a legacy nil record.
-        if incomingProf.specialization ~= nil then
-            if localProf.specialization ~= incomingProf.specialization then return false end
-        end
-        if (localProf.signature or "") ~= (incomingProf.signature or "") then return false end
-    end
-    for profName in pairs(incomingProfs) do
-        if not localProfs[profName] then return false end
-    end
-    return true
-end
-
-function MergeEngine:HasIncomingMetadataUpgrade(localEntry, incomingEntry)
-    if not localEntry or not incomingEntry then return false end
-    local localProfs = localEntry.professions or {}
-    local incomingProfs = incomingEntry.professions or {}
-
-    for profName, incomingProf in pairs(incomingProfs) do
-        local localProf = localProfs[profName]
-        if localProf and localProf.specialization == nil and incomingProf.specialization ~= nil then
-            return true
+function MergeEngine:MergeBlockAdditive(localBlock, incomingBlock)
+    local mergedRecipes = cloneRecipes(localBlock and localBlock.recipes or {})
+    local addedRecipes = 0
+    for recipeKey in pairs(incomingBlock and incomingBlock.recipes or {}) do
+        if not mergedRecipes[recipeKey] then
+            mergedRecipes[recipeKey] = true
+            addedRecipes = addedRecipes + 1
         end
     end
 
-    return false
-end
-
-function MergeEngine:ShouldApplyIncoming(localEntry, incomingEntry, opts)
-    opts = opts or {}
-    if not incomingEntry then return false, "missing-incoming" end
-    if opts.preserveOwner and localEntry and (localEntry.sourceType or "replica") == "owner"
-        and (incomingEntry.sourceType or "replica") ~= "owner" then
-        return false, "owner-precedence"
-    end
-    if self:IgnoreEquivalent(localEntry, incomingEntry) then
-        return false, "equivalent"
+    local specializationChanged = false
+    local finalSpecialization = localBlock and localBlock.specialization or nil
+    if incomingBlock and incomingBlock.specialization ~= nil
+        and tostring(incomingBlock.specialization) ~= tostring(finalSpecialization)
+    then
+        finalSpecialization = incomingBlock.specialization
+        specializationChanged = true
     end
 
-    local winner = self:ResolveRecordAuthority(localEntry, incomingEntry)
-    if winner == "incoming" then
-        return true, "newer"
-    end
-    if winner == "equal" then
-        if not localEntry then
-            return true, "missing-local"
-        end
-        if self:HasIncomingMetadataUpgrade(localEntry, incomingEntry) then
-            return true, "metadata-upgrade"
-        end
-    end
-    return false, winner
-end
+    local mergedMetadata = self:MergeTransportMetadataNonAuthoritative(
+        localBlock and localBlock.metadata or {},
+        incomingBlock and incomingBlock.metadata or {}
+    )
 
-function MergeEngine:ApplyIfNewer(localEntry, incomingEntry, opts)
-    local shouldApply, reason = self:ShouldApplyIncoming(localEntry, incomingEntry, opts)
-    if not shouldApply then
-        return false, reason, localEntry
-    end
-
-    local finalEntry = {}
-    for key, value in pairs(incomingEntry) do
-        if key ~= "professions" then
-            finalEntry[key] = value
-        end
-    end
-    finalEntry.professions = {}
-    for profName, prof in pairs(incomingEntry.professions or {}) do
-        local clone = {}
-        for key, value in pairs(prof) do
-            if key ~= "recipes" then
-                clone[key] = value
-            end
-        end
-        clone.recipes = cloneRecipes(prof.recipes)
-        finalEntry.professions[profName] = clone
-    end
-
-    return true, reason, finalEntry
+    return {
+        recipes = mergedRecipes,
+        specialization = finalSpecialization,
+        skillRank = mergedMetadata.skillRank,
+        skillMaxRank = mergedMetadata.skillMaxRank,
+        metadata = mergedMetadata,
+        changed = addedRecipes > 0 or specializationChanged,
+        addedRecipes = addedRecipes,
+        specializationChanged = specializationChanged,
+    }
 end

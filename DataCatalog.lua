@@ -94,6 +94,10 @@ local function refreshDetailAssets(info)
             info.createdItemName or "",
             info.recipeItemName or "",
         }
+        info.recipeSearchText = lowerSafe(table.concat(parts, " "))
+        for _, reagent in ipairs(info.reagents or {}) do
+            parts[#parts + 1] = reagent.name or ""
+        end
         info.searchText = lowerSafe(table.concat(parts, " "))
     end
 end
@@ -109,13 +113,51 @@ local function rememberBoundedCache(cache, order, key, value, maxEntries)
     cache[key] = value
 end
 
-local function sortCrafterRows(rows)
+-- Presence-free crafter ordering used by the build path. The live `online`
+-- tiebreaker now happens in GetRecipeCrafters where we have access to the
+-- current online cache; this stored-row sort just gives a stable initial
+-- ordering by content (skillRank, then key).
+local function sortCrafterRowsByContent(rows)
     sort(rows, function(a, b)
-        if a.online ~= b.online then return a.online end
-        if a.skillRank ~= b.skillRank then return a.skillRank > b.skillRank end
+        if (a.skillRank or 0) ~= (b.skillRank or 0) then return (a.skillRank or 0) > (b.skillRank or 0) end
         if a.memberKey ~= b.memberKey then return a.memberKey < b.memberKey end
         return tostring(a.profession) < tostring(b.profession)
     end)
+end
+
+local function getCatalogDiagnostics(data)
+    data._catalogDiagnostics = data._catalogDiagnostics or {
+        duplicateCrafterRowsDetected = 0,
+        duplicateCrafterRowsCollapsed = 0,
+        lastDuplicateRecipeKey = nil,
+        lastDuplicateMemberKey = nil,
+    }
+    return data._catalogDiagnostics
+end
+
+-- Duplicate-row tiebreaker used during build. Both rows are for the SAME
+-- member (same recipe seen in two professions), so live presence is the
+-- same on both — only content fields decide which copy survives.
+local function isBetterCrafterRow(candidate, current)
+    if not current then return true end
+    if (candidate.skillRank or 0) ~= (current.skillRank or 0) then
+        return (candidate.skillRank or 0) > (current.skillRank or 0)
+    end
+    if (candidate.skillMaxRank or 0) ~= (current.skillMaxRank or 0) then
+        return (candidate.skillMaxRank or 0) > (current.skillMaxRank or 0)
+    end
+    if tostring(candidate.profession or "") ~= tostring(current.profession or "") then
+        return tostring(candidate.profession or "") < tostring(current.profession or "")
+    end
+    return (candidate.updatedAt or 0) > (current.updatedAt or 0)
+end
+
+function Data:GetCatalogDiagnostics()
+    return getCatalogDiagnostics(self)
+end
+
+function Data:ResetCatalogDiagnostics()
+    self._catalogDiagnostics = nil
 end
 
 function Data:GetProfessionSummary()
@@ -174,12 +216,17 @@ function Data:GetCraftersForItem(itemID)
     return rows
 end
 
+-- The recipe index is purely a content aggregation: who knows what, at what
+-- skill rank, with what specialization. Live presence (`online`,
+-- `onlineCount`) is decided at query time against the online cache so the
+-- index doesn't have to be rebuilt every time someone in the guild flips
+-- their login state.
 function Data:BuildRecipeIndex()
+    local diagnostics = getCatalogDiagnostics(self)
     local index = {}
     for memberKey, entry in pairs(self:GetMembersDB()) do
         if self:IsUserVisibleMember(memberKey, entry) then
             local profs = entry.professions or {}
-            local isOnline = self:IsMemberOnline(memberKey)
             for currentProfName, prof in pairs(profs) do
                 for recipeKey in pairs(prof.recipes or {}) do
                     if isValidRecipeKey(recipeKey) then
@@ -190,29 +237,46 @@ function Data:BuildRecipeIndex()
                                 profNames = {},
                                 crafterRows = {},
                                 crafterCount = 0,
-                                onlineCount = 0,
                                 _seenMembers = {},
+                                _crafterByMemberKey = {},
                             }
                             index[recipeKey] = row
                         end
 
                         row.profNames[currentProfName] = true
-                        row.crafterRows[#row.crafterRows + 1] = {
+                        local crafterRow = {
                             memberKey = memberKey,
                             profession = currentProfName,
-                            online = isOnline,
                             skillRank = prof.skillRank or 0,
                             skillMaxRank = prof.skillMaxRank or 0,
                             specialization = prof.specialization or nil,
                             updatedAt = entry.updatedAt or 0,
                         }
+                        local existingCrafterRow = row._crafterByMemberKey[memberKey]
+                        if existingCrafterRow then
+                            diagnostics.duplicateCrafterRowsDetected = (diagnostics.duplicateCrafterRowsDetected or 0) + 1
+                            diagnostics.duplicateCrafterRowsCollapsed = (diagnostics.duplicateCrafterRowsCollapsed or 0) + 1
+                            diagnostics.lastDuplicateRecipeKey = recipeKey
+                            diagnostics.lastDuplicateMemberKey = memberKey
+                            if Addon.Sync and Addon.Sync.telemetry then
+                                Addon.Sync.telemetry.duplicateCrafterRowsDetected = (Addon.Sync.telemetry.duplicateCrafterRowsDetected or 0) + 1
+                                Addon.Sync.telemetry.duplicateCrafterRowsCollapsed = (Addon.Sync.telemetry.duplicateCrafterRowsCollapsed or 0) + 1
+                                Addon.Sync.telemetry.lastDuplicateRecipeKey = recipeKey
+                                Addon.Sync.telemetry.lastDuplicateMemberKey = memberKey
+                            end
+                            if isBetterCrafterRow(crafterRow, existingCrafterRow) then
+                                for key, value in pairs(crafterRow) do
+                                    existingCrafterRow[key] = value
+                                end
+                            end
+                        else
+                            row.crafterRows[#row.crafterRows + 1] = crafterRow
+                            row._crafterByMemberKey[memberKey] = crafterRow
+                        end
 
                         if not row._seenMembers[memberKey] then
                             row._seenMembers[memberKey] = true
                             row.crafterCount = row.crafterCount + 1
-                            if isOnline then
-                                row.onlineCount = row.onlineCount + 1
-                            end
                         end
                     end
                 end
@@ -221,8 +285,9 @@ function Data:BuildRecipeIndex()
     end
 
     for _, row in pairs(index) do
-        sortCrafterRows(row.crafterRows)
+        sortCrafterRowsByContent(row.crafterRows)
         row._seenMembers = nil
+        row._crafterByMemberKey = nil
     end
 
     self._recipeIndex = index
@@ -372,8 +437,8 @@ function Data:GetRecipeDisplayInfo(recipeKey)
         info.spellName or "",
         info.createdItemName or "",
         info.recipeItemName or "",
-        info.professionName or "",
     }
+    info.recipeSearchText = lowerSafe(table.concat(parts, " "))
     for _, reagent in ipairs(info.reagents) do
         parts[#parts + 1] = reagent.name or ""
     end
@@ -389,9 +454,11 @@ function Data:GetRecipeDisplayInfo(recipeKey)
     return info
 end
 
-function Data:GetRecipeList(profName, query, sortMode)
+function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName)
     sortMode = sortMode or "alpha"
-    local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode)
+    searchMode = searchMode == "materials" and "materials" or "recipe"
+    local categoryFilter = categoryName and categoryName ~= "" and categoryName ~= "All" and categoryName or nil
+    local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode) .. "\t" .. searchMode .. "\t" .. tostring(categoryFilter or "")
     self._recipeListCache = self._recipeListCache or {}
     self._recipeListCacheOrder = self._recipeListCacheOrder or {}
     if self._recipeListCache[cacheKey] then
@@ -406,21 +473,40 @@ function Data:GetRecipeList(profName, query, sortMode)
         if not include and indexed.profNames[profName] then
             include = true
         end
+        if include and categoryFilter and profName and profName ~= "All" then
+            include = self:GetRecipeCategory(recipeKey, profName) == categoryFilter
+        end
         if include then
             local detail = self:GetRecipeDisplayInfo(recipeKey)
+            -- Compute onlineCount live from the current online cache. The
+            -- recipe index no longer carries it (it's a presence-derived
+            -- value, not content) so we walk crafterRows here. Cost is
+            -- O(crafters-for-this-recipe) — typically 1-5, fast.
+            local onlineCount = 0
+            local crafterRows = indexed.crafterRows or {}
+            for craftIdx = 1, #crafterRows do
+                if self:IsMemberOnline(crafterRows[craftIdx].memberKey) then
+                    onlineCount = onlineCount + 1
+                end
+            end
             local row = {
                 recipeKey = recipeKey,
                 detail = detail,
                 label = (detail and detail.label) or self:ResolveRecipeLabel(recipeKey) or tostring(recipeKey),
                 crafterCount = indexed.crafterCount or 0,
-                onlineCount = indexed.onlineCount or 0,
+                onlineCount = onlineCount,
             }
             row.professionList = {}
             for currentProfName in pairs(indexed.profNames) do
                 row.professionList[#row.professionList + 1] = currentProfName
             end
             sort(row.professionList)
-            local searchText = row.detail and row.detail.searchText or lowerSafe(row.label)
+            local searchText
+            if searchMode == "materials" then
+                searchText = row.detail and row.detail.searchText or lowerSafe(row.label)
+            else
+                searchText = row.detail and row.detail.recipeSearchText or lowerSafe(row.label)
+            end
             if q == "" or searchText:find(q, 1, true) then
                 out[#out + 1] = row
             end
@@ -457,9 +543,38 @@ function Data:GetRecipeList(profName, query, sortMode)
     return out
 end
 
+-- Return a fresh crafter list with live `online` flags. The stored rows
+-- are presence-free; we copy them here and stamp the current online state
+-- so callers (UI detail panel, Tooltip) keep the same shape they had
+-- before presence was decoupled from the index. The copy + sort cost is
+-- O(crafters-for-this-recipe) — bounded and only paid per query, not per
+-- login/logout.
 function Data:GetRecipeCrafters(recipeKey)
     local indexed = self:GetRecipeIndex()[recipeKey]
-    return indexed and indexed.crafterRows or {}
+    local stored = indexed and indexed.crafterRows or nil
+    if not stored or #stored == 0 then
+        return {}
+    end
+    local out = {}
+    for i = 1, #stored do
+        local src = stored[i]
+        out[i] = {
+            memberKey = src.memberKey,
+            profession = src.profession,
+            skillRank = src.skillRank,
+            skillMaxRank = src.skillMaxRank,
+            specialization = src.specialization,
+            updatedAt = src.updatedAt,
+            online = self:IsMemberOnline(src.memberKey),
+        }
+    end
+    sort(out, function(a, b)
+        if a.online ~= b.online then return a.online end
+        if (a.skillRank or 0) ~= (b.skillRank or 0) then return (a.skillRank or 0) > (b.skillRank or 0) end
+        if a.memberKey ~= b.memberKey then return a.memberKey < b.memberKey end
+        return tostring(a.profession) < tostring(b.profession)
+    end)
+    return out
 end
 
 function Data:GetRecipeDetail(recipeKey)
@@ -486,12 +601,22 @@ function Data:DumpSummary()
     end
     local s = self:GetLocalSummary()
     Addon:SystemPrint(string.format(
-        "Members=%d Professions=%d Recipes=%d | Local rev=%d updated=%d",
+        "Members=%d Professions=%d Recipes=%d | Local owners=%d blocks=%d content=%d updated=%d",
         totalMembers,
         totalProfs,
         totalRecipes,
-        s.rev,
-        s.updatedAt
+        s.activeOwnerCount or 0,
+        s.activeBlockCount or 0,
+        s.activeContentCount or 0,
+        s.builtAt or 0
+    ))
+    local diagnostics = self:GetCatalogDiagnostics()
+    Addon:SystemPrint(string.format(
+        "Catalog duplicateCrafterRows=%d collapsed=%d lastRecipe=%s lastMember=%s",
+        diagnostics.duplicateCrafterRowsDetected or 0,
+        diagnostics.duplicateCrafterRowsCollapsed or 0,
+        tostring(diagnostics.lastDuplicateRecipeKey or "none"),
+        tostring(diagnostics.lastDuplicateMemberKey or "none")
     ))
     self:DumpScanStatus()
 end

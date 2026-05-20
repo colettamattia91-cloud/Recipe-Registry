@@ -1,410 +1,178 @@
 local Addon = _G.RecipeRegistry
 local Sync = Addon.Sync
-local Private = Sync._private
-local Constants = Private.constants
 
 local time = time
-local pairs = pairs
-local ipairs = ipairs
-local sort = table.sort
 
-local nowForPacing = Private.nowForPacing
-local shallowCopyArray = Private.shallowCopyArray
-local shallowCopyTable = Private.shallowCopyTable
-
-local SESSION_TIMEOUT = Constants.SESSION_TIMEOUT
-local OUTGOING_CHUNK_DELAY = Constants.OUTGOING_CHUNK_DELAY
-local MANIFEST_CHUNK_DELAY = Constants.MANIFEST_CHUNK_DELAY
-
-function Sync:BuildSessionId(memberKey, rev, targetKey)
-    self._sessionIdCounter = (self._sessionIdCounter or 0) + 1
-    return string.format(
-        "%s:%d:%d:%s:%d",
-        memberKey or "unknown",
-        rev or 0,
-        time(),
-        targetKey or "unknown",
-        self._sessionIdCounter
-    )
-end
-
-function Sync:HandleRequest(payload)
-    local targetKey = payload.sender
-    if not self:IsValidSyncMemberKey(targetKey) or not self:IsValidSyncMemberKey(payload.key) then return end
-    if self:IsMockKey(targetKey) or self:IsMockKey(payload.key) then return end
-
-    local entry = Addon.Data:GetMember(payload.key)
-    if not entry then return end
-    if (entry.guildStatus or "active") ~= "active" then return end
-
-    local requestedBlocks = payload.requestedBlocks or {}
-    local hasSpecificBlockRequest = type(requestedBlocks) == "table" and #requestedBlocks > 0
-    if (entry.rev or 0) <= (payload.knownRev or 0) then
-        if not hasSpecificBlockRequest then
-            return
-        end
-
-        local hasRequestedBlock = false
-        for _, blockKey in ipairs(requestedBlocks) do
-            local ownerCharacter, professionKey = Addon.Data:ParseSyncBlockKey(blockKey)
-            if ownerCharacter == payload.key and professionKey then
-                local prof = entry.professions and entry.professions[professionKey]
-                if prof and (prof.guildStatus or entry.guildStatus or "active") == "active" then
-                    hasRequestedBlock = true
-                    break
-                end
-            end
-        end
-        if not hasRequestedBlock then
-            return
-        end
+function Sync:SendBlockSnapshot(targetKey, requestPayload)
+    local allowed = true
+    if self.CanRunSyncProtocol then
+        allowed = self:CanRunSyncProtocol("BLOCK_SNAPSHOT")
     end
-
-    local sessionId = self:BuildSessionId(payload.key, entry.rev or 0, targetKey)
-    local chunks = Addon.Data:BuildSnapshotChunks(payload.key, {
-        requestedBlocks = hasSpecificBlockRequest and requestedBlocks or nil,
-    })
-    if #chunks == 0 then return end
-
-    if payload.requestedBlocks and #payload.requestedBlocks > 0
-        and payload.key ~= self:GetSelfKey()
-        and payload.key ~= targetKey
-        and not Addon.Data:IsMemberOnline(payload.key) then
-        self.telemetry.replicaRequestsServed = self.telemetry.replicaRequestsServed + 1
-        self:PushOfflineDebugEvent("served", string.format("%s to %s blocks=%d", tostring(payload.key), tostring(targetKey), #payload.requestedBlocks))
+    if not allowed then
+        return false
     end
-
-    self.outgoingSessions[sessionId] = {
-        sessionId = sessionId,
-        memberKey = payload.key,
-        targetKey = targetKey,
-        rev = entry.rev or 0,
-        updatedAt = entry.updatedAt or 0,
-        total = #chunks,
-        chunks = chunks,
-        createdAt = time(),
-        lastSentAt = 0,
-    }
-
-    self:SendOutgoingSession(sessionId)
-end
-
-function Sync:SendOutgoingSession(sessionId, onlySeqs)
-    local state = self.outgoingSessions[sessionId]
-    if not state then return end
-
-    local seqs = {}
-    if onlySeqs and #onlySeqs > 0 then
-        for _, seq in ipairs(onlySeqs) do seqs[#seqs + 1] = seq end
-        sort(seqs)
-    else
-        for seq = 1, state.total do seqs[#seqs + 1] = seq end
+    if not (type(requestPayload) == "table" and type(requestPayload.blockKey) == "string") then
+        return false
     end
-
-    for _, seq in ipairs(seqs) do
-        local chunk = state.chunks[seq]
-        if chunk then
-            self:QueueOutboundBlock(state.targetKey, {
-                sessionId = sessionId,
-                key = state.memberKey,
-                rev = chunk.rev,
-                updatedAt = chunk.updatedAt,
-                sourceType = chunk.sourceType,
-                profession = chunk.profession,
-                skillRank = chunk.skillRank,
-                skillMaxRank = chunk.skillMaxRank,
-                specialization = chunk.specialization,
-                recipeKeys = chunk.recipeKeys,
-                seq = seq,
-                total = state.total,
+    local snapshot = Addon.Data and Addon.Data.BuildBlockSnapshot and Addon.Data:BuildBlockSnapshot(requestPayload.blockKey, {
+        snapshotKind = "block-pull",
+    }) or nil
+    if type(snapshot) ~= "table" then
+        return false
+    end
+    local sent = self:SendDirectEnvelope("BLOCK_SNAPSHOT", {
+        requestId = requestPayload.requestId,
+        blockKey = snapshot.blockKey,
+        blockPayload = {
+            ownerCharacter = snapshot.ownerCharacter,
+            professionKey = snapshot.professionKey,
+            recipeKeys = snapshot.recipeKeys,
+            specialization = snapshot.specialization,
+            skillRank = snapshot.skillRank,
+            skillMaxRank = snapshot.skillMaxRank,
+            metadata = snapshot.metadata,
+        },
+    }, targetKey, "BULK")
+    if sent then
+        self.telemetry.blockSnapshotSent = (self.telemetry.blockSnapshotSent or 0) + 1
+        self.lastSnapshotServedAt = time()
+        if self.RecordSyncEvent then
+            self:RecordSyncEvent("blockSnapshotSent", {
+                peer = targetKey,
+                requestId = requestPayload.requestId,
+                blockKey = snapshot.blockKey,
+                extra = string.format("recipes=%d", #(snapshot.recipeKeys or {})),
             })
         end
+        Addon:Tracef("sync",
+            "block-snapshot-sent peer=%s requestId=%s block=%s recipes=%d",
+            tostring(targetKey or "unknown"),
+            tostring(requestPayload.requestId or "none"),
+            tostring(snapshot.blockKey or "none"),
+            #(snapshot.recipeKeys or {})
+        )
     end
+    return sent
 end
 
-function Sync:HandleSnapshotChunk(payload)
-    if not self:IsValidSyncMemberKey(payload.key) or not self:IsValidSyncMemberKey(payload.sender) then return end
-    if payload.key == self:GetSelfKey() and payload.sender == self:GetSelfKey() then return end
+function Sync:HandleReceivedBlockSnapshot(payload)
+    local session = self.outboundSeedSession
+    if type(session) ~= "table" then
+        return false
+    end
+    if session.state ~= "waiting-block" then
+        return false
+    end
+    if payload.sender ~= session.seedKey then
+        return false
+    end
+    if payload.requestId and session.activeBlockRequestId and payload.requestId ~= session.activeBlockRequestId then
+        return false
+    end
+    if payload.blockKey ~= session.activeBlockKey then
+        return false
+    end
 
-    local state = self.partialReceive[payload.key]
-    if not state or state.sessionId ~= payload.sessionId or state.rev ~= payload.rev then
-        state = {
-            sessionId = payload.sessionId,
-            memberKey = payload.key,
-            source = payload.sender,
-            rev = payload.rev,
-            updatedAt = payload.updatedAt,
-            total = payload.total,
-            seen = {},
-            startedAt = time(),
-            lastProgressAt = time(),
+    session.lastProgressAt = time()
+    self.telemetry.blockSnapshotReceived = (self.telemetry.blockSnapshotReceived or 0) + 1
+    self.telemetry.lastBlockSnapshotReceivedAt = session.lastProgressAt
+    if self.RecordSyncEvent then
+        self:RecordSyncEvent("blockSnapshotReceived", {
+            peer = payload.sender,
+            requestId = payload.requestId,
+            blockKey = payload.blockKey,
+        })
+    end
+    Addon:Tracef("sync",
+        "block-snapshot-received peer=%s requestId=%s block=%s",
+        tostring(payload.sender or "unknown"),
+        tostring(payload.requestId or "none"),
+        tostring(payload.blockKey or "none")
+    )
+
+    local incomingPayload = payload.blockPayload or payload
+    if type(incomingPayload) == "table" and incomingPayload.blockKey == nil then
+        incomingPayload = {
+            blockKey = payload.blockKey,
+            ownerCharacter = incomingPayload.ownerCharacter,
+            professionKey = incomingPayload.professionKey,
+            recipeKeys = incomingPayload.recipeKeys,
+            specialization = incomingPayload.specialization,
+            skillRank = incomingPayload.skillRank,
+            skillMaxRank = incomingPayload.skillMaxRank,
+            metadata = incomingPayload.metadata,
         }
-        self.partialReceive[payload.key] = state
     end
 
-    state.seen[payload.seq] = true
-    state.total = payload.total
-    state.lastProgressAt = time()
-
-    local request = self:GetInFlightRequest(payload.key)
-    if request then
-        request.sessionId = payload.sessionId
-        request.lastProgressAt = time()
-        request.source = payload.sender or request.source
-        self:RefreshPrimaryInFlight()
+    local applied = false
+    local result = nil
+    if Addon.Data and Addon.Data.ApplyIncomingBlockAdditive then
+        applied, result = Addon.Data:ApplyIncomingBlockAdditive(payload.blockKey, incomingPayload, {
+            sourceType = payload.sender == ((payload.blockPayload and payload.blockPayload.ownerCharacter) or payload.ownerCharacter) and "owner" or "replica",
+        })
     end
-
-    self:EnqueueReceivedChunk(payload)
-
-    local complete = true
-    for i = 1, payload.total do
-        if not state.seen[i] then
-            complete = false
-            break
+    if not applied then
+        if self.AbortOutboundSeedSession then
+            self:AbortOutboundSeedSession("block-merge-failed")
         end
-    end
-
-    if complete then
-        self.partialReceive[payload.key] = nil
-        self.inboundFinalizeQueue[#self.inboundFinalizeQueue + 1] = {
-            memberKey = payload.key,
-            rev = payload.rev,
-            updatedAt = payload.updatedAt,
-            sender = payload.sender,
-            sessionId = payload.sessionId,
-        }
-        if not self:IsMockKey(payload.sender) then
-            self:SendDirectEnvelope("DONE", {
-                sessionId = payload.sessionId,
-                key = payload.key,
-                rev = payload.rev,
-            }, payload.sender, "ALERT")
-        end
-
-        self:MarkPeerSuccess(payload.sender)
-
-        self:ClearInFlightRequest(payload.key)
-
-        Addon:RequestRefresh("snapshot-complete")
-        self:ScheduleQueuePump()
-    end
-end
-
-function Sync:GetMissingSeqs(state)
-    local missing = {}
-    if not state then return missing end
-    for i = 1, (state.total or 0) do
-        if not state.seen[i] then
-            missing[#missing + 1] = i
-        end
-    end
-    return missing
-end
-
-function Sync:SendResumeForInFlight(memberKey)
-    local request = memberKey and self:GetInFlightRequest(memberKey) or self:GetInFlightRequest()
-    if not request then return end
-    if self:IsMockKey(request.source) then return end
-    local partial = self.partialReceive[request.memberKey]
-    if not partial or partial.sessionId ~= request.sessionId then
-        self:FailInFlight(request.memberKey, true, "resume-mismatch")
-        return
-    end
-
-    local missing = self:GetMissingSeqs(partial)
-    if #missing == 0 then return end
-
-    self:SendDirectEnvelope("RESUME", {
-        sessionId = partial.sessionId,
-        key = partial.memberKey,
-        rev = partial.rev,
-        missing = missing,
-    }, request.source, "ALERT")
-end
-
-function Sync:HandleResumeRequest(payload)
-    local session = self.outgoingSessions[payload.sessionId]
-    if not session then return end
-    if not self:IsValidSyncMemberKey(payload.sender) or not self:IsValidSyncMemberKey(payload.key) then return end
-    if self:IsMockKey(payload.sender) or self:IsMockKey(payload.key) then return end
-    if session.targetKey ~= payload.sender then return end
-    if session.memberKey ~= payload.key or session.rev ~= payload.rev then return end
-
-    local missing = shallowCopyArray(payload.missing or {})
-    if #missing == 0 then return end
-    self:SendOutgoingSession(payload.sessionId, missing)
-end
-
-function Sync:HandleTransferDone(payload)
-    local session = self.outgoingSessions[payload.sessionId]
-    if not session then return end
-    if not self:IsValidSyncMemberKey(payload.sender) then return end
-    if self:IsMockKey(payload.sender) then return end
-    if session.targetKey ~= payload.sender then return end
-    self.outgoingSessions[payload.sessionId] = nil
-end
-
-function Sync:PruneOutgoingSessions()
-    local now = time()
-    local removed = 0
-    for sessionId, state in pairs(self.outgoingSessions) do
-        if (now - (state.createdAt or now)) > SESSION_TIMEOUT then
-            self.outgoingSessions[sessionId] = nil
-            removed = removed + 1
-        end
-    end
-    if removed > 0 then
-        self.telemetry.prunedOutgoingSessions = (self.telemetry.prunedOutgoingSessions or 0) + removed
-    end
-end
-
-function Sync:PrunePartialReceives()
-    local now = time()
-    local removed = 0
-    for memberKey, state in pairs(self.partialReceive) do
-        if (now - (state.lastProgressAt or now)) > SESSION_TIMEOUT then
-            self.partialReceive[memberKey] = nil
-            removed = removed + 1
-            if self:GetInFlightRequest(memberKey) then
-                self:FailInFlight(memberKey, true, "partial-timeout")
-            end
-        end
-    end
-    if removed > 0 then
-        self.telemetry.prunedPartialReceives = (self.telemetry.prunedPartialReceives or 0) + removed
-    end
-end
-
-function Sync:QueueOutboundBlock(peer, block)
-    if not peer or not block then return false end
-    self.outboundChunkQueue[#self.outboundChunkQueue + 1] = {
-        peer = peer,
-        block = block,
-        queuedAt = time(),
-    }
-    return true
-end
-
-function Sync:CanSendToPeer(peer, delay)
-    if not peer then return false end
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseOutbound() then
-        return false
-    end
-    local pacing = self.peerPacing[peer]
-    if pacing and (nowForPacing() - (pacing.lastSentAt or 0)) < (delay or OUTGOING_CHUNK_DELAY) then
-        return false
-    end
-    return true
-end
-
-function Sync:SendNextSnapshotChunk()
-    local candidateIndex
-    for index = 1, #self.outboundChunkQueue do
-        if self:CanSendToPeer(self.outboundChunkQueue[index].peer, OUTGOING_CHUNK_DELAY) then
-            candidateIndex = index
-            break
-        end
-    end
-    if not candidateIndex then
         return false
     end
 
-    local queued = table.remove(self.outboundChunkQueue, candidateIndex)
-    local block = queued.block
-    self:SendDirectEnvelope("SNAP", block, queued.peer, "BULK")
-    self.peerPacing[queued.peer] = self.peerPacing[queued.peer] or {}
-    self.peerPacing[queued.peer].lastSentAt = nowForPacing()
-    self.telemetry.sentChunks = self.telemetry.sentChunks + 1
-
-    local session = self.outgoingSessions[block.sessionId]
-    if session then
-        session.lastSentAt = time()
+    local fingerprint = type(result) == "table" and result.blockFingerprint or nil
+    if not fingerprint and Addon.Data and Addon.Data.RecomputeLocalBlockFingerprint then
+        fingerprint = Addon.Data:RecomputeLocalBlockFingerprint(payload.blockKey, {
+            reason = "block-merge",
+        })
     end
-    return true
-end
-
-function Sync:SendNextLowPriorityChunk()
-    if #self.outboundChunkQueue > 0 and self:SendNextSnapshotChunk() then
-        return true
+    self.telemetry.blockMergedImmediate = (self.telemetry.blockMergedImmediate or 0) + 1
+    self.telemetry.blockFingerprintRecomputed = (self.telemetry.blockFingerprintRecomputed or 0) + 1
+    self.telemetry.lastMergedBlockKey = tostring(payload.blockKey)
+    self.telemetry.lastMergedBlockFingerprint = fingerprint
+    self.telemetry.successfulBlockMerges = (session.successfulBlockMerges or 0) + 1
+    if self.RecordSyncEvent then
+        self:RecordSyncEvent("blockMerged", {
+            peer = payload.sender,
+            requestId = payload.requestId,
+            blockKey = payload.blockKey,
+        })
+        self:RecordSyncEvent("blockFingerprintRecomputed", {
+            reason = "block-merge",
+            blockKey = payload.blockKey,
+            extra = tostring(fingerprint or "none"),
+        })
     end
-    if self:SendNextManifestChunk() then
-        return true
+    local addedRecipes = type(result) == "table" and tonumber(result.addedRecipes or 0) or 0
+    local specChanged = type(result) == "table" and result.specializationChanged == true
+    local incomingRecipeCount = type(incomingPayload) == "table" and incomingPayload.recipeKeys
+        and #incomingPayload.recipeKeys or 0
+    Addon:Tracef("sync",
+        "block-merge-complete block=%s peer=%s incomingRecipes=%d addedRecipes=%d specChanged=%s fingerprint=%s",
+        tostring(payload.blockKey or "none"),
+        tostring(payload.sender or "unknown"),
+        incomingRecipeCount,
+        addedRecipes,
+        tostring(specChanged),
+        tostring(fingerprint or "none")
+    )
+
+    session.successfulBlockMerges = (session.successfulBlockMerges or 0) + 1
+    session.lastMergedBlockFingerprint = fingerprint
+    session.activeBlockKey = nil
+    session.activeBlockRequestId = nil
+    session.nextWantedIndex = (session.nextWantedIndex or 1) + 1
+    if self.RefreshSyncReadyState then
+        self:RefreshSyncReadyState("block-merge")
     end
-    return true
-end
-
-function Sync:EnqueueReceivedChunk(payload)
-    self.inboundChunkQueue[#self.inboundChunkQueue + 1] = shallowCopyTable(payload)
-    self.telemetry.receivedChunks = self.telemetry.receivedChunks + 1
-end
-
-function Sync:DecodeChunkStep(payload)
-    if not payload then return false end
-    if not self:IsValidSyncMemberKey(payload.key) then return false end
-    Addon.Data:AppendIncomingChunk({
-        memberKey = payload.key,
-        rev = payload.rev,
-        updatedAt = payload.updatedAt,
-        sourceType = payload.sourceType or "replica",
-        profession = payload.profession,
-        skillRank = payload.skillRank,
-        skillMaxRank = payload.skillMaxRank,
-        specialization = payload.specialization,
-        recipeKeys = payload.recipeKeys,
-    })
-    return true
-end
-
-function Sync:MergeChunkStep(item)
-    if not item then return false end
-    if not self:IsValidSyncMemberKey(item.memberKey) then return false end
-    local hadLocalEntry = Addon.Data:GetMember(item.memberKey) ~= nil
-    local localEntry = Addon.Data:GetMember(item.memberKey)
-    if item.sender and item.sender ~= item.memberKey
-        and localEntry
-        and (localEntry.guildStatus or "active") ~= "active" then
-        if Addon.Data._incoming then
-            Addon.Data._incoming[item.memberKey] = nil
+    self.lastSnapshotSuccessAt = time()
+    self:MarkPeerSuccess(payload.sender)
+    if not (session.wantedBlocks and session.wantedBlocks[session.nextWantedIndex]) then
+        if self.CompleteOutboundSeedSession then
+            self:CompleteOutboundSeedSession("all-blocks-complete")
         end
-        self:PushOfflineDebugEvent("stale-skip", string.format("%s via %s", tostring(item.memberKey), tostring(item.sender)))
-        return false
+        return result or true
     end
-    local sourceType = (item.sender and item.sender == item.memberKey) and "owner" or "replica"
-    local merged = Addon.Data:FinalizeIncomingSnapshot(item.memberKey, item.rev, {
-        sourceType = sourceType,
-        isMock = self:IsMockKey(item.memberKey) or self:IsMockKey(item.sender),
-    })
-    if merged then
-        self.telemetry.appliedChunks = self.telemetry.appliedChunks + 1
-        if item.sender and item.sender ~= item.memberKey and not Addon.Data:IsMemberOnline(item.memberKey) then
-            self.telemetry.replicaOwnersApplied = self.telemetry.replicaOwnersApplied + 1
-            if not hadLocalEntry then
-                self.telemetry.replicaNewOwnersApplied = self.telemetry.replicaNewOwnersApplied + 1
-            end
-            self:PushOfflineDebugEvent("applied", string.format("%s via %s new=%s", tostring(item.memberKey), tostring(item.sender), tostring(not hadLocalEntry)))
-        end
-        if self:IsCoordinator() then
-            self:BroadcastIndex(item.memberKey, item.rev, item.updatedAt, item.memberKey, "snapshot-merged")
-        end
+    if self.ScheduleNextWantedBlock then
+        self:ScheduleNextWantedBlock()
     end
-    return merged
-end
-
-function Sync:ProcessInboundQueue()
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseInboundApply() then
-        return true
-    end
-
-    if #self.inboundChunkQueue > 0 then
-        local payload = table.remove(self.inboundChunkQueue, 1)
-        self:DecodeChunkStep(payload)
-        return true
-    end
-
-    if #self.inboundFinalizeQueue > 0 then
-        local item = table.remove(self.inboundFinalizeQueue, 1)
-        self:MergeChunkStep(item)
-    end
-
-    return true
+    return result or true
 end

@@ -1,107 +1,130 @@
 # Recipe Registry
 
-Recipe Registry turns your guild into a proper crafting network for World of Warcraft: The Burning Crusade Classic Anniversary realms.
+Turn your guild professions into a searchable crafting network for World of Warcraft: The Burning Crusade Classic Anniversary realms.
 
-Instead of asking in chat who can craft an item, who has the right specialization, or who is online right now, you get a clean in-game directory that keeps up with your guild over time.
+Recipe Registry answers the question every guild eventually asks: "Who can make this?"
 
-Recipe Registry scans your own professions locally, syncs profession knowledge with guildmates who use the addon, and builds a searchable registry of recipes, crafters, materials, skill ranks, and supported TBC profession specializations.
+Open your professions, let the addon scan what you know, and Recipe Registry quietly builds a shared in-game directory with your guildmates. Recipes, crafters, materials, profession ranks, specializations, favorites, online status, and optional price estimates all live in one clean window instead of scattered across guild chat.
 
-It is built to be useful every day, not just impressive on paper: fast to browse, easy to understand, and gentle enough to run quietly in the background.
+It is designed for everyday guild life: fast to browse, calm in the background, and useful even when the best crafter is offline right now.
 
 ## Why Players Install It
 
-- Find the right crafter in seconds instead of asking in guild chat over and over
+- Find the right crafter without repeating the same question in guild chat
 - See who is online now and who can help later when they log back in
-- Keep profession data organized by character and profession, not buried in chat history
-- Surface supported profession specializations where they actually matter
-- Give your guild a shared long-term memory for crafting without turning gameplay into menu work
+- Search recipes by name or by materials, depending on how you think
+- Keep favorites per character for the crafts you ask about most often
+- Spot important TBC specializations such as Transmute Master, Armorsmith, Spellfire Tailor, Dragonscale Leatherworker, and more
+- Estimate material costs when TradeSkillMaster or Auctionator data is available
+- Give your guild a long-term crafting memory that updates quietly over time
 
-## What You Get
+## Feature Highlights
 
-### A real guild crafting directory
-- Builds a shared guild database from real profession data
-- Keeps recipes grouped by character and profession for cleaner browsing
-- Preserves visibility for both online and offline crafters
-- Uses progressive background sync instead of trying to flood everyone at once
-- Lets replica peers help fill in offline guildmate data over time
+### Guild Crafting Directory
 
-### Better recipe discovery
-- Fast searchable recipe browser with profession tabs
-- Favorites per character
-- Rarity-aware crafted item presentation
-- Detailed recipe view with output info, crafter list, and materials
-- Online crafters shown first when you need a craft right away
+- Builds a shared recipe registry from real profession data
+- Tracks recipes by character, profession, rank, and specialization
+- Shows online crafters first while keeping offline crafters available for later
+- Keeps guild data useful across reloads, relogs, and addon updates
+- Works best when multiple guildmates install it, but remains useful as your own personal profession browser
 
-### Crafter context that actually helps
-- Tracks profession skill ranks alongside recipe ownership
-- Tracks supported TBC profession specializations including Alchemy, Blacksmithing, Tailoring, Leatherworking, and Engineering specializations
-- Shows specialization in relevant crafter and recipe views when available
-- Helps you identify not just who can craft something, but who has the right version of that profession
+### Fast Recipe Browser
 
-### Cost and material visibility
-- Material cost estimates in the recipe detail panel
-- Unit and total reagent price display
-- Overall recipe cost summary when price data is available
-- Clean fallback behavior when pricing sources are missing
+- Profession tabs for quick browsing
+- Favorites tab for your most-used crafts
+- Search by recipe name or by required materials
+- Sort recipes alphabetically or by item rarity
+- AtlasLoot categories when AtlasLoot data is available
+- Smooth scrolling and searching, even with large guild recipe lists
 
-### Tooltip and chat quality-of-life
-- Adds known crafters to supported item, recipe, and spell or enchant tooltips
-- Makes guild crafting knowledge visible directly from normal gameplay
-- Supports easy recipe sharing and quick crafter contact flows
+### Craft Requests And Sharing
 
-### Safe long-term guild data
-- Protects complete local data from suspicious partial profession scans
-- Hides stale ex-guild data from normal browsing before pruning it later
-- Uses safety checks to avoid destructive cleanup when roster data looks incomplete
-- Keeps sync work paced and chunked to reduce noise and avoid bursty behavior in larger guilds
+- Use the Ask button to whisper a crafter directly from the recipe view
+- Share the selected recipe to guild, party, raid, or say
+- See known crafters directly on supported item, recipe, spell, and enchant tooltips
+- Keep online and offline crafter lists readable instead of hunting through chat history
+
+### Materials And Costs
+
+- View crafted output, reagents, known crafters, and total materials in one place
+- See reagent unit prices and total recipe cost when market data is available
+- Uses TradeSkillMaster first, with Auctionator as a fallback
+- Handles missing prices gracefully so the recipe view still stays useful
+
+### Quiet Background Sync
+
+- Shares guild recipe data automatically with compatible guildmates
+- Paces larger updates so the addon stays responsive
+- Waits for safer moments around login, reloads, combat, instances, and roster loading
+- Keeps normal chat output quiet, with extra diagnostics available only when you need troubleshooting
 
 ## Built For TBC Guild Life
 
-Recipe Registry is especially nice in guilds where:
+Recipe Registry is especially helpful when:
 
-- multiple players cover the same profession with different specializations
-- crafting requests happen often enough that chat becomes repetitive
-- people play on different schedules and many useful crafters are offline when needed
-- you want a practical replacement for "does anyone know who can make this?"
+- Your guild has several crafters covering the same profession
+- Specializations matter and the "right" crafter is not always obvious
+- Players are online at different times
+- Officers or raid leaders often need to find enchants, resist gear, consumables, or crafted upgrades quickly
+- You want a practical answer to "who can make this?" without maintaining a spreadsheet
+
+## Getting Started
+
+1. Install Recipe Registry.
+2. Join a guild.
+3. Open each of your profession windows at least once so your recipes can be scanned.
+4. Ask guildmates to install the addon too for automatic guild sharing.
+5. Open Recipe Registry from the minimap button or with `/rr`.
+6. Search, browse, favorite recipes, and contact crafters directly from the addon.
+
+The first sync may take a little time, especially in a larger guild. After that, Recipe Registry keeps itself updated quietly while you play.
+
+## Useful Commands
+
+- `/rr` opens the main Recipe Registry window
+- `/rr options` opens the settings panel
+- `/rr rescan` queues a fresh profession scan
+- `/rr share guild` shares the selected recipe in guild chat
+- `/rr share party`, `/rr share raid`, and `/rr share say` share the selected recipe to other channels
+- `/rr prices <item name or item link>` checks available market pricing data
+
+Most players only need `/rr`. The rest is there when you want more control.
 
 ## Optional Integrations
 
 ### AtlasLoot
-AtlasLoot improves local recipe resolution, especially for spell-based or enchant-style recipes, crafted outputs, and reagent metadata. Recipe Registry works without it, but some recipe detail will be less rich.
 
-### TradeSkillMaster and Auctionator
-If market addons are available, Recipe Registry can estimate reagent and craft costs. TradeSkillMaster is checked first, with Auctionator used as a fallback.
+AtlasLoot improves recipe recognition, crafted outputs, reagent details, and profession category browsing. Recipe Registry works without it, but AtlasLoot makes the recipe browser richer.
+
+### TradeSkillMaster And Auctionator
+
+If TradeSkillMaster or Auctionator is installed, Recipe Registry can show material prices and estimated craft costs. Pricing depends on the freshness of your market data.
 
 ## Compatibility
 
 - Built for WoW TBC Anniversary / The Burning Crusade Classic 2.5.x
-- Works perfectly well as a standalone guild recipe addon
-- Optional addons enhance pricing and recipe detail, but are not required for core sync and browsing
+- Core browsing and guild sync work without optional addons
+- Optional addons improve recipe detail and market pricing
+- Important for `2.0.0`: guild sync uses a new model that is not compatible with Recipe Registry `1.x` sync. Your own saved recipes remain safe, but guildmates should update to `2.0.0` or newer to share data with you.
 
 ## Installation
 
 ### CurseForge App
+
 Install Recipe Registry through CurseForge, then launch the game.
 
-### Manual install
+### Manual Install
+
 1. Download the release zip.
 2. Extract it into `Interface/AddOns/`.
 3. Make sure the folder name is `RecipeRegistry`.
 4. Restart the game or reload the interface.
 
-## Getting Started
-
-1. Join a guild.
-2. Open each of your profession windows at least once so your local data can be scanned.
-3. Open the addon window from the minimap button or the addon's normal in-game entry point.
-4. Give the guild sync a little time to exchange profession blocks with other users.
-5. Browse recipes, mark favorites, and refresh old roster data whenever needed through the addon's cleanup flow.
-
 ## Notes
 
-- Item names and icons may appear gradually the first time WoW populates its local cache.
-- Cost estimates depend on the quality and freshness of your available market data.
-- The addon is intentionally conservative around incomplete profession data so that temporary API weirdness does not destroy a good local database.
+- Item names and icons may appear gradually the first time WoW fills its local item cache.
+- Cost estimates depend on TradeSkillMaster or Auctionator data and may not always be available.
+- The addon is intentionally careful with incomplete profession and roster data so a temporary game API hiccup does not erase useful guild information.
 
 ## Support The Project
 

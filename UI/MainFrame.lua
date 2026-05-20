@@ -4,7 +4,7 @@ Addon.UI = UI
 
 local SEARCH_DEBOUNCE = 0.15
 local GLOBAL_SEARCH_DEBOUNCE = 0.35
-local GLOBAL_SEARCH_MIN_CHARS = 2
+local GLOBAL_SEARCH_MIN_CHARS = 3
 
 local PROF_ORDER = {
     "Favorites", "Alchemy", "Blacksmithing", "Cooking", "Enchanting", "Engineering",
@@ -292,11 +292,22 @@ local function openWhisperWindow(target)
     end
 end
 
+-- Shift-click routing for an item link. HandleModifiedItemClick is WoW's
+-- canonical entry point that dispatches the link to whatever currently
+-- has focus: chat edit boxes, the auction house search field, dressing
+-- room, profession windows, etc. Falls back to ChatEdit_InsertLink only
+-- if the routing helper is unavailable (very old clients).
 local function insertLinkInChat(link)
     if not link then return false end
-    if type(ChatEdit_InsertLink) ~= "function" then return false end
-    local ok = ChatEdit_InsertLink(link)
-    return ok and true or false
+    if type(HandleModifiedItemClick) == "function" then
+        local ok = HandleModifiedItemClick(link)
+        if ok then return true end
+    end
+    if type(ChatEdit_InsertLink) == "function" then
+        local ok = ChatEdit_InsertLink(link)
+        return ok and true or false
+    end
+    return false
 end
 
 local function createStatCard(parent, label, width)
@@ -378,7 +389,12 @@ end
 function UI:OnInitialize()
     self.selectedProfession = Addon.db and Addon.db.profile and Addon.db.profile.selectedProfession or nil
     self.sortMode = (Addon.db and Addon.db.profile and Addon.db.profile.sortMode) or "alpha"
+    self.searchMode = (Addon.db and Addon.db.profile and (Addon.db.profile.defaultSearchMode or Addon.db.profile.searchMode)) or "recipe"
+    if self.searchMode ~= "materials" then
+        self.searchMode = "recipe"
+    end
     self.selectedRecipeKey = nil
+    self.selectedCategory = nil
     self.searchText = ""
 end
 
@@ -428,6 +444,9 @@ function UI:ClearSearch()
     if self.frame and self.frame.searchBox then
         self.frame.searchBox:SetText("")
         self.frame.searchBox:ClearFocus()
+    end
+    if self.frame and self.frame.searchClearButton then
+        self.frame.searchClearButton:Hide()
     end
     self:CancelSearchTimer()
 end
@@ -494,7 +513,7 @@ local function buildRefreshPlan(reasons)
     end
 
     for reason in pairs(reasons) do
-        if reason == "coordinator" or reason == "queue" then
+        if reason == "queue" then
             plan.status = true
         elseif reason == "roster" then
             plan.status = true
@@ -520,6 +539,83 @@ local function buildRefreshPlan(reasons)
     end
 
     return plan
+end
+
+function UI:GetDegradedModeReason()
+    if not Addon.Data then
+        return "data-unavailable"
+    end
+    local hasCachedData = false
+    for memberKey, entry in pairs(Addon.Data:GetMembersDB() or {}) do
+        if Addon.Data:IsUserVisibleMember(memberKey, entry, true) and next(entry.professions or {}) ~= nil then
+            hasCachedData = true
+            break
+        end
+    end
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseHeavyUI() then
+        if not hasCachedData then
+            return "sensitive-context"
+        end
+    end
+    if Addon.Sync and Addon.Sync.IsInWarmup and Addon.Sync:IsInWarmup() then
+        if not hasCachedData then
+            return "warmup"
+        end
+    end
+    if Addon.Sync and Addon.Sync.IsInWorldTransition and Addon.Sync:IsInWorldTransition() then
+        return "world-transition"
+    end
+    if not (self.frame and self.frame.recipeRows and self.frame.detailLines) then
+        return "frame-not-ready"
+    end
+    return nil
+end
+
+function UI:IsHeavyRefreshAllowed()
+    return self:GetDegradedModeReason() == nil
+end
+
+function UI:MarkFullRefreshPending(reason)
+    self.fullRefreshPending = true
+    self.fullRefreshPendingReason = reason or self.fullRefreshPendingReason or "pending"
+    if Addon.Sync and Addon.Sync.telemetry then
+        Addon.Sync.telemetry.transitionDeferredUI = (Addon.Sync.telemetry.transitionDeferredUI or 0) + 1
+    end
+end
+
+function UI:RefreshDegradedStatus(reason)
+    if not self.frame then return end
+    reason = tostring(reason or "sync-pending")
+    self.currentRecipeRows = {}
+    self.currentDetail = nil
+    self.selectedRecipeKey = nil
+    setTextIfChanged(self.frame.recipeHeader, "Status only while Recipe Registry stabilizes")
+    for index = 1, #(self.frame.recipeRows or {}) do
+        setShownIfChanged(self.frame.recipeRows[index], false)
+    end
+    if self.frame.recipeContent and self.frame.recipeContent.SetHeight then
+        self.frame.recipeContent:SetHeight(1)
+    end
+    setTextIfChanged(self.frame.detailTitle, "Recipe details")
+    setTextIfChanged(self.frame.detailSub, "Heavy UI refresh is deferred until sync becomes stable.")
+    self:RenderDetailLines({
+        string.format("Status-only mode active: %s.", reason:gsub("%-", " ")),
+        "The full recipe list and detail panel will resume automatically.",
+    }, {}, {})
+    self:RefreshSummaryCards()
+end
+
+function UI:TryResumeFullRefresh()
+    if not self.fullRefreshPending then
+        return false
+    end
+    if not self:IsHeavyRefreshAllowed() then
+        return false
+    end
+    self.fullRefreshPending = false
+    self.fullRefreshPendingReason = nil
+    Addon:RequestRefresh("resume-full-refresh")
+    return true
 end
 
 function UI:OnEnable()
@@ -676,7 +772,8 @@ function UI:CreateMainFrame()
     searchBox:SetPoint("TOPRIGHT", -10, -30)
     searchBox:SetHeight(24)
     searchBox:SetAutoFocus(false)
-    searchBox:SetTextInsets(6, 6, 0, 0)
+    -- Right inset reserves space for the clear-button overlay below.
+    searchBox:SetTextInsets(6, 22, 0, 0)
     searchBox:SetScript("OnEscapePressed", function()
         UI:ClearSearchFocus()
     end)
@@ -685,9 +782,38 @@ function UI:CreateMainFrame()
         UI:ClearSearchFocus()
         UI:OpenChatAfterSearch()
     end)
+    f.searchBox = searchBox
+
+    -- Small ✕ clear button overlaid on the right edge of the search box.
+    -- Only visible when there's text to clear.
+    local clearButton = CreateFrame("Button", nil, searchBox)
+    clearButton:SetSize(14, 14)
+    clearButton:SetPoint("RIGHT", -4, 0)
+    clearButton:SetNormalTexture("Interface\\Buttons\\UI-StopButton")
+    if clearButton.GetNormalTexture then
+        local tex = clearButton:GetNormalTexture()
+        if tex and tex.SetVertexColor then
+            tex:SetVertexColor(0.85, 0.85, 0.85, 0.85)
+        end
+    end
+    clearButton:SetHighlightTexture("Interface\\Buttons\\UI-StopButton", "ADD")
+    clearButton:Hide()
+    clearButton:SetScript("OnClick", function()
+        UI:ClearSearch()
+        UI:RefreshRecipeList()
+        UI:RefreshDetailPanel()
+        UI:RefreshSummaryCards()
+    end)
+    f.searchClearButton = clearButton
+
     searchBox:SetScript("OnTextChanged", function(box)
         UI.searchText = box:GetText() or ""
         UI.selectedRecipeKey = nil
+        if UI.searchText ~= "" then
+            clearButton:Show()
+        else
+            clearButton:Hide()
+        end
         UI:CancelSearchTimer()
         local delay = SEARCH_DEBOUNCE
         if UI.selectedProfession == nil and UI.searchText ~= "" then
@@ -701,13 +827,15 @@ function UI:CreateMainFrame()
             UI:RefreshSummaryCards()
         end, delay)
     end)
-    f.searchBox = searchBox
 
     local searchFocusWatcher = CreateFrame("Frame", nil, f)
     searchFocusWatcher:Hide()
+    -- Polled at ~5 Hz: just needs to catch "user clicked outside the frame
+    -- to defocus the search box". 20 Hz was overkill — no perceptible UX
+    -- difference at 200ms but 4x less work while the box is focused.
     searchFocusWatcher:SetScript("OnUpdate", function(self, elapsed)
         self._elapsed = (self._elapsed or 0) + (elapsed or 0)
-        if self._elapsed < 0.05 then return end
+        if self._elapsed < 0.2 then return end
         self._elapsed = 0
         if not (f.searchBox and f.searchBox.HasFocus and f.searchBox:HasFocus()) then
             self._mouseDown = nil
@@ -733,19 +861,54 @@ function UI:CreateMainFrame()
     end)
     f.searchFocusWatcher = searchFocusWatcher
 
+    local searchScopeLabel = left:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    searchScopeLabel:SetPoint("TOPLEFT", searchBox, "BOTTOMLEFT", 2, -12)
+    searchScopeLabel:SetText("Search scope")
+    f.searchScopeLabel = searchScopeLabel
+
+    local searchRecipes, searchMaterials
+    searchRecipes = createCardStyleButton(left, 103, 24)
+    searchRecipes:SetPoint("TOPLEFT", searchBox, "BOTTOMLEFT", 0, -30)
+    searchRecipes:SetLabel("Recipes")
+    searchRecipes:SetScript("OnClick", function()
+        UI.searchMode = "recipe"
+        UI.selectedRecipeKey = nil
+        searchRecipes:SetSelected(true)
+        searchMaterials:SetSelected(false)
+        UI:ApplySearchNow()
+    end)
+    f.searchRecipes = searchRecipes
+
+    searchMaterials = createCardStyleButton(left, 107, 24)
+    searchMaterials:SetPoint("LEFT", searchRecipes, "RIGHT", 6, 0)
+    searchMaterials:SetLabel("+ Materials")
+    searchMaterials:SetScript("OnClick", function()
+        UI.searchMode = "materials"
+        UI.selectedRecipeKey = nil
+        searchRecipes:SetSelected(false)
+        searchMaterials:SetSelected(true)
+        UI:ApplySearchNow()
+    end)
+    f.searchMaterials = searchMaterials
+
     local profLabel = left:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    profLabel:SetPoint("TOPLEFT", searchBox, "BOTTOMLEFT", 2, -12)
+    profLabel:SetPoint("TOPLEFT", searchRecipes, "BOTTOMLEFT", 2, -14)
     profLabel:SetText("Profession filter")
 
+    local profScroll = CreateFrame("ScrollFrame", nil, left, "UIPanelScrollFrameTemplate")
+    profScroll:SetPoint("TOPLEFT", profLabel, "BOTTOMLEFT", -2, -8)
+    profScroll:SetPoint("BOTTOMRIGHT", -28, 58)
+    local profContent = CreateFrame("Frame", nil, profScroll)
+    profContent:SetSize(216, 1)
+    profScroll:SetScrollChild(profContent)
+    f.profScroll = profScroll
+    f.profContent = profContent
+
     f.profButtons = {}
-    local lastProf
+    f.categoryButtons = {}
     for i, profName in ipairs(PROF_ORDER) do
-        local b = createCardStyleButton(left, 216, 24)
-        if i == 1 then
-            b:SetPoint("TOPLEFT", searchBox, "BOTTOMLEFT", 0, -30)
-        else
-            b:SetPoint("TOPLEFT", lastProf, "BOTTOMLEFT", 0, -6)
-        end
+        local b = createCardStyleButton(profContent, 216, 24)
+        b:SetPoint("TOPLEFT", 0, -((i - 1) * 30))
         b:SetScript("OnClick", function()
             if UI.selectedProfession == profName then
                 UI.selectedProfession = nil
@@ -754,10 +917,10 @@ function UI:CreateMainFrame()
             end
             if Addon.db and Addon.db.profile then Addon.db.profile.selectedProfession = UI.selectedProfession end
             UI.selectedRecipeKey = nil
+            UI.selectedCategory = nil
             UI:Refresh()
         end)
         f.profButtons[profName] = b
-        lastProf = b
     end
 
     local hint = left:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
@@ -777,30 +940,33 @@ function UI:CreateMainFrame()
     f.center = center
     hookFocusRelease(center)
 
+    -- Single segmented switch replaces the two side-by-side sort buttons.
+    -- The original layout let the header text overlap the buttons whenever
+    -- the header string grew (e.g., "Status only while Recipe Registry
+    -- stabilizes"). The switch is narrower and the header is now bounded
+    -- on its right edge so the two never collide.
+    local sortSwitch = createCardStyleButton(center, 130, 24)
+    sortSwitch:SetPoint("TOPRIGHT", -8, -8)
+    sortSwitch:SetLabel("Sort: Alphabetical")
+    sortSwitch:SetScript("OnClick", function()
+        UI.sortMode = (UI.sortMode == "alpha") and "rarity" or "alpha"
+        if Addon.db and Addon.db.profile then Addon.db.profile.sortMode = UI.sortMode end
+        UI:Refresh()
+    end)
+    f.sortSwitch = sortSwitch
+
     local recipeHeader = center:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     recipeHeader:SetPoint("TOPLEFT", 12, -12)
+    recipeHeader:SetPoint("TOPRIGHT", sortSwitch, "TOPLEFT", -10, -4)
+    recipeHeader:SetJustifyH("LEFT")
+    if recipeHeader.SetWordWrap then
+        recipeHeader:SetWordWrap(false)
+    end
+    if recipeHeader.SetMaxLines then
+        recipeHeader:SetMaxLines(1)
+    end
     recipeHeader:SetText("Recipes")
     f.recipeHeader = recipeHeader
-
-    local sortAlpha = createCardStyleButton(center, 96, 24)
-    sortAlpha:SetPoint("TOPRIGHT", -112, -8)
-    sortAlpha:SetLabel("Alphabetical")
-    sortAlpha:SetScript("OnClick", function()
-        UI.sortMode = "alpha"
-        if Addon.db and Addon.db.profile then Addon.db.profile.sortMode = UI.sortMode end
-        UI:Refresh()
-    end)
-    f.sortAlpha = sortAlpha
-
-    local sortRarity = createCardStyleButton(center, 86, 24)
-    sortRarity:SetPoint("LEFT", sortAlpha, "RIGHT", 6, 0)
-    sortRarity:SetLabel("Rarity")
-    sortRarity:SetScript("OnClick", function()
-        UI.sortMode = "rarity"
-        if Addon.db and Addon.db.profile then Addon.db.profile.sortMode = UI.sortMode end
-        UI:Refresh()
-    end)
-    f.sortRarity = sortRarity
 
 
     local recipeScroll = CreateFrame("ScrollFrame", nil, center, "UIPanelScrollFrameTemplate")
@@ -811,7 +977,16 @@ function UI:CreateMainFrame()
     recipeScroll:SetScrollChild(recipeContent)
     f.recipeScroll = recipeScroll
     f.recipeContent = recipeContent
+    -- Pool of recycled row frames. Index = pool slot, not recipe-list index.
+    -- The pool grows on demand to (visible rows + buffer); rebinding happens
+    -- per scroll tick via UI:RenderVisibleRecipeRows.
     f.recipeRows = {}
+    recipeScroll:HookScript("OnVerticalScroll", function()
+        UI:RenderVisibleRecipeRows()
+    end)
+    recipeScroll:HookScript("OnSizeChanged", function()
+        UI:RenderVisibleRecipeRows()
+    end)
 
     local right = CreateFrame("Frame", nil, f, "BackdropTemplate")
     right:SetPoint("TOPLEFT", center, "TOPRIGHT", 10, 0)
@@ -962,6 +1137,20 @@ function UI:CreateMainFrame()
     self:RefreshDebugVisibility()
 end
 
+function UI:EnsureCategoryButton(index)
+    local button = self.frame.categoryButtons[index]
+    if button then return button end
+
+    button = createCardStyleButton(self.frame.profContent, 198, 20)
+    button:SetScript("OnClick", function(self)
+        UI.selectedCategory = self.categoryName
+        UI.selectedRecipeKey = nil
+        UI:Refresh()
+    end)
+    self.frame.categoryButtons[index] = button
+    return button
+end
+
 function UI:EnsureRecipeRow(index)
     local row = self.frame.recipeRows[index]
     if row then return row end
@@ -1075,13 +1264,34 @@ function UI:EnsureDetailLine(index)
         line.text:SetWordWrap(true)
     end
 
-    line.actionButton = CreateFrame("Button", nil, line)
-    line.actionButton:SetSize(16, 16)
+    -- Compact text button matching the addon's gold/dark theme. The
+    -- previous icon-only square (a 16x16 tinted FriendsList chat sprite)
+    -- read as visual noise rather than an obvious action affordance —
+    -- the user reported it as "proprio brutto". This version reads as
+    -- a real button: dark fill, gold edge, "Ask" label, hover lift.
+    line.actionButton = CreateFrame("Button", nil, line, "BackdropTemplate")
+    line.actionButton:SetSize(36, 16)
     line.actionButton:SetPoint("RIGHT", -2, 0)
-    line.actionButton.icon = line.actionButton:CreateTexture(nil, "ARTWORK")
-    line.actionButton.icon:SetAllPoints()
-    line.actionButton.icon:SetTexture("Interface\\FriendsFrame\\UI-FriendsList-Small-Up")
-    line.actionButton.icon:SetVertexColor(0.8, 1.0, 0.8, 1)
+    if line.actionButton.SetBackdrop then
+        line.actionButton:SetBackdrop({
+            bgFile   = "Interface\\Buttons\\WHITE8x8",
+            edgeFile = "Interface\\Buttons\\WHITE8x8",
+            edgeSize = 1,
+        })
+        line.actionButton:SetBackdropColor(0.13, 0.11, 0.08, 0.95)
+        line.actionButton:SetBackdropBorderColor(1, 0.82, 0, 0.75)
+    end
+    line.actionButton.label = line.actionButton:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    line.actionButton.label:SetPoint("LEFT", 2, 0)
+    line.actionButton.label:SetPoint("RIGHT", -2, 0)
+    line.actionButton.label:SetJustifyH("CENTER")
+    line.actionButton.label:SetText("Ask")
+    line.actionButton.label:SetTextColor(1.0, 0.92, 0.75)
+    line.actionButton:SetHighlightTexture("Interface\\Buttons\\WHITE8x8", "ADD")
+    local hi = line.actionButton:GetHighlightTexture()
+    if hi and hi.SetVertexColor then
+        hi:SetVertexColor(1, 0.82, 0, 0.18)
+    end
     line.actionButton:SetScript("OnClick", function(self, button)
         if button ~= "LeftButton" then return end
         local parent = self:GetParent()
@@ -1161,14 +1371,19 @@ end
 function UI:RefreshStatusBar()
     local sync = Addon.Sync
     local state = sync and sync.GetUiState and sync:GetUiState() or nil
-    local summary = Addon.Data:GetLocalSummary()
+    local summary = Addon.Data and Addon.Data.GetLocalSummary and Addon.Data:GetLocalSummary() or {
+        updatedAt = 0,
+    }
     local bootstrap = state and state.bootstrap or nil
+    local degradedReason = self:GetDegradedModeReason()
     local cleanupRunning = Addon.GuildLifecycleMaintenance and Addon.GuildLifecycleMaintenance.IsCleanupRunning
         and Addon.GuildLifecycleMaintenance:IsCleanupRunning() or false
 
     local members = 0
-    for _ in ipairs(Addon.Data:GetSortedMemberKeys(false)) do
-        members = members + 1
+    if Addon.Data and Addon.Data.GetSortedMemberKeys then
+        for _ in ipairs(Addon.Data:GetSortedMemberKeys(false)) do
+            members = members + 1
+        end
     end
 
     local onlineNodes = state and state.onlineNodes or 0
@@ -1204,6 +1419,9 @@ function UI:RefreshStatusBar()
     end
     if cleanupRunning then
         subtitle = subtitle .. " | roster cleanup running"
+    end
+    if degradedReason then
+        subtitle = subtitle .. " | status only: " .. degradedReason:gsub("%-", " ")
     end
     setTextIfChanged(self.frame.subtitle, subtitle)
 
@@ -1300,6 +1518,17 @@ end
 
 function UI:RefreshProfessionButtons()
     local summary = Addon.Data:GetProfessionSummary()
+    local useCategories = Addon.db and Addon.db.profile and Addon.db.profile.useRecipeCategories ~= false
+    local yOffset = 0
+    local categoryButtonIndex = 0
+
+    local function placeButton(button, indent, height, gap)
+        button:ClearAllPoints()
+        button:SetPoint("TOPLEFT", indent or 0, -yOffset)
+        setShownIfChanged(button, true)
+        yOffset = yOffset + (height or 24) + (gap or 6)
+    end
+
     for _, profName in ipairs(PROF_ORDER) do
         local button = self.frame.profButtons[profName]
         if profName == "Favorites" then
@@ -1308,7 +1537,175 @@ function UI:RefreshProfessionButtons()
             button:SetLabel(profName, getProfessionIcon(profName))
         end
         button:SetSelected(self.selectedProfession == profName)
+        placeButton(button, 0, 24, 6)
+
+        if useCategories and self.selectedProfession == profName and profName ~= "Favorites" then
+            local categories = Addon.Data.GetRecipeCategories and Addon.Data:GetRecipeCategories(profName, true) or {}
+            local selectedCategoryExists = self.selectedCategory == nil
+            for _, categoryName in ipairs(categories) do
+                if categoryName == self.selectedCategory then
+                    selectedCategoryExists = true
+                    break
+                end
+            end
+            if not selectedCategoryExists then
+                self.selectedCategory = nil
+            end
+            if #categories > 0 then
+                categoryButtonIndex = categoryButtonIndex + 1
+                local allButton = self:EnsureCategoryButton(categoryButtonIndex)
+                allButton.categoryName = nil
+                allButton:SetLabel("All")
+                allButton:SetSelected(self.selectedCategory == nil)
+                placeButton(allButton, 14, 20, 4)
+
+                for _, categoryName in ipairs(categories) do
+                    categoryButtonIndex = categoryButtonIndex + 1
+                    local categoryButton = self:EnsureCategoryButton(categoryButtonIndex)
+                    categoryButton.categoryName = categoryName
+                    categoryButton:SetLabel(categoryName)
+                    categoryButton:SetSelected(self.selectedCategory == categoryName)
+                    placeButton(categoryButton, 14, 20, 4)
+                end
+                yOffset = yOffset + 2
+            end
+        elseif self.selectedProfession == profName then
+            self.selectedCategory = nil
+        end
     end
+    for i = categoryButtonIndex + 1, #(self.frame.categoryButtons or {}) do
+        setShownIfChanged(self.frame.categoryButtons[i], false)
+    end
+    if self.frame.profContent then
+        self.frame.profContent:SetHeight(math.max(1, yOffset + 4))
+    end
+    if self.frame.searchRecipes then
+        self.frame.searchRecipes:SetSelected(self.searchMode ~= "materials")
+    end
+    if self.frame.searchMaterials then
+        self.frame.searchMaterials:SetSelected(self.searchMode == "materials")
+    end
+end
+
+local RECIPE_ROW_HEIGHT = 70
+local RECIPE_ROW_BUFFER = 2
+
+function UI:BindRecipeRow(row, recipeIdx, rowData)
+    row:SetPoint("TOPLEFT", 0, -((recipeIdx - 1) * RECIPE_ROW_HEIGHT))
+    row.recipeKey = rowData.recipeKey
+
+    local isFav = self:IsFavorite(rowData.recipeKey)
+    row.favoriteButton.isFavorite = isFav
+    row.favoriteButton.recipeKey = rowData.recipeKey
+    setFavoriteButtonState(row.favoriteButton, isFav)
+
+    local detail = rowData.detail or {}
+    local colorItemID = detail.createdItemID or detail.recipeItemID
+    local tooltipLink = (detail.createdItemID and ("item:" .. detail.createdItemID))
+        or (detail.recipeItemID and ("item:" .. detail.recipeItemID))
+        or (detail.spellID and ("spell:" .. detail.spellID))
+        or nil
+    row.tooltipLink = tooltipLink
+    local titleText = rowData.label
+    local rowIcon = detail.createdItemIcon or detail.recipeItemIcon or detail.spellIcon or getItemIcon(colorItemID)
+    if rowIcon then
+        setTextureIfChanged(row.icon, rowIcon)
+        setShownIfChanged(row.icon, true)
+    else
+        setTextureIfChanged(row.icon, "Interface\\Icons\\INV_Misc_QuestionMark")
+        setShownIfChanged(row.icon, true)
+    end
+    if colorItemID then
+        titleText = getItemColorizedName(colorItemID, rowData.label)
+        local sr, sg, sb = getQualityColor(getItemQuality(colorItemID) or 1)
+        setVertexColorIfChanged(row.stripe, sr, sg, sb, 1)
+    else
+        setVertexColorIfChanged(row.stripe, 0.42, 0.42, 0.42, 1)
+    end
+    setTextIfChanged(row.title, titleText)
+
+    local statsParts = {
+        string.format("%d crafter(s)", rowData.crafterCount or 0),
+    }
+    if (rowData.onlineCount or 0) > 0 then
+        statsParts[#statsParts + 1] = string.format("|cff55d66b%d online|r", rowData.onlineCount or 0)
+    end
+    setTextIfChanged(row.stats, table.concat(statsParts, "\n"))
+
+    local metaParts = {}
+    if self.selectedProfession == nil and rowData.professionList and #rowData.professionList > 0 then
+        metaParts[#metaParts + 1] = table.concat(rowData.professionList, ", ")
+    end
+    setTextIfChanged(row.meta, table.concat(metaParts, " - "))
+
+    if self.selectedRecipeKey == rowData.recipeKey then
+        setBackdropColorsIfChanged(row, COLOR_ROW_SELECTED[1], COLOR_ROW_SELECTED[2], COLOR_ROW_SELECTED[3], COLOR_ROW_SELECTED[4], 1, 0.82, 0, 0.95)
+    else
+        setBackdropColorsIfChanged(row, COLOR_ROW[1], COLOR_ROW[2], COLOR_ROW[3], COLOR_ROW[4], 0.22, 0.22, 0.22, 1)
+    end
+    setShownIfChanged(row, true)
+end
+
+-- Virtualized rendering: only the rows that fall in the visible scroll
+-- window (plus a small buffer above/below) are bound to recipe data. The
+-- pool grows on demand and never shrinks below the largest window ever
+-- needed, so swapping a 5-row Favorites tab for a 2000-row global search
+-- keeps the pool size at ~ visibleRows + buffer (typically 10-15).
+--
+-- OnVerticalScroll fires per pixel during a scroll gesture but the actual
+-- visible window only changes every RECIPE_ROW_HEIGHT pixels. We cache the
+-- last bound window and skip rebind when neither bound has moved. The
+-- cache is cleared by RefreshRecipeList/RefreshVisibleRecipeRowAssets,
+-- which are the entry points where the underlying data (or selection)
+-- can change while the window stays the same.
+function UI:InvalidateRecipeWindowCache()
+    self._lastRenderedFirstIdx = nil
+    self._lastRenderedLastIdx = nil
+end
+
+function UI:RenderVisibleRecipeRows()
+    if not self.frame or not self.currentRecipeRows then return end
+    local rows = self.currentRecipeRows
+    local total = #rows
+    local pool = self.frame.recipeRows
+    if total == 0 then
+        for i = 1, #pool do
+            setShownIfChanged(pool[i], false)
+        end
+        self:InvalidateRecipeWindowCache()
+        return
+    end
+
+    local scrollFrame = self.frame.recipeScroll
+    local offset = (scrollFrame and scrollFrame.GetVerticalScroll and scrollFrame:GetVerticalScroll()) or 0
+    local viewHeight = (scrollFrame and scrollFrame:GetHeight()) or 0
+    if viewHeight <= 0 then
+        -- Frame hasn't been laid out yet (first paint). Fall back to a
+        -- conservative initial window so we don't render nothing.
+        viewHeight = 600
+    end
+
+    local firstIdx = math.max(1, math.floor(offset / RECIPE_ROW_HEIGHT) + 1 - RECIPE_ROW_BUFFER)
+    local lastIdx = math.min(total, math.ceil((offset + viewHeight) / RECIPE_ROW_HEIGHT) + RECIPE_ROW_BUFFER)
+
+    if self._lastRenderedFirstIdx == firstIdx and self._lastRenderedLastIdx == lastIdx then
+        return
+    end
+
+    local visibleCount = math.max(0, lastIdx - firstIdx + 1)
+
+    local poolSlot = 0
+    for recipeIdx = firstIdx, lastIdx do
+        poolSlot = poolSlot + 1
+        local row = self:EnsureRecipeRow(poolSlot)
+        self:BindRecipeRow(row, recipeIdx, rows[recipeIdx])
+    end
+    for i = visibleCount + 1, #pool do
+        setShownIfChanged(pool[i], false)
+    end
+
+    self._lastRenderedFirstIdx = firstIdx
+    self._lastRenderedLastIdx = lastIdx
 end
 
 function UI:RefreshRecipeList()
@@ -1317,13 +1714,18 @@ function UI:RefreshRecipeList()
     if effectiveProfession == "Favorites" then
         effectiveProfession = nil
     end
+    local categoryFilter
+    if Addon.db and Addon.db.profile and Addon.db.profile.useRecipeCategories ~= false
+        and self.selectedProfession and self.selectedProfession ~= "Favorites" then
+        categoryFilter = self.selectedCategory
+    end
     local globalSearch = (self.selectedProfession == nil and self.searchText and self.searchText ~= "")
     local canRunGlobalSearch = globalSearch and string.len(self.searchText or "") >= GLOBAL_SEARCH_MIN_CHARS
     local rows = {}
     if self.selectedProfession == "Favorites" or self.selectedProfession ~= nil or canRunGlobalSearch then
-        rows = Addon.Data:GetRecipeList(effectiveProfession, self.searchText, self.sortMode)
+        rows = Addon.Data:GetRecipeList(effectiveProfession, self.searchText, self.sortMode, self.searchMode, categoryFilter)
     end
-    
+
     -- Filter by favorites if selected
     if self.selectedProfession == "Favorites" then
         local filteredRows = {}
@@ -1334,11 +1736,13 @@ function UI:RefreshRecipeList()
         end
         rows = filteredRows
     end
-    
+
     self.currentRecipeRows = rows
     local headerText
     if self.selectedProfession == "Favorites" then
         headerText = "Favorite recipes"
+    elseif self.selectedProfession and categoryFilter then
+        headerText = self.selectedProfession .. ": " .. tostring(categoryFilter)
     elseif self.selectedProfession then
         headerText = self.selectedProfession .. " recipes"
     elseif globalSearch and not canRunGlobalSearch then
@@ -1349,8 +1753,10 @@ function UI:RefreshRecipeList()
         headerText = "Select a profession or search"
     end
     setTextIfChanged(self.frame.recipeHeader, headerText)
-    self.frame.sortAlpha:SetSelected(self.sortMode == "alpha")
-    self.frame.sortRarity:SetSelected(self.sortMode == "rarity")
+    if self.frame.sortSwitch then
+        local sortLabel = self.sortMode == "rarity" and "Sort: Rarity" or "Sort: Alphabetical"
+        self.frame.sortSwitch:SetLabel(sortLabel)
+    end
 
     local selectedExists = false
     if self.selectedRecipeKey then
@@ -1368,120 +1774,37 @@ function UI:RefreshRecipeList()
         self.selectedRecipeKey = nil
     end
 
-    for i, rowData in ipairs(rows) do
-        local row = self:EnsureRecipeRow(i)
-        row:SetPoint("TOPLEFT", 0, -((i - 1) * 70))
-        row.recipeKey = rowData.recipeKey
-        
-        -- Update favorite button appearance
-        local isFav = self:IsFavorite(rowData.recipeKey)
-        row.favoriteButton.isFavorite = isFav
-        row.favoriteButton.recipeKey = rowData.recipeKey
-        setFavoriteButtonState(row.favoriteButton, isFav)
-        
-        local detail = rowData.detail or {}
-        local colorItemID = detail.createdItemID or detail.recipeItemID
-        local tooltipLink = (detail.createdItemID and ("item:" .. detail.createdItemID))
-            or (detail.recipeItemID and ("item:" .. detail.recipeItemID))
-            or (detail.spellID and ("spell:" .. detail.spellID))
-            or nil
-        row.tooltipLink = tooltipLink
-        local titleText = rowData.label
-        local rowIcon = detail.createdItemIcon or detail.recipeItemIcon or detail.spellIcon or getItemIcon(colorItemID)
-        if rowIcon then
-            setTextureIfChanged(row.icon, rowIcon)
-            setShownIfChanged(row.icon, true)
-        else
-            setTextureIfChanged(row.icon, "Interface\\Icons\\INV_Misc_QuestionMark")
-            setShownIfChanged(row.icon, true)
-        end
-        if colorItemID then
-            titleText = getItemColorizedName(colorItemID, rowData.label)
-            local sr, sg, sb = getQualityColor(getItemQuality(colorItemID) or 1)
-            setVertexColorIfChanged(row.stripe, sr, sg, sb, 1)
-        else
-            setVertexColorIfChanged(row.stripe, 0.42, 0.42, 0.42, 1)
-        end
-        setTextIfChanged(row.title, titleText)
-        local statsParts = {
-            string.format("%d crafter(s)", rowData.crafterCount or 0),
-        }
-        if (rowData.onlineCount or 0) > 0 then
-            statsParts[#statsParts + 1] = string.format("|cff55d66b%d online|r", rowData.onlineCount or 0)
-        end
-        setTextIfChanged(row.stats, table.concat(statsParts, "\n"))
-        local metaParts = {}
-        if self.selectedProfession == nil and rowData.professionList and #rowData.professionList > 0 then
-            metaParts[#metaParts + 1] = table.concat(rowData.professionList, ", ")
-        end
-        row.meta:SetText(table.concat(metaParts, "  •  "))
-        metaParts = {}
-        if self.selectedProfession == nil and rowData.professionList and #rowData.professionList > 0 then
-            metaParts[#metaParts + 1] = table.concat(rowData.professionList, ", ")
-        end
-        setTextIfChanged(row.meta, table.concat(metaParts, " - "))
-        if self.selectedRecipeKey == rowData.recipeKey then
-            setBackdropColorsIfChanged(row, COLOR_ROW_SELECTED[1], COLOR_ROW_SELECTED[2], COLOR_ROW_SELECTED[3], COLOR_ROW_SELECTED[4], 1, 0.82, 0, 0.95)
-        else
-            setBackdropColorsIfChanged(row, COLOR_ROW[1], COLOR_ROW[2], COLOR_ROW[3], COLOR_ROW[4], 0.22, 0.22, 0.22, 1)
-        end
-        setShownIfChanged(row, true)
-    end
-    for i = #rows + 1, #self.frame.recipeRows do
-        setShownIfChanged(self.frame.recipeRows[i], false)
-    end
-    local contentHeight = math.max(1, #rows * 70 + 10)
+    local contentHeight = math.max(1, #rows * RECIPE_ROW_HEIGHT + 10)
     if self.frame.recipeContent._rrHeight ~= contentHeight then
         self.frame.recipeContent._rrHeight = contentHeight
         self.frame.recipeContent:SetHeight(contentHeight)
     end
+
+    -- Data and/or selection just changed: force a re-bind even if the
+    -- visible window indices match the previous render.
+    self:InvalidateRecipeWindowCache()
+    self:RenderVisibleRecipeRows()
     self:RefreshSummaryCards()
 end
 
+-- Reuse the pooled render: when item info arrives or assets change, the
+-- visible-window walk in BindRecipeRow already picks up the new icons,
+-- colors, and labels via the same code path.
 function UI:RefreshVisibleRecipeRowAssets()
     if not self.frame or not self.currentRecipeRows then
         return
     end
 
-    for i, rowData in ipairs(self.currentRecipeRows) do
-        local row = self.frame.recipeRows[i]
-        if not row or row._rrShown == false then
-            break
-        end
-
+    -- Refresh detail snapshots for visible rows (item info may have arrived).
+    local rows = self.currentRecipeRows
+    for _, rowData in ipairs(rows) do
         local detail = Addon.Data:GetRecipeDisplayInfo(rowData.recipeKey) or rowData.detail or {}
         rowData.detail = detail
         rowData.label = (detail and detail.label) or rowData.label or tostring(rowData.recipeKey)
-
-        local colorItemID = detail.createdItemID or detail.recipeItemID
-        local titleText = rowData.label
-        if colorItemID then
-            titleText = getItemColorizedName(colorItemID, rowData.label)
-        end
-        setTextIfChanged(row.title, titleText)
-
-        local tooltipLink = (detail.createdItemID and ("item:" .. detail.createdItemID))
-            or (detail.recipeItemID and ("item:" .. detail.recipeItemID))
-            or (detail.spellID and ("spell:" .. detail.spellID))
-            or nil
-        row.tooltipLink = tooltipLink
-
-        local rowIcon = detail.createdItemIcon or detail.recipeItemIcon or detail.spellIcon or getItemIcon(colorItemID)
-        if rowIcon then
-            setTextureIfChanged(row.icon, rowIcon)
-            setShownIfChanged(row.icon, true)
-        else
-            setTextureIfChanged(row.icon, "Interface\\Icons\\INV_Misc_QuestionMark")
-            setShownIfChanged(row.icon, true)
-        end
-
-        if colorItemID then
-            local sr, sg, sb = getQualityColor(getItemQuality(colorItemID) or 1)
-            setVertexColorIfChanged(row.stripe, sr, sg, sb, 1)
-        else
-            setVertexColorIfChanged(row.stripe, 0.42, 0.42, 0.42, 1)
-        end
     end
+    -- Per-row data refreshed: force re-bind on the same window.
+    self:InvalidateRecipeWindowCache()
+    self:RenderVisibleRecipeRows()
 end
 
 function UI:RenderDetailLines(lines, lineLinks, lineMeta)
@@ -1496,12 +1819,20 @@ function UI:RenderDetailLines(lines, lineLinks, lineMeta)
         line:ClearAllPoints()
         line:SetPoint("TOPLEFT", 0, -yOffset)
         line:SetWidth(420)
-        if meta and meta.canRequest and meta.memberKey then
+        -- requestTarget drives the left-click whisper-open (always
+        -- available for non-self crafters). actionButton is the "request
+        -- this craft" affordance which sends a whisper from the addon —
+        -- gated by canRequest so it stays hidden while the sync pause
+        -- policy is active (raid/instance/combat).
+        if meta and meta.memberKey and (meta.canWhisper or meta.canRequest) then
             line.requestTarget = whisperTargetFromMemberKey(meta.memberKey)
-            setShownIfChanged(line.actionButton, true)
+            local showActionButton = meta.canRequest == true
+            setShownIfChanged(line.actionButton, showActionButton)
             line.text:ClearAllPoints()
             line.text:SetPoint("TOPLEFT", 0, 0)
-            line.text:SetPoint("TOPRIGHT", -24, 0)
+            -- Reserve room for the 36px-wide Ask button + 4px breathing
+            -- room. -4 still applies when the button is hidden.
+            line.text:SetPoint("TOPRIGHT", showActionButton and -44 or -4, 0)
         else
             setShownIfChanged(line.actionButton, false)
             line.text:ClearAllPoints()
@@ -1537,6 +1868,7 @@ function UI:RefreshDetailPanel()
     local lineMeta = {}
     if not self.selectedRecipeKey then
         self.currentDetail = nil
+        self._lastDetailSignature = nil
         setTextIfChanged(self.frame.detailTitle, "Recipe details")
         setTextIfChanged(self.frame.detailSub, "Select a recipe to see materials and available crafters.")
         self.frame.detailFavoriteButton.recipeKey = nil
@@ -1554,6 +1886,34 @@ function UI:RefreshDetailPanel()
     local detail = Addon.Data:GetRecipeDetail(self.selectedRecipeKey)
     self.currentDetail = detail
     local isFavorite = self:IsFavorite(self.selectedRecipeKey)
+
+    -- Cheap visibility-only signature: if nothing visible has changed since
+    -- the last render, skip the full rebuild. Catches the common "roster
+    -- update fired but the open recipe is unaffected" case where we'd
+    -- otherwise rebuild the entire crafters+materials+cost block from
+    -- scratch on every periodic refresh.
+    local onlineCount = 0
+    if detail.crafters then
+        for _, c in ipairs(detail.crafters) do
+            if c.online then onlineCount = onlineCount + 1 end
+        end
+    end
+    local signature = string.format(
+        "%s|%s|%d|%d|%s|%s|%s|%s",
+        tostring(self.selectedRecipeKey),
+        isFavorite and "1" or "0",
+        tonumber(detail.crafterCount) or 0,
+        onlineCount,
+        tostring(detail.cost and detail.cost.total or ""),
+        tostring(detail.cost and detail.cost.missingCount or 0),
+        tostring(detail.cost and detail.cost.source or ""),
+        tostring(self._offlineCraftersExpanded)
+    )
+    if self._lastDetailSignature == signature then
+        return
+    end
+    self._lastDetailSignature = signature
+
     local iconTagText = textureTag(detail.createdItemIcon or detail.recipeItemIcon or detail.spellIcon, 18)
     local titleItemID = detail.createdItemID or detail.recipeItemID
     local titleText = detail.label or tostring(self.selectedRecipeKey)
@@ -1605,9 +1965,18 @@ function UI:RefreshDetailPanel()
                 nameText = nameText .. " " .. colorText("[" .. crafter.specialization .. "]", unpackColor(MUTED))
             end
             lines[#lines + 1] = string.format("%s %s", state, nameText)
-            if (not selfKey or crafter.memberKey ~= selfKey) then
+            if not selfKey or crafter.memberKey ~= selfKey then
+                -- canWhisper is a local UI action (opens a chat window) and
+                -- has no sync implications, so it stays enabled even when
+                -- SyncPausePolicy pauses protocol traffic (raids,
+                -- instances, combat). canRequest gates the "request a
+                -- craft" action button, which DOES send a whisper from
+                -- the addon — kept under the sync-pause gate so we don't
+                -- emit chat messages while the player is busy.
+                local canRequest = not (Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("BLOCK_PULL_REQUEST"))
                 lineMeta[#lines] = {
-                    canRequest = true,
+                    canRequest = canRequest,
+                    canWhisper = true,
                     memberKey = crafter.memberKey,
                 }
             end
@@ -1675,13 +2044,29 @@ function UI:Toggle()
         self:RestoreFramePlacement()
         self.frame:Show()
         self:RefreshDebugVisibility()
-        self:Refresh(nil)
+        local degradedReason = self:GetDegradedModeReason()
+        if degradedReason then
+            self:RefreshStatusBar()
+            self:RefreshDegradedStatus(degradedReason)
+            self:MarkFullRefreshPending(degradedReason)
+        else
+            self:Refresh(nil)
+        end
         self.frame.searchBox:SetText(self.searchText or "")
     end
 end
 
 function UI:Refresh(reasons)
     if not self.frame or not self.frame:IsShown() then return end
+    local degradedReason = self:GetDegradedModeReason()
+    if degradedReason then
+        self:RefreshStatusBar()
+        self:RefreshDegradedStatus(degradedReason)
+        self:MarkFullRefreshPending(degradedReason)
+        return
+    end
+    self.fullRefreshPending = false
+    self.fullRefreshPendingReason = nil
     local plan = buildRefreshPlan(reasons)
     if plan.status then
         self:RefreshStatusBar()

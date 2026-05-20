@@ -4,53 +4,77 @@ Addon.Sync = Sync
 local Private = Sync._private or {}
 Sync._private = Private
 
-local PREFIX = Addon.ADDON_PREFIX
+local PREFIX = Addon.COMM_PREFIX or Addon.ADDON_PREFIX
 local time = time
 local pairs = pairs
 local ipairs = ipairs
-local sort = table.sort
-local random = math.random
-local tinsert = table.insert
-local tremove = table.remove
 local min = math.min
-local max = math.max
 local GetTime = GetTime
 
-local REQUEST_TIMEOUT = 12
-local PROGRESS_TIMEOUT = 4
-local SESSION_TIMEOUT = 35
+local REQUEST_TIMEOUT = 25
+local SESSION_TIMEOUT = 60
 local NODE_TIMEOUT = 95
 local HELLO_INTERVAL = 30
+-- Stretch the auto-HELLO cadence once our published fingerprint stops
+-- changing AND we have established peers in onlineNodes. Two aligned
+-- peers used to HELLO every 30s forever just to assert liveness; the
+-- receiver then suppressed the SUMMARY for `fingerprints-match`,
+-- producing pure background traffic. Stable-state HELLOs at 75s still
+-- arrive within NODE_TIMEOUT (95s) so peers don't prune us, with a
+-- comfortable margin for ChatThrottleLib jitter.
+local HELLO_INTERVAL_STABLE = 75
 local AUTO_SYNC_INTERVAL = 20
-local OUTGOING_CHUNK_DELAY = 0.20
-local MANIFEST_CHUNK_DELAY = 0.12
-local MANIFEST_INITIAL_JITTER = 0.35
-local MAX_RESUME_ATTEMPTS = 3
-local COORDINATOR_RECOMPUTE_DELAY = 0.35
-local MANIFEST_PUSH_COOLDOWN = 20
-local MANIFEST_CATCHUP_OWNER_CAP_PER_FLUSH = 8
-local MANIFEST_CATCHUP_BLOCK_CAP_PER_FLUSH = 32
-local MANIFEST_CATCHUP_DRAIN_DELAY = 0.20
-local MAX_REQUEST_RETRIES = 3
-local MAX_HELLO_AUTO_RETRIES = 1
-local MAX_CONCURRENT_REQUESTS = 2
-local ROSTER_FRESHNESS_MAX_AGE = 20
-local ROSTER_REFRESH_REQUEST_COOLDOWN = 8
 local PEER_BACKOFF_SECONDS = 45
-local HELLO_AUTO_BACKOFF_SECONDS = 20
-local PEER_BACKOFF_FAILURE_THRESHOLD = 2
-local MANIFEST_REFRESH_REQUEST_COOLDOWN = 30
+-- Grace periods after entering the world. Sync stays paused (no HELLO
+-- broadcast, no inbound serving) for this long so the addon doesn't
+-- compete with WoW's load/reload/zone-change for frame time. Login and
+-- reload have their own values because those events do far more work
+-- (item cache priming, guild roster fetch, AtlasLoot warmup, full
+-- profession scan) than a plain zone change.
+local POST_LOGIN_GRACE_SECONDS = 30
+local POST_RELOAD_GRACE_SECONDS = 25
 local POST_WORLD_GRACE_SECONDS = 12
 local POST_INSTANCE_GRACE_SECONDS = 15
+local POST_RELOAD_IN_INSTANCE_GRACE_SECONDS = 30
 local POST_COMBAT_GRACE_SECONDS = 6
-local MANIFEST_MERGE_ANNOUNCE_DEBOUNCE = 8
-local MANIFEST_MERGE_ANNOUNCE_MAX_DELAY = 25
-local OFFLINE_DEBUG_LOG_LIMIT = 12
+local ROSTER_FRESHNESS_MAX_AGE = 20
+local SUMMARY_COLLECTION_WINDOW = 6
+local SUMMARY_SATURATION_THRESHOLD = 80
+-- Time between BLOCK_PULL_REQUESTs. Bumped from 1.0 to 2.5 to give the
+-- requester's Lua VM time to GC the per-merge transients (cloned recipe
+-- maps, decompression buffers, intermediate tables, trace strings)
+-- before the next snapshot lands. Receivers observed memory climbing
+-- to ~150 MB and visible stutter during massive pulls at the old
+-- cadence. The total wall-clock for a full sync increases (e.g., 100
+-- blocks: 100s -> 250s) but the per-frame budget breathes.
+local BLOCK_PULL_DELAY_SECONDS = 2.5
+-- Per-block response window. AceComm BULK priority is rate-limited by
+-- ChatThrottleLib (~800 bytes/sec shared across all BULK queues). A
+-- typical BLOCK_SNAPSHOT compressed is 1-3 KB; a seeder serving multiple
+-- peers can take 10-15s to push a single snapshot out the door. 20s left
+-- no headroom and produced spurious block-response-timeout aborts
+-- mid-pull, forcing the requester to start over and pull everything
+-- again on the next cycle. The 60s SESSION_TIMEOUT still bounds total
+-- stall in case the seeder truly stops responding.
+local BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS = 60
+local HELLO_RESCHEDULE_DELAY_SECONDS = 5
+local HELLO_RESCHEDULE_JITTER_SECONDS = 10
+local POST_SYNC_HELLO_COOLDOWN_SECONDS = 30
+local DISCOVERY_RETRY_INITIAL_SECONDS = 20
+local DISCOVERY_RETRY_STEP_SECONDS = 20
+local DISCOVERY_RETRY_MAX_SECONDS = 300
+local MAX_INBOUND_SEED_SESSIONS = 4
+local MAX_INBOUND_SEED_SESSIONS_PER_PEER = 1
+local SEED_SELECTION_TOP_BAND_RATIO = 0.95
+local RECENT_SYNC_EVENTS_LIMIT = 50
+local TRUSTED_ROSTER_CLEANUP_INTERVAL_SECONDS = 86400
 
 local function countKeys(tbl)
-    local n = 0
-    for _ in pairs(tbl or {}) do n = n + 1 end
-    return n
+    local total = 0
+    for _ in pairs(tbl or {}) do
+        total = total + 1
+    end
+    return total
 end
 
 local function nowForPacing()
@@ -62,7 +86,9 @@ end
 
 local function shallowCopyArray(src)
     local out = {}
-    for i = 1, #(src or {}) do out[i] = src[i] end
+    for index = 1, #(src or {}) do
+        out[index] = src[index]
+    end
     return out
 end
 
@@ -74,38 +100,11 @@ local function shallowCopyTable(src)
     return out
 end
 
-local function getManifestAnnouncementId(chunks, manifest)
-    if type(chunks) == "table" and chunks[1] and chunks[1].manifestId then
-        return tostring(chunks[1].manifestId)
-    end
-    if type(manifest) ~= "table" then return nil end
-    local totals = manifest.totals or {}
-    return string.format(
-        "%s:%d:%d:%d",
-        tostring(manifest.memberKey or "unknown"),
-        tonumber(manifest.builtAt or 0) or 0,
-        tonumber(manifest.manifestSerial or 0) or 0,
-        tonumber(totals.blocks or 0) or 0
-    )
-end
-
-local function countArrayUnique(values)
-    local seen = {}
-    local count = 0
-    for _, value in ipairs(values or {}) do
-        if value and not seen[value] then
-            seen[value] = true
-            count = count + 1
-        end
-    end
-    return count
-end
-
 local function cloneStringSet(src)
     local out = {}
-    for _, value in ipairs(src or {}) do
-        if value then
-            out[#out + 1] = value
+    for index = 1, #(src or {}) do
+        if src[index] then
+            out[#out + 1] = src[index]
         end
     end
     return out
@@ -131,196 +130,247 @@ local function addRetrySuffix(why)
     return text .. ":retry"
 end
 
-local function newSyncTelemetry()
-    return {
-        sentChunks = 0,
-        receivedChunks = 0,
-        appliedChunks = 0,
-        skippedEquivalentMerges = 0,
-        pausedSyncCycles = 0,
-        busySeedRejections = 0,
-        replicaManifestOwnersSeen = 0,
-        replicaManifestBlocksSeen = 0,
-        replicaRequestsQueued = 0,
-        replicaRequestsServed = 0,
-        replicaOwnersApplied = 0,
-        replicaNewOwnersApplied = 0,
-        manifestChunksSent = 0,
-        manifestChunksQueued = 0,
-        manifestChunksDelivered = 0,
-        manifestChunksReceived = 0,
-        manifestCooldownSkips = 0,
-        manifestUnchangedSkips = 0,
-        manifestDeferredSends = 0,
-        manifestPendingFlushes = 0,
-        manifestQueueMaxDepth = 0,
-        manifestBuildRequests = 0,
-        manifestForceReplies = 0,
-        manifestCatchupCandidates = 0,
-        manifestCatchupQueued = 0,
-        manifestCatchupDeferred = 0,
-        manifestCatchupDrained = 0,
-        manifestCatchupSkippedOnlineOwners = 0,
-        manifestCatchupSkippedStaleOwners = 0,
-        manifestCatchupMaxDeferred = 0,
-        peerBackoffSkips = 0,
-        peerBackoffApplied = 0,
-        requestRetries = 0,
-        requestDrops = 0,
-        requestDispatches = 0,
-        requestConcurrencyMax = 0,
-        rosterRefreshRequests = 0,
-        manifestCompareDeferred = 0,
-        warmupDeferrals = 0,
-        coalescedManifestSchedules = 0,
-        coalescedManifestFlushes = 0,
-        catchupDrainDeferrals = 0,
-        prunedOutgoingSessions = 0,
-        prunedPartialReceives = 0,
-        prunedPartialManifestReceives = 0,
-        prunedTricklePeerState = 0,
-        prunedTrickleOutboundQueues = 0,
-    }
-end
-
-local function mergeRequestedBlocks(existing, incoming)
-    if type(existing) ~= "table" or #existing == 0 then
-        return cloneStringSet(incoming)
-    end
-    if type(incoming) ~= "table" or #incoming == 0 then
-        return cloneStringSet(existing)
-    end
-
-    local seen = {}
-    local merged = {}
-    for _, blockKey in ipairs(existing) do
-        if blockKey and not seen[blockKey] then
-            seen[blockKey] = true
-            merged[#merged + 1] = blockKey
-        end
-    end
-    for _, blockKey in ipairs(incoming) do
-        if blockKey and not seen[blockKey] then
-            seen[blockKey] = true
-            merged[#merged + 1] = blockKey
-        end
-    end
-    sort(merged)
-    return merged
-end
-
-local function cloneFingerprintMap(src)
-    local out = {}
-    for blockKey, fingerprint in pairs(src or {}) do
-        if blockKey and fingerprint ~= nil then
-            out[blockKey] = fingerprint
-        end
-    end
-    return out
-end
-
-local function mergeExpectedFingerprints(existing, incoming)
-    local merged = cloneFingerprintMap(existing)
-    for blockKey, fingerprint in pairs(incoming or {}) do
-        if blockKey and fingerprint ~= nil then
-            merged[blockKey] = fingerprint
-        end
-    end
-    return merged
-end
-
-local function sliceExpectedFingerprints(src, blockKeys)
-    local out = {}
-    for _, blockKey in ipairs(blockKeys or {}) do
-        local fingerprint = src and src[blockKey] or nil
-        if fingerprint ~= nil then
-            out[blockKey] = fingerprint
-        end
-    end
-    return out
-end
-
-local function cloneStringRange(src, firstIndex, lastIndex)
-    local out = {}
-    local finalIndex = min(lastIndex or #(src or {}), #(src or {}))
-    for index = firstIndex or 1, finalIndex do
-        if src[index] then
-            out[#out + 1] = src[index]
-        end
-    end
-    return out
-end
-
 local function isMockKey(memberKey)
     return type(memberKey) == "string"
         and (memberKey:find("__RRMockPeer", 1, true) == 1 or memberKey:find("__RRMockOwner", 1, true) == 1)
 end
 
+local function newSyncTelemetry()
+    return {
+        helloSent = 0,
+        summarySent = 0,
+        summaryReceived = 0,
+        seedSelected = 0,
+        indexDiffRequestSent = 0,
+        indexDiffRequestReceived = 0,
+        indexDiffResponseSent = 0,
+        indexDiffResponseReceived = 0,
+        indexDiffBusySent = 0,
+        indexDiffBusyReceived = 0,
+        blocksOffered = 0,
+        blockPullRequestSent = 0,
+        blockPullStarted = 0,
+        blockPullDelayed = 0,
+        blockSnapshotSent = 0,
+        blockSnapshotReceived = 0,
+        blockMergedImmediate = 0,
+        blockFingerprintRecomputed = 0,
+        outboundSessionCompleted = 0,
+        outboundSessionAborted = 0,
+        unsupportedMessagesIgnored = 0,
+        lastUnsupportedMessageKind = nil,
+        lastUnsupportedMessageSender = nil,
+        lastUnsupportedMessageAt = 0,
+        globalFingerprintDirty = 0,
+        pausedSyncCycles = 0,
+        skippedEquivalentMerges = 0,
+        syncIndexCacheHit = 0,
+        syncIndexCacheMiss = 0,
+        syncIndexBlockRebuilt = 0,
+        syncIndexFullRebuild = 0,
+        syncIndexGlobalRecomputed = 0,
+        syncIndexDirtyBlockCount = 0,
+        buildChannelDrops = 0,
+        ignoredBuildChannelPeers = 0,
+        lastBuildChannelDropPeer = nil,
+        lastBuildChannelDropRemote = nil,
+        lastBuildChannelDropReason = nil,
+        versionIneligiblePeers = 0,
+        skippedVersionIncompatible = 0,
+        skippedMissingCapability = 0,
+        assumedModernCapabilities = 0,
+        assumedModernCapabilityPeer = nil,
+        assumedModernCapabilityPurpose = nil,
+        lastVersionNoticePeer = nil,
+        lastVersionNoticeRemote = nil,
+        latestRemoteVersionSeen = nil,
+        newerVersionSeen = 0,
+        newerProtocolSeen = 0,
+        activeCommPrefix = PREFIX,
+        lastSelectedPeer = nil,
+        lastSelectedReason = nil,
+        lastSeedSelectionHash = nil,
+        lastSeedSelectionBand = nil,
+        seedSelectionHashed = 0,
+        seedFallbackSelected = 0,
+        seedBusyReceived = 0,
+        seedBusyNoFallback = 0,
+        lastAbortReason = nil,
+        lastSummaryPeer = nil,
+        lastIndexDiffSeed = nil,
+        lastIndexDiffRequestId = nil,
+        lastIndexDiffTarget = nil,
+        lastIndexDiffLocalBlockCount = 0,
+        lastIndexDiffOfferedCount = 0,
+        lastIndexDiffNoOfferReason = nil,
+        lastIndexDiffBusyPeer = nil,
+        lastIndexDiffBusyReason = nil,
+        lastBlockPullBlockKey = nil,
+        lastBlockPullRequestId = nil,
+        lastBlockPullSentAt = 0,
+        lastBlockSnapshotReceivedAt = 0,
+        lastBlockPullTimeoutAt = 0,
+        lastBlockPullTimeoutReason = nil,
+        lastMergedBlockKey = nil,
+        lastMergedBlockFingerprint = nil,
+        lastBlockOfferReasons = nil,
+        lastSessionCompleteReason = nil,
+        syncReadyTransitions = 0,
+        lastSyncReady = false,
+        lastSyncReadyReason = nil,
+        lastSyncNotReadyReason = nil,
+        savedVariablesReadyAt = 0,
+        playerReadyAt = 0,
+        rosterPreflightReadyAt = 0,
+        indexReadyAt = 0,
+        lastReadinessGateFailure = nil,
+        helloScheduled = 0,
+        helloScheduleCoalesced = 0,
+        helloDeferredNotReady = 0,
+        helloDeferredPaused = 0,
+        helloDeferredOutboundActive = 0,
+        helloDeferredReason = nil,
+        lastHelloScheduledReason = nil,
+        lastHelloScheduledDelay = 0,
+        lastHelloDueAt = 0,
+        lastHelloSentAt = 0,
+        lastHelloId = nil,
+        lastHelloFingerprint = nil,
+        summaryWindowOpened = 0,
+        summaryWindowClosed = 0,
+        lastSummaryWindowCloseAt = 0,
+        lastSummaryCount = 0,
+        summaryCollectionTimeouts = 0,
+        discoveryRetryMisses = 0,
+        discoveryRetryDelay = 0,
+        discoveryRetryNextAt = 0,
+        discoveryRetryCapHits = 0,
+        discoveryRetryReset = 0,
+        lastDiscoveryRetryReason = nil,
+        lastNoSeedReason = nil,
+        seedCandidatesSeen = 0,
+        seedCandidatesRejected = 0,
+        lastSeedCandidateCount = 0,
+        lastSeedRejectReasons = nil,
+        successfulBlockMerges = 0,
+        inboundSeedSessionsMax = MAX_INBOUND_SEED_SESSIONS,
+        inboundSeedSessionsRejectedCap = 0,
+        inboundSeedSessionsRejectedPaused = 0,
+        inboundSeedSessionsRejectedNotReady = 0,
+        inboundSeedSessionsClearedPause = 0,
+        inboundSeedSessionsCompleted = 0,
+        inboundBlockPullRejectedUnknownRequest = 0,
+        inboundBlockPullRejectedNotOffered = 0,
+        summarySuppressedAtCap = 0,
+        lastInboundRequester = nil,
+        lastInboundRequestId = nil,
+        lastInboundServedBlockKey = nil,
+        lastDirtyBlockKey = nil,
+        lastRebuiltBlockKey = nil,
+        lastGlobalFingerprintAt = 0,
+        lastGlobalFingerprintReason = nil,
+        lastPauseReason = nil,
+        lastPauseEnterReason = nil,
+        lastPauseExitReason = nil,
+        outboundSessionsAbortedPause = 0,
+        lastNoSummaryAt = 0,
+        rosterSyncRelevantUpdates = 0,
+        rosterSyncNoopUpdates = 0,
+        rosterUpdateIgnoredForSync = 0,
+        rosterIndexDirtySkipped = 0,
+        rosterKnownOwnersChecked = 0,
+        rosterUnknownMembersIgnored = 0,
+        rosterCleanupRuns = 0,
+        rosterCleanupSkippedThrottle = 0,
+        rosterCleanupChangedOwners = 0,
+        lastRosterSyncSignature = nil,
+        lastRosterSyncRelevantReason = nil,
+    }
+end
+
 Private.constants = {
     PREFIX = PREFIX,
     REQUEST_TIMEOUT = REQUEST_TIMEOUT,
-    PROGRESS_TIMEOUT = PROGRESS_TIMEOUT,
     SESSION_TIMEOUT = SESSION_TIMEOUT,
     NODE_TIMEOUT = NODE_TIMEOUT,
     HELLO_INTERVAL = HELLO_INTERVAL,
+    HELLO_INTERVAL_STABLE = HELLO_INTERVAL_STABLE,
     AUTO_SYNC_INTERVAL = AUTO_SYNC_INTERVAL,
-    OUTGOING_CHUNK_DELAY = OUTGOING_CHUNK_DELAY,
-    MANIFEST_CHUNK_DELAY = MANIFEST_CHUNK_DELAY,
-    MANIFEST_INITIAL_JITTER = MANIFEST_INITIAL_JITTER,
-    MAX_RESUME_ATTEMPTS = MAX_RESUME_ATTEMPTS,
-    COORDINATOR_RECOMPUTE_DELAY = COORDINATOR_RECOMPUTE_DELAY,
-    MANIFEST_PUSH_COOLDOWN = MANIFEST_PUSH_COOLDOWN,
-    MANIFEST_CATCHUP_OWNER_CAP_PER_FLUSH = MANIFEST_CATCHUP_OWNER_CAP_PER_FLUSH,
-    MANIFEST_CATCHUP_BLOCK_CAP_PER_FLUSH = MANIFEST_CATCHUP_BLOCK_CAP_PER_FLUSH,
-    MANIFEST_CATCHUP_DRAIN_DELAY = MANIFEST_CATCHUP_DRAIN_DELAY,
-    MAX_REQUEST_RETRIES = MAX_REQUEST_RETRIES,
-    MAX_HELLO_AUTO_RETRIES = MAX_HELLO_AUTO_RETRIES,
-    MAX_CONCURRENT_REQUESTS = MAX_CONCURRENT_REQUESTS,
-    ROSTER_FRESHNESS_MAX_AGE = ROSTER_FRESHNESS_MAX_AGE,
-    ROSTER_REFRESH_REQUEST_COOLDOWN = ROSTER_REFRESH_REQUEST_COOLDOWN,
     PEER_BACKOFF_SECONDS = PEER_BACKOFF_SECONDS,
-    HELLO_AUTO_BACKOFF_SECONDS = HELLO_AUTO_BACKOFF_SECONDS,
-    PEER_BACKOFF_FAILURE_THRESHOLD = PEER_BACKOFF_FAILURE_THRESHOLD,
-    MANIFEST_REFRESH_REQUEST_COOLDOWN = MANIFEST_REFRESH_REQUEST_COOLDOWN,
+    POST_LOGIN_GRACE_SECONDS = POST_LOGIN_GRACE_SECONDS,
+    POST_RELOAD_GRACE_SECONDS = POST_RELOAD_GRACE_SECONDS,
     POST_WORLD_GRACE_SECONDS = POST_WORLD_GRACE_SECONDS,
     POST_INSTANCE_GRACE_SECONDS = POST_INSTANCE_GRACE_SECONDS,
+    POST_RELOAD_IN_INSTANCE_GRACE_SECONDS = POST_RELOAD_IN_INSTANCE_GRACE_SECONDS,
     POST_COMBAT_GRACE_SECONDS = POST_COMBAT_GRACE_SECONDS,
-    MANIFEST_MERGE_ANNOUNCE_DEBOUNCE = MANIFEST_MERGE_ANNOUNCE_DEBOUNCE,
-    MANIFEST_MERGE_ANNOUNCE_MAX_DELAY = MANIFEST_MERGE_ANNOUNCE_MAX_DELAY,
-    OFFLINE_DEBUG_LOG_LIMIT = OFFLINE_DEBUG_LOG_LIMIT,
+    ROSTER_FRESHNESS_MAX_AGE = ROSTER_FRESHNESS_MAX_AGE,
+    SUMMARY_COLLECTION_WINDOW = SUMMARY_COLLECTION_WINDOW,
+    SUMMARY_SATURATION_THRESHOLD = SUMMARY_SATURATION_THRESHOLD,
+    BLOCK_PULL_DELAY_SECONDS = BLOCK_PULL_DELAY_SECONDS,
+    BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS = BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS,
+    HELLO_RESCHEDULE_DELAY_SECONDS = HELLO_RESCHEDULE_DELAY_SECONDS,
+    HELLO_RESCHEDULE_JITTER_SECONDS = HELLO_RESCHEDULE_JITTER_SECONDS,
+    POST_SYNC_HELLO_COOLDOWN_SECONDS = POST_SYNC_HELLO_COOLDOWN_SECONDS,
+    DISCOVERY_RETRY_INITIAL_SECONDS = DISCOVERY_RETRY_INITIAL_SECONDS,
+    DISCOVERY_RETRY_STEP_SECONDS = DISCOVERY_RETRY_STEP_SECONDS,
+    DISCOVERY_RETRY_MAX_SECONDS = DISCOVERY_RETRY_MAX_SECONDS,
+    MAX_INBOUND_SEED_SESSIONS = MAX_INBOUND_SEED_SESSIONS,
+    MAX_INBOUND_SEED_SESSIONS_PER_PEER = MAX_INBOUND_SEED_SESSIONS_PER_PEER,
+    SEED_SELECTION_TOP_BAND_RATIO = SEED_SELECTION_TOP_BAND_RATIO,
+    RECENT_SYNC_EVENTS_LIMIT = RECENT_SYNC_EVENTS_LIMIT,
+    TRUSTED_ROSTER_CLEANUP_INTERVAL_SECONDS = TRUSTED_ROSTER_CLEANUP_INTERVAL_SECONDS,
+    MAX_CONCURRENT_REQUESTS = 1,
 }
 Private.countKeys = countKeys
 Private.nowForPacing = nowForPacing
 Private.shallowCopyArray = shallowCopyArray
 Private.shallowCopyTable = shallowCopyTable
-Private.getManifestAnnouncementId = getManifestAnnouncementId
-Private.countArrayUnique = countArrayUnique
 Private.cloneStringSet = cloneStringSet
 Private.isHelloAutoReason = isHelloAutoReason
 Private.isManualReason = isManualReason
 Private.addRetrySuffix = addRetrySuffix
 Private.newSyncTelemetry = newSyncTelemetry
-Private.mergeRequestedBlocks = mergeRequestedBlocks
-Private.cloneFingerprintMap = cloneFingerprintMap
-Private.mergeExpectedFingerprints = mergeExpectedFingerprints
-Private.sliceExpectedFingerprints = sliceExpectedFingerprints
-Private.cloneStringRange = cloneStringRange
 Private.isMockKey = isMockKey
 
+-- User-tunable sync knobs resolve through these helpers so a bogus
+-- SavedVariables value (or a missing profile during early init) can never
+-- push the sync engine outside the safe operating range. The clamps also
+-- shield us from a future refactor that bumps the constants without
+-- updating the slider min/max in Options.lua.
+local function readTuning(field, fallback, minValue, maxValue)
+    local profile = Addon.db and Addon.db.profile or nil
+    local value = profile and profile.tuning and tonumber(profile.tuning[field])
+    if value == nil then return fallback end
+    if value < minValue then return minValue end
+    if value > maxValue then return maxValue end
+    return value
+end
+
+function Sync:GetBlockPullDelay()
+    return readTuning("blockPullDelaySeconds", BLOCK_PULL_DELAY_SECONDS, 1.0, 5.0)
+end
+
+function Sync:GetMaxInboundSeedSessions()
+    local value = readTuning("maxInboundSeedSessions", MAX_INBOUND_SEED_SESSIONS, 1, 4)
+    return math.floor(value + 0.5)
+end
+
+function Sync:GetBlockPullResponseTimeout()
+    return readTuning("blockPullResponseTimeoutSeconds", BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS, 30, 120)
+end
+
 function Sync:Startup()
-    self:RegisterComm(PREFIX)
-    self:EnterWarmup("startup", POST_WORLD_GRACE_SECONDS)
-    self:ScheduleHello(1)
-    self.helloTicker = self:ScheduleRepeatingTimer("BroadcastHello", HELLO_INTERVAL)
-    self.queueTicker = self:ScheduleRepeatingTimer("ProcessRequestQueue", 1)
-    self.pruneTicker = self:ScheduleRepeatingTimer("PruneState", 5)
-    self.autoSyncTicker = self:ScheduleRepeatingTimer("AutoSyncTick", AUTO_SYNC_INTERVAL)
-    self:ScheduleTimer("AutoSyncTick", 6)
-    self:AdvertiseLocalRevision("startup")
-    self:EnsureBackgroundWorkers()
-    if Addon.Data and Addon.Data.ScheduleManifestBuild then
-        Addon.Data:ScheduleManifestBuild("startup")
+    if self._startupInitialized then
+        return true
     end
+    self._startupInitialized = true
+    self:RegisterComm(PREFIX)
+    self.queueTicker = self.queueTicker or self:ScheduleRepeatingTimer("ProcessRequestQueue", 1)
+    self.pruneTicker = self.pruneTicker or self:ScheduleRepeatingTimer("PruneState", 5)
+    self.autoSyncTicker = self.autoSyncTicker or self:ScheduleRepeatingTimer("AutoSyncTick", AUTO_SYNC_INTERVAL)
+    self:ScheduleTimer("AutoSyncTick", 6)
+    self:EnsureBackgroundWorkers()
+    return true
 end
 
 function Sync:GetSelfKey()
@@ -328,7 +378,9 @@ function Sync:GetSelfKey()
 end
 
 function Sync:GetWhisperTarget(memberKey)
-    if not memberKey then return nil end
+    if not memberKey then
+        return nil
+    end
     local name = memberKey:match("^([^%-]+)")
     return name or memberKey
 end
@@ -341,15 +393,14 @@ function Sync:IsRealTrafficSuppressed()
 end
 
 function Sync:IsMockKey(memberKey)
-    if isMockKey(memberKey) then return true end
-    local row = memberKey and self.registry and self.registry[memberKey] or nil
+    if isMockKey(memberKey) then
+        return true
+    end
+    local row = memberKey and self.onlineNodes and self.onlineNodes[memberKey] or nil
     return row and row.isMock == true or false
 end
 
 function Sync:IsValidSyncMemberKey(memberKey)
-    if Addon.Data and Addon.Data.IsValidMemberKey then
-        return Addon.Data:IsValidMemberKey(memberKey)
-    end
     return type(memberKey) == "string"
         and memberKey ~= ""
         and not memberKey:find(":", 1, true)
