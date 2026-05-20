@@ -153,9 +153,19 @@ function Data:ApplyIncomingBlockAdditive(blockKey, snapshot, opts)
         Addon.Tooltip:InvalidateIndex("block-merge")
     end
 
-    local fingerprint = self.RecomputeLocalBlockFingerprint and self:RecomputeLocalBlockFingerprint(blockKey, {
-        reason = "block-merge",
-    }) or nil
+    -- The block fingerprint recompute walks the roster and rebuilds the
+    -- dirty blocks of the sync index — for an owner with many recipes that
+    -- is the heaviest part of the post-merge work, and doing it inline at
+    -- the end of every block pull produced a visible per-merge stutter. The
+    -- block is already marked dirty above (MarkSyncIndexDirty or
+    -- MarkOwnerSyncBlocksDirty), so any consumer that needs the fingerprint
+    -- right now (e.g. a SUMMARY build) will trigger the rebuild lazily. For
+    -- the routine "merge then move on" path we defer the rebuild via an
+    -- AceBucket message so consecutive merges coalesce into a single
+    -- rebuild instead of paying the cost N times.
+    if Addon.SendMessage then
+        Addon:SendMessage("RR_BLOCK_MERGE_POST", blockKey)
+    end
     return true, {
         blockKey = blockKey,
         ownerCharacter = ownerCharacter,
@@ -163,7 +173,7 @@ function Data:ApplyIncomingBlockAdditive(blockKey, snapshot, opts)
         changed = merged.changed == true,
         addedRecipes = merged.addedRecipes or 0,
         specializationChanged = merged.specializationChanged == true,
-        blockFingerprint = fingerprint,
+        blockFingerprint = nil,
     }
 end
 

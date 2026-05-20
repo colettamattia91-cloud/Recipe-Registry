@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.0.1] - 2026-05-20
+### Changed
+- Guild recipe sync is smoother when receiving several recipe groups in a row, reducing short pauses while your local recipe database catches up.
+- Recipe sharing now batches more of its behind-the-scenes refresh work, keeping the addon responsive during larger guild sync updates.
+
 ## [2.0.0] - 2026-05-20
 ### Added
 - A redesigned guild sync experience for `2.0.0`: guildmates can share recipe data more reliably after login, reloads, database wipes, and addon updates.
