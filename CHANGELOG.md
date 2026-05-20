@@ -4,15 +4,21 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 ### Added
-- Local backend coverage now includes reload recovery regressions plus a two-tier sync soak harness with explicit suite selection: the default backend pass keeps the controlled churn soak, while the heavier 50-peer soak runs only in `-Suite soak`.
-- Release `2.0.0` notes now make the sync boundary explicit: pre-`2.0` clients are no longer considered modern sync peers, `dev` builds talk only on `RRDEV`, `release` builds talk only on `RecipeRegistry`, and guilds should update the addon line together for reliable sync.
+- A redesigned guild sync experience for `2.0.0`: guildmates can share recipe data more reliably after login, reloads, database wipes, and addon updates.
+- Clearer update boundaries: regular release builds now sync only with compatible release builds, while development and test builds stay isolated from live guild data.
+- New recipe browser controls, including an easier sort switch, improved search clearing, material-search control, and a more readable options panel.
+- A quicker way to ask guildmates for a craft, with better whisper behavior when you are in a raid.
+- More helpful sync status and troubleshooting output when debug tools are enabled, while normal play stays quiet.
 
 ### Changed
-- Snapshot serving memory work is still under investigation and intentionally not part of `1.8.1`; any lighter `SNAP` session materialization changes remain deferred until they can be exercised against real peers.
-- The local sync harness can now snapshot and restore SavedVariables across simulated reloads, inspect residual queue state more directly, and assert true baseline stability before churn begins.
-- Manifest and index catch-up now avoid impossible replica/self-owner request paths that could leave idle-looking peers with undrained sync work after heavier churn.
-- Automatic profession scans now stay quiet on unchanged results, broad weapon/generic skill events no longer surface fake profession rescan output, and manual rescans still report user-visible changed or unchanged results.
-- Guild roster preflight now remains a login/reload readiness gate only: ongoing roster updates do not invalidate the sync index, and trusted cleanup reuses a supplied roster snapshot instead of requesting a fresh guild roster unless it needs a fallback view.
+- Background sync now waits for safer moments around login, reloads, combat, instances, and busy roster loading instead of trying to do everything at once.
+- Startup, reload, update, and database-wipe recovery now handle guild data sharing more smoothly, with less need for manual refreshes.
+- Recipe data requests are more tolerant of slow or unavailable guildmates and version changes during sync.
+- Recipe lists, searches, tooltips, and Auction House lookups are smoother in larger guild databases and reuse more work instead of rebuilding the same view repeatedly.
+- Profession scans are quieter: automatic checks no longer announce unchanged or unrelated skill events, while manual refreshes still tell you what happened.
+- Guildmate presence is handled more conservatively during startup, so active players are less likely to disappear from recipe results while the roster is still warming up.
+- Large data sharing remains deliberately paced to avoid stalls or memory spikes in real guild use.
+- Remaining in-game help text and option labels have been cleaned up for a more consistent addon experience.
 
 ## [1.8.1] - 2026-05-10
 ### Added
