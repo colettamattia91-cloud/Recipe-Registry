@@ -893,7 +893,8 @@ function Sync:MaybeNotifyPeerVersion(peerKey, info)
     end
 
     Addon:Print(string.format(
-        "Recipe Registry: a newer version was detected in your guild (%s).",
+        "Recipe Registry: a newer version was detected from %s (%s).",
+        tostring(latestRemotePeer or peerKey or "unknown"),
         tostring(latestRemoteVersion or "unknown")
     ))
     notice.lastNoticedVersion = latestRemoteVersion
