@@ -10,7 +10,6 @@ local function seedMember(data, memberKey, profession, recipeKeys, opts)
     opts = opts or {}
     local entry = data:GetOrCreateMember(memberKey)
     entry.owner = memberKey
-    entry.rev = opts.rev or 1
     entry.updatedAt = opts.updatedAt or 100
     entry.sourceType = opts.sourceType or "replica"
     entry.guildStatus = opts.guildStatus or "active"
@@ -21,7 +20,6 @@ local function seedMember(data, memberKey, profession, recipeKeys, opts)
         count = opts.count or 0,
         skillRank = opts.skillRank or 300,
         skillMaxRank = opts.skillMaxRank or 375,
-        blockRevision = opts.blockRevision or entry.rev,
         lastUpdatedAt = opts.updatedAt or entry.updatedAt,
         sourceType = opts.sourceType or entry.sourceType,
         guildStatus = opts.guildStatus or entry.guildStatus,

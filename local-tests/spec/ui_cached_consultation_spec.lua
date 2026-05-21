@@ -26,7 +26,6 @@ local function seedProfession(data, memberKey, profession, recipeKey, opts)
     opts = opts or {}
     local entry = data:GetOrCreateMember(memberKey)
     entry.owner = memberKey
-    entry.rev = opts.rev or entry.rev or 1
     entry.updatedAt = opts.updatedAt or entry.updatedAt or 100
     entry.sourceType = opts.sourceType or entry.sourceType or "owner"
     entry.guildStatus = opts.guildStatus or entry.guildStatus or "active"
@@ -35,7 +34,6 @@ local function seedProfession(data, memberKey, profession, recipeKey, opts)
         recipes = { [recipeKey] = true },
         count = 1,
         signature = tostring(recipeKey),
-        blockRevision = opts.blockRevision or entry.rev,
         lastUpdatedAt = opts.updatedAt or entry.updatedAt,
         sourceType = opts.sourceType or entry.sourceType,
         guildStatus = opts.guildStatus or entry.guildStatus,

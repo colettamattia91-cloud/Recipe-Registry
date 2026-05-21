@@ -34,6 +34,7 @@ $activeAllSpecs = @(
     "block_merge_list_cache_invalidation_spec.lua",
     "build_channel_isolation_spec.lua",
     "catalog_cache_spec.lua",
+    "data_cleanup_spec.lua",
     "diagnostics_snapshot_spec.lua",
     "discovery_debug_spec.lua",
     "dirty_active_pull_debug_spec.lua",
@@ -43,12 +44,15 @@ $activeAllSpecs = @(
     "slash_output_spec.lua",
     "sync_debug_output_spec.lua",
     "sync_event_log_spec.lua",
+    "sync_codec_spec.lua",
     "sync_legacy_grep_gate_spec.lua",
+    "block_snapshot_error_paths_spec.lua",
     "sync_phase1_unsupported_message_spec.lua",
     "sync_phase2_summary_foundation_spec.lua",
     "sync_phase34_block_pull_spec.lua",
     "sync_roster_invalidation_spec.lua",
     "ui_cached_consultation_spec.lua",
+    "tooltip_spec.lua",
     "soak_block_pull_saturation_spec.lua",
     "soak_discovery_backoff_churn_spec.lua",
     "soak_hello_storm_spec.lua",
@@ -57,6 +61,7 @@ $activeAllSpecs = @(
 )
 $activeSyncSpecs = @(
     "build_channel_isolation_spec.lua",
+    "block_snapshot_error_paths_spec.lua",
     "diagnostics_snapshot_spec.lua",
     "discovery_debug_spec.lua",
     "dirty_active_pull_debug_spec.lua",
@@ -65,6 +70,7 @@ $activeSyncSpecs = @(
     "slash_output_spec.lua",
     "sync_debug_output_spec.lua",
     "sync_event_log_spec.lua",
+    "sync_codec_spec.lua",
     "sync_legacy_grep_gate_spec.lua",
     "sync_phase1_unsupported_message_spec.lua",
     "sync_phase2_summary_foundation_spec.lua",
@@ -120,7 +126,7 @@ if (-not $specs -or $specs.Count -eq 0) {
 }
 
 $suiteDescriptions = @{
-    all = "default/all runs the current supported backend baseline and excludes historical or not-yet-migrated specs."
+    all = "default/all runs the current supported backend baseline."
     quick = "quick currently matches the supported backend baseline."
     sync = "sync runs the supported HELLO/SUMMARY/index-diff/block-pull/runtime-cache/build-isolation rewrite coverage."
     soak = "soak runs active HELLO storm, seed election, block-pull saturation, discovery backoff, and memory-bounds coverage."

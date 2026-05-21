@@ -70,6 +70,8 @@ Legacy runtime modules are no longer loaded:
 - block-pull pacing
 - runtime sync index cache behavior
 - single globalFingerprint lifecycle
+- wire codec encode/decode and malformed payload rejection
+- BLOCK_SNAPSHOT mismatch / merge-failure error paths
 - delayed / coalesced HELLO scheduling
 - progressive discovery retry backoff (`20s +20s`, capped at `300s`, with jitter)
 - inbound seed session caps and pause clearing
@@ -82,6 +84,8 @@ Legacy runtime modules are no longer loaded:
 - bounded recent sync event log coverage
 - inbound seed session debug counters and pause clearing diagnostics
 - cached recipe consultation during warm-up and instance pause
+- tooltip index lookup/rendering and warm-up deferral
+- corrupt data cleanup and database wipe reset behavior
 - active soak coverage for HELLO storms, seed election, block-pull saturation, and discovery backoff
 
 ## Alpha tester workflow
@@ -102,7 +106,7 @@ For alpha sync reports, ask testers for:
 
 ## Backend suite governance
 
-The active backend suites now use an explicit supported-spec baseline. Historical pre-rewrite manifest/coordinator/request-chunk specs and other not-yet-migrated auxiliary specs may still remain in-tree for reference, but they are not part of the active backend status.
+The backend suites use an explicit supported-spec baseline. Historical pre-rewrite manifest/coordinator/request-chunk specs have been removed from `local-tests/spec`; tests in this folder are expected to target the current Wire v3 model or non-sync addon behavior that is still relevant.
 
 Current supported sync suite coverage is the rewrite path only:
 
@@ -127,7 +131,7 @@ The active runtime baseline also assumes:
 - dirty active outbound pull sessions may continue block-to-block without republishing HELLO;
 - fixed startup timers are watchdogs only, not readiness source of truth.
 
-Historical specs that still target removed runtime concepts are not part of the active `all`, `quick`, or `sync` suites until they are either rewritten or formally archived elsewhere.
+Specs that target removed runtime concepts should be rewritten for the Wire v3 path or deleted instead of staying in-tree as inactive references.
 
 If you need to exercise only the active rewrite path explicitly, use:
 

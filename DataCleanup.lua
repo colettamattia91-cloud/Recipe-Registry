@@ -167,9 +167,8 @@ local function commitCorruptClean(data, stats, dirtyAll, dirtyBlocks, reason)
         if dirtyAll then
             data:MarkSyncIndexDirty(reason or "clean-corrupt")
         else
-            for _blockKey in pairs(dirtyBlocks or {}) do
-                data:MarkSyncIndexDirty(reason or "clean-corrupt")
-                break
+            for blockKey in pairs(dirtyBlocks or {}) do
+                data:MarkSyncIndexDirty(reason or "clean-corrupt", blockKey)
             end
         end
     end
