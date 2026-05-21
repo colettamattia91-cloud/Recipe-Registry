@@ -1256,12 +1256,26 @@ function Data:BuildCachedGuildRosterSnapshot()
 end
 
 function Data:InvalidateRecipeCaches(scope)
+    -- Two generation tokens for async builders:
+    --   * _recipeListCacheGeneration is bumped on ANY invalidation. The
+    --     chunked list builder reads it at start and at commit; mismatch
+    --     means the partial rows it just assembled are based on stale
+    --     filter state (live onlineCount, included recipes, etc.) and
+    --     must not be cached.
+    --   * _recipeIndexGeneration is bumped only when the index itself is
+    --     dropped (metadata or full scope). Presence/list invalidations
+    --     leave the content index intact, so an in-flight index build
+    --     would needlessly discard its result if it shared the same
+    --     token — and presence flips fire often enough during startup
+    --     that this would keep the first build from ever finishing.
+    self._recipeListCacheGeneration = (self._recipeListCacheGeneration or 0) + 1
     if scope == "list" then
         self._recipeListCache = nil
         self._recipeListCacheOrder = nil
         return
     end
     if scope == "metadata" then
+        self._recipeIndexGeneration = (self._recipeIndexGeneration or 0) + 1
         self._recipeDetailCache = nil
         self._recipeDetailCacheOrder = nil
         self._recipeIndex = nil
@@ -1284,6 +1298,7 @@ function Data:InvalidateRecipeCaches(scope)
         return
     end
 
+    self._recipeIndexGeneration = (self._recipeIndexGeneration or 0) + 1
     self._recipeListCache = nil
     self._recipeListCacheOrder = nil
     self._recipeDetailCache = nil

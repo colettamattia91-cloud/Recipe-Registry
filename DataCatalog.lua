@@ -20,6 +20,17 @@ local shouldRefreshItemName = Private.shouldRefreshItemName
 
 local MAX_RECIPE_LIST_CACHE_ENTRIES = 12
 local MAX_RECIPE_DETAIL_CACHE_ENTRIES = 256
+local RECIPES_PER_LIST_BUILD_STEP = 60
+local LIST_BUILD_BUDGET_MS = 3
+local MEMBERS_PER_INDEX_BUILD_STEP = 12
+local INDEX_BUILD_BUDGET_MS = 3
+
+local function nowMsLocal()
+    if type(debugprofilestop) == "function" then
+        return debugprofilestop()
+    end
+    return GetTime() * 1000
+end
 
 local function refreshDetailAssets(info)
     if not info then return end
@@ -298,6 +309,174 @@ function Data:GetRecipeIndex()
     return self._recipeIndex or self:BuildRecipeIndex()
 end
 
+-- Chunked counterpart to BuildRecipeIndex. The synchronous version walks
+-- members × professions × recipes in one go; on large guild rosters that's
+-- a multi-hundred-ms freeze that the UI's async list builder would otherwise
+-- pay on first call. Cache hit fires onComplete inline; cache miss runs via
+-- Performance:ScheduleJob, processing ~12 members per step. Multiple callers
+-- (e.g., two near-simultaneous RefreshRecipeList invocations) coalesce onto
+-- the same job — only the first kicks it off, the rest queue their callback.
+function Data:BuildRecipeIndexAsync(onComplete)
+    if self._recipeIndex then
+        if onComplete then onComplete(self._recipeIndex) end
+        return
+    end
+
+    if self._recipeIndexBuildCallbacks then
+        if onComplete then
+            self._recipeIndexBuildCallbacks[#self._recipeIndexBuildCallbacks + 1] = onComplete
+        end
+        return
+    end
+
+    self._recipeIndexBuildCallbacks = onComplete and { onComplete } or {}
+
+    if not (Addon.Performance and Addon.Performance.ScheduleJob) then
+        local index = self:BuildRecipeIndex()
+        local callbacks = self._recipeIndexBuildCallbacks
+        self._recipeIndexBuildCallbacks = nil
+        for _, cb in ipairs(callbacks) do
+            if cb then cb(index) end
+        end
+        return
+    end
+
+    local memberKeys = {}
+    for memberKey, entry in pairs(self:GetMembersDB()) do
+        if self:IsUserVisibleMember(memberKey, entry) then
+            memberKeys[#memberKeys + 1] = memberKey
+        end
+    end
+
+    local jobState = {
+        memberKeys = memberKeys,
+        cursor = 1,
+        index = {},
+        indexGenerationAtStart = self._recipeIndexGeneration or 0,
+    }
+
+    Addon.Performance:ScheduleJob("recipe-index-build", function(state, ctx)
+        return self:RunRecipeIndexBuildStep(state, ctx)
+    end, {
+        category = "ui",
+        label = "recipe-index-build",
+        budgetMs = INDEX_BUILD_BUDGET_MS,
+        state = jobState,
+    })
+end
+
+function Data:RunRecipeIndexBuildStep(state, ctx)
+    local budgetMs = (ctx and ctx.budgetMs) or INDEX_BUILD_BUDGET_MS
+    local startedAt = nowMsLocal()
+    local processed = 0
+    local memberKeys = state.memberKeys
+    local total = #memberKeys
+    local index = state.index
+    local diagnostics = getCatalogDiagnostics(self)
+
+    while state.cursor <= total do
+        local memberKey = memberKeys[state.cursor]
+        state.cursor = state.cursor + 1
+        local entry = self:GetMember(memberKey)
+        if entry and self:IsUserVisibleMember(memberKey, entry) then
+            local profs = entry.professions or {}
+            for currentProfName, prof in pairs(profs) do
+                for recipeKey in pairs(prof.recipes or {}) do
+                    if isValidRecipeKey(recipeKey) then
+                        local row = index[recipeKey]
+                        if not row then
+                            row = {
+                                recipeKey = recipeKey,
+                                profNames = {},
+                                crafterRows = {},
+                                crafterCount = 0,
+                                _seenMembers = {},
+                                _crafterByMemberKey = {},
+                            }
+                            index[recipeKey] = row
+                        end
+
+                        row.profNames[currentProfName] = true
+                        local crafterRow = {
+                            memberKey = memberKey,
+                            profession = currentProfName,
+                            skillRank = prof.skillRank or 0,
+                            skillMaxRank = prof.skillMaxRank or 0,
+                            specialization = prof.specialization or nil,
+                            updatedAt = entry.updatedAt or 0,
+                        }
+                        local existingCrafterRow = row._crafterByMemberKey[memberKey]
+                        if existingCrafterRow then
+                            diagnostics.duplicateCrafterRowsDetected = (diagnostics.duplicateCrafterRowsDetected or 0) + 1
+                            diagnostics.duplicateCrafterRowsCollapsed = (diagnostics.duplicateCrafterRowsCollapsed or 0) + 1
+                            diagnostics.lastDuplicateRecipeKey = recipeKey
+                            diagnostics.lastDuplicateMemberKey = memberKey
+                            if Addon.Sync and Addon.Sync.telemetry then
+                                Addon.Sync.telemetry.duplicateCrafterRowsDetected = (Addon.Sync.telemetry.duplicateCrafterRowsDetected or 0) + 1
+                                Addon.Sync.telemetry.duplicateCrafterRowsCollapsed = (Addon.Sync.telemetry.duplicateCrafterRowsCollapsed or 0) + 1
+                                Addon.Sync.telemetry.lastDuplicateRecipeKey = recipeKey
+                                Addon.Sync.telemetry.lastDuplicateMemberKey = memberKey
+                            end
+                            if isBetterCrafterRow(crafterRow, existingCrafterRow) then
+                                for key, value in pairs(crafterRow) do
+                                    existingCrafterRow[key] = value
+                                end
+                            end
+                        else
+                            row.crafterRows[#row.crafterRows + 1] = crafterRow
+                            row._crafterByMemberKey[memberKey] = crafterRow
+                        end
+
+                        if not row._seenMembers[memberKey] then
+                            row._seenMembers[memberKey] = true
+                            row.crafterCount = row.crafterCount + 1
+                        end
+                    end
+                end
+            end
+        end
+        processed = processed + 1
+        if processed >= MEMBERS_PER_INDEX_BUILD_STEP then
+            return true, state
+        end
+        if (nowMsLocal() - startedAt) >= budgetMs then
+            return true, state
+        end
+    end
+
+    for _, row in pairs(index) do
+        sortCrafterRowsByContent(row.crafterRows)
+        row._seenMembers = nil
+        row._crafterByMemberKey = nil
+    end
+
+    -- Only abandon the build if the INDEX was invalidated (metadata/full
+    -- scope). Presence/list invalidations leave content untouched so the
+    -- partial index we just assembled is still valid; the list builder
+    -- that depends on it has its own _recipeListCacheGeneration check.
+    local currentGeneration = self._recipeIndexGeneration or 0
+    if currentGeneration ~= (state.indexGenerationAtStart or 0) then
+        local callbacks = self._recipeIndexBuildCallbacks
+        self._recipeIndexBuildCallbacks = nil
+        if callbacks then
+            for _, cb in ipairs(callbacks) do
+                if cb then cb(nil) end
+            end
+        end
+        return false, state
+    end
+
+    self._recipeIndex = index
+    local callbacks = self._recipeIndexBuildCallbacks
+    self._recipeIndexBuildCallbacks = nil
+    if callbacks then
+        for _, cb in ipairs(callbacks) do
+            if cb then cb(index) end
+        end
+    end
+    return false, state
+end
+
 function Data:ResolveRecipeLabel(recipeKey)
     if not recipeKey then return nil end
     local n = tonumber(recipeKey)
@@ -541,6 +720,214 @@ function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName)
         MAX_RECIPE_LIST_CACHE_ENTRIES
     )
     return out
+end
+
+-- Build a recipe list asynchronously, spreading the per-recipe work across
+-- multiple frames via the job scheduler. The freeze on first /show after a
+-- /reload came from this loop running synchronously: ~hundreds of
+-- GetRecipeDisplayInfo calls + a full sort, blocking the main thread for
+-- seconds on large guild rosters. Cached results take the fast path and
+-- fire onComplete inline (so cache hits feel synchronous to the caller).
+--
+-- Cache misses run via Performance:ScheduleJob with a per-step budget; the
+-- caller shows a "Loading..." placeholder while the build progresses. The
+-- caller uses a generation token to discard the callback if the filter
+-- changed mid-build, so the wasted work is bounded to the time already spent.
+function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, categoryName, onComplete)
+    sortMode = sortMode or "alpha"
+    searchMode = searchMode == "materials" and "materials" or "recipe"
+    local categoryFilter = categoryName and categoryName ~= "" and categoryName ~= "All" and categoryName or nil
+    local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode) .. "\t" .. searchMode .. "\t" .. tostring(categoryFilter or "")
+    self._recipeListCache = self._recipeListCache or {}
+    self._recipeListCacheOrder = self._recipeListCacheOrder or {}
+
+    if self._recipeListCache[cacheKey] then
+        if onComplete then onComplete(self._recipeListCache[cacheKey], true) end
+        return
+    end
+
+    if not (Addon.Performance and Addon.Performance.ScheduleJob) then
+        local rows = self:GetRecipeList(profName, query, sortMode, searchMode, categoryName)
+        if onComplete then onComplete(rows, false) end
+        return
+    end
+
+    -- Two-phase async: first ensure the recipe index is built (chunked if
+    -- not yet cached), then schedule the list build. The list job inherits
+    -- the index that was just produced. If the index callback receives
+    -- `nil` (invalidation mid-build) we surface that to the caller so it
+    -- can wait for the follow-up RequestRefresh instead of finalizing
+    -- against stale data.
+    self:BuildRecipeIndexAsync(function(recipeIndex)
+        if not recipeIndex then
+            if onComplete then onComplete(nil, false) end
+            return
+        end
+
+        -- The list cache may have been nulled by an InvalidateRecipeCaches
+        -- call between the BuildRecipeListAsync entry and this callback;
+        -- re-init defensively before the lookup. Cache hit here happens if
+        -- a peer caller raced ahead and finished the same cacheKey.
+        self._recipeListCache = self._recipeListCache or {}
+        self._recipeListCacheOrder = self._recipeListCacheOrder or {}
+        if self._recipeListCache[cacheKey] then
+            if onComplete then onComplete(self._recipeListCache[cacheKey], true) end
+            return
+        end
+
+        local candidates = {}
+        for recipeKey in pairs(recipeIndex) do
+            candidates[#candidates + 1] = recipeKey
+        end
+
+        local jobState = {
+            candidates = candidates,
+            recipeIndex = recipeIndex,
+            cursor = 1,
+            out = {},
+            q = lowerSafe(query),
+            profName = profName,
+            categoryFilter = categoryFilter,
+            searchMode = searchMode,
+            sortMode = sortMode,
+            cacheKey = cacheKey,
+            cacheGenerationAtStart = self._recipeListCacheGeneration or 0,
+            onComplete = onComplete,
+        }
+
+        Addon.Performance:ScheduleJob("recipe-list-build", function(state, ctx)
+            return self:RunRecipeListBuildStep(state, ctx)
+        end, {
+            category = "ui",
+            label = "recipe-list-build",
+            budgetMs = LIST_BUILD_BUDGET_MS,
+            state = jobState,
+        })
+    end)
+end
+
+function Data:RunRecipeListBuildStep(state, ctx)
+    local budgetMs = (ctx and ctx.budgetMs) or LIST_BUILD_BUDGET_MS
+    local startedAt = nowMsLocal()
+    local processedThisStep = 0
+
+    local candidates = state.candidates
+    local recipeIndex = state.recipeIndex
+    local out = state.out
+    local profName = state.profName
+    local categoryFilter = state.categoryFilter
+    local searchMode = state.searchMode
+    local q = state.q
+    local total = #candidates
+
+    while state.cursor <= total do
+        local recipeKey = candidates[state.cursor]
+        state.cursor = state.cursor + 1
+        processedThisStep = processedThisStep + 1
+
+        local indexed = recipeIndex[recipeKey]
+        if indexed then
+            local include = (not profName or profName == "All")
+            if not include and indexed.profNames[profName] then
+                include = true
+            end
+            if include and categoryFilter and profName and profName ~= "All" then
+                include = self:GetRecipeCategory(recipeKey, profName) == categoryFilter
+            end
+            if include then
+                local detail = self:GetRecipeDisplayInfo(recipeKey)
+                local onlineCount = 0
+                local crafterRows = indexed.crafterRows or {}
+                for craftIdx = 1, #crafterRows do
+                    if self:IsMemberOnline(crafterRows[craftIdx].memberKey) then
+                        onlineCount = onlineCount + 1
+                    end
+                end
+                local row = {
+                    recipeKey = recipeKey,
+                    detail = detail,
+                    label = (detail and detail.label) or self:ResolveRecipeLabel(recipeKey) or tostring(recipeKey),
+                    crafterCount = indexed.crafterCount or 0,
+                    onlineCount = onlineCount,
+                }
+                row.professionList = {}
+                for currentProfName in pairs(indexed.profNames) do
+                    row.professionList[#row.professionList + 1] = currentProfName
+                end
+                sort(row.professionList)
+                local searchText
+                if searchMode == "materials" then
+                    searchText = row.detail and row.detail.searchText or lowerSafe(row.label)
+                else
+                    searchText = row.detail and row.detail.recipeSearchText or lowerSafe(row.label)
+                end
+                if q == "" or searchText:find(q, 1, true) then
+                    out[#out + 1] = row
+                end
+            end
+        end
+
+        if processedThisStep >= RECIPES_PER_LIST_BUILD_STEP then
+            return true, state
+        end
+        if (nowMsLocal() - startedAt) >= budgetMs then
+            return true, state
+        end
+    end
+
+    local sortMode = state.sortMode
+    sort(out, function(a, b)
+        if sortMode == "rarity" then
+            local aq = (a.detail and (a.detail.createdItemQuality or a.detail.recipeItemQuality))
+            local bq = (b.detail and (b.detail.createdItemQuality or b.detail.recipeItemQuality))
+            aq = aq == nil and -1 or aq
+            bq = bq == nil and -1 or bq
+            if aq ~= bq then return aq > bq end
+        end
+        local al = lowerSafe(a.label)
+        local bl = lowerSafe(b.label)
+        if al ~= bl then return al < bl end
+        local ao = a.onlineCount or 0
+        local bo = b.onlineCount or 0
+        if ao ~= bo then return ao > bo end
+        local ac = a.crafterCount or 0
+        local bc = b.crafterCount or 0
+        if ac ~= bc then return ac > bc end
+        return tostring(a.recipeKey) < tostring(b.recipeKey)
+    end)
+
+    -- If the underlying caches were invalidated mid-build (roster presence
+    -- flip, scan completion, etc.) the rows we just assembled may already be
+    -- stale. Abandon the result rather than poisoning the cache with it.
+    -- The caller's UI generation token already discards the callback in
+    -- that situation, so dropping silently is the cleanest contract.
+    local currentGeneration = self._recipeListCacheGeneration or 0
+    if currentGeneration ~= (state.cacheGenerationAtStart or 0) then
+        if state.onComplete then
+            state.onComplete(nil, false)
+        end
+        return false, state
+    end
+
+    self._recipeListCache = self._recipeListCache or {}
+    self._recipeListCacheOrder = self._recipeListCacheOrder or {}
+    local cached = self._recipeListCache[state.cacheKey]
+    if not cached then
+        rememberBoundedCache(
+            self._recipeListCache,
+            self._recipeListCacheOrder,
+            state.cacheKey,
+            out,
+            MAX_RECIPE_LIST_CACHE_ENTRIES
+        )
+    else
+        out = cached
+    end
+
+    if state.onComplete then
+        state.onComplete(out, false)
+    end
+    return false, state
 end
 
 -- Return a fresh crafter list with live `online` flags. The stored rows

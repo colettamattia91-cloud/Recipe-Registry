@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.0.3] - 2026-05-21
+### Changed
+- The Recipe Registry window now opens without freezing the client, even on the first try after a `/reload`. The recipe list, the underlying recipe index, and the AtlasLoot category index all build progressively in the background while the window stays responsive, with a brief "loading" indicator until the data is ready.
+- Profession buttons now appear labelled in the sidebar during sync warmup instead of as empty rows, so the addon window looks usable as soon as it opens.
+
 ## [2.0.2] - 2026-05-20
 ### Changed
 - Recipe Registry is smoother while guild recipe data is syncing, especially when the addon window is open.
