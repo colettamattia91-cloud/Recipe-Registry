@@ -2,7 +2,28 @@
 
 All notable changes to this project are documented in this file.
 
-## [Unreleased]
+## [2.0.4] - 2026-05-21
+### Changed
+- The recipe browser's background data builders now keep progressing with a tiny budget even while heavier UI work is paused, preventing the window from getting stuck on `Loading...` if it is opened during combat or other paused moments.
+- AtlasLoot category indexing now uses the same lightweight background path, so first-load browsing stays responsive while category labels catch up.
+- Corrupt-data cleanup now marks only the affected sync blocks dirty when possible instead of forcing a broader sync index rebuild after every repair.
+
+## [2.0.3] - 2026-05-21
+### Changed
+- The Recipe Registry window now opens without freezing the client, even on the first try after a `/reload`. The recipe list, the underlying recipe index, and the AtlasLoot category index all build progressively in the background while the window stays responsive, with a brief "loading" indicator until the data is ready.
+- Profession buttons now appear labelled in the sidebar during sync warmup instead of as empty rows, so the addon window looks usable as soon as it opens.
+
+## [2.0.2] - 2026-05-20
+### Changed
+- Recipe Registry is smoother while guild recipe data is syncing, especially when the addon window is open.
+- Recipe tooltips now refresh their guild crafter data more calmly after sync activity, reducing small pauses during larger updates.
+
+## [2.0.1] - 2026-05-20
+### Changed
+- Guild recipe sync is smoother when receiving several recipe groups in a row, reducing short pauses while your local recipe database catches up.
+- Recipe sharing now batches more of its behind-the-scenes refresh work, keeping the addon responsive during larger guild sync updates.
+
+## [2.0.0] - 2026-05-20
 ### Added
 - A redesigned guild sync experience for `2.0.0`: guildmates can share recipe data more reliably after login, reloads, database wipes, and addon updates.
 - Clearer update boundaries: regular release builds now sync only with compatible release builds, while development and test builds stay isolated from live guild data.
