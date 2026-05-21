@@ -126,14 +126,6 @@ Install Recipe Registry through CurseForge, then launch the game.
 - Cost estimates depend on TradeSkillMaster or Auctionator data and may not always be available.
 - The addon is intentionally careful with incomplete profession and roster data so a temporary game API hiccup does not erase useful guild information.
 
-## Acknowledgments
-
-Recipe Registry was originally inspired by GuildCrafts by dkruenbo, an MIT-licensed guild profession tracking addon.
-
-While Recipe Registry has since been substantially rewritten around its own sync protocol, data model, indexing pipeline, integrations, diagnostics, and UI workflow, GuildCrafts is acknowledged as an early source of inspiration/reference.
-
-See `THIRD_PARTY_NOTICES.md` for license details.
-
 ## Support The Project
 
 If Recipe Registry makes guild crafting smoother for you and your friends, and you want to help keep it maintained and improved, you can support development here:
@@ -145,3 +137,8 @@ Thank you. It genuinely helps keep the project alive.
 ## Feedback And Support
 
 - Issues and feedback: [GitHub Issues](https://github.com/colettamattia91-cloud/Recipe-Registry/issues)
+
+## Acknowledgments
+
+Recipe Registry was originally inspired by GuildCrafts by dkruenbo, an MIT-licensed guild profession tracking addon.
+See `THIRD_PARTY_NOTICES.md` for license details.
