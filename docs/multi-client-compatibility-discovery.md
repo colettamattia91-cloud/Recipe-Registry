@@ -12,6 +12,7 @@ Completabile offline:
 - Matrice di compatibilita' iniziale.
 - Scope professioni consigliato.
 - Gate no-regression.
+- Cross-check locale con `C:\Users\valer\Documents\ProfessionMaster`.
 
 Richiede verifica in-game:
 
@@ -26,6 +27,7 @@ Richiede verifica in-game:
 - Warcraft Wiki GetTradeSkillInfo: `https://warcraft.wiki.gg/wiki/API_GetTradeSkillInfo`
 - Warcraft Wiki Classic API matrix: `https://warcraft.wiki.gg/wiki/World_of_Warcraft_API/Classic`
 - Warcraft Wiki GetFirstTradeSkill: `https://warcraft.wiki.gg/wiki/API_GetFirstTradeSkill`
+- Addon locale ProfessionMaster: `C:\Users\valer\Documents\ProfessionMaster`
 
 Nota: Warcraft Wiki indica che i valori Interface sono aggiornati da contributor e possono essere non aggiornati. La fonte finale resta il client reale via `GetBuildInfo()`.
 
@@ -35,15 +37,21 @@ Valori preliminari:
 
 | Client | Interface preliminare | Stato |
 |---|---:|---|
-| TBC Classic Anniversary | `20505` | Attuale baseline repo |
-| Mists of Pandaria Classic | `50503` | Da confermare in-game |
-| Classic Era / Vanilla | `11508` | Da confermare in-game |
+| TBC Classic Anniversary | `20505` | Attuale baseline repo; confermato da `ProfessionMaster_TBC.toc` |
+| Mists of Pandaria Classic | `50503` | Confermato da `ProfessionMaster_Mists.toc`; resta verifica in-game |
+| Classic Era / Vanilla | `11508` | Confermato da `ProfessionMaster_Vanilla.toc`; resta verifica in-game |
 
 Direzione consigliata:
 
 - Partire da singolo `RecipeRegistry.toc` con `## Interface: 50503, 20505, 11508`.
 - Evitare TOC specifici finche' il load order resta identico.
 - Usare TOC specifici solo se una fase successiva richiede file caricati diversamente per client.
+
+Osservazione da ProfessionMaster:
+
+- Usa TOC separati per espansione: Vanilla `11508`, TBC `20505`, Wrath `30405`, Cata `40402`, Mists `50503`.
+- Ogni TOC carica dataset cumulativi per espansione: Vanilla solo vanilla; TBC vanilla+bcc; Mists vanilla+bcc+wrath+cata+mop.
+- Questo conferma i numeri Interface preliminari, ma non sostituisce la verifica finale con `GetBuildInfo()` nel client reale.
 
 ## File e API impattati
 
@@ -89,9 +97,16 @@ API/oggetti da normalizzare:
 Rischi:
 
 - Era e TBC dipendono dal vecchio split TradeSkill/Craft, soprattutto per Enchanting.
-- MoP Classic potrebbe avere API Classic moderne/backportate ma non identiche nei return e nei filtri.
+- ProfessionMaster usa anche su MoP il vecchio path `GetTradeSkill*`/`GetCraft*`, non `C_TradeSkillUI`; il rischio MoP resta sui return reali e sui filtri, non necessariamente su una migrazione obbligatoria a `C_TradeSkillUI`.
 - I filtri devono essere sempre snapshot/restore con guardie `type(...) == "function"` e `pcall`.
 - Le scansioni parziali devono continuare a non cancellare dati owner validi.
+
+Evidenza da ProfessionMaster:
+
+- `services/own-professions-service.lua` legge professioni crafting con `GetTradeSkillLine`, `GetNumTradeSkills`, `GetTradeSkillInfo`, `GetTradeSkillItemLink`, `GetTradeSkillRecipeLink`.
+- Enchanting/CraftFrame usa `GetCraftDisplaySkillLine`, `GetNumCrafts`, `GetCraftInfo`, `GetCraftItemLink`.
+- La rilevazione gathering combina `GetNumSkillLines`/`GetSkillLineInfo`, fallback `GetProfessions`/`GetProfessionInfo`, fallback spellbook e fallback persisted level.
+- Per Recipe Registry la discovery suggerisce un adapter che mantenga il path attuale ma aggiunga fallback `GetProfessions`/`GetProfessionInfo` almeno per detection/rank su MoP.
 
 ### Guild roster
 
@@ -116,6 +131,11 @@ Rischi:
 - Timing del roster diverso tra client.
 - Snapshot incompleto non deve far marcare membri stale in modo aggressivo.
 - La readiness sync deve restare conservativa.
+
+Evidenza da ProfessionMaster:
+
+- `services/player-service.lua` chiama `C_GuildInfo.GuildRoster()` e legge con `GetNumGuildMembers()`/`GetGuildRosterInfo()`.
+- Recipe Registry ha gia' fallback `C_GuildInfo.GuildRoster`/`GuildRoster`; mantenerlo e' piu' conservativo di ProfessionMaster.
 
 ### Options/UI/tooltip
 
@@ -146,6 +166,12 @@ Rischi:
 - Tooltip hooks disponibili ma con timing diverso.
 - `C_Item` puo' essere assente o parziale.
 
+Evidenza da ProfessionMaster:
+
+- `views/settings-view.lua` usa lo stesso pattern fallback: `Settings.RegisterCanvasLayoutCategory` + `Settings.RegisterAddOnCategory`, altrimenti `InterfaceOptions_AddCategory`; apertura via `Settings.OpenToCategory` o `InterfaceOptionsFrame_OpenToCategory`.
+- `services/tooltip-service.lua` hooka `OnTooltipSetItem`, `OnTooltipSetSpell`, `OnTooltipCleared`, `OnTooltipSetUnit` e `GameTooltip:Show`.
+- Questo supporta l'approccio attuale di Recipe Registry, ma resta necessario smoke test in-game per tooltip/frame specifici.
+
 ### Optional integrations
 
 File principali:
@@ -168,6 +194,11 @@ Rischi:
 - Dataset AtlasLoot diversi per espansione.
 - TSM/Auctionator possono non supportare tutti i client o avere API differenti.
 - Il fallback deve restare graceful: niente errori Lua e UI funzionante anche senza prezzi/categorie.
+
+Evidenza da ProfessionMaster:
+
+- Non risultano riferimenti diretti a AtlasLoot, TSM o Auctionator.
+- ProfessionMaster non puo' quindi verificare questi optional deps; restano punti da testare direttamente.
 
 ## Scope professioni consigliato
 
@@ -214,6 +245,11 @@ Da valutare solo se richiesto:
 - First Aid
 - Fishing
 
+Nota da ProfessionMaster:
+
+- ProfessionMaster include Fishing nel mapping spell ma non la tratta come professione principale mostrata.
+- ProfessionMaster non mostra Skinning nella lista principale, mentre Recipe Registry attualmente lo traccia. Mantenerlo e' possibile, ma va trattato come professione senza ricette craftabili oppure escluso dalla UI se produce solo blocchi vuoti.
+
 Specializzazioni da verificare:
 
 - Blacksmithing
@@ -248,6 +284,12 @@ Specializzazioni da verificare:
 - Spell ID professioni.
 - Eventuali profession specializations ancora rilevanti.
 - Skill rank/max rank return per professione.
+
+Nota da ProfessionMaster:
+
+- ProfessionMaster aggiunge Jewelcrafting da BCC in poi e Inscription da Wrath in poi.
+- Il modello `profession-spells.lua` usa SkillLine ID `755` per Jewelcrafting e `773` per Inscription.
+- Il dataset `models/skills/mop.lua` contiene skill con `["p"] = 755` e `["p"] = 773`, confermando lo scope MoP con Jewelcrafting + Inscription.
 
 ## Matrice supporto iniziale
 
