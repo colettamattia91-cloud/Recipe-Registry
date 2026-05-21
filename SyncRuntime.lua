@@ -28,7 +28,7 @@ local POST_RELOAD_IN_INSTANCE_GRACE_SECONDS = Constants.POST_RELOAD_IN_INSTANCE_
 local RECENT_SYNC_EVENTS_LIMIT = Constants.RECENT_SYNC_EVENTS_LIMIT or 50
 
 local LIFECYCLE_DEBUG_LIMIT = 20
-local VERSION_NOTICE_COOLDOWN = 12 * 60 * 60
+local VERSION_NOTICE_COOLDOWN = 4 * 60 * 60
 local DISCOVERY_RETRY_INITIAL_SECONDS = Constants.DISCOVERY_RETRY_INITIAL_SECONDS or 20
 local DISCOVERY_RETRY_STEP_SECONDS = Constants.DISCOVERY_RETRY_STEP_SECONDS or 20
 local DISCOVERY_RETRY_MAX_SECONDS = Constants.DISCOVERY_RETRY_MAX_SECONDS or 300
@@ -720,7 +720,7 @@ function Sync:SetPeerIneligibleReason(peerKey, reason)
     end
 end
 
-function Sync:RecordLatestRemoteVersion(remoteVersion)
+function Sync:RecordLatestRemoteVersion(remoteVersion, peerKey)
     if not remoteVersion or not compareSemver then
         return
     end
@@ -735,6 +735,7 @@ function Sync:RecordLatestRemoteVersion(remoteVersion)
     local isNewer = current == nil or compareSemver(remoteVersion, current) == 1
     if isNewer then
         notice.latestRemoteVersionSeen = remoteVersion
+        notice.latestRemoteVersionPeer = peerKey
     end
     self.telemetry.latestRemoteVersionSeen = tostring(notice.latestRemoteVersionSeen or remoteVersion)
 end
@@ -820,7 +821,7 @@ function Sync:MaybeNotifyPeerVersion(peerKey, info)
         return
     end
 
-    self:RecordLatestRemoteVersion(info.addonVersion)
+    self:RecordLatestRemoteVersion(info.addonVersion, peerKey)
 
     local now = time()
     if info.compatibility == "remote-newer-wire" then
@@ -858,34 +859,55 @@ function Sync:MaybeNotifyPeerVersion(peerKey, info)
         )
         return
     end
-    local sameVersionCooldown = tostring(notice.lastNoticedVersion or "") == tostring(info.addonVersion or "")
-        and (now - (notice.lastUpdateNoticeAt or 0)) < VERSION_NOTICE_COOLDOWN
-    if sameVersionCooldown then
+    local latestRemoteVersion = notice.latestRemoteVersionSeen or info.addonVersion
+    local latestRemotePeer = notice.latestRemoteVersionPeer or peerKey
+    local latestCmp = compareSemver(latestRemoteVersion, localAddonVersion)
+    if latestCmp == nil or latestCmp <= 0 then
         Addon:Tracef("sync",
-            "version-notice-skip peer=%s reason=cooldown remote=%s ageSec=%d",
+            "version-notice-skip peer=%s reason=latest-not-newer local=%s latest=%s cmp=%s",
+            tostring(peerKey or "unknown"),
+            tostring(localAddonVersion or "?"),
+            tostring(latestRemoteVersion or "?"),
+            tostring(latestCmp)
+        )
+        return
+    end
+
+    local anyNewerVersionCooldown = false
+    if notice.lastNoticedVersion then
+        local lastNoticedCmp = compareSemver(tostring(notice.lastNoticedVersion), tostring(localAddonVersion or ""))
+        anyNewerVersionCooldown = lastNoticedCmp ~= nil
+            and lastNoticedCmp == 1
+            and (now - (notice.lastUpdateNoticeAt or 0)) < VERSION_NOTICE_COOLDOWN
+    end
+    if anyNewerVersionCooldown then
+        Addon:Tracef("sync",
+            "version-notice-skip peer=%s reason=update-cooldown remote=%s latest=%s lastNoticed=%s ageSec=%d",
             tostring(peerKey or "unknown"),
             tostring(info.addonVersion or "?"),
+            tostring(latestRemoteVersion or "?"),
+            tostring(notice.lastNoticedVersion or "none"),
             now - (notice.lastUpdateNoticeAt or 0)
         )
         return
     end
 
     Addon:Print(string.format(
-        "Recipe Registry: a newer version was detected from %s (%s).",
-        tostring(peerKey),
-        tostring(info.addonVersion or "unknown")
+        "Recipe Registry: a newer version was detected in your guild (%s).",
+        tostring(latestRemoteVersion or "unknown")
     ))
-    notice.lastNoticedVersion = info.addonVersion
+    notice.lastNoticedVersion = latestRemoteVersion
     notice.lastUpdateNoticeAt = now
-    notice.lastNoticedPeer = peerKey
-    self.telemetry.lastVersionNoticePeer = peerKey
-    self.telemetry.lastVersionNoticeRemote = tostring(info.addonVersion or "unknown")
+    notice.lastNoticedPeer = latestRemotePeer
+    self.telemetry.lastVersionNoticePeer = latestRemotePeer
+    self.telemetry.lastVersionNoticeRemote = tostring(latestRemoteVersion or "unknown")
     self.telemetry.newerVersionSeen = (self.telemetry.newerVersionSeen or 0) + 1
     Addon:Tracef("sync",
-        "version-notice-fired peer=%s local=%s remote=%s",
-        tostring(peerKey or "unknown"),
+        "version-notice-fired peer=%s local=%s remote=%s latest=%s",
+        tostring(latestRemotePeer or peerKey or "unknown"),
         tostring(localAddonVersion or "?"),
-        tostring(info.addonVersion or "?")
+        tostring(info.addonVersion or "?"),
+        tostring(latestRemoteVersion or "?")
     )
 end
 

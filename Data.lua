@@ -56,6 +56,7 @@ local DB_DEFAULTS = {
         },
         updateNotice = {
             latestRemoteVersionSeen = nil,
+            latestRemoteVersionPeer = nil,
             lastNoticedVersion = nil,
             lastUpdateNoticeAt = 0,
             lastProtocolNoticeAt = 0,
@@ -1053,6 +1054,11 @@ end
 
 function Data:GetUpdateNoticeState()
     self.db.global.updateNotice = self.db.global.updateNotice or {}
+    if self.db.global.updateNotice.latestRemoteVersionPeer ~= nil
+        and type(self.db.global.updateNotice.latestRemoteVersionPeer) ~= "string"
+    then
+        self.db.global.updateNotice.latestRemoteVersionPeer = nil
+    end
     if type(self.db.global.updateNotice.lastUpdateNoticeAt) ~= "number" then
         self.db.global.updateNotice.lastUpdateNoticeAt = 0
     end
