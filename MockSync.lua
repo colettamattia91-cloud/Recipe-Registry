@@ -6,8 +6,6 @@ local pairs = pairs
 local ipairs = ipairs
 local sort = table.sort
 local format = string.format
-local max = math.max
-local floor = math.floor
 
 local MOCK_PEER_PREFIX = "__RRMockPeer"
 local MOCK_OWNER_PREFIX = "__RRMockOwner"
@@ -18,27 +16,20 @@ local MOCK_PROFESSIONS = {
 }
 
 local SCENARIOS = {
-    light = { peers = 2, professions = 2, recipesPerProfession = 30, chunkSize = 20, peerDelay = 0.12, hardIsolation = true },
-    medium = { peers = 4, professions = 3, recipesPerProfession = 70, chunkSize = 24, peerDelay = 0.09, hardIsolation = true },
-    heavy = { peers = 8, professions = 4, recipesPerProfession = 120, chunkSize = 28, peerDelay = 0.06, hardIsolation = true },
-    burst = { peers = 12, professions = 4, recipesPerProfession = 160, chunkSize = 40, peerDelay = 0.02, hardIsolation = true },
-    bootstrap = { peers = 1, professions = 6, recipesPerProfession = 220, chunkSize = 32, peerDelay = 0.04, sourceType = "bootstrap", hardIsolation = true },
-    traffic = { mode = "traffic", peers = 3, ownersPerPeer = 2, professions = 3, recipesPerProfession = 80, chunkSize = 24, peerDelay = 0.08, requestDelay = 0.05, sourceType = "replica", hardIsolation = true },
-    offline = { mode = "traffic", peers = 4, ownersPerPeer = 3, professions = 3, recipesPerProfession = 110, chunkSize = 24, peerDelay = 0.06, requestDelay = 0.05, sourceType = "replica", hardIsolation = true },
-    offlinewipe = { mode = "traffic", peers = 4, ownersPerPeer = 3, professions = 3, recipesPerProfession = 110, chunkSize = 24, peerDelay = 0.06, requestDelay = 0.05, sourceType = "replica", hardIsolation = true },
-    trafficburst = { mode = "traffic", peers = 6, ownersPerPeer = 3, professions = 4, recipesPerProfession = 150, chunkSize = 32, peerDelay = 0.02, requestDelay = 0.02, sourceType = "replica", hardIsolation = true },
+    light = { peers = 2, ownersPerPeer = 1, professions = 2, recipesPerProfession = 30, hardIsolation = true },
+    medium = { peers = 4, ownersPerPeer = 1, professions = 3, recipesPerProfession = 70, hardIsolation = true },
+    heavy = { peers = 8, ownersPerPeer = 1, professions = 4, recipesPerProfession = 120, hardIsolation = true },
+    burst = { peers = 12, ownersPerPeer = 1, professions = 4, recipesPerProfession = 160, hardIsolation = true },
+    bootstrap = { peers = 1, ownersPerPeer = 1, professions = 6, recipesPerProfession = 220, sourceType = "bootstrap", hardIsolation = true },
+    traffic = { mode = "traffic", peers = 3, ownersPerPeer = 2, professions = 3, recipesPerProfession = 80, hardIsolation = true },
+    offline = { mode = "traffic", peers = 4, ownersPerPeer = 3, professions = 3, recipesPerProfession = 110, hardIsolation = true },
+    offlinewipe = { mode = "traffic", peers = 4, ownersPerPeer = 3, professions = 3, recipesPerProfession = 110, hardIsolation = true },
+    trafficburst = { mode = "traffic", peers = 6, ownersPerPeer = 3, professions = 4, recipesPerProfession = 150, hardIsolation = true },
     roster = { mode = "roster", activeMembers = 6, missingMembers = 4, prunableMembers = 2, professions = 3, recipesPerProfession = 18, hardIsolation = true },
     rosterheavy = { mode = "roster", activeMembers = 12, missingMembers = 8, prunableMembers = 5, professions = 4, recipesPerProfession = 28, hardIsolation = true },
     rosterbad = { mode = "rosterbad", activeMembers = 10, professions = 2, recipesPerProfession = 12, hardIsolation = true },
     integrity = { mode = "integrity", professions = 2, recipesPerProfession = 16, hardIsolation = true },
 }
-
-local function nowSeconds()
-    if type(GetTime) == "function" then
-        return GetTime()
-    end
-    return time()
-end
 
 local function cloneTable(src)
     local out = {}
@@ -56,14 +47,12 @@ local function countKeys(tbl)
     return count
 end
 
-local function copyRecipeSlice(recipeKeys, startIndex, chunkSize)
-    local slice = {}
-    for offset = 0, (chunkSize - 1) do
-        local recipeKey = recipeKeys[startIndex + offset]
-        if not recipeKey then break end
-        slice[#slice + 1] = recipeKey
+local function makeRecipeSet(recipeKeys)
+    local recipes = {}
+    for index = 1, #recipeKeys do
+        recipes[recipeKeys[index]] = true
     end
-    return slice
+    return recipes
 end
 
 function MockSync:OnInitialize()
@@ -75,7 +64,6 @@ function MockSync:Reset()
     self.hardIsolation = false
     self.scenarioName = nil
     self.scenarioConfig = nil
-    self.pendingPayloads = {}
     self.mockDatasets = {}
     self.rosterScenario = nil
     self.integrityScenario = nil
@@ -83,12 +71,11 @@ function MockSync:Reset()
     self.telemetry = {
         scenariosStarted = 0,
         scenariosCompleted = 0,
-        payloadsQueued = 0,
-        payloadsDelivered = 0,
         peersSimulated = 0,
-        trafficAnnouncements = 0,
-        trafficRequests = 0,
-        trafficSnapshots = 0,
+        membersSeeded = 0,
+        blocksSeeded = 0,
+        helloInjected = 0,
+        summaryInjected = 0,
         rosterRunsStarted = 0,
         rosterRunsCompleted = 0,
         integrityRunsStarted = 0,
@@ -102,12 +89,11 @@ function MockSync:ResetTelemetry()
     self.telemetry = {
         scenariosStarted = 0,
         scenariosCompleted = 0,
-        payloadsQueued = 0,
-        payloadsDelivered = 0,
         peersSimulated = 0,
-        trafficAnnouncements = 0,
-        trafficRequests = 0,
-        trafficSnapshots = 0,
+        membersSeeded = 0,
+        blocksSeeded = 0,
+        helloInjected = 0,
+        summaryInjected = 0,
         rosterRunsStarted = 0,
         rosterRunsCompleted = 0,
         integrityRunsStarted = 0,
@@ -119,7 +105,9 @@ end
 
 function MockSync:GetScenarioConfig(name)
     local config = SCENARIOS[name]
-    if not config then return nil end
+    if not config then
+        return nil
+    end
     return cloneTable(config)
 end
 
@@ -150,12 +138,12 @@ end
 function MockSync:SeedMockMember(memberKey, professions, recipesPerProfession, opts)
     opts = opts or {}
     local entry = Addon.Data:GetOrCreateMember(memberKey)
+    local updatedAt = opts.updatedAt or time()
     entry.owner = memberKey
-    entry.rev = opts.rev or (((self._scenarioSerial or 0) * 1000) + professions)
-    entry.updatedAt = opts.updatedAt or time()
+    entry.updatedAt = updatedAt
     entry.sourceType = opts.sourceType or "replica"
     entry.guildStatus = opts.guildStatus or "active"
-    entry.lastSeenInGuildAt = opts.lastSeenInGuildAt or entry.updatedAt
+    entry.lastSeenInGuildAt = opts.lastSeenInGuildAt or updatedAt
     entry.staleAt = opts.staleAt or 0
     entry.isMock = true
     entry.professions = {}
@@ -163,24 +151,152 @@ function MockSync:SeedMockMember(memberKey, professions, recipesPerProfession, o
     for professionIndex = 1, professions do
         local professionKey = MOCK_PROFESSIONS[((professionIndex - 1) % #MOCK_PROFESSIONS) + 1]
         local recipeKeys = self:BuildRecipeKeys(90 + professionIndex, 40 + professions, professionIndex, recipesPerProfession)
-        local recipes = {}
-        for recipeIndex = 1, #recipeKeys do
-            recipes[recipeKeys[recipeIndex]] = true
-        end
         entry.professions[professionKey] = {
-            recipes = recipes,
+            recipes = makeRecipeSet(recipeKeys),
             skillRank = 300,
             skillMaxRank = 375,
             sourceType = entry.sourceType,
             guildStatus = entry.guildStatus,
             lastSeenInGuildAt = entry.lastSeenInGuildAt,
-            blockRevision = entry.rev,
-            lastUpdatedAt = entry.updatedAt,
+            lastUpdatedAt = updatedAt,
         }
+        self.telemetry.blocksSeeded = (self.telemetry.blocksSeeded or 0) + 1
     end
 
     Addon.Data:NormalizeMemberEntry(entry, memberKey)
+    self.telemetry.membersSeeded = (self.telemetry.membersSeeded or 0) + 1
     return entry
+end
+
+function MockSync:IsMockKey(memberKey)
+    return type(memberKey) == "string"
+        and (memberKey:find(MOCK_PEER_PREFIX, 1, true) == 1 or memberKey:find(MOCK_OWNER_PREFIX, 1, true) == 1)
+end
+
+function MockSync:IsLocalTrafficEnabled(sourceKey, memberKey)
+    if not self.active then
+        return false
+    end
+    if not (self.scenarioConfig and self.scenarioConfig.mode == "traffic") then
+        return false
+    end
+    if sourceKey and not self.mockDatasets[sourceKey] then
+        return false
+    end
+    if memberKey and not self:IsMockKey(memberKey) then
+        return false
+    end
+    return true
+end
+
+function MockSync:IsHardIsolationEnabled()
+    return self.active == true and self.hardIsolation == true
+end
+
+function MockSync:RecordSuppressedSend()
+    self.telemetry.suppressedSends = (self.telemetry.suppressedSends or 0) + 1
+end
+
+function MockSync:InjectTrafficDiscovery(peerKey, ownerCount, blockCount, contentCount)
+    if not Addon.Sync then
+        return
+    end
+    local fingerprint = format("mock:%s:%d:%d:%d", tostring(peerKey), ownerCount, blockCount, contentCount)
+    local helloId = format("mock-hello:%s:%d", tostring(peerKey), self._scenarioSerial or 0)
+    local caps = Addon.Sync.GetLocalProtocolCaps and Addon.Sync:GetLocalProtocolCaps() or nil
+    local hello = {
+        kind = "HELLO",
+        sender = peerKey,
+        key = peerKey,
+        helloId = helloId,
+        addonVersion = Addon.ADDON_VERSION or Addon.DISPLAY_VERSION,
+        version = Addon.ADDON_VERSION or Addon.DISPLAY_VERSION,
+        wireVersion = Addon.WIRE_VERSION,
+        buildChannel = Addon.BUILD_CHANNEL,
+        buildId = Addon.BUILD_ID,
+        capabilities = Addon.CAPABILITIES,
+        caps = caps,
+        syncModel = "index-diff-block-pull",
+        indexStatus = "ready",
+        activeOwnerCount = ownerCount,
+        activeBlockCount = blockCount,
+        activeContentCount = contentCount,
+        globalFingerprint = fingerprint,
+        isMock = true,
+    }
+    Addon.Sync:TouchNode(peerKey, Addon.ADDON_VERSION or Addon.DISPLAY_VERSION)
+    if Addon.Sync.ObservePeerVersion then
+        Addon.Sync:ObservePeerVersion(peerKey, hello)
+    end
+    Addon.Sync:HandleHello(hello)
+    self.telemetry.helloInjected = (self.telemetry.helloInjected or 0) + 1
+
+    Addon.Sync:HandleSummary({
+        kind = "SUMMARY",
+        sender = peerKey,
+        helloId = helloId,
+        activeOwnerCount = ownerCount,
+        activeBlockCount = blockCount,
+        activeContentCount = contentCount,
+        globalFingerprint = fingerprint,
+        isMock = true,
+    })
+    self.telemetry.summaryInjected = (self.telemetry.summaryInjected or 0) + 1
+end
+
+function MockSync:SeedScenario(name, config)
+    self:Cleanup()
+    self.active = true
+    self.hardIsolation = config.hardIsolation == true
+    self.scenarioName = name
+    self.scenarioConfig = config
+    self.mockDatasets = {}
+    self._scenarioSerial = (self._scenarioSerial or 0) + 1
+    self.telemetry.scenariosStarted = (self.telemetry.scenariosStarted or 0) + 1
+    self.telemetry.peersSimulated = config.peers or 0
+
+    local totalOwners = 0
+    local totalBlocks = 0
+    local totalContent = 0
+
+    for peerIndex = 1, (config.peers or 0) do
+        local peerKey = self:BuildPeerKey(peerIndex)
+        self.mockDatasets[peerKey] = { peerKey = peerKey, owners = {} }
+        for ownerIndex = 1, (config.ownersPerPeer or 1) do
+            local ownerKey = self:BuildOwnerKey(peerIndex, ownerIndex)
+            self:SeedMockMember(ownerKey, config.professions or 2, config.recipesPerProfession or 12, {
+                sourceType = config.sourceType or "replica",
+                updatedAt = time(),
+                lastSeenInGuildAt = time(),
+            })
+            self.mockDatasets[peerKey].owners[ownerKey] = true
+            totalOwners = totalOwners + 1
+            totalBlocks = totalBlocks + (config.professions or 0)
+            totalContent = totalContent + ((config.professions or 0) * (config.recipesPerProfession or 0))
+        end
+        if config.mode == "traffic" then
+            self:InjectTrafficDiscovery(
+                peerKey,
+                config.ownersPerPeer or 1,
+                (config.ownersPerPeer or 1) * (config.professions or 0),
+                (config.ownersPerPeer or 1) * (config.professions or 0) * (config.recipesPerProfession or 0)
+            )
+        end
+    end
+
+    if Addon.Data and Addon.Data.MarkSyncIndexDirty then
+        Addon.Data:MarkSyncIndexDirty("mock-seed", nil, {
+            full = true,
+        })
+    end
+    if Addon.Sync and Addon.Sync.ScheduleHello then
+        Addon.Sync:ScheduleHello("mock-seed", 0.2)
+    end
+
+    self.active = false
+    self.telemetry.scenariosCompleted = (self.telemetry.scenariosCompleted or 0) + 1
+    Addon:RequestRefresh("mock")
+    return true, format("owners=%d blocks=%d content=%d", totalOwners, totalBlocks, totalContent)
 end
 
 function MockSync:StartRosterScenario(name, config)
@@ -202,7 +318,7 @@ function MockSync:StartRosterScenario(name, config)
         running = true,
         label = "mock-roster-" .. tostring(name),
     }
-    self.telemetry.scenariosStarted = self.telemetry.scenariosStarted + 1
+    self.telemetry.scenariosStarted = (self.telemetry.scenariosStarted or 0) + 1
     self.telemetry.rosterRunsStarted = (self.telemetry.rosterRunsStarted or 0) + 1
 
     local now = time()
@@ -285,7 +401,7 @@ function MockSync:StartRosterBadScenario(name, config)
         running = false,
         label = "mock-rosterbad-" .. tostring(name),
     }
-    self.telemetry.scenariosStarted = self.telemetry.scenariosStarted + 1
+    self.telemetry.scenariosStarted = (self.telemetry.scenariosStarted or 0) + 1
     self.telemetry.rosterRunsStarted = (self.telemetry.rosterRunsStarted or 0) + 1
 
     local memberKeys = {}
@@ -314,7 +430,7 @@ function MockSync:StartRosterBadScenario(name, config)
     end
 
     self.active = false
-    self.telemetry.scenariosCompleted = self.telemetry.scenariosCompleted + 1
+    self.telemetry.scenariosCompleted = (self.telemetry.scenariosCompleted or 0) + 1
     self.telemetry.rosterRunsCompleted = (self.telemetry.rosterRunsCompleted or 0) + 1
     Addon:RequestRefresh("mock-rosterbad")
     return reason == "roster-empty" or reason == "roster-too-small", reason or "cleanup-start-failed"
@@ -331,12 +447,11 @@ function MockSync:StartIntegrityScenario(name, config)
         passed = false,
         reason = "not-run",
     }
-    self.telemetry.scenariosStarted = self.telemetry.scenariosStarted + 1
+    self.telemetry.scenariosStarted = (self.telemetry.scenariosStarted or 0) + 1
     self.telemetry.integrityRunsStarted = (self.telemetry.integrityRunsStarted or 0) + 1
 
     local memberKey = self:BuildOwnerKey(77, 1)
     local entry = self:SeedMockMember(memberKey, config.professions or 2, config.recipesPerProfession or 16, {
-        rev = 10,
         sourceType = "replica",
         guildStatus = "active",
         updatedAt = time() - 60,
@@ -357,41 +472,36 @@ function MockSync:StartIntegrityScenario(name, config)
         return false, "missing-professions"
     end
 
-    local expectedPrimaryCount = entry.professions[primaryProfession].count or 0
-    local primaryKeys = {}
-    for recipeKey in pairs(entry.professions[primaryProfession].recipes or {}) do
-        primaryKeys[#primaryKeys + 1] = recipeKey
-    end
-    sort(primaryKeys, function(a, b) return tostring(a) < tostring(b) end)
-    local subset = {}
-    local subsetCount = max(1, floor(#primaryKeys / 2))
-    for index = 1, subsetCount do
-        subset[#subset + 1] = primaryKeys[index]
-    end
-
-    local incomingRev = 20
-    local incomingUpdatedAt = time()
-    Addon.Data:BeginIncomingSnapshot(memberKey, incomingRev, incomingUpdatedAt)
-    Addon.Data:AppendIncomingChunk({
-        memberKey = memberKey,
-        rev = incomingRev,
-        updatedAt = incomingUpdatedAt,
-        sourceType = "replica",
-        profession = primaryProfession,
-        skillRank = entry.professions[primaryProfession].skillRank or 0,
-        skillMaxRank = entry.professions[primaryProfession].skillMaxRank or 0,
-        recipeKeys = subset,
+    local blockKey = Addon.Data:BuildSyncBlockKey(memberKey, primaryProfession)
+    local snapshot = Addon.Data:BuildBlockSnapshot(blockKey, {
+        snapshotKind = "mock-integrity",
     })
-    local merged = Addon.Data:FinalizeIncomingSnapshot(memberKey, incomingRev, {
+    local subset = {}
+    for index = 1, math.max(1, math.floor(#(snapshot.recipeKeys or {}) / 2)) do
+        subset[#subset + 1] = snapshot.recipeKeys[index]
+    end
+    snapshot.recipeKeys = subset
+
+    local applied = Addon.Data:ApplyIncomingBlockAdditive(blockKey, {
+        blockKey = blockKey,
+        ownerCharacter = memberKey,
+        professionKey = primaryProfession,
+        recipeKeys = snapshot.recipeKeys,
+        specialization = snapshot.specialization,
+        skillRank = snapshot.skillRank,
+        skillMaxRank = snapshot.skillMaxRank,
+        metadata = snapshot.metadata,
+    }, {
         sourceType = "replica",
-        isMock = true,
     })
 
     local resolved = Addon.Data:GetMember(memberKey)
     local primaryCount = resolved and resolved.professions and resolved.professions[primaryProfession]
         and resolved.professions[primaryProfession].count or 0
     local secondaryExists = resolved and resolved.professions and resolved.professions[secondaryProfession] ~= nil
-    local passed = merged == true and primaryCount >= expectedPrimaryCount and secondaryExists
+    local expectedPrimaryCount = entry.professions[primaryProfession].count or 0
+    local passed = applied == true and primaryCount >= expectedPrimaryCount and secondaryExists
+
     self.integrityScenario = {
         name = name,
         passed = passed,
@@ -406,7 +516,7 @@ function MockSync:StartIntegrityScenario(name, config)
 
     if passed then
         self.telemetry.integrityRunsCompleted = (self.telemetry.integrityRunsCompleted or 0) + 1
-        self.telemetry.scenariosCompleted = self.telemetry.scenariosCompleted + 1
+        self.telemetry.scenariosCompleted = (self.telemetry.scenariosCompleted or 0) + 1
     else
         self.telemetry.integrityRunsFailed = (self.telemetry.integrityRunsFailed or 0) + 1
     end
@@ -415,426 +525,8 @@ function MockSync:StartIntegrityScenario(name, config)
     return passed, self.integrityScenario.reason
 end
 
-function MockSync:IsMockKey(memberKey)
-    return type(memberKey) == "string"
-        and (memberKey:find(MOCK_PEER_PREFIX, 1, true) == 1 or memberKey:find(MOCK_OWNER_PREFIX, 1, true) == 1)
-end
-
-function MockSync:IsLocalTrafficEnabled(sourceKey, memberKey)
-    if not self.active then return false end
-    if not (self.scenarioConfig and self.scenarioConfig.mode == "traffic") then return false end
-    if sourceKey and not self.mockDatasets[sourceKey] then return false end
-    if memberKey and not self:IsMockKey(memberKey) then return false end
-    return true
-end
-
-function MockSync:IsHardIsolationEnabled()
-    return self.active == true and self.hardIsolation == true
-end
-
-function MockSync:RecordSuppressedSend()
-    self.telemetry.suppressedSends = (self.telemetry.suppressedSends or 0) + 1
-end
-
-function MockSync:QueuePayload(deliverAt, payload)
-    self.pendingPayloads[#self.pendingPayloads + 1] = {
-        deliverAt = deliverAt,
-        payload = payload,
-    }
-    self.telemetry.payloadsQueued = self.telemetry.payloadsQueued + 1
-end
-
-function MockSync:BuildDirectPeerPayloads(peerIndex, config)
-    local peerKey = self:BuildPeerKey(peerIndex)
-    local payloads = {}
-    local sessionId = format("mock:%s:%d", peerKey, self._scenarioSerial or 0)
-    local rev = ((self._scenarioSerial or 0) * 1000) + peerIndex
-    local updatedAt = time()
-    local total = 0
-    local perProfession = {}
-
-    for professionIndex = 1, config.professions do
-        local profession = MOCK_PROFESSIONS[((professionIndex - 1) % #MOCK_PROFESSIONS) + 1]
-        local allRecipeKeys = self:BuildRecipeKeys(peerIndex, 1, professionIndex, config.recipesPerProfession)
-        perProfession[#perProfession + 1] = {
-            profession = profession,
-            recipeKeys = allRecipeKeys,
-        }
-        total = total + math.max(1, math.ceil(#allRecipeKeys / config.chunkSize))
-    end
-
-    local seq = 0
-    for _, row in ipairs(perProfession) do
-        local index = 1
-        while index <= #row.recipeKeys do
-            seq = seq + 1
-            payloads[#payloads + 1] = {
-                kind = "SNAP",
-                sender = peerKey,
-                sessionId = sessionId,
-                key = peerKey,
-                rev = rev,
-                updatedAt = updatedAt,
-                sourceType = config.sourceType or "replica",
-                isMock = true,
-                profession = row.profession,
-                skillRank = 300,
-                skillMaxRank = 375,
-                recipeKeys = copyRecipeSlice(row.recipeKeys, index, config.chunkSize),
-                seq = seq,
-                total = total,
-            }
-            index = index + config.chunkSize
-        end
-    end
-
-    return peerKey, payloads, rev, updatedAt
-end
-
-function MockSync:BuildTrafficDataset(peerIndex, config)
-    local peerKey = self:BuildPeerKey(peerIndex)
-    local peerRevision = ((self._scenarioSerial or 0) * 1000) + peerIndex
-    local builtAt = time()
-    local owners = {}
-    local manifestBlocks = {}
-    local totals = { blocks = 0, recipes = 0 }
-
-    for ownerIndex = 1, (config.ownersPerPeer or 1) do
-        local ownerKey = self:BuildOwnerKey(peerIndex, ownerIndex)
-        local ownerRevision = peerRevision + ownerIndex
-        local professions = {}
-        for professionIndex = 1, config.professions do
-            local professionKey = MOCK_PROFESSIONS[((professionIndex - 1) % #MOCK_PROFESSIONS) + 1]
-            local recipeKeys = self:BuildRecipeKeys(peerIndex, ownerIndex, professionIndex, config.recipesPerProfession)
-            local signature = table.concat(recipeKeys, ":")
-            professions[professionKey] = {
-                profession = professionKey,
-                recipeKeys = recipeKeys,
-                skillRank = 300,
-                skillMaxRank = 375,
-                revision = ownerRevision,
-                updatedAt = builtAt,
-                sourceType = config.sourceType or "replica",
-                count = #recipeKeys,
-                signature = signature,
-            }
-            local blockKey = Addon.Data:BuildSyncBlockKey(ownerKey, professionKey)
-            manifestBlocks[blockKey] = {
-                blockKey = blockKey,
-                ownerCharacter = ownerKey,
-                professionKey = professionKey,
-                revision = ownerRevision,
-                lastUpdatedAt = builtAt,
-                sourceType = config.sourceType or "replica",
-                guildStatus = "active",
-                lastSeenInGuildAt = builtAt,
-                count = #recipeKeys,
-                fingerprint = signature,
-            }
-            totals.blocks = totals.blocks + 1
-            totals.recipes = totals.recipes + #recipeKeys
-        end
-
-        owners[ownerKey] = {
-            memberKey = ownerKey,
-            rev = ownerRevision,
-            updatedAt = builtAt,
-            sourceType = config.sourceType or "replica",
-            professions = professions,
-        }
-    end
-
-    return {
-        peerKey = peerKey,
-        peerRevision = peerRevision,
-        updatedAt = builtAt,
-        owners = owners,
-        manifest = {
-            builtAt = builtAt,
-            memberKey = peerKey,
-            totals = totals,
-            blocks = manifestBlocks,
-        },
-    }
-end
-
-function MockSync:BuildManifestChunks(dataset)
-    local blockKeys = {}
-    for blockKey in pairs(dataset.manifest.blocks or {}) do
-        blockKeys[#blockKeys + 1] = blockKey
-    end
-    sort(blockKeys)
-
-    local manifestId = format("mockmani:%s:%d:%d", dataset.peerKey, self._scenarioSerial or 0, #blockKeys)
-    local chunks = {}
-    local chunkSize = 24
-    for startIndex = 1, #blockKeys, chunkSize do
-        local blocks = {}
-        for offset = 0, (chunkSize - 1) do
-            local blockKey = blockKeys[startIndex + offset]
-            if not blockKey then break end
-            blocks[#blocks + 1] = cloneTable(dataset.manifest.blocks[blockKey])
-        end
-        chunks[#chunks + 1] = {
-            kind = "MANI",
-            sender = dataset.peerKey,
-            manifestId = manifestId,
-            builtAt = dataset.manifest.builtAt,
-            memberKey = dataset.peerKey,
-            totals = dataset.manifest.totals,
-            seq = #chunks + 1,
-            total = math.max(1, math.ceil(#blockKeys / chunkSize)),
-            blocks = blocks,
-            isMock = true,
-        }
-    end
-
-    if #chunks == 0 then
-        chunks[1] = {
-            kind = "MANI",
-            sender = dataset.peerKey,
-            manifestId = manifestId,
-            builtAt = dataset.manifest.builtAt,
-            memberKey = dataset.peerKey,
-            totals = dataset.manifest.totals,
-            seq = 1,
-            total = 1,
-            blocks = {},
-            isMock = true,
-        }
-    end
-
-    return chunks
-end
-
-function MockSync:QueueDirectScenarioPayloads(name, config)
-    local scenarioStartedAt = nowSeconds()
-
-    for peerIndex = 1, config.peers do
-        local peerKey, payloads, rev, updatedAt = self:BuildDirectPeerPayloads(peerIndex, config)
-        if Addon.Sync then
-            Addon.Sync:TouchNode(peerKey, "mock")
-            Addon.Sync:RecordRevisionHint(peerKey, rev, updatedAt, peerKey, { isMock = true })
-        end
-        for payloadIndex = 1, #payloads do
-            self:QueuePayload(
-                scenarioStartedAt + ((payloadIndex - 1) * config.peerDelay),
-                payloads[payloadIndex]
-            )
-        end
-    end
-end
-
-function MockSync:QueueTrafficScenarioPayloads(config)
-    local scenarioStartedAt = nowSeconds()
-
-    for peerIndex = 1, config.peers do
-        local dataset = self:BuildTrafficDataset(peerIndex, config)
-        self.mockDatasets[dataset.peerKey] = dataset
-        if Addon.Sync then
-            Addon.Sync:TouchNode(dataset.peerKey, "mock-traffic")
-            Addon.Sync:RecordRevisionHint(dataset.peerKey, dataset.peerRevision, dataset.updatedAt, dataset.peerKey, { isMock = true })
-        end
-
-        self:QueuePayload(scenarioStartedAt + ((peerIndex - 1) * config.peerDelay), {
-            kind = "HELLO",
-            sender = dataset.peerKey,
-            key = dataset.peerKey,
-            rev = dataset.peerRevision,
-            updatedAt = dataset.updatedAt,
-            version = "mock-traffic",
-            isMock = true,
-        })
-
-        local manifestChunks = self:BuildManifestChunks(dataset)
-        for chunkIndex = 1, #manifestChunks do
-            self:QueuePayload(
-                scenarioStartedAt + ((peerIndex - 1) * config.peerDelay) + 0.02 + ((chunkIndex - 1) * 0.01),
-                manifestChunks[chunkIndex]
-            )
-        end
-    end
-end
-
-function MockSync:QueueScenarioPayloads(name)
-    local config = self:GetScenarioConfig(name)
-    if not config then return false, "unknown-scenario" end
-
-    self:Cleanup()
-    self.active = true
-    self.hardIsolation = config.hardIsolation == true
-    self.scenarioName = name
-    self.scenarioConfig = config
-    self.pendingPayloads = {}
-    self.mockDatasets = {}
-    self._scenarioSerial = (self._scenarioSerial or 0) + 1
-    self.telemetry.scenariosStarted = self.telemetry.scenariosStarted + 1
-    self.telemetry.peersSimulated = config.peers
-
-    if config.mode == "traffic" then
-        self:QueueTrafficScenarioPayloads(config)
-    else
-        self:QueueDirectScenarioPayloads(name, config)
-    end
-
-    sort(self.pendingPayloads, function(a, b)
-        return (a.deliverAt or 0) < (b.deliverAt or 0)
-    end)
-    return true
-end
-
-function MockSync:DeliverTrafficPayload(payload)
-    if not Addon.Sync then return end
-    if payload.kind == "HELLO" then
-        self.telemetry.trafficAnnouncements = self.telemetry.trafficAnnouncements + 1
-        Addon.Sync:HandleHello(payload)
-        return
-    end
-    if payload.kind == "MANI" then
-        self.telemetry.trafficAnnouncements = self.telemetry.trafficAnnouncements + 1
-        Addon.Sync:HandleManifestChunk(payload)
-        return
-    end
-    if payload.kind == "SNAP" then
-        self.telemetry.trafficSnapshots = self.telemetry.trafficSnapshots + 1
-        Addon.Sync:HandleSnapshotChunk(payload)
-    end
-end
-
-function MockSync:DeliverNextPayload()
-    if #self.pendingPayloads == 0 then
-        self._workerScheduled = false
-        if self.active and not (self.scenarioConfig and self.scenarioConfig.mode == "traffic") then
-            self.active = false
-            self.telemetry.scenariosCompleted = self.telemetry.scenariosCompleted + 1
-            Addon:RequestRefresh("mock")
-        end
-        return false
-    end
-
-    local nextPayload = self.pendingPayloads[1]
-    if (nextPayload.deliverAt or 0) > nowSeconds() then
-        return true
-    end
-
-    table.remove(self.pendingPayloads, 1)
-    self.telemetry.payloadsDelivered = self.telemetry.payloadsDelivered + 1
-
-    if nextPayload.payload.kind == "SNAP" and not nextPayload.payload.sessionId then
-        nextPayload.payload.sessionId = format("mock:snap:%s:%d", nextPayload.payload.key or "unknown", self._scenarioSerial or 0)
-    end
-
-    if self.scenarioConfig and self.scenarioConfig.mode == "traffic" then
-        self:DeliverTrafficPayload(nextPayload.payload)
-    elseif Addon.Sync then
-        Addon.Sync:HandleSnapshotChunk(nextPayload.payload)
-    end
-
-    Addon:RequestRefresh("mock")
-    return true
-end
-
-function MockSync:BuildOwnerSnapshotPayloads(peerKey, ownerKey)
-    local dataset = self.mockDatasets[peerKey]
-    local owner = dataset and dataset.owners and dataset.owners[ownerKey]
-    if not owner then return nil end
-
-    local payloads = {}
-    local sessionId = format("mockreq:%s:%s:%d", peerKey, ownerKey, self._scenarioSerial or 0)
-    local total = 0
-    local professionNames = {}
-    for professionKey in pairs(owner.professions or {}) do
-        professionNames[#professionNames + 1] = professionKey
-    end
-    sort(professionNames)
-
-    for _, professionKey in ipairs(professionNames) do
-        local profession = owner.professions[professionKey]
-        total = total + math.max(1, math.ceil(#(profession.recipeKeys or {}) / (self.scenarioConfig.chunkSize or 24)))
-    end
-
-    local seq = 0
-    for _, professionKey in ipairs(professionNames) do
-        local profession = owner.professions[professionKey]
-        local index = 1
-        repeat
-            seq = seq + 1
-            payloads[#payloads + 1] = {
-                kind = "SNAP",
-                sender = peerKey,
-                sessionId = sessionId,
-                key = ownerKey,
-                rev = owner.rev,
-                updatedAt = owner.updatedAt,
-                sourceType = profession.sourceType or owner.sourceType or "replica",
-                isMock = true,
-                profession = professionKey,
-                skillRank = profession.skillRank or 0,
-                skillMaxRank = profession.skillMaxRank or 0,
-                recipeKeys = copyRecipeSlice(profession.recipeKeys or {}, index, self.scenarioConfig.chunkSize or 24),
-                seq = seq,
-                total = total,
-            }
-            index = index + (self.scenarioConfig.chunkSize or 24)
-        until index > #(profession.recipeKeys or {})
-    end
-
-    return payloads
-end
-
-function MockSync:HandleLocalRequest(request)
-    local dataset = request and self.mockDatasets and self.mockDatasets[request.source]
-    if not dataset then return false end
-    local owner = dataset.owners and dataset.owners[request.memberKey]
-    if not owner then return false end
-
-    local requestedBlocks = request.requestedBlocks or {}
-    local hasSpecificBlockRequest = type(requestedBlocks) == "table" and #requestedBlocks > 0
-    if (owner.rev or 0) <= (request.knownRev or 0) then
-        if not hasSpecificBlockRequest then
-            return false
-        end
-
-        local hasRequestedBlock = false
-        for _, blockKey in ipairs(requestedBlocks) do
-            local ownerCharacter, professionKey = Addon.Data:ParseSyncBlockKey(blockKey)
-            if ownerCharacter == request.memberKey and professionKey and owner.professions and owner.professions[professionKey] then
-                hasRequestedBlock = true
-                break
-            end
-        end
-        if not hasRequestedBlock then
-            return false
-        end
-    end
-
-    self.telemetry.trafficRequests = self.telemetry.trafficRequests + 1
-    local payloads = self:BuildOwnerSnapshotPayloads(request.source, request.memberKey)
-    if not payloads or #payloads == 0 then
-        return false
-    end
-
-    local startAt = nowSeconds() + (self.scenarioConfig.requestDelay or 0.05)
-    for payloadIndex = 1, #payloads do
-        self:QueuePayload(startAt + ((payloadIndex - 1) * (self.scenarioConfig.peerDelay or 0.05)), payloads[payloadIndex])
-    end
-    sort(self.pendingPayloads, function(a, b)
-        return (a.deliverAt or 0) < (b.deliverAt or 0)
-    end)
-    self:EnsureWorker()
-    return true
-end
-
-function MockSync:EnsureWorker()
-    if self._workerScheduled or not Addon.Performance then return end
-    self._workerScheduled = true
-    Addon.Performance:ScheduleJob("mock-sync-loop", function()
-        return self:DeliverNextPayload()
-    end, {
-        category = "mock",
-        label = "mock-sync-loop",
-        budgetMs = 1,
-    })
+function MockSync:HandleLocalRequest(_request)
+    return false
 end
 
 function MockSync:StartScenario(name)
@@ -851,26 +543,17 @@ function MockSync:StartScenario(name)
     if config.mode == "integrity" then
         return self:StartIntegrityScenario(name, config)
     end
-
-    local ok, err = self:QueueScenarioPayloads(name)
-    if not ok then
-        return false, err
-    end
-    self:EnsureWorker()
-    Addon:RequestRefresh("mock")
-    return true
+    return self:SeedScenario(name, config)
 end
 
 function MockSync:Stop()
-    self.pendingPayloads = {}
-    self.mockDatasets = {}
     self.active = false
     self.hardIsolation = false
     self.scenarioName = nil
     self.scenarioConfig = nil
+    self.mockDatasets = {}
     self.rosterScenario = nil
     self.integrityScenario = nil
-    self._workerScheduled = false
     Addon:RequestRefresh("mock")
 end
 
@@ -880,18 +563,6 @@ function MockSync:Cleanup()
     local removedRegistry, removedOnlineNodes, removedPending = 0, 0, 0
     if Addon.Sync and Addon.Sync.CleanupMockState then
         removedRegistry, removedOnlineNodes, removedPending = Addon.Sync:CleanupMockState()
-    end
-    if Addon.TrickleSync and Addon.TrickleSync.peerState then
-        for peerKey in pairs(Addon.TrickleSync.peerState) do
-            if self:IsMockKey(peerKey) then
-                Addon.TrickleSync.peerState[peerKey] = nil
-            end
-        end
-        for peerKey in pairs(Addon.TrickleSync.outboundQueue or {}) do
-            if self:IsMockKey(peerKey) then
-                Addon.TrickleSync.outboundQueue[peerKey] = nil
-            end
-        end
     end
     return removedMembers, removedRegistry, removedOnlineNodes, removedPending
 end
@@ -904,13 +575,12 @@ function MockSync:GetDebugSnapshot()
     if self.rosterScenario and not rosterRunning and lastCleanup and lastCleanup.label == self.rosterScenario.label and self.rosterScenario.running then
         self.rosterScenario.running = false
         self.active = false
-        self.telemetry.scenariosCompleted = self.telemetry.scenariosCompleted + 1
+        self.telemetry.scenariosCompleted = (self.telemetry.scenariosCompleted or 0) + 1
         self.telemetry.rosterRunsCompleted = (self.telemetry.rosterRunsCompleted or 0) + 1
     end
     return {
         active = self.active,
         scenarioName = self.scenarioName,
-        pendingPayloads = #self.pendingPayloads,
         datasets = countKeys(self.mockDatasets),
         telemetry = self.telemetry,
         scenarioCount = countKeys(SCENARIOS),
@@ -927,21 +597,19 @@ function MockSync:DumpStatus()
     local snapshot = self:GetDebugSnapshot()
     local telemetry = snapshot.telemetry or {}
     Addon:SystemPrint(format(
-        "Mock active=%s scenario=%s traffic=%s isolated=%s pending=%d datasets=%d started=%d completed=%d queued=%d delivered=%d peers=%d announcements=%d requests=%d snapshots=%d suppressed=%d",
+        "Mock active=%s scenario=%s traffic=%s isolated=%s datasets=%d started=%d completed=%d peers=%d members=%d blocks=%d hello=%d summary=%d suppressed=%d",
         tostring(snapshot.active),
         tostring(snapshot.scenarioName or "none"),
         tostring(snapshot.localTraffic),
         tostring(snapshot.hardIsolation),
-        snapshot.pendingPayloads or 0,
         snapshot.datasets or 0,
         telemetry.scenariosStarted or 0,
         telemetry.scenariosCompleted or 0,
-        telemetry.payloadsQueued or 0,
-        telemetry.payloadsDelivered or 0,
         telemetry.peersSimulated or 0,
-        telemetry.trafficAnnouncements or 0,
-        telemetry.trafficRequests or 0,
-        telemetry.trafficSnapshots or 0,
+        telemetry.membersSeeded or 0,
+        telemetry.blocksSeeded or 0,
+        telemetry.helloInjected or 0,
+        telemetry.summaryInjected or 0,
         telemetry.suppressedSends or 0
     ))
     if snapshot.rosterScenario then

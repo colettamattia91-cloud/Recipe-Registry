@@ -358,7 +358,13 @@ function Data:BuildRecipeIndexAsync(onComplete)
     Addon.Performance:ScheduleJob("recipe-index-build", function(state, ctx)
         return self:RunRecipeIndexBuildStep(state, ctx)
     end, {
-        category = "ui",
+        -- "ui-data" is intentionally distinct from "ui": SyncPausePolicy
+        -- pauses "ui" in combat/instance to keep tooltip rebuilds quiet
+        -- during heavy moments. The recipe data builders run with a tiny
+        -- per-step budget (~3 ms) and are the only thing standing between
+        -- the user and a usable Recipe Registry window — pausing them in
+        -- a dungeon would leave the panel stuck on "Loading..." forever.
+        category = "ui-data",
         label = "recipe-index-build",
         budgetMs = INDEX_BUILD_BUDGET_MS,
         state = jobState,
@@ -798,7 +804,7 @@ function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, catego
         Addon.Performance:ScheduleJob("recipe-list-build", function(state, ctx)
             return self:RunRecipeListBuildStep(state, ctx)
         end, {
-            category = "ui",
+            category = "ui-data",
             label = "recipe-list-build",
             budgetMs = LIST_BUILD_BUDGET_MS,
             state = jobState,

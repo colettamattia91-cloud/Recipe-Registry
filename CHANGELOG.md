@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.0.4] - 2026-05-21
+### Changed
+- The recipe browser's background data builders now keep progressing with a tiny budget even while heavier UI work is paused, preventing the window from getting stuck on `Loading...` if it is opened during combat or other paused moments.
+- AtlasLoot category indexing now uses the same lightweight background path, so first-load browsing stays responsive while category labels catch up.
+- Corrupt-data cleanup now marks only the affected sync blocks dirty when possible instead of forcing a broader sync index rebuild after every repair.
+
 ## [2.0.3] - 2026-05-21
 ### Changed
 - The Recipe Registry window now opens without freezing the client, even on the first try after a `/reload`. The recipe list, the underlying recipe index, and the AtlasLoot category index all build progressively in the background while the window stays responsive, with a brief "loading" indicator until the data is ready.

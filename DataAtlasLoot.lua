@@ -355,7 +355,7 @@ function Data:BuildAtlasLootCategoryIndexAsync(onComplete)
     Addon.Performance:ScheduleJob("atlas-category-build", function(state, ctx)
         return self:RunAtlasLootCategoryBuildStep(state, ctx)
     end, {
-        category = "ui",
+        category = "ui-data",
         label = "atlas-category-build",
         budgetMs = 3,
         state = jobState,
