@@ -295,6 +295,118 @@ function Data:GetAtlasLootCategoryIndex()
     return self:BuildAtlasLootCategoryIndex()
 end
 
+-- Chunked counterpart to BuildAtlasLootCategoryIndex. The sync build walks
+-- the entire AtlasLoot crafting module in one pass — hundreds of rows per
+-- profession, ~50–200 ms total. Triggered at PLAYER_LOGIN so the work
+-- happens during sync warmup (when the UI is in degraded mode and the
+-- player isn't waiting on it). Callers that hit the lookup before the
+-- prebuild finishes still fall back to the sync builder via
+-- GetAtlasLootCategoryIndex; that's a rare path because warmup usually
+-- gives the prebuild more than enough time to complete.
+function Data:BuildAtlasLootCategoryIndexAsync(onComplete)
+    if self._atlasCategoryIndex and not self._atlasCategoryIndex.unavailable then
+        if onComplete then onComplete(self._atlasCategoryIndex) end
+        return
+    end
+
+    if self._atlasCategoryIndexBuildCallbacks then
+        if onComplete then
+            self._atlasCategoryIndexBuildCallbacks[#self._atlasCategoryIndexBuildCallbacks + 1] = onComplete
+        end
+        return
+    end
+
+    self._atlasCategoryIndexBuildCallbacks = onComplete and { onComplete } or {}
+
+    if not (Addon.Performance and Addon.Performance.ScheduleJob) then
+        local index = self:BuildAtlasLootCategoryIndex()
+        local callbacks = self._atlasCategoryIndexBuildCallbacks
+        self._atlasCategoryIndexBuildCallbacks = nil
+        for _, cb in ipairs(callbacks) do
+            if cb then cb(index) end
+        end
+        return
+    end
+
+    local module, itemDB, moduleName = getAtlasLootCraftingModule(true)
+    local index = {
+        categoriesByProfession = {},
+        categorySeenByProfession = {},
+        categoryByRecipe = {},
+    }
+    if not module then
+        index.unavailable = true
+        self._atlasCategoryIndex = index
+        local callbacks = self._atlasCategoryIndexBuildCallbacks
+        self._atlasCategoryIndexBuildCallbacks = nil
+        for _, cb in ipairs(callbacks) do
+            if cb then cb(index) end
+        end
+        return
+    end
+
+    local jobState = {
+        module = module,
+        orderedKeys = getOrderedContentKeys(module, itemDB, moduleName),
+        cursor = 1,
+        index = index,
+    }
+
+    Addon.Performance:ScheduleJob("atlas-category-build", function(state, ctx)
+        return self:RunAtlasLootCategoryBuildStep(state, ctx)
+    end, {
+        category = "ui",
+        label = "atlas-category-build",
+        budgetMs = 3,
+        state = jobState,
+    })
+end
+
+function Data:RunAtlasLootCategoryBuildStep(state, ctx)
+    local budgetMs = (ctx and ctx.budgetMs) or 3
+    local startedAt = (type(debugprofilestop) == "function") and debugprofilestop() or 0
+    local module = state.module
+    local orderedKeys = state.orderedKeys
+    local index = state.index
+    local total = #orderedKeys
+
+    while state.cursor <= total do
+        local contentKey = orderedKeys[state.cursor]
+        state.cursor = state.cursor + 1
+        local content = module[contentKey]
+        local professionName = content and getProfessionFromContent(self, contentKey, content) or nil
+        if professionName and type(content.items) == "table" then
+            for _, category in ipairs(content.items) do
+                local categoryName = category and category.name
+                if categoryName then
+                    for diffKey, rows in pairs(category) do
+                        if diffKey ~= "name" and type(rows) == "table" then
+                            for _, row in ipairs(rows) do
+                                registerAtlasRow(index, self, professionName, categoryName, row)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        local now = (type(debugprofilestop) == "function") and debugprofilestop() or 0
+        if (now - startedAt) >= budgetMs then
+            return true, state
+        end
+    end
+
+    index.categorySeenByProfession = nil
+    self._atlasCategoryIndex = index
+    local callbacks = self._atlasCategoryIndexBuildCallbacks
+    self._atlasCategoryIndexBuildCallbacks = nil
+    if callbacks then
+        for _, cb in ipairs(callbacks) do
+            if cb then cb(index) end
+        end
+    end
+    return false, state
+end
+
 function Data:GetRecipeCategory(recipeKey, profession)
     if not recipeKey or not profession then return nil end
     local index = self:GetAtlasLootCategoryIndex()

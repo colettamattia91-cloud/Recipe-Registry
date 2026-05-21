@@ -414,6 +414,16 @@ function Addon:OnPlayerLogin()
             self.Data:ScheduleSafeAutoClean({ maxMembersPerStep = 8 })
         end, 8)
     end
+    -- Pre-warm the AtlasLoot category index during sync warmup so the
+    -- first post-warmup RefreshProfessionButtons doesn't pay for it
+    -- synchronously. The 1s delay lets the heavier login-phase work
+    -- (sync startup, profession detection, sync-index prepare) breathe
+    -- before this chunked job competes with them.
+    if self.Data and self.Data.BuildAtlasLootCategoryIndexAsync then
+        self:ScheduleTimer(function()
+            self.Data:BuildAtlasLootCategoryIndexAsync()
+        end, 1)
+    end
     -- Keep one watchdog for pathological reload/login paths, but readiness comes
     -- from PLAYER_LOGIN / PLAYER_ENTERING_WORLD / GUILD_ROSTER_UPDATE + index prep.
     self:ScheduleTimer("OnLoginReady", 10)

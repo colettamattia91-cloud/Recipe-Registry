@@ -1513,9 +1513,17 @@ function UI:RefreshSummaryCards()
     setTextIfChanged(self.frame.cards.recipes.text, label)
 end
 
-function UI:RefreshProfessionButtons()
+function UI:RefreshProfessionButtons(opts)
+    -- `skipCategories` lets the degraded-mode renderer populate the
+    -- profession sidebar without touching the AtlasLoot category index.
+    -- GetRecipeCategories(_, true) triggers BuildAtlasLootCategoryIndex
+    -- on cache miss, which walks the entire AtlasLoot crafting module
+    -- synchronously — that's a multi-hundred-ms freeze the warmup path
+    -- can't absorb. After warmup, the normal Refresh path runs with
+    -- skipCategories=false and the categories appear.
+    local skipCategories = opts and opts.skipCategories or false
     local summary = Addon.Data:GetProfessionSummary()
-    local useCategories = Addon.db and Addon.db.profile and Addon.db.profile.useRecipeCategories ~= false
+    local useCategories = (not skipCategories) and Addon.db and Addon.db.profile and Addon.db.profile.useRecipeCategories ~= false
     local yOffset = 0
     local categoryButtonIndex = 0
 
@@ -1726,6 +1734,19 @@ function UI:RenderVisibleRecipeRows()
     self._lastRenderedLastIdx = lastIdx
 end
 
+-- Kicks off a chunked recipe-list build through Data:BuildRecipeListAsync.
+-- The build path:
+--   * cache hit  → onComplete fires inline; finalize runs synchronously
+--                  inside this call (no perceptible delay).
+--   * cache miss → job processes ~60 recipes per scheduler step; the panel
+--                  shows a "Loading..." header until the callback fires.
+--
+-- The generation token discards stale callbacks: if the filter changes
+-- (profession switch, search debounce fires, favorites toggle) before the
+-- previous build finishes, the in-flight callback notices the mismatch and
+-- returns without touching the UI. A `nil` rows payload from the callback
+-- means the data cache was invalidated mid-build — we drop it for the same
+-- reason; the originating event will have queued its own RefreshRecipeList.
 function UI:RefreshRecipeList()
     if not self.frame then return end
     local effectiveProfession = self.selectedProfession
@@ -1739,13 +1760,72 @@ function UI:RefreshRecipeList()
     end
     local globalSearch = (self.selectedProfession == nil and self.searchText and self.searchText ~= "")
     local canRunGlobalSearch = globalSearch and string.len(self.searchText or "") >= GLOBAL_SEARCH_MIN_CHARS
-    local rows = {}
-    if self.selectedProfession == "Favorites" or self.selectedProfession ~= nil or canRunGlobalSearch then
-        rows = Addon.Data:GetRecipeList(effectiveProfession, self.searchText, self.sortMode, self.searchMode, categoryFilter)
+
+    local context = {
+        selectedProfession = self.selectedProfession,
+        categoryFilter = categoryFilter,
+        globalSearch = globalSearch,
+        canRunGlobalSearch = canRunGlobalSearch,
+        sortMode = self.sortMode,
+    }
+
+    self._recipeListGeneration = (self._recipeListGeneration or 0) + 1
+    local generation = self._recipeListGeneration
+
+    if not (self.selectedProfession == "Favorites" or self.selectedProfession ~= nil or canRunGlobalSearch) then
+        self:_FinalizeRecipeList({}, context, generation)
+        return
     end
 
-    -- Filter by favorites if selected
-    if self.selectedProfession == "Favorites" then
+    local callbackFiredInline = false
+    Addon.Data:BuildRecipeListAsync(
+        effectiveProfession,
+        self.searchText,
+        self.sortMode,
+        self.searchMode,
+        categoryFilter,
+        function(rows, _wasCached)
+            callbackFiredInline = true
+            if self._recipeListGeneration ~= generation then return end
+            if not rows then return end
+            self:_FinalizeRecipeList(rows, context, generation)
+        end
+    )
+
+    if not callbackFiredInline then
+        self:_ShowRecipeListLoadingState(context, generation)
+    end
+end
+
+-- The build is async and the panel is empty (or showing prior rows we don't
+-- want to leave stale-looking). Update header + selection so the user sees
+-- a clear "we're working on it" state instead of a frozen-looking frame.
+function UI:_ShowRecipeListLoadingState(context, generation)
+    if self._recipeListGeneration ~= generation then return end
+    local headerText
+    if context.selectedProfession == "Favorites" then
+        headerText = "Favorites - loading..."
+    elseif context.selectedProfession and context.categoryFilter then
+        headerText = context.selectedProfession .. ": " .. tostring(context.categoryFilter) .. " - loading..."
+    elseif context.selectedProfession then
+        headerText = context.selectedProfession .. " - loading..."
+    elseif context.globalSearch and not context.canRunGlobalSearch then
+        headerText = string.format("Type at least %d characters to search all recipes", GLOBAL_SEARCH_MIN_CHARS)
+    else
+        headerText = "Loading recipes..."
+    end
+    setTextIfChanged(self.frame.recipeHeader, headerText)
+    if self.frame.sortSwitch then
+        local sortLabel = context.sortMode == "rarity" and "Sort: Rarity" or "Sort: Alphabetical"
+        self.frame.sortSwitch:SetLabel(sortLabel)
+    end
+end
+
+function UI:_FinalizeRecipeList(rows, context, generation)
+    if not self.frame then return end
+    if self._recipeListGeneration ~= generation then return end
+
+    if context.selectedProfession == "Favorites" then
         local filteredRows = {}
         for _, row in ipairs(rows) do
             if self:IsFavorite(row.recipeKey) then
@@ -1757,22 +1837,22 @@ function UI:RefreshRecipeList()
 
     self.currentRecipeRows = rows
     local headerText
-    if self.selectedProfession == "Favorites" then
+    if context.selectedProfession == "Favorites" then
         headerText = "Favorite recipes"
-    elseif self.selectedProfession and categoryFilter then
-        headerText = self.selectedProfession .. ": " .. tostring(categoryFilter)
-    elseif self.selectedProfession then
-        headerText = self.selectedProfession .. " recipes"
-    elseif globalSearch and not canRunGlobalSearch then
+    elseif context.selectedProfession and context.categoryFilter then
+        headerText = context.selectedProfession .. ": " .. tostring(context.categoryFilter)
+    elseif context.selectedProfession then
+        headerText = context.selectedProfession .. " recipes"
+    elseif context.globalSearch and not context.canRunGlobalSearch then
         headerText = string.format("Type at least %d characters to search all recipes", GLOBAL_SEARCH_MIN_CHARS)
-    elseif globalSearch then
+    elseif context.globalSearch then
         headerText = "Search results"
     else
         headerText = "Select a profession or search"
     end
     setTextIfChanged(self.frame.recipeHeader, headerText)
     if self.frame.sortSwitch then
-        local sortLabel = self.sortMode == "rarity" and "Sort: Rarity" or "Sort: Alphabetical"
+        local sortLabel = context.sortMode == "rarity" and "Sort: Rarity" or "Sort: Alphabetical"
         self.frame.sortSwitch:SetLabel(sortLabel)
     end
 
@@ -1803,6 +1883,9 @@ function UI:RefreshRecipeList()
     self:InvalidateRecipeWindowCache()
     self:RenderVisibleRecipeRows()
     self:RefreshSummaryCards()
+    -- Async path: the selection may have changed after the list arrived,
+    -- so refresh the detail panel to keep it in sync with the new rows.
+    self:RefreshDetailPanel()
 end
 
 -- Reuse the pooled render: when item info arrives or assets change, the
@@ -2059,6 +2142,7 @@ function UI:Toggle()
         local degradedReason = self:GetDegradedModeReason()
         if degradedReason then
             self:RefreshStatusBar()
+            self:RefreshProfessionButtons({ skipCategories = true })
             self:RefreshDegradedStatus(degradedReason)
             self:MarkFullRefreshPending(degradedReason)
         else
@@ -2073,6 +2157,12 @@ function UI:Refresh(reasons)
     local degradedReason = self:GetDegradedModeReason()
     if degradedReason then
         self:RefreshStatusBar()
+        -- Profession buttons are static labels — populating them while sync
+        -- is still warming up gives the user a non-empty sidebar instead
+        -- of a row of unlabelled rectangles. skipCategories=true keeps us
+        -- off the AtlasLoot category index, which would otherwise build
+        -- synchronously here and reintroduce the freeze.
+        self:RefreshProfessionButtons({ skipCategories = true })
         self:RefreshDegradedStatus(degradedReason)
         self:MarkFullRefreshPending(degradedReason)
         return
