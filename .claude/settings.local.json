@@ -1,5 +1,6 @@
 {
   "permissions": {
+    "defaultMode": "auto",
     "allow": [
       "Bash(pwsh -NoProfile -Command \"& { .\\\\local-tests\\\\run-backend-tests.ps1 -Suite sync 2>&1 | Out-File c:\\\\temp\\\\rrtest.log -Encoding utf8 ; Get-Content c:\\\\temp\\\\rrtest.log -Tail 80 }\")",
       "Bash(mkdir -p c:/tmp)",
@@ -11,7 +12,29 @@
       "Bash(pwsh -NoProfile -Command \"& { .\\\\local-tests\\\\run-backend-tests.ps1 -Spec sync_phase34_block_pull_spec.lua 2>&1 | Out-File c:/tmp/rrtest_baseline.log -Encoding utf8 }\")",
       "Bash(pwsh -NoProfile -Command \"& { .\\\\local-tests\\\\run-backend-tests.ps1 2>&1 | Out-File c:/tmp/rrtest_all.log -Encoding utf8 }\")",
       "Bash(pwsh -NoProfile -Command \".\\\\local-tests\\\\run-syntax.ps1\")",
-      "Bash(\"/c/Program Files \\(x86\\)/Lua/5.1/lua.exe\" local-tests/spec/soak_hello_storm_spec.lua)"
+      "Bash(\"/c/Program Files \\(x86\\)/Lua/5.1/lua.exe\" local-tests/spec/soak_hello_storm_spec.lua)",
+      "Bash(git add *)",
+      "Bash(git commit -m *)",
+      "Bash(git mv *)",
+      "Bash(git checkout *)",
+      "Bash(git tag *)",
+      "Bash(git fetch *)",
+      "Bash(git merge *)",
+      "Bash(git rebase *)",
+      "Bash(git restore *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(touch *)",
+      "Bash(pwsh -NoProfile -Command \"& { .\\\\local-tests\\\\run-*)",
+      "Bash(pwsh -NoProfile -Command \".\\\\local-tests\\\\run-*)",
+      "Bash(powershell.exe -NoProfile -File ./local-tests/run-*)",
+      "Bash(powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./local-tests/run-*)",
+      "Bash(powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\\\\local-tests\\\\run-*)",
+      "Bash(powershell.exe -NoProfile -Command \"Set-Location 'C:\\\\Progetti\\\\Public\\\\RecipeRegistry'; .\\\\local-tests\\\\run-*)",
+      "Bash(\"/c/Program Files \\(x86\\)/Lua/5.1/lua.exe\" local-tests/spec/*)",
+      "Bash(\"C:/Program Files (x86)/Lua/5.1/lua.exe\" local-tests/spec/*)",
+      "Bash(\"C:\\\\Program Files (x86)\\\\Lua\\\\5.1\\\\lua.exe\" local-tests/spec/*)"
     ]
   }
 }
