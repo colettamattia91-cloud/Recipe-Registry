@@ -314,24 +314,39 @@ The plugin must never reach into `RecipeRegistry.Data._private`, `RecipeRegistry
 
 The plugin embeds AceSerializer + LibDeflate in its own `Libs/`. It implements its own thin codec rather than calling `RecipeRegistry.Sync:EncodeWirePayload` — keeps the public API surface smaller and avoids cross-addon coupling on a method that conceptually belongs to the recipe sync. The actual implementation can be copy-pasted from [`Sync/SyncCodec.lua`](../Sync/SyncCodec.lua) (~120 lines, no external deps beyond the libs).
 
-### 3.8 Coordination with `feature/guild-addon-adoption-status`
+### 3.8 Adoption-status feature — resolved 2026-05-22
 
-A parallel feature branch (`feature/guild-addon-adoption-status`, not yet pushed to this clone) is adding:
+`feature/guild-addon-adoption-status` shipped with RR 2.0.6 and was merged into this branch on 2026-05-22. The coordination dependency this section originally tracked is now closed.
 
-- A new tab in RR's main frame showing which guildmates run the addon.
-- Per-peer "addon-seen" telemetry (when each peer last announced themselves as an RR client).
-- Companion parameters to the existing [`Data/Data.lua` `KNOWN_OWNER_OFFLINE_STALE_DAYS`](../Data/Data.lua#L47) stale-peer mechanism, which already excludes long-offline crafters' blocks from the sync cycle.
+**What that feature actually shipped** (from `docs/Guild Addon Adoption Status.md` + the merged code):
 
-**Phase 0 dependencies on that branch:**
+- Tab name: `"Guild Addons"` (constant `ADDON_STATUS_VIEW` in [`UI/MainFrame.lua:8`](../UI/MainFrame.lua#L8)).
+- Hardcoded tab — **no `RecipeRegistry.UI:RegisterExternalTab` hook was introduced**. The tab and its handlers are inline in MainFrame.lua.
+- New SavedVariables: `RecipeRegistryDB.global.addonPeers` with `firstSeenAt`, `lastSeenAt`, `addonVersion`, `wireVersion`, `buildChannel`, `buildId`. Schema bumped to 3.
+- New data API: `Data:GetGuildAddonStatusRows({ searchText, staleAfterDays })`. Not formally listed in `docs/recipe-registry-public-api.md` but de-facto public.
+- Stale threshold: **30 days** since `lastSeenAt` (different from this branch's previously-proposed retention windows of 14/30/60 — see §9).
+- Slash: `/rr adoption` / `/rr addonstatus`.
+- Hooks into existing HELLO / sync traffic to populate the peer log. No new wire protocol.
 
-1. **Tab registration API.** The "addon adoption" tab and the "Craft Orders" tab need to use the same public hook on RR's main frame. The hook's signature, lifecycle, error handling, and placement rules (where the tab lands relative to profession tabs) must be designed jointly. Recommended path: whichever branch lands first defines the hook, the second branch adopts it as-is.
-2. **Stale / seen parameters.** Order retention windows (§9) should ideally reuse — not parallel-define — the same "stale" concept already encoded in `KNOWN_OWNER_OFFLINE_STALE_DAYS` and extended by the adoption-status branch. One tunable for "a peer is considered stale after N days" instead of three separate ones.
-3. **Public API surface.** The §3.6 public API contract may need to expose additional methods consumed by both the adoption tab and the order board (e.g., `Data:GetPeerLastSeen(memberKey)`). Both branches' authors must agree on what's "public".
+**Consequences for the Orders branch:**
 
-**Action items for Phase 0:**
-- Sync with Mattia (or whoever drives the adoption-status branch) before designing the UI tab hook.
-- Document the agreed hook in `docs/recipe-registry-public-api.md`.
-- If the adoption branch lands first, this branch adopts the hook unchanged. If this branch lands first, design conservatively for the adoption branch's anticipated use.
+1. **The UI tab hook (§10) does NOT exist.** Orders tab implementation is a fresh decision — see §3.8.1 for the options.
+2. **Stale parameter alignment (§9).** The order subsystem can read 30 days as a starting reference, but Orders has multiple retention windows (completed/cancelled/failed/tombstone) so full reuse of one parameter is impractical. Practical alignment: keep Orders' default `tombstoneRetentionDays` reasonably close to or above the adoption-status `staleAfterDays` so a peer the adoption tab still considers "seen" can't have already had their orders tombstoned out from under them.
+3. **`Data:GetGuildAddonStatusRows` and `addonPeers` storage.** Not currently listed as public API. The Orders subsystem does not need them today — its peer-tracking is per-protocol (RRORD prefix) and independent.
+
+#### 3.8.1 Orders UI tab — open decision
+
+Three concrete paths now that adoption-status shipped without a generic hook:
+
+**A. Add `RecipeRegistry.UI:RegisterExternalTab` to RR.** ~20-30 lines in MainFrame.lua. Plugin registers itself during OnEnable. Cleanest architecturally for a separate-addon model. Requires touching RR — but in a strictly-additive way (new function, no existing behavior changed).
+
+**B. Mirror the adoption-status pattern: hardcode an Orders tab in RR's MainFrame.lua.** Impossible for a separate addon. Would only work if Orders moves back inside RR, contradicting the §1 distribution decision.
+
+**C. Plugin owns its own window (`CraftOrdersFrame`).** Independent frame, independent slash to open it. Worse UX (two UI surfaces, two toggles) but zero RR coupling beyond the public API in §3.6.
+
+**Recommendation: A.** Strictly-additive `RegisterExternalTab` keeps RR's structure clean, lets the plugin stay separate, and the hook is small enough that it doesn't compromise RR's release stability. The hook design is a single Phase 0 deliverable rather than a coordination challenge — see roadmap Phase 3 trigger.
+
+Pending decision from Mattia before Phase 3.
 
 ### 3.9 Future migration to separate CurseForge projects
 
@@ -670,9 +685,11 @@ Three options considered:
 
 **Recommendation: A**, implemented via a new public hook `RecipeRegistry.UI:RegisterExternalTab(spec)` (listed in §3.6). The hook takes a tab name, icon, and a `Build(parent)` callback; the plugin's `CraftOrdersBoard.lua` calls it during its own OnEnable. RR's main frame iterates registered external tabs and inserts them at the end of `PROF_ORDER`.
 
+**Note (2026-05-22):** RR 2.0.6 added a "Guild Addons" tab inline without introducing this hook (see §3.8). Adopting Option A now means proposing the hook post-hoc to RR, which is a strictly-additive ~20-30 line change. Option C (separate window) remains as the no-RR-touch fallback if Mattia prefers not to extend RR.
+
 C remains a Phase 8 ergonomic add (a "Request craft" button on the recipe detail that opens the Orders tab pre-populated). The minimap right-click menu can list "Open Orders" if (and only if) the plugin is loaded — checked via `if _G.RecipeRegistry_Orders then`.
 
-**Open question §13.3** — Mattia to confirm tab-vs-window before designing the public hook in Phase 0.
+**Open question** — Mattia to confirm tab-vs-window before Phase 3. See §3.8.1.
 
 ---
 

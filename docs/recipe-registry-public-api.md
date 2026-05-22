@@ -74,7 +74,7 @@ Plugins are expected to keep their own log DB, but RR's `Trace`/`Tracef` is avai
 
 ## UI integration hook
 
-> **STATUS: not yet implemented.** Designed jointly with `feature/guild-addon-adoption-status` per craft-orders roadmap §3.8. This section will be filled in during Phase 0 once the hook signature is agreed.
+> **STATUS: not implemented as of RR 2.0.6.** The adoption-status work that shipped in 2.0.6 added the "Guild Addons" tab inline in MainFrame.lua without introducing a generic hook. Adding `RecipeRegistry.UI:RegisterExternalTab` is now a fresh strictly-additive proposal — see craft-orders roadmap §3.8.1 for the decision tree.
 
 Expected shape:
 
