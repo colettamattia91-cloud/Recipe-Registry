@@ -476,6 +476,7 @@ function Sync:HandleSummary(payload)
             buildChannel = Addon.BUILD_CHANNEL,
             buildId = Addon.BUILD_ID,
             caps = self.GetLocalProtocolCaps and self:GetLocalProtocolCaps() or nil,
+            _skipAddonPeerMemory = true,
         })
         if self.RecordPeerCaps then
             self:RecordPeerCaps(peerKey, self.GetLocalProtocolCaps and self:GetLocalProtocolCaps() or nil)

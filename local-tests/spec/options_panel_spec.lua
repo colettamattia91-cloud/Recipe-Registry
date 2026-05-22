@@ -122,7 +122,7 @@ end
 local function loadAddonWithOptions(mode)
     local addon = Loader.Load()
     local uiState = installUiStubs(mode)
-    local chunk = assert(loadfile("Options.lua"))
+    local chunk = loadfile("Options.lua") or assert(loadfile("UI/Options.lua"))
     chunk("RecipeRegistry", {})
     return addon, uiState
 end

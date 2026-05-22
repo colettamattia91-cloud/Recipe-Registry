@@ -5,9 +5,34 @@ Addon.UI = UI
 local SEARCH_DEBOUNCE = 0.15
 local GLOBAL_SEARCH_DEBOUNCE = 0.35
 local GLOBAL_SEARCH_MIN_CHARS = 3
+local ADDON_STATUS_VIEW = "Guild Addons"
+local FAVORITES_VIEW = "Favorites"
+local ADDON_STATUS_LEGACY_VIEWS = {
+    ["Addon Status"] = true,
+    ["Guild Addon Adoption"] = true,
+}
+local ADDON_STATUS_DEFAULT_SORT = "name"
+local ADDON_STATUS_FILTER_CYCLES = {
+    status = {"all", "online_with_addon", "online_addon_not_seen", "seen_before", "not_seen_recently", "never_seen"},
+    roster = {"all", "online", "offline"},
+    version = {"all", "current", "old", "unknown"},
+}
+local ADDON_STATUS_FILTER_LABELS = {
+    online_with_addon = "Active",
+    online_addon_not_seen = "Online no addon",
+    seen_before = "Seen before",
+    not_seen_recently = "Stale",
+    never_seen = "Never seen",
+    online = "Online",
+    offline = "Offline",
+    current = "Current",
+    old = "Old",
+    unknown = "Unknown",
+}
+local ADDON_STATUS_FILTER_MARKER = "|cffffd100[F]|r"
 
 local PROF_ORDER = {
-    "Favorites", "Alchemy", "Blacksmithing", "Cooking", "Enchanting", "Engineering",
+    FAVORITES_VIEW, "Alchemy", "Blacksmithing", "Cooking", "Enchanting", "Engineering",
     "Jewelcrafting", "Leatherworking", "Mining", "Tailoring"
 }
 
@@ -59,6 +84,11 @@ local function colorText(text, r, g, b)
     g = math.max(0, math.min(1, g or 1))
     b = math.max(0, math.min(1, b or 1))
     return string.format("|cff%02x%02x%02x%s|r", r * 255, g * 255, b * 255, tostring(text))
+end
+
+local function lowerSafe(v)
+    if v == nil then return "" end
+    return tostring(v):lower()
 end
 
 local function getQualityColor(quality)
@@ -124,6 +154,27 @@ local function statusTag(online)
     return "|TInterface\\COMMON\\Indicator-Red:12:12:0:0|t"
 end
 
+local function addonStatusColor(statusKey)
+    if statusKey == "online_with_addon" then
+        return 0.35, 0.95, 0.45
+    end
+    if statusKey == "online_addon_not_seen" then
+        return 1.0, 0.82, 0.25
+    end
+    if statusKey == "seen_before" then
+        return 0.55, 0.72, 1.0
+    end
+    if statusKey == "not_seen_recently" then
+        return 1.0, 0.48, 0.28
+    end
+    return 0.55, 0.55, 0.55
+end
+
+local function addonStatusLabelColor(row)
+    local r, g, b = addonStatusColor(row and row.addonStatusKey)
+    return colorText(row and row.addonStatusLabel or "Never seen", r, g, b)
+end
+
 local function getProfessionIcon(profName)
     local spellID = PROFESSION_SPELL_IDS[profName]
     return getSpellIcon(spellID)
@@ -164,7 +215,12 @@ local function releaseSearchFocus()
         ui:ClearSearchFocus()
         return
     end
-    local searchBox = ui and ui.frame and ui.frame.searchBox
+    local frame = ui and ui.frame
+    local searchBox = frame and frame.searchBox
+    if searchBox and searchBox.HasFocus and searchBox:HasFocus() then
+        searchBox:ClearFocus()
+    end
+    searchBox = frame and frame.addonStatusSearchBox
     if searchBox and searchBox.HasFocus and searchBox:HasFocus() then
         searchBox:ClearFocus()
     end
@@ -237,6 +293,12 @@ local function ageText(ts)
     if delta < 3600 then return math.floor(delta / 60) .. "m ago" end
     if delta < 86400 then return math.floor(delta / 3600) .. "h ago" end
     return math.floor(delta / 86400) .. "d ago"
+end
+
+local function timestampText(ts)
+    if not ts or ts <= 0 then return "never" end
+    local formatted = date and date("%Y-%m-%d %H:%M", ts) or tostring(ts)
+    return string.format("%s (%s)", formatted, ageText(ts))
 end
 
 local function safeText(v)
@@ -331,6 +393,7 @@ local function createStatCard(parent, label, width)
 end
 
 local function setTextIfChanged(region, value)
+    if not region then return end
     value = value or ""
     if region._rrText == value then return end
     region._rrText = value
@@ -352,6 +415,7 @@ local function setVertexColorIfChanged(region, r, g, b, a)
 end
 
 local function setShownIfChanged(frame, shouldShow)
+    if not frame then return end
     shouldShow = shouldShow and true or false
     if frame._rrShown == shouldShow then return end
     frame._rrShown = shouldShow
@@ -388,6 +452,16 @@ end
 
 function UI:OnInitialize()
     self.selectedProfession = Addon.db and Addon.db.profile and Addon.db.profile.selectedProfession or nil
+    if ADDON_STATUS_LEGACY_VIEWS[self.selectedProfession] then
+        self.selectedProfession = ADDON_STATUS_VIEW
+    end
+    self.addonStatusSortKey = ADDON_STATUS_DEFAULT_SORT
+    self.addonStatusSortDir = "asc"
+    self.addonStatusFilters = {
+        status = "all",
+        roster = "all",
+        version = "all",
+    }
     self.sortMode = (Addon.db and Addon.db.profile and Addon.db.profile.sortMode) or "alpha"
     self.searchMode = (Addon.db and Addon.db.profile and (Addon.db.profile.defaultSearchMode or Addon.db.profile.searchMode)) or "recipe"
     if self.searchMode ~= "materials" then
@@ -395,7 +469,99 @@ function UI:OnInitialize()
     end
     self.selectedRecipeKey = nil
     self.selectedCategory = nil
+    self.recipeSearchText = ""
+    self.addonStatusSearchText = ""
     self.searchText = ""
+end
+
+function UI:IsAddonStatusView()
+    return self.selectedProfession == ADDON_STATUS_VIEW
+end
+
+function UI:GetMainView()
+    if self:IsAddonStatusView() then
+        return "addon"
+    end
+    return "recipes"
+end
+
+function UI:SetMainView(view)
+    if view == "addon" then
+        self.selectedProfession = ADDON_STATUS_VIEW
+    else
+        if self.selectedProfession == ADDON_STATUS_VIEW then
+            self.selectedProfession = nil
+        end
+    end
+    self:ActivateSearchForCurrentView()
+    if Addon.db and Addon.db.profile then
+        Addon.db.profile.selectedProfession = self.selectedProfession
+    end
+    self.selectedRecipeKey = nil
+    self.selectedAddonStatusKey = nil
+    self.selectedCategory = nil
+    self:ApplyMainLayout()
+    self:Refresh()
+end
+
+function UI:GetAddonStatusFilter(columnKey)
+    self.addonStatusFilters = self.addonStatusFilters or {}
+    return self.addonStatusFilters[columnKey] or "all"
+end
+
+function UI:CycleAddonStatusFilter(columnKey)
+    local cycle = ADDON_STATUS_FILTER_CYCLES[columnKey]
+    if not cycle then
+        self:SetAddonStatusSort(columnKey)
+        return
+    end
+    self.addonStatusFilters = self.addonStatusFilters or {}
+    local current = self.addonStatusFilters[columnKey] or "all"
+    local nextIndex = 1
+    for index, value in ipairs(cycle) do
+        if value == current then
+            nextIndex = index + 1
+            break
+        end
+    end
+    if nextIndex > #cycle then
+        nextIndex = 1
+    end
+    self.addonStatusFilters[columnKey] = cycle[nextIndex]
+    self.selectedAddonStatusKey = nil
+    self:ResetRecipeScroll()
+    self:RefreshRecipeList()
+    self:RefreshSummaryCards()
+end
+
+function UI:SetAddonStatusSort(columnKey)
+    columnKey = columnKey or ADDON_STATUS_DEFAULT_SORT
+    if self.addonStatusSortKey == columnKey then
+        self.addonStatusSortDir = self.addonStatusSortDir == "asc" and "desc" or "asc"
+    else
+        self.addonStatusSortKey = columnKey
+        self.addonStatusSortDir = columnKey == "lastSeen" and "desc" or "asc"
+    end
+    self.selectedAddonStatusKey = nil
+    self:ResetRecipeScroll()
+    self:RefreshRecipeList()
+    self:RefreshSummaryCards()
+end
+
+function UI:HandleAddonStatusHeaderClick(columnKey, mouseButton)
+    if mouseButton == "RightButton" then
+        self:CycleAddonStatusFilter(columnKey)
+    else
+        self:SetAddonStatusSort(columnKey)
+    end
+end
+
+function UI:ResetRecipeScroll()
+    local scroll = self.frame and self.frame.recipeScroll
+    if scroll and scroll.SetVerticalScroll then
+        scroll:SetVerticalScroll(0)
+    end
+    self:InvalidateRecipeWindowCache()
 end
 
 local function getMainFrameProfile()
@@ -408,7 +574,12 @@ local function getMainFrameProfile()
 end
 
 function UI:ClearSearchFocus()
-    local searchBox = self.frame and self.frame.searchBox
+    if not self.frame then return end
+    local searchBox = self.frame.searchBox
+    if searchBox and searchBox.HasFocus and searchBox:HasFocus() then
+        searchBox:ClearFocus()
+    end
+    searchBox = self.frame.addonStatusSearchBox
     if searchBox and searchBox.HasFocus and searchBox:HasFocus() then
         searchBox:ClearFocus()
     end
@@ -419,6 +590,52 @@ function UI:CancelSearchTimer()
         Addon:CancelTimer(self._searchTimer, true)
         self._searchTimer = nil
     end
+end
+
+function UI:ActivateSearchForCurrentView()
+    if self:IsAddonStatusView() then
+        self.searchText = self.addonStatusSearchText or ""
+    else
+        self.searchText = self.recipeSearchText or ""
+    end
+    return self.searchText
+end
+
+function UI:RefreshSearchClearButtons()
+    if not self.frame then return end
+    setShownIfChanged(self.frame.searchClearButton, (self.recipeSearchText or "") ~= "")
+    setShownIfChanged(self.frame.addonStatusSearchClearButton, (self.addonStatusSearchText or "") ~= "")
+end
+
+function UI:SetSearchBoxValue(box, text)
+    if not box then return end
+    text = text or ""
+    if box.GetText and box:GetText() == text then return end
+    self._syncingSearchBoxes = true
+    box:SetText(text)
+    self._syncingSearchBoxes = nil
+end
+
+function UI:SyncSearchControls()
+    if not self.frame then return end
+    self:SetSearchBoxValue(self.frame.searchBox, self.recipeSearchText or "")
+    self:SetSearchBoxValue(self.frame.addonStatusSearchBox, self.addonStatusSearchText or "")
+    self:RefreshSearchClearButtons()
+end
+
+function UI:ScheduleSearchRefresh()
+    self:CancelSearchTimer()
+    local delay = SEARCH_DEBOUNCE
+    if self.selectedProfession == nil and self.searchText ~= "" then
+        delay = GLOBAL_SEARCH_DEBOUNCE
+    end
+    self._searchTimer = Addon:ScheduleTimer(function()
+        UI._searchTimer = nil
+        if not UI.frame or not UI.frame:IsShown() then return end
+        UI:RefreshRecipeList()
+        UI:RefreshDetailPanel()
+        UI:RefreshSummaryCards()
+    end, delay)
 end
 
 function UI:ApplySearchNow()
@@ -439,15 +656,17 @@ function UI:OpenChatAfterSearch()
 end
 
 function UI:ClearSearch()
-    self.searchText = ""
+    if self:IsAddonStatusView() then
+        self.addonStatusSearchText = ""
+    else
+        self.recipeSearchText = ""
+    end
+    self:ActivateSearchForCurrentView()
+    self.selectedAddonStatusKey = nil
     self:CancelSearchTimer()
-    if self.frame and self.frame.searchBox then
-        self.frame.searchBox:SetText("")
-        self.frame.searchBox:ClearFocus()
-    end
-    if self.frame and self.frame.searchClearButton then
-        self.frame.searchClearButton:Hide()
-    end
+    self:ResetRecipeScroll()
+    self:SyncSearchControls()
+    self:ClearSearchFocus()
     self:CancelSearchTimer()
 end
 
@@ -515,6 +734,10 @@ local function buildRefreshPlan(reasons)
     for reason in pairs(reasons) do
         if reason == "queue" then
             plan.status = true
+        elseif reason == "addon-status" then
+            plan.status = true
+            plan.list = true
+            plan.detail = true
         elseif reason == "roster" then
             plan.status = true
             plan.list = true
@@ -616,6 +839,68 @@ function UI:TryResumeFullRefresh()
     self.fullRefreshPendingReason = nil
     Addon:RequestRefresh("resume-full-refresh")
     return true
+end
+
+function UI:RefreshMainTabs()
+    if not (self.frame and self.frame.mainTabs) then return end
+    local currentView = self:GetMainView()
+    for viewName, button in pairs(self.frame.mainTabs) do
+        button:SetSelected(viewName == currentView)
+    end
+end
+
+function UI:RefreshAddonStatusControls()
+    if not self.frame then return end
+    local f = self.frame
+    local addonStatusView = self:IsAddonStatusView()
+    setShownIfChanged(f.addonStatusControls, addonStatusView)
+    setShownIfChanged(f.addonStatusHelp, addonStatusView)
+    setShownIfChanged(f.recipeHeader, not addonStatusView)
+    setShownIfChanged(f.sortSwitch, not addonStatusView)
+    self:SyncSearchControls()
+end
+
+function UI:ApplyMainLayout()
+    if not self.frame then return end
+    local f = self.frame
+    if not (f.left and f.center and f.right) then return end
+
+    f.left:ClearAllPoints()
+    f.left:SetPoint("TOPLEFT", 10, -154)
+    f.left:SetPoint("BOTTOMLEFT", 10, 34)
+    f.left:SetWidth(240)
+
+    f.center:ClearAllPoints()
+    f.right:ClearAllPoints()
+    if self:IsAddonStatusView() then
+        setShownIfChanged(f.topBand, false)
+        setShownIfChanged(f.left, false)
+        f.center:SetPoint("TOPLEFT", 10, -94)
+        f.center:SetPoint("BOTTOMRIGHT", -10, 34)
+        setShownIfChanged(f.right, false)
+        if f.recipeScroll then
+            f.recipeScroll:ClearAllPoints()
+            f.recipeScroll:SetPoint("TOPLEFT", 8, -58)
+            f.recipeScroll:SetPoint("BOTTOMRIGHT", -28, 10)
+        end
+    else
+        setShownIfChanged(f.topBand, true)
+        setShownIfChanged(f.left, true)
+        f.center:SetPoint("TOPLEFT", f.left, "TOPRIGHT", 10, 0)
+        f.center:SetPoint("BOTTOMLEFT", f.left, "BOTTOMRIGHT", 10, 0)
+        f.center:SetWidth(360)
+        f.right:SetPoint("TOPLEFT", f.center, "TOPRIGHT", 10, 0)
+        f.right:SetPoint("TOPRIGHT", -10, -154)
+        f.right:SetPoint("BOTTOMRIGHT", -10, 34)
+        setShownIfChanged(f.right, true)
+        if f.recipeScroll then
+            f.recipeScroll:ClearAllPoints()
+            f.recipeScroll:SetPoint("TOPLEFT", 8, -40)
+            f.recipeScroll:SetPoint("BOTTOMRIGHT", -28, 10)
+        end
+    end
+    self:RefreshAddonStatusControls()
+    self:InvalidateRecipeWindowCache()
 end
 
 function UI:OnEnable()
@@ -738,9 +1023,34 @@ function UI:CreateMainFrame()
     autoLabel:SetTextColor(0.7, 0.9, 0.7)
     f.autoLabel = autoLabel
 
+    local mainNav = CreateFrame("Frame", nil, f)
+    mainNav:SetPoint("TOPLEFT", 10, -58)
+    mainNav:SetPoint("TOPRIGHT", -10, -58)
+    mainNav:SetHeight(28)
+    f.mainNav = mainNav
+    hookFocusRelease(mainNav)
+
+    local recipesTab = createCardStyleButton(mainNav, 112, 24)
+    recipesTab:SetPoint("LEFT", 0, 0)
+    recipesTab:SetLabel("Recipes")
+    recipesTab:SetScript("OnClick", function()
+        UI:SetMainView("recipes")
+    end)
+
+    local addonStatusTab = createCardStyleButton(mainNav, 132, 24)
+    addonStatusTab:SetPoint("LEFT", recipesTab, "RIGHT", 8, 0)
+    addonStatusTab:SetLabel(ADDON_STATUS_VIEW)
+    addonStatusTab:SetScript("OnClick", function()
+        UI:SetMainView("addon")
+    end)
+    f.mainTabs = {
+        recipes = recipesTab,
+        addon = addonStatusTab,
+    }
+
     local topBand = CreateFrame("Frame", nil, f)
-    topBand:SetPoint("TOPLEFT", 10, -58)
-    topBand:SetPoint("TOPRIGHT", -10, -58)
+    topBand:SetPoint("TOPLEFT", 10, -94)
+    topBand:SetPoint("TOPRIGHT", -10, -94)
     topBand:SetHeight(52)
     f.topBand = topBand
     hookFocusRelease(topBand)
@@ -756,7 +1066,7 @@ function UI:CreateMainFrame()
     f.cards = {members = card1, recipes = card2, network = card3, updated = card4}
 
     local left = CreateFrame("Frame", nil, f, "BackdropTemplate")
-    left:SetPoint("TOPLEFT", 10, -118)
+    left:SetPoint("TOPLEFT", 10, -154)
     left:SetPoint("BOTTOMLEFT", 10, 34)
     left:SetWidth(240)
     createBackdrop(left, COLOR_PANEL[1], COLOR_PANEL[2], COLOR_PANEL[3], COLOR_PANEL[4], COLOR_BORDER[1], COLOR_BORDER[2], COLOR_BORDER[3], COLOR_BORDER[4])
@@ -807,25 +1117,14 @@ function UI:CreateMainFrame()
     f.searchClearButton = clearButton
 
     searchBox:SetScript("OnTextChanged", function(box)
-        UI.searchText = box:GetText() or ""
+        if UI._syncingSearchBoxes then return end
+        UI.recipeSearchText = box:GetText() or ""
+        UI.searchText = UI.recipeSearchText
         UI.selectedRecipeKey = nil
-        if UI.searchText ~= "" then
-            clearButton:Show()
-        else
-            clearButton:Hide()
-        end
-        UI:CancelSearchTimer()
-        local delay = SEARCH_DEBOUNCE
-        if UI.selectedProfession == nil and UI.searchText ~= "" then
-            delay = GLOBAL_SEARCH_DEBOUNCE
-        end
-        UI._searchTimer = Addon:ScheduleTimer(function()
-            UI._searchTimer = nil
-            if not UI.frame or not UI.frame:IsShown() then return end
-            UI:RefreshRecipeList()
-            UI:RefreshDetailPanel()
-            UI:RefreshSummaryCards()
-        end, delay)
+        UI.selectedAddonStatusKey = nil
+        UI:ResetRecipeScroll()
+        UI:SyncSearchControls()
+        UI:ScheduleSearchRefresh()
     end)
 
     local searchFocusWatcher = CreateFrame("Frame", nil, f)
@@ -894,6 +1193,7 @@ function UI:CreateMainFrame()
     local profLabel = left:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     profLabel:SetPoint("TOPLEFT", searchRecipes, "BOTTOMLEFT", 2, -14)
     profLabel:SetText("Profession filter")
+    f.profLabel = profLabel
 
     local profScroll = CreateFrame("ScrollFrame", nil, left, "UIPanelScrollFrameTemplate")
     profScroll:SetPoint("TOPLEFT", profLabel, "BOTTOMLEFT", -2, -8)
@@ -917,6 +1217,7 @@ function UI:CreateMainFrame()
             end
             if Addon.db and Addon.db.profile then Addon.db.profile.selectedProfession = UI.selectedProfession end
             UI.selectedRecipeKey = nil
+            UI.selectedAddonStatusKey = nil
             UI.selectedCategory = nil
             UI:Refresh()
         end)
@@ -968,6 +1269,75 @@ function UI:CreateMainFrame()
     recipeHeader:SetText("Recipes")
     f.recipeHeader = recipeHeader
 
+    local addonStatusControls = CreateFrame("Frame", nil, center)
+    addonStatusControls:SetPoint("TOPLEFT", 8, -8)
+    addonStatusControls:SetPoint("TOPRIGHT", -8, -8)
+    addonStatusControls:SetHeight(26)
+    f.addonStatusControls = addonStatusControls
+
+    local addonStatusTitle = addonStatusControls:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    addonStatusTitle:SetPoint("LEFT", 4, 0)
+    addonStatusTitle:SetText(ADDON_STATUS_VIEW)
+    addonStatusTitle:SetTextColor(1.0, 0.82, 0)
+    f.addonStatusTitle = addonStatusTitle
+
+    local addonStatusHelp = center:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    addonStatusHelp:SetPoint("TOPLEFT", addonStatusControls, "BOTTOMLEFT", 4, -6)
+    addonStatusHelp:SetPoint("TOPRIGHT", addonStatusControls, "BOTTOMRIGHT", -4, -6)
+    addonStatusHelp:SetJustifyH("LEFT")
+    addonStatusHelp:SetText("Left-click column headers to sort; right-click headers marked [F] to filter.")
+    addonStatusHelp:SetTextColor(0.66, 0.66, 0.66)
+    f.addonStatusHelp = addonStatusHelp
+
+    local addonStatusSearchBox = CreateFrame("EditBox", nil, addonStatusControls, "InputBoxTemplate")
+    addonStatusSearchBox:SetPoint("RIGHT", 0, 0)
+    addonStatusSearchBox:SetSize(230, 24)
+    addonStatusSearchBox:SetAutoFocus(false)
+    addonStatusSearchBox:SetTextInsets(6, 22, 0, 0)
+    addonStatusSearchBox:SetScript("OnEscapePressed", function()
+        UI:ClearSearchFocus()
+    end)
+    addonStatusSearchBox:SetScript("OnEnterPressed", function()
+        UI:ApplySearchNow()
+        UI:ClearSearchFocus()
+        UI:OpenChatAfterSearch()
+    end)
+    addonStatusSearchBox:SetScript("OnTextChanged", function(box)
+        if UI._syncingSearchBoxes then return end
+        UI.addonStatusSearchText = box:GetText() or ""
+        UI.searchText = UI.addonStatusSearchText
+        UI.selectedRecipeKey = nil
+        UI.selectedAddonStatusKey = nil
+        UI:ResetRecipeScroll()
+        UI:SyncSearchControls()
+        UI:ScheduleSearchRefresh()
+    end)
+    f.addonStatusSearchBox = addonStatusSearchBox
+
+    local addonStatusSearchLabel = addonStatusControls:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    addonStatusSearchLabel:SetPoint("RIGHT", addonStatusSearchBox, "LEFT", -8, 0)
+    addonStatusSearchLabel:SetText("Search")
+    addonStatusSearchLabel:SetTextColor(0.72, 0.72, 0.72)
+    f.addonStatusSearchLabel = addonStatusSearchLabel
+
+    local addonStatusSearchClearButton = CreateFrame("Button", nil, addonStatusSearchBox)
+    addonStatusSearchClearButton:SetSize(14, 14)
+    addonStatusSearchClearButton:SetPoint("RIGHT", -4, 0)
+    addonStatusSearchClearButton:SetNormalTexture("Interface\\Buttons\\UI-StopButton")
+    if addonStatusSearchClearButton.GetNormalTexture then
+        local tex = addonStatusSearchClearButton:GetNormalTexture()
+        if tex and tex.SetVertexColor then
+            tex:SetVertexColor(0.85, 0.85, 0.85, 0.85)
+        end
+    end
+    addonStatusSearchClearButton:SetHighlightTexture("Interface\\Buttons\\UI-StopButton", "ADD")
+    addonStatusSearchClearButton:Hide()
+    addonStatusSearchClearButton:SetScript("OnClick", function()
+        UI:ClearSearch()
+        UI:RefreshRecipeList()
+        UI:RefreshSummaryCards()
+    end)
+    f.addonStatusSearchClearButton = addonStatusSearchClearButton
 
     local recipeScroll = CreateFrame("ScrollFrame", nil, center, "UIPanelScrollFrameTemplate")
     recipeScroll:SetPoint("TOPLEFT", 8, -40)
@@ -990,7 +1360,7 @@ function UI:CreateMainFrame()
 
     local right = CreateFrame("Frame", nil, f, "BackdropTemplate")
     right:SetPoint("TOPLEFT", center, "TOPRIGHT", 10, 0)
-    right:SetPoint("TOPRIGHT", -10, -118)
+    right:SetPoint("TOPRIGHT", -10, -154)
     right:SetPoint("BOTTOMRIGHT", -10, 34)
     createBackdrop(right, COLOR_PANEL[1], COLOR_PANEL[2], COLOR_PANEL[3], COLOR_PANEL[4], COLOR_BORDER[1], COLOR_BORDER[2], COLOR_BORDER[3], COLOR_BORDER[4])
     f.right = right
@@ -1134,6 +1504,7 @@ function UI:CreateMainFrame()
     f.debugDump = debugDump
 
     self.frame = f
+    self:ApplyMainLayout()
     self:RefreshDebugVisibility()
 end
 
@@ -1228,6 +1599,18 @@ function UI:EnsureRecipeRow(index)
     row:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 
     row:SetScript("OnClick", function(self, button)
+        if self.addonStatusHeaderRow then
+            return
+        end
+        if self.addonStatusGroupKey then
+            return
+        end
+        if self.addonStatusMemberKey then
+            return
+        end
+        if not self.recipeKey then
+            return
+        end
         if button == "RightButton" then
             UI:ToggleFavorite(self.recipeKey)
         else
@@ -1237,6 +1620,7 @@ function UI:EnsureRecipeRow(index)
         end
     end)
     row:SetScript("OnEnter", function(self)
+        if self.addonStatusMemberKey then return end
         if not self.tooltipLink then return end
         GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
         GameTooltip:SetHyperlink(self.tooltipLink)
@@ -1375,7 +1759,6 @@ function UI:RefreshStatusBar()
         members = 0,
         updatedAt = 0,
     }
-    local bootstrap = state and state.bootstrap or nil
     local degradedReason = self:GetDegradedModeReason()
     local cleanupRunning = Addon.GuildLifecycleMaintenance and Addon.GuildLifecycleMaintenance.IsCleanupRunning
         and Addon.GuildLifecycleMaintenance:IsCleanupRunning() or false
@@ -1385,15 +1768,33 @@ function UI:RefreshStatusBar()
     local onlineNodes = state and state.onlineNodes or 0
     local queued = state and state.queued or 0
     local inFlight = state and state.inFlight
-    local role = state and state.role or "Client"
     local paused = state and state.paused or false
-
-    local subtitle = string.format(
-        "Automatic sync • %s • %d guild node(s) • %d known member(s)",
-        role,
-        onlineNodes,
-        members
-    )
+    local subtitle
+    if self:IsAddonStatusView() then
+        local summary = self.currentAddonStatusSummary
+        if not summary and Addon.Data and Addon.Data.GetGuildAddonStatusRows then
+            local _, fetchedSummary = Addon.Data:GetGuildAddonStatusRows({
+                searchText = self.searchText,
+                staleAfterDays = 30,
+            })
+            summary = fetchedSummary
+        end
+        summary = summary or {}
+        local counts = summary.statusCounts or {}
+        subtitle = string.format(
+            "%s • %d roster member(s) • %d using Recipe Registry now • refreshed %s",
+            ADDON_STATUS_VIEW,
+            summary.rosterTotal or 0,
+            counts.online_with_addon or 0,
+            ageText(summary.lastRosterRefreshAt)
+        )
+    else
+        subtitle = string.format(
+            "Automatic sync • %d guild addon node(s) • %d known crafter(s)",
+            onlineNodes,
+            members
+        )
+    end
     if inFlight then
         subtitle = subtitle .. string.format(" • syncing %s", tostring(inFlight))
     elseif queued and queued > 0 then
@@ -1401,17 +1802,6 @@ function UI:RefreshStatusBar()
     end
     if paused then
         subtitle = subtitle .. " | paused"
-    end
-    if bootstrap then
-        if bootstrap.inProgress then
-            subtitle = subtitle .. " | bootstrap in progress"
-        elseif bootstrap.canBootstrap then
-            subtitle = subtitle .. " | bootstrap available"
-        elseif bootstrap.completed then
-            subtitle = subtitle .. " | bootstrap completed"
-        else
-            subtitle = subtitle .. " | bootstrap not needed"
-        end
     end
     if cleanupRunning then
         subtitle = subtitle .. " | roster cleanup running"
@@ -1438,9 +1828,11 @@ function UI:RefreshStatusBar()
     end
 
     setTextIfChanged(self.frame.cards.members.value, tostring(members))
+    setTextIfChanged(self.frame.cards.members.text, "Known crafters")
     setTextIfChanged(self.frame.cards.network.value, string.format("%d / %d", onlineNodes, state and state.registry or 0))
+    setTextIfChanged(self.frame.cards.network.text, "Guild addon nodes")
     setTextIfChanged(self.frame.cards.updated.value, ageText(statusSnapshot.updatedAt))
-    setTextIfChanged(self.frame.cards.updated.text, "Last local update")
+    setTextIfChanged(self.frame.cards.updated.text, "Last recipe update")
     if self.frame.cleanupButton then
         self.frame.cleanupButton:SetText(cleanupRunning and "Cleaning..." or "Roster Cleanup")
         if cleanupRunning then
@@ -1449,6 +1841,7 @@ function UI:RefreshStatusBar()
             self.frame.cleanupButton:Enable()
         end
     end
+    self:RefreshMainTabs()
     self:RefreshDebugPanel()
 end
 
@@ -1498,6 +1891,35 @@ function UI:RefreshDebugPanel()
 end
 
 function UI:RefreshSummaryCards()
+    if self:IsAddonStatusView() then
+        local summary = self.currentAddonStatusSummary
+        if not summary and Addon.Data and Addon.Data.GetGuildAddonStatusRows then
+            local _, fetchedSummary = Addon.Data:GetGuildAddonStatusRows({
+                searchText = self.searchText,
+                staleAfterDays = 30,
+            })
+            summary = fetchedSummary
+        end
+        summary = summary or {}
+        local counts = summary.statusCounts or {}
+        local seenWithAddon = (counts.online_with_addon or 0)
+            + (counts.seen_before or 0)
+            + (counts.not_seen_recently or 0)
+        setTextIfChanged(self.frame.cards.members.value, tostring(summary.rosterTotal or 0))
+        setTextIfChanged(self.frame.cards.members.text, "Roster members")
+        if self.searchText and self.searchText ~= "" or (summary.filteredRows and summary.filteredRows ~= summary.shownRows) then
+            setTextIfChanged(self.frame.cards.recipes.value, tostring(summary.filteredRows or summary.shownRows or 0))
+            setTextIfChanged(self.frame.cards.recipes.text, "Matching members")
+        else
+            setTextIfChanged(self.frame.cards.recipes.value, tostring(seenWithAddon))
+            setTextIfChanged(self.frame.cards.recipes.text, "Seen with addon")
+        end
+        setTextIfChanged(self.frame.cards.network.value, tostring(counts.online_with_addon or 0))
+        setTextIfChanged(self.frame.cards.network.text, "Using addon now")
+        setTextIfChanged(self.frame.cards.updated.value, ageText(summary.lastRosterRefreshAt))
+        setTextIfChanged(self.frame.cards.updated.text, "Roster refresh")
+        return
+    end
     local shown = self.currentRecipeRows and #self.currentRecipeRows or 0
     setTextIfChanged(self.frame.cards.recipes.value, tostring(shown))
     local label
@@ -1527,6 +1949,17 @@ function UI:RefreshProfessionButtons(opts)
     local yOffset = 0
     local categoryButtonIndex = 0
 
+    if self.frame.searchScopeLabel and self.frame.searchRecipes and self.frame.searchMaterials and self.frame.profLabel then
+        setShownIfChanged(self.frame.searchScopeLabel, true)
+        setShownIfChanged(self.frame.searchRecipes, true)
+        setShownIfChanged(self.frame.searchMaterials, true)
+        setShownIfChanged(self.frame.profScroll, true)
+        setShownIfChanged(self.frame.sidebarHint, true)
+        self.frame.profLabel:ClearAllPoints()
+        self.frame.profLabel:SetPoint("TOPLEFT", self.frame.searchRecipes, "BOTTOMLEFT", 2, -14)
+        self.frame.profLabel:SetText("Profession filter")
+    end
+
     local function placeButton(button, indent, height, gap)
         button:ClearAllPoints()
         button:SetPoint("TOPLEFT", indent or 0, -yOffset)
@@ -1536,15 +1969,11 @@ function UI:RefreshProfessionButtons(opts)
 
     for _, profName in ipairs(PROF_ORDER) do
         local button = self.frame.profButtons[profName]
-        if profName == "Favorites" then
-            button:SetLabel("Favorites")
-        else
-            button:SetLabel(profName, getProfessionIcon(profName))
-        end
+        button:SetLabel(profName, profName ~= FAVORITES_VIEW and getProfessionIcon(profName) or nil)
         button:SetSelected(self.selectedProfession == profName)
         placeButton(button, 0, 24, 6)
 
-        if useCategories and self.selectedProfession == profName and profName ~= "Favorites" then
+        if useCategories and self.selectedProfession == profName and profName ~= FAVORITES_VIEW then
             local categories = Addon.Data.GetRecipeCategories and Addon.Data:GetRecipeCategories(profName, true) or {}
             local selectedCategoryExists = self.selectedCategory == nil
             for _, categoryName in ipairs(categories) do
@@ -1593,7 +2022,117 @@ function UI:RefreshProfessionButtons(opts)
 end
 
 local RECIPE_ROW_HEIGHT = 70
+local ADDON_STATUS_ROW_HEIGHT = 28
 local RECIPE_ROW_BUFFER = 2
+
+function UI:GetListRowHeight()
+    return self:IsAddonStatusView() and ADDON_STATUS_ROW_HEIGHT or RECIPE_ROW_HEIGHT
+end
+
+function UI:GetListRowWidth()
+    local scroll = self.frame and self.frame.recipeScroll
+    local width = scroll and scroll.GetWidth and scroll:GetWidth() or nil
+    if type(width) ~= "number" or width <= 0 then
+        width = self:IsAddonStatusView() and 860 or 314
+    end
+    return math.max(300, width - 10)
+end
+
+local function getAddonStatusVersionState(row)
+    local version = row and row.addonVersion
+    if version == nil or version == "" or version == "unknown" or version == "-" then
+        return "unknown"
+    end
+    local compare = Addon.BuildInfo and Addon.BuildInfo.CompareSemver
+    local cmp = compare and compare(tostring(version), tostring(Addon.ADDON_VERSION or Addon.DISPLAY_VERSION or ""))
+    if cmp == nil then
+        return "unknown"
+    end
+    if cmp < 0 then
+        return "old"
+    end
+    return "current"
+end
+
+local function compareAddonStatusRows(a, b, sortKey)
+    if sortKey == "status" then
+        local av, bv = a.addonStatusOrder or 99, b.addonStatusOrder or 99
+        if av ~= bv then return av < bv end
+    elseif sortKey == "roster" then
+        if (a.online == true) ~= (b.online == true) then
+            return a.online == true
+        end
+    elseif sortKey == "version" then
+        local compare = Addon.BuildInfo and Addon.BuildInfo.CompareSemver
+        local av, bv = tostring(a.addonVersion or ""), tostring(b.addonVersion or "")
+        local cmp = compare and compare(av, bv)
+        if cmp ~= nil and cmp ~= 0 then return cmp < 0 end
+        if av ~= bv then return av < bv end
+    elseif sortKey == "lastSeen" then
+        local av, bv = tonumber(a.lastSeenAt or 0) or 0, tonumber(b.lastSeenAt or 0) or 0
+        if av ~= bv then return av < bv end
+    elseif sortKey == "rank" then
+        local av, bv = tostring(a.rankName or ""), tostring(b.rankName or "")
+        if av ~= bv then return av < bv end
+    elseif sortKey == "zone" then
+        local av, bv = tostring(a.zone or ""), tostring(b.zone or "")
+        if av ~= bv then return av < bv end
+    end
+    return tostring(a.memberKey or "") < tostring(b.memberKey or "")
+end
+
+function UI:AddonStatusRowPassesHeaderFilters(row)
+    local filters = self.addonStatusFilters or {}
+    local statusFilter = filters.status or "all"
+    if statusFilter ~= "all" and row.addonStatusKey ~= statusFilter then
+        return false
+    end
+
+    local rosterFilter = filters.roster or "all"
+    if rosterFilter == "online" and row.online ~= true then
+        return false
+    elseif rosterFilter == "offline" and row.online == true then
+        return false
+    end
+
+    local versionFilter = filters.version or "all"
+    if versionFilter ~= "all" and getAddonStatusVersionState(row) ~= versionFilter then
+        return false
+    end
+
+    return true
+end
+
+function UI:GetFilteredSortedAddonStatusRows(rows)
+    local out = {}
+    for _, row in ipairs(rows or {}) do
+        if self:AddonStatusRowPassesHeaderFilters(row) then
+            out[#out + 1] = row
+        end
+    end
+
+    local sortKey = self.addonStatusSortKey or ADDON_STATUS_DEFAULT_SORT
+    local descending = self.addonStatusSortDir == "desc"
+    table.sort(out, function(a, b)
+        if descending then
+            return compareAddonStatusRows(b, a, sortKey)
+        end
+        return compareAddonStatusRows(a, b, sortKey)
+    end)
+    return out
+end
+
+function UI:BuildAddonStatusDisplayRows(rows)
+    local out = {
+        {
+            rowType = "addonStatusTableHeader",
+        },
+    }
+    for _, row in ipairs(self:GetFilteredSortedAddonStatusRows(rows)) do
+        out[#out + 1] = row
+    end
+    return out
+end
 
 local function getVisibleRecipeWindow(ui, total)
     if total <= 0 then
@@ -1610,9 +2149,238 @@ local function getVisibleRecipeWindow(ui, total)
         viewHeight = 600
     end
 
-    local firstIdx = math.max(1, math.floor(offset / RECIPE_ROW_HEIGHT) + 1 - RECIPE_ROW_BUFFER)
-    local lastIdx = math.min(total, math.ceil((offset + viewHeight) / RECIPE_ROW_HEIGHT) + RECIPE_ROW_BUFFER)
+    local rowHeight = ui and ui.GetListRowHeight and ui:GetListRowHeight() or RECIPE_ROW_HEIGHT
+    local firstIdx = math.max(1, math.floor(offset / rowHeight) + 1 - RECIPE_ROW_BUFFER)
+    local lastIdx = math.min(total, math.ceil((offset + viewHeight) / rowHeight) + RECIPE_ROW_BUFFER)
     return firstIdx, lastIdx
+end
+
+function UI:EnsureAddonStatusRowParts(row)
+    if row.addonStatusPartsReady then return end
+
+    row.addonSectionTitle = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.addonSectionTitle:SetPoint("LEFT", 10, 0)
+    row.addonSectionTitle:SetPoint("RIGHT", -10, 0)
+    row.addonSectionTitle:SetJustifyH("LEFT")
+
+    row.addonName = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.addonName:SetPoint("LEFT", 12, 0)
+    row.addonName:SetWidth(210)
+    row.addonName:SetJustifyH("LEFT")
+
+    row.addonStatus = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.addonStatus:SetPoint("LEFT", row.addonName, "RIGHT", 8, 0)
+    row.addonStatus:SetWidth(160)
+    row.addonStatus:SetJustifyH("LEFT")
+
+    row.addonRoster = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.addonRoster:SetPoint("LEFT", row.addonStatus, "RIGHT", 8, 0)
+    row.addonRoster:SetWidth(138)
+    row.addonRoster:SetJustifyH("LEFT")
+
+    row.addonVersion = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.addonVersion:SetPoint("LEFT", row.addonRoster, "RIGHT", 8, 0)
+    row.addonVersion:SetWidth(94)
+    row.addonVersion:SetJustifyH("LEFT")
+
+    row.addonLastSeen = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.addonLastSeen:SetPoint("LEFT", row.addonVersion, "RIGHT", 8, 0)
+    row.addonLastSeen:SetWidth(110)
+    row.addonLastSeen:SetJustifyH("LEFT")
+
+    row.addonRank = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.addonRank:SetPoint("LEFT", row.addonLastSeen, "RIGHT", 8, 0)
+    row.addonRank:SetWidth(130)
+    row.addonRank:SetJustifyH("LEFT")
+
+    row.addonZone = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.addonZone:SetPoint("LEFT", row.addonRank, "RIGHT", 8, 0)
+    row.addonZone:SetWidth(150)
+    row.addonZone:SetJustifyH("LEFT")
+
+    row.addonHeaderButtons = {}
+    local headerColumns = {
+        { key = "name", region = row.addonName },
+        { key = "status", region = row.addonStatus },
+        { key = "roster", region = row.addonRoster },
+        { key = "version", region = row.addonVersion },
+        { key = "lastSeen", region = row.addonLastSeen },
+        { key = "rank", region = row.addonRank },
+        { key = "zone", region = row.addonZone },
+    }
+    for _, column in ipairs(headerColumns) do
+        local button = CreateFrame("Button", nil, row)
+        button.addonStatusColumnKey = column.key
+        button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+        button:SetPoint("TOPLEFT", column.region, "TOPLEFT", -4, 0)
+        button:SetPoint("BOTTOMRIGHT", column.region, "BOTTOMRIGHT", 4, 0)
+        button.highlight = button:CreateTexture(nil, "HIGHLIGHT")
+        button.highlight:SetAllPoints()
+        button.highlight:SetTexture("Interface\\Buttons\\WHITE8x8")
+        button.highlight:SetVertexColor(1, 1, 1, 0.06)
+        button:SetScript("OnClick", function(self, mouseButton)
+            UI:HandleAddonStatusHeaderClick(self.addonStatusColumnKey, mouseButton)
+        end)
+        button:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+            GameTooltip:AddLine("Left-click to sort")
+            if ADDON_STATUS_FILTER_CYCLES[self.addonStatusColumnKey] then
+                GameTooltip:AddLine("Right-click to filter", 0.8, 0.8, 0.8)
+            end
+            GameTooltip:Show()
+        end)
+        button:SetScript("OnLeave", function()
+            GameTooltip:Hide()
+        end)
+        button:Hide()
+        row.addonHeaderButtons[column.key] = button
+    end
+
+    row.addonStatusPartsReady = true
+end
+
+function UI:SetAddonStatusHeaderButtonsVisible(row, visible)
+    self:EnsureAddonStatusRowParts(row)
+    for _, button in pairs(row.addonHeaderButtons or {}) do
+        setShownIfChanged(button, visible)
+    end
+end
+
+function UI:SetAddonStatusPartsVisible(row, visible)
+    self:EnsureAddonStatusRowParts(row)
+    setShownIfChanged(row.addonSectionTitle, visible)
+    setShownIfChanged(row.addonName, visible)
+    setShownIfChanged(row.addonStatus, visible)
+    setShownIfChanged(row.addonRoster, visible)
+    setShownIfChanged(row.addonVersion, visible)
+    setShownIfChanged(row.addonLastSeen, visible)
+    setShownIfChanged(row.addonRank, visible)
+    setShownIfChanged(row.addonZone, visible)
+end
+
+function UI:HideRecipeRowParts(row)
+    setShownIfChanged(row.icon, false)
+    setShownIfChanged(row.favoriteButton, false)
+    setShownIfChanged(row.title, false)
+    setShownIfChanged(row.stats, false)
+    setShownIfChanged(row.meta, false)
+end
+
+function UI:BindAddonStatusGroupRow(row, rowIdx, rowData)
+    local rowHeight = self:GetListRowHeight()
+    row:SetPoint("TOPLEFT", 0, -((rowIdx - 1) * rowHeight))
+    row:SetSize(self:GetListRowWidth(), rowHeight - 2)
+    row.recipeKey = nil
+    row.addonStatusMemberKey = nil
+    row.addonStatusGroupKey = rowData.groupKey
+    row.addonStatusHeaderRow = false
+    row.tooltipLink = nil
+    self:HideRecipeRowParts(row)
+    self:SetAddonStatusPartsVisible(row, false)
+    self:SetAddonStatusHeaderButtonsVisible(row, false)
+    setShownIfChanged(row.addonSectionTitle, true)
+
+    local arrow = rowData.collapsed and "|cff9fa6b2\226\150\184|r" or "|cff9fa6b2\226\150\190|r"
+    setTextIfChanged(row.addonSectionTitle, string.format("%s %s (%d)", arrow, rowData.groupLabel or "Group", rowData.count or 0))
+    row.addonSectionTitle:SetTextColor(1.0, 0.82, 0.0)
+    setVertexColorIfChanged(row.stripe, 1, 0.82, 0, 1)
+    setBackdropColorsIfChanged(row, 0.10, 0.09, 0.07, 0.98, 0.28, 0.24, 0.12, 0.95)
+    setShownIfChanged(row, true)
+end
+
+function UI:GetAddonStatusHeaderText(columnKey, baseLabel)
+    local text = baseLabel
+    local filter = self:GetAddonStatusFilter(columnKey)
+    if filter ~= "all" then
+        text = string.format("%s: %s", baseLabel, ADDON_STATUS_FILTER_LABELS[filter] or filter)
+    end
+    if (self.addonStatusSortKey or ADDON_STATUS_DEFAULT_SORT) == columnKey then
+        text = text .. (self.addonStatusSortDir == "desc" and " v" or " ^")
+    end
+    if ADDON_STATUS_FILTER_CYCLES[columnKey] then
+        text = text .. " " .. ADDON_STATUS_FILTER_MARKER
+    end
+    return text
+end
+
+function UI:BindAddonStatusHeaderRow(row, rowIdx)
+    local rowHeight = self:GetListRowHeight()
+    row:SetPoint("TOPLEFT", 0, -((rowIdx - 1) * rowHeight))
+    row:SetSize(self:GetListRowWidth(), rowHeight - 2)
+    row.recipeKey = nil
+    row.addonStatusMemberKey = nil
+    row.addonStatusGroupKey = nil
+    row.addonStatusHeaderRow = true
+    row.tooltipLink = nil
+    self:HideRecipeRowParts(row)
+    self:SetAddonStatusPartsVisible(row, true)
+    self:SetAddonStatusHeaderButtonsVisible(row, true)
+    setShownIfChanged(row.addonSectionTitle, false)
+
+    setTextIfChanged(row.addonName, self:GetAddonStatusHeaderText("name", "Name"))
+    setTextIfChanged(row.addonStatus, self:GetAddonStatusHeaderText("status", "Addon"))
+    setTextIfChanged(row.addonRoster, self:GetAddonStatusHeaderText("roster", "Presence"))
+    setTextIfChanged(row.addonVersion, self:GetAddonStatusHeaderText("version", "Version"))
+    setTextIfChanged(row.addonLastSeen, self:GetAddonStatusHeaderText("lastSeen", "Last seen"))
+    setTextIfChanged(row.addonRank, self:GetAddonStatusHeaderText("rank", "Rank"))
+    setTextIfChanged(row.addonZone, self:GetAddonStatusHeaderText("zone", "Zone"))
+    row.addonName:SetTextColor(0.72, 0.72, 0.72)
+    row.addonStatus:SetTextColor(0.72, 0.72, 0.72)
+    row.addonRoster:SetTextColor(0.72, 0.72, 0.72)
+    row.addonVersion:SetTextColor(0.72, 0.72, 0.72)
+    row.addonLastSeen:SetTextColor(0.72, 0.72, 0.72)
+    row.addonRank:SetTextColor(0.72, 0.72, 0.72)
+    row.addonZone:SetTextColor(0.72, 0.72, 0.72)
+    setVertexColorIfChanged(row.stripe, 0.35, 0.35, 0.35, 1)
+    setBackdropColorsIfChanged(row, 0.06, 0.06, 0.06, 0.98, 0.20, 0.20, 0.20, 0.95)
+    setShownIfChanged(row, true)
+end
+
+function UI:BindAddonStatusRow(row, rowIdx, rowData)
+    if rowData.rowType == "addonStatusGroup" then
+        self:BindAddonStatusGroupRow(row, rowIdx, rowData)
+        return
+    end
+    if rowData.rowType == "addonStatusTableHeader" then
+        self:BindAddonStatusHeaderRow(row, rowIdx)
+        return
+    end
+    local rowHeight = self:GetListRowHeight()
+    row:SetPoint("TOPLEFT", 0, -((rowIdx - 1) * rowHeight))
+    row:SetSize(self:GetListRowWidth(), rowHeight - 2)
+    row.recipeKey = nil
+    row.addonStatusMemberKey = rowData.memberKey
+    row.addonStatusGroupKey = nil
+    row.addonStatusHeaderRow = false
+    row.tooltipLink = nil
+    self:HideRecipeRowParts(row)
+    self:SetAddonStatusPartsVisible(row, true)
+    self:SetAddonStatusHeaderButtonsVisible(row, false)
+    setShownIfChanged(row.addonSectionTitle, false)
+
+    local sr, sg, sb = addonStatusColor(rowData.addonStatusKey)
+    setVertexColorIfChanged(row.stripe, sr, sg, sb, 1)
+
+    local titleText = getClassColorizedName(rowData.memberKey)
+    if rowData.isLocalPlayer then
+        titleText = titleText .. " " .. colorText("(you)", unpackColor(MUTED))
+    end
+    setTextIfChanged(row.addonName, titleText)
+    setTextIfChanged(row.addonStatus, addonStatusLabelColor(rowData))
+    setTextIfChanged(row.addonRoster, rowData.online and colorText("Online", 0.35, 0.95, 0.45) or colorText("Offline", 0.85, 0.45, 0.45))
+    setTextIfChanged(row.addonVersion, safeText(rowData.addonVersion))
+    setTextIfChanged(row.addonLastSeen, rowData.lastSeenAt and rowData.lastSeenAt > 0 and tostring(rowData.lastSeenAgeText or ageText(rowData.lastSeenAt)) or "never")
+    setTextIfChanged(row.addonRank, safeText(rowData.rankName))
+    setTextIfChanged(row.addonZone, safeText(rowData.zone))
+    row.addonName:SetTextColor(getClassColor(rowData.memberKey))
+    row.addonStatus:SetTextColor(0.92, 0.92, 0.88)
+    row.addonRoster:SetTextColor(0.92, 0.92, 0.88)
+    row.addonVersion:SetTextColor(0.82, 0.82, 0.82)
+    row.addonLastSeen:SetTextColor(0.82, 0.82, 0.82)
+    row.addonRank:SetTextColor(0.82, 0.82, 0.82)
+    row.addonZone:SetTextColor(0.82, 0.82, 0.82)
+    setBackdropColorsIfChanged(row, COLOR_ROW[1], COLOR_ROW[2], COLOR_ROW[3], COLOR_ROW[4], 0.22, 0.22, 0.22, 1)
+    setShownIfChanged(row, true)
 end
 
 function UI:RefreshRecipeRowAssets(rowData)
@@ -1626,9 +2394,29 @@ function UI:RefreshRecipeRowAssets(rowData)
 end
 
 function UI:BindRecipeRow(row, recipeIdx, rowData)
+    if rowData and (rowData.rowType == "addonStatus"
+        or rowData.rowType == "addonStatusGroup"
+        or rowData.rowType == "addonStatusTableHeader") then
+        self:BindAddonStatusRow(row, recipeIdx, rowData)
+        return
+    end
     rowData = self:RefreshRecipeRowAssets(rowData) or rowData
-    row:SetPoint("TOPLEFT", 0, -((recipeIdx - 1) * RECIPE_ROW_HEIGHT))
+    local rowHeight = self:GetListRowHeight()
+    row:SetPoint("TOPLEFT", 0, -((recipeIdx - 1) * rowHeight))
+    row:SetSize(314, rowHeight)
     row.recipeKey = rowData.recipeKey
+    row.addonStatusMemberKey = nil
+    row.addonStatusGroupKey = nil
+    row.addonStatusHeaderRow = false
+    if row.addonStatusPartsReady then
+        self:SetAddonStatusPartsVisible(row, false)
+        self:SetAddonStatusHeaderButtonsVisible(row, false)
+    end
+    setShownIfChanged(row.icon, true)
+    setShownIfChanged(row.title, true)
+    setShownIfChanged(row.stats, true)
+    setShownIfChanged(row.meta, true)
+    setShownIfChanged(row.favoriteButton, true)
 
     local isFav = self:IsFavorite(rowData.recipeKey)
     row.favoriteButton.isFavorite = isFav
@@ -1646,9 +2434,13 @@ function UI:BindRecipeRow(row, recipeIdx, rowData)
     local rowIcon = detail.createdItemIcon or detail.recipeItemIcon or detail.spellIcon or getItemIcon(colorItemID)
     if rowIcon then
         setTextureIfChanged(row.icon, rowIcon)
+        if row.icon.SetTexCoord then row.icon:SetTexCoord(0, 1, 0, 1) end
+        setVertexColorIfChanged(row.icon, 1, 1, 1, 1)
         setShownIfChanged(row.icon, true)
     else
         setTextureIfChanged(row.icon, "Interface\\Icons\\INV_Misc_QuestionMark")
+        if row.icon.SetTexCoord then row.icon:SetTexCoord(0, 1, 0, 1) end
+        setVertexColorIfChanged(row.icon, 1, 1, 1, 1)
         setShownIfChanged(row.icon, true)
     end
     if colorItemID then
@@ -1685,7 +2477,7 @@ end
 -- Virtualized rendering: only the rows that fall in the visible scroll
 -- window (plus a small buffer above/below) are bound to recipe data. The
 -- pool grows on demand and never shrinks below the largest window ever
--- needed, so swapping a 5-row Favorites tab for a 2000-row global search
+-- needed, so swapping a 5-row Favorites filter for a 2000-row global search
 -- keeps the pool size at ~ visibleRows + buffer (typically 10-15).
 --
 -- OnVerticalScroll fires per pixel during a scroll gesture but the actual
@@ -1749,6 +2541,13 @@ end
 -- reason; the originating event will have queued its own RefreshRecipeList.
 function UI:RefreshRecipeList()
     if not self.frame then return end
+    if self:IsAddonStatusView() then
+        self:RefreshAddonStatusList()
+        return
+    end
+    self.searchText = self.recipeSearchText or ""
+    self.currentAddonStatusSummary = nil
+    self.selectedAddonStatusKey = nil
     local effectiveProfession = self.selectedProfession
     if effectiveProfession == "Favorites" then
         effectiveProfession = nil
@@ -1774,6 +2573,11 @@ function UI:RefreshRecipeList()
 
     if not (self.selectedProfession == "Favorites" or self.selectedProfession ~= nil or canRunGlobalSearch) then
         self:_FinalizeRecipeList({}, context, generation)
+        return
+    end
+
+    if self.selectedProfession == FAVORITES_VIEW then
+        self:_FinalizeRecipeList(self:BuildFavoriteRecipeRows(), context, generation)
         return
     end
 
@@ -1816,6 +2620,10 @@ function UI:_ShowRecipeListLoadingState(context, generation)
     end
     setTextIfChanged(self.frame.recipeHeader, headerText)
     if self.frame.sortSwitch then
+        setShownIfChanged(self.frame.sortSwitch, true)
+        if self.frame.sortSwitch.Enable then
+            self.frame.sortSwitch:Enable()
+        end
         local sortLabel = context.sortMode == "rarity" and "Sort: Rarity" or "Sort: Alphabetical"
         self.frame.sortSwitch:SetLabel(sortLabel)
     end
@@ -1852,6 +2660,10 @@ function UI:_FinalizeRecipeList(rows, context, generation)
     end
     setTextIfChanged(self.frame.recipeHeader, headerText)
     if self.frame.sortSwitch then
+        setShownIfChanged(self.frame.sortSwitch, true)
+        if self.frame.sortSwitch.Enable then
+            self.frame.sortSwitch:Enable()
+        end
         local sortLabel = context.sortMode == "rarity" and "Sort: Rarity" or "Sort: Alphabetical"
         self.frame.sortSwitch:SetLabel(sortLabel)
     end
@@ -1872,7 +2684,7 @@ function UI:_FinalizeRecipeList(rows, context, generation)
         self.selectedRecipeKey = nil
     end
 
-    local contentHeight = math.max(1, #rows * RECIPE_ROW_HEIGHT + 10)
+    local contentHeight = math.max(1, #rows * self:GetListRowHeight() + 10)
     if self.frame.recipeContent._rrHeight ~= contentHeight then
         self.frame.recipeContent._rrHeight = contentHeight
         self.frame.recipeContent:SetHeight(contentHeight)
@@ -1900,6 +2712,184 @@ function UI:RefreshVisibleRecipeRowAssets()
     -- virtualized window and let off-screen rows refresh lazily on scroll.
     self:InvalidateRecipeWindowCache()
     self:RenderVisibleRecipeRows()
+end
+
+function UI:BuildFavoriteRecipeRows()
+    local favorites = Addon.charDB and Addon.charDB.favorites or {}
+    local favoriteKeys = {}
+    local favoriteSet = {}
+    for recipeKey, enabled in pairs(favorites) do
+        if enabled then
+            local key = tostring(recipeKey)
+            favoriteSet[key] = true
+            favoriteKeys[#favoriteKeys + 1] = key
+        end
+    end
+    if #favoriteKeys == 0 or not Addon.Data then
+        return {}
+    end
+
+    local data = Addon.Data
+    local rowsByKey = {}
+
+    local function ensureRow(recipeKey)
+        local key = tostring(recipeKey)
+        local row = rowsByKey[key]
+        if row then return row end
+
+        local detail = data.GetRecipeDisplayInfo and data:GetRecipeDisplayInfo(recipeKey) or nil
+        row = {
+            recipeKey = recipeKey,
+            detail = detail,
+            label = (detail and detail.label)
+                or (data.ResolveRecipeLabel and data:ResolveRecipeLabel(recipeKey))
+                or tostring(recipeKey),
+            crafterCount = 0,
+            onlineCount = 0,
+            professionList = {},
+            _profNames = {},
+            _seenMembers = {},
+        }
+        rowsByKey[key] = row
+        return row
+    end
+
+    local function addIndexedRecipe(recipeKey, indexed)
+        if not indexed then return end
+        local row = ensureRow(recipeKey)
+        row.crafterCount = indexed.crafterCount or 0
+        row.onlineCount = 0
+        for _, crafter in ipairs(indexed.crafterRows or {}) do
+            if data.IsMemberOnline and data:IsMemberOnline(crafter.memberKey) then
+                row.onlineCount = row.onlineCount + 1
+            end
+        end
+        for profName in pairs(indexed.profNames or {}) do
+            row._profNames[profName] = true
+        end
+    end
+
+    if data._recipeIndex then
+        for _, favoriteKey in ipairs(favoriteKeys) do
+            addIndexedRecipe(favoriteKey, data._recipeIndex[favoriteKey] or data._recipeIndex[tonumber(favoriteKey)])
+        end
+    else
+        for memberKey, entry in pairs(data.GetMembersDB and data:GetMembersDB() or {}) do
+            if data.IsUserVisibleMember and data:IsUserVisibleMember(memberKey, entry) then
+                for profName, prof in pairs(entry.professions or {}) do
+                    for recipeKey in pairs(prof.recipes or {}) do
+                        local key = tostring(recipeKey)
+                        if favoriteSet[key] then
+                            local row = ensureRow(recipeKey)
+                            row._profNames[profName] = true
+                            if not row._seenMembers[memberKey] then
+                                row._seenMembers[memberKey] = true
+                                row.crafterCount = row.crafterCount + 1
+                                if data.IsMemberOnline and data:IsMemberOnline(memberKey) then
+                                    row.onlineCount = row.onlineCount + 1
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    local q = lowerSafe(self.searchText)
+    local out = {}
+    for _, row in pairs(rowsByKey) do
+        for profName in pairs(row._profNames or {}) do
+            row.professionList[#row.professionList + 1] = profName
+        end
+        table.sort(row.professionList)
+        row._profNames = nil
+        row._seenMembers = nil
+
+        local searchText
+        if self.searchMode == "materials" then
+            searchText = row.detail and row.detail.searchText or lowerSafe(row.label)
+        else
+            searchText = row.detail and row.detail.recipeSearchText or lowerSafe(row.label)
+        end
+        if q == "" or searchText:find(q, 1, true) then
+            out[#out + 1] = row
+        end
+    end
+
+    table.sort(out, function(a, b)
+        if self.sortMode == "rarity" then
+            local aq = a.detail and (a.detail.createdItemQuality or a.detail.recipeItemQuality)
+            local bq = b.detail and (b.detail.createdItemQuality or b.detail.recipeItemQuality)
+            aq = aq == nil and -1 or aq
+            bq = bq == nil and -1 or bq
+            if aq ~= bq then return aq > bq end
+        end
+        local al = lowerSafe(a.label)
+        local bl = lowerSafe(b.label)
+        if al ~= bl then return al < bl end
+        if (a.onlineCount or 0) ~= (b.onlineCount or 0) then return (a.onlineCount or 0) > (b.onlineCount or 0) end
+        if (a.crafterCount or 0) ~= (b.crafterCount or 0) then return (a.crafterCount or 0) > (b.crafterCount or 0) end
+        return tostring(a.recipeKey) < tostring(b.recipeKey)
+    end)
+
+    return out
+end
+
+function UI:RefreshAddonStatusList()
+    self.searchText = self.addonStatusSearchText or ""
+    self._recipeListGeneration = (self._recipeListGeneration or 0) + 1
+    self.selectedRecipeKey = nil
+    local rows, summary = {}, {
+        rosterReady = false,
+        reason = "data-unavailable",
+        rosterTotal = 0,
+        shownRows = 0,
+        addonPeersActive = 0,
+        lastRosterRefreshAt = 0,
+    }
+    if Addon.Data and Addon.Data.GetGuildAddonStatusRows then
+        rows, summary = Addon.Data:GetGuildAddonStatusRows({
+            searchText = self.searchText,
+            staleAfterDays = 30,
+        })
+    end
+    self:_FinalizeAddonStatusList(rows or {}, summary or {})
+end
+
+function UI:_FinalizeAddonStatusList(rows, summary)
+    if not self.frame then return end
+    self.currentAddonStatusRows = rows or {}
+    self.currentAddonStatusSummary = summary or {}
+    self.currentRecipeRows = self:BuildAddonStatusDisplayRows(self.currentAddonStatusRows)
+    self.currentAddonStatusSummary.filteredRows = math.max(0, #self.currentRecipeRows - 1)
+
+    local headerText
+    if self.currentAddonStatusSummary.rosterReady ~= true then
+        headerText = ADDON_STATUS_VIEW .. " - waiting for guild roster"
+    elseif self.searchText and self.searchText ~= "" then
+        headerText = ADDON_STATUS_VIEW .. " search results"
+    else
+        headerText = ADDON_STATUS_VIEW
+    end
+    setTextIfChanged(self.frame.recipeHeader, headerText)
+    if self.frame.sortSwitch then
+        setShownIfChanged(self.frame.sortSwitch, false)
+    end
+    self:RefreshAddonStatusControls()
+
+    self.selectedAddonStatusKey = nil
+
+    local contentHeight = math.max(1, #self.currentRecipeRows * self:GetListRowHeight() + 10)
+    if self.frame.recipeContent._rrHeight ~= contentHeight then
+        self.frame.recipeContent._rrHeight = contentHeight
+        self.frame.recipeContent:SetHeight(contentHeight)
+    end
+
+    self:InvalidateRecipeWindowCache()
+    self:RenderVisibleRecipeRows()
+    self:RefreshSummaryCards()
+    self:RefreshDetailPanel()
 end
 
 function UI:RenderDetailLines(lines, lineLinks, lineMeta)
@@ -1956,11 +2946,88 @@ function UI:RenderDetailLines(lines, lineLinks, lineMeta)
     end
 end
 
+function UI:GetSelectedAddonStatusRow()
+    if not self.selectedAddonStatusKey then
+        return nil
+    end
+    for _, rowData in ipairs(self.currentRecipeRows or {}) do
+        if rowData.rowType == "addonStatus" and rowData.memberKey == self.selectedAddonStatusKey then
+            return rowData
+        end
+    end
+    return nil
+end
+
+function UI:RefreshAddonStatusDetailPanel()
+    if not self.frame then return end
+    self.currentDetail = nil
+    self._lastDetailSignature = nil
+    self.frame.detailFavoriteButton.recipeKey = nil
+    self.frame.detailFavoriteButton.isFavorite = false
+    setShownIfChanged(self.frame.detailFavoriteButton, false)
+    self.frame.detailScroll:SetPoint("TOPLEFT", 8, -54)
+
+    local lines = {}
+    local summary = self.currentAddonStatusSummary or {}
+    if summary.rosterReady ~= true then
+        setTextIfChanged(self.frame.detailTitle, ADDON_STATUS_VIEW)
+        setTextIfChanged(self.frame.detailSub, "Waiting for the guild roster refresh.")
+        lines[#lines + 1] = "Guild roster data is not loaded yet."
+        lines[#lines + 1] = "Recipe Registry has requested a roster refresh and will update this view automatically."
+        self:RenderDetailLines(lines, {}, {})
+        return
+    end
+
+    local row = self:GetSelectedAddonStatusRow()
+    if not row then
+        setTextIfChanged(self.frame.detailTitle, ADDON_STATUS_VIEW)
+        setTextIfChanged(self.frame.detailSub, "No guild member selected.")
+        if self.searchText and self.searchText ~= "" then
+            lines[#lines + 1] = "No guild roster rows match this search."
+        else
+            lines[#lines + 1] = "No guild roster rows are available."
+        end
+        self:RenderDetailLines(lines, {}, {})
+        return
+    end
+
+    local sr, sg, sb = addonStatusColor(row.addonStatusKey)
+    setTextIfChanged(self.frame.detailTitle, getClassColorizedName(row.memberKey))
+    setTextIfChanged(self.frame.detailSub, colorText(row.addonStatusLabel, sr, sg, sb))
+
+    lines[#lines + 1] = "|cffffd100Addon|r"
+    lines[#lines + 1] = "Status: " .. addonStatusLabelColor(row)
+    lines[#lines + 1] = "Version: " .. safeText(row.addonVersion)
+    lines[#lines + 1] = "Wire: " .. safeText(row.wireVersion)
+    lines[#lines + 1] = "Build channel: " .. safeText(row.buildChannel)
+    lines[#lines + 1] = "Build ID: " .. safeText(row.buildId)
+    lines[#lines + 1] = "First seen addon: " .. timestampText(row.firstSeenAt)
+    lines[#lines + 1] = "Last seen addon: " .. timestampText(row.lastSeenAt)
+
+    lines[#lines + 1] = " "
+    lines[#lines + 1] = "|cffffd100Roster|r"
+    lines[#lines + 1] = "Online status: " .. (row.online and colorText("Online", 0.35, 0.95, 0.45) or colorText("Offline", 0.85, 0.45, 0.45))
+    lines[#lines + 1] = "Rank: " .. safeText(row.rankName)
+    lines[#lines + 1] = "Level: " .. safeText(row.level)
+    lines[#lines + 1] = "Zone: " .. safeText(row.zone)
+    if row.status and row.status ~= "" then
+        lines[#lines + 1] = "Roster status: " .. safeText(row.status)
+    end
+
+    self:RenderDetailLines(lines, {}, {})
+end
+
 function UI:RefreshDetailPanel()
     if not self.frame then return end
+    if self:IsAddonStatusView() then
+        self.currentDetail = nil
+        self._lastDetailSignature = nil
+        return
+    end
     local lines = {}
     local lineLinks = {}
     local lineMeta = {}
+    setShownIfChanged(self.frame.detailFavoriteButton, true)
     if not self.selectedRecipeKey then
         self.currentDetail = nil
         self._lastDetailSignature = nil
@@ -2140,7 +3207,7 @@ function UI:Toggle()
         self.frame:Show()
         self:RefreshDebugVisibility()
         local degradedReason = self:GetDegradedModeReason()
-        if degradedReason then
+        if degradedReason and not self:IsAddonStatusView() then
             self:RefreshStatusBar()
             self:RefreshProfessionButtons({ skipCategories = true })
             self:RefreshDegradedStatus(degradedReason)
@@ -2148,14 +3215,15 @@ function UI:Toggle()
         else
             self:Refresh(nil)
         end
-        self.frame.searchBox:SetText(self.searchText or "")
+        self:SyncSearchControls()
     end
 end
 
 function UI:Refresh(reasons)
     if not self.frame or not self.frame:IsShown() then return end
+    self:ApplyMainLayout()
     local degradedReason = self:GetDegradedModeReason()
-    if degradedReason then
+    if degradedReason and not self:IsAddonStatusView() then
         self:RefreshStatusBar()
         -- Profession buttons are static labels — populating them while sync
         -- is still warming up gives the user a non-empty sidebar instead
