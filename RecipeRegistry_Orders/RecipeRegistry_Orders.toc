@@ -1,6 +1,6 @@
 ## Interface: 20505
-## Title: Recipe Registry — Craft Orders (Skeleton)
-## Notes: Phase 0 skeleton. Real plugin starts in Phase 1.
+## Title: Recipe Registry — Craft Orders
+## Notes: Guild craft order board with mail-assisted material and delivery flow
 ## Author: Mattia
 ## Version: 0.1.0
 ## X-Build-Channel: dev
@@ -9,5 +9,7 @@
 ## SavedVariables: RecipeRegistry_OrdersDB,RecipeRegistry_OrdersLogDB
 ## SavedVariablesPerCharacter: RecipeRegistry_OrdersCharDB
 ## X-Category: Guild
+
+Libs\embeds.xml
 
 Core\CraftOrders.lua
