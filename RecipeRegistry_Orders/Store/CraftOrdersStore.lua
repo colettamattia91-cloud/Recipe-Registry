@@ -234,6 +234,74 @@ function Store:DeleteOrder(orderId, reason)
     return true
 end
 
+-- Allows the requester to mark some quantity of a material as supplied
+-- by the crafter (or pull it back to requester-provided). Provider is
+-- "requester" or "crafter". Quantity is optional — when omitted the
+-- full required amount goes to the named provider.
+--
+-- The total required quantity does not change; only the split between
+-- requester-supplied and crafter-supplied does. Restricted to Draft
+-- orders since this controls what the mail assistant will attach.
+function Store:SetProvider(orderId, itemID, provider, quantity, actor)
+    local order = self:GetOrder(orderId)
+    if not order then return false, "unknown-order" end
+
+    local SM = getStateMachine()
+    if order.status ~= SM.STATES.DRAFT then
+        return false, "not-draft"
+    end
+
+    if provider ~= "requester" and provider ~= "crafter" then
+        return false, "invalid-provider"
+    end
+
+    itemID = tonumber(itemID)
+    if not itemID then return false, "invalid-itemid" end
+
+    local bucket = order.materials and order.materials[itemID] or nil
+    if not bucket then return false, "unknown-material" end
+
+    local required = tonumber(bucket.required) or 0
+    if required <= 0 then return false, "material-required-zero" end
+
+    local target = tonumber(quantity)
+    if target == nil then
+        target = required
+    end
+    if target < 0 then target = 0 end
+    if target > required then target = required end
+
+    local previousRequester = bucket.requesterProvided or 0
+    local previousCrafter = bucket.crafterProvided or 0
+
+    if provider == "crafter" then
+        bucket.crafterProvided   = target
+        bucket.requesterProvided = required - target
+    else
+        bucket.requesterProvided = target
+        bucket.crafterProvided   = required - target
+    end
+
+    order.updatedAt = time()
+
+    self:AppendEvent({
+        kind    = "OrderUpdated",
+        orderId = orderId,
+        actor   = actor or order.requester,
+        payload = {
+            change            = "provider-set",
+            itemID            = itemID,
+            provider          = provider,
+            quantity          = target,
+            previousRequester = previousRequester,
+            previousCrafter   = previousCrafter,
+            newRequester      = bucket.requesterProvided,
+            newCrafter        = bucket.crafterProvided,
+        },
+    })
+    return true, bucket
+end
+
 function Store:Transition(orderId, toState, actor, payload)
     local order = self:GetOrder(orderId)
     if not order then return false, "unknown-order" end

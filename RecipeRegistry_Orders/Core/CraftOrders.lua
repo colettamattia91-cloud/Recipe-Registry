@@ -169,6 +169,11 @@ local function printHelp(self)
     self:Print("/rrord add <id|prefix> <recipeKey> <qty>   - add a line to a draft")
     self:Print("/rrord list                  - list known orders (newest first)")
     self:Print("/rrord status <id|prefix>    - show one order's detail + materials")
+    self:Print("/rrord set-provider <id|prefix> <itemID> requester|crafter [qty]")
+    self:Print("                              - mark some/all of a material as crafter-supplied")
+    self:Print("/rrord transition <id|prefix> <state> [as requester|crafter|system]")
+    self:Print("                              - manually drive the state machine (test/debug)")
+    self:Print("/rrord events [id|prefix] [limit]  - inspect the event log")
     self:Print("/rrord delete <id|prefix>    - delete a draft order")
 end
 
@@ -329,13 +334,22 @@ local function cmdStatus(self, rest)
             self:Print(string.format("  Materials (%d distinct, %d units total):", distinct, totalUnits))
             for index = 1, #materials do
                 local m = materials[index]
-                local providerTag = m.requesterProvided > 0 and "requester" or "crafter"
+                local req = m.requesterProvided or 0
+                local cra = m.crafterProvided or 0
+                local providerStr
+                if req > 0 and cra > 0 then
+                    providerStr = string.format("requester %d / crafter %d", req, cra)
+                elseif cra > 0 then
+                    providerStr = "crafter"
+                else
+                    providerStr = "requester"
+                end
                 self:Print(string.format(
                     "    item:%d x%d  (%s, %s)",
                     m.itemID,
                     m.required,
                     tostring(m.name or "?"),
-                    providerTag
+                    providerStr
                 ))
             end
         else
@@ -400,6 +414,193 @@ local function cmdAdd(self, rest)
     ))
 end
 
+local function cmdSetProvider(self, rest)
+    local idArg, restAfterId = splitCommand(rest)
+    local itemArg, restAfterItem = splitCommand(restAfterId)
+    local providerArg, restAfterProvider = splitCommand(restAfterItem)
+    local quantityArg = (restAfterProvider or ""):match("^%s*(%S+)%s*$") or ""
+
+    if idArg == "" or itemArg == "" or providerArg == "" then
+        self:Print("Usage: /rrord set-provider <id|prefix> <itemID> requester|crafter [quantity]")
+        self:Print("  Quantity omitted => the whole required amount goes to the named provider.")
+        return
+    end
+
+    local itemID = tonumber(itemArg)
+    if not itemID then
+        self:Print("itemID must be a number.")
+        return
+    end
+
+    providerArg = providerArg:lower()
+    if providerArg ~= "requester" and providerArg ~= "crafter" then
+        self:Print("Provider must be 'requester' or 'crafter'.")
+        return
+    end
+
+    local quantity = quantityArg ~= "" and tonumber(quantityArg) or nil
+    if quantityArg ~= "" and quantity == nil then
+        self:Print("Quantity must be a number when supplied.")
+        return
+    end
+
+    local order, err = resolveOrderByPrefix(self, idArg)
+    if not order then
+        self:Print("Order lookup failed: " .. tostring(err))
+        return
+    end
+
+    local ok, setErr = self.Store:SetProvider(order.id, itemID, providerArg, quantity, self:GetLocalPlayerKey())
+    if not ok then
+        self:Print("set-provider failed: " .. tostring(setErr))
+        return
+    end
+
+    local bucket = order.materials[itemID]
+    self:Print(string.format(
+        "%s item:%d  required=%d  requester=%d  crafter=%d",
+        shortenOrderId(order.id),
+        itemID,
+        bucket.required or 0,
+        bucket.requesterProvided or 0,
+        bucket.crafterProvided or 0
+    ))
+end
+
+local function formatEventPayload(payload)
+    if type(payload) ~= "table" then return "" end
+    local parts = {}
+    for key, value in pairs(payload) do
+        if type(value) == "table" then
+            parts[#parts + 1] = tostring(key) .. "={...}"
+        else
+            parts[#parts + 1] = tostring(key) .. "=" .. tostring(value)
+        end
+    end
+    table.sort(parts)
+    return table.concat(parts, " ")
+end
+
+local function cmdEvents(self, rest)
+    local idArg, restAfter = splitCommand(rest)
+    local limit = tonumber((restAfter or ""):match("^%s*(%S+)%s*$") or "") or 10
+    if limit < 1 then limit = 1 end
+    if limit > 200 then limit = 200 end
+
+    local order
+    if idArg ~= "" then
+        local found, err = resolveOrderByPrefix(self, idArg)
+        if not found then
+            self:Print("Order lookup failed: " .. tostring(err))
+            return
+        end
+        order = found
+    end
+
+    local log = self.db.global.events and self.db.global.events.log or {}
+    if #log == 0 then
+        self:Print("Event log is empty.")
+        return
+    end
+
+    local matched = {}
+    for index = #log, 1, -1 do
+        local entry = log[index]
+        if not order or entry.orderId == order.id then
+            matched[#matched + 1] = entry
+            if #matched >= limit then break end
+        end
+    end
+
+    if #matched == 0 then
+        self:Print(string.format("No events found for %s.", shortenOrderId(order.id)))
+        return
+    end
+
+    self:Print(string.format(
+        "Events: %d shown%s",
+        #matched,
+        order and (" (order " .. shortenOrderId(order.id) .. ")") or ""
+    ))
+    for index = #matched, 1, -1 do
+        local e = matched[index]
+        self:Print(string.format(
+            "  seq=%d t=%d kind=%s actor=%s producer=%s  %s",
+            e.seq or 0,
+            e.at or 0,
+            tostring(e.kind or "?"),
+            tostring(e.actor or "?"),
+            tostring(e.producer or "?"),
+            formatEventPayload(e.payload)
+        ))
+    end
+end
+
+local function cmdTransition(self, rest)
+    local idArg, restAfterId = splitCommand(rest)
+    local toStateArg, restAfterState = splitCommand(restAfterId)
+    local actorArg = (restAfterState or ""):match("^%s*(.-)%s*$") or ""
+    -- Allow `as <actor>` form
+    if actorArg:sub(1, 3):lower() == "as " then
+        actorArg = actorArg:sub(4):match("^%s*(.-)%s*$") or ""
+    end
+
+    if idArg == "" or toStateArg == "" then
+        self:Print("Usage: /rrord transition <id|prefix> <toState> [as requester|crafter|system]")
+        local SM = self.StateMachine
+        if SM and SM.STATES then
+            local names = {}
+            for _, v in pairs(SM.STATES) do names[#names + 1] = v end
+            table.sort(names)
+            self:Print("Valid states: " .. table.concat(names, ", "))
+        end
+        return
+    end
+
+    local SM = self.StateMachine
+    if not (SM and SM.IsValidState and SM:IsValidState(toStateArg)) then
+        self:Print("Unknown target state: " .. tostring(toStateArg))
+        return
+    end
+
+    local order, err = resolveOrderByPrefix(self, idArg)
+    if not order then
+        self:Print("Order lookup failed: " .. tostring(err))
+        return
+    end
+
+    local actor = actorArg ~= "" and actorArg or self:GetLocalPlayerKey()
+    -- Normalize actor: if it's a player key string, infer role.
+    local actorRole
+    if actor == "requester" or actor == "crafter" or actor == "system" then
+        actorRole = actor
+    elseif actor == order.requester then
+        actorRole = SM.ACTORS.REQUESTER
+    elseif actor == order.crafter then
+        actorRole = SM.ACTORS.CRAFTER
+    else
+        actorRole = SM.ACTORS.SYSTEM
+    end
+
+    local ok, transErr = self.Store:Transition(order.id, toStateArg, actorRole, { source = "slash" })
+    if not ok then
+        self:Print(string.format(
+            "Transition rejected: %s -> %s as %s (%s)",
+            tostring(order.status),
+            tostring(toStateArg),
+            tostring(actorRole),
+            tostring(transErr)
+        ))
+        return
+    end
+    self:Print(string.format(
+        "%s transitioned to %s as %s",
+        shortenOrderId(order.id),
+        toStateArg,
+        actorRole
+    ))
+end
+
 local function cmdDelete(self, rest)
     local prefix = (rest or ""):match("^%s*(.-)%s*$") or ""
     if prefix == "" then
@@ -445,6 +646,18 @@ function Addon:SlashHandler(input)
     end
     if cmd == "status" or cmd == "show" then
         cmdStatus(self, rest)
+        return
+    end
+    if cmd == "set-provider" or cmd == "provider" then
+        cmdSetProvider(self, rest)
+        return
+    end
+    if cmd == "transition" or cmd == "trans" then
+        cmdTransition(self, rest)
+        return
+    end
+    if cmd == "events" or cmd == "log" then
+        cmdEvents(self, rest)
         return
     end
     if cmd == "delete" or cmd == "del" or cmd == "rm" then
