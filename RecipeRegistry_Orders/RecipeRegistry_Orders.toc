@@ -1,0 +1,13 @@
+## Interface: 20505
+## Title: Recipe Registry — Craft Orders (Skeleton)
+## Notes: Phase 0 skeleton. Real plugin starts in Phase 1.
+## Author: Mattia
+## Version: 0.1.0
+## X-Build-Channel: dev
+## X-Build-ID: dev
+## Dependencies: RecipeRegistry
+## SavedVariables: RecipeRegistry_OrdersDB,RecipeRegistry_OrdersLogDB
+## SavedVariablesPerCharacter: RecipeRegistry_OrdersCharDB
+## X-Category: Guild
+
+Core\CraftOrders.lua

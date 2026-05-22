@@ -192,11 +192,11 @@ Two options for the libs the plugin needs (`AceAddon-3.0`, `AceEvent-3.0`, `AceT
 
 **CurseForge integration constraint (verified 2026-05-22):** the repo currently uses CurseForge's native GitHub integration, which only supports "build on every commit" or "build on every tag" with no tag pattern filtering. A single CurseForge project is therefore the only feasible model without migrating off the native integration. See §3.9 for the future migration trigger.
 
-Current repo layout has `RecipeRegistry.toc` at root and `package-as: RecipeRegistry` in [`.pkgmeta`](../.pkgmeta). To ship two addons from one repo we restructure into addon-folder-per-subdirectory:
+**Layout decision (implemented Phase 0):** rather than restructuring RR's sources into a `RecipeRegistry/` subdirectory, we keep RR at the repo root (where it already lives) and add `RecipeRegistry_Orders/` as a sibling subdirectory. This is the AtlasLoot pattern, supported out-of-the-box by the BigWigs Packager via `move-folders`. The full-restructure alternative was abandoned because the packager has no first-class concept of "git root != addon root" — each addon needs to be packaged as if the source were at top level.
 
 ```
-repo-root/                                 (git root, NOT a WoW addon)
-  .pkgmeta                                 (updated)
+repo-root/                                 (git root + RecipeRegistry addon source)
+  .pkgmeta
   CHANGELOG.md
   README.md
   CLAUDE.md
@@ -204,21 +204,21 @@ repo-root/                                 (git root, NOT a WoW addon)
   .claude/
   docs/                                    (excluded from package)
   local-tests/                             (excluded from package)
-  RecipeRegistry/                          (addon 1 — current root contents moved here)
-    RecipeRegistry.toc
-    Core/
-    Data/
-    Sync/
-    UI/
-    Integrations/
-    Libs/
-  RecipeRegistry_Orders/                   (addon 2 — new)
+  scripts/                                 (excluded from package)
+  RecipeRegistry.toc                       (RR addon entry point)
+  Core/                                    (RR sources at root)
+  Data/
+  Sync/
+  UI/
+  Integrations/
+  Libs/
+  RecipeRegistry_Orders/                   (plugin addon — sibling subdirectory)
     RecipeRegistry_Orders.toc
-    Libs/
-    Core/, Store/, Planner/, Mail/, Sync/, UI/, Diagnostics/
+    Core/CraftOrders.lua
+    (Libs/ and additional folders grow per phase)
 ```
 
-Updated `.pkgmeta` (sketch — to be validated against BigWigs Packager docs in Phase 0):
+Active [`.pkgmeta`](../.pkgmeta):
 
 ```yaml
 package-as: RecipeRegistry
@@ -229,22 +229,24 @@ ignore:
   - .claude
   - .gitignore
   - CLAUDE.md
+  - Sync/MockSync.lua
   - docs
   - local-tests
-  - RecipeRegistry_Orders                  # exclude from the main addon's folder copy
+  - scripts
 move-folders:
   RecipeRegistry/RecipeRegistry_Orders: RecipeRegistry_Orders
 ```
 
-The `move-folders` directive (or equivalent — exact syntax to verify in Phase 0) hoists the plugin folder out as a sibling addon in the packaged ZIP. Both addons end up at the top level of the release ZIP.
+The `move-folders` directive instructs the packager: after packaging the repo as `RecipeRegistry/`, find the `RecipeRegistry_Orders` subdirectory inside and hoist it out as a sibling addon folder in the release ZIP. Both addons end up at the top level of the release ZIP, ready for WoW's AddOns directory.
 
-**Dev workflow:** symlink (or use `mklink /D` on Windows) two entries into WoW's AddOns directory:
+**Dev workflow:** WoW does not see `RecipeRegistry_Orders/` automatically because its `.toc` is nested inside `RecipeRegistry/` at dev time. Use symlinks (`mklink /D` on Windows) to expose both addons to WoW:
+
 ```
-WoW\Interface\AddOns\RecipeRegistry        → repo-root\RecipeRegistry\
+WoW\Interface\AddOns\RecipeRegistry        → repo-root\
 WoW\Interface\AddOns\RecipeRegistry_Orders → repo-root\RecipeRegistry_Orders\
 ```
 
-A small `scripts/dev-link.ps1` helper script will be added in Phase 0 to automate the symlink creation.
+A [`scripts/dev-link.ps1`](../scripts/dev-link.ps1) helper script automates this — see [`docs/release-process.md`](release-process.md) for usage and the full release workflow.
 
 **Versioning model under single CurseForge project:**
 - `RecipeRegistry/RecipeRegistry.toc` `## Version` is the **CurseForge-visible** version — what users see on the project page, in update notifications, in `_G.GetAddOnMetadata("RecipeRegistry", "Version")`.
