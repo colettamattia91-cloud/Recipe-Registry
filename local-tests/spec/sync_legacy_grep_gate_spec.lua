@@ -1,23 +1,23 @@
 local Test = dofile("local-tests/harness/test.lua")
 
 local ACTIVE_RUNTIME_FILES = {
-    "BuildInfo.lua",
-    "Core.lua",
-    "Data.lua",
-    "DataCatalog.lua",
-    "DataIndex.lua",
-    "DataScan.lua",
-    "DataSnapshot.lua",
-    "MergeEngine.lua",
-    "MockSync.lua",
-    "Sync.lua",
-    "SyncCodec.lua",
-    "SyncDiagnostics.lua",
-    "SyncPausePolicy.lua",
-    "SyncProtocol.lua",
-    "SyncRequests.lua",
-    "SyncRuntime.lua",
-    "SyncTransfer.lua",
+    "Core/BuildInfo.lua",
+    "Core/Core.lua",
+    "Data/Data.lua",
+    "Data/DataCatalog.lua",
+    "Data/DataIndex.lua",
+    "Data/DataScan.lua",
+    "Data/DataSnapshot.lua",
+    "Data/MergeEngine.lua",
+    "Sync/MockSync.lua",
+    "Sync/Sync.lua",
+    "Sync/SyncCodec.lua",
+    "Sync/SyncDiagnostics.lua",
+    "Sync/SyncPausePolicy.lua",
+    "Sync/SyncProtocol.lua",
+    "Sync/SyncRequests.lua",
+    "Sync/SyncRuntime.lua",
+    "Sync/SyncTransfer.lua",
     "UI/MainFrame.lua",
 }
 
@@ -117,7 +117,7 @@ Test.it("active runtime Lua files are free of explicit legacy sync protocol symb
 end)
 
 Test.it("protocol dispatch exposes only the supported modern message kinds", function()
-    local protocol = readFile("SyncProtocol.lua")
+    local protocol = readFile("Sync/SyncProtocol.lua")
 
     Test.truthy(protocol:find('payload%.kind == "HELLO"', 1, false) ~= nil, "HELLO dispatch should remain")
     Test.truthy(protocol:find('payload%.kind == "SUMMARY"', 1, false) ~= nil, "SUMMARY dispatch should remain")

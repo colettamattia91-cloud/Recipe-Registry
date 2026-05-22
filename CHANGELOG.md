@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased]
+### Added
+- Added an `Addon Status` view in the main window that compares the live guild roster with locally observed Recipe Registry peers, using a 30-day "not seen recently" threshold without implying uninstall status.
+- Added `/rr adoption` and `/rr addonstatus` diagnostics for a quick roster/addon adoption summary.
+
 ## [2.0.4] - 2026-05-21
 ### Changed
 - The recipe browser's background data builders now keep progressing with a tiny budget even while heavier UI work is paused, preventing the window from getting stuck on `Loading...` if it is opened during combat or other paused moments.

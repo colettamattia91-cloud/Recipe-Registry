@@ -5,9 +5,10 @@ Addon.UI = UI
 local SEARCH_DEBOUNCE = 0.15
 local GLOBAL_SEARCH_DEBOUNCE = 0.35
 local GLOBAL_SEARCH_MIN_CHARS = 3
+local ADDON_STATUS_VIEW = "Addon Status"
 
 local PROF_ORDER = {
-    "Favorites", "Alchemy", "Blacksmithing", "Cooking", "Enchanting", "Engineering",
+    "Favorites", ADDON_STATUS_VIEW, "Alchemy", "Blacksmithing", "Cooking", "Enchanting", "Engineering",
     "Jewelcrafting", "Leatherworking", "Mining", "Tailoring"
 }
 
@@ -122,6 +123,27 @@ local function statusTag(online)
         return "|TInterface\\COMMON\\Indicator-Green:12:12:0:0|t"
     end
     return "|TInterface\\COMMON\\Indicator-Red:12:12:0:0|t"
+end
+
+local function addonStatusColor(statusKey)
+    if statusKey == "online_with_addon" then
+        return 0.35, 0.95, 0.45
+    end
+    if statusKey == "online_addon_not_seen" then
+        return 1.0, 0.82, 0.25
+    end
+    if statusKey == "seen_before" then
+        return 0.55, 0.72, 1.0
+    end
+    if statusKey == "not_seen_recently" then
+        return 1.0, 0.48, 0.28
+    end
+    return 0.55, 0.55, 0.55
+end
+
+local function addonStatusLabelColor(row)
+    local r, g, b = addonStatusColor(row and row.addonStatusKey)
+    return colorText(row and row.addonStatusLabel or "Never seen", r, g, b)
 end
 
 local function getProfessionIcon(profName)
@@ -239,6 +261,12 @@ local function ageText(ts)
     return math.floor(delta / 86400) .. "d ago"
 end
 
+local function timestampText(ts)
+    if not ts or ts <= 0 then return "never" end
+    local formatted = date and date("%Y-%m-%d %H:%M", ts) or tostring(ts)
+    return string.format("%s (%s)", formatted, ageText(ts))
+end
+
 local function safeText(v)
     if v == nil then return "-" end
     return tostring(v)
@@ -331,6 +359,7 @@ local function createStatCard(parent, label, width)
 end
 
 local function setTextIfChanged(region, value)
+    if not region then return end
     value = value or ""
     if region._rrText == value then return end
     region._rrText = value
@@ -388,6 +417,9 @@ end
 
 function UI:OnInitialize()
     self.selectedProfession = Addon.db and Addon.db.profile and Addon.db.profile.selectedProfession or nil
+    if self.selectedProfession == "Guild Addon Adoption" then
+        self.selectedProfession = ADDON_STATUS_VIEW
+    end
     self.sortMode = (Addon.db and Addon.db.profile and Addon.db.profile.sortMode) or "alpha"
     self.searchMode = (Addon.db and Addon.db.profile and (Addon.db.profile.defaultSearchMode or Addon.db.profile.searchMode)) or "recipe"
     if self.searchMode ~= "materials" then
@@ -396,6 +428,10 @@ function UI:OnInitialize()
     self.selectedRecipeKey = nil
     self.selectedCategory = nil
     self.searchText = ""
+end
+
+function UI:IsAddonStatusView()
+    return self.selectedProfession == ADDON_STATUS_VIEW
 end
 
 local function getMainFrameProfile()
@@ -440,6 +476,7 @@ end
 
 function UI:ClearSearch()
     self.searchText = ""
+    self.selectedAddonStatusKey = nil
     self:CancelSearchTimer()
     if self.frame and self.frame.searchBox then
         self.frame.searchBox:SetText("")
@@ -515,6 +552,10 @@ local function buildRefreshPlan(reasons)
     for reason in pairs(reasons) do
         if reason == "queue" then
             plan.status = true
+        elseif reason == "addon-status" then
+            plan.status = true
+            plan.list = true
+            plan.detail = true
         elseif reason == "roster" then
             plan.status = true
             plan.list = true
@@ -809,6 +850,7 @@ function UI:CreateMainFrame()
     searchBox:SetScript("OnTextChanged", function(box)
         UI.searchText = box:GetText() or ""
         UI.selectedRecipeKey = nil
+        UI.selectedAddonStatusKey = nil
         if UI.searchText ~= "" then
             clearButton:Show()
         else
@@ -894,6 +936,7 @@ function UI:CreateMainFrame()
     local profLabel = left:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     profLabel:SetPoint("TOPLEFT", searchRecipes, "BOTTOMLEFT", 2, -14)
     profLabel:SetText("Profession filter")
+    f.profLabel = profLabel
 
     local profScroll = CreateFrame("ScrollFrame", nil, left, "UIPanelScrollFrameTemplate")
     profScroll:SetPoint("TOPLEFT", profLabel, "BOTTOMLEFT", -2, -8)
@@ -917,6 +960,7 @@ function UI:CreateMainFrame()
             end
             if Addon.db and Addon.db.profile then Addon.db.profile.selectedProfession = UI.selectedProfession end
             UI.selectedRecipeKey = nil
+            UI.selectedAddonStatusKey = nil
             UI.selectedCategory = nil
             UI:Refresh()
         end)
@@ -1228,6 +1272,14 @@ function UI:EnsureRecipeRow(index)
     row:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 
     row:SetScript("OnClick", function(self, button)
+        if self.addonStatusMemberKey then
+            if button == "LeftButton" then
+                UI.selectedAddonStatusKey = self.addonStatusMemberKey
+                UI:RefreshRecipeList()
+                UI:RefreshDetailPanel()
+            end
+            return
+        end
         if button == "RightButton" then
             UI:ToggleFavorite(self.recipeKey)
         else
@@ -1237,6 +1289,7 @@ function UI:EnsureRecipeRow(index)
         end
     end)
     row:SetScript("OnEnter", function(self)
+        if self.addonStatusMemberKey then return end
         if not self.tooltipLink then return end
         GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
         GameTooltip:SetHyperlink(self.tooltipLink)
@@ -1438,7 +1491,9 @@ function UI:RefreshStatusBar()
     end
 
     setTextIfChanged(self.frame.cards.members.value, tostring(members))
+    setTextIfChanged(self.frame.cards.members.text, "Known members")
     setTextIfChanged(self.frame.cards.network.value, string.format("%d / %d", onlineNodes, state and state.registry or 0))
+    setTextIfChanged(self.frame.cards.network.text, "Network nodes")
     setTextIfChanged(self.frame.cards.updated.value, ageText(statusSnapshot.updatedAt))
     setTextIfChanged(self.frame.cards.updated.text, "Last local update")
     if self.frame.cleanupButton then
@@ -1498,6 +1553,26 @@ function UI:RefreshDebugPanel()
 end
 
 function UI:RefreshSummaryCards()
+    if self:IsAddonStatusView() then
+        local summary = self.currentAddonStatusSummary
+        if not summary and Addon.Data and Addon.Data.GetGuildAddonStatusRows then
+            local _, fetchedSummary = Addon.Data:GetGuildAddonStatusRows({
+                searchText = self.searchText,
+                staleAfterDays = 30,
+            })
+            summary = fetchedSummary
+        end
+        summary = summary or {}
+        setTextIfChanged(self.frame.cards.members.value, tostring(summary.rosterTotal or 0))
+        setTextIfChanged(self.frame.cards.members.text, "Roster total")
+        setTextIfChanged(self.frame.cards.recipes.value, tostring(summary.shownRows or 0))
+        setTextIfChanged(self.frame.cards.recipes.text, "Rows shown")
+        setTextIfChanged(self.frame.cards.network.value, tostring(summary.addonPeersActive or 0))
+        setTextIfChanged(self.frame.cards.network.text, "Addon peers active")
+        setTextIfChanged(self.frame.cards.updated.value, ageText(summary.lastRosterRefreshAt))
+        setTextIfChanged(self.frame.cards.updated.text, "Roster refresh")
+        return
+    end
     local shown = self.currentRecipeRows and #self.currentRecipeRows or 0
     setTextIfChanged(self.frame.cards.recipes.value, tostring(shown))
     local label
@@ -1526,6 +1601,21 @@ function UI:RefreshProfessionButtons(opts)
     local useCategories = (not skipCategories) and Addon.db and Addon.db.profile and Addon.db.profile.useRecipeCategories ~= false
     local yOffset = 0
     local categoryButtonIndex = 0
+    local addonStatusView = self:IsAddonStatusView()
+
+    if self.frame.searchScopeLabel and self.frame.searchRecipes and self.frame.searchMaterials and self.frame.profLabel then
+        setShownIfChanged(self.frame.searchScopeLabel, not addonStatusView)
+        setShownIfChanged(self.frame.searchRecipes, not addonStatusView)
+        setShownIfChanged(self.frame.searchMaterials, not addonStatusView)
+        self.frame.profLabel:ClearAllPoints()
+        if addonStatusView then
+            self.frame.profLabel:SetPoint("TOPLEFT", self.frame.searchBox, "BOTTOMLEFT", 2, -14)
+            self.frame.profLabel:SetText("Directory view")
+        else
+            self.frame.profLabel:SetPoint("TOPLEFT", self.frame.searchRecipes, "BOTTOMLEFT", 2, -14)
+            self.frame.profLabel:SetText("Profession filter")
+        end
+    end
 
     local function placeButton(button, indent, height, gap)
         button:ClearAllPoints()
@@ -1538,6 +1628,8 @@ function UI:RefreshProfessionButtons(opts)
         local button = self.frame.profButtons[profName]
         if profName == "Favorites" then
             button:SetLabel("Favorites")
+        elseif profName == ADDON_STATUS_VIEW then
+            button:SetLabel("Addon Status")
         else
             button:SetLabel(profName, getProfessionIcon(profName))
         end
@@ -1615,6 +1707,54 @@ local function getVisibleRecipeWindow(ui, total)
     return firstIdx, lastIdx
 end
 
+function UI:BindAddonStatusRow(row, rowIdx, rowData)
+    row:SetPoint("TOPLEFT", 0, -((rowIdx - 1) * RECIPE_ROW_HEIGHT))
+    row.recipeKey = nil
+    row.addonStatusMemberKey = rowData.memberKey
+    row.tooltipLink = nil
+    setShownIfChanged(row.favoriteButton, false)
+
+    setTextureIfChanged(row.icon, "Interface\\Buttons\\WHITE8x8")
+    if row.icon.SetTexCoord then
+        row.icon:SetTexCoord(0, 1, 0, 1)
+    end
+    local sr, sg, sb = addonStatusColor(rowData.addonStatusKey)
+    setVertexColorIfChanged(row.icon, sr, sg, sb, 0.95)
+    setVertexColorIfChanged(row.stripe, sr, sg, sb, 1)
+    setShownIfChanged(row.icon, true)
+
+    local titleText = getClassColorizedName(rowData.memberKey)
+    if rowData.isLocalPlayer then
+        titleText = titleText .. " " .. colorText("(you)", unpackColor(MUTED))
+    end
+    setTextIfChanged(row.title, titleText)
+
+    local rosterState = rowData.online and statusTag(true) .. " Online" or statusTag(false) .. " Offline"
+    setTextIfChanged(row.stats, string.format("%s\n%s", addonStatusLabelColor(rowData), rosterState))
+
+    local metaParts = {}
+    if rowData.rankName and rowData.rankName ~= "" then
+        metaParts[#metaParts + 1] = rowData.rankName
+    end
+    if rowData.level and tonumber(rowData.level) and tonumber(rowData.level) > 0 then
+        metaParts[#metaParts + 1] = "Level " .. tostring(rowData.level)
+    end
+    if rowData.zone and rowData.zone ~= "" then
+        metaParts[#metaParts + 1] = rowData.zone
+    end
+    if rowData.lastSeenAt and rowData.lastSeenAt > 0 then
+        metaParts[#metaParts + 1] = "Addon " .. tostring(rowData.lastSeenAgeText or ageText(rowData.lastSeenAt))
+    end
+    setTextIfChanged(row.meta, #metaParts > 0 and table.concat(metaParts, " - ") or "No roster details")
+
+    if self.selectedAddonStatusKey == rowData.memberKey then
+        setBackdropColorsIfChanged(row, COLOR_ROW_SELECTED[1], COLOR_ROW_SELECTED[2], COLOR_ROW_SELECTED[3], COLOR_ROW_SELECTED[4], 1, 0.82, 0, 0.95)
+    else
+        setBackdropColorsIfChanged(row, COLOR_ROW[1], COLOR_ROW[2], COLOR_ROW[3], COLOR_ROW[4], 0.22, 0.22, 0.22, 1)
+    end
+    setShownIfChanged(row, true)
+end
+
 function UI:RefreshRecipeRowAssets(rowData)
     if not (rowData and rowData.recipeKey and Addon.Data and Addon.Data.GetRecipeDisplayInfo) then
         return rowData
@@ -1626,9 +1766,15 @@ function UI:RefreshRecipeRowAssets(rowData)
 end
 
 function UI:BindRecipeRow(row, recipeIdx, rowData)
+    if rowData and rowData.rowType == "addonStatus" then
+        self:BindAddonStatusRow(row, recipeIdx, rowData)
+        return
+    end
     rowData = self:RefreshRecipeRowAssets(rowData) or rowData
     row:SetPoint("TOPLEFT", 0, -((recipeIdx - 1) * RECIPE_ROW_HEIGHT))
     row.recipeKey = rowData.recipeKey
+    row.addonStatusMemberKey = nil
+    setShownIfChanged(row.favoriteButton, true)
 
     local isFav = self:IsFavorite(rowData.recipeKey)
     row.favoriteButton.isFavorite = isFav
@@ -1646,9 +1792,13 @@ function UI:BindRecipeRow(row, recipeIdx, rowData)
     local rowIcon = detail.createdItemIcon or detail.recipeItemIcon or detail.spellIcon or getItemIcon(colorItemID)
     if rowIcon then
         setTextureIfChanged(row.icon, rowIcon)
+        if row.icon.SetTexCoord then row.icon:SetTexCoord(0, 1, 0, 1) end
+        setVertexColorIfChanged(row.icon, 1, 1, 1, 1)
         setShownIfChanged(row.icon, true)
     else
         setTextureIfChanged(row.icon, "Interface\\Icons\\INV_Misc_QuestionMark")
+        if row.icon.SetTexCoord then row.icon:SetTexCoord(0, 1, 0, 1) end
+        setVertexColorIfChanged(row.icon, 1, 1, 1, 1)
         setShownIfChanged(row.icon, true)
     end
     if colorItemID then
@@ -1749,6 +1899,12 @@ end
 -- reason; the originating event will have queued its own RefreshRecipeList.
 function UI:RefreshRecipeList()
     if not self.frame then return end
+    if self:IsAddonStatusView() then
+        self:RefreshAddonStatusList()
+        return
+    end
+    self.currentAddonStatusSummary = nil
+    self.selectedAddonStatusKey = nil
     local effectiveProfession = self.selectedProfession
     if effectiveProfession == "Favorites" then
         effectiveProfession = nil
@@ -1816,6 +1972,9 @@ function UI:_ShowRecipeListLoadingState(context, generation)
     end
     setTextIfChanged(self.frame.recipeHeader, headerText)
     if self.frame.sortSwitch then
+        if self.frame.sortSwitch.Enable then
+            self.frame.sortSwitch:Enable()
+        end
         local sortLabel = context.sortMode == "rarity" and "Sort: Rarity" or "Sort: Alphabetical"
         self.frame.sortSwitch:SetLabel(sortLabel)
     end
@@ -1852,6 +2011,9 @@ function UI:_FinalizeRecipeList(rows, context, generation)
     end
     setTextIfChanged(self.frame.recipeHeader, headerText)
     if self.frame.sortSwitch then
+        if self.frame.sortSwitch.Enable then
+            self.frame.sortSwitch:Enable()
+        end
         local sortLabel = context.sortMode == "rarity" and "Sort: Rarity" or "Sort: Alphabetical"
         self.frame.sortSwitch:SetLabel(sortLabel)
     end
@@ -1900,6 +2062,75 @@ function UI:RefreshVisibleRecipeRowAssets()
     -- virtualized window and let off-screen rows refresh lazily on scroll.
     self:InvalidateRecipeWindowCache()
     self:RenderVisibleRecipeRows()
+end
+
+function UI:RefreshAddonStatusList()
+    self._recipeListGeneration = (self._recipeListGeneration or 0) + 1
+    self.selectedRecipeKey = nil
+    local rows, summary = {}, {
+        rosterReady = false,
+        reason = "data-unavailable",
+        rosterTotal = 0,
+        shownRows = 0,
+        addonPeersActive = 0,
+        lastRosterRefreshAt = 0,
+    }
+    if Addon.Data and Addon.Data.GetGuildAddonStatusRows then
+        rows, summary = Addon.Data:GetGuildAddonStatusRows({
+            searchText = self.searchText,
+            staleAfterDays = 30,
+        })
+    end
+    self:_FinalizeAddonStatusList(rows or {}, summary or {})
+end
+
+function UI:_FinalizeAddonStatusList(rows, summary)
+    if not self.frame then return end
+    self.currentRecipeRows = rows or {}
+    self.currentAddonStatusSummary = summary or {}
+
+    local headerText
+    if self.currentAddonStatusSummary.rosterReady ~= true then
+        headerText = "Addon Status - waiting for guild roster"
+    elseif self.searchText and self.searchText ~= "" then
+        headerText = "Addon Status search results"
+    else
+        headerText = "Addon Status"
+    end
+    setTextIfChanged(self.frame.recipeHeader, headerText)
+    if self.frame.sortSwitch then
+        self.frame.sortSwitch:SetLabel("30-day status")
+        if self.frame.sortSwitch.Disable then
+            self.frame.sortSwitch:Disable()
+        end
+    end
+
+    local selectedExists = false
+    if self.selectedAddonStatusKey then
+        for _, rowData in ipairs(self.currentRecipeRows) do
+            if rowData.memberKey == self.selectedAddonStatusKey then
+                selectedExists = true
+                break
+            end
+        end
+    end
+
+    if (not self.selectedAddonStatusKey or not selectedExists) and #self.currentRecipeRows > 0 then
+        self.selectedAddonStatusKey = self.currentRecipeRows[1].memberKey
+    elseif #self.currentRecipeRows == 0 then
+        self.selectedAddonStatusKey = nil
+    end
+
+    local contentHeight = math.max(1, #self.currentRecipeRows * RECIPE_ROW_HEIGHT + 10)
+    if self.frame.recipeContent._rrHeight ~= contentHeight then
+        self.frame.recipeContent._rrHeight = contentHeight
+        self.frame.recipeContent:SetHeight(contentHeight)
+    end
+
+    self:InvalidateRecipeWindowCache()
+    self:RenderVisibleRecipeRows()
+    self:RefreshSummaryCards()
+    self:RefreshDetailPanel()
 end
 
 function UI:RenderDetailLines(lines, lineLinks, lineMeta)
@@ -1956,11 +2187,87 @@ function UI:RenderDetailLines(lines, lineLinks, lineMeta)
     end
 end
 
+function UI:GetSelectedAddonStatusRow()
+    if not self.selectedAddonStatusKey then
+        return nil
+    end
+    for _, rowData in ipairs(self.currentRecipeRows or {}) do
+        if rowData.rowType == "addonStatus" and rowData.memberKey == self.selectedAddonStatusKey then
+            return rowData
+        end
+    end
+    return nil
+end
+
+function UI:RefreshAddonStatusDetailPanel()
+    if not self.frame then return end
+    self.currentDetail = nil
+    self._lastDetailSignature = nil
+    self.frame.detailFavoriteButton.recipeKey = nil
+    self.frame.detailFavoriteButton.isFavorite = false
+    setShownIfChanged(self.frame.detailFavoriteButton, false)
+    self.frame.detailScroll:SetPoint("TOPLEFT", 8, -54)
+
+    local lines = {}
+    local summary = self.currentAddonStatusSummary or {}
+    if summary.rosterReady ~= true then
+        setTextIfChanged(self.frame.detailTitle, "Addon Status")
+        setTextIfChanged(self.frame.detailSub, "Waiting for the guild roster refresh.")
+        lines[#lines + 1] = "Guild roster data is not loaded yet."
+        lines[#lines + 1] = "Recipe Registry has requested a roster refresh and will update this view automatically."
+        self:RenderDetailLines(lines, {}, {})
+        return
+    end
+
+    local row = self:GetSelectedAddonStatusRow()
+    if not row then
+        setTextIfChanged(self.frame.detailTitle, "Addon Status")
+        setTextIfChanged(self.frame.detailSub, "No guild member selected.")
+        if self.searchText and self.searchText ~= "" then
+            lines[#lines + 1] = "No guild roster rows match this search."
+        else
+            lines[#lines + 1] = "No guild roster rows are available."
+        end
+        self:RenderDetailLines(lines, {}, {})
+        return
+    end
+
+    local sr, sg, sb = addonStatusColor(row.addonStatusKey)
+    setTextIfChanged(self.frame.detailTitle, getClassColorizedName(row.memberKey))
+    setTextIfChanged(self.frame.detailSub, colorText(row.addonStatusLabel, sr, sg, sb))
+
+    lines[#lines + 1] = "|cffffd100Addon|r"
+    lines[#lines + 1] = "Status: " .. addonStatusLabelColor(row)
+    lines[#lines + 1] = "Version: " .. safeText(row.addonVersion)
+    lines[#lines + 1] = "Wire: " .. safeText(row.wireVersion)
+    lines[#lines + 1] = "Build channel: " .. safeText(row.buildChannel)
+    lines[#lines + 1] = "Build ID: " .. safeText(row.buildId)
+    lines[#lines + 1] = "First seen addon: " .. timestampText(row.firstSeenAt)
+    lines[#lines + 1] = "Last seen addon: " .. timestampText(row.lastSeenAt)
+
+    lines[#lines + 1] = " "
+    lines[#lines + 1] = "|cffffd100Roster|r"
+    lines[#lines + 1] = "Online status: " .. (row.online and colorText("Online", 0.35, 0.95, 0.45) or colorText("Offline", 0.85, 0.45, 0.45))
+    lines[#lines + 1] = "Rank: " .. safeText(row.rankName)
+    lines[#lines + 1] = "Level: " .. safeText(row.level)
+    lines[#lines + 1] = "Zone: " .. safeText(row.zone)
+    if row.status and row.status ~= "" then
+        lines[#lines + 1] = "Roster status: " .. safeText(row.status)
+    end
+
+    self:RenderDetailLines(lines, {}, {})
+end
+
 function UI:RefreshDetailPanel()
     if not self.frame then return end
+    if self:IsAddonStatusView() then
+        self:RefreshAddonStatusDetailPanel()
+        return
+    end
     local lines = {}
     local lineLinks = {}
     local lineMeta = {}
+    setShownIfChanged(self.frame.detailFavoriteButton, true)
     if not self.selectedRecipeKey then
         self.currentDetail = nil
         self._lastDetailSignature = nil
@@ -2140,7 +2447,7 @@ function UI:Toggle()
         self.frame:Show()
         self:RefreshDebugVisibility()
         local degradedReason = self:GetDegradedModeReason()
-        if degradedReason then
+        if degradedReason and not self:IsAddonStatusView() then
             self:RefreshStatusBar()
             self:RefreshProfessionButtons({ skipCategories = true })
             self:RefreshDegradedStatus(degradedReason)
@@ -2155,7 +2462,7 @@ end
 function UI:Refresh(reasons)
     if not self.frame or not self.frame:IsShown() then return end
     local degradedReason = self:GetDegradedModeReason()
-    if degradedReason then
+    if degradedReason and not self:IsAddonStatusView() then
         self:RefreshStatusBar()
         -- Profession buttons are static labels — populating them while sync
         -- is still warming up gives the user a non-empty sidebar instead

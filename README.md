@@ -12,6 +12,7 @@ It is designed for everyday guild life: fast to browse, calm in the background, 
 
 - Find the right crafter without repeating the same question in guild chat
 - See who is online now and who can help later when they log back in
+- Check which guildmates your client has recently seen using Recipe Registry, without guessing uninstall status
 - Search recipes by name or by materials, depending on how you think
 - Keep favorites per character for the crafts you ask about most often
 - Spot important TBC specializations such as Transmute Master, Armorsmith, Spellfire Tailor, Dragonscale Leatherworker, and more
@@ -54,6 +55,7 @@ It is designed for everyday guild life: fast to browse, calm in the background, 
 ### Quiet Background Sync
 
 - Shares guild recipe data automatically with compatible guildmates
+- Adds an Addon Status view that cross-checks the live guild roster with locally observed Recipe Registry peers
 - Paces larger updates so the addon stays responsive
 - Waits for safer moments around login, reloads, combat, instances, and roster loading
 - Keeps normal chat output quiet, with extra diagnostics available only when you need troubleshooting
@@ -84,6 +86,7 @@ The first sync may take a little time, especially in a larger guild. After that,
 - `/rr` opens the main Recipe Registry window
 - `/rr options` opens the settings panel
 - `/rr rescan` queues a fresh profession scan
+- `/rr adoption` or `/rr addonstatus` prints a guild addon status summary
 - `/rr share guild` shares the selected recipe in guild chat
 - `/rr share party`, `/rr share raid`, and `/rr share say` share the selected recipe to other channels
 - `/rr prices <item name or item link>` checks available market pricing data

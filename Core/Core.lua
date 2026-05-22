@@ -307,7 +307,7 @@ local function printMainHelp(self)
     self:Print("/rr - open or close the main window.")
     self:Print("/rr options, /rr mini, /rr debug, /rr debug log")
     self:Print("/rr rescan - queue a profession scan and scan active profession API data.")
-    self:Print("/rr version, /rr versions, /rr dump, /rr self [profession], /rr sync [debug, diag, peers, sessions, log], /rr offline, /rr pull")
+    self:Print("/rr version, /rr versions, /rr adoption, /rr dump, /rr self [profession], /rr sync [debug, diag, peers, sessions, log], /rr offline, /rr pull")
     self:Print("/rr perf [toggle, dump, reset, help]")
     if self.MockSync then
         self:Print("/rr mock [status, start <" .. MOCK_SCENARIOS .. ">, stop, cleanup, reset, help]")
@@ -1049,6 +1049,18 @@ function Addon:SlashHandler(input)
             self.Sync:DumpPeerVersions()
         else
             self:Print("Peer version diagnostics not available.")
+        end
+        return
+    end
+
+    if cmd == "adoption" or cmd == "addonstatus" then
+        if self.Data and self.Data.DumpAddonAdoptionStatus then
+            self.Data:DumpAddonAdoptionStatus({
+                searchText = rest,
+                staleAfterDays = 30,
+            })
+        else
+            self:Print("Addon status diagnostics not available.")
         end
         return
     end
