@@ -1,0 +1,592 @@
+local Loader = dofile("local-tests/harness/load-addon.lua")
+local CommBus = dofile("local-tests/harness/comm-bus.lua")
+local Test = dofile("local-tests/harness/test.lua")
+
+local function countSentKind(rows, kind)
+    local total = 0
+    for _, row in ipairs(rows or {}) do
+        if type(row.message) == "table" and row.message.kind == kind then
+            total = total + 1
+        end
+    end
+    return total
+end
+
+local function countKinds(rows, kinds)
+    local total = 0
+    for _, kind in ipairs(kinds or {}) do
+        total = total + countSentKind(rows, kind)
+    end
+    return total
+end
+
+local function seedProfession(data, memberKey, professionKey, recipeKeys, opts)
+    opts = opts or {}
+    local entry = data:GetOrCreateMember(memberKey)
+    local recipes = {}
+    for _, recipeKey in ipairs(recipeKeys or {}) do
+        recipes[recipeKey] = true
+    end
+    entry.guildStatus = "active"
+    entry.sourceType = opts.sourceType or entry.sourceType or data:GetMemberSourceType(memberKey)
+    entry.updatedAt = opts.updatedAt or entry.updatedAt or 100
+    entry.lastSeenInGuildAt = opts.lastSeenInGuildAt or entry.updatedAt
+    entry.professions[professionKey] = {
+        recipes = recipes,
+        skillRank = opts.skillRank or 75,
+        skillMaxRank = opts.skillMaxRank or 150,
+        specialization = opts.specialization,
+        sourceType = opts.professionSourceType or entry.sourceType,
+        guildStatus = "active",
+        lastSeenInGuildAt = entry.lastSeenInGuildAt,
+        lastUpdatedAt = entry.updatedAt,
+    }
+    data:NormalizeMemberEntry(entry, memberKey)
+    data:MarkSyncIndexDirty(opts.reason or "test-seed")
+    return entry
+end
+
+local function refreshSyncNode(node, reason)
+    local addon = node and node.addon or nil
+    if not addon then
+        return
+    end
+    if node and node.state then
+        Loader.Wow.UseState(node.state)
+        _G.RecipeRegistry = addon
+        _G.RecipeRegistryDB = addon.db
+        _G.RecipeRegistryCharDB = addon.charDB
+    end
+    if addon.Data and addon.Data.PrepareSyncIndexNow then
+        addon.Data:PrepareSyncIndexNow(reason or "phase34-refresh")
+    end
+    if addon.Sync and addon.Sync.RefreshSyncReadyState then
+        addon.Sync:RefreshSyncReadyState(reason or "phase34-refresh")
+    end
+end
+
+local function primeStandaloneSync(addon, wow, data, reason)
+    local ownerKey = data:GetPlayerKey()
+    wow.SetGuildRoster({
+        { name = ownerKey, online = true, rankName = "Member", rankIndex = 5, level = 70, classDisplayName = "Mage", classFileName = "MAGE" },
+    })
+    data:RebuildOnlineCache()
+    Loader.PrimeSyncReady(addon, {
+        reason = reason or "phase34-prime",
+        runTimers = false,
+    })
+end
+
+io.write("Sync phase 3/4 block pull\n")
+
+Test.it("selected seed exchanges INDEX_DIFF and sequential BLOCK_PULL/BLOCK_SNAPSHOT only", function()
+    local bus = CommBus.New({
+        names = { "Requester", "Seed", "Smaller" },
+    })
+    local requester = bus:AddNode("Requester")
+    local seed = bus:AddNode("Seed")
+    local smaller = bus:AddNode("Smaller")
+
+    bus:SeedSelfProfession(requester, {
+        profession = "Alchemy",
+        recipeCount = 1,
+        baseRecipe = 1000,
+    })
+    bus:SeedSelfProfession(seed, {
+        profession = "Alchemy",
+        recipeCount = 3,
+        baseRecipe = 2000,
+    })
+    bus:Activate(seed)
+    seedProfession(seed.addon.Data, seed.key, "Tailoring", { 3001, 3002 }, {
+        sourceType = "owner",
+        professionSourceType = "owner",
+        reason = "seed-tailoring",
+    })
+    refreshSyncNode(seed, "seed-tailoring")
+    bus:SeedSelfProfession(smaller, {
+        profession = "Alchemy",
+        recipeCount = 2,
+        baseRecipe = 4000,
+    })
+
+    bus:Activate(requester)
+    requester.addon.Data:MarkSyncIndexDirty("requester-start")
+    bus:Activate(seed)
+    seed.addon.Data:MarkSyncIndexDirty("seed-start")
+    bus:Activate(smaller)
+    smaller.addon.Data:MarkSyncIndexDirty("smaller-start")
+    refreshSyncNode(requester, "requester-start")
+    refreshSyncNode(seed, "seed-start")
+    refreshSyncNode(smaller, "smaller-start")
+
+    bus:Activate(requester)
+    requester.addon.Sync:BroadcastHello()
+
+    local settled = bus:RunUntil(function()
+        local session = requester.addon.Sync.outboundSeedSession
+        return session and session.state == "completed"
+    end, {
+        maxTicks = 220,
+    })
+
+    Test.truthy(settled, "requester should complete one outbound seed session")
+    Test.eq(requester.addon.Sync.activeHelloCycle.selectedSeedKey, seed.key, "largest seed should be selected")
+    Test.eq(countSentKind(requester.state.sentComm, "INDEX_DIFF_REQUEST"), 1, "requester should send one index diff request")
+    Test.eq(countSentKind(seed.state.sentComm, "INDEX_DIFF_RESPONSE"), 1, "selected seed should answer with one index diff response")
+    Test.eq(countSentKind(smaller.state.sentComm, "INDEX_DIFF_RESPONSE"), 0, "non-selected peer should not send index diff response")
+    Test.eq(countSentKind(requester.state.sentComm, "BLOCK_PULL_REQUEST"), 2, "requester should pull two offered blocks")
+    Test.eq(countSentKind(seed.state.sentComm, "BLOCK_SNAPSHOT"), 2, "selected seed should send one snapshot per offered block")
+    local replica = requester.addon.Data:GetMember(seed.key)
+    Test.truthy(replica, "requester should store pulled seed owner")
+    Test.truthy(replica.professions.Alchemy, "alchemy block should be merged")
+    Test.truthy(replica.professions.Tailoring, "tailoring block should be merged")
+    Test.eq(replica.professions.Alchemy.count or 0, 3, "alchemy count should match seed")
+    Test.eq(replica.professions.Tailoring.count or 0, 2, "tailoring count should match seed")
+end)
+
+Test.it("requester does not ask for block N+1 before block N snapshot is merged", function()
+    local delayedBlockKey = nil
+    local delayedOnce = false
+    local bus = CommBus.New({
+        names = { "DelayedRequester", "DelayedSeed" },
+        routeHook = function(_, senderNode, targetNode, row, payload)
+            if senderNode and targetNode
+                and senderNode.name == "DelayedSeed"
+                and targetNode.name == "DelayedRequester"
+                and type(payload) == "table"
+                and payload.kind == "BLOCK_SNAPSHOT"
+                and payload.blockKey == delayedBlockKey
+                and not delayedOnce
+            then
+                delayedOnce = true
+                return "delay", 5
+            end
+        end,
+    })
+    local requester = bus:AddNode("DelayedRequester")
+    local seed = bus:AddNode("DelayedSeed")
+
+    bus:SeedSelfProfession(seed, {
+        profession = "Alchemy",
+        recipeCount = 3,
+        baseRecipe = 5000,
+    })
+    bus:Activate(seed)
+    seedProfession(seed.addon.Data, seed.key, "Tailoring", { 6001, 6002 }, {
+        sourceType = "owner",
+        professionSourceType = "owner",
+        reason = "delay-tailoring",
+    })
+    refreshSyncNode(seed, "delay-tailoring")
+    delayedBlockKey = seed.addon.Data:BuildSyncBlockKey(seed.key, "Alchemy")
+
+    bus:Activate(requester)
+    requester.addon.Sync:BroadcastHello()
+
+    local sawFirstPull = bus:RunUntil(function()
+        return countSentKind(requester.state.sentComm, "BLOCK_PULL_REQUEST") >= 1
+    end, {
+        maxTicks = 220,
+    })
+
+    Test.truthy(sawFirstPull, "first block pull should be sent")
+    Test.eq(countSentKind(requester.state.sentComm, "BLOCK_PULL_REQUEST"), 1, "only the first block pull should be sent while snapshot one is delayed")
+
+    local settled = bus:RunUntil(function()
+        local session = requester.addon.Sync.outboundSeedSession
+        return session and session.state == "completed"
+    end, {
+        maxTicks = 240,
+    })
+
+    Test.truthy(settled, "delayed session should still complete")
+    Test.eq(countSentKind(requester.state.sentComm, "BLOCK_PULL_REQUEST"), 2, "second pull should be sent only after first merge completes")
+end)
+
+Test.it("INDEX_DIFF_REQUEST and BLOCK_PULL_REQUEST stay minimal on the wire", function()
+    local bus = CommBus.New({
+        names = { "MinimalRequester", "MinimalSeed" },
+    })
+    local requester = bus:AddNode("MinimalRequester")
+    local seed = bus:AddNode("MinimalSeed")
+
+    bus:SeedSelfProfession(requester, {
+        profession = "Alchemy",
+        recipeCount = 1,
+        baseRecipe = 6100,
+    })
+    bus:SeedSelfProfession(seed, {
+        profession = "Alchemy",
+        recipeCount = 3,
+        baseRecipe = 7100,
+    })
+    bus:Activate(requester)
+    requester.addon.Data:MarkSyncIndexDirty("minimal-requester")
+    bus:Activate(seed)
+    seed.addon.Data:MarkSyncIndexDirty("minimal-seed")
+    refreshSyncNode(requester, "minimal-requester")
+    refreshSyncNode(seed, "minimal-seed")
+
+    bus:Activate(requester)
+    requester.addon.Sync:BroadcastHello()
+
+    local sentPull = bus:RunUntil(function()
+        return countSentKind(requester.state.sentComm, "BLOCK_PULL_REQUEST") >= 1
+    end, {
+        maxTicks = 300,
+    })
+
+    Test.truthy(sentPull, "requester should reach the block pull stage")
+
+    local diffPayload
+    local pullPayload
+    for _, row in ipairs(requester.state.sentComm or {}) do
+        local message = row.message
+        if type(message) == "table" and message.kind == "INDEX_DIFF_REQUEST" then
+            diffPayload = message
+        elseif type(message) == "table" and message.kind == "BLOCK_PULL_REQUEST" then
+            pullPayload = message
+            break
+        end
+    end
+
+    Test.truthy(diffPayload, "index diff request payload should be captured")
+    Test.truthy(type(diffPayload.requestId) == "string" and diffPayload.requestId ~= "", "index diff request id")
+    Test.truthy(type(diffPayload.blocks) == "table", "index diff request should carry block digests")
+    Test.eq(diffPayload.sessionId, nil, "index diff request should not carry sessionId")
+    Test.eq(diffPayload.helloId, nil, "index diff request should not carry helloId")
+    Test.eq(diffPayload.cycleId, nil, "index diff request should not carry cycleId")
+    Test.eq(diffPayload.globalFingerprint, nil, "index diff request should not carry global fingerprint")
+    Test.eq(diffPayload.activeOwnerCount, nil, "index diff request should not carry owner counts")
+    Test.eq(diffPayload.activeBlockCount, nil, "index diff request should not carry block counts")
+    Test.eq(diffPayload.activeContentCount, nil, "index diff request should not carry content counts")
+    Test.eq(diffPayload.recipeKeys, nil, "index diff request should not carry recipe payload")
+    Test.eq(diffPayload.metadata, nil, "index diff request should not carry metadata payload")
+
+    Test.truthy(pullPayload, "block pull request payload should be captured")
+    Test.truthy(type(pullPayload.requestId) == "string" and pullPayload.requestId ~= "", "block pull request id")
+    Test.truthy(type(pullPayload.blockKey) == "string" and pullPayload.blockKey ~= "", "block pull request block key")
+    Test.eq(pullPayload.expectedFingerprint, nil, "block pull request should not carry expectedFingerprint")
+    Test.eq(pullPayload.offeredFingerprint, nil, "block pull request should not carry offeredFingerprint")
+    Test.eq(pullPayload.knownFingerprint, nil, "block pull request should not carry knownFingerprint")
+    Test.eq(pullPayload.knownRev, nil, "block pull request should not carry knownRev")
+    Test.eq(pullPayload.wantRev, nil, "block pull request should not carry wantRev")
+    Test.eq(pullPayload.sessionId, nil, "block pull request should not carry sessionId")
+    Test.eq(pullPayload.helloId, nil, "block pull request should not carry helloId")
+    Test.eq(pullPayload.cycleId, nil, "block pull request should not carry cycleId")
+    Test.eq(pullPayload.metadata, nil, "block pull request should not carry metadata")
+end)
+
+Test.it("next block pull is scheduled after the internal delay once a block merge completes", function()
+    local bus = CommBus.New({
+        names = { "PacingRequester", "PacingSeed" },
+    })
+    local requester = bus:AddNode("PacingRequester")
+    local seed = bus:AddNode("PacingSeed")
+
+    bus:SeedSelfProfession(requester, {
+        profession = "Alchemy",
+        recipeCount = 1,
+        baseRecipe = 8100,
+    })
+    bus:SeedSelfProfession(seed, {
+        profession = "Alchemy",
+        recipeCount = 3,
+        baseRecipe = 9100,
+    })
+    bus:Activate(seed)
+    seedProfession(seed.addon.Data, seed.key, "Tailoring", { 9201, 9202 }, {
+        sourceType = "owner",
+        professionSourceType = "owner",
+        reason = "pacing-tailoring",
+    })
+    refreshSyncNode(seed, "pacing-tailoring")
+    bus:Activate(requester)
+    requester.addon.Data:MarkSyncIndexDirty("pacing-requester")
+    bus:Activate(seed)
+    seed.addon.Data:MarkSyncIndexDirty("pacing-seed")
+    refreshSyncNode(requester, "pacing-requester")
+    refreshSyncNode(seed, "pacing-seed")
+
+    bus:Activate(requester)
+    requester.addon.Sync:BroadcastHello()
+
+    local scheduled = bus:RunUntil(function()
+        local session = requester.addon.Sync.outboundSeedSession
+        return session
+            and session.state == "waiting-next-block-delay"
+            and session.nextBlockTimer ~= nil
+    end, {
+        maxTicks = 300,
+    })
+
+    local session = requester.addon.Sync.outboundSeedSession or {}
+    local state = requester.addon.Data:GetSyncIndexDebugState()
+    Test.truthy(scheduled, "next block pull should enter the paced delay state")
+    Test.eq(requester.addon.Sync._private.constants.BLOCK_PULL_DELAY_SECONDS, 2.5, "internal block pull delay constant")
+    Test.truthy(type(session.nextBlockReadyAt) == "number" and session.nextBlockReadyAt > time(), "next block ready timestamp")
+    Test.truthy(state.globalFingerprintDirty, "block merge should dirty the global fingerprint while the pull session is still active")
+    Test.eq(countSentKind(requester.state.sentComm, "BLOCK_PULL_REQUEST"), 1, "second block pull should not be sent inline with the merge")
+    local helloBefore = countSentKind(requester.state.sentComm, "HELLO")
+    Test.falsy(requester.addon.Sync:BroadcastHello(), "dirty active pull should refuse HELLO publication")
+    Test.eq(countSentKind(requester.state.sentComm, "HELLO"), helloBefore, "dirty active pull should not emit HELLO while the session is active")
+
+    local completed = bus:RunUntil(function()
+        local currentSession = requester.addon.Sync.outboundSeedSession
+        return currentSession and currentSession.state == "completed"
+    end, {
+        maxTicks = 240,
+    })
+
+    Test.truthy(completed, "paced block pull session should still complete")
+    Test.eq(requester.addon.Sync.telemetry.blockPullDelayed or 0, 1, "delay telemetry should record the scheduled follow-up")
+    Test.eq(countSentKind(requester.state.sentComm, "BLOCK_PULL_REQUEST"), 2, "second block pull should be sent after the delay")
+end)
+
+Test.it("index diff does not offer a lower-count block back to a richer requester", function()
+    local addon, wow = Loader.Load()
+    local data = addon.Data
+    local ownerKey = data:GetPlayerKey()
+    wow.SetGuildRoster({
+        { name = ownerKey, online = true, rankName = "Member", rankIndex = 5, level = 70, classDisplayName = "Mage", classFileName = "MAGE" },
+    })
+    data:RebuildOnlineCache()
+
+    seedProfession(data, ownerKey, "Alchemy", { 7001 }, {
+        sourceType = "owner",
+        professionSourceType = "owner",
+        reason = "local-one",
+    })
+    local blockKey = data:BuildSyncBlockKey(ownerKey, "Alchemy")
+
+    local response = data:BuildIndexDiffResponse({
+        blocks = {
+            [blockKey] = {
+                count = 2,
+                fingerprint = "different-fingerprint",
+            },
+        },
+    }, {
+        reason = "higher-requester",
+    })
+
+    Test.eq(#(response.offeredBlocks or {}), 0, "seed should not offer a lower-count block back to the requester")
+end)
+
+Test.it("session completion refreshes the merged fingerprint and schedules a delayed follow-up HELLO", function()
+    local bus = CommBus.New({
+        names = { "PublishRequester", "PublishSeed" },
+    })
+    local requester = bus:AddNode("PublishRequester")
+    local seed = bus:AddNode("PublishSeed")
+
+    bus:SeedSelfProfession(requester, {
+        profession = "Alchemy",
+        recipeCount = 1,
+        baseRecipe = 15000,
+    })
+    refreshSyncNode(requester, "publish-baseline")
+    local baseline = requester.addon.Data:BuildLocalSummary({
+        reason = "publish-baseline",
+    }).globalFingerprint
+
+    bus:SeedSelfProfession(seed, {
+        profession = "Alchemy",
+        recipeCount = 3,
+        baseRecipe = 15100,
+    })
+
+    bus:Activate(requester)
+    requester.addon.Sync:BroadcastHello()
+
+    local settled = bus:RunUntil(function()
+        local session = requester.addon.Sync.outboundSeedSession
+        return session and session.state == "completed"
+    end, {
+        maxTicks = 220,
+    })
+
+    Test.truthy(settled, "requester should complete the modern pull session")
+    local state = requester.addon.Data:GetSyncIndexDebugState()
+    Test.ne(state.globalFingerprint, baseline, "completion should refresh the merged fingerprint")
+    Test.falsy(state.globalFingerprintDirty, "completion should leave the single global fingerprint valid")
+    Test.truthy(requester.addon.Sync._helloTimer ~= nil, "completion should schedule a delayed hello instead of sending inline")
+    Test.truthy(type(requester.addon.Sync.lastHelloScheduleReason) == "string"
+        and requester.addon.Sync.lastHelloScheduleReason:find("seed%-session%-complete", 1, false) ~= nil,
+        "completion should schedule a follow-up hello")
+end)
+
+Test.it("session timeout abort keeps partial merged progress and schedules a delayed HELLO", function()
+    local addon, wow = Loader.Load()
+    local data = addon.Data
+    local ownerKey = data:GetPlayerKey()
+    primeStandaloneSync(addon, wow, data, "phase34-timeout-partial")
+
+    seedProfession(data, ownerKey, "Alchemy", { 8001 }, {
+        sourceType = "owner",
+        professionSourceType = "owner",
+        reason = "baseline",
+    })
+    data:PrepareSyncIndexNow("baseline-summary")
+    local publishedBefore = data:BuildLocalSummary({
+        reason = "baseline-summary",
+    }).globalFingerprint
+
+    seedProfession(data, ownerKey, "Alchemy", { 8001, 8002 }, {
+        sourceType = "owner",
+        professionSourceType = "owner",
+        reason = "changed-before-timeout",
+    })
+    local liveFingerprint = data:BuildGlobalFingerprint(data:GetLiveSyncIndex({
+        reason = "live-before-timeout",
+    }))
+    addon.Sync.outboundSeedSession = {
+        state = "waiting-index-diff",
+        seedKey = "Timeoutpeer-TestRealm",
+        sessionId = "timeout-session",
+        startedAt = time() - 100,
+        lastProgressAt = time() - 100,
+        successfulBlockMerges = 1,
+    }
+
+    addon.Sync:ProcessRequestQueue()
+
+    local state = data:GetSyncIndexDebugState()
+    Test.eq(addon.Sync.outboundSeedSession.state, "aborted", "session should abort on timeout")
+    Test.ne(publishedBefore, liveFingerprint, "test setup should change the live fingerprint")
+    Test.eq(state.globalFingerprint, liveFingerprint, "abort should keep the merged partial local fingerprint")
+    Test.falsy(state.globalFingerprintDirty, "abort should leave the single global fingerprint valid")
+    Test.truthy(addon.Sync._helloTimer ~= nil, "abort after merged progress should schedule a delayed hello")
+    Test.truthy(type(addon.Sync.lastHelloScheduleReason) == "string"
+        and addon.Sync.lastHelloScheduleReason:find("seed%-session%-abort%-partial", 1, false) ~= nil,
+        "abort after merged progress should schedule a follow-up hello")
+end)
+
+Test.it("abort before any successful pull does not publish a new fingerprint", function()
+    local addon, wow = Loader.Load()
+    local data = addon.Data
+    local ownerKey = data:GetPlayerKey()
+    primeStandaloneSync(addon, wow, data, "phase34-timeout-empty")
+
+    seedProfession(data, ownerKey, "Alchemy", { 16001 }, {
+        sourceType = "owner",
+        professionSourceType = "owner",
+        reason = "abort-baseline",
+    })
+    data:PrepareSyncIndexNow("abort-baseline-publish")
+    local publishedBefore = data:BuildLocalSummary({
+        reason = "abort-baseline-publish",
+    }).globalFingerprint
+
+    addon.Sync.outboundSeedSession = {
+        state = "waiting-index-diff",
+        seedKey = "Abortpeer-TestRealm",
+        sessionId = "abort-session",
+        startedAt = time() - 100,
+        lastProgressAt = time() - 100,
+        successfulBlockMerges = 0,
+    }
+
+    addon.Sync:ProcessRequestQueue()
+
+    local state = data:GetSyncIndexDebugState()
+    Test.eq(addon.Sync.outboundSeedSession.state, "aborted", "session should abort on timeout")
+    Test.eq(state.globalFingerprint, publishedBefore, "abort without merged blocks should keep the single fingerprint unchanged")
+    Test.falsy(state.globalFingerprintDirty, "abort without merged blocks should not leave the fingerprint dirty")
+    Test.truthy(addon.Sync._helloTimer ~= nil, "abort before any merge should still schedule a retry hello")
+    Test.truthy(type(addon.Sync.lastHelloScheduleReason) == "string"
+        and addon.Sync.lastHelloScheduleReason:find("seed%-session%-abort%-retry", 1, false) ~= nil,
+        "abort before any merge should schedule a retry hello")
+end)
+
+Test.it("inbound seed sessions are capped and ignore overflow safely", function()
+    local addon, _wow = Loader.Load()
+    local maxInbound = addon.Sync._private.constants.MAX_INBOUND_SEED_SESSIONS or 1
+
+    for index = 1, maxInbound do
+        local peerKey = string.format("Inboundcap%02d-TestRealm", index)
+        local caps = addon.Sync:GetLocalProtocolCaps()
+        addon.Sync:ObservePeerVersion(peerKey, {
+            sender = peerKey,
+            addonVersion = addon.ADDON_VERSION,
+            wireVersion = addon.WIRE_VERSION,
+            buildChannel = addon.BUILD_CHANNEL,
+            caps = caps,
+        })
+        addon.Sync:RecordPeerCaps(peerKey, caps)
+        local session, reason = addon.Sync:RegisterInboundSeedSession(peerKey, string.format("REQ:%02d", index), {
+            { blockKey = string.format("%s::Alchemy", peerKey) },
+        })
+        Test.truthy(session ~= nil, "inbound session within cap should be registered")
+        Test.eq(reason, "ready", "inbound session within cap reason")
+    end
+
+    local overflowPeer = "Inboundoverflow-TestRealm"
+    local overflowCaps = addon.Sync:GetLocalProtocolCaps()
+    addon.Sync:ObservePeerVersion(overflowPeer, {
+        sender = overflowPeer,
+        addonVersion = addon.ADDON_VERSION,
+        wireVersion = addon.WIRE_VERSION,
+        buildChannel = addon.BUILD_CHANNEL,
+        caps = overflowCaps,
+    })
+    addon.Sync:RecordPeerCaps(overflowPeer, overflowCaps)
+
+    local overflowSession, overflowReason = addon.Sync:RegisterInboundSeedSession(overflowPeer, "REQ:overflow", {
+        { blockKey = "overflow::Alchemy" },
+    })
+
+    Test.eq(overflowSession, nil, "overflow inbound session should be ignored")
+    Test.eq(overflowReason, "global-cap", "overflow inbound session reason")
+    Test.eq(addon.Sync:GetInboundSeedSessionCount(), maxInbound, "inbound seed session count should stay capped")
+end)
+
+Test.it("paused seed clears inbound sessions and timeout recovery schedules a retry HELLO", function()
+    local addon, wow = Loader.Load()
+    primeStandaloneSync(addon, wow, addon.Data, "phase34-paused-seed")
+    local peerKey = "Pausedseed-TestRealm"
+    local caps = addon.Sync:GetLocalProtocolCaps()
+
+    addon.Sync:ObservePeerVersion(peerKey, {
+        sender = peerKey,
+        addonVersion = addon.ADDON_VERSION,
+        wireVersion = addon.WIRE_VERSION,
+        buildChannel = addon.BUILD_CHANNEL,
+        caps = caps,
+    })
+    addon.Sync:RecordPeerCaps(peerKey, caps)
+    local session = addon.Sync:RegisterInboundSeedSession(peerKey, "REQ:paused", {
+        { blockKey = "Pausedseed-TestRealm::Alchemy" },
+    })
+
+    Test.truthy(session ~= nil, "seed should register one inbound session before pause")
+    Test.eq(addon.Sync:GetInboundSeedSessionCount(), 1, "one inbound session should be active before pause")
+
+    wow.SetInstance(true, "party")
+    addon.SyncPausePolicy:RefreshPauseState()
+    Test.eq(addon.Sync:GetInboundSeedSessionCount(), 0, "pause should clear inbound seed sessions")
+
+    wow.SetInstance(false, "none")
+    addon.SyncPausePolicy:RefreshPauseState()
+    addon.Sync.warmupUntil = 0
+    addon.Sync:RefreshSyncReadyState("phase34-paused-seed-recovery")
+
+    addon.Sync.outboundSeedSession = {
+        state = "waiting-block",
+        seedKey = peerKey,
+        sessionId = "paused-timeout",
+        startedAt = time() - 100,
+        lastProgressAt = time() - 100,
+        successfulBlockMerges = 0,
+    }
+    addon.Sync:ProcessRequestQueue()
+
+    Test.eq(addon.Sync.outboundSeedSession.state, "aborted", "requester side should abort after the missing response timeout")
+    Test.truthy(addon.Sync._helloTimer ~= nil, "requester recovery should schedule a retry hello")
+    Test.truthy(type(addon.Sync.lastHelloScheduleReason) == "string"
+        and addon.Sync.lastHelloScheduleReason:find("seed%-session%-abort%-retry", 1, false) ~= nil,
+        "requester recovery should use the retry hello path")
+end)
+
+io.write(string.format("Sync phase 3/4 block pull: %d test(s) passed\n", Test.count))

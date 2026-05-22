@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.0.6] - 2026-05-22
+### Added
+- Added a `Guild Addons` view in the main window that compares the live guild roster with locally observed Recipe Registry peers, using a 30-day "not seen recently" threshold without implying uninstall status.
+- The Guild Addons view now uses a full-width table with top-right search plus sortable and filterable headers for presence, addon visibility, and version checks.
+- Added `/rr adoption` and `/rr addonstatus` diagnostics for a quick roster/addon adoption summary.
+
 ## [2.0.5] - 2026-05-22
 ### Changed
 - Documentation/licensing: added GuildCrafts acknowledgment and third-party MIT notice.

@@ -684,6 +684,9 @@ function Sync:ObservePeerVersion(peerKey, payload)
 
     self.peerVersions = self.peerVersions or {}
     self.peerVersions[peerKey] = info
+    if Addon.Data and Addon.Data.RecordAddonPeer and not (type(payload) == "table" and payload._skipAddonPeerMemory == true) then
+        Addon.Data:RecordAddonPeer(peerKey, payload, info.lastSeenAt)
+    end
     return info
 end
 
@@ -2107,6 +2110,9 @@ function Sync:TouchNode(key, version)
     self.onlineNodes[key] = self.onlineNodes[key] or {}
     self.onlineNodes[key].lastSeen = time()
     self.onlineNodes[key].version = version or self.onlineNodes[key].version
+    if Addon.Data and Addon.Data.TouchAddonPeer then
+        Addon.Data:TouchAddonPeer(key, version, self.onlineNodes[key].lastSeen)
+    end
 
     local selfKey = self:GetSelfKey()
     self.onlineNodes[selfKey] = self.onlineNodes[selfKey] or { version = Addon.ADDON_VERSION or Addon.DISPLAY_VERSION }

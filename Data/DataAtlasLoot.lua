@@ -145,6 +145,15 @@ end
 
 local function normalizeAtlasCategory(professionName, categoryName)
     if not categoryName then return nil end
+    if professionName == "Cooking" then
+        local firstStat = tostring(categoryName):match("^%s*([^+&/]+)%s*[%+&/]")
+        if firstStat then
+            firstStat = firstStat:gsub("^%s+", ""):gsub("%s+$", "")
+            if firstStat ~= "" then
+                return firstStat
+            end
+        end
+    end
     if professionName ~= "Engineering" then return categoryName end
 
     local text = normalizeCategoryText(categoryName)
