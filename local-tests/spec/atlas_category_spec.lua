@@ -292,6 +292,100 @@ local function installEngineeringAtlasMock(wow)
     }
 end
 
+local function installCookingAtlasMock(wow)
+    local state = wow.GetState()
+    state.items[27659] = { name = "Warp Burger", quality = 1, icon = "warp-burger-icon" }
+    state.items[27657] = { name = "Blackened Basilisk", quality = 1, icon = "basilisk-icon" }
+    state.items[27658] = { name = "Roasted Clefthoof", quality = 1, icon = "clefthoof-icon" }
+    state.items[27692] = { name = "Recipe: Warp Burger", quality = 1, icon = "recipe-warp-burger-icon" }
+    state.items[27690] = { name = "Recipe: Blackened Basilisk", quality = 1, icon = "recipe-basilisk-icon" }
+    state.items[27691] = { name = "Recipe: Roasted Clefthoof", quality = 1, icon = "recipe-clefthoof-icon" }
+    state.spells[33276] = "Warp Burger"
+    state.spells[33286] = "Blackened Basilisk"
+    state.spells[33284] = "Roasted Clefthoof"
+
+    _G.AtlasLoot = {
+        Data = {
+            Recipe = {
+                GetRecipeForSpell = function(spellID)
+                    if spellID == 33276 then return 27692 end
+                    if spellID == 33286 then return 27690 end
+                    if spellID == 33284 then return 27691 end
+                    return nil
+                end,
+                GetRecipeData = function(itemID)
+                    if itemID == 27692 then return { 3, 325, 33276 } end
+                    if itemID == 27690 then return { 3, 315, 33286 } end
+                    if itemID == 27691 then return { 3, 325, 33284 } end
+                    return nil
+                end,
+            },
+            Profession = {
+                GetCraftSpellForCreatedItem = function(itemID)
+                    if itemID == 27659 then return 33276 end
+                    if itemID == 27657 then return 33286 end
+                    if itemID == 27658 then return 33284 end
+                    return nil
+                end,
+                GetCreatedItemID = function(spellID)
+                    if spellID == 33276 then return 27659 end
+                    if spellID == 33286 then return 27657 end
+                    if spellID == 33284 then return 27658 end
+                    return nil
+                end,
+                GetProfessionData = function(spellID)
+                    if spellID == 33276 then return { 27659, 3, 325, 325, 375, { 27678 }, { 1 }, 1 } end
+                    if spellID == 33286 then return { 27657, 3, 315, 315, 375, { 27677 }, { 1 }, 1 } end
+                    if spellID == 33284 then return { 27658, 3, 325, 325, 375, { 27681 }, { 1 }, 1 } end
+                    return nil
+                end,
+                GetProfessionName = function(professionID)
+                    return professionID == 3 and "Cooking" or nil
+                end,
+            },
+        },
+    }
+
+    local module = {
+        __contentOrder = { "CookingBC" },
+        CookingBC = {
+            name = "Cooking",
+            items = {
+                {
+                    name = "Agility + Spirit",
+                    [1] = {
+                        { 1, 33276 },
+                    },
+                },
+                {
+                    name = "Spell Damage + Spirit",
+                    [1] = {
+                        { 1, 33286 },
+                    },
+                },
+                {
+                    name = "Stamina + Spirit",
+                    [1] = {
+                        { 1, 33284 },
+                    },
+                },
+            },
+        },
+    }
+    _G.AtlasLoot.ItemDB = {
+        Storage = {
+            AtlasLootClassic_Crafting = module,
+        },
+        Get = function(_self, name)
+            return _self.Storage and _self.Storage[name] or nil
+        end,
+        GetModuleList = function(_self, name)
+            local currentModule = _self.Storage and _self.Storage[name] or nil
+            return currentModule and currentModule.__contentOrder or nil
+        end,
+    }
+end
+
 local function countKeys(tbl)
     local count = 0
     for _ in pairs(tbl or {}) do
@@ -383,6 +477,24 @@ Test.it("loads AtlasLootClassic_Crafting on demand before building categories", 
 
     Test.truthy(loaded, "crafting module should be loaded on demand")
     Test.eq(categories[1], "Classic Potions", "categories should be available after on-demand load")
+end)
+
+Test.it("normalizes TBC Cooking buff categories by their primary stat", function()
+    local _addon, wow, data = freshAddon()
+    installCookingAtlasMock(wow)
+    seedMember(data, "Cookone-TestRealm", "Cooking", {
+        [27659] = true,
+        [27657] = true,
+        [27658] = true,
+    })
+
+    local categories = data:GetRecipeCategories("Cooking", true)
+    Test.eq(categories[1], "Agility", "agility/spirit food should normalize to agility")
+    Test.eq(categories[2], "Spell Damage", "spell-damage/spirit food should normalize to spell damage")
+    Test.eq(categories[3], "Stamina", "stamina/spirit food should normalize to stamina")
+    Test.eq(#data:GetRecipeList("Cooking", "", "alpha", "recipe", "Agility"), 1, "Warp Burger should appear under Agility")
+    Test.eq(data:GetRecipeList("Cooking", "", "alpha", "recipe", "Agility")[1].recipeKey, 27659, "Warp Burger recipe key")
+    assertCategoryCoverage(data, "Cooking")
 end)
 
 Test.it("normalizes Engineering AtlasLoot categories and preserves All coverage", function()

@@ -5,6 +5,57 @@ local function join(...)
     return table.concat(parts, "/")
 end
 
+local FILE_PATHS = {
+    ["Core.lua"] = "Core/Core.lua",
+    ["BuildInfo.lua"] = "Core/BuildInfo.lua",
+    ["Performance.lua"] = "Core/Performance.lua",
+    ["Data.lua"] = "Data/Data.lua",
+    ["DataAtlasLoot.lua"] = "Data/DataAtlasLoot.lua",
+    ["DataScan.lua"] = "Data/DataScan.lua",
+    ["DataSnapshot.lua"] = "Data/DataSnapshot.lua",
+    ["DataCatalog.lua"] = "Data/DataCatalog.lua",
+    ["DataIndex.lua"] = "Data/DataIndex.lua",
+    ["DataCleanup.lua"] = "Data/DataCleanup.lua",
+    ["MergeEngine.lua"] = "Data/MergeEngine.lua",
+    ["BootstrapSync.lua"] = "Sync/BootstrapSync.lua",
+    ["SyncPausePolicy.lua"] = "Sync/SyncPausePolicy.lua",
+    ["GuildLifecycleMaintenance.lua"] = "Data/GuildLifecycleMaintenance.lua",
+    ["MockSync.lua"] = "Sync/MockSync.lua",
+    ["Market.lua"] = "Integrations/Market.lua",
+    ["Sync.lua"] = "Sync/Sync.lua",
+    ["SyncRuntime.lua"] = "Sync/SyncRuntime.lua",
+    ["SyncProtocol.lua"] = "Sync/SyncProtocol.lua",
+    ["SyncCodec.lua"] = "Sync/SyncCodec.lua",
+    ["SyncRequests.lua"] = "Sync/SyncRequests.lua",
+    ["SyncTransfer.lua"] = "Sync/SyncTransfer.lua",
+    ["SyncDiagnostics.lua"] = "Sync/SyncDiagnostics.lua",
+    ["Tooltip.lua"] = "UI/Tooltip.lua",
+    ["MainFrame.lua"] = "UI/MainFrame.lua",
+    ["Options.lua"] = "UI/Options.lua",
+    ["MinimapButton.lua"] = "UI/MinimapButton.lua",
+}
+
+local function fileExists(path)
+    local handle = io.open(path, "r")
+    if handle then
+        handle:close()
+        return true
+    end
+    return false
+end
+
+local function resolveAddonPath(file)
+    local direct = join(root, file)
+    if fileExists(direct) then
+        return direct
+    end
+    local mapped = FILE_PATHS[file]
+    if mapped then
+        return join(root, mapped)
+    end
+    return direct
+end
+
 local Wow = dofile(join(root, "local-tests", "harness", "wow.lua"))
 
 local Loader = {
@@ -62,7 +113,7 @@ function Loader.Load(opts)
 
     local files = opts.files or Loader.BackendFiles
     for _, file in ipairs(files) do
-        local path = join(root, file)
+        local path = resolveAddonPath(file)
         local chunk, err = loadfile(path)
         if not chunk then
             error("failed to load " .. path .. ": " .. tostring(err), 2)
