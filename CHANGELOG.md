@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.0.5] - 2026-05-22
+### Changed
+- Documentation/licensing: added GuildCrafts acknowledgment and third-party MIT notice.
+
 ## [2.0.4] - 2026-05-21
 ### Changed
 - The recipe browser's background data builders now keep progressing with a tiny budget even while heavier UI work is paused, preventing the window from getting stuck on `Loading...` if it is opened during combat or other paused moments.
