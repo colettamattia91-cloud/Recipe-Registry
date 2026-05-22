@@ -67,6 +67,42 @@ local function countKeys(tbl)
     return n
 end
 
+function Addon:GetLocalPlayerKey()
+    local rr = getRR()
+    if rr and rr.Data and type(rr.Data.GetPlayerKey) == "function" then
+        local ok, key = pcall(rr.Data.GetPlayerKey, rr.Data)
+        if ok and type(key) == "string" and key ~= "" then
+            return key
+        end
+    end
+    if type(UnitFullName) == "function" then
+        local name, realm = UnitFullName("player")
+        if name then
+            realm = (realm and realm ~= "") and realm or (GetRealmName and GetRealmName() or "UnknownRealm")
+            realm = realm:gsub("[%s%-]", "")
+            return name .. "-" .. realm
+        end
+    end
+    return nil
+end
+
+local function getRecipeDisplayInfo(recipeKey)
+    local rr = getRR()
+    if not (rr and rr.Data and type(rr.Data.GetRecipeDisplayInfo) == "function") then
+        return nil
+    end
+    local ok, info = pcall(rr.Data.GetRecipeDisplayInfo, rr.Data, recipeKey)
+    if ok and type(info) == "table" then
+        return info
+    end
+    return nil
+end
+
+local function shortenOrderId(id)
+    if type(id) ~= "string" or #id <= 16 then return id end
+    return id:sub(1, 8) .. "…" .. id:sub(-4)
+end
+
 local function formatRRStatus()
     local rr = getRR()
     if not rr then
@@ -127,13 +163,18 @@ end
 
 local function printHelp(self)
     self:Print("Recipe Registry — Craft Orders commands:")
-    self:Print("/rrord            - show this help")
-    self:Print("/rrord status     - plugin + RR-link diagnostics")
+    self:Print("/rrord                       - show this help")
+    self:Print("/rrord diag                  - plugin + RR-link diagnostics")
+    self:Print("/rrord new <recipeKey> <qty> <Char-Realm>  - create a draft order")
+    self:Print("/rrord list                  - list known orders (newest first)")
+    self:Print("/rrord status <id|prefix>    - show one order's detail")
+    self:Print("/rrord delete <id|prefix>    - delete a draft order")
 end
 
-local function printStatus(self)
+local function printDiag(self)
     self:Print(string.format("Craft Orders v%s (schema %d)", self.ADDON_VERSION, self.SCHEMA_VERSION))
     self:Print("RecipeRegistry link: " .. formatRRStatus())
+    self:Print("Local player key: " .. tostring(self:GetLocalPlayerKey() or "?"))
     self:Print(string.format(
         "Storage: orders=%d events=%d peers=%d drafts=%d",
         countKeys(self.db.global.orders),
@@ -143,19 +184,191 @@ local function printStatus(self)
     ))
 end
 
+local function resolveOrderByPrefix(self, prefix)
+    if type(prefix) ~= "string" or prefix == "" then
+        return nil, "missing-id"
+    end
+    if self.Store:GetOrder(prefix) then
+        return self.Store:GetOrder(prefix)
+    end
+    local matches = {}
+    for _, order in ipairs(self.Store:ListOrders()) do
+        if order.id:sub(1, #prefix) == prefix then
+            matches[#matches + 1] = order
+            if #matches > 1 then break end
+        end
+    end
+    if #matches == 0 then return nil, "no-match" end
+    if #matches > 1 then return nil, "ambiguous-prefix" end
+    return matches[1]
+end
+
+local function cmdNew(self, rest)
+    local recipeKeyArg, restAfterKey = splitCommand(rest)
+    local quantityArg, restAfterQty = splitCommand(restAfterKey)
+    local crafterArg = restAfterQty:match("^%s*(.-)%s*$") or ""
+
+    local recipeKey = tonumber(recipeKeyArg)
+    local quantity = tonumber(quantityArg)
+
+    if not recipeKey or recipeKey == 0 then
+        self:Print("Usage: /rrord new <recipeKey> <quantity> <Char-Realm>")
+        self:Print("  recipeKey: positive itemID or negative spellID (see /rr r <id> in RR).")
+        return
+    end
+    if not quantity or quantity <= 0 then
+        self:Print("Quantity must be a positive integer.")
+        return
+    end
+    if crafterArg == "" then
+        self:Print("Missing crafter. Use full Char-Realm form (e.g. Mattia-PyrewoodVillage).")
+        return
+    end
+
+    local requester = self:GetLocalPlayerKey()
+    if not requester then
+        self:Print("Could not determine local player key.")
+        return
+    end
+
+    local info = getRecipeDisplayInfo(recipeKey)
+    local recipeLabel = info and info.label or ("recipe:" .. tostring(recipeKey))
+
+    local order, err = self.Store:CreateDraft({
+        requester = requester,
+        crafter   = crafterArg,
+        lines = {
+            {
+                recipeKey    = recipeKey,
+                quantity     = quantity,
+                recipeLabel  = recipeLabel,
+                outputItemID = info and info.createdItemID or nil,
+            },
+        },
+    })
+    if not order then
+        self:Print("Failed to create draft: " .. tostring(err))
+        return
+    end
+
+    self:Print(string.format(
+        "Draft created: %s — %s x%d for %s.",
+        shortenOrderId(order.id),
+        recipeLabel,
+        quantity,
+        crafterArg
+    ))
+    self:Print("Full id: " .. order.id)
+end
+
+local function cmdList(self)
+    local orders = self.Store:ListOrders()
+    if #orders == 0 then
+        self:Print("No orders.")
+        return
+    end
+    self:Print(string.format("Orders: %d", #orders))
+    for index = 1, #orders do
+        local order = orders[index]
+        local lineCount = #(order.lines or {})
+        local firstLine = order.lines and order.lines[1] or nil
+        local label = firstLine and firstLine.recipeLabel or "?"
+        self:Print(string.format(
+            "%s  [%s]  %s x%d%s  req=%s cra=%s",
+            shortenOrderId(order.id),
+            tostring(order.status),
+            label,
+            firstLine and firstLine.quantity or 0,
+            lineCount > 1 and (" (+" .. (lineCount - 1) .. " more)") or "",
+            tostring(order.requester),
+            tostring(order.crafter)
+        ))
+    end
+end
+
+local function cmdStatus(self, rest)
+    local prefix = (rest or ""):match("^%s*(.-)%s*$") or ""
+    if prefix == "" then
+        self:Print("Usage: /rrord status <id|prefix>")
+        return
+    end
+    local order, err = resolveOrderByPrefix(self, prefix)
+    if not order then
+        self:Print("Order lookup failed: " .. tostring(err))
+        return
+    end
+    self:Print(string.format("Order %s [%s]", order.id, tostring(order.status)))
+    self:Print(string.format(
+        "  requester=%s crafter=%s deliveryMode=%s",
+        tostring(order.requester),
+        tostring(order.crafter),
+        tostring(order.deliveryMode)
+    ))
+    self:Print(string.format(
+        "  created=%d updated=%d lines=%d",
+        order.createdAt or 0,
+        order.updatedAt or 0,
+        #(order.lines or {})
+    ))
+    for index = 1, #(order.lines or {}) do
+        local line = order.lines[index]
+        self:Print(string.format(
+            "    #%d  recipeKey=%d qty=%d  %s",
+            index,
+            line.recipeKey or 0,
+            line.quantity or 0,
+            tostring(line.recipeLabel or "?")
+        ))
+    end
+end
+
+local function cmdDelete(self, rest)
+    local prefix = (rest or ""):match("^%s*(.-)%s*$") or ""
+    if prefix == "" then
+        self:Print("Usage: /rrord delete <id|prefix>")
+        return
+    end
+    local order, err = resolveOrderByPrefix(self, prefix)
+    if not order then
+        self:Print("Order lookup failed: " .. tostring(err))
+        return
+    end
+    local ok, deleteErr = self.Store:DeleteOrder(order.id, "user-delete")
+    if not ok then
+        self:Print("Cannot delete: " .. tostring(deleteErr))
+        return
+    end
+    self:Print("Deleted draft " .. shortenOrderId(order.id))
+end
+
 function Addon:SlashHandler(input)
-    local cmd = splitCommand(input)
+    local cmd, rest = splitCommand(input)
     cmd = cmd:lower()
 
     if cmd == "" or cmd == "help" then
         printHelp(self)
         return
     end
-
-    if cmd == "status" or cmd == "diag" then
-        printStatus(self)
+    if cmd == "diag" or cmd == "status-self" then
+        printDiag(self)
+        return
+    end
+    if cmd == "new" then
+        cmdNew(self, rest)
+        return
+    end
+    if cmd == "list" or cmd == "ls" then
+        cmdList(self)
+        return
+    end
+    if cmd == "status" or cmd == "show" then
+        cmdStatus(self, rest)
+        return
+    end
+    if cmd == "delete" or cmd == "del" or cmd == "rm" then
+        cmdDelete(self, rest)
         return
     end
 
-    self:Print("Unknown command. /rrord for help.")
+    self:Print("Unknown command: " .. cmd .. ". /rrord for help.")
 end

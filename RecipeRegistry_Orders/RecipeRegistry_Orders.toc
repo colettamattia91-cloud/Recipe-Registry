@@ -13,3 +13,5 @@
 Libs\embeds.xml
 
 Core\CraftOrders.lua
+Store\CraftOrdersStateMachine.lua
+Store\CraftOrdersStore.lua
