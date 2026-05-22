@@ -6,7 +6,7 @@ Owner of this doc: the implementation plan for the feature. The source requireme
 
 This roadmap is the working plan. It must not be overwritten without a follow-up commit explaining what changed and why.
 
-**Distribution model (decided 2026-05-22):** Craft Orders ships as a **separate addon** (`RecipeRegistry_Orders`) inside the **same git repo** and the **same CurseForge project** as Recipe Registry. Both addon folders are produced from one ZIP at package time (AtlasLoot pattern). The CurseForge release cadence is coordinated: any tag bumps both addons together. Independent CurseForge release cycles (separate project, separate version stream) are deferred until Craft Orders reaches stability — see §3.8 for the migration trigger. See §3.5 and §11 Phase 0 for the repo restructure work this implies.
+**Distribution model (decided 2026-05-22):** Craft Orders ships as a **separate addon** (`RecipeRegistry_Orders`) inside the **same git repo** and the **same CurseForge project** as Recipe Registry. Both addon folders are produced from one ZIP at package time (AtlasLoot pattern). The CurseForge release cadence is coordinated: any tag bumps both addons together. Independent CurseForge release cycles (separate project, separate version stream) are deferred until Craft Orders reaches stability — see §3.9 for the migration trigger. See §3.5 and §11 Phase 0 for the repo restructure work this implies.
 
 ---
 
@@ -190,7 +190,7 @@ Two options for the libs the plugin needs (`AceAddon-3.0`, `AceEvent-3.0`, `AceT
 
 ### 3.5 Repo packaging structure
 
-**CurseForge integration constraint (verified 2026-05-22):** the repo currently uses CurseForge's native GitHub integration, which only supports "build on every commit" or "build on every tag" with no tag pattern filtering. A single CurseForge project is therefore the only feasible model without migrating off the native integration. See §3.8 for the future migration trigger.
+**CurseForge integration constraint (verified 2026-05-22):** the repo currently uses CurseForge's native GitHub integration, which only supports "build on every commit" or "build on every tag" with no tag pattern filtering. A single CurseForge project is therefore the only feasible model without migrating off the native integration. See §3.9 for the future migration trigger.
 
 Current repo layout has `RecipeRegistry.toc` at root and `package-as: RecipeRegistry` in [`.pkgmeta`](../.pkgmeta). To ship two addons from one repo we restructure into addon-folder-per-subdirectory:
 
@@ -249,7 +249,7 @@ A small `scripts/dev-link.ps1` helper script will be added in Phase 0 to automat
 **Versioning model under single CurseForge project:**
 - `RecipeRegistry/RecipeRegistry.toc` `## Version` is the **CurseForge-visible** version — what users see on the project page, in update notifications, in `_G.GetAddOnMetadata("RecipeRegistry", "Version")`.
 - `RecipeRegistry_Orders/RecipeRegistry_Orders.toc` `## Version` is the **plugin-internal** version — visible in WoW's addon list and consumed by the plugin's own diagnostics, but not surfaced on CurseForge.
-- Tags follow RR's existing scheme (no prefix). Every tag releases both addons together. Even an Orders-only bugfix bumps RR's CurseForge version cosmetically — accepted trade-off (see §3.8).
+- Tags follow RR's existing scheme (no prefix). Every tag releases both addons together. Even an Orders-only bugfix bumps RR's CurseForge version cosmetically — accepted trade-off (see §3.9).
 - CHANGELOG.md stays at repo root and uses sections per addon, e.g.:
   ```
   ## 2.1.0 — 2026-06-15
@@ -312,7 +312,26 @@ The plugin must never reach into `RecipeRegistry.Data._private`, `RecipeRegistry
 
 The plugin embeds AceSerializer + LibDeflate in its own `Libs/`. It implements its own thin codec rather than calling `RecipeRegistry.Sync:EncodeWirePayload` — keeps the public API surface smaller and avoids cross-addon coupling on a method that conceptually belongs to the recipe sync. The actual implementation can be copy-pasted from [`Sync/SyncCodec.lua`](../Sync/SyncCodec.lua) (~120 lines, no external deps beyond the libs).
 
-### 3.8 Future migration to separate CurseForge projects
+### 3.8 Coordination with `feature/guild-addon-adoption-status`
+
+A parallel feature branch (`feature/guild-addon-adoption-status`, not yet pushed to this clone) is adding:
+
+- A new tab in RR's main frame showing which guildmates run the addon.
+- Per-peer "addon-seen" telemetry (when each peer last announced themselves as an RR client).
+- Companion parameters to the existing [`Data/Data.lua` `KNOWN_OWNER_OFFLINE_STALE_DAYS`](../Data/Data.lua#L47) stale-peer mechanism, which already excludes long-offline crafters' blocks from the sync cycle.
+
+**Phase 0 dependencies on that branch:**
+
+1. **Tab registration API.** The "addon adoption" tab and the "Craft Orders" tab need to use the same public hook on RR's main frame. The hook's signature, lifecycle, error handling, and placement rules (where the tab lands relative to profession tabs) must be designed jointly. Recommended path: whichever branch lands first defines the hook, the second branch adopts it as-is.
+2. **Stale / seen parameters.** Order retention windows (§9) should ideally reuse — not parallel-define — the same "stale" concept already encoded in `KNOWN_OWNER_OFFLINE_STALE_DAYS` and extended by the adoption-status branch. One tunable for "a peer is considered stale after N days" instead of three separate ones.
+3. **Public API surface.** The §3.6 public API contract may need to expose additional methods consumed by both the adoption tab and the order board (e.g., `Data:GetPeerLastSeen(memberKey)`). Both branches' authors must agree on what's "public".
+
+**Action items for Phase 0:**
+- Sync with Mattia (or whoever drives the adoption-status branch) before designing the UI tab hook.
+- Document the agreed hook in `docs/recipe-registry-public-api.md`.
+- If the adoption branch lands first, this branch adopts the hook unchanged. If this branch lands first, design conservatively for the adoption branch's anticipated use.
+
+### 3.9 Future migration to separate CurseForge projects
 
 The current single-project model accepts that every release bumps both addons. This is fine while Craft Orders is in active development (Phase 0-8 in §11) because:
 
@@ -394,6 +413,9 @@ ledger = {
       seenMailId  = nil|<inbox identifier>,
       receivedAt  = nil|<epoch>,
       source      = "scanner"|"assumed"|"manual",
+      senderMatch = true|false|nil,                 -- nil = not checked yet, false = mismatch (tamper)
+      hashMatch   = true|false|nil,                 -- nil = not checked yet, false = mismatch (tamper)
+      tamperFlags = { ... },                        -- e.g., { "sender-mismatch", "hash-mismatch", "item-count-mismatch" }
     },
   },
   returned        = { [itemID] = count, ... },      -- updated by cancellation flow
@@ -412,8 +434,9 @@ event = {
   producer     = "Char-Realm",                      -- who appended this event
   orderId      = "...",
   kind         = "OrderCreated" | "OrderUpdated" | "MaterialsSent" | "MaterialsReceived"
-              | "MaterialsAssumed" | "MaterialsMissing" | "Accepted" | "DeliverySent"
-              | "DeliveryConfirmed" | "CancelRequested" | "Returned" | "Cancelled"
+              | "MaterialsAssumed" | "MaterialsMissing" | "TamperDetected"
+              | "Accepted" | "DeliverySent" | "DeliveryConfirmed"
+              | "CancelRequested" | "Returned" | "Cancelled"
               | "Expired" | "Failed" | "Pruned",
   at           = <epoch>,
   payload      = { ... },                           -- kind-specific
@@ -548,7 +571,35 @@ Body:
   --RR-END--
   ```
 
-The hash is a checksum of the items table to detect corrupted bodies.
+The hash is a deterministic checksum over the canonical serialization of the `items` table (keys sorted, then concatenated as `itemID=count` pairs). It serves two purposes:
+
+1. **Corruption detection** — accidental body edits, encoding glitches.
+2. **Tamper detection** — a malicious or buggy sender that ships fewer items than the marker promises, or vice versa. See §7.4.
+
+### 7.4 Scanner integrity verification (consumed by `CraftOrdersMailScanner.lua`)
+
+On every order mail the scanner reads from the inbox, it performs four checks before applying the receipt to the ledger:
+
+| Check | Logic | Fail behavior |
+|---|---|---|
+| **Sender match** | The mail's sender (normalized `Char-Realm`) must equal the order's `requester`. | Record `senderMatch=false` and add `"sender-mismatch"` to `tamperFlags`. |
+| **Hash match** | Recompute the canonical hash of the items declared in the marker; compare with `h` in the marker. | Record `hashMatch=false` and `"hash-mismatch"`. |
+| **Marker-vs-attachments match** | Walk the actual attachments via `GetInboxItem(mailIndex, attachIndex)`; verify every promised item is present with at least the promised count. | Add `"item-count-mismatch"` or `"item-missing"` per offending item. |
+| **Batch identity** | `b` and `bt` in the marker match the order's `batches[batchNumber]` slot. | Add `"batch-mismatch"`. |
+
+When **any** check fails:
+
+- Append a `TamperDetected` event with the failing flags and a snapshot of what was actually observed.
+- Mark the affected ledger batch with `senderMatch=false` / `hashMatch=false` / `tamperFlags`.
+- Do **not** automatically downgrade the order to `MaterialsReceived` or `Accepted` — the order stays in its current state until the crafter manually decides.
+- Surface the failure prominently in the order detail UI with a clear warning, the observed-vs-expected delta, and explicit action buttons ("Accept anyway", "Cancel and return what arrived", "Report to requester").
+
+When all checks pass:
+
+- Apply the receipt normally; ledger batch gets `senderMatch=true`, `hashMatch=true`, empty `tamperFlags`.
+- Normal lifecycle continues.
+
+Rationale: this is a guild trust environment, not a cryptographic escrow. The checks catch accidental misuse (wrong sender, garbled body, missing item) and obvious tampering without trying to be unbreakable. A motivated bad actor can always craft a body marker that matches the attachments they send — the value of the verification is that it makes any *manipulation between sender and recipient* (the spec's words in §16) visible, and it makes any *protocol-vs-reality drift* visible to both parties.
 
 ### 7.2 Attachment plan
 
@@ -582,7 +633,7 @@ Postal's OpenAll can loot a mail before the order scanner reads it. If that happ
 
 - Register a `MAIL_SHOW` handler with a higher-priority callback than Postal where possible (Postal exposes hooks in some versions — Phase 0 to verify).
 - On `MAIL_SHOW`, immediately walk the inbox once and tag any RR order mail with a `seen` flag in the ledger, *before* Postal's OpenAll can fire.
-- If a known `orderId` from board sync arrives with `MaterialsSent` but no scan ever fired and the configured grace window (default 30 minutes) has passed, downgrade missing → assumed received with a clear UI distinction. Source spec §14.
+- When the crafter opens the mailbox, for any known order in `MaterialsSent` state whose `MaterialsSent` timestamp is older than the grace window (default **2 hours**, see §13 resolved answers), and for which the scanner does not find the order mail in the inbox: downgrade `missing` → `assumed received` with a clear UI distinction. Source spec §14. Rationale: TBC mail between different accounts takes ~1 hour to deliver; 30 minutes would generate false "missing" reports on legitimately-delayed mail.
 
 ### 8.4 Fallback
 
@@ -645,8 +696,11 @@ Work items:
   - Verify `.\local-tests\run-backend-tests.ps1` green again before any new specs.
 - **Public API draft** (per §3.6):
   - Stub out the documented surface in RR. For methods that already exist (`Data:GetRecipeDisplayInfo`, etc.) no change beyond marking them in code as "public — consumed by RecipeRegistry_Orders".
-  - Design `RecipeRegistry.UI:RegisterExternalTab` (signature, lifecycle, error handling).
+  - **Coordinate with `feature/guild-addon-adoption-status`** before designing `RecipeRegistry.UI:RegisterExternalTab` (per §3.8). That branch is implementing its own tab and the hook must serve both. If the adoption branch already has a hook design, adopt it; otherwise propose one and validate with that branch's author.
   - Document the contract in a new doc `docs/recipe-registry-public-api.md`.
+- **Cross-branch alignment** (per §3.8):
+  - Identify stale-peer parameters used by `feature/guild-addon-adoption-status` (extends [`Data/Data.lua:47` `KNOWN_OWNER_OFFLINE_STALE_DAYS = 14`](../Data/Data.lua#L47)).
+  - Decide whether the order subsystem's retention windows (§9) reuse the same tunable or define their own. Recommendation: reuse, to keep one user-facing "stale" concept across the addon family.
 - **WoW API validation** — write `docs/craft-orders-mail-api-findings.md` after testing in-game:
   - Mailbox subject and body length limits.
   - Exact attachment count limit on TBC 2.5.x.
@@ -686,9 +740,10 @@ Work items:
 ### Phase 4 — Inbox recognition + assumed receipt
 - `CraftOrdersMailScanner.lua`.
 - Parses inbox on `MAIL_SHOW`, matches RR-ORDER marker, records ledger.
+- Performs the four integrity checks in §7.4 (sender match, hash match, marker-vs-attachments, batch identity).
 - Generates missing-material reply draft (does not send).
-- Assumed-receipt fallback after configurable grace window.
-- Specs: scanner against mocked inbox states (matching mail, mismatched mail, mail with wrong checksum, missing items, duplicate batches).
+- Assumed-receipt fallback: 2-hour grace window from `MaterialsSent`, evaluated on mailbox open per §13 resolved answers.
+- Specs: scanner against mocked inbox states — matching mail, sender mismatch, hash mismatch, item-count mismatch, batch mismatch, mail wholly missing past grace window, mail wholly missing before grace window, duplicate batches, mail from non-RR sender (ignored cleanly).
 - **Exit criterion:** Phase 4 specs green + manual two-character roundtrip in game with a single mail.
 
 ### Phase 5 — Postal compatibility
@@ -748,31 +803,23 @@ These are blocking decisions I will not make alone. Sorted by phase impact.
 - Codec → plugin owns its own copy of the codec, no cross-addon call (§3.7).
 - Slash command → plugin owns `/rrord`, not a subcommand of `/rr` (§3.3).
 - Library embedding → plugin embeds its own Libs (§3.4 recommendation A).
-- CurseForge model → single project, ship together, RR's `## Version` leads on CF, plugin tracks its own internal version. Migration to two projects deferred per §3.8 trigger.
+- CurseForge model → single project, ship together, RR's `## Version` leads on CF, plugin tracks its own internal version. Migration to two projects deferred per §3.9 trigger.
 - CHANGELOG strategy → single `CHANGELOG.md` at repo root with per-addon sections (§3.5).
 - `.pkgmeta` validation → via scratch-tag test release on CurseForge, coordinated with Mattia.
+- Test harness fix → **lands on `develop`, not on this branch**, because it's a regression caused by the recent reorg refactor (commit d16fef4). Phase 0 of this feature waits for that fix on develop, then rebases.
+- UI placement → Option A (Orders tab via public `RegisterExternalTab` hook on RR's main frame). **Must coordinate with the existing `feature/guild-addon-adoption-status` branch**, which is already implementing a tab for visualizing addon adoption among guildmates. The public hook should be designed jointly so both features use the same API. See §3.8 below.
+- Wire prefix → `RRORD` (release) / `RRORDDEV` (dev).
+- Retention windows → 14 days completed/cancelled, 30 days failed/expired, 60 days tombstones. **To revisit and possibly align with the "stale peer" parameters already in [`Data/Data.lua:47`](../Data/Data.lua#L47) `KNOWN_OWNER_OFFLINE_STALE_DAYS = 14` and the new "addon seen" telemetry on `feature/guild-addon-adoption-status`.** Alignment is desirable so a guild's "tunable stale window" is one concept end-to-end, not two parallel ones.
+- Assumed-receipt grace window → **2 hours from `MaterialsSent` event timestamp, triggered on mailbox open**. Logic: when the crafter opens the mailbox, if more than 2 hours have passed since the materials were sent and the scanner does not find the order mail, assume the materials were delivered (likely looted while the addon was disabled or by Postal/OpenAll). 30 minutes was rejected as too short — TBC mail delivery between different accounts can take ~1 hour. (For same-account character-to-character mail there's no delay, but in that case users would not normally use the order workflow anyway.) Other temporal transitions (Expired, Failed) get separate timeouts decided later.
+- Sender + integrity verification → Option A: **sender match + payload hash + flag mismatch**. The scanner verifies the mail sender matches the order's `requester`, recomputes the hash of the `items` table in the mail body marker, and compares it to the hash embedded in the marker. Any mismatch is recorded as a `TamperDetected` event and surfaced in the order detail UI, but does **not** block manual operations — the crafter can still accept or cancel with full awareness.
+- Mock tooling parity → **ship `CraftOrdersMock.lua` from the start** alongside the protocol in Phase 6. Recipe sync's parallel `Sync/MockSync.lua` proved its value during the sync rewrite for soak/integration tests; the order protocol benefits from the same pattern at no extra design cost.
+- Localization → **English-only, hardcoded**. WoW has no out-of-the-box translation infrastructure for addons; maintaining N translations by hand is high effort and low ROI for this feature.
+- Plugin version at launch → `0.1.0`. RR keeps its current version.
+- Doc language → English.
 
-**Still open:**
+### 13.1 No remaining blocking questions
 
-1. **Test harness scope (blocks Phase 1 specs).** The repo restructure (§3.5) will move RR sources into a subdirectory. The harness path fix becomes mandatory — confirm I should do it as part of Phase 0 alongside the restructure, in one commit (Option A: update `Loader.BackendFiles` to `RecipeRegistry/Core/Core.lua` etc.; Option B: also fix the `loadfile("Options.lua")` bare reads in specs). Recommendation: both, in the same commit.
-
-2. **UI placement (blocks Phase 3).** Option A (Orders tab via `RecipeRegistry.UI:RegisterExternalTab` hook on the main frame), B (plugin owns a separate window), or C (compact widget on recipe detail)? Recommendation: A. A also requires designing the public hook in Phase 0.
-
-3. **Wire prefix string (blocks Phase 6).** `RRORD`/`RRORDDEV` proposed. Any preference?
-
-4. **Default retention windows (blocks Phase 6).** Proposed 14 days completed/cancelled, 30 days failed/expired, 60 days tombstones. Acceptable?
-
-5. **Assumed-receipt grace window (blocks Phase 4).** Proposed 30 minutes from `MaterialsSent` event timestamp. Too short / too long?
-
-6. **Public API doc owner (blocks Phase 0).** I propose adding `docs/recipe-registry-public-api.md` on this branch so the contract is reviewable before Phase 1 starts. Confirm or push back.
-
-7. **Mock data + dev tooling parity.** Recipe sync has `MockSync.lua` for scenario testing. Should Phase 6 ship a similar `RecipeRegistry_Orders/Sync/CraftOrdersMock.lua` from the start (parallel with the protocol), or defer it?
-
-8. **Localization of mail body.** Source spec §11 says "human-readable first". Should the body honor a future locale system, or hardcode English for v1?
-
-9. **Plugin version number at launch.** Proposed `0.1.0` while in pre-release on the feature branch. Confirm or pick differently. RR keeps `2.0.4`.
-
-10. **Doc language.** This roadmap is in English (matches repo convention). Should follow-up findings docs (Phase 0 output) be English or Italian?
+All 10 originally listed questions have been resolved. Phase 0 work items are now fully specified, with one explicit cross-branch coordination dependency tracked in §3.8.
 
 ---
 
