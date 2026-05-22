@@ -6,6 +6,6 @@ ignore:
   - .claude
   - .gitignore
   - CLAUDE.md
-  - MockSync.lua
+  - Sync/MockSync.lua
   - docs
   - local-tests
