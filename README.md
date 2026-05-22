@@ -31,8 +31,8 @@ It is designed for everyday guild life: fast to browse, calm in the background, 
 
 ### Fast Recipe Browser
 
-- Profession tabs for quick browsing
-- Favorites tab for your most-used crafts
+- Profession filters for quick browsing
+- Favorites filter for your most-used crafts
 - Search by recipe name or by required materials
 - Sort recipes alphabetically or by item rarity
 - AtlasLoot categories when AtlasLoot data is available
@@ -55,7 +55,7 @@ It is designed for everyday guild life: fast to browse, calm in the background, 
 ### Quiet Background Sync
 
 - Shares guild recipe data automatically with compatible guildmates
-- Adds an Addon Status view that cross-checks the live guild roster with locally observed Recipe Registry peers
+- Adds a Guild Addons table that cross-checks the live guild roster with locally observed Recipe Registry peers, with sortable/filterable headers for presence, version, and addon visibility
 - Paces larger updates so the addon stays responsive
 - Waits for safer moments around login, reloads, combat, instances, and roster loading
 - Keeps normal chat output quiet, with extra diagnostics available only when you need troubleshooting
