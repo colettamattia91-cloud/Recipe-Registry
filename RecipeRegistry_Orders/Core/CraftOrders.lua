@@ -166,8 +166,9 @@ local function printHelp(self)
     self:Print("/rrord                       - show this help")
     self:Print("/rrord diag                  - plugin + RR-link diagnostics")
     self:Print("/rrord new <recipeKey> <qty> <Char-Realm>  - create a draft order")
+    self:Print("/rrord add <id|prefix> <recipeKey> <qty>   - add a line to a draft")
     self:Print("/rrord list                  - list known orders (newest first)")
-    self:Print("/rrord status <id|prefix>    - show one order's detail")
+    self:Print("/rrord status <id|prefix>    - show one order's detail + materials")
     self:Print("/rrord delete <id|prefix>    - delete a draft order")
 end
 
@@ -320,6 +321,83 @@ local function cmdStatus(self, rest)
             tostring(line.recipeLabel or "?")
         ))
     end
+
+    if self.Planner and self.Planner.GetSortedMaterials then
+        local materials = self.Planner:GetSortedMaterials(order)
+        if #materials > 0 then
+            local distinct, totalUnits = self.Planner:CountMaterials(order)
+            self:Print(string.format("  Materials (%d distinct, %d units total):", distinct, totalUnits))
+            for index = 1, #materials do
+                local m = materials[index]
+                local providerTag = m.requesterProvided > 0 and "requester" or "crafter"
+                self:Print(string.format(
+                    "    item:%d x%d  (%s, %s)",
+                    m.itemID,
+                    m.required,
+                    tostring(m.name or "?"),
+                    providerTag
+                ))
+            end
+        else
+            self:Print("  Materials: none computed yet")
+        end
+        if order._plannerMissing and #order._plannerMissing > 0 then
+            self:Print(string.format(
+                "  |cffffcc00Warning:|r %d line(s) without reagent info (RR data missing for those recipeKeys)",
+                #order._plannerMissing
+            ))
+        end
+    end
+end
+
+local function cmdAdd(self, rest)
+    local idArg, restAfterId = splitCommand(rest)
+    local recipeKeyArg, restAfterKey = splitCommand(restAfterId)
+    local quantityArg = (restAfterKey or ""):match("^%s*(%S+)%s*$") or ""
+
+    if idArg == "" or recipeKeyArg == "" or quantityArg == "" then
+        self:Print("Usage: /rrord add <id|prefix> <recipeKey> <quantity>")
+        return
+    end
+
+    local recipeKey = tonumber(recipeKeyArg)
+    local quantity = tonumber(quantityArg)
+    if not recipeKey or recipeKey == 0 then
+        self:Print("recipeKey must be a non-zero number.")
+        return
+    end
+    if not quantity or quantity <= 0 then
+        self:Print("Quantity must be a positive integer.")
+        return
+    end
+
+    local order, err = resolveOrderByPrefix(self, idArg)
+    if not order then
+        self:Print("Order lookup failed: " .. tostring(err))
+        return
+    end
+
+    local info = getRecipeDisplayInfo(recipeKey)
+    local recipeLabel = info and info.label or ("recipe:" .. tostring(recipeKey))
+
+    local ok, addErr = self.Store:AddLine(order.id, {
+        recipeKey    = recipeKey,
+        quantity     = quantity,
+        recipeLabel  = recipeLabel,
+        outputItemID = info and info.createdItemID or nil,
+    }, self:GetLocalPlayerKey())
+    if not ok then
+        self:Print("Cannot add line: " .. tostring(addErr))
+        return
+    end
+
+    self:Print(string.format(
+        "Line added to %s: %s x%d (now %d lines).",
+        shortenOrderId(order.id),
+        recipeLabel,
+        quantity,
+        #order.lines
+    ))
 end
 
 local function cmdDelete(self, rest)
@@ -355,6 +433,10 @@ function Addon:SlashHandler(input)
     end
     if cmd == "new" then
         cmdNew(self, rest)
+        return
+    end
+    if cmd == "add" then
+        cmdAdd(self, rest)
         return
     end
     if cmd == "list" or cmd == "ls" then

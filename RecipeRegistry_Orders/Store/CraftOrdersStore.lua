@@ -111,6 +111,10 @@ function Store:CreateDraft(spec)
 
     self:GetDB().orders[order.id] = order
 
+    if Addon.Planner and Addon.Planner.RecomputeOrder then
+        Addon.Planner:RecomputeOrder(order)
+    end
+
     self:AppendEvent({
         kind    = "OrderCreated",
         orderId = order.id,
@@ -123,6 +127,87 @@ function Store:CreateDraft(spec)
     })
 
     return order
+end
+
+function Store:AddLine(orderId, line, actor)
+    local order = self:GetOrder(orderId)
+    if not order then return false, "unknown-order" end
+
+    local SM = getStateMachine()
+    if order.status ~= SM.STATES.DRAFT then
+        return false, "not-draft"
+    end
+
+    if type(line) ~= "table" then return false, "invalid-line" end
+    local recipeKey = tonumber(line.recipeKey)
+    local quantity = tonumber(line.quantity)
+    if not recipeKey or recipeKey == 0 then return false, "invalid-line-recipekey" end
+    if not quantity or quantity <= 0 then return false, "invalid-line-quantity" end
+
+    order.lines[#order.lines + 1] = {
+        recipeKey    = recipeKey,
+        quantity     = quantity,
+        recipeLabel  = line.recipeLabel,
+        outputItemID = tonumber(line.outputItemID),
+    }
+    order.updatedAt = time()
+
+    if Addon.Planner and Addon.Planner.RecomputeOrder then
+        Addon.Planner:RecomputeOrder(order)
+    end
+
+    self:AppendEvent({
+        kind    = "OrderUpdated",
+        orderId = orderId,
+        actor   = actor or order.requester,
+        payload = {
+            change      = "line-added",
+            recipeKey   = recipeKey,
+            quantity    = quantity,
+            recipeLabel = line.recipeLabel,
+            lineIndex   = #order.lines,
+        },
+    })
+    return true, order
+end
+
+function Store:RemoveLine(orderId, lineIndex, actor)
+    local order = self:GetOrder(orderId)
+    if not order then return false, "unknown-order" end
+
+    local SM = getStateMachine()
+    if order.status ~= SM.STATES.DRAFT then
+        return false, "not-draft"
+    end
+
+    lineIndex = tonumber(lineIndex)
+    if not lineIndex or lineIndex < 1 or lineIndex > #(order.lines or {}) then
+        return false, "invalid-line-index"
+    end
+
+    if #order.lines == 1 then
+        return false, "last-line-protected"
+    end
+
+    local removed = table.remove(order.lines, lineIndex)
+    order.updatedAt = time()
+
+    if Addon.Planner and Addon.Planner.RecomputeOrder then
+        Addon.Planner:RecomputeOrder(order)
+    end
+
+    self:AppendEvent({
+        kind    = "OrderUpdated",
+        orderId = orderId,
+        actor   = actor or order.requester,
+        payload = {
+            change      = "line-removed",
+            recipeKey   = removed and removed.recipeKey,
+            quantity    = removed and removed.quantity,
+            lineIndex   = lineIndex,
+        },
+    })
+    return true, order
 end
 
 function Store:DeleteOrder(orderId, reason)
