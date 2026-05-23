@@ -17,6 +17,16 @@ local function freshReleaseAddon()
     return addon, wow, addon.Data
 end
 
+local function freshUiAddon()
+    local files = {}
+    for _, file in ipairs(Loader.BackendFiles) do
+        files[#files + 1] = file
+    end
+    files[#files + 1] = "MainFrame.lua"
+    local addon, wow = Loader.Load({ files = files })
+    return addon, wow, addon.Data
+end
+
 local function printLogContains(wow, needle)
     for _, line in ipairs(wow.GetPrints()) do
         if tostring(line):find(needle, 1, true) then
@@ -240,6 +250,457 @@ Test.it("prints pull output on the modern sync path", function()
 
     Test.truthy(printLogContains(wow, "Scheduled a hello cycle for index-diff sync."), "pull output")
     Test.eq(countGuildCommKind(wow, "HELLO"), 0, "pull should schedule work instead of sending inline")
+end)
+
+Test.it("shares selected recipes with chat-safe text and preserved links", function()
+    local addon = freshUiAddon()
+    local sent = {}
+
+    _G.GetSpellLink = function(spellID)
+        return string.format("|Henchant:%d|h[Enchant Weapon - Fiery Weapon]|h", spellID)
+    end
+    _G.SendChatMessage = function(message, channel, language, target)
+        sent[#sent + 1] = {
+            message = message,
+            channel = channel,
+            language = language,
+            target = target,
+        }
+    end
+
+    addon.UI.selectedRecipeKey = "Enchanting:13898"
+    addon.Data.GetRecipeDetail = function()
+        return {
+            spellID = 13898,
+            cost = {
+                total = 106164,
+                source = "Auctionator | TSM",
+            },
+            reagents = {
+                { itemID = 10940, count = 4 },
+                { name = "Strange | Dust", count = 2 },
+            },
+        }
+    end
+
+    addon:SlashHandler("share guild")
+
+    Test.eq(#sent, 2, "share should send summary and mats lines")
+    Test.eq(sent[1].channel, "GUILD", "share channel")
+    Test.eq(sent[1].message, "[RR] |Henchant:13898|h[Enchant Weapon - Fiery Weapon]|h - Mats total: 10g 61s 64c - Source: Auctionator || TSM", "summary chat text")
+    Test.truthy(sent[2].message:find("|Hitem:10940", 1, true) ~= nil, "reagent item link should be preserved")
+    Test.truthy(sent[2].message:find("Strange || Dust", 1, true) ~= nil, "plain reagent names should escape pipes")
+    Test.truthy(sent[1].message:find("|T", 1, true) == nil, "chat summary should not include texture escapes")
+    Test.truthy(sent[1].message:find(" | ", 1, true) == nil, "chat summary should not include literal pipe separators")
+end)
+
+Test.it("shares selected recipes to guild by default", function()
+    local addon = freshUiAddon()
+    local sent = {}
+
+    _G.SendChatMessage = function(message, channel, language, target)
+        sent[#sent + 1] = {
+            message = message,
+            channel = channel,
+            language = language,
+            target = target,
+        }
+    end
+
+    addon.UI.selectedRecipeKey = "Alchemy:9001"
+    addon.Data.GetRecipeDetail = function()
+        return {
+            label = "Elixir | of Defaults",
+            cost = {
+                total = 0,
+                source = "Manual | Entry",
+            },
+        }
+    end
+
+    addon:SlashHandler("share")
+
+    Test.eq(#sent, 1, "default share should send one summary line")
+    Test.eq(sent[1].channel, "GUILD", "default share channel")
+    Test.eq(sent[1].target, nil, "guild share should not include a channel target")
+    Test.truthy(sent[1].message:find("Elixir || of Defaults", 1, true) ~= nil, "plain recipe label should escape pipes")
+    Test.truthy(sent[1].message:find("Source: Manual || Entry", 1, true) ~= nil, "plain source should escape pipes")
+end)
+
+Test.it("reports share command errors without sending chat", function()
+    local addon, wow = freshUiAddon()
+    local sent = 0
+
+    _G.SendChatMessage = function()
+        sent = sent + 1
+    end
+    _G.GetChannelList = nil
+    _G.GetChannelName = nil
+
+    addon:SlashHandler("share guild")
+    addon:SlashHandler("share party")
+
+    addon.UI.selectedRecipeKey = "Alchemy:missing"
+    addon:SlashHandler("share nope")
+    addon:SlashHandler("share channel:9")
+    addon.Data.GetRecipeDetail = function()
+        return nil
+    end
+    addon:SlashHandler("share guild")
+
+    Test.eq(sent, 0, "failed share commands should not send chat")
+    Test.truthy(printLogContains(wow, "No recipe selected."), "missing selected recipe output")
+    Test.truthy(printLogContains(wow, "You are not in a party."), "unavailable party output")
+    Test.truthy(printLogContains(wow, "Usage: /rr share [guild|party|raid|say|yell|channel number]"), "invalid share usage output")
+    Test.truthy(printLogContains(wow, "Chat channel 9 is not available."), "missing custom channel output")
+    Test.truthy(printLogContains(wow, "No recipe details available."), "missing detail output")
+end)
+
+Test.it("shares selected recipes to numbered chat channels", function()
+    local addon = freshUiAddon()
+    local sent = {}
+
+    _G.GetChannelList = function()
+        return 2, "Trade", false
+    end
+    _G.SendChatMessage = function(message, channel, language, target)
+        sent[#sent + 1] = {
+            message = message,
+            channel = channel,
+            language = language,
+            target = target,
+        }
+    end
+
+    addon.UI.selectedRecipeKey = "Alchemy:9001"
+    addon.Data.GetRecipeDetail = function()
+        return {
+            label = "Elixir of Testing",
+            cost = {
+                total = 0,
+                source = "N/A",
+            },
+        }
+    end
+
+    addon:SlashHandler("share channel:2")
+
+    Test.eq(#sent, 1, "share should send one summary line without reagents")
+    Test.eq(sent[1].channel, "CHANNEL", "custom channel chat type")
+    Test.eq(sent[1].target, 2, "custom channel target")
+    Test.truthy(sent[1].message:find("Elixir of Testing", 1, true) ~= nil, "custom channel summary")
+end)
+
+Test.it("splits long shared reagent lists into chat-sized chunks", function()
+    local addon = freshUiAddon()
+    local sent = {}
+    local reagents = {}
+
+    for i = 1, 24 do
+        reagents[#reagents + 1] = {
+            itemID = 12000 + i,
+            count = i,
+        }
+    end
+
+    _G.SendChatMessage = function(message, channel, language, target)
+        sent[#sent + 1] = {
+            message = message,
+            channel = channel,
+            language = language,
+            target = target,
+        }
+    end
+
+    addon.UI.selectedRecipeKey = "Tailoring:bulk"
+    addon.Data.GetRecipeDetail = function()
+        return {
+            label = "Bulk Cloth Test",
+            cost = {
+                total = 123,
+                source = "N/A",
+            },
+            reagents = reagents,
+        }
+    end
+
+    addon:SlashHandler("share guild")
+
+    Test.gte(#sent, 3, "long reagent list should be split after the summary")
+    Test.eq(sent[1].channel, "GUILD", "summary channel")
+    for i = 2, #sent do
+        Test.eq(sent[i].channel, "GUILD", "reagent chunk channel")
+        Test.truthy(sent[i].message:find("^%[RR%] Mats:"), "reagent chunk prefix")
+        Test.lte(#sent[i].message, 240, "reagent chunk should stay within chat chunk budget")
+    end
+end)
+
+Test.it("opens a share dropdown with currently available channels", function()
+    local addon = freshUiAddon()
+    local added = {}
+    local toggled = false
+
+    _G.IsInGroup = function() return true end
+    _G.GetChannelList = function()
+        return 2, "Trade", false
+    end
+    _G.EasyMenu = nil
+    _G.UIDropDownMenu_CreateInfo = function()
+        return {}
+    end
+    _G.UIDropDownMenu_AddButton = function(info)
+        added[#added + 1] = info
+    end
+    _G.UIDropDownMenu_Initialize = function(frame, initializer, displayMode)
+        frame.initialized = true
+        frame.displayMode = displayMode
+        initializer(frame, 1)
+    end
+    _G.ToggleDropDownMenu = function()
+        toggled = true
+    end
+
+    addon.UI.selectedRecipeKey = "Alchemy:9001"
+    addon.UI.frame = {
+        shareMenuFrame = {},
+    }
+    addon.UI.RefreshRecipeList = function()
+        error("opening the share menu should not refresh recipes")
+    end
+    addon.UI.RefreshDetailPanel = function()
+        error("opening the share menu should not refresh recipe details")
+    end
+
+    addon.UI:OpenShareMenu({})
+
+    Test.truthy(toggled, "share dropdown should open through UIDropDownMenu")
+    Test.eq(#added, 5, "share menu should include available standard and custom channels")
+    Test.eq(added[1].text, "Guild", "guild menu item")
+    Test.eq(added[2].text, "Say", "say menu item")
+    Test.eq(added[3].text, "Party", "party menu item")
+    Test.eq(added[4].text, "Yell", "yell menu item")
+    Test.eq(added[5].text, "2. Trade", "custom channel menu item")
+end)
+
+Test.it("opens a share menu through EasyMenu when native dropdown helpers are unavailable", function()
+    local addon = freshUiAddon()
+    local menuSeen
+    local anchor = {}
+    local shown = 0
+
+    _G.GetChannelList = nil
+    _G.GetChannelName = nil
+    _G.IsInGroup = nil
+    _G.UIDropDownMenu_CreateInfo = nil
+    _G.UIDropDownMenu_AddButton = nil
+    _G.UIDropDownMenu_Initialize = nil
+    _G.ToggleDropDownMenu = nil
+    _G.EasyMenu = function(menu)
+        menuSeen = menu
+    end
+
+    addon.UI.selectedRecipeKey = "Alchemy:9001"
+    addon.UI.frame = {
+        shareMenuFrame = {},
+        shareMenuClickCatcher = {
+            Show = function()
+                shown = shown + 1
+            end,
+            Hide = function() end,
+        },
+    }
+
+    addon.UI:OpenShareMenu(anchor)
+
+    Test.truthy(menuSeen, "EasyMenu should receive a menu")
+    Test.eq(#menuSeen, 3, "EasyMenu should include available standard channels")
+    Test.eq(menuSeen[1].text, "Guild", "EasyMenu guild item")
+    Test.eq(menuSeen[2].text, "Say", "EasyMenu say item")
+    Test.eq(menuSeen[3].text, "Yell", "EasyMenu yell item")
+    Test.eq(shown, 1, "click catcher should show for EasyMenu")
+    Test.eq(addon.UI._shareMenuOpen, true, "share menu state should open")
+end)
+
+Test.it("opens the built-in fallback share menu when dropdown APIs are unavailable", function()
+    local addon = freshUiAddon()
+    local shown = 0
+
+    local function fakeFrame()
+        local frame = {
+            points = {},
+            scripts = {},
+            shown = false,
+        }
+        function frame:SetBackdrop(backdrop) self.backdrop = backdrop end
+        function frame:SetBackdropColor(r, g, b, a) self.backdropColor = { r, g, b, a } end
+        function frame:SetBackdropBorderColor(r, g, b, a) self.borderColor = { r, g, b, a } end
+        function frame:SetFrameStrata(strata) self.frameStrata = strata end
+        function frame:SetFrameLevel(level) self.frameLevel = level end
+        function frame:GetFrameLevel() return self.frameLevel or 0 end
+        function frame:SetClampedToScreen(value) self.clampedToScreen = value end
+        function frame:SetSize(width, height) self.width, self.height = width, height end
+        function frame:SetHeight(height) self.height = height end
+        function frame:ClearAllPoints() self.points = {} end
+        function frame:SetPoint(...) self.points[#self.points + 1] = { ... } end
+        function frame:SetText(text) self.text = text end
+        function frame:SetScript(script, fn) self.scripts[script] = fn end
+        function frame:Show() self.shown = true end
+        function frame:Hide() self.shown = false end
+        return frame
+    end
+
+    _G.GetChannelList = nil
+    _G.GetChannelName = nil
+    _G.IsInGroup = nil
+    _G.UIDropDownMenu_CreateInfo = nil
+    _G.UIDropDownMenu_AddButton = nil
+    _G.UIDropDownMenu_Initialize = nil
+    _G.ToggleDropDownMenu = nil
+    _G.EasyMenu = nil
+    _G.CreateFrame = function()
+        return fakeFrame()
+    end
+
+    addon.UI.selectedRecipeKey = "Alchemy:9001"
+    addon.UI.frame = {
+        right = {},
+        shareMenuClickCatcher = {
+            Show = function()
+                shown = shown + 1
+            end,
+            Hide = function() end,
+            GetFrameLevel = function()
+                return 7
+            end,
+        },
+    }
+
+    addon.UI:OpenShareMenu({})
+
+    local popup = addon.UI.frame.fallbackShareMenu
+    Test.truthy(popup, "fallback menu should be created")
+    Test.truthy(popup.shown, "fallback menu should show")
+    Test.eq(shown, 1, "click catcher should show for fallback menu")
+    Test.eq(#popup.rows, 3, "fallback menu should include available standard channels")
+    Test.eq(popup.rows[1].text, "Guild", "fallback guild item")
+    Test.eq(popup.rows[2].text, "Say", "fallback say item")
+    Test.eq(popup.rows[3].text, "Yell", "fallback yell item")
+    Test.eq(addon.UI._shareMenuOpen, true, "fallback share menu state should open")
+end)
+
+Test.it("closes open share dropdowns when the main UI closes", function()
+    local addon = freshUiAddon()
+    local closed = 0
+    local shareHidden = false
+    local fallbackHidden = false
+    local clickCatcherHidden = 0
+    local searchCleared = false
+
+    _G.CloseDropDownMenus = function()
+        closed = closed + 1
+    end
+
+    addon.UI._shareMenuOpen = true
+    addon.UI.ClearSearch = function()
+        searchCleared = true
+    end
+    addon.UI.frame = {
+        shown = true,
+        IsShown = function(self)
+            return self.shown == true
+        end,
+        Hide = function(self)
+            self.shown = false
+            addon.UI:HandleFrameHidden()
+        end,
+        shareMenuFrame = {
+            Hide = function()
+                shareHidden = true
+            end,
+        },
+        fallbackShareMenu = {
+            Hide = function()
+                fallbackHidden = true
+            end,
+        },
+        shareMenuClickCatcher = {
+            Hide = function()
+                clickCatcherHidden = clickCatcherHidden + 1
+            end,
+        },
+    }
+
+    addon.UI:Close("test")
+
+    Test.eq(addon.UI.frame.shown, false, "main frame should close")
+    Test.eq(closed, 1, "native dropdowns should close once")
+    Test.truthy(shareHidden, "UIDropDownMenu frame should hide")
+    Test.truthy(fallbackHidden, "fallback menu should hide")
+    Test.gte(clickCatcherHidden, 1, "share menu click catcher should hide")
+    Test.truthy(searchCleared, "normal frame hide handling should still run")
+    Test.eq(addon.UI._shareMenuOpen, false, "share menu state should reset")
+end)
+
+Test.it("manages the share menu click catcher independently of recipe refresh", function()
+    local addon = freshUiAddon()
+    local shown = 0
+    local hidden = 0
+
+    addon.UI.frame = {
+        shareMenuClickCatcher = {
+            Show = function()
+                shown = shown + 1
+            end,
+            Hide = function()
+                hidden = hidden + 1
+            end,
+        },
+    }
+    addon.UI.RefreshRecipeList = function()
+        error("share menu click catcher state should not refresh recipes")
+    end
+    addon.UI.RefreshDetailPanel = function()
+        error("share menu click catcher state should not refresh recipe details")
+    end
+
+    addon.UI:ShowShareMenuClickCatcher()
+    addon.UI:HideShareMenuClickCatcher()
+
+    Test.eq(shown, 1, "share menu click catcher should show")
+    Test.eq(hidden, 1, "share menu click catcher should hide")
+end)
+
+Test.it("closing the share dropdown does not close the main UI", function()
+    local addon = freshUiAddon()
+    local shareHidden = false
+    local clickCatcherHidden = false
+
+    addon.UI._shareMenuOpen = true
+    addon.UI.frame = {
+        shown = true,
+        IsShown = function(self)
+            return self.shown == true
+        end,
+        Hide = function(self)
+            self.shown = false
+        end,
+        shareMenuFrame = {
+            Hide = function()
+                shareHidden = true
+            end,
+        },
+        shareMenuClickCatcher = {
+            Hide = function()
+                clickCatcherHidden = true
+            end,
+        },
+    }
+
+    addon.UI:CloseShareMenus()
+
+    Test.eq(addon.UI.frame.shown, true, "main frame should remain open")
+    Test.truthy(shareHidden, "share dropdown frame should hide")
+    Test.truthy(clickCatcherHidden, "share menu click catcher should hide")
 end)
 
 Test.it("prints mock help and usage with every scenario", function()

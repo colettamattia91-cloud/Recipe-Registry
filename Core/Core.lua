@@ -312,7 +312,7 @@ local function printMainHelp(self)
     if self.MockSync then
         self:Print("/rr mock [status, start <" .. MOCK_SCENARIOS .. ">, stop, cleanup, reset, help]")
     end
-    self:Print("/rr prices <item name or link>, /rr share [guild, party, raid, say]")
+    self:Print("/rr prices <item name or link>, /rr share [guild, party, raid, say, yell, channel number]")
     self:Print("/rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID>")
     self:Print("/rr clean [check], /rr wipe")
 end
