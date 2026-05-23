@@ -2,11 +2,27 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.0.7] - 2026-05-23
+### Added
+- Added `/rr share reply` and `/rr share r` to share the selected recipe to a whisper target, preferring the active whisper edit box before falling back to the most recent whisper.
+
+### Changed
+- Recipe sharing now offers only the available Guild, Say, Party, Raid, and Reply channels, with Reply labelled by target when available.
+- Shared recipe messages now use chat-safe plain money text, preserve real item and spell links, and escape plain-text pipe characters.
+- The crafter Ask button is clearer and more consistent with the recipe detail panel.
+
+### Fixed
+- Enchanting and other spell-based local scans no longer store transient profession row indexes when recipe item links are unavailable.
+
 ## [2.0.6] - 2026-05-22
 ### Added
 - Added a `Guild Addons` view in the main window that compares the live guild roster with locally observed Recipe Registry peers, using a 30-day "not seen recently" threshold without implying uninstall status.
 - The Guild Addons view now uses a full-width table with top-right search plus sortable and filterable headers for presence, addon visibility, and version checks.
 - Added `/rr adoption` and `/rr addonstatus` diagnostics for a quick roster/addon adoption summary.
+
+## [2.0.5] - 2026-05-22
+### Changed
+- Documentation/licensing: added GuildCrafts acknowledgment and third-party MIT notice.
 
 ## [2.0.4] - 2026-05-21
 ### Changed
