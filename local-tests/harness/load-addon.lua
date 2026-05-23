@@ -13,6 +13,8 @@ local FILE_PATHS = {
     ["DataAtlasLoot.lua"] = "Data/DataAtlasLoot.lua",
     ["DataScan.lua"] = "Data/DataScan.lua",
     ["DataSnapshot.lua"] = "Data/DataSnapshot.lua",
+    ["RecipeOwnershipIndex.lua"] = "Data/RecipeOwnershipIndex.lua",
+    ["RecipeUiFilters.lua"] = "Data/RecipeUiFilters.lua",
     ["DataCatalog.lua"] = "Data/DataCatalog.lua",
     ["DataIndex.lua"] = "Data/DataIndex.lua",
     ["DataCleanup.lua"] = "Data/DataCleanup.lua",
@@ -33,6 +35,14 @@ local FILE_PATHS = {
     ["MainFrame.lua"] = "UI/MainFrame.lua",
     ["Options.lua"] = "UI/Options.lua",
     ["MinimapButton.lua"] = "UI/MinimapButton.lua",
+}
+
+local METADATA_FILE_PATHS = {
+    ["RecipeMetadataAddon.lua"] = "RecipeRegistry_Metadata/Core/RecipeMetadataAddon.lua",
+    ["RecipeMetadata_Generated.lua"] = "RecipeRegistry_Metadata/Data/RecipeMetadata_Generated.lua",
+    ["RecipeMetadata_Overrides.lua"] = "RecipeRegistry_Metadata/Data/RecipeMetadata_Overrides.lua",
+    ["RecipeMetadata.lua"] = "RecipeRegistry_Metadata/Data/RecipeMetadata.lua",
+    ["RecipeMetadataDiagnostics.lua"] = "RecipeRegistry_Metadata/Diagnostics/RecipeMetadataDiagnostics.lua",
 }
 
 local function fileExists(path)
@@ -56,6 +66,18 @@ local function resolveAddonPath(file)
     return direct
 end
 
+local function resolveMetadataPath(file)
+    local direct = join(root, file)
+    if fileExists(direct) then
+        return direct
+    end
+    local mapped = METADATA_FILE_PATHS[file]
+    if mapped then
+        return join(root, mapped)
+    end
+    return direct
+end
+
 local Wow = dofile(join(root, "local-tests", "harness", "wow.lua"))
 
 local Loader = {
@@ -67,6 +89,8 @@ local Loader = {
         "DataAtlasLoot.lua",
         "DataScan.lua",
         "DataSnapshot.lua",
+        "RecipeOwnershipIndex.lua",
+        "RecipeUiFilters.lua",
         "DataCatalog.lua",
         "DataIndex.lua",
         "DataCleanup.lua",
@@ -83,6 +107,13 @@ local Loader = {
         "SyncRequests.lua",
         "SyncTransfer.lua",
         "SyncDiagnostics.lua",
+    },
+    MetadataFiles = {
+        "RecipeMetadataAddon.lua",
+        "RecipeMetadata_Generated.lua",
+        "RecipeMetadata_Overrides.lua",
+        "RecipeMetadata.lua",
+        "RecipeMetadataDiagnostics.lua",
     },
 }
 
@@ -146,6 +177,56 @@ function Loader.Load(opts)
     end
 
     return addon, Wow
+end
+
+function Loader.LoadMetadata(opts)
+    opts = opts or {}
+    if opts.reset ~= false then
+        Wow.Reset({
+            payloadMode = opts.payloadMode,
+            addonMetadata = opts.addonMetadata,
+        })
+    elseif opts.payloadMode or opts.addonMetadata then
+        Wow.Configure({
+            payloadMode = opts.payloadMode,
+            addonMetadata = opts.addonMetadata,
+        })
+    end
+
+    local coreAddon
+    if opts.loadCore ~= false then
+        coreAddon = Loader.Load({
+            reset = false,
+            initialize = opts.initializeCore ~= false,
+            enable = opts.enableCore == true,
+            initialReqTimeoutsEnabled = opts.initialReqTimeoutsEnabled,
+            savedVariables = opts.savedVariables,
+        })
+    end
+
+    local files = opts.files or Loader.MetadataFiles
+    for _, file in ipairs(files) do
+        local path = resolveMetadataPath(file)
+        local chunk, err = loadfile(path)
+        if not chunk then
+            error("failed to load " .. path .. ": " .. tostring(err), 2)
+        end
+        chunk("RecipeRegistry_Metadata", {})
+    end
+
+    local metadataAddon = _G.RecipeRegistry_Metadata
+    if not metadataAddon then
+        error("RecipeRegistry_Metadata addon was not created", 2)
+    end
+
+    if opts.initialize ~= false then
+        runAddonLifecycle(metadataAddon, "OnInitialize")
+    end
+    if opts.enable == true then
+        runAddonLifecycle(metadataAddon, "OnEnable")
+    end
+
+    return metadataAddon, Wow, coreAddon
 end
 
 function Loader.Initialize(addon)

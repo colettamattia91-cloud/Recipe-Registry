@@ -1,0 +1,8 @@
+categories:
+  - key: food, label: Food, order: 10
+  - key: misc, label: Miscellaneous, order: 999
+subcategories:
+  food:
+    - key: meat, label: Meat, order: 10
+rules:
+  cooking.food.meat: category: food, subcategory: meat, sortOrder: 10

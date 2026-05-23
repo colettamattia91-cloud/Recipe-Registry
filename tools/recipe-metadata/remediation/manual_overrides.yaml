@@ -1,0 +1,8 @@
+# Generator-time overrides for recipe metadata corrections.
+expansionBySpellId: {}
+createdItemBySpellId: {}
+recipeItemBySpellId: {}
+categoryBySpellId: {}
+selfOnlyOutputlessBySpellId: {}
+bopOutputBySpellId: {}
+bindTypeByCreatedItemId: {}

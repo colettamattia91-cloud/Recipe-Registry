@@ -1,0 +1,8 @@
+categories:
+  - key: cloth, label: Cloth, order: 10
+  - key: misc, label: Miscellaneous, order: 999
+subcategories:
+  cloth:
+    - key: bolts, label: Bolts, order: 10
+rules:
+  tailoring.cloth.bolts: category: cloth, subcategory: bolts, sortOrder: 20

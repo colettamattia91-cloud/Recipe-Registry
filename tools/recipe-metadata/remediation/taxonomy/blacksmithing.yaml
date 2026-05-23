@@ -1,0 +1,12 @@
+categories:
+  - key: stones, label: Stones, order: 10
+  - key: armor, label: Armor, order: 20
+  - key: misc, label: Miscellaneous, order: 999
+subcategories:
+  stones:
+    - key: sharpening, label: Sharpening, order: 10
+  armor:
+    - key: plate, label: Plate, order: 10
+rules:
+  blacksmithing.stones.sharpening: category: stones, subcategory: sharpening, sortOrder: 10
+  blacksmithing.armor.plate: category: armor, subcategory: plate, sortOrder: 120

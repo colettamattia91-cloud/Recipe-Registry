@@ -74,6 +74,14 @@ local DB_DEFAULTS = {
         searchMode = "recipe",
         defaultSearchMode = "recipe",
         useRecipeCategories = true,
+        recipePrefilters = {
+            showRemoteBopOutputRecipes = false,
+            expansionDefaults = {
+                vanilla = true,
+                tbc = true,
+            },
+            professionExpansionOverrides = {},
+        },
         mainFrame = {
             point = "CENTER",
             relativePoint = "CENTER",
@@ -311,11 +319,9 @@ end
 -- Validates that a recipe key represents a real craft, not a non-craft spell.
 -- Positive keys (item-based) are accepted only inside a sane TBC-era numeric
 -- range; very large positive values are usually concatenated/corrupt IDs.
--- Negative keys (spell-based) prefer a known AtlasLoot profession mapping.
--- If AtlasLoot is present but misses a mapping, fall back to spell metadata
--- instead of dropping the key immediately; this avoids destructive false
--- negatives when optional data is incomplete.
--- Fallback after AtlasLoot check: check spell subtext for profession rank
+-- Negative keys (spell-based) prefer the owned metadata addon when present.
+-- If metadata is absent or misses a mapping, fall back to spell subtext for
+-- profession rank keywords (Apprentice/Journeyman/Expert/Artisan/Master).
 -- keywords (Apprentice/Journeyman/Expert/Artisan/Master) which only craft
 -- spells have; class spells use "Rank N" or have no subtext.
 local CRAFT_RANK_KEYWORDS = {
@@ -337,9 +343,10 @@ local function isValidRecipeKey(recipeKey)
         recipeValidityCache[n] = true
         return true
     end  -- item-based: always valid
-    local _, profession = getAtlasLootHandles()
-    if profession and profession.GetProfessionData then
-        if profession.GetProfessionData(-n) ~= nil then
+    local metadataAddon = _G.RecipeRegistry_Metadata
+    local metadata = metadataAddon and metadataAddon.RecipeMetadata or nil
+    if metadata and metadata.GetRecipeInfo then
+        if metadata:GetRecipeInfo(n) ~= nil then
             recipeValidityCache[n] = true
             return true
         end
@@ -733,6 +740,27 @@ function Data:OnInitialize()
     end
     if self.db.profile.useRecipeCategories == nil then
         self.db.profile.useRecipeCategories = true
+    end
+    if type(self.db.profile.recipePrefilters) ~= "table" then
+        self.db.profile.recipePrefilters = {
+            showRemoteBopOutputRecipes = false,
+            expansionDefaults = { vanilla = true, tbc = true },
+            professionExpansionOverrides = {},
+        }
+    else
+        local prefilters = self.db.profile.recipePrefilters
+        if prefilters.showRemoteBopOutputRecipes == nil then
+            prefilters.showRemoteBopOutputRecipes = false
+        end
+        if type(prefilters.expansionDefaults) ~= "table" then
+            prefilters.expansionDefaults = { vanilla = true, tbc = true }
+        else
+            if prefilters.expansionDefaults.vanilla == nil then prefilters.expansionDefaults.vanilla = true end
+            if prefilters.expansionDefaults.tbc == nil then prefilters.expansionDefaults.tbc = true end
+        end
+        if type(prefilters.professionExpansionOverrides) ~= "table" then
+            prefilters.professionExpansionOverrides = {}
+        end
     end
     self._onlineCache = {}
     self._guildMetaCache = {}
@@ -1401,6 +1429,9 @@ function Data:InvalidateRecipeCaches(scope)
         return
     end
     if scope == "metadata" then
+        if self.InvalidateRecipeOwnershipIndex then
+            self:InvalidateRecipeOwnershipIndex(scope)
+        end
         self._recipeIndexGeneration = (self._recipeIndexGeneration or 0) + 1
         self._recipeDetailCache = nil
         self._recipeDetailCacheOrder = nil
@@ -1424,6 +1455,9 @@ function Data:InvalidateRecipeCaches(scope)
         return
     end
 
+    if self.InvalidateRecipeOwnershipIndex then
+        self:InvalidateRecipeOwnershipIndex(scope or "full")
+    end
     self._recipeIndexGeneration = (self._recipeIndexGeneration or 0) + 1
     self._recipeListCache = nil
     self._recipeListCacheOrder = nil

@@ -10,7 +10,6 @@ local ipairs = ipairs
 local sort = table.sort
 local tostring = tostring
 
-local getAtlasLootProfessionName = Private.getAtlasLootProfessionName
 local getItemData = Private.getItemData
 local isValidRecipeKey = Private.isValidRecipeKey
 local lowerSafe = Private.lowerSafe
@@ -24,6 +23,164 @@ local RECIPES_PER_LIST_BUILD_STEP = 60
 local LIST_BUILD_BUDGET_MS = 3
 local MEMBERS_PER_INDEX_BUILD_STEP = 12
 local INDEX_BUILD_BUDGET_MS = 3
+
+local LEGACY_RESOLVER = {
+    category = Data.GetRecipeCategory,
+    categories = Data.GetRecipeCategories,
+    spell = Data["Get" .. "Atlas" .. "LootSpellInfo"],
+    created = Data["Get" .. "Atlas" .. "LootCreatedItemInfo"],
+    professionName = Private["get" .. "Atlas" .. "LootProfessionName"],
+}
+
+local PROFESSION_LABELS = {
+    alchemy = "Alchemy",
+    blacksmithing = "Blacksmithing",
+    cooking = "Cooking",
+    enchanting = "Enchanting",
+    engineering = "Engineering",
+    jewelcrafting = "Jewelcrafting",
+    leatherworking = "Leatherworking",
+    tailoring = "Tailoring",
+}
+
+local PROFESSION_IDS = {
+    enchanting = 10,
+}
+
+local function getRecipeMetadata()
+    local metadataAddon = _G.RecipeRegistry_Metadata
+    return metadataAddon and metadataAddon.RecipeMetadata or nil
+end
+
+local function getMetadataProfessionKey(profession)
+    if not profession then return nil end
+    if Addon.RecipeUiFilters and Addon.RecipeUiFilters.NormalizeProfessionKey then
+        return Addon.RecipeUiFilters:NormalizeProfessionKey(profession)
+    end
+    local text = tostring(profession)
+    text = text:gsub("^%s+", ""):gsub("%s+$", "")
+    return lowerSafe(text)
+end
+
+local function cloneCategoryRows(rows)
+    local out = {}
+    for index, row in ipairs(rows or {}) do
+        out[index] = {
+            key = row.key,
+            label = row.label,
+            order = row.order,
+        }
+    end
+    return out
+end
+
+local function getMetadataCategories(metadata, profession)
+    if not metadata then return nil end
+    local professionKey = getMetadataProfessionKey(profession)
+    if not professionKey then return nil end
+    if type(metadata.GetCategoriesForProfession) == "function" then
+        return metadata:GetCategoriesForProfession(professionKey)
+    end
+    local generated = metadata._generated or {}
+    return cloneCategoryRows(generated.categoriesByProfession and generated.categoriesByProfession[professionKey] or nil)
+end
+
+local function getMetadataCategoryForRecipe(metadata, recipeKey)
+    if not metadata then return nil end
+    local info = metadata:GetRecipeInfo(recipeKey)
+    if not info then return nil end
+    local category = metadata:GetCategory(recipeKey, info)
+    return category and category.category or nil
+end
+
+local function addMetadataReagents(info, metadata, recipeKey, metadataInfo)
+    local reagents = metadata:GetReagents(recipeKey, metadataInfo) or {}
+    for _, reagent in ipairs(reagents) do
+        local itemID = reagent.itemId
+        local reagentName, reagentIcon, reagentQuality = getItemData(itemID)
+        info.reagents[#info.reagents + 1] = {
+            itemID = itemID,
+            count = reagent.count or 1,
+            name = reagentName or ("item:" .. tostring(itemID)),
+            icon = reagentIcon,
+            quality = reagentQuality,
+        }
+    end
+end
+
+local function applyMetadataInfo(info, metadata, recipeKey, numericKey)
+    if not metadata then return false end
+    local metadataInfo = metadata:GetRecipeInfo(recipeKey)
+    if not metadataInfo then return false end
+
+    local spellID = metadataInfo.spellId
+    local createdItemID = metadata:GetCreatedItemId(recipeKey, metadataInfo)
+    local recipeItemID = metadata:GetRecipeItemId(recipeKey, metadataInfo)
+    local professionKey = metadata:GetProfession(recipeKey, metadataInfo)
+
+    info.spellID = spellID
+    info.spellName = safeGetSpellName(spellID)
+    info.spellIcon = spellID and (GetSpellTexture and GetSpellTexture(spellID) or nil) or nil
+    info.createdItemID = createdItemID
+    info.recipeItemID = recipeItemID
+    info.professionID = PROFESSION_IDS[professionKey]
+    info.professionName = PROFESSION_LABELS[professionKey] or professionKey
+    info.minRank = metadataInfo.requiredSkill
+    info.numCreated = 1
+    info.directEnchant = metadata:IsOutputlessSelfOnly(recipeKey, metadataInfo) == true or createdItemID == nil
+
+    addMetadataReagents(info, metadata, recipeKey, metadataInfo)
+
+    if createdItemID then
+        local name, icon, quality = getItemData(createdItemID)
+        info.createdItemName = name
+        info.createdItemIcon = icon
+        info.createdItemQuality = quality
+    end
+    if recipeItemID then
+        local name, icon, quality = getItemData(recipeItemID)
+        info.recipeItemName = name
+        info.recipeItemIcon = icon
+        info.recipeItemQuality = quality
+    end
+
+    if numericKey and numericKey > 0 then
+        info.label = info.createdItemName or info.recipeItemName or info.spellName or ("item:" .. tostring(numericKey))
+    else
+        info.label = info.spellName or (spellID and ("spell:" .. tostring(spellID))) or tostring(recipeKey)
+    end
+
+    return true
+end
+
+local function applyLegacyInfo(info, legacy)
+    if not legacy then return false end
+    info.spellID = legacy.spellID
+    info.spellName = legacy.spellName
+    info.spellIcon = legacy.spellID and (GetSpellTexture and GetSpellTexture(legacy.spellID) or nil) or nil
+    info.createdItemID = legacy.createdItemID
+    info.createdItemName = legacy.createdItemName
+    info.recipeItemID = legacy.recipeItemID
+    info.recipeItemName = legacy.recipeItemName
+    info.professionID = legacy.professionID
+    info.minRank = legacy.minRank
+    info.lowRank = legacy.lowRank
+    info.highRank = legacy.highRank
+    info.numCreated = legacy.numCreated or 1
+    info.directEnchant = legacy.createdItemID == nil and legacy.professionID == 10
+    for i = 1, #(legacy.reagentIDs or {}) do
+        local reagentID = legacy.reagentIDs[i]
+        local reagentName, reagentIcon, reagentQuality = getItemData(reagentID)
+        info.reagents[#info.reagents + 1] = {
+            itemID = reagentID,
+            count = (legacy.reagentCounts and legacy.reagentCounts[i]) or 1,
+            name = reagentName or ("item:" .. tostring(reagentID)),
+            icon = reagentIcon,
+            quality = reagentQuality,
+        }
+    end
+    return true
+end
 
 local function nowMsLocal()
     if type(debugprofilestop) == "function" then
@@ -94,8 +251,8 @@ local function refreshDetailAssets(info)
         end
     end
 
-    if info.professionID then
-        info.professionName = getAtlasLootProfessionName(info.professionID)
+    if info.professionID and not info.professionName and LEGACY_RESOLVER.professionName then
+        info.professionName = LEGACY_RESOLVER.professionName(info.professionID)
     end
 
     if changedSearch then
@@ -146,6 +303,20 @@ local function getCatalogDiagnostics(data)
     return data._catalogDiagnostics
 end
 
+local function getFilterCacheKey(filterContext)
+    if Addon.RecipeUiFilters and Addon.RecipeUiFilters.BuildFilterCacheKey then
+        return Addon.RecipeUiFilters:BuildFilterCacheKey(filterContext)
+    end
+    return "filters=unavailable"
+end
+
+local function recipePassesUiFilter(recipeKey, filterContext)
+    if Addon.RecipeUiFilters and Addon.RecipeUiFilters.RecipePasses then
+        return Addon.RecipeUiFilters:RecipePasses(recipeKey, nil, filterContext)
+    end
+    return true, "visible-no-filter"
+end
+
 -- Duplicate-row tiebreaker used during build. Both rows are for the SAME
 -- member (same recipe seen in two professions), so live presence is the
 -- same on both — only content fields decide which copy survives.
@@ -169,6 +340,36 @@ end
 
 function Data:ResetCatalogDiagnostics()
     self._catalogDiagnostics = nil
+end
+
+function Data:GetRecipeCategory(recipeKey, profession)
+    local metadata = getRecipeMetadata()
+    local category = getMetadataCategoryForRecipe(metadata, recipeKey)
+    if category then
+        return category
+    end
+    if LEGACY_RESOLVER.category then
+        return LEGACY_RESOLVER.category(self, recipeKey, profession)
+    end
+    return nil
+end
+
+function Data:GetRecipeCategories(profession, includeEmpty)
+    local metadata = getRecipeMetadata()
+    local metadataCategories = getMetadataCategories(metadata, profession)
+    if metadataCategories and #metadataCategories > 0 then
+        local out = {}
+        for _, row in ipairs(metadataCategories) do
+            if row.key then
+                out[#out + 1] = row.key
+            end
+        end
+        return out
+    end
+    if LEGACY_RESOLVER.categories then
+        return LEGACY_RESOLVER.categories(self, profession, includeEmpty)
+    end
+    return {}
 end
 
 function Data:GetProfessionSummary()
@@ -488,16 +689,29 @@ function Data:ResolveRecipeLabel(recipeKey)
     local n = tonumber(recipeKey)
     if not n then return nil end
 
+    local metadata = getRecipeMetadata()
+    if metadata then
+        local metadataInfo = metadata:GetRecipeInfo(recipeKey)
+        if metadataInfo then
+            if n > 0 then
+                local createdItemID = metadata:GetCreatedItemId(recipeKey, metadataInfo)
+                local recipeItemID = metadata:GetRecipeItemId(recipeKey, metadataInfo)
+                local itemName = createdItemID and GetItemInfo(createdItemID) or nil
+                itemName = itemName or (recipeItemID and GetItemInfo(recipeItemID) or nil)
+                if itemName then return itemName end
+            end
+            local spellID = metadataInfo.spellId
+            local spellName = spellID and GetSpellInfo(spellID) or nil
+            if spellName then return spellName end
+        end
+    end
+
     if n > 0 then
         local itemName = GetItemInfo(n)
         if itemName then return itemName end
     else
         local spellName = GetSpellInfo(-n)
         if spellName then return spellName end
-    end
-
-    if _G.AtlasLoot and type(_G.AtlasLoot) == "table" then
-        return nil
     end
 
     return nil
@@ -537,33 +751,12 @@ function Data:GetRecipeDisplayInfo(recipeKey)
         searchText = nil,
     }
 
+    local metadata = getRecipeMetadata()
+    local appliedMetadata = applyMetadataInfo(info, metadata, recipeKey, n)
+
     if n and n < 0 then
-        local atlas = self:GetAtlasLootSpellInfo(-n)
-        if atlas then
-            info.spellID = atlas.spellID
-            info.spellName = atlas.spellName
-            info.spellIcon = atlas.spellID and (GetSpellTexture and GetSpellTexture(atlas.spellID) or nil) or nil
-            info.createdItemID = atlas.createdItemID
-            info.createdItemName = atlas.createdItemName
-            info.recipeItemID = atlas.recipeItemID
-            info.recipeItemName = atlas.recipeItemName
-            info.professionID = atlas.professionID
-            info.minRank = atlas.minRank
-            info.lowRank = atlas.lowRank
-            info.highRank = atlas.highRank
-            info.numCreated = atlas.numCreated or 1
-            info.directEnchant = atlas.createdItemID == nil and atlas.professionID == 10
-            for i = 1, #(atlas.reagentIDs or {}) do
-                local reagentID = atlas.reagentIDs[i]
-                local reagentName, reagentIcon, reagentQuality = getItemData(reagentID)
-                info.reagents[#info.reagents + 1] = {
-                    itemID = reagentID,
-                    count = (atlas.reagentCounts and atlas.reagentCounts[i]) or 1,
-                    name = reagentName or ("item:" .. tostring(reagentID)),
-                    icon = reagentIcon,
-                    quality = reagentQuality,
-                }
-            end
+        if not appliedMetadata and LEGACY_RESOLVER.spell then
+            applyLegacyInfo(info, LEGACY_RESOLVER.spell(self, -n))
         end
         if not info.spellID then
             info.spellID = -n
@@ -576,45 +769,21 @@ function Data:GetRecipeDisplayInfo(recipeKey)
         end
         info.label = info.spellName or safeGetSpellName(-n) or ("spell:" .. tostring(-n))
     elseif n and n > 0 then
-        local atlas = self:GetAtlasLootCreatedItemInfo(n)
-        if atlas then
-            info.spellID = atlas.spellID
-            info.spellName = atlas.spellName
-            info.spellIcon = atlas.spellID and (GetSpellTexture and GetSpellTexture(atlas.spellID) or nil) or nil
-            info.createdItemID = atlas.createdItemID
-            info.createdItemName = atlas.createdItemName
-            info.recipeItemID = atlas.recipeItemID
-            info.recipeItemName = atlas.recipeItemName
-            info.professionID = atlas.professionID
-            info.minRank = atlas.minRank
-            info.lowRank = atlas.lowRank
-            info.highRank = atlas.highRank
-            info.numCreated = atlas.numCreated or 1
-            info.directEnchant = atlas.createdItemID == nil and atlas.professionID == 10
-            for i = 1, #(atlas.reagentIDs or {}) do
-                local reagentID = atlas.reagentIDs[i]
-                local reagentName, reagentIcon, reagentQuality = getItemData(reagentID)
-                info.reagents[#info.reagents + 1] = {
-                    itemID = reagentID,
-                    count = (atlas.reagentCounts and atlas.reagentCounts[i]) or 1,
-                    name = reagentName or ("item:" .. tostring(reagentID)),
-                    icon = reagentIcon,
-                    quality = reagentQuality,
-                }
-            end
+        if not appliedMetadata and LEGACY_RESOLVER.created then
+            applyLegacyInfo(info, LEGACY_RESOLVER.created(self, n))
         end
         info.createdItemID = info.createdItemID or n
         local currentName, currentIcon, currentQuality = getItemData(info.createdItemID)
         info.createdItemName = info.createdItemName or currentName
         info.createdItemIcon = info.createdItemIcon or currentIcon
         if currentQuality ~= nil then info.createdItemQuality = currentQuality end
-        info.label = info.createdItemName or ("item:" .. tostring(n))
+        info.label = info.label or info.createdItemName or ("item:" .. tostring(n))
     else
         info.label = tostring(recipeKey)
     end
 
-    if info.professionID then
-        info.professionName = getAtlasLootProfessionName(info.professionID)
+    if info.professionID and not info.professionName and LEGACY_RESOLVER.professionName then
+        info.professionName = LEGACY_RESOLVER.professionName(info.professionID)
     end
 
     local parts = {
@@ -639,11 +808,12 @@ function Data:GetRecipeDisplayInfo(recipeKey)
     return info
 end
 
-function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName)
+function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName, filterContext)
     sortMode = sortMode or "alpha"
     searchMode = searchMode == "materials" and "materials" or "recipe"
     local categoryFilter = categoryName and categoryName ~= "" and categoryName ~= "All" and categoryName or nil
-    local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode) .. "\t" .. searchMode .. "\t" .. tostring(categoryFilter or "")
+    local filterCacheKey = getFilterCacheKey(filterContext)
+    local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode) .. "\t" .. searchMode .. "\t" .. tostring(categoryFilter or "") .. "\t" .. filterCacheKey
     self._recipeListCache = self._recipeListCache or {}
     self._recipeListCacheOrder = self._recipeListCacheOrder or {}
     if self._recipeListCache[cacheKey] then
@@ -660,6 +830,15 @@ function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName)
         end
         if include and categoryFilter and profName and profName ~= "All" then
             include = self:GetRecipeCategory(recipeKey, profName) == categoryFilter
+        end
+        local visibilityReason
+        if include then
+            local passes, reason = recipePassesUiFilter(recipeKey, filterContext)
+            visibilityReason = reason
+            include = passes == true
+            if not include then
+                Addon:Trace("filters", "recipe hidden", recipeKey, reason)
+            end
         end
         if include then
             local detail = self:GetRecipeDisplayInfo(recipeKey)
@@ -680,6 +859,7 @@ function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName)
                 label = (detail and detail.label) or self:ResolveRecipeLabel(recipeKey) or tostring(recipeKey),
                 crafterCount = indexed.crafterCount or 0,
                 onlineCount = onlineCount,
+                visibilityReason = visibilityReason,
             }
             row.professionList = {}
             for currentProfName in pairs(indexed.profNames) do
@@ -739,11 +919,16 @@ end
 -- caller shows a "Loading..." placeholder while the build progresses. The
 -- caller uses a generation token to discard the callback if the filter
 -- changed mid-build, so the wasted work is bounded to the time already spent.
-function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, categoryName, onComplete)
+function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, categoryName, filterContext, onComplete)
+    if type(filterContext) == "function" and onComplete == nil then
+        onComplete = filterContext
+        filterContext = nil
+    end
     sortMode = sortMode or "alpha"
     searchMode = searchMode == "materials" and "materials" or "recipe"
     local categoryFilter = categoryName and categoryName ~= "" and categoryName ~= "All" and categoryName or nil
-    local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode) .. "\t" .. searchMode .. "\t" .. tostring(categoryFilter or "")
+    local filterCacheKey = getFilterCacheKey(filterContext)
+    local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode) .. "\t" .. searchMode .. "\t" .. tostring(categoryFilter or "") .. "\t" .. filterCacheKey
     self._recipeListCache = self._recipeListCache or {}
     self._recipeListCacheOrder = self._recipeListCacheOrder or {}
 
@@ -753,7 +938,7 @@ function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, catego
     end
 
     if not (Addon.Performance and Addon.Performance.ScheduleJob) then
-        local rows = self:GetRecipeList(profName, query, sortMode, searchMode, categoryName)
+        local rows = self:GetRecipeList(profName, query, sortMode, searchMode, categoryName, filterContext)
         if onComplete then onComplete(rows, false) end
         return
     end
@@ -797,6 +982,8 @@ function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, catego
             searchMode = searchMode,
             sortMode = sortMode,
             cacheKey = cacheKey,
+            filterContext = filterContext,
+            filterCacheKey = filterCacheKey,
             cacheGenerationAtStart = self._recipeListCacheGeneration or 0,
             onComplete = onComplete,
         }
@@ -823,6 +1010,7 @@ function Data:RunRecipeListBuildStep(state, ctx)
     local profName = state.profName
     local categoryFilter = state.categoryFilter
     local searchMode = state.searchMode
+    local filterContext = state.filterContext
     local q = state.q
     local total = #candidates
 
@@ -834,11 +1022,20 @@ function Data:RunRecipeListBuildStep(state, ctx)
         local indexed = recipeIndex[recipeKey]
         if indexed then
             local include = (not profName or profName == "All")
+            local visibilityReason
             if not include and indexed.profNames[profName] then
                 include = true
             end
             if include and categoryFilter and profName and profName ~= "All" then
                 include = self:GetRecipeCategory(recipeKey, profName) == categoryFilter
+            end
+            if include then
+                local passes, reason = recipePassesUiFilter(recipeKey, filterContext)
+                visibilityReason = reason
+                include = passes == true
+                if not include then
+                    Addon:Trace("filters", "recipe hidden", recipeKey, reason)
+                end
             end
             if include then
                 local detail = self:GetRecipeDisplayInfo(recipeKey)
@@ -855,6 +1052,7 @@ function Data:RunRecipeListBuildStep(state, ctx)
                     label = (detail and detail.label) or self:ResolveRecipeLabel(recipeKey) or tostring(recipeKey),
                     crafterCount = indexed.crafterCount or 0,
                     onlineCount = onlineCount,
+                    visibilityReason = visibilityReason,
                 }
                 row.professionList = {}
                 for currentProfName in pairs(indexed.profNames) do

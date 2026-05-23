@@ -29,6 +29,11 @@ local function makeSpellKey(spellID)
     return "spell:" .. tostring(spellID)
 end
 
+local function getRecipeMetadata()
+    local metadataAddon = _G.RecipeRegistry_Metadata
+    return metadataAddon and metadataAddon.RecipeMetadata or nil
+end
+
 local function addRecipeKey(index, key, recipeKey)
     if not key or recipeKey == nil then return end
     local bucket = index[key]
@@ -347,11 +352,18 @@ function Tooltip:GetRowsForItemID(itemID)
         return directRows, directKey
     end
 
-    local atlas = Addon.Data and Addon.Data.GetAtlasLootRecipeInfo and Addon.Data:GetAtlasLootRecipeInfo(itemID)
-    if atlas then
+    local metadata = getRecipeMetadata()
+    if metadata then
+        local info = metadata:GetRecipeInfo(itemID)
+        local normalized = metadata:NormalizeRecipeKey(itemID)
+        local spellID = normalized and normalized.spellId or (info and info.spellId)
+        local createdItemID = info and metadata:GetCreatedItemId(itemID, info) or nil
+        if normalized and normalized.source == "createdItem" then
+            createdItemID = itemID
+        end
         local rows = self:MergeRows(
-            self:GetRowsForKey(makeSpellKey(atlas.spellID)),
-            self:GetRowsForKey(makeItemKey(atlas.createdItemID))
+            self:GetRowsForKey(makeSpellKey(spellID)),
+            self:GetRowsForKey(makeItemKey(createdItemID))
         )
         if #rows > 0 then
             return rows, directKey
@@ -368,11 +380,14 @@ function Tooltip:GetRowsForSpellID(spellID)
         return directRows, directKey
     end
 
-    local atlas = Addon.Data and Addon.Data.GetAtlasLootSpellInfo and Addon.Data:GetAtlasLootSpellInfo(spellID)
-    if atlas then
+    local metadata = getRecipeMetadata()
+    if metadata then
+        local info = metadata:GetRecipeInfo(-spellID)
+        local createdItemID = info and metadata:GetCreatedItemId(-spellID, info) or nil
+        local recipeItemID = info and metadata:GetRecipeItemId(-spellID, info) or nil
         local rows = self:MergeRows(
-            self:GetRowsForKey(makeItemKey(atlas.createdItemID)),
-            self:GetRowsForKey(makeItemKey(atlas.recipeItemID))
+            self:GetRowsForKey(makeItemKey(createdItemID)),
+            self:GetRowsForKey(makeItemKey(recipeItemID))
         )
         if #rows > 0 then
             return rows, directKey

@@ -2380,12 +2380,9 @@ end
 
 function UI:RefreshProfessionButtons(opts)
     -- `skipCategories` lets the degraded-mode renderer populate the
-    -- profession sidebar without touching the AtlasLoot category index.
-    -- GetRecipeCategories(_, true) triggers BuildAtlasLootCategoryIndex
-    -- on cache miss, which walks the entire AtlasLoot crafting module
-    -- synchronously — that's a multi-hundred-ms freeze the warmup path
-    -- can't absorb. After warmup, the normal Refresh path runs with
-    -- skipCategories=false and the categories appear.
+    -- profession sidebar without touching category providers during warmup.
+    -- After warmup, the normal Refresh path runs with skipCategories=false
+    -- and the categories appear.
     local skipCategories = opts and opts.skipCategories or false
     local summary = Addon.Data:GetProfessionSummary()
     local useCategories = (not skipCategories) and Addon.db and Addon.db.profile and Addon.db.profile.useRecipeCategories ~= false
@@ -3010,6 +3007,15 @@ function UI:RefreshRecipeList()
         canRunGlobalSearch = canRunGlobalSearch,
         sortMode = self.sortMode,
     }
+    context.filterContext = {
+        selectedProfession = self.selectedProfession,
+        effectiveProfession = effectiveProfession,
+        categoryFilter = categoryFilter,
+        globalSearch = globalSearch,
+    }
+    if Addon.RecipeUiFilters and Addon.RecipeUiFilters.BuildFilterCacheKey then
+        context.filterCacheKey = Addon.RecipeUiFilters:BuildFilterCacheKey(context.filterContext)
+    end
 
     self._recipeListGeneration = (self._recipeListGeneration or 0) + 1
     local generation = self._recipeListGeneration
@@ -3020,7 +3026,7 @@ function UI:RefreshRecipeList()
     end
 
     if self.selectedProfession == FAVORITES_VIEW then
-        self:_FinalizeRecipeList(self:BuildFavoriteRecipeRows(), context, generation)
+        self:_FinalizeRecipeList(self:BuildFavoriteRecipeRows(context.filterContext), context, generation)
         return
     end
 
@@ -3031,6 +3037,7 @@ function UI:RefreshRecipeList()
         self.sortMode,
         self.searchMode,
         categoryFilter,
+        context.filterContext,
         function(rows, _wasCached)
             callbackFiredInline = true
             if self._recipeListGeneration ~= generation then return end
@@ -3075,6 +3082,12 @@ end
 function UI:_FinalizeRecipeList(rows, context, generation)
     if not self.frame then return end
     if self._recipeListGeneration ~= generation then return end
+    if context and context.filterCacheKey and Addon.RecipeUiFilters and Addon.RecipeUiFilters.BuildFilterCacheKey then
+        local currentFilterKey = Addon.RecipeUiFilters:BuildFilterCacheKey(context.filterContext)
+        if currentFilterKey ~= context.filterCacheKey then
+            return
+        end
+    end
 
     if context.selectedProfession == "Favorites" then
         local filteredRows = {}
@@ -3157,7 +3170,7 @@ function UI:RefreshVisibleRecipeRowAssets()
     self:RenderVisibleRecipeRows()
 end
 
-function UI:BuildFavoriteRecipeRows()
+function UI:BuildFavoriteRecipeRows(filterContext)
     local favorites = Addon.charDB and Addon.charDB.favorites or {}
     local favoriteKeys = {}
     local favoriteSet = {}
@@ -3174,6 +3187,14 @@ function UI:BuildFavoriteRecipeRows()
 
     local data = Addon.Data
     local rowsByKey = {}
+
+    local function passesFilters(recipeKey)
+        if Addon.RecipeUiFilters and Addon.RecipeUiFilters.RecipePasses then
+            local passed = Addon.RecipeUiFilters:RecipePasses(recipeKey, nil, filterContext)
+            return passed == true
+        end
+        return true
+    end
 
     local function ensureRow(recipeKey)
         local key = tostring(recipeKey)
@@ -3199,6 +3220,7 @@ function UI:BuildFavoriteRecipeRows()
 
     local function addIndexedRecipe(recipeKey, indexed)
         if not indexed then return end
+        if not passesFilters(recipeKey) then return end
         local row = ensureRow(recipeKey)
         row.crafterCount = indexed.crafterCount or 0
         row.onlineCount = 0
@@ -3222,7 +3244,7 @@ function UI:BuildFavoriteRecipeRows()
                 for profName, prof in pairs(entry.professions or {}) do
                     for recipeKey in pairs(prof.recipes or {}) do
                         local key = tostring(recipeKey)
-                        if favoriteSet[key] then
+                        if favoriteSet[key] and passesFilters(recipeKey) then
                             local row = ensureRow(recipeKey)
                             row._profNames[profName] = true
                             if not row._seenMembers[memberKey] then
@@ -3679,8 +3701,7 @@ function UI:Refresh(reasons)
         -- Profession buttons are static labels — populating them while sync
         -- is still warming up gives the user a non-empty sidebar instead
         -- of a row of unlabelled rectangles. skipCategories=true keeps us
-        -- off the AtlasLoot category index, which would otherwise build
-        -- synchronously here and reintroduce the freeze.
+        -- off category providers during the degraded warmup render.
         self:RefreshProfessionButtons({ skipCategories = true })
         self:RefreshDegradedStatus(degradedReason)
         self:MarkFullRefreshPending(degradedReason)

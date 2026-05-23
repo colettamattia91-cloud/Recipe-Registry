@@ -9,3 +9,8 @@ ignore:
   - Sync/MockSync.lua
   - docs
   - local-tests
+  - scripts
+  - tools
+  - artifacts
+move-folders:
+  RecipeRegistry/RecipeRegistry_Metadata: RecipeRegistry_Metadata

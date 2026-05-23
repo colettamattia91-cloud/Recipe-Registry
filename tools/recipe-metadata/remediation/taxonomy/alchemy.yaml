@@ -1,0 +1,16 @@
+categories:
+  - key: potions, label: Potions, order: 10
+  - key: flasks, label: Flasks, order: 20
+  - key: misc, label: Miscellaneous, order: 999
+subcategories:
+  potions:
+    - key: combat, label: Combat, order: 10
+    - key: healing, label: Healing, order: 20
+    - key: mana, label: Mana, order: 30
+  flasks:
+    - key: guardian_elixirs, label: Guardian Elixirs, order: 10
+rules:
+  alchemy.potions.combat: category: potions, subcategory: combat, sortOrder: 20
+  alchemy.potions.healing: category: potions, subcategory: healing, sortOrder: 30
+  alchemy.potions.mana: category: potions, subcategory: mana, sortOrder: 110
+  alchemy.flasks.guardian_elixirs: category: flasks, subcategory: guardian_elixirs, sortOrder: 120

@@ -8,7 +8,7 @@
 ## SavedVariables: RecipeRegistryDB,RecipeRegistryLogDB
 ## SavedVariablesPerCharacter: RecipeRegistryCharDB
 ## X-Category: Guild
-## OptionalDeps: AtlasLootClassic,AtlasLootClassic_Crafting,AtlasLoot,TradeSkillMaster,Auctionator
+## OptionalDeps: RecipeRegistry_Metadata,AtlasLootClassic,AtlasLootClassic_Crafting,AtlasLoot,TradeSkillMaster,Auctionator
 
 Libs\embeds.xml
 
@@ -19,6 +19,8 @@ Data\Data.lua
 Data\DataAtlasLoot.lua
 Data\DataScan.lua
 Data\DataSnapshot.lua
+Data\RecipeOwnershipIndex.lua
+Data\RecipeUiFilters.lua
 Data\DataCatalog.lua
 Data\DataIndex.lua
 Data\DataCleanup.lua

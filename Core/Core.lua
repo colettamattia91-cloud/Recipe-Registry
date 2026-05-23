@@ -26,6 +26,7 @@ local DEBUG_LOG_DEFAULTS = {
         transfer = true,
         offline = true,
         version = true,
+        filters = true,
     },
     entries = {},
     nextSequence = 0,
@@ -37,6 +38,7 @@ local DEBUG_LOG_SCOPE_NAMES = {
     transfer = true,
     offline = true,
     version = true,
+    filters = true,
 }
 
 local function cloneShallow(src)
@@ -309,12 +311,108 @@ local function printMainHelp(self)
     self:Print("/rr rescan - queue a profession scan and scan active profession API data.")
     self:Print("/rr version, /rr versions, /rr adoption, /rr dump, /rr self [profession], /rr sync [debug, diag, peers, sessions, log], /rr offline, /rr pull")
     self:Print("/rr perf [toggle, dump, reset, help]")
+    self:Print("/rr filters [unresolved, explain <recipeKey>]")
     if self.MockSync then
         self:Print("/rr mock [status, start <" .. MOCK_SCENARIOS .. ">, stop, cleanup, reset, help]")
     end
     self:Print("/rr prices <item name or link>, /rr share [guild, party, raid, say, yell, channel number]")
-    self:Print("/rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID>")
+    self:Print("/rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID> - legacy resolver diagnostics")
     self:Print("/rr clean [check], /rr wipe")
+end
+
+local function getRecipePrefilters(self)
+    local profile = self.db and self.db.profile or {}
+    local filters = profile.recipePrefilters or {}
+    filters.expansionDefaults = filters.expansionDefaults or {}
+    filters.professionExpansionOverrides = filters.professionExpansionOverrides or {}
+    return filters
+end
+
+local function dumpFilterStatus(self)
+    local filters = getRecipePrefilters(self)
+    local metadata = _G.RecipeRegistry_Metadata and _G.RecipeRegistry_Metadata.RecipeMetadata or nil
+    if not metadata then
+        self:Print("Recipe filters: metadata plugin not installed; all recipes visible.")
+        return
+    end
+    local counts = metadata:GetRecordCounts()
+    local defaults = filters.expansionDefaults or {}
+    self:Print(string.format(
+        "Recipe filters: metadata=%s unresolved=%d vanilla=%s tbc=%s remoteBop=%s",
+        tostring(metadata.metadataVersion or "unknown"),
+        counts.unresolved or 0,
+        defaults.vanilla ~= false and "on" or "off",
+        defaults.tbc ~= false and "on" or "off",
+        filters.showRemoteBopOutputRecipes == true and "show" or "hide"
+    ))
+end
+
+local function dumpFilterUnresolved(self, severity)
+    local metadata = _G.RecipeRegistry_Metadata and _G.RecipeRegistry_Metadata.RecipeMetadata or nil
+    if not metadata then
+        self:Print("Recipe filters: metadata plugin not installed.")
+        return
+    end
+    local unresolved = metadata:GetUnresolvedRecords(severity ~= "" and severity or nil)
+    if #unresolved == 0 then
+        self:Print("Recipe filters unresolved: none.")
+        return
+    end
+    self:Print(string.format("Recipe filters unresolved: %d record(s).", #unresolved))
+    local limit = math.min(#unresolved, 12)
+    for i = 1, limit do
+        local row = unresolved[i]
+        self:Print(string.format(
+            "%s spell=%s field=%s %s",
+            tostring(row.severity or "?"),
+            tostring(row.spellId or "?"),
+            tostring(row.field or "?"),
+            tostring(row.message or "")
+        ))
+    end
+    if #unresolved > limit then
+        self:Print(string.format("... %d more", #unresolved - limit))
+    end
+end
+
+local function explainFilterRecipe(self, input)
+    local recipeKey = tonumber(trimInput(input))
+    if not recipeKey then
+        self:Print("Usage: /rr filters explain <recipeKey>")
+        return
+    end
+    if not (self.RecipeUiFilters and self.RecipeUiFilters.Explain) then
+        self:Print("Recipe filters: diagnostics not available.")
+        return
+    end
+    local explanation = self.RecipeUiFilters:Explain(recipeKey, {})
+    self:Print(string.format(
+        "Recipe %s: %s reason=%s plugin=%s source=%s spell=%s",
+        tostring(recipeKey),
+        explanation.passed and "visible" or "hidden",
+        tostring(explanation.reason or "?"),
+        tostring(explanation.plugin or "?"),
+        tostring(explanation.source or "?"),
+        tostring(explanation.spellId or "?")
+    ))
+end
+
+local function handleFiltersCommand(self, rest)
+    local subcmd, subrest = splitCommand(rest)
+    subcmd = subcmd:lower()
+    if subcmd == "" or subcmd == "status" then
+        dumpFilterStatus(self)
+        return
+    end
+    if subcmd == "unresolved" then
+        dumpFilterUnresolved(self, trimInput(subrest))
+        return
+    end
+    if subcmd == "explain" then
+        explainFilterRecipe(self, subrest)
+        return
+    end
+    self:Print("Usage: /rr filters [unresolved|explain <recipeKey>]")
 end
 
 local function printPerfHelp(self)
@@ -413,16 +511,6 @@ function Addon:OnPlayerLogin()
         self:ScheduleTimer(function()
             self.Data:ScheduleSafeAutoClean({ maxMembersPerStep = 8 })
         end, 8)
-    end
-    -- Pre-warm the AtlasLoot category index during sync warmup so the
-    -- first post-warmup RefreshProfessionButtons doesn't pay for it
-    -- synchronously. The 1s delay lets the heavier login-phase work
-    -- (sync startup, profession detection, sync-index prepare) breathe
-    -- before this chunked job competes with them.
-    if self.Data and self.Data.BuildAtlasLootCategoryIndexAsync then
-        self:ScheduleTimer(function()
-            self.Data:BuildAtlasLootCategoryIndexAsync()
-        end, 1)
     end
     -- Keep one watchdog for pathological reload/login paths, but readiness comes
     -- from PLAYER_LOGIN / PLAYER_ENTERING_WORLD / GUILD_ROSTER_UPDATE + index prep.
@@ -961,6 +1049,11 @@ function Addon:SlashHandler(input)
             return
         end
         self:Print("Usage: /rr perf [toggle, dump, reset, help]")
+        return
+    end
+
+    if cmd == "filters" or cmd == "filter" then
+        handleFiltersCommand(self, rest)
         return
     end
 

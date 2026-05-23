@@ -1,0 +1,8 @@
+categories:
+  - key: ring_enchants, label: Ring Enchants, order: 40
+  - key: misc, label: Miscellaneous, order: 999
+subcategories:
+  ring_enchants:
+    - key: self_only, label: Self Only, order: 10
+rules:
+  enchanting.ring.self_only: category: ring_enchants, subcategory: self_only, sortOrder: 100

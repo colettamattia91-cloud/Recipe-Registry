@@ -1,0 +1,8 @@
+categories:
+  - key: components, label: Components, order: 10
+  - key: misc, label: Miscellaneous, order: 999
+subcategories:
+  components:
+    - key: wire, label: Wire, order: 10
+rules:
+  jewelcrafting.components.wire: category: components, subcategory: wire, sortOrder: 10

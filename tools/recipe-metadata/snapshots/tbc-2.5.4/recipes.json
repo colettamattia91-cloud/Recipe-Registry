@@ -1,0 +1,24 @@
+[
+  { "spellId": 2329, "profession": "alchemy", "firstSeenExpansion": "vanilla", "recipeItemId": null, "createdItemId": 2454, "requiredSkill": 1, "categoryHint": "alchemy.potions.combat" },
+  { "spellId": 2330, "profession": "alchemy", "firstSeenExpansion": "vanilla", "recipeItemId": null, "createdItemId": 118, "requiredSkill": 1, "categoryHint": "alchemy.potions.healing" },
+  { "spellId": 28543, "profession": "alchemy", "firstSeenExpansion": "tbc", "recipeItemId": 22907, "createdItemId": 22823, "requiredSkill": 305, "categoryHint": "alchemy.potions.mana" },
+  { "spellId": 28596, "profession": "alchemy", "firstSeenExpansion": "tbc", "recipeItemId": 22900, "createdItemId": 22845, "requiredSkill": 300, "categoryHint": "alchemy.flasks.guardian_elixirs" },
+
+  { "spellId": 2660, "profession": "blacksmithing", "firstSeenExpansion": "vanilla", "recipeItemId": null, "createdItemId": 2862, "requiredSkill": 1, "categoryHint": "blacksmithing.stones.sharpening" },
+  { "spellId": 29669, "profession": "blacksmithing", "firstSeenExpansion": "tbc", "recipeItemId": 23590, "createdItemId": 23537, "requiredSkill": 365, "categoryHint": "blacksmithing.armor.plate" },
+
+  { "spellId": 2538, "profession": "cooking", "firstSeenExpansion": "vanilla", "recipeItemId": null, "createdItemId": 2679, "requiredSkill": 1, "categoryHint": "cooking.food.meat" },
+  { "spellId": 45545, "profession": "cooking", "firstSeenExpansion": "wotlk", "recipeItemId": null, "createdItemId": 34721, "requiredSkill": 350, "categoryHint": "cooking.food.future" },
+
+  { "spellId": 27924, "profession": "enchanting", "firstSeenExpansion": "tbc", "recipeItemId": null, "createdItemId": null, "requiredSkill": 360, "categoryHint": "enchanting.ring.self_only" },
+
+  { "spellId": 3918, "profession": "engineering", "firstSeenExpansion": "vanilla", "recipeItemId": null, "createdItemId": 4357, "requiredSkill": 1, "categoryHint": "engineering.explosives.powders" },
+  { "spellId": 30303, "profession": "engineering", "firstSeenExpansion": "tbc", "recipeItemId": 23799, "createdItemId": 23761, "requiredSkill": 350, "categoryHint": "engineering.devices.weapons" },
+
+  { "spellId": 25255, "profession": "jewelcrafting", "firstSeenExpansion": "tbc", "recipeItemId": null, "createdItemId": 20816, "requiredSkill": 1, "categoryHint": "jewelcrafting.components.wire" },
+
+  { "spellId": 35530, "profession": "leatherworking", "firstSeenExpansion": "tbc", "recipeItemId": 29664, "createdItemId": 29540, "requiredSkill": 375, "categoryHint": "leatherworking.armor.bop" },
+
+  { "spellId": 26745, "profession": "tailoring", "firstSeenExpansion": "tbc", "recipeItemId": null, "createdItemId": 21840, "requiredSkill": 325, "categoryHint": "tailoring.cloth.bolts" },
+  { "spellId": 26746, "profession": "tailoring", "firstSeenExpansion": "tbc", "recipeItemId": null, "createdItemId": 21840, "requiredSkill": 325, "categoryHint": "tailoring.cloth.bolts" }
+]

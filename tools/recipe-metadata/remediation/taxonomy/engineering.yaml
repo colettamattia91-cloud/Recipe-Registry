@@ -1,0 +1,12 @@
+categories:
+  - key: explosives, label: Explosives, order: 10
+  - key: devices, label: Devices, order: 20
+  - key: misc, label: Miscellaneous, order: 999
+subcategories:
+  explosives:
+    - key: powders, label: Powders, order: 10
+  devices:
+    - key: weapons, label: Weapons, order: 10
+rules:
+  engineering.explosives.powders: category: explosives, subcategory: powders, sortOrder: 10
+  engineering.devices.weapons: category: devices, subcategory: weapons, sortOrder: 120

@@ -1,0 +1,15 @@
+## Interface: 20505
+## Title: Recipe Registry Metadata
+## Notes: Static recipe metadata library for Recipe Registry
+## Author: OpenAI + User collaboration
+## Version: 0.1.0
+## Dependencies: RecipeRegistry
+## X-Category: Guild
+
+Libs\embeds.xml
+
+Core\RecipeMetadataAddon.lua
+Data\RecipeMetadata_Generated.lua
+Data\RecipeMetadata_Overrides.lua
+Data\RecipeMetadata.lua
+Diagnostics\RecipeMetadataDiagnostics.lua

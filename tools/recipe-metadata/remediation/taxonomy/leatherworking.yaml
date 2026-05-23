@@ -1,0 +1,8 @@
+categories:
+  - key: armor, label: Armor, order: 10
+  - key: misc, label: Miscellaneous, order: 999
+subcategories:
+  armor:
+    - key: bop, label: Bind on Pickup, order: 30
+rules:
+  leatherworking.armor.bop: category: armor, subcategory: bop, sortOrder: 160

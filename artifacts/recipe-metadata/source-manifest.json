@@ -1,0 +1,44 @@
+{
+  "excluded": [
+    {
+      "expansion": "wotlk",
+      "reason": "unsupported-expansion",
+      "spellId": 45545
+    }
+  ],
+  "professionCounts": {
+    "alchemy": 4,
+    "blacksmithing": 2,
+    "cooking": 1,
+    "enchanting": 1,
+    "engineering": 2,
+    "jewelcrafting": 1,
+    "leatherworking": 1,
+    "tailoring": 2
+  },
+  "records": 14,
+  "source": {
+    "flavor": "tbc",
+    "metadataVersion": "2026.05.23.2",
+    "notes": "Minimal normalized offline snapshot for deterministic RecipeRegistry_Metadata generation.",
+    "provider": "wago.tools-db2-normalized",
+    "snapshot": "tbc-2.5.4",
+    "sourceBuild": "2.5.4.44833",
+    "tables": [
+      "SkillLineAbility",
+      "Spell",
+      "SpellEffect",
+      "ItemSparse"
+    ]
+  },
+  "supportedProfessions": [
+    "alchemy",
+    "blacksmithing",
+    "cooking",
+    "enchanting",
+    "engineering",
+    "jewelcrafting",
+    "leatherworking",
+    "tailoring"
+  ]
+}
