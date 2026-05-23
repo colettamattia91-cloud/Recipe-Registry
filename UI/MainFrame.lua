@@ -371,8 +371,8 @@ local SHARE_CHANNELS = {
     { input = "guild", label = "Guild", chatType = "GUILD", aliases = { "g", "guild" } },
     { input = "say", label = "Say", chatType = "SAY", aliases = { "s", "say" } },
     { input = "party", label = "Party", chatType = "PARTY", aliases = { "p", "party" } },
-    { input = "raid", label = "Raid", chatType = "RAID", aliases = { "r", "raid" } },
-    { input = "yell", label = "Yell", chatType = "YELL", aliases = { "y", "yell" } },
+    { input = "raid", label = "Raid", chatType = "RAID", aliases = { "raid" } },
+    { input = "reply", label = "Reply", chatType = "WHISPER", aliases = { "r", "reply", "re", "w", "whisper" } },
 }
 
 local function playerIsInRaid()
@@ -408,6 +408,9 @@ local function shareChannelUnavailableReason(def)
     if def.chatType == "RAID" and not playerIsInRaid() then
         return "You are not in a raid."
     end
+    if def.chatType == "WHISPER" and not def.target then
+        return "No recent whisper target."
+    end
     return nil
 end
 
@@ -430,103 +433,115 @@ local function findShareChannelByAlias(input)
     return nil
 end
 
-local function getCustomChannelName(channelID)
-    channelID = tonumber(channelID)
-    if not channelID then return nil end
-    if type(GetChannelName) == "function" then
-        local number, name = GetChannelName(channelID)
-        if tonumber(number) == channelID and name then
-            return name
+local function readFrameAttribute(frame, key)
+    if not frame then return nil end
+    if type(frame.GetAttribute) == "function" then
+        local ok, value = pcall(frame.GetAttribute, frame, key)
+        if ok and value ~= nil and value ~= "" then
+            return value
         end
     end
-    if type(GetChannelList) == "function" then
-        local values = { GetChannelList() }
-        local i = 1
-        while i <= #values do
-            local id = tonumber(values[i])
-            local name = values[i + 1]
-            if id == channelID and name then
-                return tostring(name)
-            end
-            if id and name and type(values[i + 2]) == "boolean" then
-                i = i + 3
-            elseif id and name then
-                i = i + 2
-            else
-                i = i + 1
+    return frame[key]
+end
+
+local function getWhisperTargetFromEditBox(editBox)
+    if not editBox then return nil end
+    local chatType = readFrameAttribute(editBox, "chatType")
+    if chatType ~= "WHISPER" then
+        return nil
+    end
+    local target = readFrameAttribute(editBox, "tellTarget")
+        or readFrameAttribute(editBox, "target")
+        or readFrameAttribute(editBox, "tellTargetName")
+    if target and target ~= "" then
+        return target
+    end
+    return nil
+end
+
+local function getActiveWhisperTarget()
+    if type(ChatEdit_GetActiveWindow) == "function" then
+        local ok, editBox = pcall(ChatEdit_GetActiveWindow)
+        if ok then
+            local target = getWhisperTargetFromEditBox(editBox)
+            if target then
+                return target
             end
         end
     end
     return nil
 end
 
+local function getLastTellTarget()
+    local activeTarget = getActiveWhisperTarget()
+    if activeTarget then
+        return activeTarget
+    end
+    if type(ChatEdit_GetLastTellTarget) == "function" then
+        local ok, target = pcall(ChatEdit_GetLastTellTarget)
+        if ok and target and target ~= "" then
+            return target
+        end
+    end
+    local globalTarget = _G.LAST_TELL_TARGET
+    if globalTarget and globalTarget ~= "" then
+        return globalTarget
+    end
+    return nil
+end
+
+local function shareChannelLabel(def, target)
+    if def.chatType == "WHISPER" and target and target ~= "" then
+        return string.format("%s: %s", tostring(def.label or "Reply"), tostring(target))
+    end
+    return def.label
+end
+
+local function resolveShareChannelTarget(def)
+    if def.chatType == "WHISPER" then
+        return getLastTellTarget()
+    end
+    return def.target
+end
+
 local function resolveShareChannel(input)
     local text = normalizeShareInput(input)
     local def = findShareChannelByAlias(text)
     if def then
-        local reason = shareChannelUnavailableReason(def)
-        if reason then return nil, reason end
-        return {
+        local target = resolveShareChannelTarget(def)
+        local channelDef = {
             input = def.input,
-            label = def.label,
+            label = shareChannelLabel(def, target),
             chatType = def.chatType,
+            target = target,
         }
+        local reason = shareChannelUnavailableReason(channelDef)
+        if reason then return nil, reason end
+        return channelDef
     end
 
-    local channelID = text:match("^channel[:%s]+(%d+)$") or text:match("^(%d+)$")
-    if channelID then
-        local name = getCustomChannelName(channelID)
-        if not name then
-            return nil, "Chat channel " .. tostring(channelID) .. " is not available."
-        end
-        return {
-            input = "channel:" .. tostring(channelID),
-            label = tostring(channelID) .. ". " .. name,
-            chatType = "CHANNEL",
-            target = tonumber(channelID),
-        }
-    end
-
-    return nil, "Usage: /rr share [guild|party|raid|say|yell|channel number]"
-end
-
-local function appendCustomShareChannels(options)
-    if type(GetChannelList) ~= "function" then return end
-    local values = { GetChannelList() }
-    local i = 1
-    while i <= #values do
-        local id = tonumber(values[i])
-        local name = values[i + 1]
-        if id and name then
-            options[#options + 1] = {
-                input = "channel:" .. tostring(id),
-                label = tostring(id) .. ". " .. tostring(name),
-                chatType = "CHANNEL",
-                target = id,
-            }
-            if type(values[i + 2]) == "boolean" then
-                i = i + 3
-            else
-                i = i + 2
-            end
-        else
-            i = i + 1
-        end
-    end
+    return nil, "Usage: /rr share [guild|party|raid|say|reply]"
 end
 
 local function buildAvailableShareChannels()
     local options = {}
     for _, def in ipairs(SHARE_CHANNELS) do
-        if not shareChannelUnavailableReason(def) then
+        local target = resolveShareChannelTarget(def)
+        local channelDef = {
+            input = def.input,
+            label = shareChannelLabel(def, target),
+            chatType = def.chatType,
+            target = target,
+        }
+        if not shareChannelUnavailableReason(channelDef) then
             options[#options + 1] = {
-                input = def.input,
-                label = def.label,
-                chatType = def.chatType,
+                input = channelDef.input,
+                label = channelDef.label,
+                chatType = channelDef.chatType,
+                target = channelDef.target,
             }
         end
     end
-    appendCustomShareChannels(options)
     return options
 end
 
@@ -3708,7 +3723,7 @@ end
 function UI:ShareSelectedRecipe(channelInput)
     local channel, channelError = resolveShareChannel(channelInput)
     if not channel then
-        Addon:Print(channelError or "Usage: /rr share [guild|party|raid|say|yell|channel number]")
+        Addon:Print(channelError or "Usage: /rr share [guild|party|raid|say|reply]")
         return
     end
 
