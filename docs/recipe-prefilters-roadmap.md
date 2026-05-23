@@ -1,432 +1,1236 @@
-# Recipe UI Prefilters: analisi tecnica e roadmap
+# Recipe UI Prefilters, Internal Metadata Library and AtlasLoot Resolver Removal
 
-## Contesto e obiettivi
+## Context and goals
 
-Recipe Registry oggi costruisce una directory di ricette condivisa a livello gilda: la UI mostra ricette note localmente o ricevute via sync, i crafter disponibili, materiali e stime di costo. Questo modello e utile per ricette craftabili per altri giocatori, ma produce rumore in due casi:
+Recipe Registry currently builds a guild-wide recipe directory. The UI shows recipes known locally or received through guild sync, together with available crafters, materials and cost estimates.
 
-- ricette che producono item `binds when picked up` (BoP), dove in pratica solo il personaggio che possiede e usa la ricetta puo beneficiare del craft;
-- ricette Vanilla/pre-TBC, che sono spesso meno rilevanti nel contesto TBC Classic Anniversary e rendono piu pesante lista, ricerca e dettaglio.
+This is useful for recipes that can be requested from other players, but it creates unnecessary UI noise and runtime overhead in two major cases:
 
-L'obiettivo e introdurre prefiltri UI, applicati prima possibile nel flusso di caricamento/rendering, per escludere queste ricette dal comportamento predefinito senza cambiare il database sync sottostante. L'utente deve poter disabilitare i filtri e ripristinare il comportamento attuale.
+- recipes that produce bind-on-pickup output items, because other players cannot craft a tradable item for the requester;
+- older expansion recipes, especially Vanilla/pre-TBC recipes, when the user wants to focus only on TBC content.
 
-## Comportamento attuale ipotizzato
+The goal is to introduce configurable UI prefilters that reduce the amount of recipe data projected into the UI runtime layer.
 
-Il flusso principale in `UI/MainFrame.lua` e:
+These filters must not change the sync database, peer ownership data, merge behavior, block fingerprints, wire protocol or any shared data structure. They must operate only on the UI/catalog projection.
 
-1. La selezione della vista/professione aggiorna `UI.selectedProfession`, `UI.selectedCategory` e resetta `UI.selectedRecipeKey`.
-2. `UI:RefreshRecipeList()` calcola:
-   - `effectiveProfession`;
-   - `categoryFilter`;
-   - ricerca globale e modalita sort.
-3. La lista viene costruita tramite `Addon.Data:BuildRecipeListAsync(effectiveProfession, searchText, sortMode, searchMode, categoryFilter, callback)`.
-4. Se il risultato non e inline, `_ShowRecipeListLoadingState()` mostra un header `loading...`.
+The intended result is:
+
+- faster UI loading;
+- less noise in recipe lists and search results;
+- deterministic filtering independent from optional third-party addons;
+- user-configurable visibility per expansion and per profession;
+- removal of AtlasLoot as a resolver for recipe metadata and profession subsections.
+
+## Mandatory architectural rule: UI-only filtering
+
+All filters described in this roadmap must apply only to the UI/catalog layer.
+
+They must not affect:
+
+- guild sync;
+- merge logic;
+- block fingerprints;
+- global fingerprints;
+- block indexes;
+- wire protocol;
+- saved peer recipe data;
+- ownership data;
+- pruning or stale-node handling.
+
+The sync layer must continue to store and index all known recipes.
+
+Changing filter options must not require a resync. Recipes already received from peers must become visible again immediately when the user disables or changes a filter.
+
+The UI must build a filtered runtime projection from the full local/synced dataset. Recipes excluded by the active filters should not enter the UI runtime recipe list/cache for the affected profession.
+
+This is not just a visual hide-after-render feature. The objective is to avoid loading, sorting, rendering and caching recipes that are not relevant under the active UI filter configuration.
+
+## Current behavior assumed
+
+The current UI flow in `UI/MainFrame.lua` is approximately:
+
+1. The selected view/profession updates `UI.selectedProfession`, `UI.selectedCategory` and resets `UI.selectedRecipeKey`.
+2. `UI:RefreshRecipeList()` computes:
+   - effective profession;
+   - category filter;
+   - global search text;
+   - sort mode.
+3. The list is built through `Addon.Data:BuildRecipeListAsync(effectiveProfession, searchText, sortMode, searchMode, categoryFilter, callback)`.
+4. If the result is not inline, `_ShowRecipeListLoadingState()` shows a loading header.
 5. `_FinalizeRecipeList(rows, context, generation)`:
-   - applica oggi solo il filtro Favorites lato UI;
-   - aggiorna `self.currentRecipeRows`;
-   - verifica se `self.selectedRecipeKey` esiste ancora;
-   - auto-seleziona la prima ricetta visibile quando necessario;
-   - chiama `RenderVisibleRecipeRows()`, `RefreshSummaryCards()` e `RefreshDetailPanel()`.
-6. `RenderVisibleRecipeRows()` usa righe virtualizzate e `BindRecipeRow()`.
-7. `BindRecipeRow()` chiama lazy `RefreshRecipeRowAssets()`, che usa `Data:GetRecipeDisplayInfo(recipeKey)` per label, icone, created item, recipe item e metadati visuali.
-8. `RefreshDetailPanel()` usa `Addon.Data:GetRecipeDetail(self.selectedRecipeKey)` e renderizza:
-   - titolo e sottotitolo;
-   - crafter online/offline;
-   - materiali;
+   - currently applies UI-side favorite handling;
+   - updates `self.currentRecipeRows`;
+   - verifies whether `self.selectedRecipeKey` is still visible;
+   - auto-selects the first visible recipe when needed;
+   - calls `RenderVisibleRecipeRows()`, `RefreshSummaryCards()` and `RefreshDetailPanel()`.
+6. `RenderVisibleRecipeRows()` uses virtualized rows and `BindRecipeRow()`.
+7. `BindRecipeRow()` calls lazy `RefreshRecipeRowAssets()`, which uses `Data:GetRecipeDisplayInfo(recipeKey)` for labels, icons, created item, recipe item and visual metadata.
+8. `RefreshDetailPanel()` uses `Addon.Data:GetRecipeDetail(self.selectedRecipeKey)` and renders:
+   - title and subtitle;
+   - online/offline crafters;
+   - materials;
    - cost estimate.
 
-Nel data layer, `DataCatalog.lua` contiene i punti piu rilevanti:
+In the data layer, `Data/DataCatalog.lua` currently contains the most relevant points:
 
-- `Data:GetRecipeDisplayInfo(recipeKey)`: costruisce/cacha metadati display, spesso arricchiti da AtlasLoot.
-- `Data:GetRecipeList(...)` e `Data:BuildRecipeListAsync(...)`: costruiscono righe lista e ordinamento.
-- `Data:GetRecipeDetail(recipeKey)`: estende i metadati display con crafter, reagenti, costi.
+- `Data:GetRecipeDisplayInfo(recipeKey)`;
+- `Data:GetRecipeList(...)`;
+- `Data:BuildRecipeListAsync(...)`;
+- `Data:GetRecipeDetail(recipeKey)`.
 
-Assunzione importante: i filtri richiesti devono essere filtri UI/catalogo, non filtri sync. I dati ricevuti dai peer devono restare salvati e indicizzati, cosi l'utente puo riattivare la visualizzazione completa senza dover risincronizzare.
+The new implementation must move filter decisions as early as possible into the data/catalog projection path, before expensive UI row construction, sorting and rendering.
 
-## Requisiti funzionali
+## Functional requirements
 
-### RF1 - Prefiltro item BoP
+### RF1 - Remote BoP output filter
 
-Escludere dalla UI le ricette il cui output e un item `binds when picked up`, tranne quando la ricetta appartiene al personaggio locale/profilo corrente.
+The user must be able to choose whether to show recipes from other guild members when the produced output item is bind-on-pickup.
 
-Regola proposta:
+The filter applies to the produced item, not to the recipe item.
 
-- se il created item non e BoP: mostra normalmente;
-- se il created item e BoP:
-  - mostra solo se il player locale e tra i crafter/owner della ricetta;
-  - nascondi se la ricetta e nota solo tramite altri membri gilda.
+Rules:
 
-Motivazione: se un craft produce un BoP, un altro crafter non puo produrre un item commerciabile per il player. Il proprietario locale puo comunque voler vedere la propria ricetta per materiali, costo o consultazione personale.
+- if the recipe produces a non-BoP item, it is visible normally;
+- if the recipe produces a BoP item and the current player knows the recipe, it must always remain visible;
+- if the recipe produces a BoP item and it is known only by another guild member, it is visible only when the user enables the dedicated option;
+- if the recipe has no produced item, the BoP output rule does not apply directly.
 
-### RF2 - Prefiltro Vanilla/pre-TBC
+Default behavior:
 
-Escludere per default le ricette classificate come Vanilla/pre-TBC. Le ricette TBC restano visibili.
+- hide remote BoP output recipes;
+- always show current-player BoP output recipes.
 
-La classificazione non dovrebbe basarsi solo su skill rank o nome:
+Suggested option name:
 
-- alcune ricette TBC possono avere rank bassi;
-- alcuni oggetti/ricette possono essere presenti in AtlasLoot con categorie non sufficienti;
-- enchanting e professioni secondarie hanno casi particolari.
+- `showRemoteBopOutputRecipes`.
 
-Serve una fonte metadata esplicita: `recipeExpansion = "vanilla" | "tbc" | "unknown"`.
+The reason is practical: if another player’s recipe produces a BoP item, the local user cannot request that item as a tradable craft.
 
-### RF3 - Opzioni utente
+### RF2 - Outputless self-only recipes
 
-Entrambi i prefiltri devono essere disabilitabili. Disabilitarli deve ripristinare il comportamento attuale della UI, cioe mostrare tutte le ricette note/sincronizzate.
+Some recipes or profession effects do not produce a normal item but are still effectively self-only. A key example is ring enchants in Enchanting.
 
-### RF4 - Configurazione per professione
+These cases cannot be detected through the BoP produced-item rule, because there may be no produced item.
 
-Per ogni professione l'utente deve poter scegliere se:
+They must be handled through explicit metadata.
 
-- usare il comportamento globale;
-- mostrare solo TBC;
-- includere anche Vanilla/pre-TBC.
+Rules:
 
-### RF5 - Globale con override
+- outputless self-only recipes must be visible for the current player when known locally;
+- outputless self-only recipes known only by other guild members should follow the same user option as remote BoP output recipes;
+- these cases must be identified by explicit spell IDs or generated metadata;
+- they must not be inferred from AtlasLoot categories.
 
-Serve una impostazione globale, ad esempio `solo TBC`, con override per singola professione. Esempio:
+Suggested metadata table:
 
-- globale: solo TBC;
-- Enchanting: includi anche Vanilla;
-- Alchemy/Blacksmithing/etc: ereditano solo TBC.
+```lua
+RecipeRegistryRecipeMetadataOverrides = {
+    selfOnlyOutputlessBySpellId = {
+        -- [spellId] = true
+    }
+}
+```
 
-## Proposta di configurazione utente
+### RF3 - Expansion visibility filter
 
-Nuove opzioni in `RecipeRegistryDB.profile`, con nomi indicativi:
+The user must be able to choose which supported expansions are visible in the UI.
+
+For TBC Anniversary, the initial supported values are:
+
+- Vanilla;
+- TBC.
+
+There should be no user-facing `unknown` expansion option.
+
+If a recipe cannot be classified as Vanilla or TBC, that is a metadata coverage issue, not a valid user-facing classification.
+
+### RF4 - Global expansion defaults
+
+The addon must provide global expansion visibility defaults.
+
+Suggested default:
 
 ```lua
 recipePrefilters = {
-    hideBopOutputs = true,
-    expansionMode = "tbc_only", -- "tbc_only" | "all"
-    professionExpansionOverrides = {
-        -- ["Enchanting"] = "all",
-        -- ["Alchemy"] = "tbc_only",
-        -- nil/assente = inherit globale
+    showRemoteBopOutputRecipes = false,
+
+    expansionDefaults = {
+        vanilla = true,
+        tbc = true,
     },
-    unknownExpansionMode = "show", -- "show" | "hide"; consigliato show in V1
+
+    professionExpansionOverrides = {
+    },
 }
 ```
 
-Default proposto:
+With this default, all Vanilla and TBC recipes are visible unless changed by the user.
 
-- `hideBopOutputs = true`;
-- `expansionMode = "tbc_only"`;
-- `professionExpansionOverrides = {}`;
-- `unknownExpansionMode = "show"` per evitare falsi negativi su ricette non ancora classificate.
+The user can globally disable Vanilla recipes, TBC recipes, or both.
 
-UI opzioni:
+### RF5 - Per-profession expansion matrix
 
-- sezione `Recipe filters` nel pannello opzioni;
-- checkbox: `Hide BoP output recipes unless known by this character`;
-- dropdown globale: `Expansion filter: TBC only / All recipes`;
-- tabella per-professione:
-  - `Inherit global`;
-  - `TBC only`;
-  - `All recipes`.
+The addon options must allow free per-profession configuration.
 
-Nota UX: quando i filtri sono attivi, la UI dovrebbe evitare messaggi invasivi. Un indicatore leggero nel summary/header puo essere utile, ad esempio `TBC filter active`, ma non e necessario per V1.
+For each profession, the user should be able to choose either:
 
-## Impatto sui dati e sui filtri
+- use global defaults;
+- use custom visibility toggles.
 
-### Metadata necessari
+When using custom visibility toggles, the profession has independent options for:
 
-Per ogni `recipeKey` servono almeno:
+- Vanilla;
+- TBC.
+
+Example:
+
+Global defaults:
+
+- Vanilla: true;
+- TBC: true.
+
+Alchemy:
+
+- use global defaults;
+- result: Vanilla and TBC visible.
+
+Engineering:
+
+- custom;
+- Vanilla: false;
+- TBC: true;
+- result: only TBC Engineering recipes visible.
+
+Suggested structure:
 
 ```lua
-{
-    recipeKey = ...,
-    professionName = "Enchanting",
-    createdItemID = 12345,
-    recipeItemID = 23456,
-    spellID = 34567,
-    outputBindType = 1, -- 1 = BoP / bind on acquire, se disponibile
-    recipeExpansion = "tbc",
+recipePrefilters = {
+    showRemoteBopOutputRecipes = false,
+
+    expansionDefaults = {
+        vanilla = true,
+        tbc = true,
+    },
+
+    professionExpansionOverrides = {
+        ["Engineering"] = {
+            inherit = false,
+            vanilla = false,
+            tbc = true,
+        },
+    },
 }
 ```
 
-Possibili fonti:
+A profession with no override or with `inherit = true` must use the global defaults.
 
-- `GetItemInfo(createdItemID)`: in WoW Classic/TBC puo esporre `bindType` tra i valori ritornati. Da verificare nel client target e nel mock test.
-- AtlasLoot: utile per `createdItemID`, `recipeItemID`, professione, reagenti e possibilmente classificazione, ma non va dato per completo.
-- Tabella curated locale: consigliata per `recipeExpansion` e per fallback BoP quando l'API item cache non e pronta.
+The UI must clearly distinguish:
 
-### Dove applicare il prefiltro
+- inherited configuration;
+- custom configuration.
 
-Il punto ideale e nel data layer, prima che le righe lista vengano consegnate alla UI:
+### RF6 - Filters must affect UI runtime projection
 
-- `Data:GetRecipeList(...)`;
-- `Data:BuildRecipeListAsync(...)`;
-- eventuale helper condiviso tipo `Data:RecipePassesUiPrefilters(recipeKey, detail, opts)`.
+Recipes excluded by filters must not be inserted into the active UI runtime list/cache for the affected profession.
 
-Vantaggi:
+This is mandatory.
 
-- riduce il numero di righe costruite/ordinate;
-- riduce chiamate lazy a `GetRecipeDisplayInfo`;
-- evita che Favorites/global search/category applichino regole divergenti;
-- centralizza cache key e invalidazione.
+The goal is not only to hide rows visually after the list is built. The filtered recipes should be excluded before list row construction, sorting, virtualized rendering and detail binding.
 
-La UI deve comunque difendersi:
+This applies to:
 
-- `_FinalizeRecipeList()` deve continuare a verificare che `selectedRecipeKey` sia ancora visibile;
-- `RefreshDetailPanel()` dovrebbe non renderizzare un dettaglio se la ricetta selezionata non passa piu i filtri correnti;
-- quando un filtro cambia, va incrementata la generazione lista e invalidata la cache visibile.
+- profession lists;
+- category/subcategory views;
+- global search;
+- favorites view;
+- detail selection;
+- any UI-side visible recipe cache.
 
-### Cache key
+### RF7 - Favorites behavior
 
-Le cache lista devono includere i nuovi parametri:
+Favorites must respect active filters.
 
-- `hideBopOutputs`;
-- expansion mode effettivo per professione;
-- `unknownExpansionMode`;
-- eventuale versione/generazione metadata.
+If a favorite recipe is hidden by the current filter configuration:
 
-Se si usa `Data:GetRecipeList` e `BuildRecipeListAsync`, la cache key deve distinguere:
+- it must not appear in the visible Favorites list;
+- it must not be removed from the saved favorites data;
+- it must reappear when the user changes filters so that it becomes visible again.
+
+There is no separate “favorites ignore filters” behavior in V1.
+
+### RF8 - Global search behavior
+
+Global search must respect active filters.
+
+If the user searches for a Vanilla recipe while Vanilla is disabled for the effective profession, the recipe must not appear in search results.
+
+If the user later enables Vanilla again, the same recipe can appear without requiring a resync.
+
+### RF9 - Summary counters
+
+Recipe counters are not required for V1.
+
+If existing UI counters become misleading after filtering, either:
+
+- remove them from the user-facing UI; or
+- make them clearly represent only visible filtered data.
+
+Raw totals may remain available only in diagnostics.
+
+No additional counter feature should be added unless it directly supports debugging or user clarity.
+
+## Addon options requirements
+
+The addon options panel must expose the new filter configuration.
+
+Required options:
+
+- checkbox: `Show BoP output recipes known only by other guild members`;
+- global expansion visibility:
+  - `Show Vanilla recipes`;
+  - `Show TBC recipes`;
+- per-profession expansion visibility:
+  - `Use global defaults`;
+  - custom toggles:
+    - `Vanilla`;
+    - `TBC`.
+
+Changing any option must:
+
+- invalidate only the affected UI/catalog runtime projection;
+- avoid touching sync state;
+- avoid rebuilding sync indexes;
+- avoid recomputing fingerprints;
+- avoid changing saved peer recipe data.
+
+For per-profession option changes, invalidation should be scoped to the affected profession when possible.
+
+Example:
+
+- changing Engineering Vanilla visibility should invalidate the Engineering UI projection;
+- it should not invalidate unrelated profession UI projections;
+- it should not invalidate sync indexes or global recipe ownership data.
+
+## Internal metadata library
+
+### Decision
+
+Recipe Registry must introduce an internal metadata library generated at build time.
+
+The internal metadata library replaces AtlasLoot as the resolver for:
+
+- recipe-to-spell resolution;
+- recipe item resolution;
+- created item resolution;
+- profession assignment;
+- expansion classification;
+- profession categories and subcategories;
+- outputless self-only recipe classification;
+- UI sort order metadata.
+
+AtlasLoot must no longer be required to build the UI recipe catalog.
+
+### Rationale
+
+AtlasLoot is currently used to resolve items and create profession subsections.
+
+However:
+
+- AtlasLoot categories are not suitable enough and are already modified at runtime;
+- relying on AtlasLoot makes the UI behavior depend on a local optional addon;
+- filtering must be deterministic regardless of the user’s installed addons;
+- Recipe Registry needs only a specific subset of metadata;
+- a generated internal metadata file gives better control over categories, sorting and remediation.
+
+The internal metadata library should not replicate an entire external recipe library unless necessary. It should contain only the data required by Recipe Registry.
+
+### Suggested files
+
+Suggested structure:
 
 ```text
-profession|search|sort|searchMode|category|hideBop|expansionMode|unknownMode|metadataGeneration
+Data/RecipeMetadata.lua
+Data/RecipeMetadata_Generated.lua
+Data/RecipeMetadata_Overrides.lua
+Data/RecipeUiFilters.lua
 ```
+
+Responsibilities:
+
+- `RecipeMetadata.lua`
+  - public API for resolving recipe metadata;
+  - merges generated data and manual overrides;
+  - exposes normalized metadata to the UI/catalog layer.
+
+- `RecipeMetadata_Generated.lua`
+  - generated static metadata;
+  - should not be edited manually.
+
+- `RecipeMetadata_Overrides.lua`
+  - manual remediation table;
+  - explicit corrections for edge cases.
+
+- `RecipeUiFilters.lua`
+  - UI-only filter predicate;
+  - effective option resolution;
+  - profession-scoped filter cache keys.
+
+### Suggested generated metadata shape
+
+```lua
+RecipeRegistryRecipeMetadata = {
+    recipesBySpellId = {
+        [28596] = {
+            profession = "Alchemy",
+            expansion = "tbc",
+            recipeItemId = 22900,
+            createdItemId = 22845,
+            category = "flasks",
+            subcategory = "guardian_elixirs",
+            sortOrder = 120,
+        },
+    },
+
+    recipeItemToSpellId = {
+        -- [recipeItemId] = spellId
+    },
+
+    createdItemToSpellIds = {
+        -- [createdItemId] = { spellId1, spellId2 }
+    },
+
+    categoriesByProfession = {
+        ["Alchemy"] = {
+            { key = "potions", label = "Potions", order = 10 },
+            { key = "elixirs", label = "Elixirs", order = 20 },
+            { key = "flasks", label = "Flasks", order = 30 },
+            { key = "transmutes", label = "Transmutes", order = 40 },
+        },
+    },
+
+    subcategoriesByProfession = {
+        ["Alchemy"] = {
+            potions = {
+                { key = "healing", label = "Healing", order = 10 },
+                { key = "mana", label = "Mana", order = 20 },
+                { key = "utility", label = "Utility", order = 30 },
+            },
+        },
+    },
+}
+```
+
+### Suggested override metadata shape
+
+```lua
+RecipeRegistryRecipeMetadataOverrides = {
+    expansionBySpellId = {
+        -- [spellId] = "vanilla" | "tbc"
+    },
+
+    createdItemBySpellId = {
+        -- [spellId] = itemId
+    },
+
+    recipeItemBySpellId = {
+        -- [spellId] = itemId
+    },
+
+    categoryBySpellId = {
+        -- [spellId] = {
+        --     category = "x",
+        --     subcategory = "y",
+        --     sortOrder = 123,
+        -- }
+    },
+
+    selfOnlyOutputlessBySpellId = {
+        -- [spellId] = true
+    },
+
+    bopOutputByCreatedItemId = {
+        -- fallback only if item bind type cannot be resolved reliably
+        -- [itemId] = true
+    },
+}
+```
+
+Overrides must remain small and focused on remediation.
+
+They must not become the primary data source.
+
+## Metadata generation pipeline
+
+Recipe Registry should include a build-time generator written specifically for this project.
+
+The generator may be conceptually inspired by existing projects such as LibTradeSkillRecipes or WowDbScripts, but it should be implemented as Recipe Registry’s own minimal pipeline.
+
+The generator should produce static Lua metadata files used by the addon.
+
+Suggested location:
+
+```text
+tools/recipe-metadata/
+  generate_recipe_metadata.py
+  README.md
+```
+
+Generated output:
+
+```text
+Data/RecipeMetadata_Generated.lua
+```
+
+The pipeline should aim to derive:
+
+- spell ID;
+- recipe item ID;
+- created item ID;
+- profession;
+- expansion;
+- category;
+- subcategory;
+- sort order.
+
+Expansion classification should be generated from reliable recipe/spell metadata, not primarily inferred from required skill rank.
+
+Required skill rank may be used only as:
+
+- a diagnostic cross-check;
+- temporary fallback during development;
+- a remediation hint.
+
+It should not be the authoritative rule for Vanilla/TBC classification.
+
+## Expansion classification
+
+The metadata library must classify each supported recipe as:
+
+- `vanilla`;
+- `tbc`.
+
+There should be no user-facing `unknown` category.
+
+If a recipe cannot be classified, it must be treated as unresolved metadata.
+
+Unresolved metadata behavior:
+
+- log it in diagnostics;
+- expose it through a debug command;
+- avoid silently treating it as a third expansion;
+- avoid exposing it as a user option;
+- correct it through generator improvements or explicit overrides.
+
+Suggested diagnostic command:
+
+```text
+/rr filters unresolved
+```
+
+Suggested diagnostic output:
+
+- recipe key;
+- spell ID;
+- recipe item ID;
+- created item ID;
+- profession;
+- reason;
+- suggested remediation source.
+
+Policy for unresolved recipes in V1:
+
+- show unresolved recipes conservatively to avoid false negatives;
+- log them for remediation;
+- do not classify them as Vanilla or TBC until resolved.
+
+## BoP and self-only visibility resolution
+
+The UI filter must determine whether a recipe is self-only for other players.
+
+A recipe is self-only when:
+
+- it produces a BoP output item; or
+- it is explicitly marked as outputless/self-only by metadata.
+
+### Produced item BoP detection
+
+Primary source:
+
+- WoW item API, using the produced `createdItemId`.
+
+If the item cache is not ready:
+
+- do not permanently hide based only on missing item data;
+- use cached metadata or override if available;
+- queue/mark for later metadata refresh if needed;
+- avoid aggressive flicker.
+
+Fallback source:
+
+- `bopOutputByCreatedItemId` override table.
+
+### Outputless self-only detection
+
+Primary source:
+
+- `selfOnlyOutputlessBySpellId`.
+
+This is required for cases such as ring enchants.
+
+Rules:
+
+- current-player self-only recipes are always visible;
+- remote-only self-only recipes are visible only when `showRemoteBopOutputRecipes = true`.
+
+## Current-player definition
+
+For V1, “self” means only the current player character.
+
+Do not treat alts as self.
+
+Reasons:
+
+- BoP outputs cannot be traded to alts;
+- Recipe Registry does not have a reliable account-level alt ownership system;
+- guild roster information is not sufficient to determine who owns which alt;
+- alt inference would create false positives.
+
+Suggested helper:
+
+```lua
+Data:IsRecipeKnownByCurrentPlayer(recipeKey)
+```
+
+This helper should check whether the current player key is among the owners/crafters of the recipe.
+
+## AtlasLoot removal
+
+### Decision
+
+AtlasLoot must be removed from the resolver path.
+
+It must not be used to decide:
+
+- recipe visibility;
+- expansion classification;
+- recipe item mapping;
+- created item mapping;
+- profession category;
+- profession subcategory;
+- self-only/outputless classification;
+- whether a recipe enters the UI runtime projection.
+
+### Transitional policy
+
+During migration, AtlasLoot may remain installed and supported only if there are legacy call-sites that have not yet been migrated.
+
+However, the new filter path must not depend on AtlasLoot.
+
+Acceptance criteria:
+
+- the same Recipe Registry configuration produces the same visible recipe list with or without AtlasLoot installed;
+- AtlasLoot does not change Vanilla/TBC classification;
+- AtlasLoot does not change BoP/self-only visibility;
+- AtlasLoot does not change category/subcategory assignment for the new UI projection;
+- AtlasLoot is not part of the filter cache key;
+- after all call-sites are migrated, remove `AtlasLootClassic` and `AtlasLoot` from `OptionalDeps`.
+
+### Replacement responsibilities
+
+The internal metadata library replaces AtlasLoot for:
+
+- recipe item resolution;
+- created item resolution;
+- spell mapping;
+- profession categories;
+- profession subcategories;
+- sort order;
+- metadata remediation.
+
+Icons should be resolved through WoW APIs using available IDs:
+
+- created item icon from `createdItemId`;
+- recipe item icon from `recipeItemId`;
+- spell icon from `spellId`;
+- fallback question mark icon.
+
+Suggested icon fallback order:
+
+1. created item icon;
+2. recipe item icon;
+3. spell icon;
+4. internal placeholder icon.
+
+## UI/category model
+
+The new profession category model should be owned by Recipe Registry.
+
+Categories and subcategories should be defined in internal metadata, not imported from AtlasLoot and patched at runtime.
+
+Category design goals:
+
+- stable;
+- readable;
+- useful for players;
+- consistent across installations;
+- independent from optional addons;
+- easy to override manually.
+
+Suggested category metadata:
+
+```lua
+categoriesByProfession = {
+    ["Engineering"] = {
+        { key = "consumables", label = "Consumables", order = 10 },
+        { key = "devices", label = "Devices", order = 20 },
+        { key = "goggles", label = "Goggles", order = 30 },
+        { key = "ammo", label = "Ammo", order = 40 },
+        { key = "misc", label = "Miscellaneous", order = 999 },
+    },
+}
+```
+
+Each recipe should resolve to:
+
+- profession;
+- category key;
+- optional subcategory key;
+- sort order.
+
+If a recipe has no category assignment, it should go to a controlled fallback category such as `misc`, and diagnostics should report it as category remediation.
+
+## UI filter predicate
+
+Introduce a central UI-only predicate.
+
+Suggested API:
+
+```lua
+Data:RecipePassesUiPrefilters(recipeKey, detail, uiFilterOptions)
+```
+
+or:
+
+```lua
+RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, uiFilterOptions)
+```
+
+The predicate should evaluate:
+
+1. effective profession expansion visibility;
+2. recipe expansion;
+3. current-player ownership;
+4. remote BoP output visibility;
+5. outputless self-only visibility.
+
+Pseudo-flow:
+
+- resolve recipe metadata;
+- if expansion is unresolved:
+  - log diagnostics;
+  - apply unresolved policy;
+- check whether expansion is enabled for the effective profession;
+- if not enabled, reject;
+- check whether recipe is self-only;
+- if self-only and known by current player, accept;
+- if self-only and only known remotely, accept only if `showRemoteBopOutputRecipes = true`;
+- otherwise accept.
+
+This predicate must be used consistently by:
+
+- normal profession list;
+- global search;
+- category/subcategory views;
+- favorites;
+- detail selection validation.
+
+## UI runtime projection
+
+The UI should build a filtered runtime projection from full recipe data.
+
+The projection must be scoped by profession where possible.
+
+Suggested concept:
+
+- sync data remains complete;
+- data/catalog layer exposes full data internally;
+- UI asks for a filtered projection;
+- filtered projection is cached by profession and filter options;
+- changing filter options invalidates only affected UI projections.
+
+The projection should contain only visible recipes.
+
+This avoids:
+
+- constructing rows for hidden recipes;
+- sorting hidden recipes;
+- binding hidden rows;
+- resolving icons for hidden recipes;
+- rendering hidden details;
+- unnecessary global search entries.
+
+## Cache key requirements
+
+Recipe list/projection cache keys must include filter-relevant options.
+
+Suggested cache key components:
+
+- profession;
+- search text;
+- sort mode;
+- search mode;
+- category;
+- subcategory;
+- effective Vanilla visibility;
+- effective TBC visibility;
+- remote BoP output visibility;
+- metadata generation version;
+- UI filter generation.
+
+Do not include:
+
+- AtlasLoot availability;
+- sync generation unless the underlying recipe ownership data changed;
+- unrelated profession filter settings.
+
+For per-profession changes, invalidate only:
+
+- that profession’s UI projection;
+- global search projection if it includes that profession;
+- favorites projection if needed.
+
+Do not invalidate:
+
+- sync fingerprints;
+- block indexes;
+- merge state;
+- peer data;
+- saved variables.
+
+## Data layer impact
+
+### Data/DataCatalog.lua
+
+Required changes:
+
+- stop using AtlasLoot as recipe resolver for new UI filter path;
+- use `RecipeMetadata` for spell/item/profession/category/expansion;
+- extend list building to accept UI filter options;
+- apply filter before row construction;
+- extend cache keys with effective filter values;
+- expose diagnostics for unresolved metadata;
+- ensure `GetRecipeDetail` can use internal metadata.
+
+Relevant methods:
+
+- `Data:GetRecipeDisplayInfo(recipeKey)`;
+- `Data:GetRecipeList(...)`;
+- `Data:BuildRecipeListAsync(...)`;
+- `Data:GetRecipeDetail(recipeKey)`.
+
+### Data/RecipeMetadata.lua
+
+New module.
+
+Responsibilities:
+
+- resolve metadata by recipe key;
+- normalize generated data and overrides;
+- provide recipe expansion;
+- provide created item ID;
+- provide recipe item ID;
+- provide profession;
+- provide category/subcategory;
+- identify outputless self-only recipes;
+- expose metadata diagnostics.
+
+Suggested methods:
+
+- `GetRecipeInfo(recipeKey)`;
+- `GetRecipeExpansion(recipeKey, info)`;
+- `GetCreatedItemId(recipeKey, info)`;
+- `GetRecipeItemId(recipeKey, info)`;
+- `GetProfession(recipeKey, info)`;
+- `GetCategory(recipeKey, info)`;
+- `IsOutputlessSelfOnly(recipeKey, info)`;
+- `GetMetadataResolutionStatus(recipeKey, info)`.
+
+### Data/RecipeUiFilters.lua
+
+New module.
+
+Responsibilities:
+
+- compute effective global/per-profession options;
+- evaluate recipe visibility;
+- expose cache key components;
+- keep filter logic out of sync modules.
+
+Suggested methods:
+
+- `GetEffectiveExpansionVisibility(professionName)`;
+- `RecipePasses(recipeKey, recipeInfo, filterContext)`;
+- `BuildFilterCacheKey(filterContext)`;
+- `InvalidateProfessionProjection(professionName, reason)`.
+
+## UI layer impact
+
+### UI/MainFrame.lua
+
+Required changes:
+
+- `UI:RefreshRecipeList()` must build filter context and pass it to the data layer;
+- `_FinalizeRecipeList()` must assume rows are already filtered;
+- `_FinalizeRecipeList()` must not reinsert hidden recipes;
+- `BuildFavoriteRecipeRows()` must use the same filter predicate;
+- global search must request filtered projection;
+- category/subcategory views must use internal metadata categories;
+- detail panel must only show recipes selected from the filtered projection.
+
+### Detail panel
+
+No special link-handling behavior is required for V1.
+
+A recipe hidden by filters should not be selectable through normal addon UI because it should not be present in the filtered runtime list.
+
+If defensive handling is needed, the detail panel may clear selection when the selected recipe is no longer part of `currentRecipeRows`.
+
+### Profession buttons and categories
+
+Profession categories/subcategories should come from internal Recipe Registry metadata.
+
+AtlasLoot categories must no longer be used and then modified at runtime.
+
+Optional future polish:
+
+- small filter-active indicator;
+- tooltip explaining that some recipes are hidden by filters.
+
+This is not required for V1.
+
+## Options.lua impact
+
+Required additions:
+
+- checkbox for remote BoP output recipes;
+- global Vanilla/TBC toggles;
+- per-profession configuration table;
+- `Use global defaults` toggle per profession;
+- per-profession Vanilla/TBC toggles when custom mode is active.
+
+On option change:
+
+- update profile settings;
+- invalidate affected UI projection;
+- request UI refresh;
+- do not touch sync.
+
+Suggested invalidation examples:
+
+- global expansion default changed:
+  - invalidate all UI projections;
+  - refresh current UI.
+
+- profession override changed:
+  - invalidate only that profession projection;
+  - invalidate global search/favorites projections if needed;
+  - refresh current UI if that profession is active.
+
+- remote BoP output option changed:
+  - invalidate all UI projections, because the rule can affect all professions.
+
+## Core/defaults impact
+
+Add profile defaults:
+
+```lua
+recipePrefilters = {
+    showRemoteBopOutputRecipes = false,
+
+    expansionDefaults = {
+        vanilla = true,
+        tbc = true,
+    },
+
+    professionExpansionOverrides = {
+    },
+}
+```
+
+Schema migration should be non-destructive.
+
+Do not modify:
+
+- members;
+- profession blocks;
+- recipe ownership;
+- sync state;
+- fingerprints;
+- wire version.
+
+## Diagnostics
+
+Add diagnostics for metadata coverage and filter behavior.
+
+Suggested command:
+
+```text
+/rr filters
+```
+
+Possible output:
+
+- active global expansion defaults;
+- active profession override for current profession;
+- remote BoP output visibility;
+- number of unresolved metadata entries;
+- number of category remediation entries.
+
+Suggested command:
+
+```text
+/rr filters unresolved
+```
+
+Possible output:
+
+- unresolved recipe key;
+- spell ID;
+- recipe item ID;
+- created item ID;
+- profession if known;
+- failure reason;
+- suggested remediation type.
+
+Suggested command:
+
+```text
+/rr filters explain <recipeKey>
+```
+
+Possible output:
+
+- recipe metadata;
+- expansion;
+- category;
+- self-only status;
+- current-player ownership;
+- effective profession filter;
+- final pass/fail reason.
+
+Diagnostics must not be noisy by default.
+
+## Manual test scenarios
+
+### Expansion filters
+
+- default settings:
+  - Vanilla enabled;
+  - TBC enabled;
+  - all recipes visible.
+
+- global Vanilla disabled:
+  - Vanilla recipes hidden from profession list;
+  - Vanilla recipes hidden from search;
+  - Vanilla favorites hidden but not removed;
+  - TBC recipes remain visible.
+
+- Engineering override:
+  - global Vanilla enabled;
+  - Engineering custom Vanilla disabled;
+  - Engineering shows only TBC;
+  - Alchemy still follows global defaults.
+
+### Remote BoP output
+
+- BoP output recipe known only by guildmate:
+  - hidden by default.
+
+- same remote BoP output with option enabled:
+  - visible.
+
+- BoP output recipe known by current player:
+  - always visible.
+
+- non-BoP recipe known by guildmate:
+  - visible normally.
+
+### Outputless self-only
+
+- ring enchant known only by guildmate:
+  - hidden by default.
+
+- ring enchant known only by guildmate with remote self-only option enabled:
+  - visible.
+
+- ring enchant known by current player:
+  - always visible.
 
 ### Favorites
 
-`UI:BuildFavoriteRecipeRows()` oggi costruisce righe dai favorite key e cammina l'indice ricette. Anche Favorites deve rispettare i prefiltri per coerenza, salvo opzione futura `Favorites ignore filters`. Per V1: Favorites rispetta i filtri attivi.
+- favorite a Vanilla recipe;
+- disable Vanilla;
+- favorite disappears from visible Favorites;
+- re-enable Vanilla;
+- favorite reappears;
+- saved favorite data remains unchanged.
 
 ### Global search
 
-La ricerca globale deve rispettare gli stessi prefiltri. Se l'utente cerca una ricetta Vanilla con `TBC only` attivo, non deve apparire. Disabilitando il filtro deve tornare visibile.
+- search for a hidden Vanilla recipe:
+  - no result.
+
+- re-enable Vanilla:
+  - same search returns the recipe.
+
+### AtlasLoot independence
+
+- run addon with AtlasLoot installed;
+- record visible recipe list;
+- run addon without AtlasLoot installed;
+- same config must produce same visible recipe list;
+- category/subcategory assignment must remain stable;
+- filter results must not change.
+
+### Sync separation
 
-## Punti del codice da investigare/modificare
+- receive recipes via sync while filters hide them;
+- verify they are saved;
+- verify fingerprints are unchanged by UI filters;
+- disable filters;
+- recipes appear without resync.
 
-### `UI/MainFrame.lua`
+## Automated tests
 
-Punti principali:
+### Metadata tests
 
-- `UI:RefreshRecipeList()`
-  - costruisce il contesto della lista;
-  - deve passare le opzioni filtro effettive al data layer;
-  - deve includere il filtro nel `context` per header/sommario.
-
-- `UI:_FinalizeRecipeList(rows, context, generation)`
-  - oggi filtra solo Favorites;
-  - deve mantenere selezione coerente se la ricetta selezionata viene filtrata;
-  - puo aggiornare header/summary con eventuale indicatore filtro.
-
-- `UI:BuildFavoriteRecipeRows()`
-  - deve usare lo stesso predicato `RecipePassesUiPrefilters`.
-
-- `UI:RefreshDetailPanel()`
-  - deve gestire il caso in cui `selectedRecipeKey` non passi piu i filtri;
-  - deve evitare render stale quando un'opzione cambia.
-
-- `UI:RefreshProfessionButtons()`
-  - possibile punto per indicare override professione o conteggi filtrati;
-  - da valutare in V2, non obbligatorio per V1.
-
-### `Data/DataCatalog.lua`
-
-Punti principali:
-
-- `Data:GetRecipeDisplayInfo(recipeKey)`
-  - arricchire `info` con `outputBindType`, `isOutputBop`, `recipeExpansion`;
-  - fare refresh quando item cache diventa disponibile.
-
-- `Data:GetRecipeList(...)`
-  - aggiungere parametro opzioni filtro o oggetto `uiFilterOptions`;
-  - applicare predicato prima di inserire riga.
-
-- `Data:BuildRecipeListAsync(...)`
-  - stesso filtro del path sync;
-  - cache key estesa.
-
-- `Data:GetRecipeDetail(recipeKey)`
-  - dettaglio puo includere metadati filtro per debug/tooltip.
-
-### `Options.lua`
-
-- aggiungere controlli profilo;
-- al cambio opzione:
-  - invalidare recipe list cache;
-  - invalidare detail/list visible cache;
-  - richiedere refresh UI.
-
-### `Core.lua` / defaults DB
-
-- aggiungere defaults profilo;
-- bump schema solo se il progetto richiede migrazione esplicita per nuovi defaults;
-- comando diagnostico opzionale, ad esempio `/rr filters`.
-
-### Test harness
-
-- estendere mock `GetItemInfo` se serve restituire `bindType`;
-- aggiungere helper per metadata expansion;
-- coprire path sync e async lista.
-
-## Rischi e casi limite
-
-### Item cache incompleta
-
-`GetItemInfo(createdItemID)` puo non essere pronto. Se il bind type non e disponibile:
-
-- non filtrare come BoP solo per assenza dati;
-- marcare metadata come `unknown`;
-- aggiornare quando arriva item cache event;
-- evitare flicker aggressivo.
-
-### Ricette senza created item
-
-Enchanting diretto e alcune ricette spell-based possono non avere `createdItemID`.
-
-Regola proposta:
-
-- BoP filter non si applica se manca `createdItemID`;
-- expansion filter usa recipe/spell metadata, non solo output item.
-
-### BoP ma owner locale multiplo
-
-Se il player ha piu personaggi/profili, "solo chi effettivamente ha quella recipe" va definito come:
-
-- V1: il personaggio corrente (`Data:GetPlayerKey()`) deve risultare owner/crafter della ricetta;
-- V2 opzionale: profili/alt locali sullo stesso account possono essere trattati come visibili se esiste una nozione affidabile di "mio alt".
-
-### Ricette ricevute via sync
-
-Non filtrare in sync, merge o fingerprint. Filtrare solo in UI. Altrimenti cambiare opzione richiederebbe risync o invaliderebbe fingerprint contenuto.
-
-### Classificazione Vanilla/TBC incompleta
-
-I falsi positivi sono peggiori dei falsi negativi: nascondere una ricetta TBC per errore danneggia la feature. Per V1:
-
-- `unknownExpansionMode = "show"`;
-- logging/debug per ricette unknown;
-- tabella metadata incrementale.
-
-### Categoria AtlasLoot
-
-Il filtro expansion deve essere applicato dopo categoria/professione o prima in modo coerente. Se categoria AtlasLoot include ricette Vanilla e TBC, con `TBC only` devono restare solo le TBC.
-
-### Selezione dettaglio stale
-
-Quando un filtro nasconde la ricetta selezionata:
-
-- `_FinalizeRecipeList()` deve selezionare la prima riga visibile;
-- se non ci sono righe, `selectedRecipeKey = nil`;
-- `RefreshDetailPanel()` deve mostrare `No recipe selected` o messaggio filtrato.
-
-## Strategia di migrazione
-
-Migrazione dati:
-
-- aggiungere defaults non distruttivi a `RecipeRegistryDB.profile.recipePrefilters`;
-- non modificare `members`, profession blocks, sync state o recipe ownership;
-- non cambiare wire protocol.
-
-Compatibilita comportamento:
-
-- il comportamento attuale resta recuperabile disabilitando entrambi i prefiltri;
-- per evitare sorprese su profili esistenti si puo scegliere una delle due strategie:
-  - `product default`: nuovi e vecchi profili ricevono filtri ON, con opt-out;
-  - `compat default`: nuovi profili ON, profili esistenti OFF fino a scelta esplicita.
-
-Dato il requisito "pre-TBC escluso dal comportamento predefinito", la roadmap consiglia `product default` ON, ma con release note e opzioni ben visibili.
-
-## Piano di implementazione incrementale
-
-### Fase 1 - Metadata e predicato
-
-- Aggiungere helper metadata:
-  - `Data:GetRecipeUiMetadata(recipeKey)`;
-  - `Data:IsRecipeOutputBop(recipeKey, detail)`;
-  - `Data:GetRecipeExpansion(recipeKey, detail)`.
-- Aggiungere predicato:
-
-```lua
-Data:RecipePassesUiPrefilters(recipeKey, detail, opts)
-```
-
-- Nessun cambio UI ancora; solo test unitari su metadata/predicato.
-
-### Fase 2 - Opzioni e defaults
-
-- Aggiungere defaults `recipePrefilters`.
-- Aggiungere controlli in `Options.lua`.
-- Al cambio opzione:
-  - invalidare recipe list cache;
-  - richiedere `Addon:RequestRefresh("recipe-prefilter-options")`.
-
-### Fase 3 - Integrazione lista Data
-
-- Estendere `GetRecipeList` e `BuildRecipeListAsync` con `uiFilterOptions`.
-- Aggiornare cache key.
-- Applicare filtro prima di costruire/inserire righe.
-- Coprire profession list, global search, category filter e sorting.
-
-### Fase 4 - Integrazione UI selection/detail
-
-- `UI:RefreshRecipeList()` calcola opzioni effettive per professione.
-- `_FinalizeRecipeList()` mantiene selezione coerente.
-- `RefreshDetailPanel()` rifiuta dettagli non piu visibili.
-- `BuildFavoriteRecipeRows()` usa lo stesso predicato.
-
-### Fase 5 - Metadata expansion completa
-
-- Aggiungere tabella curated per expansion.
-- Inserire coverage per professioni principali.
-- Aggiungere diagnostica per unknown:
-  - conteggio ricette unknown;
-  - comando/debug opzionale.
-
-### Fase 6 - UX polish
-
-- Indicatore leggero negli header quando filtri attivi.
-- Per-profession override nel pannello opzioni.
-- Eventuale tooltip: "Some recipes hidden by filters".
-
-## Suggerimenti test manuali/regressione
-
-### Test manuali
-
-- Con filtri default ON:
-  - aprire Alchemy: verificare che Vanilla/pre-TBC note non appaiano;
-  - disabilitare `TBC only`: verificare che riappaiano;
-  - impostare globale `TBC only`, override Enchanting `All`: verificare Enchanting include Vanilla mentre altre professioni no.
-
-- BoP:
-  - ricetta BoP nota solo a un guildmate: non deve apparire;
-  - stessa ricetta BoP nota al player corrente: deve apparire;
-  - ricetta non-BoP nota a guildmate: deve apparire.
-
-- Favorites:
-  - mettere tra i preferiti una ricetta Vanilla;
-  - con `TBC only` attivo non deve comparire in Favorites;
-  - disattivando il filtro deve tornare.
-
-- Global search:
-  - cercare una ricetta Vanilla con filtro ON: non visibile;
-  - filtro OFF: visibile.
-
-- Detail:
-  - selezionare una ricetta che poi viene nascosta cambiando opzione;
-  - il dettaglio deve cambiare selezione o mostrare stato vuoto senza errori.
-
-### Test automatizzati
-
-- `Data:RecipePassesUiPrefilters`:
-  - BoP remoto nascosto;
-  - BoP locale visibile;
-  - non-BoP visibile;
-  - Vanilla nascosto con TBC only;
-  - Vanilla visibile con override professione.
-
-- `BuildRecipeListAsync`:
-  - cache key diversa per opzioni diverse;
-  - callback stale non aggiorna UI;
-  - sorting stabile dopo filtro.
-
-- `UI:_FinalizeRecipeList`:
-  - selectedRecipeKey rimossa se filtrata;
-  - prima riga visibile auto-selezionata;
-  - zero rows produce dettaglio vuoto.
-
-- Regression:
-  - sync fingerprints invariati;
-  - merge/additive sync invariato;
-  - AtlasLoot category filter invariato salvo esclusioni richieste.
-
+- generated metadata resolves spell ID to expansion;
+- generated metadata resolves spell ID to profession;
+- generated metadata resolves spell ID to created item;
+- generated metadata resolves spell ID to recipe item;
+- generated metadata resolves category/subcategory;
+- override corrects generated value;
+- unresolved metadata is reported as remediation.
+
+### Filter predicate tests
+
+- Vanilla hidden when disabled;
+- TBC visible when enabled;
+- profession override beats global defaults;
+- inherited profession uses global defaults;
+- remote BoP output hidden by default;
+- remote BoP output visible when option enabled;
+- current-player BoP output always visible;
+- outputless self-only remote hidden by default;
+- outputless self-only current-player visible;
+- unresolved metadata follows conservative V1 policy and logs remediation.
+
+### UI projection tests
+
+- hidden recipes do not enter UI runtime projection;
+- hidden recipes are not sorted;
+- hidden recipes are not returned by global search;
+- hidden favorites are not shown;
+- changing Engineering override invalidates Engineering projection only;
+- changing global defaults invalidates all UI projections;
+- sync indexes are not invalidated by UI filter changes.
+
+### Regression tests
+
+- sync fingerprints unchanged by filter configuration;
+- merge behavior unchanged;
+- block indexes unchanged;
+- saved recipe data unchanged;
+- UI works with AtlasLoot absent;
+- UI behavior does not change when AtlasLoot is present.
+
+## Migration strategy
+
+### Phase 1 - Internal metadata module
+
+- introduce `RecipeMetadata.lua`;
+- introduce generated metadata file;
+- introduce overrides file;
+- add metadata diagnostics;
+- do not change UI behavior yet.
+
+### Phase 2 - Filter options
+
+- add defaults;
+- add options UI;
+- implement effective global/per-profession expansion visibility;
+- implement remote BoP output option;
+- add option-change invalidation hooks.
+
+### Phase 3 - UI filter predicate
+
+- implement `RecipeUiFilters`;
+- apply predicate in data/catalog list building;
+- ensure hidden recipes do not enter UI runtime projection;
+- update cache keys.
+
+### Phase 4 - Category/subcategory migration
+
+- move profession categories/subcategories to internal metadata;
+- remove AtlasLoot category usage;
+- remove runtime category patching based on AtlasLoot;
+- validate category output per profession.
+
+### Phase 5 - BoP and outputless self-only handling
+
+- resolve produced item BoP through item API and overrides;
+- add outputless self-only metadata;
+- test Enchanting ring cases;
+- apply current-player ownership rule.
+
+### Phase 6 - AtlasLoot resolver removal
+
+- remove AtlasLoot from resolver call-sites;
+- ensure UI behavior is identical with or without AtlasLoot;
+- remove AtlasLoot from filter path completely;
+- remove `AtlasLootClassic` / `AtlasLoot` from `OptionalDeps` after no call-sites remain.
+
+### Phase 7 - Metadata generator hardening
+
+- improve build-time generator;
+- add coverage reports;
+- fail or warn on unresolved metadata depending on release mode;
+- document remediation workflow.
+
+## Acceptance criteria
+
+The implementation is complete when:
+
+- Vanilla/TBC visibility is configurable globally;
+- Vanilla/TBC visibility is configurable per profession;
+- per-profession inheritance from global defaults works;
+- remote BoP output visibility is configurable;
+- current-player BoP output recipes are always visible;
+- outputless self-only recipes are handled explicitly;
+- filters apply before UI row construction;
+- hidden recipes do not enter the UI runtime projection;
+- favorites respect filters without deleting saved favorite data;
+- global search respects filters;
+- sync data remains complete;
+- fingerprints and block indexes are unaffected;
+- changing filter options does not trigger sync invalidation;
+- AtlasLoot is not used as resolver for recipe metadata or categories;
+- UI behavior is deterministic with or without AtlasLoot installed;
+- unresolved metadata is treated as remediation, not as a user-facing expansion;
+- diagnostics exist for unresolved metadata and filter explanations.
+
+## Non-goals
+
+This work does not aim to:
+
+- change guild sync behavior;
+- change merge behavior;
+- change recipe ownership semantics;
+- prune saved recipe data;
+- infer account alts;
+- expose an `unknown` expansion option;
+- add new user-facing recipe counters;
+- keep AtlasLoot as a metadata authority;
+- create a full general-purpose replacement for every external trade skill library.
+
+The goal is a focused internal metadata system for Recipe Registry’s own UI/catalog needs.
