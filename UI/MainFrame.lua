@@ -1616,7 +1616,7 @@ function UI:CreateMainFrame()
 
     local detailTitle = right:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     detailTitle:SetPoint("TOPLEFT", 12, -12)
-    detailTitle:SetPoint("TOPRIGHT", -118, -12)
+    detailTitle:SetPoint("TOPRIGHT", -132, -12)
     detailTitle:SetJustifyH("LEFT")
     if detailTitle.SetWordWrap then
         detailTitle:SetWordWrap(false)
@@ -1650,8 +1650,47 @@ function UI:CreateMainFrame()
     end)
     f.detailFavoriteButton = detailFavoriteButton
 
-    local detailShareButton = createButton(right, "Share", 54, 18)
+    local detailShareButton = CreateFrame("Button", nil, right, "BackdropTemplate")
+    detailShareButton:SetSize(68, 18)
     detailShareButton:SetPoint("TOPRIGHT", detailFavoriteButton, "TOPLEFT", -8, 0)
+    if detailShareButton.SetBackdrop then
+        detailShareButton:SetBackdrop({
+            bgFile   = "Interface\\Buttons\\WHITE8x8",
+            edgeFile = "Interface\\Buttons\\WHITE8x8",
+            edgeSize = 1,
+        })
+        detailShareButton:SetBackdropColor(0.13, 0.11, 0.08, 0.95)
+        detailShareButton:SetBackdropBorderColor(1, 0.82, 0, 0.75)
+    end
+    detailShareButton.label = detailShareButton:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    detailShareButton.label:SetPoint("LEFT", 6, 0)
+    detailShareButton.label:SetPoint("RIGHT", -18, 0)
+    detailShareButton.label:SetJustifyH("CENTER")
+    detailShareButton.label:SetText("Share")
+    detailShareButton.label:SetTextColor(1.0, 0.92, 0.75)
+    detailShareButton.menuArrow = detailShareButton:CreateTexture(nil, "ARTWORK")
+    detailShareButton.menuArrow:SetSize(12, 12)
+    detailShareButton.menuArrow:SetPoint("RIGHT", -6, 0)
+    detailShareButton.menuArrow:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up")
+    if detailShareButton.menuArrow.SetVertexColor then
+        detailShareButton.menuArrow:SetVertexColor(1.0, 0.82, 0, 1)
+    end
+    detailShareButton:SetHighlightTexture("Interface\\Buttons\\WHITE8x8", "ADD")
+    local shareHi = detailShareButton:GetHighlightTexture()
+    if shareHi and shareHi.SetVertexColor then
+        shareHi:SetVertexColor(1, 0.82, 0, 0.18)
+    end
+    detailShareButton:SetScript("OnMouseDown", function(self)
+        releaseSearchFocus()
+        if self.SetBackdropColor then
+            self:SetBackdropColor(0.10, 0.09, 0.07, 1)
+        end
+    end)
+    detailShareButton:SetScript("OnMouseUp", function(self)
+        if self.SetBackdropColor then
+            self:SetBackdropColor(0.13, 0.11, 0.08, 0.95)
+        end
+    end)
     detailShareButton:SetScript("OnClick", function(self, button)
         if button ~= "LeftButton" then return end
         UI:OpenShareMenu(self)
