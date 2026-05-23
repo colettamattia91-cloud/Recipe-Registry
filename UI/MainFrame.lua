@@ -322,6 +322,37 @@ local function formatMoney(copper)
     return table.concat(parts, " ")
 end
 
+local function formatMoneyForChat(copper)
+    if type(copper) ~= "number" then return "n/a" end
+    local g = math.floor(copper / 10000)
+    local s = math.floor((copper % 10000) / 100)
+    local c = copper % 100
+    local parts = {}
+    if g > 0 then parts[#parts + 1] = tostring(g) .. "g" end
+    if s > 0 then parts[#parts + 1] = tostring(s) .. "s" end
+    if c > 0 then parts[#parts + 1] = tostring(c) .. "c" end
+    if #parts == 0 then return "0" end
+    return table.concat(parts, " ")
+end
+
+local function escapeChatPlainText(value)
+    if value == nil then return "" end
+    return tostring(value):gsub("|", "||")
+end
+
+local function isChatLink(value)
+    local text = tostring(value or "")
+    return text:find("|H", 1, true) ~= nil and text:find("|h", 1, true) ~= nil
+end
+
+local function chatDisplayText(value)
+    if value == nil then return "" end
+    if isChatLink(value) then
+        return tostring(value)
+    end
+    return escapeChatPlainText(value)
+end
+
 local function channelForInput(input)
     local c = tostring(input or "guild"):lower()
     if c == "g" or c == "guild" then return "GUILD" end
@@ -3290,15 +3321,18 @@ function UI:ShareSelectedRecipe(channelInput)
         or getItemLinkByID(detail.createdItemID)
         or (detail.label or tostring(self.selectedRecipeKey))
 
-    local totalText = (detail.cost and detail.cost.total and formatMoney(detail.cost.total)) or "n/a"
+    local totalText = (detail.cost and detail.cost.total and formatMoneyForChat(detail.cost.total)) or "n/a"
     local sourceText = (detail.cost and detail.cost.source) or "N/A"
-    SendChatMessage(string.format("[RR] %s | Mats total: %s | Source: %s", tostring(recipeLink), totalText, tostring(sourceText)), channel)
+    SendChatMessage(string.format("[RR] %s - Mats total: %s - Source: %s",
+        chatDisplayText(recipeLink),
+        escapeChatPlainText(totalText),
+        escapeChatPlainText(sourceText)), channel)
 
     if detail.reagents and #detail.reagents > 0 then
         local chunk = "[RR] Mats:"
         for _, reagent in ipairs(detail.reagents) do
             local link = getItemLinkByID(reagent.itemID) or reagent.name or ("item:" .. tostring(reagent.itemID or "?"))
-            local seg = string.format(" %s x%d", tostring(link), reagent.count or 1)
+            local seg = string.format(" %s x%d", chatDisplayText(link), reagent.count or 1)
             if #chunk + #seg > 240 then
                 SendChatMessage(chunk, channel)
                 chunk = "[RR] Mats:" .. seg

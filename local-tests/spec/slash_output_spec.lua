@@ -242,6 +242,53 @@ Test.it("prints pull output on the modern sync path", function()
     Test.eq(countGuildCommKind(wow, "HELLO"), 0, "pull should schedule work instead of sending inline")
 end)
 
+Test.it("shares selected recipes with chat-safe text and preserved links", function()
+    local files = {}
+    for _, file in ipairs(Loader.BackendFiles) do
+        files[#files + 1] = file
+    end
+    files[#files + 1] = "MainFrame.lua"
+    local addon = Loader.Load({ files = files })
+    local sent = {}
+
+    _G.GetSpellLink = function(spellID)
+        return string.format("|Henchant:%d|h[Enchant Weapon - Fiery Weapon]|h", spellID)
+    end
+    _G.SendChatMessage = function(message, channel, language, target)
+        sent[#sent + 1] = {
+            message = message,
+            channel = channel,
+            language = language,
+            target = target,
+        }
+    end
+
+    addon.UI.selectedRecipeKey = "Enchanting:13898"
+    addon.Data.GetRecipeDetail = function()
+        return {
+            spellID = 13898,
+            cost = {
+                total = 106164,
+                source = "Auctionator | TSM",
+            },
+            reagents = {
+                { itemID = 10940, count = 4 },
+                { name = "Strange | Dust", count = 2 },
+            },
+        }
+    end
+
+    addon:SlashHandler("share guild")
+
+    Test.eq(#sent, 2, "share should send summary and mats lines")
+    Test.eq(sent[1].channel, "GUILD", "share channel")
+    Test.eq(sent[1].message, "[RR] |Henchant:13898|h[Enchant Weapon - Fiery Weapon]|h - Mats total: 10g 61s 64c - Source: Auctionator || TSM", "summary chat text")
+    Test.truthy(sent[2].message:find("|Hitem:10940", 1, true) ~= nil, "reagent item link should be preserved")
+    Test.truthy(sent[2].message:find("Strange || Dust", 1, true) ~= nil, "plain reagent names should escape pipes")
+    Test.truthy(sent[1].message:find("|T", 1, true) == nil, "chat summary should not include texture escapes")
+    Test.truthy(sent[1].message:find(" | ", 1, true) == nil, "chat summary should not include literal pipe separators")
+end)
+
 Test.it("prints mock help and usage with every scenario", function()
     local addon, wow = freshAddon()
 
