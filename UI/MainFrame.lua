@@ -236,6 +236,20 @@ local function createButton(parent, text, width, height)
     return b
 end
 
+local function setButtonEnabledIfChanged(button, enabled)
+    if not button then return end
+    enabled = enabled and true or false
+    if button._rrEnabled == enabled then return end
+    button._rrEnabled = enabled
+    if enabled then
+        if button.Enable then button:Enable() end
+        if button.SetAlpha then button:SetAlpha(1) end
+    else
+        if button.Disable then button:Disable() end
+        if button.SetAlpha then button:SetAlpha(0.45) end
+    end
+end
+
 local function createCardStyleButton(parent, width, height)
     local b = CreateFrame("Button", nil, parent, "BackdropTemplate")
     b:SetSize(width, height)
@@ -322,13 +336,198 @@ local function formatMoney(copper)
     return table.concat(parts, " ")
 end
 
-local function channelForInput(input)
-    local c = tostring(input or "guild"):lower()
-    if c == "g" or c == "guild" then return "GUILD" end
-    if c == "p" or c == "party" then return "PARTY" end
-    if c == "r" or c == "raid" then return "RAID" end
-    if c == "s" or c == "say" then return "SAY" end
+local function formatMoneyForChat(copper)
+    if type(copper) ~= "number" then return "n/a" end
+    local g = math.floor(copper / 10000)
+    local s = math.floor((copper % 10000) / 100)
+    local c = copper % 100
+    local parts = {}
+    if g > 0 then parts[#parts + 1] = tostring(g) .. "g" end
+    if s > 0 then parts[#parts + 1] = tostring(s) .. "s" end
+    if c > 0 then parts[#parts + 1] = tostring(c) .. "c" end
+    if #parts == 0 then return "0" end
+    return table.concat(parts, " ")
+end
+
+local function escapeChatPlainText(value)
+    if value == nil then return "" end
+    return tostring(value):gsub("|", "||")
+end
+
+local function isChatLink(value)
+    local text = tostring(value or "")
+    return text:find("|H", 1, true) ~= nil and text:find("|h", 1, true) ~= nil
+end
+
+local function chatDisplayText(value)
+    if value == nil then return "" end
+    if isChatLink(value) then
+        return tostring(value)
+    end
+    return escapeChatPlainText(value)
+end
+
+local SHARE_CHANNELS = {
+    { input = "guild", label = "Guild", chatType = "GUILD", aliases = { "g", "guild" } },
+    { input = "say", label = "Say", chatType = "SAY", aliases = { "s", "say" } },
+    { input = "party", label = "Party", chatType = "PARTY", aliases = { "p", "party" } },
+    { input = "raid", label = "Raid", chatType = "RAID", aliases = { "r", "raid" } },
+    { input = "yell", label = "Yell", chatType = "YELL", aliases = { "y", "yell" } },
+}
+
+local function playerIsInRaid()
+    if type(IsInRaid) == "function" then
+        return IsInRaid() == true
+    end
+    if type(GetNumRaidMembers) == "function" then
+        return (GetNumRaidMembers() or 0) > 0
+    end
+    return false
+end
+
+local function playerIsInParty()
+    if playerIsInRaid() then
+        return false
+    end
+    if type(IsInGroup) == "function" then
+        return IsInGroup() == true
+    end
+    if type(GetNumPartyMembers) == "function" then
+        return (GetNumPartyMembers() or 0) > 0
+    end
+    return false
+end
+
+local function shareChannelUnavailableReason(def)
+    if def.chatType == "GUILD" and not (type(IsInGuild) == "function" and IsInGuild()) then
+        return "You are not in a guild."
+    end
+    if def.chatType == "PARTY" and not playerIsInParty() then
+        return "You are not in a party."
+    end
+    if def.chatType == "RAID" and not playerIsInRaid() then
+        return "You are not in a raid."
+    end
     return nil
+end
+
+local function normalizeShareInput(input)
+    local text = tostring(input or "guild"):lower()
+    text = text:match("^%s*(.-)%s*$") or text
+    if text == "" then return "guild" end
+    return text
+end
+
+local function findShareChannelByAlias(input)
+    local c = normalizeShareInput(input)
+    for _, def in ipairs(SHARE_CHANNELS) do
+        for _, alias in ipairs(def.aliases or {}) do
+            if c == alias then
+                return def
+            end
+        end
+    end
+    return nil
+end
+
+local function getCustomChannelName(channelID)
+    channelID = tonumber(channelID)
+    if not channelID then return nil end
+    if type(GetChannelName) == "function" then
+        local number, name = GetChannelName(channelID)
+        if tonumber(number) == channelID and name then
+            return name
+        end
+    end
+    if type(GetChannelList) == "function" then
+        local values = { GetChannelList() }
+        local i = 1
+        while i <= #values do
+            local id = tonumber(values[i])
+            local name = values[i + 1]
+            if id == channelID and name then
+                return tostring(name)
+            end
+            if id and name and type(values[i + 2]) == "boolean" then
+                i = i + 3
+            elseif id and name then
+                i = i + 2
+            else
+                i = i + 1
+            end
+        end
+    end
+    return nil
+end
+
+local function resolveShareChannel(input)
+    local text = normalizeShareInput(input)
+    local def = findShareChannelByAlias(text)
+    if def then
+        local reason = shareChannelUnavailableReason(def)
+        if reason then return nil, reason end
+        return {
+            input = def.input,
+            label = def.label,
+            chatType = def.chatType,
+        }
+    end
+
+    local channelID = text:match("^channel[:%s]+(%d+)$") or text:match("^(%d+)$")
+    if channelID then
+        local name = getCustomChannelName(channelID)
+        if not name then
+            return nil, "Chat channel " .. tostring(channelID) .. " is not available."
+        end
+        return {
+            input = "channel:" .. tostring(channelID),
+            label = tostring(channelID) .. ". " .. name,
+            chatType = "CHANNEL",
+            target = tonumber(channelID),
+        }
+    end
+
+    return nil, "Usage: /rr share [guild|party|raid|say|yell|channel number]"
+end
+
+local function appendCustomShareChannels(options)
+    if type(GetChannelList) ~= "function" then return end
+    local values = { GetChannelList() }
+    local i = 1
+    while i <= #values do
+        local id = tonumber(values[i])
+        local name = values[i + 1]
+        if id and name then
+            options[#options + 1] = {
+                input = "channel:" .. tostring(id),
+                label = tostring(id) .. ". " .. tostring(name),
+                chatType = "CHANNEL",
+                target = id,
+            }
+            if type(values[i + 2]) == "boolean" then
+                i = i + 3
+            else
+                i = i + 2
+            end
+        else
+            i = i + 1
+        end
+    end
+end
+
+local function buildAvailableShareChannels()
+    local options = {}
+    for _, def in ipairs(SHARE_CHANNELS) do
+        if not shareChannelUnavailableReason(def) then
+            options[#options + 1] = {
+                input = def.input,
+                label = def.label,
+                chatType = def.chatType,
+            }
+        end
+    end
+    appendCustomShareChannels(options)
+    return options
 end
 
 local function getItemLinkByID(itemID)
@@ -670,7 +869,39 @@ function UI:ClearSearch()
     self:CancelSearchTimer()
 end
 
+function UI:CloseShareMenus()
+    local frame = self.frame
+    if self._shareMenuOpen and type(CloseDropDownMenus) == "function" then
+        CloseDropDownMenus()
+    end
+    if frame and frame.shareMenuFrame and frame.shareMenuFrame.Hide then
+        frame.shareMenuFrame:Hide()
+    end
+    if frame and frame.fallbackShareMenu and frame.fallbackShareMenu.Hide then
+        frame.fallbackShareMenu:Hide()
+    end
+    if frame and frame.shareMenuClickCatcher and frame.shareMenuClickCatcher.Hide then
+        frame.shareMenuClickCatcher:Hide()
+    end
+    self._shareMenuOpen = false
+end
+
+function UI:ShowShareMenuClickCatcher()
+    local catcher = self.frame and self.frame.shareMenuClickCatcher
+    if catcher and catcher.Show then
+        catcher:Show()
+    end
+end
+
+function UI:HideShareMenuClickCatcher()
+    local catcher = self.frame and self.frame.shareMenuClickCatcher
+    if catcher and catcher.Hide then
+        catcher:Hide()
+    end
+end
+
 function UI:HandleFrameHidden()
+    self:CloseShareMenus()
     self:ClearSearch()
 end
 
@@ -706,6 +937,7 @@ function UI:RestoreFramePlacement()
 end
 
 function UI:Close(reason)
+    self:CloseShareMenus()
     self:ClearSearchFocus()
     self:CancelSearchTimer()
     if self.frame and self.frame:IsShown() then
@@ -935,6 +1167,22 @@ function UI:CreateMainFrame()
     f:SetClampedToScreen(true)
     f:SetFrameStrata("HIGH")
     createBackdrop(f, COLOR_BG[1], COLOR_BG[2], COLOR_BG[3], COLOR_BG[4], COLOR_BORDER[1], COLOR_BORDER[2], COLOR_BORDER[3], COLOR_BORDER[4])
+
+    local shareMenuClickCatcher = CreateFrame("Frame", nil, UIParent)
+    shareMenuClickCatcher:SetAllPoints(UIParent)
+    shareMenuClickCatcher:EnableMouse(true)
+    if shareMenuClickCatcher.SetFrameStrata then
+        shareMenuClickCatcher:SetFrameStrata("DIALOG")
+    end
+    if shareMenuClickCatcher.SetFrameLevel then
+        shareMenuClickCatcher:SetFrameLevel(0)
+    end
+    shareMenuClickCatcher:SetScript("OnMouseDown", function()
+        UI:CloseShareMenus()
+    end)
+    shareMenuClickCatcher:Hide()
+    f.shareMenuClickCatcher = shareMenuClickCatcher
+
     self.frame = f
     self:RestoreFramePlacement()
     f:Hide()
@@ -1368,7 +1616,7 @@ function UI:CreateMainFrame()
 
     local detailTitle = right:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     detailTitle:SetPoint("TOPLEFT", 12, -12)
-    detailTitle:SetPoint("TOPRIGHT", -52, -12)
+    detailTitle:SetPoint("TOPRIGHT", -132, -12)
     detailTitle:SetJustifyH("LEFT")
     if detailTitle.SetWordWrap then
         detailTitle:SetWordWrap(false)
@@ -1402,9 +1650,73 @@ function UI:CreateMainFrame()
     end)
     f.detailFavoriteButton = detailFavoriteButton
 
+    local detailShareButton = CreateFrame("Button", nil, right, "BackdropTemplate")
+    detailShareButton:SetSize(68, 18)
+    detailShareButton:SetPoint("TOPRIGHT", detailFavoriteButton, "TOPLEFT", -8, 0)
+    if detailShareButton.SetBackdrop then
+        detailShareButton:SetBackdrop({
+            bgFile   = "Interface\\Buttons\\WHITE8x8",
+            edgeFile = "Interface\\Buttons\\WHITE8x8",
+            edgeSize = 1,
+        })
+        detailShareButton:SetBackdropColor(0.13, 0.11, 0.08, 0.95)
+        detailShareButton:SetBackdropBorderColor(1, 0.82, 0, 0.75)
+    end
+    detailShareButton.label = detailShareButton:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    detailShareButton.label:SetPoint("LEFT", 6, 0)
+    detailShareButton.label:SetPoint("RIGHT", -18, 0)
+    detailShareButton.label:SetJustifyH("CENTER")
+    detailShareButton.label:SetText("Share")
+    detailShareButton.label:SetTextColor(1.0, 0.92, 0.75)
+    detailShareButton.menuArrow = detailShareButton:CreateTexture(nil, "ARTWORK")
+    detailShareButton.menuArrow:SetSize(12, 12)
+    detailShareButton.menuArrow:SetPoint("RIGHT", -6, 0)
+    detailShareButton.menuArrow:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up")
+    if detailShareButton.menuArrow.SetVertexColor then
+        detailShareButton.menuArrow:SetVertexColor(1.0, 0.82, 0, 1)
+    end
+    detailShareButton:SetHighlightTexture("Interface\\Buttons\\WHITE8x8", "ADD")
+    local shareHi = detailShareButton:GetHighlightTexture()
+    if shareHi and shareHi.SetVertexColor then
+        shareHi:SetVertexColor(1, 0.82, 0, 0.18)
+    end
+    detailShareButton:SetScript("OnMouseDown", function(self)
+        releaseSearchFocus()
+        if self.SetBackdropColor then
+            self:SetBackdropColor(0.10, 0.09, 0.07, 1)
+        end
+    end)
+    detailShareButton:SetScript("OnMouseUp", function(self)
+        if self.SetBackdropColor then
+            self:SetBackdropColor(0.13, 0.11, 0.08, 0.95)
+        end
+    end)
+    detailShareButton:SetScript("OnClick", function(self, button)
+        if button ~= "LeftButton" then return end
+        UI:OpenShareMenu(self)
+    end)
+    detailShareButton:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+        if UI.selectedRecipeKey then
+            GameTooltip:AddLine("Share recipe")
+            GameTooltip:AddLine("Choose a chat channel.", 0.8, 0.8, 0.8)
+        else
+            GameTooltip:AddLine("No recipe selected")
+        end
+        GameTooltip:Show()
+    end)
+    detailShareButton:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    f.detailShareButton = detailShareButton
+
+    local shareMenuFrame = CreateFrame("Frame", "RecipeRegistryShareMenu", right, "UIDropDownMenuTemplate")
+    shareMenuFrame:Hide()
+    f.shareMenuFrame = shareMenuFrame
+
     local detailTitleButton = CreateFrame("Button", nil, right)
     detailTitleButton:SetPoint("TOPLEFT", 10, -10)
-    detailTitleButton:SetPoint("TOPRIGHT", detailFavoriteButton, "TOPLEFT", -10, 0)
+    detailTitleButton:SetPoint("TOPRIGHT", detailShareButton, "TOPLEFT", -10, 0)
     detailTitleButton:SetHeight(18)
     detailTitleButton:SetScript("OnClick", function(_, button)
         if button ~= "LeftButton" or not IsShiftKeyDown() then return end
@@ -1750,6 +2062,137 @@ function UI:ToggleFavorite(recipeKey)
     end
     UI:RefreshRecipeList()
     UI:RefreshDetailPanel()
+end
+
+function UI:GetAvailableShareChannels()
+    return buildAvailableShareChannels()
+end
+
+function UI:OpenFallbackShareMenu(anchor, menu)
+    if type(CreateFrame) ~= "function" then
+        return false
+    end
+    local frame = self.frame
+    local parent = (frame and frame.right) or UIParent
+    if not parent then
+        return false
+    end
+
+    local popup = frame and frame.fallbackShareMenu
+    if not popup then
+        popup = CreateFrame("Frame", nil, parent, "BackdropTemplate")
+        createBackdrop(popup, 0.04, 0.04, 0.04, 0.98, 0.42, 0.34, 0.16, 0.95)
+        popup.rows = {}
+        if popup.SetFrameStrata then popup:SetFrameStrata("DIALOG") end
+        if popup.SetFrameLevel then
+            local catcher = frame and frame.shareMenuClickCatcher
+            local level = catcher and catcher.GetFrameLevel and catcher:GetFrameLevel() or 0
+            popup:SetFrameLevel(level + 1)
+        end
+        if popup.SetClampedToScreen then popup:SetClampedToScreen(true) end
+        if frame then
+            frame.fallbackShareMenu = popup
+        end
+    end
+
+    local width = 150
+    local rowHeight = 20
+    for index, item in ipairs(menu) do
+        local row = popup.rows[index]
+        if not row then
+            row = createButton(popup, "", width - 8, rowHeight)
+            popup.rows[index] = row
+        end
+        row:ClearAllPoints()
+        row:SetPoint("TOPLEFT", 4, -4 - ((index - 1) * (rowHeight + 2)))
+        row:SetPoint("TOPRIGHT", -4, -4 - ((index - 1) * (rowHeight + 2)))
+        row:SetHeight(rowHeight)
+        row:SetText(item.text)
+        local func = item.func
+        row:SetScript("OnClick", function()
+            popup:Hide()
+            if func then func() end
+        end)
+        row:Show()
+    end
+    for index = #menu + 1, #(popup.rows or {}) do
+        popup.rows[index]:Hide()
+    end
+
+    popup:SetSize(width, (#menu * (rowHeight + 2)) + 6)
+    popup:ClearAllPoints()
+    if anchor then
+        popup:SetPoint("TOPRIGHT", anchor, "BOTTOMRIGHT", 0, -2)
+    else
+        popup:SetPoint("CENTER", parent, "CENTER", 0, 0)
+    end
+    popup:Show()
+    return true
+end
+
+function UI:OpenShareMenu(anchor)
+    self:CloseShareMenus()
+    if not self.selectedRecipeKey then
+        Addon:Print("No recipe selected.")
+        return
+    end
+    local channels = self:GetAvailableShareChannels()
+    if #channels == 0 then
+        Addon:Print("No available chat channels.")
+        return
+    end
+
+    local menu = {}
+    for _, channel in ipairs(channels) do
+        local input = channel.input
+        local label = channel.label
+        menu[#menu + 1] = {
+            text = label,
+            notCheckable = true,
+            func = function()
+                UI:CloseShareMenus()
+                UI:ShareSelectedRecipe(input)
+            end,
+        }
+    end
+
+    local menuFrame = self.frame and self.frame.shareMenuFrame
+    if menuFrame
+        and type(UIDropDownMenu_Initialize) == "function"
+        and type(UIDropDownMenu_CreateInfo) == "function"
+        and type(UIDropDownMenu_AddButton) == "function"
+        and type(ToggleDropDownMenu) == "function" then
+        self:ShowShareMenuClickCatcher()
+        UIDropDownMenu_Initialize(menuFrame, function(_, level)
+            if level and level > 1 then return end
+            for _, item in ipairs(menu) do
+                local info = UIDropDownMenu_CreateInfo()
+                info.text = item.text
+                info.notCheckable = true
+                info.func = item.func
+                UIDropDownMenu_AddButton(info, level or 1)
+            end
+        end, "MENU")
+        ToggleDropDownMenu(1, nil, menuFrame, anchor, 0, 0)
+        self._shareMenuOpen = true
+        return
+    end
+
+    if type(EasyMenu) == "function" then
+        self:ShowShareMenuClickCatcher()
+        EasyMenu(menu, menuFrame or anchor, anchor, 0, 0, "MENU", 2)
+        self._shareMenuOpen = true
+        return
+    end
+
+    self:ShowShareMenuClickCatcher()
+    if self:OpenFallbackShareMenu(anchor, menu) then
+        self._shareMenuOpen = true
+        return
+    end
+    self:HideShareMenuClickCatcher()
+
+    Addon:Print("Share menu is not available.")
 end
 
 function UI:RefreshStatusBar()
@@ -3022,20 +3465,26 @@ function UI:RefreshDetailPanel()
     if self:IsAddonStatusView() then
         self.currentDetail = nil
         self._lastDetailSignature = nil
+        self:CloseShareMenus()
+        setShownIfChanged(self.frame.detailFavoriteButton, false)
+        setShownIfChanged(self.frame.detailShareButton, false)
         return
     end
     local lines = {}
     local lineLinks = {}
     local lineMeta = {}
     setShownIfChanged(self.frame.detailFavoriteButton, true)
+    setShownIfChanged(self.frame.detailShareButton, true)
     if not self.selectedRecipeKey then
         self.currentDetail = nil
         self._lastDetailSignature = nil
+        self:CloseShareMenus()
         setTextIfChanged(self.frame.detailTitle, "Recipe details")
         setTextIfChanged(self.frame.detailSub, "Select a recipe to see materials and available crafters.")
         self.frame.detailFavoriteButton.recipeKey = nil
         self.frame.detailFavoriteButton.isFavorite = false
         setFavoriteButtonState(self.frame.detailFavoriteButton, false)
+        setButtonEnabledIfChanged(self.frame.detailShareButton, false)
         if self.frame.detailTooltip then
             self.frame.detailTooltip:Hide()
         end
@@ -3086,6 +3535,7 @@ function UI:RefreshDetailPanel()
     self.frame.detailFavoriteButton.recipeKey = self.selectedRecipeKey
     self.frame.detailFavoriteButton.isFavorite = isFavorite
     setFavoriteButtonState(self.frame.detailFavoriteButton, isFavorite)
+    setButtonEnabledIfChanged(self.frame.detailShareButton, true)
 
     local subtitleParts = {}
     if detail.professionName then subtitleParts[#subtitleParts + 1] = detail.professionName end
@@ -3098,6 +3548,7 @@ function UI:RefreshDetailPanel()
 
     -- Reset offline accordion state when recipe changes
     if self._lastDetailRecipeKey ~= self.selectedRecipeKey then
+        self:CloseShareMenus()
         self._offlineCraftersExpanded = nil
         self._lastDetailRecipeKey = self.selectedRecipeKey
     end
@@ -3255,22 +3706,9 @@ function UI:Refresh(reasons)
 end
 
 function UI:ShareSelectedRecipe(channelInput)
-    local channel = channelForInput(channelInput)
+    local channel, channelError = resolveShareChannel(channelInput)
     if not channel then
-        Addon:Print("Usage: /rr share [guild|party|raid|say]")
-        return
-    end
-
-    if channel == "GUILD" and not IsInGuild() then
-        Addon:Print("You are not in a guild.")
-        return
-    end
-    if channel == "PARTY" and not IsInGroup() then
-        Addon:Print("You are not in a party.")
-        return
-    end
-    if channel == "RAID" and not IsInRaid() then
-        Addon:Print("You are not in a raid.")
+        Addon:Print(channelError or "Usage: /rr share [guild|party|raid|say|yell|channel number]")
         return
     end
 
@@ -3290,24 +3728,27 @@ function UI:ShareSelectedRecipe(channelInput)
         or getItemLinkByID(detail.createdItemID)
         or (detail.label or tostring(self.selectedRecipeKey))
 
-    local totalText = (detail.cost and detail.cost.total and formatMoney(detail.cost.total)) or "n/a"
+    local totalText = (detail.cost and detail.cost.total and formatMoneyForChat(detail.cost.total)) or "n/a"
     local sourceText = (detail.cost and detail.cost.source) or "N/A"
-    SendChatMessage(string.format("[RR] %s | Mats total: %s | Source: %s", tostring(recipeLink), totalText, tostring(sourceText)), channel)
+    SendChatMessage(string.format("[RR] %s - Mats total: %s - Source: %s",
+        chatDisplayText(recipeLink),
+        escapeChatPlainText(totalText),
+        escapeChatPlainText(sourceText)), channel.chatType, nil, channel.target)
 
     if detail.reagents and #detail.reagents > 0 then
         local chunk = "[RR] Mats:"
         for _, reagent in ipairs(detail.reagents) do
             local link = getItemLinkByID(reagent.itemID) or reagent.name or ("item:" .. tostring(reagent.itemID or "?"))
-            local seg = string.format(" %s x%d", tostring(link), reagent.count or 1)
+            local seg = string.format(" %s x%d", chatDisplayText(link), reagent.count or 1)
             if #chunk + #seg > 240 then
-                SendChatMessage(chunk, channel)
+                SendChatMessage(chunk, channel.chatType, nil, channel.target)
                 chunk = "[RR] Mats:" .. seg
             else
                 chunk = chunk .. seg
             end
         end
         if chunk ~= "[RR] Mats:" then
-            SendChatMessage(chunk, channel)
+            SendChatMessage(chunk, channel.chatType, nil, channel.target)
         end
     end
 end

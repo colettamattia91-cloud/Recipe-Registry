@@ -725,7 +725,7 @@ local function installWowGlobals()
     end
     _G.GetCraftInfo = function(index)
         local row = state.craftSkill.entries[index] or {}
-        return row.name, row.type
+        return row.name, row.subSpellName, row.type, row.numAvailable, row.isExpanded, row.trainingPointCost, row.requiredLevel
     end
     _G.GetCraftItemLink = function(index)
         local row = state.craftSkill.entries[index] or {}
