@@ -88,7 +88,7 @@ The first sync may take a little time, especially in a larger guild. After that,
 - `/rr rescan` queues a fresh profession scan
 - `/rr adoption` or `/rr addonstatus` prints a guild addon status summary
 - `/rr share guild` shares the selected recipe in guild chat
-- `/rr share party`, `/rr share raid`, and `/rr share say` share the selected recipe to other channels
+- `/rr share party`, `/rr share raid`, `/rr share say`, and `/rr share reply` share the selected recipe to other available channels
 - `/rr prices <item name or item link>` checks available market pricing data
 
 Most players only need `/rr`. The rest is there when you want more control.
