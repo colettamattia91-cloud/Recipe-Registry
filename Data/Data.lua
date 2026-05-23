@@ -344,7 +344,9 @@ local function isValidRecipeKey(recipeKey)
             return true
         end
     end
-    -- Fallback: check spell subtext for craft rank keywords.
+    -- Fallback: check spell subtext for craft rank keywords. Direct enchants
+    -- often resolve as craft spells with no subtext, so a blank subtext is not
+    -- evidence of corruption.
     local spellName = safeGetSpellName(-n)
     if not spellName then
         recipeValidityCache[n] = true
@@ -355,6 +357,10 @@ local function isValidRecipeKey(recipeKey)
         subtext = GetSpellSubtext(-n)
     elseif type(GetSpellBookItemInfo) ~= "function" then
         -- No API to check subtext: allow through
+        return true
+    end
+    if subtext == nil or subtext == "" then
+        recipeValidityCache[n] = true
         return true
     end
     if subtext and CRAFT_RANK_KEYWORDS[subtext] then

@@ -79,6 +79,21 @@ local function debugSuppressedScan(self, context, message)
     end
 end
 
+local function buildScannedRecipeKey(itemLink, recipeLink)
+    local itemID, invalidItemID = extractItemID(itemLink)
+    if invalidItemID then
+        return invalidItemID
+    end
+    if itemID then
+        return itemID
+    end
+    local spellID = extractSpellID(recipeLink)
+    if spellID then
+        return -spellID
+    end
+    return nil
+end
+
 function Data:ApplyLocalProfessionMetadata(profession, metadata)
     local entry = self:GetOrCreateMember(self:GetPlayerKey())
     local prof = entry.professions[profession] or { recipes = {} }
@@ -456,8 +471,7 @@ function Data:ScanTradeSkill(opts)
         for i = 1, numSkills do
             local recipeName, recipeType = GetTradeSkillInfo(i)
             if recipeName and recipeType ~= "header" and recipeType ~= "subheader" then
-                local itemID, invalidItemID = extractItemID(GetTradeSkillItemLink(i))
-                local recipeKey = invalidItemID or itemID or -(extractSpellID(GetTradeSkillRecipeLink(i)) or i)
+                local recipeKey = buildScannedRecipeKey(GetTradeSkillItemLink(i), GetTradeSkillRecipeLink(i))
                 if isValidRecipeKey(recipeKey) then
                     recipes[recipeKey] = true
                 else
@@ -534,10 +548,9 @@ function Data:ScanCraft(opts)
     local recipes = {}
     local ok, err = pcall(function()
         for i = 1, (initialNumCrafts or GetNumCrafts() or 0) do
-            local recipeName, recipeType = GetCraftInfo(i)
+            local recipeName, _craftSubSpellName, recipeType = GetCraftInfo(i)
             if recipeName and recipeType ~= "header" and recipeType ~= "subheader" then
-                local itemID, invalidItemID = extractItemID(GetCraftItemLink(i))
-                local recipeKey = invalidItemID or itemID or -(extractSpellID(GetCraftRecipeLink(i)) or i)
+                local recipeKey = buildScannedRecipeKey(GetCraftItemLink(i), GetCraftRecipeLink(i))
                 if isValidRecipeKey(recipeKey) then
                     recipes[recipeKey] = true
                 else
