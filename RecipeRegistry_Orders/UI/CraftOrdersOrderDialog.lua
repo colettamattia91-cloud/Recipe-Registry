@@ -313,6 +313,22 @@ function OrderDialog:_AcquireRow(index)
     return row
 end
 
+-- Status colour pair matches RR core's existing convention for
+-- online (soft green) vs offline (red). Encoded as inline |cff...
+-- codes so the meta string can mix coloured fragments.
+local STATUS_ONLINE_COLOR  = "|cff66dd66"
+local STATUS_OFFLINE_COLOR = "|cffdd5555"
+
+local function formatCrafterMeta(entry)
+    local status = entry.online and "online" or "offline"
+    local color  = entry.online and STATUS_ONLINE_COLOR or STATUS_OFFLINE_COLOR
+    local meta   = color .. status .. "|r"
+    if entry.skillRank then
+        meta = string.format("%s  |cffaaaaaa• skill %d|r", meta, entry.skillRank)
+    end
+    return meta
+end
+
 function OrderDialog:RefreshCrafterList()
     if not (self.frame and self._currentInfo) then return end
     local crafters = self:GetSortedCrafters(self._currentInfo, {
@@ -333,11 +349,7 @@ function OrderDialog:RefreshCrafterList()
             else
                 row.nameText:SetTextColor(0.94, 0.92, 0.88)
             end
-            local meta = entry.online and "online" or "offline"
-            if entry.skillRank then
-                meta = string.format("%s  •  %d", meta, entry.skillRank)
-            end
-            row.metaText:SetText(meta)
+            row.metaText:SetText(formatCrafterMeta(entry))
             row:Show()
         end
     end
@@ -383,6 +395,17 @@ function OrderDialog:OnConfirm()
     self:Close()
 end
 
+-- Auto-decides whether the dialog should open with offline crafters
+-- visible. Rule: if at least one crafter is online, default to
+-- online-only (cleaner picker). If zero online but some exist
+-- offline, default to "show offline" so the picker isn't empty.
+function OrderDialog:ShouldDefaultToOffline(info)
+    local online = self:GetSortedCrafters(info, { includeOffline = false })
+    if #online > 0 then return false end
+    local all = self:GetSortedCrafters(info, { includeOffline = true })
+    return #all > 0
+end
+
 function OrderDialog:Open(recipeKey, info)
     if not recipeKey then return end
     local f = self:Build()
@@ -390,9 +413,9 @@ function OrderDialog:Open(recipeKey, info)
 
     self._currentRecipeKey = recipeKey
     self._currentInfo      = info
-    self._includeOffline   = false
+    self._includeOffline   = self:ShouldDefaultToOffline(info)
     if f.offlineToggle and f.offlineToggle.SetChecked then
-        f.offlineToggle:SetChecked(false)
+        f.offlineToggle:SetChecked(self._includeOffline)
     end
 
     local label = (info and info.label) or tostring(recipeKey)
@@ -401,6 +424,16 @@ function OrderDialog:Open(recipeKey, info)
     end
 
     local selection = self:ComputeInitialSelection(recipeKey, info)
+    -- If we auto-fell-back to offline and the regular online-only
+    -- selection didn't pick anyone, pick the first offline crafter
+    -- so the dialog opens with something selected.
+    if self._includeOffline and not selection.crafter then
+        local all = self:GetSortedCrafters(info, { includeOffline = true })
+        if #all > 0 then
+            selection.crafter = all[1].memberKey
+            selection.source  = "first-offline"
+        end
+    end
     if f.qtyBox and f.qtyBox.SetText then
         f.qtyBox:SetText(tostring(selection.quantity or 1))
     end

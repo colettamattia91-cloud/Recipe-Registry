@@ -154,4 +154,28 @@ Test.it("ConfirmAddToCart twice for same recipe+crafter merges quantities", func
     Test.eq(plugin.Cart:GetLines()[1].quantity, 5)
 end)
 
+Test.it("ShouldDefaultToOffline is false when at least one crafter is online", function()
+    local plugin = freshPlugin()
+    local doDefault = plugin.OrderDialog:ShouldDefaultToOffline(makeInfo(929, {
+        { memberKey = "Alice-X", online = true,  skillRank = 350 },
+        { memberKey = "Bob-Y",   online = false, skillRank = 375 },
+    }))
+    Test.falsy(doDefault)
+end)
+
+Test.it("ShouldDefaultToOffline is true when nobody is online but offline crafters exist", function()
+    local plugin = freshPlugin()
+    local doDefault = plugin.OrderDialog:ShouldDefaultToOffline(makeInfo(929, {
+        { memberKey = "Alice-X", online = false, skillRank = 350 },
+        { memberKey = "Bob-Y",   online = false, skillRank = 375 },
+    }))
+    Test.truthy(doDefault)
+end)
+
+Test.it("ShouldDefaultToOffline is false when there are no crafters at all", function()
+    local plugin = freshPlugin()
+    Test.falsy(plugin.OrderDialog:ShouldDefaultToOffline(makeInfo(929, {})))
+    Test.falsy(plugin.OrderDialog:ShouldDefaultToOffline(nil))
+end)
+
 io.write(string.format("Craft Orders order dialog: %d test(s) passed\n", Test.count))

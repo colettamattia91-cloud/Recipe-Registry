@@ -165,7 +165,10 @@ end
 
 -- Called from RefreshDetailPanel each render so the visible / enabled
 -- state stays in sync with the current recipe. Anchors actions in
--- registration order, growing left from the favorite button.
+-- registration order, growing left from the favorite button. Also
+-- shrinks the detail title button's right edge to terminate at the
+-- leftmost realized action, so the title's clickable area doesn't
+-- extend behind the action icons and steal their hover tooltip.
 function UI:RealizeRecipeActions(parent, rightmostAnchor)
     ensureRegistry()
     if not parent then return end
@@ -178,6 +181,7 @@ function UI:RealizeRecipeActions(parent, rightmostAnchor)
     end
 
     local anchor = rightmostAnchor
+    local leftmostVisible = nil
     for _, id in ipairs(UI.__recipeActionOrder) do
         local spec = UI.__recipeActions[id]
         local visible = true
@@ -206,9 +210,26 @@ function UI:RealizeRecipeActions(parent, rightmostAnchor)
                     end
                 end
                 anchor = button
+                leftmostVisible = button
             end
         elseif button and button.Hide then
             button:Hide()
+        end
+    end
+
+    -- Shrink the title button so its hover region stops at the LEFT
+    -- edge of the leftmost visible action. When no actions are visible
+    -- (e.g. nothing registered or all hidden), fall back to the
+    -- original anchor against detailFavoriteButton.
+    local titleButton = self.frame and self.frame.detailTitleButton or nil
+    local favorite    = self.frame and self.frame.detailFavoriteButton or nil
+    if titleButton and titleButton.ClearAllPoints and titleButton.SetPoint then
+        titleButton:ClearAllPoints()
+        titleButton:SetPoint("TOPLEFT", 10, -10)
+        if leftmostVisible then
+            titleButton:SetPoint("TOPRIGHT", leftmostVisible, "TOPLEFT", -10, 0)
+        elseif favorite then
+            titleButton:SetPoint("TOPRIGHT", favorite, "TOPLEFT", -10, 0)
         end
     end
 end

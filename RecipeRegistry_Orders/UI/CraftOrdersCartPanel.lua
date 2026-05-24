@@ -228,9 +228,14 @@ function CartPanel:BuildToggle()
     local host = _G.RecipeRegistryFrame
     if not host then return nil end
 
+    -- Anchored to the bottom-right of the main frame so it doesn't
+    -- collide with the title-bar widgets (Sync indicator, Roster
+    -- Cleanup button, close button). Sits just above the resize
+    -- handle if present.
     local toggle = CreateFrame("Button", "RecipeRegistry_OrdersCartToggle", host, "BackdropTemplate")
     toggle:SetSize(96, 22)
-    toggle:SetPoint("TOPRIGHT", host, "TOPRIGHT", -110, -8)
+    toggle:SetPoint("BOTTOMRIGHT", host, "BOTTOMRIGHT", -14, 10)
+    toggle:SetFrameLevel((host:GetFrameLevel() or 0) + 5)
     applyPanelBackdrop(toggle)
 
     toggle.label = toggle:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
