@@ -336,6 +336,7 @@ Test.it("reports share command errors without sending chat", function()
     end
     _G.GetChannelList = nil
     _G.GetChannelName = nil
+    _G.ChatEdit_GetActiveWindow = nil
 
     addon:SlashHandler("share guild")
     addon:SlashHandler("share party")
@@ -343,6 +344,7 @@ Test.it("reports share command errors without sending chat", function()
     addon.UI.selectedRecipeKey = "Alchemy:missing"
     addon:SlashHandler("share nope")
     addon:SlashHandler("share channel:9")
+    addon:SlashHandler("share reply")
     addon.Data.GetRecipeDetail = function()
         return nil
     end
@@ -351,17 +353,18 @@ Test.it("reports share command errors without sending chat", function()
     Test.eq(sent, 0, "failed share commands should not send chat")
     Test.truthy(printLogContains(wow, "No recipe selected."), "missing selected recipe output")
     Test.truthy(printLogContains(wow, "You are not in a party."), "unavailable party output")
-    Test.truthy(printLogContains(wow, "Usage: /rr share [guild|party|raid|say|yell|channel number]"), "invalid share usage output")
-    Test.truthy(printLogContains(wow, "Chat channel 9 is not available."), "missing custom channel output")
+    Test.truthy(printLogContains(wow, "Usage: /rr share [guild|party|raid|say|reply]"), "invalid share usage output")
+    Test.truthy(printLogContains(wow, "No recent whisper target."), "missing reply target output")
     Test.truthy(printLogContains(wow, "No recipe details available."), "missing detail output")
 end)
 
-Test.it("shares selected recipes to numbered chat channels", function()
+Test.it("shares selected recipes to the last whisper reply target", function()
     local addon = freshUiAddon()
     local sent = {}
 
-    _G.GetChannelList = function()
-        return 2, "Trade", false
+    _G.ChatEdit_GetActiveWindow = nil
+    _G.ChatEdit_GetLastTellTarget = function()
+        return "Whisperfriend"
     end
     _G.SendChatMessage = function(message, channel, language, target)
         sent[#sent + 1] = {
@@ -383,12 +386,56 @@ Test.it("shares selected recipes to numbered chat channels", function()
         }
     end
 
-    addon:SlashHandler("share channel:2")
+    addon:SlashHandler("share r")
 
     Test.eq(#sent, 1, "share should send one summary line without reagents")
-    Test.eq(sent[1].channel, "CHANNEL", "custom channel chat type")
-    Test.eq(sent[1].target, 2, "custom channel target")
-    Test.truthy(sent[1].message:find("Elixir of Testing", 1, true) ~= nil, "custom channel summary")
+    Test.eq(sent[1].channel, "WHISPER", "reply share type")
+    Test.eq(sent[1].target, "Whisperfriend", "reply share target")
+    Test.truthy(sent[1].message:find("Elixir of Testing", 1, true) ~= nil, "reply summary")
+end)
+
+Test.it("prefers the active whisper edit box over the last whisper target", function()
+    local addon = freshUiAddon()
+    local sent = {}
+    local editBox = {}
+
+    function editBox:GetAttribute(key)
+        if key == "chatType" then return "WHISPER" end
+        if key == "tellTarget" then return "Intendedfriend" end
+        return nil
+    end
+
+    _G.ChatEdit_GetActiveWindow = function()
+        return editBox
+    end
+    _G.ChatEdit_GetLastTellTarget = function()
+        return "Recentfriend"
+    end
+    _G.SendChatMessage = function(message, channel, language, target)
+        sent[#sent + 1] = {
+            message = message,
+            channel = channel,
+            language = language,
+            target = target,
+        }
+    end
+
+    addon.UI.selectedRecipeKey = "Alchemy:9001"
+    addon.Data.GetRecipeDetail = function()
+        return {
+            label = "Elixir of Intent",
+            cost = {
+                total = 0,
+                source = "N/A",
+            },
+        }
+    end
+
+    addon:SlashHandler("share reply")
+
+    Test.eq(#sent, 1, "reply share should send one summary line")
+    Test.eq(sent[1].channel, "WHISPER", "active edit box share type")
+    Test.eq(sent[1].target, "Intendedfriend", "active edit box target should win")
 end)
 
 Test.it("splits long shared reagent lists into chat-sized chunks", function()
@@ -441,8 +488,9 @@ Test.it("opens a share dropdown with currently available channels", function()
     local toggled = false
 
     _G.IsInGroup = function() return true end
-    _G.GetChannelList = function()
-        return 2, "Trade", false
+    _G.ChatEdit_GetActiveWindow = nil
+    _G.ChatEdit_GetLastTellTarget = function()
+        return "Whisperfriend"
     end
     _G.EasyMenu = nil
     _G.UIDropDownMenu_CreateInfo = function()
@@ -474,12 +522,11 @@ Test.it("opens a share dropdown with currently available channels", function()
     addon.UI:OpenShareMenu({})
 
     Test.truthy(toggled, "share dropdown should open through UIDropDownMenu")
-    Test.eq(#added, 5, "share menu should include available standard and custom channels")
+    Test.eq(#added, 4, "share menu should include available standard and reply channels")
     Test.eq(added[1].text, "Guild", "guild menu item")
     Test.eq(added[2].text, "Say", "say menu item")
     Test.eq(added[3].text, "Party", "party menu item")
-    Test.eq(added[4].text, "Yell", "yell menu item")
-    Test.eq(added[5].text, "2. Trade", "custom channel menu item")
+    Test.eq(added[4].text, "Reply: Whisperfriend", "reply menu item")
 end)
 
 Test.it("opens a share menu through EasyMenu when native dropdown helpers are unavailable", function()
@@ -488,9 +535,9 @@ Test.it("opens a share menu through EasyMenu when native dropdown helpers are un
     local anchor = {}
     local shown = 0
 
-    _G.GetChannelList = nil
-    _G.GetChannelName = nil
     _G.IsInGroup = nil
+    _G.ChatEdit_GetActiveWindow = nil
+    _G.ChatEdit_GetLastTellTarget = nil
     _G.UIDropDownMenu_CreateInfo = nil
     _G.UIDropDownMenu_AddButton = nil
     _G.UIDropDownMenu_Initialize = nil
@@ -513,10 +560,9 @@ Test.it("opens a share menu through EasyMenu when native dropdown helpers are un
     addon.UI:OpenShareMenu(anchor)
 
     Test.truthy(menuSeen, "EasyMenu should receive a menu")
-    Test.eq(#menuSeen, 3, "EasyMenu should include available standard channels")
+    Test.eq(#menuSeen, 2, "EasyMenu should include available standard channels")
     Test.eq(menuSeen[1].text, "Guild", "EasyMenu guild item")
     Test.eq(menuSeen[2].text, "Say", "EasyMenu say item")
-    Test.eq(menuSeen[3].text, "Yell", "EasyMenu yell item")
     Test.eq(shown, 1, "click catcher should show for EasyMenu")
     Test.eq(addon.UI._shareMenuOpen, true, "share menu state should open")
 end)
@@ -549,9 +595,9 @@ Test.it("opens the built-in fallback share menu when dropdown APIs are unavailab
         return frame
     end
 
-    _G.GetChannelList = nil
-    _G.GetChannelName = nil
     _G.IsInGroup = nil
+    _G.ChatEdit_GetActiveWindow = nil
+    _G.ChatEdit_GetLastTellTarget = nil
     _G.UIDropDownMenu_CreateInfo = nil
     _G.UIDropDownMenu_AddButton = nil
     _G.UIDropDownMenu_Initialize = nil
@@ -581,10 +627,9 @@ Test.it("opens the built-in fallback share menu when dropdown APIs are unavailab
     Test.truthy(popup, "fallback menu should be created")
     Test.truthy(popup.shown, "fallback menu should show")
     Test.eq(shown, 1, "click catcher should show for fallback menu")
-    Test.eq(#popup.rows, 3, "fallback menu should include available standard channels")
+    Test.eq(#popup.rows, 2, "fallback menu should include available standard channels")
     Test.eq(popup.rows[1].text, "Guild", "fallback guild item")
     Test.eq(popup.rows[2].text, "Say", "fallback say item")
-    Test.eq(popup.rows[3].text, "Yell", "fallback yell item")
     Test.eq(addon.UI._shareMenuOpen, true, "fallback share menu state should open")
 end)
 
