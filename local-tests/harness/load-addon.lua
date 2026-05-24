@@ -33,6 +33,7 @@ local FILE_PATHS = {
     ["MainFrame.lua"] = "UI/MainFrame.lua",
     ["Options.lua"] = "UI/Options.lua",
     ["MinimapButton.lua"] = "UI/MinimapButton.lua",
+    ["ExternalTabs.lua"] = "UI/ExternalTabs.lua",
 }
 
 local function fileExists(path)
@@ -85,6 +86,16 @@ local Loader = {
         "SyncDiagnostics.lua",
     },
 }
+
+-- The UI module is defined in UI/MainFrame.lua; ExternalTabs.lua decorates
+-- it with the public external-tab registry. Specs that exercise the hook
+-- can opt into loading the UI layer via opts.files = Loader.BackendFilesWithUI.
+Loader.BackendFilesWithUI = {}
+for _, name in ipairs(Loader.BackendFiles) do
+    Loader.BackendFilesWithUI[#Loader.BackendFilesWithUI + 1] = name
+end
+Loader.BackendFilesWithUI[#Loader.BackendFilesWithUI + 1] = "MainFrame.lua"
+Loader.BackendFilesWithUI[#Loader.BackendFilesWithUI + 1] = "ExternalTabs.lua"
 
 local function runAddonLifecycle(addon, methodName)
     if addon and type(addon[methodName]) == "function" then
@@ -161,6 +172,7 @@ Loader.OrdersFiles = {
     "RecipeRegistry_Orders/Store/CraftOrdersStateMachine.lua",
     "RecipeRegistry_Orders/Store/CraftOrdersStore.lua",
     "RecipeRegistry_Orders/Planner/CraftOrdersPlanner.lua",
+    "RecipeRegistry_Orders/UI/CraftOrdersBoard.lua",
 }
 
 -- Loads the RecipeRegistry_Orders plugin chunks on top of whatever RR state

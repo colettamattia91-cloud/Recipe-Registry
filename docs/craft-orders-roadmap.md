@@ -756,6 +756,8 @@ Work items:
 - No guild sync yet — board shows only locally-known orders.
 - **Exit criterion:** UI usable with seeded test data, no console errors.
 
+**Progress (2026-05-23):** the `RecipeRegistry.UI:RegisterExternalTab` hook landed on this branch (see [`UI/ExternalTabs.lua`](../UI/ExternalTabs.lua) and §3.8.1 Option A). The plugin's [`UI/CraftOrdersBoard.lua`](../RecipeRegistry_Orders/UI/CraftOrdersBoard.lua) registers itself in `OnEnable` and ships a minimal panel scaffold (header + list-frame + detail-frame) with data-side rendering helpers covered by [`local-tests/spec/orders_phase3_board_spec.lua`](../local-tests/spec/orders_phase3_board_spec.lua). **Still pending for exit:** row widget + scroll frame + click-to-select wiring, filters per §20, and in-game observation pass.
+
 ### Phase 4 — Inbox recognition + assumed receipt
 - `CraftOrdersMailScanner.lua`.
 - Parses inbox on `MAIL_SHOW`, matches RR-ORDER marker, records ledger.

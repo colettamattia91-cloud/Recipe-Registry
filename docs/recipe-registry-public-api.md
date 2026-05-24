@@ -74,35 +74,44 @@ Plugins are expected to keep their own log DB, but RR's `Trace`/`Tracef` is avai
 
 ## UI integration hook
 
-> **STATUS: not implemented as of RR 2.0.6.** The adoption-status work that shipped in 2.0.6 added the "Guild Addons" tab inline in MainFrame.lua without introducing a generic hook. Adding `RecipeRegistry.UI:RegisterExternalTab` is now a fresh strictly-additive proposal — see craft-orders roadmap §3.8.1 for the decision tree.
+> **STATUS: implemented on `feature/craft-orders-mail-assistant`.** Lives in [`UI/ExternalTabs.lua`](../UI/ExternalTabs.lua) with minimal additive touches to [`UI/MainFrame.lua`](../UI/MainFrame.lua). The "Guild Addons" tab introduced in RR 2.0.6 remains inline; only **new** external tabs go through this hook.
 
-Expected shape:
+Signature:
 
 ```lua
-RecipeRegistry.UI:RegisterExternalTab({
-    id          = "craft-orders",          -- unique string, used as tab key
-    title       = "Orders",                -- shown on the tab button
-    icon        = "Interface\\...",        -- optional texture path
-    order       = 100,                     -- relative position; profession tabs are ~0-99
-    onShow      = function(panel) ... end, -- called when tab becomes visible
-    onHide      = function(panel) ... end, -- called when tab becomes hidden
-    onRefresh   = function(panel, scopes) end, -- called by RR's deferred refresh path
+local ok, err = RecipeRegistry.UI:RegisterExternalTab({
+    id         = "orders",                     -- unique string; must not start with "ext:" (reserved)
+    label      = "Craft Orders",               -- shown on the nav button
+    icon       = nil,                          -- optional texture path (reserved for future use)
+    build      = function(panel) ... end,      -- called once with a Frame to populate
+    onSelect   = function(panel) ... end,      -- called when the tab becomes visible
+    onDeselect = function(panel) ... end,      -- called when leaving the tab
 })
 ```
 
+Returns `true` on success, or `nil, <reason>` for validation failures. Reason codes: `invalid-spec`, `missing-id`, `reserved-prefix`, `missing-label`, `invalid-build`, `invalid-onselect`, `invalid-ondeselect`.
+
 Lifecycle:
 
-1. Plugin calls `RegisterExternalTab` during its own `OnEnable`.
-2. RR adds the tab to its main frame on next refresh.
-3. RR creates the `panel` Frame (parented to the main frame's content area) and passes it to the plugin's callbacks.
-4. RR forwards refresh scopes (`"presence"`, `"metadata"`, ...) so the plugin's tab can be selectively rebuilt.
+1. Plugin calls `RegisterExternalTab` during its own `OnEnable` (RR's `Dependencies` ordering guarantees RR's UI module exists by then).
+2. RR creates a tab button anchored to the right of the built-in tabs and a full-width panel anchored inside the main frame.
+3. The first time the tab is shown, RR calls `build(panel)`. The plugin populates the panel however it likes.
+4. On every subsequent activation, RR calls `onSelect(panel)`. On leaving the tab, `onDeselect(panel)`.
+5. Re-registration with the same `id` replaces the spec but preserves the existing panel/button (idempotent).
+6. Callbacks are invoked under `pcall`; a throw is logged via `Tracef("ui", ...)` but does not crash the host UI.
 
-Open questions for Phase 0:
+Query helpers:
 
-- Does the plugin own the panel's CreateFrame call or does RR?
-- Can a plugin register more than one tab?
-- How does unregistration work on plugin disable / `/reload`?
-- What's the error contract if the callback throws?
+```lua
+RecipeRegistry.UI:HasExternalTab(id)         -- bool
+RecipeRegistry.UI:GetExternalTabSpec(id)     -- spec table or nil
+RecipeRegistry.UI:ListExternalTabs()         -- array of ids in registration order
+RecipeRegistry.UI:GetExternalTabId()         -- id of the currently active external tab, or nil
+RecipeRegistry.UI:IsExternalView()           -- bool
+RecipeRegistry.UI:SelectExternalTab(id)      -- programmatic activation
+```
+
+Internal view-id encoding: external tab selections are stored in `UI.selectedProfession` with the `ext:` prefix to avoid collisions with profession names or the `ADDON_STATUS_VIEW` sentinel. Plugins should never construct that prefix themselves — use `SelectExternalTab(id)` (raw id, no prefix).
 
 ## Stability boundary
 

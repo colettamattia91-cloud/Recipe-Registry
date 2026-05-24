@@ -16,3 +16,4 @@ Core\CraftOrders.lua
 Store\CraftOrdersStateMachine.lua
 Store\CraftOrdersStore.lua
 Planner\CraftOrdersPlanner.lua
+UI\CraftOrdersBoard.lua

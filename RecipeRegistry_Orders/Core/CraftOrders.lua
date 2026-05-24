@@ -136,9 +136,6 @@ function Addon:OnInitialize()
 end
 
 function Addon:OnEnable()
-    -- Skeleton phase: confirm load on enable so the user sees both the
-    -- plugin and the RR-dependency link working without having to run a
-    -- command. Replace with quiet behaviour once Phase 1 modules land.
     local rr = getRR()
     if rr and type(rr.Print) == "function" then
         rr:Print(string.format(
@@ -149,6 +146,16 @@ function Addon:OnEnable()
         DEFAULT_CHAT_FRAME:AddMessage(
             "|cffffcc00RecipeRegistry_Orders:|r loaded without RR access. /rrord for status."
         )
+    end
+
+    if self.Board and self.Board.RegisterTab then
+        local ok, err = self.Board:RegisterTab()
+        if not ok then
+            self:Print(string.format(
+                "|cffffcc00Craft Orders:|r tab registration deferred (%s). Run /rrord diag for details.",
+                tostring(err)
+            ))
+        end
     end
 end
 
@@ -177,9 +184,26 @@ local function printHelp(self)
     self:Print("/rrord delete <id|prefix>    - delete a draft order")
 end
 
+local function formatHookStatus(self)
+    local rr = getRR()
+    if not rr then return "|cffff5555rr-missing|r" end
+    if not rr.UI then return "|cffff5555rr.UI missing|r (RR loaded but UI module absent)" end
+    if type(rr.UI.RegisterExternalTab) ~= "function" then
+        return "|cffff5555hook missing|r (rr.UI:RegisterExternalTab not defined — UI/ExternalTabs.lua not loaded?)"
+    end
+    local hasTab = rr.UI.HasExternalTab and rr.UI:HasExternalTab("orders") or false
+    local registered = self.Board and self.Board.tabRegistered or false
+    return string.format(
+        "|cff88ff88ok|r registered=%s host-has-tab=%s",
+        tostring(registered),
+        tostring(hasTab)
+    )
+end
+
 local function printDiag(self)
     self:Print(string.format("Craft Orders v%s (schema %d)", self.ADDON_VERSION, self.SCHEMA_VERSION))
     self:Print("RecipeRegistry link: " .. formatRRStatus())
+    self:Print("UI hook: " .. formatHookStatus(self))
     self:Print("Local player key: " .. tostring(self:GetLocalPlayerKey() or "?"))
     self:Print(string.format(
         "Storage: orders=%d events=%d peers=%d drafts=%d",

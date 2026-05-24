@@ -286,6 +286,14 @@ local function createCardStyleButton(parent, width, height)
     return b
 end
 
+-- Exposed for UI/ExternalTabs.lua so sibling addons can spawn nav-row
+-- tab buttons in the same visual style without duplicating the factory.
+function UI:_CreateMainNavButton(parent, label, width, height)
+    local button = createCardStyleButton(parent, width or 132, height or 24)
+    button:SetLabel(label or "")
+    return button
+end
+
 local function ageText(ts)
     if not ts or ts <= 0 then return "never" end
     local delta = math.max(0, time() - ts)
@@ -486,6 +494,17 @@ function UI:GetMainView()
 end
 
 function UI:SetMainView(view)
+    if self.IsExternalView and self:IsExternalView() then
+        -- Clear any external tab selection when the user explicitly
+        -- switches back to a built-in view.
+        local externalId = self:GetExternalTabId()
+        local externalSpec = externalId and self:GetExternalTabSpec(externalId) or nil
+        local panel = externalId and self:GetExternalTabPanel(externalId) or nil
+        if externalSpec and externalSpec.onDeselect and panel then
+            pcall(externalSpec.onDeselect, panel)
+        end
+        self.selectedProfession = nil
+    end
     if view == "addon" then
         self.selectedProfession = ADDON_STATUS_VIEW
     else
@@ -844,8 +863,17 @@ end
 function UI:RefreshMainTabs()
     if not (self.frame and self.frame.mainTabs) then return end
     local currentView = self:GetMainView()
+    local externalView = self.IsExternalView and self:IsExternalView()
     for viewName, button in pairs(self.frame.mainTabs) do
-        button:SetSelected(viewName == currentView)
+        if type(viewName) == "string"
+            and viewName:sub(1, #(self.EXTERNAL_VIEW_PREFIX or "ext:")) == (self.EXTERNAL_VIEW_PREFIX or "ext:") then
+            -- External tab buttons are refreshed by RefreshExternalTabButtons.
+        else
+            button:SetSelected(not externalView and viewName == currentView)
+        end
+    end
+    if self.RefreshExternalTabButtons then
+        self:RefreshExternalTabButtons()
     end
 end
 
@@ -872,6 +900,26 @@ function UI:ApplyMainLayout()
 
     f.center:ClearAllPoints()
     f.right:ClearAllPoints()
+    local externalView = self.IsExternalView and self:IsExternalView()
+    if externalView then
+        setShownIfChanged(f.topBand, false)
+        setShownIfChanged(f.left, false)
+        setShownIfChanged(f.center, false)
+        setShownIfChanged(f.right, false)
+        if self.ApplyExternalTabLayout then
+            self:ApplyExternalTabLayout()
+        end
+        self:RefreshAddonStatusControls()
+        self:InvalidateRecipeWindowCache()
+        return
+    end
+    -- Hide any external tab panel that might still be visible from a
+    -- previous selection. Built-in views (recipes / addon) own the
+    -- centre area themselves.
+    if self.ApplyExternalTabLayout then
+        self:ApplyExternalTabLayout()
+    end
+    setShownIfChanged(f.center, true)
     if self:IsAddonStatusView() then
         setShownIfChanged(f.topBand, false)
         setShownIfChanged(f.left, false)
@@ -1047,6 +1095,10 @@ function UI:CreateMainFrame()
         recipes = recipesTab,
         addon = addonStatusTab,
     }
+
+    if self.RealizeExternalTabs then
+        self:RealizeExternalTabs(mainNav, addonStatusTab)
+    end
 
     local topBand = CreateFrame("Frame", nil, f)
     topBand:SetPoint("TOPLEFT", 10, -94)

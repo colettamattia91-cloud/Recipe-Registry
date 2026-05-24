@@ -346,6 +346,15 @@ function Store:AppendEvent(event)
         schemaVersion = 1,
     }
     db.events.log[#db.events.log + 1] = entry
+
+    -- Broadcast a generic "something changed" signal so subscribers
+    -- (Board, future tooltip integrations) can re-render. Uses
+    -- AceEvent-3.0 messages via the addon mixin; tests stub these as
+    -- no-ops so the assertion harness is unaffected.
+    if type(Addon.SendMessage) == "function" then
+        Addon:SendMessage("CraftOrders:Changed", entry.kind, entry.orderId)
+    end
+
     return entry
 end
 
