@@ -25,3 +25,4 @@ Sync\CraftOrdersRuntime.lua
 Sync\CraftOrdersDiagnostics.lua
 UI\CraftOrdersBoard.lua
 UI\CraftOrdersOrderDialog.lua
+UI\CraftOrdersCartPanel.lua

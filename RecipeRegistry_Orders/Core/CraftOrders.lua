@@ -195,6 +195,12 @@ function Addon:OnEnable()
             end,
         })
     end
+
+    -- Spawn the floating cart toggle on RR's main frame and subscribe
+    -- to CartChanged so it re-renders on every Add / Remove / Update.
+    if self.CartPanel and self.CartPanel.Wire then
+        self.CartPanel:Wire()
+    end
 end
 
 local function splitCommand(text)
