@@ -46,6 +46,7 @@ $activeAllSpecs = @(
     "orders_phase1_store_spec.lua",
     "orders_phase3_board_spec.lua",
     "orders_phase6_codec_spec.lua",
+    "orders_phase6_diagnostics_spec.lua",
     "orders_phase6_protocol_spec.lua",
     "orders_phase6_reducer_spec.lua",
     "orders_phase6_runtime_spec.lua",

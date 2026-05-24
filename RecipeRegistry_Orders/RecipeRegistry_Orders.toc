@@ -21,4 +21,5 @@ Sync\CraftOrdersCodec.lua
 Sync\CraftOrdersReducer.lua
 Sync\CraftOrdersProtocol.lua
 Sync\CraftOrdersRuntime.lua
+Sync\CraftOrdersDiagnostics.lua
 UI\CraftOrdersBoard.lua

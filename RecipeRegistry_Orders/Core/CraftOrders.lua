@@ -194,6 +194,7 @@ local function printHelp(self)
     self:Print("/rrord transition <id|prefix> <state> [as requester|crafter|system]")
     self:Print("                              - manually drive the state machine (test/debug)")
     self:Print("/rrord events [id|prefix] [limit]  - inspect the event log")
+    self:Print("/rrord sync                  - dump sync protocol + runtime telemetry")
     self:Print("/rrord delete <id|prefix>    - delete a draft order")
 end
 
@@ -225,6 +226,20 @@ local function printDiag(self)
         countKeys(self.db.global.peers),
         countKeys(self.charDB.drafts)
     ))
+    if self.Diagnostics and self.Diagnostics.FormatStatusLine then
+        self:Print(self.Diagnostics:FormatStatusLine())
+    end
+end
+
+local function cmdSync(self)
+    if not (self.Diagnostics and self.Diagnostics.FormatSyncLines) then
+        self:Print("Sync diagnostics unavailable.")
+        return
+    end
+    local lines = self.Diagnostics:FormatSyncLines()
+    for index = 1, #lines do
+        self:Print(lines[index])
+    end
 end
 
 local function resolveOrderByPrefix(self, prefix)
@@ -695,6 +710,10 @@ function Addon:SlashHandler(input)
     end
     if cmd == "events" or cmd == "log" then
         cmdEvents(self, rest)
+        return
+    end
+    if cmd == "sync" then
+        cmdSync(self)
         return
     end
     if cmd == "delete" or cmd == "del" or cmd == "rm" then

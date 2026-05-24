@@ -782,6 +782,14 @@ Work items:
 - Specs: event reducer idempotence, duplicate event ignored, invalid transition rejected, tombstone resurrection prevention, large-guild login does not flood, paused in instance, dev/release isolation.
 - **Exit criterion:** Phase 6 specs green + multi-character soak test (5+ peers) shows no traffic in raid.
 
+**Progress (2026-05-24):** Phase 6 specs landed across four iterations totalling 61 backend assertions. All harness-side requirements met:
+- **A — Foundations** (`51c9635`): `Core/BuildInfo.lua` (RRORD/RRORDDEV prefix + wire v1), `Sync/CraftOrdersCodec.lua` (AceSerializer + LibDeflate framing with the RRO1| marker), `Sync/CraftOrdersReducer.lua` (event reducer with dedupe via per-peer HWM, tombstone resurrection prevention, state-machine validation, producer collision rejection, batch ApplyEvents). Specs: 25.
+- **B — Protocol** (`fe94e9f`): `Sync/CraftOrdersProtocol.lua` (HELLO_ORDERS/SUMMARY_ORDERS/EVENTS_REQUEST/EVENTS_RESPONSE + dispatch + wire-version + build-channel gates). Specs: 16, including an end-to-end handshake (HELLO → SUMMARY → EVENTS_REQUEST → EVENTS_RESPONSE → reducer materializes remote orders).
+- **C — Runtime** (`5ce2c5a`): `Sync/CraftOrdersRuntime.lua` (coalesced delayed HELLO, login/local-change/roster trigger wiring, pause-policy gate calling `_G.RecipeRegistry.SyncPausePolicy:ShouldPauseProtocolTraffic`, readiness gate, MIN_BROADCAST_INTERVAL floor). Specs: 12.
+- **D — Diagnostics**: `Sync/CraftOrdersDiagnostics.lua` (Snapshot + FormatSyncLines + FormatStatusLine) and `/rrord sync` slash + sync line in `/rrord diag`. Specs: 8.
+
+**Exit criterion remaining:** multi-character in-game soak test (5+ peers) confirming no Orders traffic during raid/instance. The harness-side coverage is in place; the empirical observation is yours.
+
 ### Phase 7 — Cancellation + return
 - Cancel flow, returnable computation from ledger (never from bag totals), batch split on return.
 - Specs: returnable matches confirmed minus already-returned; crafter-provided excluded; assumed-receipt shows warning; manual override path.
