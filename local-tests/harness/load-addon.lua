@@ -34,6 +34,7 @@ local FILE_PATHS = {
     ["Options.lua"] = "UI/Options.lua",
     ["MinimapButton.lua"] = "UI/MinimapButton.lua",
     ["ExternalTabs.lua"] = "UI/ExternalTabs.lua",
+    ["RecipeActions.lua"] = "UI/RecipeActions.lua",
 }
 
 local function fileExists(path)
@@ -96,6 +97,7 @@ for _, name in ipairs(Loader.BackendFiles) do
 end
 Loader.BackendFilesWithUI[#Loader.BackendFilesWithUI + 1] = "MainFrame.lua"
 Loader.BackendFilesWithUI[#Loader.BackendFilesWithUI + 1] = "ExternalTabs.lua"
+Loader.BackendFilesWithUI[#Loader.BackendFilesWithUI + 1] = "RecipeActions.lua"
 
 local function runAddonLifecycle(addon, methodName)
     if addon and type(addon[methodName]) == "function" then

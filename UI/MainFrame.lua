@@ -3088,6 +3088,10 @@ function UI:RefreshDetailPanel()
         self.frame.detailFavoriteButton.recipeKey = nil
         self.frame.detailFavoriteButton.isFavorite = false
         setFavoriteButtonState(self.frame.detailFavoriteButton, false)
+        -- Hide any plugin-registered recipe-action buttons too.
+        if self.RealizeRecipeActions then
+            self:RealizeRecipeActions(self.frame.right or self.frame, self.frame.detailFavoriteButton)
+        end
         if self.frame.detailTooltip then
             self.frame.detailTooltip:Hide()
         end
@@ -3138,6 +3142,13 @@ function UI:RefreshDetailPanel()
     self.frame.detailFavoriteButton.recipeKey = self.selectedRecipeKey
     self.frame.detailFavoriteButton.isFavorite = isFavorite
     setFavoriteButtonState(self.frame.detailFavoriteButton, isFavorite)
+
+    -- Render any sibling-addon-provided per-recipe action buttons,
+    -- anchored to the LEFT of the favorite button. Implemented in
+    -- UI/RecipeActions.lua as a strictly-additive hook.
+    if self.RealizeRecipeActions then
+        self:RealizeRecipeActions(self.frame.right or self.frame, self.frame.detailFavoriteButton)
+    end
 
     local subtitleParts = {}
     if detail.professionName then subtitleParts[#subtitleParts + 1] = detail.professionName end

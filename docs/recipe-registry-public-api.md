@@ -113,6 +113,48 @@ RecipeRegistry.UI:SelectExternalTab(id)      -- programmatic activation
 
 Internal view-id encoding: external tab selections are stored in `UI.selectedProfession` with the `ext:` prefix to avoid collisions with profession names or the `ADDON_STATUS_VIEW` sentinel. Plugins should never construct that prefix themselves — use `SelectExternalTab(id)` (raw id, no prefix).
 
+## Per-recipe action hook
+
+> **STATUS: implemented on `feature/craft-orders-mail-assistant`.** Lives in [`UI/RecipeActions.lua`](../UI/RecipeActions.lua) with a single call site inside [`UI/MainFrame.lua`](../UI/MainFrame.lua)'s `RefreshDetailPanel`.
+
+Lets sibling addons add an 18×18 icon button to the recipe detail panel, anchored to the left of the existing favorite button. Multiple actions stack right-to-left in registration order.
+
+Signature:
+
+```lua
+local ok, err = RecipeRegistry.UI:RegisterRecipeAction({
+    id        = "order",                                -- unique string; required
+    label     = "Add to order cart",                    -- tooltip text; required
+    icon      = "Interface\\Icons\\INV_Misc_Bag_08",    -- texture path; optional
+    onClick   = function(recipeKey, info) ... end,      -- optional
+    isVisible = function(recipeKey, info) return ... end, -- optional; default true
+    isEnabled = function(recipeKey, info) return ... end, -- optional; default true
+})
+```
+
+Returns `true` on success, or `nil, <reason>`. Reason codes: `invalid-spec`, `missing-id`, `missing-label`, `invalid-icon`, `invalid-onclick`, `invalid-isvisible`, `invalid-isenabled`.
+
+Lifecycle:
+
+1. Plugin calls `RegisterRecipeAction` during its own `OnEnable`. RR's `RefreshDetailPanel` picks the action up on the next render.
+2. When a recipe is selected, RR walks the registered actions in registration order and:
+   - Calls `isVisible(recipeKey, info)` if provided. A falsy result hides the button.
+   - Realizes/reuses the icon button anchored to the previous action (or the favorite button for the first action).
+   - Calls `isEnabled(recipeKey, info)` if provided. A falsy result dims the icon and disables clicks.
+3. Click handler receives `(recipeKey, info)` where `info` is the result of `Data:GetRecipeDetail(recipeKey)` (the same structure RR uses internally).
+4. Re-registration with the same `id` replaces the spec; the underlying widget is reused so there's no flicker.
+
+Query helpers:
+
+```lua
+RecipeRegistry.UI:HasRecipeAction(id)         -- bool
+RecipeRegistry.UI:GetRecipeActionSpec(id)     -- spec table or nil
+RecipeRegistry.UI:ListRecipeActions()         -- array of ids in registration order
+RecipeRegistry.UI:UnregisterRecipeAction(id)  -- removes spec; hides widget; idempotent
+```
+
+Callbacks run under `pcall`; a throw is swallowed (the icon stays visible, the click is silently dropped). A future revision may route exceptions to `Tracef("ui", ...)` once Phase 4 emits other kinds of UI-level diagnostics.
+
 ## Stability boundary
 
 Plugins **must not**:

@@ -39,3 +39,4 @@ UI\MinimapButton.lua
 UI\Options.lua
 UI\MainFrame.lua
 UI\ExternalTabs.lua
+UI\RecipeActions.lua
