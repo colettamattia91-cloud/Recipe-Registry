@@ -41,6 +41,7 @@ $activeAllSpecs = @(
     "external_tabs_registry_spec.lua",
     "inbound_seed_debug_spec.lua",
     "options_panel_spec.lua",
+    "orders_cart_spec.lua",
     "orders_phase1_planner_spec.lua",
     "orders_phase1_state_machine_spec.lua",
     "orders_phase1_store_spec.lua",

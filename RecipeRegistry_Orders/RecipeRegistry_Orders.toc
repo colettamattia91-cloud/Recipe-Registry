@@ -17,6 +17,7 @@ Core\BuildInfo.lua
 Store\CraftOrdersStateMachine.lua
 Store\CraftOrdersStore.lua
 Planner\CraftOrdersPlanner.lua
+Cart\CraftOrdersCart.lua
 Sync\CraftOrdersCodec.lua
 Sync\CraftOrdersReducer.lua
 Sync\CraftOrdersProtocol.lua

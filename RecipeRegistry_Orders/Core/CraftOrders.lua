@@ -38,6 +38,7 @@ local DB_DEFAULTS = {
 
 local CHAR_DB_DEFAULTS = {
     drafts = {},
+    cart   = { lines = {} },
 }
 
 local function ensureCharDB()
