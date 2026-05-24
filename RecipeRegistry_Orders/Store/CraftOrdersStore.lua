@@ -367,6 +367,18 @@ function Store:AppendEvent(event)
     }
     db.events.log[#db.events.log + 1] = entry
 
+    -- Keep the per-producer high-water-mark in sync with the local
+    -- event seq so the protocol layer's HELLO summary can advertise
+    -- "I have my own events up to seq=N" without scanning the log.
+    db.peers = db.peers or {}
+    local peerRecord = db.peers[producer]
+    if not peerRecord then
+        peerRecord = { highWaterSeq = 0, lastSeenAt = 0 }
+        db.peers[producer] = peerRecord
+    end
+    peerRecord.highWaterSeq = entry.seq
+    peerRecord.lastSeenAt   = entry.at or peerRecord.lastSeenAt
+
     -- Broadcast a generic "something changed" signal so subscribers
     -- (Board, future tooltip integrations) can re-render. Uses
     -- AceEvent-3.0 messages via the addon mixin; tests stub these as

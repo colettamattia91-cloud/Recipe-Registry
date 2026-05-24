@@ -157,6 +157,15 @@ function Addon:OnEnable()
             ))
         end
     end
+
+    -- Hook the addon comm channel so peer traffic (HELLO_ORDERS,
+    -- SUMMARY_ORDERS, EVENTS_*) lands in the protocol layer. The
+    -- runtime scheduler (Phase 6 iteration C) will decide when to
+    -- broadcast our own HELLO; until then the protocol responds to
+    -- inbound traffic but stays quiet on the wire.
+    if self.Protocol and self.Protocol.RegisterCommHandler then
+        self.Protocol:RegisterCommHandler()
+    end
 end
 
 local function splitCommand(text)

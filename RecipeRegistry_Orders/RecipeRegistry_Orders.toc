@@ -19,4 +19,5 @@ Store\CraftOrdersStore.lua
 Planner\CraftOrdersPlanner.lua
 Sync\CraftOrdersCodec.lua
 Sync\CraftOrdersReducer.lua
+Sync\CraftOrdersProtocol.lua
 UI\CraftOrdersBoard.lua

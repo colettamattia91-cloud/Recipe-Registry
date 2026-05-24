@@ -175,6 +175,7 @@ Loader.OrdersFiles = {
     "RecipeRegistry_Orders/Planner/CraftOrdersPlanner.lua",
     "RecipeRegistry_Orders/Sync/CraftOrdersCodec.lua",
     "RecipeRegistry_Orders/Sync/CraftOrdersReducer.lua",
+    "RecipeRegistry_Orders/Sync/CraftOrdersProtocol.lua",
     "RecipeRegistry_Orders/UI/CraftOrdersBoard.lua",
 }
 
