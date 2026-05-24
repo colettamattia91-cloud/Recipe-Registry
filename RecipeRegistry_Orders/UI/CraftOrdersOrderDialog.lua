@@ -323,8 +323,12 @@ local function formatCrafterMeta(entry)
     local status = entry.online and "online" or "offline"
     local color  = entry.online and STATUS_ONLINE_COLOR or STATUS_OFFLINE_COLOR
     local meta   = color .. status .. "|r"
-    if entry.skillRank then
-        meta = string.format("%s  |cffaaaaaa• skill %d|r", meta, entry.skillRank)
+    -- skillRank can be 0 for crafters whose profession data hasn't been
+    -- scanned yet (truthy in Lua); only render the suffix when there's
+    -- an actual rank to show.
+    local rank = tonumber(entry.skillRank) or 0
+    if rank > 0 then
+        meta = string.format("%s  |cffaaaaaa• skill %d|r", meta, rank)
     end
     return meta
 end

@@ -212,6 +212,31 @@ local function applyPanelBackdrop(frame)
     frame:SetBackdropBorderColor(COLOR_BORDER[1], COLOR_BORDER[2], COLOR_BORDER[3], COLOR_BORDER[4])
 end
 
+-- Mirrors UI/MainFrame.lua's "Ask" button style: dark fill, gold edge,
+-- gold-tinted label, gold-tinted hover. Used for the row +/-/x
+-- buttons and the Checkout / Clear buttons so the cart UI reads as a
+-- single visual family.
+local function buildAskStyleButton(parent, width, height, label)
+    if not CreateFrame then return nil end
+    local button = CreateFrame("Button", nil, parent, "BackdropTemplate")
+    button:SetSize(width, height)
+    button:SetBackdrop(PANEL_BACKDROP)
+    button:SetBackdropColor(0.13, 0.11, 0.08, 0.95)
+    button:SetBackdropBorderColor(1, 0.82, 0, 0.75)
+
+    button.label = button:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    button.label:SetPoint("LEFT", 2, 0)
+    button.label:SetPoint("RIGHT", -2, 0)
+    button.label:SetJustifyH("CENTER")
+    button.label:SetText(label or "")
+    button.label:SetTextColor(1.0, 0.92, 0.75)
+
+    button:SetHighlightTexture("Interface\\Buttons\\WHITE8x8", "ADD")
+    local hi = button:GetHighlightTexture()
+    if hi and hi.SetVertexColor then hi:SetVertexColor(1, 0.82, 0, 0.18) end
+    return button
+end
+
 local function qualityColor(quality)
     if type(quality) ~= "number" then return nil end
     local palette = _G.ITEM_QUALITY_COLORS and _G.ITEM_QUALITY_COLORS[quality]
@@ -222,31 +247,64 @@ end
 -- ---------------------------------------------------------------------
 -- Toggle button — small "Cart (N)" widget anchored to RR's main frame.
 
+-- The cart icon is a 22x22 square button anchored to RR's main frame
+-- title bar (left of the existing title-bar widgets via an offset).
+-- Dark backdrop + gold-tinted icon + small count badge bottom-right
+-- keep the look consistent with the addon's other gold-on-black
+-- affordances (Ask button, action icons).
+local CART_TOGGLE_SIZE     = 22
+local CART_TOGGLE_INSET    = 18
+local CART_TOGGLE_OFFSET_X = -200  -- clears close + Roster Cleanup + Sync indicator
+local CART_TOGGLE_OFFSET_Y = -6
+
 function CartPanel:BuildToggle()
     if self.toggle then return self.toggle end
     if not CreateFrame then return nil end
     local host = _G.RecipeRegistryFrame
     if not host then return nil end
 
-    -- Anchored to the bottom-right of the main frame so it doesn't
-    -- collide with the title-bar widgets (Sync indicator, Roster
-    -- Cleanup button, close button). Sits just above the resize
-    -- handle if present.
     local toggle = CreateFrame("Button", "RecipeRegistry_OrdersCartToggle", host, "BackdropTemplate")
-    toggle:SetSize(96, 22)
-    toggle:SetPoint("BOTTOMRIGHT", host, "BOTTOMRIGHT", -14, 10)
+    toggle:SetSize(CART_TOGGLE_SIZE, CART_TOGGLE_SIZE)
+    toggle:SetPoint("TOPRIGHT", host, "TOPRIGHT", CART_TOGGLE_OFFSET_X, CART_TOGGLE_OFFSET_Y)
     toggle:SetFrameLevel((host:GetFrameLevel() or 0) + 5)
     applyPanelBackdrop(toggle)
 
-    toggle.label = toggle:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    toggle.label:SetPoint("CENTER")
-    toggle.label:SetText("Cart (0)")
+    toggle.icon = toggle:CreateTexture(nil, "ARTWORK")
+    toggle.icon:SetSize(CART_TOGGLE_INSET, CART_TOGGLE_INSET)
+    toggle.icon:SetPoint("CENTER")
+    toggle.icon:SetTexture("Interface\\Icons\\INV_Misc_Bag_08")
+    -- Crop the standard item-icon border so the icon sits cleanly
+    -- inside the small button, then re-tint gold to match the Ask
+    -- button family.
+    toggle.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
+    toggle.icon:SetVertexColor(1.0, 0.82, 0.0, 1.0)
+
+    -- Badge fontstring sits in the bottom-right of the icon and shows
+    -- the line count when > 0. Hidden when the cart is empty so the
+    -- button stays clean.
+    toggle.badge = toggle:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    toggle.badge:SetPoint("BOTTOMRIGHT", toggle, "BOTTOMRIGHT", 1, -1)
+    toggle.badge:SetTextColor(1.0, 0.92, 0.45)
 
     toggle:SetScript("OnEnter", function(widget)
         widget:SetBackdropBorderColor(1.00, 0.82, 0.00, 0.95)
+        local tooltip = _G.GameTooltip
+        if tooltip then
+            tooltip:SetOwner(widget, "ANCHOR_BOTTOMRIGHT")
+            tooltip:AddLine("Craft order cart")
+            local count = Addon.Cart and Addon.Cart:CountLines() or 0
+            if count > 0 then
+                tooltip:AddLine(string.format("%d line(s) pending", count), 0.8, 0.8, 0.8)
+            else
+                tooltip:AddLine("Cart is empty", 0.7, 0.7, 0.7)
+            end
+            tooltip:AddLine("Click to open the cart", 0.6, 0.6, 0.6)
+            tooltip:Show()
+        end
     end)
     toggle:SetScript("OnLeave", function(widget)
         widget:SetBackdropBorderColor(COLOR_BORDER[1], COLOR_BORDER[2], COLOR_BORDER[3], COLOR_BORDER[4])
+        if _G.GameTooltip then _G.GameTooltip:Hide() end
     end)
     toggle:SetScript("OnClick", function() CartPanel:Toggle() end)
 
@@ -257,8 +315,8 @@ end
 function CartPanel:RefreshToggle()
     if not self.toggle then return end
     local count = Addon.Cart and Addon.Cart:CountLines() or 0
-    if self.toggle.label and self.toggle.label.SetText then
-        self.toggle.label:SetText(string.format("Cart (%d)", count))
+    if self.toggle.badge and self.toggle.badge.SetText then
+        self.toggle.badge:SetText(count > 0 and tostring(count) or "")
     end
 end
 
@@ -315,17 +373,13 @@ function CartPanel:Build()
     self._rowPool   = self._rowPool or {}
     self._headerPool = self._headerPool or {}
 
-    local checkout = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-    checkout:SetSize(120, 24)
+    local checkout = buildAskStyleButton(f, 120, 22, "Checkout")
     checkout:SetPoint("BOTTOMLEFT", 16, 14)
-    checkout:SetText("Checkout")
     checkout:SetScript("OnClick", function() CartPanel:OnCheckoutClicked() end)
     f.checkout = checkout
 
-    local clear = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-    clear:SetSize(120, 24)
+    local clear = buildAskStyleButton(f, 120, 22, "Clear cart")
     clear:SetPoint("BOTTOMRIGHT", -16, 14)
-    clear:SetText("Clear cart")
     clear:SetScript("OnClick", function() CartPanel:OnClearClicked() end)
     f.clear = clear
 
@@ -355,18 +409,14 @@ function CartPanel:_AcquireRow(index)
     if row.labelText.SetWordWrap then row.labelText:SetWordWrap(false) end
     if row.labelText.SetMaxLines then row.labelText:SetMaxLines(1) end
 
-    row.removeButton = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
-    row.removeButton:SetSize(18, 18)
+    row.removeButton = buildAskStyleButton(row, 18, 18, "x")
     row.removeButton:SetPoint("RIGHT", -4, 0)
-    row.removeButton:SetText("x")
     row.removeButton:SetScript("OnClick", function(widget)
         CartPanel:OnRemove(widget.boundIndex)
     end)
 
-    row.plusButton = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
-    row.plusButton:SetSize(18, 18)
+    row.plusButton = buildAskStyleButton(row, 18, 18, "+")
     row.plusButton:SetPoint("RIGHT", row.removeButton, "LEFT", -2, 0)
-    row.plusButton:SetText("+")
     row.plusButton:SetScript("OnClick", function(widget)
         CartPanel:OnIncrement(widget.boundIndex)
     end)
@@ -376,10 +426,8 @@ function CartPanel:_AcquireRow(index)
     row.qtyText:SetPoint("RIGHT", row.plusButton, "LEFT", -4, 0)
     row.qtyText:SetJustifyH("CENTER")
 
-    row.minusButton = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
-    row.minusButton:SetSize(18, 18)
+    row.minusButton = buildAskStyleButton(row, 18, 18, "-")
     row.minusButton:SetPoint("RIGHT", row.qtyText, "LEFT", -2, 0)
-    row.minusButton:SetText("-")
     row.minusButton:SetScript("OnClick", function(widget)
         CartPanel:OnDecrement(widget.boundIndex)
     end)
@@ -440,7 +488,10 @@ function CartPanel:Refresh()
                 else
                     header.label:SetTextColor(1.00, 0.82, 0.00)
                 end
-                header.label:SetText(string.format("→ %s", group.displayName))
+                -- No unicode arrow: it renders as a missing-glyph square
+                -- on WoW's default font. Plain colon header keeps the
+                -- group-by-crafter feel without the artifact.
+                header.label:SetText(group.displayName)
             end
             header:Show()
             y = y + GROUP_HEADER_HEIGHT
@@ -527,7 +578,15 @@ function CartPanel:OnCheckoutClicked()
     if type(Addon.Print) == "function" then
         for index = 1, #lines do Addon:Print(lines[index]) end
     end
-    self:Refresh()
+    -- Auto-close the panel on a fully-successful checkout: the cart is
+    -- now empty, the orders are visible in the Board, so the cart UI
+    -- no longer has anything to show. On partial failure stay open
+    -- so the user can inspect what's left and retry.
+    if result and #result.errors == 0 then
+        self:Hide()
+    else
+        self:Refresh()
+    end
 end
 
 function CartPanel:OnClearClicked()

@@ -236,6 +236,43 @@ local function createButton(parent, text, width, height)
     return b
 end
 
+-- Dark fill + gold edge button matching the addon's chrome. Same look
+-- as the inline "Ask" button in the crafter list. Use this for any
+-- top-bar or chrome-level button so it doesn't read as the default
+-- vanilla-WoW blue UIPanelButton.
+local function createAddonStyleButton(parent, text, width, height)
+    local b = CreateFrame("Button", nil, parent, "BackdropTemplate")
+    b:SetSize(width, height)
+    if b.SetBackdrop then
+        b:SetBackdrop({
+            bgFile   = "Interface\\Buttons\\WHITE8x8",
+            edgeFile = "Interface\\Buttons\\WHITE8x8",
+            edgeSize = 1,
+        })
+        b:SetBackdropColor(0.13, 0.11, 0.08, 0.95)
+        b:SetBackdropBorderColor(1, 0.82, 0, 0.75)
+    end
+    b.label = b:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    b.label:SetPoint("LEFT", 2, 0)
+    b.label:SetPoint("RIGHT", -2, 0)
+    b.label:SetJustifyH("CENTER")
+    b.label:SetText(text or "")
+    b.label:SetTextColor(1.0, 0.92, 0.75)
+    b:SetHighlightTexture("Interface\\Buttons\\WHITE8x8", "ADD")
+    local hi = b:GetHighlightTexture()
+    if hi and hi.SetVertexColor then hi:SetVertexColor(1, 0.82, 0, 0.18) end
+    b:SetScript("OnMouseDown", function() releaseSearchFocus() end)
+    -- Override SetText so existing call sites (cleanupButton:SetText
+    -- when the background job toggles state) update the label rather
+    -- than hitting the base Button's no-op SetText.
+    function b:SetText(value)
+        if self.label and self.label.SetText then
+            self.label:SetText(value or "")
+        end
+    end
+    return b
+end
+
 local function createCardStyleButton(parent, width, height)
     local b = CreateFrame("Button", nil, parent, "BackdropTemplate")
     b:SetSize(width, height)
@@ -383,7 +420,11 @@ end
 local function createStatCard(parent, label, width)
     local card = CreateFrame("Frame", nil, parent, "BackdropTemplate")
     card:SetSize(width, 44)
-    createBackdrop(card, 0.075, 0.075, 0.075, 0.96, COLOR_BORDER[1], COLOR_BORDER[2], COLOR_BORDER[3], 0.9)
+    -- Subtle backdrop with a barely-there border so the cards read as
+    -- passive info panels rather than clickable buttons. The full
+    -- COLOR_BORDER alpha gave them a button-y outline; dropping it to
+    -- ~0.15 keeps the visual grouping without the affordance.
+    createBackdrop(card, 0.075, 0.075, 0.075, 0.85, COLOR_BORDER[1], COLOR_BORDER[2], COLOR_BORDER[3], 0.15)
 
     local value = card:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     value:SetPoint("TOPLEFT", 10, -8)
@@ -1038,7 +1079,7 @@ function UI:CreateMainFrame()
         UI:Close("button")
     end)
 
-    local cleanup = createButton(titleBar, "Roster Cleanup", 112, 22)
+    local cleanup = createAddonStyleButton(titleBar, "Roster Cleanup", 112, 22)
     cleanup:SetPoint("RIGHT", close, "LEFT", -12, 0)
     cleanup:SetScript("OnClick", function()
         if not (Addon.GuildLifecycleMaintenance and Addon.GuildLifecycleMaintenance.StartManualCleanup) then
