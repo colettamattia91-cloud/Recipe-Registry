@@ -156,6 +156,56 @@ function Loader.Enable(addon)
     runAddonLifecycle(addon or _G.RecipeRegistry, "OnEnable")
 end
 
+Loader.OrdersFiles = {
+    "RecipeRegistry_Orders/Core/CraftOrders.lua",
+    "RecipeRegistry_Orders/Store/CraftOrdersStateMachine.lua",
+    "RecipeRegistry_Orders/Store/CraftOrdersStore.lua",
+    "RecipeRegistry_Orders/Planner/CraftOrdersPlanner.lua",
+}
+
+-- Loads the RecipeRegistry_Orders plugin chunks on top of whatever RR state
+-- the caller has prepared (real RR via Loader.Load, or a hand-rolled stub
+-- assigned to _G.RecipeRegistry). Phase 1 specs use a tiny stub since the
+-- planner only needs Data:GetRecipeDisplayInfo, and the store needs
+-- Addon:GetLocalPlayerKey to work — both already do without RR loaded.
+function Loader.LoadOrders(opts)
+    opts = opts or {}
+
+    if opts.recipeRegistryStub ~= nil then
+        _G.RecipeRegistry = opts.recipeRegistryStub
+    end
+
+    if opts.savedVariables then
+        _G.RecipeRegistry_OrdersDB = opts.savedVariables.db or opts.savedVariables.global or {}
+        _G.RecipeRegistry_OrdersCharDB = opts.savedVariables.charDB or opts.savedVariables.char or {}
+        _G.RecipeRegistry_OrdersLogDB = opts.savedVariables.logDB or opts.savedVariables.log or {}
+    end
+
+    local files = opts.files or Loader.OrdersFiles
+    for _, file in ipairs(files) do
+        local path = join(root, file)
+        local chunk, err = loadfile(path)
+        if not chunk then
+            error("failed to load " .. path .. ": " .. tostring(err), 2)
+        end
+        chunk("RecipeRegistry_Orders", {})
+    end
+
+    local plugin = _G.RecipeRegistry_Orders
+    if not plugin then
+        error("RecipeRegistry_Orders addon was not created", 2)
+    end
+
+    if opts.initialize ~= false then
+        runAddonLifecycle(plugin, "OnInitialize")
+    end
+    if opts.enable == true then
+        runAddonLifecycle(plugin, "OnEnable")
+    end
+
+    return plugin
+end
+
 function Loader.PrimeSyncReady(addon, opts)
     addon = addon or _G.RecipeRegistry
     opts = opts or {}

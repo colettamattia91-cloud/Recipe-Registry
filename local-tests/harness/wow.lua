@@ -345,9 +345,21 @@ end
 local function installLibStub()
     local libs = {}
 
-    local AceAddon = {}
-    function AceAddon:NewAddon(name)
-        return newAddon(name)
+    local AceAddon = { __addons = {} }
+    function AceAddon:NewAddon(name, ...)
+        -- Mixin names (e.g. "AceConsole-3.0", "AceEvent-3.0") are accepted
+        -- and ignored: the harness already embeds Print/Register*/timer
+        -- helpers on every addon via embedBaseMethods.
+        local addon = newAddon(name)
+        self.__addons[name] = addon
+        return addon
+    end
+    function AceAddon:GetAddon(name, silent)
+        local addon = self.__addons[name]
+        if not addon and silent ~= true then
+            error("AceAddon-3.0 has no addon registered as " .. tostring(name), 2)
+        end
+        return addon
     end
     libs["AceAddon-3.0"] = AceAddon
 
@@ -797,6 +809,10 @@ function Wow.Reset(opts)
     _G.RecipeRegistry = nil
     _G.RecipeRegistryDB = nil
     _G.RecipeRegistryCharDB = nil
+    _G.RecipeRegistry_Orders = nil
+    _G.RecipeRegistry_OrdersDB = nil
+    _G.RecipeRegistry_OrdersCharDB = nil
+    _G.RecipeRegistry_OrdersLogDB = nil
     _G.__RecipeRegistrySerializedValues = {}
     _G.__RecipeRegistrySerializedNextId = 0
 
