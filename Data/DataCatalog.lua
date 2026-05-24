@@ -24,14 +24,6 @@ local LIST_BUILD_BUDGET_MS = 3
 local MEMBERS_PER_INDEX_BUILD_STEP = 12
 local INDEX_BUILD_BUDGET_MS = 3
 
-local LEGACY_RESOLVER = {
-    category = Data.GetRecipeCategory,
-    categories = Data.GetRecipeCategories,
-    spell = Data["Get" .. "Atlas" .. "LootSpellInfo"],
-    created = Data["Get" .. "Atlas" .. "LootCreatedItemInfo"],
-    professionName = Private["get" .. "Atlas" .. "LootProfessionName"],
-}
-
 local PROFESSION_LABELS = {
     alchemy = "Alchemy",
     blacksmithing = "Blacksmithing",
@@ -153,35 +145,6 @@ local function applyMetadataInfo(info, metadata, recipeKey, numericKey)
     return true
 end
 
-local function applyLegacyInfo(info, legacy)
-    if not legacy then return false end
-    info.spellID = legacy.spellID
-    info.spellName = legacy.spellName
-    info.spellIcon = legacy.spellID and (GetSpellTexture and GetSpellTexture(legacy.spellID) or nil) or nil
-    info.createdItemID = legacy.createdItemID
-    info.createdItemName = legacy.createdItemName
-    info.recipeItemID = legacy.recipeItemID
-    info.recipeItemName = legacy.recipeItemName
-    info.professionID = legacy.professionID
-    info.minRank = legacy.minRank
-    info.lowRank = legacy.lowRank
-    info.highRank = legacy.highRank
-    info.numCreated = legacy.numCreated or 1
-    info.directEnchant = legacy.createdItemID == nil and legacy.professionID == 10
-    for i = 1, #(legacy.reagentIDs or {}) do
-        local reagentID = legacy.reagentIDs[i]
-        local reagentName, reagentIcon, reagentQuality = getItemData(reagentID)
-        info.reagents[#info.reagents + 1] = {
-            itemID = reagentID,
-            count = (legacy.reagentCounts and legacy.reagentCounts[i]) or 1,
-            name = reagentName or ("item:" .. tostring(reagentID)),
-            icon = reagentIcon,
-            quality = reagentQuality,
-        }
-    end
-    return true
-end
-
 local function nowMsLocal()
     if type(debugprofilestop) == "function" then
         return debugprofilestop()
@@ -249,10 +212,6 @@ local function refreshDetailAssets(info)
                 changedSearch = true
             end
         end
-    end
-
-    if info.professionID and not info.professionName and LEGACY_RESOLVER.professionName then
-        info.professionName = LEGACY_RESOLVER.professionName(info.professionID)
     end
 
     if changedSearch then
@@ -344,30 +303,23 @@ end
 
 function Data:GetRecipeCategory(recipeKey, profession)
     local metadata = getRecipeMetadata()
-    local category = getMetadataCategoryForRecipe(metadata, recipeKey)
-    if category then
-        return category
-    end
-    if LEGACY_RESOLVER.category then
-        return LEGACY_RESOLVER.category(self, recipeKey, profession)
+    if metadata then
+        return getMetadataCategoryForRecipe(metadata, recipeKey)
     end
     return nil
 end
 
 function Data:GetRecipeCategories(profession, includeEmpty)
     local metadata = getRecipeMetadata()
-    local metadataCategories = getMetadataCategories(metadata, profession)
-    if metadataCategories and #metadataCategories > 0 then
+    if metadata then
+        local metadataCategories = getMetadataCategories(metadata, profession)
         local out = {}
-        for _, row in ipairs(metadataCategories) do
+        for _, row in ipairs(metadataCategories or {}) do
             if row.key then
                 out[#out + 1] = row.key
             end
         end
         return out
-    end
-    if LEGACY_RESOLVER.categories then
-        return LEGACY_RESOLVER.categories(self, profession, includeEmpty)
     end
     return {}
 end
@@ -752,12 +704,9 @@ function Data:GetRecipeDisplayInfo(recipeKey)
     }
 
     local metadata = getRecipeMetadata()
-    local appliedMetadata = applyMetadataInfo(info, metadata, recipeKey, n)
+    applyMetadataInfo(info, metadata, recipeKey, n)
 
     if n and n < 0 then
-        if not appliedMetadata and LEGACY_RESOLVER.spell then
-            applyLegacyInfo(info, LEGACY_RESOLVER.spell(self, -n))
-        end
         if not info.spellID then
             info.spellID = -n
         end
@@ -769,9 +718,6 @@ function Data:GetRecipeDisplayInfo(recipeKey)
         end
         info.label = info.spellName or safeGetSpellName(-n) or ("spell:" .. tostring(-n))
     elseif n and n > 0 then
-        if not appliedMetadata and LEGACY_RESOLVER.created then
-            applyLegacyInfo(info, LEGACY_RESOLVER.created(self, n))
-        end
         info.createdItemID = info.createdItemID or n
         local currentName, currentIcon, currentQuality = getItemData(info.createdItemID)
         info.createdItemName = info.createdItemName or currentName
@@ -780,10 +726,6 @@ function Data:GetRecipeDisplayInfo(recipeKey)
         info.label = info.label or info.createdItemName or ("item:" .. tostring(n))
     else
         info.label = tostring(recipeKey)
-    end
-
-    if info.professionID and not info.professionName and LEGACY_RESOLVER.professionName then
-        info.professionName = LEGACY_RESOLVER.professionName(info.professionID)
     end
 
     local parts = {
@@ -1166,6 +1108,36 @@ function Data:GetRecipeCrafters(recipeKey)
         return tostring(a.profession) < tostring(b.profession)
     end)
     return out
+end
+
+function Data:GetRecipeRequestability(recipeKey, memberKey)
+    if recipeKey == nil then
+        return false, "missing-recipe"
+    end
+
+    local selfKey = self.GetPlayerKey and self:GetPlayerKey() or nil
+    if selfKey and memberKey and memberKey == selfKey then
+        return false, "current-player"
+    end
+
+    local metadata = getRecipeMetadata()
+    if not metadata then
+        return true, "requestable-no-plugin"
+    end
+
+    local info = metadata:GetRecipeInfo(recipeKey)
+    if not info then
+        return true, "requestable-unresolved"
+    end
+
+    if metadata:IsOutputlessSelfOnly(recipeKey, info) == true then
+        return false, "not-requestable-self-only"
+    end
+    if metadata:IsBopOutput(recipeKey, info) == true then
+        return false, "not-requestable-bop-output"
+    end
+
+    return true, "requestable"
 end
 
 function Data:GetRecipeDetail(recipeKey)

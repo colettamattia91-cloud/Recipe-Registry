@@ -316,7 +316,6 @@ local function printMainHelp(self)
         self:Print("/rr mock [status, start <" .. MOCK_SCENARIOS .. ">, stop, cleanup, reset, help]")
     end
     self:Print("/rr prices <item name or link>, /rr share [guild, party, raid, say, reply]")
-    self:Print("/rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID>")
     self:Print("/rr clean [check], /rr wipe")
 end
 
@@ -529,7 +528,7 @@ function Addon:OnPlayerEnteringWorld(_event, isLogin, isReload)
         local inInstance = IsInInstance and select(1, IsInInstance()) or false
         -- Pick the longest applicable grace for the event we're handling.
         -- Login and reload do a lot more work than a zone change (item
-        -- cache priming, full guild roster fetch, AtlasLoot warmup,
+        -- cache priming, full guild roster fetch, metadata warmup,
         -- profession scan), so they get their own dedicated values.
         local duration
         if inInstance and (isLogin or isReload) then
@@ -1162,26 +1161,6 @@ function Addon:SlashHandler(input)
         if self.Data and self.Data.DumpLocalSyncStatus then
             self.Data:DumpLocalSyncStatus(rest)
         end
-        return
-    end
-
-    if cmd == "atlas" or cmd == "al" then
-        if self.Data then self.Data:DumpAtlasLootStatus() end
-        return
-    end
-
-    if cmd == "r" or cmd == "recipe" then
-        if self.Data then self.Data:DebugRecipeItem(tonumber(rest or "")) end
-        return
-    end
-
-    if cmd == "s" or cmd == "spell" then
-        if self.Data then self.Data:DebugSpell(tonumber(rest or "")) end
-        return
-    end
-
-    if cmd == "i" or cmd == "item" or cmd == "created" then
-        if self.Data then self.Data:DebugCreatedItem(tonumber(rest or "")) end
         return
     end
 

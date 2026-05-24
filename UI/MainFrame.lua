@@ -3094,6 +3094,26 @@ function UI:_ShowRecipeListLoadingState(context, generation)
     end
 end
 
+function UI:RejectStaleRecipeSelection(rows)
+    if not self.selectedRecipeKey then
+        return false
+    end
+
+    local selected = tostring(self.selectedRecipeKey)
+    for _, rowData in ipairs(rows or {}) do
+        if tostring(rowData.recipeKey) == selected then
+            return false
+        end
+    end
+
+    self.selectedRecipeKey = nil
+    self.currentDetail = nil
+    self._lastDetailSignature = nil
+    self._lastDetailRecipeKey = nil
+    self:CloseShareMenus()
+    return true
+end
+
 function UI:_FinalizeRecipeList(rows, context, generation)
     if not self.frame then return end
     if self._recipeListGeneration ~= generation then return end
@@ -3139,14 +3159,9 @@ function UI:_FinalizeRecipeList(rows, context, generation)
         self.frame.sortSwitch:SetLabel(sortLabel)
     end
 
-    local selectedExists = false
-    if self.selectedRecipeKey then
-        for _, rowData in ipairs(rows) do
-            if rowData.recipeKey == self.selectedRecipeKey then
-                selectedExists = true
-                break
-            end
-        end
+    local selectedExists = self.selectedRecipeKey ~= nil
+    if selectedExists then
+        selectedExists = not self:RejectStaleRecipeSelection(rows)
     end
 
     if (not self.selectedRecipeKey or not selectedExists) and #rows > 0 then
@@ -3169,6 +3184,59 @@ function UI:_FinalizeRecipeList(rows, context, generation)
     -- Async path: the selection may have changed after the list arrived,
     -- so refresh the detail panel to keep it in sync with the new rows.
     self:RefreshDetailPanel()
+end
+
+function UI:GetCrafterRequestability(recipeKey, crafter, selfKey)
+    if not crafter or not crafter.memberKey then
+        return false, "missing-crafter"
+    end
+    if selfKey and crafter.memberKey == selfKey then
+        return false, "current-player"
+    end
+    if Addon.Data and Addon.Data.GetRecipeRequestability then
+        return Addon.Data:GetRecipeRequestability(recipeKey, crafter.memberKey)
+    end
+    return true, "requestable"
+end
+
+function UI:GetCrafterRequestMeta(recipeKey, crafter, selfKey)
+    local requestable, reason = self:GetCrafterRequestability(recipeKey, crafter, selfKey)
+    if reason == "current-player" then
+        return nil, requestable, reason
+    end
+
+    local canRequest = false
+    if requestable then
+        canRequest = not (Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("BLOCK_PULL_REQUEST"))
+    end
+
+    return {
+        canRequest = canRequest,
+        canWhisper = true,
+        memberKey = crafter and crafter.memberKey or nil,
+        requestable = requestable,
+        requestabilityReason = reason,
+    }, requestable, reason
+end
+
+function UI:BuildDetailRequestabilitySignature(detail)
+    local crafters = detail and detail.crafters or nil
+    if not crafters or #crafters == 0 then
+        return ""
+    end
+
+    local selfKey = Addon.Data and Addon.Data.GetPlayerKey and Addon.Data:GetPlayerKey() or nil
+    local parts = {}
+    for _, crafter in ipairs(crafters) do
+        local requestable, reason = self:GetCrafterRequestability(detail.recipeKey, crafter, selfKey)
+        parts[#parts + 1] = table.concat({
+            tostring(crafter.memberKey or ""),
+            requestable and "1" or "0",
+            tostring(reason or ""),
+        }, ":")
+    end
+    table.sort(parts)
+    return table.concat(parts, ",")
 end
 
 -- Reuse the pooled render: when item info arrives or assets change, the
@@ -3546,8 +3614,9 @@ function UI:RefreshDetailPanel()
             if c.online then onlineCount = onlineCount + 1 end
         end
     end
+    local requestabilitySignature = self:BuildDetailRequestabilitySignature(detail)
     local signature = string.format(
-        "%s|%s|%d|%d|%s|%s|%s|%s",
+        "%s|%s|%d|%d|%s|%s|%s|%s|%s",
         tostring(self.selectedRecipeKey),
         isFavorite and "1" or "0",
         tonumber(detail.crafterCount) or 0,
@@ -3555,7 +3624,8 @@ function UI:RefreshDetailPanel()
         tostring(detail.cost and detail.cost.total or ""),
         tostring(detail.cost and detail.cost.missingCount or 0),
         tostring(detail.cost and detail.cost.source or ""),
-        tostring(self._offlineCraftersExpanded)
+        tostring(self._offlineCraftersExpanded),
+        requestabilitySignature
     )
     if self._lastDetailSignature == signature then
         return
@@ -3614,21 +3684,19 @@ function UI:RefreshDetailPanel()
             if crafter.specialization then
                 nameText = nameText .. " " .. colorText("[" .. crafter.specialization .. "]", unpackColor(MUTED))
             end
+            local requestMeta, requestable = self:GetCrafterRequestMeta(self.selectedRecipeKey, crafter, selfKey)
+            if requestable == false and (not selfKey or crafter.memberKey ~= selfKey) then
+                nameText = nameText .. " " .. colorText("[Not requestable]", unpackColor(MUTED))
+            end
             lines[#lines + 1] = string.format("%s %s", state, nameText)
-            if not selfKey or crafter.memberKey ~= selfKey then
+            if requestMeta then
                 -- canWhisper is a local UI action (opens a chat window) and
                 -- has no sync implications, so it stays enabled even when
                 -- SyncPausePolicy pauses protocol traffic (raids,
-                -- instances, combat). canRequest gates the "request a
-                -- craft" action button, which DOES send a whisper from
-                -- the addon — kept under the sync-pause gate so we don't
-                -- emit chat messages while the player is busy.
-                local canRequest = not (Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("BLOCK_PULL_REQUEST"))
-                lineMeta[#lines] = {
-                    canRequest = canRequest,
-                    canWhisper = true,
-                    memberKey = crafter.memberKey,
-                }
+                -- instances, combat). canRequest also stays false for
+                -- BoP and self-only recipes that remote crafters cannot
+                -- deliver.
+                lineMeta[#lines] = requestMeta
             end
         end
         if #offlineCrafters > 0 then
@@ -3645,6 +3713,10 @@ function UI:RefreshDetailPanel()
                     local nameText = getClassColorizedName(crafter.memberKey)
                     if crafter.specialization then
                         nameText = nameText .. " " .. colorText("[" .. crafter.specialization .. "]", unpackColor(MUTED))
+                    end
+                    local requestable = self:GetCrafterRequestability(self.selectedRecipeKey, crafter, selfKey)
+                    if requestable == false and (not selfKey or crafter.memberKey ~= selfKey) then
+                        nameText = nameText .. " " .. colorText("[Not requestable]", unpackColor(MUTED))
                     end
                     lines[#lines + 1] = string.format("%s %s", state, nameText)
                 end

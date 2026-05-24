@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased]
+### Added
+- Added the separately distributed `RecipeRegistry_Metadata` addon as the authoritative static metadata library for Recipe Registry recipe browsing, filtering, categories, reagents, and requestability checks.
+- Added metadata-backed recipe prefilters, including expansion defaults, per-profession overrides, conservative unresolved handling, and diagnostics through `/rr filters`, `/rr filters unresolved`, and `/rr filters explain <recipeKey>`.
+
+### Changed
+- Recipe category navigation, detail cost estimates, material search, and remote BoP/self-only requestability now use internal metadata instead of external recipe resolver data.
+
+### Removed
+- Removed AtlasLoot as a Recipe Registry runtime dependency. `RecipeRegistry.toc` no longer lists AtlasLoot optional dependencies, and the legacy AtlasLoot resolver module is no longer shipped.
+
 ## [2.0.6] - 2026-05-22
 ### Added
 - Added a `Guild Addons` view in the main window that compares the live guild roster with locally observed Recipe Registry peers, using a 30-day "not seen recently" threshold without implying uninstall status.

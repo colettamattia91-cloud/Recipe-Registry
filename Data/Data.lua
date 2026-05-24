@@ -173,8 +173,6 @@ local PROFESSION_SPECIALIZATIONS = {
 
 local localeMap
 local recipeValidityCache = {}
-local atlasHandlesCache
-local atlasProfessionNameCache = {}
 
 local function cloneArray(src)
     if type(src) ~= "table" then return src end
@@ -223,66 +221,6 @@ Private.countRecipeKeys = countRecipeKeys
 Private.countKeys = countKeys
 Private.cloneTableShallow = cloneTableShallow
 Private.nowMs = nowMs
-
-local function cloneAtlasInfo(info)
-    if type(info) ~= "table" then return info end
-    local out = {}
-    for k, v in pairs(info) do
-        out[k] = v
-    end
-    if info.reagentIDs then
-        out.reagentIDs = cloneArray(info.reagentIDs)
-    end
-    if info.reagentCounts then
-        out.reagentCounts = cloneArray(info.reagentCounts)
-    end
-    return out
-end
-
-local function getAtlasLootHandles()
-    if atlasHandlesCache and atlasHandlesCache.recipe and atlasHandlesCache.profession then
-        return atlasHandlesCache.recipe, atlasHandlesCache.profession
-    end
-
-    -- Build candidates without nil holes (ipairs stops at first nil).
-    local candidates = {}
-    if type(_G.AtlasLootClassic) == "table" then
-        candidates[#candidates + 1] = _G.AtlasLootClassic
-    end
-    if type(_G.AtlasLoot) == "table" then
-        candidates[#candidates + 1] = _G.AtlasLoot
-    end
-
-    for _, atlas in ipairs(candidates) do
-        -- Prefer modern shape: AtlasLoot.Data.Recipe / AtlasLoot.Data.Profession
-        local data = type(atlas.Data) == "table" and atlas.Data or atlas
-        local recipe = data.Recipe
-        local profession = data.Profession
-        if type(recipe) == "table" and type(profession) == "table" then
-            atlasHandlesCache = {
-                recipe = recipe,
-                profession = profession,
-            }
-            return recipe, profession
-        end
-    end
-
-    return nil, nil
-end
-
-local function getAtlasLootProfessionName(professionID)
-    if not professionID then return nil end
-    if atlasProfessionNameCache[professionID] ~= nil then
-        return atlasProfessionNameCache[professionID]
-    end
-    local _, profession = getAtlasLootHandles()
-    if profession and type(profession.GetProfessionName) == "function" then
-        local name = profession.GetProfessionName(professionID)
-        atlasProfessionNameCache[professionID] = name
-        return name
-    end
-    return nil
-end
 
 local function safeGetItemName(itemID)
     if not itemID then return nil end
@@ -668,9 +606,6 @@ end
 
 Private.TRACKED = TRACKED
 Private.cloneArray = cloneArray
-Private.cloneAtlasInfo = cloneAtlasInfo
-Private.getAtlasLootHandles = getAtlasLootHandles
-Private.getAtlasLootProfessionName = getAtlasLootProfessionName
 Private.safeGetItemName = safeGetItemName
 Private.safeGetSpellName = safeGetSpellName
 Private.getItemData = getItemData
@@ -702,9 +637,6 @@ function Data:OnInitialize()
         _G.RecipeRegistryCharDB.favorites = {}
     end
     Addon.charDB = _G.RecipeRegistryCharDB
-    self._atlasRecipeInfoCache = {}
-    self._atlasSpellInfoCache = {}
-    self._atlasCreatedItemInfoCache = {}
     self._scanNeededByProfession = {}
     self._genericScanAttempts = {}
     self._scanTelemetry = newScanTelemetry()

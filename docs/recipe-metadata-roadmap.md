@@ -1039,6 +1039,12 @@ Work items:
 - Category navigation works with AtlasLoot absent.
 - Inventory shows zero AtlasLoot category lookups in the new path.
 
+**Phase 8 completion note (2026-05-24):**
+
+- Category navigation with AtlasLoot absent is covered by `local-tests/spec/category_metadata_navigation_spec.lua`, which seeds every supported v1 profession and verifies metadata category filtering covers the same recipes as the All view.
+- The same spec installs throwing AtlasLoot category/ItemDB stubs while `RecipeRegistry_Metadata` is present; `Data:GetRecipeCategory`, `Data:GetRecipeCategories`, and category-filtered `Data:GetRecipeList` still succeed, proving the new category path performs zero AtlasLoot category lookups.
+- `docs/atlasloot-removal-inventory.md` was updated with the Phase 8 category review and records the `DataCatalog.lua` category call-site as metadata-backed, with the legacy AtlasLoot category provider restricted to plugin-absent fallback until Phase 9.
+
 ### Phase 9 — AtlasLoot removal + release hardening
 
 **Goal:** AtlasLoot is fully removed from RR. The new path is the only path. Per §17 decision 8, dropping `OptionalDeps: AtlasLoot` is a **release blocker for v1**, not deferred.
@@ -1059,6 +1065,16 @@ Work items:
 - Manual UI smoke test passes — the "with AtlasLoot installed" scenario now only verifies that *RR ignores AtlasLoot if present*, not that AtlasLoot fills gaps.
 - `RecipeRegistry.toc` contains zero AtlasLoot references.
 - `git grep -i atlasloot RecipeRegistry/` returns zero matches outside an explicitly archived legacy folder (if any).
+
+**Phase 9 completion note (2026-05-24):**
+
+- §8.2 parity criteria are satisfied by the Phase 5-8 replacement specs plus Phase 9 hardening: list/detail/category/material/cost/search/favorites use `RecipeRegistry_Metadata` or direct WoW item/spell APIs, `atlasloot_projection_parity_spec.lua` verifies identical projection with a contradictory AtlasLoot stub present, and `category_metadata_navigation_spec.lua` verifies metadata-only category taxonomy.
+- `RecipeRegistry.toc` now lists `RecipeRegistry_Metadata` as the only recipe metadata optional dependency, contains zero AtlasLoot references, and no longer loads `Data/DataAtlasLoot.lua`.
+- `Data/DataAtlasLoot.lua` and the legacy `/rr atlas`, `/rr r`, `/rr s`, `/rr i` diagnostics were removed; `/rr filters`, `/rr filters unresolved`, and `/rr filters explain <recipeKey>` remain the supported metadata/filter diagnostics.
+- Strict generator validation is enabled in `.github/workflows/recipe-metadata.yml` through `generate --offline --check` and `validate --strict`.
+- `CHANGELOG.md`, `docs/recipe-registry-public-api.md`, and `docs/atlasloot-removal-inventory.md` document the final separate-addon contract, filter behavior, and AtlasLoot removal.
+- Release validation evidence: `.\local-tests\run-backend-tests.ps1`, `.\local-tests\run-syntax.ps1`, `python -m unittest discover -s tools/recipe-metadata/tests`, `python tools/recipe-metadata/generate_recipe_metadata.py generate --flavor tbc --offline --check`, `python tools/recipe-metadata/generate_recipe_metadata.py validate --flavor tbc --strict`, `Select-String -Path .\RecipeRegistry.toc -Pattern "AtlasLoot"`, and `git grep -i atlasloot -- RecipeRegistry.toc Core Data Sync UI Integrations Libs` all pass with the final code.
+- The manual UI smoke expectation for the "with AtlasLoot installed" case is represented in the harness by `atlasloot_projection_parity_spec.lua` and the throwing-stub category test: AtlasLoot may exist globally, but RR ignores it.
 
 ---
 
@@ -1147,7 +1163,7 @@ Single canonical test list. Phase plan references this section instead of restat
 - UI works with AtlasLoot absent (the default case post-v1).
 - UI behavior identical whether the user has AtlasLoot installed or not.
 - Cost estimate works using internal reagents only.
-- `atlasloot_call_site_gate_spec.lua` fails the suite if AtlasLoot is referenced from any path in the projection allowlist.
+- `atlasloot_call_site_gate_spec.lua` fails the suite if AtlasLoot is referenced from the release runtime surface loaded by `RecipeRegistry.toc`.
 
 ### 13.7 Plugin-absent fallback
 
@@ -1257,7 +1273,7 @@ Suggested measurement points (exposed via `/rr filters` or a separate diagnostic
 | Recipe-side sync regression caused by accidental coupling | The filter layer is UI-only by contract. Regression test `filter_sync_isolation_spec.lua` verifies sync fingerprints are unchanged before/after every filter operation. |
 | Plugin and RR drift out of sync on release | Single CurseForge project + single repo + single packager run guarantees they ship together. |
 | Wire prefix collision with future addons | Plugin uses no wire — it's pure data. No collision possible. |
-| AtlasLoot taint reintroduced silently | `atlasloot_call_site_gate_spec.lua` fails the test suite if AtlasLoot is referenced from any path in the new projection allowlist. |
+| AtlasLoot taint reintroduced silently | `atlasloot_call_site_gate_spec.lua` fails the test suite if AtlasLoot is referenced from the release runtime surface loaded by `RecipeRegistry.toc`. |
 | Item cache thrash on `GET_ITEM_INFO_RECEIVED` storms | Scoped per-profession invalidation + rate limiting per §10.2. |
 | `metadataVersion` drift between committed Lua and what generator emits | CI `generate --offline --check` fails on stale committed output. |
 | Coverage gaps per profession block a release | Strict mode fails the build; release blocker is explicit in `coverage.md`. |

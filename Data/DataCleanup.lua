@@ -311,6 +311,6 @@ function Data:WipeDatabase()
     if Addon.Sync then
         Addon.Sync:KickoffDatabaseResync()
     end
-    Addon:Print("Database wiped. AtlasLoot lookups stay available; sync cache is clean and a fresh guild resync was requested.")
+    Addon:Print("Database wiped. Metadata lookups stay available; sync cache is clean and a fresh guild resync was requested.")
     Addon:RequestRefresh("wipe")
 end
