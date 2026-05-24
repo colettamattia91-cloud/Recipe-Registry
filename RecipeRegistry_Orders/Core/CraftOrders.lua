@@ -159,12 +159,16 @@ function Addon:OnEnable()
     end
 
     -- Hook the addon comm channel so peer traffic (HELLO_ORDERS,
-    -- SUMMARY_ORDERS, EVENTS_*) lands in the protocol layer. The
-    -- runtime scheduler (Phase 6 iteration C) will decide when to
-    -- broadcast our own HELLO; until then the protocol responds to
-    -- inbound traffic but stays quiet on the wire.
+    -- SUMMARY_ORDERS, EVENTS_*) lands in the protocol layer.
     if self.Protocol and self.Protocol.RegisterCommHandler then
         self.Protocol:RegisterCommHandler()
+    end
+
+    -- Activate the runtime scheduler: subscribes to local-mutation and
+    -- guild-roster events and schedules the first delayed HELLO so
+    -- peers learn we're online without flooding the channel.
+    if self.Runtime and self.Runtime.OnEnable then
+        self.Runtime:OnEnable()
     end
 end
 

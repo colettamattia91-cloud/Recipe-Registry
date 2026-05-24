@@ -48,6 +48,7 @@ $activeAllSpecs = @(
     "orders_phase6_codec_spec.lua",
     "orders_phase6_protocol_spec.lua",
     "orders_phase6_reducer_spec.lua",
+    "orders_phase6_runtime_spec.lua",
     "p4_scan_opportunistic_spec.lua",
     "slash_output_spec.lua",
     "sync_debug_output_spec.lua",

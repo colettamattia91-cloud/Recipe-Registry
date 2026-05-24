@@ -20,4 +20,5 @@ Planner\CraftOrdersPlanner.lua
 Sync\CraftOrdersCodec.lua
 Sync\CraftOrdersReducer.lua
 Sync\CraftOrdersProtocol.lua
+Sync\CraftOrdersRuntime.lua
 UI\CraftOrdersBoard.lua
