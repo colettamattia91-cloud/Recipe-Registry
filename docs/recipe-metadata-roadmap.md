@@ -7,6 +7,8 @@ Owner of this doc: the implementation plan for the feature. The source requireme
 
 This roadmap is the working plan. It must not be overwritten without a follow-up commit explaining what changed and why.
 
+**Current implementation status (updated 2026-05-24 after remediation pass):** the branch is **not Phase 9 / release-ready**. It contains a working metadata-addon scaffold, UI filter integration, AtlasLoot call-site removal gates, scoped profession filter cache keys/invalidation, metadata category/subcategory navigation, and a strict validator that now blocks fixture datasets. It does **not** yet satisfy the roadmap's real-data / 100% expected coverage requirement. Treat Phase 4 as incomplete and Phase 9 as blocked until a release-candidate metadata snapshot replaces the fixture dataset with complete Vanilla + TBC recipe coverage.
+
 **Distribution model (decided 2026-05-23):** the generated metadata library ships as a **separate addon** (`RecipeRegistry_Metadata`) inside the **same git repo** and the **same CurseForge project** as Recipe Registry and Craft Orders. Same AtlasLoot-style `move-folders` packaging pattern documented in [`craft-orders-roadmap.md`](craft-orders-roadmap.md) §3.5. The Python generator stays out of the runtime entirely, in `tools/recipe-metadata/`.
 
 Recipe Registry depends on the metadata addon as **optional** (`## OptionalDeps`): if `RecipeRegistry_Metadata` is not installed, RR falls back to its current behavior (no expansion filter, conservative remote-BoP behavior, AtlasLoot-as-resolver where still wired). With the plugin installed, RR's UI gains expansion filters, BoP filters, owner index, and the AtlasLoot resolver path is fully replaceable.
@@ -54,6 +56,7 @@ The UI must build a *filtered runtime projection* from the complete local/synced
 ### 1.4 Supported expansion model
 
 - `vanilla` and `tbc` are the only supported expansion values for v1.
+- The TBC `2.5.5` release-candidate dataset must include every supported-profession recipe whose first supported expansion is Vanilla or TBC. A TBC-only delta dataset is not sufficient.
 - No user-facing `unknown` expansion toggle. Unresolved-expansion records are a *remediation task*, not a third user category.
 - Future expansion records (WotLK and beyond) must be filtered out of the runtime TBC metadata, or reported as out-of-scope by the generator.
 
@@ -512,7 +515,7 @@ python tools/recipe-metadata/generate_recipe_metadata.py report   [--flavor tbc]
 
 | Priority | Source | Purpose |
 |----------|--------|---------|
-| 1 | **wago.tools** DB2 snapshots (TBC 2.5.x build) | spell → profession → required skill, items, reagents, bind types |
+| 1 | **wago.tools** DB2 snapshots (TBC 2.5.5 build) | spell → profession → required skill, items, reagents, bind types |
 | 2 | Secondary static / scraped sources | fields not available in DB2 (e.g., expansion classification helpers) |
 | 3 | Local committed snapshots in `tools/recipe-metadata/snapshots/` | deterministic offline regeneration; CI source |
 | 4 | Manual remediation (`manual_overrides.yaml`) | known exceptions and corrections |
@@ -919,7 +922,7 @@ Work items:
 
 ### Phase 4 — Generator real data extraction
 
-**Goal:** replace the sample data with a real TBC dataset.
+**Goal:** replace the sample data with a real TBC `2.5.5` dataset that includes every supported Vanilla and TBC recipe.
 
 Work items:
 
@@ -964,9 +967,16 @@ Work items:
 
 - `python ... generate --offline --check` succeeds on committed snapshots.
 - `python ... validate --strict` succeeds with **zero** release-blocking unresolved records.
-- `coverage.md` shows 100% resolved expansion, profession, and category for every recipe of every supported profession (§7.7).
+- `coverage.md` shows expected/actual/missing coverage by profession, by expansion (`vanilla`, `tbc`), and by profession/expansion for every recipe of every supported profession (§7.7).
 - `reagent-coverage.md` shows 100% resolved reagents for every recipe whose UI detail / cost path depends on reagent metadata.
 - Any gap is closed by either upstream improvement or by adding the missing entry to `manual_overrides.yaml`. No deferred-to-v1.1 entries.
+
+**Review status (2026-05-24): blocked.**
+
+- The committed snapshot is still a small fixture: `artifacts/recipe-metadata/coverage.md` reports `Records: 14`, and the manifest marks the input as `datasetKind: fixture`.
+- `validate --strict` now fails this fixture dataset by design. It will pass only when a release-candidate snapshot declares expected counts by profession, expansion, and profession/expansion and the emitted records meet them.
+- `fetch` is maintainer-only and imports normalized snapshot JSON files into the committed snapshot directory; it still depends on a separate upstream normalization step.
+- Phase 4 remains incomplete until the source provider ingests a real TBC `2.5.5` dataset containing both Vanilla and TBC recipes, strict validation compares emitted coverage against expected supported-profession recipe coverage, and the reports prove full expansion/profession/category/reagent coverage over that real dataset.
 
 ### Phase 5 — AtlasLoot call-site inventory + replacement
 
@@ -1039,11 +1049,12 @@ Work items:
 - Category navigation works with AtlasLoot absent.
 - Inventory shows zero AtlasLoot category lookups in the new path.
 
-**Phase 8 completion note (2026-05-24):**
+**Phase 8 partial-completion note (2026-05-24):**
 
 - Category navigation with AtlasLoot absent is covered by `local-tests/spec/category_metadata_navigation_spec.lua`, which seeds every supported v1 profession and verifies metadata category filtering covers the same recipes as the All view.
 - The same spec installs throwing AtlasLoot category/ItemDB stubs while `RecipeRegistry_Metadata` is present; `Data:GetRecipeCategory`, `Data:GetRecipeCategories`, and category-filtered `Data:GetRecipeList` still succeed, proving the new category path performs zero AtlasLoot category lookups.
 - `docs/atlasloot-removal-inventory.md` was updated with the Phase 8 category review and records the `DataCatalog.lua` category call-site as metadata-backed, with the legacy AtlasLoot category provider restricted to plugin-absent fallback until Phase 9.
+- Remaining gap: the UI currently exposes category keys only. `Data:GetRecipeCategories` drops category labels/subcategory rows, and `MainFrame.lua` renders the raw key as the button label. Subcategory navigation and polished category labels are still required for the full §5.2 / §8 taxonomy contract.
 
 ### Phase 9 — AtlasLoot removal + release hardening
 
@@ -1066,15 +1077,16 @@ Work items:
 - `RecipeRegistry.toc` contains zero AtlasLoot references.
 - `git grep -i atlasloot RecipeRegistry/` returns zero matches outside an explicitly archived legacy folder (if any).
 
-**Phase 9 completion note (2026-05-24):**
+**Phase 9 review correction (2026-05-24): blocked, not complete.**
 
-- §8.2 parity criteria are satisfied by the Phase 5-8 replacement specs plus Phase 9 hardening: list/detail/category/material/cost/search/favorites use `RecipeRegistry_Metadata` or direct WoW item/spell APIs, `atlasloot_projection_parity_spec.lua` verifies identical projection with a contradictory AtlasLoot stub present, and `category_metadata_navigation_spec.lua` verifies metadata-only category taxonomy.
-- `RecipeRegistry.toc` now lists `RecipeRegistry_Metadata` as the only recipe metadata optional dependency, contains zero AtlasLoot references, and no longer loads `Data/DataAtlasLoot.lua`.
-- `Data/DataAtlasLoot.lua` and the legacy `/rr atlas`, `/rr r`, `/rr s`, `/rr i` diagnostics were removed; `/rr filters`, `/rr filters unresolved`, and `/rr filters explain <recipeKey>` remain the supported metadata/filter diagnostics.
-- Strict generator validation is enabled in `.github/workflows/recipe-metadata.yml` through `generate --offline --check` and `validate --strict`.
-- `CHANGELOG.md`, `docs/recipe-registry-public-api.md`, and `docs/atlasloot-removal-inventory.md` document the final separate-addon contract, filter behavior, and AtlasLoot removal.
-- Release validation evidence: `.\local-tests\run-backend-tests.ps1`, `.\local-tests\run-syntax.ps1`, `python -m unittest discover -s tools/recipe-metadata/tests`, `python tools/recipe-metadata/generate_recipe_metadata.py generate --flavor tbc --offline --check`, `python tools/recipe-metadata/generate_recipe_metadata.py validate --flavor tbc --strict`, `Select-String -Path .\RecipeRegistry.toc -Pattern "AtlasLoot"`, and `git grep -i atlasloot -- RecipeRegistry.toc Core Data Sync UI Integrations Libs` all pass with the final code.
-- The manual UI smoke expectation for the "with AtlasLoot installed" case is represented in the harness by `atlasloot_projection_parity_spec.lua` and the throwing-stub category test: AtlasLoot may exist globally, but RR ignores it.
+- Confirmed working before remediation: local Lua tests, Lua syntax checks, generator unittest suite, `generate --offline --check`, and AtlasLoot grep/parity gates passed against the fixture data.
+- Release blocker: `validate --strict` now correctly fails because the metadata fixture contains only 14 records. Removing AtlasLoot as a runtime authority is not release-safe until Phase 4 produces full supported-profession Vanilla + TBC coverage.
+- Fixed in remediation pass: strict validation now fails fixture datasets and release-candidate snapshots with missing expected counts by profession, expansion, or profession/expansion.
+- Fixed in remediation pass: scoped profession cache keys and targeted profession/global-search cache eviction prevent unrelated profession overrides from busting normal profession list caches.
+- Fixed in remediation pass: unknown BoP output records track created-item info and invalidate affected profession projections when item cache data arrives.
+- Fixed in remediation pass: category/subcategory UI renders metadata labels and supports subcategory filtering.
+- Remaining release blocker: the committed snapshot is still a 14-record fixture, not the full supported-profession Vanilla + TBC release-candidate dataset.
+- Keep AtlasLoot removal work staged behind these blockers. If AtlasLoot is dropped from `OptionalDeps` before the real metadata dataset and gates are complete, most real recipes will lose resolver coverage.
 
 ---
 
@@ -1276,7 +1288,7 @@ Suggested measurement points (exposed via `/rr filters` or a separate diagnostic
 | AtlasLoot taint reintroduced silently | `atlasloot_call_site_gate_spec.lua` fails the test suite if AtlasLoot is referenced from the release runtime surface loaded by `RecipeRegistry.toc`. |
 | Item cache thrash on `GET_ITEM_INFO_RECEIVED` storms | Scoped per-profession invalidation + rate limiting per §10.2. |
 | `metadataVersion` drift between committed Lua and what generator emits | CI `generate --offline --check` fails on stale committed output. |
-| Coverage gaps per profession block a release | Strict mode fails the build; release blocker is explicit in `coverage.md`. |
+| Coverage gaps per profession block a release | Strict mode must fail when expected supported-profession records are absent, not only when emitted records are malformed. `coverage.md` must report coverage against a real expected denominator. |
 | User loses filter settings on profile migration | Migration is purely additive (§10.6); unknown keys preserved. Spec covers each missing-key scenario. |
 
 ---
@@ -1325,11 +1337,48 @@ Until then, single CurseForge project, coordinated releases. Cosmetic "RR update
 
 ---
 
-## 20. How to advance
+## 20. Remediation backlog from branch review (2026-05-24)
 
-Decisions §17 are locked. Next steps:
+Use this as the next VSCode implementation order. Each item must land with tests that fail on the current reviewed branch and pass after the fix.
 
-1. Fork `feature/recipe-metadata-library` from `develop` whenever it's convenient (parallel to the craft-orders branch, no strict ordering).
-2. Commit this doc as the first feature-branch commit.
-3. Start Phase 0: data contract + scaffolds.
-4. Loop back here for Phase 1 plan refinement once the sample data + plugin API are in place.
+1. **Replace fixture coverage with real expected coverage.**
+   - Implement or import the full supported-profession TBC `2.5.5` source snapshot, including all Vanilla recipes and all TBC recipes in scope.
+   - Keep committed snapshots minimal, but make them complete for v1 scope: alchemy, blacksmithing, enchanting, engineering, jewelcrafting, leatherworking, tailoring, and cooking.
+   - Update `source-manifest.json` to distinguish "fixture/sample" from "release candidate dataset".
+
+2. **Make `validate --strict` a real release gate.**
+   - Add expected-record accounting per supported profession, per supported expansion, and per profession/expansion pair.
+   - Fail strict validation when the emitted set is missing expected recipes, missing reagents for cost/detail paths, missing category/subcategory taxonomy, or missing BoP/self-only classification required by filters.
+   - Add tests proving a truncated snapshot fails strict validation.
+
+3. **Implement the source refresh path.**
+   - Replace placeholder `fetch` with the decided maintainer-only snapshot refresh flow.
+   - Pin source build/version metadata in the manifest and make offline generation reproducible from committed snapshots.
+   - Keep network access out of runtime and out of CI's offline path.
+
+4. **Fix cache key and invalidation scope.** *(implemented 2026-05-24)*
+   - Make normal profession list cache keys include only the effective visibility for that profession, remote-BoP setting, metadata version/schema/flavor, category/search/sort, and the relevant filter/projection generation.
+   - Keep global search and Favorites keys broad enough to account for all professions they may include.
+   - Replace full list-cache invalidation for per-profession override changes with targeted invalidation plus global/Favorites invalidation where applicable.
+   - Add regression tests proving an Engineering override does not evict an unrelated Alchemy profession list cache.
+
+5. **Finish BoP item-cache policy.** *(implemented 2026-05-24 for runtime unknown-bind handling)*
+   - Preserve static `bopOutput` as the preferred source.
+   - Add runtime `GetItemInfo` confirmation only where metadata is unknown and track pending created-item lookups.
+   - Map item-info events to affected created item IDs, recipe keys, and profession projections; dedupe/rate-limit repeated refreshes.
+   - Add tests for unknown BoP pending behavior and scoped refresh after `GET_ITEM_INFO_RECEIVED`.
+
+6. **Complete category/subcategory UX.** *(implemented 2026-05-24)*
+   - Return category rows with stable keys, labels, order, and optional subcategory rows from `Data:GetRecipeCategories`.
+   - Render user-facing labels in the sidebar instead of raw category keys.
+   - Add subcategory filtering/navigation or explicitly collapse subcategories into category labels with a documented v1 decision.
+   - Add tests that labels/subcategories survive through `RecipeMetadata` → `DataCatalog` → `MainFrame`.
+
+7. **Validate addon load-order and distribution.** *(partially implemented 2026-05-24: metadata hard dependency removed)*
+   - Confirm the `OptionalDeps` + metadata hard dependency model in an in-game or TOC-order harness test.
+   - Ensure the metadata addon can be enabled/disabled independently without load errors.
+   - Keep `.pkgmeta`, TOCs, and release notes aligned with the final load-order behavior.
+
+8. **Only then re-run Phase 9.**
+   - Re-run backend tests, syntax checks, Python unittest, `generate --offline --check`, `validate --strict`, AtlasLoot grep gates, and manual smoke with AtlasLoot installed but ignored.
+   - Restore a Phase 9 completion note only after the real dataset and release gates pass.

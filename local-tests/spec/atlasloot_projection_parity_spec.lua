@@ -81,7 +81,13 @@ local function captureProjection(withAtlas)
     table.sort(rowKeys)
 
     return table.concat({
-        table.concat(categories or {}, ","),
+        table.concat((function()
+            local parts = {}
+            for _, row in ipairs(categories or {}) do
+                parts[#parts + 1] = tostring(row.key) .. ":" .. tostring(row.label)
+            end
+            return parts
+        end)(), ","),
         table.concat(rowKeys, ","),
         tostring(detail.spellID),
         tostring(detail.createdItemID),

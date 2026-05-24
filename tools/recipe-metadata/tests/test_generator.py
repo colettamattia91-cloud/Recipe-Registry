@@ -25,6 +25,27 @@ def load_default_records():
     return primary, records, diagnostics
 
 
+def build_expected_counts(records):
+    expected = {
+        "total": len(records),
+        "byProfession": {},
+        "byExpansion": {},
+        "byProfessionExpansion": {},
+    }
+    for record in records:
+        expected["byProfession"][record.profession_key] = (
+            expected["byProfession"].get(record.profession_key, 0) + 1
+        )
+        expected["byExpansion"][record.expansion] = (
+            expected["byExpansion"].get(record.expansion, 0) + 1
+        )
+        expected["byProfessionExpansion"].setdefault(record.profession_key, {})
+        expected["byProfessionExpansion"][record.profession_key][record.expansion] = (
+            expected["byProfessionExpansion"][record.profession_key].get(record.expansion, 0) + 1
+        )
+    return expected
+
+
 class GeneratorPipelineTests(unittest.TestCase):
     def test_normal_vanilla_and_tbc_crafts(self):
         _primary, records, _diagnostics = load_default_records()
@@ -142,6 +163,89 @@ class GeneratorPipelineTests(unittest.TestCase):
                 generator.REPORT_DIR = original_report_dir
 
         self.assertEqual(exit_code, 1)
+
+    def test_strict_validation_fails_fixture_dataset_kind(self):
+        primary, records, diagnostics = load_default_records()
+
+        failures, _unresolved = validate_records(
+            records,
+            diagnostics,
+            strict=True,
+            source_manifest=primary["manifest"],
+        )
+
+        self.assertTrue(any(item["field"] == "datasetKind" for item in failures))
+
+    def test_strict_validation_fails_truncated_release_candidate_snapshot(self):
+        primary, records, diagnostics = load_default_records()
+        expected = build_expected_counts(records)
+        manifest = dict(primary["manifest"], datasetKind="release-candidate", expectedRecipeCounts=expected)
+
+        failures, _unresolved = validate_records(
+            records[:-1],
+            diagnostics,
+            strict=True,
+            source_manifest=manifest,
+        )
+
+        self.assertTrue(any(item["field"] == "recipeCoverage" for item in failures))
+
+    def test_release_candidate_requires_vanilla_and_tbc_expected_coverage(self):
+        primary, records, diagnostics = load_default_records()
+        expected = build_expected_counts(records)
+        manifest = dict(
+            primary["manifest"],
+            datasetKind="release-candidate",
+            expectedRecipeCounts={"byProfession": expected["byProfession"]},
+        )
+
+        failures, _unresolved = validate_records(
+            records,
+            diagnostics,
+            strict=True,
+            source_manifest=manifest,
+        )
+
+        self.assertTrue(any(item["field"] == "expectedCoverage" for item in failures))
+
+    def test_strict_validation_fails_missing_vanilla_or_tbc_records(self):
+        primary, records, diagnostics = load_default_records()
+        expected = build_expected_counts(records)
+        manifest = dict(primary["manifest"], datasetKind="release-candidate", expectedRecipeCounts=expected)
+        truncated = tuple(record for record in records if record.spell_id != 2329)
+
+        failures, _unresolved = validate_records(
+            truncated,
+            diagnostics,
+            strict=True,
+            source_manifest=manifest,
+        )
+
+        self.assertTrue(any(item["field"] == "expansionCoverage" for item in failures))
+        self.assertTrue(any(item["field"] == "professionExpansionCoverage" for item in failures))
+
+    def test_coverage_report_shows_expected_actual_and_missing(self):
+        primary, records, diagnostics = load_default_records()
+        primary = dict(primary)
+        expected = {"alchemy": 5}
+        primary["manifest"] = dict(primary["manifest"], datasetKind="release-candidate", expectedRecipeCounts=expected)
+
+        reports = generator.build_reports(records, diagnostics, primary)
+
+        self.assertIn("| alchemy | 4 | 5 | 1 |", reports["coverage.md"])
+
+    def test_coverage_report_shows_vanilla_and_tbc_denominators(self):
+        primary, records, diagnostics = load_default_records()
+        primary = dict(primary)
+        expected = build_expected_counts(records)
+        expected["byExpansion"]["vanilla"] += 1
+        expected["byProfessionExpansion"]["alchemy"]["vanilla"] += 1
+        primary["manifest"] = dict(primary["manifest"], datasetKind="release-candidate", expectedRecipeCounts=expected)
+
+        reports = generator.build_reports(records, diagnostics, primary)
+
+        self.assertIn("| vanilla | 5 | 6 | 1 |", reports["coverage.md"])
+        self.assertIn("| alchemy | 2 | 3 | 1 | 2 | 2 | 0 |", reports["coverage.md"])
 
 
 if __name__ == "__main__":

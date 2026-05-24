@@ -14,7 +14,7 @@ import json
 from pathlib import Path
 
 
-DEFAULT_SNAPSHOT = "tbc-2.5.4"
+DEFAULT_SNAPSHOT = "tbc-2.5.5"
 
 
 def _read_json(path):

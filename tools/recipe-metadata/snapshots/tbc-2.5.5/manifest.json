@@ -1,0 +1,31 @@
+{
+  "provider": "wago.tools-db2-normalized",
+  "snapshot": "tbc-2.5.5",
+  "metadataVersion": "2026.05.23.2",
+  "flavor": "tbc",
+  "datasetKind": "fixture",
+  "sourceBuild": "2.5.5",
+  "scope": {
+    "expansions": [
+      "vanilla",
+      "tbc"
+    ],
+    "professions": [
+      "alchemy",
+      "blacksmithing",
+      "cooking",
+      "enchanting",
+      "engineering",
+      "jewelcrafting",
+      "leatherworking",
+      "tailoring"
+    ]
+  },
+  "tables": [
+    "SkillLineAbility",
+    "Spell",
+    "SpellEffect",
+    "ItemSparse"
+  ],
+  "notes": "Minimal normalized offline snapshot for deterministic RecipeRegistry_Metadata generation."
+}

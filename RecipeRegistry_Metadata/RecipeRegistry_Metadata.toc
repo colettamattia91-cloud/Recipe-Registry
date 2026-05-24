@@ -3,7 +3,6 @@
 ## Notes: Static recipe metadata library for Recipe Registry
 ## Author: OpenAI + User collaboration
 ## Version: 0.1.0
-## Dependencies: RecipeRegistry
 ## X-Category: Guild
 
 Libs\embeds.xml

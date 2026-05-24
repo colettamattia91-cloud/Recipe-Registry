@@ -1,7 +1,7 @@
 local Loader = dofile("local-tests/harness/load-addon.lua")
 local Test = dofile("local-tests/harness/test.lua")
 
-local _metadataAddon, _wow, addon = Loader.LoadMetadata()
+local metadataAddon, wow, addon = Loader.LoadMetadata()
 local data = addon.Data
 local filters = addon.RecipeUiFilters
 
@@ -43,4 +43,26 @@ Test.it("always shows BoP output recipes known by the current player", function(
     local passes, reason = filters:RecipePasses(-35530)
     Test.eq(passes, true)
     Test.eq(reason, "visible-current-player")
+end)
+
+Test.it("keeps unknown BoP visible until item info confirms the bind type", function()
+    local metadata = metadataAddon.RecipeMetadata
+    local record = metadata:GetRecipeInfo(-28543)
+    record.bopOutput = nil
+    addon.db.profile.recipePrefilters.showRemoteBopOutputRecipes = false
+    seedMember("RemoteBop-TestRealm", "Alchemy", -28543, "replica")
+
+    local passes, reason = filters:RecipePasses(-28543)
+    Test.eq(passes, true)
+    Test.eq(reason, "visible-normal")
+    Test.truthy(data._pendingBopItemInfoByItemID and data._pendingBopItemInfoByItemID[22823], "unknown bind should be tracked")
+
+    wow.GetState().items[22823] = { bindType = 1 }
+    wow.DeliverEvent(addon, "GET_ITEM_INFO_RECEIVED", 22823)
+    wow.AdvanceTime(0.8)
+    wow.RunDueTimers()
+
+    passes, reason = filters:RecipePasses(-28543)
+    Test.eq(passes, false)
+    Test.eq(reason, "hidden-remote-bop")
 end)

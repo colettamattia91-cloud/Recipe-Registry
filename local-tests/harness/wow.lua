@@ -637,7 +637,7 @@ local function installWowGlobals()
         local item = state.items[itemID] or {}
         local name = item.name or ("Item " .. tostring(itemID))
         local link = item.link or itemLink(itemID, name)
-        return name, link, item.quality or 1, nil, nil, nil, nil, nil, nil, item.icon or ("item-icon-" .. tostring(itemID))
+        return name, link, item.quality or 1, nil, nil, nil, nil, nil, nil, item.icon or ("item-icon-" .. tostring(itemID)), nil, nil, nil, item.bindType
     end
     _G.GetItemInfoInstant = function(itemID)
         return tonumber(itemID), nil, nil, nil, "item-icon-" .. tostring(itemID)

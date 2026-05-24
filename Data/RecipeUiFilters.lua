@@ -22,6 +22,8 @@ local PROFESSION_KEY_BY_DISPLAY = {
     Tailoring = "tailoring",
 }
 
+local FAVORITES_VIEW = "Favorites"
+
 local function normalizeProfessionKey(professionKey)
     if not professionKey then
         return nil
@@ -150,6 +152,9 @@ function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
 
     local selfOnly = metadata:IsOutputlessSelfOnly(recipeKey, info)
     local bopOutput = metadata:IsBopOutput(recipeKey, info)
+    if bopOutput == nil and Addon.Data and Addon.Data.ResolveRecipeBopOutput then
+        bopOutput = Addon.Data:ResolveRecipeBopOutput(recipeKey, info)
+    end
     local restricted = selfOnly == true or bopOutput == true
     if restricted and ownership.knownByCurrentPlayer == true then
         return true, "visible-current-player"
@@ -171,6 +176,29 @@ function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
     return true, "visible-normal"
 end
 
+local function appendOverride(parts, professionKey, override)
+    if type(override) ~= "table" then
+        return
+    end
+    parts[#parts + 1] = table.concat({
+        "override",
+        normalizeProfessionKey(professionKey) or tostring(professionKey),
+        boolToken(override.inherit ~= false),
+        boolToken(override.vanilla == true),
+        boolToken(override.tbc == true),
+    }, ":")
+end
+
+local function shouldUseBroadFilterKey(ctx)
+    if not ctx then
+        return true
+    end
+    if ctx.globalSearch == true or ctx.selectedProfession == FAVORITES_VIEW then
+        return true
+    end
+    return normalizeProfessionKey(ctx.effectiveProfession or ctx.selectedProfession) == nil
+end
+
 function RecipeUiFilters:BuildFilterCacheKey(ctx)
     ctx = ctx or {}
     local metadata = getMetadata()
@@ -179,29 +207,34 @@ function RecipeUiFilters:BuildFilterCacheKey(ctx)
     end
 
     local filters = getProfilePrefilters()
+    local data = Addon.Data or {}
     local parts = {
         "plugin=present",
         "metadata=" .. tostring(metadata.metadataVersion or ""),
         "schema=" .. tostring(metadata.schemaVersion or ""),
         "flavor=" .. tostring(metadata.flavor or ""),
         "remoteBop=" .. boolToken(filters.showRemoteBopOutputRecipes == true),
-        "defaultVanilla=" .. boolToken(filters.expansionDefaults and filters.expansionDefaults.vanilla ~= false),
-        "defaultTbc=" .. boolToken(filters.expansionDefaults and filters.expansionDefaults.tbc ~= false),
-        "ownership=" .. tostring(Addon.Data and Addon.Data._recipeOwnershipIndexGeneration or 0),
+        "ownership=" .. tostring(data._recipeOwnershipIndexGeneration or 0),
     }
 
     local overrides = filters.professionExpansionOverrides or {}
-    for _, professionKey in ipairs(sortedKeys(overrides)) do
-        local override = overrides[professionKey]
-        if type(override) == "table" then
-            parts[#parts + 1] = table.concat({
-                "override",
-                normalizeProfessionKey(professionKey) or tostring(professionKey),
-                boolToken(override.inherit ~= false),
-                boolToken(override.vanilla == true),
-                boolToken(override.tbc == true),
-            }, ":")
+    if shouldUseBroadFilterKey(ctx) then
+        parts[#parts + 1] = "scope=broad"
+        parts[#parts + 1] = "defaultVanilla=" .. boolToken(filters.expansionDefaults and filters.expansionDefaults.vanilla ~= false)
+        parts[#parts + 1] = "defaultTbc=" .. boolToken(filters.expansionDefaults and filters.expansionDefaults.tbc ~= false)
+        parts[#parts + 1] = "filterGen=" .. tostring(data._recipeFilterGenerationAll or 0)
+        for _, professionKey in ipairs(sortedKeys(overrides)) do
+            appendOverride(parts, professionKey, overrides[professionKey])
         end
+    else
+        local professionKey = normalizeProfessionKey(ctx.effectiveProfession or ctx.selectedProfession)
+        local visibility = self:GetEffectiveExpansionVisibility(professionKey)
+        local professionGenerations = data._recipeFilterGenerationByProfession or {}
+        parts[#parts + 1] = "scope=profession:" .. tostring(professionKey)
+        parts[#parts + 1] = "vanilla=" .. boolToken(visibility.vanilla ~= false)
+        parts[#parts + 1] = "tbc=" .. boolToken(visibility.tbc ~= false)
+        parts[#parts + 1] = "inherited=" .. boolToken(visibility.inherited == true)
+        parts[#parts + 1] = "filterGen=" .. tostring(professionGenerations[professionKey] or 0)
     end
 
     return table.concat(parts, "|")
@@ -223,10 +256,13 @@ function RecipeUiFilters:Explain(recipeKey, ctx)
 end
 
 function RecipeUiFilters:InvalidateProfessionProjection(professionKey, reason)
-    if Addon.Data and Addon.Data.InvalidateRecipeCaches then
+    local normalizedProfession = normalizeProfessionKey(professionKey)
+    if Addon.Data and Addon.Data.InvalidateRecipeListCacheForFilter then
+        Addon.Data:InvalidateRecipeListCacheForFilter(normalizedProfession, reason)
+    elseif Addon.Data and Addon.Data.InvalidateRecipeCaches then
         Addon.Data:InvalidateRecipeCaches("list")
     end
     if Addon.RequestRefresh then
-        Addon:RequestRefresh(reason or ("filters:" .. tostring(professionKey or "all")))
+        Addon:RequestRefresh(reason or ("filters:" .. tostring(normalizedProfession or "all")))
     end
 end

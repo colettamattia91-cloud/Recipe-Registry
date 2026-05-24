@@ -75,13 +75,27 @@ local function cloneSpellIdList(list)
     return out
 end
 
-local function cloneCategoryList(list)
+local function cloneSubcategoryList(list)
+    local out = {}
+    for index, subcategory in ipairs(list or {}) do
+        out[index] = {
+            key = subcategory.key,
+            label = subcategory.label,
+            order = subcategory.order,
+        }
+    end
+    return out
+end
+
+local function cloneCategoryList(list, subcategoriesByCategory)
     local out = {}
     for index, category in ipairs(list or {}) do
+        local key = category.key
         out[index] = {
-            key = category.key,
+            key = key,
             label = category.label,
             order = category.order,
+            subcategories = cloneSubcategoryList(subcategoriesByCategory and subcategoriesByCategory[key] or nil),
         }
     end
     return out
@@ -295,7 +309,21 @@ end
 
 function RecipeMetadata:GetCategoriesForProfession(professionKey)
     local generatedCategories = self._generated and self._generated.categoriesByProfession
-    return cloneCategoryList(generatedCategories and generatedCategories[professionKey] or nil)
+    local generatedSubcategories = self._generated and self._generated.subcategoriesByProfession
+    return cloneCategoryList(
+        generatedCategories and generatedCategories[professionKey] or nil,
+        generatedSubcategories and generatedSubcategories[professionKey] or nil
+    )
+end
+
+function RecipeMetadata:GetSubcategoriesForProfession(professionKey, categoryKey)
+    local generatedSubcategories = self._generated and self._generated.subcategoriesByProfession
+    return cloneSubcategoryList(
+        generatedSubcategories
+            and generatedSubcategories[professionKey]
+            and generatedSubcategories[professionKey][categoryKey]
+            or nil
+    )
 end
 
 function RecipeMetadata:GetCreatedItemId(recipeKey, info)

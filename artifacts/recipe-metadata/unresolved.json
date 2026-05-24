@@ -1,1 +1,8 @@
-[]
+[
+  {
+    "field": "datasetKind",
+    "message": "strict validation requires a release-candidate dataset, got fixture",
+    "severity": "release-blocking",
+    "spellId": null
+  }
+]

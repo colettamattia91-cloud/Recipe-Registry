@@ -3,11 +3,16 @@ local Test = dofile("local-tests/harness/test.lua")
 
 local addon, wow, core = Loader.LoadMetadata()
 
-Test.it("loads the metadata addon after Recipe Registry", function()
+Test.it("loads the metadata addon with an acyclic optional dependency model", function()
     Test.truthy(core, "core addon should load")
     Test.truthy(addon, "metadata addon should load")
     Test.eq(addon.ADDON_VERSION, "0.1.0")
     Test.truthy(addon.RecipeMetadata, "metadata table should be exposed")
+
+    local handle = assert(io.open("RecipeRegistry_Metadata/RecipeRegistry_Metadata.toc", "r"))
+    local contents = handle:read("*a")
+    handle:close()
+    Test.falsy(contents:find("## Dependencies: RecipeRegistry", 1, true), "metadata addon must not hard-depend on Recipe Registry")
 end)
 
 Test.it("exposes generated record counts for diagnostics", function()

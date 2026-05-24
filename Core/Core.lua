@@ -764,7 +764,11 @@ function Addon:OnItemInfoBucket(events)
     self.bucketTelemetry.itemBuckets = (self.bucketTelemetry.itemBuckets or 0) + 1
     self.bucketTelemetry.itemEventsAbsorbed = (self.bucketTelemetry.itemEventsAbsorbed or 0) + absorbed
     self.bucketTelemetry.lastItemBucketAt = time()
-    if self.Data then
+    local handledMetadataBop = false
+    if self.Data and self.Data.OnMetadataItemInfoReceived then
+        handledMetadataBop = self.Data:OnMetadataItemInfoReceived(events) == true
+    end
+    if self.Data and not handledMetadataBop then
         self.Data:InvalidateRecipeCaches("list")
     end
     self:RequestRefresh("item-cache")

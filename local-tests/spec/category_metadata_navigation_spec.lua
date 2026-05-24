@@ -66,8 +66,8 @@ local function assertCategoryCoverage(profession)
 
     local union = {}
     local summedRows = 0
-    for _, categoryName in ipairs(data:GetRecipeCategories(profession, true)) do
-        local rows = data:GetRecipeList(profession, "", "alpha", "recipe", categoryName, {})
+    for _, categoryRow in ipairs(data:GetRecipeCategories(profession, true)) do
+        local rows = data:GetRecipeList(profession, "", "alpha", "recipe", categoryRow.key, {})
         summedRows = summedRows + #rows
         for _, row in ipairs(rows) do
             local key = tostring(row.recipeKey)
@@ -94,6 +94,7 @@ Test.it("navigates categories from RecipeRegistry_Metadata with AtlasLoot absent
     for profession, recipeKeys in pairs(PROFESSION_RECIPES) do
         local categories = data:GetRecipeCategories(profession, true)
         Test.truthy(#categories > 0, profession .. " should expose metadata categories")
+        Test.truthy(categories[1].label, profession .. " category should expose a user-facing label")
         for _, recipeKey in ipairs(recipeKeys) do
             local categoryName = data:GetRecipeCategory(recipeKey, profession)
             Test.truthy(categoryName, profession .. " recipe should resolve a metadata category")
@@ -124,6 +125,30 @@ Test.it("does not call the AtlasLoot category index while metadata is installed"
     }
 
     Test.eq(data:GetRecipeCategory(-28596, "Alchemy"), "flasks")
-    Test.truthy(#data:GetRecipeCategories("Alchemy", true) > 0)
+    local categories = data:GetRecipeCategories("Alchemy", true)
+    Test.truthy(#categories > 0)
+    Test.eq(categories[1].label, "Potions")
     Test.eq(#data:GetRecipeList("Alchemy", "", "alpha", "recipe", "flasks", {}), 1)
+end)
+
+Test.it("carries labels and subcategory filters through metadata navigation", function()
+    local selfKey = data:GetPlayerKey()
+    seedProfession(selfKey, "Alchemy", { -2329, -2330, -28543, -28596 })
+    data:InvalidateRecipeCaches("category-subcategory-test")
+
+    local categories = data:GetRecipeCategories("Alchemy", true)
+    local potions
+    for _, row in ipairs(categories) do
+        if row.key == "potions" then
+            potions = row
+            break
+        end
+    end
+    Test.truthy(potions, "potions category should be present")
+    Test.eq(potions.label, "Potions")
+    Test.truthy(#(potions.subcategories or {}) >= 3, "potions subcategories should be exposed")
+
+    local manaRows = data:GetRecipeList("Alchemy", "", "alpha", "recipe", "subcategory:potions:mana", {})
+    Test.eq(#manaRows, 1)
+    Test.eq(manaRows[1].recipeKey, -28543)
 end)

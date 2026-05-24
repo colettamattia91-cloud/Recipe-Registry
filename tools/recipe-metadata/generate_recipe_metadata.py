@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import json
+import shutil
 import sys
 from pathlib import Path
 
@@ -107,7 +108,31 @@ def _build_pipeline(snapshot=DEFAULT_SNAPSHOT, flavor="tbc"):
 
 
 def command_fetch(args):
-    print("fetch is maintainer-only; committed offline snapshots are used by generate/validate")
+    if not args.source_dir:
+        print("fetch is maintainer-only; pass --source-dir with normalized snapshot JSON files", file=sys.stderr)
+        return 2
+
+    source_dir = Path(args.source_dir)
+    if not source_dir.exists():
+        print("missing source snapshot directory: " + str(source_dir), file=sys.stderr)
+        return 2
+
+    target_dir = SNAPSHOT_ROOT / args.snapshot
+    required = ("manifest.json", "recipes.json", "spell_effects.json", "item_sparse.json")
+    optional = ("secondary_static.json",)
+    target_dir.mkdir(parents=True, exist_ok=True)
+    for name in required:
+        src = source_dir / name
+        if not src.exists():
+            print("missing required snapshot file: " + str(src), file=sys.stderr)
+            return 2
+        shutil.copyfile(src, target_dir / name)
+    for name in optional:
+        src = source_dir / name
+        if src.exists():
+            shutil.copyfile(src, target_dir / name)
+
+    print("imported normalized snapshot into " + str(target_dir))
     return 0
 
 
@@ -140,7 +165,12 @@ def command_generate(args):
 
 def command_validate(args):
     primary, records, diagnostics, _content, _reports = _build_pipeline(args.snapshot, args.flavor)
-    failures, unresolved = validate_records(records, diagnostics, strict=args.strict)
+    failures, unresolved = validate_records(
+        records,
+        diagnostics,
+        strict=args.strict,
+        source_manifest=primary.get("manifest", {}),
+    )
     emit_reports(records, diagnostics, primary, REPORT_DIR)
     if failures:
         for failure in failures:
@@ -165,6 +195,7 @@ def build_parser():
     fetch = subparsers.add_parser("fetch")
     fetch.add_argument("--flavor", default="tbc")
     fetch.add_argument("--snapshot", default=DEFAULT_SNAPSHOT)
+    fetch.add_argument("--source-dir")
     fetch.set_defaults(func=command_fetch)
 
     generate = subparsers.add_parser("generate")

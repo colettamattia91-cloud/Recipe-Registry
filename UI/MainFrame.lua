@@ -1841,7 +1841,7 @@ function UI:EnsureCategoryButton(index)
 
     button = createCardStyleButton(self.frame.profContent, 198, 20)
     button:SetScript("OnClick", function(self)
-        UI.selectedCategory = self.categoryName
+        UI.selectedCategory = self.categoryToken
         UI.selectedRecipeKey = nil
         UI:Refresh()
     end)
@@ -2431,11 +2431,20 @@ function UI:RefreshProfessionButtons(opts)
         if useCategories and self.selectedProfession == profName and profName ~= FAVORITES_VIEW then
             local categories = Addon.Data.GetRecipeCategories and Addon.Data:GetRecipeCategories(profName, true) or {}
             local selectedCategoryExists = self.selectedCategory == nil
-            for _, categoryName in ipairs(categories) do
-                if categoryName == self.selectedCategory then
+            for _, categoryRow in ipairs(categories) do
+                local categoryToken = categoryRow.key or categoryRow
+                if categoryToken == self.selectedCategory then
                     selectedCategoryExists = true
                     break
                 end
+                for _, subcategoryRow in ipairs(categoryRow.subcategories or {}) do
+                    local subcategoryToken = "subcategory:" .. tostring(categoryToken) .. ":" .. tostring(subcategoryRow.key)
+                    if subcategoryToken == self.selectedCategory then
+                        selectedCategoryExists = true
+                        break
+                    end
+                end
+                if selectedCategoryExists then break end
             end
             if not selectedCategoryExists then
                 self.selectedCategory = nil
@@ -2443,18 +2452,33 @@ function UI:RefreshProfessionButtons(opts)
             if #categories > 0 then
                 categoryButtonIndex = categoryButtonIndex + 1
                 local allButton = self:EnsureCategoryButton(categoryButtonIndex)
-                allButton.categoryName = nil
+                allButton.categoryToken = nil
+                allButton.categoryLabel = "All"
                 allButton:SetLabel("All")
                 allButton:SetSelected(self.selectedCategory == nil)
                 placeButton(allButton, 14, 20, 4)
 
-                for _, categoryName in ipairs(categories) do
+                for _, categoryRow in ipairs(categories) do
+                    local categoryToken = categoryRow.key or categoryRow
+                    local categoryLabel = categoryRow.label or categoryToken
                     categoryButtonIndex = categoryButtonIndex + 1
                     local categoryButton = self:EnsureCategoryButton(categoryButtonIndex)
-                    categoryButton.categoryName = categoryName
-                    categoryButton:SetLabel(categoryName)
-                    categoryButton:SetSelected(self.selectedCategory == categoryName)
+                    categoryButton.categoryToken = categoryToken
+                    categoryButton.categoryLabel = categoryLabel
+                    categoryButton:SetLabel(categoryLabel)
+                    categoryButton:SetSelected(self.selectedCategory == categoryToken)
                     placeButton(categoryButton, 14, 20, 4)
+
+                    for _, subcategoryRow in ipairs(categoryRow.subcategories or {}) do
+                        local subcategoryToken = "subcategory:" .. tostring(categoryToken) .. ":" .. tostring(subcategoryRow.key)
+                        categoryButtonIndex = categoryButtonIndex + 1
+                        local subcategoryButton = self:EnsureCategoryButton(categoryButtonIndex)
+                        subcategoryButton.categoryToken = subcategoryToken
+                        subcategoryButton.categoryLabel = subcategoryRow.label or subcategoryRow.key
+                        subcategoryButton:SetLabel(subcategoryButton.categoryLabel)
+                        subcategoryButton:SetSelected(self.selectedCategory == subcategoryToken)
+                        placeButton(subcategoryButton, 28, 18, 3)
+                    end
                 end
                 yOffset = yOffset + 2
             end
@@ -2474,6 +2498,26 @@ function UI:RefreshProfessionButtons(opts)
     if self.frame.searchMaterials then
         self.frame.searchMaterials:SetSelected(self.searchMode == "materials")
     end
+end
+
+function UI:GetCategoryFilterLabel(profession, categoryToken)
+    if not categoryToken or not (Addon.Data and Addon.Data.GetRecipeCategories) then
+        return nil
+    end
+    local subcategoryCategory, subcategoryKey = tostring(categoryToken):match("^subcategory:([^:]+):(.+)$")
+    for _, categoryRow in ipairs(Addon.Data:GetRecipeCategories(profession, true) or {}) do
+        local categoryKey = categoryRow.key or categoryRow
+        if subcategoryCategory and categoryKey == subcategoryCategory then
+            for _, subcategoryRow in ipairs(categoryRow.subcategories or {}) do
+                if subcategoryRow.key == subcategoryKey then
+                    return (categoryRow.label or categoryKey) .. " / " .. (subcategoryRow.label or subcategoryKey)
+                end
+            end
+        elseif categoryKey == categoryToken then
+            return categoryRow.label or categoryKey
+        end
+    end
+    return tostring(categoryToken)
 end
 
 local RECIPE_ROW_HEIGHT = 70
@@ -3012,6 +3056,7 @@ function UI:RefreshRecipeList()
         and self.selectedProfession and self.selectedProfession ~= "Favorites" then
         categoryFilter = self.selectedCategory
     end
+    local categoryLabel = self:GetCategoryFilterLabel(self.selectedProfession, categoryFilter)
     local globalSearch = (self.selectedProfession == nil and self.searchText and self.searchText ~= "")
     local canRunGlobalSearch = globalSearch and string.len(self.searchText or "") >= GLOBAL_SEARCH_MIN_CHARS
 
@@ -3021,6 +3066,7 @@ function UI:RefreshRecipeList()
         globalSearch = globalSearch,
         canRunGlobalSearch = canRunGlobalSearch,
         sortMode = self.sortMode,
+        categoryLabel = categoryLabel,
     }
     context.filterContext = {
         selectedProfession = self.selectedProfession,
@@ -3075,7 +3121,7 @@ function UI:_ShowRecipeListLoadingState(context, generation)
     if context.selectedProfession == "Favorites" then
         headerText = "Favorites - loading..."
     elseif context.selectedProfession and context.categoryFilter then
-        headerText = context.selectedProfession .. ": " .. tostring(context.categoryFilter) .. " - loading..."
+        headerText = context.selectedProfession .. ": " .. tostring(context.categoryLabel or context.categoryFilter) .. " - loading..."
     elseif context.selectedProfession then
         headerText = context.selectedProfession .. " - loading..."
     elseif context.globalSearch and not context.canRunGlobalSearch then
@@ -3139,7 +3185,7 @@ function UI:_FinalizeRecipeList(rows, context, generation)
     if context.selectedProfession == "Favorites" then
         headerText = "Favorite recipes"
     elseif context.selectedProfession and context.categoryFilter then
-        headerText = context.selectedProfession .. ": " .. tostring(context.categoryFilter)
+        headerText = context.selectedProfession .. ": " .. tostring(context.categoryLabel or context.categoryFilter)
     elseif context.selectedProfession then
         headerText = context.selectedProfession .. " recipes"
     elseif context.globalSearch and not context.canRunGlobalSearch then

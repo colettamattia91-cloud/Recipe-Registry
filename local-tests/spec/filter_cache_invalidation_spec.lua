@@ -44,15 +44,21 @@ Test.it("extends recipe list cache keys with filter state", function()
 end)
 
 Test.it("invalidates only projection caches when filter settings change", function()
-    data._recipeListCache = { sentinel = true }
-    data._recipeListCacheOrder = { "sentinel" }
-    local beforeGeneration = data._recipeListCacheGeneration or 0
+    data._recipeListCache = {
+        ["Alchemy\t\talpha\trecipe\t\told"] = true,
+        ["Blacksmithing\t\talpha\trecipe\t\told"] = true,
+    }
+    data._recipeListCacheOrder = {
+        "Alchemy\t\talpha\trecipe\t\told",
+        "Blacksmithing\t\talpha\trecipe\t\told",
+    }
+    data._recipeIndex = { sentinel = true }
 
     filters:InvalidateProfessionProjection("alchemy", "test-filter-change")
 
-    Test.eq(data._recipeListCache, nil)
-    Test.eq(data._recipeListCacheOrder, nil)
-    Test.gte(data._recipeListCacheGeneration or 0, beforeGeneration + 1)
+    Test.eq(data._recipeListCache["Alchemy\t\talpha\trecipe\t\told"], nil)
+    Test.eq(data._recipeListCache["Blacksmithing\t\talpha\trecipe\t\told"], true)
+    Test.truthy(data._recipeIndex.sentinel, "filter invalidation must not drop the content index")
     Test.eq(addon.Performance.pendingUIRefreshScopes["test-filter-change"], true)
 end)
 
@@ -65,4 +71,47 @@ Test.it("leaves sync fingerprints unchanged across filter-only changes", functio
 
     local after = data:BuildLocalSummary({ reason = "filter-after" }).globalFingerprint
     Test.eq(after, before)
+end)
+
+Test.it("keeps profession cache keys scoped to the active profession", function()
+    local ctx = { selectedProfession = "Alchemy", effectiveProfession = "Alchemy" }
+    local before = filters:BuildFilterCacheKey(ctx)
+
+    addon.db.profile.recipePrefilters.professionExpansionOverrides.engineering = {
+        inherit = false,
+        vanilla = false,
+        tbc = true,
+    }
+
+    local after = filters:BuildFilterCacheKey(ctx)
+    Test.eq(after, before)
+end)
+
+Test.it("preserves unrelated profession list caches on scoped override changes", function()
+    seedMember("ScopedCache-Alchemy", "Alchemy", { -2329, -28596 })
+    seedMember("ScopedCache-Engineering", "Engineering", { -3918, -30303 })
+
+    local alchemyCtx = { selectedProfession = "Alchemy", effectiveProfession = "Alchemy" }
+    local engineeringCtx = { selectedProfession = "Engineering", effectiveProfession = "Engineering" }
+    data:GetRecipeList("Alchemy", "", "alpha", "recipe", nil, alchemyCtx)
+    data:GetRecipeList("Engineering", "", "alpha", "recipe", nil, engineeringCtx)
+
+    local alchemyCacheKey
+    local engineeringCacheKey
+    for key in pairs(data._recipeListCache or {}) do
+        local text = tostring(key)
+        if text:sub(1, 8) == "Alchemy\t" then
+            alchemyCacheKey = key
+        elseif text:sub(1, 12) == "Engineering\t" then
+            engineeringCacheKey = key
+        end
+    end
+
+    Test.truthy(alchemyCacheKey, "alchemy cache should exist before scoped invalidation")
+    Test.truthy(engineeringCacheKey, "engineering cache should exist before scoped invalidation")
+
+    filters:InvalidateProfessionProjection("engineering", "filters:engineering")
+
+    Test.truthy(data._recipeListCache[alchemyCacheKey], "alchemy cache should be preserved")
+    Test.eq(data._recipeListCache[engineeringCacheKey], nil)
 end)

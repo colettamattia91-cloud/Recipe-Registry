@@ -57,10 +57,19 @@ end
 local function cloneCategoryRows(rows)
     local out = {}
     for index, row in ipairs(rows or {}) do
+        local subcategories = {}
+        for subIndex, subcategory in ipairs(row.subcategories or {}) do
+            subcategories[subIndex] = {
+                key = subcategory.key,
+                label = subcategory.label,
+                order = subcategory.order,
+            }
+        end
         out[index] = {
             key = row.key,
             label = row.label,
             order = row.order,
+            subcategories = subcategories,
         }
     end
     return out
@@ -74,15 +83,73 @@ local function getMetadataCategories(metadata, profession)
         return metadata:GetCategoriesForProfession(professionKey)
     end
     local generated = metadata._generated or {}
-    return cloneCategoryRows(generated.categoriesByProfession and generated.categoriesByProfession[professionKey] or nil)
+    local rows = cloneCategoryRows(generated.categoriesByProfession and generated.categoriesByProfession[professionKey] or nil)
+    local subcategoriesByCategory = generated.subcategoriesByProfession and generated.subcategoriesByProfession[professionKey] or {}
+    for _, row in ipairs(rows) do
+        row.subcategories = cloneCategoryRows(subcategoriesByCategory[row.key] or nil)
+    end
+    return rows
 end
 
-local function getMetadataCategoryForRecipe(metadata, recipeKey)
+local function getMetadataCategoryInfoForRecipe(metadata, recipeKey)
     if not metadata then return nil end
     local info = metadata:GetRecipeInfo(recipeKey)
     if not info then return nil end
-    local category = metadata:GetCategory(recipeKey, info)
+    return metadata:GetCategory(recipeKey, info)
+end
+
+local function getMetadataCategoryForRecipe(metadata, recipeKey)
+    local category = getMetadataCategoryInfoForRecipe(metadata, recipeKey)
     return category and category.category or nil
+end
+
+local function categoryFilterToken(categoryName)
+    if type(categoryName) == "table" then
+        if categoryName.filterToken then
+            return categoryName.filterToken
+        end
+        if categoryName.subcategory then
+            return "subcategory:" .. tostring(categoryName.key or "") .. ":" .. tostring(categoryName.subcategory)
+        end
+        return categoryName.key
+    end
+    return categoryName
+end
+
+local function recipeMatchesCategoryFilter(metadata, recipeKey, categoryFilter)
+    local token = categoryFilterToken(categoryFilter)
+    if not token or token == "" or token == "All" then
+        return true
+    end
+
+    local category = getMetadataCategoryInfoForRecipe(metadata, recipeKey)
+    if not category then
+        return false
+    end
+
+    local subCategory = tostring(token):match("^subcategory:([^:]+):(.+)$")
+    if subCategory then
+        local categoryKey, subcategoryKey = tostring(token):match("^subcategory:([^:]+):(.+)$")
+        return category.category == categoryKey and category.subcategory == subcategoryKey
+    end
+
+    local categoryKey = tostring(token):match("^category:(.+)$") or token
+    return category.category == categoryKey
+end
+
+local function getItemBindType(itemID)
+    if not itemID or type(GetItemInfo) ~= "function" then
+        return nil, "unavailable"
+    end
+    local name = GetItemInfo(itemID)
+    if not name then
+        return nil, "pending"
+    end
+    local bindType = select(14, GetItemInfo(itemID))
+    if bindType == nil then
+        return nil, "unknown"
+    end
+    return tonumber(bindType), "resolved"
 end
 
 local function addMetadataReagents(info, metadata, recipeKey, metadataInfo)
@@ -309,19 +376,141 @@ function Data:GetRecipeCategory(recipeKey, profession)
     return nil
 end
 
+function Data:GetRecipeCategoryInfo(recipeKey, profession)
+    local metadata = getRecipeMetadata()
+    if metadata then
+        return getMetadataCategoryInfoForRecipe(metadata, recipeKey)
+    end
+    return nil
+end
+
 function Data:GetRecipeCategories(profession, includeEmpty)
     local metadata = getRecipeMetadata()
     if metadata then
-        local metadataCategories = getMetadataCategories(metadata, profession)
-        local out = {}
-        for _, row in ipairs(metadataCategories or {}) do
-            if row.key then
-                out[#out + 1] = row.key
-            end
-        end
-        return out
+        return cloneCategoryRows(getMetadataCategories(metadata, profession))
     end
     return {}
+end
+
+function Data:ResolveRecipeBopOutput(recipeKey, metadataInfo)
+    local metadata = getRecipeMetadata()
+    if not metadata then
+        return nil, "no-plugin"
+    end
+
+    local info = metadataInfo or metadata:GetRecipeInfo(recipeKey)
+    if not info then
+        return nil, "unresolved"
+    end
+
+    local static = metadata:IsBopOutput(recipeKey, info)
+    if static ~= nil then
+        return static == true, "static"
+    end
+
+    local createdItemID = metadata:GetCreatedItemId(recipeKey, info)
+    if not createdItemID then
+        return nil, "no-created-item"
+    end
+
+    local bindType, status = getItemBindType(createdItemID)
+    if bindType ~= nil then
+        return bindType == 1, "item-info"
+    end
+
+    self._pendingBopItemInfoByItemID = self._pendingBopItemInfoByItemID or {}
+    local bucket = self._pendingBopItemInfoByItemID[createdItemID]
+    if not bucket then
+        bucket = {}
+        self._pendingBopItemInfoByItemID[createdItemID] = bucket
+    end
+    bucket[recipeKey] = true
+    bucket[tostring(recipeKey)] = true
+    return nil, status == "pending" and "pending-item-info" or "unknown-item-bind"
+end
+
+function Data:OnMetadataItemInfoReceived(events)
+    local pending = self._pendingBopItemInfoByItemID
+    if type(pending) ~= "table" then
+        return false
+    end
+
+    local metadata = getRecipeMetadata()
+    local affectedProfessions = {}
+    local affected = false
+    for itemID in pairs(events or {}) do
+        local numericItemID = tonumber(itemID)
+        local bucket = numericItemID and pending[numericItemID] or nil
+        if bucket then
+            pending[numericItemID] = nil
+            affected = true
+            for recipeKey in pairs(bucket) do
+                local info = metadata and metadata:GetRecipeInfo(recipeKey) or nil
+                local professionKey = metadata and metadata:GetProfession(recipeKey, info) or nil
+                if professionKey then
+                    affectedProfessions[professionKey] = true
+                end
+                if self._recipeDetailCache then
+                    self._recipeDetailCache[recipeKey] = nil
+                end
+            end
+        end
+    end
+
+    if not affected then
+        return false
+    end
+
+    local invalidatedAny = false
+    for professionKey in pairs(affectedProfessions) do
+        invalidatedAny = true
+        if self.InvalidateRecipeListCacheForFilter then
+            self:InvalidateRecipeListCacheForFilter(professionKey, "item-cache-bop")
+        end
+    end
+    if not invalidatedAny and self.InvalidateRecipeCaches then
+        self:InvalidateRecipeCaches("list")
+    end
+    return true
+end
+
+function Data:InvalidateRecipeListCacheForFilter(professionKey, reason)
+    self._recipeFilterGenerationByProfession = self._recipeFilterGenerationByProfession or {}
+    if not professionKey then
+        self._recipeFilterGenerationAll = (self._recipeFilterGenerationAll or 0) + 1
+        if self.InvalidateRecipeCaches then
+            self:InvalidateRecipeCaches("list")
+        end
+        return
+    end
+
+    self._recipeFilterGenerationByProfession[professionKey] = (self._recipeFilterGenerationByProfession[professionKey] or 0) + 1
+    local professionLabel = PROFESSION_LABELS[professionKey] or professionKey
+    local professionPrefix = tostring(professionLabel or "") .. "\t"
+    local globalPrefix = "\t"
+
+    local cache = self._recipeListCache
+    local order = self._recipeListCacheOrder
+    if type(cache) ~= "table" then
+        return
+    end
+
+    for key in pairs(cache) do
+        local text = tostring(key)
+        if text:sub(1, #professionPrefix) == professionPrefix or text:sub(1, 1) == globalPrefix then
+            cache[key] = nil
+        end
+    end
+
+    if type(order) == "table" then
+        local kept = {}
+        for _, key in ipairs(order) do
+            if cache[key] ~= nil then
+                kept[#kept + 1] = key
+            end
+        end
+        self._recipeListCacheOrder = kept
+    end
 end
 
 function Data:GetProfessionSummary()
@@ -753,7 +942,8 @@ end
 function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName, filterContext)
     sortMode = sortMode or "alpha"
     searchMode = searchMode == "materials" and "materials" or "recipe"
-    local categoryFilter = categoryName and categoryName ~= "" and categoryName ~= "All" and categoryName or nil
+    local categoryFilter = categoryFilterToken(categoryName)
+    categoryFilter = categoryFilter and categoryFilter ~= "" and categoryFilter ~= "All" and categoryFilter or nil
     local filterCacheKey = getFilterCacheKey(filterContext)
     local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode) .. "\t" .. searchMode .. "\t" .. tostring(categoryFilter or "") .. "\t" .. filterCacheKey
     self._recipeListCache = self._recipeListCache or {}
@@ -771,7 +961,7 @@ function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName,
             include = true
         end
         if include and categoryFilter and profName and profName ~= "All" then
-            include = self:GetRecipeCategory(recipeKey, profName) == categoryFilter
+            include = recipeMatchesCategoryFilter(getRecipeMetadata(), recipeKey, categoryFilter)
         end
         local visibilityReason
         if include then
@@ -868,7 +1058,8 @@ function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, catego
     end
     sortMode = sortMode or "alpha"
     searchMode = searchMode == "materials" and "materials" or "recipe"
-    local categoryFilter = categoryName and categoryName ~= "" and categoryName ~= "All" and categoryName or nil
+    local categoryFilter = categoryFilterToken(categoryName)
+    categoryFilter = categoryFilter and categoryFilter ~= "" and categoryFilter ~= "All" and categoryFilter or nil
     local filterCacheKey = getFilterCacheKey(filterContext)
     local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode) .. "\t" .. searchMode .. "\t" .. tostring(categoryFilter or "") .. "\t" .. filterCacheKey
     self._recipeListCache = self._recipeListCache or {}
@@ -969,7 +1160,7 @@ function Data:RunRecipeListBuildStep(state, ctx)
                 include = true
             end
             if include and categoryFilter and profName and profName ~= "All" then
-                include = self:GetRecipeCategory(recipeKey, profName) == categoryFilter
+                include = recipeMatchesCategoryFilter(getRecipeMetadata(), recipeKey, categoryFilter)
             end
             if include then
                 local passes, reason = recipePassesUiFilter(recipeKey, filterContext)
@@ -1133,7 +1324,11 @@ function Data:GetRecipeRequestability(recipeKey, memberKey)
     if metadata:IsOutputlessSelfOnly(recipeKey, info) == true then
         return false, "not-requestable-self-only"
     end
-    if metadata:IsBopOutput(recipeKey, info) == true then
+    local bopOutput = metadata:IsBopOutput(recipeKey, info)
+    if bopOutput == nil and self.ResolveRecipeBopOutput then
+        bopOutput = self:ResolveRecipeBopOutput(recipeKey, info)
+    end
+    if bopOutput == true then
         return false, "not-requestable-bop-output"
     end
 

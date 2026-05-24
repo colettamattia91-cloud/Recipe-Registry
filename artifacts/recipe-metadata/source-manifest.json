@@ -6,6 +6,10 @@
       "spellId": 45545
     }
   ],
+  "expansionCounts": {
+    "tbc": 9,
+    "vanilla": 5
+  },
   "professionCounts": {
     "alchemy": 4,
     "blacksmithing": 2,
@@ -16,14 +20,65 @@
     "leatherworking": 1,
     "tailoring": 2
   },
+  "professionExpansionCounts": {
+    "alchemy": {
+      "tbc": 2,
+      "vanilla": 2
+    },
+    "blacksmithing": {
+      "tbc": 1,
+      "vanilla": 1
+    },
+    "cooking": {
+      "tbc": 0,
+      "vanilla": 1
+    },
+    "enchanting": {
+      "tbc": 1,
+      "vanilla": 0
+    },
+    "engineering": {
+      "tbc": 1,
+      "vanilla": 1
+    },
+    "jewelcrafting": {
+      "tbc": 1,
+      "vanilla": 0
+    },
+    "leatherworking": {
+      "tbc": 1,
+      "vanilla": 0
+    },
+    "tailoring": {
+      "tbc": 2,
+      "vanilla": 0
+    }
+  },
   "records": 14,
   "source": {
+    "datasetKind": "fixture",
     "flavor": "tbc",
     "metadataVersion": "2026.05.23.2",
     "notes": "Minimal normalized offline snapshot for deterministic RecipeRegistry_Metadata generation.",
     "provider": "wago.tools-db2-normalized",
-    "snapshot": "tbc-2.5.4",
-    "sourceBuild": "2.5.4.44833",
+    "scope": {
+      "expansions": [
+        "vanilla",
+        "tbc"
+      ],
+      "professions": [
+        "alchemy",
+        "blacksmithing",
+        "cooking",
+        "enchanting",
+        "engineering",
+        "jewelcrafting",
+        "leatherworking",
+        "tailoring"
+      ]
+    },
+    "snapshot": "tbc-2.5.5",
+    "sourceBuild": "2.5.5",
     "tables": [
       "SkillLineAbility",
       "Spell",
@@ -31,6 +86,10 @@
       "ItemSparse"
     ]
   },
+  "supportedExpansions": [
+    "vanilla",
+    "tbc"
+  ],
   "supportedProfessions": [
     "alchemy",
     "blacksmithing",

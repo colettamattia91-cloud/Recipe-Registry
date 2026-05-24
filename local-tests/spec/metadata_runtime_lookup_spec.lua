@@ -42,6 +42,17 @@ Test.it("returns cloned reagent data for normal crafts", function()
     Test.eq(fresh[1].count, 7)
 end)
 
+Test.it("returns category labels with cloned subcategory rows", function()
+    local categories = metadata:GetCategoriesForProfession("alchemy")
+    Test.eq(categories[1].key, "potions")
+    Test.eq(categories[1].label, "Potions")
+    Test.eq(categories[1].subcategories[1].key, "combat")
+
+    categories[1].subcategories[1].label = "Changed"
+    local fresh = metadata:GetSubcategoriesForProfession("alchemy", "potions")
+    Test.eq(fresh[1].label, "Combat")
+end)
+
 Test.it("reports outputless and BoP metadata without requiring Recipe Registry integration", function()
     local outputless = metadata:GetRecipeInfo(-27924)
     Test.eq(outputless.spellId, 27924)
