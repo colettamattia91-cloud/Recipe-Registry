@@ -182,6 +182,7 @@ Loader.OrdersFiles = {
     "RecipeRegistry_Orders/Sync/CraftOrdersRuntime.lua",
     "RecipeRegistry_Orders/Sync/CraftOrdersDiagnostics.lua",
     "RecipeRegistry_Orders/UI/CraftOrdersBoard.lua",
+    "RecipeRegistry_Orders/UI/CraftOrdersOrderDialog.lua",
 }
 
 -- Loads the RecipeRegistry_Orders plugin chunks on top of whatever RR state

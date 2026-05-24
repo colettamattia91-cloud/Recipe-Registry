@@ -24,3 +24,4 @@ Sync\CraftOrdersProtocol.lua
 Sync\CraftOrdersRuntime.lua
 Sync\CraftOrdersDiagnostics.lua
 UI\CraftOrdersBoard.lua
+UI\CraftOrdersOrderDialog.lua

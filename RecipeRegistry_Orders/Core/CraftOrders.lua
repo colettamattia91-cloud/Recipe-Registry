@@ -37,8 +37,12 @@ local DB_DEFAULTS = {
 }
 
 local CHAR_DB_DEFAULTS = {
-    drafts = {},
-    cart   = { lines = {} },
+    drafts       = {},
+    cart         = { lines = {} },
+    -- lastChoices[recipeKey] = { crafter, quantity } — remembers what
+    -- the user picked last time they ordered this recipe so the order
+    -- dialog can prefill quantity and crafter on the next click.
+    lastChoices  = {},
 }
 
 local function ensureCharDB()
@@ -170,6 +174,26 @@ function Addon:OnEnable()
     -- peers learn we're online without flooding the channel.
     if self.Runtime and self.Runtime.OnEnable then
         self.Runtime:OnEnable()
+    end
+
+    -- Inject the "Order" icon button into RR's recipe detail panel via
+    -- the public UI hook. Clicking it opens our OrderDialog, which
+    -- adds a line to the cart. If RR is too old to expose the hook,
+    -- the registration silently fails — the slash-command flow still
+    -- works.
+    local rrHost = getRR()
+    if rrHost and rrHost.UI and type(rrHost.UI.RegisterRecipeAction) == "function" and self.OrderDialog then
+        rrHost.UI:RegisterRecipeAction({
+            id    = "order",
+            label = "Add to order cart",
+            icon  = "Interface\\Icons\\INV_Misc_Bag_08",
+            onClick = function(recipeKey, info)
+                Addon.OrderDialog:Open(recipeKey, info)
+            end,
+            isVisible = function(recipeKey)
+                return recipeKey ~= nil
+            end,
+        })
     end
 end
 
