@@ -115,14 +115,33 @@ function Store:CreateDraft(spec)
         Addon.Planner:RecomputeOrder(order)
     end
 
+    -- OrderCreated carries the full order snapshot so a remote peer's
+    -- reducer can materialize the order from a single event, without
+    -- needing additional bootstrap. lineCount stays in the payload as
+    -- a redundant sanity field — the reducer cross-checks it against
+    -- #lines after deserializing.
+    local snapshotLines = {}
+    for index = 1, #order.lines do
+        local source = order.lines[index]
+        snapshotLines[index] = {
+            recipeKey    = source.recipeKey,
+            quantity     = source.quantity,
+            recipeLabel  = source.recipeLabel,
+            outputItemID = source.outputItemID,
+        }
+    end
     self:AppendEvent({
         kind    = "OrderCreated",
         orderId = order.id,
         actor   = spec.requester,
         payload = {
-            requester = order.requester,
-            crafter   = order.crafter,
-            lineCount = #order.lines,
+            requester    = order.requester,
+            crafter      = order.crafter,
+            deliveryMode = order.deliveryMode,
+            notes        = order.notes,
+            lines        = snapshotLines,
+            lineCount    = #order.lines,
+            createdAt    = order.createdAt,
         },
     })
 
@@ -319,6 +338,7 @@ function Store:Transition(orderId, toState, actor, payload)
         orderId = orderId,
         actor   = actor,
         payload = {
+            change    = "state-transition",
             fromState = fromState,
             toState   = toState,
             details   = payload,

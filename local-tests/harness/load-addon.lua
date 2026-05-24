@@ -169,9 +169,12 @@ end
 
 Loader.OrdersFiles = {
     "RecipeRegistry_Orders/Core/CraftOrders.lua",
+    "RecipeRegistry_Orders/Core/BuildInfo.lua",
     "RecipeRegistry_Orders/Store/CraftOrdersStateMachine.lua",
     "RecipeRegistry_Orders/Store/CraftOrdersStore.lua",
     "RecipeRegistry_Orders/Planner/CraftOrdersPlanner.lua",
+    "RecipeRegistry_Orders/Sync/CraftOrdersCodec.lua",
+    "RecipeRegistry_Orders/Sync/CraftOrdersReducer.lua",
     "RecipeRegistry_Orders/UI/CraftOrdersBoard.lua",
 }
 

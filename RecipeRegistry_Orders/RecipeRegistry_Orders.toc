@@ -13,7 +13,10 @@
 Libs\embeds.xml
 
 Core\CraftOrders.lua
+Core\BuildInfo.lua
 Store\CraftOrdersStateMachine.lua
 Store\CraftOrdersStore.lua
 Planner\CraftOrdersPlanner.lua
+Sync\CraftOrdersCodec.lua
+Sync\CraftOrdersReducer.lua
 UI\CraftOrdersBoard.lua
