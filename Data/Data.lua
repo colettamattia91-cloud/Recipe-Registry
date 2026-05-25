@@ -1405,6 +1405,7 @@ function Data:InvalidateRecipeCaches(scope)
         self._recipeDetailCache = nil
         self._recipeDetailCacheOrder = nil
         self._recipeIndex = nil
+        self._recipesByProfession = nil
         if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
             Addon.Tooltip:InvalidateIndex("metadata")
         end
@@ -1430,6 +1431,7 @@ function Data:InvalidateRecipeCaches(scope)
     self._recipeDetailCache = nil
     self._recipeDetailCacheOrder = nil
     self._recipeIndex = nil
+    self._recipesByProfession = nil
     if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
         Addon.Tooltip:InvalidateIndex(scope or "full")
     end

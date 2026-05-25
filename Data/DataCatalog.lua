@@ -25,6 +25,54 @@ local LIST_BUILD_BUDGET_MS = 3
 local MEMBERS_PER_INDEX_BUILD_STEP = 12
 local INDEX_BUILD_BUDGET_MS = 3
 
+-- Build the per-profession recipe index from a populated content index.
+-- This is the inversion of `index[recipeKey].profNames` — a flat list of
+-- recipeKeys per profession so the list builder can iterate only the
+-- relevant slice instead of walking the entire guild catalog every time
+-- the user clicks a profession in the left menu.
+local function buildRecipesByProfession(index)
+    local byProfession = {}
+    for recipeKey, row in pairs(index) do
+        local profNames = row.profNames
+        if profNames then
+            for profName in pairs(profNames) do
+                local list = byProfession[profName]
+                if not list then
+                    list = {}
+                    byProfession[profName] = list
+                end
+                list[#list + 1] = recipeKey
+            end
+        end
+    end
+    return byProfession
+end
+
+-- Return the candidate recipeKey list to feed the list builder. For a
+-- profession-specific view we use the precomputed `_recipesByProfession`
+-- slice (typically 10-15× smaller than the global catalog); for "All" /
+-- global search / Favorites paths we fall back to materializing every key
+-- from the content index. The returned array is always a fresh copy so
+-- async jobs holding it as cursor state survive an index rebuild.
+local function getRecipeCandidates(data, recipeIndex, profName)
+    if profName and profName ~= "All" then
+        local scoped = data._recipesByProfession and data._recipesByProfession[profName]
+        if scoped then
+            local out = {}
+            for i = 1, #scoped do
+                out[i] = scoped[i]
+            end
+            return out
+        end
+        return {}
+    end
+    local out = {}
+    for recipeKey in pairs(recipeIndex) do
+        out[#out + 1] = recipeKey
+    end
+    return out
+end
+
 local function nowMsLocal()
     if type(debugprofilestop) == "function" then
         return debugprofilestop()
@@ -302,11 +350,24 @@ function Data:BuildRecipeIndex()
     end
 
     self._recipeIndex = index
+    self._recipesByProfession = buildRecipesByProfession(index)
     return index
 end
 
 function Data:GetRecipeIndex()
     return self._recipeIndex or self:BuildRecipeIndex()
+end
+
+-- Public accessor for the per-profession recipe slice. Returns the live
+-- array; callers must not mutate it. Returns nil when no member is known
+-- for the profession (distinct from an empty result — empty would mean
+-- "profession exists, no recipes match").
+function Data:GetRecipeKeysForProfession(profName)
+    if not profName then return nil end
+    if not self._recipeIndex then
+        self:BuildRecipeIndex()
+    end
+    return self._recipesByProfession and self._recipesByProfession[profName] or nil
 end
 
 -- Chunked counterpart to BuildRecipeIndex. The synchronous version walks
@@ -456,6 +517,8 @@ function Data:RunRecipeIndexBuildStep(state, ctx)
         row._crafterByMemberKey = nil
     end
 
+    local byProfession = buildRecipesByProfession(index)
+
     -- Only abandon the build if the INDEX was invalidated (metadata/full
     -- scope). Presence/list invalidations leave content untouched so the
     -- partial index we just assembled is still valid; the list builder
@@ -473,6 +536,7 @@ function Data:RunRecipeIndexBuildStep(state, ctx)
     end
 
     self._recipeIndex = index
+    self._recipesByProfession = byProfession
     local callbacks = self._recipeIndexBuildCallbacks
     self._recipeIndexBuildCallbacks = nil
     if callbacks then
@@ -653,9 +717,12 @@ function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName)
     local out = {}
     local q = lowerSafe(query)
     local recipeIndex = self:GetRecipeIndex()
-    for recipeKey, indexed in pairs(recipeIndex) do
-        local include = (not profName or profName == "All")
-        if not include and indexed.profNames[profName] then
+    local candidates = getRecipeCandidates(self, recipeIndex, profName)
+    for cIdx = 1, #candidates do
+        local recipeKey = candidates[cIdx]
+        local indexed = recipeIndex[recipeKey]
+        local include = indexed and (not profName or profName == "All")
+        if indexed and not include and indexed.profNames[profName] then
             include = true
         end
         if include and categoryFilter and profName and profName ~= "All" then
@@ -781,10 +848,7 @@ function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, catego
             return
         end
 
-        local candidates = {}
-        for recipeKey in pairs(recipeIndex) do
-            candidates[#candidates + 1] = recipeKey
-        end
+        local candidates = getRecipeCandidates(self, recipeIndex, profName)
 
         local jobState = {
             candidates = candidates,
