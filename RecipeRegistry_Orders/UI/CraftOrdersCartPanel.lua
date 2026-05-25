@@ -213,27 +213,41 @@ local function applyPanelBackdrop(frame)
 end
 
 -- Mirrors UI/MainFrame.lua's "Ask" button style: dark fill, gold edge,
--- gold-tinted label, gold-tinted hover. Used for the row +/-/x
--- buttons and the Checkout / Clear buttons so the cart UI reads as a
--- single visual family.
-local function buildAskStyleButton(parent, width, height, label)
+-- gold-tinted label, gold-tinted hover. Used for the row +/- buttons
+-- and the Checkout / Clear buttons so the cart UI reads as a single
+-- visual family. Pass tone="red" for the destructive variant
+-- (currently the row remove button): bright red label/border/hover.
+local function buildAskStyleButton(parent, width, height, label, tone)
     if not CreateFrame then return nil end
     local button = CreateFrame("Button", nil, parent, "BackdropTemplate")
     button:SetSize(width, height)
     button:SetBackdrop(PANEL_BACKDROP)
-    button:SetBackdropColor(0.13, 0.11, 0.08, 0.95)
-    button:SetBackdropBorderColor(1, 0.82, 0, 0.75)
+
+    local labelR, labelG, labelB = 1.0, 0.92, 0.75
+    local borderR, borderG, borderB, borderA = 1, 0.82, 0, 0.75
+    local hoverR, hoverG, hoverB, hoverA = 1, 0.82, 0, 0.18
+    if tone == "red" then
+        labelR, labelG, labelB = 1.0, 0.30, 0.30
+        borderR, borderG, borderB, borderA = 1.0, 0.25, 0.25, 0.95
+        hoverR, hoverG, hoverB, hoverA = 1.0, 0.20, 0.20, 0.28
+    end
+
+    button:SetBackdropColor(0.13, 0.08, 0.08, 0.95)
+    if tone ~= "red" then
+        button:SetBackdropColor(0.13, 0.11, 0.08, 0.95)
+    end
+    button:SetBackdropBorderColor(borderR, borderG, borderB, borderA)
 
     button.label = button:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     button.label:SetPoint("LEFT", 2, 0)
     button.label:SetPoint("RIGHT", -2, 0)
     button.label:SetJustifyH("CENTER")
     button.label:SetText(label or "")
-    button.label:SetTextColor(1.0, 0.92, 0.75)
+    button.label:SetTextColor(labelR, labelG, labelB)
 
     button:SetHighlightTexture("Interface\\Buttons\\WHITE8x8", "ADD")
     local hi = button:GetHighlightTexture()
-    if hi and hi.SetVertexColor then hi:SetVertexColor(1, 0.82, 0, 0.18) end
+    if hi and hi.SetVertexColor then hi:SetVertexColor(hoverR, hoverG, hoverB, hoverA) end
     return button
 end
 
@@ -245,38 +259,38 @@ local function qualityColor(quality)
 end
 
 -- ---------------------------------------------------------------------
--- Toggle button — small "Cart (N)" widget anchored to RR's main frame.
+-- Toggle button — small "Cart (N)" widget anchored to RR's main nav row.
 
--- The cart icon is a 22x22 square button anchored to RR's main frame
--- title bar (left of the existing title-bar widgets via an offset).
--- Dark backdrop + gold-tinted icon + small count badge bottom-right
--- keep the look consistent with the addon's other gold-on-black
--- affordances (Ask button, action icons).
+-- The cart toggle lives at the right end of RR's main tab strip (Recipes
+-- / Guild Addons / Craft Orders / ...) so it's reachable from any tab
+-- without overlapping content. Uses our custom stylized-cart TGA
+-- (Assets/cart-icon) re-tinted gold so it matches the Ask-button family.
 local CART_TOGGLE_SIZE     = 22
 local CART_TOGGLE_INSET    = 18
-local CART_TOGGLE_OFFSET_X = -200  -- clears close + Roster Cleanup + Sync indicator
-local CART_TOGGLE_OFFSET_Y = -6
+local CART_TOGGLE_OFFSET_X = -4
+local CART_ICON_TEXTURE    = "Interface\\AddOns\\RecipeRegistry_Orders\\UI\\Assets\\cart-icon"
 
 function CartPanel:BuildToggle()
     if self.toggle then return self.toggle end
     if not CreateFrame then return nil end
     local host = _G.RecipeRegistryFrame
     if not host then return nil end
+    -- Anchor to the host's main nav row when it's available; fall back
+    -- to the host frame's top-right corner if RR's layout changes.
+    local anchor = host.mainNav or host
+    local anchorPoint = host.mainNav and "RIGHT" or "TOPRIGHT"
+    local anchorOffsetY = host.mainNav and 0 or -6
 
     local toggle = CreateFrame("Button", "RecipeRegistry_OrdersCartToggle", host, "BackdropTemplate")
     toggle:SetSize(CART_TOGGLE_SIZE, CART_TOGGLE_SIZE)
-    toggle:SetPoint("TOPRIGHT", host, "TOPRIGHT", CART_TOGGLE_OFFSET_X, CART_TOGGLE_OFFSET_Y)
+    toggle:SetPoint("RIGHT", anchor, anchorPoint, CART_TOGGLE_OFFSET_X, anchorOffsetY)
     toggle:SetFrameLevel((host:GetFrameLevel() or 0) + 5)
     applyPanelBackdrop(toggle)
 
     toggle.icon = toggle:CreateTexture(nil, "ARTWORK")
     toggle.icon:SetSize(CART_TOGGLE_INSET, CART_TOGGLE_INSET)
     toggle.icon:SetPoint("CENTER")
-    toggle.icon:SetTexture("Interface\\Icons\\INV_Misc_Bag_08")
-    -- Crop the standard item-icon border so the icon sits cleanly
-    -- inside the small button, then re-tint gold to match the Ask
-    -- button family.
-    toggle.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
+    toggle.icon:SetTexture(CART_ICON_TEXTURE)
     toggle.icon:SetVertexColor(1.0, 0.82, 0.0, 1.0)
 
     -- Badge fontstring sits in the bottom-right of the icon and shows
