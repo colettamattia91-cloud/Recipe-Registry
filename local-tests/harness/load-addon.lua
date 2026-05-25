@@ -13,6 +13,10 @@ local FILE_PATHS = {
     ["DataScan.lua"] = "Data/DataScan.lua",
     ["DataSnapshot.lua"] = "Data/DataSnapshot.lua",
     ["RecipeOwnershipIndex.lua"] = "Data/RecipeOwnershipIndex.lua",
+    ["RecipeMetadata_Generated.lua"] = "Data/Metadata/RecipeMetadata_Generated.lua",
+    ["RecipeMetadata_Overrides.lua"] = "Data/Metadata/RecipeMetadata_Overrides.lua",
+    ["RecipeMetadata.lua"] = "Data/Metadata/RecipeMetadata.lua",
+    ["RecipeMetadataDiagnostics.lua"] = "Data/Metadata/RecipeMetadataDiagnostics.lua",
     ["RecipeUiFilters.lua"] = "Data/RecipeUiFilters.lua",
     ["DataCatalog.lua"] = "Data/DataCatalog.lua",
     ["DataIndex.lua"] = "Data/DataIndex.lua",
@@ -36,14 +40,6 @@ local FILE_PATHS = {
     ["MinimapButton.lua"] = "UI/MinimapButton.lua",
 }
 
-local METADATA_FILE_PATHS = {
-    ["RecipeMetadataAddon.lua"] = "RecipeRegistry_Metadata/Core/RecipeMetadataAddon.lua",
-    ["RecipeMetadata_Generated.lua"] = "RecipeRegistry_Metadata/Data/RecipeMetadata_Generated.lua",
-    ["RecipeMetadata_Overrides.lua"] = "RecipeRegistry_Metadata/Data/RecipeMetadata_Overrides.lua",
-    ["RecipeMetadata.lua"] = "RecipeRegistry_Metadata/Data/RecipeMetadata.lua",
-    ["RecipeMetadataDiagnostics.lua"] = "RecipeRegistry_Metadata/Diagnostics/RecipeMetadataDiagnostics.lua",
-}
-
 local function fileExists(path)
     local handle = io.open(path, "r")
     if handle then
@@ -65,18 +61,6 @@ local function resolveAddonPath(file)
     return direct
 end
 
-local function resolveMetadataPath(file)
-    local direct = join(root, file)
-    if fileExists(direct) then
-        return direct
-    end
-    local mapped = METADATA_FILE_PATHS[file]
-    if mapped then
-        return join(root, mapped)
-    end
-    return direct
-end
-
 local Wow = dofile(join(root, "local-tests", "harness", "wow.lua"))
 
 local Loader = {
@@ -88,6 +72,10 @@ local Loader = {
         "DataScan.lua",
         "DataSnapshot.lua",
         "RecipeOwnershipIndex.lua",
+        "RecipeMetadata_Generated.lua",
+        "RecipeMetadata_Overrides.lua",
+        "RecipeMetadata.lua",
+        "RecipeMetadataDiagnostics.lua",
         "RecipeUiFilters.lua",
         "DataCatalog.lua",
         "DataIndex.lua",
@@ -105,13 +93,6 @@ local Loader = {
         "SyncRequests.lua",
         "SyncTransfer.lua",
         "SyncDiagnostics.lua",
-    },
-    MetadataFiles = {
-        "RecipeMetadataAddon.lua",
-        "RecipeMetadata_Generated.lua",
-        "RecipeMetadata_Overrides.lua",
-        "RecipeMetadata.lua",
-        "RecipeMetadataDiagnostics.lua",
     },
 }
 
@@ -177,54 +158,23 @@ function Loader.Load(opts)
     return addon, Wow
 end
 
+-- After the metadata fold-in, metadata is loaded as part of RR's own backend
+-- files. LoadMetadata stays as a thin compat wrapper so existing specs that
+-- destructure (metadataAddon, wow, coreAddon) keep working — both
+-- `metadataAddon` and `coreAddon` are now the same RR addon, since the
+-- metadata module hangs off it as `addon.RecipeMetadata`.
 function Loader.LoadMetadata(opts)
     opts = opts or {}
-    if opts.reset ~= false then
-        Wow.Reset({
-            payloadMode = opts.payloadMode,
-            addonMetadata = opts.addonMetadata,
-        })
-    elseif opts.payloadMode or opts.addonMetadata then
-        Wow.Configure({
-            payloadMode = opts.payloadMode,
-            addonMetadata = opts.addonMetadata,
-        })
-    end
-
-    local coreAddon
-    if opts.loadCore ~= false then
-        coreAddon = Loader.Load({
-            reset = false,
-            initialize = opts.initializeCore ~= false,
-            enable = opts.enableCore == true,
-            initialReqTimeoutsEnabled = opts.initialReqTimeoutsEnabled,
-            savedVariables = opts.savedVariables,
-        })
-    end
-
-    local files = opts.files or Loader.MetadataFiles
-    for _, file in ipairs(files) do
-        local path = resolveMetadataPath(file)
-        local chunk, err = loadfile(path)
-        if not chunk then
-            error("failed to load " .. path .. ": " .. tostring(err), 2)
-        end
-        chunk("RecipeRegistry_Metadata", {})
-    end
-
-    local metadataAddon = _G.RecipeRegistry_Metadata
-    if not metadataAddon then
-        error("RecipeRegistry_Metadata addon was not created", 2)
-    end
-
-    if opts.initialize ~= false then
-        runAddonLifecycle(metadataAddon, "OnInitialize")
-    end
-    if opts.enable == true then
-        runAddonLifecycle(metadataAddon, "OnEnable")
-    end
-
-    return metadataAddon, Wow, coreAddon
+    local addon = Loader.Load({
+        reset = opts.reset,
+        initialize = opts.initialize ~= false,
+        enable = opts.enable == true,
+        payloadMode = opts.payloadMode,
+        addonMetadata = opts.addonMetadata,
+        initialReqTimeoutsEnabled = opts.initialReqTimeoutsEnabled,
+        savedVariables = opts.savedVariables,
+    })
+    return addon, Wow, addon
 end
 
 function Loader.Initialize(addon)

@@ -18,7 +18,7 @@ from recipe_sources.db2_provider import DEFAULT_SNAPSHOT
 from recipe_sources.local_snapshot_provider import load_local_snapshot
 
 
-OUTPUT_PATH = REPO_ROOT / "RecipeRegistry_Metadata" / "Data" / "RecipeMetadata_Generated.lua"
+OUTPUT_PATH = REPO_ROOT / "Data" / "Metadata" / "RecipeMetadata_Generated.lua"
 SNAPSHOT_ROOT = SCRIPT_DIR / "snapshots"
 TAXONOMY_ROOT = SCRIPT_DIR / "remediation" / "taxonomy"
 OVERRIDES_PATH = SCRIPT_DIR / "remediation" / "manual_overrides.yaml"

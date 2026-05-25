@@ -797,7 +797,6 @@ function Wow.Reset(opts)
     _G.RecipeRegistry = nil
     _G.RecipeRegistryDB = nil
     _G.RecipeRegistryCharDB = nil
-    _G.RecipeRegistry_Metadata = nil
     _G.RecipeRegistryRecipeMetadata = nil
     _G.RecipeRegistryRecipeMetadataOverrides = nil
     _G.__RecipeRegistrySerializedValues = {}

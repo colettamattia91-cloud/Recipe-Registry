@@ -12,5 +12,3 @@ ignore:
   - scripts
   - tools
   - artifacts
-move-folders:
-  RecipeRegistry/RecipeRegistry_Metadata: RecipeRegistry_Metadata

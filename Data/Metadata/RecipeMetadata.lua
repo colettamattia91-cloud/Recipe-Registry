@@ -1,4 +1,4 @@
-local Addon = _G.RecipeRegistry_Metadata
+local Addon = _G.RecipeRegistry
 if not Addon then
     return
 end

@@ -8,7 +8,7 @@
 ## SavedVariables: RecipeRegistryDB,RecipeRegistryLogDB
 ## SavedVariablesPerCharacter: RecipeRegistryCharDB
 ## X-Category: Guild
-## OptionalDeps: RecipeRegistry_Metadata,TradeSkillMaster,Auctionator
+## OptionalDeps: TradeSkillMaster,Auctionator
 
 Libs\embeds.xml
 
@@ -19,6 +19,10 @@ Data\Data.lua
 Data\DataScan.lua
 Data\DataSnapshot.lua
 Data\RecipeOwnershipIndex.lua
+Data\Metadata\RecipeMetadata_Generated.lua
+Data\Metadata\RecipeMetadata_Overrides.lua
+Data\Metadata\RecipeMetadata.lua
+Data\Metadata\RecipeMetadataDiagnostics.lua
 Data\RecipeUiFilters.lua
 Data\DataCatalog.lua
 Data\DataIndex.lua

@@ -1,11 +1,12 @@
 # Recipe Metadata Generator
 
-Build-time tool for the `RecipeRegistry_Metadata` addon. Runtime addon code must not fetch network data.
+Build-time tool for the `RecipeRegistry` metadata library (folded into the RR addon under `Data/Metadata/`). Runtime addon code must not fetch network data.
 
 The Phase 4 generator reads committed offline snapshots from
 `tools/recipe-metadata/snapshots/tbc-2.5.5/`, applies RR-owned taxonomy files
-from `remediation/taxonomy/`, emits the generated Lua data addon payload, and
-writes coverage reports to `artifacts/recipe-metadata/`.
+from `remediation/taxonomy/`, emits the generated Lua payload to
+`Data/Metadata/RecipeMetadata_Generated.lua`, and writes coverage reports to
+`artifacts/recipe-metadata/`.
 
 The committed snapshot is currently a minimal normalized DB2-derived fixture. It models
 the fields used from `SkillLineAbility`, `Spell`, `SpellEffect`, and

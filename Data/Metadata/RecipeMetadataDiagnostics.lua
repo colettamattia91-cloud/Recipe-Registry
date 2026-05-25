@@ -1,16 +1,15 @@
-local Addon = _G.RecipeRegistry_Metadata
+local Addon = _G.RecipeRegistry
 if not Addon then
     return
 end
 
-local Diagnostics = Addon:NewModule("Diagnostics")
-Addon.Diagnostics = Diagnostics
+local Diagnostics = Addon:NewModule("RecipeMetadataDiagnostics")
+Addon.RecipeMetadataDiagnostics = Diagnostics
 
 function Diagnostics:PrintVersion()
     local metadata = Addon.RecipeMetadata or {}
     Addon:Print(string.format(
-        "RecipeRegistry_Metadata %s; metadata %s; schema %s; flavor %s",
-        tostring(Addon.ADDON_VERSION or "unknown"),
+        "RecipeRegistry metadata %s; schema %s; flavor %s",
         tostring(metadata.metadataVersion or "unknown"),
         tostring(metadata.schemaVersion or "unknown"),
         tostring(metadata.flavor or "unknown")

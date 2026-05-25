@@ -329,9 +329,9 @@ end
 
 local function dumpFilterStatus(self)
     local filters = getRecipePrefilters(self)
-    local metadata = _G.RecipeRegistry_Metadata and _G.RecipeRegistry_Metadata.RecipeMetadata or nil
+    local metadata = self.RecipeMetadata
     if not metadata then
-        self:Print("Recipe filters: metadata plugin not installed; all recipes visible.")
+        self:Print("Recipe filters: metadata module not ready; all recipes visible.")
         return
     end
     local counts = metadata:GetRecordCounts()
@@ -347,9 +347,9 @@ local function dumpFilterStatus(self)
 end
 
 local function dumpFilterUnresolved(self, severity)
-    local metadata = _G.RecipeRegistry_Metadata and _G.RecipeRegistry_Metadata.RecipeMetadata or nil
+    local metadata = self.RecipeMetadata
     if not metadata then
-        self:Print("Recipe filters: metadata plugin not installed.")
+        self:Print("Recipe filters: metadata module not ready.")
         return
     end
     local unresolved = metadata:GetUnresolvedRecords(severity ~= "" and severity or nil)
@@ -412,6 +412,28 @@ local function handleFiltersCommand(self, rest)
         return
     end
     self:Print("Usage: /rr filters [unresolved|explain <recipeKey>]")
+end
+
+local function handleMetaCommand(self, rest)
+    local subcmd = splitCommand(rest):lower()
+    local diagnostics = self.RecipeMetadataDiagnostics
+    if subcmd == "" or subcmd == "diag" then
+        if diagnostics and diagnostics.PrintDiagnostics then
+            diagnostics:PrintDiagnostics()
+        else
+            self:Print("Recipe metadata diagnostics not ready.")
+        end
+        return
+    end
+    if subcmd == "version" then
+        if diagnostics and diagnostics.PrintVersion then
+            diagnostics:PrintVersion()
+        else
+            self:Print("Recipe metadata diagnostics not ready.")
+        end
+        return
+    end
+    self:Print("Usage: /rr meta [diag|version]")
 end
 
 local function printPerfHelp(self)
@@ -1057,6 +1079,11 @@ function Addon:SlashHandler(input)
 
     if cmd == "filters" or cmd == "filter" then
         handleFiltersCommand(self, rest)
+        return
+    end
+
+    if cmd == "meta" then
+        handleMetaCommand(self, rest)
         return
     end
 

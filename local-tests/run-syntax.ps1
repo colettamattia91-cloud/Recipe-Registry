@@ -3,8 +3,7 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 $luaRoot = "C:\Program Files (x86)\Lua\5.1"
 $tocPaths = @(
-    (Join-Path $repoRoot "RecipeRegistry.toc"),
-    (Join-Path $repoRoot "RecipeRegistry_Metadata\RecipeRegistry_Metadata.toc")
+    (Join-Path $repoRoot "RecipeRegistry.toc")
 )
 
 if (-not (Test-Path (Join-Path $luaRoot "luac.exe"))) {

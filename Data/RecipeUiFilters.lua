@@ -62,8 +62,7 @@ local function getProfilePrefilters()
 end
 
 local function getMetadata()
-    local plugin = _G.RecipeRegistry_Metadata
-    return plugin and plugin.RecipeMetadata or nil
+    return Addon.RecipeMetadata
 end
 
 local function boolToken(value)

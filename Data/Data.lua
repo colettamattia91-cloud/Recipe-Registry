@@ -281,8 +281,7 @@ local function isValidRecipeKey(recipeKey)
         recipeValidityCache[n] = true
         return true
     end  -- item-based: always valid
-    local metadataAddon = _G.RecipeRegistry_Metadata
-    local metadata = metadataAddon and metadataAddon.RecipeMetadata or nil
+    local metadata = Addon.RecipeMetadata
     if metadata and metadata.GetRecipeInfo then
         if metadata:GetRecipeInfo(n) ~= nil then
             recipeValidityCache[n] = true

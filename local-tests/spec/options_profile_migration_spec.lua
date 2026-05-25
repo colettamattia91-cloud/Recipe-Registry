@@ -157,13 +157,15 @@ end)
 
 Test.it("shows a clear metadata plugin hint when filter controls are unavailable", function()
     local addon = Loader.Load()
+    -- Simulate a broken/unloaded metadata module to check the fallback hint.
+    addon.RecipeMetadata = nil
     local options = loadOptions(addon)
 
     options:EnsurePanel()
 
     Test.truthy(options.filterPluginHint, "plugin hint should be present")
     Test.truthy(
-        options.filterPluginHint.text:find("RecipeRegistry_Metadata plugin not installed", 1, true),
+        options.filterPluginHint.text:find("Recipe metadata module not loaded", 1, true),
         "plugin hint should explain why filters are unavailable"
     )
     Test.eq(options.globalVanillaCheck, nil, "global filter controls should not be created without plugin")

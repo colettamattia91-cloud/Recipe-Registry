@@ -30,8 +30,7 @@ local function makeSpellKey(spellID)
 end
 
 local function getRecipeMetadata()
-    local metadataAddon = _G.RecipeRegistry_Metadata
-    return metadataAddon and metadataAddon.RecipeMetadata or nil
+    return Addon.RecipeMetadata
 end
 
 local function addRecipeKey(index, key, recipeKey)

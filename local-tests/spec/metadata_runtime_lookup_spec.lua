@@ -5,7 +5,6 @@ local addon = Loader.LoadMetadata()
 local metadata = addon.RecipeMetadata
 
 Test.it("exposes the Phase 1 public identity fields", function()
-    Test.eq(addon.ADDON_VERSION, "0.1.0")
     Test.eq(metadata.metadataVersion, "2026.05.23.2")
     Test.eq(metadata.schemaVersion, 1)
     Test.eq(metadata.flavor, "tbc")

@@ -40,8 +40,7 @@ local PROFESSION_IDS = {
 }
 
 local function getRecipeMetadata()
-    local metadataAddon = _G.RecipeRegistry_Metadata
-    return metadataAddon and metadataAddon.RecipeMetadata or nil
+    return Addon.RecipeMetadata
 end
 
 local function getMetadataProfessionKey(profession)

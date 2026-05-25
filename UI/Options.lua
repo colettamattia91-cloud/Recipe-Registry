@@ -70,8 +70,7 @@ local function clampTuning(field, value)
 end
 
 local function hasMetadataPlugin()
-    local plugin = _G.RecipeRegistry_Metadata
-    return type(plugin) == "table" and type(plugin.RecipeMetadata) == "table"
+    return type(Addon.RecipeMetadata) == "table"
 end
 
 local function ensureRecipePrefilters(profile)
@@ -408,10 +407,10 @@ function Options:RefreshControls()
     local filters = ensureRecipePrefilters(profile)
     if self.filterPluginHint then
         if hasMetadataPlugin() then
-            local metadata = _G.RecipeRegistry_Metadata and _G.RecipeRegistry_Metadata.RecipeMetadata
-            self.filterPluginHint:SetText("Recipe metadata plugin installed. Metadata version: " .. tostring(metadata and metadata.metadataVersion or "?"))
+            local metadata = Addon.RecipeMetadata
+            self.filterPluginHint:SetText("Recipe metadata loaded. Metadata version: " .. tostring(metadata and metadata.metadataVersion or "?"))
         else
-            self.filterPluginHint:SetText("RecipeRegistry_Metadata plugin not installed. Recipe filters are unavailable.")
+            self.filterPluginHint:SetText("Recipe metadata module not loaded. Recipe filters are unavailable.")
         end
     end
     if self.globalVanillaCheck then

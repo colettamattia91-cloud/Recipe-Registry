@@ -69,8 +69,8 @@ Test.it("bounds recipe detail cache across many lookups", function()
 end)
 
 Test.it("searches recipe names by default and materials only when requested", function()
-    local _addon, data = freshAddon()
-    local previousMetadata = _G.RecipeRegistry_Metadata
+    local addon, data = freshAddon()
+    local previousMetadata = addon.RecipeMetadata
     local metadata = {
         GetRecipeInfo = function(_, recipeKey)
             if tonumber(recipeKey) ~= 98001 then return nil end
@@ -109,7 +109,7 @@ Test.it("searches recipe names by default and materials only when requested", fu
             return info and info.reagents or {}
         end,
     }
-    _G.RecipeRegistry_Metadata = { RecipeMetadata = metadata }
+    addon.RecipeMetadata = metadata
     local state = Loader.Wow.GetState()
     state.items[98001] = { name = "Arcane Widget", quality = 2, icon = "widget-icon" }
     state.items[24001] = { name = "Primal Mooncloth", quality = 3, icon = "cloth-icon" }
@@ -122,7 +122,7 @@ Test.it("searches recipe names by default and materials only when requested", fu
     Test.eq(#data:GetRecipeList("Alchemy", "mooncloth", "alpha"), 0, "default search should ignore material names")
     Test.eq(#data:GetRecipeList("Alchemy", "mooncloth", "alpha", "materials"), 1, "materials search should include reagent names")
 
-    _G.RecipeRegistry_Metadata = previousMetadata
+    addon.RecipeMetadata = previousMetadata
 end)
 
 io.write(string.format("Catalog cache: %d test(s) passed\n", Test.count))
