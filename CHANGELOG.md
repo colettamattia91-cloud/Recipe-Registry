@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.0.8] - 2026-05-26
+### Changed
+- Switching profession in the left menu is significantly faster, especially on large guild rosters. The recipe list builder now iterates only the slice of the catalog that belongs to the selected profession instead of walking the entire guild index on every click.
+
 ## [2.0.7] - 2026-05-23
 ### Added
 - Added `/rr share reply` and `/rr share r` to share the selected recipe to a whisper target, preferring the active whisper edit box before falling back to the most recent whisper.
