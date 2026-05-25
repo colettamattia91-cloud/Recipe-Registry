@@ -7,11 +7,13 @@ Owner of this doc: the implementation plan for the feature. The source requireme
 
 This roadmap is the working plan. It must not be overwritten without a follow-up commit explaining what changed and why.
 
-**Current implementation status (updated 2026-05-24 after remediation pass):** the branch is **not Phase 9 / release-ready**. It contains a working metadata-addon scaffold, UI filter integration, AtlasLoot call-site removal gates, scoped profession filter cache keys/invalidation, metadata category/subcategory navigation, and a strict validator that now blocks fixture datasets. It does **not** yet satisfy the roadmap's real-data / 100% expected coverage requirement. Treat Phase 4 as incomplete and Phase 9 as blocked until a release-candidate metadata snapshot replaces the fixture dataset with complete Vanilla + TBC recipe coverage.
+> **REVISED 2026-05-26 — metadata folded into RR.** The metadata library no longer ships as a separate `RecipeRegistry_Metadata` sibling addon. Its data is fully static (Lua tables baked at build time), has no SavedVariables, no wire protocol, and no runtime mutability, so the OptionalDeps split added packaging/loading complexity without any benefit. The four metadata files now live under `Data/Metadata/` inside the RR addon and load as part of RR's own backend order. The Python generator in `tools/recipe-metadata/` is unchanged. Sections below that still describe the old plugin model (especially §3, §4.1, §10.7, parts of §11) are kept for historical reference; the live architecture is the one summarized in this banner and in §3.* below.
 
-**Distribution model (decided 2026-05-23):** the generated metadata library ships as a **separate addon** (`RecipeRegistry_Metadata`) inside the **same git repo** and the **same CurseForge project** as Recipe Registry and Craft Orders. Same AtlasLoot-style `move-folders` packaging pattern documented in [`craft-orders-roadmap.md`](craft-orders-roadmap.md) §3.5. The Python generator stays out of the runtime entirely, in `tools/recipe-metadata/`.
+**Current implementation status (updated 2026-05-26 after fold-in):** the branch contains the metadata library inside RR (`Data/Metadata/`), UI filter integration, AtlasLoot call-site removal gates, scoped profession filter cache keys/invalidation, metadata category/subcategory navigation, the per-profession recipe slice perf fix ported from develop, and a strict validator that now blocks fixture datasets. It does **not** yet satisfy the roadmap's real-data / 100% expected coverage requirement. Treat Phase 4 as incomplete and Phase 9 as blocked until a release-candidate metadata snapshot replaces the fixture dataset with complete Vanilla + TBC recipe coverage.
 
-Recipe Registry depends on the metadata addon as **optional** (`## OptionalDeps`): if `RecipeRegistry_Metadata` is not installed, RR falls back to its current behavior (no expansion filter, conservative remote-BoP behavior, AtlasLoot-as-resolver where still wired). With the plugin installed, RR's UI gains expansion filters, BoP filters, owner index, and the AtlasLoot resolver path is fully replaceable.
+**Distribution model (REVISED 2026-05-26, supersedes 2026-05-23 plugin model):** the generated metadata library is part of the Recipe Registry addon itself. The four Lua files (`RecipeMetadata_Generated.lua`, `RecipeMetadata_Overrides.lua`, `RecipeMetadata.lua`, `RecipeMetadataDiagnostics.lua`) live in `Data/Metadata/` and are listed in `RecipeRegistry.toc` after `Data/RecipeOwnershipIndex.lua` and before `Data/RecipeUiFilters.lua`. The Python generator in `tools/recipe-metadata/` is build-time only and is excluded from the CurseForge ZIP via `.pkgmeta`. No separate addon, no `## OptionalDeps: RecipeRegistry_Metadata` line, no `move-folders` entry.
+
+Because the metadata module is loaded by RR itself, `_G.RecipeRegistry.RecipeMetadata` is always available when RR is loaded. Consumer code reads `Addon.RecipeMetadata` directly; defensive guards (`if not metadata then ...`) only fire if the Lua files fail to load for an unexpected reason, not because the user "didn't install the plugin".
 
 ---
 
@@ -90,6 +92,8 @@ The UI must build a *filtered runtime projection* from the complete local/synced
 ---
 
 ## 3. Module distribution model
+
+> **SUPERSEDED 2026-05-26.** Sections 3.1–3.6 below describe the original plugin-addon model. The live distribution model is in the header banner at the top of this document: metadata is folded into the RR addon, files live in `Data/Metadata/`, and there is no separate `RecipeRegistry_Metadata` addon. Read the historical sections only for context on the decisions that were rolled back.
 
 ### 3.1 Plugin addon `RecipeRegistry_Metadata`
 
@@ -177,11 +181,11 @@ move-folders:
 
 ---
 
-## 4. Public API contract (RR ↔ RecipeRegistry_Metadata)
+## 4. Public API contract (RR metadata module surface)
 
-The plugin exposes a stable surface on the global `RecipeRegistry_Metadata` table. RR consumes only the methods listed below. Anything else is internal and can change without notice.
+> **REVISED 2026-05-26.** The surface is now exposed on `_G.RecipeRegistry.RecipeMetadata` (single addon, no cross-addon boundary). The method list below is still authoritative; only the access path changed. The "Plugin → RR" / "RR → Plugin" framing in §4.1–§4.2 is historical.
 
-### 4.1 Plugin → RR (consumed by RR)
+### 4.1 Module → RR consumers (consumed by RR UI and Data layer)
 
 ```lua
 -- Identity
@@ -788,6 +792,25 @@ Profile migration is non-destructive:
 - Migration must **never** modify synced recipe data.
 
 ### 10.7 TOC load order
+
+> **REVISED 2026-05-26 — actual order in `RecipeRegistry.toc` after fold-in:**
+>
+> ```
+> Data/Data.lua
+> Data/DataScan.lua
+> Data/DataSnapshot.lua
+> Data/RecipeOwnershipIndex.lua
+> Data/Metadata/RecipeMetadata_Generated.lua   -- global RecipeRegistryRecipeMetadata table
+> Data/Metadata/RecipeMetadata_Overrides.lua   -- global RecipeRegistryRecipeMetadataOverrides table
+> Data/Metadata/RecipeMetadata.lua             -- builds Addon.RecipeMetadata from the two globals above
+> Data/Metadata/RecipeMetadataDiagnostics.lua  -- Addon.RecipeMetadataDiagnostics module
+> Data/RecipeUiFilters.lua                     -- consumes Addon.RecipeMetadata
+> Data/DataCatalog.lua                         -- consumes Addon.RecipeMetadata
+> ```
+>
+> Diagnostics are exposed via `/rr meta diag` and `/rr meta version` (handled by the RR slash dispatcher in `Core/Core.lua`). The historical text below describes the obsolete plugin-addon load order and is kept for context only.
+
+
 
 ```
 RecipeRegistry_Metadata/RecipeRegistry_Metadata.toc loads first (declared as OptionalDep)

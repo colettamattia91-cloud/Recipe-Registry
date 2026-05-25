@@ -25,11 +25,11 @@ The Phase 9 gate reads `RecipeRegistry.toc` and fails if any loaded runtime Lua 
 
 ## Verification Notes
 
-`local-tests/spec/atlasloot_projection_parity_spec.lua` loads `RecipeRegistry_Metadata`, captures list/category/detail projection output with no AtlasLoot global, then repeats with a deliberately contradictory AtlasLoot stub installed. The output must be byte-identical, proving the metadata-backed projection ignores AtlasLoot when present.
+`local-tests/spec/atlasloot_projection_parity_spec.lua` loads RR (with the folded-in metadata library), captures list/category/detail projection output with no AtlasLoot global, then repeats with a deliberately contradictory AtlasLoot stub installed. The output must be byte-identical, proving the metadata-backed projection ignores AtlasLoot when present.
 
 Phase 8 category verification:
 
-- `Data:GetRecipeCategory` and `Data:GetRecipeCategories` were reviewed on 2026-05-24. With `RecipeRegistry_Metadata` installed, both functions resolve exclusively from `RecipeMetadata:GetCategory` / `RecipeMetadata:GetCategoriesForProfession`; the legacy AtlasLoot category provider is reachable only when the metadata addon is absent.
+- `Data:GetRecipeCategory` and `Data:GetRecipeCategories` were reviewed on 2026-05-24. Both functions resolve exclusively from `RecipeMetadata:GetCategory` / `RecipeMetadata:GetCategoriesForProfession`. After the 2026-05-26 fold-in the metadata library is always loaded with RR, so the legacy AtlasLoot category provider is unreachable in normal operation.
 - `local-tests/spec/category_metadata_navigation_spec.lua` exercises every supported v1 profession with AtlasLoot absent and verifies category filtering covers the same recipes as the All view.
 - The same spec replaces the AtlasLoot category index and ItemDB entry points with throwing stubs while metadata is installed; category lookup, category list, and category-filtered recipe list still succeed. This is the Phase 8 evidence for zero AtlasLoot category lookups in the new path.
 
@@ -37,7 +37,7 @@ Manual Phase 5 review:
 
 - `Data/DataCatalog.lua`, `UI/MainFrame.lua`, `UI/Tooltip.lua`, and `UI/Options.lua` were reviewed as the projection allowlist.
 - The projection allowlist contains no direct `AtlasLoot` or `AtlasLootClassic` references.
-- Normal list/category/detail/material projection resolves through `RecipeRegistry_Metadata.RecipeMetadata` when the metadata addon is installed.
+- Normal list/category/detail/material projection resolves through `Addon.RecipeMetadata` (the folded-in metadata library inside RR).
 - Tooltip alternate-key projection resolves through `RecipeMetadata` normalization and item mapping.
 - Phase 9 staging deleted the legacy resolver module, removed AtlasLoot optional dependencies, removed explicit legacy slash diagnostics, and broadened `atlasloot_call_site_gate_spec.lua` from the projection allowlist to the release runtime surface loaded by `RecipeRegistry.toc`.
 - Release remains blocked while `validate --strict` reports the committed metadata snapshot as a fixture rather than a release-candidate dataset with complete Vanilla + TBC expected coverage.

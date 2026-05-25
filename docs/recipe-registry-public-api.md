@@ -4,7 +4,7 @@ This document describes stable surfaces intended for sibling Recipe Registry add
 
 ## RecipeMetadata
 
-`RecipeRegistry_Metadata` is a separate addon distributed with Recipe Registry. Recipe Registry declares it as an optional dependency and reads the public API from `_G.RecipeRegistry_Metadata.RecipeMetadata` when the addon is installed.
+The metadata library is **part of the Recipe Registry addon itself** — it is no longer a separate `RecipeRegistry_Metadata` sibling addon. Consumers reach the public API through `_G.RecipeRegistry.RecipeMetadata`.
 
 For the TBC `2.5.5` data flavor, metadata records cover both supported recipe
 expansions: `vanilla` and `tbc`. A release-candidate dataset must not omit
@@ -12,10 +12,9 @@ Vanilla recipes just because the runtime client is TBC.
 
 Identity fields:
 
-- `RecipeRegistry_Metadata.ADDON_VERSION`
-- `RecipeRegistry_Metadata.RecipeMetadata.metadataVersion`
-- `RecipeRegistry_Metadata.RecipeMetadata.schemaVersion`
-- `RecipeRegistry_Metadata.RecipeMetadata.flavor`
+- `RecipeRegistry.RecipeMetadata.metadataVersion` — data snapshot version (e.g. `2026.05.23.2`)
+- `RecipeRegistry.RecipeMetadata.schemaVersion` — runtime schema version
+- `RecipeRegistry.RecipeMetadata.flavor` — `"tbc"`
 
 Stable lookup contract:
 
@@ -41,8 +40,6 @@ RecipeMetadata:GetRecordCounts()
 
 Category rows have stable `key`, user-facing `label`, numeric `order`, and optional `subcategories` rows with the same `key` / `label` / `order` shape. Recipe Registry uses these rows for UI navigation; callers should store keys, not labels.
 
-The metadata addon is read-only at runtime except for its committed override table. It does not participate in guild sync, does not write SavedVariables, and does not replace Recipe Registry's saved recipe ownership data.
+The metadata library is read-only at runtime except for its committed override table. It does not participate in guild sync, does not write SavedVariables, and does not replace Recipe Registry's saved recipe ownership data.
 
-When `RecipeRegistry_Metadata` is absent, Recipe Registry must load cleanly and use conservative visible-all behavior for UI prefilters. AtlasLoot is not part of the public contract and is not consulted as a fallback.
-
-`RecipeRegistry_Metadata` is not a hard dependency of Recipe Registry and does not hard-depend on Recipe Registry. Recipe Registry declares it as an optional dependency so the metadata table is available before Recipe Registry builds recipe projections when both addons are enabled.
+Since the library now lives inside the RR addon, it is always available when Recipe Registry is loaded. The defensive `if not Addon.RecipeMetadata then ...` guards in consumer code only fire if the metadata Lua files fail to load for an unexpected reason; they no longer represent a "plugin not installed" scenario. AtlasLoot is not part of the public contract and is not consulted as a fallback.
