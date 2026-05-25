@@ -35,6 +35,7 @@ $activeAllSpecs = @(
     "block_merge_list_cache_invalidation_spec.lua",
     "build_channel_isolation_spec.lua",
     "catalog_cache_spec.lua",
+    "catalog_recipes_by_profession_spec.lua",
     "category_metadata_navigation_spec.lua",
     "data_cleanup_spec.lua",
     "diagnostics_snapshot_spec.lua",
