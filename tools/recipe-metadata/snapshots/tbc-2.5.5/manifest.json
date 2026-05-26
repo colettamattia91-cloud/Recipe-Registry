@@ -66,6 +66,7 @@
       "SpellReagents",
       "ItemEffect",
       "ItemSparse",
+      "Item",
       "SpellName"
     ],
     "vanillaBuild": "1.15.7.61582"
@@ -140,6 +141,7 @@
     ],
     "lateVanillaRecipesFromBaseline": 64,
     "rawRows": {
+      "Item": 30057,
       "ItemEffect": 17729,
       "ItemSparse": 30044,
       "SkillLineAbility": 7018,

@@ -24,7 +24,7 @@ def load_fixture_snapshot():
         {"spellId": 2329, "profession": "alchemy", "firstSeenExpansion": "vanilla", "recipeItemId": None, "createdItemId": 2454, "requiredSkill": 1, "categoryHint": "alchemy.potions.combat"},
         {"spellId": 2330, "profession": "alchemy", "firstSeenExpansion": "vanilla", "recipeItemId": None, "createdItemId": 118, "requiredSkill": 1, "categoryHint": "alchemy.potions.healing"},
         {"spellId": 28543, "profession": "alchemy", "firstSeenExpansion": "tbc", "recipeItemId": 22907, "createdItemId": 22823, "requiredSkill": 305, "categoryHint": "alchemy.potions.mana"},
-        {"spellId": 28596, "profession": "alchemy", "firstSeenExpansion": "tbc", "recipeItemId": 22900, "createdItemId": 22845, "requiredSkill": 300, "categoryHint": "alchemy.flasks.guardian_elixirs"},
+        {"spellId": 28587, "profession": "alchemy", "firstSeenExpansion": "tbc", "recipeItemId": 22900, "createdItemId": 22845, "requiredSkill": 300, "categoryHint": "alchemy.flasks.guardian_elixirs"},
         {"spellId": 2660, "profession": "blacksmithing", "firstSeenExpansion": "vanilla", "recipeItemId": None, "createdItemId": 2862, "requiredSkill": 1, "categoryHint": "blacksmithing.stones.sharpening"},
         {"spellId": 29669, "profession": "blacksmithing", "firstSeenExpansion": "tbc", "recipeItemId": 23590, "createdItemId": 23537, "requiredSkill": 365, "categoryHint": "blacksmithing.armor.plate"},
         {"spellId": 2538, "profession": "cooking", "firstSeenExpansion": "vanilla", "recipeItemId": None, "createdItemId": 2679, "requiredSkill": 1, "categoryHint": "cooking.food.meat"},
@@ -62,6 +62,7 @@ def load_fixture_snapshot():
             21840: 0,
             22823: 0,
             22845: 0,
+            22851: 0,
             23537: 0,
             23761: 0,
             29540: 1,
@@ -147,8 +148,8 @@ class GeneratorPipelineTests(unittest.TestCase):
 
         self.assertEqual(by_spell[2329].expansion, "vanilla")
         self.assertEqual(by_spell[2329].profession_key, "alchemy")
-        self.assertEqual(by_spell[28596].expansion, "tbc")
-        self.assertEqual(by_spell[28596].category_key, "flasks")
+        self.assertEqual(by_spell[28587].expansion, "tbc")
+        self.assertEqual(by_spell[28587].category_key, "flasks")
 
     def test_recipe_and_created_item_shapes(self):
         _primary, records, _diagnostics = load_default_records()
@@ -156,8 +157,8 @@ class GeneratorPipelineTests(unittest.TestCase):
 
         self.assertIsNone(by_spell[2329].recipe_item_id)
         self.assertEqual(by_spell[2329].created_item_id, 2454)
-        self.assertEqual(by_spell[28596].recipe_item_id, 22900)
-        self.assertEqual(by_spell[28596].created_item_id, 22845)
+        self.assertEqual(by_spell[28587].recipe_item_id, 22900)
+        self.assertEqual(by_spell[28587].created_item_id, 22845)
         self.assertIsNone(by_spell[27924].recipe_item_id)
         self.assertIsNone(by_spell[27924].created_item_id)
 
@@ -181,14 +182,30 @@ class GeneratorPipelineTests(unittest.TestCase):
     def test_missing_category_falls_back_to_misc_with_diagnostic(self):
         primary, secondary = load_fixture_snapshot()
         primary = dict(primary)
-        primary["recipes"] = [dict(primary["recipes"][0], categoryHint="missing.category")]
-        primary["reagentsBySpellId"] = {2329: primary["reagentsBySpellId"][2329]}
+        # Use a spellId that is NOT in any profession whitelist so the hint-based
+        # fallback path is exercised. Real whitelisted spellIds bypass categoryHint.
+        primary["recipes"] = [dict(primary["recipes"][0], spellId=99999, categoryHint="missing.category")]
+        primary["reagentsBySpellId"] = {99999: primary["reagentsBySpellId"][2329]}
         taxonomies = load_taxonomies(ROOT / "remediation" / "taxonomy")
 
         records, diagnostics = normalize_records(primary, secondary, taxonomies, {})
 
         self.assertEqual(records[0].category_key, "misc")
-        self.assertEqual(diagnostics["categoryFallbacks"][0]["spellId"], 2329)
+        self.assertEqual(diagnostics["categoryFallbacks"][0]["spellId"], 99999)
+
+    def test_whitelist_classification_beats_category_hint(self):
+        primary, secondary = load_fixture_snapshot()
+        primary = dict(primary)
+        # spellId 2329 is whitelisted as elixirs/battle regardless of any hint.
+        primary["recipes"] = [dict(primary["recipes"][0], categoryHint="alchemy.misc")]
+        primary["reagentsBySpellId"] = {2329: primary["reagentsBySpellId"][2329]}
+        taxonomies = load_taxonomies(ROOT / "remediation" / "taxonomy")
+
+        records, diagnostics = normalize_records(primary, secondary, taxonomies, {})
+
+        self.assertEqual(records[0].category_key, "elixirs")
+        self.assertEqual(records[0].subcategory_key, "battle")
+        self.assertEqual(diagnostics["categoryFallbacks"], [])
 
     def test_missing_reagent_data_is_release_blocking_in_strict_validation(self):
         record = RecipeRecord(

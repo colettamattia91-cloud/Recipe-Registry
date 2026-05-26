@@ -37,9 +37,41 @@ SOURCE_TABLES = (
     "SpellReagents",
     "ItemEffect",
     "ItemSparse",
+    "Item",
     "SpellName",
 )
 VANILLA_SKILL_LINE_ABILITY_TABLE = "VanillaSkillLineAbility"
+
+# DB2 Item.ClassID values relevant to crafted output classification.
+ITEM_CLASS_WEAPON = 2
+ITEM_CLASS_ARMOR = 4
+# DB2 Item.SubclassID values for armor.
+ARMOR_SUBCLASS_BY_ID = {
+    1: "cloth",
+    2: "leather",
+    3: "mail",
+    4: "plate",
+}
+# DB2 Item.SubclassID values for weapons, collapsed to filter-friendly classes
+# (1h+2h combined). Bows/guns/crossbows/wands/fishing poles aren't blacksmithed
+# but the map covers them for completeness.
+WEAPON_SUBCLASS_BY_ID = {
+    0: "axe", 1: "axe",
+    2: "bow",
+    3: "gun",
+    4: "mace", 5: "mace",
+    6: "polearm",
+    7: "sword", 8: "sword",
+    9: "warglaive",
+    10: "staff",
+    13: "fist",
+    15: "dagger",
+    16: "thrown",
+    17: "spear",
+    18: "crossbow",
+    19: "wand",
+    20: "fishing_pole",
+}
 
 
 def _as_int(value, default=0):
@@ -157,6 +189,40 @@ def _items_by_id(item_sparse):
         for row in item_sparse
         if _as_int(row.get("ID"))
     }
+
+
+def _item_class_by_id(item_table):
+    """Map itemId -> (classID, subclassID) from the DB2 Item table."""
+    out = {}
+    for row in item_table:
+        item_id = _as_int(row.get("ID"))
+        if not item_id:
+            continue
+        out[item_id] = (
+            _as_int(row.get("ClassID"), None),
+            _as_int(row.get("SubclassID"), None),
+        )
+    return out
+
+
+def _armor_type(item_id, item_class_by_id):
+    class_subclass = item_class_by_id.get(item_id)
+    if not class_subclass:
+        return None
+    class_id, subclass_id = class_subclass
+    if class_id != ITEM_CLASS_ARMOR:
+        return None
+    return ARMOR_SUBCLASS_BY_ID.get(subclass_id)
+
+
+def _weapon_class(item_id, item_class_by_id):
+    class_subclass = item_class_by_id.get(item_id)
+    if not class_subclass:
+        return None
+    class_id, subclass_id = class_subclass
+    if class_id != ITEM_CLASS_WEAPON:
+        return None
+    return WEAPON_SUBCLASS_BY_ID.get(subclass_id)
 
 
 def _names_by_spell(spell_names):
@@ -277,6 +343,7 @@ def build_normalized_snapshot(
     spell_reagents = tables["SpellReagents"]
     item_effects = tables["ItemEffect"]
     item_sparse = tables["ItemSparse"]
+    item_table = tables.get("Item", ())
     spell_names = tables["SpellName"]
     vanilla_skill_line_ability = tables.get(VANILLA_SKILL_LINE_ABILITY_TABLE, ())
 
@@ -285,6 +352,7 @@ def build_normalized_snapshot(
     reagents_by_spell = _reagent_rows_by_spell(spell_reagents)
     recipe_items = _recipe_items_by_spell(item_effects)
     items_by_id = _items_by_id(item_sparse)
+    item_class_by_id = _item_class_by_id(item_table)
     names_by_spell = _names_by_spell(spell_names)
     vanilla_recipe_spell_ids = _supported_skill_line_spells(vanilla_skill_line_ability)
 
@@ -350,6 +418,8 @@ def build_normalized_snapshot(
             "itemId": item_id,
             "name": source.get("Display_lang") or None,
             "bindType": _as_int(source.get("Bonding"), None),
+            "armorType": _armor_type(item_id, item_class_by_id),
+            "weaponClass": _weapon_class(item_id, item_class_by_id),
         })
 
     manifest = {

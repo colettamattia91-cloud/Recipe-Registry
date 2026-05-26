@@ -5,7 +5,7 @@ local _metadataAddon, _wow, addon = Loader.LoadMetadata()
 local data = addon.Data
 
 local PROFESSION_RECIPES = {
-    Alchemy = { -2329, -28596 },
+    Alchemy = { -2329, -28587 },
     Blacksmithing = { -2660 },
     Cooking = { -2538 },
     Enchanting = { -27924 },
@@ -107,7 +107,7 @@ end)
 
 Test.it("does not call the AtlasLoot category index while metadata is installed", function()
     local selfKey = data:GetPlayerKey()
-    seedProfession(selfKey, "Alchemy", { -2329, -28596 })
+    seedProfession(selfKey, "Alchemy", { -2329, -28587 })
     data:InvalidateRecipeCaches("category-atlas-block-test")
 
     data.GetAtlasLootCategoryIndex = function()
@@ -124,7 +124,7 @@ Test.it("does not call the AtlasLoot category index while metadata is installed"
         },
     }
 
-    Test.eq(data:GetRecipeCategory(-28596, "Alchemy"), "flasks")
+    Test.eq(data:GetRecipeCategory(-28587, "Alchemy"), "flasks")
     local categories = data:GetRecipeCategories("Alchemy", true)
     Test.truthy(#categories > 0)
     Test.eq(categories[1].label, "Potions")
@@ -133,7 +133,7 @@ end)
 
 Test.it("carries labels and subcategory filters through metadata navigation", function()
     local selfKey = data:GetPlayerKey()
-    seedProfession(selfKey, "Alchemy", { -2329, -2330, -28543, -28596 })
+    seedProfession(selfKey, "Alchemy", { -2329, -2330, -28555, -28587 })
     data:InvalidateRecipeCaches("category-subcategory-test")
 
     local categories = data:GetRecipeCategories("Alchemy", true)
@@ -150,5 +150,5 @@ Test.it("carries labels and subcategory filters through metadata navigation", fu
 
     local manaRows = data:GetRecipeList("Alchemy", "", "alpha", "recipe", "subcategory:potions:mana", {})
     Test.eq(#manaRows, 1)
-    Test.eq(manaRows[1].recipeKey, -28543)
+    Test.eq(manaRows[1].recipeKey, -28555)
 end)

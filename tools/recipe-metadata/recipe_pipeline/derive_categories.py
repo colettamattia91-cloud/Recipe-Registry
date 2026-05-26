@@ -23,6 +23,7 @@ def load_taxonomy_file(path):
         "categories": [],
         "subcategories": {},
         "rules": {},
+        "spells": {},
     }
     section = None
     current_category = None
@@ -62,6 +63,14 @@ def load_taxonomy_file(path):
                 if line.startswith("  ") and not line.startswith("    ") and ":" in stripped:
                     hint, value = stripped.split(":", 1)
                     taxonomy["rules"][hint.strip()] = _parse_key_values(value)
+            elif section == "spells":
+                if line.startswith("  ") and not line.startswith("    ") and ":" in stripped:
+                    spell_text, value = stripped.split(":", 1)
+                    try:
+                        spell_id = int(spell_text.strip())
+                    except ValueError:
+                        continue
+                    taxonomy["spells"][spell_id] = _parse_key_values(value)
 
     return taxonomy
 
@@ -76,13 +85,23 @@ def load_taxonomies(root):
 
 def derive_category(recipe, profession_key, taxonomies, diagnostics):
     taxonomy = taxonomies.get(profession_key, {})
+    spell_id = int(recipe["spellId"])
+
+    spell_rule = taxonomy.get("spells", {}).get(spell_id)
+    if spell_rule:
+        return (
+            spell_rule.get("category"),
+            spell_rule.get("subcategory") or None,
+            int(spell_rule.get("sortOrder", 999)),
+        )
+
     hint = recipe.get("categoryHint")
     rule = taxonomy.get("rules", {}).get(hint)
     if rule:
         return rule.get("category"), rule.get("subcategory") or None, int(rule.get("sortOrder", 999))
 
     diagnostics.setdefault("categoryFallbacks", []).append({
-        "spellId": int(recipe["spellId"]),
+        "spellId": spell_id,
         "profession": profession_key,
         "hint": hint,
     })
