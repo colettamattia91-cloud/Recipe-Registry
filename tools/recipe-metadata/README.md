@@ -29,8 +29,11 @@ already-normalized snapshot bundle and validates it before copying it into
 `snapshots/`. `--source wago-anniversary` refreshes the normalized bundle from
 Wago Tools DB2 using `product=wow_anniversary`; it reads `SkillLineAbility`,
 `SpellEffect`, `SpellReagents`, `ItemEffect`, `ItemSparse`, and `SpellName`.
-Recipe candidates are supported-profession rows with a create-item effect, plus
-enchanting outputless enchant rows with reagent data.
+It also reads Vanilla `SkillLineAbility` from `--vanilla-build` and classifies
+recipes as `vanilla` when their spell exists in that baseline; all remaining
+supported recipes are `tbc`. Recipe candidates are supported-profession rows
+with a create-item effect, plus enchanting outputless enchant rows with reagent
+data.
 
 Phase 4 release gates:
 

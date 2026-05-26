@@ -442,14 +442,29 @@ class GeneratorPipelineTests(unittest.TestCase):
                 "Spell": "2329",
                 "MinSkillLineRank": "1",
             }, {
+                "SkillLine": "202",
+                "Spell": "26011",
+                "MinSkillLineRank": "250",
+            }, {
                 "SkillLine": "333",
                 "Spell": "27924",
                 "MinSkillLineRank": "1",
+            }],
+            "VanillaSkillLineAbility": [{
+                "SkillLine": "171",
+                "Spell": "2329",
+            }, {
+                "SkillLine": "202",
+                "Spell": "26011",
             }],
             "SpellEffect": [{
                 "SpellID": "2329",
                 "Effect": "24",
                 "EffectItemType": "2454",
+            }, {
+                "SpellID": "26011",
+                "Effect": "24",
+                "EffectItemType": "21277",
             }, {
                 "SpellID": "27924",
                 "Effect": "53",
@@ -463,6 +478,10 @@ class GeneratorPipelineTests(unittest.TestCase):
                 "ReagentCount_0": "1",
                 "ReagentCount_1": "1",
                 "ReagentCount_2": "1",
+            }, {
+                "SpellID": "26011",
+                "Reagent_0": "15407",
+                "ReagentCount_0": "1",
             }, {
                 "SpellID": "27924",
                 "Reagent_0": "22449",
@@ -480,6 +499,10 @@ class GeneratorPipelineTests(unittest.TestCase):
                 "Display_lang": "Elixir of Lion's Strength",
                 "Bonding": "0",
             }, {
+                "ID": "21277",
+                "Display_lang": "Tranquil Mechanical Yeti",
+                "Bonding": "0",
+            }, {
                 "ID": "22536",
                 "Display_lang": "Formula: Enchant Ring - Spellpower",
                 "Bonding": "1",
@@ -488,6 +511,9 @@ class GeneratorPipelineTests(unittest.TestCase):
             "SpellName": [{
                 "ID": "2329",
                 "Name_lang": "Elixir of Lion's Strength",
+            }, {
+                "ID": "26011",
+                "Name_lang": "Tranquil Mechanical Yeti",
             }, {
                 "ID": "27924",
                 "Name_lang": "Enchant Ring - Spellpower",
@@ -498,11 +524,13 @@ class GeneratorPipelineTests(unittest.TestCase):
 
         self.assertEqual(recipes[2329]["createdItemId"], 2454)
         self.assertEqual(recipes[2329]["firstSeenExpansion"], "vanilla")
+        self.assertEqual(recipes[26011]["firstSeenExpansion"], "vanilla")
         self.assertEqual(recipes[27924]["recipeItemId"], 22536)
         self.assertIsNone(recipes[27924]["createdItemId"])
         self.assertEqual(recipes[27924]["requiredSkill"], 360)
         self.assertEqual(snapshot["secondary_static.json"]["selfOnlyOutputlessSpellIds"], [27924])
-        self.assertEqual(snapshot["manifest.json"]["expectedRecipeCounts"]["total"], 2)
+        self.assertEqual(snapshot["manifest.json"]["sourceStats"]["lateVanillaRecipesFromBaseline"], 1)
+        self.assertEqual(snapshot["manifest.json"]["expectedRecipeCounts"]["total"], 3)
 
 
 if __name__ == "__main__":

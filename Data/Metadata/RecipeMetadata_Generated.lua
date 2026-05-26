@@ -17297,7 +17297,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [25659] = {
             profession = "cooking",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21025,
             createdItemId = 21023,
             category = "food",
@@ -17314,7 +17314,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [25704] = {
             profession = "cooking",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21099,
             createdItemId = 21072,
             category = "food",
@@ -17329,7 +17329,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [25954] = {
             profession = "cooking",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21219,
             createdItemId = 21217,
             category = "food",
@@ -17344,7 +17344,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26011] = {
             profession = "engineering",
-            expansion = "tbc",
+            expansion = "vanilla",
             createdItemId = 21277,
             category = "misc",
             sortOrder = 999,
@@ -17359,7 +17359,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26085] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21358,
             createdItemId = 21340,
             category = "misc",
@@ -17375,7 +17375,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26086] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21369,
             createdItemId = 21341,
             category = "misc",
@@ -17391,7 +17391,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26087] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21371,
             createdItemId = 21342,
             category = "misc",
@@ -17408,7 +17408,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26277] = {
             profession = "alchemy",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21547,
             createdItemId = 21546,
             category = "potions",
@@ -17424,7 +17424,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26279] = {
             profession = "leatherworking",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21548,
             createdItemId = 21278,
             category = "misc",
@@ -17441,7 +17441,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26403] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21722,
             createdItemId = 21154,
             category = "misc",
@@ -17457,7 +17457,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26407] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21723,
             createdItemId = 21542,
             category = "misc",
@@ -17473,7 +17473,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26416] = {
             profession = "engineering",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21724,
             createdItemId = 21558,
             category = "misc",
@@ -17487,7 +17487,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26417] = {
             profession = "engineering",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21725,
             createdItemId = 21559,
             category = "misc",
@@ -17501,7 +17501,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26418] = {
             profession = "engineering",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21726,
             createdItemId = 21557,
             category = "misc",
@@ -17515,7 +17515,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26420] = {
             profession = "engineering",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21727,
             createdItemId = 21589,
             category = "misc",
@@ -17529,7 +17529,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26421] = {
             profession = "engineering",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21728,
             createdItemId = 21590,
             category = "misc",
@@ -17543,7 +17543,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26422] = {
             profession = "engineering",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21729,
             createdItemId = 21592,
             category = "misc",
@@ -17557,7 +17557,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26423] = {
             profession = "engineering",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21730,
             createdItemId = 21571,
             category = "misc",
@@ -17571,7 +17571,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26424] = {
             profession = "engineering",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21731,
             createdItemId = 21574,
             category = "misc",
@@ -17585,7 +17585,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26425] = {
             profession = "engineering",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21732,
             createdItemId = 21576,
             category = "misc",
@@ -17599,7 +17599,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26426] = {
             profession = "engineering",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21733,
             createdItemId = 21714,
             category = "misc",
@@ -17613,7 +17613,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26427] = {
             profession = "engineering",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21734,
             createdItemId = 21716,
             category = "misc",
@@ -17627,7 +17627,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26428] = {
             profession = "engineering",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21735,
             createdItemId = 21718,
             category = "misc",
@@ -17641,7 +17641,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26442] = {
             profession = "engineering",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21738,
             createdItemId = 21569,
             category = "misc",
@@ -17657,7 +17657,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [26443] = {
             profession = "engineering",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 21737,
             createdItemId = 21570,
             category = "misc",
@@ -18642,7 +18642,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [27585] = {
             profession = "blacksmithing",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22209,
             createdItemId = 22197,
             category = "armor",
@@ -18658,7 +18658,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [27586] = {
             profession = "blacksmithing",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22219,
             createdItemId = 22198,
             category = "armor",
@@ -18675,7 +18675,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [27587] = {
             profession = "blacksmithing",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22222,
             createdItemId = 22196,
             category = "armor",
@@ -18693,7 +18693,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [27588] = {
             profession = "blacksmithing",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22214,
             createdItemId = 22195,
             category = "armor",
@@ -18708,7 +18708,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [27589] = {
             profession = "blacksmithing",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22220,
             createdItemId = 22194,
             category = "armor",
@@ -18725,7 +18725,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [27590] = {
             profession = "blacksmithing",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22221,
             createdItemId = 22191,
             category = "armor",
@@ -18743,7 +18743,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [27658] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22307,
             createdItemId = 22246,
             category = "misc",
@@ -18758,7 +18758,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [27659] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22308,
             createdItemId = 22248,
             category = "misc",
@@ -18773,7 +18773,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [27660] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22309,
             createdItemId = 22249,
             category = "misc",
@@ -18789,7 +18789,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [27724] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22310,
             createdItemId = 22251,
             category = "misc",
@@ -18805,7 +18805,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [27725] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22312,
             createdItemId = 22252,
             category = "misc",
@@ -18821,7 +18821,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [27829] = {
             profession = "blacksmithing",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22388,
             createdItemId = 22385,
             category = "armor",
@@ -18838,7 +18838,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [27830] = {
             profession = "blacksmithing",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22390,
             createdItemId = 22384,
             category = "armor",
@@ -18857,7 +18857,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [27832] = {
             profession = "blacksmithing",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22389,
             createdItemId = 22383,
             category = "armor",
@@ -18874,7 +18874,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [27837] = {
             profession = "enchanting",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22392,
             category = "misc",
             sortOrder = 999,
@@ -19407,7 +19407,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28205] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22684,
             createdItemId = 22654,
             category = "misc",
@@ -19423,7 +19423,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28207] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22686,
             createdItemId = 22652,
             category = "misc",
@@ -19439,7 +19439,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28208] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22685,
             createdItemId = 22658,
             category = "misc",
@@ -19455,7 +19455,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28209] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22687,
             createdItemId = 22655,
             category = "misc",
@@ -19471,7 +19471,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28210] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22683,
             createdItemId = 22660,
             category = "misc",
@@ -19487,7 +19487,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28219] = {
             profession = "leatherworking",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22692,
             createdItemId = 22661,
             category = "misc",
@@ -19504,7 +19504,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28220] = {
             profession = "leatherworking",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22694,
             createdItemId = 22662,
             category = "misc",
@@ -19521,7 +19521,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28221] = {
             profession = "leatherworking",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22695,
             createdItemId = 22663,
             category = "misc",
@@ -19538,7 +19538,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28222] = {
             profession = "leatherworking",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22696,
             createdItemId = 22664,
             category = "misc",
@@ -19555,7 +19555,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28223] = {
             profession = "leatherworking",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22697,
             createdItemId = 22666,
             category = "misc",
@@ -19572,7 +19572,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28224] = {
             profession = "leatherworking",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22698,
             createdItemId = 22665,
             category = "misc",
@@ -19589,7 +19589,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28242] = {
             profession = "blacksmithing",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22703,
             createdItemId = 22669,
             category = "armor",
@@ -19606,7 +19606,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28243] = {
             profession = "blacksmithing",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22704,
             createdItemId = 22670,
             category = "armor",
@@ -19623,7 +19623,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28244] = {
             profession = "blacksmithing",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22705,
             createdItemId = 22671,
             category = "armor",
@@ -19654,7 +19654,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28327] = {
             profession = "engineering",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22729,
             createdItemId = 22728,
             category = "misc",
@@ -19668,7 +19668,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28461] = {
             profession = "blacksmithing",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22766,
             createdItemId = 22762,
             category = "armor",
@@ -19685,7 +19685,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28462] = {
             profession = "blacksmithing",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22767,
             createdItemId = 22763,
             category = "armor",
@@ -19701,7 +19701,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28463] = {
             profession = "blacksmithing",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22768,
             createdItemId = 22764,
             category = "armor",
@@ -19716,7 +19716,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28472] = {
             profession = "leatherworking",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22771,
             createdItemId = 22759,
             category = "misc",
@@ -19732,7 +19732,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28473] = {
             profession = "leatherworking",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22770,
             createdItemId = 22760,
             category = "misc",
@@ -19748,7 +19748,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28474] = {
             profession = "leatherworking",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22769,
             createdItemId = 22761,
             category = "misc",
@@ -19763,7 +19763,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28480] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22774,
             createdItemId = 22756,
             category = "misc",
@@ -19779,7 +19779,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28481] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22773,
             createdItemId = 22757,
             category = "misc",
@@ -19795,7 +19795,7 @@ RecipeRegistryRecipeMetadata = {
         },
         [28482] = {
             profession = "tailoring",
-            expansion = "tbc",
+            expansion = "vanilla",
             recipeItemId = 22772,
             createdItemId = 22758,
             category = "misc",

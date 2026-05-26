@@ -20,18 +20,18 @@ Release-blocking unresolved: 0
 
 | Expansion | Recipes | Expected | Missing |
 |---|---:|---:|---:|
-| vanilla | 1172 | 1172 | 0 |
-| tbc | 957 | 957 | 0 |
+| vanilla | 1236 | 1236 | 0 |
+| tbc | 893 | 893 | 0 |
 
 ## Profession / Expansion Coverage
 
 | Profession | Vanilla | Expected Vanilla | Missing Vanilla | TBC | Expected TBC | Missing TBC |
 |---|---:|---:|---:|---:|---:|---:|
-| alchemy | 115 | 115 | 0 | 71 | 71 | 0 |
-| blacksmithing | 235 | 235 | 0 | 150 | 150 | 0 |
-| cooking | 78 | 78 | 0 | 38 | 38 | 0 |
-| enchanting | 150 | 150 | 0 | 73 | 73 | 0 |
-| engineering | 153 | 153 | 0 | 97 | 97 | 0 |
+| alchemy | 116 | 116 | 0 | 70 | 70 | 0 |
+| blacksmithing | 250 | 250 | 0 | 135 | 135 | 0 |
+| cooking | 81 | 81 | 0 | 35 | 35 | 0 |
+| enchanting | 151 | 151 | 0 | 72 | 72 | 0 |
+| engineering | 169 | 169 | 0 | 81 | 81 | 0 |
 | jewelcrafting | 0 | 0 | 0 | 261 | 261 | 0 |
-| leatherworking | 225 | 225 | 0 | 154 | 154 | 0 |
-| tailoring | 216 | 216 | 0 | 113 | 113 | 0 |
+| leatherworking | 235 | 235 | 0 | 144 | 144 | 0 |
+| tailoring | 234 | 234 | 0 | 95 | 95 | 0 |

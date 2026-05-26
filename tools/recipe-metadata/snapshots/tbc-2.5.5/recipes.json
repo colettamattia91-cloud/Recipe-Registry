@@ -1037,7 +1037,7 @@
   {
     "categoryHint": "alchemy.potions.combat",
     "createdItemId": 21546,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "alchemy",
     "recipeItemId": 21547,
     "requiredSkill": 250,
@@ -3791,7 +3791,7 @@
   {
     "categoryHint": "blacksmithing.armor.plate",
     "createdItemId": 22197,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "blacksmithing",
     "recipeItemId": 22209,
     "requiredSkill": 300,
@@ -3800,7 +3800,7 @@
   {
     "categoryHint": "blacksmithing.armor.plate",
     "createdItemId": 22198,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "blacksmithing",
     "recipeItemId": 22219,
     "requiredSkill": 300,
@@ -3809,7 +3809,7 @@
   {
     "categoryHint": "blacksmithing.armor.plate",
     "createdItemId": 22196,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "blacksmithing",
     "recipeItemId": 22222,
     "requiredSkill": 300,
@@ -3818,7 +3818,7 @@
   {
     "categoryHint": "blacksmithing.armor.plate",
     "createdItemId": 22195,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "blacksmithing",
     "recipeItemId": 22214,
     "requiredSkill": 300,
@@ -3827,7 +3827,7 @@
   {
     "categoryHint": "blacksmithing.armor.plate",
     "createdItemId": 22194,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "blacksmithing",
     "recipeItemId": 22220,
     "requiredSkill": 300,
@@ -3836,7 +3836,7 @@
   {
     "categoryHint": "blacksmithing.armor.plate",
     "createdItemId": 22191,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "blacksmithing",
     "recipeItemId": 22221,
     "requiredSkill": 300,
@@ -3845,7 +3845,7 @@
   {
     "categoryHint": "blacksmithing.armor.plate",
     "createdItemId": 22385,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "blacksmithing",
     "recipeItemId": 22388,
     "requiredSkill": 300,
@@ -3854,7 +3854,7 @@
   {
     "categoryHint": "blacksmithing.armor.plate",
     "createdItemId": 22384,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "blacksmithing",
     "recipeItemId": 22390,
     "requiredSkill": 300,
@@ -3863,7 +3863,7 @@
   {
     "categoryHint": "blacksmithing.armor.plate",
     "createdItemId": 22383,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "blacksmithing",
     "recipeItemId": 22389,
     "requiredSkill": 300,
@@ -3872,7 +3872,7 @@
   {
     "categoryHint": "blacksmithing.armor.plate",
     "createdItemId": 22669,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "blacksmithing",
     "recipeItemId": 22703,
     "requiredSkill": 300,
@@ -3881,7 +3881,7 @@
   {
     "categoryHint": "blacksmithing.armor.plate",
     "createdItemId": 22670,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "blacksmithing",
     "recipeItemId": 22704,
     "requiredSkill": 300,
@@ -3890,7 +3890,7 @@
   {
     "categoryHint": "blacksmithing.armor.plate",
     "createdItemId": 22671,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "blacksmithing",
     "recipeItemId": 22705,
     "requiredSkill": 300,
@@ -3899,7 +3899,7 @@
   {
     "categoryHint": "blacksmithing.armor.plate",
     "createdItemId": 22762,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "blacksmithing",
     "recipeItemId": 22766,
     "requiredSkill": 300,
@@ -3908,7 +3908,7 @@
   {
     "categoryHint": "blacksmithing.armor.plate",
     "createdItemId": 22763,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "blacksmithing",
     "recipeItemId": 22767,
     "requiredSkill": 300,
@@ -3917,7 +3917,7 @@
   {
     "categoryHint": "blacksmithing.armor.plate",
     "createdItemId": 22764,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "blacksmithing",
     "recipeItemId": 22768,
     "requiredSkill": 300,
@@ -5843,7 +5843,7 @@
   {
     "categoryHint": "cooking.food.meat",
     "createdItemId": 21023,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "cooking",
     "recipeItemId": 21025,
     "requiredSkill": 300,
@@ -5852,7 +5852,7 @@
   {
     "categoryHint": "cooking.food.meat",
     "createdItemId": 21072,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "cooking",
     "recipeItemId": 21099,
     "requiredSkill": 80,
@@ -5861,7 +5861,7 @@
   {
     "categoryHint": "cooking.food.meat",
     "createdItemId": 21217,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "cooking",
     "recipeItemId": 21219,
     "requiredSkill": 175,
@@ -7535,7 +7535,7 @@
   {
     "categoryHint": "enchanting.misc",
     "createdItemId": null,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "enchanting",
     "recipeItemId": 22392,
     "requiredSkill": 290,
@@ -9569,7 +9569,7 @@
   {
     "categoryHint": "engineering.misc",
     "createdItemId": 21277,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "engineering",
     "recipeItemId": null,
     "requiredSkill": null,
@@ -9578,7 +9578,7 @@
   {
     "categoryHint": "engineering.misc",
     "createdItemId": 21558,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "engineering",
     "recipeItemId": 21724,
     "requiredSkill": 125,
@@ -9587,7 +9587,7 @@
   {
     "categoryHint": "engineering.misc",
     "createdItemId": 21559,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "engineering",
     "recipeItemId": 21725,
     "requiredSkill": 125,
@@ -9596,7 +9596,7 @@
   {
     "categoryHint": "engineering.misc",
     "createdItemId": 21557,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "engineering",
     "recipeItemId": 21726,
     "requiredSkill": 125,
@@ -9605,7 +9605,7 @@
   {
     "categoryHint": "engineering.misc",
     "createdItemId": 21589,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "engineering",
     "recipeItemId": 21727,
     "requiredSkill": 175,
@@ -9614,7 +9614,7 @@
   {
     "categoryHint": "engineering.misc",
     "createdItemId": 21590,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "engineering",
     "recipeItemId": 21728,
     "requiredSkill": 175,
@@ -9623,7 +9623,7 @@
   {
     "categoryHint": "engineering.misc",
     "createdItemId": 21592,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "engineering",
     "recipeItemId": 21729,
     "requiredSkill": 175,
@@ -9632,7 +9632,7 @@
   {
     "categoryHint": "engineering.misc",
     "createdItemId": 21571,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "engineering",
     "recipeItemId": 21730,
     "requiredSkill": 225,
@@ -9641,7 +9641,7 @@
   {
     "categoryHint": "engineering.misc",
     "createdItemId": 21574,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "engineering",
     "recipeItemId": 21731,
     "requiredSkill": 225,
@@ -9650,7 +9650,7 @@
   {
     "categoryHint": "engineering.misc",
     "createdItemId": 21576,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "engineering",
     "recipeItemId": 21732,
     "requiredSkill": 225,
@@ -9659,7 +9659,7 @@
   {
     "categoryHint": "engineering.misc",
     "createdItemId": 21714,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "engineering",
     "recipeItemId": 21733,
     "requiredSkill": 275,
@@ -9668,7 +9668,7 @@
   {
     "categoryHint": "engineering.misc",
     "createdItemId": 21716,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "engineering",
     "recipeItemId": 21734,
     "requiredSkill": 275,
@@ -9677,7 +9677,7 @@
   {
     "categoryHint": "engineering.misc",
     "createdItemId": 21718,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "engineering",
     "recipeItemId": 21735,
     "requiredSkill": 275,
@@ -9686,7 +9686,7 @@
   {
     "categoryHint": "engineering.misc",
     "createdItemId": 21569,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "engineering",
     "recipeItemId": 21738,
     "requiredSkill": 225,
@@ -9695,7 +9695,7 @@
   {
     "categoryHint": "engineering.misc",
     "createdItemId": 21570,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "engineering",
     "recipeItemId": 21737,
     "requiredSkill": 275,
@@ -9704,7 +9704,7 @@
   {
     "categoryHint": "engineering.misc",
     "createdItemId": 22728,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "engineering",
     "recipeItemId": 22729,
     "requiredSkill": 275,
@@ -14816,7 +14816,7 @@
   {
     "categoryHint": "leatherworking.misc",
     "createdItemId": 21278,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "leatherworking",
     "recipeItemId": 21548,
     "requiredSkill": 300,
@@ -14825,7 +14825,7 @@
   {
     "categoryHint": "leatherworking.misc",
     "createdItemId": 22661,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "leatherworking",
     "recipeItemId": 22692,
     "requiredSkill": 300,
@@ -14834,7 +14834,7 @@
   {
     "categoryHint": "leatherworking.misc",
     "createdItemId": 22662,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "leatherworking",
     "recipeItemId": 22694,
     "requiredSkill": 300,
@@ -14843,7 +14843,7 @@
   {
     "categoryHint": "leatherworking.misc",
     "createdItemId": 22663,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "leatherworking",
     "recipeItemId": 22695,
     "requiredSkill": 300,
@@ -14852,7 +14852,7 @@
   {
     "categoryHint": "leatherworking.misc",
     "createdItemId": 22664,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "leatherworking",
     "recipeItemId": 22696,
     "requiredSkill": 300,
@@ -14861,7 +14861,7 @@
   {
     "categoryHint": "leatherworking.misc",
     "createdItemId": 22666,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "leatherworking",
     "recipeItemId": 22697,
     "requiredSkill": 300,
@@ -14870,7 +14870,7 @@
   {
     "categoryHint": "leatherworking.misc",
     "createdItemId": 22665,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "leatherworking",
     "recipeItemId": 22698,
     "requiredSkill": 300,
@@ -14879,7 +14879,7 @@
   {
     "categoryHint": "leatherworking.misc",
     "createdItemId": 22759,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "leatherworking",
     "recipeItemId": 22771,
     "requiredSkill": 300,
@@ -14888,7 +14888,7 @@
   {
     "categoryHint": "leatherworking.misc",
     "createdItemId": 22760,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "leatherworking",
     "recipeItemId": 22770,
     "requiredSkill": 300,
@@ -14897,7 +14897,7 @@
   {
     "categoryHint": "leatherworking.misc",
     "createdItemId": 22761,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "leatherworking",
     "recipeItemId": 22769,
     "requiredSkill": 300,
@@ -18146,7 +18146,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 21340,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 21358,
     "requiredSkill": 260,
@@ -18155,7 +18155,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 21341,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 21369,
     "requiredSkill": 285,
@@ -18164,7 +18164,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 21342,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 21371,
     "requiredSkill": 300,
@@ -18173,7 +18173,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 21154,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 21722,
     "requiredSkill": 250,
@@ -18182,7 +18182,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 21542,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 21723,
     "requiredSkill": 250,
@@ -18506,7 +18506,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 22246,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 22307,
     "requiredSkill": 225,
@@ -18515,7 +18515,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 22248,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 22308,
     "requiredSkill": 275,
@@ -18524,7 +18524,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 22249,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 22309,
     "requiredSkill": 300,
@@ -18533,7 +18533,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 22251,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 22310,
     "requiredSkill": 275,
@@ -18542,7 +18542,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 22252,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 22312,
     "requiredSkill": 300,
@@ -18551,7 +18551,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 22654,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 22684,
     "requiredSkill": 300,
@@ -18560,7 +18560,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 22652,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 22686,
     "requiredSkill": 300,
@@ -18569,7 +18569,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 22658,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 22685,
     "requiredSkill": 300,
@@ -18578,7 +18578,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 22655,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 22687,
     "requiredSkill": 300,
@@ -18587,7 +18587,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 22660,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 22683,
     "requiredSkill": 300,
@@ -18596,7 +18596,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 22756,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 22774,
     "requiredSkill": 300,
@@ -18605,7 +18605,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 22757,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 22773,
     "requiredSkill": 300,
@@ -18614,7 +18614,7 @@
   {
     "categoryHint": "tailoring.misc",
     "createdItemId": 22758,
-    "firstSeenExpansion": "tbc",
+    "firstSeenExpansion": "vanilla",
     "profession": "tailoring",
     "recipeItemId": 22772,
     "requiredSkill": 300,

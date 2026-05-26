@@ -11,13 +11,14 @@ from urllib.request import Request, urlopen
 
 DEFAULT_PRODUCT = "wow_anniversary"
 DEFAULT_BRANCH = "wow_anniversary"
+DEFAULT_VANILLA_BUILD = "1.15.7.61582"
+DEFAULT_LOCALE = "enUS"
 DEFAULT_METADATA_VERSION = "wago-wow-anniversary-tbc-2.5.5"
 WAGO_DB2_BASE_URL = "https://wago.tools/db2"
 
 CREATE_ITEM_EFFECT = 24
 ENCHANT_ITEM_EFFECT = 53
 LEARN_RECIPE_TRIGGER = 6
-TBC_SPELL_ID_FLOOR = 25255
 
 PROFESSION_BY_SKILL_LINE = {
     164: "blacksmithing",
@@ -38,6 +39,7 @@ SOURCE_TABLES = (
     "ItemSparse",
     "SpellName",
 )
+VANILLA_SKILL_LINE_ABILITY_TABLE = "VanillaSkillLineAbility"
 
 
 def _as_int(value, default=0):
@@ -53,11 +55,7 @@ def _csv_rows(text):
     return list(csv.DictReader(io.StringIO(text)))
 
 
-def fetch_wago_table(table, product=DEFAULT_PRODUCT, branch=DEFAULT_BRANCH, timeout=90):
-    query = urlencode({
-        "branch": branch,
-        "product": product,
-    })
+def _fetch_wago_csv(table, query, timeout):
     url = "{0}/{1}/csv?{2}".format(WAGO_DB2_BASE_URL, table, query)
     request = Request(url, headers={
         "User-Agent": "RecipeRegistry metadata importer",
@@ -67,11 +65,40 @@ def fetch_wago_table(table, product=DEFAULT_PRODUCT, branch=DEFAULT_BRANCH, time
     return _csv_rows(content)
 
 
-def fetch_wago_tables(product=DEFAULT_PRODUCT, branch=DEFAULT_BRANCH, timeout=90):
-    return {
+def fetch_wago_table(table, product=DEFAULT_PRODUCT, branch=DEFAULT_BRANCH, timeout=90):
+    query = urlencode({
+        "branch": branch,
+        "product": product,
+    })
+    return _fetch_wago_csv(table, query, timeout)
+
+
+def fetch_wago_build_table(table, build, locale=DEFAULT_LOCALE, timeout=90):
+    query = urlencode({
+        "build": build,
+        "locale": locale,
+    })
+    return _fetch_wago_csv(table, query, timeout)
+
+
+def fetch_wago_tables(
+    product=DEFAULT_PRODUCT,
+    branch=DEFAULT_BRANCH,
+    vanilla_build=DEFAULT_VANILLA_BUILD,
+    locale=DEFAULT_LOCALE,
+    timeout=90,
+):
+    tables = {
         table: fetch_wago_table(table, product=product, branch=branch, timeout=timeout)
         for table in SOURCE_TABLES
     }
+    tables[VANILLA_SKILL_LINE_ABILITY_TABLE] = fetch_wago_build_table(
+        "SkillLineAbility",
+        vanilla_build,
+        locale=locale,
+        timeout=timeout,
+    )
+    return tables
 
 
 def _created_items_by_spell(spell_effects):
@@ -140,10 +167,20 @@ def _names_by_spell(spell_names):
     }
 
 
-def _first_seen_expansion(spell_id, profession):
-    if profession == "jewelcrafting" or spell_id >= TBC_SPELL_ID_FLOOR:
-        return "tbc"
-    return "vanilla"
+def _supported_skill_line_spells(skill_line_ability):
+    spells = set()
+    for row in skill_line_ability:
+        if _as_int(row.get("SkillLine")) in PROFESSION_BY_SKILL_LINE:
+            spell_id = _as_int(row.get("Spell"))
+            if spell_id:
+                spells.add(spell_id)
+    return spells
+
+
+def _first_seen_expansion(spell_id, vanilla_recipe_spell_ids):
+    if spell_id in vanilla_recipe_spell_ids:
+        return "vanilla"
+    return "tbc"
 
 
 def _required_skill(recipe_item_id, skill_line_row, items_by_id):
@@ -231,6 +268,7 @@ def build_normalized_snapshot(
     snapshot,
     product=DEFAULT_PRODUCT,
     branch=DEFAULT_BRANCH,
+    vanilla_build=DEFAULT_VANILLA_BUILD,
     metadata_version=DEFAULT_METADATA_VERSION,
     dataset_kind="release-candidate",
 ):
@@ -240,6 +278,7 @@ def build_normalized_snapshot(
     item_effects = tables["ItemEffect"]
     item_sparse = tables["ItemSparse"]
     spell_names = tables["SpellName"]
+    vanilla_skill_line_ability = tables.get(VANILLA_SKILL_LINE_ABILITY_TABLE, ())
 
     created_items = _created_items_by_spell(spell_effects)
     enchant_spells = _enchant_spells(spell_effects)
@@ -247,12 +286,14 @@ def build_normalized_snapshot(
     recipe_items = _recipe_items_by_spell(item_effects)
     items_by_id = _items_by_id(item_sparse)
     names_by_spell = _names_by_spell(spell_names)
+    vanilla_recipe_spell_ids = _supported_skill_line_spells(vanilla_skill_line_ability)
 
     recipes = []
     used_item_ids = set()
     self_only_outputless_spell_ids = []
     seen_recipe_spell_ids = set()
     duplicates_skipped = 0
+    late_vanilla_recipe_spell_ids = []
 
     for row in skill_line_ability:
         skill_line = _as_int(row.get("SkillLine"))
@@ -273,6 +314,9 @@ def build_normalized_snapshot(
         spell_name = names_by_spell.get(spell_id, "")
         if profession == "enchanting" and spell_name.lower().startswith("enchant ring -"):
             self_only_outputless_spell_ids.append(spell_id)
+        first_seen_expansion = _first_seen_expansion(spell_id, vanilla_recipe_spell_ids)
+        if first_seen_expansion == "vanilla" and spell_id >= 25255:
+            late_vanilla_recipe_spell_ids.append(spell_id)
 
         if created_item_id:
             used_item_ids.add(created_item_id)
@@ -284,7 +328,7 @@ def build_normalized_snapshot(
         recipes.append({
             "spellId": spell_id,
             "profession": profession,
-            "firstSeenExpansion": _first_seen_expansion(spell_id, profession),
+            "firstSeenExpansion": first_seen_expansion,
             "recipeItemId": recipe_item_id,
             "createdItemId": created_item_id,
             "requiredSkill": _required_skill(recipe_item_id, row, items_by_id),
@@ -317,15 +361,24 @@ def build_normalized_snapshot(
         "source": {
             "product": product,
             "branch": branch,
+            "vanillaBuild": vanilla_build,
             "tables": list(SOURCE_TABLES),
-            "expansionRule": "jewelcrafting or spellId >= {0} => tbc; lower spellIds => vanilla".format(
-                TBC_SPELL_ID_FLOOR,
+            "expansionRule": "spell present in Vanilla SkillLineAbility build {0} => vanilla; otherwise tbc".format(
+                vanilla_build,
             ),
+            "recipeItemPolicy": "primary recipeItemId comes from DB2 ItemEffect ParentItemID; alternate teaching sources are intentionally not modeled",
+            "createdItemPolicy": "createdItemId comes from DB2 SpellEffect Effect=24 EffectItemType",
         },
         "sourceStats": {
-            "rawRows": {name: len(tables[name]) for name in SOURCE_TABLES},
+            "rawRows": {
+                name: len(tables[name])
+                for name in list(SOURCE_TABLES) + [VANILLA_SKILL_LINE_ABILITY_TABLE]
+                if name in tables
+            },
             "records": len(recipes),
             "duplicateSkillLineAbilityRecipesSkipped": duplicates_skipped,
+            "lateVanillaRecipesFromBaseline": len(set(late_vanilla_recipe_spell_ids)),
+            "lateVanillaRecipeSpellIds": sorted(set(late_vanilla_recipe_spell_ids)),
         },
         "expectedRecipeCounts": _expected_counts(recipes),
     }

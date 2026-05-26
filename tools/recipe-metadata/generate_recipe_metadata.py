@@ -18,8 +18,10 @@ from recipe_sources.db2_provider import DEFAULT_SNAPSHOT
 from recipe_sources.local_snapshot_provider import load_local_snapshot
 from recipe_sources.wago_anniversary_provider import (
     DEFAULT_BRANCH as DEFAULT_WAGO_BRANCH,
+    DEFAULT_LOCALE as DEFAULT_WAGO_LOCALE,
     DEFAULT_METADATA_VERSION as DEFAULT_WAGO_METADATA_VERSION,
     DEFAULT_PRODUCT as DEFAULT_WAGO_PRODUCT,
+    DEFAULT_VANILLA_BUILD,
     build_normalized_snapshot,
     fetch_wago_tables,
     write_normalized_snapshot,
@@ -214,11 +216,14 @@ def command_fetch(args):
             fetch_wago_tables(
                 product=args.wago_product,
                 branch=args.wago_branch,
+                vanilla_build=args.vanilla_build,
+                locale=args.locale,
                 timeout=args.timeout,
             ),
             args.snapshot,
             product=args.wago_product,
             branch=args.wago_branch,
+            vanilla_build=args.vanilla_build,
             metadata_version=args.metadata_version,
             dataset_kind=args.dataset_kind,
         )
@@ -337,6 +342,8 @@ def build_parser():
     fetch.add_argument("--source-dir")
     fetch.add_argument("--wago-product", default=DEFAULT_WAGO_PRODUCT)
     fetch.add_argument("--wago-branch", default=DEFAULT_WAGO_BRANCH)
+    fetch.add_argument("--vanilla-build", default=DEFAULT_VANILLA_BUILD)
+    fetch.add_argument("--locale", default=DEFAULT_WAGO_LOCALE)
     fetch.add_argument("--metadata-version", default=DEFAULT_WAGO_METADATA_VERSION)
     fetch.add_argument("--dataset-kind", default="release-candidate", choices=("fixture", "release-candidate"))
     fetch.add_argument("--timeout", type=int, default=90)

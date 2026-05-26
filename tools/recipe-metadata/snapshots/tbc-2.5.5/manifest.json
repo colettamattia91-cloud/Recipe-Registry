@@ -2,8 +2,8 @@
   "datasetKind": "release-candidate",
   "expectedRecipeCounts": {
     "byExpansion": {
-      "tbc": 957,
-      "vanilla": 1172
+      "tbc": 893,
+      "vanilla": 1236
     },
     "byProfession": {
       "alchemy": 186,
@@ -17,35 +17,35 @@
     },
     "byProfessionExpansion": {
       "alchemy": {
-        "tbc": 71,
-        "vanilla": 115
+        "tbc": 70,
+        "vanilla": 116
       },
       "blacksmithing": {
-        "tbc": 150,
-        "vanilla": 235
+        "tbc": 135,
+        "vanilla": 250
       },
       "cooking": {
-        "tbc": 38,
-        "vanilla": 78
+        "tbc": 35,
+        "vanilla": 81
       },
       "enchanting": {
-        "tbc": 73,
-        "vanilla": 150
+        "tbc": 72,
+        "vanilla": 151
       },
       "engineering": {
-        "tbc": 97,
-        "vanilla": 153
+        "tbc": 81,
+        "vanilla": 169
       },
       "jewelcrafting": {
         "tbc": 261
       },
       "leatherworking": {
-        "tbc": 154,
-        "vanilla": 225
+        "tbc": 144,
+        "vanilla": 235
       },
       "tailoring": {
-        "tbc": 113,
-        "vanilla": 216
+        "tbc": 95,
+        "vanilla": 234
       }
     },
     "total": 2129
@@ -56,8 +56,10 @@
   "snapshot": "tbc-2.5.5",
   "source": {
     "branch": "wow_anniversary",
-    "expansionRule": "jewelcrafting or spellId >= 25255 => tbc; lower spellIds => vanilla",
+    "createdItemPolicy": "createdItemId comes from DB2 SpellEffect Effect=24 EffectItemType",
+    "expansionRule": "spell present in Vanilla SkillLineAbility build 1.15.7.61582 => vanilla; otherwise tbc",
     "product": "wow_anniversary",
+    "recipeItemPolicy": "primary recipeItemId comes from DB2 ItemEffect ParentItemID; alternate teaching sources are intentionally not modeled",
     "tables": [
       "SkillLineAbility",
       "SpellEffect",
@@ -65,17 +67,86 @@
       "ItemEffect",
       "ItemSparse",
       "SpellName"
-    ]
+    ],
+    "vanillaBuild": "1.15.7.61582"
   },
   "sourceStats": {
     "duplicateSkillLineAbilityRecipesSkipped": 1,
+    "lateVanillaRecipeSpellIds": [
+      25659,
+      25704,
+      25954,
+      26011,
+      26085,
+      26086,
+      26087,
+      26277,
+      26279,
+      26403,
+      26407,
+      26416,
+      26417,
+      26418,
+      26420,
+      26421,
+      26422,
+      26423,
+      26424,
+      26425,
+      26426,
+      26427,
+      26428,
+      26442,
+      26443,
+      27585,
+      27586,
+      27587,
+      27588,
+      27589,
+      27590,
+      27658,
+      27659,
+      27660,
+      27724,
+      27725,
+      27829,
+      27830,
+      27832,
+      27837,
+      28205,
+      28207,
+      28208,
+      28209,
+      28210,
+      28219,
+      28220,
+      28221,
+      28222,
+      28223,
+      28224,
+      28242,
+      28243,
+      28244,
+      28327,
+      28461,
+      28462,
+      28463,
+      28472,
+      28473,
+      28474,
+      28480,
+      28481,
+      28482
+    ],
+    "lateVanillaRecipesFromBaseline": 64,
     "rawRows": {
       "ItemEffect": 17729,
       "ItemSparse": 30044,
       "SkillLineAbility": 7018,
       "SpellEffect": 38303,
       "SpellName": 28650,
-      "SpellReagents": 2659
+      "SpellReagents": 2659,
+      "VanillaSkillLineAbility": 6143
     },
     "records": 2129
   }

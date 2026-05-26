@@ -127,6 +127,35 @@ def build_reports(records, diagnostics, primary):
                 fallback.get("hint"),
             ))
 
+    source = source_manifest_data.get("source", {})
+    source_stats = source_manifest_data.get("sourceStats", {})
+    late_vanilla_spell_ids = source_stats.get("lateVanillaRecipeSpellIds") or []
+    audit_lines = [
+        "# Source Gap Audit",
+        "",
+        "Provider: {0}".format(source_manifest_data.get("provider", "unknown")),
+        "Expansion rule: {0}".format(source.get("expansionRule", "unknown")),
+        "Recipe item policy: {0}".format(source.get("recipeItemPolicy", "unknown")),
+        "Created item policy: {0}".format(source.get("createdItemPolicy", "unknown")),
+        "",
+        "| Check | Value |",
+        "|---|---:|",
+        "| Late-Vanilla recipes from baseline diff | {0} |".format(
+            source_stats.get("lateVanillaRecipesFromBaseline", 0),
+        ),
+        "| Duplicate SkillLineAbility recipe rows skipped | {0} |".format(
+            source_stats.get("duplicateSkillLineAbilityRecipesSkipped", 0),
+        ),
+        "",
+    ]
+    if late_vanilla_spell_ids:
+        audit_lines.extend([
+            "## Late-Vanilla Spell IDs",
+            "",
+            ", ".join(str(spell_id) for spell_id in late_vanilla_spell_ids),
+            "",
+        ])
+
     source_manifest = {
         "source": primary.get("manifest", {}),
         "records": len(records),
@@ -148,6 +177,7 @@ def build_reports(records, diagnostics, primary):
         "coverage.md": "\n".join(coverage_lines) + "\n",
         "reagent-coverage.md": "\n".join(reagent_lines) + "\n",
         "category-remediation.md": "\n".join(category_lines) + "\n",
+        "source-gap-audit.md": "\n".join(audit_lines) + "\n",
         "unresolved.json": json.dumps(unresolved, indent=2, sort_keys=True) + "\n",
         "source-manifest.json": json.dumps(source_manifest, indent=2, sort_keys=True) + "\n",
     }
