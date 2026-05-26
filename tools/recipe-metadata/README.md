@@ -8,12 +8,11 @@ from `remediation/taxonomy/`, emits the generated Lua payload to
 `Data/Metadata/RecipeMetadata_Generated.lua`, and writes coverage reports to
 `artifacts/recipe-metadata/`.
 
-The committed snapshot is currently a minimal normalized DB2-derived fixture. It models
-the fields used from `SkillLineAbility`, `Spell`, `SpellEffect`, and
-`ItemSparse`; `secondary_static.json` supplies semantic gaps such as
-outputless self-only flags. The release-candidate snapshot for TBC `2.5.5`
-must contain every supported Vanilla and TBC recipe, not only recipes newly
-introduced in TBC.
+The committed snapshot is a normalized Wago Tools DB2 release-candidate dataset
+for Classic Anniversary TBC `2.5.5`. It contains every supported Vanilla and TBC
+recipe currently emitted by the source importer, not only recipes newly
+introduced in TBC; `secondary_static.json` supplies semantic gaps such as
+outputless self-only flags.
 
 ```powershell
 python tools/recipe-metadata/generate_recipe_metadata.py generate --flavor tbc --offline
@@ -21,13 +20,22 @@ python tools/recipe-metadata/generate_recipe_metadata.py generate --flavor tbc -
 python tools/recipe-metadata/generate_recipe_metadata.py validate --flavor tbc --strict
 python tools/recipe-metadata/generate_recipe_metadata.py report --flavor tbc
 python tools/recipe-metadata/generate_recipe_metadata.py fetch --snapshot tbc-2.5.5 --source-dir C:\path\to\normalized-snapshot
+python tools/recipe-metadata/generate_recipe_metadata.py fetch --snapshot tbc-2.5.5 --source wago-anniversary
 python -m unittest discover -s tools/recipe-metadata/tests
 ```
+
+`fetch` supports two maintainer-only modes. `--source-dir` imports an
+already-normalized snapshot bundle and validates it before copying it into
+`snapshots/`. `--source wago-anniversary` refreshes the normalized bundle from
+Wago Tools DB2 using `product=wow_anniversary`; it reads `SkillLineAbility`,
+`SpellEffect`, `SpellReagents`, `ItemEffect`, `ItemSparse`, and `SpellName`.
+Recipe candidates are supported-profession rows with a create-item effect, plus
+enchanting outputless enchant rows with reagent data.
 
 Phase 4 release gates:
 
 - `generate --offline --check` must report the generated Lua and reports as current.
-- `validate --strict` must finish with zero release-blocking unresolved records. It is expected to fail while the committed snapshot is marked `datasetKind: fixture`.
+- `validate --strict` must finish with zero release-blocking unresolved records.
 - `artifacts/recipe-metadata/coverage.md` must show 100% expansion,
   profession, category, and expected-record coverage for every supported v1
   profession. Expected counts must be declared by profession, by expansion

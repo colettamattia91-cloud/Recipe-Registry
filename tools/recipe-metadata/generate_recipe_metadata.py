@@ -16,6 +16,14 @@ from recipe_pipeline.normalize import normalize_records
 from recipe_pipeline.validate import validate_records
 from recipe_sources.db2_provider import DEFAULT_SNAPSHOT
 from recipe_sources.local_snapshot_provider import load_local_snapshot
+from recipe_sources.wago_anniversary_provider import (
+    DEFAULT_BRANCH as DEFAULT_WAGO_BRANCH,
+    DEFAULT_METADATA_VERSION as DEFAULT_WAGO_METADATA_VERSION,
+    DEFAULT_PRODUCT as DEFAULT_WAGO_PRODUCT,
+    build_normalized_snapshot,
+    fetch_wago_tables,
+    write_normalized_snapshot,
+)
 
 
 OUTPUT_PATH = REPO_ROOT / "Data" / "Metadata" / "RecipeMetadata_Generated.lua"
@@ -89,6 +97,99 @@ def _load_overrides(path=OVERRIDES_PATH):
     return buckets
 
 
+def _load_snapshot_json(path, expected_type, errors):
+    try:
+        value = json.loads(Path(path).read_text(encoding="utf-8"))
+    except Exception as exc:
+        errors.append("{0}: invalid JSON ({1})".format(Path(path).name, exc))
+        return None
+    if not isinstance(value, expected_type):
+        errors.append("{0}: expected {1}, got {2}".format(
+            Path(path).name,
+            expected_type.__name__,
+            type(value).__name__,
+        ))
+        return None
+    return value
+
+
+def _has_key(row, key):
+    return isinstance(row, dict) and key in row and row[key] is not None
+
+
+def validate_normalized_snapshot_dir(source_dir, expected_snapshot=None):
+    source_dir = Path(source_dir)
+    errors = []
+    required_shapes = {
+        "manifest.json": dict,
+        "recipes.json": list,
+        "spell_effects.json": list,
+        "item_sparse.json": list,
+    }
+    loaded = {}
+
+    for name, expected_type in required_shapes.items():
+        path = source_dir / name
+        if not path.exists():
+            errors.append("missing required snapshot file: " + str(path))
+            continue
+        loaded[name] = _load_snapshot_json(path, expected_type, errors)
+
+    secondary_path = source_dir / "secondary_static.json"
+    if secondary_path.exists():
+        loaded["secondary_static.json"] = _load_snapshot_json(secondary_path, dict, errors)
+
+    manifest = loaded.get("manifest.json")
+    if isinstance(manifest, dict):
+        snapshot = manifest.get("snapshot")
+        if expected_snapshot and snapshot != expected_snapshot:
+            errors.append("manifest snapshot {0} does not match requested snapshot {1}".format(
+                snapshot or "<missing>",
+                expected_snapshot,
+            ))
+        if manifest.get("flavor") != "tbc":
+            errors.append("manifest flavor must be tbc")
+        if manifest.get("datasetKind") not in ("fixture", "release-candidate"):
+            errors.append("manifest datasetKind must be fixture or release-candidate")
+
+    recipes = loaded.get("recipes.json") or []
+    seen_spell_ids = {}
+    for index, row in enumerate(recipes):
+        if not isinstance(row, dict):
+            errors.append("recipes.json[{0}]: expected object".format(index))
+            continue
+        for key in ("spellId", "profession", "firstSeenExpansion", "categoryHint"):
+            if not _has_key(row, key):
+                errors.append("recipes.json[{0}]: missing {1}".format(index, key))
+        spell_id = row.get("spellId")
+        if spell_id in seen_spell_ids:
+            errors.append("recipes.json[{0}]: duplicate spellId {1}".format(index, spell_id))
+        seen_spell_ids[spell_id] = True
+
+    spell_effects = loaded.get("spell_effects.json") or []
+    for index, row in enumerate(spell_effects):
+        if not isinstance(row, dict):
+            errors.append("spell_effects.json[{0}]: expected object".format(index))
+            continue
+        for key in ("spellId", "effectType"):
+            if not _has_key(row, key):
+                errors.append("spell_effects.json[{0}]: missing {1}".format(index, key))
+        if row.get("effectType") == "reagent":
+            for key in ("itemId", "count"):
+                if not _has_key(row, key):
+                    errors.append("spell_effects.json[{0}]: reagent missing {1}".format(index, key))
+
+    item_sparse = loaded.get("item_sparse.json") or []
+    for index, row in enumerate(item_sparse):
+        if not isinstance(row, dict):
+            errors.append("item_sparse.json[{0}]: expected object".format(index))
+            continue
+        if not _has_key(row, "itemId"):
+            errors.append("item_sparse.json[{0}]: missing itemId".format(index))
+
+    return errors
+
+
 def _build_pipeline(snapshot=DEFAULT_SNAPSHOT, flavor="tbc"):
     primary, secondary = load_local_snapshot(SNAPSHOT_ROOT, snapshot)
     taxonomies = load_taxonomies(TAXONOMY_ROOT)
@@ -108,6 +209,37 @@ def _build_pipeline(snapshot=DEFAULT_SNAPSHOT, flavor="tbc"):
 
 
 def command_fetch(args):
+    if args.source == "wago-anniversary":
+        snapshot_data = build_normalized_snapshot(
+            fetch_wago_tables(
+                product=args.wago_product,
+                branch=args.wago_branch,
+                timeout=args.timeout,
+            ),
+            args.snapshot,
+            product=args.wago_product,
+            branch=args.wago_branch,
+            metadata_version=args.metadata_version,
+            dataset_kind=args.dataset_kind,
+        )
+        incoming_dir = SNAPSHOT_ROOT / (args.snapshot + ".incoming")
+        if incoming_dir.exists():
+            shutil.rmtree(incoming_dir)
+        write_normalized_snapshot(snapshot_data, incoming_dir)
+        validation_errors = validate_normalized_snapshot_dir(incoming_dir, args.snapshot)
+        if validation_errors:
+            for error in validation_errors:
+                print(error, file=sys.stderr)
+            return 2
+
+        target_dir = SNAPSHOT_ROOT / args.snapshot
+        target_dir.mkdir(parents=True, exist_ok=True)
+        for name in snapshot_data:
+            shutil.copyfile(incoming_dir / name, target_dir / name)
+        shutil.rmtree(incoming_dir)
+        print("fetched Wago Anniversary snapshot into " + str(target_dir))
+        return 0
+
     if not args.source_dir:
         print("fetch is maintainer-only; pass --source-dir with normalized snapshot JSON files", file=sys.stderr)
         return 2
@@ -115,6 +247,12 @@ def command_fetch(args):
     source_dir = Path(args.source_dir)
     if not source_dir.exists():
         print("missing source snapshot directory: " + str(source_dir), file=sys.stderr)
+        return 2
+
+    validation_errors = validate_normalized_snapshot_dir(source_dir, args.snapshot)
+    if validation_errors:
+        for error in validation_errors:
+            print(error, file=sys.stderr)
         return 2
 
     target_dir = SNAPSHOT_ROOT / args.snapshot
@@ -195,7 +333,13 @@ def build_parser():
     fetch = subparsers.add_parser("fetch")
     fetch.add_argument("--flavor", default="tbc")
     fetch.add_argument("--snapshot", default=DEFAULT_SNAPSHOT)
+    fetch.add_argument("--source", default="normalized-dir", choices=("normalized-dir", "wago-anniversary"))
     fetch.add_argument("--source-dir")
+    fetch.add_argument("--wago-product", default=DEFAULT_WAGO_PRODUCT)
+    fetch.add_argument("--wago-branch", default=DEFAULT_WAGO_BRANCH)
+    fetch.add_argument("--metadata-version", default=DEFAULT_WAGO_METADATA_VERSION)
+    fetch.add_argument("--dataset-kind", default="release-candidate", choices=("fixture", "release-candidate"))
+    fetch.add_argument("--timeout", type=int, default=90)
     fetch.set_defaults(func=command_fetch)
 
     generate = subparsers.add_parser("generate")

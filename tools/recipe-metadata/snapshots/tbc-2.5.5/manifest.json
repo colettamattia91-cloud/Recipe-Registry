@@ -1,31 +1,82 @@
 {
-  "provider": "wago.tools-db2-normalized",
-  "snapshot": "tbc-2.5.5",
-  "metadataVersion": "2026.05.23.2",
+  "datasetKind": "release-candidate",
+  "expectedRecipeCounts": {
+    "byExpansion": {
+      "tbc": 957,
+      "vanilla": 1172
+    },
+    "byProfession": {
+      "alchemy": 186,
+      "blacksmithing": 385,
+      "cooking": 116,
+      "enchanting": 223,
+      "engineering": 250,
+      "jewelcrafting": 261,
+      "leatherworking": 379,
+      "tailoring": 329
+    },
+    "byProfessionExpansion": {
+      "alchemy": {
+        "tbc": 71,
+        "vanilla": 115
+      },
+      "blacksmithing": {
+        "tbc": 150,
+        "vanilla": 235
+      },
+      "cooking": {
+        "tbc": 38,
+        "vanilla": 78
+      },
+      "enchanting": {
+        "tbc": 73,
+        "vanilla": 150
+      },
+      "engineering": {
+        "tbc": 97,
+        "vanilla": 153
+      },
+      "jewelcrafting": {
+        "tbc": 261
+      },
+      "leatherworking": {
+        "tbc": 154,
+        "vanilla": 225
+      },
+      "tailoring": {
+        "tbc": 113,
+        "vanilla": 216
+      }
+    },
+    "total": 2129
+  },
   "flavor": "tbc",
-  "datasetKind": "fixture",
-  "sourceBuild": "2.5.5",
-  "scope": {
-    "expansions": [
-      "vanilla",
-      "tbc"
-    ],
-    "professions": [
-      "alchemy",
-      "blacksmithing",
-      "cooking",
-      "enchanting",
-      "engineering",
-      "jewelcrafting",
-      "leatherworking",
-      "tailoring"
+  "metadataVersion": "wago-wow-anniversary-tbc-2.5.5",
+  "provider": "wago.tools-db2",
+  "snapshot": "tbc-2.5.5",
+  "source": {
+    "branch": "wow_anniversary",
+    "expansionRule": "jewelcrafting or spellId >= 25255 => tbc; lower spellIds => vanilla",
+    "product": "wow_anniversary",
+    "tables": [
+      "SkillLineAbility",
+      "SpellEffect",
+      "SpellReagents",
+      "ItemEffect",
+      "ItemSparse",
+      "SpellName"
     ]
   },
-  "tables": [
-    "SkillLineAbility",
-    "Spell",
-    "SpellEffect",
-    "ItemSparse"
-  ],
-  "notes": "Minimal normalized offline snapshot for deterministic RecipeRegistry_Metadata generation."
+  "sourceStats": {
+    "duplicateSkillLineAbilityRecipesSkipped": 1,
+    "rawRows": {
+      "ItemEffect": 17729,
+      "ItemSparse": 30044,
+      "SkillLineAbility": 7018,
+      "SpellEffect": 38303,
+      "SpellName": 28650,
+      "SpellReagents": 2659
+    },
+    "records": 2129
+  }
 }

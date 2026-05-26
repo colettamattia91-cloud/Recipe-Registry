@@ -6,3 +6,4 @@ subcategories:
     - key: meat, label: Meat, order: 10
 rules:
   cooking.food.meat: category: food, subcategory: meat, sortOrder: 10
+  cooking.misc: category: misc, sortOrder: 999

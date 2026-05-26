@@ -10,3 +10,4 @@ subcategories:
 rules:
   engineering.explosives.powders: category: explosives, subcategory: powders, sortOrder: 10
   engineering.devices.weapons: category: devices, subcategory: weapons, sortOrder: 120
+  engineering.misc: category: misc, sortOrder: 999

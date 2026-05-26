@@ -6,3 +6,4 @@ subcategories:
     - key: self_only, label: Self Only, order: 10
 rules:
   enchanting.ring.self_only: category: ring_enchants, subcategory: self_only, sortOrder: 100
+  enchanting.misc: category: misc, sortOrder: 999

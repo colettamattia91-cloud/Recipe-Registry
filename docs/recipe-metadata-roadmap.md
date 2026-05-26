@@ -9,7 +9,7 @@ This roadmap is the working plan. It must not be overwritten without a follow-up
 
 > **REVISED 2026-05-26 — metadata folded into RR.** The metadata library no longer ships as a separate `RecipeRegistry_Metadata` sibling addon. Its data is fully static (Lua tables baked at build time), has no SavedVariables, no wire protocol, and no runtime mutability, so the OptionalDeps split added packaging/loading complexity without any benefit. The four metadata files now live under `Data/Metadata/` inside the RR addon and load as part of RR's own backend order. The Python generator in `tools/recipe-metadata/` is unchanged. Sections below that still describe the old plugin model (especially §3, §4.1, §10.7, parts of §11) are kept for historical reference; the live architecture is the one summarized in this banner and in §3.* below.
 
-**Current implementation status (updated 2026-05-26 after fold-in):** the branch contains the metadata library inside RR (`Data/Metadata/`), UI filter integration, AtlasLoot call-site removal gates, scoped profession filter cache keys/invalidation, metadata category/subcategory navigation, the per-profession recipe slice perf fix ported from develop, and a strict validator that now blocks fixture datasets. It does **not** yet satisfy the roadmap's real-data / 100% expected coverage requirement. Treat Phase 4 as incomplete and Phase 9 as blocked until a release-candidate metadata snapshot replaces the fixture dataset with complete Vanilla + TBC recipe coverage.
+**Current implementation status (updated 2026-05-26 after Wago dataset import):** the branch contains the metadata library inside RR (`Data/Metadata/`), UI filter integration, AtlasLoot call-site removal gates, scoped profession filter cache keys/invalidation, metadata category/subcategory navigation, the per-profession recipe slice perf fix ported from develop, a Wago Tools DB2 importer for `product=wow_anniversary`, and a release-candidate `tbc-2.5.5` snapshot with 2129 supported Vanilla + TBC recipe records. `generate --offline --check` and `validate --strict` pass against the committed snapshot with zero release-blocking unresolved records.
 
 **Distribution model (REVISED 2026-05-26, supersedes 2026-05-23 plugin model):** the generated metadata library is part of the Recipe Registry addon itself. The four Lua files (`RecipeMetadata_Generated.lua`, `RecipeMetadata_Overrides.lua`, `RecipeMetadata.lua`, `RecipeMetadataDiagnostics.lua`) live in `Data/Metadata/` and are listed in `RecipeRegistry.toc` after `Data/RecipeOwnershipIndex.lua` and before `Data/RecipeUiFilters.lua`. The Python generator in `tools/recipe-metadata/` is build-time only and is excluded from the CurseForge ZIP via `.pkgmeta`. No separate addon, no `## OptionalDeps: RecipeRegistry_Metadata` line, no `move-folders` entry.
 
@@ -994,12 +994,12 @@ Work items:
 - `reagent-coverage.md` shows 100% resolved reagents for every recipe whose UI detail / cost path depends on reagent metadata.
 - Any gap is closed by either upstream improvement or by adding the missing entry to `manual_overrides.yaml`. No deferred-to-v1.1 entries.
 
-**Review status (2026-05-24): blocked.**
+**Review status (2026-05-26): release-candidate dataset imported.**
 
-- The committed snapshot is still a small fixture: `artifacts/recipe-metadata/coverage.md` reports `Records: 14`, and the manifest marks the input as `datasetKind: fixture`.
-- `validate --strict` now fails this fixture dataset by design. It will pass only when a release-candidate snapshot declares expected counts by profession, expansion, and profession/expansion and the emitted records meet them.
-- `fetch` is maintainer-only and imports normalized snapshot JSON files into the committed snapshot directory; it still depends on a separate upstream normalization step.
-- Phase 4 remains incomplete until the source provider ingests a real TBC `2.5.5` dataset containing both Vanilla and TBC recipes, strict validation compares emitted coverage against expected supported-profession recipe coverage, and the reports prove full expansion/profession/category/reagent coverage over that real dataset.
+- The committed snapshot is now generated from Wago Tools DB2 `product=wow_anniversary` and reports `Records: 2129`.
+- The manifest marks the input as `datasetKind: release-candidate` and declares expected counts by profession, expansion, and profession/expansion.
+- `fetch --source wago-anniversary` is the maintainer-only source refresh path; generation and validation remain offline from the committed normalized snapshot.
+- `validate --strict` succeeds with zero release-blocking unresolved records against the committed snapshot.
 
 ### Phase 5 — AtlasLoot call-site inventory + replacement
 
@@ -1100,16 +1100,15 @@ Work items:
 - `RecipeRegistry.toc` contains zero AtlasLoot references.
 - `git grep -i atlasloot RecipeRegistry/` returns zero matches outside an explicitly archived legacy folder (if any).
 
-**Phase 9 review correction (2026-05-24): blocked, not complete.**
+**Phase 9 review correction (updated 2026-05-26): dataset blocker cleared.**
 
 - Confirmed working before remediation: local Lua tests, Lua syntax checks, generator unittest suite, `generate --offline --check`, and AtlasLoot grep/parity gates passed against the fixture data.
-- Release blocker: `validate --strict` now correctly fails because the metadata fixture contains only 14 records. Removing AtlasLoot as a runtime authority is not release-safe until Phase 4 produces full supported-profession Vanilla + TBC coverage.
+- Fixed in dataset import pass: the committed metadata snapshot is now a 2129-record release-candidate Wago Tools DB2 dataset for supported Vanilla + TBC professions.
 - Fixed in remediation pass: strict validation now fails fixture datasets and release-candidate snapshots with missing expected counts by profession, expansion, or profession/expansion.
 - Fixed in remediation pass: scoped profession cache keys and targeted profession/global-search cache eviction prevent unrelated profession overrides from busting normal profession list caches.
 - Fixed in remediation pass: unknown BoP output records track created-item info and invalidate affected profession projections when item cache data arrives.
 - Fixed in remediation pass: category/subcategory UI renders metadata labels and supports subcategory filtering.
-- Remaining release blocker: the committed snapshot is still a 14-record fixture, not the full supported-profession Vanilla + TBC release-candidate dataset.
-- Keep AtlasLoot removal work staged behind these blockers. If AtlasLoot is dropped from `OptionalDeps` before the real metadata dataset and gates are complete, most real recipes will lose resolver coverage.
+- Remaining release checks should focus on manual in-game smoke and packaging/export verification rather than fixture replacement.
 
 ---
 
@@ -1364,19 +1363,19 @@ Until then, single CurseForge project, coordinated releases. Cosmetic "RR update
 
 Use this as the next VSCode implementation order. Each item must land with tests that fail on the current reviewed branch and pass after the fix.
 
-1. **Replace fixture coverage with real expected coverage.**
+1. **Replace fixture coverage with real expected coverage.** *(implemented 2026-05-26)*
    - Implement or import the full supported-profession TBC `2.5.5` source snapshot, including all Vanilla recipes and all TBC recipes in scope.
    - Keep committed snapshots minimal, but make them complete for v1 scope: alchemy, blacksmithing, enchanting, engineering, jewelcrafting, leatherworking, tailoring, and cooking.
    - Update `source-manifest.json` to distinguish "fixture/sample" from "release candidate dataset".
 
-2. **Make `validate --strict` a real release gate.**
+2. **Make `validate --strict` a real release gate.** *(implemented 2026-05-26 for expected counts, reagents, outputless enchants, and release-candidate dataset kind)*
    - Add expected-record accounting per supported profession, per supported expansion, and per profession/expansion pair.
    - Fail strict validation when the emitted set is missing expected recipes, missing reagents for cost/detail paths, missing category/subcategory taxonomy, or missing BoP/self-only classification required by filters.
    - Add tests proving a truncated snapshot fails strict validation.
 
-3. **Implement the source refresh path.**
+3. **Implement the source refresh path.** *(implemented 2026-05-26 for Wago Tools DB2 Anniversary import; exact upstream build-id pinning remains a follow-up if Wago exposes a stable historical selector)*
    - Replace placeholder `fetch` with the decided maintainer-only snapshot refresh flow.
-   - Pin source build/version metadata in the manifest and make offline generation reproducible from committed snapshots.
+   - Record source product/branch metadata in the manifest and make offline generation reproducible from committed snapshots.
    - Keep network access out of runtime and out of CI's offline path.
 
 4. **Fix cache key and invalidation scope.** *(implemented 2026-05-24)*

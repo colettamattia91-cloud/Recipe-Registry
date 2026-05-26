@@ -1,90 +1,135 @@
 {
-  "excluded": [
-    {
-      "expansion": "wotlk",
-      "reason": "unsupported-expansion",
-      "spellId": 45545
-    }
-  ],
+  "excluded": [],
   "expansionCounts": {
-    "tbc": 9,
-    "vanilla": 5
+    "tbc": 957,
+    "vanilla": 1172
   },
   "professionCounts": {
-    "alchemy": 4,
-    "blacksmithing": 2,
-    "cooking": 1,
-    "enchanting": 1,
-    "engineering": 2,
-    "jewelcrafting": 1,
-    "leatherworking": 1,
-    "tailoring": 2
+    "alchemy": 186,
+    "blacksmithing": 385,
+    "cooking": 116,
+    "enchanting": 223,
+    "engineering": 250,
+    "jewelcrafting": 261,
+    "leatherworking": 379,
+    "tailoring": 329
   },
   "professionExpansionCounts": {
     "alchemy": {
-      "tbc": 2,
-      "vanilla": 2
+      "tbc": 71,
+      "vanilla": 115
     },
     "blacksmithing": {
-      "tbc": 1,
-      "vanilla": 1
+      "tbc": 150,
+      "vanilla": 235
     },
     "cooking": {
-      "tbc": 0,
-      "vanilla": 1
+      "tbc": 38,
+      "vanilla": 78
     },
     "enchanting": {
-      "tbc": 1,
-      "vanilla": 0
+      "tbc": 73,
+      "vanilla": 150
     },
     "engineering": {
-      "tbc": 1,
-      "vanilla": 1
+      "tbc": 97,
+      "vanilla": 153
     },
     "jewelcrafting": {
-      "tbc": 1,
+      "tbc": 261,
       "vanilla": 0
     },
     "leatherworking": {
-      "tbc": 1,
-      "vanilla": 0
+      "tbc": 154,
+      "vanilla": 225
     },
     "tailoring": {
-      "tbc": 2,
-      "vanilla": 0
+      "tbc": 113,
+      "vanilla": 216
     }
   },
-  "records": 14,
+  "records": 2129,
   "source": {
-    "datasetKind": "fixture",
+    "datasetKind": "release-candidate",
+    "expectedRecipeCounts": {
+      "byExpansion": {
+        "tbc": 957,
+        "vanilla": 1172
+      },
+      "byProfession": {
+        "alchemy": 186,
+        "blacksmithing": 385,
+        "cooking": 116,
+        "enchanting": 223,
+        "engineering": 250,
+        "jewelcrafting": 261,
+        "leatherworking": 379,
+        "tailoring": 329
+      },
+      "byProfessionExpansion": {
+        "alchemy": {
+          "tbc": 71,
+          "vanilla": 115
+        },
+        "blacksmithing": {
+          "tbc": 150,
+          "vanilla": 235
+        },
+        "cooking": {
+          "tbc": 38,
+          "vanilla": 78
+        },
+        "enchanting": {
+          "tbc": 73,
+          "vanilla": 150
+        },
+        "engineering": {
+          "tbc": 97,
+          "vanilla": 153
+        },
+        "jewelcrafting": {
+          "tbc": 261
+        },
+        "leatherworking": {
+          "tbc": 154,
+          "vanilla": 225
+        },
+        "tailoring": {
+          "tbc": 113,
+          "vanilla": 216
+        }
+      },
+      "total": 2129
+    },
     "flavor": "tbc",
-    "metadataVersion": "2026.05.23.2",
-    "notes": "Minimal normalized offline snapshot for deterministic RecipeRegistry_Metadata generation.",
-    "provider": "wago.tools-db2-normalized",
-    "scope": {
-      "expansions": [
-        "vanilla",
-        "tbc"
-      ],
-      "professions": [
-        "alchemy",
-        "blacksmithing",
-        "cooking",
-        "enchanting",
-        "engineering",
-        "jewelcrafting",
-        "leatherworking",
-        "tailoring"
+    "metadataVersion": "wago-wow-anniversary-tbc-2.5.5",
+    "provider": "wago.tools-db2",
+    "snapshot": "tbc-2.5.5",
+    "source": {
+      "branch": "wow_anniversary",
+      "expansionRule": "jewelcrafting or spellId >= 25255 => tbc; lower spellIds => vanilla",
+      "product": "wow_anniversary",
+      "tables": [
+        "SkillLineAbility",
+        "SpellEffect",
+        "SpellReagents",
+        "ItemEffect",
+        "ItemSparse",
+        "SpellName"
       ]
     },
-    "snapshot": "tbc-2.5.5",
-    "sourceBuild": "2.5.5",
-    "tables": [
-      "SkillLineAbility",
-      "Spell",
-      "SpellEffect",
-      "ItemSparse"
-    ]
+    "sourceStats": {
+      "duplicateSkillLineAbilityRecipesSkipped": 1,
+      "rawRows": {
+        "ItemEffect": 17729,
+        "ItemSparse": 30044,
+        "SkillLineAbility": 7018,
+        "SpellEffect": 38303,
+        "SpellName": 28650,
+        "SpellReagents": 2659
+      },
+      "records": 2129
+    }
   },
   "supportedExpansions": [
     "vanilla",

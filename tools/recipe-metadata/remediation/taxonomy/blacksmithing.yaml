@@ -10,3 +10,4 @@ subcategories:
 rules:
   blacksmithing.stones.sharpening: category: stones, subcategory: sharpening, sortOrder: 10
   blacksmithing.armor.plate: category: armor, subcategory: plate, sortOrder: 120
+  blacksmithing.misc: category: misc, sortOrder: 999

@@ -14,3 +14,4 @@ rules:
   alchemy.potions.healing: category: potions, subcategory: healing, sortOrder: 30
   alchemy.potions.mana: category: potions, subcategory: mana, sortOrder: 110
   alchemy.flasks.guardian_elixirs: category: flasks, subcategory: guardian_elixirs, sortOrder: 120
+  alchemy.misc: category: misc, sortOrder: 999

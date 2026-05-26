@@ -95,6 +95,11 @@ def collect_unresolved(records, diagnostics=None, source_manifest=None):
                 "message": message,
             })
 
+        expected_outputless = (
+            record.is_outputless_self_only
+            or (record.profession_key == "enchanting" and record.created_item_id is None)
+        )
+
         if record.profession_key not in SUPPORTED_PROFESSIONS:
             add("profession", "release-blocking", "missing or unsupported profession")
         if record.expansion not in SUPPORTED_EXPANSIONS:
@@ -103,7 +108,7 @@ def collect_unresolved(records, diagnostics=None, source_manifest=None):
             add("category", "release-blocking", "missing category")
         if record.sort_order is None:
             add("sortOrder", "release-blocking", "missing sort order")
-        if not record.is_outputless_self_only and record.created_item_id is None:
+        if not expected_outputless and record.created_item_id is None:
             add("createdItemId", "release-blocking", "missing created item for normal craft")
         if not record.is_outputless_self_only and not record.reagents:
             add("reagents", "release-blocking", "missing reagents")

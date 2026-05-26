@@ -3,7 +3,7 @@
 Phase: Recipe Metadata Roadmap Phase 5; staged for Phase 9
 Reviewed: 2026-05-23; Phase 8 category review 2026-05-24; Phase 9 staging review 2026-05-24
 
-This inventory follows `docs/recipe-metadata-roadmap.md` section 8.1. The runtime surface is currently AtlasLoot-free, but Phase 9 remains release-blocked until the metadata dataset and strict coverage gates are release-candidate grade for the full Vanilla + TBC recipe scope.
+This inventory follows `docs/recipe-metadata-roadmap.md` section 8.1. The runtime surface is currently AtlasLoot-free, and the committed Wago Tools DB2 snapshot now satisfies the strict release-candidate coverage gate for the supported Vanilla + TBC recipe scope.
 
 | File | Function | Current AtlasLoot usage | Runtime path | Replacement source | Migration action | Test coverage | Status |
 |------|----------|--------------------------|--------------|--------------------|------------------|---------------|--------|
@@ -40,4 +40,4 @@ Manual Phase 5 review:
 - Normal list/category/detail/material projection resolves through `Addon.RecipeMetadata` (the folded-in metadata library inside RR).
 - Tooltip alternate-key projection resolves through `RecipeMetadata` normalization and item mapping.
 - Phase 9 staging deleted the legacy resolver module, removed AtlasLoot optional dependencies, removed explicit legacy slash diagnostics, and broadened `atlasloot_call_site_gate_spec.lua` from the projection allowlist to the release runtime surface loaded by `RecipeRegistry.toc`.
-- Release remains blocked while `validate --strict` reports the committed metadata snapshot as a fixture rather than a release-candidate dataset with complete Vanilla + TBC expected coverage.
+- The committed metadata snapshot is now a release-candidate Wago Tools DB2 dataset; `validate --strict` reports complete expected Vanilla + TBC coverage for supported professions.

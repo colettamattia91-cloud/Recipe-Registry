@@ -1,7 +1,12 @@
 {
-  "selfOnlyOutputlessSpellIds": [27924],
   "bopOutputBySpellId": {},
-  "recipeItemBySpellId": {},
   "createdItemBySpellId": {},
-  "expansionBySpellId": {}
+  "expansionBySpellId": {},
+  "recipeItemBySpellId": {},
+  "selfOnlyOutputlessSpellIds": [
+    27920,
+    27924,
+    27926,
+    27927
+  ]
 }

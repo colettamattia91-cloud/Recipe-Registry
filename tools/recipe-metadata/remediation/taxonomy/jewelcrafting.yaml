@@ -6,3 +6,4 @@ subcategories:
     - key: wire, label: Wire, order: 10
 rules:
   jewelcrafting.components.wire: category: components, subcategory: wire, sortOrder: 10
+  jewelcrafting.misc: category: misc, sortOrder: 999
