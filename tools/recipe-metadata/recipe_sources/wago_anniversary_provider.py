@@ -225,6 +225,45 @@ def _weapon_class(item_id, item_class_by_id):
     return WEAPON_SUBCLASS_BY_ID.get(subclass_id)
 
 
+# DB2 ItemSparse.InventoryType -> filter-friendly slot label. Covers the
+# inventory types relevant to crafted output classification.
+INVENTORY_SLOT_BY_TYPE = {
+    1:  "head",
+    2:  "neck",
+    3:  "shoulder",
+    4:  "shirt",
+    5:  "chest",
+    6:  "waist",
+    7:  "legs",
+    8:  "feet",
+    9:  "wrist",
+    10: "hands",
+    11: "ring",
+    12: "trinket",
+    13: "one_hand",
+    14: "shield",
+    15: "ranged",
+    16: "back",
+    17: "two_hand",
+    18: "bag",
+    19: "tabard",
+    20: "robe",
+    21: "main_hand",
+    22: "off_hand",
+    23: "holdable",
+    25: "thrown",
+    26: "ranged_right",
+    27: "quiver",
+    28: "relic",
+}
+
+
+def _inventory_slot(inv_type):
+    if inv_type is None:
+        return None
+    return INVENTORY_SLOT_BY_TYPE.get(inv_type)
+
+
 def _names_by_spell(spell_names):
     return {
         _as_int(row.get("ID")): row.get("Name_lang", "")
@@ -420,6 +459,7 @@ def build_normalized_snapshot(
             "bindType": _as_int(source.get("Bonding"), None),
             "armorType": _armor_type(item_id, item_class_by_id),
             "weaponClass": _weapon_class(item_id, item_class_by_id),
+            "inventorySlot": _inventory_slot(_as_int(source.get("InventoryType"), None)),
         })
 
     manifest = {

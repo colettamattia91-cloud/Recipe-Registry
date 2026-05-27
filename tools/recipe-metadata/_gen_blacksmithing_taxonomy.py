@@ -2,8 +2,9 @@
 classification for all 385 Vanilla+TBC blacksmithing recipes.
 
 Architecture:
-- Armor recipes (mail/plate): subcategory auto-derived from item_sparse.armorType
-  (which the wago provider extracts from DB2 Item.ClassID=4 / SubclassID).
+- Armor recipes (mail/plate): split into TWO top-level categories (mail, plate),
+  each subdivided by slot. Subcategory auto-derived from
+  item_sparse.inventorySlot (robe collapsed into chest).
 - Weapon recipes (sword/axe/mace/dagger/polearm/thrown/fist): subcategory auto-
   derived from item_sparse.weaponClass (DB2 Item.ClassID=2 / SubclassID).
 - Everything else (stones, rods, keys, materials, wards, shields) is manually
@@ -19,12 +20,24 @@ SNAPSHOT_DIR = Path(__file__).parent / "snapshots" / "tbc-2.5.5"
 
 CATEGORIES = [
     ("weapons",      "Weapons",          10),
-    ("armor",        "Armor",            20),
-    ("enhancements", "Enhancements",     30),  # Sharpening / weightstone / shield spike / weapon chain / rune
-    ("rods",         "Rods",             40),  # Enchanter's rods
-    ("materials",    "Materials",        50),  # Grinding stones + structural parts
-    ("keys",         "Skeleton Keys",    60),
+    ("mail",         "Mail Armor",       20),
+    ("plate",        "Plate Armor",      30),
+    ("enhancements", "Enhancements",     40),  # Sharpening / weightstone / shield spike / weapon chain / rune
+    ("rods",         "Rods",             50),  # Enchanter's rods
+    ("materials",    "Materials",        60),  # Grinding stones + structural parts
+    ("keys",         "Skeleton Keys",    70),
     ("misc",         "Miscellaneous",   999),
+]
+
+_ARMOR_SLOT_SUBS = [
+    ("head",     "Head",     10),
+    ("shoulder", "Shoulder", 20),
+    ("chest",    "Chest",    30),
+    ("waist",    "Waist",    40),
+    ("legs",     "Legs",     50),
+    ("feet",     "Feet",     60),
+    ("hands",    "Hands",    70),
+    ("wrist",    "Wrist",    80),
 ]
 
 SUBCATEGORIES = {
@@ -37,10 +50,8 @@ SUBCATEGORIES = {
         ("thrown",  "Thrown",      60),
         ("fist",    "Fist Weapons", 70),
     ],
-    "armor": [
-        ("mail",  "Mail",  10),
-        ("plate", "Plate", 20),
-    ],
+    "mail":  _ARMOR_SLOT_SUBS,
+    "plate": _ARMOR_SLOT_SUBS,
     "enhancements": [
         ("sharpening",   "Sharpening Stones", 10),
         ("weightstone",  "Weightstones",      20),
@@ -48,6 +59,14 @@ SUBCATEGORIES = {
         ("weapon_chain", "Weapon Chains",     40),
         ("rune",         "Runes of Warding",  50),
     ],
+}
+
+# Robe (InventoryType=20) is a visual variant of chest; merge.
+SLOT_TO_ARMOR_SUB = {
+    "head": "head", "shoulder": "shoulder",
+    "chest": "chest", "robe": "chest",
+    "waist": "waist", "legs": "legs", "feet": "feet",
+    "hands": "hands", "wrist": "wrist",
 }
 
 # Manual classification for items that aren't armor/weapon by DB2 class.
@@ -138,7 +157,14 @@ def _classify_recipe(recipe, item_lookup, skill_default=1):
 
     armor = info.get("armorType")
     if armor in ("mail", "plate"):
-        return ("armor", armor, sort_order)
+        slot = info.get("inventorySlot")
+        sub = SLOT_TO_ARMOR_SUB.get(slot)
+        if sub:
+            return (armor, sub, sort_order)
+        raise AssertionError(
+            f"BS spellId={spell_id} ({info.get('name')}) is {armor} armor "
+            f"but has unrecognised inventorySlot={slot!r}."
+        )
 
     weapon = info.get("weaponClass")
     if weapon in ("sword", "axe", "mace", "dagger", "polearm", "thrown", "fist"):
