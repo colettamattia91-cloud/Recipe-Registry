@@ -513,6 +513,16 @@ function Addon:OnEnable()
         if self.MinimapButton then self.MinimapButton:Refresh() end
         if self.UI then self.UI:CreateMainFrame() end
     end, 0.2)
+
+    -- PLAYER_LOGIN is one-shot per session. If OnEnable runs after PLAYER_LOGIN
+    -- already fired (LoadOnDemand chains, late enable, addon loaded after login
+    -- complete) the handler registered above never gets invoked and
+    -- Sync.playerReady stays false forever, blocking HELLO with reason=player.
+    -- Replay OnPlayerLogin on the next tick. Sync:Startup is idempotent
+    -- (_startupInitialized guard) and SetPlayerReady just re-asserts the flag.
+    if IsLoggedIn and IsLoggedIn() then
+        self:ScheduleTimer("OnPlayerLogin", 0)
+    end
 end
 
 function Addon:OnPlayerLogin()
