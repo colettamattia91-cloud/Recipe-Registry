@@ -186,6 +186,38 @@ local function createRadio(parent, label, onClick)
     return radio
 end
 
+local function createColumnHeader(parent, text, width)
+    local fs = parent:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+    fs:SetWidth(width or 80)
+    fs:SetJustifyH("CENTER")
+    fs:SetText(text or "")
+    return fs
+end
+
+local function setHoverTooltip(frame, title, body)
+    if not frame then return end
+    frame:HookScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        if title then GameTooltip:AddLine(title) end
+        if body then GameTooltip:AddLine(body, 1, 1, 1, true) end
+        GameTooltip:Show()
+    end)
+    frame:HookScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+end
+
+local function setCheckEnabled(check, enabled)
+    if not check then return end
+    if enabled then
+        check:Enable()
+        check:SetAlpha(1.0)
+    else
+        check:Disable()
+        check:SetAlpha(0.4)
+    end
+end
+
 local SLIDER_BACKDROP = {
     bgFile   = "Interface\\Buttons\\UI-SliderBar-Background",
     edgeFile = "Interface\\Buttons\\UI-SliderBar-Border",
@@ -436,6 +468,8 @@ function Options:RefreshControls()
                     row.vanillaCheck:SetChecked(filters.expansionDefaults.vanilla ~= false)
                     row.tbcCheck:SetChecked(filters.expansionDefaults.tbc ~= false)
                 end
+                setCheckEnabled(row.vanillaCheck, custom)
+                setCheckEnabled(row.tbcCheck, custom)
             end
         end
     end
@@ -550,11 +584,27 @@ function Options:EnsurePanel()
         local matrixHeader = createText(content, "Profession overrides", "GameFontNormalSmall")
         matrixHeader:SetPoint("TOPLEFT", remoteBopCheck, "BOTTOMLEFT", 28, -10)
 
-        local columns = createText(content, "Profession                         Custom     Vanilla     TBC")
-        columns:SetPoint("TOPLEFT", matrixHeader, "BOTTOMLEFT", 0, -6)
+        local headerProfession = createColumnHeader(content, "Profession", 132)
+        headerProfession:SetJustifyH("LEFT")
+        headerProfession:SetPoint("TOPLEFT", matrixHeader, "BOTTOMLEFT", 0, -8)
+
+        local headerCustom = createColumnHeader(content, "Custom")
+        headerCustom:SetPoint("CENTER", headerProfession, "LEFT", 190 + 12, 0)
+
+        local headerVanilla = createColumnHeader(content, "Vanilla")
+        headerVanilla:SetPoint("CENTER", headerProfession, "LEFT", 284 + 12, 0)
+
+        local headerTbc = createColumnHeader(content, "TBC")
+        headerTbc:SetPoint("CENTER", headerProfession, "LEFT", 372 + 12, 0)
+
+        local separator = content:CreateTexture(nil, "ARTWORK")
+        separator:SetColorTexture(0.4, 0.4, 0.4, 0.5)
+        separator:SetHeight(1)
+        separator:SetPoint("TOPLEFT", headerProfession, "BOTTOMLEFT", 0, -3)
+        separator:SetPoint("RIGHT", headerTbc, "RIGHT", 20, 0)
 
         self.professionFilterControls = {}
-        local previous = columns
+        local previous = separator
         for _, profession in ipairs(FILTER_PROFESSIONS) do
             local professionKey = profession.key
             local label = createText(content, profession.label, "GameFontHighlightSmall")
@@ -565,19 +615,25 @@ function Options:EnsurePanel()
                 setProfessionCustom(professionKey, self:GetChecked() and true or false)
                 Options:RefreshControls()
             end)
-            customCheck:SetPoint("LEFT", label, "LEFT", 190, 0)
+            customCheck:SetPoint("CENTER", label, "LEFT", 190 + 12, 0)
+            setHoverTooltip(customCheck, "Custom override",
+                "When enabled, " .. profession.label .. " uses its own Vanilla/TBC visibility instead of the global defaults above.")
 
             local vanillaCheck = createCheck(content, "", function(self)
                 setProfessionExpansion(professionKey, "vanilla", self:GetChecked() and true or false)
                 Options:RefreshControls()
             end)
-            vanillaCheck:SetPoint("LEFT", label, "LEFT", 284, 0)
+            vanillaCheck:SetPoint("CENTER", label, "LEFT", 284 + 12, 0)
+            setHoverTooltip(vanillaCheck, "Show Vanilla recipes",
+                "Enable Custom on this row to change this value; otherwise it mirrors the global Vanilla default.")
 
             local tbcCheck = createCheck(content, "", function(self)
                 setProfessionExpansion(professionKey, "tbc", self:GetChecked() and true or false)
                 Options:RefreshControls()
             end)
-            tbcCheck:SetPoint("LEFT", label, "LEFT", 372, 0)
+            tbcCheck:SetPoint("CENTER", label, "LEFT", 372 + 12, 0)
+            setHoverTooltip(tbcCheck, "Show TBC recipes",
+                "Enable Custom on this row to change this value; otherwise it mirrors the global TBC default.")
 
             self.professionFilterControls[professionKey] = {
                 label = label,
