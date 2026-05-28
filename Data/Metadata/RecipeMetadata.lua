@@ -442,6 +442,42 @@ function RecipeMetadata:SubcategoryHasRecipeUnderVisibility(professionKey, categ
     return false
 end
 
+-- Hash set of catalogued spell IDs that satisfy the active expansion
+-- visibility for the given profession (and optionally narrowed by category
+-- / subcategory). The list builder consults this hash to skip the per-
+-- recipe expansion check entirely on catalogued recipes — the only
+-- remaining runtime work is the BoP/ownership filter on a much smaller set.
+-- Returns nil if the nav-tree is unavailable (callers fall back to the
+-- per-recipe predicate).
+function RecipeMetadata:BuildVisibleSpellIdHash(professionKey, visibility, categoryKey, subcategoryKey)
+    local tree = self._navTree
+    if not tree or not professionKey or not visibility then return nil end
+
+    local function consumeArray(arr, hash)
+        if type(arr) ~= "table" then return end
+        for i = 1, #arr do hash[arr[i]] = true end
+    end
+
+    local function gatherForExpansion(expansion, hash)
+        local profNode = tree[expansion] and tree[expansion][professionKey]
+        if not profNode then return end
+        if subcategoryKey and categoryKey then
+            local catNode = profNode[categoryKey]
+            if catNode then consumeArray(catNode[subcategoryKey], hash) end
+        elseif categoryKey then
+            local catNode = profNode[categoryKey]
+            if catNode then consumeArray(catNode._all, hash) end
+        else
+            consumeArray(profNode._all, hash)
+        end
+    end
+
+    local hash = {}
+    if visibility.vanilla ~= false then gatherForExpansion("vanilla", hash) end
+    if visibility.tbc ~= false then gatherForExpansion("tbc", hash) end
+    return hash
+end
+
 function RecipeMetadata:GetCategoriesForProfession(professionKey)
     local generatedCategories = self._generated and self._generated.categoriesByProfession
     local generatedSubcategories = self._generated and self._generated.subcategoriesByProfession

@@ -1095,6 +1095,48 @@ function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName,
     local q = lowerSafe(query)
     local recipeIndex = self:GetRecipeIndex()
     local candidates = getRecipeCandidates(self, recipeIndex, profName)
+
+    -- Static pre-filter: when an expansion is hidden for this profession,
+    -- build a hash of catalogued spell IDs that satisfy the active filter
+    -- (and optional category narrowing) directly from the metadata nav-tree.
+    -- Candidates whose normalized spell ID is catalogued but absent from
+    -- this hash are rejected without paying the per-recipe RecipePasses
+    -- expansion check. Uncatalogued candidates fall through to RecipePasses
+    -- so spell-keyed out-of-scope recipes (Mining smelting) keep showing
+    -- per the conservative policy.
+    local listMetadata = getRecipeMetadata()
+    local filtersModule = Addon.RecipeUiFilters
+    local visibleSpellIdsHash
+    if listMetadata and filtersModule
+        and profName and profName ~= "All"
+        and listMetadata.BuildVisibleSpellIdHash
+        and filtersModule.GetEffectiveExpansionVisibility
+    then
+        local visibility = filtersModule:GetEffectiveExpansionVisibility(profName)
+        if visibility and (visibility.vanilla == false or visibility.tbc == false) then
+            local catKey, subKey
+            if categoryFilter then
+                local filterText = tostring(categoryFilter)
+                local cat, sub = filterText:match("^subcategory:([^:]+):(.+)$")
+                if cat then
+                    catKey, subKey = cat, sub
+                else
+                    catKey = filterText:match("^category:(.+)$") or filterText
+                end
+            end
+            local profKey = filtersModule.NormalizeProfessionKey
+                and filtersModule:NormalizeProfessionKey(profName)
+                or profName
+            visibleSpellIdsHash = listMetadata:BuildVisibleSpellIdHash(profKey, visibility, catKey, subKey)
+            -- Empty hash means the profession isn't in metadata at all
+            -- (Mining/Fishing) or every expansion is hidden — fall back to the
+            -- per-recipe predicate so the conservative path stays correct.
+            if visibleSpellIdsHash and not next(visibleSpellIdsHash) then
+                visibleSpellIdsHash = nil
+            end
+        end
+    end
+
     for cIdx = 1, #candidates do
         local recipeKey = candidates[cIdx]
         local indexed = recipeIndex[recipeKey]
@@ -1104,6 +1146,17 @@ function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName,
         end
         if include and categoryFilter and profName and profName ~= "All" then
             include = recipeMatchesCategoryFilter(getRecipeMetadata(), recipeKey, categoryFilter)
+        end
+        if include and visibleSpellIdsHash then
+            -- Use the record's canonical spellId, not just the normalized key.
+            -- Normalization sets spellId for any negative key even when no
+            -- record exists (e.g. the key was an item ID that happens to look
+            -- like a spell); only the actual record proves the recipe is
+            -- catalogued and thus subject to the hash filter.
+            local info = listMetadata:GetRecipeInfo(recipeKey)
+            if info and info.spellId and not visibleSpellIdsHash[info.spellId] then
+                include = false
+            end
         end
         local visibilityReason
         if include then
@@ -1243,11 +1296,47 @@ function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, catego
 
         local candidates = getRecipeCandidates(self, recipeIndex, profName)
 
+        -- Pre-compute the visible-spell-ids hash once for the whole async
+        -- build so each step skips RecipePasses on catalogued recipes that
+        -- can't possibly pass the active expansion filter. See the matching
+        -- block in GetRecipeList for the rationale.
+        local listMetadata = getRecipeMetadata()
+        local filtersModule = Addon.RecipeUiFilters
+        local visibleSpellIdsHash
+        if listMetadata and filtersModule
+            and profName and profName ~= "All"
+            and listMetadata.BuildVisibleSpellIdHash
+            and filtersModule.GetEffectiveExpansionVisibility
+        then
+            local visibility = filtersModule:GetEffectiveExpansionVisibility(profName)
+            if visibility and (visibility.vanilla == false or visibility.tbc == false) then
+                local catKey, subKey
+                if categoryFilter then
+                    local filterText = tostring(categoryFilter)
+                    local cat, sub = filterText:match("^subcategory:([^:]+):(.+)$")
+                    if cat then
+                        catKey, subKey = cat, sub
+                    else
+                        catKey = filterText:match("^category:(.+)$") or filterText
+                    end
+                end
+                local profKey = filtersModule.NormalizeProfessionKey
+                    and filtersModule:NormalizeProfessionKey(profName)
+                    or profName
+                visibleSpellIdsHash = listMetadata:BuildVisibleSpellIdHash(profKey, visibility, catKey, subKey)
+                if visibleSpellIdsHash and not next(visibleSpellIdsHash) then
+                    visibleSpellIdsHash = nil
+                end
+            end
+        end
+
         local jobState = {
             candidates = candidates,
             recipeIndex = recipeIndex,
             cursor = 1,
             out = {},
+            visibleSpellIdsHash = visibleSpellIdsHash,
+            listMetadata = listMetadata,
             q = lowerSafe(query),
             profName = profName,
             categoryFilter = categoryFilter,
@@ -1285,6 +1374,8 @@ function Data:RunRecipeListBuildStep(state, ctx)
     local filterContext = state.filterContext
     local q = state.q
     local total = #candidates
+    local visibleSpellIdsHash = state.visibleSpellIdsHash
+    local listMetadata = state.listMetadata
 
     while state.cursor <= total do
         local recipeKey = candidates[state.cursor]
@@ -1300,6 +1391,15 @@ function Data:RunRecipeListBuildStep(state, ctx)
             end
             if include and categoryFilter and profName and profName ~= "All" then
                 include = recipeMatchesCategoryFilter(getRecipeMetadata(), recipeKey, categoryFilter)
+            end
+            if include and visibleSpellIdsHash and listMetadata then
+                -- See the matching block in GetRecipeList for why we look up
+                -- the record explicitly instead of trusting the normalized
+                -- spellId alone.
+                local info = listMetadata:GetRecipeInfo(recipeKey)
+                if info and info.spellId and not visibleSpellIdsHash[info.spellId] then
+                    include = false
+                end
             end
             if include then
                 local passes, reason = recipePassesUiFilter(recipeKey, filterContext)
