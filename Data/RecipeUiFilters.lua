@@ -130,15 +130,16 @@ function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
             Addon:Trace("filters", "metadata ambiguous for recipe", recipeKey)
             return true, "visible-unresolved-conservative"
         end
-        -- Last-gate cleanup (profile-gated, default on): entries the metadata
-        -- library does not catalogue (corrupt scan rows that slipped past
-        -- DataCleanup, items imported as recipes, out-of-scope profession
-        -- recipes like Mining smelting) are dropped before they reach the UI.
-        -- Overrides roadmap §9 conservative show because in TBC Classic the
-        -- dataset is comprehensive — a legit-but-uncatalogued recipe is far
-        -- rarer than spurious garbage. Flip via hideUncataloguedRecipes.
-        if profileFilters.hideUncataloguedRecipes ~= false then
-            Addon:Trace("filters", "metadata uncatalogued for recipe", recipeKey)
+        -- Last-gate cleanup (profile-gated, default on): drop only the entries
+        -- that look like spurious garbage — positive item-IDs imported as
+        -- recipe keys without a metadata match. Negative spell keys are
+        -- always legit (scanned from a real TradeSkill window) even if the
+        -- profession sits outside the v1 metadata scope (Mining smelting,
+        -- First Aid, Fishing), so they stay visible per roadmap §9 even
+        -- with the flag on.
+        local numericKey = tonumber(recipeKey)
+        if profileFilters.hideUncataloguedRecipes ~= false and numericKey and numericKey > 0 then
+            Addon:Trace("filters", "metadata uncatalogued item-key recipe", recipeKey)
             return false, "hidden-uncatalogued"
         end
         Addon:Trace("filters", "metadata unresolved for recipe", recipeKey)

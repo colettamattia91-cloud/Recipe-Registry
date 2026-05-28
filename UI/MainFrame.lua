@@ -2284,7 +2284,13 @@ function UI:RefreshStatusBar()
     end
     setTextIfChanged(self.frame.subtitle, subtitle)
 
-    if onlineNodes > 1 then
+    -- Until local sync state stabilizes (warmup / world transition / sensitive
+    -- context) we deliberately don't go green even when peers are online —
+    -- green should mean "we're ready and have peers", not just "peers exist".
+    if degradedReason then
+        setVertexColorIfChanged(self.frame.syncDot, 1.0, 0.82, 0.0, 1)
+        self.frame.autoLabel:SetTextColor(1.0, 0.9, 0.45)
+    elseif onlineNodes > 1 then
         setVertexColorIfChanged(self.frame.syncDot, 0.2, 0.9, 0.2, 1)
         self.frame.autoLabel:SetTextColor(0.7, 0.95, 0.7)
     elseif onlineNodes == 1 then
