@@ -459,6 +459,23 @@ function Data:GetVisibleRecipeCategories(profession, filterContext)
         return {}
     end
 
+    -- Fast path: when no expansion is hidden for this profession, the
+    -- predicate-based prune cannot drop a category that holds recipes —
+    -- every taxonomy category with a real recipe in the slice will keep at
+    -- least one visible row. Skipping the sweep here avoids an O(slice)
+    -- RecipePasses pass on every RefreshProfessionButtons during warmup,
+    -- when the ownership-generation token bumps repeatedly and busts the
+    -- cache below. The sweep still runs whenever the user has actually
+    -- filtered an expansion away (the only case pruning matters for UX).
+    local filtersModule = Addon.RecipeUiFilters
+    local visibility = filtersModule
+        and filtersModule.GetEffectiveExpansionVisibility
+        and filtersModule:GetEffectiveExpansionVisibility(profession)
+        or nil
+    if visibility and visibility.vanilla ~= false and visibility.tbc ~= false then
+        return fullRows
+    end
+
     local filterCacheKey = getFilterCacheKey(filterContext)
     local cacheKey = tostring(profession or "") .. "\t" .. filterCacheKey
     self._visibleCategoryCache = self._visibleCategoryCache or {}

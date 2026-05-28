@@ -41,16 +41,26 @@ local function keySet(rows)
     return set
 end
 
-Test.it("prunes sidebar categories to those with recipes visible under the active filters", function()
+Test.it("prunes sidebar categories to those with recipes visible under a restrictive filter", function()
     local selfKey = data:GetPlayerKey()
     seedProfession(selfKey, "Alchemy", ALCHEMY_RECIPES)
-    data:InvalidateRecipeCaches("visible-category-default-test")
+
+    -- Hide vanilla for alchemy: only the TBC seeded recipes (-28555, -28587)
+    -- should survive the predicate, so the sidebar must drop every taxonomy
+    -- category that those two recipes don't belong to.
+    addon.db.profile.recipePrefilters.professionExpansionOverrides.alchemy = {
+        inherit = false,
+        vanilla = false,
+        tbc = true,
+    }
+    data:InvalidateRecipeListCacheForFilter("alchemy", "visible-category-restrictive-test")
 
     local full = data:GetRecipeCategories("Alchemy", true)
     Test.truthy(#full > 0, "full taxonomy should expose categories")
 
     local visible = data:GetVisibleRecipeCategories("Alchemy", SIDEBAR_CONTEXT)
-    Test.truthy(#visible > 0, "default filters should keep at least one category visible")
+    Test.truthy(#visible > 0, "restrictive filter should still keep at least one category visible")
+    Test.truthy(#visible < #full, "restrictive filter should prune at least one taxonomy category")
 
     -- Every visible category must exist in the taxonomy and actually contain at
     -- least one recipe that passes the same predicate the list uses.
