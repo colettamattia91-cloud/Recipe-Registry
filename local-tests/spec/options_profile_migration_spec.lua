@@ -29,8 +29,23 @@ local function makeFrame()
     function frame:SetTexture(texture)
         self.texture = texture
     end
+    function frame:SetColorTexture(r, g, b, a)
+        self.colorTexture = { r, g, b, a }
+    end
     function frame:SetScript(scriptName, callback)
         self.scripts[scriptName] = callback
+    end
+    function frame:HookScript(scriptName, callback)
+        self.scripts[scriptName] = callback
+    end
+    function frame:Enable()
+        self.enabled = true
+    end
+    function frame:Disable()
+        self.enabled = false
+    end
+    function frame:SetAlpha(alpha)
+        self.alpha = alpha
     end
     function frame:SetChecked(value)
         self.checked = value == true
@@ -88,6 +103,12 @@ local function installUiStubs()
         frame.template = template
         return frame
     end
+    _G.GameTooltip = {
+        SetOwner = function() end,
+        AddLine = function() end,
+        Show = function() end,
+        Hide = function() end,
+    }
     _G.Settings = {
         RegisterCanvasLayoutCategory = function(panel, name)
             state.registeredPanel = panel
@@ -153,6 +174,21 @@ Test.it("creates safe defaults when the saved prefilter block is missing", funct
     Test.eq(filters.expansionDefaults.vanilla, true)
     Test.eq(filters.expansionDefaults.tbc, true)
     Test.eq(type(filters.professionExpansionOverrides), "table")
+end)
+
+Test.it("defaults and repairs the recipe category view mode", function()
+    local fresh = Loader.Load()
+    Test.eq(fresh.db.profile.recipeCategoryView, "expanded")
+
+    local invalid = Loader.Load({
+        savedVariables = { db = { profile = { recipeCategoryView = "bogus" } } },
+    })
+    Test.eq(invalid.db.profile.recipeCategoryView, "expanded")
+
+    local accordion = Loader.Load({
+        savedVariables = { db = { profile = { recipeCategoryView = "accordion" } } },
+    })
+    Test.eq(accordion.db.profile.recipeCategoryView, "accordion")
 end)
 
 Test.it("shows a clear metadata plugin hint when filter controls are unavailable", function()

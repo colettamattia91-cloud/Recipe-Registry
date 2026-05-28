@@ -403,6 +403,22 @@ local function setRecipeCategoriesEnabled(enabled)
     refreshOpenDirectory()
 end
 
+local function setRecipeCategoryView(viewMode)
+    local profile = getProfile()
+    if not profile then return end
+    if viewMode ~= "accordion" and viewMode ~= "categoriesOnly" then
+        viewMode = "expanded"
+    end
+    profile.recipeCategoryView = viewMode
+    -- View mode only changes sidebar layout, not which recipes are visible,
+    -- so no list/category cache invalidation is needed — just drop transient
+    -- accordion state and rebuild the open directory.
+    if Addon.UI then
+        Addon.UI.expandedCategory = nil
+    end
+    refreshOpenDirectory()
+end
+
 local function setMinimapShown(shown)
     local profile = getProfile()
     if not profile then return end
@@ -417,6 +433,23 @@ function Options:RefreshControls()
     if not profile then return end
     if self.categoryCheck then
         self.categoryCheck:SetChecked(profile.useRecipeCategories ~= false)
+    end
+    local categoriesEnabled = profile.useRecipeCategories ~= false
+    local categoryView = profile.recipeCategoryView
+    if categoryView ~= "accordion" and categoryView ~= "categoriesOnly" then
+        categoryView = "expanded"
+    end
+    if self.categoryViewExpandedRadio then
+        self.categoryViewExpandedRadio:SetChecked(categoryView == "expanded")
+        setCheckEnabled(self.categoryViewExpandedRadio, categoriesEnabled)
+    end
+    if self.categoryViewAccordionRadio then
+        self.categoryViewAccordionRadio:SetChecked(categoryView == "accordion")
+        setCheckEnabled(self.categoryViewAccordionRadio, categoriesEnabled)
+    end
+    if self.categoryViewCategoriesOnlyRadio then
+        self.categoryViewCategoriesOnlyRadio:SetChecked(categoryView == "categoriesOnly")
+        setCheckEnabled(self.categoryViewCategoriesOnlyRadio, categoriesEnabled)
     end
     if self.recipeSearchRadio then
         self.recipeSearchRadio:SetChecked(profile.defaultSearchMode ~= "materials")
@@ -535,7 +568,31 @@ function Options:EnsurePanel()
     local categoryHelp = createText(content, "When enabled, selecting a profession can expand into All plus metadata categories.")
     categoryHelp:SetPoint("TOPLEFT", categoryCheck, "BOTTOMLEFT", 28, 0)
 
-    local searchHeader = createHeader(content, "Search Defaults", categoryHelp, -18)
+    local categoryViewLabel = createText(content, "Category view", "GameFontHighlightSmall")
+    categoryViewLabel:SetPoint("TOPLEFT", categoryHelp, "BOTTOMLEFT", 0, -8)
+
+    local expandedViewRadio = createRadio(content, "Expanded tree (all subcategories shown)", function()
+        setRecipeCategoryView("expanded")
+        Options:RefreshControls()
+    end)
+    expandedViewRadio:SetPoint("TOPLEFT", categoryViewLabel, "BOTTOMLEFT", -2, -6)
+    self.categoryViewExpandedRadio = expandedViewRadio
+
+    local accordionViewRadio = createRadio(content, "Collapsible (one category expanded at a time)", function()
+        setRecipeCategoryView("accordion")
+        Options:RefreshControls()
+    end)
+    accordionViewRadio:SetPoint("TOPLEFT", expandedViewRadio, "BOTTOMLEFT", 0, -2)
+    self.categoryViewAccordionRadio = accordionViewRadio
+
+    local categoriesOnlyViewRadio = createRadio(content, "Categories only (hide subcategories)", function()
+        setRecipeCategoryView("categoriesOnly")
+        Options:RefreshControls()
+    end)
+    categoriesOnlyViewRadio:SetPoint("TOPLEFT", accordionViewRadio, "BOTTOMLEFT", 0, -2)
+    self.categoryViewCategoriesOnlyRadio = categoriesOnlyViewRadio
+
+    local searchHeader = createHeader(content, "Search Defaults", categoriesOnlyViewRadio, -18)
     local recipeSearchRadio = createRadio(content, "Recipe names only", function()
         setSearchMode("recipe")
         Options:RefreshControls()

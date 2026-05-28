@@ -37,6 +37,7 @@ $activeAllSpecs = @(
     "catalog_cache_spec.lua",
     "catalog_recipes_by_profession_spec.lua",
     "category_metadata_navigation_spec.lua",
+    "category_visible_prefilter_spec.lua",
     "data_cleanup_spec.lua",
     "diagnostics_snapshot_spec.lua",
     "detail_cost_estimate_internal_reagents_spec.lua",

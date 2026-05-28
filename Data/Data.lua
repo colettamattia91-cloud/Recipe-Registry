@@ -74,6 +74,7 @@ local DB_DEFAULTS = {
         searchMode = "recipe",
         defaultSearchMode = "recipe",
         useRecipeCategories = true,
+        recipeCategoryView = "expanded",
         recipePrefilters = {
             showRemoteBopOutputRecipes = false,
             expansionDefaults = {
@@ -671,6 +672,10 @@ function Data:OnInitialize()
     end
     if self.db.profile.useRecipeCategories == nil then
         self.db.profile.useRecipeCategories = true
+    end
+    local categoryView = self.db.profile.recipeCategoryView
+    if categoryView ~= "expanded" and categoryView ~= "accordion" and categoryView ~= "categoriesOnly" then
+        self.db.profile.recipeCategoryView = "expanded"
     end
     if type(self.db.profile.recipePrefilters) ~= "table" then
         self.db.profile.recipePrefilters = {

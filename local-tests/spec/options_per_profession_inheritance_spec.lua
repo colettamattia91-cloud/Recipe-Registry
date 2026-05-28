@@ -29,8 +29,23 @@ local function makeFrame()
     function frame:SetTexture(texture)
         self.texture = texture
     end
+    function frame:SetColorTexture(r, g, b, a)
+        self.colorTexture = { r, g, b, a }
+    end
     function frame:SetScript(scriptName, callback)
         self.scripts[scriptName] = callback
+    end
+    function frame:HookScript(scriptName, callback)
+        self.scripts[scriptName] = callback
+    end
+    function frame:Enable()
+        self.enabled = true
+    end
+    function frame:Disable()
+        self.enabled = false
+    end
+    function frame:SetAlpha(alpha)
+        self.alpha = alpha
     end
     function frame:SetChecked(value)
         self.checked = value == true
@@ -87,6 +102,12 @@ local function installUiStubs()
         frame.template = template
         return frame
     end
+    _G.GameTooltip = {
+        SetOwner = function() end,
+        AddLine = function() end,
+        Show = function() end,
+        Hide = function() end,
+    }
     _G.Settings = {
         RegisterCanvasLayoutCategory = function()
             return { ID = 731 }

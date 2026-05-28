@@ -439,6 +439,83 @@ function Data:GetRecipeCategories(profession, includeEmpty)
     return {}
 end
 
+-- Like GetRecipeCategories, but pruned to the categories/subcategories that
+-- actually contain at least one recipe visible under the active UI filters.
+-- The sidebar uses this so expansion/BoP filters that hide every recipe in a
+-- category also hide that category's button: the filtered projection drives
+-- the tree, never the static taxonomy alone (UI-only filter contract).
+--
+-- Cached by profession + filter cache key. That key already folds in metadata
+-- version, ownership generation, and the profession's effective expansion
+-- visibility, so a filter change yields a new key and stale entries fall out
+-- of the bounded cache without explicit invalidation.
+function Data:GetVisibleRecipeCategories(profession, filterContext)
+    local metadata = getRecipeMetadata()
+    if not metadata then
+        return {}
+    end
+    local fullRows = getMetadataCategories(metadata, profession)
+    if not fullRows or #fullRows == 0 then
+        return {}
+    end
+
+    local filterCacheKey = getFilterCacheKey(filterContext)
+    local cacheKey = tostring(profession or "") .. "\t" .. filterCacheKey
+    self._visibleCategoryCache = self._visibleCategoryCache or {}
+    self._visibleCategoryCacheOrder = self._visibleCategoryCacheOrder or {}
+    if self._visibleCategoryCache[cacheKey] then
+        return self._visibleCategoryCache[cacheKey]
+    end
+
+    local presentCategories = {}
+    local presentSubcategories = {}
+    local recipeIndex = self:GetRecipeIndex()
+    local candidates = getRecipeCandidates(self, recipeIndex, profession)
+    for i = 1, #candidates do
+        local recipeKey = candidates[i]
+        if recipePassesUiFilter(recipeKey, filterContext) then
+            local categoryInfo = getMetadataCategoryInfoForRecipe(metadata, recipeKey)
+            if categoryInfo and categoryInfo.category then
+                local categoryKey = categoryInfo.category
+                presentCategories[categoryKey] = true
+                local subKey = categoryInfo.subcategory
+                if subKey then
+                    local bucket = presentSubcategories[categoryKey]
+                    if not bucket then
+                        bucket = {}
+                        presentSubcategories[categoryKey] = bucket
+                    end
+                    bucket[subKey] = true
+                end
+            end
+        end
+    end
+
+    local out = {}
+    for _, row in ipairs(fullRows) do
+        if presentCategories[row.key] then
+            local bucket = presentSubcategories[row.key]
+            local subs = {}
+            for _, sub in ipairs(row.subcategories or {}) do
+                if bucket and bucket[sub.key] then
+                    subs[#subs + 1] = sub
+                end
+            end
+            row.subcategories = subs
+            out[#out + 1] = row
+        end
+    end
+
+    rememberBoundedCache(
+        self._visibleCategoryCache,
+        self._visibleCategoryCacheOrder,
+        cacheKey,
+        out,
+        MAX_RECIPE_LIST_CACHE_ENTRIES
+    )
+    return out
+end
+
 function Data:ResolveRecipeBopOutput(recipeKey, metadataInfo)
     local metadata = getRecipeMetadata()
     if not metadata then
