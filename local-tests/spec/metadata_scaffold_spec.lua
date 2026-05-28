@@ -1,7 +1,7 @@
 local Loader = dofile("local-tests/harness/load-addon.lua")
 local Test = dofile("local-tests/harness/test.lua")
 
-local addon, wow = Loader.LoadMetadata()
+local addon, wow = Loader.LoadMetadata({ fixture = true })
 
 Test.it("loads metadata as part of the RR addon (no separate plugin)", function()
     Test.truthy(addon, "RR addon should load")

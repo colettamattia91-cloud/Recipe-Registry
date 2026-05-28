@@ -12,10 +12,12 @@ end
 
 local addon = Loader.Load({
     files = getUiFiles(),
+    metadataFixture = true,
 })
 Loader.LoadMetadata({
     reset = false,
     loadCore = false,
+    fixture = true,
 })
 
 local data = addon.Data

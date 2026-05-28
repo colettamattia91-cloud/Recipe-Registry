@@ -1,7 +1,7 @@
 local Loader = dofile("local-tests/harness/load-addon.lua")
 local Test = dofile("local-tests/harness/test.lua")
 
-local addon = Loader.LoadMetadata()
+local addon = Loader.LoadMetadata({ fixture = true })
 local metadata = addon.RecipeMetadata
 local overrides = metadata._overrides
 

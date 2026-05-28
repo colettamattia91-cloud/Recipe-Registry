@@ -122,8 +122,17 @@ function Loader.Load(opts)
     end
 
     local files = opts.files or Loader.BackendFiles
+    -- Unit specs that assert exact record-level facts load a small, stable
+    -- sample dataset instead of the volatile production metadata so they stay
+    -- deterministic across `generate` runs. `metadataFixture` swaps only the
+    -- generated table file; the metadata code under test is unchanged.
+    local fixtureGeneratedPath = opts.metadataFixture
+        and join(root, "local-tests", "fixtures", "RecipeMetadata_Generated.lua")
+        or nil
     for _, file in ipairs(files) do
-        local path = resolveAddonPath(file)
+        local path = (fixtureGeneratedPath and file == "RecipeMetadata_Generated.lua")
+            and fixtureGeneratedPath
+            or resolveAddonPath(file)
         local chunk, err = loadfile(path)
         if not chunk then
             error("failed to load " .. path .. ": " .. tostring(err), 2)
@@ -173,6 +182,8 @@ function Loader.LoadMetadata(opts)
         addonMetadata = opts.addonMetadata,
         initialReqTimeoutsEnabled = opts.initialReqTimeoutsEnabled,
         savedVariables = opts.savedVariables,
+        metadataFixture = opts.fixture,
+        files = opts.files,
     })
     return addon, Wow, addon
 end

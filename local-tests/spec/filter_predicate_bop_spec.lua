@@ -1,7 +1,7 @@
 local Loader = dofile("local-tests/harness/load-addon.lua")
 local Test = dofile("local-tests/harness/test.lua")
 
-local metadataAddon, wow, addon = Loader.LoadMetadata()
+local metadataAddon, wow, addon = Loader.LoadMetadata({ fixture = true })
 local data = addon.Data
 local filters = addon.RecipeUiFilters
 
