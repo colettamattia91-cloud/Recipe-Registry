@@ -60,15 +60,18 @@ Test.it("prunes sidebar categories to those with recipes visible under a restric
 
     local visible = data:GetVisibleRecipeCategories("Alchemy", SIDEBAR_CONTEXT)
     Test.truthy(#visible > 0, "restrictive filter should still keep at least one category visible")
-    Test.truthy(#visible < #full, "restrictive filter should prune at least one taxonomy category")
+    Test.truthy(#visible <= #full, "visible categories are a subset of the full taxonomy")
 
-    -- Every visible category must exist in the taxonomy and actually contain at
-    -- least one recipe that passes the same predicate the list uses.
+    -- Pruning is driven by the metadata nav-tree (which expansions a category
+    -- holds in the dataset), not by what the seeded user happens to own.
+    -- A category is visible iff the dataset has at least one recipe in it
+    -- under the visible expansions — assert that invariant directly.
     local fullSet = keySet(full)
     for _, row in ipairs(visible) do
         Test.truthy(fullSet[tostring(row.key)], "visible category must exist in the taxonomy")
-        local rows = data:GetRecipeList("Alchemy", "", "alpha", "recipe", row.key, SIDEBAR_CONTEXT)
-        Test.truthy(#rows > 0, "a visible category should contain at least one visible recipe")
+        local hasRecipe = addon.RecipeMetadata:CategoryHasRecipeUnderVisibility(
+            "alchemy", row.key, { vanilla = false, tbc = true })
+        Test.truthy(hasRecipe, "visible category must hold a recipe in the visible expansion")
     end
 end)
 

@@ -174,6 +174,82 @@ local function addCreatedItemIndex(index, createdItemId, spellId)
     bucket[#bucket + 1] = spellId
 end
 
+local function buildNavTreeFromRecords(recordsBySpellId)
+    -- Mirror the structure the Python generator emits: a nested map
+    -- expansion → profession → category → subcategory keyed by recipe IDs.
+    -- Each non-leaf node carries an `_all` array that unions every recipe
+    -- under it so the runtime can answer "all recipes for this expansion×
+    -- profession" or "all recipes in this category" with a single table get.
+    local tree = {}
+    for spellId, record in pairs(recordsBySpellId) do
+        local expansion = record.expansion
+        local profession = record.profession
+        if expansion and profession then
+            local expNode = tree[expansion]
+            if not expNode then
+                expNode = {}
+                tree[expansion] = expNode
+            end
+            local profNode = expNode[profession]
+            if not profNode then
+                profNode = { _all = {} }
+                expNode[profession] = profNode
+            end
+            profNode._all[#profNode._all + 1] = spellId
+
+            local categoryKey = record.category or "misc"
+            local catNode = profNode[categoryKey]
+            if not catNode then
+                catNode = { _all = {} }
+                profNode[categoryKey] = catNode
+            end
+            catNode._all[#catNode._all + 1] = spellId
+
+            local subKey = record.subcategory
+            if subKey ~= nil then
+                local subList = catNode[subKey]
+                if not subList then
+                    subList = {}
+                    catNode[subKey] = subList
+                end
+                subList[#subList + 1] = spellId
+            end
+        end
+    end
+    for _, expNode in pairs(tree) do
+        for _, profNode in pairs(expNode) do
+            table.sort(profNode._all)
+            for categoryKey, catNode in pairs(profNode) do
+                if categoryKey ~= "_all" then
+                    table.sort(catNode._all)
+                    for subKey, subList in pairs(catNode) do
+                        if subKey ~= "_all" then
+                            table.sort(subList)
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return tree
+end
+
+local function overridesAffectClassification(overrideTable)
+    if type(overrideTable) ~= "table" then return false end
+    -- Only expansion + category overrides change the navTree's shape;
+    -- other override buckets (createdItem, recipeItem, bopOutput, etc.) leave
+    -- the nav classification unchanged.
+    if type(overrideTable.expansionBySpellId) == "table"
+        and next(overrideTable.expansionBySpellId) ~= nil then
+        return true
+    end
+    if type(overrideTable.categoryBySpellId) == "table"
+        and next(overrideTable.categoryBySpellId) ~= nil then
+        return true
+    end
+    return false
+end
+
 function RecipeMetadata:_Rebuild()
     generated = _G.RecipeRegistryRecipeMetadata or generated or {}
     overrides = _G.RecipeRegistryRecipeMetadataOverrides or overrides or {}
@@ -200,6 +276,15 @@ function RecipeMetadata:_Rebuild()
 
     for _, spellIds in pairs(self._createdItemToSpellIds) do
         table.sort(spellIds)
+    end
+
+    -- Prefer the static nav-tree baked into Generated.lua (fast, no Lua
+    -- iteration at load) but fall back to a runtime build when it is absent
+    -- (sample fixture) or when runtime overrides change classification.
+    if generated.navTree and not overridesAffectClassification(overrides) then
+        self._navTree = generated.navTree
+    else
+        self._navTree = buildNavTreeFromRecords(self._recordsBySpellId)
     end
 
     return self
@@ -305,6 +390,56 @@ function RecipeMetadata:GetCategory(recipeKey, info)
         subcategory = info.subcategory,
         sortOrder = info.sortOrder,
     }
+end
+
+function RecipeMetadata:GetNavTree()
+    return self._navTree
+end
+
+-- O(1) presence map: which expansions hold at least one recipe for the
+-- given profession. Used by the sidebar to drop professions whose only
+-- expansions are filtered away (e.g. Jewelcrafting in a Vanilla-only view).
+function RecipeMetadata:GetProfessionExpansionsFromNav(professionKey)
+    local tree = self._navTree
+    if not tree then return nil end
+    return {
+        vanilla = tree.vanilla and tree.vanilla[professionKey] ~= nil or false,
+        tbc = tree.tbc and tree.tbc[professionKey] ~= nil or false,
+    }
+end
+
+-- True if `professionKey/categoryKey` holds at least one recipe under any of
+-- the visible expansions. `visibility = { vanilla = bool, tbc = bool }`.
+function RecipeMetadata:CategoryHasRecipeUnderVisibility(professionKey, categoryKey, visibility)
+    local tree = self._navTree
+    if not tree or not professionKey or not categoryKey then return false end
+    if visibility.vanilla ~= false then
+        local node = tree.vanilla and tree.vanilla[professionKey] and tree.vanilla[professionKey][categoryKey]
+        if node and node._all and #node._all > 0 then return true end
+    end
+    if visibility.tbc ~= false then
+        local node = tree.tbc and tree.tbc[professionKey] and tree.tbc[professionKey][categoryKey]
+        if node and node._all and #node._all > 0 then return true end
+    end
+    return false
+end
+
+-- True if `professionKey/categoryKey/subcategoryKey` holds at least one
+-- recipe under any of the visible expansions.
+function RecipeMetadata:SubcategoryHasRecipeUnderVisibility(professionKey, categoryKey, subcategoryKey, visibility)
+    local tree = self._navTree
+    if not tree or not professionKey or not categoryKey or not subcategoryKey then return false end
+    if visibility.vanilla ~= false then
+        local catNode = tree.vanilla and tree.vanilla[professionKey] and tree.vanilla[professionKey][categoryKey]
+        local subList = catNode and catNode[subcategoryKey]
+        if type(subList) == "table" and #subList > 0 then return true end
+    end
+    if visibility.tbc ~= false then
+        local catNode = tree.tbc and tree.tbc[professionKey] and tree.tbc[professionKey][categoryKey]
+        local subList = catNode and catNode[subcategoryKey]
+        if type(subList) == "table" and #subList > 0 then return true end
+    end
+    return false
 end
 
 function RecipeMetadata:GetCategoriesForProfession(professionKey)

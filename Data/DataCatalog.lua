@@ -459,14 +459,8 @@ function Data:GetVisibleRecipeCategories(profession, filterContext)
         return {}
     end
 
-    -- Fast path: when no expansion is hidden for this profession, the
-    -- predicate-based prune cannot drop a category that holds recipes —
-    -- every taxonomy category with a real recipe in the slice will keep at
-    -- least one visible row. Skipping the sweep here avoids an O(slice)
-    -- RecipePasses pass on every RefreshProfessionButtons during warmup,
-    -- when the ownership-generation token bumps repeatedly and busts the
-    -- cache below. The sweep still runs whenever the user has actually
-    -- filtered an expansion away (the only case pruning matters for UX).
+    -- Fast path: when no expansion is hidden for this profession, no
+    -- category can possibly be filtered out. Return the full taxonomy as-is.
     local filtersModule = Addon.RecipeUiFilters
     local visibility = filtersModule
         and filtersModule.GetEffectiveExpansionVisibility
@@ -475,46 +469,27 @@ function Data:GetVisibleRecipeCategories(profession, filterContext)
     if visibility and visibility.vanilla ~= false and visibility.tbc ~= false then
         return fullRows
     end
-
-    local filterCacheKey = getFilterCacheKey(filterContext)
-    local cacheKey = tostring(profession or "") .. "\t" .. filterCacheKey
-    self._visibleCategoryCache = self._visibleCategoryCache or {}
-    self._visibleCategoryCacheOrder = self._visibleCategoryCacheOrder or {}
-    if self._visibleCategoryCache[cacheKey] then
-        return self._visibleCategoryCache[cacheKey]
+    if not visibility then
+        return fullRows
     end
 
-    local presentCategories = {}
-    local presentSubcategories = {}
-    local recipeIndex = self:GetRecipeIndex()
-    local candidates = getRecipeCandidates(self, recipeIndex, profession)
-    for i = 1, #candidates do
-        local recipeKey = candidates[i]
-        if recipePassesUiFilter(recipeKey, filterContext) then
-            local categoryInfo = getMetadataCategoryInfoForRecipe(metadata, recipeKey)
-            if categoryInfo and categoryInfo.category then
-                local categoryKey = categoryInfo.category
-                presentCategories[categoryKey] = true
-                local subKey = categoryInfo.subcategory
-                if subKey then
-                    local bucket = presentSubcategories[categoryKey]
-                    if not bucket then
-                        bucket = {}
-                        presentSubcategories[categoryKey] = bucket
-                    end
-                    bucket[subKey] = true
-                end
-            end
-        end
+    -- Restrictive filter: walk the taxonomy (small) and ask the metadata
+    -- nav-tree whether each category/subcategory still holds a recipe under
+    -- the active expansion visibility. Direct O(1) lookups, no per-recipe
+    -- predicate sweep. Falls through to fullRows when the metadata module
+    -- can't answer (no nav-tree → empty filter result rather than spurious
+    -- false negatives).
+    local professionKey = getMetadataProfessionKey(profession)
+    if not professionKey or type(metadata.CategoryHasRecipeUnderVisibility) ~= "function" then
+        return fullRows
     end
 
     local out = {}
     for _, row in ipairs(fullRows) do
-        if presentCategories[row.key] then
-            local bucket = presentSubcategories[row.key]
+        if metadata:CategoryHasRecipeUnderVisibility(professionKey, row.key, visibility) then
             local subs = {}
             for _, sub in ipairs(row.subcategories or {}) do
-                if bucket and bucket[sub.key] then
+                if metadata:SubcategoryHasRecipeUnderVisibility(professionKey, row.key, sub.key, visibility) then
                     subs[#subs + 1] = sub
                 end
             end
@@ -522,48 +497,22 @@ function Data:GetVisibleRecipeCategories(profession, filterContext)
             out[#out + 1] = row
         end
     end
-
-    rememberBoundedCache(
-        self._visibleCategoryCache,
-        self._visibleCategoryCacheOrder,
-        cacheKey,
-        out,
-        MAX_RECIPE_LIST_CACHE_ENTRIES
-    )
     return out
 end
 
 -- Which expansions hold at least one recipe for this profession in the
 -- generated metadata. Used by the sidebar to drop professions whose only
 -- expansions are currently hidden (e.g. Jewelcrafting in a Vanilla-only
--- view). The mapping is derived once from static metadata and cached for
--- the lifetime of the session; metadata is a build-time artifact so the
--- result does not need invalidation outside of a /reload.
+-- view). Backed by the pre-built nav-tree in the metadata module — O(1).
 function Data:GetProfessionExpansions(profession)
     local metadata = getRecipeMetadata()
     if not metadata then return nil end
     local key = getMetadataProfessionKey(profession)
     if not key then return nil end
-
-    self._professionExpansionCache = self._professionExpansionCache or {}
-    local cached = self._professionExpansionCache[key]
-    if cached then return cached end
-
-    local result = { vanilla = false, tbc = false }
-    local generated = metadata._generated or {}
-    local recipes = generated.recipesBySpellId or {}
-    for _, record in pairs(recipes) do
-        if record.profession == key then
-            if record.expansion == "vanilla" then
-                result.vanilla = true
-            elseif record.expansion == "tbc" then
-                result.tbc = true
-            end
-            if result.vanilla and result.tbc then break end
-        end
+    if metadata.GetProfessionExpansionsFromNav then
+        return metadata:GetProfessionExpansionsFromNav(key)
     end
-    self._professionExpansionCache[key] = result
-    return result
+    return { vanilla = false, tbc = false }
 end
 
 function Data:ResolveRecipeBopOutput(recipeKey, metadataInfo)

@@ -57,6 +57,80 @@ def _emit_array_table(entries, indent="        "):
     return lines
 
 
+def _build_nav_tree(records):
+    """Group recipes hierarchically expansion → profession → category → subcategory.
+
+    Each node exposes an `_all` array that unions every recipe under it, so the
+    runtime can answer "show all recipes for this expansion×profession" or
+    "this category" with a direct table lookup instead of iterating records.
+    Leaves at the subcategory level are plain arrays; recipes that have no
+    subcategory live only under the category `_all` array.
+    """
+    tree = {}
+    for record in records:
+        exp = record.expansion
+        prof = record.profession_key
+        cat = record.category_key or "misc"
+        sub = record.subcategory_key
+        spell_id = record.spell_id
+
+        exp_node = tree.setdefault(exp, {})
+        prof_node = exp_node.setdefault(prof, {"_all": []})
+        prof_node["_all"].append(spell_id)
+
+        cat_node = prof_node.get(cat)
+        if cat_node is None:
+            cat_node = {"_all": []}
+            prof_node[cat] = cat_node
+        cat_node["_all"].append(spell_id)
+
+        if sub is not None:
+            sub_list = cat_node.get(sub)
+            if sub_list is None:
+                sub_list = []
+                cat_node[sub] = sub_list
+            sub_list.append(spell_id)
+    return tree
+
+
+def _emit_id_array(values, indent):
+    sorted_values = sorted(values)
+    return indent + "{ " + ", ".join(str(value) for value in sorted_values) + " },"
+
+
+def _emit_nav_tree(tree, indent="    "):
+    """Render the nav-tree as deterministic Lua source."""
+    lines = [indent + "navTree = {"]
+    inner1 = indent + "    "
+    inner2 = inner1 + "    "
+    inner3 = inner2 + "    "
+    inner4 = inner3 + "    "
+    for exp in sorted(tree):
+        lines.append(inner1 + "[" + _lua_string(exp) + "] = {")
+        exp_node = tree[exp]
+        for prof in sorted(exp_node):
+            prof_node = exp_node[prof]
+            lines.append(inner2 + "[" + _lua_string(prof) + "] = {")
+            lines.append(inner3 + "_all = " + _emit_id_array(prof_node["_all"], "").lstrip())
+            for cat in sorted(key for key in prof_node if key != "_all"):
+                cat_node = prof_node[cat]
+                lines.append(inner3 + "[" + _lua_string(cat) + "] = {")
+                lines.append(inner4 + "_all = " + _emit_id_array(cat_node["_all"], "").lstrip())
+                for sub in sorted(key for key in cat_node if key != "_all"):
+                    lines.append(
+                        inner4
+                        + "["
+                        + _lua_string(sub)
+                        + "] = "
+                        + _emit_id_array(cat_node[sub], "").lstrip()
+                    )
+                lines.append(inner3 + "},")
+            lines.append(inner2 + "},")
+        lines.append(inner1 + "},")
+    lines.append(indent + "},")
+    return lines
+
+
 def emit_lua(records, categories_by_profession, subcategories_by_profession, metadata_version, schema_version=1, flavor="tbc"):
     records = sorted(records, key=lambda record: record.spell_id)
     created_item_to_spell_ids = defaultdict(list)
@@ -95,5 +169,8 @@ def emit_lua(records, categories_by_profession, subcategories_by_profession, met
             lines.append("            " + category + " = ")
             lines.extend(_emit_array_table(subcategories_by_profession[profession][category], "            "))
         lines.append("        },")
-    lines.extend(["    },", "}", ""])
+    lines.append("    },")
+    lines.append("")
+    lines.extend(_emit_nav_tree(_build_nav_tree(records)))
+    lines.extend(["}", ""])
     return "\n".join(lines)
