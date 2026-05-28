@@ -1376,6 +1376,11 @@ function Data:InvalidateRecipeCaches(scope)
         self._recipeIndexGeneration = (self._recipeIndexGeneration or 0) + 1
         self._recipeDetailCache = nil
         self._recipeDetailCacheOrder = nil
+        self._recipeDetailCacheReady = nil
+        if self.db and self.db.global then
+            self.db.global.recipeDetailCache = nil
+            self.db.global.recipeDetailCacheOrder = nil
+        end
         self._recipeIndex = nil
         self._recipesByProfession = nil
         if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
@@ -1405,6 +1410,11 @@ function Data:InvalidateRecipeCaches(scope)
     self._recipeListCacheOrder = nil
     self._recipeDetailCache = nil
     self._recipeDetailCacheOrder = nil
+    self._recipeDetailCacheReady = nil
+    if self.db and self.db.global then
+        self.db.global.recipeDetailCache = nil
+        self.db.global.recipeDetailCacheOrder = nil
+    end
     self._recipeIndex = nil
     self._recipesByProfession = nil
     if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then

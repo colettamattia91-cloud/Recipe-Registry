@@ -235,7 +235,12 @@ local function applyMetadataInfo(info, metadata, recipeKey, numericKey)
     info.numCreated = 1
     info.directEnchant = metadata:IsOutputlessSelfOnly(recipeKey, metadataInfo) == true or createdItemID == nil
 
-    addMetadataReagents(info, metadata, recipeKey, metadataInfo)
+    -- Reagent name resolution is deferred to Data:EnsureRecipeReagents. The
+    -- list build doesn't read reagent names in the default "recipe" search
+    -- mode and the per-reagent GetItemInfo calls were the dominant cost on
+    -- profession-switch (5+ reagents × hundreds of recipes × cold WoW item
+    -- cache). The detail panel and "materials" search mode materialize them
+    -- explicitly on demand.
 
     if createdItemID then
         local name, icon, quality = getItemData(createdItemID)
@@ -1041,11 +1046,54 @@ function Data:ResolveRecipeLabel(recipeKey)
     return nil
 end
 
+-- The recipe detail cache is bounded and now persisted across sessions in
+-- SavedVariables, tagged by the metadata library version. First-time visits
+-- to a profession still pay the GetItemInfo storm, but subsequent /reload
+-- and even subsequent sessions land on a warm cache so the user only eats
+-- the cold lookup once per recipe per metadata generation.
+local function ensureDetailCache(data)
+    if data._recipeDetailCacheReady then
+        return data._recipeDetailCache, data._recipeDetailCacheOrder
+    end
+    data._recipeDetailCacheReady = true
+
+    local global = data.db and data.db.global
+    if not global then
+        data._recipeDetailCache = data._recipeDetailCache or {}
+        data._recipeDetailCacheOrder = data._recipeDetailCacheOrder or {}
+        return data._recipeDetailCache, data._recipeDetailCacheOrder
+    end
+
+    if type(global.recipeDetailCache) ~= "table" then
+        global.recipeDetailCache = {}
+    end
+    if type(global.recipeDetailCacheOrder) ~= "table" then
+        global.recipeDetailCacheOrder = {}
+    end
+
+    -- Wipe when the metadata snapshot changes: a regen can alter spellIds,
+    -- created items, reagents, etc., so cached display info would surface
+    -- the old shape under the new metadata.
+    local currentVersion = (Addon.RecipeMetadata and Addon.RecipeMetadata.metadataVersion) or ""
+    if global.recipeDetailCacheVersion ~= currentVersion then
+        for key in pairs(global.recipeDetailCache) do
+            global.recipeDetailCache[key] = nil
+        end
+        for i = #global.recipeDetailCacheOrder, 1, -1 do
+            global.recipeDetailCacheOrder[i] = nil
+        end
+        global.recipeDetailCacheVersion = currentVersion
+    end
+
+    data._recipeDetailCache = global.recipeDetailCache
+    data._recipeDetailCacheOrder = global.recipeDetailCacheOrder
+    return data._recipeDetailCache, data._recipeDetailCacheOrder
+end
+
 function Data:GetRecipeDisplayInfo(recipeKey)
     if recipeKey == nil then return nil end
-    self._recipeDetailCache = self._recipeDetailCache or {}
-    self._recipeDetailCacheOrder = self._recipeDetailCacheOrder or {}
-    local cached = self._recipeDetailCache[recipeKey]
+    local detailCache, detailCacheOrder = ensureDetailCache(self)
+    local cached = detailCache[recipeKey]
     if cached then
         refreshDetailAssets(cached)
         return cached
@@ -1113,8 +1161,8 @@ function Data:GetRecipeDisplayInfo(recipeKey)
     info.searchText = lowerSafe(table.concat(parts, " "))
     refreshDetailAssets(info)
     rememberBoundedCache(
-        self._recipeDetailCache,
-        self._recipeDetailCacheOrder,
+        detailCache,
+        detailCacheOrder,
         recipeKey,
         info,
         MAX_RECIPE_DETAIL_CACHE_ENTRIES
@@ -1223,6 +1271,9 @@ function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName,
         end
         if include then
             local detail = self:GetRecipeDisplayInfo(recipeKey)
+            if searchMode == "materials" and detail then
+                self:EnsureRecipeReagents(detail)
+            end
             -- Compute onlineCount live from the current online cache. The
             -- recipe index no longer carries it (it's a presence-derived
             -- value, not content) so we walk crafterRows here. Cost is
@@ -1472,6 +1523,9 @@ function Data:RunRecipeListBuildStep(state, ctx)
             end
             if include then
                 local detail = self:GetRecipeDisplayInfo(recipeKey)
+                if searchMode == "materials" and detail then
+                    self:EnsureRecipeReagents(detail)
+                end
                 local onlineCount = 0
                 local crafterRows = indexed.crafterRows or {}
                 for craftIdx = 1, #crafterRows do
@@ -1635,9 +1689,43 @@ function Data:GetRecipeRequestability(recipeKey, memberKey)
     return true, "requestable"
 end
 
+-- Materialize reagent names lazily. The list build skips this for the default
+-- "recipe" search mode because the per-reagent GetItemInfo calls dominate
+-- profession-switch latency on cold caches. The detail panel always invokes
+-- it before rendering the materials section, and the list build runs it
+-- explicitly when the user is searching in "materials" mode (the only path
+-- that actually needs reagent strings in the search index).
+function Data:EnsureRecipeReagents(info)
+    if not info or info._reagentsMaterialized then return info end
+    local metadata = getRecipeMetadata()
+    if metadata then
+        info.reagents = info.reagents or {}
+        for index = #info.reagents, 1, -1 do
+            info.reagents[index] = nil
+        end
+        -- Resolve the metadata record explicitly so mock implementations that
+        -- don't fall back to GetRecipeInfo internally still see the record.
+        local metadataInfo = metadata.GetRecipeInfo and metadata:GetRecipeInfo(info.recipeKey) or nil
+        addMetadataReagents(info, metadata, info.recipeKey, metadataInfo)
+        local parts = {
+            info.label or "",
+            info.spellName or "",
+            info.createdItemName or "",
+            info.recipeItemName or "",
+        }
+        for _, reagent in ipairs(info.reagents) do
+            parts[#parts + 1] = reagent.name or ""
+        end
+        info.searchText = lowerSafe(table.concat(parts, " "))
+    end
+    info._reagentsMaterialized = true
+    return info
+end
+
 function Data:GetRecipeDetail(recipeKey)
     local detail = self:GetRecipeDisplayInfo(recipeKey) or { recipeKey = recipeKey, label = tostring(recipeKey) }
     refreshDetailAssets(detail)
+    self:EnsureRecipeReagents(detail)
     detail.crafters = self:GetRecipeCrafters(recipeKey)
     detail.crafterCount = #detail.crafters
     if Addon.Market and Addon.Market.ApplyRecipeCosts then
