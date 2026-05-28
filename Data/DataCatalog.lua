@@ -23,6 +23,20 @@ local RECIPES_PER_LIST_BUILD_STEP = 60
 local LIST_BUILD_BUDGET_MS = 3
 local MEMBERS_PER_INDEX_BUILD_STEP = 12
 local INDEX_BUILD_BUDGET_MS = 3
+local LIST_BUILD_TELEMETRY_CAPACITY = 10
+
+-- Module-level counters used by the list-build telemetry to attribute time
+-- to specific cost centers (per-recipe display info build vs. reagent
+-- materialization). All cheap monotonic increments; the list-build records
+-- snapshot deltas around each run rather than calling out to the counters
+-- in the hot loop.
+local catalogStats = {
+    displayInfoCalls = 0,
+    displayInfoCacheHits = 0,
+    displayInfoBuildMs = 0,
+    ensureReagentsCalls = 0,
+    ensureReagentsMs = 0,
+}
 
 local PROFESSION_LABELS = {
     alchemy = "Alchemy",
@@ -269,6 +283,50 @@ local function nowMsLocal()
         return debugprofilestop()
     end
     return GetTime() * 1000
+end
+
+local function newListBuildTelemetryRecord(profName, categoryFilter, searchMode)
+    return {
+        profName = profName or "(none)",
+        categoryFilter = tostring(categoryFilter or "All"),
+        searchMode = searchMode or "recipe",
+        startedAt = nowMsLocal(),
+        candidates = 0,
+        included = 0,
+        stepCount = 0,
+        stepMsTotal = 0,
+        status = "running",
+    }
+end
+
+local function pushListBuildTelemetry(data, record)
+    if not data or not record then return end
+    data._listBuildTelemetry = data._listBuildTelemetry or { runs = {} }
+    local runs = data._listBuildTelemetry.runs
+    table.insert(runs, 1, record)
+    while #runs > LIST_BUILD_TELEMETRY_CAPACITY do
+        table.remove(runs)
+    end
+end
+
+local function finalizeListBuildTelemetry(data, record, status, outRows)
+    if not record then return end
+    if record._finalized then return end
+    record._finalized = true
+    record.status = status or "completed"
+    record.totalMs = nowMsLocal() - record.startedAt
+    if outRows then record.included = #outRows end
+    if data and data.GetCatalogStatsSnapshot then
+        local endStats = data:GetCatalogStatsSnapshot()
+        local start = record._statsAtStart or {}
+        record.displayInfoCalls = (endStats.displayInfoCalls or 0) - (start.displayInfoCalls or 0)
+        record.displayInfoCacheHits = (endStats.displayInfoCacheHits or 0) - (start.displayInfoCacheHits or 0)
+        record.displayInfoBuildMs = (endStats.displayInfoBuildMs or 0) - (start.displayInfoBuildMs or 0)
+        record.ensureReagentsCalls = (endStats.ensureReagentsCalls or 0) - (start.ensureReagentsCalls or 0)
+        record.ensureReagentsMs = (endStats.ensureReagentsMs or 0) - (start.ensureReagentsMs or 0)
+    end
+    record._statsAtStart = nil
+    pushListBuildTelemetry(data, record)
 end
 
 local function refreshDetailAssets(info)
@@ -1090,14 +1148,78 @@ local function ensureDetailCache(data)
     return data._recipeDetailCache, data._recipeDetailCacheOrder
 end
 
+function Data:GetCatalogStatsSnapshot()
+    return {
+        displayInfoCalls = catalogStats.displayInfoCalls,
+        displayInfoCacheHits = catalogStats.displayInfoCacheHits,
+        displayInfoBuildMs = catalogStats.displayInfoBuildMs,
+        ensureReagentsCalls = catalogStats.ensureReagentsCalls,
+        ensureReagentsMs = catalogStats.ensureReagentsMs,
+    }
+end
+
+function Data:ResetListBuildTelemetry()
+    self._listBuildTelemetry = { runs = {} }
+    catalogStats.displayInfoCalls = 0
+    catalogStats.displayInfoCacheHits = 0
+    catalogStats.displayInfoBuildMs = 0
+    catalogStats.ensureReagentsCalls = 0
+    catalogStats.ensureReagentsMs = 0
+end
+
+function Data:DumpListBuildTelemetry()
+    local print = function(line) Addon:SystemPrint(line) end
+    local telemetry = self._listBuildTelemetry
+    if not telemetry or not telemetry.runs or #telemetry.runs == 0 then
+        print("List-build telemetry: no runs recorded yet.")
+        return
+    end
+    print(string.format("List-build telemetry (last %d run(s), most recent first):", #telemetry.runs))
+    for index, run in ipairs(telemetry.runs) do
+        local hits = run.displayInfoCacheHits or 0
+        local calls = run.displayInfoCalls or 0
+        local builds = math.max(0, calls - hits)
+        local buildMs = run.displayInfoBuildMs or 0
+        local avgBuild = builds > 0 and (buildMs / builds) or 0
+        print(string.format(
+            "  %d. %s / cat=%s / %s -- %.1fms total, %s",
+            index,
+            tostring(run.profName),
+            tostring(run.categoryFilter),
+            tostring(run.searchMode),
+            run.totalMs or 0,
+            run.status or "?"
+        ))
+        print(string.format(
+            "      candidates=%d included=%d  steps=%d stepMs=%.1f",
+            run.candidates or 0,
+            run.included or 0,
+            run.stepCount or 0,
+            run.stepMsTotal or 0
+        ))
+        print(string.format(
+            "      displayInfo calls=%d hits=%d builds=%d buildMs=%.1f (avg %.2fms/recipe)",
+            calls, hits, builds, buildMs, avgBuild
+        ))
+        print(string.format(
+            "      reagents calls=%d ms=%.1f",
+            run.ensureReagentsCalls or 0,
+            run.ensureReagentsMs or 0
+        ))
+    end
+end
+
 function Data:GetRecipeDisplayInfo(recipeKey)
     if recipeKey == nil then return nil end
+    catalogStats.displayInfoCalls = catalogStats.displayInfoCalls + 1
     local detailCache, detailCacheOrder = ensureDetailCache(self)
     local cached = detailCache[recipeKey]
     if cached then
+        catalogStats.displayInfoCacheHits = catalogStats.displayInfoCacheHits + 1
         refreshDetailAssets(cached)
         return cached
     end
+    local buildStartedAt = nowMsLocal()
 
     local n = tonumber(recipeKey)
     local info = {
@@ -1167,6 +1289,7 @@ function Data:GetRecipeDisplayInfo(recipeKey)
         info,
         MAX_RECIPE_DETAIL_CACHE_ENTRIES
     )
+    catalogStats.displayInfoBuildMs = catalogStats.displayInfoBuildMs + (nowMsLocal() - buildStartedAt)
     return info
 end
 
@@ -1442,6 +1565,10 @@ function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, catego
             end
         end
 
+        local telemetry = newListBuildTelemetryRecord(profName, categoryFilter, searchMode)
+        telemetry.candidates = #candidates
+        telemetry._statsAtStart = self:GetCatalogStatsSnapshot()
+
         local jobState = {
             candidates = candidates,
             recipeIndex = recipeIndex,
@@ -1459,6 +1586,7 @@ function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, catego
             filterCacheKey = filterCacheKey,
             cacheGenerationAtStart = self._recipeListCacheGeneration or 0,
             onComplete = onComplete,
+            telemetry = telemetry,
         }
 
         Addon.Performance:ScheduleJob("recipe-list-build", function(state, ctx)
@@ -1476,6 +1604,10 @@ function Data:RunRecipeListBuildStep(state, ctx)
     local budgetMs = (ctx and ctx.budgetMs) or LIST_BUILD_BUDGET_MS
     local startedAt = nowMsLocal()
     local processedThisStep = 0
+    local telemetry = state.telemetry
+    if telemetry then
+        telemetry.stepCount = (telemetry.stepCount or 0) + 1
+    end
 
     local candidates = state.candidates
     local recipeIndex = state.recipeIndex
@@ -1559,9 +1691,11 @@ function Data:RunRecipeListBuildStep(state, ctx)
         end
 
         if processedThisStep >= RECIPES_PER_LIST_BUILD_STEP then
+            if telemetry then telemetry.stepMsTotal = (telemetry.stepMsTotal or 0) + (nowMsLocal() - startedAt) end
             return true, state
         end
         if (nowMsLocal() - startedAt) >= budgetMs then
+            if telemetry then telemetry.stepMsTotal = (telemetry.stepMsTotal or 0) + (nowMsLocal() - startedAt) end
             return true, state
         end
     end
@@ -1592,8 +1726,11 @@ function Data:RunRecipeListBuildStep(state, ctx)
     -- stale. Abandon the result rather than poisoning the cache with it.
     -- The caller's UI generation token already discards the callback in
     -- that situation, so dropping silently is the cleanest contract.
+    if telemetry then telemetry.stepMsTotal = (telemetry.stepMsTotal or 0) + (nowMsLocal() - startedAt) end
+
     local currentGeneration = self._recipeListCacheGeneration or 0
     if currentGeneration ~= (state.cacheGenerationAtStart or 0) then
+        finalizeListBuildTelemetry(self, telemetry, "abandoned", out)
         if state.onComplete then
             state.onComplete(nil, false)
         end
@@ -1614,6 +1751,8 @@ function Data:RunRecipeListBuildStep(state, ctx)
     else
         out = cached
     end
+
+    finalizeListBuildTelemetry(self, telemetry, "completed", out)
 
     if state.onComplete then
         state.onComplete(out, false)
@@ -1697,6 +1836,8 @@ end
 -- that actually needs reagent strings in the search index).
 function Data:EnsureRecipeReagents(info)
     if not info or info._reagentsMaterialized then return info end
+    catalogStats.ensureReagentsCalls = catalogStats.ensureReagentsCalls + 1
+    local startedAt = nowMsLocal()
     local metadata = getRecipeMetadata()
     if metadata then
         info.reagents = info.reagents or {}
@@ -1719,6 +1860,7 @@ function Data:EnsureRecipeReagents(info)
         info.searchText = lowerSafe(table.concat(parts, " "))
     end
     info._reagentsMaterialized = true
+    catalogStats.ensureReagentsMs = catalogStats.ensureReagentsMs + (nowMsLocal() - startedAt)
     return info
 end
 

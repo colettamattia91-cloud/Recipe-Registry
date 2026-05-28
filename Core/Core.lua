@@ -439,6 +439,7 @@ end
 local function printPerfHelp(self)
     self:Print("/rr perf toggle - show or hide the performance/debug panel.")
     self:Print("/rr perf dump - print scheduler, queues, sync and scan diagnostics.")
+    self:Print("/rr perf list - print recent recipe-list build telemetry (timing breakdown).")
     self:Print("/rr perf reset - clear performance, sync and scan counters.")
 end
 
@@ -1069,11 +1070,22 @@ function Addon:SlashHandler(input)
             if self.Data and self.Data.ResetCatalogDiagnostics then
                 self.Data:ResetCatalogDiagnostics()
             end
+            if self.Data and self.Data.ResetListBuildTelemetry then
+                self.Data:ResetListBuildTelemetry()
+            end
             self:RequestRefresh("perf")
             self:Print("Performance, sync, scan, and cache counters reset.")
             return
         end
-        self:Print("Usage: /rr perf [toggle, dump, reset, help]")
+        if perfCmd == "list" or perfCmd == "builds" then
+            if self.Data and self.Data.DumpListBuildTelemetry then
+                self.Data:DumpListBuildTelemetry()
+            else
+                self:Print("List-build telemetry is not available.")
+            end
+            return
+        end
+        self:Print("Usage: /rr perf [toggle, dump, list, reset, help]")
         return
     end
 

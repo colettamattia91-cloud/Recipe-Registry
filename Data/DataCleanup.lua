@@ -11,6 +11,28 @@ local cloneTableShallow = Private.cloneTableShallow
 local countRecipeKeys = Private.countRecipeKeys
 local isValidRecipeKey = Private.isValidRecipeKey
 
+-- Returns true only when the recipe key resolves to a spell or item known to
+-- the WoW client. Used by the auto-clean pass to drop entries left behind by
+-- mock harnesses or older addon versions that no longer correspond to a real
+-- in-game spell/item. GetItemInfoInstant is the synchronous local DB lookup
+-- (returns nil for invalid item IDs without any server round-trip); the
+-- spell-side check goes through GetSpellInfo which returns nil for unknown
+-- spell IDs.
+local function isRecipeKeyResolvableInClient(recipeKey)
+    local numeric = tonumber(recipeKey)
+    if not numeric then return false end
+    if numeric < 0 then
+        return type(GetSpellInfo) == "function" and GetSpellInfo(-numeric) ~= nil
+    end
+    if numeric > 0 then
+        if type(GetItemInfoInstant) == "function" then
+            return GetItemInfoInstant(numeric) ~= nil
+        end
+        return type(GetItemInfo) == "function" and GetItemInfo(numeric) ~= nil
+    end
+    return false
+end
+
 local function newCorruptCleanStats()
     return {
         removedMembers = 0,
@@ -183,6 +205,19 @@ function Data:ShouldCleanRecipeFromProfession(profName, recipeKey, opts)
         return true, "invalid-key"
     end
 
+    -- Drop ghost recipe keys left over from old mocks or aborted scans whose
+    -- IDs the WoW client doesn't know about. Skipped when no real WoW API is
+    -- available (specs run under the harness which doesn't stub these), so
+    -- unit tests with synthetic keys keep working.
+    if opts.checkClientResolvable
+        and type(GetSpellInfo) == "function"
+        and (type(GetItemInfoInstant) == "function" or type(GetItemInfo) == "function")
+    then
+        if not isRecipeKeyResolvableInClient(recipeKey) then
+            return true, "not-in-client"
+        end
+    end
+
     if opts.checkProfessionMismatches == false then
         return false
     end
@@ -263,6 +298,7 @@ function Data:ScheduleSafeAutoClean(opts)
 
             state.dirtyAll = cleanCorruptMember(self, memberKey, self:GetMember(memberKey), {
                 checkProfessionMismatches = false,
+                checkClientResolvable = true,
             }, state.stats, state.dirtyBlocks) or state.dirtyAll
             state.index = state.index + 1
             processed = processed + 1
