@@ -72,6 +72,20 @@ Test.it("prunes sidebar categories to those with recipes visible under a restric
     end
 end)
 
+Test.it("reports which expansions hold recipes for each supported profession", function()
+    -- Static metadata-derived primitive used by the sidebar to drop a
+    -- profession whose only expansions are currently filtered away (e.g. JC
+    -- is TBC-only, so a Vanilla-only view hides its button).
+    local alchemy = data:GetProfessionExpansions("Alchemy")
+    Test.truthy(alchemy and alchemy.vanilla, "Alchemy should report at least one Vanilla recipe")
+    Test.truthy(alchemy and alchemy.tbc, "Alchemy should report at least one TBC recipe")
+
+    local jewelcrafting = data:GetProfessionExpansions("Jewelcrafting")
+    Test.truthy(jewelcrafting, "Jewelcrafting should resolve a metadata profession key")
+    Test.eq(jewelcrafting.vanilla, false, "Jewelcrafting did not exist in Vanilla")
+    Test.truthy(jewelcrafting.tbc, "Jewelcrafting should report at least one TBC recipe")
+end)
+
 Test.it("drops every sidebar category when all expansions are hidden for the profession", function()
     local selfKey = data:GetPlayerKey()
     seedProfession(selfKey, "Alchemy", ALCHEMY_RECIPES)

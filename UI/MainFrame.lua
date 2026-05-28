@@ -2439,9 +2439,36 @@ function UI:RefreshProfessionButtons(opts)
         local button = self.frame.profButtons[profName]
         button:SetLabel(profName, profName ~= FAVORITES_VIEW and getProfessionIcon(profName) or nil)
         button:SetSelected(self.selectedProfession == profName)
-        placeButton(button, 0, 24, 6)
 
-        if useCategories and self.selectedProfession == profName and profName ~= FAVORITES_VIEW then
+        -- Hide professions whose only expansions are currently filtered away.
+        -- Skipped when the filter is permissive (both Vanilla and TBC visible
+        -- for the profession): in that case every supported profession stays
+        -- in the sidebar. Only fires under a restrictive filter, e.g. JC has
+        -- no Vanilla recipes so it disappears in a Vanilla-only view.
+        local hideProfession = false
+        if profName ~= FAVORITES_VIEW and Addon.RecipeUiFilters and Addon.Data then
+            local visibility = Addon.RecipeUiFilters:GetEffectiveExpansionVisibility(profName)
+            if visibility and (visibility.vanilla == false or visibility.tbc == false) then
+                local expansions = Addon.Data.GetProfessionExpansions
+                    and Addon.Data:GetProfessionExpansions(profName)
+                    or nil
+                if expansions and (expansions.vanilla or expansions.tbc) then
+                    local vanillaMatch = visibility.vanilla and expansions.vanilla
+                    local tbcMatch = visibility.tbc and expansions.tbc
+                    if not vanillaMatch and not tbcMatch then
+                        hideProfession = true
+                    end
+                end
+            end
+        end
+
+        if hideProfession then
+            setShownIfChanged(button, false)
+        else
+            placeButton(button, 0, 24, 6)
+        end
+
+        if not hideProfession and useCategories and self.selectedProfession == profName and profName ~= FAVORITES_VIEW then
             local viewMode = (Addon.db and Addon.db.profile and Addon.db.profile.recipeCategoryView) or "expanded"
             -- Sidebar categories follow the same projection as the recipe list:
             -- only categories with at least one recipe visible under the active

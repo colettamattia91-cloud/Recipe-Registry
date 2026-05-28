@@ -533,6 +533,39 @@ function Data:GetVisibleRecipeCategories(profession, filterContext)
     return out
 end
 
+-- Which expansions hold at least one recipe for this profession in the
+-- generated metadata. Used by the sidebar to drop professions whose only
+-- expansions are currently hidden (e.g. Jewelcrafting in a Vanilla-only
+-- view). The mapping is derived once from static metadata and cached for
+-- the lifetime of the session; metadata is a build-time artifact so the
+-- result does not need invalidation outside of a /reload.
+function Data:GetProfessionExpansions(profession)
+    local metadata = getRecipeMetadata()
+    if not metadata then return nil end
+    local key = getMetadataProfessionKey(profession)
+    if not key then return nil end
+
+    self._professionExpansionCache = self._professionExpansionCache or {}
+    local cached = self._professionExpansionCache[key]
+    if cached then return cached end
+
+    local result = { vanilla = false, tbc = false }
+    local generated = metadata._generated or {}
+    local recipes = generated.recipesBySpellId or {}
+    for _, record in pairs(recipes) do
+        if record.profession == key then
+            if record.expansion == "vanilla" then
+                result.vanilla = true
+            elseif record.expansion == "tbc" then
+                result.tbc = true
+            end
+            if result.vanilla and result.tbc then break end
+        end
+    end
+    self._professionExpansionCache[key] = result
+    return result
+end
+
 function Data:ResolveRecipeBopOutput(recipeKey, metadataInfo)
     local metadata = getRecipeMetadata()
     if not metadata then
