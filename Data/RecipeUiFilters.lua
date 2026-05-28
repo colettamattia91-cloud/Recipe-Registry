@@ -58,6 +58,9 @@ local function getProfilePrefilters()
     if filters.showRemoteBopOutputRecipes == nil then
         filters.showRemoteBopOutputRecipes = false
     end
+    if filters.hideUncataloguedRecipes == nil then
+        filters.hideUncataloguedRecipes = true
+    end
     return filters
 end
 
@@ -116,14 +119,29 @@ function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
         return true, "visible-no-plugin"
     end
 
+    local profileFilters = getProfilePrefilters()
     local info = recipeInfo or metadata:GetRecipeInfo(recipeKey)
     local resolution = metadata:GetMetadataResolutionStatus(recipeKey, info)
     if not info then
         if resolution == "ambiguous" then
+            -- Real recipe with mapping ambiguity (e.g. same created item from
+            -- multiple spells): keep visible per roadmap §9 conservative show —
+            -- the mapping is a remediation task, the recipe itself is legit.
             Addon:Trace("filters", "metadata ambiguous for recipe", recipeKey)
-        else
-            Addon:Trace("filters", "metadata unresolved for recipe", recipeKey)
+            return true, "visible-unresolved-conservative"
         end
+        -- Last-gate cleanup (profile-gated, default on): entries the metadata
+        -- library does not catalogue (corrupt scan rows that slipped past
+        -- DataCleanup, items imported as recipes, out-of-scope profession
+        -- recipes like Mining smelting) are dropped before they reach the UI.
+        -- Overrides roadmap §9 conservative show because in TBC Classic the
+        -- dataset is comprehensive — a legit-but-uncatalogued recipe is far
+        -- rarer than spurious garbage. Flip via hideUncataloguedRecipes.
+        if profileFilters.hideUncataloguedRecipes ~= false then
+            Addon:Trace("filters", "metadata uncatalogued for recipe", recipeKey)
+            return false, "hidden-uncatalogued"
+        end
+        Addon:Trace("filters", "metadata unresolved for recipe", recipeKey)
         return true, "visible-unresolved-conservative"
     end
 
@@ -213,6 +231,7 @@ function RecipeUiFilters:BuildFilterCacheKey(ctx)
         "schema=" .. tostring(metadata.schemaVersion or ""),
         "flavor=" .. tostring(metadata.flavor or ""),
         "remoteBop=" .. boolToken(filters.showRemoteBopOutputRecipes == true),
+        "hideUncat=" .. boolToken(filters.hideUncataloguedRecipes ~= false),
         "ownership=" .. tostring(data._recipeOwnershipIndexGeneration or 0),
     }
 

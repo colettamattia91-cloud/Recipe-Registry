@@ -1,8 +1,18 @@
 local Loader = dofile("local-tests/harness/load-addon.lua")
 local Test = dofile("local-tests/harness/test.lua")
 
+local function disableUncataloguedGate(addon)
+    -- This spec seeds synthetic recipe keys not present in the metadata
+    -- dataset; keep the last-gate uncatalogued cleanup off so the seeded
+    -- rows survive the filter predicate.
+    if addon and addon.db and addon.db.profile and addon.db.profile.recipePrefilters then
+        addon.db.profile.recipePrefilters.hideUncataloguedRecipes = false
+    end
+end
+
 local function freshAddon()
     local addon, wow = Loader.Load()
+    disableUncataloguedGate(addon)
     return addon, wow, addon.Data
 end
 
@@ -15,6 +25,7 @@ local function freshAddonWithUi()
     local addon, wow = Loader.Load({
         files = files,
     })
+    disableUncataloguedGate(addon)
     return addon, wow, addon.Data, addon.UI
 end
 

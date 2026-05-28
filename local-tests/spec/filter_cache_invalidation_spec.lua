@@ -5,6 +5,11 @@ local _metadataAddon, _wow, addon = Loader.LoadMetadata()
 local data = addon.Data
 local filters = addon.RecipeUiFilters
 
+-- This spec exercises filter cache key + invalidation behavior using
+-- synthetic recipe keys; keep the last-gate uncatalogued cleanup off so the
+-- seeded rows survive the filter predicate.
+addon.db.profile.recipePrefilters.hideUncataloguedRecipes = false
+
 local function seedMember(memberKey, profession, recipeKeys, sourceType)
     local entry = data:GetOrCreateMember(memberKey)
     entry.guildStatus = "active"

@@ -77,6 +77,7 @@ local DB_DEFAULTS = {
         recipeCategoryView = "expanded",
         recipePrefilters = {
             showRemoteBopOutputRecipes = false,
+            hideUncataloguedRecipes = true,
             expansionDefaults = {
                 vanilla = true,
                 tbc = true,
@@ -680,6 +681,7 @@ function Data:OnInitialize()
     if type(self.db.profile.recipePrefilters) ~= "table" then
         self.db.profile.recipePrefilters = {
             showRemoteBopOutputRecipes = false,
+            hideUncataloguedRecipes = true,
             expansionDefaults = { vanilla = true, tbc = true },
             professionExpansionOverrides = {},
         }
@@ -687,6 +689,9 @@ function Data:OnInitialize()
         local prefilters = self.db.profile.recipePrefilters
         if prefilters.showRemoteBopOutputRecipes == nil then
             prefilters.showRemoteBopOutputRecipes = false
+        end
+        if prefilters.hideUncataloguedRecipes == nil then
+            prefilters.hideUncataloguedRecipes = true
         end
         if type(prefilters.expansionDefaults) ~= "table" then
             prefilters.expansionDefaults = { vanilla = true, tbc = true }

@@ -54,6 +54,7 @@ $activeAllSpecs = @(
     "filter_predicate_bop_spec.lua",
     "filter_predicate_expansion_spec.lua",
     "filter_predicate_outputless_spec.lua",
+    "filter_predicate_uncatalogued_spec.lua",
     "inbound_seed_debug_spec.lua",
     "metadata_normalize_key_spec.lua",
     "metadata_override_merge_spec.lua",

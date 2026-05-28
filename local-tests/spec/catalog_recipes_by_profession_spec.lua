@@ -3,6 +3,12 @@ local Test = dofile("local-tests/harness/test.lua")
 
 local function freshAddon()
     local addon = Loader.Load()
+    -- This spec seeds synthetic recipe keys not in the metadata dataset; keep
+    -- the last-gate uncatalogued cleanup off so the seeded rows survive the
+    -- filter predicate.
+    if addon and addon.db and addon.db.profile and addon.db.profile.recipePrefilters then
+        addon.db.profile.recipePrefilters.hideUncataloguedRecipes = false
+    end
     return addon, addon.Data
 end
 
