@@ -459,37 +459,81 @@ function Data:GetVisibleRecipeCategories(profession, filterContext)
         return {}
     end
 
-    -- Fast path: when no expansion is hidden for this profession, no
-    -- category can possibly be filtered out. Return the full taxonomy as-is.
     local filtersModule = Addon.RecipeUiFilters
-    local visibility = filtersModule
+    local visibility = (filtersModule
         and filtersModule.GetEffectiveExpansionVisibility
-        and filtersModule:GetEffectiveExpansionVisibility(profession)
-        or nil
-    if visibility and visibility.vanilla ~= false and visibility.tbc ~= false then
+        and filtersModule:GetEffectiveExpansionVisibility(profession))
+        or { vanilla = true, tbc = true }
+
+    local professionKey = getMetadataProfessionKey(profession)
+    if not professionKey then
         return fullRows
     end
-    if not visibility then
+    local tree = metadata._navTree
+    if not tree then
         return fullRows
     end
 
-    -- Restrictive filter: walk the taxonomy (small) and ask the metadata
-    -- nav-tree whether each category/subcategory still holds a recipe under
-    -- the active expansion visibility. Direct O(1) lookups, no per-recipe
-    -- predicate sweep. Falls through to fullRows when the metadata module
-    -- can't answer (no nav-tree → empty filter result rather than spurious
-    -- false negatives).
-    local professionKey = getMetadataProfessionKey(profession)
-    if not professionKey or type(metadata.CategoryHasRecipeUnderVisibility) ~= "function" then
-        return fullRows
+    -- Build the owned spell-id set for this profession by intersecting the
+    -- guild's recipe slice with the metadata catalogue. The sidebar prune
+    -- below uses this set so categories the user has nothing in are hidden
+    -- (the previous nav-tree-only prune answered "the dataset has recipes
+    -- here" which surfaced empty buttons for content the user didn't own).
+    -- Touch the recipe index so `_recipesByProfession` reflects the current
+    -- members DB (the prune runs from a stable cached slice; an outdated
+    -- index would silently hide categories the user actually owns).
+    self:GetRecipeIndex()
+    local ownedSpellIds = {}
+    local recipesByProf = self._recipesByProfession or {}
+    local slice = recipesByProf[profession]
+    if slice then
+        for i = 1, #slice do
+            local info = metadata:GetRecipeInfo(slice[i])
+            if info and info.spellId then
+                ownedSpellIds[info.spellId] = true
+            end
+        end
+    end
+
+    local visibleExpansions = {}
+    if visibility.vanilla ~= false then visibleExpansions[#visibleExpansions + 1] = "vanilla" end
+    if visibility.tbc ~= false then visibleExpansions[#visibleExpansions + 1] = "tbc" end
+
+    local function arrayHasOwned(arr)
+        if type(arr) ~= "table" then return false end
+        for i = 1, #arr do
+            if ownedSpellIds[arr[i]] then return true end
+        end
+        return false
+    end
+
+    local function nodeForCategory(expansion, catKey)
+        local profNode = tree[expansion] and tree[expansion][professionKey]
+        return profNode and profNode[catKey] or nil
+    end
+
+    local function categoryHasOwnedVisible(catKey)
+        for _, expansion in ipairs(visibleExpansions) do
+            local catNode = nodeForCategory(expansion, catKey)
+            if catNode and arrayHasOwned(catNode._all) then return true end
+        end
+        return false
+    end
+
+    local function subcategoryHasOwnedVisible(catKey, subKey)
+        for _, expansion in ipairs(visibleExpansions) do
+            local catNode = nodeForCategory(expansion, catKey)
+            if catNode and arrayHasOwned(catNode[subKey]) then return true end
+        end
+        return false
     end
 
     local out = {}
     for _, row in ipairs(fullRows) do
-        if metadata:CategoryHasRecipeUnderVisibility(professionKey, row.key, visibility) then
+        if categoryHasOwnedVisible(row.key) then
             local subs = {}
             for _, sub in ipairs(row.subcategories or {}) do
-                if metadata:SubcategoryHasRecipeUnderVisibility(professionKey, row.key, sub.key, visibility) then
+                if subcategoryHasOwnedVisible(row.key, sub.key) then
                     subs[#subs + 1] = sub
                 end
             end
@@ -1083,6 +1127,16 @@ function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName,
     searchMode = searchMode == "materials" and "materials" or "recipe"
     local categoryFilter = categoryFilterToken(categoryName)
     categoryFilter = categoryFilter and categoryFilter ~= "" and categoryFilter ~= "All" and categoryFilter or nil
+    -- Out-of-scope professions (Mining, First Aid, Fishing) have no metadata
+    -- to filter against; tell RecipePasses to bypass the hide-uncatalogued
+    -- gate so their scanned recipes survive the predicate.
+    if profName and profName ~= "All" and Addon.RecipeUiFilters and Addon.RecipeUiFilters.IsSupportedProfession then
+        local profKey = Addon.RecipeUiFilters:NormalizeProfessionKey(profName)
+        if not Addon.RecipeUiFilters:IsSupportedProfession(profKey) then
+            filterContext = filterContext or {}
+            filterContext.allowUncataloguedRecipes = true
+        end
+    end
     local filterCacheKey = getFilterCacheKey(filterContext)
     local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode) .. "\t" .. searchMode .. "\t" .. tostring(categoryFilter or "") .. "\t" .. filterCacheKey
     self._recipeListCache = self._recipeListCache or {}
@@ -1255,6 +1309,13 @@ function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, catego
     searchMode = searchMode == "materials" and "materials" or "recipe"
     local categoryFilter = categoryFilterToken(categoryName)
     categoryFilter = categoryFilter and categoryFilter ~= "" and categoryFilter ~= "All" and categoryFilter or nil
+    if profName and profName ~= "All" and Addon.RecipeUiFilters and Addon.RecipeUiFilters.IsSupportedProfession then
+        local profKey = Addon.RecipeUiFilters:NormalizeProfessionKey(profName)
+        if not Addon.RecipeUiFilters:IsSupportedProfession(profKey) then
+            filterContext = filterContext or {}
+            filterContext.allowUncataloguedRecipes = true
+        end
+    end
     local filterCacheKey = getFilterCacheKey(filterContext)
     local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode) .. "\t" .. searchMode .. "\t" .. tostring(categoryFilter or "") .. "\t" .. filterCacheKey
     self._recipeListCache = self._recipeListCache or {}

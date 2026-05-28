@@ -89,6 +89,21 @@ function RecipeUiFilters:NormalizeProfessionKey(professionKey)
     return normalizeProfessionKey(professionKey)
 end
 
+-- The v1 metadata library only catalogues the eight crafting professions
+-- declared in PROFESSION_KEY_BY_DISPLAY. Gathering/auxiliary professions
+-- (Mining, First Aid, Fishing, Herbalism, Skinning) are out of scope, so
+-- the hide-uncatalogued gate must not apply to their recipes — there is no
+-- metadata to compare against and dropping their rows hides legitimate
+-- scan data.
+function RecipeUiFilters:IsSupportedProfession(professionKey)
+    if not professionKey then return false end
+    if PROFESSION_KEY_BY_DISPLAY[professionKey] then return true end
+    for _, canonical in pairs(PROFESSION_KEY_BY_DISPLAY) do
+        if canonical == professionKey then return true end
+    end
+    return false
+end
+
 function RecipeUiFilters:GetEffectiveExpansionVisibility(professionKey)
     local filters = getProfilePrefilters()
     local normalizedProfession = normalizeProfessionKey(professionKey)
@@ -138,7 +153,16 @@ function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
         -- First Aid, Fishing), so they stay visible per roadmap §9 even
         -- with the flag on.
         local numericKey = tonumber(recipeKey)
-        if profileFilters.hideUncataloguedRecipes ~= false and numericKey and numericKey > 0 then
+        -- Out-of-scope professions (Mining, First Aid, Fishing, ...) opt out
+        -- of the hide-uncatalogued gate via filterContext, because there is
+        -- no metadata to compare against — every recipe in those professions
+        -- is "uncatalogued" by definition and dropping them hides real scan
+        -- data, not garbage.
+        local skipUncataloguedGate = filterContext and filterContext.allowUncataloguedRecipes == true
+        if not skipUncataloguedGate
+            and profileFilters.hideUncataloguedRecipes ~= false
+            and numericKey and numericKey > 0
+        then
             Addon:Trace("filters", "metadata uncatalogued item-key recipe", recipeKey)
             return false, "hidden-uncatalogued"
         end

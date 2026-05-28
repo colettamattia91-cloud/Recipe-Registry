@@ -53,7 +53,7 @@ Test.it("prunes sidebar categories to those with recipes visible under a restric
         vanilla = false,
         tbc = true,
     }
-    data:InvalidateRecipeListCacheForFilter("alchemy", "visible-category-restrictive-test")
+    data:InvalidateRecipeCaches("visible-category-restrictive-test")
 
     local full = data:GetRecipeCategories("Alchemy", true)
     Test.truthy(#full > 0, "full taxonomy should expose categories")
@@ -62,16 +62,14 @@ Test.it("prunes sidebar categories to those with recipes visible under a restric
     Test.truthy(#visible > 0, "restrictive filter should still keep at least one category visible")
     Test.truthy(#visible <= #full, "visible categories are a subset of the full taxonomy")
 
-    -- Pruning is driven by the metadata nav-tree (which expansions a category
-    -- holds in the dataset), not by what the seeded user happens to own.
-    -- A category is visible iff the dataset has at least one recipe in it
-    -- under the visible expansions — assert that invariant directly.
+    -- Prune is driven by the user's owned recipes intersected with the
+    -- nav-tree under the active visibility, so categories with no owned
+    -- recipes are hidden even when the dataset has content for them.
     local fullSet = keySet(full)
     for _, row in ipairs(visible) do
         Test.truthy(fullSet[tostring(row.key)], "visible category must exist in the taxonomy")
-        local hasRecipe = addon.RecipeMetadata:CategoryHasRecipeUnderVisibility(
-            "alchemy", row.key, { vanilla = false, tbc = true })
-        Test.truthy(hasRecipe, "visible category must hold a recipe in the visible expansion")
+        local rows = data:GetRecipeList("Alchemy", "", "alpha", "recipe", row.key, SIDEBAR_CONTEXT)
+        Test.truthy(#rows > 0, "a visible category should contain at least one visible owned recipe")
     end
 end)
 
@@ -98,7 +96,7 @@ Test.it("drops every sidebar category when all expansions are hidden for the pro
         vanilla = false,
         tbc = false,
     }
-    data:InvalidateRecipeListCacheForFilter("alchemy", "visible-category-all-hidden-test")
+    data:InvalidateRecipeCaches("visible-category-all-hidden-test")
 
     -- The static taxonomy is filter-independent; only the visible projection prunes.
     Test.truthy(#data:GetRecipeCategories("Alchemy", true) > 0, "full taxonomy is unaffected by filters")

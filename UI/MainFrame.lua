@@ -1463,8 +1463,11 @@ function UI:CreateMainFrame()
     local profScroll = CreateFrame("ScrollFrame", nil, left, "UIPanelScrollFrameTemplate")
     profScroll:SetPoint("TOPLEFT", profLabel, "BOTTOMLEFT", -2, -8)
     profScroll:SetPoint("BOTTOMRIGHT", -28, 58)
+    -- profScroll uses UIPanelScrollFrameTemplate which renders a ~16-20px
+    -- scrollbar inside its right edge. Sizing profContent at 196 leaves the
+    -- scrollbar an unobstructed lane and avoids clipping button right edges.
     local profContent = CreateFrame("Frame", nil, profScroll)
-    profContent:SetSize(216, 1)
+    profContent:SetSize(196, 1)
     profScroll:SetScrollChild(profContent)
     f.profScroll = profScroll
     f.profContent = profContent
@@ -1472,9 +1475,7 @@ function UI:CreateMainFrame()
     f.profButtons = {}
     f.categoryButtons = {}
     for i, profName in ipairs(PROF_ORDER) do
-        -- Leave a small right margin inside profContent (216 wide) so the
-        -- button border doesn't visually clip against the sidebar's right edge.
-        local b = createCardStyleButton(profContent, 212, 24)
+        local b = createCardStyleButton(profContent, 192, 24)
         b:SetPoint("TOPLEFT", 0, -((i - 1) * 30))
         b:SetScript("OnClick", function()
             if UI.selectedProfession == profName then
@@ -2527,9 +2528,10 @@ function UI:RefreshProfessionButtons(opts)
             end
 
             if #categories > 0 then
-                -- profContent is 216 wide; size each row to fit its indent so
-                -- subcategory rows (deeper indent) don't bleed past the sidebar.
-                local function widthFor(indent) return 216 - indent - 4 end
+                -- profContent is 196 wide (sized to clear the sidebar's
+                -- scrollbar); size each row to fit its indent so subcategory
+                -- rows at the deeper indent don't bleed past it.
+                local function widthFor(indent) return 196 - indent - 4 end
                 categoryButtonIndex = categoryButtonIndex + 1
                 local allButton = self:EnsureCategoryButton(categoryButtonIndex)
                 allButton.categoryToken = nil
