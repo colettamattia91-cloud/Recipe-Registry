@@ -151,9 +151,15 @@ local function createButton(parent, text, width, onClick)
     return b
 end
 
+local SECTION_LEFT_X = 14
 local function createHeader(parent, text, anchor, yOffset)
     local header = parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    header:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, yOffset or -18)
+    -- Two-anchor trick: LEFT pins X to a fixed margin on the panel, TOP pins
+    -- Y to the previous element's bottom. Without the LEFT anchor each
+    -- header inherited the X of its anchor (which was usually an indented
+    -- help-text), and the panel staircased to the right with every section.
+    header:SetPoint("LEFT", parent, "LEFT", SECTION_LEFT_X, 0)
+    header:SetPoint("TOP", anchor, "BOTTOM", 0, yOffset or -18)
     header:SetText(text)
     return header
 end

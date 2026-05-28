@@ -1472,7 +1472,9 @@ function UI:CreateMainFrame()
     f.profButtons = {}
     f.categoryButtons = {}
     for i, profName in ipairs(PROF_ORDER) do
-        local b = createCardStyleButton(profContent, 216, 24)
+        -- Leave a small right margin inside profContent (216 wide) so the
+        -- button border doesn't visually clip against the sidebar's right edge.
+        local b = createCardStyleButton(profContent, 212, 24)
         b:SetPoint("TOPLEFT", 0, -((i - 1) * 30))
         b:SetScript("OnClick", function()
             if UI.selectedProfession == profName then
@@ -2519,6 +2521,9 @@ function UI:RefreshProfessionButtons(opts)
             end
 
             if #categories > 0 then
+                -- profContent is 216 wide; size each row to fit its indent so
+                -- subcategory rows (deeper indent) don't bleed past the sidebar.
+                local function widthFor(indent) return 216 - indent - 4 end
                 categoryButtonIndex = categoryButtonIndex + 1
                 local allButton = self:EnsureCategoryButton(categoryButtonIndex)
                 allButton.categoryToken = nil
@@ -2526,6 +2531,7 @@ function UI:RefreshProfessionButtons(opts)
                 allButton.categoryLabel = "All"
                 allButton:SetLabel("All")
                 allButton:SetSelected(self.selectedCategory == nil)
+                allButton:SetWidth(widthFor(14))
                 placeButton(allButton, 14, 20, 4)
 
                 for _, categoryRow in ipairs(categories) do
@@ -2547,6 +2553,7 @@ function UI:RefreshProfessionButtons(opts)
                         categoryButton:SetLabel(categoryLabel)
                     end
                     categoryButton:SetSelected(self.selectedCategory == categoryToken)
+                    categoryButton:SetWidth(widthFor(14))
                     placeButton(categoryButton, 14, 20, 4)
 
                     -- expanded: always show subcategories; accordion: only for the
@@ -2563,6 +2570,7 @@ function UI:RefreshProfessionButtons(opts)
                             subcategoryButton.categoryLabel = subcategoryRow.label or subcategoryRow.key
                             subcategoryButton:SetLabel(subcategoryButton.categoryLabel)
                             subcategoryButton:SetSelected(self.selectedCategory == subcategoryToken)
+                            subcategoryButton:SetWidth(widthFor(28))
                             placeButton(subcategoryButton, 28, 18, 3)
                         end
                     end
