@@ -35249,6 +35249,17 @@ RecipeRegistryRecipeMetadata = {
             { key = "materials", label = "Materials", order = 70 },
             { key = "misc", label = "Miscellaneous", order = 999 },
         },
+        mining = 
+        {
+            { key = "starter_bars", label = "Starter Bars", order = 10 },
+            { key = "low_bars", label = "Low-Tier Bars", order = 20 },
+            { key = "mid_bars", label = "Mid-Tier Bars", order = 30 },
+            { key = "high_bars", label = "High-Tier Bars", order = 40 },
+            { key = "elite_bars", label = "Elite Bars", order = 50 },
+            { key = "tbc_bars", label = "Outland Bars", order = 60 },
+            { key = "alloys", label = "Alloys", order = 70 },
+            { key = "misc", label = "Miscellaneous", order = 999 },
+        },
         tailoring = 
         {
             { key = "armor", label = "Cloth Armor", order = 10 },
@@ -35436,6 +35447,8 @@ RecipeRegistryRecipeMetadata = {
                 { key = "hands", label = "Hands", order = 70 },
                 { key = "wrist", label = "Wrist", order = 80 },
             },
+        },
+        mining = {
         },
         tailoring = {
             armor = 

@@ -1,0 +1,43 @@
+# Mining taxonomy: classification by SMELTING tier (Vanilla → TBC).
+# Mining is a gathering profession; its only recipes are Smelting spells
+# that turn raw ore into bars. The "tier" buckets keep them grouped the
+# way the in-game Smelting window does (Copper/Bronze first, then the
+# higher-tier metals).
+#
+# Recipe IDs become available only after the Wago provider is taught to
+# include the Mining SkillLine (186) and the snapshot is re-fetched +
+# regenerated. Until then the runtime falls back to the out-of-scope
+# visible-conservative path for Mining recipes.
+categories:
+  - key: starter_bars, label: Starter Bars, order: 10
+  - key: low_bars, label: Low-Tier Bars, order: 20
+  - key: mid_bars, label: Mid-Tier Bars, order: 30
+  - key: high_bars, label: High-Tier Bars, order: 40
+  - key: elite_bars, label: Elite Bars, order: 50
+  - key: tbc_bars, label: Outland Bars, order: 60
+  - key: alloys, label: Alloys, order: 70
+  - key: misc, label: Miscellaneous, order: 999
+subcategories:
+spells:
+  # Vanilla smelting (Copper through Thorium + alloys)
+  2657: category: starter_bars, sortOrder: 1   # Smelt Copper
+  2658: category: starter_bars, sortOrder: 20  # Smelt Silver
+  2659: category: starter_bars, sortOrder: 50  # Smelt Bronze
+  3304: category: low_bars, sortOrder: 65       # Smelt Tin
+  2660: category: low_bars, sortOrder: 75       # Smelt Gold
+  3307: category: low_bars, sortOrder: 100      # Smelt Iron
+  3308: category: mid_bars, sortOrder: 165      # Smelt Steel
+  10097: category: mid_bars, sortOrder: 175     # Smelt Mithril
+  10098: category: mid_bars, sortOrder: 230     # Smelt Truesilver
+  16153: category: high_bars, sortOrder: 245    # Smelt Thorium
+  14891: category: high_bars, sortOrder: 275    # Smelt Dark Iron
+  29686: category: elite_bars, sortOrder: 300   # Smelt Enchanted Thorium
+  29688: category: alloys, sortOrder: 300       # Smelt Arcanite
+  # TBC smelting (Outland metals + alloys)
+  29356: category: tbc_bars, sortOrder: 305     # Smelt Fel Iron
+  29358: category: tbc_bars, sortOrder: 325     # Smelt Adamantite
+  29359: category: alloys, sortOrder: 335       # Smelt Eternium
+  29360: category: alloys, sortOrder: 350       # Smelt Hardened Adamantite
+  29361: category: tbc_bars, sortOrder: 350     # Smelt Khorium
+  39728: category: alloys, sortOrder: 360       # Smelt Felsteel
+  39729: category: alloys, sortOrder: 370       # Smelt Hardened Khorium

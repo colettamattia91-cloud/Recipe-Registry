@@ -25,6 +25,7 @@ PROFESSION_BY_SKILL_LINE = {
     165: "leatherworking",
     171: "alchemy",
     185: "cooking",
+    186: "mining",        # Smelting recipes live under the Mining SkillLine
     197: "tailoring",
     202: "engineering",
     333: "enchanting",
