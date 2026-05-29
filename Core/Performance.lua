@@ -8,8 +8,14 @@ local tremove = table.remove
 local min = math.min
 
 local TICK_INTERVAL = 0.05
+-- Budget the scheduler is allowed to spend per timer tick (~50ms). Sized to
+-- fit two heavy jobs (e.g. two 12ms list-build steps) without overrunning
+-- by more than a frame. Per-job step budgets remain governed by
+-- opts.budgetMs / DEFAULT_BUDGET_MS — the tick budget is a cap, not the
+-- per-step budget.
+local TICK_BUDGET_MS = 30
 local DEFAULT_BUDGET_MS = 3
-local DEFAULT_MAX_STEPS = 6
+local DEFAULT_MAX_STEPS = 10
 
 local function nowMs()
     if type(debugprofilestop) == "function" then
@@ -216,7 +222,7 @@ end
 
 function Performance:RunNextStep()
     local startedAt = nowMs()
-    local budgetMs = DEFAULT_BUDGET_MS
+    local budgetMs = TICK_BUDGET_MS
     local remainingSteps = DEFAULT_MAX_STEPS
 
     while remainingSteps > 0 and (nowMs() - startedAt) < budgetMs do
@@ -226,18 +232,36 @@ function Performance:RunNextStep()
         local job = queue[1]
         if not job then break end
 
-        local keepGoing, elapsed = self:RunJobStep(job, budgetMs - (nowMs() - startedAt))
-        remainingSteps = remainingSteps - 1
-
-        if keepGoing then
-            tremove(queue, 1)
-            queue[#queue + 1] = job
-        else
-            tremove(queue, 1)
+        -- Honor per-job maxStepsPerRun: when the LIST build (or any other
+        -- job that opts into multi-step ticks) is selected, let it run up
+        -- to N consecutive steps before rotating the queue. This is how a
+        -- job declares "I want a fair share of the tick budget, not just
+        -- one slot." A 50ms scheduler tick used to give the list build a
+        -- single 3ms step before the next category round-robined in,
+        -- which dragged ~300-candidate professions out to 20s of wall
+        -- time despite only ~700ms of actual work.
+        local jobStepsLeft = job.maxStepsPerRun or 1
+        local completed = false
+        while jobStepsLeft > 0
+            and remainingSteps > 0
+            and (nowMs() - startedAt) < budgetMs
+        do
+            local keepGoing, elapsed = self:RunJobStep(job, budgetMs - (nowMs() - startedAt))
+            remainingSteps = remainingSteps - 1
+            jobStepsLeft = jobStepsLeft - 1
+            if not keepGoing then
+                tremove(queue, 1)
+                completed = true
+                break
+            end
+            if elapsed <= 0 then
+                break
+            end
         end
 
-        if elapsed <= 0 then
-            break
+        if not completed then
+            tremove(queue, 1)
+            queue[#queue + 1] = job
         end
     end
 
@@ -318,6 +342,7 @@ function Performance:GetDebugSnapshot()
         pendingUIRefresh = countKeys(self.pendingUIRefreshScopes),
         pausedCategories = self.pausedCategories,
         tickInterval = TICK_INTERVAL,
+        tickBudgetMs = TICK_BUDGET_MS,
         defaultBudgetMs = DEFAULT_BUDGET_MS,
     }
 end

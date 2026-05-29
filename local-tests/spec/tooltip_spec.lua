@@ -179,9 +179,11 @@ Test.it("restarts the tooltip rebuild when data changes again during an active b
     local addon, _wow, data, tooltip = freshAddon()
     local memberKey = "Craftertwo-TestRealm"
     -- Seed enough recipes that one scheduler tick won't finish the build,
-    -- so we can observe the mid-build invalidation/restart.
+    -- so we can observe the mid-build invalidation/restart. After
+    -- TICK_BUDGET_MS climbed to 30 and maxStepsPerRun is honored, a single
+    -- tick fits ~10 tooltip-job steps; the seed must outpace that.
     local recipes = {}
-    for key = 96001, 96500 do recipes[key] = true end
+    for key = 96001, 99000 do recipes[key] = true end
     local entry = data:GetOrCreateMember(memberKey)
     entry.owner = memberKey
     entry.updatedAt = 100
