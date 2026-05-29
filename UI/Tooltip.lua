@@ -186,6 +186,17 @@ function Tooltip:RunIndexBuildStep(state)
     local recipeKeys = state.recipeKeys or {}
     local recipeIndex = state.recipeIndex or {}
     local index = state.index or {}
+    -- Partial alignment with the UI predicate: the tooltip is informational
+    -- ("who knows this item / spell") and shouldn't follow user-preference
+    -- filters like expansion or BoP, because those answer a different
+    -- question. But it MUST honor the garbage gates — otherwise hovering an
+    -- ordinary item like a Worn Axe surfaces ghost crafter rows from old
+    -- mocks, and clearing those entries from one user's DB doesn't stop
+    -- their tooltip from showing them. Skip recipe keys that don't resolve
+    -- in the WoW client, plus positive item keys the metadata doesn't
+    -- catalogue (real-but-not-a-recipe items like Worn Axe).
+    local resolvableCheck = Addon.Data and Addon.Data.IsRecipeKeyResolvableInClient
+    local metadata = Addon.RecipeMetadata
 
     while state.cursor <= #recipeKeys and processed < TOOLTIP_INDEX_RECIPES_PER_STEP do
         local recipeKey = recipeKeys[state.cursor]
@@ -197,7 +208,22 @@ function Tooltip:RunIndexBuildStep(state)
         elseif numericKey and numericKey < 0 then
             key = makeSpellKey(-numericKey)
         end
-        if key and indexed and indexed.crafterRows and #indexed.crafterRows > 0 then
+        local skip = false
+        if resolvableCheck and not Addon.Data:IsRecipeKeyResolvableInClient(recipeKey) then
+            skip = true
+        elseif metadata and metadata.GetRecipeInfo
+            and metadata.metadataVersion  -- only enforce when metadata is actually loaded
+            and numericKey and numericKey > 0
+            and metadata:GetRecipeInfo(recipeKey) == nil
+        then
+            -- Positive item-key not catalogued: looks like a real item to
+            -- the WoW client but isn't a known recipe — drop from tooltip.
+            skip = true
+        end
+        if not skip
+            and key
+            and indexed and indexed.crafterRows and #indexed.crafterRows > 0
+        then
             addRecipeKey(index, key, recipeKey)
         end
         state.cursor = state.cursor + 1

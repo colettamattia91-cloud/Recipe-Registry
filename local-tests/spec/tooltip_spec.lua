@@ -136,21 +136,21 @@ end)
 Test.it("serves stale tooltip rows during a background rebuild after invalidation", function()
     local addon, _wow, data, tooltip = freshAddon()
     local memberKey = "Crafterone-TestRealm"
-    seedProfession(data, memberKey, "Alchemy", 95001, { sourceType = "replica" })
+    seedProfession(data, memberKey, "Alchemy", 22900, { sourceType = "replica" })
 
     data._recipeIndex = nil
     tooltip:RebuildIndex()
     local initialVersion = tooltip.indexVersion
-    local oldRows = tooltip:GetRowsForKey("item:95001")
+    local oldRows = tooltip:GetRowsForKey("item:22900")
     Test.eq(#(oldRows or {}), 1, "initial tooltip rows should exist")
 
     -- Mutate the profession block in place to add a second recipe, then
     -- invalidate the metadata cache. InvalidateIndex only marks dirty —
     -- the rebuild is deferred to the next hover or lifecycle event.
     local entry = data:GetMember(memberKey)
-    entry.professions.Alchemy.recipes[95002] = true
+    entry.professions.Alchemy.recipes[22907] = true
     entry.professions.Alchemy.count = 2
-    entry.professions.Alchemy.signature = "95001,95002"
+    entry.professions.Alchemy.signature = "22900,22907"
     data:InvalidateRecipeCaches("metadata")
 
     local queuesAfterInvalidate = addon.Performance:GetQueueLengths()
@@ -158,8 +158,8 @@ Test.it("serves stale tooltip rows during a background rebuild after invalidatio
         "invalidate alone should not schedule a tooltip rebuild")
     Test.truthy(tooltip.indexDirty, "invalidate should mark the tooltip index dirty")
 
-    local staleRows = tooltip:GetRowsForKey("item:95001")
-    local missingRows = tooltip:GetRowsForKey("item:95002")
+    local staleRows = tooltip:GetRowsForKey("item:22900")
+    local missingRows = tooltip:GetRowsForKey("item:22907")
     Test.eq(#(staleRows or {}), 1, "stale index should still serve previous rows during rebuild")
     Test.eq(#(missingRows or {}), 0, "new rows should not appear before the rebuild job runs")
     Test.eq(tooltip.indexVersion, initialVersion, "hover path should not rebuild synchronously")
@@ -170,7 +170,7 @@ Test.it("serves stale tooltip rows during a background rebuild after invalidatio
 
     runUntilIdle(addon)
 
-    local rebuiltRows = tooltip:GetRowsForKey("item:95002")
+    local rebuiltRows = tooltip:GetRowsForKey("item:22907")
     Test.eq(#(rebuiltRows or {}), 1, "new rows should appear after the background rebuild")
     Test.eq(tooltip.indexVersion, initialVersion + 1, "background rebuild should advance tooltip index version")
 end)
@@ -183,7 +183,7 @@ Test.it("restarts the tooltip rebuild when data changes again during an active b
     -- TICK_BUDGET_MS climbed to 30 and maxStepsPerRun is honored, a single
     -- tick fits ~10 tooltip-job steps; the seed must outpace that.
     local recipes = {}
-    for key = 96001, 99000 do recipes[key] = true end
+    for key = 96001, 99000 do recipes[-key] = true end
     local entry = data:GetOrCreateMember(memberKey)
     entry.owner = memberKey
     entry.updatedAt = 100
@@ -210,7 +210,7 @@ Test.it("restarts the tooltip rebuild when data changes again during an active b
     -- Bump the data while a build is mid-flight. The previous build's
     -- generation token is now stale; the next scheduler tick will abort
     -- it. Trigger a fresh build to pick up the new data.
-    entry.professions.Alchemy.recipes[97001] = true
+    entry.professions.Alchemy.recipes[-97001] = true
     entry.professions.Alchemy.count = 501
     entry.professions.Alchemy.signature = "many+97001"
     data:InvalidateRecipeCaches("metadata")
@@ -218,7 +218,7 @@ Test.it("restarts the tooltip rebuild when data changes again during an active b
 
     runUntilIdle(addon, 40)
 
-    local rows = tooltip:GetRowsForKey("item:97001")
+    local rows = tooltip:GetRowsForKey("spell:97001")
     Test.eq(#(rows or {}), 1, "latest data should win after invalidation during an active rebuild")
     Test.falsy(tooltip.indexDirty, "tooltip index should be clean after the restarted build completes")
 end)

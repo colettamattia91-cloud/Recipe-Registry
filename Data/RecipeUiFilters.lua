@@ -19,6 +19,7 @@ local PROFESSION_KEY_BY_DISPLAY = {
     Engineering = "engineering",
     Jewelcrafting = "jewelcrafting",
     Leatherworking = "leatherworking",
+    Mining = "mining",
     Tailoring = "tailoring",
 }
 

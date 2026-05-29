@@ -1315,7 +1315,18 @@ function Addon:SlashHandler(input)
     if cmd == "clean" or cmd == "repair" then
         local mode = trimInput(rest):lower()
         local dryRun = mode == "check" or mode == "dryrun" or mode == "dry-run" or mode == "preview"
-        local dataStats = self.Data and self.Data.CleanCorruptData and self.Data:CleanCorruptData({ dryRun = dryRun }) or {}
+        -- Match the auto-clean's behavior: also drop keys that don't resolve
+        -- against the WoW client DB (mock leftovers, aborted scan rows). The
+        -- previous handler only ran the "invalid key shape" check, so users
+        -- running /rr clean manually saw zero removals and assumed the
+        -- command was broken even though the warmup pass would have cleaned
+        -- the same data.
+        local dataStats = self.Data and self.Data.CleanCorruptData
+            and self.Data:CleanCorruptData({
+                dryRun = dryRun,
+                checkClientResolvable = true,
+            })
+            or {}
         local syncStats = self.Sync and self.Sync.CleanCorruptState and self.Sync:CleanCorruptState({ dryRun = dryRun }) or {}
         local repaired = (dataStats.repairedBlocks or 0) + (dataStats.repairedCounts or 0) + (dataStats.repairedSignatures or 0)
         self:Print(string.format(
