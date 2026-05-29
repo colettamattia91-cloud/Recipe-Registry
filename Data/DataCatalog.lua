@@ -20,7 +20,16 @@ local shouldRefreshItemName = Private.shouldRefreshItemName
 local MAX_RECIPE_LIST_CACHE_ENTRIES = 12
 local MAX_RECIPE_DETAIL_CACHE_ENTRIES = 256
 local RECIPES_PER_LIST_BUILD_STEP = 60
-local LIST_BUILD_BUDGET_MS = 3
+-- Budget per step and steps-per-tick are calibrated against the scheduler's
+-- 50ms tick interval. Telemetry on real guild data showed list builds
+-- spending ~130ms between steps (50ms tick + queue rotation) and finishing
+-- in tens of seconds for ~300 candidates — almost entirely scheduling
+-- latency, not work (per-candidate predicate cost is ~0.1-1ms). Three steps
+-- per tick × 12ms each yields ~36ms of work per 50ms tick, two frames of
+-- pause at 60 fps but a profession switch that completes in 300-500ms
+-- instead of 10+ seconds.
+local LIST_BUILD_BUDGET_MS = 12
+local LIST_BUILD_STEPS_PER_TICK = 3
 local MEMBERS_PER_INDEX_BUILD_STEP = 12
 local INDEX_BUILD_BUDGET_MS = 3
 local LIST_BUILD_TELEMETRY_CAPACITY = 10
@@ -1595,6 +1604,7 @@ function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, catego
             category = "ui-data",
             label = "recipe-list-build",
             budgetMs = LIST_BUILD_BUDGET_MS,
+            maxStepsPerRun = LIST_BUILD_STEPS_PER_TICK,
             state = jobState,
         })
     end)
@@ -1730,9 +1740,16 @@ function Data:RunRecipeListBuildStep(state, ctx)
 
     local currentGeneration = self._recipeListCacheGeneration or 0
     if currentGeneration ~= (state.cacheGenerationAtStart or 0) then
-        finalizeListBuildTelemetry(self, telemetry, "abandoned", out)
+        -- Data changed mid-build. Hand the result we just produced to the
+        -- caller so the user actually sees something this cycle — the UI
+        -- maintains its own _recipeListGeneration token that drops callbacks
+        -- for navigated-away states, so we don't paint over a profession the
+        -- user already left. Skip the list cache write so we never pin a
+        -- stale slice under a key a fresh build would otherwise overwrite;
+        -- the next refresh will recompute against current data.
+        finalizeListBuildTelemetry(self, telemetry, "stale-delivered", out)
         if state.onComplete then
-            state.onComplete(nil, false)
+            state.onComplete(out, false)
         end
         return false, state
     end
