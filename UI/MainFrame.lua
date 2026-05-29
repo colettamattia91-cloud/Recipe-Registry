@@ -3206,7 +3206,22 @@ function UI:RefreshRecipeList()
         function(rows, _wasCached)
             callbackFiredInline = true
             if self._recipeListGeneration ~= generation then return end
-            if not rows then return end
+            if not rows then
+                -- The recipe index was invalidated mid-build (warmup
+                -- traffic, scan completion, sync merge…). The original
+                -- callsite is supposed to follow up with a RequestRefresh
+                -- but some warmup paths don't, leaving the UI stuck on
+                -- "Loading…" forever. Defer a refresh ourselves; the
+                -- generation check above keeps us from racing a manual
+                -- profession change.
+                if Addon.ScheduleTimer then
+                    Addon:ScheduleTimer(function()
+                        if self._recipeListGeneration ~= generation then return end
+                        Addon:RequestRefresh("list-stale-retry")
+                    end, 0.25)
+                end
+                return
+            end
             self:_FinalizeRecipeList(rows, context, generation)
         end
     )

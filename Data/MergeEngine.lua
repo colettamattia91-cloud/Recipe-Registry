@@ -31,10 +31,17 @@ function MergeEngine:NormalizeIncomingBlockPayload(payload)
     if type(payload) ~= "table" then
         return nil
     end
+    -- Drop recipe keys the local WoW client doesn't recognise BEFORE they
+    -- enter the merge. Peers that haven't run the cleanup yet keep sending
+    -- ghost IDs from old mocks; without this gate every BLOCK_SNAPSHOT we
+    -- consume reseeds the corruption we just removed from our own DB.
+    local clientCheck = Addon and Addon.Data and Addon.Data.IsRecipeKeyResolvableInClient
     local recipeSet = {}
     for _, recipeKey in ipairs(payload.recipeKeys or {}) do
         if recipeKey ~= nil then
-            recipeSet[recipeKey] = true
+            if not clientCheck or Addon.Data:IsRecipeKeyResolvableInClient(recipeKey) then
+                recipeSet[recipeKey] = true
+            end
         end
     end
     return {

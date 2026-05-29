@@ -20,7 +20,13 @@ local isValidRecipeKey = Private.isValidRecipeKey
 -- spell IDs.
 local function isRecipeKeyResolvableInClient(recipeKey)
     local numeric = tonumber(recipeKey)
-    if not numeric then return false end
+    -- Non-numeric keys can't be classified against the WoW spell/item DB at
+    -- all. They shouldn't appear in production (real recipe keys are
+    -- positive item IDs or negative spell IDs) but a few synthetic strings
+    -- exist in unit specs and pre-rewrite favourites data. Treat them as
+    -- "unknown but harmless" rather than poisoning UI/sync paths with a
+    -- categorical false negative.
+    if not numeric then return true end
     if numeric < 0 then
         return type(GetSpellInfo) == "function" and GetSpellInfo(-numeric) ~= nil
     end
@@ -31,6 +37,13 @@ local function isRecipeKeyResolvableInClient(recipeKey)
         return type(GetItemInfo) == "function" and GetItemInfo(numeric) ~= nil
     end
     return false
+end
+
+-- Public accessor so the UI predicate and sync producer/consumer can share
+-- the same "is this key a real spell or item in the WoW client" check used
+-- by the auto-clean pass.
+function Data:IsRecipeKeyResolvableInClient(recipeKey)
+    return isRecipeKeyResolvableInClient(recipeKey)
 end
 
 local function newCorruptCleanStats()

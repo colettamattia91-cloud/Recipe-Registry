@@ -166,6 +166,17 @@ function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
             Addon:Trace("filters", "metadata uncatalogued item-key recipe", recipeKey)
             return false, "hidden-uncatalogued"
         end
+        -- Last-resort sanity check: if neither the metadata library nor the
+        -- WoW client knows about this recipe key, it's a ghost (old mock /
+        -- corrupted scan) and pretending it's a real recipe just keeps the
+        -- garbage propagating between peers. Hide it. The same predicate
+        -- guards the sync producer/consumer, so peers also stop echoing it.
+        if Addon.Data and Addon.Data.IsRecipeKeyResolvableInClient
+            and not Addon.Data:IsRecipeKeyResolvableInClient(recipeKey)
+        then
+            Addon:Trace("filters", "recipe key not resolvable in client", recipeKey)
+            return false, "hidden-not-in-client"
+        end
         Addon:Trace("filters", "metadata unresolved for recipe", recipeKey)
         return true, "visible-unresolved-conservative"
     end
