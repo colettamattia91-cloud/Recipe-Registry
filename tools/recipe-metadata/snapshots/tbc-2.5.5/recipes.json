@@ -16200,6 +16200,168 @@
     "spellId": 351771
   },
   {
+    "categoryHint": "mining.misc",
+    "createdItemId": 2840,
+    "firstSeenExpansion": "vanilla",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 2657
+  },
+  {
+    "categoryHint": "mining.misc",
+    "createdItemId": 2842,
+    "firstSeenExpansion": "vanilla",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 2658
+  },
+  {
+    "categoryHint": "mining.misc",
+    "createdItemId": 2841,
+    "firstSeenExpansion": "vanilla",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 2659
+  },
+  {
+    "categoryHint": "mining.misc",
+    "createdItemId": 3576,
+    "firstSeenExpansion": "vanilla",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 3304
+  },
+  {
+    "categoryHint": "mining.misc",
+    "createdItemId": 3575,
+    "firstSeenExpansion": "vanilla",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 3307
+  },
+  {
+    "categoryHint": "mining.misc",
+    "createdItemId": 3577,
+    "firstSeenExpansion": "vanilla",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 3308
+  },
+  {
+    "categoryHint": "mining.misc",
+    "createdItemId": 3859,
+    "firstSeenExpansion": "vanilla",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 3569
+  },
+  {
+    "categoryHint": "mining.misc",
+    "createdItemId": 3860,
+    "firstSeenExpansion": "vanilla",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 10097
+  },
+  {
+    "categoryHint": "mining.misc",
+    "createdItemId": 6037,
+    "firstSeenExpansion": "vanilla",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 10098
+  },
+  {
+    "categoryHint": "mining.misc",
+    "createdItemId": 11371,
+    "firstSeenExpansion": "vanilla",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 14891
+  },
+  {
+    "categoryHint": "mining.misc",
+    "createdItemId": 12359,
+    "firstSeenExpansion": "vanilla",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 16153
+  },
+  {
+    "categoryHint": "mining.misc",
+    "createdItemId": 17771,
+    "firstSeenExpansion": "vanilla",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 22967
+  },
+  {
+    "categoryHint": "mining.misc",
+    "createdItemId": 23445,
+    "firstSeenExpansion": "tbc",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 29356
+  },
+  {
+    "categoryHint": "mining.misc",
+    "createdItemId": 23446,
+    "firstSeenExpansion": "tbc",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 29358
+  },
+  {
+    "categoryHint": "mining.misc",
+    "createdItemId": 23447,
+    "firstSeenExpansion": "tbc",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 29359
+  },
+  {
+    "categoryHint": "mining.misc",
+    "createdItemId": 23448,
+    "firstSeenExpansion": "tbc",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 29360
+  },
+  {
+    "categoryHint": "mining.misc",
+    "createdItemId": 23449,
+    "firstSeenExpansion": "tbc",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 29361
+  },
+  {
+    "categoryHint": "mining.misc",
+    "createdItemId": 23573,
+    "firstSeenExpansion": "tbc",
+    "profession": "mining",
+    "recipeItemId": null,
+    "requiredSkill": null,
+    "spellId": 29686
+  },
+  {
     "categoryHint": "tailoring.misc",
     "createdItemId": 2568,
     "firstSeenExpansion": "vanilla",

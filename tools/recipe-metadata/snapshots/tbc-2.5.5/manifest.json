@@ -2,8 +2,8 @@
   "datasetKind": "release-candidate",
   "expectedRecipeCounts": {
     "byExpansion": {
-      "tbc": 893,
-      "vanilla": 1236
+      "tbc": 899,
+      "vanilla": 1248
     },
     "byProfession": {
       "alchemy": 186,
@@ -13,6 +13,7 @@
       "engineering": 250,
       "jewelcrafting": 261,
       "leatherworking": 379,
+      "mining": 18,
       "tailoring": 329
     },
     "byProfessionExpansion": {
@@ -43,12 +44,16 @@
         "tbc": 144,
         "vanilla": 235
       },
+      "mining": {
+        "tbc": 6,
+        "vanilla": 12
+      },
       "tailoring": {
         "tbc": 95,
         "vanilla": 234
       }
     },
-    "total": 2129
+    "total": 2147
   },
   "flavor": "tbc",
   "metadataVersion": "wago-wow-anniversary-tbc-2.5.5",
@@ -150,6 +155,6 @@
       "SpellReagents": 2659,
       "VanillaSkillLineAbility": 6143
     },
-    "records": 2129
+    "records": 2150
   }
 }
