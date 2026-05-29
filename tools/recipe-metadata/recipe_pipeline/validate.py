@@ -9,6 +9,7 @@ SUPPORTED_PROFESSIONS = (
     "engineering",
     "jewelcrafting",
     "leatherworking",
+    "mining",
     "tailoring",
 )
 SUPPORTED_EXPANSIONS = ("vanilla", "tbc")
