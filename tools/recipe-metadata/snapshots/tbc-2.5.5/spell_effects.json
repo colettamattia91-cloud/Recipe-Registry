@@ -746,6 +746,30 @@
   {
     "count": 1,
     "effectType": "reagent",
+    "itemId": 2770,
+    "spellId": 2657
+  },
+  {
+    "count": 1,
+    "effectType": "reagent",
+    "itemId": 2775,
+    "spellId": 2658
+  },
+  {
+    "count": 1,
+    "effectType": "reagent",
+    "itemId": 2840,
+    "spellId": 2659
+  },
+  {
+    "count": 1,
+    "effectType": "reagent",
+    "itemId": 3576,
+    "spellId": 2659
+  },
+  {
+    "count": 1,
+    "effectType": "reagent",
     "itemId": 2835,
     "spellId": 2660
   },
@@ -1438,6 +1462,24 @@
     "effectType": "reagent",
     "itemId": 3575,
     "spellId": 3297
+  },
+  {
+    "count": 1,
+    "effectType": "reagent",
+    "itemId": 2771,
+    "spellId": 3304
+  },
+  {
+    "count": 1,
+    "effectType": "reagent",
+    "itemId": 2772,
+    "spellId": 3307
+  },
+  {
+    "count": 1,
+    "effectType": "reagent",
+    "itemId": 2776,
+    "spellId": 3308
   },
   {
     "count": 8,
@@ -2398,6 +2440,18 @@
     "effectType": "reagent",
     "itemId": 3859,
     "spellId": 3515
+  },
+  {
+    "count": 1,
+    "effectType": "reagent",
+    "itemId": 3575,
+    "spellId": 3569
+  },
+  {
+    "count": 1,
+    "effectType": "reagent",
+    "itemId": 3857,
+    "spellId": 3569
   },
   {
     "count": 6,
@@ -8288,6 +8342,18 @@
   {
     "count": 1,
     "effectType": "reagent",
+    "itemId": 3858,
+    "spellId": 10097
+  },
+  {
+    "count": 1,
+    "effectType": "reagent",
+    "itemId": 7911,
+    "spellId": 10098
+  },
+  {
+    "count": 1,
+    "effectType": "reagent",
     "itemId": 8150,
     "spellId": 10482
   },
@@ -12150,6 +12216,12 @@
     "spellId": 14810
   },
   {
+    "count": 8,
+    "effectType": "reagent",
+    "itemId": 11370,
+    "spellId": 14891
+  },
+  {
     "count": 4,
     "effectType": "reagent",
     "itemId": 4291,
@@ -12562,6 +12634,12 @@
     "effectType": "reagent",
     "itemId": 7068,
     "spellId": 15973
+  },
+  {
+    "count": 1,
+    "effectType": "reagent",
+    "itemId": 10620,
+    "spellId": 16153
   },
   {
     "count": 4,
@@ -18874,6 +18952,30 @@
     "effectType": "reagent",
     "itemId": 15407,
     "spellId": 22928
+  },
+  {
+    "count": 10,
+    "effectType": "reagent",
+    "itemId": 12360,
+    "spellId": 22967
+  },
+  {
+    "count": 1,
+    "effectType": "reagent",
+    "itemId": 17010,
+    "spellId": 22967
+  },
+  {
+    "count": 1,
+    "effectType": "reagent",
+    "itemId": 18562,
+    "spellId": 22967
+  },
+  {
+    "count": 3,
+    "effectType": "reagent",
+    "itemId": 18567,
+    "spellId": 22967
   },
   {
     "count": 1,
@@ -25728,6 +25830,42 @@
     "spellId": 28957
   },
   {
+    "count": 2,
+    "effectType": "reagent",
+    "itemId": 23424,
+    "spellId": 29356
+  },
+  {
+    "count": 2,
+    "effectType": "reagent",
+    "itemId": 23425,
+    "spellId": 29358
+  },
+  {
+    "count": 2,
+    "effectType": "reagent",
+    "itemId": 23427,
+    "spellId": 29359
+  },
+  {
+    "count": 3,
+    "effectType": "reagent",
+    "itemId": 23445,
+    "spellId": 29360
+  },
+  {
+    "count": 2,
+    "effectType": "reagent",
+    "itemId": 23447,
+    "spellId": 29360
+  },
+  {
+    "count": 2,
+    "effectType": "reagent",
+    "itemId": 23426,
+    "spellId": 29361
+  },
+  {
     "count": 4,
     "effectType": "reagent",
     "itemId": 23445,
@@ -26452,6 +26590,12 @@
     "effectType": "reagent",
     "itemId": 23573,
     "spellId": 29672
+  },
+  {
+    "count": 10,
+    "effectType": "reagent",
+    "itemId": 23446,
+    "spellId": 29686
   },
   {
     "count": 1,
@@ -31848,6 +31992,18 @@
     "spellId": 35591
   },
   {
+    "count": 1,
+    "effectType": "reagent",
+    "itemId": 22452,
+    "spellId": 35750
+  },
+  {
+    "count": 1,
+    "effectType": "reagent",
+    "itemId": 21884,
+    "spellId": 35751
+  },
+  {
     "count": 8,
     "effectType": "reagent",
     "itemId": 7081,
@@ -36916,6 +37072,18 @@
     "effectType": "reagent",
     "itemId": 23573,
     "spellId": 46144
+  },
+  {
+    "count": 3,
+    "effectType": "reagent",
+    "itemId": 23449,
+    "spellId": 46353
+  },
+  {
+    "count": 1,
+    "effectType": "reagent",
+    "itemId": 23573,
+    "spellId": 46353
   },
   {
     "count": 1,

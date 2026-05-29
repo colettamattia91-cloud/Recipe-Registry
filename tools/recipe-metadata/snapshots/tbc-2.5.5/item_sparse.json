@@ -955,8 +955,40 @@
     "armorType": null,
     "bindType": 0,
     "inventorySlot": null,
+    "itemId": 2770,
+    "name": "Copper Ore",
+    "weaponClass": null
+  },
+  {
+    "armorType": null,
+    "bindType": 0,
+    "inventorySlot": null,
+    "itemId": 2771,
+    "name": "Tin Ore",
+    "weaponClass": null
+  },
+  {
+    "armorType": null,
+    "bindType": 0,
+    "inventorySlot": null,
     "itemId": 2772,
     "name": "Iron Ore",
+    "weaponClass": null
+  },
+  {
+    "armorType": null,
+    "bindType": 0,
+    "inventorySlot": null,
+    "itemId": 2775,
+    "name": "Silver Ore",
+    "weaponClass": null
+  },
+  {
+    "armorType": null,
+    "bindType": 0,
+    "inventorySlot": null,
+    "itemId": 2776,
+    "name": "Gold Ore",
     "weaponClass": null
   },
   {
@@ -1707,6 +1739,14 @@
     "armorType": null,
     "bindType": 0,
     "inventorySlot": null,
+    "itemId": 3576,
+    "name": "Tin Bar",
+    "weaponClass": null
+  },
+  {
+    "armorType": null,
+    "bindType": 0,
+    "inventorySlot": null,
     "itemId": 3577,
     "name": "Gold Bar",
     "weaponClass": null
@@ -2230,6 +2270,14 @@
     "itemId": 3856,
     "name": "Shadow Crescent Axe",
     "weaponClass": "axe"
+  },
+  {
+    "armorType": null,
+    "bindType": 0,
+    "inventorySlot": null,
+    "itemId": 3857,
+    "name": "Coal",
+    "weaponClass": null
   },
   {
     "armorType": null,
@@ -6331,6 +6379,14 @@
     "armorType": null,
     "bindType": 0,
     "inventorySlot": null,
+    "itemId": 7911,
+    "name": "Truesilver Ore",
+    "weaponClass": null
+  },
+  {
+    "armorType": null,
+    "bindType": 0,
+    "inventorySlot": null,
     "itemId": 7912,
     "name": "Solid Stone",
     "weaponClass": null
@@ -9493,6 +9549,14 @@
     "inventorySlot": null,
     "itemId": 11291,
     "name": "Star Wood",
+    "weaponClass": null
+  },
+  {
+    "armorType": null,
+    "bindType": 0,
+    "inventorySlot": null,
+    "itemId": 11370,
+    "name": "Dark Iron Ore",
     "weaponClass": null
   },
   {
@@ -14595,6 +14659,14 @@
     "armorType": null,
     "bindType": 0,
     "inventorySlot": null,
+    "itemId": 17771,
+    "name": "Elementium Bar",
+    "weaponClass": null
+  },
+  {
+    "armorType": null,
+    "bindType": 0,
+    "inventorySlot": null,
     "itemId": 18045,
     "name": "Tender Wolf Steak",
     "weaponClass": null
@@ -15029,6 +15101,22 @@
     "inventorySlot": null,
     "itemId": 18519,
     "name": "Pattern: Shifting Cloak",
+    "weaponClass": null
+  },
+  {
+    "armorType": null,
+    "bindType": 0,
+    "inventorySlot": null,
+    "itemId": 18562,
+    "name": "Elementium Ore",
+    "weaponClass": null
+  },
+  {
+    "armorType": null,
+    "bindType": 0,
+    "inventorySlot": null,
+    "itemId": 18567,
+    "name": "Elemental Flux",
     "weaponClass": null
   },
   {
@@ -20405,6 +20493,30 @@
     "inventorySlot": null,
     "itemId": 23155,
     "name": "Design: Lustrous Azure Moonstone",
+    "weaponClass": null
+  },
+  {
+    "armorType": null,
+    "bindType": 0,
+    "inventorySlot": null,
+    "itemId": 23424,
+    "name": "Fel Iron Ore",
+    "weaponClass": null
+  },
+  {
+    "armorType": null,
+    "bindType": 0,
+    "inventorySlot": null,
+    "itemId": 23425,
+    "name": "Adamantite Ore",
+    "weaponClass": null
+  },
+  {
+    "armorType": null,
+    "bindType": 0,
+    "inventorySlot": null,
+    "itemId": 23426,
+    "name": "Khorium Ore",
     "weaponClass": null
   },
   {
@@ -29589,6 +29701,14 @@
     "inventorySlot": null,
     "itemId": 35219,
     "name": "Pattern: Sun-Drenched Scale Chestguard",
+    "weaponClass": null
+  },
+  {
+    "armorType": null,
+    "bindType": 1,
+    "inventorySlot": null,
+    "itemId": 35273,
+    "name": "Study of Advanced Smelting",
     "weaponClass": null
   },
   {

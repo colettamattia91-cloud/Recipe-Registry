@@ -1,7 +1,7 @@
 # Recipe Metadata Reagent Coverage
 
-Recipes requiring reagent metadata: 2125
-Resolved reagents: 2125
+Recipes requiring reagent metadata: 2143
+Resolved reagents: 2143
 Coverage: 100%
 
 | Spell ID | Profession | Reagents |
@@ -57,6 +57,9 @@ Coverage: 100%
 | 2547 | cooking | 2 |
 | 2548 | cooking | 2 |
 | 2549 | cooking | 2 |
+| 2657 | mining | 1 |
+| 2658 | mining | 1 |
+| 2659 | mining | 2 |
 | 2660 | blacksmithing | 1 |
 | 2661 | blacksmithing | 1 |
 | 2662 | blacksmithing | 1 |
@@ -101,6 +104,9 @@ Coverage: 100%
 | 3295 | blacksmithing | 6 |
 | 3296 | blacksmithing | 6 |
 | 3297 | blacksmithing | 6 |
+| 3304 | mining | 1 |
+| 3307 | mining | 1 |
+| 3308 | mining | 1 |
 | 3319 | blacksmithing | 1 |
 | 3320 | blacksmithing | 1 |
 | 3321 | blacksmithing | 2 |
@@ -153,6 +159,7 @@ Coverage: 100%
 | 3511 | blacksmithing | 3 |
 | 3513 | blacksmithing | 4 |
 | 3515 | blacksmithing | 3 |
+| 3569 | mining | 2 |
 | 3753 | leatherworking | 2 |
 | 3755 | tailoring | 2 |
 | 3756 | leatherworking | 2 |
@@ -495,6 +502,8 @@ Coverage: 100%
 | 10011 | blacksmithing | 5 |
 | 10013 | blacksmithing | 5 |
 | 10015 | blacksmithing | 6 |
+| 10097 | mining | 1 |
+| 10098 | mining | 1 |
 | 10482 | leatherworking | 2 |
 | 10487 | leatherworking | 2 |
 | 10490 | leatherworking | 3 |
@@ -730,6 +739,7 @@ Coverage: 100%
 | 14807 | enchanting | 2 |
 | 14809 | enchanting | 3 |
 | 14810 | enchanting | 3 |
+| 14891 | mining | 1 |
 | 14930 | leatherworking | 4 |
 | 14932 | leatherworking | 4 |
 | 15255 | engineering | 3 |
@@ -755,6 +765,7 @@ Coverage: 100%
 | 15935 | cooking | 2 |
 | 15972 | blacksmithing | 5 |
 | 15973 | blacksmithing | 4 |
+| 16153 | mining | 1 |
 | 16639 | blacksmithing | 1 |
 | 16640 | blacksmithing | 2 |
 | 16641 | blacksmithing | 1 |
@@ -1069,6 +1080,7 @@ Coverage: 100%
 | 22926 | leatherworking | 6 |
 | 22927 | leatherworking | 6 |
 | 22928 | leatherworking | 6 |
+| 22967 | mining | 4 |
 | 23066 | engineering | 2 |
 | 23067 | engineering | 2 |
 | 23068 | engineering | 2 |
@@ -1442,6 +1454,11 @@ Coverage: 100%
 | 28953 | jewelcrafting | 1 |
 | 28955 | jewelcrafting | 1 |
 | 28957 | jewelcrafting | 1 |
+| 29356 | mining | 1 |
+| 29358 | mining | 1 |
+| 29359 | mining | 1 |
+| 29360 | mining | 2 |
+| 29361 | mining | 1 |
 | 29545 | blacksmithing | 1 |
 | 29547 | blacksmithing | 1 |
 | 29548 | blacksmithing | 1 |
@@ -1492,6 +1509,7 @@ Coverage: 100%
 | 29669 | blacksmithing | 3 |
 | 29671 | blacksmithing | 3 |
 | 29672 | blacksmithing | 4 |
+| 29686 | mining | 1 |
 | 29688 | alchemy | 5 |
 | 29692 | blacksmithing | 4 |
 | 29693 | blacksmithing | 4 |
