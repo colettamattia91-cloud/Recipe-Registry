@@ -49,18 +49,102 @@ local function summarizeOfferedBlocks(offeredBlocks)
     return flattenSorted(reasonCounts), flattenSorted(profCounts), table.concat(blockKeys, ",")
 end
 
-function Sync:BuildWantedBlockOrder(offeredBlocks)
+-- Skip blocks that have repeatedly delivered no progress from a given
+-- peer. Cross-version sync (older clients with different recipe-key
+-- validation against a current build) can produce blocks whose
+-- fingerprint never converges because the two sides disagree on which
+-- keys belong in contentKeys.
+-- Pulling them forever burns bandwidth and CPU on both ends. The
+-- saturation tracker (see RecordBlockNoProgress) raises a per-(peer,
+-- block) cooldown after a couple of zero-add pulls; this filter honors
+-- it until the cooldown expires. Also applies broadly — temporary
+-- corruption on a single peer, missing locale tokens, future version
+-- skew, etc. — so it stays useful beyond any specific transition.
+local BLOCK_SATURATION_NO_PROGRESS_THRESHOLD = 2
+local BLOCK_SATURATION_COOLDOWN_SECONDS = 300
+
+local function getSaturationEntry(self, peerKey, blockKey, create)
+    if type(peerKey) ~= "string" or peerKey == "" then return nil end
+    if type(blockKey) ~= "string" or blockKey == "" then return nil end
+    self._blockSaturation = self._blockSaturation or {}
+    local peerTable = self._blockSaturation[peerKey]
+    if not peerTable then
+        if not create then return nil end
+        peerTable = {}
+        self._blockSaturation[peerKey] = peerTable
+    end
+    local entry = peerTable[blockKey]
+    if not entry and create then
+        entry = { noProgressCount = 0, saturatedUntil = 0 }
+        peerTable[blockKey] = entry
+    end
+    return entry
+end
+
+function Sync:IsBlockSaturated(peerKey, blockKey)
+    local entry = getSaturationEntry(self, peerKey, blockKey, false)
+    if not entry then return false end
+    local now = time()
+    if (entry.saturatedUntil or 0) <= now then
+        -- Cooldown expired: clear the counter so the next pull gets a
+        -- fresh chance to converge (e.g. peer may have updated in the
+        -- meantime).
+        entry.saturatedUntil = 0
+        entry.noProgressCount = 0
+        return false
+    end
+    return true
+end
+
+function Sync:RecordBlockNoProgress(peerKey, blockKey)
+    local entry = getSaturationEntry(self, peerKey, blockKey, true)
+    if not entry then return end
+    entry.noProgressCount = (entry.noProgressCount or 0) + 1
+    if entry.noProgressCount >= BLOCK_SATURATION_NO_PROGRESS_THRESHOLD then
+        entry.saturatedUntil = time() + BLOCK_SATURATION_COOLDOWN_SECONDS
+        Addon:Tracef("sync",
+            "block-saturation-set peer=%s block=%s noProgressCount=%d cooldownSeconds=%d",
+            tostring(peerKey),
+            tostring(blockKey),
+            entry.noProgressCount,
+            BLOCK_SATURATION_COOLDOWN_SECONDS
+        )
+    end
+end
+
+function Sync:ResetBlockSaturation(peerKey, blockKey)
+    local entry = getSaturationEntry(self, peerKey, blockKey, false)
+    if entry then
+        entry.noProgressCount = 0
+        entry.saturatedUntil = 0
+    end
+end
+
+function Sync:BuildWantedBlockOrder(offeredBlocks, peerKey)
     local rows = {}
+    local skipped = 0
     for index = 1, #(offeredBlocks or {}) do
         local row = offeredBlocks[index]
         if type(row) == "table" and type(row.blockKey) == "string" and row.blockKey ~= "" then
-            rows[#rows + 1] = {
-                blockKey = row.blockKey,
-                count = tonumber(row.count or 0) or 0,
-                fingerprint = row.fingerprint,
-                reason = row.reason,
-            }
+            if peerKey and self:IsBlockSaturated(peerKey, row.blockKey) then
+                skipped = skipped + 1
+            else
+                rows[#rows + 1] = {
+                    blockKey = row.blockKey,
+                    count = tonumber(row.count or 0) or 0,
+                    fingerprint = row.fingerprint,
+                    reason = row.reason,
+                }
+            end
         end
+    end
+    if skipped > 0 then
+        Addon:Tracef("sync",
+            "block-saturation-skip peer=%s skipped=%d kept=%d",
+            tostring(peerKey or "unknown"),
+            skipped,
+            #rows
+        )
     end
     table.sort(rows, function(left, right)
         if (left.count or 0) ~= (right.count or 0) then
@@ -286,8 +370,8 @@ function Sync:HandleReceivedIndexDiffResponse(payload)
 
     session.lastProgressAt = time()
     session.state = "index-diff-ready"
-    session.offeredBlocks = self:BuildWantedBlockOrder(payload.offeredBlocks or {})
-    session.wantedBlocks = self:BuildWantedBlockOrder(payload.offeredBlocks or {})
+    session.offeredBlocks = self:BuildWantedBlockOrder(payload.offeredBlocks or {}, payload.sender)
+    session.wantedBlocks = self:BuildWantedBlockOrder(payload.offeredBlocks or {}, payload.sender)
     session.nextWantedIndex = 1
     self.telemetry.indexDiffResponseReceived = (self.telemetry.indexDiffResponseReceived or 0) + 1
     self.telemetry.blocksOffered = (self.telemetry.blocksOffered or 0) + #(session.offeredBlocks or {})

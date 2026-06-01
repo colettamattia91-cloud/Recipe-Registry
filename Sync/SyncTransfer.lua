@@ -150,6 +150,25 @@ function Sync:HandleReceivedBlockSnapshot(payload)
         tostring(specChanged)
     )
 
+    -- Saturation tracking: when a peer keeps offering a block whose pull
+    -- delivers nothing new, we've likely hit a cross-version or locale
+    -- divergence where our and their contentKeys can't converge. Mark
+    -- the (peer, block) for backoff so future INDEX_DIFF responses don't
+    -- re-queue this block until the cooldown expires. Any pull that
+    -- DOES make progress (added recipes, spec change, or empty incoming
+    -- which signals the peer dropped the block) resets the counter.
+    if payload.sender and payload.blockKey then
+        if incomingRecipeCount > 0 and addedRecipes == 0 and not specChanged then
+            if self.RecordBlockNoProgress then
+                self:RecordBlockNoProgress(payload.sender, payload.blockKey)
+            end
+        else
+            if self.ResetBlockSaturation then
+                self:ResetBlockSaturation(payload.sender, payload.blockKey)
+            end
+        end
+    end
+
     session.successfulBlockMerges = (session.successfulBlockMerges or 0) + 1
     session.lastMergedBlockFingerprint = nil
     session.activeBlockKey = nil
