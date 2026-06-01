@@ -188,13 +188,20 @@ function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
         return true, "visible-unresolved-conservative"
     end
 
-    local expansion = metadata:GetRecipeExpansion(recipeKey, info)
-    local visibility = self:GetEffectiveExpansionVisibility(professionKey)
-    if expansion == "vanilla" and visibility.vanilla == false then
-        return false, "hidden-expansion"
-    end
-    if expansion == "tbc" and visibility.tbc == false then
-        return false, "hidden-expansion"
+    -- Mining is expansion-agnostic in the UI: 18 smelting spells total,
+    -- shallow sidebar, so vanilla and TBC bars share one view regardless
+    -- of the user's selected expansion. Skip the per-recipe expansion gate
+    -- for mining so e.g. Smelt Truesilver (vanilla) stays visible under
+    -- a TBC filter view. Matches BuildVisibleSpellIdHash's special-case.
+    if professionKey ~= "mining" then
+        local expansion = metadata:GetRecipeExpansion(recipeKey, info)
+        local visibility = self:GetEffectiveExpansionVisibility(professionKey)
+        if expansion == "vanilla" and visibility.vanilla == false then
+            return false, "hidden-expansion"
+        end
+        if expansion == "tbc" and visibility.tbc == false then
+            return false, "hidden-expansion"
+        end
     end
 
     local ctx = filterContext or {}

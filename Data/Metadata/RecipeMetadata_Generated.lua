@@ -15820,8 +15820,8 @@ RecipeRegistryRecipeMetadata = {
             profession = "mining",
             expansion = "vanilla",
             createdItemId = 17771,
-            category = "elementals",
-            sortOrder = 10,
+            category = "metals",
+            sortOrder = 120,
             bopOutput = false,
             reagents = {
                 { itemId = 12360, count = 10 },
@@ -21626,8 +21626,8 @@ RecipeRegistryRecipeMetadata = {
             profession = "mining",
             expansion = "tbc",
             createdItemId = 23448,
-            category = "elementals",
-            sortOrder = 20,
+            category = "metals",
+            sortOrder = 230,
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 3 },
@@ -21639,7 +21639,7 @@ RecipeRegistryRecipeMetadata = {
             expansion = "tbc",
             createdItemId = 23449,
             category = "metals",
-            sortOrder = 230,
+            sortOrder = 240,
             bopOutput = false,
             reagents = {
                 { itemId = 23426, count = 2 },
@@ -22394,8 +22394,8 @@ RecipeRegistryRecipeMetadata = {
             profession = "mining",
             expansion = "tbc",
             createdItemId = 23573,
-            category = "elementals",
-            sortOrder = 30,
+            category = "metals",
+            sortOrder = 250,
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 10 },
@@ -27302,6 +27302,28 @@ RecipeRegistryRecipeMetadata = {
             reagents = {
                 { itemId = 23571, count = 3 },
                 { itemId = 23793, count = 4 },
+            },
+        },
+        [35750] = {
+            profession = "mining",
+            expansion = "tbc",
+            createdItemId = 22573,
+            category = "metals",
+            sortOrder = 300,
+            bopOutput = false,
+            reagents = {
+                { itemId = 22452, count = 1 },
+            },
+        },
+        [35751] = {
+            profession = "mining",
+            expansion = "tbc",
+            createdItemId = 22574,
+            category = "metals",
+            sortOrder = 310,
+            bopOutput = false,
+            reagents = {
+                { itemId = 21884, count = 1 },
             },
         },
         [36074] = {
@@ -34646,6 +34668,8 @@ RecipeRegistryRecipeMetadata = {
         [22463] = { 32667 },
         [22521] = { 28016 },
         [22522] = { 28019 },
+        [22573] = { 35750 },
+        [22574] = { 35751 },
         [22645] = { 28267 },
         [22652] = { 28207 },
         [22654] = { 28205 },
@@ -35472,7 +35496,6 @@ RecipeRegistryRecipeMetadata = {
         mining = 
         {
             { key = "metals", label = "Metals", order = 10 },
-            { key = "elementals", label = "Elemental Alloys", order = 20 },
             { key = "misc", label = "Miscellaneous", order = 999 },
         },
         tailoring = 
@@ -35936,12 +35959,9 @@ RecipeRegistryRecipeMetadata = {
                 },
             },
             ["mining"] = {
-                _all = { 29356, 29358, 29359, 29360, 29361, 29686 },
-                ["elementals"] = {
-                    _all = { 29360, 29686 },
-                },
+                _all = { 29356, 29358, 29359, 29360, 29361, 29686, 35750, 35751 },
                 ["metals"] = {
-                    _all = { 29356, 29358, 29359, 29361 },
+                    _all = { 29356, 29358, 29359, 29360, 29361, 29686, 35750, 35751 },
                 },
             },
             ["tailoring"] = {
@@ -36211,11 +36231,8 @@ RecipeRegistryRecipeMetadata = {
             },
             ["mining"] = {
                 _all = { 2657, 2658, 2659, 3304, 3307, 3308, 3569, 10097, 10098, 14891, 16153, 22967 },
-                ["elementals"] = {
-                    _all = { 22967 },
-                },
                 ["metals"] = {
-                    _all = { 2657, 2658, 2659, 3304, 3307, 3308, 3569, 10097, 10098, 14891, 16153 },
+                    _all = { 2657, 2658, 2659, 3304, 3307, 3308, 3569, 10097, 10098, 14891, 16153, 22967 },
                 },
             },
             ["tailoring"] = {

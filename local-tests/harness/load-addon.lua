@@ -120,6 +120,16 @@ function Loader.Load(opts)
             addonMetadata = opts.addonMetadata,
         })
     end
+    -- Sync gates and the tooltip garbage filter call
+    -- `Data:IsRecipeKeyCatalogued` to drop real-but-not-a-recipe items
+    -- (Worn Axe and similar). Many specs seed synthetic positive recipe
+    -- keys that don't exist in production metadata, so the global flag
+    -- below lets the test harness bypass that strict check while keeping
+    -- the looser "resolvable in client" check active. Set it to nil if a
+    -- specific spec wants the production behavior.
+    _G._RR_TEST_HARNESS_BYPASS_CATALOGUE_GATE = opts.enforceCatalogueGate
+        and nil
+        or true
 
     local files = opts.files or Loader.BackendFiles
     -- Unit specs that assert exact record-level facts load a small, stable

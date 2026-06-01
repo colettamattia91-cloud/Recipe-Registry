@@ -46,6 +46,51 @@ function Data:IsRecipeKeyResolvableInClient(recipeKey)
     return isRecipeKeyResolvableInClient(recipeKey)
 end
 
+-- Stricter than IsRecipeKeyResolvableInClient: a key is "catalogued" only
+-- when the metadata library actually maps it to a recipe. Catches real
+-- items that aren't recipes — e.g. Worn Axe (item 2196 is a valid item
+-- so GetItemInfoInstant returns non-nil, but no recipe spell maps to it).
+-- Used by /rr clean and by the sync garbage gate; auto-clean stays
+-- conservative because metadata may not be loaded yet at warmup.
+local function isRecipeKeyCatalogued(metadata, recipeKey)
+    if not metadata then return true end
+    local numeric = tonumber(recipeKey)
+    if not numeric then return true end  -- non-numeric: can't classify
+    if numeric < 0 then
+        local records = metadata._recordsBySpellId
+        return records and records[-numeric] ~= nil
+    end
+    if numeric > 0 then
+        local generated = metadata._generated
+        if not generated then return true end
+        if generated.recipeItemToSpellId and generated.recipeItemToSpellId[numeric] then
+            return true
+        end
+        if generated.createdItemToSpellIds and generated.createdItemToSpellIds[numeric] then
+            return true
+        end
+        return false
+    end
+    return false
+end
+
+-- Public accessor for sync gates and tooltip garbage filter. Returns true
+-- when metadata isn't loaded yet, so callers don't reject good data during
+-- warmup before the library has populated its lookup tables. Also returns
+-- true when the test harness has asked to bypass the strict check (many
+-- specs seed synthetic positive recipe keys that aren't in production
+-- metadata; the bypass keeps them passing without weakening the gate).
+function Data:IsRecipeKeyCatalogued(recipeKey)
+    if _G._RR_TEST_HARNESS_BYPASS_CATALOGUE_GATE then
+        return true
+    end
+    local metadata = Addon and Addon.RecipeMetadata
+    if not metadata or not metadata.metadataVersion then
+        return true
+    end
+    return isRecipeKeyCatalogued(metadata, recipeKey)
+end
+
 local function newCorruptCleanStats()
     return {
         removedMembers = 0,
@@ -228,6 +273,20 @@ function Data:ShouldCleanRecipeFromProfession(profName, recipeKey, opts)
     then
         if not isRecipeKeyResolvableInClient(recipeKey) then
             return true, "not-in-client"
+        end
+    end
+
+    -- Stricter, opt-in via /rr clean: drop keys the metadata library doesn't
+    -- map to any recipe. Catches real items that aren't recipes (Worn Axe
+    -- and friends), which the resolvable-in-client check lets through
+    -- because they're valid WoW items. Auto-clean doesn't pass this flag
+    -- because metadata might not be ready 8s after login.
+    if opts.checkMetadataCatalogued then
+        local metadata = Addon and Addon.RecipeMetadata
+        if metadata and metadata.metadataVersion
+            and not isRecipeKeyCatalogued(metadata, recipeKey)
+        then
+            return true, "not-in-metadata"
         end
     end
 

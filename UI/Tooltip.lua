@@ -196,7 +196,7 @@ function Tooltip:RunIndexBuildStep(state)
     -- in the WoW client, plus positive item keys the metadata doesn't
     -- catalogue (real-but-not-a-recipe items like Worn Axe).
     local resolvableCheck = Addon.Data and Addon.Data.IsRecipeKeyResolvableInClient
-    local metadata = Addon.RecipeMetadata
+    local cataloguedCheck = Addon.Data and Addon.Data.IsRecipeKeyCatalogued
 
     while state.cursor <= #recipeKeys and processed < TOOLTIP_INDEX_RECIPES_PER_STEP do
         local recipeKey = recipeKeys[state.cursor]
@@ -211,13 +211,10 @@ function Tooltip:RunIndexBuildStep(state)
         local skip = false
         if resolvableCheck and not Addon.Data:IsRecipeKeyResolvableInClient(recipeKey) then
             skip = true
-        elseif metadata and metadata.GetRecipeInfo
-            and metadata.metadataVersion  -- only enforce when metadata is actually loaded
-            and numericKey and numericKey > 0
-            and metadata:GetRecipeInfo(recipeKey) == nil
-        then
-            -- Positive item-key not catalogued: looks like a real item to
-            -- the WoW client but isn't a known recipe — drop from tooltip.
+        elseif cataloguedCheck and not Addon.Data:IsRecipeKeyCatalogued(recipeKey) then
+            -- Real-but-not-a-recipe item (e.g. Worn Axe): WoW resolves it as a
+            -- valid item but the metadata library doesn't map it to any recipe,
+            -- so showing crafter rows on its tooltip would be garbage.
             skip = true
         end
         if not skip

@@ -1,7 +1,7 @@
 # Recipe Metadata Reagent Coverage
 
-Recipes requiring reagent metadata: 2143
-Resolved reagents: 2143
+Recipes requiring reagent metadata: 2145
+Resolved reagents: 2145
 Coverage: 100%
 
 | Spell ID | Profession | Reagents |
@@ -1842,6 +1842,8 @@ Coverage: 100%
 | 35589 | leatherworking | 3 |
 | 35590 | leatherworking | 3 |
 | 35591 | leatherworking | 2 |
+| 35750 | mining | 1 |
+| 35751 | mining | 1 |
 | 36074 | leatherworking | 4 |
 | 36075 | leatherworking | 5 |
 | 36076 | leatherworking | 5 |

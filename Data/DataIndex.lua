@@ -253,6 +253,12 @@ local function buildContentKeysForProfession(self, profession)
             -- peers echo old mock garbage back at us; filtering at fingerprint
             -- build time means corrupt entries never reach the sync wire and
             -- never participate in INDEX_DIFF or BLOCK_SNAPSHOT exchanges.
+            -- Only the resolvable-in-client check applies here — every WoW
+            -- client agrees on whether an ID is a real spell/item so the
+            -- gate stays symmetric across peers. A stricter metadata-
+            -- catalogued check would diverge fingerprints between peers
+            -- running different Generated.lua versions; that lives in the
+            -- tooltip/UI gates and /rr clean instead.
             -- The harness mock returns names for any numeric ID, so unit
             -- specs that seed synthetic keys still see them included.
             if not clientCheck or self:IsRecipeKeyResolvableInClient(recipeKey) then

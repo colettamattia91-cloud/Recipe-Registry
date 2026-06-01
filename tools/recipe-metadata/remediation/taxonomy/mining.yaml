@@ -1,21 +1,14 @@
-# Mining taxonomy — two buckets only.
+# Mining taxonomy — single bucket.
 #
-# Mining is a gathering profession; its only "recipes" are the Smelting
-# spells. The user wants the sidebar to stay shallow here, so we keep just
-# two categories:
-#
-# - metals: basic ore-to-bar smelts and pure metal-to-metal alloys
-#   (Bronze, Steel, Eternium). What you smelt straight from the forge.
-# - elementals: smelts that require a Primal/Elemental component
-#   (Elementium needs Elemental Flux; Felsteel and Hardened Adamantite
-#   need Primal Fire / Primal Earth). These usually involve a profession
-#   trainer prerequisite or a quest unlock.
+# Mining is a gathering profession and its only "recipes" are Smelting
+# spells. The user wants a shallow sidebar with everything under one
+# category. Mote of Earth / Mote of Fire are NOT mining recipes — they're
+# reagents that drop from elementals, so they correctly never appear here.
 #
 # Note: the loader does not strip end-of-line comments, so each spell's
 # description sits on its own line above its binding.
 categories:
   - key: metals, label: Metals, order: 10
-  - key: elementals, label: Elemental Alloys, order: 20
   - key: misc, label: Miscellaneous, order: 999
 subcategories:
 spells:
@@ -42,16 +35,20 @@ spells:
   # Smelt Thorium (Vanilla)
   16153: category: metals, sortOrder: 110
   # Smelt Elementium (Vanilla — requires Elemental Flux)
-  22967: category: elementals, sortOrder: 10
+  22967: category: metals, sortOrder: 120
   # Smelt Fel Iron (TBC)
   29356: category: metals, sortOrder: 200
   # Smelt Adamantite (TBC)
   29358: category: metals, sortOrder: 210
   # Smelt Eternium (TBC alloy: Fel Iron + Adamantite)
   29359: category: metals, sortOrder: 220
-  # Smelt Khorium (TBC)
-  29361: category: metals, sortOrder: 230
   # Smelt Felsteel (TBC — requires Primal Fire)
-  29360: category: elementals, sortOrder: 20
+  29360: category: metals, sortOrder: 230
+  # Smelt Khorium (TBC)
+  29361: category: metals, sortOrder: 240
   # Smelt Hardened Adamantite (TBC — requires Primal Earth)
-  29686: category: elementals, sortOrder: 30
+  29686: category: metals, sortOrder: 250
+  # Earth Shatter (TBC — Primal Earth -> 10 Mote of Earth)
+  35750: category: metals, sortOrder: 300
+  # Fire Sunder (TBC — Primal Fire -> 10 Mote of Fire)
+  35751: category: metals, sortOrder: 310

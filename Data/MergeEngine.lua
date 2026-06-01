@@ -34,7 +34,14 @@ function MergeEngine:NormalizeIncomingBlockPayload(payload)
     -- Drop recipe keys the local WoW client doesn't recognise BEFORE they
     -- enter the merge. Peers that haven't run the cleanup yet keep sending
     -- ghost IDs from old mocks; without this gate every BLOCK_SNAPSHOT we
-    -- consume reseeds the corruption we just removed from our own DB.
+    -- consume reseeds the corruption we just removed from our own DB. The
+    -- resolvable-in-client check is the only sync-safe gate here: every
+    -- WoW client agrees on whether an ID is real regardless of addon
+    -- version, so applying it symmetrically across peers converges
+    -- fingerprints. The stricter metadata-catalogued check lives in the
+    -- tooltip/UI gates and /rr clean — it's metadata-version dependent
+    -- and would diverge fingerprints across peers running different
+    -- Generated.lua builds.
     local clientCheck = Addon and Addon.Data and Addon.Data.IsRecipeKeyResolvableInClient
     local recipeSet = {}
     for _, recipeKey in ipairs(payload.recipeKeys or {}) do

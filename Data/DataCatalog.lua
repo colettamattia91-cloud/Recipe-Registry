@@ -458,9 +458,9 @@ local function getFilterCacheKey(filterContext)
     return "filters=unavailable"
 end
 
-local function recipePassesUiFilter(recipeKey, filterContext)
+local function recipePassesUiFilter(recipeKey, filterContext, recipeInfo)
     if Addon.RecipeUiFilters and Addon.RecipeUiFilters.RecipePasses then
-        return Addon.RecipeUiFilters:RecipePasses(recipeKey, nil, filterContext)
+        return Addon.RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
     end
     return true, "visible-no-filter"
 end
@@ -1643,6 +1643,7 @@ function Data:RunRecipeListBuildStep(state, ctx)
         if indexed then
             local include = (not profName or profName == "All")
             local visibilityReason
+            local recipeInfo  -- shared metadata record, lazily fetched, reused below
             if not include and indexed.profNames[profName] then
                 include = true
             end
@@ -1652,14 +1653,15 @@ function Data:RunRecipeListBuildStep(state, ctx)
             if include and visibleSpellIdsHash and listMetadata then
                 -- See the matching block in GetRecipeList for why we look up
                 -- the record explicitly instead of trusting the normalized
-                -- spellId alone.
-                local info = listMetadata:GetRecipeInfo(recipeKey)
-                if info and info.spellId and not visibleSpellIdsHash[info.spellId] then
+                -- spellId alone. Cache the result so RecipePasses below
+                -- doesn't pay the lookup a second time per candidate.
+                recipeInfo = listMetadata:GetRecipeInfo(recipeKey)
+                if recipeInfo and recipeInfo.spellId and not visibleSpellIdsHash[recipeInfo.spellId] then
                     include = false
                 end
             end
             if include then
-                local passes, reason = recipePassesUiFilter(recipeKey, filterContext)
+                local passes, reason = recipePassesUiFilter(recipeKey, filterContext, recipeInfo)
                 visibilityReason = reason
                 include = passes == true
                 if not include then
@@ -1747,10 +1749,25 @@ function Data:RunRecipeListBuildStep(state, ctx)
         -- caller so the user actually sees something this cycle — the UI
         -- maintains its own _recipeListGeneration token that drops callbacks
         -- for navigated-away states, so we don't paint over a profession the
-        -- user already left. Skip the list cache write so we never pin a
-        -- stale slice under a key a fresh build would otherwise overwrite;
-        -- the next refresh will recompute against current data.
+        -- user already left. Also write to the cache under the post-bump
+        -- generation: during an initial sync storm the same key invalidates
+        -- repeatedly, so refusing to cache forces a fresh 2s+ rebuild on
+        -- every navigation between invalidations. A slightly-stale cached
+        -- slice that survives until the NEXT invalidation is far better
+        -- UX than re-paying the full build cost each click; the staleness
+        -- gets refreshed naturally when the next invalidation drops cache.
         finalizeListBuildTelemetry(self, telemetry, "stale-delivered", out)
+        self._recipeListCache = self._recipeListCache or {}
+        self._recipeListCacheOrder = self._recipeListCacheOrder or {}
+        if not self._recipeListCache[state.cacheKey] then
+            rememberBoundedCache(
+                self._recipeListCache,
+                self._recipeListCacheOrder,
+                state.cacheKey,
+                out,
+                MAX_RECIPE_LIST_CACHE_ENTRIES
+            )
+        end
         if state.onComplete then
             state.onComplete(out, false)
         end

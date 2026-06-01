@@ -1325,6 +1325,7 @@ function Addon:SlashHandler(input)
             and self.Data:CleanCorruptData({
                 dryRun = dryRun,
                 checkClientResolvable = true,
+                checkMetadataCatalogued = true,
             })
             or {}
         local syncStats = self.Sync and self.Sync.CleanCorruptState and self.Sync:CleanCorruptState({ dryRun = dryRun }) or {}

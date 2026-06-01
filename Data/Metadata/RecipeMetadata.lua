@@ -473,6 +473,15 @@ function RecipeMetadata:BuildVisibleSpellIdHash(professionKey, visibility, categ
     end
 
     local hash = {}
+    -- Mining only has 18 smelting spells and the user prefers a shallow,
+    -- expansion-agnostic view rather than juggling vanilla vs TBC bars.
+    -- Always include both expansions for mining so e.g. Truesilver Bar
+    -- (vanilla) stays visible under a TBC filter view.
+    if professionKey == "mining" then
+        gatherForExpansion("vanilla", hash)
+        gatherForExpansion("tbc", hash)
+        return hash
+    end
     if visibility.vanilla ~= false then gatherForExpansion("vanilla", hash) end
     if visibility.tbc ~= false then gatherForExpansion("tbc", hash) end
     return hash
