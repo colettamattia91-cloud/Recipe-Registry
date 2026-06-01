@@ -3285,6 +3285,20 @@ function UI:_FinalizeRecipeList(rows, context, generation)
     if context and context.filterCacheKey and Addon.RecipeUiFilters and Addon.RecipeUiFilters.BuildFilterCacheKey then
         local currentFilterKey = Addon.RecipeUiFilters:BuildFilterCacheKey(context.filterContext)
         if currentFilterKey ~= context.filterCacheKey then
+            -- The filter key shifted between RefreshRecipeList kick-off and
+            -- the build completing — most commonly an ownership-index
+            -- generation bump from an incoming sync block-merge. Dropping
+            -- the result silently leaves the centre panel stuck on
+            -- "Loading…" until something else nudges a refresh. Schedule
+            -- a short retry on the next frame so the user actually sees
+            -- rows; the generation gate above keeps us from clobbering a
+            -- profession the user navigated away from in the meantime.
+            if Addon.ScheduleTimer then
+                Addon:ScheduleTimer(function()
+                    if self._recipeListGeneration ~= generation then return end
+                    Addon:RequestRefresh("list-filter-key-shift")
+                end, 0.1)
+            end
             return
         end
     end
