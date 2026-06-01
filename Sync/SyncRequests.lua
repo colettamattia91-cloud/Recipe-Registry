@@ -84,11 +84,16 @@ end
 function Sync:IsBlockSaturated(peerKey, blockKey)
     local entry = getSaturationEntry(self, peerKey, blockKey, false)
     if not entry then return false end
-    local now = time()
-    if (entry.saturatedUntil or 0) <= now then
-        -- Cooldown expired: clear the counter so the next pull gets a
-        -- fresh chance to converge (e.g. peer may have updated in the
-        -- meantime).
+    local saturatedUntil = entry.saturatedUntil or 0
+    if saturatedUntil <= 0 then
+        -- Counter is incrementing but threshold not yet reached: NOT
+        -- saturated, but also don't reset — we need the count to survive
+        -- between sessions so the threshold can actually be crossed.
+        return false
+    end
+    if saturatedUntil <= time() then
+        -- Cooldown expired: clear so the next pull gets a fresh chance
+        -- (peer may have updated in the meantime).
         entry.saturatedUntil = 0
         entry.noProgressCount = 0
         return false
