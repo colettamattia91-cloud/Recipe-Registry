@@ -307,6 +307,10 @@ local function newListBuildTelemetryRecord(profName, categoryFilter, searchMode)
         included = 0,
         stepCount = 0,
         stepMsTotal = 0,
+        predicateMs = 0,    -- recipePassesUiFilter (RecipePasses cascade)
+        visibleHashMs = 0,  -- visibleSpellIdsHash lookup (GetRecipeInfo+hash check)
+        categoryMs = 0,     -- recipeMatchesCategoryFilter
+        crafterLoopMs = 0,  -- crafterRows IsMemberOnline loop + professionList build
         status = "running",
     }
 end
@@ -1218,6 +1222,13 @@ function Data:DumpListBuildTelemetry()
             run.ensureReagentsCalls or 0,
             run.ensureReagentsMs or 0
         ))
+        print(string.format(
+            "      phases: predicate=%.1fms visibleHash=%.1fms category=%.1fms crafterLoop=%.1fms",
+            run.predicateMs or 0,
+            run.visibleHashMs or 0,
+            run.categoryMs or 0,
+            run.crafterLoopMs or 0
+        ))
     end
 end
 
@@ -1648,20 +1659,22 @@ function Data:RunRecipeListBuildStep(state, ctx)
                 include = true
             end
             if include and categoryFilter and profName and profName ~= "All" then
+                local phaseStart = nowMsLocal()
                 include = recipeMatchesCategoryFilter(getRecipeMetadata(), recipeKey, categoryFilter)
+                if telemetry then telemetry.categoryMs = (telemetry.categoryMs or 0) + (nowMsLocal() - phaseStart) end
             end
             if include and visibleSpellIdsHash and listMetadata then
-                -- See the matching block in GetRecipeList for why we look up
-                -- the record explicitly instead of trusting the normalized
-                -- spellId alone. Cache the result so RecipePasses below
-                -- doesn't pay the lookup a second time per candidate.
+                local phaseStart = nowMsLocal()
                 recipeInfo = listMetadata:GetRecipeInfo(recipeKey)
                 if recipeInfo and recipeInfo.spellId and not visibleSpellIdsHash[recipeInfo.spellId] then
                     include = false
                 end
+                if telemetry then telemetry.visibleHashMs = (telemetry.visibleHashMs or 0) + (nowMsLocal() - phaseStart) end
             end
             if include then
+                local phaseStart = nowMsLocal()
                 local passes, reason = recipePassesUiFilter(recipeKey, filterContext, recipeInfo)
+                if telemetry then telemetry.predicateMs = (telemetry.predicateMs or 0) + (nowMsLocal() - phaseStart) end
                 visibilityReason = reason
                 include = passes == true
                 if not include then
@@ -1673,6 +1686,7 @@ function Data:RunRecipeListBuildStep(state, ctx)
                 if searchMode == "materials" and detail then
                     self:EnsureRecipeReagents(detail)
                 end
+                local crafterPhaseStart = nowMsLocal()
                 local onlineCount = 0
                 local crafterRows = indexed.crafterRows or {}
                 for craftIdx = 1, #crafterRows do
@@ -1693,6 +1707,7 @@ function Data:RunRecipeListBuildStep(state, ctx)
                     row.professionList[#row.professionList + 1] = currentProfName
                 end
                 sort(row.professionList)
+                if telemetry then telemetry.crafterLoopMs = (telemetry.crafterLoopMs or 0) + (nowMsLocal() - crafterPhaseStart) end
                 local searchText
                 if searchMode == "materials" then
                     searchText = row.detail and row.detail.searchText or lowerSafe(row.label)
