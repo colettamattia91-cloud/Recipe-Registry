@@ -27308,8 +27308,8 @@ RecipeRegistryRecipeMetadata = {
             profession = "mining",
             expansion = "tbc",
             createdItemId = 22573,
-            category = "metals",
-            sortOrder = 300,
+            category = "elementals",
+            sortOrder = 10,
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 1 },
@@ -27319,8 +27319,8 @@ RecipeRegistryRecipeMetadata = {
             profession = "mining",
             expansion = "tbc",
             createdItemId = 22574,
-            category = "metals",
-            sortOrder = 310,
+            category = "elementals",
+            sortOrder = 20,
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 1 },
@@ -35496,6 +35496,7 @@ RecipeRegistryRecipeMetadata = {
         mining = 
         {
             { key = "metals", label = "Metals", order = 10 },
+            { key = "elementals", label = "Elementals", order = 20 },
             { key = "misc", label = "Miscellaneous", order = 999 },
         },
         tailoring = 
@@ -35960,8 +35961,11 @@ RecipeRegistryRecipeMetadata = {
             },
             ["mining"] = {
                 _all = { 29356, 29358, 29359, 29360, 29361, 29686, 35750, 35751 },
+                ["elementals"] = {
+                    _all = { 35750, 35751 },
+                },
                 ["metals"] = {
-                    _all = { 29356, 29358, 29359, 29360, 29361, 29686, 35750, 35751 },
+                    _all = { 29356, 29358, 29359, 29360, 29361, 29686 },
                 },
             },
             ["tailoring"] = {

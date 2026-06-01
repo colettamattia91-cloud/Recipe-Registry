@@ -294,10 +294,26 @@ function Data:ShouldCleanRecipeFromProfession(profName, recipeKey, opts)
         return false
     end
 
-    local actualProfession = self:ResolveRecipeProfession(recipeKey)
-    local expectedProfession = type(profName) == "string" and self:GetCanonicalProfession(profName) or nil
-    if actualProfession and expectedProfession and actualProfession ~= expectedProfession then
-        return true, "profession-mismatch", actualProfession
+    -- Cross-check the recipe's declared profession against where the entry
+    -- actually lives in our DB. The metadata library is the canonical
+    -- source of truth — there's no Data:ResolveRecipeProfession helper
+    -- (an earlier branch referenced one that never landed), so query the
+    -- metadata directly and only act when both sides agree on a value.
+    local metadata = Addon and Addon.RecipeMetadata
+    local actualProfession = metadata and metadata.GetProfession
+        and metadata:GetProfession(recipeKey)
+        or nil
+    local expectedProfession = type(profName) == "string"
+        and self:GetCanonicalProfession(profName)
+        or nil
+    if actualProfession and expectedProfession then
+        local normalizedExpected = expectedProfession
+        if type(normalizedExpected) == "string" then
+            normalizedExpected = normalizedExpected:lower()
+        end
+        if actualProfession ~= normalizedExpected then
+            return true, "profession-mismatch", actualProfession
+        end
     end
     return false
 end

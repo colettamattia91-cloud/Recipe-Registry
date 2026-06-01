@@ -1,14 +1,17 @@
-# Mining taxonomy — single bucket.
+# Mining taxonomy.
 #
 # Mining is a gathering profession and its only "recipes" are Smelting
-# spells. The user wants a shallow sidebar with everything under one
-# category. Mote of Earth / Mote of Fire are NOT mining recipes — they're
-# reagents that drop from elementals, so they correctly never appear here.
+# plus two shatter spells. Two buckets:
+#
+# - metals: ore-to-bar smelts and metal-to-metal alloys, vanilla + TBC.
+# - elementals: shatter spells that break a Primal into 10 Motes
+#   (Earth Shatter, Fire Sunder). Trainer-taught TBC mining utility spells.
 #
 # Note: the loader does not strip end-of-line comments, so each spell's
 # description sits on its own line above its binding.
 categories:
   - key: metals, label: Metals, order: 10
+  - key: elementals, label: Elementals, order: 20
   - key: misc, label: Miscellaneous, order: 999
 subcategories:
 spells:
@@ -49,6 +52,6 @@ spells:
   # Smelt Hardened Adamantite (TBC — requires Primal Earth)
   29686: category: metals, sortOrder: 250
   # Earth Shatter (TBC — Primal Earth -> 10 Mote of Earth)
-  35750: category: metals, sortOrder: 300
+  35750: category: elementals, sortOrder: 10
   # Fire Sunder (TBC — Primal Fire -> 10 Mote of Fire)
-  35751: category: metals, sortOrder: 310
+  35751: category: elementals, sortOrder: 20
