@@ -1384,14 +1384,26 @@ function Data:InvalidateRecipeCaches(scope)
     end
     self._recipeListCacheGeneration = (self._recipeListCacheGeneration or 0) + 1
     if scope == "list" then
+        -- Content changed (new recipes / new owner / status flip): the
+        -- ownership index "who knows recipe X" depends on those facts,
+        -- so it must drop here, not under "metadata" which is also fired
+        -- for skill-rank-only refreshes that don't change ownership.
+        if self.InvalidateRecipeOwnershipIndex then
+            self:InvalidateRecipeOwnershipIndex(scope)
+        end
         self._recipeListCache = nil
         self._recipeListCacheOrder = nil
         return
     end
     if scope == "metadata" then
-        if self.InvalidateRecipeOwnershipIndex then
-            self:InvalidateRecipeOwnershipIndex(scope)
-        end
+        -- "metadata" is fired after every block merge, INCLUDING rank/spec
+        -- only refreshes that don't add or remove recipes. The ownership
+        -- index is unaffected by rank changes, so dropping it here forces
+        -- a full member-walk rebuild on the very next predicate call —
+        -- which during sync storms turned into the dominant cost in
+        -- RecipePasses (one rebuild per recipe-list refresh after each
+        -- merge). DataSnapshot also fires "list" scope when content
+        -- actually changed; that path drops ownership above.
         self._recipeIndexGeneration = (self._recipeIndexGeneration or 0) + 1
         self._recipeDetailCache = nil
         self._recipeDetailCacheOrder = nil

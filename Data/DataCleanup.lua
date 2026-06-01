@@ -74,6 +74,48 @@ local function isRecipeKeyCatalogued(metadata, recipeKey)
     return false
 end
 
+-- Returns a set of every profession the metadata library can map the
+-- given recipe key to. Positive item keys can resolve to two professions
+-- when an item is both crafted by one recipe and teaches another (e.g.
+-- item 10644: engineering-crafted Goblin Mortar that teaches an alchemy
+-- recipe). Negative spell keys resolve to a single profession. Returns
+-- nil when metadata can't classify the key at all.
+local function collectRecipeKeyProfessions(metadata, recipeKey)
+    if not metadata then return nil end
+    local numeric = tonumber(recipeKey)
+    if not numeric then return nil end
+    local set
+    local function addProfession(spellId)
+        if not spellId then return end
+        local records = metadata._recordsBySpellId
+        local record = records and records[spellId]
+        local profession = record and record.profession
+        if profession and profession ~= "" then
+            set = set or {}
+            set[profession] = true
+        end
+    end
+    if numeric < 0 then
+        addProfession(-numeric)
+        return set
+    end
+    if numeric > 0 then
+        local generated = metadata._generated
+        if generated then
+            local viaRecipeItem = generated.recipeItemToSpellId and generated.recipeItemToSpellId[numeric]
+            if viaRecipeItem then addProfession(viaRecipeItem) end
+            local viaCreatedItem = generated.createdItemToSpellIds and generated.createdItemToSpellIds[numeric]
+            if type(viaCreatedItem) == "table" then
+                for i = 1, #viaCreatedItem do
+                    addProfession(viaCreatedItem[i])
+                end
+            end
+        end
+        return set
+    end
+    return nil
+end
+
 -- Public accessor for sync gates and tooltip garbage filter. Returns true
 -- when metadata isn't loaded yet, so callers don't reject good data during
 -- warmup before the library has populated its lookup tables. Also returns
@@ -190,7 +232,7 @@ local function cleanCorruptMember(data, memberKey, entry, opts, stats, dirtyBloc
                 end
                 blockDirty = true
                 Addon:Debug(
-                    "Removed corrupt recipe",
+                    dryRun and "Would remove corrupt recipe" or "Removed corrupt recipe",
                     tostring(removal.key),
                     "from",
                     memberKey,
@@ -295,24 +337,30 @@ function Data:ShouldCleanRecipeFromProfession(profName, recipeKey, opts)
     end
 
     -- Cross-check the recipe's declared profession against where the entry
-    -- actually lives in our DB. The metadata library is the canonical
-    -- source of truth — there's no Data:ResolveRecipeProfession helper
-    -- (an earlier branch referenced one that never landed), so query the
-    -- metadata directly and only act when both sides agree on a value.
+    -- actually lives in our DB. Positive item keys can legitimately tie to
+    -- TWO professions: e.g. item 10644 is both the engineering-crafted
+    -- Goblin Mortar AND the recipe-teaching item for the alchemy spell
+    -- that uses it. Both stores are correct — collect every profession
+    -- the metadata maps the key to, and only flag a mismatch when none
+    -- of them match the storage profession.
     local metadata = Addon and Addon.RecipeMetadata
-    local actualProfession = metadata and metadata.GetProfession
-        and metadata:GetProfession(recipeKey)
-        or nil
+    local actualProfessions = collectRecipeKeyProfessions(metadata, recipeKey)
     local expectedProfession = type(profName) == "string"
         and self:GetCanonicalProfession(profName)
         or nil
-    if actualProfession and expectedProfession then
+    if actualProfessions and expectedProfession then
         local normalizedExpected = expectedProfession
         if type(normalizedExpected) == "string" then
             normalizedExpected = normalizedExpected:lower()
         end
-        if actualProfession ~= normalizedExpected then
-            return true, "profession-mismatch", actualProfession
+        if not actualProfessions[normalizedExpected] then
+            -- Pick a single representative for the diagnostic
+            local representative
+            for prof in pairs(actualProfessions) do
+                representative = prof
+                break
+            end
+            return true, "profession-mismatch", representative
         end
     end
     return false
