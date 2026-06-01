@@ -13,9 +13,9 @@ local TICK_INTERVAL = 0.05
 -- by more than a frame. Per-job step budgets remain governed by
 -- opts.budgetMs / DEFAULT_BUDGET_MS — the tick budget is a cap, not the
 -- per-step budget.
-local TICK_BUDGET_MS = 30
+local TICK_BUDGET_MS = 36
 local DEFAULT_BUDGET_MS = 3
-local DEFAULT_MAX_STEPS = 10
+local DEFAULT_MAX_STEPS = 12
 
 local function nowMs()
     if type(debugprofilestop) == "function" then
