@@ -17,7 +17,10 @@ local safeGetItemName = Private.safeGetItemName
 local safeGetSpellName = Private.safeGetSpellName
 local shouldRefreshItemName = Private.shouldRefreshItemName
 
-local MAX_RECIPE_LIST_CACHE_ENTRIES = 12
+-- Bumped from 12 → 32 so navigation through profession × category combos
+-- stays cached across short browsing sessions. Per-entry memory is small
+-- (recipe rows hold references into _recipeIndex, not heavy detail tables).
+local MAX_RECIPE_LIST_CACHE_ENTRIES = 32
 local MAX_RECIPE_DETAIL_CACHE_ENTRIES = 256
 local RECIPES_PER_LIST_BUILD_STEP = 60
 -- Budget per step and steps-per-tick are calibrated against the scheduler's

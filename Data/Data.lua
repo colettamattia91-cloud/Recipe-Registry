@@ -1352,17 +1352,36 @@ end
 
 function Data:InvalidateRecipeCaches(scope)
     -- Two generation tokens for async builders:
-    --   * _recipeListCacheGeneration is bumped on ANY invalidation. The
+    --   * _recipeListCacheGeneration is bumped on invalidations that change
+    --     WHICH recipes the list contains (metadata, list, full). The
     --     chunked list builder reads it at start and at commit; mismatch
-    --     means the partial rows it just assembled are based on stale
-    --     filter state (live onlineCount, included recipes, etc.) and
-    --     must not be cached.
+    --     means the partial rows it just assembled are based on a stale
+    --     filter / projection and must not be cached. Presence flips do
+    --     NOT bump this — see below.
     --   * _recipeIndexGeneration is bumped only when the index itself is
     --     dropped (metadata or full scope). Presence/list invalidations
     --     leave the content index intact, so an in-flight index build
     --     would needlessly discard its result if it shared the same
     --     token — and presence flips fire often enough during startup
     --     that this would keep the first build from ever finishing.
+    if scope == "presence" then
+        -- Presence flips (roster online/offline) only affect the sort key
+        -- onlineCount, not the set of visible recipes. Clearing the cached
+        -- list forces the next refresh to rebuild with fresh online counts;
+        -- but bumping the generation here ALSO abandoned every in-flight
+        -- list build, and during warmup presence flips arrive faster than
+        -- a build can finish — meaning the cache was repeatedly emptied
+        -- without ever being repopulated, so each profession switch paid
+        -- the full rebuild cost. Letting active builds complete writes a
+        -- slightly-stale-by-sort-order result to cache; the next presence
+        -- flip will trigger a quick re-sort on the next refresh.
+        self._recipeListCache = nil
+        self._recipeListCacheOrder = nil
+        if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
+            Addon.Tooltip:InvalidateIndex("presence")
+        end
+        return
+    end
     self._recipeListCacheGeneration = (self._recipeListCacheGeneration or 0) + 1
     if scope == "list" then
         self._recipeListCache = nil
@@ -1388,20 +1407,6 @@ function Data:InvalidateRecipeCaches(scope)
         end
         return
     end
-    if scope == "presence" then
-        -- Presence is no longer materialized inside _recipeIndex — online
-        -- flags and onlineCount are derived live from _onlineCache when
-        -- GetRecipeCrafters / GetRecipeList run. Roster presence flips
-        -- therefore don't invalidate the content index; we only need to
-        -- drop the list cache because its sort uses live onlineCount.
-        self._recipeListCache = nil
-        self._recipeListCacheOrder = nil
-        if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
-            Addon.Tooltip:InvalidateIndex("presence")
-        end
-        return
-    end
-
     if self.InvalidateRecipeOwnershipIndex then
         self:InvalidateRecipeOwnershipIndex(scope or "full")
     end

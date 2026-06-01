@@ -45,12 +45,12 @@ Test.it("bounds recipe list cache across many distinct queries", function()
         count = 150,
     })
 
-    for i = 1, 20 do
+    for i = 1, 50 do
         data:GetRecipeList(nil, "query-" .. tostring(i), "alpha")
     end
 
-    Test.gte(12, Test.countKeys(data._recipeListCache), "recipe list cache should stay bounded")
-    Test.gte(12, #(data._recipeListCacheOrder or {}), "recipe list cache order should stay bounded")
+    Test.gte(32, Test.countKeys(data._recipeListCache), "recipe list cache should stay bounded")
+    Test.gte(32, #(data._recipeListCacheOrder or {}), "recipe list cache order should stay bounded")
 end)
 
 Test.it("bounds recipe detail cache across many lookups", function()
