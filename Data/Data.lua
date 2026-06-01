@@ -256,19 +256,15 @@ local function shouldRefreshItemName(name, itemID)
     return name == ("item:" .. tostring(itemID))
 end
 
--- Validates that a recipe key represents a real craft, not a non-craft spell.
--- Positive keys (item-based) are accepted only inside a sane TBC-era numeric
--- range; very large positive values are usually concatenated/corrupt IDs.
--- Negative keys (spell-based) prefer the owned metadata addon when present.
--- If metadata is absent or misses a mapping, fall back to spell subtext for
--- profession rank keywords (Apprentice/Journeyman/Expert/Artisan/Master).
--- keywords (Apprentice/Journeyman/Expert/Artisan/Master) which only craft
--- spells have; class spells use "Rank N" or have no subtext.
-local CRAFT_RANK_KEYWORDS = {
-    ["Apprentice"] = true, ["Journeyman"] = true, ["Expert"] = true,
-    ["Artisan"] = true, ["Master"] = true,
-}
 local MAX_REASONABLE_RECIPE_KEY = 100000000
+-- Pure-shape validity check. Two peers running different addon versions,
+-- different metadata builds, or different locales must agree on whether
+-- a key passes this gate — otherwise their block contentKeys diverge and
+-- the block fingerprints never converge, producing endless re-pull loops
+-- where addedRecipes=0 but counts and fingerprints stay mismatched.
+-- The earlier metadata + subtext fallback was a semantic check ("does
+-- this look like a real craft spell?") and belongs in the UI/cleanup
+-- gates, not in the wire-facing validity check shared by all peers.
 local function isValidRecipeKey(recipeKey)
     local n = tonumber(recipeKey)
     if not n then return false end
@@ -279,43 +275,8 @@ local function isValidRecipeKey(recipeKey)
         recipeValidityCache[n] = false
         return false
     end
-    if n > 0 then
-        recipeValidityCache[n] = true
-        return true
-    end  -- item-based: always valid
-    local metadata = Addon.RecipeMetadata
-    if metadata and metadata.GetRecipeInfo then
-        if metadata:GetRecipeInfo(n) ~= nil then
-            recipeValidityCache[n] = true
-            return true
-        end
-    end
-    -- Fallback: check spell subtext for craft rank keywords. Direct enchants
-    -- often resolve as craft spells with no subtext, so a blank subtext is not
-    -- evidence of corruption.
-    local spellName = safeGetSpellName(-n)
-    if not spellName then
-        recipeValidityCache[n] = true
-        return true
-    end  -- can't resolve spell: benefit of doubt
-    local subtext
-    if type(GetSpellSubtext) == "function" then
-        subtext = GetSpellSubtext(-n)
-    elseif type(GetSpellBookItemInfo) ~= "function" then
-        -- No API to check subtext: allow through
-        return true
-    end
-    if subtext == nil or subtext == "" then
-        recipeValidityCache[n] = true
-        return true
-    end
-    if subtext and CRAFT_RANK_KEYWORDS[subtext] then
-        recipeValidityCache[n] = true
-        return true
-    end
-    -- No recognised craft subtext: block it
-    recipeValidityCache[n] = false
-    return false
+    recipeValidityCache[n] = true
+    return true
 end
 
 local function formatReagents(reagentIDs, reagentCounts)
