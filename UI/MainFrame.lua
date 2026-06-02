@@ -3419,21 +3419,18 @@ function UI:RefreshHiddenExpansionHint(profession)
     end
     local visibility = filters:GetEffectiveExpansionVisibility(profKey)
     local hiddenExpansion, hiddenCount
-    local function countForExpansion(exp)
-        local tree = metadata._navTree and metadata._navTree[exp]
-        local profNode = tree and tree[profKey]
-        local all = profNode and profNode._all
-        return all and #all or 0
-    end
+    local getCount = metadata.GetExpansionRecipeCount
+        and function(exp) return metadata:GetExpansionRecipeCount(profKey, exp) end
+        or function() return 0 end
     if visibility.vanilla == false then
-        local n = countForExpansion("vanilla")
+        local n = getCount("vanilla")
         if n > 0 then
             hiddenExpansion = "vanilla"
             hiddenCount = n
         end
     end
     if not hiddenExpansion and visibility.tbc == false then
-        local n = countForExpansion("tbc")
+        local n = getCount("tbc")
         if n > 0 then
             hiddenExpansion = "tbc"
             hiddenCount = n

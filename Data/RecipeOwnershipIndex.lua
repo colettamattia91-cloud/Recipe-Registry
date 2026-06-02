@@ -4,21 +4,20 @@ if not Data then
     return
 end
 
-local tostring = tostring
 local tonumber = tonumber
 local pairs = pairs
 
-local function storeSummary(index, recipeKey, summary)
-    index.byRecipeKey[recipeKey] = summary
-    index.byRecipeKey[tostring(recipeKey)] = summary
-    local numeric = tonumber(recipeKey)
-    if numeric then
-        index.byRecipeKey[numeric] = summary
-    end
+-- Canonicalize the recipeKey to a numeric form when possible so insertion
+-- and lookup agree on a single index key. Storing the same summary under
+-- raw, tostring, AND tonumber forms was 3x the table footprint of the
+-- index for no benefit — every caller goes through canonical().
+local function canonical(recipeKey)
+    return tonumber(recipeKey) or recipeKey
 end
 
 local function getOrCreateSummary(index, recipeKey)
-    local existing = index.byRecipeKey[recipeKey] or index.byRecipeKey[tostring(recipeKey)]
+    local key = canonical(recipeKey)
+    local existing = index.byRecipeKey[key]
     if existing then
         return existing
     end
@@ -27,7 +26,7 @@ local function getOrCreateSummary(index, recipeKey)
         hasRemoteOwners = false,
         remoteOwnerCount = 0,
     }
-    storeSummary(index, recipeKey, summary)
+    index.byRecipeKey[key] = summary
     return summary
 end
 
@@ -72,7 +71,7 @@ end
 
 function Data:GetRecipeOwnershipSummary(recipeKey)
     local index = self:GetRecipeOwnershipIndex()
-    return index.byRecipeKey[recipeKey] or index.byRecipeKey[tostring(recipeKey)] or {
+    return index.byRecipeKey[canonical(recipeKey)] or {
         knownByCurrentPlayer = false,
         hasRemoteOwners = false,
         remoteOwnerCount = 0,

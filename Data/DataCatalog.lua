@@ -513,10 +513,14 @@ function Data:GetRecipeCategoryInfo(recipeKey, profession)
     return nil
 end
 
-function Data:GetRecipeCategories(profession, includeEmpty)
+function Data:GetRecipeCategories(profession, _includeEmpty)
     local metadata = getRecipeMetadata()
     if metadata then
-        return cloneCategoryRows(getMetadataCategories(metadata, profession))
+        -- getMetadataCategories already returns freshly-cloned rows
+        -- (cloneCategoryRows at the leaf level on every row + subcategory),
+        -- so wrapping it in another cloneCategoryRows here was paying for
+        -- a redundant deep copy on every sidebar refresh.
+        return getMetadataCategories(metadata, profession)
     end
     return {}
 end

@@ -1376,27 +1376,23 @@ function Data:InvalidateRecipeCaches(scope)
         -- RecipePasses (one rebuild per recipe-list refresh after each
         -- merge). DataSnapshot also fires "list" scope when content
         -- actually changed; that path drops ownership above.
-        self._recipeIndexGeneration = (self._recipeIndexGeneration or 0) + 1
-        self._recipeDetailCache = nil
-        self._recipeDetailCacheOrder = nil
-        self._recipeDetailCacheReady = nil
-        if self.db and self.db.global then
-            self.db.global.recipeDetailCache = nil
-            self.db.global.recipeDetailCacheOrder = nil
-        end
-        self._recipeIndex = nil
-        self._recipesByProfession = nil
-        if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
-            Addon.Tooltip:InvalidateIndex("metadata")
-        end
+        self:_DropRecipeIndexAndDetailCache("metadata")
         return
     end
     if self.InvalidateRecipeOwnershipIndex then
         self:InvalidateRecipeOwnershipIndex(scope or "full")
     end
-    self._recipeIndexGeneration = (self._recipeIndexGeneration or 0) + 1
     self._recipeListCache = nil
     self._recipeListCacheOrder = nil
+    self:_DropRecipeIndexAndDetailCache(scope or "full")
+end
+
+-- Shared invalidation tail used by both the "metadata" scope and the
+-- default/full path. Bumps the index generation, drops the in-memory
+-- detail cache and its persistent twin, clears the recipe index and the
+-- by-profession map, and notifies the tooltip.
+function Data:_DropRecipeIndexAndDetailCache(reason)
+    self._recipeIndexGeneration = (self._recipeIndexGeneration or 0) + 1
     self._recipeDetailCache = nil
     self._recipeDetailCacheOrder = nil
     self._recipeDetailCacheReady = nil
@@ -1407,7 +1403,7 @@ function Data:InvalidateRecipeCaches(scope)
     self._recipeIndex = nil
     self._recipesByProfession = nil
     if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
-        Addon.Tooltip:InvalidateIndex(scope or "full")
+        Addon.Tooltip:InvalidateIndex(reason)
     end
 end
 

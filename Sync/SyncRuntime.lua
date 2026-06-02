@@ -2118,28 +2118,24 @@ function Sync:ShouldDeferHeavyLifecycleWork(_reason)
     return self:EstimateRuntimeQueuePressure() >= 70
 end
 
+local function isBackoffStoreActive(store, sourceKey, now)
+    if not store then return false end
+    local untilAt = store[sourceKey]
+    if not untilAt then return false end
+    if untilAt <= now then
+        store[sourceKey] = nil
+        return false
+    end
+    return true
+end
+
 function Sync:IsPeerBackoffActive(sourceKey)
     if not self:IsValidSyncMemberKey(sourceKey) then
         return false
     end
     local now = time()
-    local untilAt = self.peerBackoffUntil and self.peerBackoffUntil[sourceKey] or nil
-    if untilAt then
-        if untilAt <= now then
-            self.peerBackoffUntil[sourceKey] = nil
-        else
-            return true
-        end
-    end
-    local sessionUntil = self._peerSessionBackoffUntil and self._peerSessionBackoffUntil[sourceKey] or nil
-    if sessionUntil then
-        if sessionUntil <= now then
-            self._peerSessionBackoffUntil[sourceKey] = nil
-        else
-            return true
-        end
-    end
-    return false
+    return isBackoffStoreActive(self.peerBackoffUntil, sourceKey, now)
+        or isBackoffStoreActive(self._peerSessionBackoffUntil, sourceKey, now)
 end
 
 function Sync:TouchNode(key, version)

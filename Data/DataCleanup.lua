@@ -55,23 +55,19 @@ end
 local function isRecipeKeyCatalogued(metadata, recipeKey)
     if not metadata then return true end
     local numeric = tonumber(recipeKey)
-    if not numeric then return true end  -- non-numeric: can't classify
+    if not numeric or numeric == 0 then
+        -- non-numeric or zero: not classifiable, default to "keep"
+        return numeric ~= 0
+    end
     if numeric < 0 then
         local records = metadata._recordsBySpellId
         return records and records[-numeric] ~= nil
     end
-    if numeric > 0 then
-        local generated = metadata._generated
-        if not generated then return true end
-        if generated.recipeItemToSpellId and generated.recipeItemToSpellId[numeric] then
-            return true
-        end
-        if generated.createdItemToSpellIds and generated.createdItemToSpellIds[numeric] then
-            return true
-        end
-        return false
-    end
-    return false
+    local generated = metadata._generated
+    if not generated then return true end
+    return (generated.recipeItemToSpellId and generated.recipeItemToSpellId[numeric] ~= nil)
+        or (generated.createdItemToSpellIds and generated.createdItemToSpellIds[numeric] ~= nil)
+        or false
 end
 
 -- Returns a set of every profession the metadata library can map the

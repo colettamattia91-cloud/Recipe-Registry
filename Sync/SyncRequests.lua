@@ -73,15 +73,9 @@ end
 -- Cross-version sync loops typically arise immediately after login (the
 -- offending peer is back online) so resetting the state at reload would
 -- mean re-paying the discovery cost every session.
-local function getSaturationStore(self, create)
+local function getSaturationStore(create)
     local db = Addon and Addon.Data and Addon.Data.db and Addon.Data.db.global or nil
-    if not db then
-        if create then
-            self._blockFingerprintSaturation = self._blockFingerprintSaturation or {}
-            return self._blockFingerprintSaturation
-        end
-        return self._blockFingerprintSaturation
-    end
+    if not db then return nil end
     if type(db.syncSaturation) ~= "table" then
         if not create then return nil end
         db.syncSaturation = {}
@@ -93,9 +87,9 @@ local function getSaturationStore(self, create)
     return db.syncSaturation.blockFingerprints
 end
 
-local function getSaturationEntry(self, blockKey, fingerprint, create)
+local function getSaturationEntry(blockKey, fingerprint, create)
     if type(blockKey) ~= "string" or blockKey == "" then return nil end
-    local store = getSaturationStore(self, create)
+    local store = getSaturationStore(create)
     if not store then return nil end
     local fp = normalizeFingerprint(fingerprint)
     local blockTable = store[blockKey]
@@ -113,7 +107,7 @@ local function getSaturationEntry(self, blockKey, fingerprint, create)
 end
 
 function Sync:IsBlockFingerprintSaturated(blockKey, fingerprint)
-    local entry = getSaturationEntry(self, blockKey, fingerprint, false)
+    local entry = getSaturationEntry(blockKey, fingerprint, false)
     if not entry then return false end
     local saturatedUntil = entry.saturatedUntil or 0
     if saturatedUntil <= 0 then
@@ -132,7 +126,7 @@ function Sync:IsBlockFingerprintSaturated(blockKey, fingerprint)
 end
 
 function Sync:RecordBlockFingerprintNoProgress(blockKey, fingerprint)
-    local entry = getSaturationEntry(self, blockKey, fingerprint, true)
+    local entry = getSaturationEntry(blockKey, fingerprint, true)
     if not entry then return end
     entry.noProgressCount = (entry.noProgressCount or 0) + 1
     if entry.noProgressCount >= BLOCK_SATURATION_NO_PROGRESS_THRESHOLD then
@@ -148,7 +142,7 @@ function Sync:RecordBlockFingerprintNoProgress(blockKey, fingerprint)
 end
 
 function Sync:ResetBlockFingerprintSaturation(blockKey, fingerprint)
-    local entry = getSaturationEntry(self, blockKey, fingerprint, false)
+    local entry = getSaturationEntry(blockKey, fingerprint, false)
     if entry then
         entry.noProgressCount = 0
         entry.saturatedUntil = 0
@@ -406,8 +400,13 @@ function Sync:HandleReceivedIndexDiffResponse(payload)
 
     session.lastProgressAt = time()
     session.state = "index-diff-ready"
-    session.offeredBlocks = self:BuildWantedBlockOrder(payload.offeredBlocks or {}, payload.sender)
-    session.wantedBlocks = self:BuildWantedBlockOrder(payload.offeredBlocks or {}, payload.sender)
+    -- offeredBlocks is read-only (telemetry / logging); wantedBlocks is
+    -- iterated by nextWantedIndex. Same source so share the list — two
+    -- BuildWantedBlockOrder calls were doing two table sorts and two
+    -- saturation-store walks for the same answer.
+    local orderedBlocks = self:BuildWantedBlockOrder(payload.offeredBlocks or {}, payload.sender)
+    session.offeredBlocks = orderedBlocks
+    session.wantedBlocks = orderedBlocks
     session.nextWantedIndex = 1
     self.telemetry.indexDiffResponseReceived = (self.telemetry.indexDiffResponseReceived or 0) + 1
     self.telemetry.blocksOffered = (self.telemetry.blocksOffered or 0) + #(session.offeredBlocks or {})

@@ -504,6 +504,18 @@ function RecipeMetadata:BuildVisibleSpellIdHash(professionKey, visibility, categ
     return hash
 end
 
+-- Public count helper for callers that want "how many catalogued recipes
+-- does this profession have for this expansion?" without iterating the
+-- nav-tree themselves. Returns 0 when nothing matches; the underscore-
+-- prefixed _navTree should not be reached by consumers directly.
+function RecipeMetadata:GetExpansionRecipeCount(professionKey, expansion)
+    local tree = self._navTree
+    if not tree or not professionKey or not expansion then return 0 end
+    local profNode = tree[expansion] and tree[expansion][professionKey] or nil
+    local all = profNode and profNode._all
+    return all and #all or 0
+end
+
 function RecipeMetadata:GetCategoriesForProfession(professionKey)
     local generatedCategories = self._generated and self._generated.categoriesByProfession
     local generatedSubcategories = self._generated and self._generated.subcategoriesByProfession
