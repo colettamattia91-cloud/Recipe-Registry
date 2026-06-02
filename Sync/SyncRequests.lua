@@ -69,15 +69,40 @@ local function normalizeFingerprint(fingerprint)
     return tostring(fingerprint)
 end
 
+-- Saturation lives in SavedVariables so the cooldown survives /reload.
+-- Cross-version sync loops typically arise immediately after login (the
+-- offending peer is back online) so resetting the state at reload would
+-- mean re-paying the discovery cost every session.
+local function getSaturationStore(self, create)
+    local db = Addon and Addon.Data and Addon.Data.db and Addon.Data.db.global or nil
+    if not db then
+        if create then
+            self._blockFingerprintSaturation = self._blockFingerprintSaturation or {}
+            return self._blockFingerprintSaturation
+        end
+        return self._blockFingerprintSaturation
+    end
+    if type(db.syncSaturation) ~= "table" then
+        if not create then return nil end
+        db.syncSaturation = {}
+    end
+    if type(db.syncSaturation.blockFingerprints) ~= "table" then
+        if not create then return nil end
+        db.syncSaturation.blockFingerprints = {}
+    end
+    return db.syncSaturation.blockFingerprints
+end
+
 local function getSaturationEntry(self, blockKey, fingerprint, create)
     if type(blockKey) ~= "string" or blockKey == "" then return nil end
+    local store = getSaturationStore(self, create)
+    if not store then return nil end
     local fp = normalizeFingerprint(fingerprint)
-    self._blockFingerprintSaturation = self._blockFingerprintSaturation or {}
-    local blockTable = self._blockFingerprintSaturation[blockKey]
+    local blockTable = store[blockKey]
     if not blockTable then
         if not create then return nil end
         blockTable = {}
-        self._blockFingerprintSaturation[blockKey] = blockTable
+        store[blockKey] = blockTable
     end
     local entry = blockTable[fp]
     if not entry and create then

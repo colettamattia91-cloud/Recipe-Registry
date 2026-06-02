@@ -182,7 +182,7 @@ function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
         return true, "visible-unresolved-conservative"
     end
 
-    local professionKey = metadata:GetProfession(recipeKey, info)
+    local professionKey = info.profession
     if not professionKey then
         Addon:Trace("filters", "metadata missing profession for recipe", recipeKey)
         return true, "visible-unresolved-conservative"
@@ -194,13 +194,24 @@ function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
     -- for mining so e.g. Smelt Truesilver (vanilla) stays visible under
     -- a TBC filter view. Matches BuildVisibleSpellIdHash's special-case.
     if professionKey ~= "mining" then
-        local expansion = metadata:GetRecipeExpansion(recipeKey, info)
-        local visibility = self:GetEffectiveExpansionVisibility(professionKey)
-        if expansion == "vanilla" and visibility.vanilla == false then
-            return false, "hidden-expansion"
-        end
-        if expansion == "tbc" and visibility.tbc == false then
-            return false, "hidden-expansion"
+        -- Hot path: the list-build callsite passes the per-profession
+        -- visibility precomputed once. RecipePasses skips an O(profile +
+        -- override) lookup per candidate, which previously dominated the
+        -- predicate phase on Blacksmithing-sized lists (300+ candidates).
+        local visibility = filterContext and filterContext.precomputedVisibility
+            and filterContext.precomputedVisibility[professionKey]
+            or self:GetEffectiveExpansionVisibility(professionKey)
+        -- Skip the whole expansion gate when visibility is fully on; the
+        -- field reads here are cheap, but the resulting per-candidate
+        -- GetRecipeExpansion call also disappears.
+        if visibility.vanilla == false or visibility.tbc == false then
+            local expansion = info.expansion
+            if expansion == "vanilla" and visibility.vanilla == false then
+                return false, "hidden-expansion"
+            end
+            if expansion == "tbc" and visibility.tbc == false then
+                return false, "hidden-expansion"
+            end
         end
     end
 
@@ -211,8 +222,13 @@ function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
     end
     ownership = ownership or {}
 
-    local selfOnly = metadata:IsOutputlessSelfOnly(recipeKey, info)
-    local bopOutput = metadata:IsBopOutput(recipeKey, info)
+    -- Read straight off the record. IsOutputlessSelfOnly / IsBopOutput
+    -- are wrappers around the same field access; calling them per
+    -- candidate adds two method dispatches each that pile up on large
+    -- profession lists. Static bopOutput is emitted for every catalogued
+    -- recipe, so the dynamic fallback only fires for unresolved records.
+    local selfOnly = info.selfOnlyOutputless == true
+    local bopOutput = info.bopOutput
     if bopOutput == nil and Addon.Data and Addon.Data.ResolveRecipeBopOutput then
         bopOutput = Addon.Data:ResolveRecipeBopOutput(recipeKey, info)
     end
@@ -221,11 +237,10 @@ function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
         return true, "visible-current-player"
     end
 
-    local filters = getProfilePrefilters()
-    if selfOnly == true and filters.showRemoteBopOutputRecipes ~= true then
+    if selfOnly == true and profileFilters.showRemoteBopOutputRecipes ~= true then
         return false, "hidden-outputless-self-only"
     end
-    if bopOutput == true and filters.showRemoteBopOutputRecipes ~= true then
+    if bopOutput == true and profileFilters.showRemoteBopOutputRecipes ~= true then
         return false, "hidden-remote-bop"
     end
 

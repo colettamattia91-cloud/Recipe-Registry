@@ -356,11 +356,28 @@ function RecipeMetadata:NormalizeRecipeKey(recipeKey)
 end
 
 function RecipeMetadata:GetRecipeInfo(recipeKey)
-    local normalized = self:NormalizeRecipeKey(recipeKey)
-    if not normalized.spellId then
-        return nil
+    -- Hot path: skip the table allocation that NormalizeRecipeKey does when
+    -- we just want the record. Called once per candidate inside the list
+    -- build predicate cascade, so 300+ allocations per profession refresh
+    -- otherwise pile up against the Lua GC.
+    local numeric = tonumber(recipeKey)
+    if not numeric then return nil end
+    local floored = math.floor(numeric)
+    if floored == 0 then return nil end
+    if floored < 0 then
+        return self._recordsBySpellId[-floored]
     end
-    return self._recordsBySpellId[normalized.spellId]
+    local recipeSpellId = self._recipeItemToSpellId[floored]
+    if recipeSpellId then
+        return self._recordsBySpellId[recipeSpellId]
+    end
+    local createdSpellIds = self._createdItemToSpellIds[floored]
+    if type(createdSpellIds) == "table" and #createdSpellIds == 1 then
+        return self._recordsBySpellId[createdSpellIds[1]]
+    end
+    -- Ambiguous or unknown: fall back to the full normalize so the
+    -- caller still gets the ambiguity flag in GetMetadataResolutionStatus.
+    return nil
 end
 
 local function getInfo(self, recipeKey, info)

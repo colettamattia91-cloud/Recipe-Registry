@@ -67,6 +67,10 @@ local DB_DEFAULTS = {
         },
         members = {},
         addonPeers = {},
+        syncSaturation = {
+            -- [blockKey][fingerprint] = { noProgressCount, saturatedUntil }
+            blockFingerprints = {},
+        },
     },
     profile = {
         selectedProfession = nil,

@@ -214,11 +214,14 @@ local function getItemBindType(itemID)
     if not itemID or type(GetItemInfo) ~= "function" then
         return nil, "unavailable"
     end
-    local name = GetItemInfo(itemID)
+    -- One GetItemInfo call returns the whole tuple. The previous version
+    -- called it twice (once for name, once with select(14, …) for the
+    -- bind type) which doubled per-recipe overhead during predicate
+    -- filtering against item caches that already had the entry.
+    local name, _, _, _, _, _, _, _, _, _, _, _, _, bindType = GetItemInfo(itemID)
     if not name then
         return nil, "pending"
     end
-    local bindType = select(14, GetItemInfo(itemID))
     if bindType == nil then
         return nil, "unknown"
     end
@@ -1585,6 +1588,27 @@ function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, catego
                 if visibleSpellIdsHash and not next(visibleSpellIdsHash) then
                     visibleSpellIdsHash = nil
                 end
+            end
+        end
+
+        -- Precompute the per-profession visibility once. RecipePasses
+        -- consults it via filterContext.precomputedVisibility so it
+        -- doesn't re-derive the same answer for every candidate (which
+        -- on Blacksmithing-sized lists meant 300+ profile-prefilter
+        -- lookups per build).
+        if filtersModule and filtersModule.GetEffectiveExpansionVisibility then
+            filterContext = filterContext or {}
+            local precomputed = filterContext.precomputedVisibility
+            if type(precomputed) ~= "table" then
+                precomputed = {}
+                filterContext.precomputedVisibility = precomputed
+            end
+            local profKey = profName
+            if profKey and profKey ~= "All" and filtersModule.NormalizeProfessionKey then
+                profKey = filtersModule:NormalizeProfessionKey(profName) or profName
+            end
+            if profKey and profKey ~= "All" and not precomputed[profKey] then
+                precomputed[profKey] = filtersModule:GetEffectiveExpansionVisibility(profKey)
             end
         end
 
