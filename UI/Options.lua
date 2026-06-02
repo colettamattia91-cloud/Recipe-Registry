@@ -86,7 +86,7 @@ local function ensureRecipePrefilters(profile)
         filters.expansionDefaults = {}
     end
     if filters.expansionDefaults.vanilla == nil then
-        filters.expansionDefaults.vanilla = true
+        filters.expansionDefaults.vanilla = false
     end
     if filters.expansionDefaults.tbc == nil then
         filters.expansionDefaults.tbc = true
@@ -102,7 +102,9 @@ local function resetRecipePrefilters(profile)
     profile.recipePrefilters = {
         showRemoteBopOutputRecipes = false,
         expansionDefaults = {
-            vanilla = true,
+            -- Match DB_DEFAULTS in Data.lua — TBC-only by default. Vanilla
+            -- recipes are an opt-in via the global Vanilla checkbox.
+            vanilla = false,
             tbc = true,
         },
         professionExpansionOverrides = {},

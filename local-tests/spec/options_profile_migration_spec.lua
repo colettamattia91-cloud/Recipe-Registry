@@ -171,7 +171,7 @@ Test.it("creates safe defaults when the saved prefilter block is missing", funct
 
     local filters = addon.db.profile.recipePrefilters
     Test.eq(filters.showRemoteBopOutputRecipes, false)
-    Test.eq(filters.expansionDefaults.vanilla, true)
+    Test.eq(filters.expansionDefaults.vanilla, false)  -- TBC-only default
     Test.eq(filters.expansionDefaults.tbc, true)
     Test.eq(type(filters.professionExpansionOverrides), "table")
 end)
@@ -234,7 +234,7 @@ Test.it("resets migrated prefilters from the panel defaults action", function()
 
     local filters = addon.db.profile.recipePrefilters
     Test.eq(filters.showRemoteBopOutputRecipes, false)
-    Test.eq(filters.expansionDefaults.vanilla, true)
+    Test.eq(filters.expansionDefaults.vanilla, false)  -- TBC-only default
     Test.eq(filters.expansionDefaults.tbc, true)
     Test.eq(Test.countKeys(filters.professionExpansionOverrides), 0)
 end)

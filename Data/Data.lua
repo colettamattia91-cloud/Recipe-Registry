@@ -83,7 +83,14 @@ local DB_DEFAULTS = {
             showRemoteBopOutputRecipes = false,
             hideUncataloguedRecipes = true,
             expansionDefaults = {
-                vanilla = true,
+                -- TBC-only by default. The vast majority of players land
+                -- on TBC content; surfacing 1248 vanilla recipes by
+                -- default in every profession list is noise for the
+                -- normal case. Users who actively level vanilla can flip
+                -- the toggle in /rr options. Existing users with an
+                -- explicit value keep theirs (AceDB only applies
+                -- defaults to keys not yet present in the profile).
+                vanilla = false,
                 tbc = true,
             },
             professionExpansionOverrides = {},

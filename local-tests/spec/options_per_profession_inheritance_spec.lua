@@ -120,6 +120,18 @@ end
 local function loadAddonWithMetadataOptions()
     local metadataAddon, _wow, addon = Loader.LoadMetadata()
     Test.truthy(metadataAddon)
+    -- These specs were written when the global default was both
+    -- expansions on. The user-facing default later flipped to TBC-only;
+    -- override back to "both on" here so the existing assertions (click
+    -- to disable Vanilla, etc.) still describe meaningful interactions.
+    local prefilters = addon.db
+        and addon.db.profile
+        and addon.db.profile.recipePrefilters
+        or nil
+    if prefilters and prefilters.expansionDefaults then
+        prefilters.expansionDefaults.vanilla = true
+        prefilters.expansionDefaults.tbc = true
+    end
     installUiStubs()
     local chunk = loadfile("Options.lua") or assert(loadfile("UI/Options.lua"))
     chunk("RecipeRegistry", {})

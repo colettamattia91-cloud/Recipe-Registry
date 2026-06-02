@@ -4,6 +4,18 @@ local Test = dofile("local-tests/harness/test.lua")
 local _metadataAddon, _wow, addon = Loader.LoadMetadata()
 local data = addon.Data
 
+-- The user-facing default flipped to "TBC only" — the fixtures here mix
+-- vanilla and TBC keys to verify cross-expansion category navigation,
+-- so opt the profile back into both for this spec.
+local prefilters = addon.db
+    and addon.db.profile
+    and addon.db.profile.recipePrefilters
+    or nil
+if prefilters and prefilters.expansionDefaults then
+    prefilters.expansionDefaults.vanilla = true
+    prefilters.expansionDefaults.tbc = true
+end
+
 local PROFESSION_RECIPES = {
     Alchemy = { -2329, -28587 },
     Blacksmithing = { -2660 },

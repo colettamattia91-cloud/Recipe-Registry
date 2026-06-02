@@ -48,7 +48,10 @@ local function getProfilePrefilters()
         filters.expansionDefaults = {}
     end
     if filters.expansionDefaults.vanilla == nil then
-        filters.expansionDefaults.vanilla = true
+        -- TBC-only default at first-touch — matches DB_DEFAULTS so legacy
+        -- saved data missing this field doesn't surprise the user with a
+        -- different visibility than a fresh install would give them.
+        filters.expansionDefaults.vanilla = false
     end
     if filters.expansionDefaults.tbc == nil then
         filters.expansionDefaults.tbc = true

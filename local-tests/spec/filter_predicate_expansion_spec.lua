@@ -26,7 +26,23 @@ local function seedMember(memberKey, profession, recipeKeys)
     data:InvalidateRecipeCaches()
 end
 
-Test.it("passes Vanilla and TBC recipes with default expansion visibility", function()
+Test.it("hides Vanilla and shows TBC with default expansion visibility", function()
+    -- Default flipped to TBC-only — vanilla recipes are filtered out
+    -- unless the user opts back in via /rr options.
+    local vanillaPasses, vanillaReason = filters:RecipePasses(-2329)
+    local tbcPasses, tbcReason = filters:RecipePasses(-28596)
+
+    Test.eq(vanillaPasses, false)
+    Test.eq(vanillaReason, "hidden-expansion")
+    Test.eq(tbcPasses, true)
+    Test.eq(tbcReason, "visible-normal")
+    Test.truthy(metadataAddon.RecipeMetadata, "metadata plugin should be present")
+end)
+
+Test.it("passes Vanilla and TBC recipes when both expansions are enabled", function()
+    addon.db.profile.recipePrefilters.expansionDefaults.vanilla = true
+    addon.db.profile.recipePrefilters.expansionDefaults.tbc = true
+
     local vanillaPasses, vanillaReason = filters:RecipePasses(-2329)
     local tbcPasses, tbcReason = filters:RecipePasses(-28596)
 
@@ -34,7 +50,6 @@ Test.it("passes Vanilla and TBC recipes with default expansion visibility", func
     Test.eq(vanillaReason, "visible-normal")
     Test.eq(tbcPasses, true)
     Test.eq(tbcReason, "visible-normal")
-    Test.truthy(metadataAddon.RecipeMetadata, "metadata plugin should be present")
 end)
 
 Test.it("hides globally disabled Vanilla recipes without hiding TBC", function()
