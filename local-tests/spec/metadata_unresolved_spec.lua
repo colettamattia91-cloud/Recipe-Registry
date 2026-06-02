@@ -22,6 +22,7 @@ Test.it("reports release-blocking and warning fields for incomplete records", fu
         selfOnlyOutputless = false,
         reagents = {},
     }
+    metadata:InvalidateResolutionCache()
 
     local all = metadata:GetUnresolvedRecords()
     local blocking = metadata:GetUnresolvedRecords("release-blocking")
@@ -47,6 +48,7 @@ Test.it("keeps outputless self-only records from requiring created output", func
         selfOnlyOutputless = true,
         reagents = {},
     }
+    metadata:InvalidateResolutionCache()
 
     local unresolved = metadata:GetUnresolvedRecords()
     Test.eq(#unresolved, 0)

@@ -261,6 +261,9 @@ function RecipeMetadata:_Rebuild()
     self._recordsBySpellId = {}
     self._recipeItemToSpellId = {}
     self._createdItemToSpellIds = {}
+    -- Drop the resolution-status memo so the next predicate call rebuilds
+    -- it against the fresh record set.
+    self._unresolvedSpellIdSet = nil
 
     for _, spellId in ipairs(sortedRecordIds(generated.recipesBySpellId)) do
         local record = cloneRecord(spellId, generated.recipesBySpellId[spellId])
@@ -604,24 +607,49 @@ function RecipeMetadata:_CollectUnresolvedRecords()
     return out
 end
 
+-- Build a set { [spellId] = true } of records that have at least one
+-- unresolved field. The full _CollectUnresolvedRecords walk is O(N)
+-- over every catalogued record (~2150 in the current dataset); doing
+-- it inside RecipePasses meant 300+ × 2150 ops per profession list
+-- build, which produced visible CPU spikes when opening a profession.
+-- The set is built once per metadata rebuild and lookup is O(1).
+local function ensureUnresolvedSpellIdSet(self)
+    if self._unresolvedSpellIdSet ~= nil then
+        return self._unresolvedSpellIdSet
+    end
+    local set = {}
+    for _, unresolved in ipairs(self:_CollectUnresolvedRecords()) do
+        local spellId = unresolved and unresolved.spellId
+        if spellId then
+            set[spellId] = true
+        end
+    end
+    self._unresolvedSpellIdSet = set
+    return set
+end
+
+-- Drop the memoized unresolved set. Production code goes through
+-- _Rebuild which clears it automatically; tests and tools that poke
+-- _recordsBySpellId directly must call this to force a refresh.
+function RecipeMetadata:InvalidateResolutionCache()
+    self._unresolvedSpellIdSet = nil
+end
+
 function RecipeMetadata:GetMetadataResolutionStatus(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    if info then
+        -- Resolved record. ambiguousSpellIds can only flag NULL info, so
+        -- skip the full NormalizeRecipeKey call (which allocates a fresh
+        -- table) when we already have a record.
+        return ensureUnresolvedSpellIdSet(self)[info.spellId]
+            and "unresolved" or "resolved"
+    end
+    -- info is nil: either ambiguous mapping or genuinely unknown.
     local normalized = self:NormalizeRecipeKey(recipeKey)
     if normalized.ambiguousSpellIds then
         return "ambiguous"
     end
-
-    info = getInfo(self, recipeKey, info)
-    if not info then
-        return "unresolved"
-    end
-
-    for _, unresolved in ipairs(self:_CollectUnresolvedRecords()) do
-        if unresolved.spellId == info.spellId then
-            return "unresolved"
-        end
-    end
-
-    return "resolved"
+    return "unresolved"
 end
 
 function RecipeMetadata:GetUnresolvedRecords(severity)
