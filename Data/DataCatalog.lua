@@ -1567,13 +1567,27 @@ function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, catego
         -- block in GetRecipeList for the rationale.
         local listMetadata = getRecipeMetadata()
         local filtersModule = Addon.RecipeUiFilters
+        -- Merge the per-session expansion reveal into the effective
+        -- visibility WITHOUT mutating the profile. If the user clicked
+        -- the "show hidden Vanilla" hint, this view treats Vanilla as
+        -- visible for the predicate cascade only.
+        local sessionReveal = filterContext and filterContext.sessionRevealedExpansions or nil
+        local function applySessionReveal(visibility)
+            if not sessionReveal then return visibility end
+            return {
+                professionKey = visibility.professionKey,
+                vanilla = visibility.vanilla ~= false or sessionReveal.vanilla == true,
+                tbc = visibility.tbc ~= false or sessionReveal.tbc == true,
+                inherited = visibility.inherited,
+            }
+        end
         local visibleSpellIdsHash
         if listMetadata and filtersModule
             and profName and profName ~= "All"
             and listMetadata.BuildVisibleSpellIdHash
             and filtersModule.GetEffectiveExpansionVisibility
         then
-            local visibility = filtersModule:GetEffectiveExpansionVisibility(profName)
+            local visibility = applySessionReveal(filtersModule:GetEffectiveExpansionVisibility(profName))
             if visibility and (visibility.vanilla == false or visibility.tbc == false) then
                 local catKey, subKey
                 if categoryFilter then
@@ -1612,7 +1626,9 @@ function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, catego
                 profKey = filtersModule:NormalizeProfessionKey(profName) or profName
             end
             if profKey and profKey ~= "All" and not precomputed[profKey] then
-                precomputed[profKey] = filtersModule:GetEffectiveExpansionVisibility(profKey)
+                precomputed[profKey] = applySessionReveal(
+                    filtersModule:GetEffectiveExpansionVisibility(profKey)
+                )
             end
         end
 

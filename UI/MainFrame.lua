@@ -3214,6 +3214,21 @@ function UI:RefreshRecipeList()
         categoryFilter = categoryFilter,
         globalSearch = globalSearch,
     }
+    -- Thread the per-session expansion reveal so RecipePasses /
+    -- BuildVisibleSpellIdHash treat the hidden expansion as visible
+    -- for THIS view only. Profile prefilters stay untouched, so other
+    -- professions still respect the saved Vanilla=off preference.
+    if self._sessionRevealedExpansions and effectiveProfession then
+        local filtersModule = Addon.RecipeUiFilters
+        local profKey = effectiveProfession
+        if filtersModule and filtersModule.NormalizeProfessionKey then
+            profKey = filtersModule:NormalizeProfessionKey(effectiveProfession) or effectiveProfession
+        end
+        local reveal = profKey and self._sessionRevealedExpansions[profKey]
+        if reveal then
+            context.filterContext.sessionRevealedExpansions = reveal
+        end
+    end
     if Addon.RecipeUiFilters and Addon.RecipeUiFilters.BuildFilterCacheKey then
         context.filterCacheKey = Addon.RecipeUiFilters:BuildFilterCacheKey(context.filterContext)
     end
@@ -3411,6 +3426,7 @@ function UI:RefreshHiddenExpansionHint(profession)
     local hint = self.frame and self.frame.hiddenExpansionHint
     if not hint then return end
     if not profession or profession == "All" or profession == "Favorites" then
+        self:_SetRecipeScrollAnchor(false)
         if hint.IsShown and hint:IsShown() then hint:Hide() end
         return
     end
@@ -3428,6 +3444,17 @@ function UI:RefreshHiddenExpansionHint(profession)
         return
     end
     local visibility = filters:GetEffectiveExpansionVisibility(profKey)
+    -- Honour the per-session reveal so the hint disappears after click
+    -- without forcing the user to refresh / re-navigate to clear it.
+    local sessionReveal = self._sessionRevealedExpansions
+        and self._sessionRevealedExpansions[profKey]
+        or nil
+    if sessionReveal then
+        visibility = {
+            vanilla = visibility.vanilla ~= false or sessionReveal.vanilla == true,
+            tbc = visibility.tbc ~= false or sessionReveal.tbc == true,
+        }
+    end
     local hiddenExpansion, hiddenCount
     local getCount = metadata.GetExpansionRecipeCount
         and function(exp) return metadata:GetExpansionRecipeCount(profKey, exp) end
@@ -3447,6 +3474,7 @@ function UI:RefreshHiddenExpansionHint(profession)
         end
     end
     if not hiddenExpansion then
+        self:_SetRecipeScrollAnchor(false)
         if hint.IsShown and hint:IsShown() then hint:Hide() end
         return
     end
@@ -3461,36 +3489,52 @@ function UI:RefreshHiddenExpansionHint(profession)
             hiddenCount == 1 and "" or "s"
         ))
     end
+    self:_SetRecipeScrollAnchor(true)
     hint:Show()
 end
 
--- Flip the visibility of the currently-pending expansion (set by
--- RefreshHiddenExpansionHint) and refresh the list. If a per-profession
--- override is active we update the override; otherwise we update the
--- global default so the effect carries across professions that inherit.
+-- Toggle the recipeScroll's top anchor so the hint never overlaps the
+-- first recipe row. When the hint is shown, the scroll starts BELOW it;
+-- when hidden, the scroll reclaims that strip. Anchors are set
+-- explicitly (ClearAllPoints + SetPoint) so successive toggles don't
+-- accumulate.
+function UI:_SetRecipeScrollAnchor(hintShown)
+    local scroll = self.frame and self.frame.recipeScroll
+    if not scroll then return end
+    local topY = hintShown and -60 or -40
+    if scroll._rrHintTopY == topY then return end
+    scroll._rrHintTopY = topY
+    scroll:ClearAllPoints()
+    scroll:SetPoint("TOPLEFT", 8, topY)
+    scroll:SetPoint("BOTTOMRIGHT", -28, 10)
+end
+
+-- Click handler: per-session reveal of the hidden expansion for the
+-- currently-viewed profession. The user's saved profile is NOT
+-- mutated, so navigating to another profession (or /reload) shows the
+-- hint again at the original preference. Stored on the UI module so
+-- subsequent navigations back to the same profession keep the reveal.
 function UI:UnhideCurrentProfessionExpansion()
     local hint = self.frame and self.frame.hiddenExpansionHint
     if not hint or not hint._pendingExpansion then return end
-    local profile = Addon.db and Addon.db.profile or nil
-    if not profile then return end
-    profile.recipePrefilters = profile.recipePrefilters or {}
-    local prefilters = profile.recipePrefilters
-    prefilters.expansionDefaults = prefilters.expansionDefaults or {}
-    prefilters.professionExpansionOverrides = prefilters.professionExpansionOverrides or {}
     local profKey = hint._pendingProfession
-    local override = profKey and prefilters.professionExpansionOverrides[profKey] or nil
-    if type(override) == "table" and override.inherit == false then
-        override[hint._pendingExpansion] = true
-    else
-        prefilters.expansionDefaults[hint._pendingExpansion] = true
+    if not profKey then return end
+    self._sessionRevealedExpansions = self._sessionRevealedExpansions or {}
+    local profReveal = self._sessionRevealedExpansions[profKey]
+    if type(profReveal) ~= "table" then
+        profReveal = {}
+        self._sessionRevealedExpansions[profKey] = profReveal
     end
-    if Addon.RecipeUiFilters and Addon.RecipeUiFilters.InvalidateProfessionProjection then
-        Addon.RecipeUiFilters:InvalidateProfessionProjection(profKey, "unhide-expansion-hint")
-    elseif Addon.Data and Addon.Data.InvalidateRecipeCaches then
+    profReveal[hint._pendingExpansion] = true
+    -- Invalidate the list-cache slice for this profession only — the
+    -- session reveal changes the predicate outcome for the current view
+    -- but leaves every other cached list (other professions, profile-
+    -- side filters) intact.
+    if Addon.Data and Addon.Data.InvalidateRecipeCaches then
         Addon.Data:InvalidateRecipeCaches("list")
     end
     hint:Hide()
-    Addon:RequestRefresh("unhide-expansion-hint")
+    Addon:RequestRefresh("unhide-expansion-session")
 end
 
 function UI:GetCrafterRequestability(recipeKey, crafter, selfKey)
