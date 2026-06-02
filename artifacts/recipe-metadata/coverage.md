@@ -2,7 +2,7 @@
 
 Snapshot: tbc-2.5.5
 Dataset kind: release-candidate
-Records: 2149
+Records: 2150
 Release-blocking unresolved: 0
 
 | Profession | Recipes | Expected | Missing | Expansion | Profession | Category |
@@ -14,7 +14,7 @@ Release-blocking unresolved: 0
 | engineering | 250 | 250 | 0 | 100% | 100% | 100% |
 | jewelcrafting | 261 | 261 | 0 | 100% | 100% | 100% |
 | leatherworking | 379 | 379 | 0 | 100% | 100% | 100% |
-| mining | 20 | 20 | 0 | 100% | 100% | 100% |
+| mining | 21 | 21 | 0 | 100% | 100% | 100% |
 | tailoring | 329 | 329 | 0 | 100% | 100% | 100% |
 
 ## Expansion Coverage
@@ -22,7 +22,7 @@ Release-blocking unresolved: 0
 | Expansion | Recipes | Expected | Missing |
 |---|---:|---:|---:|
 | vanilla | 1248 | 1248 | 0 |
-| tbc | 901 | 901 | 0 |
+| tbc | 902 | 902 | 0 |
 
 ## Profession / Expansion Coverage
 
@@ -35,5 +35,5 @@ Release-blocking unresolved: 0
 | engineering | 169 | 169 | 0 | 81 | 81 | 0 |
 | jewelcrafting | 0 | 0 | 0 | 261 | 261 | 0 |
 | leatherworking | 235 | 235 | 0 | 144 | 144 | 0 |
-| mining | 12 | 12 | 0 | 8 | 8 | 0 |
+| mining | 12 | 12 | 0 | 9 | 9 | 0 |
 | tailoring | 234 | 234 | 0 | 95 | 95 | 0 |

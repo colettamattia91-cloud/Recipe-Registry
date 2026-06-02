@@ -1,7 +1,7 @@
 # Recipe Metadata Reagent Coverage
 
-Recipes requiring reagent metadata: 2145
-Resolved reagents: 2145
+Recipes requiring reagent metadata: 2146
+Resolved reagents: 2146
 Coverage: 100%
 
 | Spell ID | Profession | Reagents |
@@ -2115,6 +2115,7 @@ Coverage: 100%
 | 46141 | blacksmithing | 5 |
 | 46142 | blacksmithing | 5 |
 | 46144 | blacksmithing | 5 |
+| 46353 | mining | 2 |
 | 46403 | jewelcrafting | 1 |
 | 46404 | jewelcrafting | 1 |
 | 46405 | jewelcrafting | 1 |

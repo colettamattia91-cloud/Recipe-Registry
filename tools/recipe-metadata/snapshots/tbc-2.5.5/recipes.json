@@ -19017,6 +19017,15 @@
     "spellId": 46144
   },
   {
+    "categoryHint": "mining.advanced",
+    "createdItemId": 35128,
+    "firstSeenExpansion": "tbc",
+    "profession": "mining",
+    "recipeItemId": 35273,
+    "requiredSkill": 375,
+    "spellId": 46353
+  },
+  {
     "categoryHint": "jewelcrafting.misc",
     "createdItemId": 35315,
     "firstSeenExpansion": "tbc",

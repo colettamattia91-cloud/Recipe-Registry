@@ -55,3 +55,5 @@ spells:
   35750: category: elementals, sortOrder: 10
   # Fire Sunder (TBC — Primal Fire -> 10 Mote of Fire)
   35751: category: elementals, sortOrder: 20
+  # Smelt Hardened Khorium (TBC 2.4 — Study of Advanced Smelting drop)
+  46353: category: metals, sortOrder: 260

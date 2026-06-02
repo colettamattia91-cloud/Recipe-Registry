@@ -31496,6 +31496,20 @@ RecipeRegistryRecipeMetadata = {
                 { itemId = 23573, count = 4 },
             },
         },
+        [46353] = {
+            profession = "mining",
+            expansion = "tbc",
+            recipeItemId = 35273,
+            createdItemId = 35128,
+            category = "metals",
+            sortOrder = 260,
+            requiredSkill = 375,
+            bopOutput = false,
+            reagents = {
+                { itemId = 23449, count = 3 },
+                { itemId = 23573, count = 1 },
+            },
+        },
         [46403] = {
             profession = "jewelcrafting",
             expansion = "tbc",
@@ -33428,6 +33442,7 @@ RecipeRegistryRecipeMetadata = {
         [35553] = 46141,
         [35555] = 46142,
         [35554] = 46144,
+        [35273] = 46353,
         [35322] = 46403,
         [35323] = 46404,
         [35325] = 46405,
@@ -35375,6 +35390,7 @@ RecipeRegistryRecipeMetadata = {
         [34504] = { 30347 },
         [34832] = { 45695 },
         [34847] = { 46111 },
+        [35128] = { 46353 },
         [35181] = { 46108 },
         [35182] = { 46109 },
         [35183] = { 46106 },
@@ -35960,12 +35976,12 @@ RecipeRegistryRecipeMetadata = {
                 },
             },
             ["mining"] = {
-                _all = { 29356, 29358, 29359, 29360, 29361, 29686, 35750, 35751 },
+                _all = { 29356, 29358, 29359, 29360, 29361, 29686, 35750, 35751, 46353 },
                 ["elementals"] = {
                     _all = { 35750, 35751 },
                 },
                 ["metals"] = {
-                    _all = { 29356, 29358, 29359, 29360, 29361, 29686 },
+                    _all = { 29356, 29358, 29359, 29360, 29361, 29686, 46353 },
                 },
             },
             ["tailoring"] = {
