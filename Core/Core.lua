@@ -597,6 +597,27 @@ function Addon:OnPlayerEnteringWorld(_event, isLogin, isReload)
     if self.Sync and self.Sync.RefreshSyncReadyState then
         self.Sync:RefreshSyncReadyState("player-entering-world")
     end
+
+    -- Detect transitions out of an instance and re-probe profession state.
+    -- Recipes learned in-instance (trainer, scroll, drop) only fire
+    -- SKILL_LINES_CHANGED / SPELLS_CHANGED there, and without a profession
+    -- window open we can't read the new recipe list. The deferred-scan
+    -- flag set by ProcessSkillSignal in that situation needs the user to
+    -- open the relevant profession window after exit. Re-running
+    -- DetectProfessions here lets us notice skill-rank changes
+    -- immediately even if the window is never opened; an actual recipe
+    -- scan still requires the window, but the dirty fingerprint state is
+    -- at least updated.
+    local nowInInstance = IsInInstance and select(1, IsInInstance()) or false
+    if self._lastWorldInInstance == true and nowInInstance == false then
+        if self.Data and self.Data.DetectProfessions then
+            self.Data:DetectProfessions()
+        end
+        if self.Data and self.Data.MarkScanNeeded then
+            self.Data:MarkScanNeeded(nil, "instance-exit-rescan")
+        end
+    end
+    self._lastWorldInInstance = nowInInstance
 end
 
 function Addon:OnLoginReady()
@@ -710,7 +731,21 @@ function Addon:ProcessSkillSignal(event)
     if self.Data.GetVisibleTrackedProfessionContext then
         profession, source = self.Data:GetVisibleTrackedProfessionContext()
     end
+    local deferredReason = signal == "SPELLS_CHANGED" and "spell-update-deferred" or "skill-event-deferred"
     if not profession then
+        -- No trade-skill window open right now (most common case in
+        -- raid/instance UIs, or when learning a recipe from a scroll or
+        -- trainer with the profession panel closed). We can't read the
+        -- recipe list without an open window, but we MUST flag a pending
+        -- scan so the next TRADE_SKILL_SHOW / CRAFT_SHOW picks up the
+        -- change. The previous early-return silently dropped the signal,
+        -- which meant a recipe learned in an instance wouldn't surface
+        -- (or sync out) until the user manually opened the profession
+        -- after leaving the instance and the addon happened to notice.
+        if self.Data.MarkScanNeeded then
+            self.Data:MarkScanNeeded(nil, deferredReason)
+        end
+        self.Data:DetectProfessions()
         if signal == "SKILL_LINES_CHANGED" then
             self.Data:RecordScanTelemetry("scanSkippedWeaponSkill")
         else
