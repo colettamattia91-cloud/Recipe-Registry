@@ -685,7 +685,13 @@ function Addon:OnCraftShow()
     end, 0.3)
 end
 
-function Addon:OnRecipeSignal()
+function Addon:OnRecipeSignal(_event, recipeID)
+    -- Capture the most recent recipeID from NEW_RECIPE_LEARNED so the
+    -- deferred-scan notice can name the affected profession ("You may
+    -- have learned an Alchemy recipe…") instead of a generic prompt.
+    if tonumber(recipeID) then
+        self._lastRecipeLearnedSpellId = tonumber(recipeID)
+    end
     if self._recipeSignalTimer then
         self:CancelTimer(self._recipeSignalTimer, true)
     end
@@ -711,7 +717,34 @@ function Addon:ProcessRecipeSignal(reason)
         if changed then
             markSyncIndexDirtyAndScheduleHello(self, scanReason, 0.5)
         end
+        -- NEW_RECIPE_LEARNED is the strong signal — fires only on actual
+        -- learns, never at /reload. Queue the post-warmup notice and
+        -- resolve the profession label from metadata if we captured the
+        -- recipe ID.
+        if not changed then
+            local visible = self.Data.GetVisibleTrackedProfessionContext
+                and self.Data:GetVisibleTrackedProfessionContext()
+            if not visible then
+                self._pendingDeferredScanNotice = true
+                self._pendingDeferredScanProfession = self:_ResolveLearnedRecipeProfession()
+                self:ScheduleDeferredScanNoticeCheck()
+            end
+        end
     end
+end
+
+function Addon:_ResolveLearnedRecipeProfession()
+    local spellId = self._lastRecipeLearnedSpellId
+    self._lastRecipeLearnedSpellId = nil
+    if not spellId then return nil end
+    local metadata = self.RecipeMetadata
+    if not (metadata and metadata.GetProfession) then return nil end
+    local professionKey = metadata:GetProfession(-spellId)
+    if not professionKey or professionKey == "" then return nil end
+    -- Title-case the key so the chat notice reads "Alchemy" not
+    -- "alchemy". The 8 supported professions are ASCII so a single
+    -- gsub is enough.
+    return (professionKey:sub(1, 1):upper() .. professionKey:sub(2))
 end
 
 function Addon:OnSkillSignal(event)
@@ -742,7 +775,16 @@ function Addon:MaybeShowDeferredScanNotice()
     end
     self._pendingDeferredScanNotice = false
     self._deferredScanNoticeTimer = nil
-    self:Print("Some recipe-learn events fired with no profession window open. Open your profession panels to update the list.")
+    local profession = self._pendingDeferredScanProfession
+    self._pendingDeferredScanProfession = nil
+    if profession and profession ~= "" then
+        self:Print(string.format(
+            "You may have learned a %s recipe — open the profession panel to refresh the list.",
+            profession
+        ))
+    else
+        self:Print("You may have learned a recipe — open the relevant profession panel to refresh the list.")
+    end
     return true
 end
 
@@ -774,24 +816,18 @@ function Addon:ProcessSkillSignal(event)
     end
     local deferredReason = signal == "SPELLS_CHANGED" and "spell-update-deferred" or "skill-event-deferred"
     if not profession then
-        -- No trade-skill window open right now (most common case in
-        -- raid/instance UIs, or when learning a recipe from a scroll or
-        -- trainer with the profession panel closed). We can't read the
-        -- recipe list without an open window, but we MUST flag a pending
-        -- scan so the next TRADE_SKILL_SHOW / CRAFT_SHOW picks up the
-        -- change. The previous early-return silently dropped the signal,
-        -- which meant a recipe learned in an instance wouldn't surface
-        -- (or sync out) until the user manually opened the profession
-        -- after leaving the instance and the addon happened to notice.
+        -- No trade-skill window open right now. We can't read the recipe
+        -- list without an open window, but we still flag a pending scan
+        -- so the next TRADE_SKILL_SHOW / CRAFT_SHOW picks up whatever
+        -- changed. The chat notice is NOT armed from this path because
+        -- SPELLS_CHANGED and SKILL_LINES_CHANGED also fire on /reload
+        -- and login (with no actual learn happening); the notice is
+        -- armed only by NEW_RECIPE_LEARNED (strong signal) and the
+        -- instance-exit transition (carries its own context).
         if self.Data.MarkScanNeeded then
             self.Data:MarkScanNeeded(nil, deferredReason)
         end
         self.Data:DetectProfessions()
-        -- Queue a chat notice the user will see once warmup + world
-        -- transition have settled and they're out of the instance. The
-        -- watchdog re-checks every few seconds until conditions are met.
-        self._pendingDeferredScanNotice = true
-        self:ScheduleDeferredScanNoticeCheck()
         if signal == "SKILL_LINES_CHANGED" then
             self.Data:RecordScanTelemetry("scanSkippedWeaponSkill")
         else

@@ -1614,28 +1614,38 @@ function UI:CreateMainFrame()
     -- realise material is being filtered. Sits in the strip between the
     -- header and the recipe list; hidden when not applicable.
     local hiddenExpansionHint = CreateFrame("Button", nil, center)
-    hiddenExpansionHint:SetPoint("TOPLEFT", 12, -36)
-    hiddenExpansionHint:SetPoint("TOPRIGHT", -28, -36)
-    hiddenExpansionHint:SetHeight(16)
+    hiddenExpansionHint:SetPoint("TOPLEFT", 12, -34)
+    hiddenExpansionHint:SetPoint("TOPRIGHT", -28, -34)
+    hiddenExpansionHint:SetHeight(20)
+    -- Sibling recipeScroll (created right after) inherits a higher frame
+    -- level by default, so its row children render in FRONT of the hint
+    -- whenever the row strip extends past the scroll viewport edge during
+    -- a scroll. Bump the hint above the scroll strata so it always reads
+    -- on top of the recipe area.
+    hiddenExpansionHint:SetFrameStrata("HIGH")
     hiddenExpansionHint:Hide()
-    local hiddenExpansionHintText = hiddenExpansionHint:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    hiddenExpansionHintText:SetPoint("LEFT", 0, 0)
+    -- Faint background panel so the hint reads as an actionable strip
+    -- rather than blending into the centre frame backdrop.
+    local hintBg = hiddenExpansionHint:CreateTexture(nil, "BACKGROUND")
+    hintBg:SetAllPoints(true)
+    hintBg:SetColorTexture(0.95, 0.75, 0.20, 0.12)
+    hiddenExpansionHint.bg = hintBg
+    local hintHighlight = hiddenExpansionHint:CreateTexture(nil, "HIGHLIGHT")
+    hintHighlight:SetAllPoints(true)
+    hintHighlight:SetColorTexture(0.95, 0.75, 0.20, 0.22)
+    local hiddenExpansionHintText = hiddenExpansionHint:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    hiddenExpansionHintText:SetPoint("LEFT", 6, 0)
+    hiddenExpansionHintText:SetPoint("RIGHT", -6, 0)
     hiddenExpansionHintText:SetJustifyH("LEFT")
-    hiddenExpansionHintText:SetTextColor(0.6, 0.85, 1.0)
+    hiddenExpansionHintText:SetTextColor(1.0, 0.82, 0.0)
     hiddenExpansionHint.text = hiddenExpansionHintText
-    hiddenExpansionHint:SetScript("OnEnter", function(btn)
-        if btn.text then btn.text:SetTextColor(0.85, 0.95, 1.0) end
-    end)
-    hiddenExpansionHint:SetScript("OnLeave", function(btn)
-        if btn.text then btn.text:SetTextColor(0.6, 0.85, 1.0) end
-    end)
     hiddenExpansionHint:SetScript("OnClick", function()
         UI:UnhideCurrentProfessionExpansion()
     end)
     f.hiddenExpansionHint = hiddenExpansionHint
 
     local recipeScroll = CreateFrame("ScrollFrame", nil, center, "UIPanelScrollFrameTemplate")
-    recipeScroll:SetPoint("TOPLEFT", 8, -56)
+    recipeScroll:SetPoint("TOPLEFT", 8, -60)
     recipeScroll:SetPoint("BOTTOMRIGHT", -28, 10)
     local recipeContent = CreateFrame("Frame", nil, recipeScroll)
     recipeContent:SetSize(320, 1)
