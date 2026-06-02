@@ -1608,8 +1608,34 @@ function UI:CreateMainFrame()
     end)
     f.addonStatusSearchClearButton = addonStatusSearchClearButton
 
+    -- Discoverability hint: when a profession's view is restricted by the
+    -- expansion filter, surface a one-click "N <expansion> recipes hidden"
+    -- button so the user doesn't have to dive into the options panel to
+    -- realise material is being filtered. Sits in the strip between the
+    -- header and the recipe list; hidden when not applicable.
+    local hiddenExpansionHint = CreateFrame("Button", nil, center)
+    hiddenExpansionHint:SetPoint("TOPLEFT", 12, -36)
+    hiddenExpansionHint:SetPoint("TOPRIGHT", -28, -36)
+    hiddenExpansionHint:SetHeight(16)
+    hiddenExpansionHint:Hide()
+    local hiddenExpansionHintText = hiddenExpansionHint:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    hiddenExpansionHintText:SetPoint("LEFT", 0, 0)
+    hiddenExpansionHintText:SetJustifyH("LEFT")
+    hiddenExpansionHintText:SetTextColor(0.6, 0.85, 1.0)
+    hiddenExpansionHint.text = hiddenExpansionHintText
+    hiddenExpansionHint:SetScript("OnEnter", function(btn)
+        if btn.text then btn.text:SetTextColor(0.85, 0.95, 1.0) end
+    end)
+    hiddenExpansionHint:SetScript("OnLeave", function(btn)
+        if btn.text then btn.text:SetTextColor(0.6, 0.85, 1.0) end
+    end)
+    hiddenExpansionHint:SetScript("OnClick", function()
+        UI:UnhideCurrentProfessionExpansion()
+    end)
+    f.hiddenExpansionHint = hiddenExpansionHint
+
     local recipeScroll = CreateFrame("ScrollFrame", nil, center, "UIPanelScrollFrameTemplate")
-    recipeScroll:SetPoint("TOPLEFT", 8, -40)
+    recipeScroll:SetPoint("TOPLEFT", 8, -56)
     recipeScroll:SetPoint("BOTTOMRIGHT", -28, 10)
     local recipeContent = CreateFrame("Frame", nil, recipeScroll)
     recipeContent:SetSize(320, 1)
@@ -3360,9 +3386,104 @@ function UI:_FinalizeRecipeList(rows, context, generation)
     self:InvalidateRecipeWindowCache()
     self:RenderVisibleRecipeRows()
     self:RefreshSummaryCards()
+    self:RefreshHiddenExpansionHint(context.selectedProfession)
     -- Async path: the selection may have changed after the list arrived,
     -- so refresh the detail panel to keep it in sync with the new rows.
     self:RefreshDetailPanel()
+end
+
+-- Discoverability hint shown between the recipe header and the list. When
+-- the user has hidden an expansion globally (or via per-profession
+-- override) and that expansion has catalogued recipes for the current
+-- profession, expose a one-click affordance to surface them. Falls
+-- through to hidden state for "All", Favorites, or fully-on visibility.
+function UI:RefreshHiddenExpansionHint(profession)
+    local hint = self.frame and self.frame.hiddenExpansionHint
+    if not hint then return end
+    if not profession or profession == "All" or profession == "Favorites" then
+        if hint.IsShown and hint:IsShown() then hint:Hide() end
+        return
+    end
+    local filters = Addon.RecipeUiFilters
+    local metadata = Addon.RecipeMetadata
+    if not (filters and metadata) then
+        if hint.IsShown and hint:IsShown() then hint:Hide() end
+        return
+    end
+    local profKey = filters.NormalizeProfessionKey and filters:NormalizeProfessionKey(profession) or profession
+    -- Mining is intentionally expansion-agnostic at the predicate level;
+    -- the hint would never fire usefully there.
+    if profKey == "mining" then
+        if hint.IsShown and hint:IsShown() then hint:Hide() end
+        return
+    end
+    local visibility = filters:GetEffectiveExpansionVisibility(profKey)
+    local hiddenExpansion, hiddenCount
+    local function countForExpansion(exp)
+        local tree = metadata._navTree and metadata._navTree[exp]
+        local profNode = tree and tree[profKey]
+        local all = profNode and profNode._all
+        return all and #all or 0
+    end
+    if visibility.vanilla == false then
+        local n = countForExpansion("vanilla")
+        if n > 0 then
+            hiddenExpansion = "vanilla"
+            hiddenCount = n
+        end
+    end
+    if not hiddenExpansion and visibility.tbc == false then
+        local n = countForExpansion("tbc")
+        if n > 0 then
+            hiddenExpansion = "tbc"
+            hiddenCount = n
+        end
+    end
+    if not hiddenExpansion then
+        if hint.IsShown and hint:IsShown() then hint:Hide() end
+        return
+    end
+    hint._pendingProfession = profKey
+    hint._pendingExpansion = hiddenExpansion
+    local label = hiddenExpansion == "vanilla" and "Vanilla" or "TBC"
+    if hint.text then
+        hint.text:SetText(string.format(
+            "%d %s recipe%s hidden by filter — click to show",
+            hiddenCount,
+            label,
+            hiddenCount == 1 and "" or "s"
+        ))
+    end
+    hint:Show()
+end
+
+-- Flip the visibility of the currently-pending expansion (set by
+-- RefreshHiddenExpansionHint) and refresh the list. If a per-profession
+-- override is active we update the override; otherwise we update the
+-- global default so the effect carries across professions that inherit.
+function UI:UnhideCurrentProfessionExpansion()
+    local hint = self.frame and self.frame.hiddenExpansionHint
+    if not hint or not hint._pendingExpansion then return end
+    local profile = Addon.db and Addon.db.profile or nil
+    if not profile then return end
+    profile.recipePrefilters = profile.recipePrefilters or {}
+    local prefilters = profile.recipePrefilters
+    prefilters.expansionDefaults = prefilters.expansionDefaults or {}
+    prefilters.professionExpansionOverrides = prefilters.professionExpansionOverrides or {}
+    local profKey = hint._pendingProfession
+    local override = profKey and prefilters.professionExpansionOverrides[profKey] or nil
+    if type(override) == "table" and override.inherit == false then
+        override[hint._pendingExpansion] = true
+    else
+        prefilters.expansionDefaults[hint._pendingExpansion] = true
+    end
+    if Addon.RecipeUiFilters and Addon.RecipeUiFilters.InvalidateProfessionProjection then
+        Addon.RecipeUiFilters:InvalidateProfessionProjection(profKey, "unhide-expansion-hint")
+    elseif Addon.Data and Addon.Data.InvalidateRecipeCaches then
+        Addon.Data:InvalidateRecipeCaches("list")
+    end
+    hint:Hide()
+    Addon:RequestRefresh("unhide-expansion-hint")
 end
 
 function UI:GetCrafterRequestability(recipeKey, crafter, selfKey)
