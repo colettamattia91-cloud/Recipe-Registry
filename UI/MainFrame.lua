@@ -1619,10 +1619,10 @@ function UI:CreateMainFrame()
     hiddenExpansionHint:SetHeight(20)
     -- Sibling recipeScroll (created right after) inherits a higher frame
     -- level by default, so its row children render in FRONT of the hint
-    -- whenever the row strip extends past the scroll viewport edge during
-    -- a scroll. Bump the hint above the scroll strata so it always reads
-    -- on top of the recipe area.
-    hiddenExpansionHint:SetFrameStrata("HIGH")
+    -- when their y range overlaps. Bump the hint a few levels above the
+    -- centre frame so it stays on top within the same strata (changing
+    -- strata on a non-toplevel child can detach it from the parent).
+    hiddenExpansionHint:SetFrameLevel((center.GetFrameLevel and center:GetFrameLevel() or 1) + 10)
     hiddenExpansionHint:Hide()
     -- Faint background panel so the hint reads as an actionable strip
     -- rather than blending into the centre frame backdrop.
