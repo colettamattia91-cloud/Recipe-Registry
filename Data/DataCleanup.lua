@@ -435,6 +435,14 @@ function Data:ScheduleSafeAutoClean(opts)
             state.dirtyAll = cleanCorruptMember(self, memberKey, self:GetMember(memberKey), {
                 checkProfessionMismatches = false,
                 checkClientResolvable = true,
+                -- Also strip real-but-not-recipe items (Linen Cloth and
+                -- friends mistakenly stored as recipe keys by older
+                -- clients and re-fed via sync). IsRecipeKeyCatalogued
+                -- short-circuits to "accept" when metadata isn't loaded
+                -- yet, so passing the flag is safe even on early warmup
+                -- ticks: if metadata is ready the wash includes those
+                -- keys, otherwise nothing is dropped on this reason.
+                checkMetadataCatalogued = true,
             }, state.stats, state.dirtyBlocks) or state.dirtyAll
             state.index = state.index + 1
             processed = processed + 1

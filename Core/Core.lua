@@ -616,6 +616,11 @@ function Addon:OnPlayerEnteringWorld(_event, isLogin, isReload)
         if self.Data and self.Data.MarkScanNeeded then
             self.Data:MarkScanNeeded(nil, "instance-exit-rescan")
         end
+        -- Kick the deferred-scan notice scheduler so the user gets the
+        -- "open profession to refresh" hint as soon as warmup + world
+        -- transition complete, instead of waiting for the next watchdog
+        -- tick that may already have been cancelled.
+        self:ScheduleDeferredScanNoticeCheck()
     end
     self._lastWorldInInstance = nowInInstance
 end
@@ -719,6 +724,42 @@ function Addon:OnSkillSignal(event)
     end, 1.0)
 end
 
+-- Print a one-shot reminder that the user might have learned recipes
+-- while a profession window wasn't open (typical in raid/dungeon UIs or
+-- when training from a scroll). Suppressed until warmup + world
+-- transition have ended AND we're out of the instance, because firing
+-- mid-instance just adds chat noise the user can't act on anyway.
+function Addon:MaybeShowDeferredScanNotice()
+    if not self._pendingDeferredScanNotice then return false end
+    if self.Sync and self.Sync.IsInWarmup and self.Sync:IsInWarmup() then
+        return false
+    end
+    if self.Sync and self.Sync.IsInWorldTransition and self.Sync:IsInWorldTransition() then
+        return false
+    end
+    if type(IsInInstance) == "function" and select(1, IsInInstance()) then
+        return false
+    end
+    self._pendingDeferredScanNotice = false
+    self._deferredScanNoticeTimer = nil
+    self:Print("Some recipe-learn events fired with no profession window open. Open your profession panels to update the list.")
+    return true
+end
+
+function Addon:ScheduleDeferredScanNoticeCheck()
+    if not self._pendingDeferredScanNotice then return end
+    if self._deferredScanNoticeTimer then return end
+    -- Re-check every 5 seconds until conditions are met. The check is
+    -- cheap (three predicate evaluations) and self-cancels as soon as
+    -- the notice fires.
+    self._deferredScanNoticeTimer = self:ScheduleTimer(function()
+        self._deferredScanNoticeTimer = nil
+        if not self:MaybeShowDeferredScanNotice() then
+            self:ScheduleDeferredScanNoticeCheck()
+        end
+    end, 5)
+end
+
 function Addon:ProcessSkillSignal(event)
     self._skillSignalTimer = nil
     local signal = tostring(event or self._lastSkillSignalEvent or "SPELLS_CHANGED")
@@ -746,6 +787,11 @@ function Addon:ProcessSkillSignal(event)
             self.Data:MarkScanNeeded(nil, deferredReason)
         end
         self.Data:DetectProfessions()
+        -- Queue a chat notice the user will see once warmup + world
+        -- transition have settled and they're out of the instance. The
+        -- watchdog re-checks every few seconds until conditions are met.
+        self._pendingDeferredScanNotice = true
+        self:ScheduleDeferredScanNoticeCheck()
         if signal == "SKILL_LINES_CHANGED" then
             self.Data:RecordScanTelemetry("scanSkippedWeaponSkill")
         else
