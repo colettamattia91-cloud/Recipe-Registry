@@ -157,8 +157,9 @@ function Sync:HandleReceivedBlockSnapshot(payload)
     -- re-queue this block until the cooldown expires. Any pull that
     -- DOES make progress (added recipes, spec change, or empty incoming
     -- which signals the peer dropped the block) resets the counter.
+    local progressMerge = addedRecipes > 0 or specChanged or incomingRecipeCount == 0
     if payload.sender and payload.blockKey then
-        if incomingRecipeCount > 0 and addedRecipes == 0 and not specChanged then
+        if not progressMerge then
             if self.RecordBlockNoProgress then
                 self:RecordBlockNoProgress(payload.sender, payload.blockKey)
             end
@@ -167,6 +168,13 @@ function Sync:HandleReceivedBlockSnapshot(payload)
                 self:ResetBlockSaturation(payload.sender, payload.blockKey)
             end
         end
+    end
+    -- Session-level progress tracking so CompleteOutboundSeedSession can
+    -- tell "we pulled blocks but converged on nothing" apart from "we
+    -- pulled and made progress". Drives the peer-level backoff that the
+    -- seed-selection sort already honors via IsPeerBackoffActive.
+    if progressMerge then
+        session.progressBlockMerges = (session.progressBlockMerges or 0) + 1
     end
 
     session.successfulBlockMerges = (session.successfulBlockMerges or 0) + 1
