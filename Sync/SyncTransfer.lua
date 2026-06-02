@@ -150,22 +150,26 @@ function Sync:HandleReceivedBlockSnapshot(payload)
         tostring(specChanged)
     )
 
-    -- Saturation tracking: when a peer keeps offering a block whose pull
-    -- delivers nothing new, we've likely hit a cross-version or locale
-    -- divergence where our and their contentKeys can't converge. Mark
-    -- the (peer, block) for backoff so future INDEX_DIFF responses don't
-    -- re-queue this block until the cooldown expires. Any pull that
-    -- DOES make progress (added recipes, spec change, or empty incoming
-    -- which signals the peer dropped the block) resets the counter.
+    -- Saturation tracking by (block, fingerprint): the offered fingerprint
+    -- identifies the data shape the peer advertised. If pulling against
+    -- this fingerprint added zero recipes, that DATA won't converge with
+    -- ours — and the same fingerprint coming from a different peer next
+    -- session won't help either. Index on the fingerprint, not the peer,
+    -- so the backoff is convergence-aware: a peer who later advertises a
+    -- NEW fingerprint for the same block (e.g. they cleaned their DB)
+    -- gets a fresh attempt naturally. Any pull that DOES make progress
+    -- (added recipes, spec change, or empty incoming meaning the peer
+    -- dropped the block) resets the counter on that fingerprint.
     local progressMerge = addedRecipes > 0 or specChanged or incomingRecipeCount == 0
-    if payload.sender and payload.blockKey then
+    local offeredFingerprint = session.activeBlockOfferedFingerprint
+    if payload.blockKey then
         if not progressMerge then
-            if self.RecordBlockNoProgress then
-                self:RecordBlockNoProgress(payload.sender, payload.blockKey)
+            if self.RecordBlockFingerprintNoProgress then
+                self:RecordBlockFingerprintNoProgress(payload.blockKey, offeredFingerprint)
             end
         else
-            if self.ResetBlockSaturation then
-                self:ResetBlockSaturation(payload.sender, payload.blockKey)
+            if self.ResetBlockFingerprintSaturation then
+                self:ResetBlockFingerprintSaturation(payload.blockKey, offeredFingerprint)
             end
         end
     end
@@ -181,6 +185,7 @@ function Sync:HandleReceivedBlockSnapshot(payload)
     session.lastMergedBlockFingerprint = nil
     session.activeBlockKey = nil
     session.activeBlockRequestId = nil
+    session.activeBlockOfferedFingerprint = nil
     session.nextWantedIndex = (session.nextWantedIndex or 1) + 1
     if self.RefreshSyncReadyState then
         self:RefreshSyncReadyState("block-merge")
