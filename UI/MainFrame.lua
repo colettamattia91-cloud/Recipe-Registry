@@ -3511,10 +3511,12 @@ function UI:RefreshHiddenExpansionHint(profession)
 end
 
 -- Toggle the recipeScroll's top anchor so the hint never overlaps the
--- first recipe row. When the hint is shown, anchor the scroll to the
--- hint's BOTTOMLEFT with a small gap so the visual spacing is robust
--- to font / hint-height changes. When hidden, the scroll reclaims the
--- strip and anchors directly to the centre frame.
+-- first recipe row. Use absolute offsets relative to the centre frame
+-- (not frame-to-frame anchors) — anchoring to the hint while it was
+-- hidden produced a measurable mismatch (the hint's BOTTOMLEFT wasn't
+-- being honoured) that put the scroll INSIDE the hint band by ~14px.
+-- The hint sits at y=-34 with height 20, so y=-72 leaves an 18px gap
+-- below the hint's bottom edge.
 function UI:_SetRecipeScrollAnchor(hintShown)
     local frame = self.frame
     local scroll = frame and frame.recipeScroll
@@ -3523,16 +3525,7 @@ function UI:_SetRecipeScrollAnchor(hintShown)
     if scroll._rrAnchorMode == mode then return end
     scroll._rrAnchorMode = mode
     scroll:ClearAllPoints()
-    if hintShown and frame.hiddenExpansionHint then
-        -- Anchor the scroll to the hint's BOTTOMLEFT with a generous
-        -- gap (-18). A tighter gap (e.g. -10) was visibly cramped
-        -- in-game: the first row's icon backdrop crowded the hint band
-        -- with no perceptible separation. Hint sits at ~y=-34 with
-        -- height 20, so this puts the scroll top at ~y=-72.
-        scroll:SetPoint("TOPLEFT", frame.hiddenExpansionHint, "BOTTOMLEFT", -4, -18)
-    else
-        scroll:SetPoint("TOPLEFT", 8, -40)
-    end
+    scroll:SetPoint("TOPLEFT", 8, hintShown and -72 or -40)
     scroll:SetPoint("BOTTOMRIGHT", -28, 10)
 end
 
