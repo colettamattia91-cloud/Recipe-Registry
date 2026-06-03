@@ -3,27 +3,32 @@
 All notable changes to this project are documented in this file.
 
 ## [2.1.0] - 2026-06-03
-### Added
-- Added a built-in static recipe metadata library that powers the recipe browser, prefilters, category navigation, reagents, and remote-craft requestability without relying on any external resolver addon.
-- Added recipe prefilters with expansion visibility, per-profession overrides, conservative handling of unresolved entries, and diagnostics through `/rr filters`, `/rr filters unresolved`, and `/rr filters explain <recipeKey>`.
-- Added metadata-backed category rows with user-facing labels and subcategory navigation in the recipe browser sidebar.
-- Added a small banner above the recipe list when one or more expansions are hidden by the active filter, with one-click reveal of the current profession's hidden expansion for the session.
 
-### Changed
-- The default recipe view now shows only TBC content out of the box. Vanilla recipes are hidden by default and can be re-enabled globally or per profession in the options panel.
-- Recipe category navigation, detail cost estimates, material search, and remote BoP/self-only requestability now use the internal metadata library instead of external resolver data.
-- Recipe filter cache keys and invalidation are now scoped to the active profession where possible, while global search and Favorites remain cross-profession.
-- Unknown BoP output metadata now stays visible conservatively until the local item cache can confirm the created item's bind type.
-- Guild sync convergence is more robust against mismatched or stale peers: block transfers that fail to add new content are tracked per `(block, fingerprint)` so the addon stops re-pulling the same offered version from any peer, and unproductive seed sessions back off independently of normal peer success state.
-- Profession rescan reminders are quieter on reload: a "please open your profession window" notice is now shown only when a recipe is genuinely learned or after leaving an instance, with the affected profession name included in the message.
-- Profession scans no longer block on metadata catalogue checks for genuinely unknown spell-keyed recipes, while still hiding clearly garbage item-keyed entries.
-- `/rr clean` now correctly handles items that legitimately belong to more than one profession (such as Goblin Mortar) instead of flagging them as profession-mismatches.
+A big quality-of-life release for the recipe browser. Recipe Registry now ships its own recipe knowledge base, so AtlasLoot is no longer needed for categories, reagents, or cost estimates. The browser focuses on TBC content by default, filters can be tweaked per profession, and a friendly banner tells you when something is being hidden from view.
+
+Guild sync is also more resilient: stale or mismatched peers can no longer trap your client in retry loops, and the "please open your profession window" reminder is now far less chatty after a `/reload`.
+
+### Highlights
+
+- **Built-in recipe knowledge base.** Recipe categories, subcategories, reagents, crafted outputs, and remote-craft eligibility now come from a metadata library shipped with the addon. No AtlasLoot required — and no extra companion addon either.
+- **Smart recipe filters.** A new prefilter system lets you focus on the recipes that matter. The browser now defaults to TBC content; Vanilla can be turned back on globally or per profession from the options panel. Bind-on-Pickup output recipes you don't know are hidden by default to cut down on noise, while your own known crafts stay visible.
+- **Hidden-expansion banner.** When a filter is hiding part of the current profession's recipes, a small banner above the list lets you know — one click reveals them for the rest of the session, without changing your saved filters.
+- **Sidebar categories with real labels.** Profession sidebars now show proper category names and subcategory rows for fast drill-down, all sourced from the new metadata library.
+
+### Improvements
+
+- **Quieter `/reload`.** The "please open your profession window" notice no longer fires on every reload. It only appears when you actually learn a recipe or come out of an instance, and it tells you which profession needs the rescan.
+- **More reliable guild sync.** When a peer keeps offering data that doesn't add anything new, Recipe Registry now tracks that specific version and stops re-pulling it from anyone in the guild. Unproductive sources back off on their own without affecting healthy peers.
+- **Recipes that teach across professions.** `/rr clean` now correctly handles items like the Goblin Mortar (an Engineering item that teaches an Alchemy recipe) instead of flagging them as profession mismatches.
+- **Conservative bind-type display.** Newly seen recipes whose item bind type hasn't loaded yet stay visible until the local item cache can confirm them, so brand-new recipes don't briefly disappear from the browser.
 
 ### Fixed
-- The local player ready signal is now replayed when the addon is enabled after `PLAYER_LOGIN` already fired, fixing rare cases where guild sync stayed blocked until a `/reload`.
+
+- A rare startup race that could leave guild sync blocked until a manual `/reload` if the addon enabled after `PLAYER_LOGIN` had already fired. The player-ready signal is now replayed automatically.
 
 ### Removed
-- Removed AtlasLoot as a Recipe Registry runtime dependency. `RecipeRegistry.toc` no longer lists AtlasLoot optional dependencies, and the legacy AtlasLoot resolver module is no longer shipped.
+
+- **AtlasLoot is no longer a Recipe Registry dependency.** It is no longer listed in `OptionalDeps`, and the legacy AtlasLoot resolver module is no longer shipped. Existing AtlasLoot installations continue to work normally alongside Recipe Registry — they are just no longer used to power recipe details, categories, or reagent data.
 
 ## [2.0.8] - 2026-05-26
 ### Changed
