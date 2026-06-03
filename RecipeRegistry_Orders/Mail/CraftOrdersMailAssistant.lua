@@ -301,11 +301,25 @@ function Assistant:OpenComposer(order, opts)
         expiresAt    = now + self.PENDING_SEND_TTL,
     }
 
+    -- Auto-attach via the bag-scan supplier unless the caller opts
+    -- out (opts.autoAttach == false) or BagScan is unavailable. The
+    -- user always retains the final click on the in-game Send button,
+    -- so a wrong attach is recoverable: they see what landed in the
+    -- slots and can cancel before sending.
+    local autoAttach = opts.autoAttach
+    if autoAttach == nil then autoAttach = true end
+    local attachSummary
+    if autoAttach then
+        local summary = self:AutoAttachBatch(order, batchIndex)
+        if type(summary) == "table" then attachSummary = summary end
+    end
+
     return true, {
         recipient    = mail.recipient,
         subject      = mail.subject,
         batchIndex   = batchIndex,
         totalBatches = #batches,
+        autoAttach   = attachSummary,
     }
 end
 
@@ -332,4 +346,71 @@ end
 
 function Assistant:ClearPendingSend()
     self._pendingSend = nil
+end
+
+-- Returns a supplier callback bound to BagScan. The callback walks
+-- the bag inventory for each itemID and either picks up the full
+-- stack or splits the exact count onto the cursor; SendBatch's
+-- ClickSendMailItemButton then attaches whatever's on the cursor.
+-- Used internally by OpenComposer's auto-attach path and also
+-- exposed so slash commands / tests can opt in directly.
+function Assistant:DefaultBagSupplier()
+    local bagScan = Addon.BagScan
+    if not (bagScan and type(bagScan.Pick) == "function") then return nil end
+    return function(itemID, count)
+        local ok = bagScan:Pick(itemID, count)
+        return ok == true
+    end
+end
+
+-- Auto-attaches the items of a single batch by driving the bag-scan
+-- supplier + ClickSendMailItemButton, WITHOUT calling SendMail. The
+-- user reviews the staged mail and clicks the in-game Send button
+-- themselves. Returns a summary:
+--   { attached = N, missing = { { itemID, needed, available }, ... } }
+-- Missing entries cover both no-stack and split-across-stacks
+-- failures; the user attaches those slots manually.
+function Assistant:AutoAttachBatch(order, batchIndex)
+    local batches = self:PlanBatches(order)
+    if #batches == 0 then return nil, "no-shippable-items" end
+    batchIndex = tonumber(batchIndex) or 1
+    local batch = batches[batchIndex]
+    if not batch then return nil, "batch-out-of-range" end
+
+    local supplier = self:DefaultBagSupplier()
+    if not supplier then return nil, "bag-scan-missing" end
+    if type(_G.ClickSendMailItemButton) ~= "function" then
+        return nil, "mail-api-missing"
+    end
+
+    local bagScan = Addon.BagScan
+    local result = { attached = 0, missing = {} }
+
+    -- Track the cursor slot ourselves: a successful attach goes into
+    -- slot N where N is the next free attach button. The WoW UI auto-
+    -- selects the first free slot when ClickSendMailItemButton is
+    -- called without a slot id, but we pass explicit slots so the
+    -- attach order matches the batch order (easier for the user to
+    -- read against the body's "Attached:" list).
+    local nextSlot = 1
+    for index = 1, #batch.items do
+        local item = batch.items[index]
+        local need = tonumber(item.count) or 0
+        local available = bagScan and bagScan:CountItem(item.itemID) or 0
+        if need <= 0 then
+            -- nothing to do
+        elseif supplier(item.itemID, need) then
+            _G.ClickSendMailItemButton(nextSlot)
+            nextSlot = nextSlot + 1
+            result.attached = result.attached + 1
+        else
+            result.missing[#result.missing + 1] = {
+                itemID    = item.itemID,
+                name      = item.name,
+                needed    = need,
+                available = available,
+            }
+        end
+    end
+    return result
 end

@@ -886,6 +886,101 @@ local function installWowGlobals()
         clicked = 0,
         Click   = function(self) self.clicked = self.clicked + 1 end,
     }
+
+    -- Bag/container API (TBC 2.5.x). The harness models bags as a
+    -- map { [bagId] = { [slot] = { itemID, count, name } } } where
+    -- bagId 0 is the backpack and 1-4 are the extra bags. Tests set
+    -- the inventory via Wow.SetBagContents; production code reads
+    -- it via the WoW globals below.
+    local function bagState()
+        state.bags = state.bags or { [0] = {}, [1] = {}, [2] = {}, [3] = {}, [4] = {} }
+        return state.bags
+    end
+    _G.NUM_BAG_SLOTS = 4
+
+    _G.GetContainerNumSlots = function(bagId)
+        local bag = bagState()[bagId]
+        if type(bag) ~= "table" then return 0 end
+        -- 16 is the default backpack size; bag-specific bigger sizes
+        -- only matter when tests explicitly want to test the slot
+        -- ceiling. We expose whichever the test set up.
+        return bag.numSlots or 16
+    end
+
+    _G.GetContainerItemInfo = function(bagId, slot)
+        local bag = bagState()[bagId]
+        if type(bag) ~= "table" then return nil end
+        local item = bag[slot]
+        if not item then return nil end
+        -- Real signature: texture, count, locked, quality, readable,
+        -- lootable, link, isFiltered, noValue, itemID. We return
+        -- texture/count/quality/link/itemID; the rest are nil for
+        -- the production code that doesn't rely on them.
+        return item.texture, item.count or 1, false, item.quality,
+               false, false,
+               item.link or string.format("|Hitem:%d|h[%s]|h",
+                   item.itemID or 0, item.name or "item"),
+               false, false, item.itemID
+    end
+
+    _G.GetContainerItemLink = function(bagId, slot)
+        local bag = bagState()[bagId]
+        if type(bag) ~= "table" then return nil end
+        local item = bag[slot]
+        if not item then return nil end
+        return item.link or string.format("|Hitem:%d|h[%s]|h",
+            item.itemID or 0, item.name or "item")
+    end
+
+    _G.PickupContainerItem = function(bagId, slot)
+        local bag = bagState()[bagId]
+        if type(bag) ~= "table" then return end
+        local item = bag[slot]
+        if not item then return end
+        state.cursorItem = {
+            itemID = item.itemID,
+            count  = item.count or 1,
+            name   = item.name,
+            -- Mirror the source so a follow-up ClickSendMailItemButton
+            -- can debit the bag stack on attach.
+            sourceBagId = bagId,
+            sourceSlot  = slot,
+        }
+        bag[slot] = nil
+    end
+
+    _G.SplitContainerItem = function(bagId, slot, count)
+        local bag = bagState()[bagId]
+        if type(bag) ~= "table" then return end
+        local item = bag[slot]
+        if not item then return end
+        local takeCount = math.min(item.count or 1, count or 1)
+        state.cursorItem = {
+            itemID = item.itemID,
+            count  = takeCount,
+            name   = item.name,
+            sourceBagId = bagId,
+            sourceSlot  = slot,
+        }
+        item.count = (item.count or 1) - takeCount
+        if item.count <= 0 then bag[slot] = nil end
+    end
+
+    -- C_Container shim is preferred on retail; TBC clients have it
+    -- as a compatibility wrapper in newer 2.5.x builds. Production
+    -- code can branch on its presence, so we expose both.
+    _G.C_Container = _G.C_Container or {}
+    _G.C_Container.GetContainerNumSlots = _G.GetContainerNumSlots
+    _G.C_Container.GetContainerItemInfo = function(bagId, slot)
+        local _, count, _, quality, _, _, link, _, _, itemID = _G.GetContainerItemInfo(bagId, slot)
+        if not itemID then return nil end
+        return {
+            itemID = itemID, stackCount = count, quality = quality,
+            hyperlink = link,
+        }
+    end
+    _G.C_Container.PickupContainerItem = _G.PickupContainerItem
+    _G.C_Container.SplitContainerItem  = _G.SplitContainerItem
 end
 
 function Wow.Reset(opts)
@@ -1187,6 +1282,24 @@ end
 -- exercise the outgoing-mail attachment flow.
 function Wow.PutItemOnCursor(item)
     state.cursorItem = item and deepcopy(item) or nil
+end
+
+-- Sets the simulated bag inventory. Spec accepts the natural
+-- per-bag-per-slot map plus an optional numSlots override per bag:
+--   { [bagId] = { numSlots = 16, [slot] = { itemID, count, name }, ... } }
+function Wow.SetBagContents(bags)
+    state.bags = state.bags or { [0] = {}, [1] = {}, [2] = {}, [3] = {}, [4] = {} }
+    for bagId, contents in pairs(bags or {}) do
+        state.bags[bagId] = deepcopy(contents)
+    end
+end
+
+function Wow.GetBagContents()
+    return state.bags or {}
+end
+
+function Wow.GetCursorItem()
+    return state.cursorItem
 end
 
 function Wow.GetSendMailOutgoing()

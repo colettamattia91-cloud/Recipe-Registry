@@ -226,6 +226,7 @@ Loader.OrdersFiles = {
     "RecipeRegistry_Orders/Store/CraftOrdersStore.lua",
     "RecipeRegistry_Orders/Planner/CraftOrdersPlanner.lua",
     "RecipeRegistry_Orders/Cart/CraftOrdersCart.lua",
+    "RecipeRegistry_Orders/Mail/CraftOrdersBagScan.lua",
     "RecipeRegistry_Orders/Mail/CraftOrdersMailMarker.lua",
     "RecipeRegistry_Orders/Mail/CraftOrdersMailAssistant.lua",
     "RecipeRegistry_Orders/Mail/CraftOrdersMailScanner.lua",
