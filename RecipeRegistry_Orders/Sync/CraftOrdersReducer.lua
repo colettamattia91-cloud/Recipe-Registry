@@ -175,6 +175,17 @@ function Reducer:ApplyEvents(events)
             summary.rejected = summary.rejected + 1
         end
     end
+
+    -- Broadcast a single coalesced change signal when at least one
+    -- foreign event landed. The Store fires the same message on local
+    -- mutations, so the Board/Cart auto-refresh path is uniform across
+    -- "I changed it" and "a peer's update arrived". Per-event firing
+    -- would also work (the Board debounces) but a batch ApplyEvents
+    -- from EVENTS_RESPONSE would multiply the signal pointlessly.
+    if summary.applied > 0 and type(Addon.SendMessage) == "function" then
+        Addon:SendMessage("CraftOrders:Changed", "sync-applied", nil)
+    end
+
     return summary
 end
 
