@@ -295,7 +295,6 @@ local ACTION_STRIP_HEIGHT = 28
 local ACTION_BUTTON_HEIGHT = 22
 local ACTION_BUTTON_SPACING = 6
 local ACTION_BUTTON_MIN_WIDTH = 90
-local ACTION_BUTTON_LABEL_PADDING = 14
 
 -- Mirrors UI/CraftOrdersCartPanel.lua's "Ask"-style button so the board's
 -- action strip reads as part of the same visual family. Kept local to
@@ -729,11 +728,17 @@ end
 -- a third-party observer. System-only transitions (Expired,
 -- MaterialsAssumed) are intentionally never offered through the UI —
 -- those are driven by background timers, not user clicks.
-function Board:GetLocalActorForOrder(order)
-    if type(order) ~= "table" then return nil end
+local function resolveLocalPlayerKey()
     if type(Addon.GetLocalPlayerKey) ~= "function" then return nil end
     local ok, me = pcall(Addon.GetLocalPlayerKey, Addon)
     if not ok or type(me) ~= "string" or me == "" then return nil end
+    return me
+end
+
+function Board:GetLocalActorForOrder(order, me)
+    if type(order) ~= "table" then return nil end
+    me = me or resolveLocalPlayerKey()
+    if not me then return nil end
     if me == order.requester then return "requester" end
     if me == order.crafter   then return "crafter"   end
     return nil
@@ -852,11 +857,17 @@ end
 function Board:CountActionRequired()
     local store = Addon.Store
     if not store or type(store.ListOrders) ~= "function" then return 0 end
+    -- Resolve identity once so the per-order role check skips its own
+    -- pcall + globals lookup. CraftOrders:Changed fires this on every
+    -- store mutation, so the savings add up.
+    local me = resolveLocalPlayerKey()
+    if not me then return 0 end
     local orders = store:ListOrders()
     local count = 0
     for index = 1, #orders do
         local order = orders[index]
-        if #self:ComputeActionsForOrder(order) > 0 then
+        local actor = self:GetLocalActorForOrder(order, me)
+        if actor and #self:ComputeActionsForOrder(order) > 0 then
             count = count + 1
         end
     end
@@ -1254,18 +1265,6 @@ function Board:Refresh()
     end
 end
 
--- Sizes a label-only button to fit its text plus padding, with a floor
--- so a single-word label ("Accept") doesn't end up uncomfortably narrow
--- next to a longer neighbour ("Mark materials sent").
-local function measureActionWidth(label)
-    local len = #(label or "")
-    local approxWidth = len * 7 + ACTION_BUTTON_LABEL_PADDING
-    if approxWidth < ACTION_BUTTON_MIN_WIDTH then
-        approxWidth = ACTION_BUTTON_MIN_WIDTH
-    end
-    return approxWidth
-end
-
 function Board:_AcquireActionButton(index)
     self.actionButtons = self.actionButtons or {}
     local button = self.actionButtons[index]
@@ -1297,7 +1296,10 @@ function Board:_RebindActionButtons(order)
         local entry = actions[index]
         local button = self:_AcquireActionButton(index)
         if button then
-            local width = measureActionWidth(entry.label)
+            -- Width: glyph * approx-advance + padding, with a floor
+            -- so short labels stay aligned with longer neighbours.
+            local width = math.max(ACTION_BUTTON_MIN_WIDTH,
+                #(entry.label or "") * 7 + 14)
             button:SetSize(width, ACTION_BUTTON_HEIGHT)
             -- Restyle in place: the same pooled button may toggle between
             -- the default and red variants as different orders are

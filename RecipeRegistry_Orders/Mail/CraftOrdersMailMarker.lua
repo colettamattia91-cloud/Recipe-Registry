@@ -77,7 +77,7 @@ end
 -- Canonical text form of an items table: keys sorted ascending,
 -- formatted as "itemID=count" joined by commas. This is what we hash
 -- and also what we use to compare two markers' items for equality.
-local function canonicalItemString(items)
+function Marker:CanonicalItems(items)
     if type(items) ~= "table" then return "" end
     local ids = {}
     for itemID in pairs(items) do
@@ -93,12 +93,8 @@ local function canonicalItemString(items)
     return table.concat(parts, ",")
 end
 
-function Marker:CanonicalItems(items)
-    return canonicalItemString(items)
-end
-
 function Marker:CanonicalHash(items)
-    return fnv1a(canonicalItemString(items))
+    return fnv1a(self:CanonicalItems(items))
 end
 
 -- Encodes a marker block as the full multi-line text (fences + body),

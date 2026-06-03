@@ -146,19 +146,26 @@ end
 -- tombstoned, unknownKind } over the batch.
 function Reducer:ApplyEvents(events)
     if type(events) ~= "table" then return { applied = 0 } end
-    local sorted = {}
-    for index = 1, #events do
-        sorted[index] = events[index]
+    -- Single-event batches (the common case for online ticks) need no
+    -- sort; skip the copy + table.sort to keep the hot path lean.
+    local sorted
+    if #events <= 1 then
+        sorted = events
+    else
+        sorted = {}
+        for index = 1, #events do
+            sorted[index] = events[index]
+        end
+        table.sort(sorted, function(a, b)
+            local ap = tostring(a and a.producer or "")
+            local bp = tostring(b and b.producer or "")
+            if ap ~= bp then return ap < bp end
+            local ao = tostring(a and a.orderId or "")
+            local bo = tostring(b and b.orderId or "")
+            if ao ~= bo then return ao < bo end
+            return (tonumber(a and a.seq) or 0) < (tonumber(b and b.seq) or 0)
+        end)
     end
-    table.sort(sorted, function(a, b)
-        local ap = tostring(a and a.producer or "")
-        local bp = tostring(b and b.producer or "")
-        if ap ~= bp then return ap < bp end
-        local ao = tostring(a and a.orderId or "")
-        local bo = tostring(b and b.orderId or "")
-        if ao ~= bo then return ao < bo end
-        return (tonumber(a and a.seq) or 0) < (tonumber(b and b.seq) or 0)
-    end)
 
     local summary = { applied = 0, rejected = 0, duplicates = 0, tombstoned = 0, unknownKind = 0 }
     for index = 1, #sorted do

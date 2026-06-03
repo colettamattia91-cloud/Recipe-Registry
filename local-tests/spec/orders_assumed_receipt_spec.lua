@@ -34,7 +34,15 @@ end
 -- Helper: backdate the most recent MaterialsSent transition event so
 -- the order looks like it's been in flight longer than the grace
 -- window. Without this we'd need to wait real wall-clock time.
+-- Updates both the order's materialsSentAt stamp (the O(1) field
+-- production now reads) and any matching transition event so the
+-- log-walk fallback also sees the backdated timestamp.
 local function backdateMaterialsSent(plugin, orderId, secondsAgo)
+    local backdatedAt = (time and time() or 0) - secondsAgo
+    local order = plugin.Store:GetOrder(orderId)
+    if order and order.materialsSentAt then
+        order.materialsSentAt = backdatedAt
+    end
     local events = plugin.Store:GetDB().events.log
     for index = 1, #events do
         local event = events[index]
@@ -43,7 +51,7 @@ local function backdateMaterialsSent(plugin, orderId, secondsAgo)
             and event.payload
             and event.payload.change == "state-transition"
             and event.payload.toState == "MaterialsSent" then
-            event.at = (time and time() or 0) - secondsAgo
+            event.at = backdatedAt
         end
     end
 end

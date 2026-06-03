@@ -14,11 +14,12 @@ Addon.Mailbox = Mailbox
 -- Walks every entry returned by the scanner and, for each mail whose
 -- marker.orderId names a known local order, runs the §7.4 integrity
 -- check and writes the receipt to the store ledger. Returns a small
--- summary { scanned, recognized, recorded, tampered } so the slash
--- command and tests can introspect the run.
+-- summary { scanned, recognized, recorded, tampered, delivered } so the
+-- slash command and tests can introspect the run. `delivered` is the
+-- subset of `recorded` that came in as delivery-kind mail.
 function Mailbox:ProcessInbox(opts)
     opts = opts or {}
-    local summary = { scanned = 0, recognized = 0, recorded = 0, tampered = 0 }
+    local summary = { scanned = 0, recognized = 0, recorded = 0, tampered = 0, delivered = 0 }
 
     local scanner = Addon.MailScanner
     if not (scanner and type(scanner.ScanInbox) == "function") then
@@ -59,7 +60,7 @@ function Mailbox:ProcessInbox(opts)
                         valid       = outcome.valid,
                         tamperFlags = outcome.tamperFlags,
                     })
-                    if ok then summary.delivered = (summary.delivered or 0) + 1 end
+                    if ok then summary.delivered = summary.delivered + 1 end
                 end
             else
                 ok = store:RecordBatchReceipt(order.id, marker.batchNumber or 1, {
@@ -151,18 +152,18 @@ end
 -- too fast in practice.
 function Mailbox:DetectPostal()
     local postal = _G.Postal
-    if type(postal) ~= "table" then
-        if type(_G.Postal_OpenAll) ~= "function" then
-            self._postalDetected = false
-            return false
-        end
+    local hasTable = type(postal) == "table"
+    if not hasTable and type(_G.Postal_OpenAll) ~= "function" then
+        self._postalDetected = false
+        self._postalVersion = nil
+        return false
     end
     self._postalDetected = true
     -- Some Postal versions expose a top-level version; grab it when
     -- available so diagnostics can report it.
-    if type(postal) == "table" then
-        self._postalVersion = postal.version or postal.Version or postal.VERSION
-    end
+    self._postalVersion = hasTable
+        and (postal.version or postal.Version or postal.VERSION)
+        or nil
     return true, self._postalVersion
 end
 
@@ -176,17 +177,19 @@ end
 -- explicitly rejects 30 minutes as too short.
 Mailbox.GRACE_WINDOW_SECONDS = 2 * 3600
 
--- Walks the event log for the order's most recent state-transition
--- to MaterialsSent and returns its timestamp, or nil when the order
--- has never been in MaterialsSent. Used by the assumed-receipt
--- timer to measure how long the materials have been "in flight".
+-- Returns the timestamp of the most recent MaterialsSent transition
+-- on the given order, or nil when the order has never been there.
+-- Reads order.materialsSentAt, which Store:Transition stamps directly
+-- so the assumed-receipt grace check is O(1) per order rather than
+-- N * 500 events walked per MAIL_SHOW. The event-log fallback below
+-- covers orders created before this stamp was introduced; new
+-- transitions land in the field directly.
 function Mailbox:GetMaterialsSentAt(order)
     if type(order) ~= "table" or type(order.id) ~= "string" then return nil end
+    if order.materialsSentAt then return order.materialsSentAt end
+
     local store = Addon.Store
     if not (store and type(store.GetRecentEvents) == "function") then return nil end
-
-    -- The events are appended in seq order; the most recent matching
-    -- entry is the freshest. We scan the tail to keep this cheap.
     local events = store:GetRecentEvents(500)
     local lastAt
     for index = 1, #events do

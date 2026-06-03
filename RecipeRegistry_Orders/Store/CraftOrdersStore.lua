@@ -390,29 +390,45 @@ function Store:RecordBatchReceipt(orderId, batchNumber, receipt)
         },
     })
 
-    -- Emit a separate TamperDetected event when the scanner saw any
-    -- integrity failure, mirroring the spec's separation of receipt
-    -- bookkeeping vs. trust signals. Counters / UI consume this event
-    -- kind specifically.
-    if receipt.tamperFlags and #receipt.tamperFlags > 0 then
-        self:AppendEvent({
-            kind    = "TamperDetected",
-            orderId = orderId,
-            actor   = receipt.actor or "system",
-            payload = {
-                batchNumber = batchNumber,
-                flags       = receipt.tamperFlags,
-                sender      = receipt.sender,
-                senderMatch = receipt.senderMatch,
-                hashMatch   = receipt.hashMatch,
-                itemsMatch  = receipt.itemsMatch,
-                observed    = observed,
-                expected    = expected,
-            },
-        })
-    end
+    self:_AppendTamperEventIfFlagged(orderId, {
+        actor       = receipt.actor,
+        batchNumber = batchNumber,
+        flags       = receipt.tamperFlags,
+        sender      = receipt.sender,
+        senderMatch = receipt.senderMatch,
+        hashMatch   = receipt.hashMatch,
+        itemsMatch  = receipt.itemsMatch,
+        observed    = observed,
+        expected    = expected,
+    })
 
     return true, slot
+end
+
+-- Appends a TamperDetected event when the integrity check that drove
+-- the receipt left non-empty flags. Mirrors the spec's separation
+-- (§7.4) of receipt bookkeeping vs. trust signals — counters and UI
+-- consume this event kind specifically. `payload.phase` defaults to
+-- "materials"; pass "delivery" for the crafter -> requester path.
+function Store:_AppendTamperEventIfFlagged(orderId, payload)
+    if type(payload) ~= "table" then return end
+    if type(payload.flags) ~= "table" or #payload.flags == 0 then return end
+    self:AppendEvent({
+        kind    = "TamperDetected",
+        orderId = orderId,
+        actor   = payload.actor or "system",
+        payload = {
+            batchNumber = payload.batchNumber,
+            flags       = payload.flags,
+            sender      = payload.sender,
+            senderMatch = payload.senderMatch,
+            hashMatch   = payload.hashMatch,
+            itemsMatch  = payload.itemsMatch,
+            observed    = payload.observed,
+            expected    = payload.expected,
+            phase       = payload.phase,
+        },
+    })
 end
 
 -- Marks a single outgoing batch as sent: stamps sentAt + sentBy on the
@@ -484,24 +500,18 @@ function Store:RecordDelivery(orderId, opts)
             valid       = opts.valid == true,
         },
     })
-    if opts.tamperFlags and #opts.tamperFlags > 0 then
-        self:AppendEvent({
-            kind    = "TamperDetected",
-            orderId = orderId,
-            actor   = opts.actor or "system",
-            payload = {
-                batchNumber = opts.batchNumber,
-                flags       = opts.tamperFlags,
-                sender      = opts.sender,
-                senderMatch = opts.senderMatch,
-                hashMatch   = opts.hashMatch,
-                itemsMatch  = opts.itemsMatch,
-                observed    = observed,
-                expected    = opts.expected,
-                phase       = "delivery",
-            },
-        })
-    end
+    self:_AppendTamperEventIfFlagged(orderId, {
+        actor       = opts.actor,
+        batchNumber = opts.batchNumber,
+        flags       = opts.tamperFlags,
+        sender      = opts.sender,
+        senderMatch = opts.senderMatch,
+        hashMatch   = opts.hashMatch,
+        itemsMatch  = opts.itemsMatch,
+        observed    = observed,
+        expected    = opts.expected,
+        phase       = "delivery",
+    })
 
     return true, order.delivered
 end
@@ -515,8 +525,17 @@ function Store:Transition(orderId, toState, actor, payload)
     if not ok then return false, err end
 
     local fromState = order.status
+    local now = time()
     order.status = toState
-    order.updatedAt = time()
+    order.updatedAt = now
+
+    -- Stamp the MaterialsSent timestamp directly on the order so the
+    -- assumed-receipt grace check can read it in O(1) instead of
+    -- walking the event log. Same idea for the rest of the lifecycle
+    -- if/when other timers need it.
+    if toState == "MaterialsSent" then
+        order.materialsSentAt = now
+    end
 
     self:AppendEvent({
         kind    = "OrderUpdated",

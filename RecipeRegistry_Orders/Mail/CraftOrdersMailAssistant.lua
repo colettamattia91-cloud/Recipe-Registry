@@ -51,17 +51,17 @@ function Assistant:GatherShippableItems(order)
     return out
 end
 
--- Splits the shippable items into batches of at most
--- ATTACHMENTS_PER_MAIL distinct items each. Each item ends up in
--- exactly one batch — this v1 packing does NOT split a single item
--- across mails based on its stack size. That's a deliberate phase-2
--- limitation: TBC stack-size data lives in GetItemInfo which is not
--- guaranteed to be cached at composition time, so we defer per-stack
--- splitting until a later iteration that can scan the bag inventory.
-function Assistant:PlanBatches(order)
-    local items = self:GatherShippableItems(order)
+-- Greedy packing under ATTACHMENTS_PER_MAIL distinct items per batch.
+-- Each input item ends up in exactly one batch — this v1 packing does
+-- NOT split a single item across mails based on its stack size.
+-- That's a deliberate phase-2 limitation: TBC stack-size data lives
+-- in GetItemInfo which is not guaranteed to be cached at composition
+-- time, so we defer per-stack splitting until a later iteration. The
+-- optional `kind` tag flows onto each batch so downstream code never
+-- confuses materials and delivery shipments.
+function Assistant:_PackBatches(items, kind)
     local batches = {}
-    if #items == 0 then return batches end
+    if type(items) ~= "table" or #items == 0 then return batches end
 
     local perMail = self.ATTACHMENTS_PER_MAIL
     local cursor = 1
@@ -75,6 +75,7 @@ function Assistant:PlanBatches(order)
         batches[#batches + 1] = {
             batchNumber  = #batches + 1,
             totalBatches = 0,         -- patched below once we know the total
+            kind         = kind,
             items        = batchItems,
         }
         cursor = cursor + perMail
@@ -84,6 +85,10 @@ function Assistant:PlanBatches(order)
         batches[index].totalBatches = #batches
     end
     return batches
+end
+
+function Assistant:PlanBatches(order)
+    return self:_PackBatches(self:GatherShippableItems(order))
 end
 
 function Assistant:FormatSubject(order, batch)
@@ -305,12 +310,13 @@ function Assistant:OpenComposer(order, opts)
     -- out (opts.autoAttach == false) or BagScan is unavailable. The
     -- user always retains the final click on the in-game Send button,
     -- so a wrong attach is recoverable: they see what landed in the
-    -- slots and can cancel before sending.
+    -- slots and can cancel before sending. We pass the already-picked
+    -- batch in directly so PlanBatches doesn't run a second time.
     local autoAttach = opts.autoAttach
     if autoAttach == nil then autoAttach = true end
     local attachSummary
     if autoAttach then
-        local summary = self:AutoAttachBatch(order, batchIndex)
+        local summary = self:_AttachBatchItems(batch)
         if type(summary) == "table" then attachSummary = summary end
     end
 
@@ -342,10 +348,6 @@ end
 
 function Assistant:PeekPendingSend()
     return self._pendingSend
-end
-
-function Assistant:ClearPendingSend()
-    self._pendingSend = nil
 end
 
 -- Returns a supplier callback bound to BagScan. The callback walks
@@ -421,35 +423,11 @@ function Assistant:PlanDeliveryItems(order)
     return out
 end
 
--- Splits the delivery items into batches under ATTACHMENTS_PER_MAIL.
--- Same packing logic as PlanBatches but sources from the planned
--- output table instead of the materials buckets, and tags each batch
--- with kind = "delivery" so downstream code never mistakes one for
--- the other.
+-- Source is the planned output table instead of the materials buckets,
+-- and each batch is tagged kind = "delivery" so the scanner / store
+-- never confuse one for the other.
 function Assistant:PlanDeliveryBatches(order)
-    local items = self:PlanDeliveryItems(order)
-    local batches = {}
-    if #items == 0 then return batches end
-
-    local perMail = self.ATTACHMENTS_PER_MAIL
-    local cursor = 1
-    while cursor <= #items do
-        local batchItems = {}
-        for offset = 0, perMail - 1 do
-            local source = items[cursor + offset]
-            if not source then break end
-            batchItems[#batchItems + 1] = source
-        end
-        batches[#batches + 1] = {
-            batchNumber  = #batches + 1,
-            totalBatches = 0,
-            kind         = "delivery",
-            items        = batchItems,
-        }
-        cursor = cursor + perMail
-    end
-    for index = 1, #batches do batches[index].totalBatches = #batches end
-    return batches
+    return self:_PackBatches(self:PlanDeliveryItems(order), "delivery")
 end
 
 function Assistant:ComposeDeliveryMail(order, batch)
@@ -545,12 +523,13 @@ function Assistant:OpenDeliveryComposer(order, opts)
 
     -- Auto-attach via BagScan unless the caller opts out. The crafter
     -- has the finished items in their bags so the same supplier path
-    -- works for delivery.
+    -- works for delivery. Pass the picked batch in directly to avoid
+    -- re-planning batches a second time.
     local autoAttach = opts.autoAttach
     if autoAttach == nil then autoAttach = true end
     local attachSummary
     if autoAttach then
-        local summary = self:AutoAttachDeliveryBatch(order, batchIndex)
+        local summary = self:_AttachBatchItems(batch)
         if type(summary) == "table" then attachSummary = summary end
     end
 
@@ -564,13 +543,14 @@ function Assistant:OpenDeliveryComposer(order, opts)
     }
 end
 
-function Assistant:AutoAttachDeliveryBatch(order, batchIndex)
-    local batches = self:PlanDeliveryBatches(order)
-    if #batches == 0 then return nil, "no-shippable-outputs" end
-    batchIndex = tonumber(batchIndex) or 1
-    local batch = batches[batchIndex]
-    if not batch then return nil, "batch-out-of-range" end
-
+-- Walks a single batch's items and attaches each one to the SendMail
+-- UI via the supplier callback + ClickSendMailItemButton. Tracks the
+-- attach slot ourselves so the slot order matches the batch order
+-- (easier to read against the body's "Attached:" list than the WoW UI's
+-- auto-pick). Returns { attached, missing = [{itemID,name,needed,
+-- available}, ...] }; missing entries cover both supplier failures
+-- (split-across-stacks, no-stack) so the caller can surface them.
+function Assistant:_AttachBatchItems(batch)
     local supplier = self:DefaultBagSupplier()
     if not supplier then return nil, "bag-scan-missing" end
     if type(_G.ClickSendMailItemButton) ~= "function" then
@@ -583,66 +563,42 @@ function Assistant:AutoAttachDeliveryBatch(order, batchIndex)
     for index = 1, #batch.items do
         local item = batch.items[index]
         local need = tonumber(item.count) or 0
-        local available = bagScan and bagScan:CountItem(item.itemID) or 0
-        if need <= 0 then
-            -- nothing to do
-        elseif supplier(item.itemID, need) then
-            _G.ClickSendMailItemButton(nextSlot)
-            nextSlot = nextSlot + 1
-            result.attached = result.attached + 1
-        else
-            result.missing[#result.missing + 1] = {
-                itemID    = item.itemID,
-                name      = item.name,
-                needed    = need,
-                available = available,
-            }
+        if need > 0 then
+            if supplier(item.itemID, need) then
+                _G.ClickSendMailItemButton(nextSlot)
+                nextSlot = nextSlot + 1
+                result.attached = result.attached + 1
+            else
+                local available = bagScan and bagScan:CountItem(item.itemID) or 0
+                result.missing[#result.missing + 1] = {
+                    itemID    = item.itemID,
+                    name      = item.name,
+                    needed    = need,
+                    available = available,
+                }
+            end
         end
     end
     return result
 end
 
+local function pickBatch(batches, batchIndex)
+    batchIndex = tonumber(batchIndex) or 1
+    return batches[batchIndex]
+end
+
+function Assistant:AutoAttachDeliveryBatch(order, batchIndex)
+    local batches = self:PlanDeliveryBatches(order)
+    if #batches == 0 then return nil, "no-shippable-outputs" end
+    local batch = pickBatch(batches, batchIndex)
+    if not batch then return nil, "batch-out-of-range" end
+    return self:_AttachBatchItems(batch)
+end
+
 function Assistant:AutoAttachBatch(order, batchIndex)
     local batches = self:PlanBatches(order)
     if #batches == 0 then return nil, "no-shippable-items" end
-    batchIndex = tonumber(batchIndex) or 1
-    local batch = batches[batchIndex]
+    local batch = pickBatch(batches, batchIndex)
     if not batch then return nil, "batch-out-of-range" end
-
-    local supplier = self:DefaultBagSupplier()
-    if not supplier then return nil, "bag-scan-missing" end
-    if type(_G.ClickSendMailItemButton) ~= "function" then
-        return nil, "mail-api-missing"
-    end
-
-    local bagScan = Addon.BagScan
-    local result = { attached = 0, missing = {} }
-
-    -- Track the cursor slot ourselves: a successful attach goes into
-    -- slot N where N is the next free attach button. The WoW UI auto-
-    -- selects the first free slot when ClickSendMailItemButton is
-    -- called without a slot id, but we pass explicit slots so the
-    -- attach order matches the batch order (easier for the user to
-    -- read against the body's "Attached:" list).
-    local nextSlot = 1
-    for index = 1, #batch.items do
-        local item = batch.items[index]
-        local need = tonumber(item.count) or 0
-        local available = bagScan and bagScan:CountItem(item.itemID) or 0
-        if need <= 0 then
-            -- nothing to do
-        elseif supplier(item.itemID, need) then
-            _G.ClickSendMailItemButton(nextSlot)
-            nextSlot = nextSlot + 1
-            result.attached = result.attached + 1
-        else
-            result.missing[#result.missing + 1] = {
-                itemID    = item.itemID,
-                name      = item.name,
-                needed    = need,
-                available = available,
-            }
-        end
-    end
-    return result
+    return self:_AttachBatchItems(batch)
 end
