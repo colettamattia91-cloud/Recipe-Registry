@@ -73,6 +73,27 @@ function UI:GetExternalTabSpec(id)
     return UI.__externalTabs[id]
 end
 
+-- Public: rewrite the label of an already-registered tab. Used by
+-- sibling plugins to keep a live counter or status in the tab button
+-- (e.g. "Craft Orders (3)" when there are 3 orders awaiting action).
+-- Idempotent and cheap: if the label is unchanged, returns true
+-- without touching the button. Returns nil + reason for unknown tab
+-- or invalid label so callers can branch on it.
+function UI:SetExternalTabLabel(id, label)
+    ensureRegistry()
+    if type(id) ~= "string" or id == "" then return nil, "missing-id" end
+    if type(label) ~= "string" or label == "" then return nil, "missing-label" end
+    local spec = UI.__externalTabs[id]
+    if not spec then return nil, "unknown-tab" end
+    if spec.label == label then return true end
+    spec.label = label
+    local button = UI.__externalTabButtons[id]
+    if button and button.SetLabel then
+        button:SetLabel(label)
+    end
+    return true
+end
+
 function UI:HasExternalTab(id)
     ensureRegistry()
     return UI.__externalTabs[id] ~= nil

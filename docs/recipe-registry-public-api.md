@@ -109,7 +109,10 @@ RecipeRegistry.UI:ListExternalTabs()         -- array of ids in registration ord
 RecipeRegistry.UI:GetExternalTabId()         -- id of the currently active external tab, or nil
 RecipeRegistry.UI:IsExternalView()           -- bool
 RecipeRegistry.UI:SelectExternalTab(id)      -- programmatic activation
+RecipeRegistry.UI:SetExternalTabLabel(id, label) -- rewrite label (badge counter etc.)
 ```
+
+`SetExternalTabLabel(id, label)` returns `true` on success or `nil, reason` on failure (`"unknown-tab"`, `"missing-id"`, `"missing-label"`). It is the supported way for a plugin to keep a live counter or status in its tab button (e.g. `"Craft Orders (3)"` when there are 3 orders awaiting the local player's action). Idempotent and cheap: an unchanged label short-circuits without touching the underlying button.
 
 Internal view-id encoding: external tab selections are stored in `UI.selectedProfession` with the `ext:` prefix to avoid collisions with profession names or the `ADDON_STATUS_VIEW` sentinel. Plugins should never construct that prefix themselves — use `SelectExternalTab(id)` (raw id, no prefix).
 

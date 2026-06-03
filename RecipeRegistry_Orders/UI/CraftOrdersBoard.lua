@@ -707,6 +707,47 @@ function Board:ApplyOrderAction(orderId, toState, actor)
     return true
 end
 
+-- Counts the orders where the local player has at least one available
+-- transition. Used both by the tab badge and by anyone wanting a
+-- "needs your attention" measurement (e.g. future tooltip / minimap
+-- decorations). Iterates every non-terminal order; that's fine because
+-- the store typically holds tens of orders, not thousands.
+function Board:CountActionRequired()
+    local store = Addon.Store
+    if not store or type(store.ListOrders) ~= "function" then return 0 end
+    local orders = store:ListOrders()
+    local count = 0
+    for index = 1, #orders do
+        local order = orders[index]
+        if #self:ComputeActionsForOrder(order) > 0 then
+            count = count + 1
+        end
+    end
+    return count
+end
+
+-- Builds the tab label that includes a (N) suffix when the local
+-- player has action-required orders. Returns the bare base label when
+-- the count is zero, so the tab reads plain ("Craft Orders") rather
+-- than noisy ("Craft Orders (0)") in the common idle case.
+local TAB_BASE_LABEL = "Craft Orders"
+function Board:ComputeTabLabel()
+    local count = self:CountActionRequired()
+    if count <= 0 then return TAB_BASE_LABEL end
+    return string.format("%s (%d)", TAB_BASE_LABEL, count)
+end
+
+-- Pushes the computed label to RR via the public API. No-ops when the
+-- host hook isn't available so the plugin keeps working against older
+-- RR builds. Returns true on success, nil + reason otherwise.
+function Board:RefreshTabLabel()
+    local rr = getRR()
+    if not (rr and rr.UI and type(rr.UI.SetExternalTabLabel) == "function") then
+        return nil, "hook-missing"
+    end
+    return rr.UI:SetExternalTabLabel("orders", self:ComputeTabLabel())
+end
+
 -- Registers the board's tab on the host UI. Safe to call multiple times
 -- (the host registry is idempotent). Returns true on success, or nil +
 -- a short reason if RR's UI hook isn't present.
@@ -732,6 +773,9 @@ function Board:RegisterTab()
     if not ok then return nil, err end
     self.tabRegistered = true
     self:_WireAutoRefresh()
+    -- Push an initial label so the badge reflects any orders that
+    -- exist from a previous session even before the user interacts.
+    self:RefreshTabLabel()
     return true
 end
 
@@ -765,6 +809,11 @@ function Board:_WireAutoRefresh()
     if self._autoRefreshWired then return end
     if type(Addon.RegisterMessage) == "function" then
         Addon:RegisterMessage("CraftOrders:Changed", function()
+            -- Tab label refresh is cheap (one count + one comparison
+            -- in the host) and runs without debounce so the badge
+            -- updates instantly even from another tab. The panel
+            -- itself debounces via _ScheduleRefresh.
+            Board:RefreshTabLabel()
             Board:_ScheduleRefresh()
         end)
     end
