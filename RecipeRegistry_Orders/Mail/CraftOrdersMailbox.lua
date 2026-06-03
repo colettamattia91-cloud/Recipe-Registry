@@ -137,6 +137,139 @@ function Mailbox:OnMailSendSuccess()
     return slot
 end
 
+-- Detects Postal (or a compatible OpenAll provider) so the runtime
+-- can adapt. Postal is a heavily-used mail enhancer that auto-loots
+-- the inbox on open; if it fires before our scanner walks the mails,
+-- RR-marked attachments disappear before we can record receipts.
+--
+-- The defensive design: we don't try to hook or reorder Postal. The
+-- MAIL_INBOX_UPDATE-driven re-scan already fires multiple times as
+-- the inbox repopulates after a Postal pass, so a normally-paced
+-- OpenAll still ends up walking the inbox state our scanner needs.
+-- We surface detection here so /rrord mail status can report it
+-- and a future iteration can add explicit hooks if Postal proves
+-- too fast in practice.
+function Mailbox:DetectPostal()
+    local postal = _G.Postal
+    if type(postal) ~= "table" then
+        if type(_G.Postal_OpenAll) ~= "function" then
+            self._postalDetected = false
+            return false
+        end
+    end
+    self._postalDetected = true
+    -- Some Postal versions expose a top-level version; grab it when
+    -- available so diagnostics can report it.
+    if type(postal) == "table" then
+        self._postalVersion = postal.version or postal.Version or postal.VERSION
+    end
+    return true, self._postalVersion
+end
+
+function Mailbox:IsPostalDetected()
+    return self._postalDetected == true
+end
+
+-- Grace window before a MaterialsSent order with no observed inbox
+-- receipt gets downgraded to MaterialsAssumed (§8.3). 2 hours by
+-- default — TBC mail between accounts takes ~1 hour, and the spec
+-- explicitly rejects 30 minutes as too short.
+Mailbox.GRACE_WINDOW_SECONDS = 2 * 3600
+
+-- Walks the event log for the order's most recent state-transition
+-- to MaterialsSent and returns its timestamp, or nil when the order
+-- has never been in MaterialsSent. Used by the assumed-receipt
+-- timer to measure how long the materials have been "in flight".
+function Mailbox:GetMaterialsSentAt(order)
+    if type(order) ~= "table" or type(order.id) ~= "string" then return nil end
+    local store = Addon.Store
+    if not (store and type(store.GetRecentEvents) == "function") then return nil end
+
+    -- The events are appended in seq order; the most recent matching
+    -- entry is the freshest. We scan the tail to keep this cheap.
+    local events = store:GetRecentEvents(500)
+    local lastAt
+    for index = 1, #events do
+        local event = events[index]
+        if event.orderId == order.id
+            and event.kind == "OrderUpdated"
+            and event.payload
+            and event.payload.change == "state-transition"
+            and event.payload.toState == "MaterialsSent" then
+            lastAt = event.at
+        end
+    end
+    return lastAt
+end
+
+-- A batch slot counts as "observed in inbox" when the scanner wrote
+-- one for it. Tamper-flagged receipts also count: the crafter has
+-- visibility on what arrived (even if it's wrong), so they don't
+-- need the assumed-receipt downgrade.
+local function hasAnyObservedReceipt(order)
+    if type(order.batches) ~= "table" then return false end
+    for _, slot in pairs(order.batches) do
+        if type(slot) == "table" and slot.source == "scanner" then
+            return true
+        end
+    end
+    return false
+end
+
+function Mailbox:NeedsAssumedReceipt(order, now)
+    if type(order) ~= "table" then return false end
+    if order.status ~= "MaterialsSent" then return false end
+    if hasAnyObservedReceipt(order) then return false end
+
+    local sentAt = self:GetMaterialsSentAt(order)
+    if not sentAt then return false end
+    now = tonumber(now) or (time and time() or 0)
+    return (now - sentAt) >= self.GRACE_WINDOW_SECONDS
+end
+
+-- Walks every order where the local player is the crafter and the
+-- assumed-receipt criteria fire, then transitions each one to
+-- MaterialsAssumed via the state machine (system actor). Returns a
+-- summary { eligible, transitioned } so MAIL_SHOW can log + the
+-- spec can assert. Safe to call repeatedly: orders already in
+-- MaterialsAssumed (or past it) are skipped because of the status
+-- guard inside NeedsAssumedReceipt.
+function Mailbox:ApplyAssumedReceipts(opts)
+    opts = opts or {}
+    local summary = { eligible = 0, transitioned = 0 }
+    local store = Addon.Store
+    if not (store and type(store.ListOrders) == "function"
+        and type(store.Transition) == "function") then
+        return summary
+    end
+
+    local me
+    if type(Addon.GetLocalPlayerKey) == "function" then
+        local ok, key = pcall(Addon.GetLocalPlayerKey, Addon)
+        if ok and type(key) == "string" and key ~= "" then me = key end
+    end
+    if not me then return summary end
+
+    local orders = store:ListOrders({ crafter = me })
+    local now = opts.now
+    for index = 1, #orders do
+        local order = orders[index]
+        if self:NeedsAssumedReceipt(order, now) then
+            summary.eligible = summary.eligible + 1
+            local ok = store:Transition(order.id, "MaterialsAssumed", "system", {
+                reason     = "grace-window",
+                graceAfter = self.GRACE_WINDOW_SECONDS,
+            })
+            if ok then summary.transitioned = summary.transitioned + 1 end
+        end
+    end
+    return summary
+end
+
+function Mailbox:GetPostalVersion()
+    return self._postalVersion
+end
+
 -- Lifecycle entry point called from the plugin's OnEnable. Idempotent.
 -- Skips silently when the host doesn't expose RegisterEvent (test
 -- harness lite mode); tests drive ProcessInbox / OnMailSendSuccess
@@ -145,11 +278,23 @@ function Mailbox:OnEnable()
     if self._wired then return end
     if type(Addon.RegisterEvent) ~= "function" then return end
 
+    -- Initial Postal sweep + re-check on ADDON_LOADED in case Postal
+    -- loads after we do.
+    self:DetectPostal()
+    Addon:RegisterEvent("ADDON_LOADED", function()
+        Mailbox:DetectPostal()
+    end)
+
     Addon:RegisterEvent("MAIL_SHOW", function()
         if Addon.MailAssistant and Addon.MailAssistant.SetMailboxOpen then
             Addon.MailAssistant:SetMailboxOpen(true)
         end
         Mailbox:ProcessInbox()
+        -- After the scan: any MaterialsSent order older than the
+        -- grace window with no observed receipt downgrades to
+        -- MaterialsAssumed so the crafter doesn't sit on an order
+        -- forever waiting for a mail that never came.
+        Mailbox:ApplyAssumedReceipts()
     end)
     Addon:RegisterEvent("MAIL_CLOSED", function()
         if Addon.MailAssistant and Addon.MailAssistant.SetMailboxOpen then

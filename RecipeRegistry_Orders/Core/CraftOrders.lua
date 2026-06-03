@@ -736,6 +736,18 @@ local function cmdMail(self, rest)
         local open = self.MailAssistant and self.MailAssistant:IsMailboxOpen() or false
         self:Print(string.format("Mailbox: %s",
             open and "|cff88ff88open|r" or "|cffaaaaaaclosed|r"))
+        if self.Mailbox and self.Mailbox.IsPostalDetected then
+            local detected = self.Mailbox:IsPostalDetected()
+            local version  = self.Mailbox:GetPostalVersion()
+            if detected then
+                self:Print(string.format(
+                    "Postal: |cff88ff88detected|r%s — relying on MAIL_INBOX_UPDATE re-scan to catch RR mails before OpenAll consumes them.",
+                    version and (" v" .. tostring(version)) or ""
+                ))
+            else
+                self:Print("Postal: |cffaaaaaanot detected|r — RR scanner runs first on MAIL_SHOW.")
+            end
+        end
         return
     end
 
