@@ -6,7 +6,7 @@ All notable changes to this project are documented in this file.
 
 A big quality-of-life release for the recipe browser. Recipe Registry now ships its own recipe knowledge base, so AtlasLoot is no longer needed for categories, reagents, or cost estimates. The browser focuses on TBC content by default, filters can be tweaked per profession, and a friendly banner tells you when something is being hidden from view.
 
-Guild sync is also more resilient: stale or mismatched peers can no longer trap your client in retry loops, and the "please open your profession window" reminder is now far less chatty after a `/reload`.
+Guild sync also gets a new safety net that keeps stale or mismatched peers from trapping your client in retry loops, and a smarter rescan reminder tells you exactly which profession needs attention — only when it actually does.
 
 ### Highlights
 
@@ -17,8 +17,9 @@ Guild sync is also more resilient: stale or mismatched peers can no longer trap 
 
 ### Improvements
 
-- **Quieter `/reload`.** The "please open your profession window" notice no longer fires on every reload. It only appears when you actually learn a recipe or come out of an instance, and it tells you which profession needs the rescan.
-- **More reliable guild sync.** When a peer keeps offering data that doesn't add anything new, Recipe Registry now tracks that specific version and stops re-pulling it from anyone in the guild. Unproductive sources back off on their own without affecting healthy peers.
+- **Smarter rescan reminder.** Recipe Registry can now tell you when a profession actually needs a rescan — for example, right after you learn a new recipe or step out of an instance — and which profession it is. It stays quiet during ordinary `/reload`s.
+- **Stronger guild sync convergence.** A new safety net tracks specific block versions that keep failing to add new recipes and stops pulling them from any peer, while productive sources continue normally. Stale or mismatched peers can no longer trap your client in retry loops.
+- **Snappier recipe browser.** Applying the new prefilters, switching professions, and refreshing the recipe list now stay responsive even on guilds with broad recipe coverage. Filter changes no longer cause noticeable hitches on large databases.
 - **Recipes that teach across professions.** `/rr clean` now correctly handles items like the Goblin Mortar (an Engineering item that teaches an Alchemy recipe) instead of flagging them as profession mismatches.
 - **Conservative bind-type display.** Newly seen recipes whose item bind type hasn't loaded yet stay visible until the local item cache can confirm them, so brand-new recipes don't briefly disappear from the browser.
 
