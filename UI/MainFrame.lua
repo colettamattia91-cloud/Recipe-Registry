@@ -1143,9 +1143,13 @@ function UI:ApplyMainLayout()
         f.right:SetPoint("BOTTOMRIGHT", -10, 34)
         setShownIfChanged(f.right, true)
         if f.recipeScroll then
-            f.recipeScroll:ClearAllPoints()
-            f.recipeScroll:SetPoint("TOPLEFT", 8, -40)
-            f.recipeScroll:SetPoint("BOTTOMRIGHT", -28, 10)
+            -- Drop the cached anchor-mode so _SetRecipeScrollAnchor below
+            -- actually re-applies the points (the cache short-circuits
+            -- when mode already matches, but ApplyMainLayout's previous
+            -- inline SetPoint had blown the anchor out from under it).
+            f.recipeScroll._rrAnchorMode = nil
+            local hint = f.hiddenExpansionHint
+            self:_SetRecipeScrollAnchor(hint and hint:IsShown() == true)
         end
     end
     self:RefreshAddonStatusControls()
