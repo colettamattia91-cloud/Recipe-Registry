@@ -237,6 +237,16 @@ local FILTER_LABELS = {
     done   = "Filter: Done",
 }
 
+-- Scope axis is orthogonal to the status filter above and lets a user
+-- narrow the board to "only orders I requested" or "only orders I need
+-- to craft" without losing the active/done bucket.
+local SCOPE_CYCLE  = { "all", "requester", "crafter" }
+local SCOPE_LABELS = {
+    all       = "Scope: Everyone",
+    requester = "Scope: I requested",
+    crafter   = "Scope: I craft",
+}
+
 -- User-facing labels for each state-machine target state. Keeps the
 -- button text short and verb-led ("Mark received") instead of echoing
 -- the raw enum value ("MaterialsReceived"). Any transition target not
@@ -334,6 +344,35 @@ function Board:CycleFilter()
     return self:GetFilter()
 end
 
+function Board:GetScope()
+    return self.scope or "all"
+end
+
+function Board:SetScope(value)
+    if not SCOPE_LABELS[value] then return false, "unknown-scope" end
+    if self.scope == value then return true end
+    self.scope = value
+    self.selectedOrderId = nil
+    if self.panel and self.panel.scopeButton and self.panel.scopeButton.text then
+        self.panel.scopeButton.text:SetText(SCOPE_LABELS[value])
+    end
+    self:Refresh()
+    return true
+end
+
+function Board:CycleScope()
+    local current = self:GetScope()
+    local nextIdx = 1
+    for index, value in ipairs(SCOPE_CYCLE) do
+        if value == current then
+            nextIdx = (index % #SCOPE_CYCLE) + 1
+            break
+        end
+    end
+    self:SetScope(SCOPE_CYCLE[nextIdx])
+    return self:GetScope()
+end
+
 local function passesBucket(bucket, status)
     if bucket == "active" then
         return not TERMINAL_STATES[status]
@@ -355,6 +394,26 @@ function Board:BuildRowList(filters)
     if filters.status then storeFilters.status = filters.status end
     if filters.requester then storeFilters.requester = filters.requester end
     if filters.crafter then storeFilters.crafter = filters.crafter end
+
+    -- Scope axis: resolve to a concrete requester/crafter key using the
+    -- local player. Explicit filters.requester/filters.crafter passed by
+    -- a caller always win — they're how tests pin queries to a known
+    -- player without juggling the WoW mock's identity.
+    local scope = filters.scope or self.scope or "all"
+    if scope ~= "all" and not (storeFilters.requester or storeFilters.crafter) then
+        local me
+        if type(Addon.GetLocalPlayerKey) == "function" then
+            local ok, key = pcall(Addon.GetLocalPlayerKey, Addon)
+            if ok and type(key) == "string" and key ~= "" then me = key end
+        end
+        if me then
+            if scope == "requester" then
+                storeFilters.requester = me
+            elseif scope == "crafter" then
+                storeFilters.crafter = me
+            end
+        end
+    end
 
     local bucket = filters.bucket or self.filter or "all"
 
@@ -776,6 +835,28 @@ function Board:Build(panel)
         Board:CycleFilter()
     end)
     panel.filterButton = filterButton
+
+    -- Scope cycles independently of the status filter: a crafter can
+    -- pin to "I craft" and still toggle between Active/Done.
+    local scopeButton = CreateFrame("Button", nil, listFrame, "BackdropTemplate")
+    scopeButton:SetSize(120, 18)
+    scopeButton:SetPoint("RIGHT", filterButton, "LEFT", -6, 0)
+    scopeButton:SetBackdrop(PANEL_BACKDROP)
+    scopeButton:SetBackdropColor(0.12, 0.12, 0.12, 1)
+    scopeButton:SetBackdropBorderColor(0.30, 0.30, 0.30, 0.85)
+    scopeButton.text = scopeButton:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    scopeButton.text:SetPoint("CENTER")
+    scopeButton.text:SetText(SCOPE_LABELS[self:GetScope()])
+    scopeButton:SetScript("OnEnter", function(widget)
+        widget:SetBackdropBorderColor(0.65, 0.55, 0.20, 0.95)
+    end)
+    scopeButton:SetScript("OnLeave", function(widget)
+        widget:SetBackdropBorderColor(0.30, 0.30, 0.30, 0.85)
+    end)
+    scopeButton:SetScript("OnClick", function()
+        Board:CycleScope()
+    end)
+    panel.scopeButton = scopeButton
 
     local emptyHint = listFrame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     emptyHint:SetPoint("TOPLEFT", 10, -28)

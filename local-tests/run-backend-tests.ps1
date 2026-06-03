@@ -67,6 +67,7 @@ $activeAllSpecs = @(
     "options_profile_migration_spec.lua",
     "orders_board_actions_spec.lua",
     "orders_board_events_spec.lua",
+    "orders_board_scope_spec.lua",
     "orders_cart_panel_spec.lua",
     "orders_cart_spec.lua",
     "orders_order_dialog_spec.lua",
