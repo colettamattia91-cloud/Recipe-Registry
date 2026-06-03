@@ -108,7 +108,13 @@ function Scanner:VerifyIntegrity(scanEntry, order)
     local flags = {}
     local function flag(name) flags[#flags + 1] = name end
 
-    local senderMatch = scanEntry.sender == order.requester
+    -- The expected sender depends on the marker kind: for a materials
+    -- mail the sender must be the order's requester; for a delivery
+    -- mail it must be the crafter. A delivery body that arrives from
+    -- the requester (or vice versa) is treated as a sender mismatch.
+    local expectedSender = order.requester
+    if marker.kind == "delivery" then expectedSender = order.crafter end
+    local senderMatch = scanEntry.sender == expectedSender
     if not senderMatch then flag("sender-mismatch") end
 
     -- Recompute the hash over the marker's items table and compare to

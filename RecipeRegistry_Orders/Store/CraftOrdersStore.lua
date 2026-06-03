@@ -451,6 +451,61 @@ function Store:RecordBatchSent(orderId, batchNumber, payload)
     return true, slot
 end
 
+-- Accumulates a delivery shipment on order.delivered. Each call adds
+-- the observed items to a running map (one delivery may span multiple
+-- mails if the outputs need batching). Always appends an OrderUpdated
+-- {change=delivery-recorded} event; TamperDetected is appended on
+-- non-empty tamperFlags, same shape as RecordBatchReceipt. Status is
+-- intentionally not advanced — the requester transitions the order
+-- to Completed manually after confirming the goods.
+function Store:RecordDelivery(orderId, opts)
+    opts = opts or {}
+    local order = self:GetOrder(orderId)
+    if not order then return false, "unknown-order" end
+
+    local observed = opts.observed or {}
+    order.delivered = order.delivered or {}
+    for itemID, count in pairs(observed) do
+        order.delivered[itemID] = (order.delivered[itemID] or 0) + (tonumber(count) or 0)
+    end
+    order.updatedAt = time()
+
+    self:AppendEvent({
+        kind    = "OrderUpdated",
+        orderId = orderId,
+        actor   = opts.actor or "system",
+        payload = {
+            change      = "delivery-recorded",
+            batchNumber = opts.batchNumber,
+            source      = opts.source or "scanner",
+            observed    = observed,
+            mailIndex   = opts.mailIndex,
+            sender      = opts.sender,
+            valid       = opts.valid == true,
+        },
+    })
+    if opts.tamperFlags and #opts.tamperFlags > 0 then
+        self:AppendEvent({
+            kind    = "TamperDetected",
+            orderId = orderId,
+            actor   = opts.actor or "system",
+            payload = {
+                batchNumber = opts.batchNumber,
+                flags       = opts.tamperFlags,
+                sender      = opts.sender,
+                senderMatch = opts.senderMatch,
+                hashMatch   = opts.hashMatch,
+                itemsMatch  = opts.itemsMatch,
+                observed    = observed,
+                expected    = opts.expected,
+                phase       = "delivery",
+            },
+        })
+    end
+
+    return true, order.delivered
+end
+
 function Store:Transition(orderId, toState, actor, payload)
     local order = self:GetOrder(orderId)
     if not order then return false, "unknown-order" end

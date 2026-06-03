@@ -24,6 +24,15 @@ Marker.SCHEMA_VERSION = 1
 Marker.FENCE_BEGIN    = "--RR-ORDER--"
 Marker.FENCE_END      = "--RR-END--"
 
+-- Kind discriminator for the mail body:
+--   "materials": requester -> crafter, attached items are reagents
+--                expected by the recipe (default for back-compat;
+--                a marker missing the k= field decodes as materials).
+--   "delivery":  crafter -> requester, attached items are the
+--                finished outputs the crafter is delivering.
+Marker.KIND_MATERIALS = "materials"
+Marker.KIND_DELIVERY  = "delivery"
+
 -- Lua 5.1 has no native bitwise XOR. Walk each bit position of the
 -- two operands, flipping the result bit when exactly one input has it
 -- set. Inputs are non-negative integers in [0, 2^32); the result fits
@@ -124,10 +133,11 @@ function Marker:Encode(spec)
     local itemsBlock = "{" .. table.concat(itemParts, ",") .. "}"
 
     local hash = self:CanonicalHash(spec.items)
+    local kind = spec.kind or Marker.KIND_MATERIALS
 
     local payload = string.format(
-        'id="%s",req="%s",cra="%s",b=%d,bt=%d,sv=%d,h="%s",items=%s',
-        spec.orderId, spec.requester, spec.crafter,
+        'id="%s",req="%s",cra="%s",k="%s",b=%d,bt=%d,sv=%d,h="%s",items=%s',
+        spec.orderId, spec.requester, spec.crafter, kind,
         batchNumber, totalBatches, Marker.SCHEMA_VERSION,
         hash, itemsBlock
     )
@@ -221,6 +231,7 @@ function Marker:Decode(body)
     local requester = extractStringField(payload, "req")
     local crafter   = extractStringField(payload, "cra")
     local hash      = extractStringField(payload, "h")
+    local kind      = extractStringField(payload, "k")
     local batch     = extractNumberField(payload, "b")
     local total     = extractNumberField(payload, "bt")
     local schema    = extractNumberField(payload, "sv")
@@ -228,11 +239,15 @@ function Marker:Decode(body)
     if not (orderId and requester and crafter and hash and batch and total and schema and itemsRaw) then
         return nil, "missing-fields"
     end
+    -- Markers from pre-kind versions decode as materials so the
+    -- scanner keeps working against old mail bodies.
+    if not kind or kind == "" then kind = Marker.KIND_MATERIALS end
 
     return {
         orderId       = orderId,
         requester     = requester,
         crafter       = crafter,
+        kind          = kind,
         batchNumber   = batch,
         totalBatches  = total,
         schemaVersion = schema,

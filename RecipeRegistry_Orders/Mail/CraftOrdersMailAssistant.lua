@@ -370,6 +370,238 @@ end
 --   { attached = N, missing = { { itemID, needed, available }, ... } }
 -- Missing entries cover both no-stack and split-across-stacks
 -- failures; the user attaches those slots manually.
+-- Returns the finished items the crafter owes the requester for this
+-- order: { itemID, count, name } per distinct output. v1 looks up
+-- numCreated per craft via RR's recipe display info; when that's
+-- unavailable, falls back to assuming 1 output per craft. Lines
+-- without a known outputItemID are dropped.
+function Assistant:PlanDeliveryItems(order)
+    local out = {}
+    if type(order) ~= "table" or type(order.lines) ~= "table" then return out end
+
+    local rr = _G.RecipeRegistry
+    local getInfo
+    if rr and rr.Data and type(rr.Data.GetRecipeDisplayInfo) == "function" then
+        getInfo = function(key)
+            local ok, info = pcall(rr.Data.GetRecipeDisplayInfo, rr.Data, key)
+            if ok then return info end
+        end
+    end
+
+    local totals = {}
+    for index = 1, #order.lines do
+        local line = order.lines[index]
+        local quantity = tonumber(line.quantity) or 0
+        if quantity > 0 then
+            local info = getInfo and getInfo(line.recipeKey) or nil
+            local outputItemID = line.outputItemID
+                or (info and info.createdItemID)
+            if outputItemID then
+                local numCreated = tonumber(info and info.numCreated) or 1
+                local total = quantity * numCreated
+                local bucket = totals[outputItemID]
+                if not bucket then
+                    bucket = {
+                        itemID = outputItemID,
+                        name   = info and (info.createdItemName or info.label) or nil,
+                        count  = 0,
+                    }
+                    totals[outputItemID] = bucket
+                end
+                bucket.count = bucket.count + total
+            end
+        end
+    end
+
+    -- Deterministic order so the batch packing is stable.
+    local ids = {}
+    for itemID in pairs(totals) do ids[#ids + 1] = itemID end
+    table.sort(ids)
+    for _, itemID in ipairs(ids) do out[#out + 1] = totals[itemID] end
+    return out
+end
+
+-- Splits the delivery items into batches under ATTACHMENTS_PER_MAIL.
+-- Same packing logic as PlanBatches but sources from the planned
+-- output table instead of the materials buckets, and tags each batch
+-- with kind = "delivery" so downstream code never mistakes one for
+-- the other.
+function Assistant:PlanDeliveryBatches(order)
+    local items = self:PlanDeliveryItems(order)
+    local batches = {}
+    if #items == 0 then return batches end
+
+    local perMail = self.ATTACHMENTS_PER_MAIL
+    local cursor = 1
+    while cursor <= #items do
+        local batchItems = {}
+        for offset = 0, perMail - 1 do
+            local source = items[cursor + offset]
+            if not source then break end
+            batchItems[#batchItems + 1] = source
+        end
+        batches[#batches + 1] = {
+            batchNumber  = #batches + 1,
+            totalBatches = 0,
+            kind         = "delivery",
+            items        = batchItems,
+        }
+        cursor = cursor + perMail
+    end
+    for index = 1, #batches do batches[index].totalBatches = #batches end
+    return batches
+end
+
+function Assistant:ComposeDeliveryMail(order, batch)
+    if type(order) ~= "table" then return nil, "invalid-order" end
+    if type(batch) ~= "table" then return nil, "invalid-batch" end
+    if type(order.crafter) ~= "string" or order.crafter == "" then
+        return nil, "missing-crafter"
+    end
+    if type(order.requester) ~= "string" or order.requester == "" then
+        return nil, "missing-requester"
+    end
+    local marker = Addon.MailMarker
+    if not (marker and type(marker.Encode) == "function") then
+        return nil, "marker-missing"
+    end
+
+    local markerBlock, err = marker:Encode({
+        orderId      = order.id,
+        requester    = order.requester,
+        crafter      = order.crafter,
+        kind         = marker.KIND_DELIVERY,
+        batchNumber  = batch.batchNumber,
+        totalBatches = batch.totalBatches,
+        items        = self:BatchItemsAsMap(batch),
+    })
+    if not markerBlock then return nil, err end
+
+    local lines = {}
+    lines[#lines + 1] = string.format("Delivery for order %s",
+        shortenOrderId(order.id, 12))
+    lines[#lines + 1] = string.format("Batch %d of %d",
+        batch.batchNumber or 1, batch.totalBatches or 1)
+    lines[#lines + 1] = ""
+    lines[#lines + 1] = "Attached:"
+    for index = 1, #batch.items do
+        local item = batch.items[index]
+        lines[#lines + 1] = string.format("  - %s x%d",
+            tostring(item.name or ("item:" .. tostring(item.itemID))),
+            tonumber(item.count) or 0)
+    end
+
+    local body = table.concat(lines, "\n") .. "\n\n" .. markerBlock
+    return {
+        recipient   = order.requester,
+        subject     = string.format("[RR] Delivery %s (%d/%d)",
+            shortenOrderId(order.id, 8),
+            batch.batchNumber or 1, batch.totalBatches or 1),
+        body        = body,
+        attachments = batch.items,
+    }
+end
+
+-- Symmetrical to OpenComposer but for the delivery half of the flow.
+-- Same pending-send TTL bookkeeping so MAIL_SEND_SUCCESS credits the
+-- delivery batch on the crafter's side.
+function Assistant:OpenDeliveryComposer(order, opts)
+    opts = opts or {}
+    if not self:IsMailboxOpen() then return false, "mailbox-closed" end
+
+    local batches = self:PlanDeliveryBatches(order)
+    if #batches == 0 then return false, "no-shippable-outputs" end
+
+    local batchIndex = tonumber(opts.batchIndex) or 1
+    local batch = batches[batchIndex]
+    if not batch then return false, "batch-out-of-range" end
+
+    local mail, err = self:ComposeDeliveryMail(order, batch)
+    if not mail then return false, err end
+
+    local nameBox    = _G.SendMailNameEditBox
+    local subjectBox = _G.SendMailSubjectEditBox
+    local bodyBox    = _G.SendMailBodyEditBox
+    if not (subjectBox and bodyBox and nameBox) then
+        return false, "send-ui-missing"
+    end
+    local sendTab = _G.MailFrameTab2
+    if sendTab and type(sendTab.Click) == "function" then sendTab:Click() end
+    if type(nameBox.SetText) == "function"    then nameBox:SetText(mail.recipient)    end
+    if type(subjectBox.SetText) == "function" then subjectBox:SetText(mail.subject)   end
+    if type(bodyBox.SetText) == "function"    then bodyBox:SetText(mail.body)         end
+
+    local now = time and time() or 0
+    self._pendingSend = {
+        orderId      = order.id,
+        batchIndex   = batchIndex,
+        totalBatches = #batches,
+        recipient    = mail.recipient,
+        items        = self:BatchItemsAsMap(batch),
+        kind         = "delivery",
+        stagedAt     = now,
+        expiresAt    = now + self.PENDING_SEND_TTL,
+    }
+
+    -- Auto-attach via BagScan unless the caller opts out. The crafter
+    -- has the finished items in their bags so the same supplier path
+    -- works for delivery.
+    local autoAttach = opts.autoAttach
+    if autoAttach == nil then autoAttach = true end
+    local attachSummary
+    if autoAttach then
+        local summary = self:AutoAttachDeliveryBatch(order, batchIndex)
+        if type(summary) == "table" then attachSummary = summary end
+    end
+
+    return true, {
+        recipient    = mail.recipient,
+        subject      = mail.subject,
+        batchIndex   = batchIndex,
+        totalBatches = #batches,
+        autoAttach   = attachSummary,
+        kind         = "delivery",
+    }
+end
+
+function Assistant:AutoAttachDeliveryBatch(order, batchIndex)
+    local batches = self:PlanDeliveryBatches(order)
+    if #batches == 0 then return nil, "no-shippable-outputs" end
+    batchIndex = tonumber(batchIndex) or 1
+    local batch = batches[batchIndex]
+    if not batch then return nil, "batch-out-of-range" end
+
+    local supplier = self:DefaultBagSupplier()
+    if not supplier then return nil, "bag-scan-missing" end
+    if type(_G.ClickSendMailItemButton) ~= "function" then
+        return nil, "mail-api-missing"
+    end
+
+    local bagScan = Addon.BagScan
+    local result = { attached = 0, missing = {} }
+    local nextSlot = 1
+    for index = 1, #batch.items do
+        local item = batch.items[index]
+        local need = tonumber(item.count) or 0
+        local available = bagScan and bagScan:CountItem(item.itemID) or 0
+        if need <= 0 then
+            -- nothing to do
+        elseif supplier(item.itemID, need) then
+            _G.ClickSendMailItemButton(nextSlot)
+            nextSlot = nextSlot + 1
+            result.attached = result.attached + 1
+        else
+            result.missing[#result.missing + 1] = {
+                itemID    = item.itemID,
+                name      = item.name,
+                needed    = need,
+                available = available,
+            }
+        end
+    end
+    return result
+end
+
 function Assistant:AutoAttachBatch(order, batchIndex)
     local batches = self:PlanBatches(order)
     if #batches == 0 then return nil, "no-shippable-items" end

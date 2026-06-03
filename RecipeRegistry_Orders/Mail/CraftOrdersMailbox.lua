@@ -40,24 +40,45 @@ function Mailbox:ProcessInbox(opts)
         if order then
             summary.recognized = summary.recognized + 1
             local outcome = scanner:VerifyIntegrity(entry, order)
-            -- Translate marker.items into the receipt's "expected" map
-            -- so the store can compute confirmed / missing without
-            -- re-decoding the marker itself.
-            local ok = store:RecordBatchReceipt(order.id, marker.batchNumber or 1, {
-                expected    = marker.items or {},
-                observed    = entry.observed or {},
-                sender      = entry.sender,
-                source      = "scanner",
-                mailIndex   = entry.mailIndex,
-                receivedAt  = opts.now,
-                actor       = "system",
-                senderMatch = outcome.senderMatch,
-                hashMatch   = outcome.hashMatch,
-                itemsMatch  = outcome.itemsMatch,
-                batchMatch  = outcome.batchMatch,
-                valid       = outcome.valid,
-                tamperFlags = outcome.tamperFlags,
-            })
+
+            local ok
+            if marker.kind == "delivery" then
+                if type(store.RecordDelivery) == "function" then
+                    ok = store:RecordDelivery(order.id, {
+                        batchNumber = marker.batchNumber or 1,
+                        expected    = marker.items or {},
+                        observed    = entry.observed or {},
+                        sender      = entry.sender,
+                        source      = "scanner",
+                        mailIndex   = entry.mailIndex,
+                        actor       = "system",
+                        senderMatch = outcome.senderMatch,
+                        hashMatch   = outcome.hashMatch,
+                        itemsMatch  = outcome.itemsMatch,
+                        batchMatch  = outcome.batchMatch,
+                        valid       = outcome.valid,
+                        tamperFlags = outcome.tamperFlags,
+                    })
+                    if ok then summary.delivered = (summary.delivered or 0) + 1 end
+                end
+            else
+                ok = store:RecordBatchReceipt(order.id, marker.batchNumber or 1, {
+                    expected    = marker.items or {},
+                    observed    = entry.observed or {},
+                    sender      = entry.sender,
+                    source      = "scanner",
+                    mailIndex   = entry.mailIndex,
+                    receivedAt  = opts.now,
+                    actor       = "system",
+                    senderMatch = outcome.senderMatch,
+                    hashMatch   = outcome.hashMatch,
+                    itemsMatch  = outcome.itemsMatch,
+                    batchMatch  = outcome.batchMatch,
+                    valid       = outcome.valid,
+                    tamperFlags = outcome.tamperFlags,
+                })
+            end
+
             if ok then summary.recorded = summary.recorded + 1 end
             if outcome.tamperFlags and #outcome.tamperFlags > 0 then
                 summary.tampered = summary.tampered + 1
@@ -83,6 +104,27 @@ function Mailbox:OnMailSendSuccess()
     local store = Addon.Store
     if not (store and type(store.RecordBatchSent) == "function") then
         return nil, "store-not-ready"
+    end
+
+    if pending.kind == "delivery" then
+        -- Delivery sends are bookkept on order.delivered directly so a
+        -- successful crafter -> requester mail materializes the
+        -- outputs immediately for the crafter side. The requester
+        -- side will see the same update via the scanner when their
+        -- mailbox opens, but tagging it here keeps the crafter's UI
+        -- responsive without waiting for the round trip.
+        if type(store.RecordDelivery) ~= "function" then
+            return nil, "delivery-recorder-missing"
+        end
+        local ok, err = store:RecordDelivery(pending.orderId, {
+            batchNumber = pending.batchIndex,
+            observed    = pending.items or {},
+            source      = "self-sent",
+            actor       = "crafter",
+            valid       = true,
+        })
+        if not ok then return nil, err end
+        return { kind = "delivery" }
     end
 
     local ok, slot = store:RecordBatchSent(pending.orderId, pending.batchIndex, {

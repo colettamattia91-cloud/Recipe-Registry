@@ -281,6 +281,15 @@ local COMPOSER_ELIGIBLE_STATES = {
     MaterialsSent     = true,  -- still relevant for sending a follow-up batch
 }
 
+-- Order states where the crafter can ship the finished outputs back
+-- to the requester via a delivery mail. Accepted is when the crafter
+-- has confirmed they'll fulfill; DeliverySent is included so a
+-- multi-batch delivery can be continued after the first mail.
+local DELIVERY_COMPOSER_ELIGIBLE_STATES = {
+    Accepted     = true,
+    DeliverySent = true,
+}
+
 -- Layout constants for the detail-panel action strip.
 local ACTION_STRIP_HEIGHT = 28
 local ACTION_BUTTON_HEIGHT = 22
@@ -771,6 +780,19 @@ function Board:ComputeActionsForOrder(order)
         }
     end
 
+    -- "Compose delivery" is the crafter-side equivalent: ship the
+    -- finished outputs back to the requester. Eligible only on
+    -- Accepted / DeliverySent so the strip doesn't bait the crafter
+    -- into sending before they've taken the order.
+    if actor == "crafter" and DELIVERY_COMPOSER_ELIGIBLE_STATES[order.status]
+        and type(order.lines) == "table" and #order.lines > 0 then
+        out[#out + 1] = {
+            kind  = "compose-delivery",
+            label = "Compose delivery",
+            actor = "crafter",
+        }
+    end
+
     return out
 end
 
@@ -798,17 +820,24 @@ end
 -- a panel frame being built.
 function Board:DispatchAction(orderId, entry)
     if type(entry) ~= "table" then return false, "invalid-entry" end
-    if entry.kind == "compose-mail" then
+    if entry.kind == "compose-mail" or entry.kind == "compose-delivery" then
         local assistant = Addon.MailAssistant
-        if not (assistant and type(assistant.OpenComposer) == "function") then
-            return false, "mail-assistant-missing"
-        end
+        if not assistant then return false, "mail-assistant-missing" end
         local store = Addon.Store
         if not (store and type(store.GetOrder) == "function") then
             return false, "store-not-ready"
         end
         local order = store:GetOrder(orderId)
         if not order then return false, "unknown-order" end
+        if entry.kind == "compose-delivery" then
+            if type(assistant.OpenDeliveryComposer) ~= "function" then
+                return false, "delivery-composer-missing"
+            end
+            return assistant:OpenDeliveryComposer(order)
+        end
+        if type(assistant.OpenComposer) ~= "function" then
+            return false, "mail-assistant-missing"
+        end
         return assistant:OpenComposer(order)
     end
     -- Default: state-machine transition.
