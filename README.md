@@ -138,3 +138,7 @@ Thank you. It genuinely helps keep the project alive.
 ## Feedback And Support
 
 - Issues and feedback: [GitHub Issues](https://github.com/colettamattia91-cloud/Recipe-Registry/issues)
+
+## Acknowledgments
+
+Recipe Registry was originally inspired by GuildCrafts by dkruenbo. No GuildCrafts code is included in this project.
