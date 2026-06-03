@@ -481,7 +481,100 @@ function Board:FormatDetailLines(order)
         lines[#lines + 1] = sectionHeader("Materials:") .. " none computed"
     end
 
+    local eventLines = self:FormatRecentEventLines(order, 5)
+    if #eventLines > 0 then
+        lines[#lines + 1] = ""
+        lines[#lines + 1] = sectionHeader("Recent events:")
+        for index = 1, #eventLines do
+            lines[#lines + 1] = eventLines[index]
+        end
+    end
+
     return lines
+end
+
+-- Renders a single event log entry as a one-line summary. Kept as a
+-- pure function (no self) so the spec can drive it with synthetic
+-- payloads. The summary leads with the verb ("state Draft -> ...",
+-- "line +Major Healing Potion") so a scanning reader sees the action
+-- before the actor / seq metadata. Unknown kinds fall back to the raw
+-- kind string rather than dropping the entry — visibility over
+-- prettiness when something unexpected lands in the log.
+local function summarizeEvent(event)
+    if type(event) ~= "table" then return nil end
+    local payload = event.payload or {}
+    if event.kind == "OrderCreated" then
+        local lineCount = tonumber(payload.lineCount) or 0
+        return string.format("created (%d line%s)", lineCount, lineCount == 1 and "" or "s")
+    end
+    if event.kind == "OrderUpdated" then
+        if payload.change == "state-transition" then
+            return string.format("%s -> %s",
+                tostring(payload.fromState or "?"),
+                tostring(payload.toState or "?"))
+        end
+        if payload.change == "line-added" then
+            local label = payload.recipeLabel or ("recipe:" .. tostring(payload.recipeKey or "?"))
+            return string.format("line + %s x%s",
+                tostring(label),
+                tostring(payload.quantity or "?"))
+        end
+        if payload.change == "line-removed" then
+            return string.format("line -#%s", tostring(payload.lineIndex or "?"))
+        end
+        if payload.change == "provider-set" then
+            return string.format("provider item:%s = %s (qty %s)",
+                tostring(payload.itemID or "?"),
+                tostring(payload.provider or "?"),
+                tostring(payload.quantity or "?"))
+        end
+        return tostring(payload.change or "updated")
+    end
+    if event.kind == "Pruned" then
+        return "pruned"
+    end
+    return tostring(event.kind or "?")
+end
+
+-- Returns the most recent N events for the given order, formatted as
+-- ready-to-render summary lines (indented with INDENT_CONTENT, with the
+-- per-event seq and actor for traceability). Returns an empty table
+-- when there's no order or no store. The Store's GetRecentEvents
+-- returns a cross-order tail; we re-filter here so the section is
+-- per-order rather than per-plugin.
+function Board:FormatRecentEventLines(order, limit)
+    if type(order) ~= "table" or type(order.id) ~= "string" then return {} end
+    local store = Addon.Store
+    if not store or type(store.GetRecentEvents) ~= "function" then return {} end
+
+    limit = tonumber(limit) or 5
+    -- Pull more than the display limit so we can filter out events from
+    -- other orders before truncating. 4x is a coarse heuristic; we'll
+    -- revisit if event volume grows enough to push relevant entries
+    -- past this window.
+    local recent = store:GetRecentEvents(limit * 4)
+    local matching = {}
+    for index = 1, #recent do
+        local event = recent[index]
+        if event and event.orderId == order.id then
+            matching[#matching + 1] = event
+        end
+    end
+
+    local start = math.max(1, #matching - limit + 1)
+    local out = {}
+    for index = start, #matching do
+        local event = matching[index]
+        local summary = summarizeEvent(event)
+        if summary then
+            out[#out + 1] = string.format("%s#%s  %s  by %s",
+                INDENT_CONTENT,
+                tostring(event.seq or "?"),
+                summary,
+                formatPlayerKey(event.actor or "?"))
+        end
+    end
+    return out
 end
 
 -- Selection state. Plain table mutation so tests can drive it without
