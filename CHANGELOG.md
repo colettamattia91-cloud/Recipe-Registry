@@ -21,7 +21,6 @@ All notable changes to this project are documented in this file.
 
 ### Fixed
 - The local player ready signal is now replayed when the addon is enabled after `PLAYER_LOGIN` already fired, fixing rare cases where guild sync stayed blocked until a `/reload`.
-- Recipe list refresh predicates no longer rebuild large unresolved-metadata sets on every candidate row, removing a CPU spike that could cost hundreds of milliseconds per profession switch on large guild databases.
 
 ### Removed
 - Removed AtlasLoot as a Recipe Registry runtime dependency. `RecipeRegistry.toc` no longer lists AtlasLoot optional dependencies, and the legacy AtlasLoot resolver module is no longer shipped.
