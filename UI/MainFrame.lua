@@ -1618,8 +1618,12 @@ function UI:CreateMainFrame()
     -- realise material is being filtered. Sits in the strip between the
     -- header and the recipe list; hidden when not applicable.
     local hiddenExpansionHint = CreateFrame("Button", nil, center)
-    hiddenExpansionHint:SetPoint("TOPLEFT", 12, -34)
-    hiddenExpansionHint:SetPoint("TOPRIGHT", -28, -34)
+    -- y=-42 leaves ~12px of breathing room below the Sort button row
+    -- (sortSwitch bottoms out around y=-30); the scroll's hint-shown
+    -- anchor below puts another ~10px between the hint and the first
+    -- recipe row.
+    hiddenExpansionHint:SetPoint("TOPLEFT", 12, -42)
+    hiddenExpansionHint:SetPoint("TOPRIGHT", -28, -42)
     hiddenExpansionHint:SetHeight(20)
     -- Sibling recipeScroll (created right after) inherits a higher frame
     -- level by default, so its row children render in FRONT of the hint
