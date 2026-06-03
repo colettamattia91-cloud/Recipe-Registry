@@ -9,3 +9,6 @@ ignore:
   - Sync/MockSync.lua
   - docs
   - local-tests
+  - scripts
+  - tools
+  - artifacts

@@ -26,6 +26,7 @@ local DEBUG_LOG_DEFAULTS = {
         transfer = true,
         offline = true,
         version = true,
+        filters = true,
     },
     entries = {},
     nextSequence = 0,
@@ -37,6 +38,7 @@ local DEBUG_LOG_SCOPE_NAMES = {
     transfer = true,
     offline = true,
     version = true,
+    filters = true,
 }
 
 local function cloneShallow(src)
@@ -309,17 +311,135 @@ local function printMainHelp(self)
     self:Print("/rr rescan - queue a profession scan and scan active profession API data.")
     self:Print("/rr version, /rr versions, /rr adoption, /rr dump, /rr self [profession], /rr sync [debug, diag, peers, sessions, log], /rr offline, /rr pull")
     self:Print("/rr perf [toggle, dump, reset, help]")
+    self:Print("/rr filters [unresolved, explain <recipeKey>]")
     if self.MockSync then
         self:Print("/rr mock [status, start <" .. MOCK_SCENARIOS .. ">, stop, cleanup, reset, help]")
     end
     self:Print("/rr prices <item name or link>, /rr share [guild, party, raid, say, reply]")
-    self:Print("/rr atlas, /rr r <recipeItemID>, /rr s <spellID>, /rr i <createdItemID>")
     self:Print("/rr clean [check], /rr wipe")
+end
+
+local function getRecipePrefilters(self)
+    local profile = self.db and self.db.profile or {}
+    local filters = profile.recipePrefilters or {}
+    filters.expansionDefaults = filters.expansionDefaults or {}
+    filters.professionExpansionOverrides = filters.professionExpansionOverrides or {}
+    return filters
+end
+
+local function dumpFilterStatus(self)
+    local filters = getRecipePrefilters(self)
+    local metadata = self.RecipeMetadata
+    if not metadata then
+        self:Print("Recipe filters: metadata module not ready; all recipes visible.")
+        return
+    end
+    local counts = metadata:GetRecordCounts()
+    local defaults = filters.expansionDefaults or {}
+    self:Print(string.format(
+        "Recipe filters: metadata=%s unresolved=%d vanilla=%s tbc=%s remoteBop=%s",
+        tostring(metadata.metadataVersion or "unknown"),
+        counts.unresolved or 0,
+        defaults.vanilla ~= false and "on" or "off",
+        defaults.tbc ~= false and "on" or "off",
+        filters.showRemoteBopOutputRecipes == true and "show" or "hide"
+    ))
+end
+
+local function dumpFilterUnresolved(self, severity)
+    local metadata = self.RecipeMetadata
+    if not metadata then
+        self:Print("Recipe filters: metadata module not ready.")
+        return
+    end
+    local unresolved = metadata:GetUnresolvedRecords(severity ~= "" and severity or nil)
+    if #unresolved == 0 then
+        self:Print("Recipe filters unresolved: none.")
+        return
+    end
+    self:Print(string.format("Recipe filters unresolved: %d record(s).", #unresolved))
+    local limit = math.min(#unresolved, 12)
+    for i = 1, limit do
+        local row = unresolved[i]
+        self:Print(string.format(
+            "%s spell=%s field=%s %s",
+            tostring(row.severity or "?"),
+            tostring(row.spellId or "?"),
+            tostring(row.field or "?"),
+            tostring(row.message or "")
+        ))
+    end
+    if #unresolved > limit then
+        self:Print(string.format("... %d more", #unresolved - limit))
+    end
+end
+
+local function explainFilterRecipe(self, input)
+    local recipeKey = tonumber(trimInput(input))
+    if not recipeKey then
+        self:Print("Usage: /rr filters explain <recipeKey>")
+        return
+    end
+    if not (self.RecipeUiFilters and self.RecipeUiFilters.Explain) then
+        self:Print("Recipe filters: diagnostics not available.")
+        return
+    end
+    local explanation = self.RecipeUiFilters:Explain(recipeKey, {})
+    self:Print(string.format(
+        "Recipe %s: %s reason=%s plugin=%s source=%s spell=%s",
+        tostring(recipeKey),
+        explanation.passed and "visible" or "hidden",
+        tostring(explanation.reason or "?"),
+        tostring(explanation.plugin or "?"),
+        tostring(explanation.source or "?"),
+        tostring(explanation.spellId or "?")
+    ))
+end
+
+local function handleFiltersCommand(self, rest)
+    local subcmd, subrest = splitCommand(rest)
+    subcmd = subcmd:lower()
+    if subcmd == "" or subcmd == "status" then
+        dumpFilterStatus(self)
+        return
+    end
+    if subcmd == "unresolved" then
+        dumpFilterUnresolved(self, trimInput(subrest))
+        return
+    end
+    if subcmd == "explain" then
+        explainFilterRecipe(self, subrest)
+        return
+    end
+    self:Print("Usage: /rr filters [unresolved|explain <recipeKey>]")
+end
+
+local function handleMetaCommand(self, rest)
+    local subcmd = splitCommand(rest):lower()
+    local diagnostics = self.RecipeMetadataDiagnostics
+    if subcmd == "" or subcmd == "diag" then
+        if diagnostics and diagnostics.PrintDiagnostics then
+            diagnostics:PrintDiagnostics()
+        else
+            self:Print("Recipe metadata diagnostics not ready.")
+        end
+        return
+    end
+    if subcmd == "version" then
+        if diagnostics and diagnostics.PrintVersion then
+            diagnostics:PrintVersion()
+        else
+            self:Print("Recipe metadata diagnostics not ready.")
+        end
+        return
+    end
+    self:Print("Usage: /rr meta [diag|version]")
 end
 
 local function printPerfHelp(self)
     self:Print("/rr perf toggle - show or hide the performance/debug panel.")
     self:Print("/rr perf dump - print scheduler, queues, sync and scan diagnostics.")
+    self:Print("/rr perf list - print recent recipe-list build telemetry (timing breakdown).")
     self:Print("/rr perf reset - clear performance, sync and scan counters.")
 end
 
@@ -424,16 +544,6 @@ function Addon:OnPlayerLogin()
             self.Data:ScheduleSafeAutoClean({ maxMembersPerStep = 8 })
         end, 8)
     end
-    -- Pre-warm the AtlasLoot category index during sync warmup so the
-    -- first post-warmup RefreshProfessionButtons doesn't pay for it
-    -- synchronously. The 1s delay lets the heavier login-phase work
-    -- (sync startup, profession detection, sync-index prepare) breathe
-    -- before this chunked job competes with them.
-    if self.Data and self.Data.BuildAtlasLootCategoryIndexAsync then
-        self:ScheduleTimer(function()
-            self.Data:BuildAtlasLootCategoryIndexAsync()
-        end, 1)
-    end
     -- Keep one watchdog for pathological reload/login paths, but readiness comes
     -- from PLAYER_LOGIN / PLAYER_ENTERING_WORLD / GUILD_ROSTER_UPDATE + index prep.
     self:ScheduleTimer("OnLoginReady", 10)
@@ -451,7 +561,7 @@ function Addon:OnPlayerEnteringWorld(_event, isLogin, isReload)
         local inInstance = IsInInstance and select(1, IsInInstance()) or false
         -- Pick the longest applicable grace for the event we're handling.
         -- Login and reload do a lot more work than a zone change (item
-        -- cache priming, full guild roster fetch, AtlasLoot warmup,
+        -- cache priming, full guild roster fetch, metadata warmup,
         -- profession scan), so they get their own dedicated values.
         local duration
         if inInstance and (isLogin or isReload) then
@@ -487,6 +597,32 @@ function Addon:OnPlayerEnteringWorld(_event, isLogin, isReload)
     if self.Sync and self.Sync.RefreshSyncReadyState then
         self.Sync:RefreshSyncReadyState("player-entering-world")
     end
+
+    -- Detect transitions out of an instance and re-probe profession state.
+    -- Recipes learned in-instance (trainer, scroll, drop) only fire
+    -- SKILL_LINES_CHANGED / SPELLS_CHANGED there, and without a profession
+    -- window open we can't read the new recipe list. The deferred-scan
+    -- flag set by ProcessSkillSignal in that situation needs the user to
+    -- open the relevant profession window after exit. Re-running
+    -- DetectProfessions here lets us notice skill-rank changes
+    -- immediately even if the window is never opened; an actual recipe
+    -- scan still requires the window, but the dirty fingerprint state is
+    -- at least updated.
+    local nowInInstance = IsInInstance and select(1, IsInInstance()) or false
+    if self._lastWorldInInstance == true and nowInInstance == false then
+        if self.Data and self.Data.DetectProfessions then
+            self.Data:DetectProfessions()
+        end
+        if self.Data and self.Data.MarkScanNeeded then
+            self.Data:MarkScanNeeded(nil, "instance-exit-rescan")
+        end
+        -- Kick the deferred-scan notice scheduler so the user gets the
+        -- "open profession to refresh" hint as soon as warmup + world
+        -- transition complete, instead of waiting for the next watchdog
+        -- tick that may already have been cancelled.
+        self:ScheduleDeferredScanNoticeCheck()
+    end
+    self._lastWorldInInstance = nowInInstance
 end
 
 function Addon:OnLoginReady()
@@ -549,7 +685,13 @@ function Addon:OnCraftShow()
     end, 0.3)
 end
 
-function Addon:OnRecipeSignal()
+function Addon:OnRecipeSignal(_event, recipeID)
+    -- Capture the most recent recipeID from NEW_RECIPE_LEARNED so the
+    -- deferred-scan notice can name the affected profession ("You may
+    -- have learned an Alchemy recipe…") instead of a generic prompt.
+    if tonumber(recipeID) then
+        self._lastRecipeLearnedSpellId = tonumber(recipeID)
+    end
     if self._recipeSignalTimer then
         self:CancelTimer(self._recipeSignalTimer, true)
     end
@@ -575,7 +717,34 @@ function Addon:ProcessRecipeSignal(reason)
         if changed then
             markSyncIndexDirtyAndScheduleHello(self, scanReason, 0.5)
         end
+        -- NEW_RECIPE_LEARNED is the strong signal — fires only on actual
+        -- learns, never at /reload. Queue the post-warmup notice and
+        -- resolve the profession label from metadata if we captured the
+        -- recipe ID.
+        if not changed then
+            local visible = self.Data.GetVisibleTrackedProfessionContext
+                and self.Data:GetVisibleTrackedProfessionContext()
+            if not visible then
+                self._pendingDeferredScanNotice = true
+                self._pendingDeferredScanProfession = self:_ResolveLearnedRecipeProfession()
+                self:ScheduleDeferredScanNoticeCheck()
+            end
+        end
     end
+end
+
+function Addon:_ResolveLearnedRecipeProfession()
+    local spellId = self._lastRecipeLearnedSpellId
+    self._lastRecipeLearnedSpellId = nil
+    if not spellId then return nil end
+    local metadata = self.RecipeMetadata
+    if not (metadata and metadata.GetProfession) then return nil end
+    local professionKey = metadata:GetProfession(-spellId)
+    if not professionKey or professionKey == "" then return nil end
+    -- Title-case the key so the chat notice reads "Alchemy" not
+    -- "alchemy". The 8 supported professions are ASCII so a single
+    -- gsub is enough.
+    return (professionKey:sub(1, 1):upper() .. professionKey:sub(2))
 end
 
 function Addon:OnSkillSignal(event)
@@ -586,6 +755,51 @@ function Addon:OnSkillSignal(event)
     self._skillSignalTimer = self:ScheduleTimer(function()
         self:ProcessSkillSignal(self._lastSkillSignalEvent)
     end, 1.0)
+end
+
+-- Print a one-shot reminder that the user might have learned recipes
+-- while a profession window wasn't open (typical in raid/dungeon UIs or
+-- when training from a scroll). Suppressed until warmup + world
+-- transition have ended AND we're out of the instance, because firing
+-- mid-instance just adds chat noise the user can't act on anyway.
+function Addon:MaybeShowDeferredScanNotice()
+    if not self._pendingDeferredScanNotice then return false end
+    if self.Sync and self.Sync.IsInWarmup and self.Sync:IsInWarmup() then
+        return false
+    end
+    if self.Sync and self.Sync.IsInWorldTransition and self.Sync:IsInWorldTransition() then
+        return false
+    end
+    if type(IsInInstance) == "function" and select(1, IsInInstance()) then
+        return false
+    end
+    self._pendingDeferredScanNotice = false
+    self._deferredScanNoticeTimer = nil
+    local profession = self._pendingDeferredScanProfession
+    self._pendingDeferredScanProfession = nil
+    if profession and profession ~= "" then
+        self:Print(string.format(
+            "You may have learned a %s recipe — open the profession panel to refresh the list.",
+            profession
+        ))
+    else
+        self:Print("You may have learned a recipe — open the relevant profession panel to refresh the list.")
+    end
+    return true
+end
+
+function Addon:ScheduleDeferredScanNoticeCheck()
+    if not self._pendingDeferredScanNotice then return end
+    if self._deferredScanNoticeTimer then return end
+    -- Re-check every 5 seconds until conditions are met. The check is
+    -- cheap (three predicate evaluations) and self-cancels as soon as
+    -- the notice fires.
+    self._deferredScanNoticeTimer = self:ScheduleTimer(function()
+        self._deferredScanNoticeTimer = nil
+        if not self:MaybeShowDeferredScanNotice() then
+            self:ScheduleDeferredScanNoticeCheck()
+        end
+    end, 5)
 end
 
 function Addon:ProcessSkillSignal(event)
@@ -600,7 +814,20 @@ function Addon:ProcessSkillSignal(event)
     if self.Data.GetVisibleTrackedProfessionContext then
         profession, source = self.Data:GetVisibleTrackedProfessionContext()
     end
+    local deferredReason = signal == "SPELLS_CHANGED" and "spell-update-deferred" or "skill-event-deferred"
     if not profession then
+        -- No trade-skill window open right now. We can't read the recipe
+        -- list without an open window, but we still flag a pending scan
+        -- so the next TRADE_SKILL_SHOW / CRAFT_SHOW picks up whatever
+        -- changed. The chat notice is NOT armed from this path because
+        -- SPELLS_CHANGED and SKILL_LINES_CHANGED also fire on /reload
+        -- and login (with no actual learn happening); the notice is
+        -- armed only by NEW_RECIPE_LEARNED (strong signal) and the
+        -- instance-exit transition (carries its own context).
+        if self.Data.MarkScanNeeded then
+            self.Data:MarkScanNeeded(nil, deferredReason)
+        end
+        self.Data:DetectProfessions()
         if signal == "SKILL_LINES_CHANGED" then
             self.Data:RecordScanTelemetry("scanSkippedWeaponSkill")
         else
@@ -687,7 +914,11 @@ function Addon:OnItemInfoBucket(events)
     self.bucketTelemetry.itemBuckets = (self.bucketTelemetry.itemBuckets or 0) + 1
     self.bucketTelemetry.itemEventsAbsorbed = (self.bucketTelemetry.itemEventsAbsorbed or 0) + absorbed
     self.bucketTelemetry.lastItemBucketAt = time()
-    if self.Data then
+    local handledMetadataBop = false
+    if self.Data and self.Data.OnMetadataItemInfoReceived then
+        handledMetadataBop = self.Data:OnMetadataItemInfoReceived(events) == true
+    end
+    if self.Data and not handledMetadataBop then
         self.Data:InvalidateRecipeCaches("list")
     end
     self:RequestRefresh("item-cache")
@@ -966,11 +1197,32 @@ function Addon:SlashHandler(input)
             if self.Data and self.Data.ResetCatalogDiagnostics then
                 self.Data:ResetCatalogDiagnostics()
             end
+            if self.Data and self.Data.ResetListBuildTelemetry then
+                self.Data:ResetListBuildTelemetry()
+            end
             self:RequestRefresh("perf")
             self:Print("Performance, sync, scan, and cache counters reset.")
             return
         end
-        self:Print("Usage: /rr perf [toggle, dump, reset, help]")
+        if perfCmd == "list" or perfCmd == "builds" then
+            if self.Data and self.Data.DumpListBuildTelemetry then
+                self.Data:DumpListBuildTelemetry()
+            else
+                self:Print("List-build telemetry is not available.")
+            end
+            return
+        end
+        self:Print("Usage: /rr perf [toggle, dump, list, reset, help]")
+        return
+    end
+
+    if cmd == "filters" or cmd == "filter" then
+        handleFiltersCommand(self, rest)
+        return
+    end
+
+    if cmd == "meta" then
+        handleMetaCommand(self, rest)
         return
     end
 
@@ -1082,26 +1334,6 @@ function Addon:SlashHandler(input)
         return
     end
 
-    if cmd == "atlas" or cmd == "al" then
-        if self.Data then self.Data:DumpAtlasLootStatus() end
-        return
-    end
-
-    if cmd == "r" or cmd == "recipe" then
-        if self.Data then self.Data:DebugRecipeItem(tonumber(rest or "")) end
-        return
-    end
-
-    if cmd == "s" or cmd == "spell" then
-        if self.Data then self.Data:DebugSpell(tonumber(rest or "")) end
-        return
-    end
-
-    if cmd == "i" or cmd == "item" or cmd == "created" then
-        if self.Data then self.Data:DebugCreatedItem(tonumber(rest or "")) end
-        return
-    end
-
     if cmd == "wipe" or cmd == "reset" then
         if self.Data then self.Data:WipeDatabase() end
         return
@@ -1200,7 +1432,19 @@ function Addon:SlashHandler(input)
     if cmd == "clean" or cmd == "repair" then
         local mode = trimInput(rest):lower()
         local dryRun = mode == "check" or mode == "dryrun" or mode == "dry-run" or mode == "preview"
-        local dataStats = self.Data and self.Data.CleanCorruptData and self.Data:CleanCorruptData({ dryRun = dryRun }) or {}
+        -- Match the auto-clean's behavior: also drop keys that don't resolve
+        -- against the WoW client DB (mock leftovers, aborted scan rows). The
+        -- previous handler only ran the "invalid key shape" check, so users
+        -- running /rr clean manually saw zero removals and assumed the
+        -- command was broken even though the warmup pass would have cleaned
+        -- the same data.
+        local dataStats = self.Data and self.Data.CleanCorruptData
+            and self.Data:CleanCorruptData({
+                dryRun = dryRun,
+                checkClientResolvable = true,
+                checkMetadataCatalogued = true,
+            })
+            or {}
         local syncStats = self.Sync and self.Sync.CleanCorruptState and self.Sync:CleanCorruptState({ dryRun = dryRun }) or {}
         local repaired = (dataStats.repairedBlocks or 0) + (dataStats.repairedCounts or 0) + (dataStats.repairedSignatures or 0)
         self:Print(string.format(

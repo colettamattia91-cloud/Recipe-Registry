@@ -49,6 +49,17 @@ local TUNING_BOUNDS = {
     blockPullResponseTimeoutSeconds = { default = 60,  min = 30,  max = 120 },
 }
 
+local FILTER_PROFESSIONS = {
+    { key = "alchemy",        label = "Alchemy" },
+    { key = "blacksmithing",  label = "Blacksmithing" },
+    { key = "enchanting",     label = "Enchanting" },
+    { key = "engineering",    label = "Engineering" },
+    { key = "jewelcrafting",  label = "Jewelcrafting" },
+    { key = "leatherworking", label = "Leatherworking" },
+    { key = "tailoring",      label = "Tailoring" },
+    { key = "cooking",        label = "Cooking" },
+}
+
 local function clampTuning(field, value)
     local bounds = TUNING_BOUNDS[field]
     if not bounds then return value end
@@ -56,6 +67,48 @@ local function clampTuning(field, value)
     if value < bounds.min then return bounds.min end
     if value > bounds.max then return bounds.max end
     return value
+end
+
+local function hasMetadataPlugin()
+    return type(Addon.RecipeMetadata) == "table"
+end
+
+local function ensureRecipePrefilters(profile)
+    if not profile then return nil end
+    if type(profile.recipePrefilters) ~= "table" then
+        profile.recipePrefilters = {}
+    end
+    local filters = profile.recipePrefilters
+    if filters.showRemoteBopOutputRecipes == nil then
+        filters.showRemoteBopOutputRecipes = false
+    end
+    if type(filters.expansionDefaults) ~= "table" then
+        filters.expansionDefaults = {}
+    end
+    if filters.expansionDefaults.vanilla == nil then
+        filters.expansionDefaults.vanilla = false
+    end
+    if filters.expansionDefaults.tbc == nil then
+        filters.expansionDefaults.tbc = true
+    end
+    if type(filters.professionExpansionOverrides) ~= "table" then
+        filters.professionExpansionOverrides = {}
+    end
+    return filters
+end
+
+local function resetRecipePrefilters(profile)
+    if not profile then return end
+    profile.recipePrefilters = {
+        showRemoteBopOutputRecipes = false,
+        expansionDefaults = {
+            -- Match DB_DEFAULTS in Data.lua — TBC-only by default. Vanilla
+            -- recipes are an opt-in via the global Vanilla checkbox.
+            vanilla = false,
+            tbc = true,
+        },
+        professionExpansionOverrides = {},
+    }
 end
 
 local function getProfile()
@@ -82,6 +135,7 @@ local function getProfile()
     for field, bounds in pairs(TUNING_BOUNDS) do
         profile.tuning[field] = clampTuning(field, profile.tuning[field] or bounds.default)
     end
+    ensureRecipePrefilters(profile)
     return profile
 end
 
@@ -99,9 +153,15 @@ local function createButton(parent, text, width, onClick)
     return b
 end
 
+local SECTION_LEFT_X = 14
 local function createHeader(parent, text, anchor, yOffset)
     local header = parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    header:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, yOffset or -18)
+    -- Two-anchor trick: LEFT pins X to a fixed margin on the panel, TOP pins
+    -- Y to the previous element's bottom. Without the LEFT anchor each
+    -- header inherited the X of its anchor (which was usually an indented
+    -- help-text), and the panel staircased to the right with every section.
+    header:SetPoint("LEFT", parent, "LEFT", SECTION_LEFT_X, 0)
+    header:SetPoint("TOP", anchor, "BOTTOM", 0, yOffset or -18)
     header:SetText(text)
     return header
 end
@@ -132,6 +192,38 @@ local function createRadio(parent, label, onClick)
     radio.text:SetText(label or "")
     radio:SetScript("OnClick", onClick)
     return radio
+end
+
+local function createColumnHeader(parent, text, width)
+    local fs = parent:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+    fs:SetWidth(width or 80)
+    fs:SetJustifyH("CENTER")
+    fs:SetText(text or "")
+    return fs
+end
+
+local function setHoverTooltip(frame, title, body)
+    if not frame then return end
+    frame:HookScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        if title then GameTooltip:AddLine(title) end
+        if body then GameTooltip:AddLine(body, 1, 1, 1, true) end
+        GameTooltip:Show()
+    end)
+    frame:HookScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+end
+
+local function setCheckEnabled(check, enabled)
+    if not check then return end
+    if enabled then
+        check:Enable()
+        check:SetAlpha(1.0)
+    else
+        check:Disable()
+        check:SetAlpha(0.4)
+    end
 end
 
 local SLIDER_BACKDROP = {
@@ -212,6 +304,88 @@ local function refreshOpenDirectory()
     end
 end
 
+local function invalidateRecipeFilters(professionKey, reason)
+    if Addon.RecipeUiFilters and Addon.RecipeUiFilters.InvalidateProfessionProjection then
+        Addon.RecipeUiFilters:InvalidateProfessionProjection(professionKey, reason)
+    else
+        if Addon.Data and Addon.Data.InvalidateRecipeCaches then
+            Addon.Data:InvalidateRecipeCaches("list")
+        end
+    end
+    refreshOpenDirectory()
+end
+
+local function setFilterExpansionDefault(expansion, enabled)
+    local profile = getProfile()
+    if not profile then return end
+    local filters = ensureRecipePrefilters(profile)
+    filters.expansionDefaults[expansion] = enabled == true
+    invalidateRecipeFilters(nil, "filters:global-" .. tostring(expansion))
+end
+
+local function setRemoteBopVisible(enabled)
+    local profile = getProfile()
+    if not profile then return end
+    local filters = ensureRecipePrefilters(profile)
+    filters.showRemoteBopOutputRecipes = enabled == true
+    invalidateRecipeFilters(nil, "filters:remote-bop")
+end
+
+local function createProfessionOverride(filters, professionKey)
+    local overrides = filters.professionExpansionOverrides
+    local override = overrides[professionKey]
+    if type(override) ~= "table" then
+        override = {}
+        overrides[professionKey] = override
+    end
+    override.inherit = false
+    if override.vanilla == nil then
+        override.vanilla = filters.expansionDefaults.vanilla ~= false
+    end
+    if override.tbc == nil then
+        override.tbc = filters.expansionDefaults.tbc ~= false
+    end
+    return override
+end
+
+local function setProfessionCustom(professionKey, custom)
+    local profile = getProfile()
+    if not profile then return end
+    local filters = ensureRecipePrefilters(profile)
+    if custom == true then
+        createProfessionOverride(filters, professionKey)
+    else
+        filters.professionExpansionOverrides[professionKey] = nil
+    end
+    invalidateRecipeFilters(professionKey, "filters:" .. tostring(professionKey))
+end
+
+local function setProfessionExpansion(professionKey, expansion, enabled)
+    local profile = getProfile()
+    if not profile then return end
+    local filters = ensureRecipePrefilters(profile)
+    local override = createProfessionOverride(filters, professionKey)
+    override[expansion] = enabled == true
+    invalidateRecipeFilters(professionKey, "filters:" .. tostring(professionKey))
+end
+
+local function getFilterWarning(filters)
+    local defaults = filters and filters.expansionDefaults or {}
+    if defaults.vanilla == false and defaults.tbc == false then
+        return "Warning: global filters hide every Vanilla and TBC recipe."
+    end
+
+    local overrides = filters and filters.professionExpansionOverrides or {}
+    for _, profession in ipairs(FILTER_PROFESSIONS) do
+        local override = overrides[profession.key]
+        if type(override) == "table" and override.inherit == false
+            and override.vanilla == false and override.tbc == false then
+            return "Warning: one or more custom profession filters hide every Vanilla and TBC recipe."
+        end
+    end
+    return ""
+end
+
 local function setSearchMode(mode)
     local profile = getProfile()
     if not profile then return end
@@ -237,6 +411,22 @@ local function setRecipeCategoriesEnabled(enabled)
     refreshOpenDirectory()
 end
 
+local function setRecipeCategoryView(viewMode)
+    local profile = getProfile()
+    if not profile then return end
+    if viewMode ~= "accordion" and viewMode ~= "categoriesOnly" then
+        viewMode = "expanded"
+    end
+    profile.recipeCategoryView = viewMode
+    -- View mode only changes sidebar layout, not which recipes are visible,
+    -- so no list/category cache invalidation is needed — just drop transient
+    -- accordion state and rebuild the open directory.
+    if Addon.UI then
+        Addon.UI.expandedCategory = nil
+    end
+    refreshOpenDirectory()
+end
+
 local function setMinimapShown(shown)
     local profile = getProfile()
     if not profile then return end
@@ -251,6 +441,23 @@ function Options:RefreshControls()
     if not profile then return end
     if self.categoryCheck then
         self.categoryCheck:SetChecked(profile.useRecipeCategories ~= false)
+    end
+    local categoriesEnabled = profile.useRecipeCategories ~= false
+    local categoryView = profile.recipeCategoryView
+    if categoryView ~= "accordion" and categoryView ~= "categoriesOnly" then
+        categoryView = "expanded"
+    end
+    if self.categoryViewExpandedRadio then
+        self.categoryViewExpandedRadio:SetChecked(categoryView == "expanded")
+        setCheckEnabled(self.categoryViewExpandedRadio, categoriesEnabled)
+    end
+    if self.categoryViewAccordionRadio then
+        self.categoryViewAccordionRadio:SetChecked(categoryView == "accordion")
+        setCheckEnabled(self.categoryViewAccordionRadio, categoriesEnabled)
+    end
+    if self.categoryViewCategoriesOnlyRadio then
+        self.categoryViewCategoriesOnlyRadio:SetChecked(categoryView == "categoriesOnly")
+        setCheckEnabled(self.categoryViewCategoriesOnlyRadio, categoriesEnabled)
     end
     if self.recipeSearchRadio then
         self.recipeSearchRadio:SetChecked(profile.defaultSearchMode ~= "materials")
@@ -269,6 +476,46 @@ function Options:RefreshControls()
     end
     if self.pullTimeoutSlider then
         self.pullTimeoutSlider:SetDisplayValue(profile.tuning.blockPullResponseTimeoutSeconds)
+    end
+    local filters = ensureRecipePrefilters(profile)
+    if self.filterPluginHint then
+        if hasMetadataPlugin() then
+            local metadata = Addon.RecipeMetadata
+            self.filterPluginHint:SetText("Recipe metadata loaded. Metadata version: " .. tostring(metadata and metadata.metadataVersion or "?"))
+        else
+            self.filterPluginHint:SetText("Recipe metadata module not loaded. Recipe filters are unavailable.")
+        end
+    end
+    if self.globalVanillaCheck then
+        self.globalVanillaCheck:SetChecked(filters.expansionDefaults.vanilla ~= false)
+    end
+    if self.globalTbcCheck then
+        self.globalTbcCheck:SetChecked(filters.expansionDefaults.tbc ~= false)
+    end
+    if self.remoteBopCheck then
+        self.remoteBopCheck:SetChecked(filters.showRemoteBopOutputRecipes == true)
+    end
+    if self.professionFilterControls then
+        for _, profession in ipairs(FILTER_PROFESSIONS) do
+            local row = self.professionFilterControls[profession.key]
+            if row then
+                local override = filters.professionExpansionOverrides[profession.key]
+                local custom = type(override) == "table" and override.inherit == false
+                row.customCheck:SetChecked(custom)
+                if custom then
+                    row.vanillaCheck:SetChecked(override.vanilla ~= false)
+                    row.tbcCheck:SetChecked(override.tbc ~= false)
+                else
+                    row.vanillaCheck:SetChecked(filters.expansionDefaults.vanilla ~= false)
+                    row.tbcCheck:SetChecked(filters.expansionDefaults.tbc ~= false)
+                end
+                setCheckEnabled(row.vanillaCheck, custom)
+                setCheckEnabled(row.tbcCheck, custom)
+            end
+        end
+    end
+    if self.filterWarning then
+        self.filterWarning:SetText(getFilterWarning(filters))
     end
 end
 
@@ -297,7 +544,7 @@ function Options:EnsurePanel()
         scrollFrame:SetPoint("TOPLEFT", 0, 0)
         scrollFrame:SetPoint("BOTTOMRIGHT", -28, 0)
         content = CreateFrame("Frame", nil, scrollFrame)
-        content:SetSize(560, 720)
+        content:SetSize(560, 1120)
         scrollFrame:SetScrollChild(content)
     else
         content = panel
@@ -319,17 +566,41 @@ function Options:EnsurePanel()
     version:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -8)
 
     local layoutHeader = createHeader(content, "Directory Layout", version, -18)
-    local categoryCheck = createCheck(content, "Show AtlasLoot recipe categories when available", function(self)
+    local categoryCheck = createCheck(content, "Show recipe categories when available", function(self)
         setRecipeCategoriesEnabled(self:GetChecked() and true or false)
         Options:RefreshControls()
     end)
     categoryCheck:SetPoint("TOPLEFT", layoutHeader, "BOTTOMLEFT", -2, -8)
     self.categoryCheck = categoryCheck
 
-    local categoryHelp = createText(content, "When enabled, selecting a profession can expand into All plus AtlasLoot categories.")
+    local categoryHelp = createText(content, "When enabled, selecting a profession can expand into All plus metadata categories.")
     categoryHelp:SetPoint("TOPLEFT", categoryCheck, "BOTTOMLEFT", 28, 0)
 
-    local searchHeader = createHeader(content, "Search Defaults", categoryHelp, -18)
+    local categoryViewLabel = createText(content, "Category view", "GameFontHighlightSmall")
+    categoryViewLabel:SetPoint("TOPLEFT", categoryHelp, "BOTTOMLEFT", 0, -8)
+
+    local expandedViewRadio = createRadio(content, "Expanded tree (all subcategories shown)", function()
+        setRecipeCategoryView("expanded")
+        Options:RefreshControls()
+    end)
+    expandedViewRadio:SetPoint("TOPLEFT", categoryViewLabel, "BOTTOMLEFT", -2, -6)
+    self.categoryViewExpandedRadio = expandedViewRadio
+
+    local accordionViewRadio = createRadio(content, "Collapsible (one category expanded at a time)", function()
+        setRecipeCategoryView("accordion")
+        Options:RefreshControls()
+    end)
+    accordionViewRadio:SetPoint("TOPLEFT", expandedViewRadio, "BOTTOMLEFT", 0, -2)
+    self.categoryViewAccordionRadio = accordionViewRadio
+
+    local categoriesOnlyViewRadio = createRadio(content, "Categories only (hide subcategories)", function()
+        setRecipeCategoryView("categoriesOnly")
+        Options:RefreshControls()
+    end)
+    categoriesOnlyViewRadio:SetPoint("TOPLEFT", accordionViewRadio, "BOTTOMLEFT", 0, -2)
+    self.categoryViewCategoriesOnlyRadio = categoriesOnlyViewRadio
+
+    local searchHeader = createHeader(content, "Search Defaults", categoriesOnlyViewRadio, -18)
     local recipeSearchRadio = createRadio(content, "Recipe names only", function()
         setSearchMode("recipe")
         Options:RefreshControls()
@@ -347,7 +618,104 @@ function Options:EnsurePanel()
     local searchHelp = createText(content, "This sets the default scope. The search bar can still be changed quickly while browsing.")
     searchHelp:SetPoint("TOPLEFT", materialSearchRadio, "BOTTOMLEFT", 28, 0)
 
-    local accessHeader = createHeader(content, "Access", searchHelp, -18)
+    local filterHeader = createHeader(content, "Recipe Filters", searchHelp, -18)
+    local filterPluginHint = createText(content, "")
+    filterPluginHint:SetPoint("TOPLEFT", filterHeader, "BOTTOMLEFT", 0, -6)
+    self.filterPluginHint = filterPluginHint
+
+    local filterAnchor = filterPluginHint
+    if hasMetadataPlugin() then
+        local globalVanillaCheck = createCheck(content, "Show Vanilla recipes by default", function(self)
+            setFilterExpansionDefault("vanilla", self:GetChecked() and true or false)
+            Options:RefreshControls()
+        end)
+        globalVanillaCheck:SetPoint("TOPLEFT", filterPluginHint, "BOTTOMLEFT", -2, -8)
+        self.globalVanillaCheck = globalVanillaCheck
+
+        local globalTbcCheck = createCheck(content, "Show TBC recipes by default", function(self)
+            setFilterExpansionDefault("tbc", self:GetChecked() and true or false)
+            Options:RefreshControls()
+        end)
+        globalTbcCheck:SetPoint("TOPLEFT", globalVanillaCheck, "BOTTOMLEFT", 0, -2)
+        self.globalTbcCheck = globalTbcCheck
+
+        local remoteBopCheck = createCheck(content, "Show remote BoP and self-only recipes", function(self)
+            setRemoteBopVisible(self:GetChecked() and true or false)
+            Options:RefreshControls()
+        end)
+        remoteBopCheck:SetPoint("TOPLEFT", globalTbcCheck, "BOTTOMLEFT", 0, -2)
+        self.remoteBopCheck = remoteBopCheck
+
+        local matrixHeader = createText(content, "Profession overrides", "GameFontNormalSmall")
+        matrixHeader:SetPoint("TOPLEFT", remoteBopCheck, "BOTTOMLEFT", 28, -10)
+
+        local headerProfession = createColumnHeader(content, "Profession", 132)
+        headerProfession:SetJustifyH("LEFT")
+        headerProfession:SetPoint("TOPLEFT", matrixHeader, "BOTTOMLEFT", 0, -8)
+
+        local headerCustom = createColumnHeader(content, "Custom")
+        headerCustom:SetPoint("CENTER", headerProfession, "LEFT", 190 + 12, 0)
+
+        local headerVanilla = createColumnHeader(content, "Vanilla")
+        headerVanilla:SetPoint("CENTER", headerProfession, "LEFT", 284 + 12, 0)
+
+        local headerTbc = createColumnHeader(content, "TBC")
+        headerTbc:SetPoint("CENTER", headerProfession, "LEFT", 372 + 12, 0)
+
+        local separator = content:CreateTexture(nil, "ARTWORK")
+        separator:SetColorTexture(0.4, 0.4, 0.4, 0.5)
+        separator:SetHeight(1)
+        separator:SetPoint("TOPLEFT", headerProfession, "BOTTOMLEFT", 0, -3)
+        separator:SetPoint("RIGHT", headerTbc, "RIGHT", 20, 0)
+
+        self.professionFilterControls = {}
+        local previous = separator
+        for _, profession in ipairs(FILTER_PROFESSIONS) do
+            local professionKey = profession.key
+            local label = createText(content, profession.label, "GameFontHighlightSmall")
+            label:SetWidth(132)
+            label:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -6)
+
+            local customCheck = createCheck(content, "", function(self)
+                setProfessionCustom(professionKey, self:GetChecked() and true or false)
+                Options:RefreshControls()
+            end)
+            customCheck:SetPoint("CENTER", label, "LEFT", 190 + 12, 0)
+            setHoverTooltip(customCheck, "Custom override",
+                "When enabled, " .. profession.label .. " uses its own Vanilla/TBC visibility instead of the global defaults above.")
+
+            local vanillaCheck = createCheck(content, "", function(self)
+                setProfessionExpansion(professionKey, "vanilla", self:GetChecked() and true or false)
+                Options:RefreshControls()
+            end)
+            vanillaCheck:SetPoint("CENTER", label, "LEFT", 284 + 12, 0)
+            setHoverTooltip(vanillaCheck, "Show Vanilla recipes",
+                "Enable Custom on this row to change this value; otherwise it mirrors the global Vanilla default.")
+
+            local tbcCheck = createCheck(content, "", function(self)
+                setProfessionExpansion(professionKey, "tbc", self:GetChecked() and true or false)
+                Options:RefreshControls()
+            end)
+            tbcCheck:SetPoint("CENTER", label, "LEFT", 372 + 12, 0)
+            setHoverTooltip(tbcCheck, "Show TBC recipes",
+                "Enable Custom on this row to change this value; otherwise it mirrors the global TBC default.")
+
+            self.professionFilterControls[professionKey] = {
+                label = label,
+                customCheck = customCheck,
+                vanillaCheck = vanillaCheck,
+                tbcCheck = tbcCheck,
+            }
+            previous = label
+        end
+
+        local filterWarning = createText(content, "", "GameFontDisableSmall")
+        filterWarning:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -10)
+        self.filterWarning = filterWarning
+        filterAnchor = filterWarning
+    end
+
+    local accessHeader = createHeader(content, "Access", filterAnchor, -18)
     local minimapCheck = createCheck(content, "Show minimap button", function(self)
         setMinimapShown(self:GetChecked() and true or false)
         Options:RefreshControls()
@@ -451,6 +819,7 @@ function Options:EnsurePanel()
         for field, bounds in pairs(TUNING_BOUNDS) do
             profile.tuning[field] = bounds.default
         end
+        resetRecipePrefilters(profile)
         if Addon.UI then
             Addon.UI.searchMode = "recipe"
             Addon.UI.selectedRecipeKey = nil
@@ -458,6 +827,7 @@ function Options:EnsurePanel()
         if Addon.MinimapButton then
             Addon.MinimapButton:Refresh()
         end
+        invalidateRecipeFilters(nil, "filters:defaults")
         refreshOpenDirectory()
         Options:RefreshControls()
     end

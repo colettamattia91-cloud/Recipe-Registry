@@ -495,6 +495,12 @@ function Sync:CleanupMockState()
             self.peerCaps[key] = nil
             self.peerVersions[key] = nil
             self.peerBackoffUntil[key] = nil
+            if self._peerSessionBackoffUntil then
+                self._peerSessionBackoffUntil[key] = nil
+            end
+            if self._peerSessionNoProgressCount then
+                self._peerSessionNoProgressCount[key] = nil
+            end
             self.peerHealth[key] = nil
             removedOnlineNodes = removedOnlineNodes + 1
         end
@@ -543,6 +549,16 @@ function Sync:CleanCorruptState(opts)
     for key in pairs(self.peerBackoffUntil or {}) do
         if not self:IsValidSyncMemberKey(key) then
             drop(self.peerBackoffUntil, key, "peerBackoff")
+        end
+    end
+    for key in pairs(self._peerSessionBackoffUntil or {}) do
+        if not self:IsValidSyncMemberKey(key) then
+            drop(self._peerSessionBackoffUntil, key, "peerBackoff")
+        end
+    end
+    for key in pairs(self._peerSessionNoProgressCount or {}) do
+        if not self:IsValidSyncMemberKey(key) then
+            drop(self._peerSessionNoProgressCount, key, "peerBackoff")
         end
     end
 

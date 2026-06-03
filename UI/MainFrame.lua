@@ -683,6 +683,7 @@ function UI:OnInitialize()
     end
     self.selectedRecipeKey = nil
     self.selectedCategory = nil
+    self.expandedCategory = nil
     self.recipeSearchText = ""
     self.addonStatusSearchText = ""
     self.searchText = ""
@@ -714,6 +715,7 @@ function UI:SetMainView(view)
     self.selectedRecipeKey = nil
     self.selectedAddonStatusKey = nil
     self.selectedCategory = nil
+    self.expandedCategory = nil
     self:ApplyMainLayout()
     self:Refresh()
 end
@@ -1141,9 +1143,13 @@ function UI:ApplyMainLayout()
         f.right:SetPoint("BOTTOMRIGHT", -10, 34)
         setShownIfChanged(f.right, true)
         if f.recipeScroll then
-            f.recipeScroll:ClearAllPoints()
-            f.recipeScroll:SetPoint("TOPLEFT", 8, -40)
-            f.recipeScroll:SetPoint("BOTTOMRIGHT", -28, 10)
+            -- Drop the cached anchor-mode so _SetRecipeScrollAnchor below
+            -- actually re-applies the points (the cache short-circuits
+            -- when mode already matches, but ApplyMainLayout's previous
+            -- inline SetPoint had blown the anchor out from under it).
+            f.recipeScroll._rrAnchorMode = nil
+            local hint = f.hiddenExpansionHint
+            self:_SetRecipeScrollAnchor(hint and hint:IsShown() == true)
         end
     end
     self:RefreshAddonStatusControls()
@@ -1461,8 +1467,11 @@ function UI:CreateMainFrame()
     local profScroll = CreateFrame("ScrollFrame", nil, left, "UIPanelScrollFrameTemplate")
     profScroll:SetPoint("TOPLEFT", profLabel, "BOTTOMLEFT", -2, -8)
     profScroll:SetPoint("BOTTOMRIGHT", -28, 58)
+    -- profScroll uses UIPanelScrollFrameTemplate which renders a ~16-20px
+    -- scrollbar inside its right edge. Sizing profContent at 196 leaves the
+    -- scrollbar an unobstructed lane and avoids clipping button right edges.
     local profContent = CreateFrame("Frame", nil, profScroll)
-    profContent:SetSize(216, 1)
+    profContent:SetSize(196, 1)
     profScroll:SetScrollChild(profContent)
     f.profScroll = profScroll
     f.profContent = profContent
@@ -1470,7 +1479,7 @@ function UI:CreateMainFrame()
     f.profButtons = {}
     f.categoryButtons = {}
     for i, profName in ipairs(PROF_ORDER) do
-        local b = createCardStyleButton(profContent, 216, 24)
+        local b = createCardStyleButton(profContent, 192, 24)
         b:SetPoint("TOPLEFT", 0, -((i - 1) * 30))
         b:SetScript("OnClick", function()
             if UI.selectedProfession == profName then
@@ -1482,6 +1491,7 @@ function UI:CreateMainFrame()
             UI.selectedRecipeKey = nil
             UI.selectedAddonStatusKey = nil
             UI.selectedCategory = nil
+            UI.expandedCategory = nil
             UI:Refresh()
         end)
         f.profButtons[profName] = b
@@ -1602,9 +1612,58 @@ function UI:CreateMainFrame()
     end)
     f.addonStatusSearchClearButton = addonStatusSearchClearButton
 
+    -- Discoverability hint: when a profession's view is restricted by the
+    -- expansion filter, surface a one-click "N <expansion> recipes hidden"
+    -- button so the user doesn't have to dive into the options panel to
+    -- realise material is being filtered. Sits in the strip between the
+    -- header and the recipe list; hidden when not applicable.
+    local hiddenExpansionHint = CreateFrame("Button", nil, center)
+    -- y=-42 leaves ~12px of breathing room below the Sort button row
+    -- (sortSwitch bottoms out around y=-30); the scroll's hint-shown
+    -- anchor below puts another ~10px between the hint and the first
+    -- recipe row.
+    hiddenExpansionHint:SetPoint("TOPLEFT", 12, -42)
+    hiddenExpansionHint:SetPoint("TOPRIGHT", -28, -42)
+    hiddenExpansionHint:SetHeight(20)
+    -- Sibling recipeScroll (created right after) inherits a higher frame
+    -- level by default, so its row children render in FRONT of the hint
+    -- when their y range overlaps. Bump the hint a few levels above the
+    -- centre frame so it stays on top within the same strata (changing
+    -- strata on a non-toplevel child can detach it from the parent).
+    hiddenExpansionHint:SetFrameLevel((center.GetFrameLevel and center:GetFrameLevel() or 1) + 10)
+    hiddenExpansionHint:Hide()
+    -- Faint background panel so the hint reads as an actionable strip
+    -- rather than blending into the centre frame backdrop.
+    local hintBg = hiddenExpansionHint:CreateTexture(nil, "BACKGROUND")
+    hintBg:SetAllPoints(true)
+    hintBg:SetColorTexture(0.95, 0.75, 0.20, 0.12)
+    hiddenExpansionHint.bg = hintBg
+    local hintHighlight = hiddenExpansionHint:CreateTexture(nil, "HIGHLIGHT")
+    hintHighlight:SetAllPoints(true)
+    hintHighlight:SetColorTexture(0.95, 0.75, 0.20, 0.22)
+    local hiddenExpansionHintText = hiddenExpansionHint:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    hiddenExpansionHintText:SetPoint("LEFT", 6, 0)
+    hiddenExpansionHintText:SetPoint("RIGHT", -6, 0)
+    hiddenExpansionHintText:SetJustifyH("LEFT")
+    hiddenExpansionHintText:SetTextColor(1.0, 0.82, 0.0)
+    hiddenExpansionHint.text = hiddenExpansionHintText
+    hiddenExpansionHint:SetScript("OnClick", function()
+        UI:UnhideCurrentProfessionExpansion()
+    end)
+    f.hiddenExpansionHint = hiddenExpansionHint
+
     local recipeScroll = CreateFrame("ScrollFrame", nil, center, "UIPanelScrollFrameTemplate")
-    recipeScroll:SetPoint("TOPLEFT", 8, -40)
+    recipeScroll:SetPoint("TOPLEFT", 8, -60)
     recipeScroll:SetPoint("BOTTOMRIGHT", -28, 10)
+    -- WoW Classic's UIPanelScrollFrameTemplate doesn't clip children to
+    -- the scroll's visible bounds. Without this, scrolling the list
+    -- pushes row frames above the scroll's TOPLEFT (into the hint
+    -- band) where they paint over the discoverability hint and any
+    -- other UI above. Force clipping so rows disappear cleanly at
+    -- the top edge of the scroll viewport.
+    if recipeScroll.SetClipsChildren then
+        recipeScroll:SetClipsChildren(true)
+    end
     local recipeContent = CreateFrame("Frame", nil, recipeScroll)
     recipeContent:SetSize(320, 1)
     recipeScroll:SetScrollChild(recipeContent)
@@ -1841,7 +1900,17 @@ function UI:EnsureCategoryButton(index)
 
     button = createCardStyleButton(self.frame.profContent, 198, 20)
     button:SetScript("OnClick", function(self)
-        UI.selectedCategory = self.categoryName
+        -- In accordion view a top-level category button also toggles its
+        -- subcategory group. `toggleExpandKey` is set per-render only for
+        -- those buttons; it's nil for "All", flat categories, and subcategories.
+        if self.toggleExpandKey then
+            if UI.expandedCategory == self.toggleExpandKey then
+                UI.expandedCategory = nil
+            else
+                UI.expandedCategory = self.toggleExpandKey
+            end
+        end
+        UI.selectedCategory = self.categoryToken
         UI.selectedRecipeKey = nil
         UI:Refresh()
     end)
@@ -2269,7 +2338,13 @@ function UI:RefreshStatusBar()
     end
     setTextIfChanged(self.frame.subtitle, subtitle)
 
-    if onlineNodes > 1 then
+    -- Until local sync state stabilizes (warmup / world transition / sensitive
+    -- context) we deliberately don't go green even when peers are online —
+    -- green should mean "we're ready and have peers", not just "peers exist".
+    if degradedReason then
+        setVertexColorIfChanged(self.frame.syncDot, 1.0, 0.82, 0.0, 1)
+        self.frame.autoLabel:SetTextColor(1.0, 0.9, 0.45)
+    elseif onlineNodes > 1 then
         setVertexColorIfChanged(self.frame.syncDot, 0.2, 0.9, 0.2, 1)
         self.frame.autoLabel:SetTextColor(0.7, 0.95, 0.7)
     elseif onlineNodes == 1 then
@@ -2395,12 +2470,9 @@ end
 
 function UI:RefreshProfessionButtons(opts)
     -- `skipCategories` lets the degraded-mode renderer populate the
-    -- profession sidebar without touching the AtlasLoot category index.
-    -- GetRecipeCategories(_, true) triggers BuildAtlasLootCategoryIndex
-    -- on cache miss, which walks the entire AtlasLoot crafting module
-    -- synchronously — that's a multi-hundred-ms freeze the warmup path
-    -- can't absorb. After warmup, the normal Refresh path runs with
-    -- skipCategories=false and the categories appear.
+    -- profession sidebar without touching category providers during warmup.
+    -- After warmup, the normal Refresh path runs with skipCategories=false
+    -- and the categories appear.
     local skipCategories = opts and opts.skipCategories or false
     local summary = Addon.Data:GetProfessionSummary()
     local useCategories = (not skipCategories) and Addon.db and Addon.db.profile and Addon.db.profile.useRecipeCategories ~= false
@@ -2429,40 +2501,146 @@ function UI:RefreshProfessionButtons(opts)
         local button = self.frame.profButtons[profName]
         button:SetLabel(profName, profName ~= FAVORITES_VIEW and getProfessionIcon(profName) or nil)
         button:SetSelected(self.selectedProfession == profName)
-        placeButton(button, 0, 24, 6)
 
-        if useCategories and self.selectedProfession == profName and profName ~= FAVORITES_VIEW then
-            local categories = Addon.Data.GetRecipeCategories and Addon.Data:GetRecipeCategories(profName, true) or {}
+        -- Hide professions whose only expansions are currently filtered away.
+        -- Skipped when the filter is permissive (both Vanilla and TBC visible
+        -- for the profession): in that case every supported profession stays
+        -- in the sidebar. Only fires under a restrictive filter, e.g. JC has
+        -- no Vanilla recipes so it disappears in a Vanilla-only view.
+        local hideProfession = false
+        if profName ~= FAVORITES_VIEW and Addon.RecipeUiFilters and Addon.Data then
+            local visibility = Addon.RecipeUiFilters:GetEffectiveExpansionVisibility(profName)
+            if visibility and (visibility.vanilla == false or visibility.tbc == false) then
+                local expansions = Addon.Data.GetProfessionExpansions
+                    and Addon.Data:GetProfessionExpansions(profName)
+                    or nil
+                if expansions and (expansions.vanilla or expansions.tbc) then
+                    local vanillaMatch = visibility.vanilla and expansions.vanilla
+                    local tbcMatch = visibility.tbc and expansions.tbc
+                    if not vanillaMatch and not tbcMatch then
+                        hideProfession = true
+                    end
+                end
+            end
+        end
+
+        if hideProfession then
+            setShownIfChanged(button, false)
+        else
+            placeButton(button, 0, 24, 6)
+        end
+
+        if not hideProfession and useCategories and self.selectedProfession == profName and profName ~= FAVORITES_VIEW then
+            local viewMode = (Addon.db and Addon.db.profile and Addon.db.profile.recipeCategoryView) or "expanded"
+            -- Sidebar categories follow the same projection as the recipe list:
+            -- only categories with at least one recipe visible under the active
+            -- filters are offered. The filter context here mirrors the list's
+            -- but carries no categoryFilter (we want the full visible set).
+            local sidebarFilterContext = {
+                selectedProfession = profName,
+                effectiveProfession = profName,
+                globalSearch = false,
+            }
+            local categories = (Addon.Data.GetVisibleRecipeCategories
+                    and Addon.Data:GetVisibleRecipeCategories(profName, sidebarFilterContext))
+                or (Addon.Data.GetRecipeCategories and Addon.Data:GetRecipeCategories(profName, true))
+                or {}
+
             local selectedCategoryExists = self.selectedCategory == nil
-            for _, categoryName in ipairs(categories) do
-                if categoryName == self.selectedCategory then
+            for _, categoryRow in ipairs(categories) do
+                local categoryToken = categoryRow.key or categoryRow
+                if categoryToken == self.selectedCategory then
                     selectedCategoryExists = true
                     break
                 end
+                for _, subcategoryRow in ipairs(categoryRow.subcategories or {}) do
+                    local subcategoryToken = "subcategory:" .. tostring(categoryToken) .. ":" .. tostring(subcategoryRow.key)
+                    if subcategoryToken == self.selectedCategory then
+                        selectedCategoryExists = true
+                        break
+                    end
+                end
+                if selectedCategoryExists then break end
             end
             if not selectedCategoryExists then
                 self.selectedCategory = nil
             end
+
+            -- Reconcile a subcategory selection with the active view mode so the
+            -- user never ends up filtered to a subcategory whose button isn't
+            -- rendered: categoriesOnly falls back to the parent category, while
+            -- accordion expands the parent so the selection stays visible.
+            local selectedSubParent = self.selectedCategory
+                and tostring(self.selectedCategory):match("^subcategory:([^:]+):")
+            if selectedSubParent then
+                if viewMode == "categoriesOnly" then
+                    self.selectedCategory = selectedSubParent
+                elseif viewMode == "accordion" then
+                    self.expandedCategory = selectedSubParent
+                end
+            end
+
             if #categories > 0 then
+                -- profContent is 196 wide (sized to clear the sidebar's
+                -- scrollbar); size each row to fit its indent so subcategory
+                -- rows at the deeper indent don't bleed past it.
+                local function widthFor(indent) return 196 - indent - 4 end
                 categoryButtonIndex = categoryButtonIndex + 1
                 local allButton = self:EnsureCategoryButton(categoryButtonIndex)
-                allButton.categoryName = nil
+                allButton.categoryToken = nil
+                allButton.toggleExpandKey = nil
+                allButton.categoryLabel = "All"
                 allButton:SetLabel("All")
                 allButton:SetSelected(self.selectedCategory == nil)
+                allButton:SetWidth(widthFor(14))
                 placeButton(allButton, 14, 20, 4)
 
-                for _, categoryName in ipairs(categories) do
+                for _, categoryRow in ipairs(categories) do
+                    local categoryToken = categoryRow.key or categoryRow
+                    local categoryLabel = categoryRow.label or categoryToken
+                    local hasSubcategories = categoryRow.subcategories and #categoryRow.subcategories > 0
+                    local expanded = viewMode == "accordion" and self.expandedCategory == categoryToken
+
                     categoryButtonIndex = categoryButtonIndex + 1
                     local categoryButton = self:EnsureCategoryButton(categoryButtonIndex)
-                    categoryButton.categoryName = categoryName
-                    categoryButton:SetLabel(categoryName)
-                    categoryButton:SetSelected(self.selectedCategory == categoryName)
+                    categoryButton.categoryToken = categoryToken
+                    categoryButton.categoryLabel = categoryLabel
+                    if viewMode == "accordion" and hasSubcategories then
+                        categoryButton.toggleExpandKey = categoryToken
+                        local arrow = expanded and "|cff808080v|r " or "|cff808080>|r "
+                        categoryButton:SetLabel(arrow .. categoryLabel)
+                    else
+                        categoryButton.toggleExpandKey = nil
+                        categoryButton:SetLabel(categoryLabel)
+                    end
+                    categoryButton:SetSelected(self.selectedCategory == categoryToken)
+                    categoryButton:SetWidth(widthFor(14))
                     placeButton(categoryButton, 14, 20, 4)
+
+                    -- expanded: always show subcategories; accordion: only for the
+                    -- expanded category; categoriesOnly: never.
+                    local renderSubcategories = hasSubcategories
+                        and (viewMode == "expanded" or (viewMode == "accordion" and expanded))
+                    if renderSubcategories then
+                        for _, subcategoryRow in ipairs(categoryRow.subcategories or {}) do
+                            local subcategoryToken = "subcategory:" .. tostring(categoryToken) .. ":" .. tostring(subcategoryRow.key)
+                            categoryButtonIndex = categoryButtonIndex + 1
+                            local subcategoryButton = self:EnsureCategoryButton(categoryButtonIndex)
+                            subcategoryButton.categoryToken = subcategoryToken
+                            subcategoryButton.toggleExpandKey = nil
+                            subcategoryButton.categoryLabel = subcategoryRow.label or subcategoryRow.key
+                            subcategoryButton:SetLabel(subcategoryButton.categoryLabel)
+                            subcategoryButton:SetSelected(self.selectedCategory == subcategoryToken)
+                            subcategoryButton:SetWidth(widthFor(28))
+                            placeButton(subcategoryButton, 28, 18, 3)
+                        end
+                    end
                 end
                 yOffset = yOffset + 2
             end
         elseif self.selectedProfession == profName then
             self.selectedCategory = nil
+            self.expandedCategory = nil
         end
     end
     for i = categoryButtonIndex + 1, #(self.frame.categoryButtons or {}) do
@@ -2477,6 +2655,26 @@ function UI:RefreshProfessionButtons(opts)
     if self.frame.searchMaterials then
         self.frame.searchMaterials:SetSelected(self.searchMode == "materials")
     end
+end
+
+function UI:GetCategoryFilterLabel(profession, categoryToken)
+    if not categoryToken or not (Addon.Data and Addon.Data.GetRecipeCategories) then
+        return nil
+    end
+    local subcategoryCategory, subcategoryKey = tostring(categoryToken):match("^subcategory:([^:]+):(.+)$")
+    for _, categoryRow in ipairs(Addon.Data:GetRecipeCategories(profession, true) or {}) do
+        local categoryKey = categoryRow.key or categoryRow
+        if subcategoryCategory and categoryKey == subcategoryCategory then
+            for _, subcategoryRow in ipairs(categoryRow.subcategories or {}) do
+                if subcategoryRow.key == subcategoryKey then
+                    return (categoryRow.label or categoryKey) .. " / " .. (subcategoryRow.label or subcategoryKey)
+                end
+            end
+        elseif categoryKey == categoryToken then
+            return categoryRow.label or categoryKey
+        end
+    end
+    return tostring(categoryToken)
 end
 
 local RECIPE_ROW_HEIGHT = 70
@@ -3015,6 +3213,7 @@ function UI:RefreshRecipeList()
         and self.selectedProfession and self.selectedProfession ~= "Favorites" then
         categoryFilter = self.selectedCategory
     end
+    local categoryLabel = self:GetCategoryFilterLabel(self.selectedProfession, categoryFilter)
     local globalSearch = (self.selectedProfession == nil and self.searchText and self.searchText ~= "")
     local canRunGlobalSearch = globalSearch and string.len(self.searchText or "") >= GLOBAL_SEARCH_MIN_CHARS
 
@@ -3024,10 +3223,43 @@ function UI:RefreshRecipeList()
         globalSearch = globalSearch,
         canRunGlobalSearch = canRunGlobalSearch,
         sortMode = self.sortMode,
+        categoryLabel = categoryLabel,
     }
+    context.filterContext = {
+        selectedProfession = self.selectedProfession,
+        effectiveProfession = effectiveProfession,
+        categoryFilter = categoryFilter,
+        globalSearch = globalSearch,
+    }
+    -- Thread the per-session expansion reveal so RecipePasses /
+    -- BuildVisibleSpellIdHash treat the hidden expansion as visible
+    -- for THIS view only. Profile prefilters stay untouched, so other
+    -- professions still respect the saved Vanilla=off preference.
+    if self._sessionRevealedExpansions and effectiveProfession then
+        local filtersModule = Addon.RecipeUiFilters
+        local profKey = effectiveProfession
+        if filtersModule and filtersModule.NormalizeProfessionKey then
+            profKey = filtersModule:NormalizeProfessionKey(effectiveProfession) or effectiveProfession
+        end
+        local reveal = profKey and self._sessionRevealedExpansions[profKey]
+        if reveal then
+            context.filterContext.sessionRevealedExpansions = reveal
+        end
+    end
+    if Addon.RecipeUiFilters and Addon.RecipeUiFilters.BuildFilterCacheKey then
+        context.filterCacheKey = Addon.RecipeUiFilters:BuildFilterCacheKey(context.filterContext)
+    end
 
     self._recipeListGeneration = (self._recipeListGeneration or 0) + 1
     local generation = self._recipeListGeneration
+
+    -- Refresh the hint + scroll anchor before the build runs, so the
+    -- previously-rendered rows from the prior profession don't briefly
+    -- overlap the hint while the new build is in flight. _FinalizeRecipeList
+    -- re-runs the same refresh at the end (cheap no-op when nothing
+    -- changed) to catch edge cases where the hint state depends on
+    -- per-recipe data only available after the build.
+    self:RefreshHiddenExpansionHint(self.selectedProfession)
 
     if not (self.selectedProfession == "Favorites" or self.selectedProfession ~= nil or canRunGlobalSearch) then
         self:_FinalizeRecipeList({}, context, generation)
@@ -3035,7 +3267,7 @@ function UI:RefreshRecipeList()
     end
 
     if self.selectedProfession == FAVORITES_VIEW then
-        self:_FinalizeRecipeList(self:BuildFavoriteRecipeRows(), context, generation)
+        self:_FinalizeRecipeList(self:BuildFavoriteRecipeRows(context.filterContext), context, generation)
         return
     end
 
@@ -3046,10 +3278,26 @@ function UI:RefreshRecipeList()
         self.sortMode,
         self.searchMode,
         categoryFilter,
+        context.filterContext,
         function(rows, _wasCached)
             callbackFiredInline = true
             if self._recipeListGeneration ~= generation then return end
-            if not rows then return end
+            if not rows then
+                -- The recipe index was invalidated mid-build (warmup
+                -- traffic, scan completion, sync merge…). The original
+                -- callsite is supposed to follow up with a RequestRefresh
+                -- but some warmup paths don't, leaving the UI stuck on
+                -- "Loading…" forever. Defer a refresh ourselves; the
+                -- generation check above keeps us from racing a manual
+                -- profession change.
+                if Addon.ScheduleTimer then
+                    Addon:ScheduleTimer(function()
+                        if self._recipeListGeneration ~= generation then return end
+                        Addon:RequestRefresh("list-stale-retry")
+                    end, 0.25)
+                end
+                return
+            end
             self:_FinalizeRecipeList(rows, context, generation)
         end
     )
@@ -3068,7 +3316,7 @@ function UI:_ShowRecipeListLoadingState(context, generation)
     if context.selectedProfession == "Favorites" then
         headerText = "Favorites - loading..."
     elseif context.selectedProfession and context.categoryFilter then
-        headerText = context.selectedProfession .. ": " .. tostring(context.categoryFilter) .. " - loading..."
+        headerText = context.selectedProfession .. ": " .. tostring(context.categoryLabel or context.categoryFilter) .. " - loading..."
     elseif context.selectedProfession then
         headerText = context.selectedProfession .. " - loading..."
     elseif context.globalSearch and not context.canRunGlobalSearch then
@@ -3087,9 +3335,49 @@ function UI:_ShowRecipeListLoadingState(context, generation)
     end
 end
 
+function UI:RejectStaleRecipeSelection(rows)
+    if not self.selectedRecipeKey then
+        return false
+    end
+
+    local selected = tostring(self.selectedRecipeKey)
+    for _, rowData in ipairs(rows or {}) do
+        if tostring(rowData.recipeKey) == selected then
+            return false
+        end
+    end
+
+    self.selectedRecipeKey = nil
+    self.currentDetail = nil
+    self._lastDetailSignature = nil
+    self._lastDetailRecipeKey = nil
+    self:CloseShareMenus()
+    return true
+end
+
 function UI:_FinalizeRecipeList(rows, context, generation)
     if not self.frame then return end
     if self._recipeListGeneration ~= generation then return end
+    if context and context.filterCacheKey and Addon.RecipeUiFilters and Addon.RecipeUiFilters.BuildFilterCacheKey then
+        local currentFilterKey = Addon.RecipeUiFilters:BuildFilterCacheKey(context.filterContext)
+        if currentFilterKey ~= context.filterCacheKey then
+            -- The filter key shifted between RefreshRecipeList kick-off and
+            -- the build completing — most commonly an ownership-index
+            -- generation bump from an incoming sync block-merge. Dropping
+            -- the result silently leaves the centre panel stuck on
+            -- "Loading…" until something else nudges a refresh. Schedule
+            -- a short retry on the next frame so the user actually sees
+            -- rows; the generation gate above keeps us from clobbering a
+            -- profession the user navigated away from in the meantime.
+            if Addon.ScheduleTimer then
+                Addon:ScheduleTimer(function()
+                    if self._recipeListGeneration ~= generation then return end
+                    Addon:RequestRefresh("list-filter-key-shift")
+                end, 0.1)
+            end
+            return
+        end
+    end
 
     if context.selectedProfession == "Favorites" then
         local filteredRows = {}
@@ -3106,7 +3394,7 @@ function UI:_FinalizeRecipeList(rows, context, generation)
     if context.selectedProfession == "Favorites" then
         headerText = "Favorite recipes"
     elseif context.selectedProfession and context.categoryFilter then
-        headerText = context.selectedProfession .. ": " .. tostring(context.categoryFilter)
+        headerText = context.selectedProfession .. ": " .. tostring(context.categoryLabel or context.categoryFilter)
     elseif context.selectedProfession then
         headerText = context.selectedProfession .. " recipes"
     elseif context.globalSearch and not context.canRunGlobalSearch then
@@ -3126,14 +3414,9 @@ function UI:_FinalizeRecipeList(rows, context, generation)
         self.frame.sortSwitch:SetLabel(sortLabel)
     end
 
-    local selectedExists = false
-    if self.selectedRecipeKey then
-        for _, rowData in ipairs(rows) do
-            if rowData.recipeKey == self.selectedRecipeKey then
-                selectedExists = true
-                break
-            end
-        end
+    local selectedExists = self.selectedRecipeKey ~= nil
+    if selectedExists then
+        selectedExists = not self:RejectStaleRecipeSelection(rows)
     end
 
     if (not self.selectedRecipeKey or not selectedExists) and #rows > 0 then
@@ -3153,9 +3436,186 @@ function UI:_FinalizeRecipeList(rows, context, generation)
     self:InvalidateRecipeWindowCache()
     self:RenderVisibleRecipeRows()
     self:RefreshSummaryCards()
+    self:RefreshHiddenExpansionHint(context.selectedProfession)
     -- Async path: the selection may have changed after the list arrived,
     -- so refresh the detail panel to keep it in sync with the new rows.
     self:RefreshDetailPanel()
+end
+
+-- Discoverability hint shown between the recipe header and the list. When
+-- the user has hidden an expansion globally (or via per-profession
+-- override) and that expansion has catalogued recipes for the current
+-- profession, expose a one-click affordance to surface them. Falls
+-- through to hidden state for "All", Favorites, or fully-on visibility.
+function UI:RefreshHiddenExpansionHint(profession)
+    local hint = self.frame and self.frame.hiddenExpansionHint
+    if not hint then return end
+    if not profession or profession == "All" or profession == "Favorites" then
+        self:_SetRecipeScrollAnchor(false)
+        if hint.IsShown and hint:IsShown() then hint:Hide() end
+        return
+    end
+    local filters = Addon.RecipeUiFilters
+    local metadata = Addon.RecipeMetadata
+    if not (filters and metadata) then
+        if hint.IsShown and hint:IsShown() then hint:Hide() end
+        return
+    end
+    local profKey = filters.NormalizeProfessionKey and filters:NormalizeProfessionKey(profession) or profession
+    -- Mining is intentionally expansion-agnostic at the predicate level;
+    -- the hint would never fire usefully there.
+    if profKey == "mining" then
+        if hint.IsShown and hint:IsShown() then hint:Hide() end
+        return
+    end
+    local visibility = filters:GetEffectiveExpansionVisibility(profKey)
+    -- Honour the per-session reveal so the hint disappears after click
+    -- without forcing the user to refresh / re-navigate to clear it.
+    local sessionReveal = self._sessionRevealedExpansions
+        and self._sessionRevealedExpansions[profKey]
+        or nil
+    if sessionReveal then
+        visibility = {
+            vanilla = visibility.vanilla ~= false or sessionReveal.vanilla == true,
+            tbc = visibility.tbc ~= false or sessionReveal.tbc == true,
+        }
+    end
+    local hiddenExpansion, hiddenCount
+    local getCount = metadata.GetExpansionRecipeCount
+        and function(exp) return metadata:GetExpansionRecipeCount(profKey, exp) end
+        or function() return 0 end
+    if visibility.vanilla == false then
+        local n = getCount("vanilla")
+        if n > 0 then
+            hiddenExpansion = "vanilla"
+            hiddenCount = n
+        end
+    end
+    if not hiddenExpansion and visibility.tbc == false then
+        local n = getCount("tbc")
+        if n > 0 then
+            hiddenExpansion = "tbc"
+            hiddenCount = n
+        end
+    end
+    if not hiddenExpansion then
+        self:_SetRecipeScrollAnchor(false)
+        if hint.IsShown and hint:IsShown() then hint:Hide() end
+        return
+    end
+    hint._pendingProfession = profKey
+    hint._pendingExpansion = hiddenExpansion
+    local label = hiddenExpansion == "vanilla" and "Vanilla" or "TBC"
+    if hint.text then
+        hint.text:SetText(string.format(
+            "%d %s recipe%s hidden by filter — click to show",
+            hiddenCount,
+            label,
+            hiddenCount == 1 and "" or "s"
+        ))
+    end
+    self:_SetRecipeScrollAnchor(true)
+    hint:Show()
+end
+
+-- Toggle the recipeScroll's top anchor so the hint never overlaps the
+-- first recipe row. Use absolute offsets relative to the centre frame
+-- (not frame-to-frame anchors) — anchoring to the hint while it was
+-- hidden produced a measurable mismatch (the hint's BOTTOMLEFT wasn't
+-- being honoured) that put the scroll INSIDE the hint band by ~14px.
+-- The hint sits at y=-34 with height 20, so y=-72 leaves an 18px gap
+-- below the hint's bottom edge.
+function UI:_SetRecipeScrollAnchor(hintShown)
+    local frame = self.frame
+    local scroll = frame and frame.recipeScroll
+    if not scroll then return end
+    local mode = hintShown and "below-hint" or "below-header"
+    if scroll._rrAnchorMode == mode then return end
+    scroll._rrAnchorMode = mode
+    scroll:ClearAllPoints()
+    scroll:SetPoint("TOPLEFT", 8, hintShown and -72 or -40)
+    scroll:SetPoint("BOTTOMRIGHT", -28, 10)
+end
+
+-- Click handler: per-session reveal of the hidden expansion for the
+-- currently-viewed profession. The user's saved profile is NOT
+-- mutated, so navigating to another profession (or /reload) shows the
+-- hint again at the original preference. Stored on the UI module so
+-- subsequent navigations back to the same profession keep the reveal.
+function UI:UnhideCurrentProfessionExpansion()
+    local hint = self.frame and self.frame.hiddenExpansionHint
+    if not hint or not hint._pendingExpansion then return end
+    local profKey = hint._pendingProfession
+    if not profKey then return end
+    self._sessionRevealedExpansions = self._sessionRevealedExpansions or {}
+    local profReveal = self._sessionRevealedExpansions[profKey]
+    if type(profReveal) ~= "table" then
+        profReveal = {}
+        self._sessionRevealedExpansions[profKey] = profReveal
+    end
+    profReveal[hint._pendingExpansion] = true
+    -- Invalidate the list-cache slice for this profession only — the
+    -- session reveal changes the predicate outcome for the current view
+    -- but leaves every other cached list (other professions, profile-
+    -- side filters) intact.
+    if Addon.Data and Addon.Data.InvalidateRecipeCaches then
+        Addon.Data:InvalidateRecipeCaches("list")
+    end
+    hint:Hide()
+    Addon:RequestRefresh("unhide-expansion-session")
+end
+
+function UI:GetCrafterRequestability(recipeKey, crafter, selfKey)
+    if not crafter or not crafter.memberKey then
+        return false, "missing-crafter"
+    end
+    if selfKey and crafter.memberKey == selfKey then
+        return false, "current-player"
+    end
+    if Addon.Data and Addon.Data.GetRecipeRequestability then
+        return Addon.Data:GetRecipeRequestability(recipeKey, crafter.memberKey)
+    end
+    return true, "requestable"
+end
+
+function UI:GetCrafterRequestMeta(recipeKey, crafter, selfKey)
+    local requestable, reason = self:GetCrafterRequestability(recipeKey, crafter, selfKey)
+    if reason == "current-player" then
+        return nil, requestable, reason
+    end
+
+    local canRequest = false
+    if requestable then
+        canRequest = not (Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("BLOCK_PULL_REQUEST"))
+    end
+
+    return {
+        canRequest = canRequest,
+        canWhisper = true,
+        memberKey = crafter and crafter.memberKey or nil,
+        requestable = requestable,
+        requestabilityReason = reason,
+    }, requestable, reason
+end
+
+function UI:BuildDetailRequestabilitySignature(detail)
+    local crafters = detail and detail.crafters or nil
+    if not crafters or #crafters == 0 then
+        return ""
+    end
+
+    local selfKey = Addon.Data and Addon.Data.GetPlayerKey and Addon.Data:GetPlayerKey() or nil
+    local parts = {}
+    for _, crafter in ipairs(crafters) do
+        local requestable, reason = self:GetCrafterRequestability(detail.recipeKey, crafter, selfKey)
+        parts[#parts + 1] = table.concat({
+            tostring(crafter.memberKey or ""),
+            requestable and "1" or "0",
+            tostring(reason or ""),
+        }, ":")
+    end
+    table.sort(parts)
+    return table.concat(parts, ",")
 end
 
 -- Reuse the pooled render: when item info arrives or assets change, the
@@ -3172,7 +3632,7 @@ function UI:RefreshVisibleRecipeRowAssets()
     self:RenderVisibleRecipeRows()
 end
 
-function UI:BuildFavoriteRecipeRows()
+function UI:BuildFavoriteRecipeRows(filterContext)
     local favorites = Addon.charDB and Addon.charDB.favorites or {}
     local favoriteKeys = {}
     local favoriteSet = {}
@@ -3189,6 +3649,14 @@ function UI:BuildFavoriteRecipeRows()
 
     local data = Addon.Data
     local rowsByKey = {}
+
+    local function passesFilters(recipeKey)
+        if Addon.RecipeUiFilters and Addon.RecipeUiFilters.RecipePasses then
+            local passed = Addon.RecipeUiFilters:RecipePasses(recipeKey, nil, filterContext)
+            return passed == true
+        end
+        return true
+    end
 
     local function ensureRow(recipeKey)
         local key = tostring(recipeKey)
@@ -3214,6 +3682,7 @@ function UI:BuildFavoriteRecipeRows()
 
     local function addIndexedRecipe(recipeKey, indexed)
         if not indexed then return end
+        if not passesFilters(recipeKey) then return end
         local row = ensureRow(recipeKey)
         row.crafterCount = indexed.crafterCount or 0
         row.onlineCount = 0
@@ -3237,7 +3706,7 @@ function UI:BuildFavoriteRecipeRows()
                 for profName, prof in pairs(entry.professions or {}) do
                     for recipeKey in pairs(prof.recipes or {}) do
                         local key = tostring(recipeKey)
-                        if favoriteSet[key] then
+                        if favoriteSet[key] and passesFilters(recipeKey) then
                             local row = ensureRow(recipeKey)
                             row._profNames[profName] = true
                             if not row._seenMembers[memberKey] then
@@ -3524,8 +3993,9 @@ function UI:RefreshDetailPanel()
             if c.online then onlineCount = onlineCount + 1 end
         end
     end
+    local requestabilitySignature = self:BuildDetailRequestabilitySignature(detail)
     local signature = string.format(
-        "%s|%s|%d|%d|%s|%s|%s|%s",
+        "%s|%s|%d|%d|%s|%s|%s|%s|%s",
         tostring(self.selectedRecipeKey),
         isFavorite and "1" or "0",
         tonumber(detail.crafterCount) or 0,
@@ -3533,7 +4003,8 @@ function UI:RefreshDetailPanel()
         tostring(detail.cost and detail.cost.total or ""),
         tostring(detail.cost and detail.cost.missingCount or 0),
         tostring(detail.cost and detail.cost.source or ""),
-        tostring(self._offlineCraftersExpanded)
+        tostring(self._offlineCraftersExpanded),
+        requestabilitySignature
     )
     if self._lastDetailSignature == signature then
         return
@@ -3592,21 +4063,19 @@ function UI:RefreshDetailPanel()
             if crafter.specialization then
                 nameText = nameText .. " " .. colorText("[" .. crafter.specialization .. "]", unpackColor(MUTED))
             end
+            local requestMeta, requestable = self:GetCrafterRequestMeta(self.selectedRecipeKey, crafter, selfKey)
+            if requestable == false and (not selfKey or crafter.memberKey ~= selfKey) then
+                nameText = nameText .. " " .. colorText("[Not requestable]", unpackColor(MUTED))
+            end
             lines[#lines + 1] = string.format("%s %s", state, nameText)
-            if not selfKey or crafter.memberKey ~= selfKey then
+            if requestMeta then
                 -- canWhisper is a local UI action (opens a chat window) and
                 -- has no sync implications, so it stays enabled even when
                 -- SyncPausePolicy pauses protocol traffic (raids,
-                -- instances, combat). canRequest gates the "request a
-                -- craft" action button, which DOES send a whisper from
-                -- the addon — kept under the sync-pause gate so we don't
-                -- emit chat messages while the player is busy.
-                local canRequest = not (Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("BLOCK_PULL_REQUEST"))
-                lineMeta[#lines] = {
-                    canRequest = canRequest,
-                    canWhisper = true,
-                    memberKey = crafter.memberKey,
-                }
+                -- instances, combat). canRequest also stays false for
+                -- BoP and self-only recipes that remote crafters cannot
+                -- deliver.
+                lineMeta[#lines] = requestMeta
             end
         end
         if #offlineCrafters > 0 then
@@ -3623,6 +4092,10 @@ function UI:RefreshDetailPanel()
                     local nameText = getClassColorizedName(crafter.memberKey)
                     if crafter.specialization then
                         nameText = nameText .. " " .. colorText("[" .. crafter.specialization .. "]", unpackColor(MUTED))
+                    end
+                    local requestable = self:GetCrafterRequestability(self.selectedRecipeKey, crafter, selfKey)
+                    if requestable == false and (not selfKey or crafter.memberKey ~= selfKey) then
+                        nameText = nameText .. " " .. colorText("[Not requestable]", unpackColor(MUTED))
                     end
                     lines[#lines + 1] = string.format("%s %s", state, nameText)
                 end
@@ -3694,8 +4167,7 @@ function UI:Refresh(reasons)
         -- Profession buttons are static labels — populating them while sync
         -- is still warming up gives the user a non-empty sidebar instead
         -- of a row of unlabelled rectangles. skipCategories=true keeps us
-        -- off the AtlasLoot category index, which would otherwise build
-        -- synchronously here and reintroduce the freeze.
+        -- off category providers during the degraded warmup render.
         self:RefreshProfessionButtons({ skipCategories = true })
         self:RefreshDegradedStatus(degradedReason)
         self:MarkFullRefreshPending(degradedReason)

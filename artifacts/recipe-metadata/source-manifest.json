@@ -1,0 +1,232 @@
+{
+  "excluded": [],
+  "expansionCounts": {
+    "tbc": 902,
+    "vanilla": 1248
+  },
+  "professionCounts": {
+    "alchemy": 186,
+    "blacksmithing": 385,
+    "cooking": 116,
+    "enchanting": 223,
+    "engineering": 250,
+    "jewelcrafting": 261,
+    "leatherworking": 379,
+    "mining": 21,
+    "tailoring": 329
+  },
+  "professionExpansionCounts": {
+    "alchemy": {
+      "tbc": 70,
+      "vanilla": 116
+    },
+    "blacksmithing": {
+      "tbc": 135,
+      "vanilla": 250
+    },
+    "cooking": {
+      "tbc": 35,
+      "vanilla": 81
+    },
+    "enchanting": {
+      "tbc": 72,
+      "vanilla": 151
+    },
+    "engineering": {
+      "tbc": 81,
+      "vanilla": 169
+    },
+    "jewelcrafting": {
+      "tbc": 261,
+      "vanilla": 0
+    },
+    "leatherworking": {
+      "tbc": 144,
+      "vanilla": 235
+    },
+    "mining": {
+      "tbc": 9,
+      "vanilla": 12
+    },
+    "tailoring": {
+      "tbc": 95,
+      "vanilla": 234
+    }
+  },
+  "records": 2150,
+  "source": {
+    "datasetKind": "release-candidate",
+    "expectedRecipeCounts": {
+      "byExpansion": {
+        "tbc": 902,
+        "vanilla": 1248
+      },
+      "byProfession": {
+        "alchemy": 186,
+        "blacksmithing": 385,
+        "cooking": 116,
+        "enchanting": 223,
+        "engineering": 250,
+        "jewelcrafting": 261,
+        "leatherworking": 379,
+        "mining": 21,
+        "tailoring": 329
+      },
+      "byProfessionExpansion": {
+        "alchemy": {
+          "tbc": 70,
+          "vanilla": 116
+        },
+        "blacksmithing": {
+          "tbc": 135,
+          "vanilla": 250
+        },
+        "cooking": {
+          "tbc": 35,
+          "vanilla": 81
+        },
+        "enchanting": {
+          "tbc": 72,
+          "vanilla": 151
+        },
+        "engineering": {
+          "tbc": 81,
+          "vanilla": 169
+        },
+        "jewelcrafting": {
+          "tbc": 261
+        },
+        "leatherworking": {
+          "tbc": 144,
+          "vanilla": 235
+        },
+        "mining": {
+          "tbc": 9,
+          "vanilla": 12
+        },
+        "tailoring": {
+          "tbc": 95,
+          "vanilla": 234
+        }
+      },
+      "total": 2150
+    },
+    "flavor": "tbc",
+    "metadataVersion": "wago-wow-anniversary-tbc-2.5.5",
+    "provider": "wago.tools-db2",
+    "snapshot": "tbc-2.5.5",
+    "source": {
+      "branch": "wow_anniversary",
+      "createdItemPolicy": "createdItemId comes from DB2 SpellEffect Effect=24 EffectItemType",
+      "expansionRule": "spell present in Vanilla SkillLineAbility build 1.15.7.61582 => vanilla; otherwise tbc",
+      "product": "wow_anniversary",
+      "recipeItemPolicy": "primary recipeItemId comes from DB2 ItemEffect ParentItemID; alternate teaching sources are intentionally not modeled",
+      "tables": [
+        "SkillLineAbility",
+        "SpellEffect",
+        "SpellReagents",
+        "ItemEffect",
+        "ItemSparse",
+        "Item",
+        "SpellName"
+      ],
+      "vanillaBuild": "1.15.7.61582"
+    },
+    "sourceStats": {
+      "duplicateSkillLineAbilityRecipesSkipped": 1,
+      "lateVanillaRecipeSpellIds": [
+        25659,
+        25704,
+        25954,
+        26011,
+        26085,
+        26086,
+        26087,
+        26277,
+        26279,
+        26403,
+        26407,
+        26416,
+        26417,
+        26418,
+        26420,
+        26421,
+        26422,
+        26423,
+        26424,
+        26425,
+        26426,
+        26427,
+        26428,
+        26442,
+        26443,
+        27585,
+        27586,
+        27587,
+        27588,
+        27589,
+        27590,
+        27658,
+        27659,
+        27660,
+        27724,
+        27725,
+        27829,
+        27830,
+        27832,
+        27837,
+        28205,
+        28207,
+        28208,
+        28209,
+        28210,
+        28219,
+        28220,
+        28221,
+        28222,
+        28223,
+        28224,
+        28242,
+        28243,
+        28244,
+        28327,
+        28461,
+        28462,
+        28463,
+        28472,
+        28473,
+        28474,
+        28480,
+        28481,
+        28482
+      ],
+      "lateVanillaRecipesFromBaseline": 64,
+      "rawRows": {
+        "Item": 30057,
+        "ItemEffect": 17729,
+        "ItemSparse": 30044,
+        "SkillLineAbility": 7018,
+        "SpellEffect": 38303,
+        "SpellName": 28650,
+        "SpellReagents": 2659,
+        "VanillaSkillLineAbility": 6143
+      },
+      "records": 2150
+    }
+  },
+  "supportedExpansions": [
+    "vanilla",
+    "tbc"
+  ],
+  "supportedProfessions": [
+    "alchemy",
+    "blacksmithing",
+    "cooking",
+    "enchanting",
+    "engineering",
+    "jewelcrafting",
+    "leatherworking",
+    "mining",
+    "tailoring"
+  ]
+}
