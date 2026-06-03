@@ -3502,18 +3502,27 @@ function UI:RefreshHiddenExpansionHint(profession)
 end
 
 -- Toggle the recipeScroll's top anchor so the hint never overlaps the
--- first recipe row. When the hint is shown, the scroll starts BELOW it;
--- when hidden, the scroll reclaims that strip. Anchors are set
--- explicitly (ClearAllPoints + SetPoint) so successive toggles don't
--- accumulate.
+-- first recipe row. When the hint is shown, anchor the scroll to the
+-- hint's BOTTOMLEFT with a small gap so the visual spacing is robust
+-- to font / hint-height changes. When hidden, the scroll reclaims the
+-- strip and anchors directly to the centre frame.
 function UI:_SetRecipeScrollAnchor(hintShown)
-    local scroll = self.frame and self.frame.recipeScroll
+    local frame = self.frame
+    local scroll = frame and frame.recipeScroll
     if not scroll then return end
-    local topY = hintShown and -60 or -40
-    if scroll._rrHintTopY == topY then return end
-    scroll._rrHintTopY = topY
+    local mode = hintShown and "below-hint" or "below-header"
+    if scroll._rrAnchorMode == mode then return end
+    scroll._rrAnchorMode = mode
     scroll:ClearAllPoints()
-    scroll:SetPoint("TOPLEFT", 8, topY)
+    if hintShown and frame.hiddenExpansionHint then
+        -- The hint sits ~y=-34 with height 20 anchored to the centre
+        -- frame; anchoring the scroll to its BOTTOMLEFT with a 10px
+        -- gap keeps the first row a comfortable distance away even if
+        -- the hint's text wraps onto two lines.
+        scroll:SetPoint("TOPLEFT", frame.hiddenExpansionHint, "BOTTOMLEFT", -4, -10)
+    else
+        scroll:SetPoint("TOPLEFT", 8, -40)
+    end
     scroll:SetPoint("BOTTOMRIGHT", -28, 10)
 end
 
