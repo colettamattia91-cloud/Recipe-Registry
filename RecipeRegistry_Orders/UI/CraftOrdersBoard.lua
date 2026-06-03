@@ -237,6 +237,74 @@ local FILTER_LABELS = {
     done   = "Filter: Done",
 }
 
+-- User-facing labels for each state-machine target state. Keeps the
+-- button text short and verb-led ("Mark received") instead of echoing
+-- the raw enum value ("MaterialsReceived"). Any transition target not
+-- in this table falls back to the raw state name.
+local TRANSITION_LABELS = {
+    MaterialsPartial  = "Materials partial",
+    MaterialsSent     = "Mark materials sent",
+    MaterialsReceived = "Mark received",
+    MaterialsMissing  = "Mark missing",
+    Accepted          = "Accept",
+    DeliverySent      = "Mark delivery sent",
+    Completed         = "Mark completed",
+    ReturnPending     = "Request return",
+    Cancelled         = "Cancel",
+}
+
+-- Transitions that should render with the destructive (red) ask-style
+-- variant. The cancel/return path is the only one where the user is
+-- closing an order against the happy path, so it visually stands apart.
+local DESTRUCTIVE_TRANSITIONS = {
+    Cancelled     = true,
+    ReturnPending = true,
+}
+
+-- Layout constants for the detail-panel action strip.
+local ACTION_STRIP_HEIGHT = 28
+local ACTION_BUTTON_HEIGHT = 22
+local ACTION_BUTTON_SPACING = 6
+local ACTION_BUTTON_MIN_WIDTH = 90
+local ACTION_BUTTON_LABEL_PADDING = 14
+
+-- Mirrors UI/CraftOrdersCartPanel.lua's "Ask"-style button so the board's
+-- action strip reads as part of the same visual family. Kept local to
+-- the board file: the cart and the board are the only two callers and a
+-- shared helper file is more weight than the duplication is worth.
+local function buildActionButton(parent, width, height, label, tone)
+    if not CreateFrame then return nil end
+    local button = CreateFrame("Button", nil, parent, "BackdropTemplate")
+    button:SetSize(width, height)
+    button:SetBackdrop(PANEL_BACKDROP)
+
+    local labelR, labelG, labelB = 1.0, 0.92, 0.75
+    local borderR, borderG, borderB, borderA = 1, 0.82, 0, 0.75
+    local hoverR, hoverG, hoverB, hoverA = 1, 0.82, 0, 0.18
+    local bgR, bgG, bgB, bgA = 0.13, 0.11, 0.08, 0.95
+    if tone == "red" then
+        labelR, labelG, labelB = 1.0, 0.30, 0.30
+        borderR, borderG, borderB, borderA = 1.0, 0.25, 0.25, 0.95
+        hoverR, hoverG, hoverB, hoverA = 1.0, 0.20, 0.20, 0.28
+        bgR, bgG, bgB, bgA = 0.13, 0.08, 0.08, 0.95
+    end
+
+    button:SetBackdropColor(bgR, bgG, bgB, bgA)
+    button:SetBackdropBorderColor(borderR, borderG, borderB, borderA)
+
+    button.label = button:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    button.label:SetPoint("LEFT", 2, 0)
+    button.label:SetPoint("RIGHT", -2, 0)
+    button.label:SetJustifyH("CENTER")
+    button.label:SetText(label or "")
+    button.label:SetTextColor(labelR, labelG, labelB)
+
+    button:SetHighlightTexture("Interface\\Buttons\\WHITE8x8", "ADD")
+    local hi = button:GetHighlightTexture()
+    if hi and hi.SetVertexColor then hi:SetVertexColor(hoverR, hoverG, hoverB, hoverA) end
+    return button
+end
+
 function Board:GetFilter()
     return self.filter or "all"
 end
@@ -429,6 +497,64 @@ function Board:GetSelectedOrder()
     return store:GetOrder(self.selectedOrderId)
 end
 
+-- Returns the state-machine actor role the local player has on the
+-- given order: "requester", "crafter", or nil when the local player is
+-- a third-party observer. System-only transitions (Expired,
+-- MaterialsAssumed) are intentionally never offered through the UI —
+-- those are driven by background timers, not user clicks.
+function Board:GetLocalActorForOrder(order)
+    if type(order) ~= "table" then return nil end
+    if type(Addon.GetLocalPlayerKey) ~= "function" then return nil end
+    local ok, me = pcall(Addon.GetLocalPlayerKey, Addon)
+    if not ok or type(me) ~= "string" or me == "" then return nil end
+    if me == order.requester then return "requester" end
+    if me == order.crafter   then return "crafter"   end
+    return nil
+end
+
+-- Returns the ordered list of actionable transitions for the local
+-- player on the given order:
+--   { { toState = ..., label = ..., actor = ..., destructive = bool }, ... }
+-- Empty when the order is nil, the local player has no role on it, or
+-- the order is in a terminal state. The list is the source of truth
+-- for both the renderer and the spec; the renderer never inspects
+-- state-machine internals on its own.
+function Board:ComputeActionsForOrder(order)
+    local actor = self:GetLocalActorForOrder(order)
+    if not actor then return {} end
+    local SM = Addon.StateMachine
+    if not SM or type(SM.GetValidTransitions) ~= "function" then return {} end
+    local targets = SM:GetValidTransitions(order.status, actor)
+    local out = {}
+    for index = 1, #targets do
+        local toState = targets[index]
+        out[#out + 1] = {
+            toState     = toState,
+            label       = TRANSITION_LABELS[toState] or toState,
+            actor       = actor,
+            destructive = DESTRUCTIVE_TRANSITIONS[toState] == true,
+        }
+    end
+    return out
+end
+
+-- Drives a single transition from the action strip. Routed through the
+-- store so all the usual event-log and broadcast machinery fires, then
+-- refreshes the board so the detail panel reflects the new state and
+-- the new set of valid transitions. Returns true on success or
+-- false + reason so the spec can drive it without a UI.
+function Board:ApplyOrderAction(orderId, toState, actor)
+    local store = Addon.Store
+    if not store or type(store.Transition) ~= "function" then
+        return false, "store-not-ready"
+    end
+    local ok, err = store:Transition(orderId, toState, actor)
+    if not ok then return false, err end
+    -- Refresh is a no-op when the panel isn't built (spec case).
+    self:Refresh()
+    return true
+end
+
 -- Registers the board's tab on the host UI. Safe to call multiple times
 -- (the host registry is idempotent). Returns true on success, or nil +
 -- a short reason if RR's UI hook isn't present.
@@ -583,13 +709,25 @@ function Board:Build(panel)
     applyPanelBackdrop(detailFrame)
     panel.detailFrame = detailFrame
 
+    -- Action strip lives at the bottom of the detail panel and hosts
+    -- buttons for each valid state transition the local actor can drive.
+    -- We give it a fixed height up front so the detail text above can
+    -- anchor to its top edge without re-layout.
+    local actionStrip = CreateFrame("Frame", nil, detailFrame)
+    actionStrip:SetHeight(ACTION_STRIP_HEIGHT)
+    actionStrip:SetPoint("BOTTOMLEFT", 8, 8)
+    actionStrip:SetPoint("BOTTOMRIGHT", -8, 8)
+    panel.actionStrip = actionStrip
+
     local detailText = detailFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     detailText:SetPoint("TOPLEFT", 12, -12)
-    detailText:SetPoint("BOTTOMRIGHT", -12, 12)
+    detailText:SetPoint("BOTTOMRIGHT", actionStrip, "TOPRIGHT", 0, 4)
     detailText:SetJustifyH("LEFT")
     detailText:SetJustifyV("TOP")
     if detailText.SetSpacing then detailText:SetSpacing(3) end
     panel.detailText = detailText
+
+    self.actionButtons = self.actionButtons or {}
 
     self.panelBuilt = true
     self:Refresh()
@@ -752,5 +890,86 @@ function Board:Refresh()
         local order = self:GetSelectedOrder()
         local lines = self:FormatDetailLines(order)
         panel.detailText:SetText(table.concat(lines, "\n"))
+        self:_RebindActionButtons(order)
+    end
+end
+
+-- Sizes a label-only button to fit its text plus padding, with a floor
+-- so a single-word label ("Accept") doesn't end up uncomfortably narrow
+-- next to a longer neighbour ("Mark materials sent").
+local function measureActionWidth(label)
+    local len = #(label or "")
+    local approxWidth = len * 7 + ACTION_BUTTON_LABEL_PADDING
+    if approxWidth < ACTION_BUTTON_MIN_WIDTH then
+        approxWidth = ACTION_BUTTON_MIN_WIDTH
+    end
+    return approxWidth
+end
+
+function Board:_AcquireActionButton(index)
+    self.actionButtons = self.actionButtons or {}
+    local button = self.actionButtons[index]
+    if button then return button end
+    if not (self.panel and self.panel.actionStrip and CreateFrame) then return nil end
+    button = buildActionButton(self.panel.actionStrip, ACTION_BUTTON_MIN_WIDTH, ACTION_BUTTON_HEIGHT, "")
+    if not button then return nil end
+    button:SetScript("OnClick", function(widget)
+        if not (widget._boundOrderId and widget._boundToState and widget._boundActor) then return end
+        Board:ApplyOrderAction(widget._boundOrderId, widget._boundToState, widget._boundActor)
+    end)
+    self.actionButtons[index] = button
+    return button
+end
+
+-- Rebinds the action strip to the currently-selected order. Buttons are
+-- pooled and re-styled in place rather than recreated, so toggling
+-- between orders doesn't churn frames. Buttons beyond the current count
+-- are hidden but kept around for the next refresh.
+function Board:_RebindActionButtons(order)
+    local actions = self:ComputeActionsForOrder(order)
+    self.actionButtons = self.actionButtons or {}
+
+    local anchor = self.panel.actionStrip
+    if not anchor then return end
+
+    local xOffset = 0
+    for index = 1, #actions do
+        local entry = actions[index]
+        local button = self:_AcquireActionButton(index)
+        if button then
+            local width = measureActionWidth(entry.label)
+            button:SetSize(width, ACTION_BUTTON_HEIGHT)
+            -- Restyle in place: the same pooled button may toggle between
+            -- the default and red variants as different orders are
+            -- selected (e.g. Draft -> shows Cancel red; Accepted -> shows
+            -- Mark delivery sent default).
+            if entry.destructive then
+                button:SetBackdropColor(0.13, 0.08, 0.08, 0.95)
+                button:SetBackdropBorderColor(1.0, 0.25, 0.25, 0.95)
+                button.label:SetTextColor(1.0, 0.30, 0.30)
+                local hi = button:GetHighlightTexture()
+                if hi and hi.SetVertexColor then hi:SetVertexColor(1.0, 0.20, 0.20, 0.28) end
+            else
+                button:SetBackdropColor(0.13, 0.11, 0.08, 0.95)
+                button:SetBackdropBorderColor(1, 0.82, 0, 0.75)
+                button.label:SetTextColor(1.0, 0.92, 0.75)
+                local hi = button:GetHighlightTexture()
+                if hi and hi.SetVertexColor then hi:SetVertexColor(1, 0.82, 0, 0.18) end
+            end
+            button.label:SetText(entry.label)
+            button._boundOrderId = order and order.id or nil
+            button._boundToState = entry.toState
+            button._boundActor   = entry.actor
+
+            button:ClearAllPoints()
+            button:SetPoint("LEFT", anchor, "LEFT", xOffset, 0)
+            button:Show()
+            xOffset = xOffset + width + ACTION_BUTTON_SPACING
+        end
+    end
+
+    for index = #actions + 1, #self.actionButtons do
+        local extra = self.actionButtons[index]
+        if extra and extra.Hide then extra:Hide() end
     end
 end
