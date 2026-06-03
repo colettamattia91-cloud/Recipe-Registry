@@ -3236,6 +3236,14 @@ function UI:RefreshRecipeList()
     self._recipeListGeneration = (self._recipeListGeneration or 0) + 1
     local generation = self._recipeListGeneration
 
+    -- Refresh the hint + scroll anchor before the build runs, so the
+    -- previously-rendered rows from the prior profession don't briefly
+    -- overlap the hint while the new build is in flight. _FinalizeRecipeList
+    -- re-runs the same refresh at the end (cheap no-op when nothing
+    -- changed) to catch edge cases where the hint state depends on
+    -- per-recipe data only available after the build.
+    self:RefreshHiddenExpansionHint(self.selectedProfession)
+
     if not (self.selectedProfession == "Favorites" or self.selectedProfession ~= nil or canRunGlobalSearch) then
         self:_FinalizeRecipeList({}, context, generation)
         return
