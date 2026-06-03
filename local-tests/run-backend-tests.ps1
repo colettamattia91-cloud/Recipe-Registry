@@ -75,6 +75,7 @@ $activeAllSpecs = @(
     "orders_mail_compose_action_spec.lua",
     "orders_mail_marker_spec.lua",
     "orders_mail_scanner_spec.lua",
+    "orders_mail_send_tracking_spec.lua",
     "orders_mailbox_orchestrator_spec.lua",
     "orders_cart_spec.lua",
     "orders_order_dialog_spec.lua",

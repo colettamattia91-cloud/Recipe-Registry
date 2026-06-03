@@ -415,6 +415,42 @@ function Store:RecordBatchReceipt(orderId, batchNumber, receipt)
     return true, slot
 end
 
+-- Marks a single outgoing batch as sent: stamps sentAt + sentBy on the
+-- ledger slot and appends a MaterialsBatchSent event. Does NOT advance
+-- the order's status — the requester still manually flips to
+-- MaterialsSent / MaterialsPartial when they're done. Same rationale
+-- as RecordBatchReceipt: the lifecycle gates stay in the user's hands.
+function Store:RecordBatchSent(orderId, batchNumber, payload)
+    payload = payload or {}
+    local order = self:GetOrder(orderId)
+    if not order then return false, "unknown-order" end
+    batchNumber = tonumber(batchNumber)
+    if not batchNumber or batchNumber < 1 then return false, "invalid-batch" end
+
+    order.batches = order.batches or {}
+    local slot = order.batches[batchNumber] or { batchNumber = batchNumber }
+    slot.batchNumber = batchNumber
+    slot.sentAt   = payload.sentAt or time()
+    slot.sentBy   = payload.sentBy
+    slot.sentTo   = payload.recipient
+    slot.sentItems = payload.items
+    order.batches[batchNumber] = slot
+    order.updatedAt = time()
+
+    self:AppendEvent({
+        kind    = "OrderUpdated",
+        orderId = orderId,
+        actor   = payload.actor or "requester",
+        payload = {
+            change      = "batch-sent",
+            batchNumber = batchNumber,
+            recipient   = payload.recipient,
+            items       = payload.items,
+        },
+    })
+    return true, slot
+end
+
 function Store:Transition(orderId, toState, actor, payload)
     local order = self:GetOrder(orderId)
     if not order then return false, "unknown-order" end

@@ -285,10 +285,51 @@ function Assistant:OpenComposer(order, opts)
     if type(bodyBox.SetText) == "function" then
         bodyBox:SetText(mail.body)
     end
+
+    -- Remember the staged send so a follow-up MAIL_SEND_SUCCESS event
+    -- can credit the right batch on the right order. Times out after
+    -- PENDING_SEND_TTL seconds so an unrelated successful send fired
+    -- minutes later doesn't get misattributed.
+    local now = time and time() or 0
+    self._pendingSend = {
+        orderId      = order.id,
+        batchIndex   = batchIndex,
+        totalBatches = #batches,
+        recipient    = mail.recipient,
+        items        = self:BatchItemsAsMap(batch),
+        stagedAt     = now,
+        expiresAt    = now + self.PENDING_SEND_TTL,
+    }
+
     return true, {
         recipient    = mail.recipient,
         subject      = mail.subject,
         batchIndex   = batchIndex,
         totalBatches = #batches,
     }
+end
+
+-- Default TTL on a staged Compose (seconds). After this window the
+-- pending-send is dropped so an unrelated mail success doesn't get
+-- attributed to the wrong order.
+Assistant.PENDING_SEND_TTL = 120
+
+-- Returns the pending-send descriptor if still valid; clears + returns
+-- nil if expired. Used by the Mailbox MAIL_SEND_SUCCESS handler so the
+-- TTL check lives in one place.
+function Assistant:ConsumePendingSend(now)
+    local pending = self._pendingSend
+    if not pending then return nil end
+    now = tonumber(now) or (time and time() or 0)
+    self._pendingSend = nil
+    if pending.expiresAt and now > pending.expiresAt then return nil end
+    return pending
+end
+
+function Assistant:PeekPendingSend()
+    return self._pendingSend
+end
+
+function Assistant:ClearPendingSend()
+    self._pendingSend = nil
 end

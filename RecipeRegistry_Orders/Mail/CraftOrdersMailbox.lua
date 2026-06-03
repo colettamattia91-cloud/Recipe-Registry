@@ -68,9 +68,37 @@ function Mailbox:ProcessInbox(opts)
     return summary
 end
 
+-- Consumes the Assistant's pending-send descriptor (if still valid)
+-- and records the batch as sent on the order's ledger. Idempotent
+-- when there's no pending or the TTL has expired. Returns the slot
+-- on success, nil + reason otherwise.
+function Mailbox:OnMailSendSuccess()
+    local assistant = Addon.MailAssistant
+    if not (assistant and type(assistant.ConsumePendingSend) == "function") then
+        return nil, "assistant-missing"
+    end
+    local pending = assistant:ConsumePendingSend()
+    if not pending then return nil, "no-pending-send" end
+
+    local store = Addon.Store
+    if not (store and type(store.RecordBatchSent) == "function") then
+        return nil, "store-not-ready"
+    end
+
+    local ok, slot = store:RecordBatchSent(pending.orderId, pending.batchIndex, {
+        recipient = pending.recipient,
+        items     = pending.items,
+        sentBy    = Addon.GetLocalPlayerKey and Addon:GetLocalPlayerKey() or nil,
+        actor     = "requester",
+    })
+    if not ok then return nil, slot end
+    return slot
+end
+
 -- Lifecycle entry point called from the plugin's OnEnable. Idempotent.
 -- Skips silently when the host doesn't expose RegisterEvent (test
--- harness lite mode); tests drive ProcessInbox directly.
+-- harness lite mode); tests drive ProcessInbox / OnMailSendSuccess
+-- directly.
 function Mailbox:OnEnable()
     if self._wired then return end
     if type(Addon.RegisterEvent) ~= "function" then return end
@@ -91,6 +119,11 @@ function Mailbox:OnEnable()
     -- was already open at login.
     Addon:RegisterEvent("MAIL_INBOX_UPDATE", function()
         Mailbox:ProcessInbox()
+    end)
+    -- MAIL_SEND_SUCCESS lets the assistant credit a Compose'd batch
+    -- as actually sent (sentAt stamp on the ledger).
+    Addon:RegisterEvent("MAIL_SEND_SUCCESS", function()
+        Mailbox:OnMailSendSuccess()
     end)
 
     self._wired = true
