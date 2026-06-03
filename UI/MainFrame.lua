@@ -1647,6 +1647,15 @@ function UI:CreateMainFrame()
     local recipeScroll = CreateFrame("ScrollFrame", nil, center, "UIPanelScrollFrameTemplate")
     recipeScroll:SetPoint("TOPLEFT", 8, -60)
     recipeScroll:SetPoint("BOTTOMRIGHT", -28, 10)
+    -- WoW Classic's UIPanelScrollFrameTemplate doesn't clip children to
+    -- the scroll's visible bounds. Without this, scrolling the list
+    -- pushes row frames above the scroll's TOPLEFT (into the hint
+    -- band) where they paint over the discoverability hint and any
+    -- other UI above. Force clipping so rows disappear cleanly at
+    -- the top edge of the scroll viewport.
+    if recipeScroll.SetClipsChildren then
+        recipeScroll:SetClipsChildren(true)
+    end
     local recipeContent = CreateFrame("Frame", nil, recipeScroll)
     recipeContent:SetSize(320, 1)
     recipeScroll:SetScrollChild(recipeContent)
