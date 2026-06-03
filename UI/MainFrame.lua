@@ -3524,11 +3524,12 @@ function UI:_SetRecipeScrollAnchor(hintShown)
     scroll._rrAnchorMode = mode
     scroll:ClearAllPoints()
     if hintShown and frame.hiddenExpansionHint then
-        -- The hint sits ~y=-34 with height 20 anchored to the centre
-        -- frame; anchoring the scroll to its BOTTOMLEFT with a 10px
-        -- gap keeps the first row a comfortable distance away even if
-        -- the hint's text wraps onto two lines.
-        scroll:SetPoint("TOPLEFT", frame.hiddenExpansionHint, "BOTTOMLEFT", -4, -10)
+        -- Anchor the scroll to the hint's BOTTOMLEFT with a generous
+        -- gap (-18). A tighter gap (e.g. -10) was visibly cramped
+        -- in-game: the first row's icon backdrop crowded the hint band
+        -- with no perceptible separation. Hint sits at ~y=-34 with
+        -- height 20, so this puts the scroll top at ~y=-72.
+        scroll:SetPoint("TOPLEFT", frame.hiddenExpansionHint, "BOTTOMLEFT", -4, -18)
     else
         scroll:SetPoint("TOPLEFT", 8, -40)
     end
