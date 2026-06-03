@@ -49,18 +49,131 @@ local function summarizeOfferedBlocks(offeredBlocks)
     return flattenSorted(reasonCounts), flattenSorted(profCounts), table.concat(blockKeys, ",")
 end
 
-function Sync:BuildWantedBlockOrder(offeredBlocks)
+-- Skip blocks offered with a fingerprint we've already failed to converge
+-- on. In a convergence sync the question isn't WHO is sending — it's WHAT
+-- they're sending. If peer A advertised block B with fingerprint F and we
+-- pulled it with zero progress, peer C later advertising B with the same
+-- F won't help us either; they share the same divergent state. Skip
+-- straight away. The same key (B, F) also expires after a cooldown so a
+-- peer that legitimately re-broadcasts the same fingerprint after a brief
+-- network blip eventually gets another chance.
+--
+-- When peer A updates and now advertises B with a NEW fingerprint F', the
+-- (B, F') pair is fresh and we try it — convergence-aware: we trust the
+-- DATA's identity, not the peer's.
+local BLOCK_SATURATION_NO_PROGRESS_THRESHOLD = 2
+local BLOCK_SATURATION_COOLDOWN_SECONDS = 300
+
+local function normalizeFingerprint(fingerprint)
+    if fingerprint == nil then return "" end
+    return tostring(fingerprint)
+end
+
+-- Saturation lives in SavedVariables so the cooldown survives /reload.
+-- Cross-version sync loops typically arise immediately after login (the
+-- offending peer is back online) so resetting the state at reload would
+-- mean re-paying the discovery cost every session.
+local function getSaturationStore(create)
+    local db = Addon and Addon.Data and Addon.Data.db and Addon.Data.db.global or nil
+    if not db then return nil end
+    if type(db.syncSaturation) ~= "table" then
+        if not create then return nil end
+        db.syncSaturation = {}
+    end
+    if type(db.syncSaturation.blockFingerprints) ~= "table" then
+        if not create then return nil end
+        db.syncSaturation.blockFingerprints = {}
+    end
+    return db.syncSaturation.blockFingerprints
+end
+
+local function getSaturationEntry(blockKey, fingerprint, create)
+    if type(blockKey) ~= "string" or blockKey == "" then return nil end
+    local store = getSaturationStore(create)
+    if not store then return nil end
+    local fp = normalizeFingerprint(fingerprint)
+    local blockTable = store[blockKey]
+    if not blockTable then
+        if not create then return nil end
+        blockTable = {}
+        store[blockKey] = blockTable
+    end
+    local entry = blockTable[fp]
+    if not entry and create then
+        entry = { noProgressCount = 0, saturatedUntil = 0 }
+        blockTable[fp] = entry
+    end
+    return entry
+end
+
+function Sync:IsBlockFingerprintSaturated(blockKey, fingerprint)
+    local entry = getSaturationEntry(blockKey, fingerprint, false)
+    if not entry then return false end
+    local saturatedUntil = entry.saturatedUntil or 0
+    if saturatedUntil <= 0 then
+        -- Counter is incrementing but threshold not yet reached: NOT
+        -- saturated, but also don't reset — we need the count to survive
+        -- between sessions so the threshold can actually be crossed.
+        return false
+    end
+    if saturatedUntil <= time() then
+        -- Cooldown expired: clear so the next pull gets a fresh chance.
+        entry.saturatedUntil = 0
+        entry.noProgressCount = 0
+        return false
+    end
+    return true
+end
+
+function Sync:RecordBlockFingerprintNoProgress(blockKey, fingerprint)
+    local entry = getSaturationEntry(blockKey, fingerprint, true)
+    if not entry then return end
+    entry.noProgressCount = (entry.noProgressCount or 0) + 1
+    if entry.noProgressCount >= BLOCK_SATURATION_NO_PROGRESS_THRESHOLD then
+        entry.saturatedUntil = time() + BLOCK_SATURATION_COOLDOWN_SECONDS
+        Addon:Tracef("sync",
+            "block-fingerprint-saturation-set block=%s fingerprint=%s noProgressCount=%d cooldownSeconds=%d",
+            tostring(blockKey),
+            tostring(normalizeFingerprint(fingerprint)),
+            entry.noProgressCount,
+            BLOCK_SATURATION_COOLDOWN_SECONDS
+        )
+    end
+end
+
+function Sync:ResetBlockFingerprintSaturation(blockKey, fingerprint)
+    local entry = getSaturationEntry(blockKey, fingerprint, false)
+    if entry then
+        entry.noProgressCount = 0
+        entry.saturatedUntil = 0
+    end
+end
+
+function Sync:BuildWantedBlockOrder(offeredBlocks, peerKey)
     local rows = {}
+    local skipped = 0
     for index = 1, #(offeredBlocks or {}) do
         local row = offeredBlocks[index]
         if type(row) == "table" and type(row.blockKey) == "string" and row.blockKey ~= "" then
-            rows[#rows + 1] = {
-                blockKey = row.blockKey,
-                count = tonumber(row.count or 0) or 0,
-                fingerprint = row.fingerprint,
-                reason = row.reason,
-            }
+            if self:IsBlockFingerprintSaturated(row.blockKey, row.fingerprint) then
+                skipped = skipped + 1
+            else
+                rows[#rows + 1] = {
+                    blockKey = row.blockKey,
+                    count = tonumber(row.count or 0) or 0,
+                    fingerprint = row.fingerprint,
+                    reason = row.reason,
+                }
+            end
         end
+    end
+    if skipped > 0 then
+        Addon:Tracef("sync",
+            "block-fingerprint-saturation-skip peer=%s skipped=%d kept=%d",
+            tostring(peerKey or "unknown"),
+            skipped,
+            #rows
+        )
     end
     table.sort(rows, function(left, right)
         if (left.count or 0) ~= (right.count or 0) then
@@ -81,6 +194,7 @@ function Sync:ClearSeedPendingState(_seedKey, reason)
     session.nextWantedIndex = 1
     session.activeBlockKey = nil
     session.activeBlockRequestId = nil
+    session.activeBlockOfferedFingerprint = nil
     session.lastCleanupReason = tostring(reason or "clear")
     return true
 end
@@ -286,8 +400,13 @@ function Sync:HandleReceivedIndexDiffResponse(payload)
 
     session.lastProgressAt = time()
     session.state = "index-diff-ready"
-    session.offeredBlocks = self:BuildWantedBlockOrder(payload.offeredBlocks or {})
-    session.wantedBlocks = self:BuildWantedBlockOrder(payload.offeredBlocks or {})
+    -- offeredBlocks is read-only (telemetry / logging); wantedBlocks is
+    -- iterated by nextWantedIndex. Same source so share the list — two
+    -- BuildWantedBlockOrder calls were doing two table sorts and two
+    -- saturation-store walks for the same answer.
+    local orderedBlocks = self:BuildWantedBlockOrder(payload.offeredBlocks or {}, payload.sender)
+    session.offeredBlocks = orderedBlocks
+    session.wantedBlocks = orderedBlocks
     session.nextWantedIndex = 1
     self.telemetry.indexDiffResponseReceived = (self.telemetry.indexDiffResponseReceived or 0) + 1
     self.telemetry.blocksOffered = (self.telemetry.blocksOffered or 0) + #(session.offeredBlocks or {})
@@ -354,6 +473,10 @@ function Sync:RequestNextWantedBlock()
     local requestId = string.format("BLOCKREQ:%s:%s:%d", tostring(session.seedKey), tostring(row.blockKey), tonumber(time() or 0) or 0)
     session.activeBlockKey = row.blockKey
     session.activeBlockRequestId = requestId
+    -- Capture the fingerprint the peer advertised at INDEX_DIFF time. After
+    -- the pull merges we use it as the saturation key so the block-vs-data
+    -- backoff tracks WHAT we tried to pull, not WHO offered it.
+    session.activeBlockOfferedFingerprint = row.fingerprint
     session.state = "waiting-block"
     session.blockRequestedAt = time()
     session.lastProgressAt = session.blockRequestedAt
@@ -388,6 +511,7 @@ function Sync:RequestNextWantedBlock()
 
     session.activeBlockKey = nil
     session.activeBlockRequestId = nil
+    session.activeBlockOfferedFingerprint = nil
     if self.AbortOutboundSeedSession then
         self:AbortOutboundSeedSession("block-pull-send-failed")
     end

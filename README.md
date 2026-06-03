@@ -35,7 +35,8 @@ It is designed for everyday guild life: fast to browse, calm in the background, 
 - Favorites filter for your most-used crafts
 - Search by recipe name or by required materials
 - Sort recipes alphabetically or by item rarity
-- AtlasLoot categories when AtlasLoot data is available
+- Category navigation with subcategory rows for fast drill-down into each profession
+- Expansion prefilters that hide Vanilla recipes by default and can be reopened globally or per profession
 - Smooth scrolling and searching, even with large guild recipe lists
 
 ### Craft Requests And Sharing
@@ -95,10 +96,6 @@ Most players only need `/rr`. The rest is there when you want more control.
 
 ## Optional Integrations
 
-### AtlasLoot
-
-AtlasLoot improves recipe recognition, crafted outputs, reagent details, and profession category browsing. Recipe Registry works without it, but AtlasLoot makes the recipe browser richer.
-
 ### TradeSkillMaster And Auctionator
 
 If TradeSkillMaster or Auctionator is installed, Recipe Registry can show material prices and estimated craft costs. Pricing depends on the freshness of your market data.
@@ -107,7 +104,8 @@ If TradeSkillMaster or Auctionator is installed, Recipe Registry can show materi
 
 - Built for WoW TBC Anniversary / The Burning Crusade Classic 2.5.x
 - Core browsing and guild sync work without optional addons
-- Optional addons improve recipe detail and market pricing
+- Recipe details and category navigation come from a built-in static metadata library and no longer require AtlasLoot
+- TradeSkillMaster or Auctionator can be added for material pricing
 - Important for `2.0.0`: guild sync uses a new model that is not compatible with Recipe Registry `1.x` sync. Your own saved recipes remain safe, but guildmates should update to `2.0.0` or newer to share data with you.
 
 ## Installation
@@ -143,5 +141,4 @@ Thank you. It genuinely helps keep the project alive.
 
 ## Acknowledgments
 
-Recipe Registry was originally inspired by GuildCrafts by dkruenbo, an MIT-licensed guild profession tracking addon.
-See `THIRD_PARTY_NOTICES.md` for license details.
+Recipe Registry was originally inspired by GuildCrafts by dkruenbo. No GuildCrafts code is included in this project.

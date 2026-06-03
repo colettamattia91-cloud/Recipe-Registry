@@ -243,11 +243,27 @@ shouldPublishOwner = function(self, rosterState, memberKey, entry, selfKey)
     return true
 end
 
-local function buildContentKeysForProfession(profession)
+local function buildContentKeysForProfession(self, profession)
     local contentKeys = {}
+    local clientCheck = self and self.IsRecipeKeyResolvableInClient
     for recipeKey in pairs(profession and profession.recipes or {}) do
         if isValidRecipeKey(recipeKey) then
-            contentKeys[#contentKeys + 1] = normalizeContentKey(recipeKey)
+            -- Skip recipe keys that the WoW client itself doesn't recognise as
+            -- a real spell/item. Including them in the outbound block lets
+            -- peers echo old mock garbage back at us; filtering at fingerprint
+            -- build time means corrupt entries never reach the sync wire and
+            -- never participate in INDEX_DIFF or BLOCK_SNAPSHOT exchanges.
+            -- Only the resolvable-in-client check applies here — every WoW
+            -- client agrees on whether an ID is a real spell/item so the
+            -- gate stays symmetric across peers. A stricter metadata-
+            -- catalogued check would diverge fingerprints between peers
+            -- running different Generated.lua versions; that lives in the
+            -- tooltip/UI gates and /rr clean instead.
+            -- The harness mock returns names for any numeric ID, so unit
+            -- specs that seed synthetic keys still see them included.
+            if not clientCheck or self:IsRecipeKeyResolvableInClient(recipeKey) then
+                contentKeys[#contentKeys + 1] = normalizeContentKey(recipeKey)
+            end
         end
     end
     local specializationKey = buildSpecializationContentKey(profession and profession.specialization or nil)
@@ -262,7 +278,7 @@ local function buildBlockRecord(self, memberKey, professionKey, profession)
     if not blockKey then
         return nil
     end
-    local contentKeys = buildContentKeysForProfession(profession)
+    local contentKeys = buildContentKeysForProfession(self, profession)
     local joined = table.concat(contentKeys, "|")
     return {
         blockKey = blockKey,
@@ -905,7 +921,7 @@ function Data:EnsureTrustedRosterForSync(reason)
 end
 
 function Data:BuildSyntheticContentKeys(profession)
-    return buildContentKeysForProfession(profession)
+    return buildContentKeysForProfession(self, profession)
 end
 
 function Data:BuildBlockContentKeys(blockKey)
@@ -915,7 +931,7 @@ function Data:BuildBlockContentKeys(blockKey)
     end
     local entry = self:GetMember(ownerCharacter)
     local profession = entry and entry.professions and entry.professions[professionKey] or nil
-    return buildContentKeysForProfession(profession)
+    return buildContentKeysForProfession(self, profession)
 end
 
 function Data:BuildBlockFingerprint(blockKey)

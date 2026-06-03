@@ -2,3 +2,15 @@
 /build/
 /debug.log
 /RecipeRegistry-*.zip
+/.vscode/
+/build/
+/debug.log
+# Python bytecode from the metadata generator — recompiled by Python on
+# every run, no value in source control.
+__pycache__/
+*.pyc
+
+# Stray files from mis-escaped Windows paths in shell pastes (e.g.
+# "C:Tempdiff_core.txt" — a shell that interpreted "C:\Temp\…" as a
+# literal filename in the working directory).
+/C:*.txt

@@ -29,6 +29,10 @@ local function makeSpellKey(spellID)
     return "spell:" .. tostring(spellID)
 end
 
+local function getRecipeMetadata()
+    return Addon.RecipeMetadata
+end
+
 local function addRecipeKey(index, key, recipeKey)
     if not key or recipeKey == nil then return end
     local bucket = index[key]
@@ -182,6 +186,17 @@ function Tooltip:RunIndexBuildStep(state)
     local recipeKeys = state.recipeKeys or {}
     local recipeIndex = state.recipeIndex or {}
     local index = state.index or {}
+    -- Partial alignment with the UI predicate: the tooltip is informational
+    -- ("who knows this item / spell") and shouldn't follow user-preference
+    -- filters like expansion or BoP, because those answer a different
+    -- question. But it MUST honor the garbage gates — otherwise hovering an
+    -- ordinary item like a Worn Axe surfaces ghost crafter rows from old
+    -- mocks, and clearing those entries from one user's DB doesn't stop
+    -- their tooltip from showing them. Skip recipe keys that don't resolve
+    -- in the WoW client, plus positive item keys the metadata doesn't
+    -- catalogue (real-but-not-a-recipe items like Worn Axe).
+    local resolvableCheck = Addon.Data and Addon.Data.IsRecipeKeyResolvableInClient
+    local cataloguedCheck = Addon.Data and Addon.Data.IsRecipeKeyCatalogued
 
     while state.cursor <= #recipeKeys and processed < TOOLTIP_INDEX_RECIPES_PER_STEP do
         local recipeKey = recipeKeys[state.cursor]
@@ -193,7 +208,19 @@ function Tooltip:RunIndexBuildStep(state)
         elseif numericKey and numericKey < 0 then
             key = makeSpellKey(-numericKey)
         end
-        if key and indexed and indexed.crafterRows and #indexed.crafterRows > 0 then
+        local skip = false
+        if resolvableCheck and not Addon.Data:IsRecipeKeyResolvableInClient(recipeKey) then
+            skip = true
+        elseif cataloguedCheck and not Addon.Data:IsRecipeKeyCatalogued(recipeKey) then
+            -- Real-but-not-a-recipe item (e.g. Worn Axe): WoW resolves it as a
+            -- valid item but the metadata library doesn't map it to any recipe,
+            -- so showing crafter rows on its tooltip would be garbage.
+            skip = true
+        end
+        if not skip
+            and key
+            and indexed and indexed.crafterRows and #indexed.crafterRows > 0
+        then
             addRecipeKey(index, key, recipeKey)
         end
         state.cursor = state.cursor + 1
@@ -347,11 +374,18 @@ function Tooltip:GetRowsForItemID(itemID)
         return directRows, directKey
     end
 
-    local atlas = Addon.Data and Addon.Data.GetAtlasLootRecipeInfo and Addon.Data:GetAtlasLootRecipeInfo(itemID)
-    if atlas then
+    local metadata = getRecipeMetadata()
+    if metadata then
+        local info = metadata:GetRecipeInfo(itemID)
+        local normalized = metadata:NormalizeRecipeKey(itemID)
+        local spellID = normalized and normalized.spellId or (info and info.spellId)
+        local createdItemID = info and metadata:GetCreatedItemId(itemID, info) or nil
+        if normalized and normalized.source == "createdItem" then
+            createdItemID = itemID
+        end
         local rows = self:MergeRows(
-            self:GetRowsForKey(makeSpellKey(atlas.spellID)),
-            self:GetRowsForKey(makeItemKey(atlas.createdItemID))
+            self:GetRowsForKey(makeSpellKey(spellID)),
+            self:GetRowsForKey(makeItemKey(createdItemID))
         )
         if #rows > 0 then
             return rows, directKey
@@ -368,11 +402,14 @@ function Tooltip:GetRowsForSpellID(spellID)
         return directRows, directKey
     end
 
-    local atlas = Addon.Data and Addon.Data.GetAtlasLootSpellInfo and Addon.Data:GetAtlasLootSpellInfo(spellID)
-    if atlas then
+    local metadata = getRecipeMetadata()
+    if metadata then
+        local info = metadata:GetRecipeInfo(-spellID)
+        local createdItemID = info and metadata:GetCreatedItemId(-spellID, info) or nil
+        local recipeItemID = info and metadata:GetRecipeItemId(-spellID, info) or nil
         local rows = self:MergeRows(
-            self:GetRowsForKey(makeItemKey(atlas.createdItemID)),
-            self:GetRowsForKey(makeItemKey(atlas.recipeItemID))
+            self:GetRowsForKey(makeItemKey(createdItemID)),
+            self:GetRowsForKey(makeItemKey(recipeItemID))
         )
         if #rows > 0 then
             return rows, directKey
