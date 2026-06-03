@@ -321,6 +321,100 @@ function Store:SetProvider(orderId, itemID, provider, quantity, actor)
     return true, bucket
 end
 
+-- Records a per-batch receipt on order.batches[batchNumber], the
+-- material ledger described in docs/craft-orders-roadmap.md §4.2.
+-- The receipt is the output of the scanner's integrity check (plus
+-- whatever extra context the caller has — sender, mail index, source
+-- = "scanner"|"assumed"|"manual"). Computes confirmed / missing from
+-- the expected items and the observed items, always appends a
+-- MaterialsReceiptRecorded event, and additionally appends a
+-- TamperDetected event when the scanner reported any flags.
+--
+-- The order's status is intentionally NOT advanced here. Per §7.4
+-- tamper-flagged mail leaves the order in its current state so the
+-- crafter can decide what to do; even a clean receipt requires the
+-- crafter to confirm via the existing transition flow. This method
+-- only writes to the ledger and the event log.
+function Store:RecordBatchReceipt(orderId, batchNumber, receipt)
+    if type(receipt) ~= "table" then return false, "invalid-receipt" end
+    local order = self:GetOrder(orderId)
+    if not order then return false, "unknown-order" end
+    batchNumber = tonumber(batchNumber)
+    if not batchNumber or batchNumber < 1 then return false, "invalid-batch" end
+
+    local expected = receipt.expected or {}
+    local observed = receipt.observed or {}
+
+    -- confirmed[i] = min(expected[i], observed[i])
+    -- missing[i]   = max(0, expected[i] - observed[i])
+    local confirmed, missing = {}, {}
+    for itemID, expectedCount in pairs(expected) do
+        local observedCount = tonumber(observed[itemID]) or 0
+        local confirmedCount = math.min(tonumber(expectedCount) or 0, observedCount)
+        confirmed[itemID] = confirmedCount
+        local missingCount = (tonumber(expectedCount) or 0) - confirmedCount
+        if missingCount > 0 then missing[itemID] = missingCount end
+    end
+
+    order.batches = order.batches or {}
+    local slot = {
+        batchNumber = batchNumber,
+        expected    = expected,
+        confirmed   = confirmed,
+        missing     = missing,
+        assumed     = nil,
+        seenMailId  = receipt.mailIndex,
+        receivedAt  = receipt.receivedAt or time(),
+        source      = receipt.source or "scanner",
+        sender      = receipt.sender,
+        senderMatch = receipt.senderMatch,
+        hashMatch   = receipt.hashMatch,
+        itemsMatch  = receipt.itemsMatch,
+        batchMatch  = receipt.batchMatch,
+        tamperFlags = receipt.tamperFlags or {},
+    }
+    order.batches[batchNumber] = slot
+    order.updatedAt = time()
+
+    self:AppendEvent({
+        kind    = "OrderUpdated",
+        orderId = orderId,
+        actor   = receipt.actor or "system",
+        payload = {
+            change      = "receipt-recorded",
+            batchNumber = batchNumber,
+            source      = slot.source,
+            valid       = receipt.valid == true,
+            confirmed   = confirmed,
+            missing     = missing,
+        },
+    })
+
+    -- Emit a separate TamperDetected event when the scanner saw any
+    -- integrity failure, mirroring the spec's separation of receipt
+    -- bookkeeping vs. trust signals. Counters / UI consume this event
+    -- kind specifically.
+    if receipt.tamperFlags and #receipt.tamperFlags > 0 then
+        self:AppendEvent({
+            kind    = "TamperDetected",
+            orderId = orderId,
+            actor   = receipt.actor or "system",
+            payload = {
+                batchNumber = batchNumber,
+                flags       = receipt.tamperFlags,
+                sender      = receipt.sender,
+                senderMatch = receipt.senderMatch,
+                hashMatch   = receipt.hashMatch,
+                itemsMatch  = receipt.itemsMatch,
+                observed    = observed,
+                expected    = expected,
+            },
+        })
+    end
+
+    return true, slot
+end
+
 function Store:Transition(orderId, toState, actor, payload)
     local order = self:GetOrder(orderId)
     if not order then return false, "unknown-order" end

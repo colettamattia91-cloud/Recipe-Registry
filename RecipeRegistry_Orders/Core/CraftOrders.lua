@@ -201,6 +201,13 @@ function Addon:OnEnable()
     if self.CartPanel and self.CartPanel.Wire then
         self.CartPanel:Wire()
     end
+
+    -- Wire the mailbox event handlers (MAIL_SHOW / MAIL_CLOSED /
+    -- MAIL_INBOX_UPDATE) so the scanner runs whenever the player
+    -- opens the mailbox and the assistant knows the mailbox state.
+    if self.Mailbox and self.Mailbox.OnEnable then
+        self.Mailbox:OnEnable()
+    end
 end
 
 local function splitCommand(text)
@@ -226,6 +233,7 @@ local function printHelp(self)
     self:Print("                              - manually drive the state machine (test/debug)")
     self:Print("/rrord events [id|prefix] [limit]  - inspect the event log")
     self:Print("/rrord sync                  - dump sync protocol + runtime telemetry")
+    self:Print("/rrord mail [scan|status|plan <id>] - mailbox scanner + outgoing planner")
     self:Print("/rrord delete <id|prefix>    - delete a draft order")
 end
 
@@ -703,6 +711,68 @@ local function cmdDelete(self, rest)
     self:Print("Deleted draft " .. shortenOrderId(order.id))
 end
 
+-- /rrord mail [scan|status|plan <id|prefix>]
+-- - mail scan          : runs the inbox scanner once and prints a summary
+-- - mail status        : prints whether the mailbox is open + last scan summary
+-- - mail plan <id>     : prints the batch plan for the given order
+local function cmdMail(self, rest)
+    local sub, tail = splitCommand(rest)
+    sub = (sub or ""):lower()
+
+    if sub == "" or sub == "scan" then
+        if not (self.Mailbox and self.Mailbox.ProcessInbox) then
+            self:Print("Mailbox orchestrator unavailable.")
+            return
+        end
+        local summary = self.Mailbox:ProcessInbox()
+        self:Print(string.format(
+            "Mail scan: %d scanned, %d recognized, %d recorded, %d tampered.",
+            summary.scanned, summary.recognized, summary.recorded, summary.tampered
+        ))
+        return
+    end
+
+    if sub == "status" then
+        local open = self.MailAssistant and self.MailAssistant:IsMailboxOpen() or false
+        self:Print(string.format("Mailbox: %s",
+            open and "|cff88ff88open|r" or "|cffaaaaaaclosed|r"))
+        return
+    end
+
+    if sub == "plan" then
+        local prefix = (tail or ""):match("^%s*(%S+)%s*$") or ""
+        if prefix == "" then
+            self:Print("Usage: /rrord mail plan <id|prefix>")
+            return
+        end
+        local order, err = resolveOrderByPrefix(self, prefix)
+        if not order then
+            self:Print("Order lookup failed: " .. tostring(err))
+            return
+        end
+        if not (self.MailAssistant and self.MailAssistant.PlanBatches) then
+            self:Print("Mail assistant unavailable.")
+            return
+        end
+        local batches = self.MailAssistant:PlanBatches(order)
+        if #batches == 0 then
+            self:Print(string.format("Order %s has no shippable materials.",
+                shortenOrderId(order.id)))
+            return
+        end
+        self:Print(string.format("Plan for %s — %d batch(es):",
+            shortenOrderId(order.id), #batches))
+        for index = 1, #batches do
+            local batch = batches[index]
+            self:Print(string.format("  batch %d/%d — %d distinct item(s)",
+                batch.batchNumber, batch.totalBatches, #batch.items))
+        end
+        return
+    end
+
+    self:Print("Unknown mail subcommand: " .. sub .. ". Try: scan, status, plan <id>.")
+end
+
 function Addon:SlashHandler(input)
     local cmd, rest = splitCommand(input)
     cmd = cmd:lower()
@@ -749,6 +819,10 @@ function Addon:SlashHandler(input)
     end
     if cmd == "delete" or cmd == "del" or cmd == "rm" then
         cmdDelete(self, rest)
+        return
+    end
+    if cmd == "mail" then
+        cmdMail(self, rest)
         return
     end
 

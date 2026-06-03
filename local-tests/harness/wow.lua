@@ -754,6 +754,118 @@ local function installWowGlobals()
         state.craftSkill.nameFilter = value or ""
     end
     _G.CraftFrame_Update = function() end
+
+    -- Mailbox API (TBC 2.5.x surface). The harness mailbox is a passive
+    -- container: tests call Wow.OpenMailbox / Wow.AddInboxMail /
+    -- Wow.GetSentMail to drive scenarios, and the production code
+    -- reads/writes the same state via the WoW-compatible globals.
+    local function mb() return state.mailbox end
+    _G.HasNewMail        = function() return #mb().inbox > 0 end
+    _G.GetInboxNumItems  = function() return #mb().inbox end
+    _G.GetInboxHeaderInfo = function(index)
+        local mail = mb().inbox[index]
+        if not mail then return nil end
+        -- Real signature: packageIcon, stationaryIcon, sender, subject,
+        -- money, CODAmount, daysLeft, itemCount, wasRead, wasReturned,
+        -- textCreated, canReply, isGM. We return only what the addon
+        -- consumes; unused slots are nil.
+        local itemCount = mail.items and #mail.items or 0
+        return nil, nil, mail.sender, mail.subject,
+            mail.money or 0, mail.codAmount or 0,
+            mail.daysLeft or 30, itemCount,
+            mail.wasRead == true, mail.wasReturned == true,
+            true, mail.canReply ~= false, false
+    end
+    _G.GetInboxText = function(index)
+        local mail = mb().inbox[index]
+        if not mail then return "" end
+        return mail.body or "", nil, nil, nil, nil
+    end
+    _G.GetInboxItem = function(index, attachIndex)
+        local mail = mb().inbox[index]
+        if not (mail and mail.items) then return nil end
+        local item = mail.items[attachIndex]
+        if not item then return nil end
+        -- Real signature: name, itemID, texture, count, quality,
+        -- canUse, isQuestItem, ...
+        return item.name or ("item:" .. tostring(item.itemID)),
+            item.itemID, item.texture, item.count or 1,
+            item.quality or 1, true, false
+    end
+    _G.GetInboxItemLink = function(index, attachIndex)
+        local mail = mb().inbox[index]
+        if not (mail and mail.items) then return nil end
+        local item = mail.items[attachIndex]
+        if not item then return nil end
+        return item.link or string.format("|Hitem:%d|h[%s]|h",
+            item.itemID or 0, item.name or "item")
+    end
+    _G.TakeInboxItem = function(index, attachIndex)
+        local mail = mb().inbox[index]
+        if not (mail and mail.items) then return end
+        mail.items[attachIndex] = nil
+    end
+    _G.TakeInboxMoney = function(index)
+        local mail = mb().inbox[index]
+        if not mail then return end
+        mail.money = 0
+    end
+    _G.DeleteInboxItem = function(index)
+        table.remove(mb().inbox, index)
+    end
+
+    _G.SendMail = function(recipient, subject, body)
+        local out = mb().outgoing
+        local attachments = {}
+        for slotIndex = 1, #out.attachments do
+            attachments[slotIndex] = out.attachments[slotIndex]
+        end
+        mb().sent[#mb().sent + 1] = {
+            recipient   = recipient,
+            subject     = subject,
+            body        = body,
+            attachments = attachments,
+            sentAt      = state.now,
+        }
+        out.recipient = ""
+        out.subject = ""
+        out.body = ""
+        out.attachments = {}
+        -- WoW fires MAIL_SEND_SUCCESS on a successful send. Tests that
+        -- exercise the addon's handler can dispatch it via
+        -- Wow.DeliverEvent(plugin, "MAIL_SEND_SUCCESS") after the
+        -- SendMail call so the wiring is explicit.
+    end
+    _G.ClickSendMailItemButton = function(slotIndex, ...)
+        -- Production code sets state.cursorItem first; we mirror that
+        -- by reading it. Tests can also call Wow.QueueOutgoingAttachment
+        -- to skip the cursor dance.
+        local cursor = state.cursorItem
+        if not cursor then return end
+        local slot = slotIndex or (#mb().outgoing.attachments + 1)
+        mb().outgoing.attachments[slot] = {
+            itemID = cursor.itemID,
+            count  = cursor.count or 1,
+            name   = cursor.name,
+        }
+        state.cursorItem = nil
+    end
+    _G.GetSendMailItem = function(slot)
+        local item = mb().outgoing.attachments[slot]
+        if not item then return nil end
+        return item.name or ("item:" .. tostring(item.itemID)),
+            item.itemID, nil, item.count or 1, 1
+    end
+    _G.GetSendMailItemLink = function(slot)
+        local item = mb().outgoing.attachments[slot]
+        if not item then return nil end
+        return string.format("|Hitem:%d|h[%s]|h",
+            item.itemID or 0, item.name or "item")
+    end
+    _G.SetSendMailCOD     = function(_amount) end
+    _G.SetSendMailMoney   = function(_amount) end
+    _G.GetSendMailMoney   = function() return 0 end
+    _G.GetSendMailCOD     = function() return 0 end
 end
 
 function Wow.Reset(opts)
@@ -797,6 +909,12 @@ function Wow.Reset(opts)
             title = nil,
             entries = {},
             nameFilter = "",
+        },
+        mailbox = {
+            isOpen   = false,
+            inbox    = {},
+            sent     = {},
+            outgoing = { subject = "", body = "", recipient = "", attachments = {} },
         },
         payloadMode = opts.payloadMode or "table-fast",
         addonMetadata = deepcopy(opts.addonMetadata or {
@@ -996,6 +1114,63 @@ function Wow.DeliverComm(module, payload, opts)
     local sender = opts.sender or (payload and payload.sender) or state.playerName
     target:OnCommReceived(prefix, message, distribution, sender)
     return message
+end
+
+-- Mailbox helpers. Production code uses the WoW-compatible globals
+-- installed above; these are for tests that need to script the
+-- mailbox state directly (open the window, drop a fake mail in the
+-- inbox, inspect what SendMail captured).
+
+function Wow.OpenMailbox()
+    state.mailbox.isOpen = true
+end
+
+function Wow.CloseMailbox()
+    state.mailbox.isOpen = false
+end
+
+function Wow.IsMailboxOpen()
+    return state.mailbox.isOpen == true
+end
+
+-- Appends a mail to the inbox. Spec accepts the human-facing fields
+-- (sender, subject, body, items) plus optional metadata. Returns the
+-- inbox index of the new mail.
+function Wow.AddInboxMail(spec)
+    spec = spec or {}
+    local mail = {
+        sender      = spec.sender or "Unknown-Realm",
+        subject     = spec.subject or "",
+        body        = spec.body or "",
+        money       = spec.money or 0,
+        codAmount   = spec.codAmount or 0,
+        daysLeft    = spec.daysLeft or 30,
+        wasRead     = spec.wasRead == true,
+        wasReturned = spec.wasReturned == true,
+        canReply    = spec.canReply ~= false,
+        items       = deepcopy(spec.items or {}),
+    }
+    table.insert(state.mailbox.inbox, mail)
+    return #state.mailbox.inbox
+end
+
+function Wow.GetSentMail()
+    return state.mailbox.sent
+end
+
+function Wow.ClearSentMail()
+    state.mailbox.sent = {}
+end
+
+-- Simulates dropping an item onto the cursor so the next
+-- ClickSendMailItemButton call picks it up. Used by tests that
+-- exercise the outgoing-mail attachment flow.
+function Wow.PutItemOnCursor(item)
+    state.cursorItem = item and deepcopy(item) or nil
+end
+
+function Wow.GetSendMailOutgoing()
+    return state.mailbox.outgoing
 end
 
 function Wow.DeliverEvent(target, event, ...)

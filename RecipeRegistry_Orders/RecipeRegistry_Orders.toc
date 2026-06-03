@@ -18,6 +18,10 @@ Store\CraftOrdersStateMachine.lua
 Store\CraftOrdersStore.lua
 Planner\CraftOrdersPlanner.lua
 Cart\CraftOrdersCart.lua
+Mail\CraftOrdersMailMarker.lua
+Mail\CraftOrdersMailAssistant.lua
+Mail\CraftOrdersMailScanner.lua
+Mail\CraftOrdersMailbox.lua
 Sync\CraftOrdersCodec.lua
 Sync\CraftOrdersReducer.lua
 Sync\CraftOrdersProtocol.lua
