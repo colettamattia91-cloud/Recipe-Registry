@@ -284,4 +284,98 @@ Test.it("scans Enchanting Craft API data after CRAFT_SHOW even if the frame is h
     Test.eq(countAddonComm(wow), 0, "craft scan should not emit inline sync traffic")
 end)
 
+Test.it("keeps direct Enchanting spells when spell subtext is blank", function()
+    local addon, wow, data = freshAddon()
+    local previousGetSpellSubtext = _G.GetSpellSubtext
+    _G.GetSpellSubtext = function()
+        return nil
+    end
+
+    wow.SetCraftSkill("Enchanting", {
+        { name = "Enchant Blank Subtext Bracer", spellID = 90032 },
+    }, { shown = true })
+
+    addon:OnCraftShow()
+    wow.RunTimers(5)
+    _G.GetSpellSubtext = previousGetSpellSubtext
+
+    local entry = data:GetMember(data:GetPlayerKey())
+    Test.eq(entry.professions.Enchanting.count, 1, "blank-subtext direct enchant should be stored")
+    Test.hasKey(entry.professions.Enchanting.recipes, -90032, "blank-subtext direct enchant key")
+    Test.eq(data:GetScanTelemetry().invalidRecipesScan or 0, 0, "blank subtext should not mark craft spell invalid")
+end)
+
+Test.it("uses Craft API row type from the third GetCraftInfo return", function()
+    local addon, wow, data = freshAddon()
+
+    wow.SetCraftSkill("Enchanting", {
+        { name = "Bracer", type = "header", isExpanded = true },
+        { name = "Enchant Bracer - Test", subSpellName = "Enchant", type = "optimal", spellID = 90035 },
+    }, { shown = true })
+
+    addon:OnCraftShow()
+    wow.RunTimers(5)
+
+    local entry = data:GetMember(data:GetPlayerKey())
+    Test.eq(entry.professions.Enchanting.count, 1, "header rows should not be scanned as missing recipes")
+    Test.hasKey(entry.professions.Enchanting.recipes, -90035, "direct enchant spell key")
+    Test.eq(data:GetScanTelemetry().invalidRecipesScan or 0, 0, "Craft headers should not be reported as invalid recipes")
+end)
+
+Test.it("persists locally scanned Enchanting recipes across same-account alt logins", function()
+    local addon, wow = Loader.Load({ initialize = false })
+    wow.SetPlayer("Enchanter", "TestRealm")
+    Loader.Initialize(addon)
+
+    wow.SetCraftSkill("Enchanting", {
+        { name = "Enchant Persistent Bracer", subSpellName = "Enchant", type = "optimal", spellID = 90036 },
+    }, { shown = true })
+
+    addon:OnCraftShow()
+    wow.RunTimers(5)
+
+    local data = addon.Data
+    local enchanterKey = data:GetPlayerKey()
+    local sharedDB = _G.RecipeRegistryDB
+    local entry = data:GetMember(enchanterKey)
+    Test.hasKey(entry.professions.Enchanting.recipes, -90036, "initial Enchanting scan should store the spell key")
+
+    local altAddon, altWow = Loader.Load({
+        initialize = false,
+        savedVariables = {
+            db = sharedDB,
+            charDB = {},
+            logDB = {},
+        },
+    })
+    altWow.SetPlayer("Bankalt", "TestRealm")
+    Loader.Initialize(altAddon)
+
+    local altData = altAddon.Data
+    local persisted = altData:GetMember(enchanterKey)
+    Test.truthy(persisted, "same-account alt should still see the enchanter member entry")
+    Test.hasKey(persisted.professions.Enchanting.recipes, -90036, "Enchanting spell key should persist in saved variables")
+
+    local rows = altData:GetRecipeCrafters(-90036)
+    Test.eq(#rows, 1, "persisted Enchanting recipe should be locally consultable without peers")
+    Test.eq(rows[1].memberKey, enchanterKey, "persisted crafter should be the enchanter alt")
+    Test.eq(rows[1].profession, "Enchanting", "persisted profession")
+end)
+
+Test.it("does not store transient Craft row indexes when recipe links are unavailable", function()
+    local addon, wow, data = freshAddon()
+
+    wow.SetCraftSkill("Enchanting", {
+        { name = "Enchant Missing Link" },
+    }, { shown = true })
+
+    addon:OnCraftShow()
+    wow.RunTimers(5)
+
+    local entry = data:GetMember(data:GetPlayerKey())
+    Test.eq(entry.professions.Enchanting.count, 0, "missing recipe link should not produce a transient key")
+    Test.noKey(entry.professions.Enchanting.recipes, -1, "transient row index should not be stored")
+    Test.eq(data:GetScanTelemetry().invalidRecipesScan or 0, 1, "missing recipe link should be reported")
+end)
+
 io.write(string.format("P4 opportunistic scan: %d test(s) passed\n", Test.count))

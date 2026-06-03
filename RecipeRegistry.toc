@@ -1,14 +1,14 @@
 ## Interface: 20505
 ## Title: Recipe Registry
-## Notes: Lean guild profession tracker with owner-driven sync and AtlasLoot-assisted local resolution
+## Notes: Lean guild profession tracker with owner-driven sync and metadata-backed recipe browsing
 ## Author: OpenAI + User collaboration
-## Version: 2.0.4
+## Version: 2.1.0
 ## X-Build-Channel: release
 ## X-Build-ID: release
 ## SavedVariables: RecipeRegistryDB,RecipeRegistryLogDB
 ## SavedVariablesPerCharacter: RecipeRegistryCharDB
 ## X-Category: Guild
-## OptionalDeps: AtlasLootClassic,AtlasLootClassic_Crafting,AtlasLoot,TradeSkillMaster,Auctionator
+## OptionalDeps: TradeSkillMaster,Auctionator
 
 Libs\embeds.xml
 
@@ -16,9 +16,14 @@ Core\Core.lua
 Core\BuildInfo.lua
 Core\Performance.lua
 Data\Data.lua
-Data\DataAtlasLoot.lua
 Data\DataScan.lua
 Data\DataSnapshot.lua
+Data\RecipeOwnershipIndex.lua
+Data\Metadata\RecipeMetadata_Generated.lua
+Data\Metadata\RecipeMetadata_Overrides.lua
+Data\Metadata\RecipeMetadata.lua
+Data\Metadata\RecipeMetadataDiagnostics.lua
+Data\RecipeUiFilters.lua
 Data\DataCatalog.lua
 Data\DataIndex.lua
 Data\DataCleanup.lua

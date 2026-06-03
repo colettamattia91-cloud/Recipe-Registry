@@ -1753,6 +1753,36 @@ function Sync:CompleteOutboundSeedSession(reason)
     if Addon.Data and Addon.Data.RefreshGlobalFingerprint and (session.successfulBlockMerges or 0) > 0 then
         Addon.Data:RefreshGlobalFingerprint("seed-session-complete:" .. session.completedReason)
     end
+    -- Peer-level backoff for "we pulled blocks but converged on nothing":
+    -- block-saturation stops re-pulling the same block, but HELLO/SUMMARY/
+    -- INDEX_DIFF cycles keep re-electing the same peer. After two
+    -- consecutive sessions that pulled at least one block and added zero
+    -- progress, mark the peer for a cooldown so seed selection
+    -- deprioritizes them. We track this on a dedicated field instead of
+    -- peerBackoffUntil because MarkPeerSuccess clears that on every
+    -- successful block-merge (the snapshot delivery itself counts as
+    -- success even when no recipes were added), and would clobber the
+    -- session-level backoff on the very next merge.
+    if self:IsValidSyncMemberKey(session.seedKey) then
+        local pulled = (session.successfulBlockMerges or 0) > 0
+        local progressed = (session.progressBlockMerges or 0) > 0
+        self._peerSessionNoProgressCount = self._peerSessionNoProgressCount or {}
+        self._peerSessionBackoffUntil = self._peerSessionBackoffUntil or {}
+        if pulled and not progressed then
+            local count = (self._peerSessionNoProgressCount[session.seedKey] or 0) + 1
+            self._peerSessionNoProgressCount[session.seedKey] = count
+            if count >= 2 then
+                self._peerSessionBackoffUntil[session.seedKey] = time() + 120
+                Addon:Tracef("sync",
+                    "peer-backoff-set peer=%s reason=session-no-progress count=%d cooldownSeconds=120",
+                    tostring(session.seedKey), count
+                )
+            end
+        elseif progressed then
+            self._peerSessionNoProgressCount[session.seedKey] = 0
+            self._peerSessionBackoffUntil[session.seedKey] = nil
+        end
+    end
     self.telemetry.outboundSessionCompleted = (self.telemetry.outboundSessionCompleted or 0) + 1
     self.telemetry.lastSessionCompleteReason = session.completedReason
     self.telemetry.successfulBlockMerges = session.successfulBlockMerges or 0
@@ -2088,19 +2118,24 @@ function Sync:ShouldDeferHeavyLifecycleWork(_reason)
     return self:EstimateRuntimeQueuePressure() >= 70
 end
 
+local function isBackoffStoreActive(store, sourceKey, now)
+    if not store then return false end
+    local untilAt = store[sourceKey]
+    if not untilAt then return false end
+    if untilAt <= now then
+        store[sourceKey] = nil
+        return false
+    end
+    return true
+end
+
 function Sync:IsPeerBackoffActive(sourceKey)
     if not self:IsValidSyncMemberKey(sourceKey) then
         return false
     end
-    local untilAt = self.peerBackoffUntil and self.peerBackoffUntil[sourceKey] or nil
-    if not untilAt then
-        return false
-    end
-    if untilAt <= time() then
-        self.peerBackoffUntil[sourceKey] = nil
-        return false
-    end
-    return true
+    local now = time()
+    return isBackoffStoreActive(self.peerBackoffUntil, sourceKey, now)
+        or isBackoffStoreActive(self._peerSessionBackoffUntil, sourceKey, now)
 end
 
 function Sync:TouchNode(key, version)

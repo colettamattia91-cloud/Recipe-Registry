@@ -45,12 +45,12 @@ Test.it("bounds recipe list cache across many distinct queries", function()
         count = 150,
     })
 
-    for i = 1, 20 do
+    for i = 1, 50 do
         data:GetRecipeList(nil, "query-" .. tostring(i), "alpha")
     end
 
-    Test.gte(12, Test.countKeys(data._recipeListCache), "recipe list cache should stay bounded")
-    Test.gte(12, #(data._recipeListCacheOrder or {}), "recipe list cache order should stay bounded")
+    Test.gte(32, Test.countKeys(data._recipeListCache), "recipe list cache should stay bounded")
+    Test.gte(32, #(data._recipeListCacheOrder or {}), "recipe list cache order should stay bounded")
 end)
 
 Test.it("bounds recipe detail cache across many lookups", function()
@@ -69,34 +69,47 @@ Test.it("bounds recipe detail cache across many lookups", function()
 end)
 
 Test.it("searches recipe names by default and materials only when requested", function()
-    local _addon, data = freshAddon()
-    local previousAtlas = _G.AtlasLoot
-    _G.AtlasLoot = {
-        Data = {
-            Recipe = {},
-            Profession = {
-                GetCraftSpellForCreatedItem = function(itemID)
-                    return itemID == 98001 and 47001 or nil
-                end,
-                GetProfessionData = function(spellID)
-                    if spellID ~= 47001 then return nil end
-                    return {
-                        98001,
-                        1,
-                        300,
-                        300,
-                        375,
-                        { 24001 },
-                        { 2 },
-                        1,
-                    }
-                end,
-                GetProfessionName = function(professionID)
-                    return professionID == 1 and "Alchemy" or nil
-                end,
-            },
-        },
+    local addon, data = freshAddon()
+    local previousMetadata = addon.RecipeMetadata
+    local metadata = {
+        GetRecipeInfo = function(_, recipeKey)
+            if tonumber(recipeKey) ~= 98001 then return nil end
+            return {
+                spellId = 47001,
+                createdItemId = 98001,
+                profession = "alchemy",
+                requiredSkill = 300,
+                reagents = {
+                    { itemId = 24001, count = 2 },
+                },
+            }
+        end,
+        GetCreatedItemId = function(_, _recipeKey, info)
+            return info and info.createdItemId or nil
+        end,
+        GetRecipeItemId = function()
+            return nil
+        end,
+        GetProfession = function(_, _recipeKey, info)
+            return info and info.profession or nil
+        end,
+        GetRecipeExpansion = function()
+            return "tbc"
+        end,
+        GetMetadataResolutionStatus = function(_, _recipeKey, info)
+            return info and "resolved" or "unresolved"
+        end,
+        IsOutputlessSelfOnly = function()
+            return false
+        end,
+        IsBopOutput = function()
+            return false
+        end,
+        GetReagents = function(_, _recipeKey, info)
+            return info and info.reagents or {}
+        end,
     }
+    addon.RecipeMetadata = metadata
     local state = Loader.Wow.GetState()
     state.items[98001] = { name = "Arcane Widget", quality = 2, icon = "widget-icon" }
     state.items[24001] = { name = "Primal Mooncloth", quality = 3, icon = "cloth-icon" }
@@ -109,7 +122,7 @@ Test.it("searches recipe names by default and materials only when requested", fu
     Test.eq(#data:GetRecipeList("Alchemy", "mooncloth", "alpha"), 0, "default search should ignore material names")
     Test.eq(#data:GetRecipeList("Alchemy", "mooncloth", "alpha", "materials"), 1, "materials search should include reagent names")
 
-    _G.AtlasLoot = previousAtlas
+    addon.RecipeMetadata = previousMetadata
 end)
 
 io.write(string.format("Catalog cache: %d test(s) passed\n", Test.count))

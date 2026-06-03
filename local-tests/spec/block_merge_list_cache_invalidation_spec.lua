@@ -51,18 +51,27 @@ end
 
 io.write("Block merge list cache invalidation\n")
 
+-- Use real TBC spell IDs (as negative keys) so the sync inbound gate
+-- in MergeEngine — which drops keys not catalogued in metadata — lets
+-- them through. Synthetic placeholders like 11001 are not in the
+-- generated metadata and would be filtered before reaching the merge.
+local ALCHEMY_RECIPE_A = -28543  -- Elixir of Major Strength
+local ALCHEMY_RECIPE_B = -28544  -- Elixir of Major Defense
+local ALCHEMY_RECIPE_C = -28545  -- Elixir of Major Frost Power
+local TAILORING_RECIPE = -26745  -- Bolt of Imbued Netherweave
+
 Test.it("block merge that adds recipes drops the recipe list cache", function()
     local _addon, _wow, data = freshAddon()
     local owner = "Crafter-TestRealm"
     local profession = "Alchemy"
-    seedProfession(data, owner, profession, { 11001, 11002 })
+    seedProfession(data, owner, profession, { ALCHEMY_RECIPE_A, ALCHEMY_RECIPE_B })
     local blockKey = data:BuildSyncBlockKey(owner, profession)
 
     primeListCache(data)
 
     local applied, result = data:ApplyIncomingBlockAdditive(
         blockKey,
-        buildPayload(blockKey, owner, profession, { 11001, 11002, 11003 }),
+        buildPayload(blockKey, owner, profession, { ALCHEMY_RECIPE_A, ALCHEMY_RECIPE_B, ALCHEMY_RECIPE_C }),
         { sourceType = "replica" }
     )
 
@@ -76,14 +85,14 @@ Test.it("metadata-only block merge preserves the recipe list cache", function()
     local _addon, _wow, data = freshAddon()
     local owner = "Crafter-TestRealm"
     local profession = "Alchemy"
-    seedProfession(data, owner, profession, { 11001, 11002 }, { skillRank = 100 })
+    seedProfession(data, owner, profession, { ALCHEMY_RECIPE_A, ALCHEMY_RECIPE_B }, { skillRank = 100 })
     local blockKey = data:BuildSyncBlockKey(owner, profession)
 
     primeListCache(data)
 
     local applied, result = data:ApplyIncomingBlockAdditive(
         blockKey,
-        buildPayload(blockKey, owner, profession, { 11001, 11002 }, {
+        buildPayload(blockKey, owner, profession, { ALCHEMY_RECIPE_A, ALCHEMY_RECIPE_B }, {
             skillRank = 175,
             skillMaxRank = 225,
             specialization = "Transmute",
@@ -109,7 +118,7 @@ Test.it("first-ever block merge for a new owner drops the recipe list cache", fu
 
     local applied = data:ApplyIncomingBlockAdditive(
         blockKey,
-        buildPayload(blockKey, newOwner, profession, { 22001 }),
+        buildPayload(blockKey, newOwner, profession, { TAILORING_RECIPE }),
         { sourceType = "replica" }
     )
 

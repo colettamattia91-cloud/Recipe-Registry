@@ -67,6 +67,10 @@ local DB_DEFAULTS = {
         },
         members = {},
         addonPeers = {},
+        syncSaturation = {
+            -- [blockKey][fingerprint] = { noProgressCount, saturatedUntil }
+            blockFingerprints = {},
+        },
     },
     profile = {
         selectedProfession = nil,
@@ -74,6 +78,23 @@ local DB_DEFAULTS = {
         searchMode = "recipe",
         defaultSearchMode = "recipe",
         useRecipeCategories = true,
+        recipeCategoryView = "expanded",
+        recipePrefilters = {
+            showRemoteBopOutputRecipes = false,
+            hideUncataloguedRecipes = true,
+            expansionDefaults = {
+                -- TBC-only by default. The vast majority of players land
+                -- on TBC content; surfacing 1248 vanilla recipes by
+                -- default in every profession list is noise for the
+                -- normal case. Users who actively level vanilla can flip
+                -- the toggle in /rr options. Existing users with an
+                -- explicit value keep theirs (AceDB only applies
+                -- defaults to keys not yet present in the profile).
+                vanilla = false,
+                tbc = true,
+            },
+            professionExpansionOverrides = {},
+        },
         mainFrame = {
             point = "CENTER",
             relativePoint = "CENTER",
@@ -165,8 +186,6 @@ local PROFESSION_SPECIALIZATIONS = {
 
 local localeMap
 local recipeValidityCache = {}
-local atlasHandlesCache
-local atlasProfessionNameCache = {}
 
 local function cloneArray(src)
     if type(src) ~= "table" then return src end
@@ -216,66 +235,6 @@ Private.countKeys = countKeys
 Private.cloneTableShallow = cloneTableShallow
 Private.nowMs = nowMs
 
-local function cloneAtlasInfo(info)
-    if type(info) ~= "table" then return info end
-    local out = {}
-    for k, v in pairs(info) do
-        out[k] = v
-    end
-    if info.reagentIDs then
-        out.reagentIDs = cloneArray(info.reagentIDs)
-    end
-    if info.reagentCounts then
-        out.reagentCounts = cloneArray(info.reagentCounts)
-    end
-    return out
-end
-
-local function getAtlasLootHandles()
-    if atlasHandlesCache and atlasHandlesCache.recipe and atlasHandlesCache.profession then
-        return atlasHandlesCache.recipe, atlasHandlesCache.profession
-    end
-
-    -- Build candidates without nil holes (ipairs stops at first nil).
-    local candidates = {}
-    if type(_G.AtlasLootClassic) == "table" then
-        candidates[#candidates + 1] = _G.AtlasLootClassic
-    end
-    if type(_G.AtlasLoot) == "table" then
-        candidates[#candidates + 1] = _G.AtlasLoot
-    end
-
-    for _, atlas in ipairs(candidates) do
-        -- Prefer modern shape: AtlasLoot.Data.Recipe / AtlasLoot.Data.Profession
-        local data = type(atlas.Data) == "table" and atlas.Data or atlas
-        local recipe = data.Recipe
-        local profession = data.Profession
-        if type(recipe) == "table" and type(profession) == "table" then
-            atlasHandlesCache = {
-                recipe = recipe,
-                profession = profession,
-            }
-            return recipe, profession
-        end
-    end
-
-    return nil, nil
-end
-
-local function getAtlasLootProfessionName(professionID)
-    if not professionID then return nil end
-    if atlasProfessionNameCache[professionID] ~= nil then
-        return atlasProfessionNameCache[professionID]
-    end
-    local _, profession = getAtlasLootHandles()
-    if profession and type(profession.GetProfessionName) == "function" then
-        local name = profession.GetProfessionName(professionID)
-        atlasProfessionNameCache[professionID] = name
-        return name
-    end
-    return nil
-end
-
 local function safeGetItemName(itemID)
     if not itemID then return nil end
     local itemName = GetItemInfo(itemID)
@@ -308,21 +267,15 @@ local function shouldRefreshItemName(name, itemID)
     return name == ("item:" .. tostring(itemID))
 end
 
--- Validates that a recipe key represents a real craft, not a non-craft spell.
--- Positive keys (item-based) are accepted only inside a sane TBC-era numeric
--- range; very large positive values are usually concatenated/corrupt IDs.
--- Negative keys (spell-based) prefer a known AtlasLoot profession mapping.
--- If AtlasLoot is present but misses a mapping, fall back to spell metadata
--- instead of dropping the key immediately; this avoids destructive false
--- negatives when optional data is incomplete.
--- Fallback after AtlasLoot check: check spell subtext for profession rank
--- keywords (Apprentice/Journeyman/Expert/Artisan/Master) which only craft
--- spells have; class spells use "Rank N" or have no subtext.
-local CRAFT_RANK_KEYWORDS = {
-    ["Apprentice"] = true, ["Journeyman"] = true, ["Expert"] = true,
-    ["Artisan"] = true, ["Master"] = true,
-}
 local MAX_REASONABLE_RECIPE_KEY = 100000000
+-- Pure-shape validity check. Two peers running different addon versions,
+-- different metadata builds, or different locales must agree on whether
+-- a key passes this gate — otherwise their block contentKeys diverge and
+-- the block fingerprints never converge, producing endless re-pull loops
+-- where addedRecipes=0 but counts and fingerprints stay mismatched.
+-- The earlier metadata + subtext fallback was a semantic check ("does
+-- this look like a real craft spell?") and belongs in the UI/cleanup
+-- gates, not in the wire-facing validity check shared by all peers.
 local function isValidRecipeKey(recipeKey)
     local n = tonumber(recipeKey)
     if not n then return false end
@@ -333,37 +286,8 @@ local function isValidRecipeKey(recipeKey)
         recipeValidityCache[n] = false
         return false
     end
-    if n > 0 then
-        recipeValidityCache[n] = true
-        return true
-    end  -- item-based: always valid
-    local _, profession = getAtlasLootHandles()
-    if profession and profession.GetProfessionData then
-        if profession.GetProfessionData(-n) ~= nil then
-            recipeValidityCache[n] = true
-            return true
-        end
-    end
-    -- Fallback: check spell subtext for craft rank keywords.
-    local spellName = safeGetSpellName(-n)
-    if not spellName then
-        recipeValidityCache[n] = true
-        return true
-    end  -- can't resolve spell: benefit of doubt
-    local subtext
-    if type(GetSpellSubtext) == "function" then
-        subtext = GetSpellSubtext(-n)
-    elseif type(GetSpellBookItemInfo) ~= "function" then
-        -- No API to check subtext: allow through
-        return true
-    end
-    if subtext and CRAFT_RANK_KEYWORDS[subtext] then
-        recipeValidityCache[n] = true
-        return true
-    end
-    -- No recognised craft subtext: block it
-    recipeValidityCache[n] = false
-    return false
+    recipeValidityCache[n] = true
+    return true
 end
 
 local function formatReagents(reagentIDs, reagentCounts)
@@ -655,9 +579,6 @@ end
 
 Private.TRACKED = TRACKED
 Private.cloneArray = cloneArray
-Private.cloneAtlasInfo = cloneAtlasInfo
-Private.getAtlasLootHandles = getAtlasLootHandles
-Private.getAtlasLootProfessionName = getAtlasLootProfessionName
 Private.safeGetItemName = safeGetItemName
 Private.safeGetSpellName = safeGetSpellName
 Private.getItemData = getItemData
@@ -689,9 +610,6 @@ function Data:OnInitialize()
         _G.RecipeRegistryCharDB.favorites = {}
     end
     Addon.charDB = _G.RecipeRegistryCharDB
-    self._atlasRecipeInfoCache = {}
-    self._atlasSpellInfoCache = {}
-    self._atlasCreatedItemInfoCache = {}
     self._scanNeededByProfession = {}
     self._genericScanAttempts = {}
     self._scanTelemetry = newScanTelemetry()
@@ -727,6 +645,35 @@ function Data:OnInitialize()
     end
     if self.db.profile.useRecipeCategories == nil then
         self.db.profile.useRecipeCategories = true
+    end
+    local categoryView = self.db.profile.recipeCategoryView
+    if categoryView ~= "expanded" and categoryView ~= "accordion" and categoryView ~= "categoriesOnly" then
+        self.db.profile.recipeCategoryView = "expanded"
+    end
+    if type(self.db.profile.recipePrefilters) ~= "table" then
+        self.db.profile.recipePrefilters = {
+            showRemoteBopOutputRecipes = false,
+            hideUncataloguedRecipes = true,
+            expansionDefaults = { vanilla = true, tbc = true },
+            professionExpansionOverrides = {},
+        }
+    else
+        local prefilters = self.db.profile.recipePrefilters
+        if prefilters.showRemoteBopOutputRecipes == nil then
+            prefilters.showRemoteBopOutputRecipes = false
+        end
+        if prefilters.hideUncataloguedRecipes == nil then
+            prefilters.hideUncataloguedRecipes = true
+        end
+        if type(prefilters.expansionDefaults) ~= "table" then
+            prefilters.expansionDefaults = { vanilla = true, tbc = true }
+        else
+            if prefilters.expansionDefaults.vanilla == nil then prefilters.expansionDefaults.vanilla = true end
+            if prefilters.expansionDefaults.tbc == nil then prefilters.expansionDefaults.tbc = true end
+        end
+        if type(prefilters.professionExpansionOverrides) ~= "table" then
+            prefilters.professionExpansionOverrides = {}
+        end
     end
     self._onlineCache = {}
     self._guildMetaCache = {}
@@ -1377,39 +1324,29 @@ end
 
 function Data:InvalidateRecipeCaches(scope)
     -- Two generation tokens for async builders:
-    --   * _recipeListCacheGeneration is bumped on ANY invalidation. The
+    --   * _recipeListCacheGeneration is bumped on invalidations that change
+    --     WHICH recipes the list contains (metadata, list, full). The
     --     chunked list builder reads it at start and at commit; mismatch
-    --     means the partial rows it just assembled are based on stale
-    --     filter state (live onlineCount, included recipes, etc.) and
-    --     must not be cached.
+    --     means the partial rows it just assembled are based on a stale
+    --     filter / projection and must not be cached. Presence flips do
+    --     NOT bump this — see below.
     --   * _recipeIndexGeneration is bumped only when the index itself is
     --     dropped (metadata or full scope). Presence/list invalidations
     --     leave the content index intact, so an in-flight index build
     --     would needlessly discard its result if it shared the same
     --     token — and presence flips fire often enough during startup
     --     that this would keep the first build from ever finishing.
-    self._recipeListCacheGeneration = (self._recipeListCacheGeneration or 0) + 1
-    if scope == "list" then
-        self._recipeListCache = nil
-        self._recipeListCacheOrder = nil
-        return
-    end
-    if scope == "metadata" then
-        self._recipeIndexGeneration = (self._recipeIndexGeneration or 0) + 1
-        self._recipeDetailCache = nil
-        self._recipeDetailCacheOrder = nil
-        self._recipeIndex = nil
-        if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
-            Addon.Tooltip:InvalidateIndex("metadata")
-        end
-        return
-    end
     if scope == "presence" then
-        -- Presence is no longer materialized inside _recipeIndex — online
-        -- flags and onlineCount are derived live from _onlineCache when
-        -- GetRecipeCrafters / GetRecipeList run. Roster presence flips
-        -- therefore don't invalidate the content index; we only need to
-        -- drop the list cache because its sort uses live onlineCount.
+        -- Presence flips (roster online/offline) only affect the sort key
+        -- onlineCount, not the set of visible recipes. Clearing the cached
+        -- list forces the next refresh to rebuild with fresh online counts;
+        -- but bumping the generation here ALSO abandoned every in-flight
+        -- list build, and during warmup presence flips arrive faster than
+        -- a build can finish — meaning the cache was repeatedly emptied
+        -- without ever being repopulated, so each profession switch paid
+        -- the full rebuild cost. Letting active builds complete writes a
+        -- slightly-stale-by-sort-order result to cache; the next presence
+        -- flip will trigger a quick re-sort on the next refresh.
         self._recipeListCache = nil
         self._recipeListCacheOrder = nil
         if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
@@ -1417,15 +1354,56 @@ function Data:InvalidateRecipeCaches(scope)
         end
         return
     end
-
-    self._recipeIndexGeneration = (self._recipeIndexGeneration or 0) + 1
+    self._recipeListCacheGeneration = (self._recipeListCacheGeneration or 0) + 1
+    if scope == "list" then
+        -- Content changed (new recipes / new owner / status flip): the
+        -- ownership index "who knows recipe X" depends on those facts,
+        -- so it must drop here, not under "metadata" which is also fired
+        -- for skill-rank-only refreshes that don't change ownership.
+        if self.InvalidateRecipeOwnershipIndex then
+            self:InvalidateRecipeOwnershipIndex(scope)
+        end
+        self._recipeListCache = nil
+        self._recipeListCacheOrder = nil
+        return
+    end
+    if scope == "metadata" then
+        -- "metadata" is fired after every block merge, INCLUDING rank/spec
+        -- only refreshes that don't add or remove recipes. The ownership
+        -- index is unaffected by rank changes, so dropping it here forces
+        -- a full member-walk rebuild on the very next predicate call —
+        -- which during sync storms turned into the dominant cost in
+        -- RecipePasses (one rebuild per recipe-list refresh after each
+        -- merge). DataSnapshot also fires "list" scope when content
+        -- actually changed; that path drops ownership above.
+        self:_DropRecipeIndexAndDetailCache("metadata")
+        return
+    end
+    if self.InvalidateRecipeOwnershipIndex then
+        self:InvalidateRecipeOwnershipIndex(scope or "full")
+    end
     self._recipeListCache = nil
     self._recipeListCacheOrder = nil
+    self:_DropRecipeIndexAndDetailCache(scope or "full")
+end
+
+-- Shared invalidation tail used by both the "metadata" scope and the
+-- default/full path. Bumps the index generation, drops the in-memory
+-- detail cache and its persistent twin, clears the recipe index and the
+-- by-profession map, and notifies the tooltip.
+function Data:_DropRecipeIndexAndDetailCache(reason)
+    self._recipeIndexGeneration = (self._recipeIndexGeneration or 0) + 1
     self._recipeDetailCache = nil
     self._recipeDetailCacheOrder = nil
+    self._recipeDetailCacheReady = nil
+    if self.db and self.db.global then
+        self.db.global.recipeDetailCache = nil
+        self.db.global.recipeDetailCacheOrder = nil
+    end
     self._recipeIndex = nil
+    self._recipesByProfession = nil
     if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
-        Addon.Tooltip:InvalidateIndex(scope or "full")
+        Addon.Tooltip:InvalidateIndex(reason)
     end
 end
 

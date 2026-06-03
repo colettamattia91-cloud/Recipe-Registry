@@ -649,7 +649,7 @@ local function installWowGlobals()
         local item = state.items[itemID] or {}
         local name = item.name or ("Item " .. tostring(itemID))
         local link = item.link or itemLink(itemID, name)
-        return name, link, item.quality or 1, nil, nil, nil, nil, nil, nil, item.icon or ("item-icon-" .. tostring(itemID))
+        return name, link, item.quality or 1, nil, nil, nil, nil, nil, nil, item.icon or ("item-icon-" .. tostring(itemID)), nil, nil, nil, item.bindType
     end
     _G.GetItemInfoInstant = function(itemID)
         return tonumber(itemID), nil, nil, nil, "item-icon-" .. tostring(itemID)
@@ -737,7 +737,7 @@ local function installWowGlobals()
     end
     _G.GetCraftInfo = function(index)
         local row = state.craftSkill.entries[index] or {}
-        return row.name, row.type
+        return row.name, row.subSpellName, row.type, row.numAvailable, row.isExpanded, row.trainingPointCost, row.requiredLevel
     end
     _G.GetCraftItemLink = function(index)
         local row = state.craftSkill.entries[index] or {}
@@ -813,6 +813,8 @@ function Wow.Reset(opts)
     _G.RecipeRegistry_OrdersDB = nil
     _G.RecipeRegistry_OrdersCharDB = nil
     _G.RecipeRegistry_OrdersLogDB = nil
+    _G.RecipeRegistryRecipeMetadata = nil
+    _G.RecipeRegistryRecipeMetadataOverrides = nil
     _G.__RecipeRegistrySerializedValues = {}
     _G.__RecipeRegistrySerializedNextId = 0
 

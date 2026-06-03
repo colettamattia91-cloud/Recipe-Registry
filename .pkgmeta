@@ -10,5 +10,7 @@ ignore:
   - docs
   - local-tests
   - scripts
+  - tools
+  - artifacts
 move-folders:
   RecipeRegistry/RecipeRegistry_Orders: RecipeRegistry_Orders

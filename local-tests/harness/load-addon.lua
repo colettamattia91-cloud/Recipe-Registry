@@ -10,9 +10,14 @@ local FILE_PATHS = {
     ["BuildInfo.lua"] = "Core/BuildInfo.lua",
     ["Performance.lua"] = "Core/Performance.lua",
     ["Data.lua"] = "Data/Data.lua",
-    ["DataAtlasLoot.lua"] = "Data/DataAtlasLoot.lua",
     ["DataScan.lua"] = "Data/DataScan.lua",
     ["DataSnapshot.lua"] = "Data/DataSnapshot.lua",
+    ["RecipeOwnershipIndex.lua"] = "Data/RecipeOwnershipIndex.lua",
+    ["RecipeMetadata_Generated.lua"] = "Data/Metadata/RecipeMetadata_Generated.lua",
+    ["RecipeMetadata_Overrides.lua"] = "Data/Metadata/RecipeMetadata_Overrides.lua",
+    ["RecipeMetadata.lua"] = "Data/Metadata/RecipeMetadata.lua",
+    ["RecipeMetadataDiagnostics.lua"] = "Data/Metadata/RecipeMetadataDiagnostics.lua",
+    ["RecipeUiFilters.lua"] = "Data/RecipeUiFilters.lua",
     ["DataCatalog.lua"] = "Data/DataCatalog.lua",
     ["DataIndex.lua"] = "Data/DataIndex.lua",
     ["DataCleanup.lua"] = "Data/DataCleanup.lua",
@@ -66,9 +71,14 @@ local Loader = {
         "BuildInfo.lua",
         "Performance.lua",
         "Data.lua",
-        "DataAtlasLoot.lua",
         "DataScan.lua",
         "DataSnapshot.lua",
+        "RecipeOwnershipIndex.lua",
+        "RecipeMetadata_Generated.lua",
+        "RecipeMetadata_Overrides.lua",
+        "RecipeMetadata.lua",
+        "RecipeMetadataDiagnostics.lua",
+        "RecipeUiFilters.lua",
         "DataCatalog.lua",
         "DataIndex.lua",
         "DataCleanup.lua",
@@ -123,10 +133,29 @@ function Loader.Load(opts)
             addonMetadata = opts.addonMetadata,
         })
     end
+    -- Sync gates and the tooltip garbage filter call
+    -- `Data:IsRecipeKeyCatalogued` to drop real-but-not-a-recipe items
+    -- (Worn Axe and similar). Many specs seed synthetic positive recipe
+    -- keys that don't exist in production metadata, so the global flag
+    -- below lets the test harness bypass that strict check while keeping
+    -- the looser "resolvable in client" check active. Set it to nil if a
+    -- specific spec wants the production behavior.
+    _G._RR_TEST_HARNESS_BYPASS_CATALOGUE_GATE = opts.enforceCatalogueGate
+        and nil
+        or true
 
     local files = opts.files or Loader.BackendFiles
+    -- Unit specs that assert exact record-level facts load a small, stable
+    -- sample dataset instead of the volatile production metadata so they stay
+    -- deterministic across `generate` runs. `metadataFixture` swaps only the
+    -- generated table file; the metadata code under test is unchanged.
+    local fixtureGeneratedPath = opts.metadataFixture
+        and join(root, "local-tests", "fixtures", "RecipeMetadata_Generated.lua")
+        or nil
     for _, file in ipairs(files) do
-        local path = resolveAddonPath(file)
+        local path = (fixtureGeneratedPath and file == "RecipeMetadata_Generated.lua")
+            and fixtureGeneratedPath
+            or resolveAddonPath(file)
         local chunk, err = loadfile(path)
         if not chunk then
             error("failed to load " .. path .. ": " .. tostring(err), 2)
@@ -159,6 +188,27 @@ function Loader.Load(opts)
     end
 
     return addon, Wow
+end
+
+-- After the metadata fold-in, metadata is loaded as part of RR's own backend
+-- files. LoadMetadata stays as a thin compat wrapper so existing specs that
+-- destructure (metadataAddon, wow, coreAddon) keep working — both
+-- `metadataAddon` and `coreAddon` are now the same RR addon, since the
+-- metadata module hangs off it as `addon.RecipeMetadata`.
+function Loader.LoadMetadata(opts)
+    opts = opts or {}
+    local addon = Loader.Load({
+        reset = opts.reset,
+        initialize = opts.initialize ~= false,
+        enable = opts.enable == true,
+        payloadMode = opts.payloadMode,
+        addonMetadata = opts.addonMetadata,
+        initialReqTimeoutsEnabled = opts.initialReqTimeoutsEnabled,
+        savedVariables = opts.savedVariables,
+        metadataFixture = opts.fixture,
+        files = opts.files,
+    })
+    return addon, Wow, addon
 end
 
 function Loader.Initialize(addon)

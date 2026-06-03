@@ -1,0 +1,344 @@
+local Addon = _G.RecipeRegistry
+if not Addon then
+    return
+end
+
+local RecipeUiFilters = Addon:NewModule("RecipeUiFilters")
+Addon.RecipeUiFilters = RecipeUiFilters
+
+local tostring = tostring
+local tonumber = tonumber
+local pairs = pairs
+local sort = table.sort
+
+local PROFESSION_KEY_BY_DISPLAY = {
+    Alchemy = "alchemy",
+    Blacksmithing = "blacksmithing",
+    Cooking = "cooking",
+    Enchanting = "enchanting",
+    Engineering = "engineering",
+    Jewelcrafting = "jewelcrafting",
+    Leatherworking = "leatherworking",
+    Mining = "mining",
+    Tailoring = "tailoring",
+}
+
+local FAVORITES_VIEW = "Favorites"
+
+local function normalizeProfessionKey(professionKey)
+    if not professionKey then
+        return nil
+    end
+    if PROFESSION_KEY_BY_DISPLAY[professionKey] then
+        return PROFESSION_KEY_BY_DISPLAY[professionKey]
+    end
+    local text = tostring(professionKey):lower()
+    text = text:gsub("%s+", "_")
+    return text
+end
+
+local function getProfilePrefilters()
+    local profile = Addon.db and Addon.db.profile or {}
+    local filters = profile.recipePrefilters
+    if type(filters) ~= "table" then
+        filters = {}
+        profile.recipePrefilters = filters
+    end
+    if type(filters.expansionDefaults) ~= "table" then
+        filters.expansionDefaults = {}
+    end
+    if filters.expansionDefaults.vanilla == nil then
+        -- TBC-only default at first-touch — matches DB_DEFAULTS so legacy
+        -- saved data missing this field doesn't surprise the user with a
+        -- different visibility than a fresh install would give them.
+        filters.expansionDefaults.vanilla = false
+    end
+    if filters.expansionDefaults.tbc == nil then
+        filters.expansionDefaults.tbc = true
+    end
+    if type(filters.professionExpansionOverrides) ~= "table" then
+        filters.professionExpansionOverrides = {}
+    end
+    if filters.showRemoteBopOutputRecipes == nil then
+        filters.showRemoteBopOutputRecipes = false
+    end
+    if filters.hideUncataloguedRecipes == nil then
+        filters.hideUncataloguedRecipes = true
+    end
+    return filters
+end
+
+local function getMetadata()
+    return Addon.RecipeMetadata
+end
+
+local function boolToken(value)
+    return value and "1" or "0"
+end
+
+local function sortedKeys(tbl)
+    local keys = {}
+    for key in pairs(tbl or {}) do
+        keys[#keys + 1] = key
+    end
+    sort(keys, function(a, b) return tostring(a) < tostring(b) end)
+    return keys
+end
+
+function RecipeUiFilters:NormalizeProfessionKey(professionKey)
+    return normalizeProfessionKey(professionKey)
+end
+
+-- The v1 metadata library only catalogues the eight crafting professions
+-- declared in PROFESSION_KEY_BY_DISPLAY. Gathering/auxiliary professions
+-- (Mining, First Aid, Fishing, Herbalism, Skinning) are out of scope, so
+-- the hide-uncatalogued gate must not apply to their recipes — there is no
+-- metadata to compare against and dropping their rows hides legitimate
+-- scan data.
+function RecipeUiFilters:IsSupportedProfession(professionKey)
+    if not professionKey then return false end
+    if PROFESSION_KEY_BY_DISPLAY[professionKey] then return true end
+    for _, canonical in pairs(PROFESSION_KEY_BY_DISPLAY) do
+        if canonical == professionKey then return true end
+    end
+    return false
+end
+
+function RecipeUiFilters:GetEffectiveExpansionVisibility(professionKey)
+    local filters = getProfilePrefilters()
+    local normalizedProfession = normalizeProfessionKey(professionKey)
+    local defaults = filters.expansionDefaults or {}
+    local out = {
+        professionKey = normalizedProfession,
+        vanilla = defaults.vanilla ~= false,
+        tbc = defaults.tbc ~= false,
+        inherited = true,
+    }
+
+    local override = normalizedProfession and filters.professionExpansionOverrides[normalizedProfession] or nil
+    if type(override) == "table" and override.inherit == false then
+        out.inherited = false
+        if override.vanilla ~= nil then
+            out.vanilla = override.vanilla == true
+        end
+        if override.tbc ~= nil then
+            out.tbc = override.tbc == true
+        end
+    end
+    return out
+end
+
+function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
+    local metadata = getMetadata()
+    if not metadata then
+        return true, "visible-no-plugin"
+    end
+
+    local profileFilters = getProfilePrefilters()
+    local info = recipeInfo or metadata:GetRecipeInfo(recipeKey)
+    local resolution = metadata:GetMetadataResolutionStatus(recipeKey, info)
+    if not info then
+        if resolution == "ambiguous" then
+            -- Real recipe with mapping ambiguity (e.g. same created item from
+            -- multiple spells): keep visible per roadmap §9 conservative show —
+            -- the mapping is a remediation task, the recipe itself is legit.
+            Addon:Trace("filters", "metadata ambiguous for recipe", recipeKey)
+            return true, "visible-unresolved-conservative"
+        end
+        -- Last-gate cleanup (profile-gated, default on): drop only the entries
+        -- that look like spurious garbage — positive item-IDs imported as
+        -- recipe keys without a metadata match. Negative spell keys are
+        -- always legit (scanned from a real TradeSkill window) even if the
+        -- profession sits outside the v1 metadata scope (Mining smelting,
+        -- First Aid, Fishing), so they stay visible per roadmap §9 even
+        -- with the flag on.
+        local numericKey = tonumber(recipeKey)
+        -- Out-of-scope professions (Mining, First Aid, Fishing, ...) opt out
+        -- of the hide-uncatalogued gate via filterContext, because there is
+        -- no metadata to compare against — every recipe in those professions
+        -- is "uncatalogued" by definition and dropping them hides real scan
+        -- data, not garbage.
+        local skipUncataloguedGate = filterContext and filterContext.allowUncataloguedRecipes == true
+        if not skipUncataloguedGate
+            and profileFilters.hideUncataloguedRecipes ~= false
+            and numericKey and numericKey > 0
+        then
+            Addon:Trace("filters", "metadata uncatalogued item-key recipe", recipeKey)
+            return false, "hidden-uncatalogued"
+        end
+        -- Last-resort sanity check: if neither the metadata library nor the
+        -- WoW client knows about this recipe key, it's a ghost (old mock /
+        -- corrupted scan) and pretending it's a real recipe just keeps the
+        -- garbage propagating between peers. Hide it. The same predicate
+        -- guards the sync producer/consumer, so peers also stop echoing it.
+        if Addon.Data and Addon.Data.IsRecipeKeyResolvableInClient
+            and not Addon.Data:IsRecipeKeyResolvableInClient(recipeKey)
+        then
+            Addon:Trace("filters", "recipe key not resolvable in client", recipeKey)
+            return false, "hidden-not-in-client"
+        end
+        Addon:Trace("filters", "metadata unresolved for recipe", recipeKey)
+        return true, "visible-unresolved-conservative"
+    end
+
+    local professionKey = info.profession
+    if not professionKey then
+        Addon:Trace("filters", "metadata missing profession for recipe", recipeKey)
+        return true, "visible-unresolved-conservative"
+    end
+
+    -- Mining is expansion-agnostic in the UI: 18 smelting spells total,
+    -- shallow sidebar, so vanilla and TBC bars share one view regardless
+    -- of the user's selected expansion. Skip the per-recipe expansion gate
+    -- for mining so e.g. Smelt Truesilver (vanilla) stays visible under
+    -- a TBC filter view. Matches BuildVisibleSpellIdHash's special-case.
+    if professionKey ~= "mining" then
+        -- Hot path: the list-build callsite passes the per-profession
+        -- visibility precomputed once. RecipePasses skips an O(profile +
+        -- override) lookup per candidate, which previously dominated the
+        -- predicate phase on Blacksmithing-sized lists (300+ candidates).
+        local visibility = filterContext and filterContext.precomputedVisibility
+            and filterContext.precomputedVisibility[professionKey]
+            or self:GetEffectiveExpansionVisibility(professionKey)
+        -- Skip the whole expansion gate when visibility is fully on; the
+        -- field reads here are cheap, but the resulting per-candidate
+        -- GetRecipeExpansion call also disappears.
+        if visibility.vanilla == false or visibility.tbc == false then
+            local expansion = info.expansion
+            if expansion == "vanilla" and visibility.vanilla == false then
+                return false, "hidden-expansion"
+            end
+            if expansion == "tbc" and visibility.tbc == false then
+                return false, "hidden-expansion"
+            end
+        end
+    end
+
+    local ctx = filterContext or {}
+    local ownership = ctx.ownership
+    if not ownership and Addon.Data and Addon.Data.GetRecipeOwnershipSummary then
+        ownership = Addon.Data:GetRecipeOwnershipSummary(recipeKey)
+    end
+    ownership = ownership or {}
+
+    -- Read straight off the record. IsOutputlessSelfOnly / IsBopOutput
+    -- are wrappers around the same field access; calling them per
+    -- candidate adds two method dispatches each that pile up on large
+    -- profession lists. Static bopOutput is emitted for every catalogued
+    -- recipe, so the dynamic fallback only fires for unresolved records.
+    local selfOnly = info.selfOnlyOutputless == true
+    local bopOutput = info.bopOutput
+    if bopOutput == nil and Addon.Data and Addon.Data.ResolveRecipeBopOutput then
+        bopOutput = Addon.Data:ResolveRecipeBopOutput(recipeKey, info)
+    end
+    local restricted = selfOnly == true or bopOutput == true
+    if restricted and ownership.knownByCurrentPlayer == true then
+        return true, "visible-current-player"
+    end
+
+    if selfOnly == true and profileFilters.showRemoteBopOutputRecipes ~= true then
+        return false, "hidden-outputless-self-only"
+    end
+    if bopOutput == true and profileFilters.showRemoteBopOutputRecipes ~= true then
+        return false, "hidden-remote-bop"
+    end
+
+    if resolution ~= "resolved" then
+        Addon:Trace("filters", "metadata unresolved for recipe", recipeKey)
+        return true, "visible-unresolved-conservative"
+    end
+
+    return true, "visible-normal"
+end
+
+local function appendOverride(parts, professionKey, override)
+    if type(override) ~= "table" then
+        return
+    end
+    parts[#parts + 1] = table.concat({
+        "override",
+        normalizeProfessionKey(professionKey) or tostring(professionKey),
+        boolToken(override.inherit ~= false),
+        boolToken(override.vanilla == true),
+        boolToken(override.tbc == true),
+    }, ":")
+end
+
+local function shouldUseBroadFilterKey(ctx)
+    if not ctx then
+        return true
+    end
+    if ctx.globalSearch == true or ctx.selectedProfession == FAVORITES_VIEW then
+        return true
+    end
+    return normalizeProfessionKey(ctx.effectiveProfession or ctx.selectedProfession) == nil
+end
+
+function RecipeUiFilters:BuildFilterCacheKey(ctx)
+    ctx = ctx or {}
+    local metadata = getMetadata()
+    if not metadata then
+        return "plugin=absent"
+    end
+
+    local filters = getProfilePrefilters()
+    local data = Addon.Data or {}
+    local parts = {
+        "plugin=present",
+        "metadata=" .. tostring(metadata.metadataVersion or ""),
+        "schema=" .. tostring(metadata.schemaVersion or ""),
+        "flavor=" .. tostring(metadata.flavor or ""),
+        "remoteBop=" .. boolToken(filters.showRemoteBopOutputRecipes == true),
+        "hideUncat=" .. boolToken(filters.hideUncataloguedRecipes ~= false),
+        "ownership=" .. tostring(data._recipeOwnershipIndexGeneration or 0),
+    }
+
+    local overrides = filters.professionExpansionOverrides or {}
+    if shouldUseBroadFilterKey(ctx) then
+        parts[#parts + 1] = "scope=broad"
+        parts[#parts + 1] = "defaultVanilla=" .. boolToken(filters.expansionDefaults and filters.expansionDefaults.vanilla ~= false)
+        parts[#parts + 1] = "defaultTbc=" .. boolToken(filters.expansionDefaults and filters.expansionDefaults.tbc ~= false)
+        parts[#parts + 1] = "filterGen=" .. tostring(data._recipeFilterGenerationAll or 0)
+        for _, professionKey in ipairs(sortedKeys(overrides)) do
+            appendOverride(parts, professionKey, overrides[professionKey])
+        end
+    else
+        local professionKey = normalizeProfessionKey(ctx.effectiveProfession or ctx.selectedProfession)
+        local visibility = self:GetEffectiveExpansionVisibility(professionKey)
+        local professionGenerations = data._recipeFilterGenerationByProfession or {}
+        parts[#parts + 1] = "scope=profession:" .. tostring(professionKey)
+        parts[#parts + 1] = "vanilla=" .. boolToken(visibility.vanilla ~= false)
+        parts[#parts + 1] = "tbc=" .. boolToken(visibility.tbc ~= false)
+        parts[#parts + 1] = "inherited=" .. boolToken(visibility.inherited == true)
+        parts[#parts + 1] = "filterGen=" .. tostring(professionGenerations[professionKey] or 0)
+    end
+
+    return table.concat(parts, "|")
+end
+
+function RecipeUiFilters:Explain(recipeKey, ctx)
+    local passed, reason = self:RecipePasses(recipeKey, nil, ctx)
+    local metadata = getMetadata()
+    local normalized = metadata and metadata:NormalizeRecipeKey(recipeKey) or nil
+    return {
+        recipeKey = recipeKey,
+        passed = passed,
+        reason = reason,
+        plugin = metadata and "present" or "absent",
+        metadataVersion = metadata and metadata.metadataVersion or nil,
+        spellId = normalized and normalized.spellId or nil,
+        source = normalized and normalized.source or nil,
+    }
+end
+
+function RecipeUiFilters:InvalidateProfessionProjection(professionKey, reason)
+    local normalizedProfession = normalizeProfessionKey(professionKey)
+    if Addon.Data and Addon.Data.InvalidateRecipeListCacheForFilter then
+        Addon.Data:InvalidateRecipeListCacheForFilter(normalizedProfession, reason)
+    elseif Addon.Data and Addon.Data.InvalidateRecipeCaches then
+        Addon.Data:InvalidateRecipeCaches("list")
+    end
+    if Addon.RequestRefresh then
+        Addon:RequestRefresh(reason or ("filters:" .. tostring(normalizedProfession or "all")))
+    end
+end

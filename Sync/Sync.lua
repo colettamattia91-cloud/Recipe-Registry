@@ -29,7 +29,7 @@ local PEER_BACKOFF_SECONDS = 45
 -- broadcast, no inbound serving) for this long so the addon doesn't
 -- compete with WoW's load/reload/zone-change for frame time. Login and
 -- reload have their own values because those events do far more work
--- (item cache priming, guild roster fetch, AtlasLoot warmup, full
+-- (item cache priming, guild roster fetch, metadata warmup, full
 -- profession scan) than a plain zone change.
 local POST_LOGIN_GRACE_SECONDS = 30
 local POST_RELOAD_GRACE_SECONDS = 25

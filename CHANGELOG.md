@@ -2,11 +2,60 @@
 
 All notable changes to this project are documented in this file.
 
-## [Unreleased]
+## [2.1.0] - 2026-06-03
+
+A big quality-of-life release for the recipe browser. Recipe Registry now ships its own recipe knowledge base, so AtlasLoot is no longer needed for categories, reagents, or cost estimates. The browser focuses on TBC content by default, filters can be tweaked per profession, and a friendly banner tells you when something is being hidden from view.
+
+Guild sync also gets a new safety net that keeps stale or mismatched peers from trapping your client in retry loops, and a smarter rescan reminder tells you exactly which profession needs attention — only when it actually does.
+
+### Highlights
+
+- **Built-in recipe knowledge base.** Recipe categories, subcategories, reagents, crafted outputs, and remote-craft eligibility now come from a metadata library shipped with the addon. No AtlasLoot required — and no extra companion addon either.
+- **Smart recipe filters.** A new prefilter system lets you focus on the recipes that matter. The browser now defaults to TBC content; Vanilla can be turned back on globally or per profession from the options panel. Bind-on-Pickup output recipes you don't know are hidden by default to cut down on noise, while your own known crafts stay visible.
+- **Hidden-expansion banner.** When a filter is hiding part of the current profession's recipes, a small banner above the list lets you know — one click reveals them for the rest of the session, without changing your saved filters.
+- **Sidebar categories with real labels.** Profession sidebars now show proper category names and subcategory rows for fast drill-down, all sourced from the new metadata library.
+
+### Improvements
+
+- **Smarter rescan reminder.** Recipe Registry can now tell you when a profession actually needs a rescan — for example, right after you learn a new recipe or step out of an instance — and which profession it is. It stays quiet during ordinary `/reload`s.
+- **Stronger guild sync convergence.** A new safety net tracks specific block versions that keep failing to add new recipes and stops pulling them from any peer, while productive sources continue normally. Stale or mismatched peers can no longer trap your client in retry loops.
+- **Snappier recipe browser.** Applying the new prefilters, switching professions, and refreshing the recipe list now stay responsive even on guilds with broad recipe coverage. Filter changes no longer cause noticeable hitches on large databases.
+- **Recipes that teach across professions.** `/rr clean` now correctly handles items like the Goblin Mortar (an Engineering item that teaches an Alchemy recipe) instead of flagging them as profession mismatches.
+- **Conservative bind-type display.** Newly seen recipes whose item bind type hasn't loaded yet stay visible until the local item cache can confirm them, so brand-new recipes don't briefly disappear from the browser.
+
+### Fixed
+
+- A rare startup race that could leave guild sync blocked until a manual `/reload` if the addon enabled after `PLAYER_LOGIN` had already fired. The player-ready signal is now replayed automatically.
+
+### Removed
+
+- **AtlasLoot is no longer a Recipe Registry dependency.** It is no longer listed in `OptionalDeps`, and the legacy AtlasLoot resolver module is no longer shipped. Existing AtlasLoot installations continue to work normally alongside Recipe Registry — they are just no longer used to power recipe details, categories, or reagent data.
+
+## [2.0.8] - 2026-05-26
+### Changed
+- Switching profession in the left menu is significantly faster, especially on large guild rosters. The recipe list builder now iterates only the slice of the catalog that belongs to the selected profession instead of walking the entire guild index on every click.
+
+## [2.0.7] - 2026-05-23
+### Added
+- Added `/rr share reply` and `/rr share r` to share the selected recipe to a whisper target, preferring the active whisper edit box before falling back to the most recent whisper.
+
+### Changed
+- Recipe sharing now offers only the available Guild, Say, Party, Raid, and Reply channels, with Reply labelled by target when available.
+- Shared recipe messages now use chat-safe plain money text, preserve real item and spell links, and escape plain-text pipe characters.
+- The crafter Ask button is clearer and more consistent with the recipe detail panel.
+
+### Fixed
+- Enchanting and other spell-based local scans no longer store transient profession row indexes when recipe item links are unavailable.
+
+## [2.0.6] - 2026-05-22
 ### Added
 - Added a `Guild Addons` view in the main window that compares the live guild roster with locally observed Recipe Registry peers, using a 30-day "not seen recently" threshold without implying uninstall status.
 - The Guild Addons view now uses a full-width table with top-right search plus sortable and filterable headers for presence, addon visibility, and version checks.
 - Added `/rr adoption` and `/rr addonstatus` diagnostics for a quick roster/addon adoption summary.
+
+## [2.0.5] - 2026-05-22
+### Changed
+- Documentation/licensing: added GuildCrafts acknowledgment and third-party MIT notice.
 
 ## [2.0.4] - 2026-05-21
 ### Changed
