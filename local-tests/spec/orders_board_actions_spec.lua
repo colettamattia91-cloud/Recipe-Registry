@@ -44,10 +44,25 @@ local function specWith(requester, crafter)
     }
 end
 
+-- Returns the toState labels of just the state-machine transition
+-- entries; the action list also surfaces non-transition entries
+-- (e.g. "compose-mail") which this spec ignores deliberately.
 local function labelsOf(actions)
     local out = {}
     for index = 1, #actions do
-        out[index] = actions[index].toState
+        if actions[index].kind == "transition" or actions[index].toState then
+            out[#out + 1] = actions[index].toState
+        end
+    end
+    return out
+end
+
+local function transitionsOf(actions)
+    local out = {}
+    for index = 1, #actions do
+        if actions[index].kind == "transition" or actions[index].toState then
+            out[#out + 1] = actions[index]
+        end
     end
     return out
 end
@@ -83,13 +98,14 @@ Test.it("offers the requester's transitions from Draft", function()
     Test.eq(joinSorted(labelsOf(actions)),
         "Cancelled,MaterialsPartial,MaterialsSent")
 
-    for index = 1, #actions do
-        Test.eq(actions[index].actor, "requester")
-        if actions[index].toState == "Cancelled" then
-            Test.eq(actions[index].destructive, true,
+    local transitions = transitionsOf(actions)
+    for index = 1, #transitions do
+        Test.eq(transitions[index].actor, "requester")
+        if transitions[index].toState == "Cancelled" then
+            Test.eq(transitions[index].destructive, true,
                 "Cancelled must render as destructive (red)")
         else
-            Test.eq(actions[index].destructive, false)
+            Test.eq(transitions[index].destructive, false)
         end
     end
 end)

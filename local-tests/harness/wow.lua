@@ -866,6 +866,26 @@ local function installWowGlobals()
     _G.SetSendMailMoney   = function(_amount) end
     _G.GetSendMailMoney   = function() return 0 end
     _G.GetSendMailCOD     = function() return 0 end
+
+    -- SendMail UI widgets (the production code pre-fills these for
+    -- the Compose action). Bare stubs with a SetText that stores
+    -- into the outgoing struct so tests can assert what would have
+    -- ended up in the boxes.
+    local function makeBox(field)
+        return {
+            SetText = function(_self, value)
+                state.mailbox.outgoing[field] = value
+            end,
+            GetText = function() return state.mailbox.outgoing[field] or "" end,
+        }
+    end
+    _G.SendMailNameEditBox    = makeBox("recipient")
+    _G.SendMailSubjectEditBox = makeBox("subject")
+    _G.SendMailBodyEditBox    = makeBox("body")
+    _G.MailFrameTab2          = {
+        clicked = 0,
+        Click   = function(self) self.clicked = self.clicked + 1 end,
+    }
 end
 
 function Wow.Reset(opts)

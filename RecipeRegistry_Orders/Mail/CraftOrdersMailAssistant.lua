@@ -233,3 +233,62 @@ end
 function Assistant:IsMailboxOpen()
     return self._mailboxOpen == true
 end
+
+-- Pre-fills WoW's SendMail UI (recipient / subject / body) with the
+-- composed batch so the user only needs to drag-and-drop attachments
+-- and click Send. This is the "Compose" UX path — keeps the
+-- attachment flow manual (no bag scan needed) while removing the
+-- copy-paste of subject + body.
+--
+-- Returns true on success or false + reason on failure. Reasons are
+-- explicit so the Board can surface a helpful error: mailbox-closed,
+-- invalid-order, no-shippable-items, send-ui-missing.
+function Assistant:OpenComposer(order, opts)
+    opts = opts or {}
+    if not self:IsMailboxOpen() then return false, "mailbox-closed" end
+
+    local batches = self:PlanBatches(order)
+    if #batches == 0 then return false, "no-shippable-items" end
+
+    -- v1 always composes the first batch. Multi-batch orders need
+    -- the user to come back to the mailbox per batch — the composer
+    -- only stages one mail at a time because the UI can only hold
+    -- one outgoing message.
+    local batchIndex = tonumber(opts.batchIndex) or 1
+    local batch = batches[batchIndex]
+    if not batch then return false, "batch-out-of-range" end
+
+    local mail, err = self:ComposeMail(order, batch)
+    if not mail then return false, err end
+
+    -- Find the SendMail UI globals. Their names are stable across
+    -- the TBC client; defensive nil-checks below mean an addon that
+    -- breaks one of these globals (very rare) downgrades to a no-op
+    -- with a clean error rather than throwing.
+    local sendTab    = _G.MailFrameTab2
+    local nameBox    = _G.SendMailNameEditBox
+    local subjectBox = _G.SendMailSubjectEditBox
+    local bodyBox    = _G.SendMailBodyEditBox
+    if not (subjectBox and bodyBox and nameBox) then
+        return false, "send-ui-missing"
+    end
+
+    if sendTab and type(sendTab.Click) == "function" then
+        sendTab:Click()
+    end
+    if type(nameBox.SetText) == "function" then
+        nameBox:SetText(mail.recipient)
+    end
+    if type(subjectBox.SetText) == "function" then
+        subjectBox:SetText(mail.subject)
+    end
+    if type(bodyBox.SetText) == "function" then
+        bodyBox:SetText(mail.body)
+    end
+    return true, {
+        recipient    = mail.recipient,
+        subject      = mail.subject,
+        batchIndex   = batchIndex,
+        totalBatches = #batches,
+    }
+end

@@ -271,6 +271,16 @@ local DESTRUCTIVE_TRANSITIONS = {
     ReturnPending = true,
 }
 
+-- Order states where offering the requester a "Compose mail" action
+-- still makes sense. Once we're past MaterialsSent the materials
+-- have either arrived or the crafter has taken over the conversation,
+-- so cluttering the strip with a Compose button would be misleading.
+local COMPOSER_ELIGIBLE_STATES = {
+    Draft             = true,
+    MaterialsPartial  = true,
+    MaterialsSent     = true,  -- still relevant for sending a follow-up batch
+}
+
 -- Layout constants for the detail-panel action strip.
 local ACTION_STRIP_HEIGHT = 28
 local ACTION_BUTTON_HEIGHT = 22
@@ -464,6 +474,52 @@ end
 -- changing the test contract. Embeds WoW-style colour escape codes
 -- (|cffXXXXXX...|r) inline for class-coloured player names, quality-
 -- coloured material names, and the provider tag.
+-- Walks the order's ledger and returns warning lines for every batch
+-- slot that carries tamperFlags. Empty when the order has no ledger
+-- entries or all entries are clean. Each flag is grouped by batch and
+-- rendered in red so the warning is visually distinct from the rest
+-- of the detail body. The block is pure-string; the renderer SetText
+-- handles colour escapes via |cffrrggbb...|r the same way other
+-- sections do.
+function Board:FormatTamperWarning(order)
+    if type(order) ~= "table" or type(order.batches) ~= "table" then return {} end
+
+    -- Collect dirty slots in ascending batch order so the output is
+    -- stable across refreshes.
+    local dirtyBatches = {}
+    for batchNumber, slot in pairs(order.batches) do
+        if type(slot) == "table"
+            and type(slot.tamperFlags) == "table"
+            and #slot.tamperFlags > 0 then
+            dirtyBatches[#dirtyBatches + 1] = batchNumber
+        end
+    end
+    if #dirtyBatches == 0 then return {} end
+    table.sort(dirtyBatches)
+
+    local out = {}
+    out[#out + 1] = ""
+    out[#out + 1] = "|cffff5050[!] Tamper detected on this order|r"
+    for index = 1, #dirtyBatches do
+        local batchNumber = dirtyBatches[index]
+        local slot = order.batches[batchNumber]
+        out[#out + 1] = string.format(
+            "%s|cffff5050batch %d:|r %s",
+            INDENT_CONTENT,
+            batchNumber,
+            table.concat(slot.tamperFlags, ", ")
+        )
+        if slot.sender then
+            out[#out + 1] = string.format(
+                "%s%ssender: %s",
+                INDENT_CONTENT, INDENT_FIELD,
+                tostring(slot.sender)
+            )
+        end
+    end
+    return out
+end
+
 function Board:FormatDetailLines(order)
     if not order then return { "No order selected." } end
     local lines = {}
@@ -471,6 +527,16 @@ function Board:FormatDetailLines(order)
     -- Order header: gold "Order" tag + the raw id. Treated as a section
     -- header so it visually matches the Lines / Materials blocks below.
     lines[#lines + 1] = string.format("%s %s", sectionHeader("Order"), tostring(order.id))
+
+    -- Tamper warning band: when any batch ledger entry carries
+    -- tamperFlags, surface them at the top of the detail panel so the
+    -- crafter sees the problem before deciding how to respond. The
+    -- block lists the offending batch + the flag names; the user
+    -- inspects /rrord events for the full payload.
+    local tamperLines = self:FormatTamperWarning(order)
+    for tIndex = 1, #tamperLines do
+        lines[#lines + 1] = tamperLines[tIndex]
+    end
 
     -- Metadata block: indented, grey labels, semantic-coloured values.
     lines[#lines + 1] = string.format("%s%s %s",
@@ -681,12 +747,30 @@ function Board:ComputeActionsForOrder(order)
     for index = 1, #targets do
         local toState = targets[index]
         out[#out + 1] = {
+            kind        = "transition",
             toState     = toState,
             label       = TRANSITION_LABELS[toState] or toState,
             actor       = actor,
             destructive = DESTRUCTIVE_TRANSITIONS[toState] == true,
         }
     end
+
+    -- "Compose mail" is a non-transition action: it doesn't drive
+    -- the state machine, just stages the SendMail UI for the
+    -- current outgoing batch. Surfaced for the requester on any
+    -- pre-receipt state where shipping materials still makes
+    -- sense; the production guard inside MailAssistant:OpenComposer
+    -- catches edge cases (mailbox closed, nothing shippable).
+    if actor == "requester" and COMPOSER_ELIGIBLE_STATES[order.status]
+        and type(order.materials) == "table"
+        and next(order.materials) ~= nil then
+        out[#out + 1] = {
+            kind  = "compose-mail",
+            label = "Compose mail",
+            actor = "requester",
+        }
+    end
+
     return out
 end
 
@@ -705,6 +789,30 @@ function Board:ApplyOrderAction(orderId, toState, actor)
     -- Refresh is a no-op when the panel isn't built (spec case).
     self:Refresh()
     return true
+end
+
+-- Dispatches a click on an action-strip entry to its handler. The
+-- transition path stays on Store:Transition; compose-mail forwards to
+-- MailAssistant:OpenComposer so the SendMail UI is pre-filled. Kept
+-- as a separate method so the spec can exercise both branches without
+-- a panel frame being built.
+function Board:DispatchAction(orderId, entry)
+    if type(entry) ~= "table" then return false, "invalid-entry" end
+    if entry.kind == "compose-mail" then
+        local assistant = Addon.MailAssistant
+        if not (assistant and type(assistant.OpenComposer) == "function") then
+            return false, "mail-assistant-missing"
+        end
+        local store = Addon.Store
+        if not (store and type(store.GetOrder) == "function") then
+            return false, "store-not-ready"
+        end
+        local order = store:GetOrder(orderId)
+        if not order then return false, "unknown-order" end
+        return assistant:OpenComposer(order)
+    end
+    -- Default: state-machine transition.
+    return self:ApplyOrderAction(orderId, entry.toState, entry.actor)
 end
 
 -- Counts the orders where the local player has at least one available
@@ -1137,8 +1245,8 @@ function Board:_AcquireActionButton(index)
     button = buildActionButton(self.panel.actionStrip, ACTION_BUTTON_MIN_WIDTH, ACTION_BUTTON_HEIGHT, "")
     if not button then return nil end
     button:SetScript("OnClick", function(widget)
-        if not (widget._boundOrderId and widget._boundToState and widget._boundActor) then return end
-        Board:ApplyOrderAction(widget._boundOrderId, widget._boundToState, widget._boundActor)
+        if not (widget._boundOrderId and widget._boundEntry) then return end
+        Board:DispatchAction(widget._boundOrderId, widget._boundEntry)
     end)
     self.actionButtons[index] = button
     return button
@@ -1181,8 +1289,7 @@ function Board:_RebindActionButtons(order)
             end
             button.label:SetText(entry.label)
             button._boundOrderId = order and order.id or nil
-            button._boundToState = entry.toState
-            button._boundActor   = entry.actor
+            button._boundEntry   = entry
 
             button:ClearAllPoints()
             button:SetPoint("LEFT", anchor, "LEFT", xOffset, 0)
