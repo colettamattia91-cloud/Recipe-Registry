@@ -30,10 +30,9 @@ local function getOrCreateSummary(index, recipeKey)
     return summary
 end
 
-function Data:InvalidateRecipeOwnershipIndex(reason)
+function Data:InvalidateRecipeOwnershipIndex(_reason)
     self._recipeOwnershipIndex = nil
     self._recipeOwnershipIndexGeneration = (self._recipeOwnershipIndexGeneration or 0) + 1
-    self._recipeOwnershipIndexInvalidatedReason = reason
 end
 
 function Data:BuildRecipeOwnershipIndex()

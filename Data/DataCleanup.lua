@@ -461,11 +461,6 @@ function Data:ScheduleSafeAutoClean(opts)
     return true
 end
 
-function Data:CleanInvalidRecipes()
-    local stats = self:CleanCorruptData({ checkProfessionMismatches = false })
-    return stats.removedRecipes or 0
-end
-
 function Data:WipeDatabase()
     local members = self:GetMembersDB()
     for key in pairs(members) do

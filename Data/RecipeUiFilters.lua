@@ -85,10 +85,6 @@ local function sortedKeys(tbl)
     return keys
 end
 
-function RecipeUiFilters:GetMetadata()
-    return getMetadata()
-end
-
 function RecipeUiFilters:NormalizeProfessionKey(professionKey)
     return normalizeProfessionKey(professionKey)
 end
