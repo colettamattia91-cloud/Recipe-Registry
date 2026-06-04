@@ -1307,6 +1307,26 @@ function Wow.GetBagContents()
     return state.bags or {}
 end
 
+-- Bank helpers. Bank slots in TBC live at bagIDs -1 (main bank) and
+-- 5..11 (bank bag slots). The same GetContainer* surface used by bag
+-- code is reused — Wow.SetBankContents just populates those bag IDs
+-- in the same state.bags table. Production code differentiates by
+-- iterating the bank IDs explicitly when it cares about them.
+function Wow.SetBankContents(bags)
+    state.bags = state.bags or { [0] = {}, [1] = {}, [2] = {}, [3] = {}, [4] = {} }
+    for bagId, contents in pairs(bags or {}) do
+        state.bags[bagId] = deepcopy(contents)
+    end
+end
+
+function Wow.OpenBank()
+    state.bankOpen = true
+end
+
+function Wow.CloseBank()
+    state.bankOpen = false
+end
+
 function Wow.GetCursorItem()
     return state.cursorItem
 end

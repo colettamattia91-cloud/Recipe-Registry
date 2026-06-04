@@ -613,6 +613,15 @@ function CartPanel:OnCheckoutClicked()
     if result and Addon.Board and type(Addon.Board.RefreshTabLabel) == "function" then
         Addon.Board:RefreshTabLabel()
     end
+    -- Auto-open the Shopping window on a successful checkout so the
+    -- user immediately sees the aggregated materials to gather (the
+    -- floating window is parented to UIParent and survives RR's main
+    -- frame closing, so they can walk away to the AH / bank with it
+    -- still visible).
+    if result and #result.created > 0
+        and Addon.ShoppingWindow and type(Addon.ShoppingWindow.Show) == "function" then
+        Addon.ShoppingWindow:Show()
+    end
     -- Auto-close the panel on a fully-successful checkout: the cart is
     -- now empty, the orders are visible in the Board, so the cart UI
     -- no longer has anything to show. On partial failure stay open

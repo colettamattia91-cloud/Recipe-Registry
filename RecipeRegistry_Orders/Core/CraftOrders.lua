@@ -208,6 +208,16 @@ function Addon:OnEnable()
     if self.Mailbox and self.Mailbox.OnEnable then
         self.Mailbox:OnEnable()
     end
+
+    -- Shopping list (§9.1): subscribe to BANKFRAME_OPENED for the
+    -- bank-snapshot cache, and to CraftOrders:Changed so the window
+    -- (if open) re-renders live as orders mutate.
+    if self.Shopping and self.Shopping.OnEnable then
+        self.Shopping:OnEnable()
+    end
+    if self.ShoppingWindow and self.ShoppingWindow.OnEnable then
+        self.ShoppingWindow:OnEnable()
+    end
 end
 
 local function splitCommand(text)
@@ -234,6 +244,7 @@ local function printHelp(self)
     self:Print("/rrord events [id|prefix] [limit]  - inspect the event log")
     self:Print("/rrord sync                  - dump sync protocol + runtime telemetry")
     self:Print("/rrord mail [scan|status|plan <id>] - mailbox scanner + outgoing planner")
+    self:Print("/rrord shopping              - toggle the aggregated materials window")
     self:Print("/rrord delete <id|prefix>    - delete a draft order")
 end
 
@@ -835,6 +846,14 @@ function Addon:SlashHandler(input)
     end
     if cmd == "mail" then
         cmdMail(self, rest)
+        return
+    end
+    if cmd == "shopping" or cmd == "shop" then
+        if self.ShoppingWindow and self.ShoppingWindow.Toggle then
+            self.ShoppingWindow:Toggle()
+        else
+            self:Print("Shopping window unavailable.")
+        end
         return
     end
 

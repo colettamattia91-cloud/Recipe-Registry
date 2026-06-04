@@ -94,6 +94,7 @@ $activeAllSpecs = @(
     "orders_phase6_reducer_spec.lua",
     "orders_phase6_runtime_spec.lua",
     "orders_postal_compat_spec.lua",
+    "orders_shopping_aggregation_spec.lua",
     "orders_reducer_change_broadcast_spec.lua",
     "orders_store_ledger_spec.lua",
     "p4_scan_opportunistic_spec.lua",

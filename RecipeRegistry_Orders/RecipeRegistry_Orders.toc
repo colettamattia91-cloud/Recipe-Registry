@@ -19,6 +19,7 @@ Store\CraftOrdersStore.lua
 Planner\CraftOrdersPlanner.lua
 Cart\CraftOrdersCart.lua
 Mail\CraftOrdersBagScan.lua
+Shopping\CraftOrdersShopping.lua
 Mail\CraftOrdersMailMarker.lua
 Mail\CraftOrdersMailAssistant.lua
 Mail\CraftOrdersMailScanner.lua
@@ -31,3 +32,4 @@ Sync\CraftOrdersDiagnostics.lua
 UI\CraftOrdersBoard.lua
 UI\CraftOrdersOrderDialog.lua
 UI\CraftOrdersCartPanel.lua
+UI\CraftOrdersShoppingWindow.lua

@@ -227,6 +227,7 @@ Loader.OrdersFiles = {
     "RecipeRegistry_Orders/Planner/CraftOrdersPlanner.lua",
     "RecipeRegistry_Orders/Cart/CraftOrdersCart.lua",
     "RecipeRegistry_Orders/Mail/CraftOrdersBagScan.lua",
+    "RecipeRegistry_Orders/Shopping/CraftOrdersShopping.lua",
     "RecipeRegistry_Orders/Mail/CraftOrdersMailMarker.lua",
     "RecipeRegistry_Orders/Mail/CraftOrdersMailAssistant.lua",
     "RecipeRegistry_Orders/Mail/CraftOrdersMailScanner.lua",
@@ -239,6 +240,7 @@ Loader.OrdersFiles = {
     "RecipeRegistry_Orders/UI/CraftOrdersBoard.lua",
     "RecipeRegistry_Orders/UI/CraftOrdersOrderDialog.lua",
     "RecipeRegistry_Orders/UI/CraftOrdersCartPanel.lua",
+    "RecipeRegistry_Orders/UI/CraftOrdersShoppingWindow.lua",
 }
 
 -- Loads the RecipeRegistry_Orders plugin chunks on top of whatever RR state
