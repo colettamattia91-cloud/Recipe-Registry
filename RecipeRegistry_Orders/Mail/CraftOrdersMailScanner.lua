@@ -69,7 +69,11 @@ function Scanner:ScanInbox(opts)
         realm = _G.GetRealmName()
     end
 
-    local total = tonumber(_G.GetInboxNumItems()) or 0
+    -- WoW's GetInboxNumItems returns (numItems, totalItems) on TBC;
+    -- tonumber would otherwise eat the second return as its `base`
+    -- arg and throw "base out of range". Capture into a local first.
+    local inboxCount = _G.GetInboxNumItems()
+    local total = tonumber(inboxCount) or 0
     for index = 1, total do
         local _, _, rawSender, subject = _G.GetInboxHeaderInfo(index)
         local body = type(_G.GetInboxText) == "function"

@@ -761,7 +761,16 @@ local function installWowGlobals()
     -- reads/writes the same state via the WoW-compatible globals.
     local function mb() return state.mailbox end
     _G.HasNewMail        = function() return #mb().inbox > 0 end
-    _G.GetInboxNumItems  = function() return #mb().inbox end
+    -- TBC returns (numItems, totalItems): the second value is the
+    -- "total mails the server holds" including ones not yet paged in.
+    -- Caller code that does tonumber(GetInboxNumItems()) used to
+    -- crash with "base out of range" because Lua forwarded the
+    -- second return as tonumber's `base` argument. Mirror the real
+    -- signature so the harness catches the regression.
+    _G.GetInboxNumItems  = function()
+        local n = #mb().inbox
+        return n, n
+    end
     _G.GetInboxHeaderInfo = function(index)
         local mail = mb().inbox[index]
         if not mail then return nil end
