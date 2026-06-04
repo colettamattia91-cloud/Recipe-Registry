@@ -6,8 +6,9 @@
 -- Actions render as either:
 --   - icon button (18x18) when spec.icon is set; or
 --   - text button (Ask-style, dark+gold) when spec.text is set.
--- Buttons stack to the LEFT of the existing favorite button at the
--- top-right of the detail panel. spec.text wins when both are set.
+-- Buttons stack to the LEFT of the Share button (which itself sits
+-- to the LEFT of the favorite star) at the top-right of the detail
+-- panel. spec.text wins when both are set.
 --
 -- The contract is documented in docs/recipe-registry-public-api.md.
 
@@ -219,10 +220,12 @@ end
 
 -- Called from RefreshDetailPanel each render so the visible / enabled
 -- state stays in sync with the current recipe. Anchors actions in
--- registration order, growing left from the favorite button. Also
--- shrinks the detail title button's right edge to terminate at the
--- leftmost realized action, so the title's clickable area doesn't
--- extend behind the action icons and steal their hover tooltip.
+-- registration order, growing left from the supplied rightmostAnchor
+-- (the Share button in production, falling back to the favorite star
+-- if Share isn't built). Also shrinks the detail title button's
+-- right edge to terminate at the leftmost realized action, so the
+-- title's clickable area doesn't extend behind the action icons and
+-- steal their hover tooltip.
 function UI:RealizeRecipeActions(parent, rightmostAnchor)
     ensureRegistry()
     if not parent then return end

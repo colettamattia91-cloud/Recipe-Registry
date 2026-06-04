@@ -4064,7 +4064,8 @@ function UI:RefreshDetailPanel()
         setButtonEnabledIfChanged(self.frame.detailShareButton, false)
         -- Hide any plugin-registered recipe-action buttons too.
         if self.RealizeRecipeActions then
-            self:RealizeRecipeActions(self.frame.right or self.frame, self.frame.detailFavoriteButton)
+            self:RealizeRecipeActions(self.frame.right or self.frame,
+                self.frame.detailShareButton or self.frame.detailFavoriteButton)
         end
         if self.frame.detailTooltip then
             self.frame.detailTooltip:Hide()
@@ -4121,10 +4122,14 @@ function UI:RefreshDetailPanel()
     setButtonEnabledIfChanged(self.frame.detailShareButton, true)
 
     -- Render any sibling-addon-provided per-recipe action buttons,
-    -- anchored to the LEFT of the favorite button. Implemented in
-    -- UI/RecipeActions.lua as a strictly-additive hook.
+    -- anchored to the LEFT of the Share button (which itself sits to
+    -- the LEFT of the favorite star). Anchoring on Share keeps plugin
+    -- buttons from overlapping it; falls back to the favorite button
+    -- when Share isn't built (defensive — production always builds it).
+    -- Implemented in UI/RecipeActions.lua as a strictly-additive hook.
     if self.RealizeRecipeActions then
-        self:RealizeRecipeActions(self.frame.right or self.frame, self.frame.detailFavoriteButton)
+        self:RealizeRecipeActions(self.frame.right or self.frame,
+            self.frame.detailShareButton or self.frame.detailFavoriteButton)
     end
 
     local subtitleParts = {}
