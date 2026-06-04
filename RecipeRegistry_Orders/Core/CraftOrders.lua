@@ -185,8 +185,8 @@ function Addon:OnEnable()
     if rrHost and rrHost.UI and type(rrHost.UI.RegisterRecipeAction) == "function" and self.OrderDialog then
         rrHost.UI:RegisterRecipeAction({
             id    = "order",
-            label = "Add to order cart",
-            icon  = "Interface\\Icons\\INV_Misc_Bag_08",
+            label = "Add this recipe to your order cart",
+            text  = "Add to cart",
             onClick = function(recipeKey, info)
                 Addon.OrderDialog:Open(recipeKey, info)
             end,

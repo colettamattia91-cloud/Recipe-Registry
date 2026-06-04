@@ -265,9 +265,11 @@ end
 -- / Guild Addons / Craft Orders / ...) so it's reachable from any tab
 -- without overlapping content. Uses our custom stylized-cart TGA
 -- (Assets/cart-icon) re-tinted gold so it matches the Ask-button family.
-local CART_TOGGLE_SIZE     = 22
-local CART_TOGGLE_INSET    = 18
+local CART_TOGGLE_HEIGHT   = 22
+local CART_TOGGLE_ICON_W   = 16
 local CART_TOGGLE_OFFSET_X = -4
+local CART_TOGGLE_MIN_W    = 70
+local CART_TOGGLE_PAD_X    = 8
 local CART_ICON_TEXTURE    = "Interface\\AddOns\\RecipeRegistry_Orders\\UI\\Assets\\cart-icon"
 
 function CartPanel:BuildToggle()
@@ -282,23 +284,27 @@ function CartPanel:BuildToggle()
     local anchorOffsetY = host.mainNav and 0 or -6
 
     local toggle = CreateFrame("Button", "RecipeRegistry_OrdersCartToggle", host, "BackdropTemplate")
-    toggle:SetSize(CART_TOGGLE_SIZE, CART_TOGGLE_SIZE)
+    toggle:SetSize(CART_TOGGLE_MIN_W, CART_TOGGLE_HEIGHT)
     toggle:SetPoint("RIGHT", anchor, anchorPoint, CART_TOGGLE_OFFSET_X, anchorOffsetY)
     toggle:SetFrameLevel((host:GetFrameLevel() or 0) + 5)
     applyPanelBackdrop(toggle)
 
+    -- Layout: [ icon ][ "Cart" ][ "(N)" when N > 0 ]
+    -- The icon stays small on the left; the label sits to its right.
+    -- The count appears as part of the label string ("Cart" vs "Cart (3)")
+    -- so the widget width responds to content without a second fontstring.
     toggle.icon = toggle:CreateTexture(nil, "ARTWORK")
-    toggle.icon:SetSize(CART_TOGGLE_INSET, CART_TOGGLE_INSET)
-    toggle.icon:SetPoint("CENTER")
+    toggle.icon:SetSize(CART_TOGGLE_ICON_W, CART_TOGGLE_ICON_W)
+    toggle.icon:SetPoint("LEFT", 4, 0)
     toggle.icon:SetTexture(CART_ICON_TEXTURE)
     toggle.icon:SetVertexColor(1.0, 0.82, 0.0, 1.0)
 
-    -- Badge fontstring sits in the bottom-right of the icon and shows
-    -- the line count when > 0. Hidden when the cart is empty so the
-    -- button stays clean.
-    toggle.badge = toggle:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    toggle.badge:SetPoint("BOTTOMRIGHT", toggle, "BOTTOMRIGHT", 1, -1)
-    toggle.badge:SetTextColor(1.0, 0.92, 0.45)
+    toggle.label = toggle:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    toggle.label:SetPoint("LEFT", toggle.icon, "RIGHT", 4, 0)
+    toggle.label:SetPoint("RIGHT", -CART_TOGGLE_PAD_X / 2, 0)
+    toggle.label:SetJustifyH("LEFT")
+    toggle.label:SetTextColor(1.0, 0.92, 0.75)
+    toggle.label:SetText("Cart")
 
     toggle:SetScript("OnEnter", function(widget)
         widget:SetBackdropBorderColor(1.00, 0.82, 0.00, 0.95)
@@ -329,8 +335,14 @@ end
 function CartPanel:RefreshToggle()
     if not self.toggle then return end
     local count = Addon.Cart and Addon.Cart:CountLines() or 0
-    if self.toggle.badge and self.toggle.badge.SetText then
-        self.toggle.badge:SetText(count > 0 and tostring(count) or "")
+    if self.toggle.label and self.toggle.label.SetText then
+        self.toggle.label:SetText(count > 0 and string.format("Cart (%d)", count) or "Cart")
+    end
+    -- Resize to fit the rendered label so "Cart (12)" doesn't clip.
+    if self.toggle.label and self.toggle.label.GetStringWidth then
+        local textWidth = self.toggle.label:GetStringWidth() or 0
+        local needed = CART_TOGGLE_ICON_W + 8 + math.ceil(textWidth) + CART_TOGGLE_PAD_X
+        self.toggle:SetWidth(math.max(CART_TOGGLE_MIN_W, needed))
     end
 end
 

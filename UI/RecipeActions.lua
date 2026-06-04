@@ -1,10 +1,13 @@
 -- Per-recipe action registry for RecipeRegistry's detail panel.
 --
 -- A strictly-additive public API that lets sibling addons (notably
--- RecipeRegistry_Orders for "add to order cart") plug their own icon
+-- RecipeRegistry_Orders for "add to order cart") plug their own
 -- button into the recipe detail panel without touching internals.
--- Actions are rendered as 18x18 icon buttons stacked to the LEFT of
--- the existing favorite button at the top-right of the detail panel.
+-- Actions render as either:
+--   - icon button (18x18) when spec.icon is set; or
+--   - text button (Ask-style, dark+gold) when spec.text is set.
+-- Buttons stack to the LEFT of the existing favorite button at the
+-- top-right of the detail panel. spec.text wins when both are set.
 --
 -- The contract is documented in docs/recipe-registry-public-api.md.
 
@@ -26,6 +29,7 @@ local function validateSpec(spec)
     if type(spec.id) ~= "string" or spec.id == "" then return "missing-id" end
     if type(spec.label) ~= "string" or spec.label == "" then return "missing-label" end
     if spec.icon ~= nil and type(spec.icon) ~= "string" then return "invalid-icon" end
+    if spec.text ~= nil and type(spec.text) ~= "string" then return "invalid-text" end
     if spec.onClick ~= nil and type(spec.onClick) ~= "function" then return "invalid-onclick" end
     if spec.isVisible ~= nil and type(spec.isVisible) ~= "function" then return "invalid-isvisible" end
     if spec.isEnabled ~= nil and type(spec.isEnabled) ~= "function" then return "invalid-isenabled" end
@@ -46,6 +50,7 @@ function UI:RegisterRecipeAction(spec)
         id        = spec.id,
         label     = spec.label,
         icon      = spec.icon,
+        text      = spec.text,
         onClick   = spec.onClick,
         isVisible = spec.isVisible,
         isEnabled = spec.isEnabled,
@@ -107,6 +112,41 @@ end
 -- panel's right-hand frame. Anchored to the LEFT of the previous
 -- right-anchored element (favorite button or the previous action).
 -- Idempotent: an already-realized button is reused.
+-- Builds an "Ask-style" text button: dark fill, gold edge, gold-tinted
+-- label and hover. Kept local to RecipeActions because the only other
+-- callers of that visual family live in the sibling plugin (cart
+-- panel + board action strip), where they already roll their own.
+local TEXT_BUTTON_BACKDROP = {
+    bgFile   = "Interface\\Buttons\\WHITE8x8",
+    edgeFile = "Interface\\Buttons\\WHITE8x8",
+    edgeSize = 1,
+}
+
+local function styleAsTextButton(button, label)
+    button:SetSize(80, 18)
+    if button.SetBackdrop then
+        button:SetBackdrop(TEXT_BUTTON_BACKDROP)
+        button:SetBackdropColor(0.13, 0.11, 0.08, 0.95)
+        button:SetBackdropBorderColor(1, 0.82, 0, 0.75)
+    end
+    if not button.textLabel then
+        button.textLabel = button:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        button.textLabel:SetPoint("LEFT", 4, 0)
+        button.textLabel:SetPoint("RIGHT", -4, 0)
+        button.textLabel:SetJustifyH("CENTER")
+    end
+    button.textLabel:SetText(label or "")
+    button.textLabel:SetTextColor(1.0, 0.92, 0.75)
+    if button.SetHighlightTexture then
+        button:SetHighlightTexture("Interface\\Buttons\\WHITE8x8", "ADD")
+        local hi = button:GetHighlightTexture()
+        if hi and hi.SetVertexColor then hi:SetVertexColor(1, 0.82, 0, 0.18) end
+    end
+    -- Width: measure label, then add padding floor.
+    local textWidth = button.textLabel:GetStringWidth() or 0
+    button:SetWidth(math.max(60, math.ceil(textWidth) + 16))
+end
+
 function UI:_RealizeRecipeAction(id, parent, rightAnchor)
     local registry = ensureRegistry()
     local spec = registry[id]
@@ -115,8 +155,7 @@ function UI:_RealizeRecipeAction(id, parent, rightAnchor)
     local button = UI.__recipeActionButtons[id]
     if not button then
         if not CreateFrame then return nil end
-        button = CreateFrame("Button", nil, parent)
-        button:SetSize(18, 18)
+        button = CreateFrame("Button", nil, parent, "BackdropTemplate")
         button:RegisterForClicks("LeftButtonUp")
         button.icon = button:CreateTexture(nil, "ARTWORK")
         button.icon:SetAllPoints()
@@ -148,9 +187,24 @@ function UI:_RealizeRecipeAction(id, parent, rightAnchor)
     end
 
     button.actionId = id
-    if spec.icon and button.icon and button.icon.SetTexture then
-        button.icon:SetTexture(spec.icon)
-        button.icon:SetVertexColor(1, 1, 1, 1)
+
+    -- spec.text takes precedence: when set, render as a labelled
+    -- Ask-style button and hide the icon texture so the two visual
+    -- modes never bleed into each other (re-registration may flip
+    -- mode at runtime).
+    if spec.text and spec.text ~= "" then
+        if button.icon and button.icon.SetTexture then
+            button.icon:SetTexture(nil)
+        end
+        styleAsTextButton(button, spec.text)
+    else
+        button:SetSize(18, 18)
+        if button.SetBackdrop then button:SetBackdrop(nil) end
+        if button.textLabel then button.textLabel:SetText("") end
+        if spec.icon and button.icon and button.icon.SetTexture then
+            button.icon:SetTexture(spec.icon)
+            button.icon:SetVertexColor(1, 1, 1, 1)
+        end
     end
 
     button:ClearAllPoints()
