@@ -407,7 +407,3 @@ function Sync:IsValidSyncMemberKey(memberKey)
         and memberKey:find("-", 1, true) ~= nil
 end
 
-function Sync:IsLocallyStaleOwner(ownerCharacter)
-    local entry = Addon.Data and Addon.Data.GetMember and Addon.Data:GetMember(ownerCharacter) or nil
-    return entry and (entry.guildStatus or "active") ~= "active" or false
-end

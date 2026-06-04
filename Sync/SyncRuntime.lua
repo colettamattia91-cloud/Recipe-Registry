@@ -1329,9 +1329,20 @@ function Sync:ScheduleHello(reason, delay)
     return true
 end
 
+-- Generates a "<selfKey>:<epoch>:<counter>" id that's unique within
+-- this session even if the system clock is unstable. Used for both
+-- hello-cycle ids and seed-session ids; counters are caller-owned so
+-- the two id namespaces stay independent.
+local function makeSessionScopedId(self, counter)
+    return string.format("%s:%d:%d",
+        tostring(self:GetSelfKey() or "unknown"),
+        tonumber(time() or 0) or 0,
+        counter)
+end
+
 function Sync:BeginHelloCycle(reason)
     self.helloCycleCounter = (self.helloCycleCounter or 0) + 1
-    local helloId = string.format("%s:%d:%d", tostring(self:GetSelfKey() or "unknown"), tonumber(time() or 0) or 0, self.helloCycleCounter)
+    local helloId = makeSessionScopedId(self, self.helloCycleCounter)
     if self._helloCycleTimer then
         self:CancelTimer(self._helloCycleTimer, true)
         self._helloCycleTimer = nil
@@ -1524,7 +1535,7 @@ function Sync:StartOutboundSeedSession(cycle, selected, reason)
 
     self._seedSessionCounter = (self._seedSessionCounter or 0) + 1
     self.outboundSeedSession = {
-        sessionId = string.format("%s:%d:%d", tostring(self:GetSelfKey() or "unknown"), tonumber(time() or 0) or 0, self._seedSessionCounter),
+        sessionId = makeSessionScopedId(self, self._seedSessionCounter),
         seedKey = selected.peerKey,
         cycleId = cycle.cycleId,
         helloId = cycle.helloId,

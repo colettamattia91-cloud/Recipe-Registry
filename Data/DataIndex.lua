@@ -120,6 +120,31 @@ local function buildFingerprint(prefix, content)
     return string.format("%s:%s", prefix, hashString(content))
 end
 
+-- "bf3:<count>:<hash>" is the canonical block fingerprint shape. Two
+-- call sites used to format this literal; hoisting the format keeps
+-- the schema string in one place so a future bump from bf3 to bf4
+-- is a single-line change.
+local function formatBlockFingerprint(contentKeys)
+    return string.format("bf3:%d:%s",
+        #contentKeys, buildFingerprint("bf3", table.concat(contentKeys, "|")))
+end
+
+-- "gf3:<owners>:<blocks>:<contents>:<hash>" — the global fingerprint
+-- shape. Both call sites build the same `key=value` parts list joined
+-- by '|', they only differ in where they read the block count from
+-- (cached vs literal #blockKeys). Keeping that as a parameter rather
+-- than collapsing the two call sites preserves the intentional
+-- difference noted in the BuildGlobalFingerprint comment.
+local function formatGlobalFingerprint(activeOwnerCount, blockCount, activeContentCount, parts)
+    return string.format(
+        "gf3:%d:%d:%d:%s",
+        tonumber(activeOwnerCount or 0) or 0,
+        tonumber(blockCount or 0) or 0,
+        tonumber(activeContentCount or 0) or 0,
+        buildFingerprint("gf3", table.concat(parts, "|"))
+    )
+end
+
 local function buildRosterState(self, reason)
     local state = self.GetRosterPreflightState and self:GetRosterPreflightState() or nil
     if type(state) == "table" then
@@ -279,14 +304,13 @@ local function buildBlockRecord(self, memberKey, professionKey, profession)
         return nil
     end
     local contentKeys = buildContentKeysForProfession(self, profession)
-    local joined = table.concat(contentKeys, "|")
     return {
         blockKey = blockKey,
         ownerCharacter = memberKey,
         professionKey = professionKey,
         sortedContentKeys = contentKeys,
         contentCount = #contentKeys,
-        blockFingerprint = string.format("bf3:%d:%s", #contentKeys, buildFingerprint("bf3", joined)),
+        blockFingerprint = formatBlockFingerprint(contentKeys),
         builtAt = time(),
     }
 end
@@ -402,14 +426,11 @@ local function rebuildGlobalFingerprint(state, cache, reason)
         local block = cache.blocks and cache.blocks[blockKey] or nil
         parts[#parts + 1] = string.format("%s=%s", tostring(blockKey), tostring(block and block.blockFingerprint or ""))
     end
-    local payload = table.concat(parts, "|")
-    cache.globalFingerprint = string.format(
-        "gf3:%d:%d:%d:%s",
-        tonumber(cache.activeOwnerCount or 0) or 0,
-        tonumber(cache.activeBlockCount or 0) or 0,
-        tonumber(cache.activeContentCount or 0) or 0,
-        buildFingerprint("gf3", payload)
-    )
+    cache.globalFingerprint = formatGlobalFingerprint(
+        cache.activeOwnerCount,
+        cache.activeBlockCount,
+        cache.activeContentCount,
+        parts)
     cache.globalFingerprintDirty = false
     state.lastGlobalFingerprintAt = time()
     state.lastGlobalFingerprintReason = tostring(reason or "global-fingerprint")
@@ -935,8 +956,7 @@ function Data:BuildBlockContentKeys(blockKey)
 end
 
 function Data:BuildBlockFingerprint(blockKey)
-    local contentKeys = self:BuildBlockContentKeys(blockKey)
-    return string.format("bf3:%d:%s", #contentKeys, buildFingerprint("bf3", table.concat(contentKeys, "|")))
+    return formatBlockFingerprint(self:BuildBlockContentKeys(blockKey))
 end
 
 function Data:RefreshSyncBlockRecord(blockKey, reason)
@@ -975,13 +995,11 @@ function Data:BuildGlobalFingerprint(index)
         local block = blocks[blockKey]
         parts[#parts + 1] = string.format("%s=%s", tostring(blockKey), tostring(block and block.blockFingerprint or ""))
     end
-    return string.format(
-        "gf3:%d:%d:%d:%s",
-        tonumber(index and index.activeOwnerCount or 0) or 0,
+    return formatGlobalFingerprint(
+        index and index.activeOwnerCount,
         #blockKeys,
-        tonumber(index and index.activeContentCount or 0) or 0,
-        buildFingerprint("gf3", table.concat(parts, "|"))
-    )
+        index and index.activeContentCount,
+        parts)
 end
 
 function Data:BuildLocalSummary(opts)
