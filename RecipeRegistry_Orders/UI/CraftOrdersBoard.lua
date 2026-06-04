@@ -271,6 +271,17 @@ local DESTRUCTIVE_TRANSITIONS = {
     ReturnPending = true,
 }
 
+-- Target states that are now driven automatically by the mail flow
+-- (MAIL_SEND_SUCCESS -> Mailbox:AutoAdvanceMaterialsState). The action
+-- strip used to expose these as manual buttons but that was confusing:
+-- the user had to click "Mark materials sent" *after* already clicking
+-- Send in the in-game mail UI. Hidden here so the strip only surfaces
+-- transitions the user actually drives themselves.
+local SYSTEM_MANAGED_TRANSITIONS = {
+    MaterialsPartial = true,
+    MaterialsSent    = true,
+}
+
 -- Order states where offering the requester a "Compose mail" action
 -- still makes sense. Once we're past MaterialsSent the materials
 -- have either arrived or the crafter has taken over the conversation,
@@ -482,6 +493,33 @@ end
 -- changing the test contract. Embeds WoW-style colour escape codes
 -- (|cffXXXXXX...|r) inline for class-coloured player names, quality-
 -- coloured material names, and the provider tag.
+-- Renders the materials-shipment progress as a single indented field
+-- line ("Shipments: 2 of 3 batches sent") when at least one batch has
+-- been sent. Returns nil when nothing has shipped yet so the detail
+-- panel stays compact on fresh Draft orders. Total comes from a fresh
+-- PlanBatches call; sent count is anything in order.batches[n] with a
+-- sentAt stamp (a marker that RecordBatchSent writes on
+-- MAIL_SEND_SUCCESS).
+function Board:FormatShipmentProgressLine(order)
+    if type(order) ~= "table" or type(order.batches) ~= "table" then return nil end
+
+    local sentCount = 0
+    for _, slot in pairs(order.batches) do
+        if slot and slot.sentAt then sentCount = sentCount + 1 end
+    end
+    if sentCount == 0 then return nil end
+
+    local totalLabel = "?"
+    local assistant = Addon.MailAssistant
+    if assistant and type(assistant.PlanBatches) == "function" then
+        local batches = assistant:PlanBatches(order)
+        if #batches > 0 then totalLabel = tostring(#batches) end
+    end
+
+    return string.format("%s%s %d of %s batch(es) sent",
+        INDENT_FIELD, fieldLabel("Shipments:"), sentCount, totalLabel)
+end
+
 -- Walks the order's ledger and returns warning lines for every batch
 -- slot that carries tamperFlags. Empty when the order has no ledger
 -- entries or all entries are clean. Each flag is grouped by batch and
@@ -558,6 +596,11 @@ function Board:FormatDetailLines(order)
         self:ColorizeByClass(order.crafter, formatPlayerKey(order.crafter)))
     lines[#lines + 1] = string.format("%s%s %s",
         INDENT_FIELD, fieldLabel("Delivery:"), tostring(order.deliveryMode))
+
+    local shipmentLine = self:FormatShipmentProgressLine(order)
+    if shipmentLine then
+        lines[#lines + 1] = shipmentLine
+    end
 
     if order.lines and #order.lines > 0 then
         lines[#lines + 1] = ""
@@ -760,13 +803,18 @@ function Board:ComputeActionsForOrder(order)
     local out = {}
     for index = 1, #targets do
         local toState = targets[index]
-        out[#out + 1] = {
-            kind        = "transition",
-            toState     = toState,
-            label       = TRANSITION_LABELS[toState] or toState,
-            actor       = actor,
-            destructive = DESTRUCTIVE_TRANSITIONS[toState] == true,
-        }
+        -- Skip materials phases the mail flow now drives automatically.
+        -- Users still see the resulting state in the detail panel, but
+        -- never need to click a button to advance into it.
+        if not SYSTEM_MANAGED_TRANSITIONS[toState] then
+            out[#out + 1] = {
+                kind        = "transition",
+                toState     = toState,
+                label       = TRANSITION_LABELS[toState] or toState,
+                actor       = actor,
+                destructive = DESTRUCTIVE_TRANSITIONS[toState] == true,
+            }
+        end
     end
 
     -- "Compose mail" is a non-transition action: it doesn't drive

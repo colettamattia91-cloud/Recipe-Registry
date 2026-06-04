@@ -74,12 +74,15 @@ Test.it("RecordBatchSent emits an OrderUpdated{change=batch-sent} event", functi
     Test.eq(match.payload.batchNumber, 1)
 end)
 
-Test.it("RecordBatchSent does not advance the order's status", function()
+Test.it("RecordBatchSent alone does not advance the order's status", function()
+    -- RecordBatchSent is the pure ledger write; the lifecycle bump
+    -- lives in Mailbox:OnMailSendSuccess so callers who don't go
+    -- through the mail flow (e.g. future manual-trade entrypoint)
+    -- can record without triggering it.
     local plugin = freshPlugin()
     local order = draftOrder(plugin)
     plugin.Store:RecordBatchSent(order.id, 1, { recipient = "Bob-TestRealm", items = {} })
-    Test.eq(plugin.Store:GetOrder(order.id).status, "Draft",
-        "the requester still manually transitions Draft -> MaterialsSent")
+    Test.eq(plugin.Store:GetOrder(order.id).status, "Draft")
 end)
 
 Test.it("Compose stages a pending send that ConsumePendingSend returns once", function()
@@ -133,4 +136,83 @@ Test.it("Mailbox:OnMailSendSuccess is a no-op when there's no pending send", fun
     local ok, err = plugin.Mailbox:OnMailSendSuccess()
     Test.eq(ok, nil)
     Test.eq(err, "no-pending-send")
+end)
+
+Test.it("OnMailSendSuccess auto-advances Draft -> MaterialsSent for a single-batch order", function()
+    -- One small order fits in a single batch. After the user clicks
+    -- Send in WoW and MAIL_SEND_SUCCESS fires, the order should
+    -- advance to MaterialsSent without the user manually clicking
+    -- the now-removed "Mark materials sent" button.
+    local plugin = freshPlugin()
+    local order = draftOrder(plugin)
+    plugin.MailAssistant:SetMailboxOpen(true)
+    Test.truthy(plugin.Board:DispatchAction(order.id, { kind = "compose-mail" }))
+    plugin.Mailbox:OnMailSendSuccess()
+    Test.eq(plugin.Store:GetOrder(order.id).status, "MaterialsSent",
+        "single-batch send should advance straight to MaterialsSent")
+end)
+
+Test.it("OnMailSendSuccess auto-advances Draft -> MaterialsPartial when more batches remain", function()
+    -- A multi-batch order: synthesize a pending descriptor that
+    -- claims totalBatches = 3 so the first SendSuccess credits
+    -- batch 1 and the auto-advance sees 1 of 3 sent.
+    local plugin = freshPlugin()
+    local order = draftOrder(plugin)
+    plugin.MailAssistant._pendingSend = {
+        orderId      = order.id,
+        batchIndex   = 1,
+        totalBatches = 3,
+        recipient    = "Bob-TestRealm",
+        items        = { [2447] = 1 },
+        expiresAt    = (time and time() or 0) + 60,
+    }
+    plugin.Mailbox:OnMailSendSuccess()
+    Test.eq(plugin.Store:GetOrder(order.id).status, "MaterialsPartial",
+        "first of 3 batches should drop the order into MaterialsPartial")
+end)
+
+Test.it("OnMailSendSuccess advances MaterialsPartial -> MaterialsSent on the last batch", function()
+    local plugin = freshPlugin()
+    local order = draftOrder(plugin)
+    -- Stamp two batches as already sent (simulating two earlier
+    -- compose+send rounds) and move the order to MaterialsPartial,
+    -- mirroring what AutoAdvance would have done.
+    plugin.Store:RecordBatchSent(order.id, 1, { recipient = "Bob-TestRealm", items = {} })
+    plugin.Store:RecordBatchSent(order.id, 2, { recipient = "Bob-TestRealm", items = {} })
+    plugin.Store:Transition(order.id, "MaterialsPartial", "requester")
+
+    plugin.MailAssistant._pendingSend = {
+        orderId      = order.id,
+        batchIndex   = 3,
+        totalBatches = 3,
+        recipient    = "Bob-TestRealm",
+        items        = { [2447] = 1 },
+        expiresAt    = (time and time() or 0) + 60,
+    }
+    plugin.Mailbox:OnMailSendSuccess()
+    Test.eq(plugin.Store:GetOrder(order.id).status, "MaterialsSent",
+        "third of 3 batches should advance the order to MaterialsSent")
+end)
+
+Test.it("OnMailSendSuccess never moves the order back to MaterialsPartial once it's past it", function()
+    -- Defensive: if for some reason a follow-up send fires after the
+    -- order has already moved to a downstream state, the auto-advance
+    -- should NOT regress the state. Only Draft and MaterialsPartial
+    -- are valid starting points.
+    local plugin = freshPlugin()
+    local order = draftOrder(plugin)
+    plugin.Store:Transition(order.id, "MaterialsSent", "requester")
+    plugin.Store:Transition(order.id, "MaterialsReceived", "crafter")
+
+    plugin.MailAssistant._pendingSend = {
+        orderId      = order.id,
+        batchIndex   = 1,
+        totalBatches = 1,
+        recipient    = "Bob-TestRealm",
+        items        = {},
+        expiresAt    = (time and time() or 0) + 60,
+    }
+    plugin.Mailbox:OnMailSendSuccess()
+    Test.eq(plugin.Store:GetOrder(order.id).status, "MaterialsReceived",
+        "downstream state must not be regressed by a late send")
 end)

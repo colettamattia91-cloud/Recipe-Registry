@@ -135,7 +135,56 @@ function Mailbox:OnMailSendSuccess()
         actor     = "requester",
     })
     if not ok then return nil, slot end
+
+    -- Auto-advance the materials phase so the requester doesn't have to
+    -- click "Mark materials sent" by hand: the act of clicking Send on
+    -- the in-game mail IS the confirmation. Total batch count comes
+    -- from the pending descriptor (set at compose time), so it survives
+    -- a multi-batch order where the planner re-evaluates between sends.
+    self:AutoAdvanceMaterialsState(pending.orderId, pending.totalBatches)
     return slot
+end
+
+-- After a batch is recorded as sent, compute the new materials phase
+-- and call the state machine ourselves so the user doesn't have to.
+-- Rules:
+--   sentCount >= totalBatches  -> MaterialsSent (final shipment)
+--   sentCount  > 0             -> MaterialsPartial (some out, more to go)
+--   sentCount == 0             -> no-op
+-- Only fires when the order is still in Draft or MaterialsPartial.
+-- Past those states the state machine has moved on (received, etc.)
+-- so we leave it alone.
+function Mailbox:AutoAdvanceMaterialsState(orderId, totalBatches)
+    local store = Addon.Store
+    if not (store and type(store.GetOrder) == "function"
+        and type(store.Transition) == "function") then
+        return
+    end
+    local order = store:GetOrder(orderId)
+    if not order then return end
+    if order.status ~= "Draft" and order.status ~= "MaterialsPartial" then return end
+
+    local sentCount = 0
+    for _, slot in pairs(order.batches or {}) do
+        if slot and slot.sentAt then sentCount = sentCount + 1 end
+    end
+    if sentCount == 0 then return end
+
+    local totalCount = tonumber(totalBatches) or 0
+    local target
+    if totalCount > 0 and sentCount >= totalCount then
+        target = "MaterialsSent"
+    elseif order.status ~= "MaterialsPartial" then
+        target = "MaterialsPartial"
+    end
+
+    if target then
+        store:Transition(orderId, target, "requester", {
+            reason       = "auto-after-batch-send",
+            sentCount    = sentCount,
+            totalBatches = totalCount,
+        })
+    end
 end
 
 -- Detects Postal (or a compatible OpenAll provider) so the runtime

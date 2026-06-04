@@ -95,8 +95,11 @@ Test.it("offers the requester's transitions from Draft", function()
     Test.eq(plugin.Board:GetLocalActorForOrder(order), "requester")
 
     local actions = plugin.Board:ComputeActionsForOrder(order)
-    Test.eq(joinSorted(labelsOf(actions)),
-        "Cancelled,MaterialsPartial,MaterialsSent")
+    -- MaterialsPartial / MaterialsSent are now driven automatically by
+    -- the mail flow (MAIL_SEND_SUCCESS -> AutoAdvanceMaterialsState),
+    -- so the action strip only exposes Cancel as a manual transition
+    -- the requester drives themselves.
+    Test.eq(joinSorted(labelsOf(actions)), "Cancelled")
 
     local transitions = transitionsOf(actions)
     for index = 1, #transitions do

@@ -71,6 +71,7 @@ $activeAllSpecs = @(
     "orders_board_badge_spec.lua",
     "orders_board_events_spec.lua",
     "orders_board_scope_spec.lua",
+    "orders_board_shipment_progress_spec.lua",
     "orders_board_tamper_warning_spec.lua",
     "orders_cart_panel_spec.lua",
     "orders_mail_assistant_spec.lua",
