@@ -970,19 +970,208 @@ order.sendQueue = {
 Or simpler: derive on the fly from `order.batches[n].sentAt` vs the
 PlanBatches count, so no new persistent state is introduced.
 
+#### 9.5 Reject-on-receipt + return flow (decided 2026-06-05)
+
+Phase 9 design conversation rejected the idea of an explicit
+"accept order" step before materials are sent: in a guild context
+crafts are free and immediate, and the friction of waiting for the
+crafter's accept would make trade-in-person uniformly faster.
+Instead, the requester gets a **rejection path at delivery time**:
+
+- New action on `DeliverySent` for the recipient (not the crafter):
+  **"Reject delivery — return goods"**.
+- On click: state moves to `ReturnPending` (state already exists),
+  a return mail is composed back to the crafter with the received
+  items and an optional one-line reason.
+- The crafter then sees the return in their inbox; scanner records
+  it on the order; final state `Cancelled` with all goods back
+  where they started.
+
+The existing `ReturnPending` slot in the state machine is reused —
+no SM additions needed. Spec coverage: reject flow, return mail
+codec round-trip, scanner integrity check with `phase = "return"`.
+
+#### 9.6 Edit recipient (decided 2026-06-05)
+
+Until any batch has `sentAt`, the requester can change the order's
+target crafter through the order detail panel ("Change crafter →
+pick from RR's crafter list"). Once even one batch is mailed the
+field locks (changing recipient mid-shipment would strand the
+already-sent materials).
+
+Implementation hook:
+- New action `change-crafter` in `Board:ComputeActionsForOrder` for
+  the requester when status ∈ {Draft, MaterialsPartial} AND no
+  batches have `sentAt`.
+- Action opens a small dialog reusing the OrderDialog crafter
+  list, scoped to the recipe(s) on the order. Confirming writes
+  `order.crafter = newCrafter`, emits `OrderUpdated{change =
+  recipient-changed, fromCrafter, toCrafter}`.
+
+#### 9.7 Trade mode as first-class delivery (decided 2026-06-05)
+
+Mail-only is wrong for several real cases: enchanting (the enchant
+target must be in the crafter's hands), JC socketing, on-the-spot
+gem cuts, sharpening stones applied to a specific weapon. Some
+orders also start as mail and end via in-person handoff. Phase 9.7
+makes trade a peer mode of mail, not an exception.
+
+- `order.deliveryMode` accepts `"mail" | "trade" | "mixed"`.
+- For `trade` orders the entire send / receive path is manual:
+  - Requester action: **"Mark materials handed over (trade)"** →
+    state `MaterialsSent`.
+  - Crafter action: **"Mark materials received (trade)"** →
+    `MaterialsReceived`.
+  - Crafter action: **"Mark delivered (trade)"** → `DeliverySent`.
+  - Requester action: **"Mark received (trade)"** → `Completed`.
+- For `mixed` orders (mail-started, trade-closed or vice versa):
+  any state can be advanced via the manual trade actions in
+  addition to the mail-driven auto-advance.
+- The addon does **not** parse trade window contents (TRADE_SHOW /
+  TRADE_ACCEPT). Trust model stays honest: the user confirms what
+  they actually did. Hooking trade events to verify is a follow-up
+  if false-confirms become a problem in practice.
+
+Enchanting-specific shortcut: when the recipe's
+`directEnchant == true`, default delivery mode auto-picks `trade`
+(no shipment of a physical output to mail).
+
+#### 9.8 Craft + proc tracking (decided 2026-06-05)
+
+The hardest correctness problem we have. Without it, "Send the
+crafted items including procs" silently leaks the crafter's
+personal stock: they had 20 Haste Potions in their bags before
+your order; they craft 10 attempts that yield 15 (5 procs); they
+click Send → they ship 35 because that's everything in bag.
+
+Phase 9.8 splits into three increments:
+
+**9.8a — Per-order craft counter.** When an order is in `Accepted`,
+hook the tradeskill events (`TRADESKILL_SHOW`, `TRADESKILL_UPDATE`,
+`SPELLCAST_START` / `SPELLCAST_SUCCESS` for enchants) and watch
+inventory deltas. For each crafted item that matches the order's
+expected `outputItemID`, increment `order.craftTally[itemID]`.
+Store: `{ attempts, produced, lastUpdatedAt }` per output.
+
+**9.8b — Proc detection.** A craft event normally adds N to the
+output count; a proc adds N + extra. We can detect procs by
+checking the delta against the recipe's documented `numCreated`
+(from metadata). Anything beyond `numCreated` per attempt is a
+proc. Track separately: `procExtra` per output. This is heuristic
+(some recipes have variable yield baseline), but good enough for
+the user's choice.
+
+**9.8c — Compose-delivery dialog.** Replace the current
+auto-attach-everything behaviour with an explicit confirm:
+
+```
+You crafted 15 of Haste Potion across 10 attempts (5 procs).
+Order quota: 10.
+You have 35 in your bags.
+
+[ Send only the 10 ordered ]
+[ Send 15 (include procs) ]
+[ Send all 35 (warning: includes 20 pre-existing) ]
+```
+
+Default focuses the middle option. The "send all" choice surfaces
+the warning explicitly because that's the lossy path. The chosen
+amount goes into the delivery mail; the rest stays in bags.
+
+#### 9.9 Multi-alt account model (decided 2026-06-05)
+
+The OrdersDB is already account-global (per SavedVariables), so
+**all chars on the same WoW account see the same order DB.** Phase
+9.9 makes that visibility explicit in the UI and adds a
+`recipient` field so an order can have a different ship-to char
+from the placing char.
+
+- New field: `order.recipient = "Char-Realm"` — defaults to
+  `order.requester` (the placing char). When the requester wants
+  delivery to a different alt (warehouse alt, low-played alt that
+  needs the item, etc.) they pick from a dropdown of known
+  account chars.
+- Account char list is built passively: every char that opens
+  RR_Orders adds itself to `OrdersDB.accountChars = { [charKey] =
+  lastSeenAt }`. The dropdown shows the most recent ones first.
+- Crafter's delivery mail addresses `order.recipient`, not
+  `order.requester`. Same for trade mode (the crafter trades with
+  the recipient char).
+- Scanner sender check on a delivery is still `sender ==
+  order.crafter`. The recipient side is whoever opens the mailbox
+  and runs the scan; the order matches by ID.
+- Visibility: Outgoing and Incoming sub-views (§9.3) show orders
+  where **any** of my account chars is the requester / crafter
+  (not just the currently-logged char). Local actor resolution
+  becomes "this char is one of my account chars AND is the
+  requester / crafter of the order".
+- Self-account orders (Char-A → Char-B same account): same flow,
+  no sync needed because the DB is shared. Mail between same-
+  account chars is instant in TBC, so the mail flow stays the
+  fastest path for craft-by-alt scenarios.
+
+State machine and wire protocol need no changes — `recipient` is
+sync-transparent (carried in OrderCreated payload, peers learn it
+on the first event).
+
+#### 9.10 Saved order templates (decided 2026-06-05)
+
+For recurring needs ("60 mana potions every raid week"), Phase 9.10
+adds a "save this order as template" button on a Draft and a
+slash command `/rrord template send <name>` that one-clicks the
+saved spec back into a fresh order (same crafter, same lines, same
+recipient). Templates live in the per-char DB; the user names them
+themselves.
+
+Low priority — depends on 9.1-9.4 being shipped.
+
 #### Phase 9 sequencing
 
 Recommended order (least to most invasive):
-1. **9.1 Shopping list** — self-contained, immediately useful, no
-   wire-protocol surface.
-2. **9.2 Mail body redesign** — pure text changes, no behavior shift.
-3. **9.3 Board Outgoing/Incoming** — UI restructure, biggest mental-
-   model shift but no protocol change.
-4. **9.4 Send queue** — depends on 9.3's "Outgoing" view for the
-   natural surfacing point.
+1. **9.2 Mail body redesign** — pure text changes, no behavior
+   shift, but immediately improves the non-addon recipient UX.
+2. **9.1 Shopping list** — self-contained, no wire-protocol
+   surface, big QoL.
+3. **9.5 Reject delivery** — small addition to existing flow,
+   closes a real workflow hole.
+4. **9.6 Edit recipient** — small addition, makes Draft state
+   actually editable.
+5. **9.9 Multi-alt account model** — touches the order schema
+   (`recipient` field) and the Outgoing/Incoming filter logic.
+6. **9.3 Board Outgoing/Incoming** — UI restructure on top of
+   9.9's visibility model.
+7. **9.7 Trade mode** — adds a new deliveryMode + manual actions.
+   Enchanting workflows become usable.
+8. **9.8 Craft + proc tracking** — the hardest piece. 9.8a first
+   (counter), then 9.8b (procs), then 9.8c (compose dialog).
+9. **9.4 Send queue** — natural finishing piece on top of the
+   restructured Outgoing view.
+10. **9.10 Saved templates** — optional polish.
 
-Each ships with backend specs; 9.1 and 9.2 also need targeted in-game
-smoke tests added to `docs/craft-orders-in-game-test-plan.md`.
+Each ships with backend specs; 9.1, 9.2, 9.7 also need targeted
+in-game smoke tests added to
+`docs/craft-orders-in-game-test-plan.md`.
+
+#### Out of scope (logged for future)
+
+Items the Phase 9 conversation explicitly deferred:
+
+- **Payment / tip / cost negotiation** — WoW has no API for money
+  transfer between players that an addon can drive; any payment
+  layer would be a manual mention in the mail body, which the user
+  can already do. Not worth modeling.
+- **Crafter availability advertising** — RR already exposes who
+  owns which recipe; the mail flow lets a crafter respond when
+  they have time. No discovery surface needed in the addon.
+- **Priority / urgency field** — real-time urgent requests are
+  handled via the trade path (§9.7); the mail path is by nature
+  asynchronous and acceptable for non-urgent crafts.
+- **Officer / guild-wide queue view** — useful for raid-night
+  material coordination ("Char-A needs 30 Major Healing Pots for
+  the raid; who can make them?") and for the BoP-self-craft
+  scenario where Char-A orders Item X BoP from themselves. Deferred
+  to a Phase 10 officer view; record the scenario here so it
+  surfaces when that phase opens.
 
 ---
 

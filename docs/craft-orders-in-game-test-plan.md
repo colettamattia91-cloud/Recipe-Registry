@@ -107,6 +107,54 @@ Do not run until the matching subsection lands. Roadmap reference: `docs/craft-o
 45. **Persistence:** with a queue in progress, `/reload`. After the reload, the queue resumes at the same position — no orders skipped, no duplicates.
 46. **Auto-send is NOT offered:** confirm there is no "auto-send all" button. Each batch keeps the in-game Send-button confirmation step.
 
+### 9.5 Reject delivery on receipt
+
+47. **Reject action visible to recipient on DeliverySent:** as the order's recipient, open the detail panel of an order in `DeliverySent`. Verify the action strip surfaces "Reject delivery — return goods" (red/destructive style).
+48. **Reject composes return mail:** click reject. The SendMail UI pre-fills with recipient = crafter, attachments = the received items, body header "Return for order X — declined" + optional reason line.
+49. **Order moves to ReturnPending:** after Send, verify the order's status is `ReturnPending`, event log carries `change = delivery-rejected` with the recipient as actor.
+50. **Crafter sees return arrive:** crafter alt opens mailbox; scanner records the return with `phase = "return"`; final state moves to `Cancelled` with all goods restored on the crafter side.
+
+### 9.6 Edit recipient (change crafter)
+
+51. **Change-crafter action visible only on Draft / MaterialsPartial:** before any batch has `sentAt`, the requester sees a "Change crafter" action in the strip. After any batch ships, it disappears.
+52. **Picker shows crafter list scoped to recipe(s):** click "Change crafter". Dropdown lists everyone who can craft any of the order's recipes.
+53. **Confirm rewires the order:** pick a different crafter, confirm. `order.crafter` updates, OrderUpdated event with `change = recipient-changed` appended.
+54. **Locked after first send:** repeat #53 right after the first MAIL_SEND_SUCCESS. The action should be gone.
+
+### 9.7 Trade-mode delivery
+
+55. **Enchanting recipe defaults to trade mode:** "Add to cart" an enchant recipe. The order created at checkout should have `deliveryMode = "trade"` (because `directEnchant == true`).
+56. **Trade mode action strip:** detail panel shows manual `Mark materials handed over` / `Mark received via trade` / `Mark delivered via trade` actions, no Compose mail button.
+57. **State advances via manual clicks:** click through the trade-mode states and verify each click advances the state machine + appends an event with `source = "trade"`.
+58. **Mixed-mode order:** create a regular mail-mode order, send batch 1 via mail, then click "Mark delivered (trade)" on the crafter side. Verify the order can close via trade even though it started via mail.
+59. **No trade-window parsing:** confirm the addon does NOT auto-detect trade contents — the actions are purely manual confirmations.
+
+### 9.8 Craft + proc tracking
+
+60. **Craft counter starts at zero:** accept an order for 10 Haste Potions. Open the detail panel: `Crafted: 0 / 10`.
+61. **Counter ticks per craft:** craft 1 potion via the tradeskill window. Counter updates to `Crafted: 1 / 10`.
+62. **Proc detection:** craft 10 attempts. If you got 12 outputs (2 procs), counter should show `Crafted: 12 / 10 (2 procs)`.
+63. **Compose-delivery dialog presents 3 choices:** with 35 potions in bags (20 pre-existing + 15 from this order), click Compose delivery. Dialog shows:
+    - `Send only the 10 ordered`
+    - `Send 15 (include procs)`
+    - `Send all 35 (warning: includes 20 pre-existing)`
+    Middle option is the default focus.
+64. **Choice is honoured in the mail:** pick "Send 15". Verify the mail attachments are exactly 15 potions and the body marker promises 15.
+
+### 9.9 Multi-alt account model
+
+65. **All alts see the same order DB:** create an order on Char-A. Login Char-B (same account). Open Craft Orders tab. The order is visible in Outgoing.
+66. **Order with recipient ≠ requester:** when creating an order, the "Send to" dropdown lists known account chars. Pick Char-B (your warehouse alt). The order's `recipient` field is set.
+67. **Crafter mails to the recipient char:** crafter (different account, peer) ships delivery. The mail's `To:` is Char-B, not Char-A. Char-B's scanner records the delivery on the shared order DB.
+68. **Outgoing / Incoming spans all account chars:** logged on Char-C (a third alt), open Outgoing. Verify orders placed by Char-A AND Char-B show up (because the local actor resolution treats any account char as "me").
+69. **Self-account order skips sync:** Char-A orders from Char-B (alt). Verify no `RRORD*` traffic on the wire — the DB is shared locally, sync is not needed.
+70. **Account char list updates passively:** login a new alt, open Craft Orders once. Future order-creation dropdowns on other alts should now list this new char.
+
+### 9.10 Saved order templates
+
+71. **Save current order as template:** on a Draft order, click "Save as template". Name it "Raid haste pots". Template persists in per-char DB.
+72. **One-click resend:** `/rrord template send "Raid haste pots"` creates a fresh Draft order with the same crafter / lines / recipient.
+
 ---
 
 ## What to do if a test fails
