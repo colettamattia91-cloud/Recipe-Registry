@@ -1,16 +1,25 @@
 # Craft Orders — In-Game Test Plan
 
-In-game smoke tests pending on `feature/craft-orders-mail-assistant`. The backend is 83/83 spec green; these tests catch what specs can't (real WoW client + mailbox + guildmate interactions).
+In-game smoke tests pending on `feature/craft-orders-mail-assistant`. The backend is 85/85 spec green; these tests catch what specs can't (real WoW client + mailbox + guildmate interactions).
 
 **Why this list:** the autonomous work batch deferred everything that needs a real client. This is the gate before merging to `develop` / cutting a release.
+
+## Status legend
+
+- **§A** — Phase 2-8 features already shipped on the branch; tests below verify they work end-to-end.
+- **§B** — Phase 9 UX redesign (see `docs/craft-orders-roadmap.md` §11 Phase 9). Tests live here as a forward-looking checklist; do not run until the matching feature lands.
+
+---
+
+## §A Phase 2-8 shipped features
 
 ## Single-character flow (you alone, with the addon)
 
 1. **Cart → checkout → board:** open RR, pick a recipe, click the "Add to order cart" action button, set quantity, choose yourself as crafter, checkout. Verify an order appears in the Craft Orders tab.
 2. **Tab badge live counter:** create a draft order; verify the tab label becomes "Craft Orders (1)". Cancel it; verify it goes back to "Craft Orders". Switch between RR tabs while doing this — badge must update from any tab.
-3. **Detail panel action strip:** select an order. Verify the bottom of the detail panel shows the valid transitions (e.g. as requester on a Draft: Materials partial / Mark materials sent / Cancel — Cancel in red). Click one; verify the order state advances and the strip re-renders with the next valid set.
+3. **Detail panel action strip:** select an order. As requester on a Draft, expect to see only **Cancel** (red) and **Compose mail** — the "Materials partial" / "Mark materials sent" buttons have been removed because the mail flow drives those transitions automatically (commit `0f26a5e`). As crafter on MaterialsSent, expect "Mark received" / "Mark missing".
 4. **Recent events tail:** after a few transitions, the "Recent events" section in the detail panel should list them as `state Draft -> MaterialsSent` etc.
-5. **Scope filter:** create three orders — two where you're requester, one where you're crafter (use a second char if needed). Toggle the Scope button: Everyone (3) / I requested (2) / I craft (1).
+5. **Scope filter:** create three orders — two where you're requester, one where you're crafter (use a second char if needed). Toggle the Scope button: Everyone (3) / I requested (2) / I craft (1). NB: Phase 9.3 will replace this with Outgoing / Incoming sub-views — for now the scope axis remains.
 6. **Mail planner:** `/rrord mail plan <id>` should print the batch plan. With a small order it's one batch.
 
 ## Cross-character flow (you + alt OR you + guildmate)
@@ -57,6 +66,48 @@ In-game smoke tests pending on `feature/craft-orders-mail-assistant`. The backen
 ## Pause policy (already proven in RR — re-test optional)
 
 24. **Raid silence:** with two peers online, enter a raid. `/rrord sync` should report queued = 0 and no traffic on `RRORD*` until you leave. The Orders subsystem registers on the same `SyncPausePolicy` as RR's recipe sync.
+
+---
+
+## §B Phase 9 UX redesign — forward-looking checklist
+
+Do not run until the matching subsection lands. Roadmap reference: `docs/craft-orders-roadmap.md` §11 Phase 9.
+
+### 9.1 Aggregated shopping list (Auctionator-aware)
+
+25. **Open window:** with 0 outgoing orders, `/rrord shopping` (or the toggle button) opens the floating Materials window with a single "Nothing to gather" line.
+26. **Aggregation across orders:** create two outgoing orders, each needing Peacebloom: ord1 needs 4, ord2 needs 6. The window should list `Peacebloom — 10` and a tooltip on the row should attribute "ord1: 4, ord2: 6".
+27. **Item link interaction:** shift-click an item name in the window. Verify it pastes a clickable item link into the chat edit box.
+28. **Auctionator handoff (with Auctionator loaded):** click the "Send to Auctionator" button. Auctionator's shopping list / search opens pre-populated with the listed items.
+29. **Auctionator absent fallback:** disable Auctionator, click "Send to Auctionator". A paste-box should appear with a newline-joined list of item names ready to copy into Auctionator's import dialog.
+30. **Live refresh:** with the window open, cancel one order. The aggregated quantities should update without reopening the window.
+31. **Crafter-provided exclusion:** mark some material as crafter-provided via `/rrord set-provider`. That portion should drop out of the aggregated total.
+
+### 9.2 Mail body redesign
+
+32. **Salutation + signature:** Compose a mail. The body should open with "Ciao Bob," (or "Hello Bob,") using the crafter's short name, and close with "— Mattia" (your short name). No order ID in the human header.
+33. **Request phrasing:** the body should ask for the craft ("ti chiedo cortesemente di craftarmi" / "could you craft for me"), not assert it as a shipment. Recipe display name visible, no recipeKey.
+34. **Marker disclaimer:** the `--RR-ORDER--` block should be preceded by a one-line disclaimer like "tracking auto-generato — ignora se non hai Recipe Registry" so a non-addon recipient knows to skip it.
+35. **Locale switch:** flip the WoW client to enUS, Compose a fresh mail, verify the human header is in English. Marker block is byte-identical regardless of locale.
+36. **Scanner back-compat:** with the new body, the receiving char's scanner should still decode + verify integrity (zero tamperFlags on a clean mail). Old-style markers from earlier versions still decode.
+
+### 9.3 Board split — Outgoing / Incoming
+
+37. **Sub-view toggle:** the Craft Orders tab opens defaulting to Outgoing. Click Incoming and verify the list switches to orders where you're the crafter.
+38. **Counts in headers:** the Outgoing / Incoming pill labels include their respective counts: `Outgoing (2) / Incoming (5)`.
+39. **Status filter scoping:** flip to Incoming, set status filter to Active. Verify the list shows only incoming-active orders, not outgoing.
+40. **Tab badge math:** the main nav tab still reads `Craft Orders (N)` where N is total action-required across both sub-views.
+41. **Debug-all view:** `/rrord list --all` still lists everything (including third-party-observed orders) so the debug path survives the UI removal.
+
+### 9.4 Send queue
+
+42. **Queue surfaces after checkout:** after a cart checkout that produced 3 orders, the cart panel shows "You have 3 mails to send. Open mailbox to start."
+43. **MAIL_SHOW toast:** open the mailbox. A small toast in RR's main frame surfaces "Next: send batch 1 of order #abc". Clicking [Send] composes that batch.
+44. **Queue advances on MAIL_SEND_SUCCESS:** after sending batch 1, the toast switches to the next order's batch 1 (or order #abc batch 2 if multi-batch).
+45. **Persistence:** with a queue in progress, `/reload`. After the reload, the queue resumes at the same position — no orders skipped, no duplicates.
+46. **Auto-send is NOT offered:** confirm there is no "auto-send all" button. Each batch keeps the in-game Send-button confirmation step.
+
+---
 
 ## What to do if a test fails
 

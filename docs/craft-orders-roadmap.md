@@ -801,6 +801,189 @@ Work items:
 - Specs: mailable delivery happy path; non-mailable items rejected; service-craft path requires manual confirm.
 - **Exit criterion:** Phase 8 specs green + manual end-to-end deliver + confirm.
 
+### Phase 9 — UX redesign pass (2026-06-05)
+
+After Phase 2-8 shipped and Mattia ran the in-game smoke tests, four
+structural friction points surfaced. The codebase had been built
+state-machine-first (the sync model demanded deterministic states) and
+the UI ended up mirroring those internals. The mental model a user
+brings to a "craft order" is workflow-shaped, not state-machine-shaped,
+and Phase 9 closes that gap without disturbing the wire protocol.
+
+**Underlying design rule for Phase 9:** the state machine stays
+authoritative for sync and event log, but **the UI never shows enum
+names**. A translation table maps every state to a narrative label
+the user would actually say:
+
+| State machine | UI label |
+|---|---|
+| Draft | "Da spedire" / "To send" |
+| MaterialsPartial | "Spedito 2/3, manca batch 3" / "2 of 3 batches sent" |
+| MaterialsSent | "Materiali in viaggio" / "Materials in transit" |
+| MaterialsReceived | "Crafter ha ricevuto" / "Crafter received" |
+| MaterialsAssumed | "Probabilmente ricevuti" / "Assumed received" |
+| MaterialsMissing | "Materiali mancanti" / "Materials missing" |
+| Accepted | "In lavorazione" / "Crafting in progress" |
+| DeliverySent | "Goods in viaggio" / "Outputs in transit" |
+| Completed | "Concluso" / "Done" |
+| ReturnPending | "In rientro" / "Returning" |
+| Cancelled | "Annullato" / "Cancelled" |
+| Expired | "Scaduto" / "Expired" |
+| Failed | "Fallito" / "Failed" |
+
+#### 9.1 Aggregated shopping list (Auctionator-aware)
+
+Today materials are computed at draft creation and visible only inside
+the per-order detail panel. A user with 5 outgoing orders has no way to
+see the total materials they need to gather. Phase 9.1 ships a small
+floating "Materials" window that:
+
+- Aggregates `order.materials[*].required - order.materials[*].crafterProvided`
+  across **every order where the local player is the requester** and
+  whose status is `Draft` or `MaterialsPartial`.
+- Renders one row per distinct itemID with: icon, item name (as a
+  clickable hyperlink, shift-click pasteable into chat / Auctionator
+  search), total quantity needed, and a breakdown tooltip listing
+  contributing orders.
+- Exposes a **"Send to Auctionator"** button that calls
+  `Auctionator.API.v1.MultiSearch(callerID, items)` (or the equivalent
+  current API) when Auctionator is loaded, falling back to copying a
+  newline-joined name list to a paste box for manual import otherwise.
+- Refreshes on `CraftOrders:Changed` so adding/removing/checking out
+  orders updates the list live.
+- Window is small (~300x400), draggable, separately toggleable via a
+  Cart-style button or `/rrord shopping`. Persists per-character open/
+  close state.
+
+**Public surface to add:**
+```lua
+RecipeRegistry_Orders.Shopping:Open()
+RecipeRegistry_Orders.Shopping:Close()
+RecipeRegistry_Orders.Shopping:ComputeAggregated()
+  -- returns { { itemID, name, link, totalNeeded, contributingOrders = {...} }, ... }
+```
+
+**Auctionator integration test:** Phase 9.1 specs must cover the
+fallback when `_G.Auctionator` is absent (clipboard path) so the
+addon stays usable without the optional dep.
+
+#### 9.2 Mail body redesign (human-first)
+
+Current Compose mail body leads with "Materials for order
+rr-ord-xxx..." — opaque ID + machine-looking marker. A crafter without
+the plugin sees what looks like robot noise. Phase 9.2 rewrites the
+header so the body reads as a normal in-game letter:
+
+```
+Ciao Bob,
+
+Ti chiedo cortesemente di craftarmi:
+  - Major Healing Potion x2
+
+In allegato trovi i materiali. Quando hai finito, mandami i
+risultati via mail. Grazie!
+
+— Mattia
+
+[ tracking auto-generato — ignora se non hai Recipe Registry ]
+--RR-ORDER--
+{...}
+--RR-END--
+```
+
+Key changes:
+- Lead with a salutation that includes the crafter's short name.
+- "Ti chiedo cortesemente" / "Could you craft" — a request, not a
+  shipment notice. The crafter is being asked, not invoiced.
+- Recipe list uses display names already resolved (no recipeKey shown).
+- "When you're done, mail back" sets expectation explicitly.
+- Sender's short name as a signature.
+- The marker block is preceded by a one-line disclaimer that explains
+  why it's there — non-addon users learn to ignore it instead of
+  copy-pasting it into chat as garbage.
+- Language: auto-detected from `GetLocale()` with `enUS` fallback.
+  The marker block stays language-agnostic (machine-only).
+
+Scanner / decoder behavior unchanged; only the human-facing header is
+restyled. Spec coverage: header contains crafter's short name + at
+least one recipe display name + the marker disclaimer; marker still
+round-trips through Encode/Decode regardless of header changes.
+
+#### 9.3 Board split — Outgoing / Incoming
+
+Orders are 1:1 (A → B), not broadcast. The current "Everyone /
+Mine as requester / Mine as crafter" scope filter exposes the wire
+model. Mental model is:
+
+- **Outgoing** — orders I requested. I owe materials, I'm waiting
+  for goods.
+- **Incoming** — orders I was asked to craft. I owe a craft + a
+  delivery mail.
+
+Phase 9.3 replaces the scope filter with two sibling sub-views inside
+the Craft Orders tab:
+
+```
+[ Outgoing (2) ] [ Incoming (5) ]
+[ Active | Done ]   ← existing status filter, scoped to the active sub-view
+
+[ list of orders in the chosen sub-view ]
+[ detail panel ]
+```
+
+The badge tab label becomes `Craft Orders (Out 2 / In 5)` or
+`Craft Orders (7)` (total) — Phase 9.3 picks one in review.
+
+`"Everyone"` survives as `/rrord list --all` for debug, no UI surface.
+
+Tooltip and click-to-select preserved; the action strip stays as-is
+(already filters out auto-managed transitions).
+
+#### 9.4 Send queue
+
+Today the user composes mails one at a time by opening each order's
+detail and clicking Compose. With 5 pending orders that's 5 separate
+clicks across 5 detail panel openings.
+
+Phase 9.4 adds a queue:
+- After `Cart:Checkout`, the cart panel offers "You have N mails to
+  send. [Open mailbox to start.]"
+- On `MAIL_SHOW`, if there are pending material sends, a small toast
+  in RR's main frame surfaces "Next: send batch 1 of order #abc — [Send]"
+- Clicking [Send] runs Compose for that batch, the user clicks the
+  in-game Send button as today, and on `MAIL_SEND_SUCCESS` the queue
+  advances to the next pending.
+- Queue persists across reload so an interrupted session resumes.
+
+**Auto-send (no confirmation) is explicitly out of scope** — risk of
+mis-attached items being mailed to the wrong character is unacceptable.
+Each send keeps the in-game Send-button confirmation step.
+
+**Storage:**
+```lua
+order.sendQueue = {
+  pending = { batchIndex = 1 },  -- next batch to send for this order
+  -- (single field; multi-batch nuance is handled at PlanBatches time)
+}
+```
+
+Or simpler: derive on the fly from `order.batches[n].sentAt` vs the
+PlanBatches count, so no new persistent state is introduced.
+
+#### Phase 9 sequencing
+
+Recommended order (least to most invasive):
+1. **9.1 Shopping list** — self-contained, immediately useful, no
+   wire-protocol surface.
+2. **9.2 Mail body redesign** — pure text changes, no behavior shift.
+3. **9.3 Board Outgoing/Incoming** — UI restructure, biggest mental-
+   model shift but no protocol change.
+4. **9.4 Send queue** — depends on 9.3's "Outgoing" view for the
+   natural surfacing point.
+
+Each ships with backend specs; 9.1 and 9.2 also need targeted in-game
+smoke tests added to `docs/craft-orders-in-game-test-plan.md`.
+
 ---
 
 ## 12. Risks
