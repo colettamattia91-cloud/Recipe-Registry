@@ -8,16 +8,35 @@ local function getRR()
     return _G.RecipeRegistry
 end
 
+-- RR exposes two read paths for a recipe:
+--   GetRecipeDisplayInfo: fast lookup that returns an empty reagents
+--                         table (per-reagent name resolution is the
+--                         dominant cost on profession-switch and is
+--                         deferred until someone actually asks).
+--   GetRecipeDetail:      same lookup plus EnsureRecipeReagents +
+--                         crafters resolution; this is what the
+--                         detail panel uses.
+-- The planner needs the reagents, so it has to go through Detail —
+-- otherwise materials always come back empty for any recipe whose
+-- reagents haven't been materialized yet (the common case for a
+-- freshly-loaded session).
 local function getRecipeDisplayInfo(recipeKey)
     local rr = getRR()
-    if not (rr and rr.Data and type(rr.Data.GetRecipeDisplayInfo) == "function") then
-        return nil
+    if not (rr and rr.Data) then return nil end
+    if type(rr.Data.GetRecipeDetail) == "function" then
+        local ok, info = pcall(rr.Data.GetRecipeDetail, rr.Data, recipeKey)
+        if ok and type(info) == "table" then return info end
     end
+    -- Fallback for hosts that only expose GetRecipeDisplayInfo (e.g.
+    -- the unit-test stub): explicitly materialize reagents on the
+    -- returned record so the planner sees them.
+    if type(rr.Data.GetRecipeDisplayInfo) ~= "function" then return nil end
     local ok, info = pcall(rr.Data.GetRecipeDisplayInfo, rr.Data, recipeKey)
-    if ok and type(info) == "table" then
-        return info
+    if not (ok and type(info) == "table") then return nil end
+    if type(rr.Data.EnsureRecipeReagents) == "function" then
+        pcall(rr.Data.EnsureRecipeReagents, rr.Data, info)
     end
-    return nil
+    return info
 end
 
 -- Aggregate reagents across all order lines. Returns:

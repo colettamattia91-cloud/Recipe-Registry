@@ -604,6 +604,15 @@ function CartPanel:OnCheckoutClicked()
     if type(Addon.Print) == "function" then
         for index = 1, #lines do Addon:Print(lines[index]) end
     end
+    -- Belt-and-suspenders: the Store fires CraftOrders:Changed during
+    -- CreateDraft which routes through AceEvent to the Board's
+    -- RefreshTabLabel listener. Still, if the listener wiring drifts
+    -- (e.g. RegisterTab failed because RR.UI wasn't ready at OnEnable),
+    -- the badge never updates. Force a direct refresh here so the
+    -- "Craft Orders (N)" counter reflects the newly-created orders.
+    if result and Addon.Board and type(Addon.Board.RefreshTabLabel) == "function" then
+        Addon.Board:RefreshTabLabel()
+    end
     -- Auto-close the panel on a fully-successful checkout: the cart is
     -- now empty, the orders are visible in the Board, so the cart UI
     -- no longer has anything to show. On partial failure stay open

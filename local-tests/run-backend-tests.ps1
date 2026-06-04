@@ -84,6 +84,7 @@ $activeAllSpecs = @(
     "orders_delivery_flow_spec.lua",
     "orders_order_dialog_spec.lua",
     "orders_phase1_planner_spec.lua",
+    "orders_planner_lazy_reagents_spec.lua",
     "orders_phase1_state_machine_spec.lua",
     "orders_phase1_store_spec.lua",
     "orders_phase3_board_spec.lua",
