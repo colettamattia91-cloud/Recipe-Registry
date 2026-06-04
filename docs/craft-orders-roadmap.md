@@ -1125,27 +1125,36 @@ themselves.
 
 Low priority — depends on 9.1-9.4 being shipped.
 
-#### Phase 9 sequencing
+#### Phase 9 sequencing (revised 2026-06-05)
 
-Recommended order (least to most invasive):
-1. **9.2 Mail body redesign** — pure text changes, no behavior
-   shift, but immediately improves the non-addon recipient UX.
-2. **9.1 Shopping list** — self-contained, no wire-protocol
-   surface, big QoL.
-3. **9.5 Reject delivery** — small addition to existing flow,
-   closes a real workflow hole.
-4. **9.6 Edit recipient** — small addition, makes Draft state
-   actually editable.
-5. **9.9 Multi-alt account model** — touches the order schema
-   (`recipient` field) and the Outgoing/Incoming filter logic.
-6. **9.3 Board Outgoing/Incoming** — UI restructure on top of
-   9.9's visibility model.
-7. **9.7 Trade mode** — adds a new deliveryMode + manual actions.
-   Enchanting workflows become usable.
-8. **9.8 Craft + proc tracking** — the hardest piece. 9.8a first
-   (counter), then 9.8b (procs), then 9.8c (compose dialog).
-9. **9.4 Send queue** — natural finishing piece on top of the
-   restructured Outgoing view.
+Mattia's directive: **stabilize the happy mail flow first**, which
+means locking in the visualization / inventory layer (items + orders)
+before any flow-changing feature. Trade mode, multi-alt, and proc
+tracking come after the mail happy path is verified in-game.
+
+**Block A — Visualization / inventory layer (prerequisite):**
+1. **9.1 Shopping list** — items inventory across outgoing orders.
+   Self-contained, no wire-protocol surface, immediate QoL.
+2. **9.3 Board Outgoing/Incoming** — orders inventory. Restructures
+   the navigation model from "scope filter on a single list" to
+   two semantic sub-views matching how the user thinks about
+   their backlog.
+
+**Block B — Mail flow UI on top of the inventory layer:**
+3. **9.2 Mail body redesign** — pure text changes; landed alongside
+   9.4 because the queue toast and the body are both mail-flow UX.
+4. **9.4 Send queue** — post-checkout queue + MAIL_SHOW toast.
+   Surfaces inside the Outgoing sub-view from 9.3.
+
+After Block A+B ship and in-game smoke tests on the mail happy path
+pass cleanly, only then continue with:
+
+5. **9.5 Reject delivery** — closes the post-delivery workflow hole.
+6. **9.6 Edit recipient** — Draft / MaterialsPartial editability.
+7. **9.9 Multi-alt account model** — `recipient` field + account-
+   scoped visibility.
+8. **9.7 Trade mode** — first-class trade deliveryMode.
+9. **9.8 Craft + proc tracking** — 9.8a → 9.8b → 9.8c.
 10. **9.10 Saved templates** — optional polish.
 
 Each ships with backend specs; 9.1, 9.2, 9.7 also need targeted
