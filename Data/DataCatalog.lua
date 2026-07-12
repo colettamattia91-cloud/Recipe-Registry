@@ -2,8 +2,9 @@ local Addon = _G.RecipeRegistry
 local Data = Addon.Data
 local Private = Data._private
 
-local GetItemInfo = GetItemInfo
-local GetSpellInfo = GetSpellInfo
+local GetItemInfo = Addon.Compat.GetItemInfo
+local GetSpellInfo = Addon.Compat.GetSpellInfo
+local GetSpellTexture = Addon.Compat.GetSpellTexture
 local time = time
 local pairs = pairs
 local ipairs = ipairs

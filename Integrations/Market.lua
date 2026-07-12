@@ -2,6 +2,8 @@ local Addon = _G.RecipeRegistry
 local Market = Addon:NewModule("Market", "AceEvent-3.0")
 Addon.Market = Market
 
+local GetItemInfo = Addon.Compat.GetItemInfo
+
 local TSM_SOURCES = { "dbmarket", "dbminbuyout" }
 
 local function itemStringFromID(itemID)

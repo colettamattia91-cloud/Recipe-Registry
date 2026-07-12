@@ -2,6 +2,11 @@ local Addon = _G.RecipeRegistry
 local UI = Addon:NewModule("UI")
 Addon.UI = UI
 
+local GetItemInfo = Addon.Compat.GetItemInfo
+local GetItemInfoInstant = Addon.Compat.GetItemInfoInstant
+local GetSpellTexture = Addon.Compat.GetSpellTexture
+local GetSpellLink = Addon.Compat.GetSpellLink
+
 local SEARCH_DEBOUNCE = 0.15
 local GLOBAL_SEARCH_DEBOUNCE = 0.35
 local GLOBAL_SEARCH_MIN_CHARS = 3

@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased]
+
+### Changed
+
+- **Compatibility with TBC Anniversary patch 2.5.6.** The 2.5.6 client moved to the modern addon API (aligned with Classic Era 1.15.9). Crafter rows on item and spell tooltips now use the modern tooltip pipeline (`TooltipDataProcessor`) — on the old client they would have thrown a Lua error on login. Item and spell lookups (`GetItemInfo`, `GetSpellInfo`, and friends) now go through a compatibility layer that prefers the new `C_Item`/`C_Spell` APIs and falls back to the classic globals where they still exist. TOC interface version bumped to 20506.
+
 ## [2.1.0] - 2026-06-03
 
 A big quality-of-life release for the recipe browser. Recipe Registry now ships its own recipe knowledge base, so AtlasLoot is no longer needed for categories, reagents, or cost estimates. The browser focuses on TBC content by default, filters can be tweaked per profession, and a friendly banner tells you when something is being hidden from view.

@@ -7,6 +7,7 @@ end
 
 local FILE_PATHS = {
     ["Core.lua"] = "Core/Core.lua",
+    ["Compat.lua"] = "Core/Compat.lua",
     ["BuildInfo.lua"] = "Core/BuildInfo.lua",
     ["Performance.lua"] = "Core/Performance.lua",
     ["Data.lua"] = "Data/Data.lua",
@@ -66,6 +67,7 @@ local Wow = dofile(join(root, "local-tests", "harness", "wow.lua"))
 local Loader = {
     BackendFiles = {
         "Core.lua",
+        "Compat.lua",
         "BuildInfo.lua",
         "Performance.lua",
         "Data.lua",
