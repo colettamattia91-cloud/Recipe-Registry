@@ -2,6 +2,11 @@ local Addon = _G.RecipeRegistry
 local UI = Addon:NewModule("UI")
 Addon.UI = UI
 
+local GetItemInfo = Addon.Compat.GetItemInfo
+local GetItemInfoInstant = Addon.Compat.GetItemInfoInstant
+local GetSpellTexture = Addon.Compat.GetSpellTexture
+local GetSpellLink = Addon.Compat.GetSpellLink
+
 local SEARCH_DEBOUNCE = 0.15
 local GLOBAL_SEARCH_DEBOUNCE = 0.35
 local GLOBAL_SEARCH_MIN_CHARS = 3
@@ -3043,7 +3048,7 @@ function UI:RefreshRecipeRowAssets(rowData)
     if not (rowData and rowData.recipeKey and Addon.Data and Addon.Data.GetRecipeDisplayInfo) then
         return rowData
     end
-    local detail = Addon.Data:GetRecipeDisplayInfo(rowData.recipeKey) or rowData.detail or {}
+    local detail = Addon.Data:GetRecipeDisplayInfo(rowData.recipeKey, self.selectedProfession) or rowData.detail or {}
     rowData.detail = detail
     rowData.label = (detail and detail.label) or rowData.label or tostring(rowData.recipeKey)
     return rowData
@@ -3978,7 +3983,7 @@ function UI:RefreshDetailPanel()
         return
     end
 
-    local detail = Addon.Data:GetRecipeDetail(self.selectedRecipeKey)
+    local detail = Addon.Data:GetRecipeDetail(self.selectedRecipeKey, self.selectedProfession)
     self.currentDetail = detail
     local isFavorite = self:IsFavorite(self.selectedRecipeKey)
 
@@ -4204,7 +4209,7 @@ function UI:ShareSelectedRecipe(channelInput)
         return
     end
 
-    local detail = Addon.Data:GetRecipeDetail(self.selectedRecipeKey)
+    local detail = Addon.Data:GetRecipeDetail(self.selectedRecipeKey, self.selectedProfession)
     if not detail then
         Addon:Print("No recipe details available.")
         return

@@ -2,8 +2,9 @@ local Addon = _G.RecipeRegistry
 local Data = Addon.Data
 local Private = Data._private
 
-local GetItemInfo = GetItemInfo
-local GetSpellInfo = GetSpellInfo
+local GetItemInfo = Addon.Compat.GetItemInfo
+local GetSpellInfo = Addon.Compat.GetSpellInfo
+local GetSpellTexture = Addon.Compat.GetSpellTexture
 local time = time
 local pairs = pairs
 local ipairs = ipairs
@@ -77,6 +78,55 @@ local function getMetadataProfessionKey(profession)
     local text = tostring(profession)
     text = text:gsub("^%s+", ""):gsub("%s+$", "")
     return lowerSafe(text)
+end
+
+-- Resolve the metadata record for a recipe key, using a profession context
+-- to break created-item ambiguity (e.g. Gold Bar: Smelt Gold vs Transmute:
+-- Iron to Gold). The explicit context (list / detail panel profession) wins;
+-- otherwise, when the key is owned under exactly one profession in the
+-- already-built recipe index, that profession disambiguates. Returns the
+-- normalized hint key that resolved the record (nil when the plain lookup
+-- already resolves or nothing does) plus the record itself.
+local function resolveHintedMetadataInfo(data, metadata, recipeKey, professionName)
+    if not (metadata and metadata.GetRecipeInfo) then
+        return nil, nil
+    end
+    local base = metadata:GetRecipeInfo(recipeKey)
+    if base then
+        return nil, base
+    end
+    local hintKey = getMetadataProfessionKey(professionName)
+    if hintKey then
+        local hinted = metadata:GetRecipeInfo(recipeKey, hintKey)
+        if hinted then
+            return hintKey, hinted
+        end
+    end
+    -- Ownership fallback: only consult the index if it is already built —
+    -- forcing a synchronous index build here would defeat the async list
+    -- path this function serves.
+    local indexed = data._recipeIndex and data._recipeIndex[recipeKey]
+    local profNames = indexed and indexed.profNames
+    if profNames then
+        local only
+        for profName in pairs(profNames) do
+            if only ~= nil then
+                only = nil
+                break
+            end
+            only = profName
+        end
+        if only then
+            hintKey = getMetadataProfessionKey(only)
+            if hintKey then
+                local hinted = metadata:GetRecipeInfo(recipeKey, hintKey)
+                if hinted then
+                    return hintKey, hinted
+                end
+            end
+        end
+    end
+    return nil, nil
 end
 
 local function cloneCategoryRows(rows)
@@ -164,15 +214,15 @@ local function getMetadataCategories(metadata, profession)
     return rows
 end
 
-local function getMetadataCategoryInfoForRecipe(metadata, recipeKey)
+local function getMetadataCategoryInfoForRecipe(metadata, recipeKey, professionHint)
     if not metadata then return nil end
-    local info = metadata:GetRecipeInfo(recipeKey)
+    local info = metadata:GetRecipeInfo(recipeKey, professionHint)
     if not info then return nil end
     return metadata:GetCategory(recipeKey, info)
 end
 
-local function getMetadataCategoryForRecipe(metadata, recipeKey)
-    local category = getMetadataCategoryInfoForRecipe(metadata, recipeKey)
+local function getMetadataCategoryForRecipe(metadata, recipeKey, professionHint)
+    local category = getMetadataCategoryInfoForRecipe(metadata, recipeKey, professionHint)
     return category and category.category or nil
 end
 
@@ -189,13 +239,13 @@ local function categoryFilterToken(categoryName)
     return categoryName
 end
 
-local function recipeMatchesCategoryFilter(metadata, recipeKey, categoryFilter)
+local function recipeMatchesCategoryFilter(metadata, recipeKey, categoryFilter, professionHint)
     local token = categoryFilterToken(categoryFilter)
     if not token or token == "" or token == "All" then
         return true
     end
 
-    local category = getMetadataCategoryInfoForRecipe(metadata, recipeKey)
+    local category = getMetadataCategoryInfoForRecipe(metadata, recipeKey, professionHint)
     if not category then
         return false
     end
@@ -243,9 +293,9 @@ local function addMetadataReagents(info, metadata, recipeKey, metadataInfo)
     end
 end
 
-local function applyMetadataInfo(info, metadata, recipeKey, numericKey)
+local function applyMetadataInfo(info, metadata, recipeKey, numericKey, metadataInfo)
     if not metadata then return false end
-    local metadataInfo = metadata:GetRecipeInfo(recipeKey)
+    metadataInfo = metadataInfo or metadata:GetRecipeInfo(recipeKey)
     if not metadataInfo then return false end
 
     local spellID = metadataInfo.spellId
@@ -500,7 +550,7 @@ end
 function Data:GetRecipeCategory(recipeKey, profession)
     local metadata = getRecipeMetadata()
     if metadata then
-        return getMetadataCategoryForRecipe(metadata, recipeKey)
+        return getMetadataCategoryForRecipe(metadata, recipeKey, getMetadataProfessionKey(profession))
     end
     return nil
 end
@@ -508,7 +558,7 @@ end
 function Data:GetRecipeCategoryInfo(recipeKey, profession)
     local metadata = getRecipeMetadata()
     if metadata then
-        return getMetadataCategoryInfoForRecipe(metadata, recipeKey)
+        return getMetadataCategoryInfoForRecipe(metadata, recipeKey, getMetadataProfessionKey(profession))
     end
     return nil
 end
@@ -1239,11 +1289,17 @@ function Data:DumpListBuildTelemetry()
     end
 end
 
-function Data:GetRecipeDisplayInfo(recipeKey)
+function Data:GetRecipeDisplayInfo(recipeKey, professionName)
     if recipeKey == nil then return nil end
     catalogStats.displayInfoCalls = catalogStats.displayInfoCalls + 1
+    local metadata = getRecipeMetadata()
+    -- Hint-resolved records live under a composite cache key: the same
+    -- created-item key can legitimately resolve to different records per
+    -- profession context (Gold Bar under Mining vs Alchemy).
+    local hintKey, hintedMetadataInfo = resolveHintedMetadataInfo(self, metadata, recipeKey, professionName)
+    local cacheKey = hintKey and (tostring(recipeKey) .. "\031" .. hintKey) or recipeKey
     local detailCache, detailCacheOrder = ensureDetailCache(self)
-    local cached = detailCache[recipeKey]
+    local cached = detailCache[cacheKey]
     if cached then
         catalogStats.displayInfoCacheHits = catalogStats.displayInfoCacheHits + 1
         refreshDetailAssets(cached)
@@ -1275,8 +1331,8 @@ function Data:GetRecipeDisplayInfo(recipeKey)
         searchText = nil,
     }
 
-    local metadata = getRecipeMetadata()
-    applyMetadataInfo(info, metadata, recipeKey, n)
+    applyMetadataInfo(info, metadata, recipeKey, n, hintedMetadataInfo)
+    info._professionHintKey = hintKey
 
     if n and n < 0 then
         if not info.spellID then
@@ -1315,7 +1371,7 @@ function Data:GetRecipeDisplayInfo(recipeKey)
     rememberBoundedCache(
         detailCache,
         detailCacheOrder,
-        recipeKey,
+        cacheKey,
         info,
         MAX_RECIPE_DETAIL_CACHE_ENTRIES
     )
@@ -1392,15 +1448,21 @@ function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName,
         end
     end
 
+    -- Profession-scoped lists resolve ambiguous created-item keys against
+    -- the list's own profession (Gold Bar under Mining → Smelt Gold).
+    local listHintProfName = (profName and profName ~= "All") and profName or nil
+    local listHintKey = getMetadataProfessionKey(listHintProfName)
+
     for cIdx = 1, #candidates do
         local recipeKey = candidates[cIdx]
         local indexed = recipeIndex[recipeKey]
         local include = indexed and (not profName or profName == "All")
+        local recipeInfo
         if indexed and not include and indexed.profNames[profName] then
             include = true
         end
         if include and categoryFilter and profName and profName ~= "All" then
-            include = recipeMatchesCategoryFilter(getRecipeMetadata(), recipeKey, categoryFilter)
+            include = recipeMatchesCategoryFilter(getRecipeMetadata(), recipeKey, categoryFilter, listHintKey)
         end
         if include and visibleSpellIdsHash then
             -- Use the record's canonical spellId, not just the normalized key.
@@ -1408,14 +1470,17 @@ function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName,
             -- record exists (e.g. the key was an item ID that happens to look
             -- like a spell); only the actual record proves the recipe is
             -- catalogued and thus subject to the hash filter.
-            local info = listMetadata:GetRecipeInfo(recipeKey)
-            if info and info.spellId and not visibleSpellIdsHash[info.spellId] then
+            recipeInfo = listMetadata:GetRecipeInfo(recipeKey, listHintKey)
+            if recipeInfo and recipeInfo.spellId and not visibleSpellIdsHash[recipeInfo.spellId] then
                 include = false
             end
         end
         local visibilityReason
         if include then
-            local passes, reason = recipePassesUiFilter(recipeKey, filterContext)
+            if recipeInfo == nil and listMetadata and listMetadata.GetRecipeInfo then
+                recipeInfo = listMetadata:GetRecipeInfo(recipeKey, listHintKey)
+            end
+            local passes, reason = recipePassesUiFilter(recipeKey, filterContext, recipeInfo)
             visibilityReason = reason
             include = passes == true
             if not include then
@@ -1423,7 +1488,7 @@ function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName,
             end
         end
         if include then
-            local detail = self:GetRecipeDisplayInfo(recipeKey)
+            local detail = self:GetRecipeDisplayInfo(recipeKey, listHintProfName)
             if searchMode == "materials" and detail then
                 self:EnsureRecipeReagents(detail)
             end
@@ -1643,6 +1708,8 @@ function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, catego
             out = {},
             visibleSpellIdsHash = visibleSpellIdsHash,
             listMetadata = listMetadata,
+            professionHintName = (profName and profName ~= "All") and profName or nil,
+            professionHintKey = getMetadataProfessionKey((profName and profName ~= "All") and profName or nil),
             q = lowerSafe(query),
             profName = profName,
             categoryFilter = categoryFilter,
@@ -1704,12 +1771,12 @@ function Data:RunRecipeListBuildStep(state, ctx)
             end
             if include and categoryFilter and profName and profName ~= "All" then
                 local phaseStart = nowMsLocal()
-                include = recipeMatchesCategoryFilter(getRecipeMetadata(), recipeKey, categoryFilter)
+                include = recipeMatchesCategoryFilter(getRecipeMetadata(), recipeKey, categoryFilter, state.professionHintKey)
                 if telemetry then telemetry.categoryMs = (telemetry.categoryMs or 0) + (nowMsLocal() - phaseStart) end
             end
             if include and visibleSpellIdsHash and listMetadata then
                 local phaseStart = nowMsLocal()
-                recipeInfo = listMetadata:GetRecipeInfo(recipeKey)
+                recipeInfo = listMetadata:GetRecipeInfo(recipeKey, state.professionHintKey)
                 if recipeInfo and recipeInfo.spellId and not visibleSpellIdsHash[recipeInfo.spellId] then
                     include = false
                 end
@@ -1717,6 +1784,9 @@ function Data:RunRecipeListBuildStep(state, ctx)
             end
             if include then
                 local phaseStart = nowMsLocal()
+                if recipeInfo == nil and listMetadata and listMetadata.GetRecipeInfo then
+                    recipeInfo = listMetadata:GetRecipeInfo(recipeKey, state.professionHintKey)
+                end
                 local passes, reason = recipePassesUiFilter(recipeKey, filterContext, recipeInfo)
                 if telemetry then telemetry.predicateMs = (telemetry.predicateMs or 0) + (nowMsLocal() - phaseStart) end
                 visibilityReason = reason
@@ -1726,7 +1796,7 @@ function Data:RunRecipeListBuildStep(state, ctx)
                 end
             end
             if include then
-                local detail = self:GetRecipeDisplayInfo(recipeKey)
+                local detail = self:GetRecipeDisplayInfo(recipeKey, state.professionHintName)
                 if searchMode == "materials" and detail then
                     self:EnsureRecipeReagents(detail)
                 end
@@ -1942,7 +2012,11 @@ function Data:EnsureRecipeReagents(info)
         end
         -- Resolve the metadata record explicitly so mock implementations that
         -- don't fall back to GetRecipeInfo internally still see the record.
-        local metadataInfo = metadata.GetRecipeInfo and metadata:GetRecipeInfo(info.recipeKey) or nil
+        -- The stored hint keeps ambiguous created-item keys (Gold Bar)
+        -- resolving to the same record the display info was built from.
+        local metadataInfo = metadata.GetRecipeInfo
+            and metadata:GetRecipeInfo(info.recipeKey, info._professionHintKey)
+            or nil
         addMetadataReagents(info, metadata, info.recipeKey, metadataInfo)
         local parts = {
             info.label or "",
@@ -1960,8 +2034,8 @@ function Data:EnsureRecipeReagents(info)
     return info
 end
 
-function Data:GetRecipeDetail(recipeKey)
-    local detail = self:GetRecipeDisplayInfo(recipeKey) or { recipeKey = recipeKey, label = tostring(recipeKey) }
+function Data:GetRecipeDetail(recipeKey, professionName)
+    local detail = self:GetRecipeDisplayInfo(recipeKey, professionName) or { recipeKey = recipeKey, label = tostring(recipeKey) }
     refreshDetailAssets(detail)
     self:EnsureRecipeReagents(detail)
     detail.crafters = self:GetRecipeCrafters(recipeKey)

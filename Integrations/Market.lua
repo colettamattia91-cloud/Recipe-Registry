@@ -2,6 +2,8 @@ local Addon = _G.RecipeRegistry
 local Market = Addon:NewModule("Market", "AceEvent-3.0")
 Addon.Market = Market
 
+local GetItemInfo = Addon.Compat.GetItemInfo
+
 local TSM_SOURCES = { "dbmarket", "dbminbuyout" }
 
 local function itemStringFromID(itemID)
@@ -221,7 +223,7 @@ function Market:ResolveItemQuery(query)
     end
 
     if Addon.UI and Addon.UI.selectedRecipeKey and Addon.Data and Addon.Data.GetRecipeDetail then
-        local detail = Addon.Data:GetRecipeDetail(Addon.UI.selectedRecipeKey)
+        local detail = Addon.Data:GetRecipeDetail(Addon.UI.selectedRecipeKey, Addon.UI.selectedProfession)
         if detail then
             local id = checkName(detail.createdItemID)
             if id then return id, itemLink end

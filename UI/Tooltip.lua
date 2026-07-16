@@ -65,31 +65,51 @@ function Tooltip:OnEnable()
     self._indexBuildJobActive = false
     self:RegisterEvent("GET_ITEM_INFO_RECEIVED", "InvalidateIndex")
     self:RegisterEvent("GUILD_ROSTER_UPDATE", "InvalidateIndex")
-    self:HookTooltip(GameTooltip)
-    if ItemRefTooltip then
-        self:HookTooltip(ItemRefTooltip)
+    self.watchedTooltips = self.watchedTooltips or {}
+    if GameTooltip then
+        self.watchedTooltips[GameTooltip] = true
     end
+    if ItemRefTooltip then
+        self.watchedTooltips[ItemRefTooltip] = true
+    end
+    self:RegisterTooltipHooks()
     self:InvalidateIndex()
 end
 
-function Tooltip:HookTooltip(tooltip)
-    if not tooltip then return end
-    self.hookedTooltips = self.hookedTooltips or {}
-    if self.hookedTooltips[tooltip] then return end
-    self.hookedTooltips[tooltip] = true
-
-    tooltip:HookScript("OnTooltipSetItem", function(tt)
-        self:OnTooltipSetItem(tt)
-    end)
-    if not tooltip.HasScript or tooltip:HasScript("OnTooltipSetSpell") then
-        tooltip:HookScript("OnTooltipSetSpell", function(tt)
-            self:OnTooltipSetSpell(tt)
-        end)
+-- Patch 2.5.6 moved the client to the modern tooltip pipeline: the
+-- OnTooltipSetItem/OnTooltipSetSpell script types and the
+-- GameTooltip:GetItem()/GetSpell() accessors no longer exist. Item and
+-- spell payloads arrive through TooltipDataProcessor post calls, which
+-- fire for every tooltip frame in the UI — so instead of hooking specific
+-- tooltips we filter the callback down to the ones we decorate. Post
+-- calls cannot be unregistered, hence the one-shot guard.
+function Tooltip:RegisterTooltipHooks()
+    if self._tooltipHooksRegistered then return end
+    if not (TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall
+        and Enum and Enum.TooltipDataType) then
+        -- No tooltip data API (offline test harness): crafter rows are
+        -- exercised directly via AddCraftLines in specs.
+        return
     end
-    if not tooltip.HasScript or tooltip:HasScript("OnTooltipCleared") then
-        tooltip:HookScript("OnTooltipCleared", function(tt)
-            tt._rrCraftRenderedKey = nil
-        end)
+    self._tooltipHooksRegistered = true
+
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tt, data)
+        if self.watchedTooltips and self.watchedTooltips[tt] then
+            self:OnTooltipSetItem(tt, data)
+        end
+    end)
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, function(tt, data)
+        if self.watchedTooltips and self.watchedTooltips[tt] then
+            self:OnTooltipSetSpell(tt, data)
+        end
+    end)
+
+    for tooltip in pairs(self.watchedTooltips) do
+        if tooltip.HookScript and (not tooltip.HasScript or tooltip:HasScript("OnTooltipCleared")) then
+            tooltip:HookScript("OnTooltipCleared", function(tt)
+                tt._rrCraftRenderedKey = nil
+            end)
+        end
     end
 end
 
@@ -420,6 +440,12 @@ function Tooltip:GetRowsForSpellID(spellID)
 end
 
 function Tooltip:AddCraftLines(tooltip, rows, renderKey)
+    -- User toggle from /rr options ("Show crafters on tooltips"). Gated at
+    -- the single render choke point so both the item and spell tooltip
+    -- paths honour it; the crafter index keeps updating in the background
+    -- so re-enabling takes effect immediately.
+    local profile = Addon.db and Addon.db.profile
+    if profile and profile.showTooltipCrafters == false then return end
     if not rows or #rows == 0 then return end
 
     renderKey = tostring(renderKey or "craft") .. ":" .. tostring(self.indexVersion or 0)
@@ -456,19 +482,23 @@ function Tooltip:AddCraftLines(tooltip, rows, renderKey)
     tooltip:Show()
 end
 
-function Tooltip:OnTooltipSetItem(tooltip)
-    local _, link = tooltip:GetItem()
-    local itemID = extractItemID(link)
+function Tooltip:OnTooltipSetItem(tooltip, data)
+    local itemID = data and tonumber(data.id)
+    if not itemID and TooltipUtil and TooltipUtil.GetDisplayedItem then
+        -- data.id can be missing while the item is still resolving; the
+        -- displayed link is the authoritative fallback.
+        local ok, _, link = pcall(TooltipUtil.GetDisplayedItem, tooltip)
+        if ok then
+            itemID = extractItemID(link)
+        end
+    end
     if not itemID then return end
     local rows, key = self:GetRowsForItemID(itemID)
     self:AddCraftLines(tooltip, rows, key)
 end
 
-function Tooltip:OnTooltipSetSpell(tooltip)
-    if not (tooltip and tooltip.GetSpell) then return end
-    local ok, a, b, c = pcall(tooltip.GetSpell, tooltip)
-    if not ok then return end
-    local spellID = tonumber(c) or tonumber(b) or tonumber(a)
+function Tooltip:OnTooltipSetSpell(tooltip, data)
+    local spellID = data and tonumber(data.id)
     if not spellID then return end
     local rows, key = self:GetRowsForSpellID(spellID)
     self:AddCraftLines(tooltip, rows, key)

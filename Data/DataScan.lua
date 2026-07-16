@@ -79,12 +79,37 @@ local function debugSuppressedScan(self, context, message)
     end
 end
 
+-- True when the created item maps to more than one crafting spell in the
+-- metadata library (Gold Bar via Smelt Gold and Transmute: Iron to Gold;
+-- the elemental transmute pairs). Stored as the item key alone, such rows
+-- lose "which recipe does this crafter actually know".
+local function isAmbiguousCreatedItem(itemID)
+    local metadata = Addon.RecipeMetadata
+    if not (metadata and metadata.NormalizeRecipeKey) then
+        return false
+    end
+    local normalized = metadata:NormalizeRecipeKey(itemID)
+    return normalized ~= nil and normalized.ambiguousSpellIds ~= nil
+end
+
+-- Returns the primary recipe key plus, for ambiguous created items, the
+-- spell key from the recipe link as a second additive key. Both keys are
+-- stored: the item key keeps old clients and existing peer replicas
+-- converging (additive merge never removes keys), the spell key carries
+-- the exact recipe so the UI can resolve reagents. Never swap the item
+-- key for the spell key — replicas that already hold the item key would
+-- stay one key richer than the owner block forever, producing the
+-- endless fingerprint-mismatch re-pull loop the sync invariants forbid.
 local function buildScannedRecipeKey(itemLink, recipeLink)
     local itemID, invalidItemID = extractItemID(itemLink)
     if invalidItemID then
         return invalidItemID
     end
     if itemID then
+        local spellID = extractSpellID(recipeLink)
+        if spellID and isAmbiguousCreatedItem(itemID) then
+            return itemID, -spellID
+        end
         return itemID
     end
     local spellID = extractSpellID(recipeLink)
@@ -471,9 +496,12 @@ function Data:ScanTradeSkill(opts)
         for i = 1, numSkills do
             local recipeName, recipeType = GetTradeSkillInfo(i)
             if recipeName and recipeType ~= "header" and recipeType ~= "subheader" then
-                local recipeKey = buildScannedRecipeKey(GetTradeSkillItemLink(i), GetTradeSkillRecipeLink(i))
+                local recipeKey, variantSpellKey = buildScannedRecipeKey(GetTradeSkillItemLink(i), GetTradeSkillRecipeLink(i))
                 if isValidRecipeKey(recipeKey) then
                     recipes[recipeKey] = true
+                    if variantSpellKey and isValidRecipeKey(variantSpellKey) then
+                        recipes[variantSpellKey] = true
+                    end
                 else
                     self:RecordInvalidRecipeKey(recipeKey, "scan", self:GetPlayerKey(), canonical)
                     Addon:Debug("Blocked invalid recipe from TradeSkill scan:", recipeKey, "profession:", canonical)
@@ -550,9 +578,12 @@ function Data:ScanCraft(opts)
         for i = 1, (initialNumCrafts or GetNumCrafts() or 0) do
             local recipeName, _craftSubSpellName, recipeType = GetCraftInfo(i)
             if recipeName and recipeType ~= "header" and recipeType ~= "subheader" then
-                local recipeKey = buildScannedRecipeKey(GetCraftItemLink(i), GetCraftRecipeLink(i))
+                local recipeKey, variantSpellKey = buildScannedRecipeKey(GetCraftItemLink(i), GetCraftRecipeLink(i))
                 if isValidRecipeKey(recipeKey) then
                     recipes[recipeKey] = true
+                    if variantSpellKey and isValidRecipeKey(variantSpellKey) then
+                        recipes[variantSpellKey] = true
+                    end
                 else
                     self:RecordInvalidRecipeKey(recipeKey, "scan", self:GetPlayerKey(), canonical)
                     Addon:Debug("Blocked invalid recipe from Craft scan:", recipeKey, "profession:", canonical)

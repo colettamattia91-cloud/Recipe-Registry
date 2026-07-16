@@ -436,6 +436,14 @@ local function setMinimapShown(shown)
     end
 end
 
+local function setTooltipCraftersShown(shown)
+    local profile = getProfile()
+    if not profile then return end
+    -- Read live by Tooltip:AddCraftLines on every render, so no cache or
+    -- hook needs invalidating here.
+    profile.showTooltipCrafters = shown == true
+end
+
 function Options:RefreshControls()
     local profile = getProfile()
     if not profile then return end
@@ -467,6 +475,9 @@ function Options:RefreshControls()
     end
     if self.minimapCheck then
         self.minimapCheck:SetChecked(not profile.minimap.hide)
+    end
+    if self.tooltipCraftersCheck then
+        self.tooltipCraftersCheck:SetChecked(profile.showTooltipCrafters ~= false)
     end
     if self.pullDelaySlider then
         self.pullDelaySlider:SetDisplayValue(profile.tuning.blockPullDelaySeconds)
@@ -723,12 +734,21 @@ function Options:EnsurePanel()
     minimapCheck:SetPoint("TOPLEFT", accessHeader, "BOTTOMLEFT", -2, -8)
     self.minimapCheck = minimapCheck
 
+    local tooltipCraftersCheck = createCheck(content, "Show known crafters on item and spell tooltips", function(self)
+        setTooltipCraftersShown(self:GetChecked() and true or false)
+        Options:RefreshControls()
+    end)
+    tooltipCraftersCheck:SetPoint("TOPLEFT", minimapCheck, "BOTTOMLEFT", 0, -4)
+    setHoverTooltip(tooltipCraftersCheck, "Tooltip crafters",
+        "Adds a Recipe Registry section to item, recipe, spell, and enchant tooltips listing guildmates who can craft them. Disable for leaner tooltips.")
+    self.tooltipCraftersCheck = tooltipCraftersCheck
+
     local openButton = createButton(content, "Open Recipe Registry", 180, function()
         if Addon.UI then
             Addon.UI:Toggle()
         end
     end)
-    openButton:SetPoint("TOPLEFT", minimapCheck, "BOTTOMLEFT", 2, -10)
+    openButton:SetPoint("TOPLEFT", tooltipCraftersCheck, "BOTTOMLEFT", 2, -10)
 
     local tuningHeader = createHeader(content, "Sync Tuning", openButton, -28)
     local tuningHelp = createText(content,
