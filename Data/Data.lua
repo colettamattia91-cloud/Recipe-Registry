@@ -80,6 +80,7 @@ local DB_DEFAULTS = {
         defaultSearchMode = "recipe",
         useRecipeCategories = true,
         recipeCategoryView = "expanded",
+        showTooltipCrafters = true,
         recipePrefilters = {
             showRemoteBopOutputRecipes = false,
             hideUncataloguedRecipes = true,

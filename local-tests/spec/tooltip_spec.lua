@@ -133,6 +133,25 @@ Test.it("renders at most five tooltip crafters and prevents duplicate rendering 
     Test.eq(#stub.lines, lineCount, "same render key should not append duplicate lines")
 end)
 
+Test.it("honours the showTooltipCrafters profile option", function()
+    local addon, _wow, _data, tooltip = freshAddon()
+    local rows = {
+        { memberKey = "Crafterone-TestRealm", profession = "Alchemy", online = true, skillRank = 375 },
+    }
+    tooltip.indexVersion = 3
+
+    addon.db.profile.showTooltipCrafters = false
+    local stub = tooltipStub()
+    tooltip:AddCraftLines(stub, rows, "item:91001")
+    Test.eq(#stub.lines, 0, "disabled option must render no crafter lines")
+    Test.falsy(stub.shown, "disabled option must not show the tooltip")
+
+    addon.db.profile.showTooltipCrafters = true
+    tooltip:AddCraftLines(stub, rows, "item:91001")
+    Test.truthy(#stub.lines > 0, "re-enabled option renders immediately")
+    Test.eq(stub.lines[2].text, "Recipe Registry", "tooltip header present when enabled")
+end)
+
 Test.it("serves stale tooltip rows during a background rebuild after invalidation", function()
     local addon, _wow, data, tooltip = freshAddon()
     local memberKey = "Crafterone-TestRealm"
