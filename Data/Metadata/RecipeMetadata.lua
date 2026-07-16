@@ -301,7 +301,31 @@ local function normalizeNumericRecipeKey(recipeKey)
     return math.floor(numeric)
 end
 
-function RecipeMetadata:NormalizeRecipeKey(recipeKey)
+-- Ambiguous created-item keys (same item produced by more than one spell,
+-- e.g. Gold Bar via Smelt Gold and Transmute: Iron to Gold) can be broken
+-- when the caller knows which profession the recipe was scanned under.
+-- `professionHint` is a normalized profession key ("mining", "alchemy").
+-- Returns the single matching record, or nil when the hint is absent or
+-- still matches zero / more than one candidate (e.g. the two-alchemy
+-- elemental transmute pairs stay ambiguous by design).
+local function resolveAmbiguousByProfession(self, spellIds, professionHint)
+    if not professionHint then
+        return nil
+    end
+    local match
+    for _, spellId in ipairs(spellIds) do
+        local record = self._recordsBySpellId[spellId]
+        if record and record.profession == professionHint then
+            if match then
+                return nil
+            end
+            match = record
+        end
+    end
+    return match
+end
+
+function RecipeMetadata:NormalizeRecipeKey(recipeKey, professionHint)
     local normalized = {
         recipeKey = recipeKey,
         source = "unknown",
@@ -349,7 +373,13 @@ function RecipeMetadata:NormalizeRecipeKey(recipeKey)
             normalized.spellId = spellId
             normalized.recipeItemId = record and record.recipeItemId or nil
         else
-            normalized.ambiguousSpellIds = cloneSpellIdList(createdSpellIds)
+            local hinted = resolveAmbiguousByProfession(self, createdSpellIds, professionHint)
+            if hinted then
+                normalized.spellId = hinted.spellId
+                normalized.recipeItemId = hinted.recipeItemId
+            else
+                normalized.ambiguousSpellIds = cloneSpellIdList(createdSpellIds)
+            end
         end
         return normalized
     end
@@ -358,7 +388,7 @@ function RecipeMetadata:NormalizeRecipeKey(recipeKey)
     return normalized
 end
 
-function RecipeMetadata:GetRecipeInfo(recipeKey)
+function RecipeMetadata:GetRecipeInfo(recipeKey, professionHint)
     -- Hot path: skip the table allocation that NormalizeRecipeKey does when
     -- we just want the record. Called once per candidate inside the list
     -- build predicate cascade, so 300+ allocations per profession refresh
@@ -375,8 +405,14 @@ function RecipeMetadata:GetRecipeInfo(recipeKey)
         return self._recordsBySpellId[recipeSpellId]
     end
     local createdSpellIds = self._createdItemToSpellIds[floored]
-    if type(createdSpellIds) == "table" and #createdSpellIds == 1 then
-        return self._recordsBySpellId[createdSpellIds[1]]
+    if type(createdSpellIds) == "table" then
+        if #createdSpellIds == 1 then
+            return self._recordsBySpellId[createdSpellIds[1]]
+        end
+        local hinted = resolveAmbiguousByProfession(self, createdSpellIds, professionHint)
+        if hinted then
+            return hinted
+        end
     end
     -- Ambiguous or unknown: fall back to the full normalize so the
     -- caller still gets the ambiguity flag in GetMetadataResolutionStatus.

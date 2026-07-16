@@ -223,7 +223,7 @@ function Market:ResolveItemQuery(query)
     end
 
     if Addon.UI and Addon.UI.selectedRecipeKey and Addon.Data and Addon.Data.GetRecipeDetail then
-        local detail = Addon.Data:GetRecipeDetail(Addon.UI.selectedRecipeKey)
+        local detail = Addon.Data:GetRecipeDetail(Addon.UI.selectedRecipeKey, Addon.UI.selectedProfession)
         if detail then
             local id = checkName(detail.createdItemID)
             if id then return id, itemLink end

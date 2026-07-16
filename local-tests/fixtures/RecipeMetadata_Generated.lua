@@ -59,6 +59,17 @@ RecipeRegistryRecipeMetadata = {
                 { itemId = 2835, count = 1 },
             },
         },
+        [3308] = {
+            profession = "mining",
+            expansion = "vanilla",
+            createdItemId = 3577,
+            category = "metals",
+            sortOrder = 60,
+            bopOutput = false,
+            reagents = {
+                { itemId = 2776, count = 1 },
+            },
+        },
         [3918] = {
             profession = "engineering",
             expansion = "vanilla",
@@ -70,6 +81,20 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             reagents = {
                 { itemId = 2835, count = 1 },
+            },
+        },
+        [11479] = {
+            profession = "alchemy",
+            expansion = "vanilla",
+            recipeItemId = 9304,
+            createdItemId = 3577,
+            category = "transmutes",
+            subcategory = "metal",
+            sortOrder = 10,
+            requiredSkill = 225,
+            bopOutput = false,
+            reagents = {
+                { itemId = 3575, count = 1 },
             },
         },
         [25255] = {
@@ -203,6 +228,7 @@ RecipeRegistryRecipeMetadata = {
     },
 
     recipeItemToSpellId = {
+        [9304] = 11479,
         [22907] = 28543,
         [22900] = 28596,
         [23590] = 29669,
@@ -212,6 +238,7 @@ RecipeRegistryRecipeMetadata = {
 
     createdItemToSpellIds = {
         [118] = { 2330 },
+        [3577] = { 3308, 11479 },
         [2454] = { 2329 },
         [2679] = { 2538 },
         [2862] = { 2660 },
