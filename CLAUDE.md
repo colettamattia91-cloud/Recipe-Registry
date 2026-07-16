@@ -141,11 +141,20 @@ Test.it("description", function() Test.eq(actual, expected) end)
 
 ## Branch strategy
 
-- `sync-rewrite` — active development branch for the Wire v3 rewrite (this codebase). Target: merge to `main` when stable.
-- `develop` — parallel branch carrying the legacy manifest-based sync system. Not related to this rewrite.
-- `main` — production branch. Must never contain `local-tests/` or documentation files other than `README.md` and `CHANGELOG.md`.
+- `develop` — the active development branch. All work happens here: code, tests, docs, tooling.
+- `main` — release-only. Its tree must contain ONLY the addon runtime files (`RecipeRegistry.toc`, `Core/`, `Data/`, `Integrations/`, `Libs/`, `Sync/` without `MockSync.lua`, `UI/`) plus `README.md`, `CHANGELOG.md`, `LICENSE`, `.pkgmeta`, `.gitignore`. Never commit or edit directly on `main`.
 
-When preparing a merge to `main`, exclude: `local-tests/`, `docs/`, and any `.md` files other than `README.md` and `CHANGELOG.md`.
+### Release procedure (version X.Y.Z)
+
+Never `git merge develop` into `main`: a true merge drags develop's commit history (tests, tooling, unrelated work) into main even when the final tree is clean. A release is exactly ONE squash commit:
+
+1. On `develop`: update `CHANGELOG.md`, bump `## Version:` in `RecipeRegistry.toc`, run the full test suite, commit.
+2. `git checkout main && git merge --squash develop` — resolve `CHANGELOG.md` with develop's version.
+3. `git rm -rf --ignore-unmatch local-tests docs CLAUDE.md .claude .vscode .github artifacts build tools RecipeRegistry_OrdersCore Sync/MockSync.lua`
+4. Verify before committing: `git status --short` must list only runtime files + `CHANGELOG.md` + `RecipeRegistry.toc`.
+5. Commit as `Release X.Y.Z`, tag `vX.Y.Z`, check out `develop` again (and verify the checkout happened).
+6. Commit messages are plain text — no `Co-Authored-By` or any AI-attribution trailer, anywhere in this repo.
+7. Pushes are done by the maintainer (SSH key is passphrase-protected) — never attempt them.
 
 ## Active rewrite context
 
