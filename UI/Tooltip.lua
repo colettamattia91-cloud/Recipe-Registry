@@ -440,6 +440,12 @@ function Tooltip:GetRowsForSpellID(spellID)
 end
 
 function Tooltip:AddCraftLines(tooltip, rows, renderKey)
+    -- User toggle from /rr options ("Show crafters on tooltips"). Gated at
+    -- the single render choke point so both the item and spell tooltip
+    -- paths honour it; the crafter index keeps updating in the background
+    -- so re-enabling takes effect immediately.
+    local profile = Addon.db and Addon.db.profile
+    if profile and profile.showTooltipCrafters == false then return end
     if not rows or #rows == 0 then return end
 
     renderKey = tostring(renderKey or "craft") .. ":" .. tostring(self.indexVersion or 0)
