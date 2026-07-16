@@ -2,11 +2,20 @@
 
 All notable changes to this project are documented in this file.
 
-## [Unreleased]
+## [2.1.1] - 2026-07-16
+
+### Added
+
+- **Tooltip crafters can now be turned off.** A new checkbox in `/rr options` ("Show known crafters on item and spell tooltips") hides the Recipe Registry section on tooltips for players who prefer leaner tooltips. Enabled by default.
+
+### Fixed
+
+- **Multi-source recipes now show their materials.** Items that more than one recipe can create — Gold Bar, Truesilver Bar, and the elemental Essence/Primal transmutes — used to show "No material mapping available" in the recipe details. The browser now resolves them through their profession context (Smelt Gold under Mining, Transmute: Iron to Gold under Alchemy), so reagents, categories, and cost estimates work for these entries.
 
 ### Changed
 
 - **Compatibility with TBC Anniversary patch 2.5.6.** The 2.5.6 client moved to the modern addon API (aligned with Classic Era 1.15.9). Crafter rows on item and spell tooltips now use the modern tooltip pipeline (`TooltipDataProcessor`) — on the old client they would have thrown a Lua error on login. Item and spell lookups (`GetItemInfo`, `GetSpellInfo`, and friends) now go through a compatibility layer that prefers the new `C_Item`/`C_Spell` APIs and falls back to the classic globals where they still exist. TOC interface version bumped to 20506.
+- **Profession scans now record exact transmute variants.** When the same item can come from two recipes of one profession (e.g. Primal Fire via Primal Air or via Primal Mana), the scan now additionally stores the precise recipe, so guildmates can see exactly which transmute a crafter knows, with the right reagents and costs. Existing guild data stays valid; the extra detail appears after each crafter's next profession scan with this version.
 
 ## [2.1.0] - 2026-06-03
 
