@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.1.2] - 2026-07-18
+
+### Fixed
+
+- **Expansion filter now covers multi-recipe transmute items.** Essence of Water and Essence of Earth — items that two different Alchemy transmutes can create — stayed visible in the recipe browser even with Vanilla content hidden. The browser now recognizes when every possible source recipe belongs to the same hidden expansion and filters these entries correctly. Entries whose sources span professions (e.g. Gold Bar via Mining and Alchemy) remain visible as before.
+- **Reagents no longer show placeholders on first selection.** Selecting a recipe whose reagent items were not yet in the local item cache used to show raw "item:1234" entries in the materials list until the recipe was selected again. The details panel now refreshes itself as soon as the item data arrives from the server.
+
 ## [2.1.1] - 2026-07-16
 
 ### Added
