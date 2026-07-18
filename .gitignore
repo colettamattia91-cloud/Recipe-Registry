@@ -1,5 +1,6 @@
-/INTERNAL_ROADMAP.md
-/CODEBASE_ANALYSIS.local.md
+/.vscode/
+/build/
+/debug.log
 /RecipeRegistry-*.zip
 /.vscode/
 /build/
