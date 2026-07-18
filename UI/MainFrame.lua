@@ -3999,8 +3999,28 @@ function UI:RefreshDetailPanel()
         end
     end
     local requestabilitySignature = self:BuildDetailRequestabilitySignature(detail)
+    -- Item names/icons resolve asynchronously on cold caches: the first
+    -- render after selection can show "item:1234" placeholders for reagents
+    -- and title, and the item-cache refresh that follows
+    -- GET_ITEM_INFO_RECEIVED must not be swallowed by this short-circuit.
+    -- Count the still-unresolved display assets (and fold in the label,
+    -- which flips from placeholder to real name) so the signature changes
+    -- once the item data lands.
+    local pendingAssets = 0
+    if detail.reagents then
+        for _, reagent in ipairs(detail.reagents) do
+            if reagent.itemID then
+                if not reagent.name or reagent.name == ("item:" .. tostring(reagent.itemID)) then
+                    pendingAssets = pendingAssets + 1
+                end
+                if not reagent.icon then
+                    pendingAssets = pendingAssets + 1
+                end
+            end
+        end
+    end
     local signature = string.format(
-        "%s|%s|%d|%d|%s|%s|%s|%s|%s",
+        "%s|%s|%d|%d|%s|%s|%s|%s|%s|%s|%d",
         tostring(self.selectedRecipeKey),
         isFavorite and "1" or "0",
         tonumber(detail.crafterCount) or 0,
@@ -4009,7 +4029,9 @@ function UI:RefreshDetailPanel()
         tostring(detail.cost and detail.cost.missingCount or 0),
         tostring(detail.cost and detail.cost.source or ""),
         tostring(self._offlineCraftersExpanded),
-        requestabilitySignature
+        requestabilitySignature,
+        tostring(detail.label or ""),
+        pendingAssets
     )
     if self._lastDetailSignature == signature then
         return
