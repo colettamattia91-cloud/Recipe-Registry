@@ -1,5 +1,4 @@
 ## Interface: 20506
-## Interface: 20506
 ## Title: Recipe Registry
 ## Notes: Lean guild profession tracker with owner-driven sync and metadata-backed recipe browsing
 ## Author: OpenAI + User collaboration
@@ -14,7 +13,6 @@
 Libs\embeds.xml
 
 Core\Core.lua
-Core\Compat.lua
 Core\Compat.lua
 Core\BuildInfo.lua
 Core\Performance.lua
