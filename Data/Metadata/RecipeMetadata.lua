@@ -688,6 +688,42 @@ function RecipeMetadata:GetMetadataResolutionStatus(recipeKey, info)
     return "unresolved"
 end
 
+-- Classification consensus for ambiguous created-item keys. An ambiguous
+-- key means we cannot know WHICH spell the entry maps to, but the fields
+-- shared by every candidate record are still certain knowledge: Essence
+-- of Water (7080) maps to two alchemy transmutes that are both vanilla,
+-- so its profession and expansion are known even though the spell is not.
+-- Returns nil for non-ambiguous keys or when a candidate record is
+-- missing; otherwise a table whose `profession` / `expansion` fields are
+-- set only where ALL candidates agree (nil where they diverge, e.g. Gold
+-- Bar's mining/alchemy split leaves profession nil but expansion
+-- "vanilla").
+function RecipeMetadata:GetAmbiguousRecipeConsensus(recipeKey)
+    local normalized = self:NormalizeRecipeKey(recipeKey)
+    local spellIds = normalized and normalized.ambiguousSpellIds
+    if type(spellIds) ~= "table" or #spellIds == 0 then
+        return nil
+    end
+    local profession, expansion
+    for index, spellId in ipairs(spellIds) do
+        local record = self._recordsBySpellId[spellId]
+        if not record then
+            return nil
+        end
+        if index == 1 then
+            profession = record.profession
+            expansion = record.expansion
+        else
+            if record.profession ~= profession then profession = nil end
+            if record.expansion ~= expansion then expansion = nil end
+        end
+    end
+    if profession == nil and expansion == nil then
+        return nil
+    end
+    return { profession = profession, expansion = expansion }
+end
+
 function RecipeMetadata:GetUnresolvedRecords(severity)
     local out = {}
     for _, unresolved in ipairs(self:_CollectUnresolvedRecords()) do

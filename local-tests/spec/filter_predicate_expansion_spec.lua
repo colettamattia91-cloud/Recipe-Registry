@@ -103,3 +103,39 @@ Test.it("applies expansion predicate before row detail construction", function()
     Test.eq(calls["-2329"], nil, "hidden Vanilla recipe should not build detail")
     Test.eq(calls["-28596"], 1, "visible TBC recipe should build detail")
 end)
+
+Test.it("hides ambiguous created-item keys when every candidate spell is filtered", function()
+    -- Bolt of Imbued Netherweave (21840) maps to two tailoring TBC spells
+    -- (26745/26746) — ambiguous even with a profession hint, exactly like
+    -- the Essence of Water / Essence of Earth vanilla transmute pairs in
+    -- live data. When every candidate would be hidden by the expansion
+    -- prefilter, the conservative-show path must not leak the entry.
+    addon.db.profile.recipePrefilters.professionExpansionOverrides = {}
+    addon.db.profile.recipePrefilters.expansionDefaults.vanilla = true
+    addon.db.profile.recipePrefilters.expansionDefaults.tbc = false
+
+    local passes, reason = filters:RecipePasses(21840)
+    Test.eq(passes, false)
+    Test.eq(reason, "hidden-expansion")
+end)
+
+Test.it("keeps ambiguous created-item keys visible when their expansion is enabled", function()
+    addon.db.profile.recipePrefilters.expansionDefaults.vanilla = false
+    addon.db.profile.recipePrefilters.expansionDefaults.tbc = true
+
+    local passes, reason = filters:RecipePasses(21840)
+    Test.eq(passes, true)
+    Test.eq(reason, "visible-unresolved-conservative")
+end)
+
+Test.it("keeps cross-profession ambiguous keys visible via the mining candidate", function()
+    -- Gold Bar (3577): Smelt Gold (mining) + Transmute: Iron to Gold
+    -- (alchemy), both vanilla. Mining is expansion-agnostic in the UI, so
+    -- the entry stays visible even with vanilla hidden.
+    addon.db.profile.recipePrefilters.expansionDefaults.vanilla = false
+    addon.db.profile.recipePrefilters.expansionDefaults.tbc = true
+
+    local passes, reason = filters:RecipePasses(3577)
+    Test.eq(passes, true)
+    Test.eq(reason, "visible-unresolved-conservative")
+end)

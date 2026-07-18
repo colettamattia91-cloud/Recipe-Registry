@@ -77,6 +77,27 @@ Test.it("same-profession ambiguity stays ambiguous even with a hint", function()
     Test.eq(#normalized.ambiguousSpellIds, 2)
 end)
 
+Test.it("exposes classification consensus for ambiguous created-item keys", function()
+    local _addon, _data, metadata = freshAddon()
+
+    -- Same-profession pair (Bolt of Imbued Netherweave): the spell stays
+    -- unknown but profession and expansion are certain.
+    local bolt = metadata:GetAmbiguousRecipeConsensus(21840)
+    Test.truthy(bolt, "same-profession pair yields a consensus")
+    Test.eq(bolt.profession, "tailoring")
+    Test.eq(bolt.expansion, "tbc")
+
+    -- Cross-profession pair (Gold Bar): professions diverge, expansion
+    -- still agrees.
+    local goldBar = metadata:GetAmbiguousRecipeConsensus(3577)
+    Test.truthy(goldBar, "cross-profession pair still agrees on expansion")
+    Test.eq(goldBar.profession, nil, "mining vs alchemy leaves profession open")
+    Test.eq(goldBar.expansion, "vanilla")
+
+    Test.eq(metadata:GetAmbiguousRecipeConsensus(-2329), nil, "resolved keys have no ambiguity consensus")
+    Test.eq(metadata:GetAmbiguousRecipeConsensus(99999991), nil, "unknown keys have no consensus")
+end)
+
 Test.it("wrong or non-profession hints keep the conservative nil", function()
     local _addon, _data, metadata = freshAddon()
     Test.eq(metadata:GetRecipeInfo(3577, "cooking"), nil)

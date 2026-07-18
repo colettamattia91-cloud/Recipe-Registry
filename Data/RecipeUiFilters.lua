@@ -128,6 +128,30 @@ function RecipeUiFilters:GetEffectiveExpansionVisibility(professionKey)
     return out
 end
 
+-- An ambiguous created-item key still carries certain classification when
+-- every candidate spell agrees (RecipeMetadata:GetAmbiguousRecipeConsensus):
+-- Essence of Water maps to two alchemy transmutes that are both vanilla.
+-- Apply the normal expansion gate to that consensus so the entry does not
+-- slip through on the conservative-show path. Mining stays exempt
+-- (expansion-agnostic in the UI, matching the resolved-record gate), and
+-- any divergence in profession or expansion keeps the conservative show.
+local function ambiguousConsensusHiddenByExpansion(self, metadata, recipeKey, filterContext)
+    if not metadata.GetAmbiguousRecipeConsensus then
+        return false
+    end
+    local consensus = metadata:GetAmbiguousRecipeConsensus(recipeKey)
+    local professionKey = consensus and consensus.profession
+    local expansion = consensus and consensus.expansion
+    if not professionKey or not expansion or professionKey == "mining" then
+        return false
+    end
+    local visibility = filterContext and filterContext.precomputedVisibility
+        and filterContext.precomputedVisibility[professionKey]
+        or self:GetEffectiveExpansionVisibility(professionKey)
+    return (expansion == "vanilla" and visibility.vanilla == false)
+        or (expansion == "tbc" and visibility.tbc == false)
+end
+
 function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
     local metadata = getMetadata()
     if not metadata then
@@ -142,6 +166,12 @@ function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
             -- Real recipe with mapping ambiguity (e.g. same created item from
             -- multiple spells): keep visible per roadmap §9 conservative show —
             -- the mapping is a remediation task, the recipe itself is legit.
+            -- Exception: when every candidate spell would be hidden by the
+            -- expansion prefilter anyway, honor the filter.
+            if ambiguousConsensusHiddenByExpansion(self, metadata, recipeKey, filterContext) then
+                Addon:Trace("filters", "ambiguous recipe hidden by expansion consensus", recipeKey)
+                return false, "hidden-expansion"
+            end
             Addon:Trace("filters", "metadata ambiguous for recipe", recipeKey)
             return true, "visible-unresolved-conservative"
         end
