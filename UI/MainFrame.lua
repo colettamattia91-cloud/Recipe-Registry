@@ -1915,14 +1915,52 @@ function UI:CreateMainFrame()
     resizeGrip:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
     resizeGrip:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
     resizeGrip:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
-    resizeGrip:SetScript("OnMouseDown", function()
-        UI:ClearSearchFocus()
-        f:StartSizing("BOTTOMRIGHT")
-    end)
-    resizeGrip:SetScript("OnMouseUp", function()
-        f:StopMovingOrSizing()
+    -- Manual cursor-driven sizing instead of StartSizing: on Classic-era
+    -- clients StartSizing miscomputes the drag origin (scale/anchor
+    -- dependent) and the frame jumps to the screen edge on mouse-down.
+    local function stopSizing(grip)
+        if not grip._sizing then return end
+        grip._sizing = false
+        grip:SetScript("OnUpdate", nil)
         UI:SaveFramePlacement()
         UI:HandleFrameResized()
+    end
+    resizeGrip:SetScript("OnMouseDown", function(grip)
+        UI:ClearSearchFocus()
+        -- Pin the top-left corner for the duration of the drag: the saved
+        -- anchor may be CENTER, which would grow the frame in both
+        -- directions around it instead of following the dragged corner.
+        local left, top = f:GetLeft(), f:GetTop()
+        if left and top then
+            f:ClearAllPoints()
+            f:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left, top)
+        end
+        local scale = f:GetEffectiveScale()
+        local cursorX, cursorY = GetCursorPosition()
+        grip._baseWidth, grip._baseHeight = f:GetWidth(), f:GetHeight()
+        grip._baseCursorX, grip._baseCursorY = cursorX / scale, cursorY / scale
+        grip._sizing = true
+        grip:SetScript("OnUpdate", function(g)
+            if not IsMouseButtonDown("LeftButton") then
+                stopSizing(g)
+                return
+            end
+            local liveScale = f:GetEffectiveScale()
+            local x, y = GetCursorPosition()
+            x, y = x / liveScale, y / liveScale
+            -- Cap at the screen size expressed in frame-local units so the
+            -- window cannot be dragged past the visible area.
+            local maxWidth = UIParent:GetWidth() / f:GetScale()
+            local maxHeight = UIParent:GetHeight() / f:GetScale()
+            local width = g._baseWidth + (x - g._baseCursorX)
+            local height = g._baseHeight - (y - g._baseCursorY)
+            width = math.min(math.max(1000, width), maxWidth)
+            height = math.min(math.max(620, height), maxHeight)
+            f:SetSize(width, height)
+        end)
+    end)
+    resizeGrip:SetScript("OnMouseUp", function(grip)
+        stopSizing(grip)
     end)
     f.resizeGrip = resizeGrip
 
