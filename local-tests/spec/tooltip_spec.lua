@@ -242,6 +242,47 @@ Test.it("restarts the tooltip rebuild when data changes again during an active b
     Test.falsy(tooltip.indexDirty, "tooltip index should be clean after the restarted build completes")
 end)
 
+Test.it("hooks the legacy tooltip scripts when the client exposes OnTooltipSetItem", function()
+    local _addon, wow, data, tooltip = freshAddon()
+    local memberKey = "Legacycrafter-TestRealm"
+    wow.SetGuildRoster({
+        { name = memberKey, online = true, rankName = "Member", rankIndex = 5, level = 70, classDisplayName = "Mage", classFileName = "MAGE" },
+    })
+    data:RebuildOnlineCache()
+    seedProfession(data, memberKey, "Alchemy", 91001)
+    seedProfession(data, memberKey, "Enchanting", -47001)
+    tooltip:RebuildIndex()
+
+    -- Fake 2.5.6-anniversary GameTooltip: legacy script types and
+    -- GetItem()/GetSpell() accessors exist, TooltipDataProcessor post
+    -- calls never fire (the table may exist but is dead code there).
+    local legacyScripts = { OnTooltipSetItem = true, OnTooltipSetSpell = true, OnTooltipCleared = true }
+    local fake = tooltipStub()
+    fake.scripts = {}
+    function fake:HasScript(name) return legacyScripts[name] == true end
+    function fake:HookScript(name, handler) self.scripts[name] = handler end
+    function fake:GetItem() return "Test Recipe", "item:91001:0:0:0" end
+    function fake:GetSpell() return "Test Enchant", nil, 47001 end
+
+    tooltip._tooltipHooksRegistered = false
+    tooltip.watchedTooltips = { [fake] = true }
+    tooltip:RegisterTooltipHooks()
+
+    Test.truthy(tooltip._tooltipHooksRegistered, "legacy scripts should mark hooks as registered")
+    Test.truthy(fake.scripts.OnTooltipSetItem, "OnTooltipSetItem should be hooked")
+    Test.truthy(fake.scripts.OnTooltipSetSpell, "OnTooltipSetSpell should be hooked")
+    Test.truthy(fake.scripts.OnTooltipCleared, "OnTooltipCleared should be hooked")
+
+    fake.scripts.OnTooltipSetItem(fake)
+    Test.eq(fake.lines[2] and fake.lines[2].text, "Recipe Registry", "item hover should render crafter header")
+    Test.truthy(fake.shown, "item hover should show the tooltip")
+
+    fake.scripts.OnTooltipCleared(fake)
+    fake.lines = {}
+    fake.scripts.OnTooltipSetSpell(fake)
+    Test.eq(fake.lines[2] and fake.lines[2].text, "Recipe Registry", "spell hover should render crafter header")
+end)
+
 Test.it("defers index rebuild while warmup is active and schedules it afterwards", function()
     local addon, _wow, _data, tooltip = freshAddon()
 
