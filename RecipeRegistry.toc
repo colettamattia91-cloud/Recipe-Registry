@@ -2,7 +2,7 @@
 ## Title: Recipe Registry
 ## Notes: Lean guild profession tracker with owner-driven sync and metadata-backed recipe browsing
 ## Author: OpenAI + User collaboration
-## Version: 2.1.2
+## Version: 2.2.0
 ## X-Build-Channel: release
 ## X-Build-ID: release
 ## SavedVariables: RecipeRegistryDB,RecipeRegistryLogDB

@@ -135,6 +135,9 @@ local function getProfile()
     for field, bounds in pairs(TUNING_BOUNDS) do
         profile.tuning[field] = clampTuning(field, profile.tuning[field] or bounds.default)
     end
+    if type(profile.mainFrame) ~= "table" then
+        profile.mainFrame = {}
+    end
     ensureRecipePrefilters(profile)
     return profile
 end
@@ -479,6 +482,10 @@ function Options:RefreshControls()
     if self.tooltipCraftersCheck then
         self.tooltipCraftersCheck:SetChecked(profile.showTooltipCrafters ~= false)
     end
+    if self.scaleSlider then
+        local scale = tonumber(profile.mainFrame and profile.mainFrame.scale) or 1
+        self.scaleSlider:SetDisplayValue(math.floor(scale * 100 + 0.5))
+    end
     if self.pullDelaySlider then
         self.pullDelaySlider:SetDisplayValue(profile.tuning.blockPullDelaySeconds)
     end
@@ -555,7 +562,7 @@ function Options:EnsurePanel()
         scrollFrame:SetPoint("TOPLEFT", 0, 0)
         scrollFrame:SetPoint("BOTTOMRIGHT", -28, 0)
         content = CreateFrame("Frame", nil, scrollFrame)
-        content:SetSize(560, 1120)
+        content:SetSize(560, 1180)
         scrollFrame:SetScrollChild(content)
     else
         content = panel
@@ -743,12 +750,27 @@ function Options:EnsurePanel()
         "Adds a Recipe Registry section to item, recipe, spell, and enchant tooltips listing guildmates who can craft them. Disable for leaner tooltips.")
     self.tooltipCraftersCheck = tooltipCraftersCheck
 
+    local scaleSlider = createSlider(content,
+        "Main window scale",
+        60, 120, 5,
+        "%d%%",
+        function(value)
+            if Addon.UI and Addon.UI.SetFrameScale then
+                Addon.UI:SetFrameScale(value / 100)
+            end
+        end
+    )
+    scaleSlider:SetPoint("TOPLEFT", tooltipCraftersCheck, "BOTTOMLEFT", 8, -26)
+    setHoverTooltip(scaleSlider, "Main window scale",
+        "Shrinks or enlarges the whole Recipe Registry window. Useful on small screens; you can also drag the grip in the window's bottom-right corner to resize it.")
+    self.scaleSlider = scaleSlider
+
     local openButton = createButton(content, "Open Recipe Registry", 180, function()
         if Addon.UI then
             Addon.UI:Toggle()
         end
     end)
-    openButton:SetPoint("TOPLEFT", tooltipCraftersCheck, "BOTTOMLEFT", 2, -10)
+    openButton:SetPoint("TOPLEFT", scaleSlider, "BOTTOMLEFT", -6, -30)
 
     local tuningHeader = createHeader(content, "Sync Tuning", openButton, -28)
     local tuningHelp = createText(content,
@@ -838,6 +860,12 @@ function Options:EnsurePanel()
         profile.tuning = profile.tuning or {}
         for field, bounds in pairs(TUNING_BOUNDS) do
             profile.tuning[field] = bounds.default
+        end
+        if type(profile.mainFrame) == "table" then
+            profile.mainFrame.scale = 1
+        end
+        if Addon.UI and Addon.UI.ApplyFrameScale then
+            Addon.UI:ApplyFrameScale()
         end
         resetRecipePrefilters(profile)
         if Addon.UI then

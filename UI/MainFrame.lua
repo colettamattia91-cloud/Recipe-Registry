@@ -945,6 +945,7 @@ function UI:RestoreFramePlacement()
     local f = self.frame
     if not f then return end
     local settings = getMainFrameProfile()
+    self:ApplyFrameScale()
     local width = settings and tonumber(settings.width) or 1200
     local height = settings and tonumber(settings.height) or 750
     f:SetSize(math.max(1000, width or 1200), math.max(620, height or 750))
@@ -956,6 +957,38 @@ function UI:RestoreFramePlacement()
     else
         f:SetPoint("CENTER")
     end
+end
+
+local MIN_FRAME_SCALE, MAX_FRAME_SCALE = 0.6, 1.2
+
+local function clampFrameScale(value)
+    value = tonumber(value) or 1
+    if value < MIN_FRAME_SCALE then return MIN_FRAME_SCALE end
+    if value > MAX_FRAME_SCALE then return MAX_FRAME_SCALE end
+    return value
+end
+
+function UI:GetFrameScale()
+    local settings = getMainFrameProfile()
+    return clampFrameScale(settings and settings.scale or 1)
+end
+
+function UI:ApplyFrameScale()
+    local f = self.frame
+    if not (f and f.SetScale) then return end
+    f:SetScale(self:GetFrameScale())
+end
+
+-- Options setter. Re-anchoring after SetScale keeps the frame on-screen:
+-- point offsets are interpreted in scaled units, so a scale bump alone can
+-- push a corner-anchored frame outside the viewport.
+function UI:SetFrameScale(scale)
+    local settings = getMainFrameProfile()
+    if settings then
+        settings.scale = clampFrameScale(scale)
+    end
+    -- RestoreFramePlacement applies the scale before re-anchoring.
+    self:RestoreFramePlacement()
 end
 
 function UI:Close(reason)
@@ -1159,6 +1192,18 @@ function UI:ApplyMainLayout()
     end
     self:RefreshAddonStatusControls()
     self:InvalidateRecipeWindowCache()
+end
+
+-- Runs when a resize drag ends: re-binds the virtualized list for the new
+-- viewport and reflows detail text to the new panel width. The detail
+-- signature must be cleared or RefreshDetailPanel's visibility-only
+-- short-circuit would skip the reflow (same recipe, new width).
+function UI:HandleFrameResized()
+    if not self.frame then return end
+    self:InvalidateRecipeWindowCache()
+    self:RenderVisibleRecipeRows()
+    self._lastDetailSignature = nil
+    self:RefreshDetailPanel()
 end
 
 function UI:OnEnable()
@@ -1682,6 +1727,10 @@ function UI:CreateMainFrame()
         UI:RenderVisibleRecipeRows()
     end)
     recipeScroll:HookScript("OnSizeChanged", function()
+        -- Width-only changes (addon-status view during a resize drag) keep
+        -- the same visible indices, so the render short-circuit would leave
+        -- rows at their stale width without this invalidation.
+        UI:InvalidateRecipeWindowCache()
         UI:RenderVisibleRecipeRows()
     end)
 
@@ -1855,6 +1904,65 @@ function UI:CreateMainFrame()
     footerText:SetTextColor(0.70, 0.70, 0.70)
     footerText:SetJustifyH("LEFT")
     f.footerText = footerText
+
+    -- Bottom-right resize grip. The frame has been SetResizable (with
+    -- persisted width/height) for a while, but nothing ever called
+    -- StartSizing, so users had no way to actually resize the window.
+    local resizeGrip = CreateFrame("Button", nil, f)
+    resizeGrip:SetSize(16, 16)
+    resizeGrip:SetPoint("BOTTOMRIGHT", -3, 3)
+    resizeGrip:SetFrameLevel(footer:GetFrameLevel() + 5)
+    resizeGrip:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+    resizeGrip:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+    resizeGrip:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+    -- Manual cursor-driven sizing instead of StartSizing: on Classic-era
+    -- clients StartSizing miscomputes the drag origin (scale/anchor
+    -- dependent) and the frame jumps to the screen edge on mouse-down.
+    local function stopSizing(grip)
+        if not grip._sizing then return end
+        grip._sizing = false
+        grip:SetScript("OnUpdate", nil)
+        UI:SaveFramePlacement()
+        UI:HandleFrameResized()
+    end
+    resizeGrip:SetScript("OnMouseDown", function(grip)
+        UI:ClearSearchFocus()
+        -- Pin the top-left corner for the duration of the drag: the saved
+        -- anchor may be CENTER, which would grow the frame in both
+        -- directions around it instead of following the dragged corner.
+        local left, top = f:GetLeft(), f:GetTop()
+        if left and top then
+            f:ClearAllPoints()
+            f:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left, top)
+        end
+        local scale = f:GetEffectiveScale()
+        local cursorX, cursorY = GetCursorPosition()
+        grip._baseWidth, grip._baseHeight = f:GetWidth(), f:GetHeight()
+        grip._baseCursorX, grip._baseCursorY = cursorX / scale, cursorY / scale
+        grip._sizing = true
+        grip:SetScript("OnUpdate", function(g)
+            if not IsMouseButtonDown("LeftButton") then
+                stopSizing(g)
+                return
+            end
+            local liveScale = f:GetEffectiveScale()
+            local x, y = GetCursorPosition()
+            x, y = x / liveScale, y / liveScale
+            -- Cap at the screen size expressed in frame-local units so the
+            -- window cannot be dragged past the visible area.
+            local maxWidth = UIParent:GetWidth() / f:GetScale()
+            local maxHeight = UIParent:GetHeight() / f:GetScale()
+            local width = g._baseWidth + (x - g._baseCursorX)
+            local height = g._baseHeight - (y - g._baseCursorY)
+            width = math.min(math.max(1000, width), maxWidth)
+            height = math.min(math.max(620, height), maxHeight)
+            f:SetSize(width, height)
+        end)
+    end)
+    resizeGrip:SetScript("OnMouseUp", function(grip)
+        stopSizing(grip)
+    end)
+    f.resizeGrip = resizeGrip
 
     local debugPanel = CreateFrame("Frame", nil, f, "BackdropTemplate")
     debugPanel:SetPoint("TOPRIGHT", -10, -118)
@@ -3824,8 +3932,21 @@ function UI:_FinalizeAddonStatusList(rows, summary)
     self:RefreshDetailPanel()
 end
 
+function UI:GetDetailLineWidth()
+    local scroll = self.frame and self.frame.detailScroll
+    local width = scroll and scroll.GetWidth and scroll:GetWidth() or nil
+    if type(width) ~= "number" or width <= 0 then
+        width = 420
+    end
+    return math.max(320, math.floor(width))
+end
+
 function UI:RenderDetailLines(lines, lineLinks, lineMeta)
     local yOffset = 0
+    local lineWidth = self:GetDetailLineWidth()
+    if self.frame.detailContent and self.frame.detailContent.SetWidth then
+        self.frame.detailContent:SetWidth(lineWidth)
+    end
     for i, text in ipairs(lines) do
         local line = self:EnsureDetailLine(i)
         setTextIfChanged(line.text, text)
@@ -3835,7 +3956,7 @@ function UI:RenderDetailLines(lines, lineLinks, lineMeta)
         local meta = lineMeta and lineMeta[i] or nil
         line:ClearAllPoints()
         line:SetPoint("TOPLEFT", 0, -yOffset)
-        line:SetWidth(420)
+        line:SetWidth(lineWidth)
         -- requestTarget drives the left-click whisper-open (always
         -- available for non-self crafters). actionButton is the "request
         -- this craft" affordance which sends a whisper from the addon —

@@ -2,7 +2,16 @@
 
 All notable changes to this project are documented in this file.
 
-## [2.1.2] - 2026-07-18
+## [2.2.0] - 2026-07-19
+
+### Added
+
+- **The main window is now resizable.** Drag the grip in the bottom-right corner to resize the window, from the 1000×620 minimum up to your screen size. The size is remembered per profile and restored at login, and the recipe list and details panel re-flow to fit.
+- **Window scale slider.** A new "Main window scale" slider in `/rr options` (60%–120%) shrinks or enlarges the whole window — useful on smaller screens where the minimum window size takes up too much room.
+
+### Changed
+
+- **The details panel now uses its full width.** Recipe details (materials, crafters, cost estimates) previously wrapped at a fixed 420px no matter how much room the panel had; the text now follows the real panel width, including the extra space gained by resizing.
 
 ### Fixed
 
