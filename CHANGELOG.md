@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.2.1] - 2026-07-20
+
+### Fixed
+
+- **Crafter rows are back on item and spell tooltips.** Since 2.1.1 the Recipe Registry section no longer appeared on any tooltip. Hovering a craftable item, recipe, spell, or enchant shows the known crafters again.
+
 ## [2.2.0] - 2026-07-19
 
 ### Added
