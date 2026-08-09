@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- **Favorites tab shows known crafters again.** Selecting a favorited recipe reported "No crafter known yet" even when a guildmate knew it. The favorites list was building each row's recipe key in the wrong internal format, which silently broke the crafter lookup for that recipe; the row now carries the same key format used everywhere else.
+
 ## [2.2.1] - 2026-07-20
 
 ### Fixed

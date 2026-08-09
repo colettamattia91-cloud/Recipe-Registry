@@ -48,6 +48,7 @@ $activeAllSpecs = @(
     "dirty_active_pull_debug_spec.lua",
     "filter_async_stale_callback_spec.lua",
     "filter_cache_invalidation_spec.lua",
+    "filter_favorites_indexed_recipekey_spec.lua",
     "filter_favorites_preserve_hidden_spec.lua",
     "filter_favorites_reappear_on_unhide_spec.lua",
     "filter_global_search_per_profession_spec.lua",

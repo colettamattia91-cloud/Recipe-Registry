@@ -3811,7 +3811,15 @@ function UI:BuildFavoriteRecipeRows(filterContext)
 
     if data._recipeIndex then
         for _, favoriteKey in ipairs(favoriteKeys) do
-            addIndexedRecipe(favoriteKey, data._recipeIndex[favoriteKey] or data._recipeIndex[tonumber(favoriteKey)])
+            local indexed = data._recipeIndex[favoriteKey] or data._recipeIndex[tonumber(favoriteKey)]
+            -- Favorites are stored under a stringified key, but the recipe
+            -- index (and everything downstream that looks recipes up by
+            -- key, e.g. GetRecipeCrafters) is keyed by the original
+            -- numeric spellID/itemID. Use the canonical key already on the
+            -- indexed row so row.recipeKey matches that type; passing the
+            -- string through here made every crafter lookup for a
+            -- selected favorite come up empty.
+            addIndexedRecipe((indexed and indexed.recipeKey) or tonumber(favoriteKey) or favoriteKey, indexed)
         end
     else
         for memberKey, entry in pairs(data.GetMembersDB and data:GetMembersDB() or {}) do
