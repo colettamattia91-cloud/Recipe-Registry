@@ -65,24 +65,29 @@ Test.it("counts the crafted quantity, not one unit", function()
     Test.eq(addon.Market:EstimateRecipeProfit(STONE), 150)
 end)
 
-Test.it("drops a craft whose reagents cannot all be priced", function()
+-- Vendor reagents (vials, thread, spices) often have no auctions at all.
+-- Hiding what cannot be priced would quietly empty whole professions, so
+-- the filter only drops a craft it has actually judged unprofitable.
+Test.it("keeps a craft it cannot price and marks it instead", function()
     setProfitableOnly(true)
-    -- Output priced high, but one reagent has no price: unknown is not
-    -- profitable.
     usePrices({ ["i:22573"] = 100, ["i:23781"] = 10000 })
 
-    Test.eq(addon.Market:EstimateRecipeProfit(STONE), nil)
+    local profit, why = addon.Market:EstimateRecipeProfit(STONE)
+    Test.eq(profit, nil)
+    Test.eq(why, "unpriceable")
+
     local passes, reason = filters:RecipePasses(STONE)
-    Test.eq(passes, false)
-    Test.eq(reason, "hidden-not-profitable")
+    Test.eq(passes, true)
+    Test.eq(reason, "visible-unpriced")
 end)
 
-Test.it("drops a craft whose output has no price", function()
+Test.it("keeps a craft whose output has no price", function()
     setProfitableOnly(true)
     usePrices({ ["i:22573"] = 100, ["i:22574"] = 50 })
 
-    local passes = filters:RecipePasses(STONE)
-    Test.eq(passes, false)
+    local passes, reason = filters:RecipePasses(STONE)
+    Test.eq(passes, true)
+    Test.eq(reason, "visible-unpriced")
 end)
 
 Test.it("keeps the toggle out of the cheap predicate path when off", function()
@@ -106,6 +111,56 @@ Test.it("separates cached recipe lists by toggle state", function()
     setProfitableOnly(true)
     local on = filters:BuildFilterCacheKey({})
     Test.ne(off, on)
+    setProfitableOnly(false)
+end)
+
+Test.it("prices a vendor reagent at the vendor, not the auction house", function()
+    setProfitableOnly(true)
+    -- 22574 is listed at a gouging 5000 on the auction house but a merchant
+    -- sells it for 50. Without the vendor price the craft reads as a loss.
+    usePrices({ ["i:22573"] = 100, ["i:22574"] = 5000, ["i:23781"] = 100 })
+    addon.db.global.vendorPrices[22574] = 50
+
+    Test.eq(addon.Market:GetMaterialCost(22574), 50)
+    Test.eq(addon.Market:EstimateRecipeProfit(STONE), 150)
+    Test.eq(filters:RecipePasses(STONE), true)
+
+    addon.db.global.vendorPrices[22574] = nil
+end)
+
+Test.it("keeps the auction price when it undercuts the vendor", function()
+    usePrices({ ["i:22574"] = 20 })
+    addon.db.global.vendorPrices[22574] = 50
+    Test.eq(addon.Market:GetMaterialCost(22574), 20)
+    addon.db.global.vendorPrices[22574] = nil
+end)
+
+Test.it("values the output at market price even when a vendor sells it too", function()
+    -- A vendor's asking price is what you pay to buy, never what you get
+    -- for selling: it must not become the craft's sale value.
+    usePrices({ ["i:23781"] = 100 })
+    addon.db.global.vendorPrices[23781] = 1
+    Test.eq(addon.Market:GetMarketPrice(23781), 100)
+    Test.eq(addon.Market:GetMaterialCost(23781), 1)
+    addon.db.global.vendorPrices[23781] = nil
+end)
+
+Test.it("nets the auction house cut out of the verdict when asked", function()
+    setProfitableOnly(true)
+    -- 4 stones at 65 = 260 gross against 250 of reagents: profitable gross,
+    -- a loss once the house takes its 5%.
+    usePrices({ ["i:22573"] = 100, ["i:22574"] = 50, ["i:23781"] = 65 })
+    Test.eq(addon.Market:EstimateRecipeProfit(STONE), 10)
+    Test.eq(filters:RecipePasses(STONE), true)
+
+    addon.db.profile.subtractAuctionHouseCut = true
+    addon.Market:InvalidatePriceCache("spec")
+    Test.eq(addon.Market:EstimateRecipeProfit(STONE), -3)
+    local passes, reason = filters:RecipePasses(STONE)
+    Test.eq(passes, false)
+    Test.eq(reason, "hidden-not-profitable")
+
+    addon.db.profile.subtractAuctionHouseCut = false
     setProfitableOnly(false)
 end)
 

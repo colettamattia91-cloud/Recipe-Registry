@@ -5,6 +5,13 @@ Addon.Market = Market
 local GetItemInfo = Addon.Compat.GetItemInfo
 
 local TSM_SOURCES = { "dbmarket", "dbminbuyout" }
+-- What a vendor charges, as TSM models it. Kept apart from TSM_SOURCES:
+-- these are acquisition prices for reagents, never a sale value for what
+-- the recipe produces.
+local TSM_VENDOR_SOURCES = { "vendorbuy" }
+-- The auction house keeps 5% of the sale price in TBC. Only ever applied to
+-- the profit line, and only when the player asks for it.
+local AUCTION_HOUSE_CUT = 0.05
 
 local function itemStringFromID(itemID)
     if not itemID then return nil end
@@ -77,6 +84,109 @@ end
 
 function Market:OnInitialize()
     self.priceCache = {}
+    self.vendorCache = {}
+end
+
+local function vendorPriceStore(create)
+    local db = Addon.db
+    local global = db and db.global
+    if not global then return nil end
+    if type(global.vendorPrices) ~= "table" then
+        if not create then return nil end
+        global.vendorPrices = {}
+    end
+    return global.vendorPrices
+end
+
+-- Vendor prices come from two places, in order of trust:
+--   * what we watched a merchant charge this account, which is the real
+--     price including any faction discount the character has;
+--   * TSM's vendorbuy source, for players who run TSM and have never
+--     opened the relevant vendor.
+-- Auctionator has no vendor-buy data, so its users rely on the scan.
+function Market:GetVendorPrice(itemID)
+    if not itemID then return nil end
+
+    local store = vendorPriceStore(false)
+    local scanned = store and store[itemID]
+    if type(scanned) == "number" and scanned > 0 then
+        return scanned, "Vendor"
+    end
+
+    local itemString = itemStringFromID(itemID)
+    local api = _G.TSM_API
+    if itemString and api and type(api.GetCustomPriceValue) == "function" then
+        for _, source in ipairs(TSM_VENDOR_SOURCES) do
+            local ok, value = pcall(api.GetCustomPriceValue, source, itemString)
+            local copper = ok and clampCopper(value) or nil
+            if copper and copper > 0 then
+                return copper, "TSM:" .. source
+            end
+        end
+    end
+
+    local tsm4 = _G.TSM_API_FOUR
+    local customPrice = tsm4 and tsm4.CustomPrice
+    if itemString and customPrice and type(customPrice.GetValue) == "function" then
+        for _, source in ipairs(TSM_VENDOR_SOURCES) do
+            local okA, valueA = pcall(customPrice.GetValue, source, itemString)
+            local copperA = okA and clampCopper(valueA) or nil
+            if copperA and copperA > 0 then
+                return copperA, "TSM:" .. source
+            end
+            local okB, valueB = pcall(customPrice.GetValue, itemString, source)
+            local copperB = okB and clampCopper(valueB) or nil
+            if copperB and copperB > 0 then
+                return copperB, "TSM:" .. source
+            end
+        end
+    end
+
+    return nil
+end
+
+-- Reagents like vials, thread and spices are sold by vendors at a fixed
+-- price and often have no auctions at all. Reading only the auction sources
+-- either priced them far above what anyone actually pays, or left them
+-- unpriced -- which silently dropped every alchemy recipe out of the
+-- profit filter, since every flask needs a vial.
+--
+-- Every merchant window we open is scanned once and folded into the
+-- account-wide store. Items bought with an alternate currency (honor,
+-- tokens, badges) are skipped: their copper price is not what they cost.
+function Market:ScanMerchantPrices()
+    local getNum = _G.GetMerchantNumItems
+    local getInfo = _G.GetMerchantItemInfo
+    if type(getNum) ~= "function" or type(getInfo) ~= "function" then return 0 end
+
+    local store = vendorPriceStore(true)
+    if not store then return 0 end
+
+    local getLink = _G.GetMerchantItemLink
+    local learned = 0
+    local count = getNum() or 0
+    for index = 1, count do
+        local ok, _name, _texture, price, quantity, _available, _usable, extendedCost = pcall(getInfo, index)
+        if ok and extendedCost ~= true then
+            local unit = clampCopper((tonumber(price) or 0) / math.max(1, tonumber(quantity) or 1))
+            local itemID
+            if type(getLink) == "function" then
+                local okLink, link = pcall(getLink, index)
+                itemID = okLink and link and extractItemIDFromQuery(link) or nil
+            end
+            if itemID and unit and unit > 0 and store[itemID] ~= unit then
+                store[itemID] = unit
+                learned = learned + 1
+            end
+        end
+    end
+
+    if learned > 0 then
+        -- Derived costs downstream are now stale for anything using these
+        -- reagents; the same invalidation the auction house close uses.
+        self:InvalidatePriceCache("merchant-scan")
+    end
+    return learned
 end
 
 function Market:OnEnable()
@@ -87,6 +197,11 @@ function Market:OnEnable()
     -- detail cache so an open recipe panel recomputes its cost block
     -- on next refresh.
     self:RegisterEvent("AUCTION_HOUSE_CLOSED", "OnAuctionHouseClosed")
+    self:RegisterEvent("MERCHANT_SHOW", "OnMerchantShow")
+end
+
+function Market:OnMerchantShow()
+    self:ScanMerchantPrices()
 end
 
 function Market:OnAuctionHouseClosed()
@@ -95,6 +210,7 @@ end
 
 function Market:InvalidatePriceCache(reason)
     self.priceCache = {}
+    self.vendorCache = {}
     if Addon.Data and Addon.Data.InvalidateRecipeCaches then
         Addon.Data:InvalidateRecipeCaches("metadata")
     end
@@ -176,7 +292,7 @@ end
 -- entries at an arbitrary clock interval. People who scan once a day (or
 -- once a week) would otherwise pay a TSM/Auctionator query per material
 -- per detail render every 30 seconds for the same stale numbers.
-function Market:GetMaterialCost(itemID, itemLink)
+function Market:GetMarketPrice(itemID, itemLink)
     if not itemID then return nil, nil end
 
     local cached = self.priceCache[itemID]
@@ -195,6 +311,36 @@ function Market:GetMaterialCost(itemID, itemLink)
     }
 
     return price, source
+end
+
+-- What it costs to obtain one of an item: the cheaper of the auction house
+-- and the vendor. Used for reagents only. What a recipe PRODUCES is valued
+-- with GetMarketPrice instead -- a vendor's asking price is what you pay to
+-- buy, never what you get for selling.
+function Market:GetMaterialCost(itemID, itemLink)
+    if not itemID then return nil, nil end
+
+    local market, marketSource = self:GetMarketPrice(itemID, itemLink)
+
+    self.vendorCache = self.vendorCache or {}
+    local cachedVendor = self.vendorCache[itemID]
+    if not cachedVendor then
+        local price, source = self:GetVendorPrice(itemID)
+        cachedVendor = { price = price, source = source }
+        self.vendorCache[itemID] = cachedVendor
+    end
+    local vendor, vendorSource = cachedVendor.price, cachedVendor.source
+
+    if market and vendor then
+        if vendor <= market then
+            return vendor, vendorSource
+        end
+        return market, marketSource
+    end
+    if market then
+        return market, marketSource
+    end
+    return vendor, vendorSource
 end
 
 function Market:ResolveItemQuery(query)
@@ -275,6 +421,17 @@ end
 -- Profit is only marked complete when every reagent priced: a partial cost
 -- understates the spend, which would show a phantom profit on exactly the
 -- recipes whose materials nobody has listed.
+-- The auction house takes its cut off the sale, never off what you paid for
+-- the materials, so it applies to the output value alone. Off by default:
+-- the gross figure is also the price to list at.
+function Market:GetSaleMultiplier()
+    local profile = Addon.db and Addon.db.profile
+    if profile and profile.subtractAuctionHouseCut == true then
+        return 1 - AUCTION_HOUSE_CUT, true
+    end
+    return 1, false
+end
+
 local function applyCraftValue(self, detail)
     detail.value = nil
     detail.profit = nil
@@ -282,7 +439,10 @@ local function applyCraftValue(self, detail)
     local createdItemID = detail.createdItemID
     if not createdItemID then return end
 
-    local unitPrice, source = self:GetMaterialCost(createdItemID)
+    -- Market price, not GetMaterialCost: the created item may well be sold
+    -- by a vendor too, and that vendor's asking price is not what the craft
+    -- is worth to sell.
+    local unitPrice, source = self:GetMarketPrice(createdItemID)
     if not unitPrice then return end
 
     local count = tonumber(detail.numCreated) or 1
@@ -299,10 +459,12 @@ local function applyCraftValue(self, detail)
     local cost = detail.cost
     if not cost or (cost.pricedCount or 0) <= 0 then return end
 
+    local multiplier, taxed = self:GetSaleMultiplier()
     detail.profit = {
-        total = detail.value.total - cost.total,
-        totalMax = detail.value.totalMax - cost.total,
+        total = math.floor(detail.value.total * multiplier) - cost.total,
+        totalMax = math.floor(detail.value.totalMax * multiplier) - cost.total,
         complete = (cost.missingCount or 0) == 0,
+        taxed = taxed,
     }
 end
 
@@ -314,38 +476,39 @@ end
 -- pricing needs item IDs and counts, not names. Everything else is a table
 -- read plus cache-backed price lookups.
 --
--- Returns nil when the craft cannot be priced end to end (no created item,
--- no reagents, or any leg missing a price) so callers can tell "not
--- profitable" from "not priceable".
+-- Returns the profit in copper, or nil plus "unpriceable" when the craft
+-- cannot be priced end to end (no created item, no reagents, or any leg
+-- missing a price). Callers must keep those two apart: an unpriceable
+-- recipe is not a known-unprofitable one.
 function Market:EstimateRecipeProfit(recipeKey, info)
     local metadata = Addon.RecipeMetadata
-    if not metadata then return nil end
+    if not metadata then return nil, "unpriceable" end
 
     info = info or (metadata.GetRecipeInfo and metadata:GetRecipeInfo(recipeKey)) or nil
-    if not info then return nil end
+    if not info then return nil, "unpriceable" end
 
     local createdItemID = info.createdItemId
-    if not createdItemID then return nil end
+    if not createdItemID then return nil, "unpriceable" end
 
-    local unitPrice = self:GetMaterialCost(createdItemID)
-    if not unitPrice then return nil end
+    local unitPrice = self:GetMarketPrice(createdItemID)
+    if not unitPrice then return nil, "unpriceable" end
 
     local reagents = info.reagents
-    if type(reagents) ~= "table" or #reagents == 0 then return nil end
+    if type(reagents) ~= "table" or #reagents == 0 then return nil, "unpriceable" end
 
     local cost = 0
     for index = 1, #reagents do
         local reagent = reagents[index]
         local price = reagent.itemId and self:GetMaterialCost(reagent.itemId) or nil
         if not price then
-            return nil
+            return nil, "unpriceable"
         end
         cost = cost + price * (tonumber(reagent.count) or 1)
     end
 
     -- Conservative on random yields: the guaranteed quantity, not the lucky one.
     local count = tonumber(info.createdCount) or 1
-    return unitPrice * count - cost
+    return math.floor(unitPrice * count * self:GetSaleMultiplier()) - cost
 end
 
 function Market:ApplyRecipeCosts(detail)
@@ -375,14 +538,20 @@ function Market:ApplyRecipeCosts(detail)
         end
     end
 
-    local sourceLabel
-    if usedSources["TSM:dbmarket"] or usedSources["TSM:dbminbuyout"] then
-        sourceLabel = missingCount > 0 and "TSM/Auctionator" or "TSM"
-    elseif usedSources["Auctionator"] then
-        sourceLabel = "Auctionator"
-    else
-        sourceLabel = "N/A"
+    -- Name the providers that actually priced something. Vendor entries
+    -- reach this list too now, so the old TSM-or-Auctionator special case
+    -- would have reported "N/A" for a craft whose reagents all came from a
+    -- merchant.
+    local providerSeen, providers = {}, {}
+    for source in pairs(usedSources) do
+        local provider = tostring(source):match("^[^:]+") or tostring(source)
+        if not providerSeen[provider] then
+            providerSeen[provider] = true
+            providers[#providers + 1] = provider
+        end
     end
+    table.sort(providers)
+    local sourceLabel = #providers > 0 and table.concat(providers, "/") or "N/A"
 
     detail.cost = {
         total = total,
@@ -405,10 +574,16 @@ function Market:DumpStatus(rest)
     for _ in pairs(self.priceCache or {}) do
         cached = cached + 1
     end
-    Addon:Print(string.format("Price providers: TSM=%s Auctionator=%s cached=%d (invalidated on AH close)",
+    local vendorKnown = 0
+    local store = Addon.db and Addon.db.global and Addon.db.global.vendorPrices
+    for _ in pairs(store or {}) do
+        vendorKnown = vendorKnown + 1
+    end
+    Addon:Print(string.format("Price providers: TSM=%s Auctionator=%s cached=%d vendorItems=%d (invalidated on AH close)",
         hasTSM and "yes" or "no",
         hasAuctionator and "yes" or "no",
-        cached
+        cached,
+        vendorKnown
     ))
 
     local query = tostring(rest or ""):gsub("^%s+", ""):gsub("%s+$", "")
@@ -423,6 +598,10 @@ function Market:DumpStatus(rest)
         return
     end
 
+    local vendorPrice, vendorSource = self:GetVendorPrice(itemID)
+    if vendorPrice then
+        Addon:Print(string.format("  vendor: %s (%s)", formatMoney(vendorPrice), tostring(vendorSource or "unknown")))
+    end
     local price, source = self:GetMaterialCost(itemID, itemLink)
     local resolvedName = itemNameFromID(itemID) or "?"
     if price then

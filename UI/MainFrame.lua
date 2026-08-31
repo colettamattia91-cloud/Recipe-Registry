@@ -3271,6 +3271,12 @@ function UI:BindRecipeRow(row, recipeIdx, rowData)
     if (rowData.onlineCount or 0) > 0 then
         statsParts[#statsParts + 1] = string.format("|cff55d66b%d online|r", rowData.onlineCount or 0)
     end
+    -- Only ever set while the profitable-only filter is on: the row survived
+    -- the filter because its price could not be worked out, not because it
+    -- was judged profitable. Saying so keeps the filtered list honest.
+    if rowData.visibilityReason == "visible-unpriced" then
+        statsParts[#statsParts + 1] = "|cff8f949cno price data|r"
+    end
     setTextIfChanged(row.stats, table.concat(statsParts, "\n"))
 
     local metaParts = {}
@@ -4363,7 +4369,8 @@ function UI:RefreshDetailPanel()
             if hasYieldRange then
                 amount = string.format("%s - %s", amount, formatSignedMoney(profit.totalMax))
             end
-            lines[#lines + 1] = string.format("%sProfit: %s|r", colour, amount)
+            local label = profit.taxed and "Profit (after 5% AH cut)" or "Profit"
+            lines[#lines + 1] = string.format("%s%s: %s|r", colour, label, amount)
             if not profit.complete then
                 lines[#lines + 1] = "|cff8f949cSome reagents have no price: profit is an upper bound.|r"
             end

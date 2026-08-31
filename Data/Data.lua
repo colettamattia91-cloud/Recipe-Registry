@@ -68,6 +68,11 @@ local DB_DEFAULTS = {
         },
         members = {},
         addonPeers = {},
+        -- itemID -> copper, learned from merchant windows. Account-wide on
+        -- purpose: what a vendor charges is a fact about the item, not about
+        -- the character, so one alt visiting a trade-goods vendor fixes the
+        -- reagent cost for every character on the account.
+        vendorPrices = {},
         syncSaturation = {
             -- [blockKey][fingerprint] = { noProgressCount, saturatedUntil }
             blockFingerprints = {},
@@ -81,6 +86,10 @@ local DB_DEFAULTS = {
         useRecipeCategories = true,
         recipeCategoryView = "expanded",
         showTooltipCrafters = true,
+        -- Gross by default: the "Sells for" figure doubles as the price to
+        -- list an auction at, and taxing it silently would make it useless
+        -- for that. Turning this on nets the profit line instead.
+        subtractAuctionHouseCut = false,
         recipePrefilters = {
             showRemoteBopOutputRecipes = false,
             hideUncataloguedRecipes = true,

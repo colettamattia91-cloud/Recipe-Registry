@@ -451,6 +451,17 @@ local function setMinimapShown(shown)
     end
 end
 
+local function setAuctionCutSubtracted(enabled)
+    local profile = getProfile()
+    if not profile then return end
+    profile.subtractAuctionHouseCut = enabled == true
+    -- Read while building the cost block, and it also moves the profit
+    -- filter's verdict, so cached lists and details have to go.
+    if Addon.Market and Addon.Market.InvalidatePriceCache then
+        Addon.Market:InvalidatePriceCache("auction-cut-option")
+    end
+end
+
 local function setTooltipCraftersShown(shown)
     local profile = getProfile()
     if not profile then return end
@@ -493,6 +504,9 @@ function Options:RefreshControls()
     end
     if self.tooltipCraftersCheck then
         self.tooltipCraftersCheck:SetChecked(profile.showTooltipCrafters ~= false)
+    end
+    if self.auctionCutCheck then
+        self.auctionCutCheck:SetChecked(profile.subtractAuctionHouseCut == true)
     end
     if self.scaleSlider then
         local scale = tonumber(profile.mainFrame and profile.mainFrame.scale) or 1
@@ -776,6 +790,15 @@ function Options:EnsurePanel()
         "Adds a Recipe Registry section to item, recipe, spell, and enchant tooltips listing guildmates who can craft them. Disable for leaner tooltips.")
     self.tooltipCraftersCheck = tooltipCraftersCheck
 
+    local auctionCutCheck = createCheck(content, "Subtract the 5% auction house cut from profit", function(self)
+        setAuctionCutSubtracted(self:GetChecked() and true or false)
+        Options:RefreshControls()
+    end)
+    auctionCutCheck:SetPoint("TOPLEFT", tooltipCraftersCheck, "BOTTOMLEFT", 0, -4)
+    setHoverTooltip(auctionCutCheck, "Auction house cut",
+        "Off by default: the \"Sells for\" figure stays gross, which is also the price to list your auction at. Turn this on to net the 5% the auction house keeps out of the profit line and the \"only profitable\" filter.")
+    self.auctionCutCheck = auctionCutCheck
+
     local scaleSlider = createSlider(content,
         "Main window scale",
         60, 120, 5,
@@ -786,7 +809,7 @@ function Options:EnsurePanel()
             end
         end
     )
-    scaleSlider:SetPoint("TOPLEFT", tooltipCraftersCheck, "BOTTOMLEFT", 8, -26)
+    scaleSlider:SetPoint("TOPLEFT", auctionCutCheck, "BOTTOMLEFT", 8, -26)
     setHoverTooltip(scaleSlider, "Main window scale",
         "Shrinks or enlarges the whole Recipe Registry window. Useful on small screens; you can also drag the grip in the window's bottom-right corner to resize it.")
     self.scaleSlider = scaleSlider

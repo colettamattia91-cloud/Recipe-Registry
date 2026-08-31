@@ -158,15 +158,24 @@ end
 -- Profit gate for the "only profitable recipes" toggle. Deliberately the
 -- last thing RecipePasses does, and only when the toggle is on: it is the
 -- one predicate that costs price lookups, so the default path never pays
--- for it. A craft that cannot be priced end to end is not shown as
--- profitable -- "unknown" is not a third answer the user asked for.
-local function passesProfitGate(recipeKey, info)
+-- for it.
+--
+-- Only a craft that prices out at a loss is dropped. One that cannot be
+-- priced at all stays visible and is marked in the list instead: reagents
+-- with no auctions (vials, thread, spices) are common enough that hiding
+-- the unpriceable would quietly empty whole professions -- every flask
+-- needs a vial -- and the filter would be hiding recipes out of ignorance
+-- rather than out of a verdict.
+local function profitVerdict(recipeKey, info)
     local market = Addon.Market
     if not (market and market.EstimateRecipeProfit) then
-        return false
+        return "unpriceable"
     end
     local profit = market:EstimateRecipeProfit(recipeKey, info)
-    return type(profit) == "number" and profit > 0
+    if type(profit) ~= "number" then
+        return "unpriceable"
+    end
+    return profit > 0 and "profitable" or "unprofitable"
 end
 
 function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
@@ -179,9 +188,13 @@ function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
     end
     local metadata = getMetadata()
     local info = recipeInfo or (metadata and metadata:GetRecipeInfo(recipeKey)) or nil
-    if not passesProfitGate(recipeKey, info) then
+    local verdict = profitVerdict(recipeKey, info)
+    if verdict == "unprofitable" then
         Addon:Trace("filters", "recipe hidden by profit filter", recipeKey)
         return false, "hidden-not-profitable"
+    end
+    if verdict == "unpriceable" then
+        return true, "visible-unpriced"
     end
     return true, reason
 end
