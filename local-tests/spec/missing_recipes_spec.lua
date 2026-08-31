@@ -166,4 +166,47 @@ Test.it("respects the expansion prefilter", function()
     Test.truthy(tbcOnly < both, "hiding Vanilla should shorten the missing list")
 end)
 
+-- Guards the fix for the freeze this view first shipped with: resolving a
+-- name, icon and quality per candidate costs two GetItemInfo calls and a
+-- slot in a 256-entry cache, and a two-profession character has more than
+-- 600 candidates. Only the rows actually painted may be resolved.
+Test.it("builds rows without resolving names or icons", function()
+    setLocalProfession("Blacksmithing", { skillRank = 375 })
+
+    local rows = data:BuildMissingRecipeRows()
+    Test.gte(#rows, 100)
+    for _, row in ipairs(rows) do
+        Test.eq(row.detail, nil)
+        Test.eq(row.label, nil)
+    end
+end)
+
+Test.it("resolves a row on demand, once", function()
+    setLocalProfession("Blacksmithing", { skillRank = 375 })
+
+    local row = data:BuildMissingRecipeRows()[1]
+    data:ResolveMissingRow(row)
+    Test.truthy(row.label ~= nil, "resolving should give the row a label")
+    Test.eq(row._missingResolved, true)
+
+    -- A second call is a no-op: the renderer rebinds the same row on every
+    -- scroll tick.
+    local label = row.label
+    row.detail = "sentinel"
+    data:ResolveMissingRow(row)
+    Test.eq(row.detail, "sentinel")
+    Test.eq(row.label, label)
+end)
+
+Test.it("keeps a stable order between rebuilds", function()
+    setLocalProfession("Blacksmithing", { skillRank = 300 })
+
+    local first = data:BuildMissingRecipeRows()
+    local second = data:BuildMissingRecipeRows()
+    Test.eq(#first, #second)
+    for index = 1, #first do
+        Test.eq(first[index].recipeKey, second[index].recipeKey)
+    end
+end)
+
 io.write(string.format("Missing recipes: %d test(s) passed\n", Test.count))

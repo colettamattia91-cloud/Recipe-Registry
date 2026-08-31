@@ -264,6 +264,7 @@ function RecipeMetadata:_Rebuild()
     self._recordsBySpellId = {}
     self._recipeItemToSpellId = {}
     self._createdItemToSpellIds = {}
+    self._reagentItemIds = nil
     -- Drop the resolution-status memo so the next predicate call rebuilds
     -- it against the fresh record set.
     self._unresolvedSpellIdSet = nil
@@ -604,6 +605,24 @@ function RecipeMetadata:GetCreatedCount(recipeKey, info)
     end
     local minimum = tonumber(info.createdCount) or 1
     return minimum, tonumber(info.createdCountMax) or minimum
+end
+
+-- Every item that appears as a reagent of some recipe, as a set. Consumers
+-- use it to bound their own per-item stores to things the addon will ever
+-- actually price. Memoized and dropped on rebuild; the returned table is
+-- freshly built, so callers may keep it.
+function RecipeMetadata:GetReagentItemIds()
+    if self._reagentItemIds then return self._reagentItemIds end
+    local ids = {}
+    for _, record in pairs(self._recordsBySpellId or {}) do
+        for _, reagent in ipairs(record.reagents or {}) do
+            if reagent.itemId then
+                ids[reagent.itemId] = true
+            end
+        end
+    end
+    self._reagentItemIds = ids
+    return ids
 end
 
 function RecipeMetadata:GetRecipeItemId(recipeKey, info)

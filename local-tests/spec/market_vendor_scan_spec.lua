@@ -81,4 +81,30 @@ Test.it("survives a client with no merchant API", function()
     Test.eq(addon.Market:ScanMerchantPrices(), 0)
 end)
 
+-- The store is saved for good, so it has to be bounded by something other
+-- than how many merchants the player happens to open.
+Test.it("records only items the addon will ever price as a reagent", function()
+    resetStore()
+    -- 6948 is a Hearthstone: sold by nobody as a reagent, and never priced.
+    stockMerchant({
+        { itemID = 3371, name = "Empty Vial", price = 25, quantity = 1 },
+        { itemID = 6948, name = "Hearthstone", price = 100, quantity = 1 },
+    })
+
+    Test.eq(addon.Market:ScanMerchantPrices(), 1)
+    Test.eq(addon.db.global.vendorPrices[3371], 25)
+    Test.eq(addon.db.global.vendorPrices[6948], nil)
+end)
+
+Test.it("bounds the reagent set to the metadata", function()
+    local ids = addon.Market:GetPriceableReagentIds()
+    local count = 0
+    for _ in pairs(ids) do count = count + 1 end
+    -- A few hundred distinct reagents across the whole dataset: a fixed
+    -- ceiling, not one that grows with play time.
+    Test.gte(count, 50)
+    Test.lte(count, 2000)
+    Test.eq(ids[3371], true)
+end)
+
 io.write(string.format("Merchant vendor scan: %d test(s) passed\n", Test.count))

@@ -3282,8 +3282,10 @@ function UI:EnsureMissingRowParts(row)
     row.missingSectionTitle:SetJustifyH("LEFT")
 
     row.missingName = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    row.missingName:SetPoint("LEFT", 12, 0)
-    row.missingName:SetWidth(320)
+    -- Left inset leaves room for the recipe icon, which is the shared row
+    -- icon the ordinary list uses.
+    row.missingName:SetPoint("LEFT", 36, 0)
+    row.missingName:SetWidth(300)
     row.missingName:SetJustifyH("LEFT")
 
     row.missingSkill = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
@@ -3394,6 +3396,13 @@ function UI:BindMissingRow(row, rowIdx, rowData)
     prepareMissingRow(self, row, rowIdx)
     setShownIfChanged(row.missingSectionTitle, false)
 
+    -- Rows arrive unresolved: this is where the name, icon and quality are
+    -- actually looked up, for the ~15 rows on screen rather than the several
+    -- hundred in the list.
+    if Addon.Data and Addon.Data.ResolveMissingRow then
+        Addon.Data:ResolveMissingRow(rowData)
+    end
+
     local missing = rowData.missing or {}
     local detail = rowData.detail or {}
     local colorItemID = detail.createdItemID or detail.recipeItemID
@@ -3405,6 +3414,13 @@ function UI:BindMissingRow(row, rowIdx, rowData)
     setTextIfChanged(row.missingName, colorItemID
         and getItemColorizedName(colorItemID, rowData.label)
         or safeText(rowData.label))
+
+    local rowIcon = detail.createdItemIcon or detail.recipeItemIcon or detail.spellIcon
+        or getItemIcon(colorItemID)
+    setTextureIfChanged(row.icon, rowIcon or "Interface\\Icons\\INV_Misc_QuestionMark")
+    if row.icon.SetTexCoord then row.icon:SetTexCoord(0, 1, 0, 1) end
+    setVertexColorIfChanged(row.icon, 1, 1, 1, 1)
+    setShownIfChanged(row.icon, true)
 
     if missing.requiredSkill then
         -- Red only when the character cannot learn it yet: the number alone
@@ -4207,6 +4223,12 @@ function UI:FilterRowsBySearch(rows)
     if q == "" then return rows end
     local out = {}
     for _, row in ipairs(rows) do
+        -- Missing rows are built without names. Searching is the one action
+        -- that genuinely needs all of them, and it is a deliberate keystroke
+        -- rather than a background refresh, so the cost is paid here.
+        if row.missing and not row._missingResolved and Addon.Data and Addon.Data.ResolveMissingRow then
+            Addon.Data:ResolveMissingRow(row)
+        end
         local searchText
         if self.searchMode == "materials" then
             searchText = row.detail and row.detail.searchText or lowerSafe(row.label)

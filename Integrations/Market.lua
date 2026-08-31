@@ -145,6 +145,20 @@ function Market:GetVendorPrice(itemID)
     return nil
 end
 
+-- The set of items worth remembering a vendor price for: everything the
+-- metadata lists as a reagent of some recipe. Nothing else is ever priced
+-- as a material, so recording it would grow a saved table forever on the
+-- strength of every junk item the player ever walked past. Built once from
+-- the metadata, which is static.
+function Market:GetPriceableReagentIds()
+    if self._reagentIds then return self._reagentIds end
+
+    local metadata = Addon.RecipeMetadata
+    self._reagentIds = (metadata and metadata.GetReagentItemIds
+        and metadata:GetReagentItemIds()) or {}
+    return self._reagentIds
+end
+
 -- Reagents like vials, thread and spices are sold by vendors at a fixed
 -- price and often have no auctions at all. Reading only the auction sources
 -- either priced them far above what anyone actually pays, or left them
@@ -152,8 +166,16 @@ end
 -- profit filter, since every flask needs a vial.
 --
 -- Every merchant window we open is scanned once and folded into the
--- account-wide store. Items bought with an alternate currency (honor,
--- tokens, badges) are skipped: their copper price is not what they cost.
+-- account-wide store. One value per item, not per vendor: what a vendor
+-- charges for a given item is the same everywhere (a reputation discount
+-- shaves a few percent and is not worth modelling), so the last price seen
+-- simply wins.
+--
+-- Only reagents are recorded, which is what bounds the table: the metadata
+-- has a fixed set of them, so the store cannot grow past it however many
+-- merchants the player visits. Items bought with an alternate currency
+-- (honor, tokens, badges) are skipped too: their copper price is not what
+-- they cost.
 function Market:ScanMerchantPrices()
     local getNum = _G.GetMerchantNumItems
     local getInfo = _G.GetMerchantItemInfo
@@ -162,6 +184,7 @@ function Market:ScanMerchantPrices()
     local store = vendorPriceStore(true)
     if not store then return 0 end
 
+    local reagentIds = self:GetPriceableReagentIds()
     local getLink = _G.GetMerchantItemLink
     local learned = 0
     local count = getNum() or 0
@@ -174,7 +197,7 @@ function Market:ScanMerchantPrices()
                 local okLink, link = pcall(getLink, index)
                 itemID = okLink and link and extractItemIDFromQuery(link) or nil
             end
-            if itemID and unit and unit > 0 and store[itemID] ~= unit then
+            if itemID and reagentIds[itemID] and unit and unit > 0 and store[itemID] ~= unit then
                 store[itemID] = unit
                 learned = learned + 1
             end

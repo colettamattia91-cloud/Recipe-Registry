@@ -98,6 +98,30 @@ local function describeSource(info)
     return "trainer", "From a trainer"
 end
 
+-- Names, icons and item quality come from Data:GetRecipeDisplayInfo, which
+-- costs two GetItemInfo calls per recipe and takes a slot in a 256-entry
+-- cache. A blacksmith alone has ~385 catalogued recipes and a second
+-- profession pushes the total past 600, so resolving every candidate would
+-- blow that cache on every rebuild -- evicting entries the recipe browser
+-- needs -- and would do it synchronously on every list refresh while the
+-- tab is open.
+--
+-- So rows are built cheap and stay unresolved. The row renderer resolves
+-- the handful it actually paints, exactly as the ordinary recipe list does
+-- through RefreshRecipeRowAssets.
+function Data:ResolveMissingRow(row)
+    if not row or row._missingResolved then return row end
+    local professionName = row.missing and row.missing.professionName or nil
+    local detail = self.GetRecipeDisplayInfo
+        and self:GetRecipeDisplayInfo(row.recipeKey, professionName) or nil
+    row.detail = detail
+    row.label = (detail and detail.label)
+        or (self.ResolveRecipeLabel and self:ResolveRecipeLabel(row.recipeKey))
+        or tostring(row.recipeKey)
+    row._missingResolved = true
+    return row
+end
+
 -- One row per catalogued recipe of this profession that the character has
 -- not learned. Rows carry the same shape the recipe list uses so they go
 -- through the ordinary row renderer, plus a `missing` block the renderer
@@ -139,18 +163,14 @@ function Data:BuildMissingRecipeRowsForProfession(professionName, prof)
             -- this view is for. The profit filter has no business here
             -- either; you cannot craft what you have not learned.
             do
-                local detail = self.GetRecipeDisplayInfo
-                    and self:GetRecipeDisplayInfo(recipeKey, professionName) or nil
                 local requiredSkill = tonumber(info and info.requiredSkill) or nil
                 local specializationId = meta.GetSpecialization
                     and meta:GetSpecialization(recipeKey, info) or nil
                 local sourceKind, sourceLabel = describeSource(info)
                 rows[#rows + 1] = {
                     recipeKey = recipeKey,
-                    detail = detail,
-                    label = (detail and detail.label)
-                        or (self.ResolveRecipeLabel and self:ResolveRecipeLabel(recipeKey))
-                        or tostring(recipeKey),
+                    -- detail and label are filled in by ResolveMissingRow,
+                    -- for visible rows only.
                     crafterCount = 0,
                     onlineCount = 0,
                     professionList = { professionName },
@@ -179,8 +199,12 @@ end
 
 -- Every enabled profession of the current character, in one list. Sorted so
 -- the recipes the character can go and learn right now come first: skill met
--- and specialization met, then by required skill, then by profession, then
--- by name.
+-- and specialization met, then by required skill, then by profession.
+--
+-- Note the sort never reads a name: names are unresolved at this point by
+-- design, and resolving 600 of them to break ties would cost exactly what
+-- the lazy build is here to avoid. The recipe key is the final tiebreak, so
+-- the order is still stable between rebuilds.
 function Data:BuildMissingRecipeRows()
     local rows = {}
     for professionName, prof in pairs(self:GetLocalProfessionBlocks()) do
@@ -203,10 +227,7 @@ function Data:BuildMissingRecipeRows()
         if am.professionName ~= bm.professionName then
             return am.professionName < bm.professionName
         end
-        local al = tostring(a.label):lower()
-        local bl = tostring(b.label):lower()
-        if al ~= bl then return al < bl end
-        return tostring(a.recipeKey) < tostring(b.recipeKey)
+        return (tonumber(a.recipeKey) or 0) > (tonumber(b.recipeKey) or 0)
     end)
 
     return rows

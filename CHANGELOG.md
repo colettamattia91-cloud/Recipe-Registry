@@ -2,6 +2,25 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- **Missing recipes tab.** A new tab lists what your own professions can still learn: the recipe, the skill it needs against the skill you have, whether it comes from a trainer or from a recipe item, and the specialization it requires. Recipes you can go and learn right now are listed first, grouped by profession, and each profession can be left out from the options.
+- **Craft value and profit on the recipe details.** Under the cost estimate, the details panel now shows what a craft sells for -- with the quantity and unit price when it makes more than one -- and the profit against its materials, in green or red. When some reagents have no price the profit is labelled as an upper bound rather than shown as fact.
+- **"Show only profitable recipes" option.** One switch that keeps the recipes whose output is worth more than their materials. It needs TSM or Auctionator for prices; recipes whose price cannot be worked out stay in the list, marked "no price data", rather than being hidden.
+- **Vendor prices for materials.** Reagents sold by vendors -- vials, thread, spices -- often have no auctions at all, which used to leave them unpriced or priced far above what anyone pays. Every merchant window you open now teaches Recipe Registry what it charges, and a material costs whichever is cheaper between the vendor and the auction house.
+- **Option to subtract the auction house cut** from the profit figure. Off by default, so the "Sells for" figure stays gross and still works as the price to list your auction at.
+- **Tabs can be hidden.** A new Tabs section in the options switches individual tabs off. The Recipes tab is always available.
+
+### Changed
+
+- **The "Guild Addons" tab is now called "Guild members".** It lists your guildmates, with their addon status as one of the columns; the old name read as a list of addons.
+
+### Fixed
+
+- **The recipe list and details panel have their scrollbars back.** Since 2.2.2 the vertical scrollbar was missing from the central recipe list: the fix that stopped scrolled rows painting over the panel above was also clipping the scrollbar away. Mouse-wheel scrolling was unaffected.
+
 ## [2.2.2] - 2026-08-09
 
 ### Fixed
