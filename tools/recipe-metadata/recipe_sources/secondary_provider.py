@@ -8,8 +8,16 @@ deterministic offline file.
 import json
 from pathlib import Path
 
+from recipe_sources.wowhead_specialization_provider import load_specializations
+
 
 def load_secondary_sources(snapshot_dir):
+    # Specializations live in their own snapshot file rather than in
+    # secondary_static.json: they come from a different source on a different
+    # refresh cadence, and secondary_static.json is rewritten wholesale by a
+    # Wago refetch, which would silently drop them.
+    specializations = load_specializations(snapshot_dir)
+
     path = Path(snapshot_dir) / "secondary_static.json"
     if not path.exists():
         return {
@@ -18,6 +26,7 @@ def load_secondary_sources(snapshot_dir):
             "recipeItemBySpellId": {},
             "createdItemBySpellId": {},
             "expansionBySpellId": {},
+            "specializationBySpellId": specializations,
         }
 
     with path.open("r", encoding="utf-8") as handle:
@@ -32,4 +41,5 @@ def load_secondary_sources(snapshot_dir):
         "recipeItemBySpellId": int_keyed("recipeItemBySpellId"),
         "createdItemBySpellId": int_keyed("createdItemBySpellId"),
         "expansionBySpellId": int_keyed("expansionBySpellId"),
+        "specializationBySpellId": specializations,
     }

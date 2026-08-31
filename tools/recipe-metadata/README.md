@@ -21,10 +21,20 @@ python tools/recipe-metadata/generate_recipe_metadata.py validate --flavor tbc -
 python tools/recipe-metadata/generate_recipe_metadata.py report --flavor tbc
 python tools/recipe-metadata/generate_recipe_metadata.py fetch --snapshot tbc-2.5.5 --source-dir C:\path\to\normalized-snapshot
 python tools/recipe-metadata/generate_recipe_metadata.py fetch --snapshot tbc-2.5.5 --source wago-anniversary
+python tools/recipe-metadata/generate_recipe_metadata.py fetch --snapshot tbc-2.5.5 --source wowhead-specializations
 python -m unittest discover -s tools/recipe-metadata/tests
 ```
 
-`fetch` supports two maintainer-only modes. `--source-dir` imports an
+`--source wowhead-specializations` writes `specializations.json` into the
+snapshot: the specialization a recipe requires is enforced by the trainer
+server-side, so it is absent from DB2 and cannot come from the Wago snapshot.
+It reads one Wowhead profession listing per profession (nine requests, not one
+per recipe), keeps only rows whose specialization belongs to that profession,
+and refuses to overwrite the committed file if it parses nothing. The file is
+deliberately separate from `secondary_static.json`, which a Wago refetch
+rewrites wholesale.
+
+`fetch` supports three maintainer-only modes. `--source-dir` imports an
 already-normalized snapshot bundle and validates it before copying it into
 `snapshots/`. `--source wago-anniversary` refreshes the normalized bundle from
 Wago Tools DB2 using `product=wow_anniversary`; it reads `SkillLineAbility`,

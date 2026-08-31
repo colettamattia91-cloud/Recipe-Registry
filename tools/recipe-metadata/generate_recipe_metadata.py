@@ -16,6 +16,13 @@ from recipe_pipeline.normalize import normalize_records
 from recipe_pipeline.validate import validate_records
 from recipe_sources.db2_provider import DEFAULT_SNAPSHOT
 from recipe_sources.local_snapshot_provider import load_local_snapshot
+from recipe_sources.wowhead_specialization_provider import (
+    DEFAULT_FLAVOR as DEFAULT_WOWHEAD_FLAVOR,
+    DEFAULT_REQUEST_DELAY as DEFAULT_WOWHEAD_DELAY,
+    build_specialization_snapshot,
+    fetch_specializations,
+    write_specialization_snapshot,
+)
 from recipe_sources.wago_anniversary_provider import (
     DEFAULT_BRANCH as DEFAULT_WAGO_BRANCH,
     DEFAULT_LOCALE as DEFAULT_WAGO_LOCALE,
@@ -61,6 +68,7 @@ def _load_overrides(path=OVERRIDES_PATH):
         "selfOnlyOutputlessBySpellId": {},
         "bopOutputBySpellId": {},
         "bindTypeByCreatedItemId": {},
+        "specializationBySpellId": {},
     }
     if not Path(path).exists():
         return buckets
@@ -211,6 +219,23 @@ def _build_pipeline(snapshot=DEFAULT_SNAPSHOT, flavor="tbc"):
 
 
 def command_fetch(args):
+    if args.source == "wowhead-specializations":
+        # Written straight into the snapshot dir rather than through the
+        # .incoming staging dance: this is one small standalone file with no
+        # cross-file invariants for validate_normalized_snapshot_dir to check.
+        by_spell_id, per_profession = fetch_specializations(
+            flavor=args.wowhead_flavor,
+            timeout=args.timeout,
+            delay=args.request_delay,
+        )
+        if not by_spell_id:
+            print("no specialization rows parsed; refusing to overwrite the snapshot", file=sys.stderr)
+            return 2
+        payload = build_specialization_snapshot(by_spell_id, per_profession, flavor=args.wowhead_flavor)
+        path = write_specialization_snapshot(payload, SNAPSHOT_ROOT / args.snapshot)
+        print("wrote {0} ({1} specialization records)".format(path, len(by_spell_id)))
+        return 0
+
     if args.source == "wago-anniversary":
         snapshot_data = build_normalized_snapshot(
             fetch_wago_tables(
@@ -338,7 +363,9 @@ def build_parser():
     fetch = subparsers.add_parser("fetch")
     fetch.add_argument("--flavor", default="tbc")
     fetch.add_argument("--snapshot", default=DEFAULT_SNAPSHOT)
-    fetch.add_argument("--source", default="normalized-dir", choices=("normalized-dir", "wago-anniversary"))
+    fetch.add_argument("--source", default="normalized-dir", choices=("normalized-dir", "wago-anniversary", "wowhead-specializations"))
+    fetch.add_argument("--wowhead-flavor", default=DEFAULT_WOWHEAD_FLAVOR)
+    fetch.add_argument("--request-delay", type=float, default=DEFAULT_WOWHEAD_DELAY)
     fetch.add_argument("--source-dir")
     fetch.add_argument("--wago-product", default=DEFAULT_WAGO_PRODUCT)
     fetch.add_argument("--wago-branch", default=DEFAULT_WAGO_BRANCH)
