@@ -1884,6 +1884,16 @@ function UI:CreateMainFrame()
     local detailScroll = CreateFrame("ScrollFrame", nil, right, "UIPanelScrollFrameTemplate")
     detailScroll:SetPoint("TOPLEFT", 8, -54)
     detailScroll:SetPoint("BOTTOMRIGHT", -28, 10)
+    -- UNVERIFIED, do not treat as a working fix. Mirrors the recipeScroll
+    -- clipping above so scrolled detail lines stop painting over the detail
+    -- title/subtitle band. Suspected side effect: the template's ScrollBar is
+    -- a child of the ScrollFrame anchored outside its right edge, so clipping
+    -- very likely hides it -- which is the missing central scrollbar already
+    -- caused by the recipeScroll call. Needs an in-game check, and probably
+    -- replacing with a clipping container frame that spans the scrollbar lane.
+    if detailScroll.SetClipsChildren then
+        detailScroll:SetClipsChildren(true)
+    end
     local detailContent = CreateFrame("Frame", nil, detailScroll)
     detailContent:SetSize(420, 1)
     detailScroll:SetScrollChild(detailContent)
