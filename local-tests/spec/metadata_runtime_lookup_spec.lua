@@ -41,6 +41,33 @@ Test.it("returns cloned reagent data for normal crafts", function()
     Test.eq(fresh[1].count, 7)
 end)
 
+Test.it("reports crafted output quantity, defaulting to one when omitted", function()
+    -- The generated data omits createdCount for single-output crafts, so an
+    -- absent field must read as 1 rather than nil: cost-per-unit maths
+    -- divides by this.
+    local single, singleMax = metadata:GetCreatedCount(-28596)
+    Test.eq(single, 1)
+    Test.eq(singleMax, 1)
+
+    local stacked, stackedMax = metadata:GetCreatedCount(-30303)
+    Test.eq(stacked, 4)
+    Test.eq(stackedMax, 4)
+
+    Test.eq(metadata:GetCreatedCount(123456789), nil)
+end)
+
+Test.it("reports the required profession specialization, nil when unrestricted", function()
+    -- The spell ID is the specialization itself, so callers can compare it
+    -- straight against a scanned profession's specialization.
+    Test.eq(metadata:GetSpecialization(-30303), 20219)
+    Test.eq(metadata:GetSpecialization(-28596), nil)
+    Test.eq(metadata:GetSpecialization(123456789), nil)
+
+    local info = metadata:GetRecipeInfo(-30303)
+    Test.eq(info.specialization, 20219)
+    Test.eq(metadata:GetSpecialization(-30303, info), 20219)
+end)
+
 Test.it("returns category labels with cloned subcategory rows", function()
     local categories = metadata:GetCategoriesForProfession("alchemy")
     Test.eq(categories[1].key, "potions")

@@ -17,6 +17,11 @@ from recipe_pipeline.normalize import normalize_records
 from recipe_pipeline.records import ReagentRecord, RecipeRecord
 from recipe_pipeline.validate import validate_records
 from recipe_sources.wago_anniversary_provider import build_normalized_snapshot
+from recipe_sources.wowhead_specialization_provider import (
+    build_specialization_snapshot,
+    fetch_specializations,
+    parse_listview_specializations,
+)
 
 
 def load_fixture_snapshot():
@@ -548,6 +553,122 @@ class GeneratorPipelineTests(unittest.TestCase):
         self.assertEqual(snapshot["secondary_static.json"]["selfOnlyOutputlessSpellIds"], [27924])
         self.assertEqual(snapshot["manifest.json"]["sourceStats"]["lateVanillaRecipesFromBaseline"], 1)
         self.assertEqual(snapshot["manifest.json"]["expectedRecipeCounts"]["total"], 3)
+
+    def test_wago_anniversary_builder_reads_created_quantity(self):
+        # EffectBasePoints stores quantity - 1, and EffectDieSides > 1 turns
+        # the yield into a range. Ammunition is the case that matters: a
+        # single Crafted Light Shot craft yields 200 units, so a recipe
+        # priced as one item would be off by that factor.
+        def build(effect_rows):
+            return build_normalized_snapshot({
+                "SkillLineAbility": [{"SkillLine": "202", "Spell": "3919", "MinSkillLineRank": "1"}],
+                "VanillaSkillLineAbility": [],
+                "SpellEffect": effect_rows,
+                "SpellReagents": [{"SpellID": "3919", "Reagent_0": "2835", "ReagentCount_0": "1"}],
+                "ItemEffect": [],
+                "ItemSparse": [{"ID": "2516", "Display_lang": "Crafted Light Shot", "Bonding": "0"}],
+                "SpellName": [{"ID": "3919", "Name_lang": "Crafted Light Shot"}],
+            }, "unit-snapshot")["recipes.json"][0]
+
+        stacked = build([{
+            "SpellID": "3919", "Effect": "24", "EffectItemType": "2516",
+            "EffectBasePoints": "199", "EffectDieSides": "1",
+        }])
+        self.assertEqual(stacked["createdCount"], 200)
+        self.assertIsNone(stacked["createdCountMax"])
+
+        # DB2 renders some numeric columns as floats, and dieSides 0 carries
+        # the same meaning as 1: a fixed amount.
+        single = build([{
+            "SpellID": "3919", "Effect": "24", "EffectItemType": "2516",
+            "EffectBasePoints": "0.0", "EffectDieSides": "0",
+        }])
+        self.assertEqual(single["createdCount"], 1)
+        self.assertIsNone(single["createdCountMax"])
+
+        ranged = build([{
+            "SpellID": "3919", "Effect": "24", "EffectItemType": "2516",
+            "EffectBasePoints": "1", "EffectDieSides": "3",
+        }])
+        self.assertEqual(ranged["createdCount"], 2)
+        self.assertEqual(ranged["createdCountMax"], 4)
+
+
+class WowheadSpecializationTests(unittest.TestCase):
+    # One row per case, in the shape Wowhead emits: keys are only partly
+    # quoted, so the parser must not depend on the blob being valid JSON.
+    GNOMISH = ('{"cat":11,"id":12906,"learnedat":230,"name":"Gnomish Battle Chicken",'
+               '"skill":[202],"specialization":20219,quality:1,popularity:12}')
+    TEACHES_SPEC = ('{"cat":11,"id":20219,"learnedat":9999,"name":"Gnomish Engineer",'
+                    '"skill":[202],"specialization":20219,quality:-1}')
+    PLAIN = '{"cat":11,"id":29545,"learnedat":330,"name":"Felsteel Longblade","skill":[164],quality:1}'
+    FOREIGN = ('{"cat":11,"id":34542,"learnedat":375,"name":"Black Planar Edge",'
+               '"skill":[164],"specialization":17041,quality:4}')
+    NOISE = '{"id":99999,"name":"Something","specialization":12345}'
+
+    def test_parses_specialization_and_skips_the_spell_that_teaches_it(self):
+        html = "junk " + self.GNOMISH + " more " + self.TEACHES_SPEC + " " + self.PLAIN
+        self.assertEqual(parse_listview_specializations(html), {12906: 20219})
+
+    def test_rejects_unknown_specialization_ids(self):
+        self.assertEqual(parse_listview_specializations(self.NOISE), {})
+
+    def test_profession_guard_drops_rows_from_embedded_foreign_listviews(self):
+        html = self.GNOMISH + self.FOREIGN
+        self.assertEqual(
+            parse_listview_specializations(html, profession="engineering"),
+            {12906: 20219},
+        )
+        self.assertEqual(
+            parse_listview_specializations(html, profession="blacksmithing"),
+            {34542: 17041},
+        )
+        # Without the guard both rows are accepted, which is what makes the
+        # union across pages correct even though per-page counts are not.
+        self.assertEqual(parse_listview_specializations(html), {12906: 20219, 34542: 17041})
+
+    def test_fetch_visits_every_profession_and_merges(self):
+        pages = {"engineering": self.GNOMISH, "blacksmithing": self.FOREIGN}
+        seen = []
+
+        def fake_fetch(profession, flavor=None, timeout=None):
+            seen.append(profession)
+            return pages.get(profession, "")
+
+        by_spell, per_profession = fetch_specializations(
+            professions=("engineering", "blacksmithing", "cooking"),
+            delay=0,
+            fetch_page=fake_fetch,
+        )
+        self.assertEqual(seen, ["engineering", "blacksmithing", "cooking"])
+        self.assertEqual(by_spell, {12906: 20219, 34542: 17041})
+        self.assertEqual(per_profession, {"engineering": 1, "blacksmithing": 1, "cooking": 0})
+
+    def test_snapshot_payload_is_deterministic_and_named(self):
+        payload = build_specialization_snapshot({12906: 20219, 34542: 17041}, {"engineering": 1})
+        self.assertEqual(payload["specializationBySpellId"], {"12906": 20219, "34542": 17041})
+        self.assertEqual(
+            payload["sourceStats"]["bySpecialization"],
+            {"Gnomish Engineering": 1, "Master Axesmith": 1},
+        )
+        self.assertNotIn("fetchedAt", payload)
+
+    def test_normalize_carries_specialization_from_secondary_and_overrides(self):
+        primary = {"recipes": [
+            {"spellId": 12906, "profession": "engineering", "firstSeenExpansion": "vanilla",
+             "categoryHint": "engineering.misc", "createdItemId": 10725},
+            {"spellId": 29545, "profession": "blacksmithing", "firstSeenExpansion": "tbc",
+             "categoryHint": "blacksmithing.misc", "createdItemId": 23507},
+        ]}
+        secondary = {"specializationBySpellId": {12906: 20219, 29545: 9788}}
+        records, _diag = normalize_records(
+            primary, secondary, {},
+            overrides={"specializationBySpellId": {29545: 17039}},
+        )
+        by_spell = {record.spell_id: record for record in records}
+        self.assertEqual(by_spell[12906].specialization, 20219)
+        # An explicit override beats the fetched snapshot.
+        self.assertEqual(by_spell[29545].specialization, 17039)
 
 
 if __name__ == "__main__":

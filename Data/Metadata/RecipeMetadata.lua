@@ -57,6 +57,9 @@ local function cloneRecord(spellId, record)
         expansion = record.expansion,
         recipeItemId = record.recipeItemId,
         createdItemId = record.createdItemId,
+        createdCount = record.createdCount,
+        createdCountMax = record.createdCountMax,
+        specialization = record.specialization,
         category = record.category,
         subcategory = record.subcategory,
         sortOrder = record.sortOrder,
@@ -577,6 +580,30 @@ end
 function RecipeMetadata:GetCreatedItemId(recipeKey, info)
     info = getInfo(self, recipeKey, info)
     return info and info.createdItemId or nil
+end
+
+-- Spell ID of the profession specialization required to learn this recipe,
+-- or nil when any practitioner can learn it. The IDs match the ones
+-- Data.lua PROFESSION_SPECIALIZATIONS detects on the local character, so a
+-- caller can compare this directly against a scanned profession's
+-- specialization. Note this means "required to learn" — specializations that
+-- only improve yield (the TBC cloth cooldowns) are deliberately not flagged.
+function RecipeMetadata:GetSpecialization(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info and info.specialization or nil
+end
+
+-- Units produced per craft. The generated data omits the field for the
+-- common single-output case, so absence means 1 rather than "unknown".
+-- Returns min, max; the two differ only for the handful of recipes with a
+-- random yield.
+function RecipeMetadata:GetCreatedCount(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    if not info then
+        return nil
+    end
+    local minimum = tonumber(info.createdCount) or 1
+    return minimum, tonumber(info.createdCountMax) or minimum
 end
 
 function RecipeMetadata:GetRecipeItemId(recipeKey, info)
