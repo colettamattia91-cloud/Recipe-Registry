@@ -39,7 +39,7 @@ Test.it("prices a single-output craft against its reagent cost", function()
     Test.eq(detail.profit.complete, true)
 end)
 
--- spell 30303 = Adamantite Sharpening Stone: 2 reagents, 4 stones (item 23781).
+-- spell 30303 = an engineering craft that makes 4 of item 23781 from 2 reagents.
 Test.it("multiplies the output price by the crafted quantity", function()
     usePrices({
         ["i:22573"] = 100,

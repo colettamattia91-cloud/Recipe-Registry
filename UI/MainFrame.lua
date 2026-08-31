@@ -12,6 +12,11 @@ local GLOBAL_SEARCH_DEBOUNCE = 0.35
 local GLOBAL_SEARCH_MIN_CHARS = 3
 local ADDON_STATUS_VIEW = "Guild Addons"
 local FAVORITES_VIEW = "Favorites"
+-- Answers a different question from every other view: not "who can craft
+-- this" but "what can this character still learn". Kept as its own sidebar
+-- entry rather than mixed into a profession list, because a recipe nobody
+-- knows and a recipe you personally lack are not the same row.
+local MISSING_VIEW = "Missing recipes"
 local ADDON_STATUS_LEGACY_VIEWS = {
     ["Addon Status"] = true,
     ["Guild Addon Adoption"] = true,
@@ -186,6 +191,17 @@ end
 local function addonStatusLabelColor(row)
     local r, g, b = addonStatusColor(row and row.addonStatusKey)
     return colorText(row and row.addonStatusLabel or "Never seen", r, g, b)
+end
+
+-- True once this character has at least one scanned profession the missing
+-- view could report on.
+local function hasLocalProfessions()
+    local data = Addon.Data
+    if not (data and data.GetLocalProfessionBlocks) then return false end
+    for _ in pairs(data:GetLocalProfessionBlocks()) do
+        return true
+    end
+    return false
 end
 
 local function getProfessionIcon(profName)
@@ -710,6 +726,7 @@ function UI:OnInitialize()
     self.expandedCategory = nil
     self.recipeSearchText = ""
     self.addonStatusSearchText = ""
+    self.missingSearchText = ""
     self.searchText = ""
 end
 
@@ -717,9 +734,22 @@ function UI:IsAddonStatusView()
     return self.selectedProfession == ADDON_STATUS_VIEW
 end
 
+function UI:IsMissingView()
+    return self.selectedProfession == MISSING_VIEW
+end
+
+-- Both alternate views take the whole window: they are tables, not a
+-- browser with a detail panel beside it.
+function UI:IsFullWidthView()
+    return self:IsAddonStatusView() or self:IsMissingView()
+end
+
 function UI:GetMainView()
     if self:IsAddonStatusView() then
         return "addon"
+    end
+    if self:IsMissingView() then
+        return "missing"
     end
     return "recipes"
 end
@@ -727,10 +757,10 @@ end
 function UI:SetMainView(view)
     if view == "addon" then
         self.selectedProfession = ADDON_STATUS_VIEW
-    else
-        if self.selectedProfession == ADDON_STATUS_VIEW then
-            self.selectedProfession = nil
-        end
+    elseif view == "missing" then
+        self.selectedProfession = MISSING_VIEW
+    elseif self.selectedProfession == ADDON_STATUS_VIEW or self.selectedProfession == MISSING_VIEW then
+        self.selectedProfession = nil
     end
     self:ActivateSearchForCurrentView()
     if Addon.db and Addon.db.profile then
@@ -835,6 +865,8 @@ end
 function UI:ActivateSearchForCurrentView()
     if self:IsAddonStatusView() then
         self.searchText = self.addonStatusSearchText or ""
+    elseif self:IsMissingView() then
+        self.searchText = self.missingSearchText or ""
     else
         self.searchText = self.recipeSearchText or ""
     end
@@ -845,6 +877,7 @@ function UI:RefreshSearchClearButtons()
     if not self.frame then return end
     setShownIfChanged(self.frame.searchClearButton, (self.recipeSearchText or "") ~= "")
     setShownIfChanged(self.frame.addonStatusSearchClearButton, (self.addonStatusSearchText or "") ~= "")
+    setShownIfChanged(self.frame.missingSearchClearButton, (self.missingSearchText or "") ~= "")
 end
 
 function UI:SetSearchBoxValue(box, text)
@@ -860,6 +893,7 @@ function UI:SyncSearchControls()
     if not self.frame then return end
     self:SetSearchBoxValue(self.frame.searchBox, self.recipeSearchText or "")
     self:SetSearchBoxValue(self.frame.addonStatusSearchBox, self.addonStatusSearchText or "")
+    self:SetSearchBoxValue(self.frame.missingSearchBox, self.missingSearchText or "")
     self:RefreshSearchClearButtons()
 end
 
@@ -1159,10 +1193,21 @@ function UI:RefreshAddonStatusControls()
     if not self.frame then return end
     local f = self.frame
     local addonStatusView = self:IsAddonStatusView()
+    local missingView = self:IsMissingView()
     setShownIfChanged(f.addonStatusControls, addonStatusView)
     setShownIfChanged(f.addonStatusHelp, addonStatusView)
+    setShownIfChanged(f.missingControls, missingView)
+    setShownIfChanged(f.missingHelp, missingView)
+    if missingView and f.missingHelp then
+        setTextIfChanged(f.missingHelp, hasLocalProfessions()
+            and "Recipes your professions can still learn. Click a profession header to collapse it."
+            or "Open your profession windows once so Recipe Registry knows what this character has learned.")
+    end
+    -- The missing view keeps the header (it carries the count) but has no
+    -- sort switch: its order is fixed to "what you can learn right now
+    -- first", which is the only ordering that answers the question.
     setShownIfChanged(f.recipeHeader, not addonStatusView)
-    setShownIfChanged(f.sortSwitch, not addonStatusView)
+    setShownIfChanged(f.sortSwitch, not (addonStatusView or missingView))
     self:SyncSearchControls()
 end
 
@@ -1178,7 +1223,7 @@ function UI:ApplyMainLayout()
 
     f.center:ClearAllPoints()
     f.right:ClearAllPoints()
-    if self:IsAddonStatusView() then
+    if self:IsFullWidthView() then
         setShownIfChanged(f.topBand, false)
         setShownIfChanged(f.left, false)
         f.center:SetPoint("TOPLEFT", 10, -94)
@@ -1187,7 +1232,9 @@ function UI:ApplyMainLayout()
         if f.recipeClip then
             f.recipeClip._rrAnchorMode = nil
             f.recipeClip:ClearAllPoints()
-            f.recipeClip:SetPoint("TOPLEFT", 8, -58)
+            -- The missing view needs an extra band for its own header and
+            -- search strip, the same way the addon status view does.
+            f.recipeClip:SetPoint("TOPLEFT", 8, self:IsMissingView() and -70 or -58)
             f.recipeClip:SetPoint("BOTTOMRIGHT", -8, 10)
         end
     else
@@ -1382,9 +1429,18 @@ function UI:CreateMainFrame()
     addonStatusTab:SetScript("OnClick", function()
         UI:SetMainView("addon")
     end)
+    local missingTab = createCardStyleButton(mainNav, 132, 24)
+    missingTab:SetPoint("LEFT", addonStatusTab, "RIGHT", 8, 0)
+    missingTab:SetLabel(MISSING_VIEW)
+    missingTab:SetScript("OnClick", function()
+        UI:SetMainView("missing")
+    end)
+    f.missingTab = missingTab
+
     f.mainTabs = {
         recipes = recipesTab,
         addon = addonStatusTab,
+        missing = missingTab,
     }
 
     local topBand = CreateFrame("Frame", nil, f)
@@ -1681,6 +1737,75 @@ function UI:CreateMainFrame()
         UI:RefreshSummaryCards()
     end)
     f.addonStatusSearchClearButton = addonStatusSearchClearButton
+
+    -- The missing view gets its own control strip rather than borrowing the
+    -- sidebar search box: the sidebar is hidden while this view is up, the
+    -- same way it is for the addon status table.
+    local missingControls = CreateFrame("Frame", nil, center)
+    missingControls:SetPoint("TOPLEFT", 8, -8)
+    missingControls:SetPoint("TOPRIGHT", -8, -8)
+    missingControls:SetHeight(26)
+    f.missingControls = missingControls
+
+    local missingTitle = missingControls:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    missingTitle:SetPoint("LEFT", 4, 0)
+    missingTitle:SetText(MISSING_VIEW)
+    f.missingTitle = missingTitle
+
+    local missingHelp = center:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    missingHelp:SetPoint("TOPLEFT", missingControls, "BOTTOMLEFT", 4, -6)
+    missingHelp:SetPoint("TOPRIGHT", missingControls, "BOTTOMRIGHT", -4, -6)
+    missingHelp:SetJustifyH("LEFT")
+    missingHelp:SetText("Recipes your professions can still learn. Click a profession header to collapse it.")
+    missingHelp:SetTextColor(0.70, 0.70, 0.70)
+    f.missingHelp = missingHelp
+
+    local missingSearchBox = CreateFrame("EditBox", nil, missingControls, "InputBoxTemplate")
+    missingSearchBox:SetPoint("RIGHT", -8, 0)
+    missingSearchBox:SetSize(240, 22)
+    missingSearchBox:SetAutoFocus(false)
+    missingSearchBox:SetTextInsets(6, 22, 0, 0)
+    missingSearchBox:SetScript("OnEscapePressed", function()
+        UI:ClearSearchFocus()
+    end)
+    missingSearchBox:SetScript("OnEnterPressed", function()
+        UI:ApplySearchNow()
+        UI:ClearSearchFocus()
+        UI:OpenChatAfterSearch()
+    end)
+    missingSearchBox:SetScript("OnTextChanged", function(box)
+        if UI._syncingSearchBoxes then return end
+        UI.missingSearchText = box:GetText() or ""
+        UI.searchText = UI.missingSearchText
+        UI:ResetRecipeScroll()
+        UI:SyncSearchControls()
+        UI:ScheduleSearchRefresh()
+    end)
+    f.missingSearchBox = missingSearchBox
+
+    local missingSearchLabel = missingControls:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    missingSearchLabel:SetPoint("RIGHT", missingSearchBox, "LEFT", -8, 0)
+    missingSearchLabel:SetText("Search")
+    missingSearchLabel:SetTextColor(0.72, 0.72, 0.72)
+    f.missingSearchLabel = missingSearchLabel
+
+    local missingSearchClearButton = CreateFrame("Button", nil, missingSearchBox)
+    missingSearchClearButton:SetSize(14, 14)
+    missingSearchClearButton:SetPoint("RIGHT", -4, 0)
+    missingSearchClearButton:SetNormalTexture("Interface\\Buttons\\UI-StopButton")
+    if missingSearchClearButton.GetNormalTexture then
+        local tex = missingSearchClearButton:GetNormalTexture()
+        if tex and tex.SetVertexColor then
+            tex:SetVertexColor(0.85, 0.85, 0.85, 0.85)
+        end
+    end
+    missingSearchClearButton:SetHighlightTexture("Interface\\Buttons\\UI-StopButton", "ADD")
+    missingSearchClearButton:Hide()
+    missingSearchClearButton:SetScript("OnClick", function()
+        UI:ClearSearch()
+        UI:RefreshRecipeList()
+    end)
+    f.missingSearchClearButton = missingSearchClearButton
 
     -- Discoverability hint: when a profession's view is restricted by the
     -- expansion filter, surface a one-click "N <expansion> recipes hidden"
@@ -2156,6 +2281,10 @@ function UI:EnsureRecipeRow(index)
             return
         end
         if self.addonStatusGroupKey then
+            return
+        end
+        if self.missingGroupKey then
+            UI:ToggleMissingGroup(self.missingGroupKey)
             return
         end
         if self.addonStatusMemberKey then
@@ -3071,12 +3200,169 @@ function UI:SetAddonStatusPartsVisible(row, visible)
     setShownIfChanged(row.addonZone, visible)
 end
 
+-- Column layout for the missing-recipe table. Built lazily per pooled row,
+-- the same way the addon status columns are: most sessions never open this
+-- view, and the pool is shared with the ordinary recipe list.
+function UI:EnsureMissingRowParts(row)
+    if row.missingPartsReady then return end
+
+    row.missingSectionTitle = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.missingSectionTitle:SetPoint("LEFT", 10, 0)
+    row.missingSectionTitle:SetPoint("RIGHT", -10, 0)
+    row.missingSectionTitle:SetJustifyH("LEFT")
+
+    row.missingName = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.missingName:SetPoint("LEFT", 12, 0)
+    row.missingName:SetWidth(320)
+    row.missingName:SetJustifyH("LEFT")
+
+    row.missingSkill = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.missingSkill:SetPoint("LEFT", row.missingName, "RIGHT", 8, 0)
+    row.missingSkill:SetWidth(150)
+    row.missingSkill:SetJustifyH("LEFT")
+
+    row.missingSource = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.missingSource:SetPoint("LEFT", row.missingSkill, "RIGHT", 8, 0)
+    row.missingSource:SetWidth(170)
+    row.missingSource:SetJustifyH("LEFT")
+
+    row.missingSpec = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.missingSpec:SetPoint("LEFT", row.missingSource, "RIGHT", 8, 0)
+    row.missingSpec:SetWidth(200)
+    row.missingSpec:SetJustifyH("LEFT")
+
+    row.missingPartsReady = true
+end
+
+function UI:SetMissingPartsVisible(row, visible)
+    self:EnsureMissingRowParts(row)
+    setShownIfChanged(row.missingSectionTitle, visible)
+    setShownIfChanged(row.missingName, visible)
+    setShownIfChanged(row.missingSkill, visible)
+    setShownIfChanged(row.missingSource, visible)
+    setShownIfChanged(row.missingSpec, visible)
+end
+
+function UI:HideMissingRowParts(row)
+    if not row.missingPartsReady then return end
+    setShownIfChanged(row.missingSectionTitle, false)
+    setShownIfChanged(row.missingName, false)
+    setShownIfChanged(row.missingSkill, false)
+    setShownIfChanged(row.missingSource, false)
+    setShownIfChanged(row.missingSpec, false)
+end
+
 function UI:HideRecipeRowParts(row)
     setShownIfChanged(row.icon, false)
     setShownIfChanged(row.favoriteButton, false)
     setShownIfChanged(row.title, false)
     setShownIfChanged(row.stats, false)
     setShownIfChanged(row.meta, false)
+end
+
+local function prepareMissingRow(ui, row, rowIdx)
+    local rowHeight = ui:GetListRowHeight()
+    row:SetPoint("TOPLEFT", 0, -((rowIdx - 1) * rowHeight))
+    row:SetSize(ui:GetListRowWidth(), rowHeight - 2)
+    row.recipeKey = nil
+    row.addonStatusMemberKey = nil
+    row.addonStatusGroupKey = nil
+    row.addonStatusHeaderRow = false
+    row.missingGroupKey = nil
+    row.tooltipLink = nil
+    ui:HideRecipeRowParts(row)
+    if row.addonStatusPartsReady then
+        ui:SetAddonStatusPartsVisible(row, false)
+        ui:SetAddonStatusHeaderButtonsVisible(row, false)
+    end
+    ui:SetMissingPartsVisible(row, true)
+end
+
+function UI:BindMissingGroupRow(row, rowIdx, rowData)
+    prepareMissingRow(self, row, rowIdx)
+    setShownIfChanged(row.missingName, false)
+    setShownIfChanged(row.missingSkill, false)
+    setShownIfChanged(row.missingSource, false)
+    setShownIfChanged(row.missingSpec, false)
+    row.missingGroupKey = rowData.groupKey
+
+    local arrow = rowData.collapsed and "|cff9fa6b2\226\150\184|r" or "|cff9fa6b2\226\150\190|r"
+    setTextIfChanged(row.missingSectionTitle, string.format("%s %s (%d)", arrow, rowData.groupLabel or "", rowData.count or 0))
+    row.missingSectionTitle:SetTextColor(1.0, 0.82, 0.0)
+    setVertexColorIfChanged(row.stripe, 1, 0.82, 0, 1)
+    setBackdropColorsIfChanged(row, 0.10, 0.09, 0.07, 0.98, 0.28, 0.24, 0.12, 0.95)
+    setShownIfChanged(row, true)
+end
+
+function UI:BindMissingHeaderRow(row, rowIdx)
+    prepareMissingRow(self, row, rowIdx)
+    setShownIfChanged(row.missingSectionTitle, false)
+
+    setTextIfChanged(row.missingName, "Recipe")
+    setTextIfChanged(row.missingSkill, "Skill")
+    setTextIfChanged(row.missingSource, "Learned from")
+    setTextIfChanged(row.missingSpec, "Specialization")
+    row.missingName:SetTextColor(0.72, 0.72, 0.72)
+    row.missingSkill:SetTextColor(0.72, 0.72, 0.72)
+    row.missingSource:SetTextColor(0.72, 0.72, 0.72)
+    row.missingSpec:SetTextColor(0.72, 0.72, 0.72)
+    setVertexColorIfChanged(row.stripe, 0.35, 0.35, 0.35, 1)
+    setBackdropColorsIfChanged(row, 0.06, 0.06, 0.06, 0.98, 0.20, 0.20, 0.20, 0.95)
+    setShownIfChanged(row, true)
+end
+
+function UI:BindMissingRow(row, rowIdx, rowData)
+    if rowData.rowType == "missingGroup" then
+        self:BindMissingGroupRow(row, rowIdx, rowData)
+        return
+    end
+    if rowData.rowType == "missingHeader" then
+        self:BindMissingHeaderRow(row, rowIdx)
+        return
+    end
+
+    prepareMissingRow(self, row, rowIdx)
+    setShownIfChanged(row.missingSectionTitle, false)
+
+    local missing = rowData.missing or {}
+    local detail = rowData.detail or {}
+    local colorItemID = detail.createdItemID or detail.recipeItemID
+    row.tooltipLink = (detail.createdItemID and ("item:" .. detail.createdItemID))
+        or (detail.recipeItemID and ("item:" .. detail.recipeItemID))
+        or (detail.spellID and ("spell:" .. detail.spellID))
+        or nil
+
+    setTextIfChanged(row.missingName, colorItemID
+        and getItemColorizedName(colorItemID, rowData.label)
+        or safeText(rowData.label))
+
+    if missing.requiredSkill then
+        -- Red only when the character cannot learn it yet: the number alone
+        -- does not say whether it is out of reach.
+        local colour = missing.skillMet and "|cffd8d8d8" or COLOR_LOSS_TEXT
+        setTextIfChanged(row.missingSkill, string.format("%s%d|r |cff8f949c/ %d|r",
+            colour, missing.requiredSkill, missing.skillRank or 0))
+    else
+        setTextIfChanged(row.missingSkill, "|cff8f949c-|r")
+    end
+
+    setTextIfChanged(row.missingSource, safeText(missing.sourceLabel))
+    if missing.specializationName then
+        local colour = missing.specializationMet and "|cff55d66b" or COLOR_LOSS_TEXT
+        setTextIfChanged(row.missingSpec, string.format("%s%s|r", colour, missing.specializationName))
+    else
+        setTextIfChanged(row.missingSpec, "|cff8f949c-|r")
+    end
+    row.missingSource:SetTextColor(0.82, 0.82, 0.82)
+
+    -- The stripe reads as "can I go and get this now?" at a glance.
+    if missing.skillMet and missing.specializationMet then
+        setVertexColorIfChanged(row.stripe, 0.35, 0.75, 0.45, 1)
+    else
+        setVertexColorIfChanged(row.stripe, 0.55, 0.35, 0.35, 1)
+    end
+    setBackdropColorsIfChanged(row, COLOR_ROW[1], COLOR_ROW[2], COLOR_ROW[3], COLOR_ROW[4], 0.22, 0.22, 0.22, 1)
+    setShownIfChanged(row, true)
 end
 
 function UI:BindAddonStatusGroupRow(row, rowIdx, rowData)
@@ -3213,6 +3499,12 @@ function UI:BindRecipeRow(row, recipeIdx, rowData)
         self:BindAddonStatusRow(row, recipeIdx, rowData)
         return
     end
+    if rowData and (rowData.rowType == "missing"
+        or rowData.rowType == "missingGroup"
+        or rowData.rowType == "missingHeader") then
+        self:BindMissingRow(row, recipeIdx, rowData)
+        return
+    end
     rowData = self:RefreshRecipeRowAssets(rowData) or rowData
     local rowHeight = self:GetListRowHeight()
     row:SetPoint("TOPLEFT", 0, -((recipeIdx - 1) * rowHeight))
@@ -3225,6 +3517,8 @@ function UI:BindRecipeRow(row, recipeIdx, rowData)
         self:SetAddonStatusPartsVisible(row, false)
         self:SetAddonStatusHeaderButtonsVisible(row, false)
     end
+    self:HideMissingRowParts(row)
+    row.missingGroupKey = nil
     setShownIfChanged(row.icon, true)
     setShownIfChanged(row.title, true)
     setShownIfChanged(row.stats, true)
@@ -3265,9 +3559,21 @@ function UI:BindRecipeRow(row, recipeIdx, rowData)
     end
     setTextIfChanged(row.title, titleText)
 
-    local statsParts = {
-        string.format("%d crafter(s)", rowData.crafterCount or 0),
-    }
+    -- A missing-recipe row answers "can I learn this, and where", so its
+    -- stats column carries the requirements instead of the crafter count --
+    -- which is always zero here and would say nothing.
+    local missing = rowData.missing
+    local statsParts = {}
+    if missing then
+        if missing.requiredSkill then
+            local skillColour = missing.skillMet and "|cff9fa6b2" or COLOR_LOSS_TEXT
+            statsParts[#statsParts + 1] = string.format("%sSkill %d|r  |cff8f949c(you: %d)|r",
+                skillColour, missing.requiredSkill, missing.skillRank or 0)
+        end
+        statsParts[#statsParts + 1] = string.format("|cff8f949c%s|r", missing.sourceLabel or "")
+    else
+        statsParts[#statsParts + 1] = string.format("%d crafter(s)", rowData.crafterCount or 0)
+    end
     if (rowData.onlineCount or 0) > 0 then
         statsParts[#statsParts + 1] = string.format("|cff55d66b%d online|r", rowData.onlineCount or 0)
     end
@@ -3280,7 +3586,15 @@ function UI:BindRecipeRow(row, recipeIdx, rowData)
     setTextIfChanged(row.stats, table.concat(statsParts, "\n"))
 
     local metaParts = {}
-    if self.selectedProfession == nil and rowData.professionList and #rowData.professionList > 0 then
+    if missing then
+        metaParts[#metaParts + 1] = missing.professionName or ""
+        if missing.specializationName then
+            -- The specialization is the hard gate: unlike skill, you cannot
+            -- grind your way to it later without abandoning the other one.
+            local colour = missing.specializationMet and "|cff55d66b" or COLOR_LOSS_TEXT
+            metaParts[#metaParts + 1] = string.format("%s%s|r", colour, missing.specializationName)
+        end
+    elseif self.selectedProfession == nil and rowData.professionList and #rowData.professionList > 0 then
         metaParts[#metaParts + 1] = table.concat(rowData.professionList, ", ")
     end
     setTextIfChanged(row.meta, table.concat(metaParts, " - "))
@@ -3434,6 +3748,17 @@ function UI:RefreshRecipeList()
         return
     end
 
+    if self:IsMissingView() then
+        local rows = (Addon.Data and Addon.Data.BuildMissingRecipeRows
+            and Addon.Data:BuildMissingRecipeRows()) or {}
+        rows = self:FilterRowsBySearch(rows)
+        -- Stashed before the group and header rows are folded in, so the
+        -- header reports recipes rather than table rows.
+        self._missingRecipeCount = #rows
+        self:_FinalizeRecipeList(self:BuildMissingDisplayRows(rows), context, generation)
+        return
+    end
+
     local callbackFiredInline = false
     Addon.Data:BuildRecipeListAsync(
         effectiveProfession,
@@ -3478,6 +3803,8 @@ function UI:_ShowRecipeListLoadingState(context, generation)
     local headerText
     if context.selectedProfession == "Favorites" then
         headerText = "Favorites - loading..."
+    elseif context.selectedProfession == MISSING_VIEW then
+        headerText = MISSING_VIEW .. " - loading..."
     elseif context.selectedProfession and context.categoryFilter then
         headerText = context.selectedProfession .. ": " .. tostring(context.categoryLabel or context.categoryFilter) .. " - loading..."
     elseif context.selectedProfession then
@@ -3556,6 +3883,10 @@ function UI:_FinalizeRecipeList(rows, context, generation)
     local headerText
     if context.selectedProfession == "Favorites" then
         headerText = "Favorite recipes"
+    elseif context.selectedProfession == MISSING_VIEW then
+        -- The count is the point of the view, so it goes in the header
+        -- rather than making the user scroll to the bottom to find it.
+        headerText = string.format("%s - %d to learn", MISSING_VIEW, self._missingRecipeCount or 0)
     elseif context.selectedProfession and context.categoryFilter then
         headerText = context.selectedProfession .. ": " .. tostring(context.categoryLabel or context.categoryFilter)
     elseif context.selectedProfession then
@@ -3796,6 +4127,81 @@ function UI:RefreshVisibleRecipeRowAssets()
     -- virtualized window and let off-screen rows refresh lazily on scroll.
     self:InvalidateRecipeWindowCache()
     self:RenderVisibleRecipeRows()
+end
+
+-- Applies the search box to rows a view built itself. Mirrors the filtering
+-- the catalog list build does inline; the incoming order is preserved,
+-- because views that pre-sort their rows have already decided the order.
+function UI:FilterRowsBySearch(rows)
+    local q = lowerSafe(self.searchText)
+    if q == "" then return rows end
+    local out = {}
+    for _, row in ipairs(rows) do
+        local searchText
+        if self.searchMode == "materials" then
+            searchText = row.detail and row.detail.searchText or lowerSafe(row.label)
+        else
+            searchText = row.detail and row.detail.recipeSearchText or lowerSafe(row.label)
+        end
+        if searchText:find(q, 1, true) then
+            out[#out + 1] = row
+        end
+    end
+    return out
+end
+
+function UI:IsMissingGroupCollapsed(groupKey)
+    return self._collapsedMissingGroups ~= nil and self._collapsedMissingGroups[groupKey] == true
+end
+
+function UI:ToggleMissingGroup(groupKey)
+    if not groupKey then return end
+    self._collapsedMissingGroups = self._collapsedMissingGroups or {}
+    self._collapsedMissingGroups[groupKey] = (not self._collapsedMissingGroups[groupKey]) or nil
+    self:RefreshRecipeList()
+end
+
+-- Turns the flat row list from the data layer into the displayed table:
+-- one column header, then a collapsible section per profession. Grouping is
+-- the profession filter for this view -- with two professions on a
+-- character, a filter control would be more chrome than it is worth.
+function UI:BuildMissingDisplayRows(rows)
+    local order = {}
+    local byProfession = {}
+    for _, row in ipairs(rows) do
+        local professionName = (row.missing and row.missing.professionName) or "Unknown"
+        local bucket = byProfession[professionName]
+        if not bucket then
+            bucket = {}
+            byProfession[professionName] = bucket
+            order[#order + 1] = professionName
+        end
+        bucket[#bucket + 1] = row
+    end
+    table.sort(order)
+
+    local out = {}
+    if #rows > 0 then
+        out[#out + 1] = { rowType = "missingHeader" }
+    end
+    for _, professionName in ipairs(order) do
+        local bucket = byProfession[professionName]
+        local collapsed = self:IsMissingGroupCollapsed(professionName)
+        out[#out + 1] = {
+            rowType = "missingGroup",
+            groupKey = professionName,
+            groupLabel = professionName,
+            count = #bucket,
+            collapsed = collapsed,
+        }
+        if not collapsed then
+            for _, row in ipairs(bucket) do
+                row.rowType = "missing"
+                out[#out + 1] = row
+            end
+        end
+    end
+    return out
 end
 
 function UI:BuildFavoriteRecipeRows(filterContext)
@@ -4432,7 +4838,10 @@ function UI:Refresh(reasons)
     elseif plan.visibleRows then
         self:RefreshVisibleRecipeRowAssets()
     end
-    if plan.detail then
+    -- The missing view takes the full window, so there is no detail panel
+    -- to refresh; skipping keeps it from rebuilding a hidden panel on every
+    -- price or roster tick.
+    if plan.detail and not self:IsMissingView() then
         self:RefreshDetailPanel()
     end
 end

@@ -346,6 +346,18 @@ local function setProfitableOnly(enabled)
     invalidateRecipeFilters(nil, "filters:profitable-only")
 end
 
+-- The missing-recipes tab lists every profession this character has. Some
+-- people level a profession they have no intention of completing, so each
+-- one can be dropped from that view without touching the recipe browser.
+local function setMissingRecipesEnabled(professionLabel, enabled)
+    if Addon.Data and Addon.Data.SetMissingRecipesEnabledForProfession then
+        Addon.Data:SetMissingRecipesEnabledForProfession(professionLabel, enabled)
+    end
+    if Addon.UI and Addon.UI.RefreshRecipeList then
+        Addon.UI:RefreshRecipeList()
+    end
+end
+
 local function createProfessionOverride(filters, professionKey)
     local overrides = filters.professionExpansionOverrides
     local override = overrides[professionKey]
@@ -549,6 +561,13 @@ function Options:RefreshControls()
                 local override = filters.professionExpansionOverrides[profession.key]
                 local custom = type(override) == "table" and override.inherit == false
                 row.customCheck:SetChecked(custom)
+                if row.missingCheck then
+                    local enabled = true
+                    if Addon.Data and Addon.Data.IsMissingRecipesEnabledForProfession then
+                        enabled = Addon.Data:IsMissingRecipesEnabledForProfession(row.professionLabel) ~= false
+                    end
+                    row.missingCheck:SetChecked(enabled)
+                end
                 if custom then
                     row.vanillaCheck:SetChecked(override.vanilla ~= false)
                     row.tbcCheck:SetChecked(override.tbc ~= false)
@@ -720,11 +739,14 @@ function Options:EnsurePanel()
         local headerTbc = createColumnHeader(content, "TBC")
         headerTbc:SetPoint("CENTER", headerProfession, "LEFT", 372 + 12, 0)
 
+        local headerMissing = createColumnHeader(content, "Missing")
+        headerMissing:SetPoint("CENTER", headerProfession, "LEFT", 460 + 12, 0)
+
         local separator = content:CreateTexture(nil, "ARTWORK")
         separator:SetColorTexture(0.4, 0.4, 0.4, 0.5)
         separator:SetHeight(1)
         separator:SetPoint("TOPLEFT", headerProfession, "BOTTOMLEFT", 0, -3)
-        separator:SetPoint("RIGHT", headerTbc, "RIGHT", 20, 0)
+        separator:SetPoint("RIGHT", headerMissing, "RIGHT", 20, 0)
 
         self.professionFilterControls = {}
         local previous = separator
@@ -758,11 +780,21 @@ function Options:EnsurePanel()
             setHoverTooltip(tbcCheck, "Show TBC recipes",
                 "Enable Custom on this row to change this value; otherwise it mirrors the global TBC default.")
 
+            local missingCheck = createCheck(content, "", function(self)
+                setMissingRecipesEnabled(profession.label, self:GetChecked() and true or false)
+                Options:RefreshControls()
+            end)
+            missingCheck:SetPoint("CENTER", label, "LEFT", 460 + 12, 0)
+            setHoverTooltip(missingCheck, "List in Missing recipes",
+                "When enabled, the Missing recipes tab lists what this character has still to learn in " .. profession.label .. ". Only professions this character actually has are ever listed.")
+
             self.professionFilterControls[professionKey] = {
                 label = label,
                 customCheck = customCheck,
                 vanillaCheck = vanillaCheck,
                 tbcCheck = tbcCheck,
+                missingCheck = missingCheck,
+                professionLabel = profession.label,
             }
             previous = label
         end

@@ -7,8 +7,7 @@ local Test = dofile("local-tests/harness/test.lua")
 local _metadataAddon, _wow, addon = Loader.LoadMetadata()
 local filters = addon.RecipeUiFilters
 
--- spell 30303 = Adamantite Sharpening Stone: 4 stones (item 23781) from
--- 2x 22573 + 1x 22574.
+-- spell 30303 = an engineering craft: 4 of item 23781 from 2x 22573 + 1x 22574.
 local STONE = -30303
 
 local function usePrices(prices)

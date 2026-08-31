@@ -602,6 +602,10 @@ Private.shouldRefreshItemName = shouldRefreshItemName
 Private.isValidRecipeKey = isValidRecipeKey
 Private.formatReagents = formatReagents
 Private.detectSpecialization = detectSpecialization
+-- Published on the module so the missing-recipe projection can map a
+-- stored specialization name back to the spell ID the metadata library
+-- reports as a recipe requirement.
+Data.PROFESSION_SPECIALIZATIONS = PROFESSION_SPECIALIZATIONS
 Private.buildLocaleMap = buildLocaleMap
 Private.lowerSafe = lowerSafe
 Private.extractItemID = extractItemID

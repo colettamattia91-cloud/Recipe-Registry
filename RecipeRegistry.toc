@@ -26,6 +26,7 @@ Data\Metadata\RecipeMetadata.lua
 Data\Metadata\RecipeMetadataDiagnostics.lua
 Data\RecipeUiFilters.lua
 Data\DataCatalog.lua
+Data\DataMissingRecipes.lua
 Data\DataIndex.lua
 Data\DataCleanup.lua
 Data\MergeEngine.lua
