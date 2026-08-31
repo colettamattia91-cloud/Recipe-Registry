@@ -86,16 +86,56 @@ function Data:SetMissingRecipesEnabledForProfession(professionName, enabled)
     profile.missingRecipesDisabledProfessions[professionName] = (enabled == false) or nil
 end
 
--- How the recipe reaches the player. The metadata carries no learn-source
--- field -- alternate teaching sources are explicitly out of scope for the
--- generator -- but recipeItemId is a usable proxy: a recipe with a teaching
--- item is a pattern, plans or recipe you find, buy or loot, and one without
--- is taught directly by a trainer.
-local function describeSource(info)
-    if info and info.recipeItemId then
-        return "item", "From a recipe item"
+-- How the recipe reaches the player.
+--
+-- A recipe with no teaching item is taught directly by a trainer, and that is
+-- the whole answer. For the rest the metadata now carries the obtain-side
+-- data imported from Wowhead: who sells it or drops it, and where. When that
+-- import has not been run the label falls back to the shape it had before,
+-- which says only that a recipe item exists.
+local function describeSource(meta, recipeKey, info)
+    if not (info and info.recipeItemId) then
+        return "trainer", "Trainer", nil
     end
-    return "trainer", "From a trainer"
+
+    local source = meta.GetSource and meta:GetSource(recipeKey, info) or nil
+    if not source then
+        return "item", "Recipe item", nil
+    end
+
+    -- Who, then where. The name is the actionable half -- you go and find
+    -- Nightbane, or Edna Mullby -- and the zone tells you where to look.
+    local who = source.names and #source.names > 0 and table.concat(source.names, ", ") or nil
+    local where = source.zones and #source.zones > 0 and table.concat(source.zones, ", ") or nil
+
+    local function label(prefix)
+        if who and where then
+            return string.format("%s: %s (%s)", prefix, who, where)
+        end
+        return string.format("%s: %s", prefix, who or where or "?")
+    end
+
+    if source.worldDrop then
+        return "worldDrop", "World drop", source
+    end
+    if source.trashDrop then
+        -- Deliberately no creature list: the instance name is the answer,
+        -- and twenty names of Karazhan servants are not.
+        return "trash", where and ("Trash: " .. where) or "Instance trash", source
+    end
+    if source.kind == "boss" and who then
+        return "boss", label("Boss"), source
+    end
+    if source.kind == "vendor" and (who or where) then
+        return "vendor", label("Vendor"), source
+    end
+    if source.kind == "drop" and (who or where) then
+        return "drop", label("Drop"), source
+    end
+    if source.kind == "container" and (who or where) then
+        return "container", label("Container"), source
+    end
+    return "item", "Recipe item", source
 end
 
 -- Names, icons and item quality come from Data:GetRecipeDisplayInfo, which
@@ -166,7 +206,7 @@ function Data:BuildMissingRecipeRowsForProfession(professionName, prof)
                 local requiredSkill = tonumber(info and info.requiredSkill) or nil
                 local specializationId = meta.GetSpecialization
                     and meta:GetSpecialization(recipeKey, info) or nil
-                local sourceKind, sourceLabel = describeSource(info)
+                local sourceKind, sourceLabel, source = describeSource(meta, recipeKey, info)
                 rows[#rows + 1] = {
                     recipeKey = recipeKey,
                     -- detail and label are filled in by ResolveMissingRow,
@@ -183,6 +223,12 @@ function Data:BuildMissingRecipeRowsForProfession(professionName, prof)
                         skillMet = requiredSkill == nil or skillRank >= requiredSkill,
                         sourceKind = sourceKind,
                         sourceLabel = sourceLabel,
+                        -- nil means both factions, which is the common case:
+                        -- the generator omits the field rather than repeating
+                        -- it on most of the dataset.
+                        faction = source and source.faction or nil,
+                        sourceNames = source and source.names or nil,
+                        sourceZones = source and source.zones or nil,
                         specializationSpellId = specializationId,
                         specializationName = specializationId
                             and self:GetSpecializationName(professionName, specializationId) or nil,

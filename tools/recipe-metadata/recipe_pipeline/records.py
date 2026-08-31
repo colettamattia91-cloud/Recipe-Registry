@@ -32,3 +32,17 @@ class RecipeRecord:
     # or None when any practitioner can learn it. Not derivable from client
     # data — see wowhead_specialization_provider.
     specialization: Optional[int] = None
+    # Where the recipe comes from, when it is taught by an item. None means
+    # "not known" rather than "available to everyone"; "both" is the explicit
+    # answer and is what the emitter omits, since it is the common case.
+    # See wowhead_source_provider.
+    faction: Optional[str] = None
+    source_kind: Optional[str] = None
+    source_zones: Tuple[int, ...] = ()
+    source_names: Tuple[str, ...] = ()
+    # Set when the recipe drops from so many creatures across so many zones
+    # that naming them is noise rather than an answer.
+    world_drop: bool = False
+    # Set when it drops off non-boss creatures inside an instance: the
+    # instance name is the answer, the creature list is not.
+    trash_drop: bool = False

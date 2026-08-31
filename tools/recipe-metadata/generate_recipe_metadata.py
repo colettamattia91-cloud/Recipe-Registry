@@ -23,6 +23,12 @@ from recipe_sources.wowhead_specialization_provider import (
     fetch_specializations,
     write_specialization_snapshot,
 )
+from recipe_sources.wowhead_source_provider import (
+    build_snapshot as build_source_snapshot,
+    fetch_sources,
+    load_sources,
+    write_snapshot as write_source_snapshot,
+)
 from recipe_sources.wago_anniversary_provider import (
     DEFAULT_BRANCH as DEFAULT_WAGO_BRANCH,
     DEFAULT_LOCALE as DEFAULT_WAGO_LOCALE,
@@ -213,12 +219,62 @@ def _build_pipeline(snapshot=DEFAULT_SNAPSHOT, flavor="tbc"):
         metadata_version,
         SCHEMA_VERSION,
         flavor,
+        secondary.get("zonesById"),
     )
     reports = build_reports(records, diagnostics, primary)
     return primary, records, diagnostics, lua, reports
 
 
 def command_fetch(args):
+    if args.source == "wowhead-sources":
+        # One request per recipe item, and 1436 recipes have one, so the
+        # snapshot doubles as the cache: items already in it are skipped and
+        # the file is rewritten as the run goes, letting an interrupted fetch
+        # resume instead of starting over.
+        snapshot_dir = SNAPSHOT_ROOT / args.snapshot
+        recipes_path = snapshot_dir / "recipes.json"
+        if not recipes_path.exists():
+            print("no recipes.json in {0}; fetch the primary snapshot first".format(snapshot_dir), file=sys.stderr)
+            return 2
+        with recipes_path.open("r", encoding="utf-8") as handle:
+            recipes = json.load(handle)
+        recipe_item_ids = sorted({
+            record["recipeItemId"] for record in recipes if record.get("recipeItemId")
+        })
+
+        def progress(item_id, done, total, note):
+            print("  [{0}/{1}] item {2}: {3}".format(done, total, item_id, note), flush=True)
+
+        sources, zones, instance_zones, outcome = fetch_sources(
+            recipe_item_ids,
+            snapshot_dir,
+            flavor=args.wowhead_flavor,
+            timeout=args.timeout,
+            delay=args.request_delay,
+            limit=args.limit,
+            workers=args.workers,
+            progress=progress if args.verbose else None,
+        )
+        if not sources:
+            print("no source rows parsed; refusing to overwrite the snapshot", file=sys.stderr)
+            return 2
+
+        # Whatever did come back is still worth keeping -- the snapshot is the
+        # cache and a later run resumes from it -- but a run that was mostly
+        # refused must not report success.
+        payload = build_source_snapshot(sources, zones, instance_zones, flavor=args.wowhead_flavor)
+        path = write_source_snapshot(payload, snapshot_dir)
+        print("wrote {0} ({1} recipe items, {2} zones)".format(path, len(sources), len(zones)))
+        print("this run: {0}".format(outcome.describe()))
+        if outcome.mostly_failed():
+            print(
+                "most requests were refused; the snapshot is incomplete and the "
+                "payload should not be regenerated from it",
+                file=sys.stderr,
+            )
+            return 1
+        return 0
+
     if args.source == "wowhead-specializations":
         # Written straight into the snapshot dir rather than through the
         # .incoming staging dance: this is one small standalone file with no
@@ -363,7 +419,13 @@ def build_parser():
     fetch = subparsers.add_parser("fetch")
     fetch.add_argument("--flavor", default="tbc")
     fetch.add_argument("--snapshot", default=DEFAULT_SNAPSHOT)
-    fetch.add_argument("--source", default="normalized-dir", choices=("normalized-dir", "wago-anniversary", "wowhead-specializations"))
+    fetch.add_argument("--source", default="normalized-dir", choices=("normalized-dir", "wago-anniversary", "wowhead-specializations", "wowhead-sources"))
+    fetch.add_argument("--limit", type=int, default=None,
+                       help="wowhead-sources: stop after this many newly fetched items")
+    fetch.add_argument("--verbose", action="store_true",
+                       help="wowhead-sources: print progress per item")
+    fetch.add_argument("--workers", type=int, default=4,
+                       help="wowhead-sources: pages to fetch concurrently")
     fetch.add_argument("--wowhead-flavor", default=DEFAULT_WOWHEAD_FLAVOR)
     fetch.add_argument("--request-delay", type=float, default=DEFAULT_WOWHEAD_DELAY)
     fetch.add_argument("--source-dir")

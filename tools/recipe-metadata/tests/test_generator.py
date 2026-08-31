@@ -17,6 +17,14 @@ from recipe_pipeline.normalize import normalize_records
 from recipe_pipeline.records import ReagentRecord, RecipeRecord
 from recipe_pipeline.validate import validate_records
 from recipe_sources.wago_anniversary_provider import build_normalized_snapshot
+from recipe_pipeline.emit_lua import emit_lua
+from recipe_pipeline.normalize import summarize_source
+from recipe_sources.wowhead_source_provider import (
+    FetchOutcome,
+    derive_faction,
+    parse_item_sources,
+    summarize_item,
+)
 from recipe_sources.wowhead_specialization_provider import (
     build_specialization_snapshot,
     fetch_specializations,
@@ -669,6 +677,221 @@ class WowheadSpecializationTests(unittest.TestCase):
         self.assertEqual(by_spell[12906].specialization, 20219)
         # An explicit override beats the fetched snapshot.
         self.assertEqual(by_spell[29545].specialization, 17039)
+
+
+def _record(spell_id, **overrides):
+    """A minimal valid record, so source tests only state the fields at issue."""
+    fields = dict(
+        spell_id=spell_id,
+        profession_key="blacksmithing",
+        expansion="tbc",
+        recipe_item_id=None,
+        created_item_id=1000 + spell_id,
+        reagents=(),
+        category_key="misc",
+        subcategory_key=None,
+        sort_order=1,
+        required_skill=1,
+    )
+    fields.update(overrides)
+    return RecipeRecord(**fields)
+
+
+class WowheadSourceTests(unittest.TestCase):
+    # Shapes taken verbatim from live TBC pages: a single-faction vendor, a
+    # neutral one, a creature drop and a container. Wowhead inlines these with
+    # partly unquoted keys, so the parser must not assume valid JSON.
+    ALLIANCE_VENDOR = (
+        "new Listview({template: 'npc', id: 'sold-by', data: ["
+        '{"classification":0,"id":1286,"location":[1519],"maxlevel":30,"minlevel":30,'
+        '"name":"Edna Mullby","react":[1,null],"tag":"Trade Supplies","type":7}]});'
+    )
+    HORDE_VENDOR = (
+        "new Listview({template: 'npc', id: 'sold-by', data: ["
+        '{"id":3960,"location":[1637],"name":"Kaplak","react":[null,1],"tag":"Trade Supplies"}]});'
+    )
+    NEUTRAL_VENDOR = (
+        "new Listview({template: 'npc', id: 'sold-by', data: ["
+        '{"id":19239,"location":[3703],"name":"Haastrum","react":[1,1],"tag":"Trade Supplies"}]});'
+    )
+    DROP = (
+        "new Listview({template: 'npc', id: 'dropped-by', data: ["
+        '{"id":36,"location":[40,0],"name":"Harvest Golem","react":[-1,-1],"count":6,"outof":29282}]});'
+    )
+    CONTAINER = (
+        "new Listview({template: 'object', id: 'contained-in-object', data: ["
+        '{"id":2847,"location":[3433],"name":"Tattered Chest","type":3}]});'
+    )
+
+    def test_reads_vendor_zone_and_faction(self):
+        parsed = parse_item_sources(self.ALLIANCE_VENDOR)
+        self.assertEqual(len(parsed["vendors"]), 1)
+        vendor = parsed["vendors"][0]
+        self.assertEqual(vendor["name"], "Edna Mullby")
+        self.assertEqual(vendor["zones"], [1519])
+        self.assertTrue(vendor["alliance"])
+        self.assertFalse(vendor["horde"])
+        self.assertEqual(derive_faction(parsed), "alliance")
+
+    def test_null_and_hostile_react_both_mean_unavailable(self):
+        # `null` is "this NPC does not exist for you", a negative value is
+        # "it will not trade with you". Neither lets that faction buy.
+        self.assertEqual(derive_faction(parse_item_sources(self.HORDE_VENDOR)), "horde")
+        self.assertEqual(derive_faction(parse_item_sources(self.NEUTRAL_VENDOR)), "both")
+
+    def test_a_drop_is_available_to_everyone(self):
+        # A creature is hostile to both sides, so its react pair says nothing
+        # about who may loot the recipe.
+        parsed = parse_item_sources(self.DROP)
+        self.assertEqual(derive_faction(parsed), "both")
+        self.assertEqual(parsed["drops"][0]["name"], "Harvest Golem")
+        # Zone 0 is Wowhead filler and must not reach the payload.
+        self.assertEqual(parsed["drops"][0]["zones"], [40])
+
+    def test_a_drop_overrides_a_single_faction_vendor(self):
+        parsed = parse_item_sources(self.ALLIANCE_VENDOR + self.DROP)
+        self.assertEqual(derive_faction(parsed), "both")
+
+    def test_summary_names_the_kinds_and_unions_the_zones(self):
+        summary = summarize_item(parse_item_sources(self.ALLIANCE_VENDOR + self.CONTAINER))
+        self.assertEqual(summary["kinds"], ["vendor", "container"])
+        self.assertEqual(summary["zones"], [1519, 3433])
+        self.assertEqual(summary["vendors"], [{"name": "Edna Mullby", "zones": [1519]}])
+
+    def test_unrelated_listviews_are_ignored(self):
+        related = (
+            "new Listview({template: 'item', id: 'can-be-placed-in', data: ["
+            '{"id":34482,"name":"Leatherworker\'s Satchel","source":[1]}]});'
+        )
+        parsed = parse_item_sources(related + self.ALLIANCE_VENDOR)
+        self.assertEqual(len(parsed["vendors"]), 1)
+        self.assertEqual(parsed["drops"], [])
+        self.assertEqual(parsed["containers"], [])
+
+
+class SourceSummaryTests(unittest.TestCase):
+    def test_vendor_wins_over_drop_as_the_actionable_answer(self):
+        source = {
+            "faction": "both",
+            "kinds": ["vendor", "drop"],
+            "zones": [1519, 40],
+            "vendors": [{"name": "Edna Mullby", "zones": [1519]}],
+            "drops": [{"name": "Harvest Golem", "zones": [40]}],
+        }
+        faction, kind, zones, names, world_drop, trash = summarize_source(source)
+        self.assertIsNone(faction)  # "both" is the default reading of absent
+        self.assertEqual(kind, "vendor")
+        self.assertEqual(names, ("Edna Mullby",))
+        self.assertFalse(world_drop)
+
+    def test_many_droppers_collapse_to_a_world_drop(self):
+        drops = [{"name": "Mob %d" % index, "zones": [index]} for index in range(12)]
+        faction, kind, zones, names, world_drop, trash = summarize_source({
+            "faction": "both",
+            "kinds": ["drop"],
+            "zones": list(range(12)),
+            "drops": drops,
+        })
+        self.assertEqual(kind, "drop")
+        self.assertTrue(world_drop)
+        # Naming a dozen creatures across a dozen zones answers nothing, so
+        # the payload carries neither.
+        self.assertEqual(zones, ())
+        self.assertEqual(names, ())
+
+    def test_no_source_data_stays_empty(self):
+        self.assertEqual(summarize_source({}), (None, None, (), (), False, False))
+
+
+class InstanceDropTests(unittest.TestCase):
+    """A drop is not one answer: a boss, instance trash and a world drop are
+    three different things to tell the player."""
+
+    def test_a_boss_is_named(self):
+        faction, kind, zones, names, world_drop, trash = summarize_source({
+            "faction": "both",
+            "kinds": ["drop"],
+            "zones": [3457],
+            "drops": [
+                {"name": "Nightbane", "zones": [3457], "boss": True, "instance": True},
+                {"name": "Phase Hunter", "zones": [3457], "instance": True},
+            ],
+        })
+        self.assertEqual(kind, "boss")
+        self.assertEqual(names, ("Nightbane",))
+        self.assertFalse(trash)
+        self.assertEqual(zones, (3457,))
+
+    def test_instance_non_bosses_collapse_to_trash_without_a_list(self):
+        drops = [
+            {"name": "Servant %d" % index, "zones": [3457], "instance": True}
+            for index in range(4)
+        ]
+        faction, kind, zones, names, world_drop, trash = summarize_source({
+            "faction": "both", "kinds": ["drop"], "zones": [3457], "drops": drops,
+        })
+        self.assertEqual(kind, "trash")
+        self.assertTrue(trash)
+        # The instance name is the answer; the creature list is not.
+        self.assertEqual(names, ())
+        self.assertEqual(zones, (3457,))
+        self.assertFalse(world_drop)
+
+    def test_two_creatures_out_in_the_world_are_still_named(self):
+        faction, kind, zones, names, world_drop, trash = summarize_source({
+            "faction": "both",
+            "kinds": ["drop"],
+            "zones": [40],
+            "drops": [
+                {"name": "Harvest Golem", "zones": [40]},
+                {"name": "Harvest Watcher", "zones": [40]},
+            ],
+        })
+        self.assertEqual(kind, "drop")
+        self.assertEqual(names, ("Harvest Golem", "Harvest Watcher"))
+        self.assertFalse(trash)
+        self.assertFalse(world_drop)
+
+
+class FetchOutcomeTests(unittest.TestCase):
+    """A crawl that gets refused must not look like one that worked."""
+
+    def test_a_clean_run_reports_no_failures(self):
+        outcome = FetchOutcome(attempted=10, succeeded=10, failures={})
+        self.assertEqual(outcome.describe(), "10/10 fetched")
+        self.assertFalse(outcome.mostly_failed())
+
+    def test_a_blocked_run_is_flagged_and_names_the_reason(self):
+        outcome = FetchOutcome(attempted=1396, succeeded=114, failures={"http": 1282})
+        self.assertIn("1282 failed", outcome.describe())
+        self.assertIn("http", outcome.describe())
+        self.assertTrue(outcome.mostly_failed())
+
+    def test_a_few_stragglers_do_not_condemn_the_run(self):
+        outcome = FetchOutcome(attempted=100, succeeded=95, failures={"http": 5})
+        self.assertFalse(outcome.mostly_failed())
+
+
+class SourceEmitTests(unittest.TestCase):
+    def test_emits_faction_zones_and_names_but_omits_both(self):
+        alliance = _record(spell_id=1, faction="alliance", source_kind="vendor",
+                           source_zones=(1519,), source_names=("Edna Mullby",))
+        neutral = _record(spell_id=2)
+        lua = emit_lua([alliance, neutral], {}, {}, "1", 1, "tbc", {1519: "Stormwind City"})
+        self.assertIn('faction = "alliance"', lua)
+        self.assertIn('sourceKind = "vendor"', lua)
+        self.assertIn("sourceZones = { 1519 }", lua)
+        self.assertIn('sourceNames = { "Edna Mullby" }', lua)
+        self.assertIn('[1519] = "Stormwind City"', lua)
+        # The neutral record carries no faction line at all.
+        self.assertEqual(lua.count("faction ="), 1)
+
+    def test_only_cited_zones_reach_the_name_table(self):
+        record = _record(spell_id=1, source_zones=(1519,))
+        lua = emit_lua([record], {}, {}, "1", 1, "tbc",
+                       {1519: "Stormwind City", 1637: "Orgrimmar"})
+        self.assertIn('[1519] = "Stormwind City"', lua)
+        self.assertNotIn("Orgrimmar", lua)
 
 
 if __name__ == "__main__":

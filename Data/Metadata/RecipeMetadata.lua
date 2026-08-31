@@ -47,6 +47,15 @@ local function cloneReagents(reagents)
     return out
 end
 
+local function cloneStringList(list)
+    if type(list) ~= "table" then return nil end
+    local out = {}
+    for index, value in ipairs(list) do
+        out[index] = value
+    end
+    return out
+end
+
 local function cloneRecord(spellId, record)
     if type(record) ~= "table" then
         return nil
@@ -66,6 +75,15 @@ local function cloneRecord(spellId, record)
         requiredSkill = record.requiredSkill,
         selfOnlyOutputless = record.selfOnlyOutputless == true,
         bopOutput = record.bopOutput,
+        -- Obtain-side fields. An absent faction means both: that is the
+        -- common case and the generator omits it rather than repeating it on
+        -- most of the dataset.
+        faction = record.faction,
+        sourceKind = record.sourceKind,
+        worldDrop = record.worldDrop == true,
+        trashDrop = record.trashDrop == true,
+        sourceZones = cloneStringList(record.sourceZones),
+        sourceNames = cloneStringList(record.sourceNames),
         reagents = cloneReagents(record.reagents),
     }
 end
@@ -623,6 +641,41 @@ function RecipeMetadata:GetReagentItemIds()
     end
     self._reagentItemIds = ids
     return ids
+end
+
+-- Where a recipe is obtained, for the ones taught by an item. Returns nil
+-- when nothing is known -- a trainer-taught recipe has no recipe item and so
+-- no entry, which is itself the answer.
+--
+-- `faction` is nil when both factions can get it, which is the common case;
+-- callers must not read nil as "unknown". Zone IDs are resolved to names
+-- here, from the table the generator emits once at the top level rather than
+-- repeating a popular vendor city on hundreds of records.
+function RecipeMetadata:GetSource(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    if not info then return nil end
+    if not (info.faction or info.sourceKind or info.worldDrop or info.trashDrop) then
+        return nil
+    end
+
+    local zoneNames = self._generated and self._generated.zoneNamesById or nil
+    local zones
+    for _, zoneId in ipairs(info.sourceZones or {}) do
+        local name = zoneNames and zoneNames[zoneId] or nil
+        if name then
+            zones = zones or {}
+            zones[#zones + 1] = name
+        end
+    end
+
+    return {
+        faction = info.faction,
+        kind = info.sourceKind,
+        worldDrop = info.worldDrop == true,
+        trashDrop = info.trashDrop == true,
+        zones = zones,
+        names = cloneStringList(info.sourceNames),
+    }
 end
 
 function RecipeMetadata:GetRecipeItemId(recipeKey, info)

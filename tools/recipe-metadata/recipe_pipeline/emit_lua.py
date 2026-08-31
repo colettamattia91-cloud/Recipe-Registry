@@ -36,6 +36,20 @@ def _emit_record(record, indent="        "):
         lines.append(indent + "    requiredSkill = " + str(record.required_skill) + ",")
     if record.specialization is not None:
         lines.append(indent + "    specialization = " + str(record.specialization) + ",")
+    # Obtain-side fields. Absent faction means both, which is the common case,
+    # so emitting it on every record would be pure bloat.
+    if record.faction is not None:
+        lines.append(indent + "    faction = " + _lua_string(record.faction) + ",")
+    if record.source_kind is not None:
+        lines.append(indent + "    sourceKind = " + _lua_string(record.source_kind) + ",")
+    if record.world_drop:
+        lines.append(indent + "    worldDrop = true,")
+    if record.trash_drop:
+        lines.append(indent + "    trashDrop = true,")
+    if record.source_zones:
+        lines.append(indent + "    sourceZones = { " + ", ".join(str(zone) for zone in record.source_zones) + " },")
+    if record.source_names:
+        lines.append(indent + "    sourceNames = { " + ", ".join(_lua_string(name) for name in record.source_names) + " },")
     if record.is_outputless_self_only:
         lines.append(indent + "    selfOnlyOutputless = true,")
     if record.bop_output is not None:
@@ -140,7 +154,7 @@ def _emit_nav_tree(tree, indent="    "):
     return lines
 
 
-def emit_lua(records, categories_by_profession, subcategories_by_profession, metadata_version, schema_version=1, flavor="tbc"):
+def emit_lua(records, categories_by_profession, subcategories_by_profession, metadata_version, schema_version=1, flavor="tbc", zone_names=None):
     records = sorted(records, key=lambda record: record.spell_id)
     created_item_to_spell_ids = defaultdict(list)
 
@@ -178,6 +192,21 @@ def emit_lua(records, categories_by_profession, subcategories_by_profession, met
             lines.append("            " + category + " = ")
             lines.extend(_emit_array_table(subcategories_by_profession[profession][category], "            "))
         lines.append("        },")
+    lines.append("    },")
+    lines.append("")
+
+    # Zone names live once at the top level rather than being repeated on
+    # every record that points at them: a popular vendor zone is referenced by
+    # hundreds of recipes. Only zones some record actually cites are emitted.
+    cited_zones = set()
+    for record in records:
+        cited_zones.update(record.source_zones)
+    zone_names = zone_names or {}
+    lines.append("    zoneNamesById = {")
+    for zone_id in sorted(cited_zones):
+        name = zone_names.get(zone_id)
+        if name:
+            lines.append("        [" + str(zone_id) + "] = " + _lua_string(name) + ",")
     lines.append("    },")
     lines.append("")
     lines.extend(_emit_nav_tree(_build_nav_tree(records)))

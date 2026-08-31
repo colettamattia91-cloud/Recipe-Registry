@@ -3300,8 +3300,13 @@ function UI:EnsureMissingRowParts(row)
 
     row.missingSpec = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     row.missingSpec:SetPoint("LEFT", row.missingSource, "RIGHT", 8, 0)
-    row.missingSpec:SetWidth(200)
+    row.missingSpec:SetWidth(180)
     row.missingSpec:SetJustifyH("LEFT")
+
+    row.missingFaction = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.missingFaction:SetPoint("LEFT", row.missingSpec, "RIGHT", 8, 0)
+    row.missingFaction:SetWidth(90)
+    row.missingFaction:SetJustifyH("LEFT")
 
     row.missingPartsReady = true
 end
@@ -3313,6 +3318,7 @@ function UI:SetMissingPartsVisible(row, visible)
     setShownIfChanged(row.missingSkill, visible)
     setShownIfChanged(row.missingSource, visible)
     setShownIfChanged(row.missingSpec, visible)
+    setShownIfChanged(row.missingFaction, visible)
 end
 
 function UI:HideMissingRowParts(row)
@@ -3322,6 +3328,7 @@ function UI:HideMissingRowParts(row)
     setShownIfChanged(row.missingSkill, false)
     setShownIfChanged(row.missingSource, false)
     setShownIfChanged(row.missingSpec, false)
+    setShownIfChanged(row.missingFaction, false)
 end
 
 function UI:HideRecipeRowParts(row)
@@ -3356,6 +3363,7 @@ function UI:BindMissingGroupRow(row, rowIdx, rowData)
     setShownIfChanged(row.missingSkill, false)
     setShownIfChanged(row.missingSource, false)
     setShownIfChanged(row.missingSpec, false)
+    setShownIfChanged(row.missingFaction, false)
     row.missingGroupKey = rowData.groupKey
 
     local arrow = rowData.collapsed and "|cff9fa6b2\226\150\184|r" or "|cff9fa6b2\226\150\190|r"
@@ -3374,10 +3382,12 @@ function UI:BindMissingHeaderRow(row, rowIdx)
     setTextIfChanged(row.missingSkill, "Skill")
     setTextIfChanged(row.missingSource, "Learned from")
     setTextIfChanged(row.missingSpec, "Specialization")
+    setTextIfChanged(row.missingFaction, "Faction")
     row.missingName:SetTextColor(0.72, 0.72, 0.72)
     row.missingSkill:SetTextColor(0.72, 0.72, 0.72)
     row.missingSource:SetTextColor(0.72, 0.72, 0.72)
     row.missingSpec:SetTextColor(0.72, 0.72, 0.72)
+    row.missingFaction:SetTextColor(0.72, 0.72, 0.72)
     setVertexColorIfChanged(row.stripe, 0.35, 0.35, 0.35, 1)
     setBackdropColorsIfChanged(row, 0.06, 0.06, 0.06, 0.98, 0.20, 0.20, 0.20, 0.95)
     setShownIfChanged(row, true)
@@ -3440,6 +3450,16 @@ function UI:BindMissingRow(row, rowIdx, rowData)
         setTextIfChanged(row.missingSpec, "|cff8f949c-|r")
     end
     row.missingSource:SetTextColor(0.82, 0.82, 0.82)
+
+    -- Nil faction means both sides can get it, which is the common case and
+    -- deserves no ink. Only a restriction is worth a word.
+    if missing.faction == "alliance" then
+        setTextIfChanged(row.missingFaction, "|cff6699ffAlliance|r")
+    elseif missing.faction == "horde" then
+        setTextIfChanged(row.missingFaction, "|cffe05561Horde|r")
+    else
+        setTextIfChanged(row.missingFaction, "|cff8f949c-|r")
+    end
 
     -- The stripe reads as "can I go and get this now?" at a glance.
     if missing.skillMet and missing.specializationMet then
