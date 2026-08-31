@@ -311,7 +311,17 @@ local function applyMetadataInfo(info, metadata, recipeKey, numericKey, metadata
     info.professionID = PROFESSION_IDS[professionKey]
     info.professionName = PROFESSION_LABELS[professionKey] or professionKey
     info.minRank = metadataInfo.requiredSkill
-    info.numCreated = 1
+    -- Units produced per craft, straight from the metadata library. Absence
+    -- of the generated field means 1, not unknown, so the fallback is safe.
+    -- min and max differ only for the handful of random-yield recipes.
+    local createdCount, createdCountMax = 1, 1
+    if metadata.GetCreatedCount then
+        createdCount, createdCountMax = metadata:GetCreatedCount(recipeKey, metadataInfo)
+        createdCount = tonumber(createdCount) or 1
+        createdCountMax = tonumber(createdCountMax) or createdCount
+    end
+    info.numCreated = createdCount
+    info.numCreatedMax = createdCountMax
     info.directEnchant = metadata:IsOutputlessSelfOnly(recipeKey, metadataInfo) == true or createdItemID == nil
 
     -- Reagent name resolution is deferred to Data:EnsureRecipeReagents. The
@@ -1326,6 +1336,7 @@ function Data:GetRecipeDisplayInfo(recipeKey, professionName)
         highRank = nil,
         reagents = {},
         numCreated = 1,
+        numCreatedMax = 1,
         directEnchant = false,
         label = nil,
         searchText = nil,

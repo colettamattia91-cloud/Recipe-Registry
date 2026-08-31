@@ -82,6 +82,9 @@ local function ensureRecipePrefilters(profile)
     if filters.showRemoteBopOutputRecipes == nil then
         filters.showRemoteBopOutputRecipes = false
     end
+    if filters.showOnlyProfitableRecipes == nil then
+        filters.showOnlyProfitableRecipes = false
+    end
     if type(filters.expansionDefaults) ~= "table" then
         filters.expansionDefaults = {}
     end
@@ -101,6 +104,7 @@ local function resetRecipePrefilters(profile)
     if not profile then return end
     profile.recipePrefilters = {
         showRemoteBopOutputRecipes = false,
+        showOnlyProfitableRecipes = false,
         expansionDefaults = {
             -- Match DB_DEFAULTS in Data.lua — TBC-only by default. Vanilla
             -- recipes are an opt-in via the global Vanilla checkbox.
@@ -334,6 +338,14 @@ local function setRemoteBopVisible(enabled)
     invalidateRecipeFilters(nil, "filters:remote-bop")
 end
 
+local function setProfitableOnly(enabled)
+    local profile = getProfile()
+    if not profile then return end
+    local filters = ensureRecipePrefilters(profile)
+    filters.showOnlyProfitableRecipes = enabled == true
+    invalidateRecipeFilters(nil, "filters:profitable-only")
+end
+
 local function createProfessionOverride(filters, professionKey)
     local overrides = filters.professionExpansionOverrides
     local override = overrides[professionKey]
@@ -513,6 +525,9 @@ function Options:RefreshControls()
     if self.remoteBopCheck then
         self.remoteBopCheck:SetChecked(filters.showRemoteBopOutputRecipes == true)
     end
+    if self.profitableOnlyCheck then
+        self.profitableOnlyCheck:SetChecked(filters.showOnlyProfitableRecipes == true)
+    end
     if self.professionFilterControls then
         for _, profession in ipairs(FILTER_PROFESSIONS) do
             local row = self.professionFilterControls[profession.key]
@@ -664,8 +679,19 @@ function Options:EnsurePanel()
         remoteBopCheck:SetPoint("TOPLEFT", globalTbcCheck, "BOTTOMLEFT", 0, -2)
         self.remoteBopCheck = remoteBopCheck
 
+        -- One switch, not a filter axis: a craft is in when the created item
+        -- sells for more than its reagents, and out otherwise. Recipes whose
+        -- price cannot be resolved end to end are out too, which is why this
+        -- is opt-in -- without TSM or Auctionator data it empties the list.
+        local profitableOnlyCheck = createCheck(content, "Show only profitable recipes (needs TSM or Auctionator)", function(self)
+            setProfitableOnly(self:GetChecked() and true or false)
+            Options:RefreshControls()
+        end)
+        profitableOnlyCheck:SetPoint("TOPLEFT", remoteBopCheck, "BOTTOMLEFT", 0, -2)
+        self.profitableOnlyCheck = profitableOnlyCheck
+
         local matrixHeader = createText(content, "Profession overrides", "GameFontNormalSmall")
-        matrixHeader:SetPoint("TOPLEFT", remoteBopCheck, "BOTTOMLEFT", 28, -10)
+        matrixHeader:SetPoint("TOPLEFT", profitableOnlyCheck, "BOTTOMLEFT", 28, -10)
 
         local headerProfession = createColumnHeader(content, "Profession", 132)
         headerProfession:SetJustifyH("LEFT")

@@ -65,6 +65,9 @@ local function getProfilePrefilters()
     if filters.hideUncataloguedRecipes == nil then
         filters.hideUncataloguedRecipes = true
     end
+    if filters.showOnlyProfitableRecipes == nil then
+        filters.showOnlyProfitableRecipes = false
+    end
     return filters
 end
 
@@ -152,7 +155,41 @@ local function ambiguousConsensusHiddenByExpansion(self, metadata, recipeKey, fi
         or (expansion == "tbc" and visibility.tbc == false)
 end
 
+-- Profit gate for the "only profitable recipes" toggle. Deliberately the
+-- last thing RecipePasses does, and only when the toggle is on: it is the
+-- one predicate that costs price lookups, so the default path never pays
+-- for it. A craft that cannot be priced end to end is not shown as
+-- profitable -- "unknown" is not a third answer the user asked for.
+local function passesProfitGate(recipeKey, info)
+    local market = Addon.Market
+    if not (market and market.EstimateRecipeProfit) then
+        return false
+    end
+    local profit = market:EstimateRecipeProfit(recipeKey, info)
+    return type(profit) == "number" and profit > 0
+end
+
 function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
+    local passes, reason = self:EvaluateVisibility(recipeKey, recipeInfo, filterContext)
+    if passes ~= true then
+        return passes, reason
+    end
+    if getProfilePrefilters().showOnlyProfitableRecipes ~= true then
+        return true, reason
+    end
+    local metadata = getMetadata()
+    local info = recipeInfo or (metadata and metadata:GetRecipeInfo(recipeKey)) or nil
+    if not passesProfitGate(recipeKey, info) then
+        Addon:Trace("filters", "recipe hidden by profit filter", recipeKey)
+        return false, "hidden-not-profitable"
+    end
+    return true, reason
+end
+
+-- Everything except the profit gate: expansion, ownership, BoP/outputless
+-- and the uncatalogued cleanup. Split out so the expensive gate can run
+-- once, last, on the survivors.
+function RecipeUiFilters:EvaluateVisibility(recipeKey, recipeInfo, filterContext)
     local metadata = getMetadata()
     if not metadata then
         return true, "visible-no-plugin"
@@ -320,6 +357,10 @@ function RecipeUiFilters:BuildFilterCacheKey(ctx)
         "flavor=" .. tostring(metadata.flavor or ""),
         "remoteBop=" .. boolToken(filters.showRemoteBopOutputRecipes == true),
         "hideUncat=" .. boolToken(filters.hideUncataloguedRecipes ~= false),
+        -- Price data itself is not in the key: Market:InvalidatePriceCache
+        -- drops the recipe list caches wholesale when the auction house
+        -- closes, which is the only moment the underlying prices move.
+        "profitOnly=" .. boolToken(filters.showOnlyProfitableRecipes == true),
         "ownership=" .. tostring(data._recipeOwnershipIndexGeneration or 0),
     }
 

@@ -266,6 +266,88 @@ function Market:ResolveItemQuery(query)
     return nil
 end
 
+-- What one craft is worth at market, and the profit against its reagent
+-- cost. Prices the created item through the same per-item cache the
+-- reagents use (GetMaterialCost is item-generic despite the name), so the
+-- output of one recipe is already priced when it turns up as a reagent of
+-- another.
+--
+-- Profit is only marked complete when every reagent priced: a partial cost
+-- understates the spend, which would show a phantom profit on exactly the
+-- recipes whose materials nobody has listed.
+local function applyCraftValue(self, detail)
+    detail.value = nil
+    detail.profit = nil
+
+    local createdItemID = detail.createdItemID
+    if not createdItemID then return end
+
+    local unitPrice, source = self:GetMaterialCost(createdItemID)
+    if not unitPrice then return end
+
+    local count = tonumber(detail.numCreated) or 1
+    local countMax = tonumber(detail.numCreatedMax) or count
+    detail.value = {
+        unitPrice = unitPrice,
+        source = source,
+        count = count,
+        countMax = countMax,
+        total = unitPrice * count,
+        totalMax = unitPrice * countMax,
+    }
+
+    local cost = detail.cost
+    if not cost or (cost.pricedCount or 0) <= 0 then return end
+
+    detail.profit = {
+        total = detail.value.total - cost.total,
+        totalMax = detail.value.totalMax - cost.total,
+        complete = (cost.missingCount or 0) == 0,
+    }
+end
+
+-- Per-row profit estimate for the "only profitable recipes" list filter.
+--
+-- Reads the raw metadata record rather than a display info: the list build
+-- deliberately skips reagent materialization in recipe search mode because
+-- the GetItemInfo call per reagent dominates profession-switch latency, and
+-- pricing needs item IDs and counts, not names. Everything else is a table
+-- read plus cache-backed price lookups.
+--
+-- Returns nil when the craft cannot be priced end to end (no created item,
+-- no reagents, or any leg missing a price) so callers can tell "not
+-- profitable" from "not priceable".
+function Market:EstimateRecipeProfit(recipeKey, info)
+    local metadata = Addon.RecipeMetadata
+    if not metadata then return nil end
+
+    info = info or (metadata.GetRecipeInfo and metadata:GetRecipeInfo(recipeKey)) or nil
+    if not info then return nil end
+
+    local createdItemID = info.createdItemId
+    if not createdItemID then return nil end
+
+    local unitPrice = self:GetMaterialCost(createdItemID)
+    if not unitPrice then return nil end
+
+    local reagents = info.reagents
+    if type(reagents) ~= "table" or #reagents == 0 then return nil end
+
+    local cost = 0
+    for index = 1, #reagents do
+        local reagent = reagents[index]
+        local price = reagent.itemId and self:GetMaterialCost(reagent.itemId) or nil
+        if not price then
+            return nil
+        end
+        cost = cost + price * (tonumber(reagent.count) or 1)
+    end
+
+    -- Conservative on random yields: the guaranteed quantity, not the lucky one.
+    local count = tonumber(info.createdCount) or 1
+    return unitPrice * count - cost
+end
+
 function Market:ApplyRecipeCosts(detail)
     if not detail then return end
 
@@ -308,6 +390,8 @@ function Market:ApplyRecipeCosts(detail)
         missingCount = missingCount,
         source = sourceLabel,
     }
+
+    applyCraftValue(self, detail)
 end
 
 function Market:DumpStatus(rest)

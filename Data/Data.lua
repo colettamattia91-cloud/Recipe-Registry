@@ -84,6 +84,10 @@ local DB_DEFAULTS = {
         recipePrefilters = {
             showRemoteBopOutputRecipes = false,
             hideUncataloguedRecipes = true,
+            -- Off by default: it is the one prefilter that needs auction
+            -- prices, so with no TSM/Auctionator data it would empty the
+            -- list rather than filter it.
+            showOnlyProfitableRecipes = false,
             expansionDefaults = {
                 -- TBC-only by default. The vast majority of players land
                 -- on TBC content; surfacing 1248 vanilla recipes by
@@ -656,6 +660,7 @@ function Data:OnInitialize()
         self.db.profile.recipePrefilters = {
             showRemoteBopOutputRecipes = false,
             hideUncataloguedRecipes = true,
+            showOnlyProfitableRecipes = false,
             expansionDefaults = { vanilla = true, tbc = true },
             professionExpansionOverrides = {},
         }
@@ -666,6 +671,9 @@ function Data:OnInitialize()
         end
         if prefilters.hideUncataloguedRecipes == nil then
             prefilters.hideUncataloguedRecipes = true
+        end
+        if prefilters.showOnlyProfitableRecipes == nil then
+            prefilters.showOnlyProfitableRecipes = false
         end
         if type(prefilters.expansionDefaults) ~= "table" then
             prefilters.expansionDefaults = { vanilla = true, tbc = true }

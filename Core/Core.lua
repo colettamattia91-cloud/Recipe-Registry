@@ -337,12 +337,13 @@ local function dumpFilterStatus(self)
     local counts = metadata:GetRecordCounts()
     local defaults = filters.expansionDefaults or {}
     self:Print(string.format(
-        "Recipe filters: metadata=%s unresolved=%d vanilla=%s tbc=%s remoteBop=%s",
+        "Recipe filters: metadata=%s unresolved=%d vanilla=%s tbc=%s remoteBop=%s profitOnly=%s",
         tostring(metadata.metadataVersion or "unknown"),
         counts.unresolved or 0,
         defaults.vanilla ~= false and "on" or "off",
         defaults.tbc ~= false and "on" or "off",
-        filters.showRemoteBopOutputRecipes == true and "show" or "hide"
+        filters.showRemoteBopOutputRecipes == true and "show" or "hide",
+        filters.showOnlyProfitableRecipes == true and "on" or "off"
     ))
 end
 

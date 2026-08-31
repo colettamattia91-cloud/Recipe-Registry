@@ -72,6 +72,8 @@ local COLOR_BUTTON_ACTIVE = {0.13, 0.11, 0.08, 0.98}
 -- right edge, so every clipping container has to span this lane too or
 -- the bar is clipped away with the rest of the overflow.
 local SCROLLBAR_LANE = 20
+local COLOR_PROFIT_TEXT = "|cff3fbf6f"
+local COLOR_LOSS_TEXT = "|cffe05561"
 local FAVORITE_ICON = "Interface\\AddOns\\RecipeRegistry\\UI\\Assets\\favorite-star"
 local VALID_FRAME_POINTS = {
     TOPLEFT = true,
@@ -345,6 +347,17 @@ local function formatMoney(copper)
     if c > 0 then parts[#parts + 1] = string.format("%d %s", c, copperIcon) end
     if #parts == 0 then return "0" end
     return table.concat(parts, " ")
+end
+
+-- formatMoney's floor/modulo split misreads negatives (-50s comes out as
+-- "-1 g 50 s"), so the sign is carried here and only the magnitude goes
+-- through the icon formatter.
+local function formatSignedMoney(copper)
+    if type(copper) ~= "number" then return "n/a" end
+    if copper < 0 then
+        return "-" .. formatMoney(-copper)
+    end
+    return "+" .. formatMoney(copper)
 end
 
 local function formatMoneyForChat(copper)
@@ -4181,7 +4194,7 @@ function UI:RefreshDetailPanel()
         end
     end
     local signature = string.format(
-        "%s|%s|%d|%d|%s|%s|%s|%s|%s|%s|%d",
+        "%s|%s|%d|%d|%s|%s|%s|%s|%s|%s|%s|%d",
         tostring(self.selectedRecipeKey),
         isFavorite and "1" or "0",
         tonumber(detail.crafterCount) or 0,
@@ -4189,6 +4202,7 @@ function UI:RefreshDetailPanel()
         tostring(detail.cost and detail.cost.total or ""),
         tostring(detail.cost and detail.cost.missingCount or 0),
         tostring(detail.cost and detail.cost.source or ""),
+        tostring(detail.profit and detail.profit.total or ""),
         tostring(self._offlineCraftersExpanded),
         requestabilitySignature,
         tostring(detail.label or ""),
@@ -4315,6 +4329,46 @@ function UI:RefreshDetailPanel()
         lines[#lines + 1] = string.format("|cff8f949cSources: %s|r", tostring(detail.cost.source or "N/A"))
         if (detail.cost.missingCount or 0) > 0 then
             lines[#lines + 1] = string.format("|cff8f949cMissing prices: %d reagent(s)|r", detail.cost.missingCount)
+        end
+    end
+
+    -- Craft value sits directly under the cost estimate so the two numbers
+    -- profit is derived from are read together. Shown whenever the created
+    -- item has a market price, even if the reagents don't -- "what does this
+    -- sell for" is useful on its own, and the profit line says so when it
+    -- can only be an upper bound.
+    if detail.value then
+        local value = detail.value
+        local hasYieldRange = (value.countMax or value.count) > value.count
+        lines[#lines + 1] = " "
+        lines[#lines + 1] = "|cffffd100Craft value|r"
+        if hasYieldRange then
+            lines[#lines + 1] = string.format("|cffffffffSells for: %s - %s   (x%d-%d @ %s)|r",
+                formatMoney(value.total), formatMoney(value.totalMax),
+                value.count, value.countMax, formatMoney(value.unitPrice))
+        elseif value.count > 1 then
+            lines[#lines + 1] = string.format("|cffffffffSells for: %s   (x%d @ %s)|r",
+                formatMoney(value.total), value.count, formatMoney(value.unitPrice))
+        else
+            lines[#lines + 1] = string.format("|cffffffffSells for: %s|r", formatMoney(value.total))
+        end
+        lines[#lines + 1] = string.format("|cff8f949cSource: %s|r", tostring(value.source or "N/A"))
+
+        local profit = detail.profit
+        if profit then
+            -- Coloured by the low end: a range that straddles zero is not a
+            -- profitable craft, it is a gamble.
+            local colour = (profit.total >= 0) and COLOR_PROFIT_TEXT or COLOR_LOSS_TEXT
+            local amount = formatSignedMoney(profit.total)
+            if hasYieldRange then
+                amount = string.format("%s - %s", amount, formatSignedMoney(profit.totalMax))
+            end
+            lines[#lines + 1] = string.format("%sProfit: %s|r", colour, amount)
+            if not profit.complete then
+                lines[#lines + 1] = "|cff8f949cSome reagents have no price: profit is an upper bound.|r"
+            end
+        else
+            lines[#lines + 1] = "|cff8f949cProfit: no reagent prices available.|r"
         end
     end
 
