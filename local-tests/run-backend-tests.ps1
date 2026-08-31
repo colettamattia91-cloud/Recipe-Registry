@@ -42,6 +42,7 @@ $activeAllSpecs = @(
     "diagnostics_snapshot_spec.lua",
     "detail_cost_estimate_internal_reagents_spec.lua",
     "detail_item_cache_rerender_spec.lua",
+    "detail_request_button_instance_spec.lua",
     "detail_requestability_remote_bop_spec.lua",
     "detail_selection_stale_after_filter_change_spec.lua",
     "discovery_debug_spec.lua",

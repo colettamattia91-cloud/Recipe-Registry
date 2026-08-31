@@ -3697,10 +3697,12 @@ function UI:GetCrafterRequestMeta(recipeKey, crafter, selfKey)
         return nil, requestable, reason
     end
 
-    local canRequest = false
-    if requestable then
-        canRequest = not (Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("BLOCK_PULL_REQUEST"))
-    end
+    -- The "Ask" button sends a plain whisper (SendChatMessage) — it is not
+    -- addon protocol traffic, so SyncPausePolicy has no say here. Gating it
+    -- on ShouldPauseProtocolTraffic used to hide the button inside every
+    -- instance (dungeon/raid/BG), which is exactly where asking a guildmate
+    -- for a craft is most useful.
+    local canRequest = requestable == true
 
     return {
         canRequest = canRequest,
@@ -3968,8 +3970,8 @@ function UI:RenderDetailLines(lines, lineLinks, lineMeta)
         -- requestTarget drives the left-click whisper-open (always
         -- available for non-self crafters). actionButton is the "request
         -- this craft" affordance which sends a whisper from the addon —
-        -- gated by canRequest so it stays hidden while the sync pause
-        -- policy is active (raid/instance/combat).
+        -- gated by canRequest, i.e. hidden only for crafts a remote
+        -- crafter cannot deliver (BoP output, self-only outputless).
         if meta and meta.memberKey and (meta.canWhisper or meta.canRequest) then
             line.requestTarget = whisperTargetFromMemberKey(meta.memberKey)
             local showActionButton = meta.canRequest == true
@@ -4225,12 +4227,11 @@ function UI:RefreshDetailPanel()
             end
             lines[#lines + 1] = string.format("%s %s", state, nameText)
             if requestMeta then
-                -- canWhisper is a local UI action (opens a chat window) and
-                -- has no sync implications, so it stays enabled even when
-                -- SyncPausePolicy pauses protocol traffic (raids,
-                -- instances, combat). canRequest also stays false for
-                -- BoP and self-only recipes that remote crafters cannot
-                -- deliver.
+                -- Both canWhisper (opens a chat window) and canRequest
+                -- (sends a whisper) are local chat actions with no sync
+                -- implications, so neither depends on SyncPausePolicy.
+                -- canRequest stays false only for BoP and self-only
+                -- recipes that remote crafters cannot deliver.
                 lineMeta[#lines] = requestMeta
             end
         end
