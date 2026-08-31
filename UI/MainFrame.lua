@@ -66,6 +66,12 @@ local COLOR_ROW = {0.08, 0.08, 0.08, 0.96}
 local COLOR_ROW_SELECTED = {0.13, 0.11, 0.08, 0.98}
 local COLOR_BUTTON = {0.075, 0.075, 0.075, 0.98}
 local COLOR_BUTTON_ACTIVE = {0.13, 0.11, 0.08, 0.98}
+-- Horizontal room reserved to the right of a scroll viewport for the
+-- UIPanelScrollFrameTemplate ScrollBar (16px bar plus a couple of px of
+-- padding). The bar is a child of the ScrollFrame anchored outside its
+-- right edge, so every clipping container has to span this lane too or
+-- the bar is clipped away with the rest of the overflow.
+local SCROLLBAR_LANE = 20
 local FAVORITE_ICON = "Interface\\AddOns\\RecipeRegistry\\UI\\Assets\\favorite-star"
 local VALID_FRAME_POINTS = {
     TOPLEFT = true,
@@ -1165,10 +1171,11 @@ function UI:ApplyMainLayout()
         f.center:SetPoint("TOPLEFT", 10, -94)
         f.center:SetPoint("BOTTOMRIGHT", -10, 34)
         setShownIfChanged(f.right, false)
-        if f.recipeScroll then
-            f.recipeScroll:ClearAllPoints()
-            f.recipeScroll:SetPoint("TOPLEFT", 8, -58)
-            f.recipeScroll:SetPoint("BOTTOMRIGHT", -28, 10)
+        if f.recipeClip then
+            f.recipeClip._rrAnchorMode = nil
+            f.recipeClip:ClearAllPoints()
+            f.recipeClip:SetPoint("TOPLEFT", 8, -58)
+            f.recipeClip:SetPoint("BOTTOMRIGHT", -8, 10)
         end
     else
         setShownIfChanged(f.topBand, true)
@@ -1180,12 +1187,12 @@ function UI:ApplyMainLayout()
         f.right:SetPoint("TOPRIGHT", -10, -154)
         f.right:SetPoint("BOTTOMRIGHT", -10, 34)
         setShownIfChanged(f.right, true)
-        if f.recipeScroll then
+        if f.recipeClip then
             -- Drop the cached anchor-mode so _SetRecipeScrollAnchor below
             -- actually re-applies the points (the cache short-circuits
             -- when mode already matches, but ApplyMainLayout's previous
             -- inline SetPoint had blown the anchor out from under it).
-            f.recipeScroll._rrAnchorMode = nil
+            f.recipeClip._rrAnchorMode = nil
             local hint = f.hiddenExpansionHint
             self:_SetRecipeScrollAnchor(hint and hint:IsShown() == true)
         end
@@ -1675,9 +1682,9 @@ function UI:CreateMainFrame()
     hiddenExpansionHint:SetPoint("TOPLEFT", 12, -42)
     hiddenExpansionHint:SetPoint("TOPRIGHT", -28, -42)
     hiddenExpansionHint:SetHeight(20)
-    -- Sibling recipeScroll (created right after) inherits a higher frame
-    -- level by default, so its row children render in FRONT of the hint
-    -- when their y range overlaps. Bump the hint a few levels above the
+    -- The recipe list's clip container (created right after) inherits a
+    -- higher frame level by default, so its row children render in FRONT
+    -- of the hint when their y range overlaps. Bump the hint above the
     -- centre frame so it stays on top within the same strata (changing
     -- strata on a non-toplevel child can detach it from the parent).
     hiddenExpansionHint:SetFrameLevel((center.GetFrameLevel and center:GetFrameLevel() or 1) + 10)
@@ -1702,18 +1709,30 @@ function UI:CreateMainFrame()
     end)
     f.hiddenExpansionHint = hiddenExpansionHint
 
-    local recipeScroll = CreateFrame("ScrollFrame", nil, center, "UIPanelScrollFrameTemplate")
-    recipeScroll:SetPoint("TOPLEFT", 8, -60)
-    recipeScroll:SetPoint("BOTTOMRIGHT", -28, 10)
     -- WoW Classic's UIPanelScrollFrameTemplate doesn't clip children to
-    -- the scroll's visible bounds. Without this, scrolling the list
-    -- pushes row frames above the scroll's TOPLEFT (into the hint
-    -- band) where they paint over the discoverability hint and any
-    -- other UI above. Force clipping so rows disappear cleanly at
-    -- the top edge of the scroll viewport.
-    if recipeScroll.SetClipsChildren then
-        recipeScroll:SetClipsChildren(true)
+    -- the scroll's visible bounds. Without clipping, scrolling the list
+    -- pushes row frames above the scroll's TOPLEFT (into the hint band)
+    -- where they paint over the discoverability hint and any other UI
+    -- above. Clipping the ScrollFrame itself is NOT the fix: the
+    -- template's ScrollBar is a child of the ScrollFrame anchored just
+    -- outside its right edge, so it gets clipped away too -- that is
+    -- what removed the central scrollbar. Clip a container that spans
+    -- the viewport AND the scrollbar lane instead, and let the scroll
+    -- fill it minus the lane width.
+    local recipeClip = CreateFrame("Frame", nil, center)
+    recipeClip:SetPoint("TOPLEFT", 8, -60)
+    recipeClip:SetPoint("BOTTOMRIGHT", -8, 10)
+    if recipeClip.SetClipsChildren then
+        recipeClip:SetClipsChildren(true)
     end
+    f.recipeClip = recipeClip
+
+    local recipeScroll = CreateFrame("ScrollFrame", nil, recipeClip, "UIPanelScrollFrameTemplate")
+    -- Anchored to the clip container, never to `center` directly: every
+    -- layout change re-anchors the container (see _SetRecipeScrollAnchor)
+    -- so these two points stay fixed for the frame's whole lifetime.
+    recipeScroll:SetPoint("TOPLEFT", 0, 0)
+    recipeScroll:SetPoint("BOTTOMRIGHT", -SCROLLBAR_LANE, 0)
     local recipeContent = CreateFrame("Frame", nil, recipeScroll)
     recipeContent:SetSize(320, 1)
     recipeScroll:SetScrollChild(recipeContent)
@@ -1881,19 +1900,21 @@ function UI:CreateMainFrame()
     detailSub:SetJustifyH("LEFT")
     f.detailSub = detailSub
 
-    local detailScroll = CreateFrame("ScrollFrame", nil, right, "UIPanelScrollFrameTemplate")
-    detailScroll:SetPoint("TOPLEFT", 8, -54)
-    detailScroll:SetPoint("BOTTOMRIGHT", -28, 10)
-    -- UNVERIFIED, do not treat as a working fix. Mirrors the recipeScroll
-    -- clipping above so scrolled detail lines stop painting over the detail
-    -- title/subtitle band. Suspected side effect: the template's ScrollBar is
-    -- a child of the ScrollFrame anchored outside its right edge, so clipping
-    -- very likely hides it -- which is the missing central scrollbar already
-    -- caused by the recipeScroll call. Needs an in-game check, and probably
-    -- replacing with a clipping container frame that spans the scrollbar lane.
-    if detailScroll.SetClipsChildren then
-        detailScroll:SetClipsChildren(true)
+    -- Same container-clipping shape as the recipe list above: clip a frame
+    -- that spans the viewport plus the scrollbar lane, so scrolled detail
+    -- lines stop painting over the title/subtitle band without the
+    -- template's ScrollBar being clipped away with them.
+    local detailClip = CreateFrame("Frame", nil, right)
+    detailClip:SetPoint("TOPLEFT", 8, -54)
+    detailClip:SetPoint("BOTTOMRIGHT", -8, 10)
+    if detailClip.SetClipsChildren then
+        detailClip:SetClipsChildren(true)
     end
+    f.detailClip = detailClip
+
+    local detailScroll = CreateFrame("ScrollFrame", nil, detailClip, "UIPanelScrollFrameTemplate")
+    detailScroll:SetPoint("TOPLEFT", 0, 0)
+    detailScroll:SetPoint("BOTTOMRIGHT", -SCROLLBAR_LANE, 0)
     local detailContent = CreateFrame("Frame", nil, detailScroll)
     detailContent:SetSize(420, 1)
     detailScroll:SetScrollChild(detailContent)
@@ -3641,8 +3662,9 @@ function UI:RefreshHiddenExpansionHint(profession)
     hint:Show()
 end
 
--- Toggle the recipeScroll's top anchor so the hint never overlaps the
--- first recipe row. Use absolute offsets relative to the centre frame
+-- Toggle the recipe list's top anchor so the hint never overlaps the
+-- first recipe row. Moves the clip container, which the scroll fills.
+-- Uses absolute offsets relative to the centre frame
 -- (not frame-to-frame anchors) — anchoring to the hint while it was
 -- hidden produced a measurable mismatch (the hint's BOTTOMLEFT wasn't
 -- being honoured) that put the scroll INSIDE the hint band by ~14px.
@@ -3650,14 +3672,14 @@ end
 -- below the hint's bottom edge.
 function UI:_SetRecipeScrollAnchor(hintShown)
     local frame = self.frame
-    local scroll = frame and frame.recipeScroll
-    if not scroll then return end
+    local clip = frame and frame.recipeClip
+    if not clip then return end
     local mode = hintShown and "below-hint" or "below-header"
-    if scroll._rrAnchorMode == mode then return end
-    scroll._rrAnchorMode = mode
-    scroll:ClearAllPoints()
-    scroll:SetPoint("TOPLEFT", 8, hintShown and -72 or -40)
-    scroll:SetPoint("BOTTOMRIGHT", -28, 10)
+    if clip._rrAnchorMode == mode then return end
+    clip._rrAnchorMode = mode
+    clip:ClearAllPoints()
+    clip:SetPoint("TOPLEFT", 8, hintShown and -72 or -40)
+    clip:SetPoint("BOTTOMRIGHT", -8, 10)
 end
 
 -- Click handler: per-session reveal of the hidden expansion for the
@@ -4038,7 +4060,6 @@ function UI:RefreshAddonStatusDetailPanel()
     self.frame.detailFavoriteButton.recipeKey = nil
     self.frame.detailFavoriteButton.isFavorite = false
     setShownIfChanged(self.frame.detailFavoriteButton, false)
-    self.frame.detailScroll:SetPoint("TOPLEFT", 8, -54)
 
     local lines = {}
     local summary = self.currentAddonStatusSummary or {}
@@ -4118,7 +4139,6 @@ function UI:RefreshDetailPanel()
         if self.frame.detailTooltip then
             self.frame.detailTooltip:Hide()
         end
-        self.frame.detailScroll:SetPoint("TOPLEFT", 8, -54)
         lines[#lines + 1] = "No recipe selected."
         self:RenderDetailLines(lines, lineLinks, lineMeta)
         return
@@ -4196,9 +4216,6 @@ function UI:RefreshDetailPanel()
     if detail.directEnchant then subtitleParts[#subtitleParts + 1] = "Direct enchant" end
     subtitleParts[#subtitleParts + 1] = string.format("%d crafter(s)", detail.crafterCount or 0)
     setTextIfChanged(self.frame.detailSub, table.concat(subtitleParts, "  •  "))
-
-    -- Reset scroll position (no embedded tooltip anymore)
-    self.frame.detailScroll:SetPoint("TOPLEFT", 8, -54)
 
     -- Reset offline accordion state when recipe changes
     if self._lastDetailRecipeKey ~= self.selectedRecipeKey then

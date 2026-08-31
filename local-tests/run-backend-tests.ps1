@@ -82,6 +82,7 @@ $activeAllSpecs = @(
     "sync_roster_invalidation_spec.lua",
     "ui_cached_consultation_spec.lua",
     "ui_frame_scale_resize_spec.lua",
+    "ui_scroll_clipping_spec.lua",
     "tooltip_spec.lua",
     "soak_block_pull_saturation_spec.lua",
     "soak_discovery_backoff_churn_spec.lua",
