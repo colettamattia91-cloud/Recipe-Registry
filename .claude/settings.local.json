@@ -1,13 +1,39 @@
 {
   "permissions": {
     "allow": [
+      "WebFetch",
+      "WebSearch",
+      "Read",
+
+      "Edit(//c/Progetti/Public/RecipeRegistry/**)",
+      "Write(//c/Progetti/Public/RecipeRegistry/**)",
+      "Edit(//c/Users/Mattia/.claude/projects/c--Progetti-Public-RecipeRegistry/**)",
+      "Write(//c/Users/Mattia/.claude/projects/c--Progetti-Public-RecipeRegistry/**)",
+
+      "PowerShell(.\\local-tests\\run-backend-tests.ps1*)",
+      "PowerShell(.\\local-tests\\run-syntax.ps1*)",
+      "PowerShell(& \"c:\\Progetti\\Public\\RecipeRegistry\\local-tests\\run-backend-tests.ps1\"*)",
+      "PowerShell(& \"c:\\Progetti\\Public\\RecipeRegistry\\local-tests\\run-syntax.ps1\"*)",
+
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(py *)",
+
+      "Bash(git diff*)",
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(git ls-files*)",
+      "Bash(git check-ignore*)",
+      "Bash(git branch --show-current)",
+      "Bash(git stash *)",
+
       "Bash(pwsh -NoProfile -Command \"& { .\\\\local-tests\\\\run-backend-tests.ps1 -Suite sync 2>&1 | Out-File c:\\\\temp\\\\rrtest.log -Encoding utf8 ; Get-Content c:\\\\temp\\\\rrtest.log -Tail 80 }\")",
       "Bash(mkdir -p c:/tmp)",
       "Bash(pwsh -NoProfile -Command \"& { .\\\\local-tests\\\\run-backend-tests.ps1 -Suite sync 2>&1 | Out-File c:/tmp/rrtest.log -Encoding utf8 }\")",
       "Read(//c/tmp/**)",
       "Bash(pwsh -NoProfile -Command \"& { .\\\\local-tests\\\\run-backend-tests.ps1 -Spec sync_phase2_summary_foundation_spec.lua 2>&1 | Out-File c:/tmp/rrtest2.log -Encoding utf8 }\")",
       "Bash(pwsh -NoProfile -Command \"& { .\\\\local-tests\\\\run-backend-tests.ps1 -Suite sync 2>&1 | Out-File c:/tmp/rrtest3.log -Encoding utf8 }\")",
-      "Bash(git stash *)",
       "Bash(pwsh -NoProfile -Command \"& { .\\\\local-tests\\\\run-backend-tests.ps1 -Spec sync_phase34_block_pull_spec.lua 2>&1 | Out-File c:/tmp/rrtest_baseline.log -Encoding utf8 }\")",
       "Bash(pwsh -NoProfile -Command \"& { .\\\\local-tests\\\\run-backend-tests.ps1 2>&1 | Out-File c:/tmp/rrtest_all.log -Encoding utf8 }\")",
       "Bash(pwsh -NoProfile -Command \".\\\\local-tests\\\\run-syntax.ps1\")",
