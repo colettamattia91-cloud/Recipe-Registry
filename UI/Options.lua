@@ -474,6 +474,12 @@ local function setAuctionCutSubtracted(enabled)
     end
 end
 
+local function setMainTabEnabled(tabKey, enabled)
+    if Addon.UI and Addon.UI.SetMainTabEnabled then
+        Addon.UI:SetMainTabEnabled(tabKey, enabled)
+    end
+end
+
 local function setTooltipCraftersShown(shown)
     local profile = getProfile()
     if not profile then return end
@@ -519,6 +525,11 @@ function Options:RefreshControls()
     end
     if self.auctionCutCheck then
         self.auctionCutCheck:SetChecked(profile.subtractAuctionHouseCut == true)
+    end
+    if self.mainTabChecks and Addon.UI and Addon.UI.IsMainTabEnabled then
+        for tabKey, check in pairs(self.mainTabChecks) do
+            check:SetChecked(Addon.UI:IsMainTabEnabled(tabKey) ~= false)
+        end
     end
     if self.scaleSlider then
         local scale = tonumber(profile.mainFrame and profile.mainFrame.scale) or 1
@@ -805,7 +816,33 @@ function Options:EnsurePanel()
         filterAnchor = filterWarning
     end
 
-    local accessHeader = createHeader(content, "Access", filterAnchor, -18)
+    -- Driven off the UI module's tab registry, so a tab added there shows up
+    -- here without touching this panel.
+    local tabsHeader = createHeader(content, "Tabs", filterAnchor, -18)
+    local tabDefinitions = (Addon.UI and Addon.UI.GetMainTabDefinitions
+        and Addon.UI:GetMainTabDefinitions()) or {}
+    local previousTabCheck = nil
+    self.mainTabChecks = {}
+    for _, definition in ipairs(tabDefinitions) do
+        if definition.optional then
+            local tabKey = definition.key
+            local tabCheck = createCheck(content, "Show the " .. definition.label .. " tab", function(self)
+                setMainTabEnabled(tabKey, self:GetChecked() and true or false)
+                Options:RefreshControls()
+            end)
+            if previousTabCheck then
+                tabCheck:SetPoint("TOPLEFT", previousTabCheck, "BOTTOMLEFT", 0, -4)
+            else
+                tabCheck:SetPoint("TOPLEFT", tabsHeader, "BOTTOMLEFT", -2, -8)
+            end
+            setHoverTooltip(tabCheck, definition.label,
+                "Hides the tab from the top of the main window. The Recipes tab is always available, so switching every other tab off still leaves somewhere to land.")
+            self.mainTabChecks[tabKey] = tabCheck
+            previousTabCheck = tabCheck
+        end
+    end
+
+    local accessHeader = createHeader(content, "Access", previousTabCheck or tabsHeader, -18)
     local minimapCheck = createCheck(content, "Show minimap button", function(self)
         setMinimapShown(self:GetChecked() and true or false)
         Options:RefreshControls()

@@ -10,16 +10,22 @@ local GetSpellLink = Addon.Compat.GetSpellLink
 local SEARCH_DEBOUNCE = 0.15
 local GLOBAL_SEARCH_DEBOUNCE = 0.35
 local GLOBAL_SEARCH_MIN_CHARS = 3
-local ADDON_STATUS_VIEW = "Guild Addons"
+-- Named for what the list is -- the guild roster -- rather than for one of
+-- its columns. "Guild Addons" read as a list of addons, which is not what
+-- the tab shows.
+local ADDON_STATUS_VIEW = "Guild members"
 local FAVORITES_VIEW = "Favorites"
 -- Answers a different question from every other view: not "who can craft
 -- this" but "what can this character still learn". Kept as its own sidebar
 -- entry rather than mixed into a profession list, because a recipe nobody
 -- knows and a recipe you personally lack are not the same row.
 local MISSING_VIEW = "Missing recipes"
+-- Saved profiles carry the view name verbatim, so every name this tab has
+-- ever had has to keep resolving to it.
 local ADDON_STATUS_LEGACY_VIEWS = {
     ["Addon Status"] = true,
     ["Guild Addon Adoption"] = true,
+    ["Guild Addons"] = true,
 }
 local ADDON_STATUS_DEFAULT_SORT = "name"
 local ADDON_STATUS_FILTER_CYCLES = {
@@ -58,6 +64,18 @@ local PROFESSION_SPELL_IDS = {
     ["Mining"] = 2575,
     ["Skinning"] = 8613,
     ["Tailoring"] = 3908,
+}
+
+-- Top-level tabs, in nav order. Adding a tab is a row here plus its view
+-- code: the nav layout, the enable/disable options and the fallback when a
+-- tab is switched off are all driven from this table.
+--
+-- Recipes is the only one that cannot be switched off. Something has to be
+-- left when everything else is, and it is the view the addon exists for.
+local MAIN_TAB_DEFINITIONS = {
+    { key = "recipes", label = "Recipes",         width = 112, optional = false },
+    { key = "addon",   label = ADDON_STATUS_VIEW, width = 132, optional = true },
+    { key = "missing", label = MISSING_VIEW,      width = 132, optional = true },
 }
 
 local GOLD = {1, 0.82, 0}
@@ -709,6 +727,12 @@ function UI:OnInitialize()
     if ADDON_STATUS_LEGACY_VIEWS[self.selectedProfession] then
         self.selectedProfession = ADDON_STATUS_VIEW
     end
+    -- The saved view may have been switched off since it was stored.
+    if self.selectedProfession == ADDON_STATUS_VIEW and not self:IsMainTabEnabled("addon") then
+        self.selectedProfession = nil
+    elseif self.selectedProfession == MISSING_VIEW and not self:IsMainTabEnabled("missing") then
+        self.selectedProfession = nil
+    end
     self.addonStatusSortKey = ADDON_STATUS_DEFAULT_SORT
     self.addonStatusSortDir = "asc"
     self.addonStatusFilters = {
@@ -755,6 +779,11 @@ function UI:GetMainView()
 end
 
 function UI:SetMainView(view)
+    -- A disabled tab is not reachable, including through a stale saved
+    -- profile or a slash command.
+    if view and view ~= "recipes" and not self:IsMainTabEnabled(view) then
+        view = "recipes"
+    end
     if view == "addon" then
         self.selectedProfession = ADDON_STATUS_VIEW
     elseif view == "missing" then
@@ -1181,11 +1210,64 @@ function UI:TryResumeFullRefresh()
     return true
 end
 
+function UI:GetMainTabDefinitions()
+    return MAIN_TAB_DEFINITIONS
+end
+
+function UI:IsMainTabEnabled(key)
+    for _, definition in ipairs(MAIN_TAB_DEFINITIONS) do
+        if definition.key == key then
+            if not definition.optional then return true end
+            local profile = Addon.db and Addon.db.profile
+            local tabs = profile and profile.tabs
+            return type(tabs) ~= "table" or tabs[key] ~= false
+        end
+    end
+    return false
+end
+
+function UI:SetMainTabEnabled(key, enabled)
+    local profile = Addon.db and Addon.db.profile
+    if not profile or not key then return end
+    if type(profile.tabs) ~= "table" then
+        profile.tabs = {}
+    end
+    if enabled == false then
+        profile.tabs[key] = false
+    else
+        profile.tabs[key] = nil
+    end
+    -- Switching off the tab you are standing on has to land somewhere.
+    if not self:IsMainTabEnabled(self:GetMainView()) then
+        self:SetMainView("recipes")
+        return
+    end
+    self:RefreshMainTabs()
+end
+
 function UI:RefreshMainTabs()
     if not (self.frame and self.frame.mainTabs) then return end
     local currentView = self:GetMainView()
-    for viewName, button in pairs(self.frame.mainTabs) do
-        button:SetSelected(viewName == currentView)
+    -- Re-anchored every refresh rather than once at build time: hiding a tab
+    -- in the middle would otherwise leave its gap behind.
+    local previous = nil
+    for _, definition in ipairs(MAIN_TAB_DEFINITIONS) do
+        local button = self.frame.mainTabs[definition.key]
+        if button then
+            if self:IsMainTabEnabled(definition.key) then
+                button:ClearAllPoints()
+                if previous then
+                    button:SetPoint("LEFT", previous, "RIGHT", 8, 0)
+                else
+                    button:SetPoint("LEFT", 0, 0)
+                end
+                button:SetSelected(definition.key == currentView)
+                setShownIfChanged(button, true)
+                previous = button
+            else
+                setShownIfChanged(button, false)
+            end
+        end
     end
 end
 
@@ -1416,32 +1498,20 @@ function UI:CreateMainFrame()
     f.mainNav = mainNav
     hookFocusRelease(mainNav)
 
-    local recipesTab = createCardStyleButton(mainNav, 112, 24)
-    recipesTab:SetPoint("LEFT", 0, 0)
-    recipesTab:SetLabel("Recipes")
-    recipesTab:SetScript("OnClick", function()
-        UI:SetMainView("recipes")
-    end)
-
-    local addonStatusTab = createCardStyleButton(mainNav, 132, 24)
-    addonStatusTab:SetPoint("LEFT", recipesTab, "RIGHT", 8, 0)
-    addonStatusTab:SetLabel(ADDON_STATUS_VIEW)
-    addonStatusTab:SetScript("OnClick", function()
-        UI:SetMainView("addon")
-    end)
-    local missingTab = createCardStyleButton(mainNav, 132, 24)
-    missingTab:SetPoint("LEFT", addonStatusTab, "RIGHT", 8, 0)
-    missingTab:SetLabel(MISSING_VIEW)
-    missingTab:SetScript("OnClick", function()
-        UI:SetMainView("missing")
-    end)
-    f.missingTab = missingTab
-
-    f.mainTabs = {
-        recipes = recipesTab,
-        addon = addonStatusTab,
-        missing = missingTab,
-    }
+    -- Positions come from RefreshMainTabs, which lays out only the enabled
+    -- tabs; building them here just creates the buttons.
+    f.mainTabs = {}
+    for _, definition in ipairs(MAIN_TAB_DEFINITIONS) do
+        local tabKey = definition.key
+        local button = createCardStyleButton(mainNav, definition.width or 132, 24)
+        button:SetPoint("LEFT", 0, 0)
+        button:SetLabel(definition.label)
+        button:SetScript("OnClick", function()
+            UI:SetMainView(tabKey)
+        end)
+        f.mainTabs[tabKey] = button
+    end
+    f.missingTab = f.mainTabs.missing
 
     local topBand = CreateFrame("Frame", nil, f)
     topBand:SetPoint("TOPLEFT", 10, -94)

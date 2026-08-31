@@ -86,6 +86,12 @@ local DB_DEFAULTS = {
         useRecipeCategories = true,
         recipeCategoryView = "expanded",
         showTooltipCrafters = true,
+        -- Which top-level tabs are shown. Absent or true means shown; the
+        -- Recipes tab is not listed because it cannot be switched off.
+        tabs = {
+            addon = true,
+            missing = true,
+        },
         -- Gross by default: the "Sells for" figure doubles as the price to
         -- list an auction at, and taxing it silently would make it useless
         -- for that. Turning this on nets the profit line instead.
