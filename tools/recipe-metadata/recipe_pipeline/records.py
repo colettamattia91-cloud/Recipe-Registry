@@ -38,7 +38,10 @@ class RecipeRecord:
     # See wowhead_source_provider.
     faction: Optional[str] = None
     source_kind: Optional[str] = None
-    source_zones: Tuple[int, ...] = ()
+    # Zone NAMES, not IDs: the sources that carry this data each number
+    # zones differently, so names are the only shared vocabulary. The
+    # emitter interns them into its own table.
+    source_zones: Tuple[str, ...] = ()
     source_names: Tuple[str, ...] = ()
     # Set when the recipe drops from so many creatures across so many zones
     # that naming them is noise rather than an answer.

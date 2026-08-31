@@ -11,6 +11,7 @@ All notable changes to this project are documented in this file.
 - **"Show only profitable recipes" option.** One switch that keeps the recipes whose output is worth more than their materials. It needs TSM or Auctionator for prices; recipes whose price cannot be worked out stay in the list, marked "no price data", rather than being hidden.
 - **Vendor prices for materials.** Reagents sold by vendors -- vials, thread, spices -- often have no auctions at all, which used to leave them unpriced or priced far above what anyone pays. Every merchant window you open now teaches Recipe Registry what it charges, and a material costs whichever is cheaper between the vendor and the auction house.
 - **Option to subtract the auction house cut** from the profit figure. Off by default, so the "Sells for" figure stays gross and still works as the price to list your auction at.
+- **Where a recipe comes from.** The Missing recipes tab now says whether a recipe is taught by a trainer, sold by a vendor, dropped, given by a quest, or is a world drop — naming the vendor or creature and the zone where you will find them. A new Faction column marks the recipes only Alliance or only Horde can get; most are available to both, and those stay unmarked.
 - **Tabs can be hidden.** A new Tabs section in the options switches individual tabs off. The Recipes tab is always available.
 
 ### Changed

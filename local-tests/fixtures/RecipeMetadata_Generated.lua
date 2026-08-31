@@ -174,6 +174,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "guardian_elixirs",
             sortOrder = 120,
             requiredSkill = 300,
+            faction = "horde",
+            sourceKind = "vendor",
+            sourceZones = { 1 },
+            sourceNames = { "Abigail Shiel" },
             bopOutput = false,
             reagents = {
                 { itemId = 22790, count = 7 },
@@ -206,6 +210,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapons",
             sortOrder = 120,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 4 },
@@ -227,6 +233,10 @@ RecipeRegistryRecipeMetadata = {
                 { itemId = 23793, count = 6 },
             },
         },
+    },
+
+    zoneNamesById = {
+        [1] = "Tirisfal Glades",
     },
 
     recipeItemToSpellId = {

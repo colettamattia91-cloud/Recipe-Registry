@@ -38,6 +38,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 30,
             requiredSkill = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 4 },
@@ -53,6 +54,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 90,
             requiredSkill = 90,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 7 },
@@ -65,6 +68,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 2308,
             category = "cloaks",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 10 },
@@ -79,6 +83,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 50,
             requiredSkill = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 8 },
@@ -93,6 +98,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 65,
             requiredSkill = 65,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 8 },
@@ -106,6 +112,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cloaks",
             sortOrder = 65,
             requiredSkill = 65,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 5 },
@@ -121,6 +128,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 60,
             requiredSkill = 60,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 8 },
@@ -137,6 +146,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 75,
             requiredSkill = 75,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 4 },
@@ -152,6 +163,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "armor",
             sortOrder = 75,
             requiredSkill = 75,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 4 },
@@ -166,6 +178,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 125,
             requiredSkill = 125,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 10 },
@@ -181,6 +194,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 100,
             requiredSkill = 100,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 4 },
@@ -195,6 +209,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cloaks",
             sortOrder = 110,
             requiredSkill = 110,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 8 },
@@ -211,6 +226,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 100,
             requiredSkill = 100,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 6 },
@@ -254,6 +271,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mana",
             sortOrder = 10,
             requiredSkill = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 765, count = 1 },
@@ -269,6 +287,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rejuvenation",
             sortOrder = 10,
             requiredSkill = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 785, count = 2 },
@@ -285,6 +304,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 20,
             requiredSkill = 140,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2452, count = 1 },
@@ -301,6 +322,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "guardian",
             sortOrder = 20,
             requiredSkill = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2447, count = 1 },
@@ -317,6 +339,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 10,
             requiredSkill = 60,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2450, count = 1 },
@@ -348,6 +372,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "healing",
             sortOrder = 20,
             requiredSkill = 80,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 118, count = 1 },
@@ -361,6 +386,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -374,6 +400,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 1 },
@@ -403,6 +430,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 40,
             requiredSkill = 40,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 2 },
@@ -416,6 +445,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 2575,
             category = "shirts",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -429,6 +459,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 2576,
             category = "shirts",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -442,6 +473,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 2577,
             category = "shirts",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -456,6 +488,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 1 },
@@ -469,6 +502,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 2579,
             category = "shirts",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -483,6 +517,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "back",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 3 },
@@ -496,6 +531,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -510,6 +546,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 2 },
@@ -524,6 +561,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "back",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -539,6 +577,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 105,
             requiredSkill = 105,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 3 },
@@ -552,6 +592,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 2587,
             category = "shirts",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -577,6 +618,7 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 30,
             requiredSkill = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2672, count = 1 },
@@ -601,6 +643,7 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 65,
             requiredSkill = 65,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2673, count = 1 },
@@ -614,6 +657,10 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 50,
             requiredSkill = 50,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 1 },
+            sourceNames = { "Kendor Kabonka" },
             bopOutput = false,
             reagents = {
                 { itemId = 723, count = 1 },
@@ -628,6 +675,10 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 75,
             requiredSkill = 75,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 1 },
+            sourceNames = { "Kendor Kabonka" },
             bopOutput = false,
             reagents = {
                 { itemId = 729, count = 1 },
@@ -642,6 +693,7 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 75,
             requiredSkill = 75,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2674, count = 1 },
@@ -656,6 +708,9 @@ RecipeRegistryRecipeMetadata = {
             category = "mp5",
             sortOrder = 85,
             requiredSkill = 85,
+            sourceKind = "vendor",
+            sourceZones = { 1 },
+            sourceNames = { "Kendor Kabonka" },
             bopOutput = false,
             reagents = {
                 { itemId = 2675, count = 1 },
@@ -669,6 +724,7 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 110,
             requiredSkill = 110,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2677, count = 1 },
@@ -683,6 +739,10 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 100,
             requiredSkill = 100,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 1 },
+            sourceNames = { "Kendor Kabonka" },
             bopOutput = false,
             reagents = {
                 { itemId = 1080, count = 1 },
@@ -697,6 +757,9 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 110,
             requiredSkill = 110,
+            sourceKind = "vendor",
+            sourceZones = { 1 },
+            sourceNames = { "Kendor Kabonka" },
             bopOutput = false,
             reagents = {
                 { itemId = 2677, count = 2 },
@@ -712,6 +775,10 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 100,
             requiredSkill = 100,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 1 },
+            sourceNames = { "Kendor Kabonka" },
             bopOutput = false,
             reagents = {
                 { itemId = 1015, count = 2 },
@@ -735,6 +802,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 2842,
             category = "metals",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2775, count = 1 },
@@ -747,6 +815,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 2,
             category = "metals",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 1 },
@@ -773,6 +842,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 55,
             requiredSkill = 55,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 6 },
@@ -786,6 +856,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 40,
             requiredSkill = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 4 },
@@ -811,6 +882,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 65,
             requiredSkill = 65,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 10 },
@@ -825,6 +897,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sharpening",
             sortOrder = 20,
             requiredSkill = 75,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2836, count = 1 },
@@ -838,6 +911,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 80,
             requiredSkill = 80,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 10 },
@@ -852,6 +926,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 80,
             requiredSkill = 80,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 1210, count = 1 },
@@ -867,6 +943,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 95,
             requiredSkill = 95,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 6 },
@@ -880,6 +957,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 105,
             requiredSkill = 105,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 7 },
@@ -907,6 +985,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 120,
             requiredSkill = 120,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 5 },
@@ -922,6 +1001,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 130,
             requiredSkill = 130,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 10 },
@@ -937,6 +1018,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sharpening",
             sortOrder = 30,
             requiredSkill = 125,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2838, count = 1 },
@@ -950,6 +1032,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 135,
             requiredSkill = 135,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 2 },
@@ -967,6 +1050,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 30,
             requiredSkill = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2589, count = 2 },
@@ -982,6 +1066,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 35,
             requiredSkill = 35,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2589, count = 2 },
@@ -997,6 +1082,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 40,
             requiredSkill = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2589, count = 2 },
@@ -1012,6 +1098,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 75,
             requiredSkill = 75,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 1 },
@@ -1027,6 +1114,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 85,
             requiredSkill = 85,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 1 },
@@ -1042,6 +1130,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 95,
             requiredSkill = 95,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 2 },
@@ -1057,6 +1146,10 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 10,
             requiredSkill = 10,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 1 },
+            sourceNames = { "Kendor Kabonka" },
             bopOutput = false,
             reagents = {
                 { itemId = 2886, count = 1 },
@@ -1091,6 +1184,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 2997,
             category = "cloth",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2592, count = 3 },
@@ -1116,6 +1210,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enhancements",
             subcategory = "weightstone",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2592, count = 1 },
@@ -1129,6 +1224,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enhancements",
             subcategory = "weightstone",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2592, count = 1 },
@@ -1142,6 +1238,7 @@ RecipeRegistryRecipeMetadata = {
             category = "potions",
             subcategory = "rejuvenation",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2447, count = 1 },
@@ -1156,6 +1253,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "battle",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 785, count = 1 },
@@ -1172,6 +1270,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 55,
             requiredSkill = 110,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 785, count = 3 },
@@ -1186,6 +1286,7 @@ RecipeRegistryRecipeMetadata = {
             category = "potions",
             subcategory = "mana",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 785, count = 1 },
@@ -1202,6 +1303,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 30,
             requiredSkill = 120,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 1288, count = 1 },
@@ -1218,6 +1321,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "combat",
             sortOrder = 80,
             requiredSkill = 250,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 8839, count = 2 },
@@ -1232,6 +1337,7 @@ RecipeRegistryRecipeMetadata = {
             category = "potions",
             subcategory = "rejuvenation",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2450, count = 2 },
@@ -1246,6 +1352,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "guardian",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3355, count = 1 },
@@ -1262,6 +1369,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 25,
             requiredSkill = 150,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2449, count = 1 },
@@ -1278,6 +1387,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 15,
             requiredSkill = 50,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 765, count = 1 },
@@ -1292,6 +1403,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "sword",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 818, count = 2 },
@@ -1307,6 +1419,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "axe",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 774, count = 2 },
@@ -1323,6 +1436,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "axe",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 2 },
@@ -1341,6 +1455,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dagger",
             sortOrder = 125,
             requiredSkill = 125,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 1210, count = 2 },
@@ -1358,6 +1474,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "mace",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -1377,6 +1494,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 145,
             requiredSkill = 145,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 1705, count = 2 },
@@ -1393,6 +1512,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 3576,
             category = "metals",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2771, count = 1 },
@@ -1404,6 +1524,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 3575,
             category = "metals",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2772, count = 1 },
@@ -1415,6 +1536,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 3577,
             category = "metals",
             sortOrder = 60,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2776, count = 1 },
@@ -1427,6 +1549,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 8 },
@@ -1438,6 +1561,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 3470,
             category = "materials",
             sortOrder = 10,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2835, count = 2 },
@@ -1452,6 +1576,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 35,
             requiredSkill = 35,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 8 },
@@ -1465,6 +1591,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 8 },
@@ -1478,6 +1605,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -1494,6 +1622,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 60,
             requiredSkill = 60,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 774, count = 1 },
@@ -1507,6 +1637,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 3478,
             category = "materials",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2836, count = 2 },
@@ -1519,6 +1650,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "shoulder",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 5 },
@@ -1534,6 +1666,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 125,
             requiredSkill = 125,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 8 },
@@ -1548,6 +1682,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 6 },
@@ -1562,6 +1697,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 8 },
@@ -1578,6 +1714,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 145,
             requiredSkill = 145,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2605, count = 1 },
@@ -1594,6 +1732,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 150,
             requiredSkill = 150,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2605, count = 1 },
@@ -1608,6 +1748,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 3486,
             category = "materials",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2838, count = 3 },
@@ -1621,6 +1762,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 80,
             requiredSkill = 80,
+            sourceKind = "vendor",
+            sourceZones = { 1 },
+            sourceNames = { "Kendor Kabonka" },
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 1 },
@@ -1636,6 +1780,10 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 60,
             requiredSkill = 60,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 1 },
+            sourceNames = { "Kendor Kabonka" },
             bopOutput = false,
             reagents = {
                 { itemId = 3172, count = 1 },
@@ -1651,6 +1799,10 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 90,
             requiredSkill = 90,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 1 },
+            sourceNames = { "Kendor Kabonka" },
             bopOutput = false,
             reagents = {
                 { itemId = 1468, count = 2 },
@@ -1665,6 +1817,10 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 120,
             requiredSkill = 120,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 1 },
+            sourceNames = { "Kendor Kabonka" },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -1679,6 +1835,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 130,
             requiredSkill = 130,
+            sourceKind = "vendor",
+            sourceZones = { 2, 3, 1 },
+            sourceNames = { "Nerrist", "Keena", "Kendor Kabonka" },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -1693,6 +1852,10 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 110,
             requiredSkill = 110,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 1 },
+            sourceNames = { "Kendor Kabonka" },
             bopOutput = false,
             reagents = {
                 { itemId = 2251, count = 2 },
@@ -1707,6 +1870,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 110,
             requiredSkill = 110,
+            sourceKind = "vendor",
+            sourceZones = { 4, 5 },
+            sourceNames = { "Ulthaan", "Super-Seller 680" },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -1721,6 +1887,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 125,
             requiredSkill = 125,
+            sourceKind = "vendor",
+            sourceZones = { 6, 5 },
+            sourceNames = { "Zargh", "Vendor-Tron 1000" },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -1735,6 +1904,8 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 150,
             requiredSkill = 150,
+            faction = "alliance",
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 1 },
@@ -1749,6 +1920,7 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3712, count = 1 },
@@ -1762,6 +1934,7 @@ RecipeRegistryRecipeMetadata = {
             category = "potions",
             subcategory = "healing",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2450, count = 1 },
@@ -1776,6 +1949,7 @@ RecipeRegistryRecipeMetadata = {
             category = "potions",
             subcategory = "utility",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3355, count = 1 },
@@ -1791,6 +1965,9 @@ RecipeRegistryRecipeMetadata = {
             category = "oils",
             sortOrder = 40,
             requiredSkill = 165,
+            sourceKind = "vendor",
+            sourceZones = { 7, 8 },
+            sourceNames = { "Bliztik", "Montarr" },
             bopOutput = false,
             reagents = {
                 { itemId = 3369, count = 4 },
@@ -1807,6 +1984,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "guardian",
             sortOrder = 40,
             requiredSkill = 175,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3355, count = 1 },
@@ -1823,6 +2001,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rejuvenation",
             sortOrder = 50,
             requiredSkill = 180,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2453, count = 1 },
@@ -1837,6 +2017,7 @@ RecipeRegistryRecipeMetadata = {
             category = "potions",
             subcategory = "mana",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3356, count = 1 },
@@ -1853,6 +2034,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 40,
             requiredSkill = 195,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3358, count = 1 },
@@ -1868,6 +2051,9 @@ RecipeRegistryRecipeMetadata = {
             category = "oils",
             sortOrder = 50,
             requiredSkill = 200,
+            sourceKind = "vendor",
+            sourceZones = { 9 },
+            sourceNames = { "Bro'kin" },
             bopOutput = false,
             reagents = {
                 { itemId = 3358, count = 4 },
@@ -1882,6 +2068,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "dagger",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 818, count = 1 },
@@ -1900,6 +2087,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 160,
             requiredSkill = 160,
+            sourceKind = "vendor",
+            sourceZones = { 2, 1 },
+            sourceNames = { "Jutak", "Kaita Deepforge" },
             bopOutput = false,
             reagents = {
                 { itemId = 1705, count = 2 },
@@ -1918,6 +2108,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 2 },
@@ -1936,6 +2128,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 155,
             requiredSkill = 155,
+            sourceKind = "vendor",
+            sourceZones = { 10, 5, 3, 11 },
+            sourceNames = { "Jazzrik", "Muuran", "Jannos Ironwill" },
             bopOutput = false,
             reagents = {
                 { itemId = 2842, count = 4 },
@@ -1954,6 +2149,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 170,
             requiredSkill = 170,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 1705, count = 2 },
@@ -1973,6 +2170,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 180,
             requiredSkill = 180,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Zarena Cromwind" },
             bopOutput = false,
             reagents = {
                 { itemId = 1705, count = 3 },
@@ -1991,6 +2191,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 200,
             requiredSkill = 200,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 2 },
@@ -2010,6 +2212,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 185,
             requiredSkill = 185,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Jaquilina Dramet", "Vharr" },
             bopOutput = false,
             reagents = {
                 { itemId = 3466, count = 2 },
@@ -2028,6 +2233,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 200,
             requiredSkill = 200,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3466, count = 2 },
@@ -2045,6 +2252,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "wrist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2605, count = 1 },
@@ -2058,6 +2266,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "head",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2605, count = 1 },
@@ -2074,6 +2283,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 190,
             requiredSkill = 190,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Krinkle Goodsteel" },
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 2 },
@@ -2090,6 +2302,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 160,
             requiredSkill = 160,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2605, count = 1 },
@@ -2106,6 +2320,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 1 },
@@ -2120,6 +2336,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2605, count = 1 },
@@ -2136,6 +2353,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 170,
             requiredSkill = 170,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 1 },
@@ -2150,6 +2369,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 2 },
@@ -2168,6 +2388,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 195,
             requiredSkill = 195,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 4 },
@@ -2184,6 +2406,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 185,
             requiredSkill = 185,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 1705, count = 1 },
@@ -2201,6 +2425,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 200,
             requiredSkill = 200,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 4 },
@@ -2214,6 +2440,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 3859,
             category = "metals",
             sortOrder = 70,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 1 },
@@ -2227,6 +2454,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "waist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 6 },
@@ -2239,6 +2467,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4238,
             category = "bags",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 3 },
@@ -2252,6 +2481,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 3 },
@@ -2264,6 +2494,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4240,
             category = "bags",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -2278,6 +2509,8 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 95,
             requiredSkill = 95,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -2292,6 +2525,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 6 },
@@ -2305,6 +2539,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 3719,
             category = "cloaks",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -2318,6 +2553,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 6 },
@@ -2334,6 +2570,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 100,
             requiredSkill = 100,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 2 },
@@ -2348,6 +2586,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "waist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 6 },
@@ -2361,6 +2600,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 14 },
@@ -2376,6 +2616,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 120,
             requiredSkill = 120,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2312, count = 1 },
@@ -2391,6 +2633,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "waist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -2408,6 +2651,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 120,
             requiredSkill = 120,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 8 },
@@ -2422,6 +2667,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "shoulder",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 4 },
@@ -2438,6 +2684,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 140,
             requiredSkill = 140,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 12 },
@@ -2453,6 +2701,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 4 },
@@ -2471,6 +2720,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 150,
             requiredSkill = 150,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -2487,6 +2738,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 155,
             requiredSkill = 155,
+            sourceKind = "vendor",
+            sourceZones = { 13, 14 },
+            sourceNames = { "Wenna Silkbeard", "George Candarte" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 4 },
@@ -2503,6 +2757,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -2518,6 +2774,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "waist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -2536,6 +2793,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 170,
             requiredSkill = 170,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -2551,6 +2810,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "wrist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -2568,6 +2828,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 195,
             requiredSkill = 195,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 6 },
@@ -2584,6 +2846,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 185,
             requiredSkill = 185,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rikqiz" },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 2 },
@@ -2602,6 +2867,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 200,
             requiredSkill = 200,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 4096, count = 2 },
@@ -2619,6 +2886,7 @@ RecipeRegistryRecipeMetadata = {
             category = "kits",
             subcategory = "armor",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -2631,6 +2899,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4245,
             category = "bags",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 3 },
@@ -2644,6 +2913,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4231,
             category = "materials",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 783, count = 1 },
@@ -2656,6 +2926,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4233,
             category = "materials",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4232, count = 1 },
@@ -2668,6 +2939,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4236,
             category = "materials",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4235, count = 1 },
@@ -2680,6 +2952,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4305,
             category = "cloth",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4306, count = 4 },
@@ -2692,6 +2965,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -2705,6 +2979,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "wrist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 2 },
@@ -2719,6 +2994,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -2732,6 +3008,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -2747,6 +3024,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 100,
             requiredSkill = 100,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -2761,6 +3040,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 2 },
@@ -2777,6 +3057,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 95,
             requiredSkill = 95,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 2 },
@@ -2792,6 +3074,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "shoulder",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -2807,6 +3090,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 120,
             requiredSkill = 120,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 2 },
@@ -2821,6 +3106,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 4 },
@@ -2836,6 +3122,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 125,
             requiredSkill = 125,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 3 },
@@ -2850,6 +3138,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 3 },
@@ -2866,6 +3155,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 145,
             requiredSkill = 145,
+            sourceKind = "vendor",
+            sourceZones = { 13, 5 },
+            sourceNames = { "Wenna Silkbeard", "Kireena" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -2881,6 +3173,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 4 },
@@ -2898,6 +3191,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 140,
             requiredSkill = 140,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -2914,6 +3209,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 165,
             requiredSkill = 165,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Xizk Goodstitch" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -2930,6 +3228,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 170,
             requiredSkill = 170,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3824, count = 1 },
@@ -2944,6 +3244,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4305, count = 5 },
@@ -2959,6 +3260,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 1 },
@@ -2973,6 +3276,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "back",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3827, count = 1 },
@@ -2989,6 +3293,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 200,
             requiredSkill = 200,
+            sourceKind = "vendor",
+            sourceZones = { 14, 15 },
+            sourceNames = { "Micha Yance", "Ghok'kah" },
             bopOutput = false,
             reagents = {
                 { itemId = 3829, count = 1 },
@@ -3006,6 +3313,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 180,
             requiredSkill = 180,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 4305, count = 4 },
@@ -3022,6 +3331,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 200,
             requiredSkill = 200,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3864, count = 1 },
@@ -3037,6 +3348,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4339,
             category = "cloth",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4338, count = 5 },
@@ -3048,6 +3360,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4330,
             category = "shirts",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -3064,6 +3377,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 125,
             requiredSkill = 125,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 4 },
@@ -3080,6 +3395,10 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 135,
             requiredSkill = 135,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 7 },
+            sourceNames = { "Danielle Zipstitch" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -3095,6 +3414,9 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 155,
             requiredSkill = 155,
+            sourceKind = "vendor",
+            sourceZones = { 14, 7 },
+            sourceNames = { "Mallen Swain", "Sheri Zipstitch" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -3108,6 +3430,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4334,
             category = "shirts",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -3123,6 +3446,8 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 185,
             requiredSkill = 185,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 1 },
@@ -3138,6 +3463,9 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 200,
             requiredSkill = 200,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Narkk" },
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 1 },
@@ -3152,6 +3480,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -3215,6 +3544,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4359,
             category = "parts",
             sortOrder = 10,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 1 },
@@ -3228,6 +3558,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "bombs",
             sortOrder = 10,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2589, count = 1 },
@@ -3242,6 +3573,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4361,
             category = "parts",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 2 },
@@ -3255,6 +3587,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "firearms",
             sortOrder = 10,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4359, count = 1 },
@@ -3268,6 +3601,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4363,
             category = "parts",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2589, count = 2 },
@@ -3283,6 +3617,8 @@ RecipeRegistryRecipeMetadata = {
             category = "pets",
             sortOrder = 10,
             requiredSkill = 75,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 774, count = 2 },
@@ -3298,6 +3634,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "powders",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2836, count = 1 },
@@ -3310,6 +3647,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 200,
             category = "ammo",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 1 },
@@ -3324,6 +3662,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "dynamite",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2589, count = 1 },
@@ -3337,6 +3676,7 @@ RecipeRegistryRecipeMetadata = {
             category = "devices",
             subcategory = "tools",
             sortOrder = 10,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2592, count = 1 },
@@ -3354,6 +3694,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "charges",
             sortOrder = 10,
             requiredSkill = 100,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 159, count = 1 },
@@ -3369,6 +3711,7 @@ RecipeRegistryRecipeMetadata = {
             category = "goggles",
             subcategory = "cloth",
             sortOrder = 10,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 818, count = 2 },
@@ -3382,6 +3725,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "firearms",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 2 },
@@ -3399,6 +3743,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "bombs",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 3 },
@@ -3412,6 +3757,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4371,
             category = "parts",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 2 },
@@ -3427,6 +3773,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "firearms",
             sortOrder = 40,
             requiredSkill = 120,
+            sourceKind = "vendor",
+            sourceZones = { 13, 8 },
+            sourceNames = { "Fradd Swiftgear", "Jinky Twizzlefixxit" },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 3 },
@@ -3444,6 +3793,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 30,
             requiredSkill = 120,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 1210, count = 2 },
@@ -3458,6 +3809,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "bombs",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2592, count = 1 },
@@ -3472,6 +3824,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4375,
             category = "parts",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2592, count = 1 },
@@ -3487,6 +3840,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "reflectors",
             sortOrder = 10,
             requiredSkill = 125,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 4375, count = 1 },
@@ -3500,6 +3854,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "powders",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2838, count = 1 },
@@ -3513,6 +3868,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "dynamite",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2592, count = 1 },
@@ -3526,6 +3882,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 200,
             category = "ammo",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 1 },
@@ -3539,6 +3896,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "firearms",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2842, count = 3 },
@@ -3556,6 +3914,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "bombs",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 3 },
@@ -3572,6 +3931,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinkets",
             sortOrder = 10,
             requiredSkill = 140,
+            sourceKind = "vendor",
+            sourceZones = { 6, 16, 13 },
+            sourceNames = { "Gagsprocket", "Namdo Bizzfizzle", "Fradd Swiftgear" },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -3586,6 +3948,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4382,
             category = "parts",
             sortOrder = 60,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 1 },
@@ -3602,6 +3965,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "firearms",
             sortOrder = 50,
             requiredSkill = 145,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 1705, count = 2 },
@@ -3617,6 +3982,7 @@ RecipeRegistryRecipeMetadata = {
             category = "devices",
             subcategory = "consumables",
             sortOrder = 10,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2592, count = 2 },
@@ -3632,6 +3998,7 @@ RecipeRegistryRecipeMetadata = {
             category = "goggles",
             subcategory = "cloth",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 2 },
@@ -3648,6 +4015,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "reflectors",
             sortOrder = 20,
             requiredSkill = 155,
+            sourceKind = "vendor",
+            sourceZones = { 9 },
+            sourceNames = { "Rizz Loosebolt" },
             bopOutput = false,
             reagents = {
                 { itemId = 3829, count = 1 },
@@ -3660,6 +4030,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4387,
             category = "parts",
             sortOrder = 70,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 2 },
@@ -3674,6 +4045,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 140,
             requiredSkill = 160,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 1 },
@@ -3691,6 +4063,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 150,
             requiredSkill = 165,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 4 },
@@ -3705,6 +4079,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4389,
             category = "parts",
             sortOrder = 80,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 1 },
@@ -3720,6 +4095,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "grenades",
             sortOrder = 10,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 1 },
@@ -3734,6 +4110,7 @@ RecipeRegistryRecipeMetadata = {
             category = "devices",
             subcategory = "consumables",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 4 },
@@ -3749,6 +4126,7 @@ RecipeRegistryRecipeMetadata = {
             category = "devices",
             subcategory = "tools",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 4 },
@@ -3766,6 +4144,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 40,
             requiredSkill = 185,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3864, count = 2 },
@@ -3780,6 +4160,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "bombs",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 3 },
@@ -3796,6 +4177,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 180,
             requiredSkill = 195,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 2 },
@@ -3812,6 +4195,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinkets",
             sortOrder = 30,
             requiredSkill = 200,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Gnaz Blunderflame" },
             bopOutput = false,
             reagents = {
                 { itemId = 3864, count = 2 },
@@ -3830,6 +4216,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinkets",
             sortOrder = 40,
             requiredSkill = 200,
+            sourceKind = "vendor",
+            sourceZones = { 9 },
+            sourceNames = { "Zan Shivsproket" },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 2 },
@@ -3848,6 +4237,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "charges",
             sortOrder = 20,
             requiredSkill = 200,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 159, count = 1 },
@@ -3862,6 +4253,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 5,
             category = "parts",
             sortOrder = 90,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2842, count = 1 },
@@ -3874,6 +4266,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "scopes",
             sortOrder = 10,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 774, count = 1 },
@@ -3888,6 +4281,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "scopes",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -3903,6 +4297,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "scopes",
             sortOrder = 30,
             requiredSkill = 180,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Mazk Snipeshot" },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 1 },
@@ -3918,6 +4315,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "vendor",
+            sourceZones = { 3, 5 },
+            sourceNames = { "Narj Deepslice", "Super-Seller 680" },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -3933,6 +4333,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 165,
             requiredSkill = 165,
+            faction = "horde",
+            sourceKind = "vendor",
+            sourceZones = { 3 },
+            sourceNames = { "Tunkk" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -3949,6 +4353,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 165,
             requiredSkill = 165,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 3 },
+            sourceNames = { "Androd Fadran" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -3965,6 +4373,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "healing",
             sortOrder = 15,
             requiredSkill = 50,
+            faction = "horde",
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 2447, count = 1 },
@@ -3981,6 +4391,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "combat",
             sortOrder = 60,
             requiredSkill = 215,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -3996,6 +4407,8 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 40,
             requiredSkill = 40,
+            faction = "horde",
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 4 },
@@ -4011,6 +4424,8 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 10,
             requiredSkill = 10,
+            faction = "alliance",
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 5465, count = 1 },
@@ -4024,6 +4439,10 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 20,
             requiredSkill = 20,
+            faction = "horde",
+            sourceKind = "vendor",
+            sourceZones = { 17 },
+            sourceNames = { "Grimtak" },
             bopOutput = false,
             reagents = {
                 { itemId = 5466, count = 1 },
@@ -4038,6 +4457,10 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 35,
             requiredSkill = 35,
+            faction = "horde",
+            sourceKind = "vendor",
+            sourceZones = { 18 },
+            sourceNames = { "Wunna Darkmane" },
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 1 },
@@ -4053,6 +4476,10 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 50,
             requiredSkill = 50,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 19 },
+            sourceNames = { "Laird" },
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 1 },
@@ -4068,6 +4495,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 50,
             requiredSkill = 50,
+            sourceKind = "vendor",
+            sourceZones = { 6 },
+            sourceNames = { "Tari'qa" },
             bopOutput = false,
             reagents = {
                 { itemId = 4536, count = 1 },
@@ -4083,6 +4513,9 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 90,
             requiredSkill = 90,
+            sourceKind = "vendor",
+            sourceZones = { 6 },
+            sourceNames = { "Prospector Khazgorm" },
             bopOutput = false,
             reagents = {
                 { itemId = 5051, count = 1 },
@@ -4097,6 +4530,10 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 100,
             requiredSkill = 100,
+            faction = "horde",
+            sourceKind = "vendor",
+            sourceZones = { 6 },
+            sourceNames = { "Tari'qa" },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -4112,6 +4549,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 110,
             requiredSkill = 110,
+            sourceKind = "vendor",
+            sourceZones = { 4, 5 },
+            sourceNames = { "Ulthaan", "Vendor-Tron 1000" },
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 4 },
@@ -4125,6 +4565,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "scopes",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -4139,6 +4580,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 5525,
             category = "stamina",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 159, count = 1 },
@@ -4151,6 +4593,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 5527,
             category = "stamina",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -4165,6 +4608,10 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 90,
             requiredSkill = 90,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 20, 19 },
+            sourceNames = { "Kriggon Talsone", "Heldan Galesong" },
             bopOutput = false,
             reagents = {
                 { itemId = 1179, count = 1 },
@@ -4179,6 +4626,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "dagger",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 6 },
@@ -4196,6 +4644,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 140,
             requiredSkill = 140,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 2 },
@@ -4212,6 +4662,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "back",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -4228,6 +4679,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "combat",
             sortOrder = 10,
             requiredSkill = 60,
+            sourceKind = "vendor",
+            sourceZones = { 21, 22, 20, 6 },
+            sourceNames = { "Xandar Goodbeard", "Hagrus", "Defias Profiteer" },
             bopOutput = false,
             reagents = {
                 { itemId = 3371, count = 1 },
@@ -4243,6 +4697,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "combat",
             sortOrder = 20,
             requiredSkill = 175,
+            sourceKind = "vendor",
+            sourceZones = { 22, 23 },
+            sourceNames = { "Hagrus", "Ulthir" },
             bopOutput = false,
             reagents = {
                 { itemId = 3356, count = 1 },
@@ -4275,6 +4732,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "combat",
             sortOrder = 40,
             requiredSkill = 150,
+            sourceKind = "vendor",
+            sourceZones = { 24, 23, 22 },
+            sourceNames = { "Soolie Berryfizz", "Ulthir", "Kor'geld" },
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -4289,6 +4749,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -4304,6 +4765,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 70,
             requiredSkill = 70,
+            sourceKind = "vendor",
+            sourceZones = { 25, 20, 26, 19 },
+            sourceNames = { "Rathis Tomber", "Gina MacGregor", "Mahu" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -4319,6 +4783,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 115,
             requiredSkill = 115,
+            sourceKind = "vendor",
+            sourceZones = { 27, 13, 21, 26 },
+            sourceNames = { "Amy Davenport", "Jennabink Powerseam", "Rann Flamespinner" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -4333,6 +4800,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -4349,6 +4817,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 150,
             requiredSkill = 150,
+            sourceKind = "drop",
+            sourceZones = { 8, 7, 19 },
+            sourceNames = { "Grimtotem Geomancer", "Defias Enchanter", "Dark Strand Voidcaller" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -4364,6 +4835,8 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 3 },
@@ -4380,6 +4853,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 185,
             requiredSkill = 185,
+            sourceKind = "drop",
+            sourceZones = { 15, 14, 9 },
+            sourceNames = { "Theramore Infiltrator", "Shadowy Assassin", "Syndicate Spy" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 4 },
@@ -4396,6 +4872,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 90,
             requiredSkill = 90,
+            sourceKind = "vendor",
+            sourceZones = { 20, 28, 19 },
+            sourceNames = { "Gina MacGregor", "Andrew Hilbert", "Mavralyn" },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 6 },
@@ -4412,6 +4891,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 95,
             requiredSkill = 95,
+            sourceKind = "vendor",
+            sourceZones = { 20, 28, 19 },
+            sourceNames = { "Gina MacGregor", "Andrew Hilbert", "Mavralyn" },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 8 },
@@ -4429,6 +4911,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 170,
             requiredSkill = 170,
+            sourceKind = "vendor",
+            sourceZones = { 14, 2 },
+            sourceNames = { "Micha Yance", "Christoph Jeffcoat", "Blixrez Goodstitch" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 3 },
@@ -4446,6 +4931,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 190,
             requiredSkill = 190,
+            sourceKind = "vendor",
+            sourceZones = { 15 },
+            sourceNames = { "Helenia Olden" },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 14 },
@@ -4476,6 +4964,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 105,
             requiredSkill = 105,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 8 },
@@ -4490,6 +4980,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 12 },
@@ -4504,6 +4995,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -4520,6 +5012,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 170,
             requiredSkill = 170,
+            sourceKind = "vendor",
+            sourceZones = { 4, 3, 8 },
+            sourceNames = { "Lardan", "Hammon Karwn", "Jandia" },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -4534,6 +5029,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "shoulder",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -4549,6 +5045,8 @@ RecipeRegistryRecipeMetadata = {
             category = "cloaks",
             sortOrder = 125,
             requiredSkill = 125,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 14 },
@@ -4563,6 +5061,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 4 },
@@ -4577,6 +5076,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "utility",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3371, count = 1 },
@@ -4591,6 +5091,7 @@ RecipeRegistryRecipeMetadata = {
             category = "potions",
             subcategory = "healing",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3356, count = 1 },
@@ -4605,6 +5106,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "guardian",
             sortOrder = 10,
+            faction = "alliance",
             bopOutput = false,
             reagents = {
                 { itemId = 765, count = 2 },
@@ -4619,6 +5121,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Kelsey Yance" },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -4634,6 +5139,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield_spike",
             sortOrder = 10,
             requiredSkill = 150,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3478, count = 4 },
@@ -4648,6 +5155,8 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 70,
             requiredSkill = 165,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 1705, count = 1 },
@@ -4662,6 +5171,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "wrist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 2 },
@@ -4677,6 +5187,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon_chain",
             sortOrder = 10,
             requiredSkill = 190,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 2 },
@@ -4693,6 +5205,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 10,
             requiredSkill = 100,
+            sourceKind = "vendor",
+            sourceZones = { 21, 7, 6 },
+            sourceNames = { "Xandar Goodbeard", "Kzixx", "Hula'mahi" },
             bopOutput = false,
             reagents = {
                 { itemId = 2452, count = 1 },
@@ -4709,6 +5224,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 20,
             requiredSkill = 135,
+            sourceKind = "vendor",
+            sourceZones = { 14, 4 },
+            sourceNames = { "Christoph Jeffcoat", "Harklan Moongrove" },
             bopOutput = false,
             reagents = {
                 { itemId = 3356, count = 1 },
@@ -4725,6 +5243,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 30,
             requiredSkill = 165,
+            sourceKind = "vendor",
+            sourceZones = { 29, 14 },
+            sourceNames = { "Jeeda", "Nandar Branson" },
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -4741,6 +5262,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 40,
             requiredSkill = 190,
+            sourceKind = "vendor",
+            sourceZones = { 3, 2 },
+            sourceNames = { "Drovnar Strongbrew", "Glyx Brewright" },
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -4757,6 +5281,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 50,
             requiredSkill = 190,
+            sourceKind = "vendor",
+            sourceZones = { 30, 2, 12 },
+            sourceNames = { "Logannas", "Bronk", "Glyx Brewright" },
             bopOutput = false,
             reagents = {
                 { itemId = 3357, count = 1 },
@@ -4771,6 +5298,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "mace",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 2 },
@@ -4794,6 +5322,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 10940, count = 1 },
             },
@@ -4817,6 +5346,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 10938, count = 1 },
                 { itemId = 10940, count = 2 },
@@ -4840,6 +5370,7 @@ RecipeRegistryRecipeMetadata = {
             category = "devices",
             subcategory = "tools",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 6 },
@@ -4853,6 +5384,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 20,
             requiredSkill = 20,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 10938, count = 1 },
             },
@@ -4863,6 +5396,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "cloak",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 10938, count = 2 },
                 { itemId = 10940, count = 1 },
@@ -4874,6 +5408,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "bracer",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 10940, count = 3 },
             },
@@ -4885,6 +5420,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -4898,6 +5434,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -4914,6 +5451,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 55,
             requiredSkill = 55,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -4930,6 +5469,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 55,
             requiredSkill = 55,
+            sourceKind = "vendor",
+            sourceZones = { 31, 22, 19, 6 },
+            sourceNames = { "Tharynn Bouden", "Borya", "Valdaron" },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -4946,6 +5488,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 70,
             requiredSkill = 70,
+            sourceKind = "vendor",
+            sourceZones = { 23, 6, 28, 31 },
+            sourceNames = { "Elynna", "Ranik", "Andrew Hilbert" },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 2 },
@@ -4978,6 +5523,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 100,
             requiredSkill = 100,
+            sourceKind = "vendor",
+            sourceZones = { 20, 1, 14, 22 },
+            sourceNames = { "Gina MacGregor", "Alexandra Bolero", "Mallen Swain" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -4994,6 +5542,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 115,
             requiredSkill = 115,
+            sourceKind = "vendor",
+            sourceZones = { 21, 6, 13, 7 },
+            sourceNames = { "Rann Flamespinner", "Ranik", "Jennabink Powerseam" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 3 },
@@ -5007,6 +5558,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "2h_weapon",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 10940, count = 4 },
                 { itemId = 10978, count = 1 },
@@ -5018,6 +5570,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 10938, count = 2 },
                 { itemId = 10940, count = 2 },
@@ -5031,6 +5584,9 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 1,
             requiredSkill = 1,
+            sourceKind = "vendor",
+            sourceZones = { 18, 11, 1, 32 },
+            sourceNames = { "Harn Longcast", "Gretta Ganter", "Catherine Leland" },
             bopOutput = false,
             reagents = {
                 { itemId = 6291, count = 1 },
@@ -5044,6 +5600,9 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 1,
             requiredSkill = 1,
+            sourceKind = "vendor",
+            sourceZones = { 24, 20, 32, 17 },
+            sourceNames = { "Tansy Puddlefizz", "Kriggon Talsone", "Martine Tramblay" },
             bopOutput = false,
             reagents = {
                 { itemId = 6303, count = 1 },
@@ -5057,6 +5616,9 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 50,
             requiredSkill = 50,
+            sourceKind = "vendor",
+            sourceZones = { 28, 21, 33, 31 },
+            sourceNames = { "Killian Sanatha", "Khara Deepwater", "Lizbeth Cromwell" },
             bopOutput = false,
             reagents = {
                 { itemId = 6289, count = 1 },
@@ -5070,6 +5632,10 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 50,
             requiredSkill = 50,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 21 },
+            sourceNames = { "Khara Deepwater" },
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 1 },
@@ -5084,6 +5650,9 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 100,
             requiredSkill = 100,
+            sourceKind = "vendor",
+            sourceZones = { 6, 33, 14, 26 },
+            sourceNames = { "Kilxx", "Ronald Burch", "Lindea Rabonne" },
             bopOutput = false,
             reagents = {
                 { itemId = 6308, count = 1 },
@@ -5097,6 +5666,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 60,
             requiredSkill = 60,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 10938, count = 2 },
             },
@@ -5109,6 +5680,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 90,
             requiredSkill = 90,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 10939, count = 1 },
                 { itemId = 10940, count = 3 },
@@ -5122,6 +5694,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 80,
             requiredSkill = 80,
+            faction = "horde",
+            sourceKind = "vendor",
+            sourceZones = { 22, 28 },
+            sourceNames = { "Kithas", "Lilly" },
             reagents = {
                 { itemId = 10938, count = 1 },
                 { itemId = 10939, count = 1 },
@@ -5133,6 +5709,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "bracer",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 10939, count = 1 },
                 { itemId = 10940, count = 2 },
@@ -5146,6 +5723,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 80,
             requiredSkill = 80,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 10940, count = 5 },
             },
@@ -5158,6 +5737,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 90,
             requiredSkill = 90,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 10939, count = 2 },
                 { itemId = 10940, count = 4 },
@@ -5169,6 +5750,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "weapon",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 10939, count = 1 },
                 { itemId = 10940, count = 2 },
@@ -5183,6 +5765,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "2h_weapon",
             sortOrder = 100,
             requiredSkill = 100,
+            sourceKind = "vendor",
+            sourceZones = { 26, 24, 22, 28 },
+            sourceNames = { "Nata Dawnstrider", "Tilli Thistlefuzz", "Kithas" },
             reagents = {
                 { itemId = 10939, count = 3 },
             },
@@ -5193,6 +5778,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 6339,
             category = "rods",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 6218, count = 1 },
@@ -5208,6 +5794,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 6 },
@@ -5220,6 +5807,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 6338,
             category = "rods",
             sortOrder = 10,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2842, count = 1 },
@@ -5234,6 +5822,9 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 50,
             requiredSkill = 50,
+            sourceKind = "vendor",
+            sourceZones = { 20, 19, 28, 1 },
+            sourceNames = { "Kriggon Talsone", "Heldan Galesong", "Killian Sanatha" },
             bopOutput = false,
             reagents = {
                 { itemId = 6361, count = 1 },
@@ -5247,6 +5838,9 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "vendor",
+            sourceZones = { 19, 2, 22, 4 },
+            sourceNames = { "Heldan Galesong", "Kelsey Yance", "Shankys" },
             bopOutput = false,
             reagents = {
                 { itemId = 6362, count = 1 },
@@ -5258,6 +5852,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 6370,
             category = "oils",
             sortOrder = 10,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3371, count = 1 },
@@ -5270,6 +5865,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 6371,
             category = "oils",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3371, count = 1 },
@@ -5283,6 +5879,7 @@ RecipeRegistryRecipeMetadata = {
             category = "potions",
             subcategory = "utility",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2452, count = 1 },
@@ -5297,6 +5894,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "battle",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3356, count = 1 },
@@ -5310,6 +5908,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 10940, count = 4 },
                 { itemId = 10998, count = 1 },
@@ -5323,6 +5922,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 120,
             requiredSkill = 120,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 10998, count = 2 },
             },
@@ -5333,6 +5934,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "cloak",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 6371, count = 1 },
                 { itemId = 10998, count = 1 },
@@ -5346,6 +5948,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "boots",
             sortOrder = 125,
             requiredSkill = 125,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 10940, count = 8 },
             },
@@ -5358,6 +5961,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "boots",
             sortOrder = 125,
             requiredSkill = 125,
+            sourceKind = "vendor",
+            sourceZones = { 26, 14 },
+            sourceNames = { "Nata Dawnstrider", "Zixil" },
             reagents = {
                 { itemId = 10940, count = 6 },
                 { itemId = 10998, count = 2 },
@@ -5371,6 +5977,8 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 120,
             requiredSkill = 120,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -5387,6 +5995,8 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 120,
             requiredSkill = 120,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -5403,6 +6013,9 @@ RecipeRegistryRecipeMetadata = {
             category = "cloaks",
             sortOrder = 90,
             requiredSkill = 90,
+            sourceKind = "vendor",
+            sourceZones = { 6 },
+            sourceNames = { "Kalldan Felmoon" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -5419,6 +6032,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 105,
             requiredSkill = 105,
+            sourceKind = "vendor",
+            sourceZones = { 6 },
+            sourceNames = { "Kalldan Felmoon" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -5434,6 +6050,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 115,
             requiredSkill = 115,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -5449,6 +6066,8 @@ RecipeRegistryRecipeMetadata = {
             category = "special",
             sortOrder = 85,
             requiredSkill = 85,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 1 },
@@ -5464,6 +6083,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 10,
             requiredSkill = 90,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2449, count = 1 },
@@ -5480,6 +6101,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "grenades",
             sortOrder = 20,
             requiredSkill = 185,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 4306, count = 1 },
@@ -5496,6 +6118,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 90,
             requiredSkill = 90,
+            faction = "alliance",
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 6 },
@@ -5511,6 +6135,7 @@ RecipeRegistryRecipeMetadata = {
             category = "devices",
             subcategory = "tools",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 1 },
@@ -5528,6 +6153,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dynamite",
             sortOrder = 60,
             requiredSkill = 100,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2592, count = 1 },
@@ -5559,6 +6186,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 100,
             requiredSkill = 100,
+            faction = "alliance",
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 818, count = 2 },
@@ -5588,6 +6217,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 6786,
             category = "misc",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -5603,6 +6233,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -5616,6 +6247,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 6795,
             category = "shirts",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2324, count = 2 },
@@ -5629,6 +6261,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 6796,
             category = "shirts",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -5658,6 +6291,9 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 40,
             requiredSkill = 40,
+            sourceKind = "vendor",
+            sourceZones = { 21, 28 },
+            sourceNames = { "Drac Roughcut", "Andrew Hilbert" },
             bopOutput = false,
             reagents = {
                 { itemId = 3173, count = 1 },
@@ -5670,6 +6306,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 3 },
@@ -5684,6 +6321,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "head",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -5698,6 +6336,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "head",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -5711,6 +6350,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -5725,6 +6365,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "waist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -5741,6 +6382,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 2,
             category = "materials",
             sortOrder = 60,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 1 },
@@ -5753,6 +6395,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 4291, count = 2 },
@@ -5770,6 +6413,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "waist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -5785,6 +6429,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "shoulder",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 2 },
@@ -5798,6 +6443,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "waist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -5830,6 +6476,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 145,
             requiredSkill = 145,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -5847,6 +6495,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 150,
             requiredSkill = 150,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 929, count = 4 },
@@ -5864,6 +6514,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 165,
             requiredSkill = 165,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2605, count = 2 },
@@ -5880,6 +6532,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "vendor",
+            sourceZones = { 3, 30 },
+            sourceNames = { "Jun'ha", "Brienna Starglow" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -5896,6 +6551,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 180,
             requiredSkill = 180,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Xizk Goodstitch" },
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -5911,6 +6569,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -5927,6 +6586,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 190,
             requiredSkill = 190,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -5944,6 +6605,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 190,
             requiredSkill = 190,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 2 },
@@ -5961,6 +6624,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 195,
             requiredSkill = 195,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 4 },
@@ -5977,6 +6642,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -5993,6 +6659,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 205,
             requiredSkill = 205,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Vizzklick" },
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 4 },
@@ -6009,6 +6678,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 4 },
@@ -6026,6 +6696,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "dagger",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 1 },
@@ -6044,6 +6715,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 130,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 4 },
@@ -6084,6 +6756,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 7278,
             category = "bags",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 4 },
@@ -6096,6 +6769,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 7279,
             category = "bags",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 3 },
@@ -6111,6 +6785,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 35,
             requiredSkill = 35,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 5 },
@@ -6124,6 +6800,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "wrist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 6 },
@@ -6137,6 +6814,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 10 },
@@ -6152,6 +6830,10 @@ RecipeRegistryRecipeMetadata = {
             category = "cloaks",
             sortOrder = 100,
             requiredSkill = 100,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 27 },
+            sourceNames = { "Clyde Ranthal" },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 4 },
@@ -6168,6 +6850,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 120,
             requiredSkill = 120,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 13 },
+            sourceNames = { "Wenna Silkbeard" },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 4 },
@@ -6182,6 +6868,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 6 },
@@ -6196,6 +6883,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 8 },
@@ -6212,6 +6900,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 135,
             requiredSkill = 135,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 4 },
+            sourceNames = { "Harlown Darkweave" },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 8 },
@@ -6228,6 +6920,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 135,
             requiredSkill = 135,
+            sourceKind = "vendor",
+            sourceZones = { 14 },
+            sourceNames = { "Zixil" },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 6 },
@@ -6244,6 +6939,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 140,
             requiredSkill = 140,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 10 },
@@ -6260,6 +6957,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 145,
             requiredSkill = 145,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 12 },
@@ -6274,6 +6973,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 7371,
             category = "bags",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -6286,6 +6986,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 7372,
             category = "bags",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -6301,6 +7002,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 165,
             requiredSkill = 165,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -6315,6 +7018,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -6331,6 +7035,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -6344,6 +7050,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 7377,
             category = "cloaks",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -6359,6 +7066,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "wrist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 1 },
@@ -6375,6 +7083,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 190,
             requiredSkill = 190,
+            sourceKind = "vendor",
+            sourceZones = { 30, 33, 23 },
+            sourceNames = { "Jangdor Swiftstrider", "Pratt McGrubben", "Joseph Moore" },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 8 },
@@ -6389,6 +7100,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "waist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 2 },
@@ -6406,6 +7118,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 200,
             requiredSkill = 200,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3824, count = 1 },
@@ -6423,6 +7137,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 200,
             requiredSkill = 200,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2459, count = 2 },
@@ -6440,6 +7156,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 130,
             requiredSkill = 125,
+            sourceKind = "vendor",
+            sourceZones = { 24, 8 },
+            sourceNames = { "Gearcutter Cogspinner", "Jinky Twizzlefixxit" },
             bopOutput = false,
             reagents = {
                 { itemId = 774, count = 1 },
@@ -6457,6 +7176,7 @@ RecipeRegistryRecipeMetadata = {
             category = "devices",
             subcategory = "tools",
             sortOrder = 60,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 2 },
@@ -6473,6 +7193,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 160,
             requiredSkill = 165,
+            sourceKind = "vendor",
+            sourceZones = { 29, 7, 14 },
+            sourceNames = { "Veenix", "Kzixx", "Zixil" },
             bopOutput = false,
             reagents = {
                 { itemId = 814, count = 2 },
@@ -6491,6 +7214,9 @@ RecipeRegistryRecipeMetadata = {
             category = "special",
             sortOrder = 60,
             requiredSkill = 60,
+            sourceKind = "vendor",
+            sourceZones = { 9 },
+            sourceNames = { "Smudge Thunderwood" },
             bopOutput = false,
             reagents = {
                 { itemId = 159, count = 1 },
@@ -6506,6 +7232,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 160,
             requiredSkill = 160,
+            faction = "horde",
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 2 },
@@ -6522,6 +7250,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 160,
             requiredSkill = 160,
+            faction = "horde",
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 4 },
@@ -6537,6 +7267,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 175,
             requiredSkill = 175,
+            faction = "horde",
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 10 },
@@ -6553,6 +7285,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 180,
             requiredSkill = 180,
+            faction = "horde",
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 2 },
@@ -6569,6 +7303,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 185,
             requiredSkill = 185,
+            faction = "horde",
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 3 },
@@ -6583,6 +7319,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 3 },
@@ -6596,6 +7333,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enhancements",
             subcategory = "sharpening",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7912, count = 1 },
@@ -6607,6 +7345,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 7966,
             category = "materials",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7912, count = 4 },
@@ -6619,6 +7358,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enhancements",
             subcategory = "weightstone",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4306, count = 1 },
@@ -6632,6 +7372,7 @@ RecipeRegistryRecipeMetadata = {
             category = "plate",
             subcategory = "shoulder",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 8 },
@@ -6645,6 +7386,7 @@ RecipeRegistryRecipeMetadata = {
             category = "plate",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 6 },
@@ -6658,6 +7400,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -6672,6 +7415,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 210,
             requiredSkill = 210,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 10 },
@@ -6684,6 +7429,7 @@ RecipeRegistryRecipeMetadata = {
             category = "plate",
             subcategory = "head",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3859, count = 14 },
@@ -6699,6 +7445,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 215,
             requiredSkill = 215,
+            sourceKind = "vendor",
+            sourceZones = { 34, 35 },
+            sourceNames = { "Harggan", "Gharash" },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 8 },
@@ -6713,6 +7462,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield_spike",
             sortOrder = 20,
             requiredSkill = 215,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 4 },
@@ -6745,6 +7496,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 220,
             requiredSkill = 220,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -6761,6 +7513,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 220,
             requiredSkill = 220,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 10 },
@@ -6778,6 +7531,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -6793,6 +7547,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             specialization = 9788,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 10 },
@@ -6812,6 +7567,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 230,
             requiredSkill = 230,
+            faction = "horde",
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -6825,6 +7582,7 @@ RecipeRegistryRecipeMetadata = {
             category = "plate",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 16 },
@@ -6837,6 +7595,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "head",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 10 },
@@ -6851,6 +7610,8 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 80,
             requiredSkill = 235,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 4 },
@@ -6866,6 +7627,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 235,
             requiredSkill = 235,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 14 },
@@ -6879,6 +7642,7 @@ RecipeRegistryRecipeMetadata = {
             category = "plate",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 14 },
@@ -6894,6 +7658,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 245,
             requiredSkill = 245,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 14 },
@@ -6909,6 +7675,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 240,
             requiredSkill = 240,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 16 },
@@ -6925,6 +7692,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 9788,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -6943,6 +7711,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 245,
             requiredSkill = 245,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 14 },
@@ -6961,6 +7730,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 245,
             requiredSkill = 245,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 16 },
@@ -6975,6 +7745,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "sword",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 1 },
@@ -6990,6 +7761,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "mace",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 1 },
@@ -7004,6 +7776,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "sword",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 2 },
@@ -7018,6 +7791,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "axe",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 2 },
@@ -7032,6 +7806,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "axe",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -7049,6 +7824,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 220,
             requiredSkill = 220,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 16 },
@@ -7066,6 +7843,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 14 },
@@ -7081,6 +7860,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "mace",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1210, count = 4 },
@@ -7098,6 +7878,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 1,
             specialization = 9787,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 5 },
@@ -7118,6 +7899,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 240,
             requiredSkill = 240,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 2 },
@@ -7136,6 +7919,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 1,
             specialization = 9787,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3823, count = 2 },
@@ -7156,6 +7940,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 245,
             requiredSkill = 245,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 18 },
@@ -7172,6 +7958,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "polearm",
             sortOrder = 1,
             specialization = 9787,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 28 },
@@ -7190,6 +7977,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dagger",
             sortOrder = 255,
             requiredSkill = 255,
+            sourceKind = "vendor",
+            sourceZones = { 36 },
+            sourceNames = { "Magnus Frostwake" },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -7207,6 +7997,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 1,
             specialization = 9787,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 30 },
@@ -7223,6 +8014,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 3860,
             category = "metals",
             sortOrder = 80,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3858, count = 1 },
@@ -7234,6 +8026,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 6037,
             category = "metals",
             sortOrder = 90,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7911, count = 1 },
@@ -7245,6 +8038,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 8172,
             category = "materials",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8150, count = 1 },
@@ -7258,6 +8052,7 @@ RecipeRegistryRecipeMetadata = {
             category = "kits",
             subcategory = "armor",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 1 },
@@ -7273,6 +8068,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 200,
             requiredSkill = 200,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 12 },
@@ -7287,6 +8084,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 2 },
@@ -7300,6 +8098,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "head",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 2 },
@@ -7315,6 +8114,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 205,
             requiredSkill = 205,
+            sourceKind = "vendor",
+            sourceZones = { 30 },
+            sourceNames = { "Pratt McGrubben", "Jangdor Swiftstrider" },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 6 },
@@ -7329,6 +8131,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 6 },
@@ -7345,6 +8148,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 210,
             requiredSkill = 210,
+            sourceKind = "vendor",
+            sourceZones = { 30, 34 },
+            sourceNames = { "Jangdor Swiftstrider", "Nioma" },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 3 },
@@ -7359,6 +8165,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "wrist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 8 },
@@ -7375,6 +8182,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 215,
             requiredSkill = 215,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 10 },
@@ -7391,6 +8200,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 220,
             requiredSkill = 220,
+            sourceKind = "drop",
+            sourceZones = { 12 },
+            sourceNames = { "Wastewander Bandit" },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 4 },
@@ -7407,6 +8219,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 220,
             requiredSkill = 220,
+            sourceKind = "quest",
+            sourceZones = { 2 },
+            sourceNames = { "Glyx Brewright" },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 10 },
@@ -7423,6 +8238,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 220,
             requiredSkill = 220,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 8 },
@@ -7439,6 +8256,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 220,
             requiredSkill = 220,
+            sourceKind = "drop",
+            sourceZones = { 12 },
+            sourceNames = { "Wastewander Shadow Mage" },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 2 },
@@ -7455,6 +8275,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "drop",
+            sourceZones = { 12 },
+            sourceNames = { "Wastewander Thief" },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 2 },
@@ -7471,6 +8294,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 12 },
@@ -7487,6 +8311,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 10 },
@@ -7501,6 +8326,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 4 },
@@ -7528,6 +8354,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "head",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 14 },
@@ -7544,6 +8371,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 235,
             requiredSkill = 235,
+            sourceKind = "drop",
+            sourceZones = { 12 },
+            sourceNames = { "Wastewander Rogue" },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 6 },
@@ -7558,6 +8388,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 14 },
@@ -7572,6 +8403,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 16 },
@@ -7587,6 +8419,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 240,
             requiredSkill = 240,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 10 },
@@ -7602,6 +8436,8 @@ RecipeRegistryRecipeMetadata = {
             category = "cloaks",
             sortOrder = 240,
             requiredSkill = 240,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 14 },
@@ -7618,6 +8454,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 240,
             requiredSkill = 240,
+            sourceKind = "drop",
+            sourceZones = { 12 },
+            sourceNames = { "Wastewander Assassin", "Wastewander Scofflaw", "Andre Firebeard" },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 12 },
@@ -7634,6 +8473,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 245,
             requiredSkill = 245,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 14 },
@@ -7650,6 +8490,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 245,
             requiredSkill = 245,
+            sourceKind = "drop",
+            sourceZones = { 12 },
+            sourceNames = { "Wastewander Rogue" },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 14 },
@@ -7666,6 +8509,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "drop",
+            sourceZones = { 12 },
+            sourceNames = { "Wastewander Assassin", "Wastewander Scofflaw", "Andre Firebeard" },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 10 },
@@ -7682,6 +8528,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 16 },
@@ -7697,6 +8544,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cloaks",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 16 },
@@ -7712,6 +8560,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             specialization = 10656,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 24 },
@@ -7728,6 +8577,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 1,
             specialization = 10660,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 18 },
@@ -7745,6 +8595,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             specialization = 10658,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 20 },
@@ -7762,6 +8613,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 1,
             specialization = 10658,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 40 },
@@ -7779,6 +8631,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 10660,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 40 },
@@ -7796,6 +8649,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 10656,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 40 },
@@ -7825,6 +8679,7 @@ RecipeRegistryRecipeMetadata = {
             category = "potions",
             subcategory = "mana",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3358, count = 1 },
@@ -7839,6 +8694,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "battle",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -7853,6 +8709,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "guardian",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3355, count = 1 },
@@ -7866,6 +8723,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 8956,
             category = "oils",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3821, count = 1 },
@@ -7880,6 +8738,7 @@ RecipeRegistryRecipeMetadata = {
             category = "potions",
             subcategory = "rejuvenation",
             sortOrder = 20,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3821, count = 1 },
@@ -7896,6 +8755,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 60,
             requiredSkill = 210,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3358, count = 1 },
@@ -7941,6 +8802,7 @@ RecipeRegistryRecipeMetadata = {
             category = "potions",
             subcategory = "healing",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3358, count = 1 },
@@ -7957,6 +8819,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 80,
             requiredSkill = 225,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 8153, count = 1 },
@@ -7973,6 +8837,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "basic",
             sortOrder = 10,
             requiredSkill = 225,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Alchemist Pestlezugg" },
             bopOutput = true,
             reagents = {
                 { itemId = 3575, count = 4 },
@@ -7988,6 +8855,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "utility",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8836, count = 1 },
@@ -8001,6 +8869,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "battle",
             sortOrder = 60,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3821, count = 1 },
@@ -8017,6 +8886,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 50,
             requiredSkill = 235,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 8838, count = 1 },
@@ -8031,6 +8902,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "battle",
             sortOrder = 70,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3358, count = 1 },
@@ -8046,6 +8918,9 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 20,
             requiredSkill = 240,
+            sourceKind = "drop",
+            sourceZones = { 36 },
+            sourceNames = { "Skeletal Flayer", "Slavering Ghoul" },
             bopOutput = false,
             reagents = {
                 { itemId = 8836, count = 1 },
@@ -8060,6 +8935,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "battle",
             sortOrder = 80,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3821, count = 1 },
@@ -8076,6 +8952,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 80,
             requiredSkill = 240,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 8831, count = 3 },
@@ -8091,6 +8969,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 90,
             requiredSkill = 245,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 8838, count = 1 },
@@ -8106,6 +8986,9 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 10,
             requiredSkill = 245,
+            sourceKind = "vendor",
+            sourceZones = { 30 },
+            sourceNames = { "Logannas", "Bronk" },
             bopOutput = false,
             reagents = {
                 { itemId = 4342, count = 1 },
@@ -8122,6 +9005,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 100,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 1, 33 },
+            sourceNames = { "Maria Lumere", "Algernon" },
             bopOutput = false,
             reagents = {
                 { itemId = 8845, count = 3 },
@@ -8137,6 +9023,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 105,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 35, 37 },
+            sourceNames = { "Rartar", "Nina Lightbrew" },
             bopOutput = false,
             reagents = {
                 { itemId = 8845, count = 1 },
@@ -8151,6 +9040,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "utility",
             sortOrder = 60,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8846, count = 2 },
@@ -8166,6 +9056,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "metal",
             sortOrder = 10,
             requiredSkill = 225,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Alchemist Pestlezugg" },
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 1 },
@@ -8180,6 +9073,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "metal",
             sortOrder = 20,
             requiredSkill = 225,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Alchemist Pestlezugg" },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 1 },
@@ -8194,6 +9090,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 205,
             requiredSkill = 205,
+            faction = "alliance",
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 4 },
@@ -8221,6 +9119,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 1 },
@@ -8235,6 +9134,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -8250,6 +9150,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 120,
             requiredSkill = 120,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -8264,6 +9166,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 3 },
@@ -8277,6 +9180,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 3 },
@@ -8290,6 +9194,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 3 },
@@ -8303,6 +9208,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 3 },
@@ -8317,6 +9223,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 2 },
@@ -8330,6 +9237,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 3 },
@@ -8346,6 +9254,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 215,
             requiredSkill = 215,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -8362,6 +9272,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 215,
             requiredSkill = 215,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2324, count = 1 },
@@ -8378,6 +9290,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 215,
             requiredSkill = 215,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -8391,6 +9305,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 10056,
             category = "shirts",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 1 },
@@ -8438,6 +9353,9 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 220,
             requiredSkill = 220,
+            sourceKind = "vendor",
+            sourceZones = { 26, 23 },
+            sourceNames = { "Mahu", "Elynna" },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 2 },
@@ -8451,6 +9369,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 10050,
             category = "bags",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 2 },
@@ -8466,6 +9385,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -8480,6 +9401,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 4 },
@@ -8511,6 +9433,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 5 },
@@ -8525,6 +9448,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 6 },
@@ -8540,6 +9464,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 5 },
@@ -8554,6 +9479,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "head",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 3 },
@@ -8567,6 +9493,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 2 },
@@ -8581,6 +9508,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "shoulder",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 3 },
@@ -8595,6 +9523,9 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 230,
             requiredSkill = 230,
+            sourceKind = "vendor",
+            sourceZones = { 22, 24 },
+            sourceNames = { "Borya", "Outfitter Eric" },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 2 },
@@ -8609,6 +9540,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "shoulder",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 5 },
@@ -8622,6 +9554,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 10053,
             category = "misc",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2324, count = 1 },
@@ -8639,6 +9572,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 235,
             requiredSkill = 235,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -8652,6 +9587,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 10051,
             category = "bags",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -8667,6 +9603,9 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 235,
             requiredSkill = 235,
+            sourceKind = "vendor",
+            sourceZones = { 22, 24 },
+            sourceNames = { "Borya", "Outfitter Eric" },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 3 },
@@ -8683,6 +9622,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 240,
             requiredSkill = 240,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Cowardly Crosby" },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 3 },
@@ -8697,6 +9639,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 2 },
@@ -8730,6 +9673,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 240,
             requiredSkill = 240,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -8745,6 +9690,9 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 240,
             requiredSkill = 240,
+            sourceKind = "vendor",
+            sourceZones = { 33, 24 },
+            sourceNames = { "Millie Gregorian", "Outfitter Eric" },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 4 },
@@ -8760,6 +9708,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 245,
             requiredSkill = 245,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 2 },
@@ -8790,6 +9739,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 2 },
@@ -8807,6 +9757,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 245,
             requiredSkill = 245,
+            sourceKind = "vendor",
+            sourceZones = { 33, 24 },
+            sourceNames = { "Millie Gregorian", "Outfitter Eric" },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 4 },
@@ -8839,6 +9792,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 1, 26 },
+            sourceNames = { "Alexandra Bolero", "Mahu" },
             bopOutput = false,
             reagents = {
                 { itemId = 2324, count = 1 },
@@ -8853,6 +9809,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "head",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 1 },
@@ -8872,6 +9829,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 33, 24 },
+            sourceNames = { "Millie Gregorian", "Outfitter Eric" },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 5 },
@@ -8887,6 +9847,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 155,
             requiredSkill = 155,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 12 },
@@ -8913,6 +9875,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 3,
             category = "parts",
             sortOrder = 100,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3577, count = 1 },
@@ -8925,6 +9888,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "powders",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7912, count = 2 },
@@ -8938,6 +9902,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "dynamite",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4306, count = 1 },
@@ -8953,6 +9918,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 70,
             requiredSkill = 175,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3864, count = 2 },
@@ -8965,6 +9932,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 10559,
             category = "parts",
             sortOrder = 110,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 3 },
@@ -8976,6 +9944,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 10498,
             category = "parts",
             sortOrder = 120,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3859, count = 4 },
@@ -8987,6 +9956,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 10560,
             category = "parts",
             sortOrder = 130,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 1 },
@@ -9001,6 +9971,7 @@ RecipeRegistryRecipeMetadata = {
             category = "goggles",
             subcategory = "cloth",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3864, count = 2 },
@@ -9016,6 +9987,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "firearms",
             sortOrder = 60,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 4 },
@@ -9032,6 +10004,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 200,
             category = "ammo",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 1 },
@@ -9047,6 +10020,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "scopes",
             sortOrder = 50,
             requiredSkill = 210,
+            sourceKind = "vendor",
+            sourceZones = { 2, 38 },
+            sourceNames = { "Knaz Blunderflame", "Yuka Screwspigot" },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 2 },
@@ -9060,6 +10036,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 10561,
             category = "parts",
             sortOrder = 140,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 3 },
@@ -9073,6 +10050,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "bombs",
             sortOrder = 60,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 10505, count = 1 },
@@ -9089,6 +10067,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 140,
             requiredSkill = 220,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 4 },
@@ -9103,6 +10083,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "utility",
             sortOrder = 70,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -9119,6 +10100,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "firearms",
             sortOrder = 70,
             requiredSkill = 220,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 6 },
@@ -9137,6 +10120,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 150,
             requiredSkill = 225,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 4 },
@@ -9152,6 +10136,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinkets",
             sortOrder = 50,
             requiredSkill = 225,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 4 },
@@ -9169,6 +10155,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 160,
             requiredSkill = 230,
+            sourceKind = "vendor",
+            sourceZones = { 39 },
+            sourceNames = { "Jubie Gadgetspring" },
             bopOutput = false,
             reagents = {
                 { itemId = 774, count = 4 },
@@ -9185,6 +10174,7 @@ RecipeRegistryRecipeMetadata = {
             category = "goggles",
             subcategory = "cloth",
             sortOrder = 60,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 6 },
@@ -9199,6 +10189,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "bombs",
             sortOrder = 70,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 10505, count = 2 },
@@ -9215,6 +10206,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "scopes",
             sortOrder = 60,
             requiredSkill = 240,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 2 },
@@ -9229,6 +10222,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 200,
             category = "ammo",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 2 },
@@ -9242,6 +10236,7 @@ RecipeRegistryRecipeMetadata = {
             category = "goggles",
             subcategory = "cloth",
             sortOrder = 80,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 3 },
@@ -9260,6 +10255,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinkets",
             sortOrder = 60,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 34 },
+            sourceNames = { "Ruppo Zipcoil" },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 14 },
@@ -9277,6 +10275,7 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 10,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 10647, count = 1 },
@@ -9291,6 +10290,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 30,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 4 },
@@ -9308,6 +10308,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mail",
             sortOrder = 90,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 3860, count = 8 },
@@ -9323,6 +10324,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 100,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 3860, count = 8 },
@@ -9383,6 +10385,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bombs",
             sortOrder = 90,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 9061, count = 1 },
@@ -9399,6 +10402,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 50,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 4407, count = 2 },
@@ -9416,6 +10420,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 110,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 4 },
@@ -9432,6 +10437,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 60,
             specialization = 20219,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 7972, count = 4 },
@@ -9449,6 +10455,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "charges",
             sortOrder = 40,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4338, count = 1 },
@@ -9463,6 +10470,7 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 20,
             specialization = 20219,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 10647, count = 1 },
@@ -9477,6 +10485,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 120,
             specialization = 20219,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 4234, count = 2 },
@@ -9494,6 +10503,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 70,
             specialization = 20219,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 2 },
@@ -9525,6 +10535,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 90,
             specialization = 20219,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 4 },
@@ -9542,6 +10553,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinkets",
             sortOrder = 70,
             specialization = 20219,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 4 },
@@ -9574,6 +10586,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinkets",
             sortOrder = 80,
             specialization = 20219,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 4 },
@@ -9590,6 +10603,7 @@ RecipeRegistryRecipeMetadata = {
             category = "pets",
             sortOrder = 20,
             specialization = 20219,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 1529, count = 2 },
@@ -9608,6 +10622,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 130,
             specialization = 20219,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 10 },
@@ -9625,6 +10640,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 110,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 3860, count = 6 },
@@ -9655,6 +10671,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 31,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 1 },
@@ -9668,6 +10685,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "shield",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 10940, count = 2 },
                 { itemId = 10998, count = 1 },
@@ -9681,6 +10699,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "2h_weapon",
             sortOrder = 110,
             requiredSkill = 110,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 10940, count = 6 },
                 { itemId = 10998, count = 1 },
@@ -9694,6 +10714,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 110,
             requiredSkill = 110,
+            sourceKind = "vendor",
+            sourceZones = { 4, 29 },
+            sourceNames = { "Dalria", "Kulwia" },
             reagents = {
                 { itemId = 10998, count = 1 },
             },
@@ -9704,6 +10727,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "cloak",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 10940, count = 6 },
                 { itemId = 10978, count = 1 },
@@ -9717,6 +10741,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield",
             sortOrder = 115,
             requiredSkill = 115,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 10940, count = 1 },
                 { itemId = 10978, count = 1 },
@@ -9729,6 +10755,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "shield",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 10940, count = 4 },
                 { itemId = 10998, count = 2 },
@@ -9740,6 +10767,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "bracer",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11083, count = 2 },
             },
@@ -9750,6 +10778,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "weapon",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11083, count = 2 },
                 { itemId = 11084, count = 1 },
@@ -9763,6 +10792,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 135,
             requiredSkill = 135,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 6048, count = 1 },
                 { itemId = 11082, count = 1 },
@@ -9774,6 +10805,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "2h_weapon",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11083, count = 3 },
                 { itemId = 11084, count = 1 },
@@ -9787,6 +10819,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 140,
             requiredSkill = 140,
+            sourceKind = "vendor",
+            sourceZones = { 4, 29 },
+            sourceNames = { "Dalria", "Kulwia" },
             reagents = {
                 { itemId = 11083, count = 2 },
             },
@@ -9797,6 +10832,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 10940, count = 2 },
                 { itemId = 11082, count = 1 },
@@ -9809,6 +10845,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 10998, count = 2 },
                 { itemId = 11082, count = 1 },
@@ -9822,6 +10859,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 145,
             requiredSkill = 145,
+            sourceKind = "drop",
+            sourceZones = { 13 },
+            sourceNames = { "Dark Iron Demolitionist", "Dark Iron Dwarf", "Dark Iron Saboteur" },
             reagents = {
                 { itemId = 2772, count = 3 },
                 { itemId = 11083, count = 1 },
@@ -9835,6 +10875,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 145,
             requiredSkill = 145,
+            sourceKind = "drop",
+            sourceZones = { 29, 4 },
+            sourceNames = { "Blackened Ancient", "Crazed Ancient", "Withered Ancient" },
             reagents = {
                 { itemId = 3356, count = 3 },
                 { itemId = 11083, count = 1 },
@@ -9848,6 +10891,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 145,
             requiredSkill = 145,
+            sourceKind = "drop",
+            sourceZones = { 14 },
+            sourceNames = { "Torn Fin Tidehunter", "Torn Fin Muckdweller", "Torn Fin Coastrunner" },
             reagents = {
                 { itemId = 6370, count = 3 },
                 { itemId = 11083, count = 1 },
@@ -9859,6 +10905,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "bracer",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11082, count = 2 },
             },
@@ -9869,6 +10916,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11082, count = 1 },
                 { itemId = 11083, count = 1 },
@@ -9881,6 +10929,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 11130,
             category = "rods",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 5500, count = 1 },
@@ -9896,6 +10945,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "shield",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11083, count = 1 },
                 { itemId = 11134, count = 1 },
@@ -9907,6 +10957,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "cloak",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11083, count = 3 },
                 { itemId = 11138, count = 1 },
@@ -9918,6 +10969,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "boots",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11083, count = 1 },
                 { itemId = 11134, count = 1 },
@@ -9929,6 +10981,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11083, count = 3 },
             },
@@ -9939,6 +10992,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "bracer",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11134, count = 1 },
             },
@@ -9949,6 +11003,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "boots",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11083, count = 4 },
             },
@@ -9961,6 +11016,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 170,
             requiredSkill = 170,
+            sourceKind = "vendor",
+            sourceZones = { 14, 3 },
+            sourceNames = { "Micha Yance", "Keena" },
             reagents = {
                 { itemId = 11083, count = 2 },
                 { itemId = 11134, count = 1 },
@@ -9972,6 +11030,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "bracer",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11083, count = 6 },
             },
@@ -9984,6 +11043,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 5637, count = 2 },
                 { itemId = 11134, count = 1 },
@@ -9998,6 +11059,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 7067, count = 1 },
                 { itemId = 11134, count = 1 },
@@ -10010,6 +11073,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "cloak",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 7068, count = 1 },
                 { itemId = 11134, count = 1 },
@@ -10021,6 +11085,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "shield",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11135, count = 1 },
                 { itemId = 11137, count = 1 },
@@ -10032,6 +11097,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "bracer",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11137, count = 1 },
             },
@@ -10042,6 +11108,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11135, count = 1 },
             },
@@ -10054,6 +11121,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "boots",
             sortOrder = 190,
             requiredSkill = 190,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 11134, count = 2 },
                 { itemId = 11135, count = 1 },
@@ -10067,6 +11136,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield",
             sortOrder = 195,
             requiredSkill = 195,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 11135, count = 2 },
                 { itemId = 11137, count = 2 },
@@ -10079,6 +11150,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "weapon",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11135, count = 2 },
                 { itemId = 11139, count = 1 },
@@ -10090,6 +11162,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "2h_weapon",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11137, count = 4 },
                 { itemId = 11139, count = 1 },
@@ -10103,6 +11176,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 200,
             requiredSkill = 200,
+            sourceKind = "drop",
+            sourceZones = { 3 },
+            sourceNames = { "Witherbark Headhunter", "Witherbark Berserker", "Witherbark Shadow Hunter" },
             reagents = {
                 { itemId = 7392, count = 3 },
                 { itemId = 11137, count = 1 },
@@ -10114,6 +11190,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11135, count = 2 },
                 { itemId = 11137, count = 2 },
@@ -10126,6 +11203,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 11145,
             category = "rods",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 7971, count = 1 },
@@ -10141,6 +11219,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "cloak",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11137, count = 3 },
             },
@@ -10151,6 +11230,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "cloak",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11174, count = 1 },
             },
@@ -10161,6 +11241,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "gloves",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11137, count = 1 },
                 { itemId = 11174, count = 1 },
@@ -10174,6 +11255,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield",
             sortOrder = 210,
             requiredSkill = 210,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 11137, count = 5 },
             },
@@ -10184,6 +11267,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "bracer",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11174, count = 2 },
             },
@@ -10194,6 +11278,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "boots",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11137, count = 5 },
             },
@@ -10206,6 +11291,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 215,
             requiredSkill = 215,
+            sourceKind = "drop",
+            sourceZones = { 2 },
+            sourceNames = { "Venture Co. Strip Miner" },
             reagents = {
                 { itemId = 6037, count = 3 },
                 { itemId = 11137, count = 3 },
@@ -10219,6 +11307,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 220,
             requiredSkill = 220,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 11137, count = 1 },
                 { itemId = 11174, count = 3 },
@@ -10230,6 +11320,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11137, count = 6 },
             },
@@ -10242,6 +11333,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "drop",
+            sourceZones = { 35 },
+            sourceNames = { "Swampwalker", "Tangled Horror", "Molt Thorn" },
             reagents = {
                 { itemId = 8838, count = 3 },
                 { itemId = 11137, count = 3 },
@@ -10255,6 +11349,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "drop",
+            sourceZones = { 12, 9 },
+            sourceNames = { "Wastewander Assassin", "Wastewander Scofflaw", "Syndicate Assassin" },
             reagents = {
                 { itemId = 11174, count = 2 },
             },
@@ -10265,6 +11362,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "gloves",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11137, count = 3 },
                 { itemId = 11174, count = 2 },
@@ -10276,6 +11374,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "boots",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 7909, count = 1 },
                 { itemId = 11174, count = 1 },
@@ -10290,6 +11389,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 265,
             requiredSkill = 265,
+            sourceKind = "drop",
             reagents = {
                 { itemId = 7078, count = 1 },
                 { itemId = 11177, count = 4 },
@@ -10301,6 +11401,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "shield",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11175, count = 1 },
                 { itemId = 11176, count = 2 },
@@ -10314,6 +11415,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 230,
             requiredSkill = 230,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 9224, count = 1 },
                 { itemId = 11176, count = 2 },
@@ -10326,6 +11429,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11174, count = 2 },
                 { itemId = 11175, count = 1 },
@@ -10339,6 +11443,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 235,
             requiredSkill = 235,
+            sourceKind = "vendor",
+            sourceZones = { 35, 23 },
+            sourceNames = { "Banalash", "Mythrin'dir" },
             reagents = {
                 { itemId = 11175, count = 1 },
                 { itemId = 11176, count = 2 },
@@ -10352,6 +11459,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield",
             sortOrder = 235,
             requiredSkill = 235,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 3829, count = 1 },
                 { itemId = 11178, count = 1 },
@@ -10363,6 +11472,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "boots",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11175, count = 2 },
             },
@@ -10373,6 +11483,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "2h_weapon",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11176, count = 2 },
                 { itemId = 11178, count = 2 },
@@ -10384,6 +11495,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "bracer",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11175, count = 1 },
                 { itemId = 11176, count = 2 },
@@ -10395,6 +11507,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11175, count = 2 },
                 { itemId = 11176, count = 3 },
@@ -10407,6 +11520,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "weapon",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 11175, count = 2 },
                 { itemId = 11178, count = 2 },
@@ -10420,6 +11534,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 245,
             requiredSkill = 245,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 11176, count = 5 },
             },
@@ -10432,6 +11548,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 11176, count = 3 },
                 { itemId = 11178, count = 2 },
@@ -10443,6 +11561,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "gloves",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 8153, count = 2 },
                 { itemId = 11178, count = 2 },
@@ -10454,6 +11573,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 11287,
             category = "wands",
             sortOrder = 10,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4470, count = 1 },
@@ -10466,6 +11586,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 11128,
             category = "rods",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3478, count = 2 },
@@ -10478,6 +11599,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 11144,
             category = "rods",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 1 },
@@ -10490,6 +11612,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 11288,
             category = "wands",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4470, count = 1 },
@@ -10502,6 +11625,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 11289,
             category = "wands",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 11083, count = 1 },
@@ -10515,6 +11639,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 11290,
             category = "wands",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 11135, count = 1 },
@@ -10528,6 +11653,9 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 11371,
             category = "metals",
             sortOrder = 100,
+            sourceKind = "quest",
+            sourceZones = { 29 },
+            sourceNames = { "Jeeda" },
             bopOutput = false,
             reagents = {
                 { itemId = 11370, count = 8 },
@@ -10539,6 +11667,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 8217,
             category = "bags",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 4 },
@@ -10553,6 +11682,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 8218,
             category = "bags",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 6 },
@@ -10568,6 +11698,7 @@ RecipeRegistryRecipeMetadata = {
             category = "devices",
             subcategory = "tools",
             sortOrder = 70,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 1 },
@@ -10584,6 +11715,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 265,
             requiredSkill = 265,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 4 },
@@ -10614,6 +11746,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "drop",
+            sourceZones = { 40 },
+            sourceNames = { "Hammered Patron", "Ribbly's Crony" },
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 4 },
@@ -10644,6 +11779,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "drop",
             bopOutput = true,
             reagents = {
                 { itemId = 7077, count = 8 },
@@ -10658,6 +11794,7 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 10,
             requiredSkill = 265,
+            sourceKind = "drop",
             bopOutput = true,
             reagents = {
                 { itemId = 7078, count = 1 },
@@ -10707,6 +11844,7 @@ RecipeRegistryRecipeMetadata = {
             category = "potions",
             subcategory = "utility",
             sortOrder = 60,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8831, count = 3 },
@@ -10721,6 +11859,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 125,
             requiredSkill = 125,
+            sourceKind = "vendor",
+            sourceZones = { 5 },
+            sourceNames = { "Super-Seller 680" },
             bopOutput = false,
             reagents = {
                 { itemId = 1015, count = 1 },
@@ -10735,6 +11876,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "vendor",
+            sourceZones = { 2, 5, 3, 15 },
+            sourceNames = { "Nerrist", "Corporal Bluth", "Vendor-Tron 1000" },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -10749,6 +11893,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "vendor",
+            sourceZones = { 30, 5 },
+            sourceNames = { "Sheendra Tallgrass", "Vivianna", "Super-Seller 680" },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -10764,6 +11911,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "vendor",
+            sourceZones = { 2, 5 },
+            sourceNames = { "Nerrist", "Corporal Bluth", "Vendor-Tron 1000" },
             bopOutput = false,
             reagents = {
                 { itemId = 159, count = 1 },
@@ -10779,6 +11929,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "vendor",
+            sourceZones = { 5, 15, 35 },
+            sourceNames = { "Vendor-Tron 1000", "Ogg'marr", "Banalash" },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -10793,6 +11946,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "vendor",
+            sourceZones = { 15, 5 },
+            sourceNames = { "Helenia Olden", "Janet Hommers", "Super-Seller 680" },
             bopOutput = false,
             reagents = {
                 { itemId = 2596, count = 1 },
@@ -10807,6 +11963,9 @@ RecipeRegistryRecipeMetadata = {
             category = "special",
             sortOrder = 200,
             requiredSkill = 200,
+            sourceKind = "vendor",
+            sourceZones = { 15, 5 },
+            sourceNames = { "Helenia Olden", "Ogg'marr", "Super-Seller 680" },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -10823,6 +11982,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 200,
             requiredSkill = 200,
+            sourceKind = "vendor",
+            sourceZones = { 5 },
+            sourceNames = { "Vendor-Tron 1000", "Kireena", "Janet Hommers" },
             bopOutput = false,
             reagents = {
                 { itemId = 159, count = 1 },
@@ -10838,6 +12000,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "vendor",
+            sourceZones = { 20, 2, 35 },
+            sourceNames = { "Kriggon Talsone", "Uthok", "Banalash" },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 2 },
@@ -10852,6 +12017,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "vendor",
+            sourceZones = { 41, 42 },
+            sourceNames = { "Malygen", "Bale", "Himmik" },
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 2 },
@@ -10866,6 +12034,10 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 1,
             requiredSkill = 1,
+            faction = "horde",
+            sourceKind = "vendor",
+            sourceZones = { 32 },
+            sourceNames = { "Abigail Shiel" },
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 1 },
@@ -10879,6 +12051,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "dagger",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -10897,6 +12070,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dagger",
             sortOrder = 190,
             requiredSkill = 190,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3577, count = 4 },
@@ -10911,6 +12086,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 12359,
             category = "metals",
             sortOrder = 110,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 10620, count = 1 },
@@ -10922,6 +12098,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 12644,
             category = "materials",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12365, count = 4 },
@@ -10934,6 +12111,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enhancements",
             subcategory = "weightstone",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12365, count = 1 },
@@ -10947,6 +12125,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enhancements",
             subcategory = "sharpening",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12365, count = 1 },
@@ -10961,6 +12140,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 11188, count = 4 },
@@ -10977,6 +12157,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 11186, count = 4 },
@@ -10992,6 +12173,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 255,
             requiredSkill = 255,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 11184, count = 4 },
@@ -11007,6 +12189,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 260,
             requiredSkill = 260,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 2 },
@@ -11022,6 +12206,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 265,
             requiredSkill = 265,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 6 },
@@ -11037,6 +12222,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 265,
             requiredSkill = 265,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 6 },
@@ -11052,6 +12238,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 270,
             requiredSkill = 270,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 2 },
@@ -11068,6 +12256,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 270,
             requiredSkill = 270,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 12 },
@@ -11082,6 +12271,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 270,
             requiredSkill = 270,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 8153, count = 4 },
@@ -11100,6 +12291,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield_spike",
             sortOrder = 30,
             requiredSkill = 275,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 2 },
@@ -11116,6 +12309,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 280,
             requiredSkill = 280,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 8 },
@@ -11132,6 +12326,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 280,
             requiredSkill = 280,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 1 },
@@ -11148,6 +12343,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 4 },
@@ -11163,6 +12360,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 2 },
@@ -11180,6 +12378,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 4 },
@@ -11195,6 +12395,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 295,
             requiredSkill = 295,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 18 },
@@ -11209,6 +12410,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 295,
             requiredSkill = 295,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 1 },
@@ -11224,6 +12426,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 295,
             requiredSkill = 295,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 4 },
@@ -11239,6 +12443,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 2 },
@@ -11256,6 +12462,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 295,
             requiredSkill = 295,
+            sourceKind = "vendor",
+            sourceZones = { 36 },
+            sourceNames = { "Magnus Frostwake" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 4 },
@@ -11273,6 +12482,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 11186, count = 4 },
@@ -11288,6 +12498,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 20 },
@@ -11302,6 +12513,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 15 },
+            sourceNames = { "Strashaz Serpent Guard" },
             bopOutput = false,
             reagents = {
                 { itemId = 3577, count = 6 },
@@ -11318,6 +12532,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 36 },
+            sourceNames = { "Scarlet Cavalier" },
             bopOutput = false,
             reagents = {
                 { itemId = 2842, count = 10 },
@@ -11334,6 +12551,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 4 },
@@ -11351,6 +12569,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3577, count = 6 },
@@ -11369,6 +12589,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 4 },
@@ -11384,6 +12606,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 15 },
+            sourceNames = { "Strashaz Warrior" },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 2 },
@@ -11401,6 +12626,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 8168, count = 60 },
@@ -11419,6 +12646,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 8146, count = 40 },
@@ -11437,6 +12666,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 24 },
@@ -11451,6 +12681,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 15 },
+            sourceNames = { "Strashaz Myrmidon", "Tidelord Rrurgaz" },
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 1 },
@@ -11467,6 +12700,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 36 },
+            sourceNames = { "Scarlet Smith" },
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 1 },
@@ -11483,6 +12719,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 10 },
@@ -11501,6 +12739,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 6 },
@@ -11519,6 +12758,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 6 },
@@ -11537,6 +12777,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 4 },
@@ -11556,6 +12797,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 12360, count = 30 },
@@ -11626,6 +12869,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 36 },
+            sourceNames = { "Magnus Frostwake" },
             bopOutput = true,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -11643,6 +12889,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 4 },
@@ -11662,6 +12909,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 280,
             requiredSkill = 280,
+            sourceKind = "vendor",
+            sourceZones = { 36 },
+            sourceNames = { "Magnus Frostwake" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 6 },
@@ -11678,6 +12928,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 280,
             requiredSkill = 280,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -11696,6 +12947,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 280,
             requiredSkill = 280,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 4 },
@@ -11750,6 +13002,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "drop",
+            sourceZones = { 38 },
+            sourceNames = { "Volchan" },
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 4 },
@@ -11823,6 +13078,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 10 },
@@ -11841,6 +13097,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 12360, count = 15 },
@@ -11860,6 +13117,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 40 },
@@ -11879,6 +13137,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 36 },
+            sourceNames = { "Foreman Marcrid" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 4 },
@@ -11898,6 +13159,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 6 },
@@ -11916,6 +13178,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 12360, count = 20 },
@@ -11932,6 +13195,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dagger",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 6 },
@@ -11949,6 +13213,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 12655,
             category = "materials",
             sortOrder = 60,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 11176, count = 3 },
@@ -11961,6 +13226,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 12810,
             category = "materials",
             sortOrder = 70,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 1 },
@@ -11976,6 +13242,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "metal",
             sortOrder = 30,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Alchemist Pestlezugg" },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 1 },
@@ -11988,6 +13257,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 13423,
             category = "oils",
             sortOrder = 60,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -12003,6 +13273,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "combat",
             sortOrder = 30,
             requiredSkill = 255,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8846, count = 3 },
@@ -12018,6 +13289,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mana",
             sortOrder = 50,
             requiredSkill = 260,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8838, count = 2 },
@@ -12034,6 +13306,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "guardian",
             sortOrder = 60,
             requiredSkill = 265,
+            sourceKind = "vendor",
+            sourceZones = { 24, 22 },
+            sourceNames = { "Soolie Berryfizz", "Kor'geld" },
             bopOutput = false,
             reagents = {
                 { itemId = 8838, count = 1 },
@@ -12050,6 +13325,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 130,
             requiredSkill = 270,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -12066,6 +13342,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "healing",
             sortOrder = 60,
             requiredSkill = 275,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -12082,6 +13359,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 140,
             requiredSkill = 275,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8846, count = 2 },
@@ -12098,6 +13376,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 10,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 32, 43, 36 },
+            sourceNames = { "Argent Quartermaster Hasana", "Quartermaster Miranda Breechlock", "Argent Quartermaster Lightspark" },
             bopOutput = false,
             reagents = {
                 { itemId = 7082, count = 1 },
@@ -12112,6 +13393,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 20,
             requiredSkill = 275,
+            sourceKind = "vendor",
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 1 },
@@ -12126,6 +13408,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 30,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 41 },
+            sourceNames = { "Meilosh" },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 1 },
@@ -12140,6 +13425,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 40,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 36 },
+            sourceNames = { "Magnus Frostwake" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 1 },
@@ -12154,6 +13442,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 31,
             requiredSkill = 275,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 12808, count = 1 },
@@ -12168,6 +13458,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 50,
             requiredSkill = 275,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 1 },
@@ -12182,6 +13474,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 21,
             requiredSkill = 275,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 1 },
@@ -12196,6 +13490,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 60,
             requiredSkill = 275,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 1 },
@@ -12210,6 +13506,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "combat",
             sortOrder = 70,
             requiredSkill = 280,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -12226,6 +13524,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 150,
             requiredSkill = 280,
+            sourceKind = "drop",
+            sourceZones = { 39, 41 },
+            sourceNames = { "Legashi Rogue", "Jadefire Rogue" },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -12242,6 +13543,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 35,
             requiredSkill = 285,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -12258,6 +13560,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 160,
             requiredSkill = 285,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -12274,6 +13577,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 130,
             requiredSkill = 290,
+            sourceKind = "drop",
+            sourceZones = { 44 },
+            sourceNames = { "Firebrand Invoker", "Firebrand Pyromancer" },
             bopOutput = false,
             reagents = {
                 { itemId = 7068, count = 1 },
@@ -12290,6 +13596,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 140,
             requiredSkill = 290,
+            sourceKind = "drop",
+            sourceZones = { 42 },
+            sourceNames = { "Frostmaul Giant" },
             bopOutput = false,
             reagents = {
                 { itemId = 7070, count = 1 },
@@ -12306,6 +13615,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 150,
             requiredSkill = 290,
+            sourceKind = "drop",
+            sourceZones = { 36 },
+            sourceNames = { "Rotting Behemoth", "Decaying Horror" },
             bopOutput = false,
             reagents = {
                 { itemId = 7067, count = 1 },
@@ -12322,6 +13634,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 160,
             requiredSkill = 290,
+            sourceKind = "drop",
+            sourceZones = { 42 },
+            sourceNames = { "Cobalt Mageweaver" },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -12338,6 +13653,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 120,
             requiredSkill = 290,
+            sourceKind = "drop",
+            sourceZones = { 43 },
+            sourceNames = { "Dark Adept", "Shadowmage" },
             bopOutput = false,
             reagents = {
                 { itemId = 3824, count = 1 },
@@ -12370,6 +13688,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mana",
             sortOrder = 60,
             requiredSkill = 295,
+            sourceKind = "vendor",
+            sourceZones = { 36 },
+            sourceNames = { "Magnus Frostwake" },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -12386,6 +13707,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "basic",
             sortOrder = 20,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Almaador" },
             bopOutput = true,
             reagents = {
                 { itemId = 9149, count = 1 },
@@ -12403,6 +13727,8 @@ RecipeRegistryRecipeMetadata = {
             category = "flasks",
             sortOrder = 10,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -12419,6 +13745,9 @@ RecipeRegistryRecipeMetadata = {
             category = "flasks",
             sortOrder = 20,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Almaador" },
             bopOutput = false,
             reagents = {
                 { itemId = 8846, count = 7 },
@@ -12435,6 +13764,9 @@ RecipeRegistryRecipeMetadata = {
             category = "flasks",
             sortOrder = 30,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -12451,6 +13783,9 @@ RecipeRegistryRecipeMetadata = {
             category = "flasks",
             sortOrder = 40,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Alurmi" },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -12467,6 +13802,9 @@ RecipeRegistryRecipeMetadata = {
             category = "flasks",
             sortOrder = 50,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Nakodu" },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -12483,6 +13821,9 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Gikkix" },
             bopOutput = false,
             reagents = {
                 { itemId = 4603, count = 1 },
@@ -12496,6 +13837,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Kelsey Yance" },
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 1 },
@@ -12510,6 +13854,9 @@ RecipeRegistryRecipeMetadata = {
             category = "agility",
             sortOrder = 240,
             requiredSkill = 240,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Gikkix" },
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 1 },
@@ -12524,6 +13871,9 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Kelsey Yance" },
             bopOutput = false,
             reagents = {
                 { itemId = 13758, count = 1 },
@@ -12537,6 +13887,9 @@ RecipeRegistryRecipeMetadata = {
             category = "spirit",
             sortOrder = 240,
             requiredSkill = 240,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Kelsey Yance" },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 2 },
@@ -12551,6 +13904,9 @@ RecipeRegistryRecipeMetadata = {
             category = "mp5",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Gikkix" },
             bopOutput = false,
             reagents = {
                 { itemId = 159, count = 1 },
@@ -12565,6 +13921,9 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Gikkix" },
             bopOutput = false,
             reagents = {
                 { itemId = 13760, count = 1 },
@@ -12578,6 +13937,9 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 30 },
+            sourceNames = { "Vivianna", "Sheendra Tallgrass" },
             bopOutput = false,
             reagents = {
                 { itemId = 159, count = 1 },
@@ -12592,6 +13954,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 30 },
+            sourceNames = { "Vivianna", "Sheendra Tallgrass" },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -12607,6 +13972,9 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 30 },
+            sourceNames = { "Vivianna", "Sheendra Tallgrass" },
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 1 },
@@ -12619,6 +13987,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 14048,
             category = "cloth",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14047, count = 5 },
@@ -12631,6 +14000,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "waist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 3 },
@@ -12646,6 +14016,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 255,
             requiredSkill = 255,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7079, count = 2 },
@@ -12662,6 +14033,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 255,
             requiredSkill = 255,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 7079, count = 2 },
@@ -12677,6 +14050,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 260,
             requiredSkill = 260,
+            sourceKind = "vendor",
+            sourceZones = { 42 },
+            sourceNames = { "Qia" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 2 },
@@ -12693,6 +14069,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 260,
             requiredSkill = 260,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Darnall" },
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 5 },
@@ -12709,6 +14088,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 260,
             requiredSkill = 260,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 5 },
@@ -12725,6 +14105,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 260,
             requiredSkill = 260,
+            sourceKind = "drop",
+            sourceZones = { 48 },
+            sourceNames = { "Twilight Fire Guard" },
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 2 },
@@ -12741,6 +14124,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 265,
             requiredSkill = 265,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Darnall" },
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 4 },
@@ -12757,6 +14143,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 265,
             requiredSkill = 265,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 9210, count = 2 },
@@ -12774,6 +14161,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 265,
             requiredSkill = 265,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 1 },
@@ -12790,6 +14178,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 270,
             requiredSkill = 270,
+            sourceKind = "drop",
+            sourceZones = { 48 },
+            sourceNames = { "Twilight Fire Guard" },
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 2 },
@@ -12806,6 +14197,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 270,
             requiredSkill = 270,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 9210, count = 2 },
@@ -12823,6 +14215,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 270,
             requiredSkill = 270,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3577, count = 2 },
@@ -12839,6 +14232,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 270,
             requiredSkill = 270,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3577, count = 2 },
@@ -12855,6 +14249,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 9210, count = 4 },
@@ -12872,6 +14267,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -12888,6 +14284,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "drop",
+            sourceZones = { 38 },
+            sourceNames = { "Thaurissan Firewalker" },
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 1 },
@@ -12904,6 +14303,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Lorelae Wintersong" },
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 5 },
@@ -12920,6 +14322,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3577, count = 2 },
@@ -12936,6 +14339,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 11176, count = 1 },
@@ -12952,6 +14356,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 7068, count = 4 },
@@ -12970,6 +14375,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 280,
             requiredSkill = 280,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -12987,6 +14393,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 280,
             requiredSkill = 280,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 1 },
@@ -13003,6 +14410,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 280,
             requiredSkill = 280,
+            sourceKind = "drop",
+            sourceZones = { 38 },
+            sourceNames = { "Thaurissan Firewalker" },
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 1 },
@@ -13019,6 +14429,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "drop",
+            sourceZones = { 42 },
+            sourceNames = { "Cobalt Mageweaver" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 4 },
@@ -13037,6 +14450,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -13054,6 +14468,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 6 },
@@ -13070,6 +14485,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3577, count = 4 },
@@ -13087,6 +14504,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 6 },
@@ -13103,6 +14522,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 9210, count = 4 },
@@ -13119,6 +14539,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 5 },
@@ -13135,6 +14556,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 295,
             requiredSkill = 295,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 4 },
@@ -13150,6 +14572,8 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 4 },
@@ -13166,6 +14590,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 11176, count = 2 },
@@ -13182,6 +14607,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 6 },
@@ -13198,6 +14625,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 5 },
@@ -13214,6 +14643,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -13231,6 +14661,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 1 },
@@ -13248,6 +14679,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12662, count = 2 },
@@ -13265,6 +14697,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 12800, count = 1 },
@@ -13283,6 +14717,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -13301,6 +14736,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 9210, count = 10 },
@@ -13320,6 +14757,8 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 8 },
@@ -13338,6 +14777,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
             bopOutput = true,
             reagents = {
                 { itemId = 9210, count = 10 },
@@ -13357,6 +14797,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 44 },
+            sourceNames = { "Firebrand Pyromancer" },
             bopOutput = true,
             reagents = {
                 { itemId = 7076, count = 10 },
@@ -13376,6 +14819,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
             bopOutput = true,
             reagents = {
                 { itemId = 7078, count = 12 },
@@ -13394,6 +14838,9 @@ RecipeRegistryRecipeMetadata = {
             category = "cloth",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 42 },
+            sourceNames = { "Qia" },
             bopOutput = false,
             reagents = {
                 { itemId = 14256, count = 2 },
@@ -13405,6 +14852,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 15407,
             category = "materials",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8171, count = 1 },
@@ -13420,6 +14868,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 255,
             requiredSkill = 255,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Zannok Hidepiercer" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -13436,6 +14887,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 260,
             requiredSkill = 260,
+            sourceKind = "vendor",
+            sourceZones = { 36, 32 },
+            sourceNames = { "Leonard Porter", "Werg Thickblade" },
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 1 },
@@ -13452,6 +14906,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 260,
             requiredSkill = 260,
+            sourceKind = "vendor",
+            sourceZones = { 35 },
+            sourceNames = { "Masat T'andr" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 20 },
@@ -13468,6 +14925,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 265,
             requiredSkill = 265,
+            sourceKind = "drop",
+            sourceZones = { 37 },
+            sourceNames = { "Portal Seeker", "Shadowsworn Thug" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 6 },
@@ -13484,6 +14944,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 265,
             requiredSkill = 265,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 1 },
@@ -13500,6 +14961,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 265,
             requiredSkill = 265,
+            sourceKind = "vendor",
+            sourceZones = { 39 },
+            sourceNames = { "Blimo Gadgetspring" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 6 },
@@ -13516,6 +14980,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 40 },
@@ -13532,6 +14997,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 270,
             requiredSkill = 270,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 10 },
@@ -13546,6 +15012,7 @@ RecipeRegistryRecipeMetadata = {
             category = "kits",
             subcategory = "armor",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 5 },
@@ -13560,6 +15027,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 270,
             requiredSkill = 270,
+            sourceKind = "drop",
+            sourceZones = { 38 },
+            sourceNames = { "Firegut Brute" },
             bopOutput = false,
             reagents = {
                 { itemId = 7075, count = 1 },
@@ -13577,6 +15047,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 270,
             requiredSkill = 270,
+            sourceKind = "drop",
+            sourceZones = { 50 },
+            sourceNames = { "Murk Worm" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 20 },
@@ -13593,6 +15066,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 270,
             requiredSkill = 270,
+            sourceKind = "vendor",
+            sourceZones = { 30 },
+            sourceNames = { "Pratt McGrubben", "Jangdor Swiftstrider" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 12 },
@@ -13609,6 +15085,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 270,
             requiredSkill = 270,
+            sourceKind = "vendor",
+            sourceZones = { 34 },
+            sourceNames = { "Gigget Zipcoil" },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 2 },
@@ -13626,6 +15105,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -13642,6 +15123,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "drop",
+            sourceZones = { 38 },
+            sourceNames = { "Blackrock Soldier" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 6 },
@@ -13658,6 +15142,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7971, count = 1 },
@@ -13675,6 +15160,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 42 },
+            sourceNames = { "Qia" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -13691,6 +15179,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 36, 32 },
+            sourceNames = { "Leonard Porter", "Werg Thickblade" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 2 },
@@ -13708,6 +15199,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 41 },
+            sourceNames = { "Meilosh" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 28 },
@@ -13724,6 +15218,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 280,
             requiredSkill = 280,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 6 },
@@ -13740,6 +15236,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 280,
             requiredSkill = 280,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 1 },
@@ -13756,6 +15253,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 280,
             requiredSkill = 280,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 12 },
@@ -13772,6 +15270,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 280,
             requiredSkill = 280,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 8 },
@@ -13788,6 +15288,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "drop",
+            sourceZones = { 42 },
+            sourceNames = { "Winterfall Den Watcher" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 6 },
@@ -13804,6 +15307,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "drop",
+            sourceZones = { 38 },
+            sourceNames = { "Blackrock Slayer" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 8 },
@@ -13820,6 +15326,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "drop",
+            sourceZones = { 44 },
+            sourceNames = { "Firebrand Grunt" },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 1 },
@@ -13837,6 +15346,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "vendor",
+            sourceZones = { 39 },
+            sourceNames = { "Blimo Gadgetspring" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 28 },
@@ -13854,6 +15366,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "drop",
+            sourceZones = { 41 },
+            sourceNames = { "Deadwood Shaman" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 16 },
@@ -13871,6 +15386,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "drop",
+            sourceZones = { 39 },
+            sourceNames = { "Arkkoran Oracle" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 3 },
@@ -13889,6 +15407,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "vendor",
+            sourceZones = { 41 },
+            sourceNames = { "Meilosh" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 24 },
@@ -13905,6 +15426,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 10 },
@@ -13921,6 +15444,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 14 },
@@ -13937,6 +15461,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 3 },
@@ -13954,6 +15479,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "vendor",
+            sourceZones = { 51 },
+            sourceNames = { "Nergal" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 30 },
@@ -13970,6 +15498,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "vendor",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 40 },
@@ -13987,6 +15516,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "drop",
+            sourceZones = { 34 },
+            sourceNames = { "Vilebranch Hideskinner" },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 1 },
@@ -14005,6 +15537,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 295,
             requiredSkill = 295,
+            sourceKind = "drop",
+            sourceZones = { 41 },
+            sourceNames = { "Winterfall Totemic" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 6 },
@@ -14021,6 +15556,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 295,
             requiredSkill = 295,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Zannok Hidepiercer" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 8 },
@@ -14038,6 +15576,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 295,
             requiredSkill = 295,
+            sourceKind = "drop",
+            sourceZones = { 39 },
+            sourceNames = { "Cliff Breaker" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 28 },
@@ -14056,6 +15597,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 295,
             requiredSkill = 295,
+            sourceKind = "drop",
+            sourceZones = { 39 },
+            sourceNames = { "Son of Arkkoroc" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 3 },
@@ -14074,6 +15618,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 18 },
@@ -14091,6 +15636,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 2 },
@@ -14106,6 +15652,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cloaks",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 14044, count = 1 },
@@ -14122,6 +15669,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 40 },
+            sourceNames = { "Anvilrage Marshal" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 44 },
@@ -14140,6 +15690,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 36 },
+            sourceNames = { "Decaying Horror" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 16 },
@@ -14158,6 +15711,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 51 },
+            sourceNames = { "Glutinous Ooze", "Muculent Ooze", "Cloned Ooze" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 30 },
@@ -14175,6 +15731,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 4 },
@@ -14193,6 +15750,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 38 },
+            sourceNames = { "Blackrock Battlemaster" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 14 },
@@ -14210,6 +15770,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 44 },
+            sourceNames = { "Firebrand Legionnaire" },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 1 },
@@ -14227,6 +15790,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 22 },
@@ -14245,6 +15809,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 16 },
@@ -14263,6 +15828,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 42 },
+            sourceNames = { "Winterfall Ursa" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 12 },
@@ -14297,6 +15865,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 40 },
+            sourceNames = { "Anvilrage Captain" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 40 },
@@ -14313,6 +15884,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 7971, count = 2 },
@@ -14328,6 +15900,7 @@ RecipeRegistryRecipeMetadata = {
             category = "devices",
             subcategory = "consumables",
             sortOrder = 120,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 10558, count = 1 },
@@ -14343,6 +15916,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 2,
             category = "keys",
             sortOrder = 10,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2842, count = 1 },
@@ -14356,6 +15930,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 2,
             category = "keys",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 1 },
@@ -14369,6 +15944,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 2,
             category = "keys",
             sortOrder = 30,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 1 },
@@ -14382,6 +15958,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 2,
             category = "keys",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12360, count = 1 },
@@ -14395,6 +15972,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "powders",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12365, count = 2 },
@@ -14410,6 +15988,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "grenades",
             sortOrder = 30,
             requiredSkill = 260,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 3 },
@@ -14426,6 +16005,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 150,
             requiredSkill = 260,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 3 },
@@ -14441,6 +16021,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "firearms",
             sortOrder = 80,
             requiredSkill = 260,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 10546, count = 1 },
@@ -14458,6 +16039,8 @@ RecipeRegistryRecipeMetadata = {
             category = "pets",
             sortOrder = 50,
             requiredSkill = 265,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 1 },
@@ -14475,6 +16058,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 170,
             requiredSkill = 270,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 4 },
@@ -14491,6 +16075,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 160,
             requiredSkill = 275,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 6 },
@@ -14505,6 +16090,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "firearms",
             sortOrder = 90,
             requiredSkill = 275,
+            sourceKind = "drop",
+            sourceZones = { 40 },
+            sourceNames = { "Doomforge Craftsman" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -14525,6 +16113,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bombs",
             sortOrder = 100,
             requiredSkill = 285,
+            sourceKind = "drop",
+            sourceZones = { 40 },
+            sourceNames = { "Weapon Technician" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 1 },
@@ -14542,6 +16133,7 @@ RecipeRegistryRecipeMetadata = {
             category = "ammo",
             sortOrder = 70,
             requiredSkill = 285,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 2 },
@@ -14557,6 +16149,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "tools",
             sortOrder = 30,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 42 },
+            sourceNames = { "Xizzer Fizzbolt" },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 1 },
@@ -14575,6 +16170,9 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 170,
             requiredSkill = 285,
+            sourceKind = "vendor",
+            sourceZones = { 42 },
+            sourceNames = { "Xizzer Fizzbolt" },
             bopOutput = false,
             reagents = {
                 { itemId = 12360, count = 1 },
@@ -14589,6 +16187,9 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 180,
             requiredSkill = 290,
+            sourceKind = "drop",
+            sourceZones = { 52 },
+            sourceNames = { "Crimson Inquisitor" },
             bopOutput = false,
             reagents = {
                 { itemId = 10558, count = 1 },
@@ -14606,6 +16207,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 180,
             requiredSkill = 290,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 10500, count = 1 },
@@ -14622,6 +16224,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinkets",
             sortOrder = 100,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 42 },
+            sourceNames = { "Cobalt Mageweaver" },
             bopOutput = false,
             reagents = {
                 { itemId = 10558, count = 4 },
@@ -14642,6 +16247,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bombs",
             sortOrder = 110,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 3 },
@@ -14658,6 +16265,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "firearms",
             sortOrder = 100,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 43 },
+            sourceNames = { "Mossflayer Shadowhunter" },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 2 },
@@ -14676,6 +16286,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 255,
             requiredSkill = 255,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 16202, count = 3 },
             },
@@ -14688,6 +16299,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 270,
             requiredSkill = 270,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 11176, count = 10 },
                 { itemId = 16202, count = 3 },
@@ -14701,6 +16314,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 295,
             requiredSkill = 295,
+            sourceKind = "drop",
+            sourceZones = { 53 },
+            sourceNames = { "Deadwind Warlock" },
             reagents = {
                 { itemId = 16203, count = 6 },
                 { itemId = 16204, count = 6 },
@@ -14714,6 +16330,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 16204, count = 15 },
             },
@@ -14726,6 +16344,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 270,
             requiredSkill = 270,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 16202, count = 3 },
                 { itemId = 16204, count = 3 },
@@ -14739,6 +16358,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 295,
             requiredSkill = 295,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 16203, count = 4 },
                 { itemId = 16204, count = 4 },
@@ -14752,6 +16372,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 265,
             requiredSkill = 265,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 7075, count = 1 },
                 { itemId = 7077, count = 1 },
@@ -14769,6 +16390,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Lorelae Wintersong" },
             reagents = {
                 { itemId = 16204, count = 8 },
             },
@@ -14781,6 +16405,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield",
             sortOrder = 280,
             requiredSkill = 280,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 16203, count = 2 },
                 { itemId = 16204, count = 4 },
@@ -14794,6 +16419,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield",
             sortOrder = 265,
             requiredSkill = 265,
+            sourceKind = "vendor",
+            sourceZones = { 23, 33 },
+            sourceNames = { "Mythrin'dir", "Daniel Bartlett" },
             reagents = {
                 { itemId = 11176, count = 10 },
             },
@@ -14806,6 +16434,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "boots",
             sortOrder = 260,
             requiredSkill = 260,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 11176, count = 10 },
             },
@@ -14818,6 +16448,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "boots",
             sortOrder = 295,
             requiredSkill = 295,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 16203, count = 8 },
             },
@@ -14830,6 +16461,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "boots",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 16202, count = 1 },
                 { itemId = 16203, count = 2 },
@@ -14843,6 +16476,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 14344, count = 4 },
                 { itemId = 16203, count = 10 },
@@ -14857,6 +16492,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 42 },
+            sourceNames = { "Qia" },
             reagents = {
                 { itemId = 14343, count = 1 },
                 { itemId = 16204, count = 6 },
@@ -14870,6 +16508,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 14343, count = 1 },
                 { itemId = 16203, count = 3 },
@@ -14883,6 +16522,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "drop",
+            sourceZones = { 42 },
+            sourceNames = { "Anguished Highborne" },
             reagents = {
                 { itemId = 7080, count = 1 },
                 { itemId = 7082, count = 1 },
@@ -14898,6 +16540,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "2h_weapon",
             sortOrder = 295,
             requiredSkill = 295,
+            sourceKind = "drop",
+            sourceZones = { 44 },
+            sourceNames = { "Blackhand Elite" },
             reagents = {
                 { itemId = 14344, count = 4 },
                 { itemId = 16204, count = 10 },
@@ -14911,6 +16556,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 44 },
+            sourceNames = { "Spirestone Warlord" },
             reagents = {
                 { itemId = 14344, count = 2 },
                 { itemId = 16203, count = 10 },
@@ -14924,6 +16572,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 54 },
+            sourceNames = { "Spectral Researcher" },
             reagents = {
                 { itemId = 12803, count = 6 },
                 { itemId = 12808, count = 6 },
@@ -14938,6 +16589,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 295,
             requiredSkill = 295,
+            sourceKind = "drop",
+            sourceZones = { 52, 55 },
+            sourceNames = { "Thuzadin Shadowcaster", "Bonechewer Backbreaker" },
             reagents = {
                 { itemId = 12808, count = 4 },
                 { itemId = 14344, count = 4 },
@@ -14951,6 +16605,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 36, 43 },
+            sourceNames = { "Scarlet Spellbinder", "Scarlet Archmage" },
             reagents = {
                 { itemId = 12811, count = 2 },
                 { itemId = 14344, count = 4 },
@@ -14964,6 +16621,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "2h_weapon",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 54 },
+            sourceNames = { "Scholomance Adept" },
             reagents = {
                 { itemId = 14344, count = 2 },
                 { itemId = 16203, count = 12 },
@@ -14977,6 +16637,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "2h_weapon",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 52 },
+            sourceNames = { "Crimson Sorcerer" },
             reagents = {
                 { itemId = 14344, count = 2 },
                 { itemId = 16203, count = 12 },
@@ -14990,6 +16653,9 @@ RecipeRegistryRecipeMetadata = {
             category = "rods",
             sortOrder = 50,
             requiredSkill = 290,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Lorelae Wintersong" },
             bopOutput = true,
             reagents = {
                 { itemId = 11145, count = 1 },
@@ -15006,6 +16672,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 16206,
             category = "rods",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12360, count = 3 },
@@ -15021,6 +16688,9 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Jabbey" },
             bopOutput = false,
             reagents = {
                 { itemId = 1179, count = 1 },
@@ -15034,6 +16704,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 2319,
             category = "materials",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 4 },
@@ -15045,6 +16716,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4234,
             category = "materials",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 5 },
@@ -15056,6 +16728,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 4304,
             category = "materials",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 6 },
@@ -15070,6 +16743,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 12810, count = 6 },
@@ -15088,6 +16764,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 4 },
@@ -15106,6 +16785,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 295,
             requiredSkill = 295,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -15123,6 +16805,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -15140,6 +16825,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 12810, count = 6 },
@@ -15158,6 +16846,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 295,
             requiredSkill = 295,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 6 },
@@ -15174,6 +16865,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 16 },
@@ -15190,6 +16884,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 295,
             requiredSkill = 295,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 4 },
@@ -15206,6 +16903,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 16 },
@@ -15222,6 +16922,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 16 },
@@ -15239,6 +16942,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 18 },
@@ -15255,6 +16961,9 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "vendor",
+            sourceZones = { 19, 2, 22, 4 },
+            sourceNames = { "Heldan Galesong", "Kelsey Yance", "Shankys" },
             bopOutput = false,
             reagents = {
                 { itemId = 8365, count = 1 },
@@ -15268,6 +16977,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 1,
             requiredSkill = 1,
+            sourceKind = "vendor",
+            sourceZones = { 45, 56, 1, 26 },
+            sourceNames = { "Eebee Jinglepocket", "Wolgren Jinglepocket", "Khole Jinglepocket" },
             bopOutput = false,
             reagents = {
                 { itemId = 6889, count = 1 },
@@ -15282,6 +16994,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 35,
             requiredSkill = 35,
+            sourceKind = "vendor",
+            sourceZones = { 45, 56, 1, 26 },
+            sourceNames = { "Eebee Jinglepocket", "Wolgren Jinglepocket", "Khole Jinglepocket" },
             bopOutput = false,
             reagents = {
                 { itemId = 1179, count = 1 },
@@ -15299,6 +17014,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 25 },
@@ -15316,6 +17032,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 17222,
             category = "stamina",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12205, count = 2 },
@@ -15424,6 +17141,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 8170,
             category = "materials",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 6 },
@@ -15437,6 +17155,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "vendor",
+            sourceZones = { 34, 12 },
+            sourceNames = { "Truk Wildbeard", "Dirge Quikcleave", "Innkeeper Fizzgrimble" },
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 1 },
@@ -15467,6 +17188,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 200,
             requiredSkill = 200,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rikqiz" },
             bopOutput = false,
             reagents = {
                 { itemId = 1210, count = 4 },
@@ -15583,6 +17307,7 @@ RecipeRegistryRecipeMetadata = {
             category = "intellect",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 1 },
@@ -15650,6 +17375,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "utility",
             sortOrder = 25,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7972, count = 1 },
@@ -15663,6 +17389,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 18258,
             category = "misc",
             sortOrder = 1,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -15677,6 +17404,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 18258,
             category = "misc",
             sortOrder = 1,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -15783,6 +17511,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 57 },
+            sourceNames = { "Shen'dralar Provisioner" },
             bopOutput = false,
             reagents = {
                 { itemId = 13926, count = 2 },
@@ -15904,6 +17635,9 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 17771,
             category = "metals",
             sortOrder = 120,
+            sourceKind = "drop",
+            sourceZones = { 58 },
+            sourceNames = { "Master Elemental Shaper Krixix" },
             bopOutput = false,
             reagents = {
                 { itemId = 12360, count = 10 },
@@ -15922,6 +17656,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "fireworks",
             sortOrder = 10,
             requiredSkill = 150,
+            faction = "horde",
+            sourceKind = "vendor",
+            sourceZones = { 22 },
+            sourceNames = { "Sovik" },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 1 },
@@ -15938,6 +17676,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "fireworks",
             sortOrder = 20,
             requiredSkill = 150,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 24 },
+            sourceNames = { "Gearcutter Cogspinner" },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 1 },
@@ -15954,6 +17696,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "fireworks",
             sortOrder = 30,
             requiredSkill = 150,
+            sourceKind = "vendor",
+            sourceZones = { 2, 6 },
+            sourceNames = { "Crazk Sparks", "Gagsprocket" },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 1 },
@@ -15969,6 +17714,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dynamite",
             sortOrder = 70,
             requiredSkill = 200,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Blizrik Buckshot" },
             bopOutput = false,
             reagents = {
                 { itemId = 4338, count = 2 },
@@ -15983,6 +17731,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "dynamite",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14047, count = 3 },
@@ -15997,6 +17746,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 190,
             requiredSkill = 260,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 2 },
@@ -16013,6 +17763,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "reflectors",
             sortOrder = 30,
             requiredSkill = 260,
+            sourceKind = "vendor",
+            sourceZones = { 42 },
+            sourceNames = { "Xizzer Fizzbolt" },
             bopOutput = false,
             reagents = {
                 { itemId = 3829, count = 2 },
@@ -16033,6 +17786,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 190,
             requiredSkill = 265,
             specialization = 20222,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 7191, count = 2 },
@@ -16067,6 +17821,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "charges",
             sortOrder = 30,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 42 },
+            sourceNames = { "Xizzer Fizzbolt" },
             bopOutput = false,
             reagents = {
                 { itemId = 159, count = 1 },
@@ -16084,6 +17841,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "reflectors",
             sortOrder = 40,
             requiredSkill = 290,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 6 },
@@ -16102,6 +17860,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "reflectors",
             sortOrder = 50,
             requiredSkill = 300,
+            sourceKind = "drop",
+            sourceZones = { 52 },
+            sourceNames = { "Crimson Inquisitor" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 8 },
@@ -16122,6 +17883,9 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 200,
             requiredSkill = 265,
             specialization = 20219,
+            sourceKind = "drop",
+            sourceZones = { 40 },
+            sourceNames = { "Weapon Technician" },
             bopOutput = false,
             reagents = {
                 { itemId = 7191, count = 1 },
@@ -16141,6 +17905,9 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 210,
             requiredSkill = 260,
             specialization = 20219,
+            sourceKind = "drop",
+            sourceZones = { 40 },
+            sourceNames = { "Weapon Technician" },
             bopOutput = false,
             reagents = {
                 { itemId = 3864, count = 1 },
@@ -16158,6 +17925,9 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 150,
             requiredSkill = 150,
+            sourceKind = "vendor",
+            sourceZones = { 24, 22 },
+            sourceNames = { "Bombus Finespindle", "Tamar" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -16173,6 +17943,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 155,
             requiredSkill = 155,
+            sourceKind = "vendor",
+            sourceZones = { 23, 33 },
+            sourceNames = { "Saenorion", "Joseph Moore" },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 8 },
@@ -16190,6 +17963,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "transporters",
             sortOrder = 10,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 10 },
@@ -16207,6 +17981,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "transporters",
             sortOrder = 20,
             specialization = 20219,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -16227,6 +18002,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "fireworks",
             sortOrder = 40,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 30 },
+            sourceNames = { "Zorbin Fandazzle" },
             bopOutput = false,
             reagents = {
                 { itemId = 8150, count = 1 },
@@ -16243,6 +18021,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "vendor",
+            sourceZones = { 41 },
+            sourceNames = { "Meilosh" },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 3 },
@@ -16259,6 +18040,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 41 },
+            sourceNames = { "Meilosh" },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 6 },
@@ -16275,6 +18059,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "vendor",
+            sourceZones = { 32, 43, 36 },
+            sourceNames = { "Argent Quartermaster Hasana", "Quartermaster Miranda Breechlock", "Argent Quartermaster Lightspark" },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 6 },
@@ -16291,6 +18078,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 32, 43, 36 },
+            sourceNames = { "Argent Quartermaster Hasana", "Quartermaster Miranda Breechlock", "Argent Quartermaster Lightspark" },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 10 },
@@ -16307,6 +18097,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 4 },
@@ -16323,6 +18116,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 4 },
@@ -16341,6 +18137,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dagger",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 4 },
@@ -16359,6 +18158,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "polearm",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 6 },
@@ -16376,6 +18178,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 8 },
@@ -16394,6 +18199,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 6 },
@@ -16412,6 +18220,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 12 },
@@ -16430,6 +18241,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "vendor",
+            sourceZones = { 41 },
+            sourceNames = { "Meilosh" },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 3 },
@@ -16447,6 +18261,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 41 },
+            sourceNames = { "Meilosh" },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 5 },
@@ -16464,6 +18281,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "vendor",
+            sourceZones = { 32, 43, 36 },
+            sourceNames = { "Argent Quartermaster Hasana", "Quartermaster Miranda Breechlock", "Argent Quartermaster Lightspark" },
             bopOutput = false,
             reagents = {
                 { itemId = 12809, count = 2 },
@@ -16482,6 +18302,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 32, 43, 36 },
+            sourceNames = { "Argent Quartermaster Hasana", "Quartermaster Miranda Breechlock", "Argent Quartermaster Lightspark" },
             bopOutput = false,
             reagents = {
                 { itemId = 12809, count = 2 },
@@ -16498,6 +18321,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 6 },
@@ -16516,6 +18342,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 10 },
@@ -16534,6 +18363,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "vendor",
+            sourceZones = { 41 },
+            sourceNames = { "Meilosh" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 30 },
@@ -16552,6 +18384,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 41 },
+            sourceNames = { "Meilosh" },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 6 },
@@ -16570,6 +18405,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "vendor",
+            sourceZones = { 32, 43, 36 },
+            sourceNames = { "Argent Quartermaster Hasana", "Quartermaster Miranda Breechlock", "Argent Quartermaster Lightspark" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 4 },
@@ -16588,6 +18426,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 32, 43, 36 },
+            sourceNames = { "Argent Quartermaster Hasana", "Quartermaster Miranda Breechlock", "Argent Quartermaster Lightspark" },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 4 },
@@ -16606,6 +18447,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 14227, count = 4 },
@@ -16622,6 +18466,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 12607, count = 4 },
@@ -16641,6 +18488,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 12810, count = 10 },
@@ -16659,6 +18509,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 6 },
@@ -16676,6 +18529,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             reagents = {
                 { itemId = 7076, count = 2 },
                 { itemId = 14344, count = 6 },
@@ -16691,6 +18547,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 290,
             requiredSkill = 290,
+            faction = "horde",
+            sourceKind = "vendor",
+            sourceZones = { 41 },
+            sourceNames = { "Meilosh" },
             reagents = {
                 { itemId = 7082, count = 2 },
                 { itemId = 14344, count = 6 },
@@ -16706,6 +18566,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "vendor",
+            sourceZones = { 32, 43, 36 },
+            sourceNames = { "Argent Quartermaster Hasana", "Quartermaster Miranda Breechlock", "Argent Quartermaster Lightspark" },
             reagents = {
                 { itemId = 7080, count = 2 },
                 { itemId = 16203, count = 4 },
@@ -16720,6 +18583,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 32, 43, 36 },
+            sourceNames = { "Argent Quartermaster Hasana", "Quartermaster Miranda Breechlock", "Argent Quartermaster Lightspark" },
             reagents = {
                 { itemId = 12803, count = 6 },
                 { itemId = 14344, count = 2 },
@@ -16735,6 +18601,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             reagents = {
                 { itemId = 14344, count = 10 },
                 { itemId = 16203, count = 8 },
@@ -16749,6 +18618,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             reagents = {
                 { itemId = 14344, count = 15 },
                 { itemId = 16203, count = 12 },
@@ -16764,6 +18636,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 12804, count = 4 },
@@ -16782,6 +18657,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 12804, count = 4 },
@@ -16800,6 +18678,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 12810, count = 4 },
@@ -16818,6 +18699,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 4 },
@@ -16835,6 +18719,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 4 },
@@ -16852,6 +18739,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 4 },
@@ -16869,6 +18759,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -16886,6 +18779,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -16903,6 +18799,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 2 },
@@ -16920,6 +18819,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 1 },
@@ -16937,6 +18839,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 12 },
@@ -16954,6 +18859,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 20 },
@@ -16970,6 +18878,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 18 },
@@ -16986,6 +18897,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 16 },
@@ -17018,6 +18932,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 190,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 12804, count = 8 },
@@ -17036,6 +18953,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "leather",
             sortOrder = 200,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 12804, count = 8 },
@@ -17054,6 +18974,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 170,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -17070,6 +18993,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 70,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -17086,6 +19012,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "combat",
             sortOrder = 50,
             requiredSkill = 285,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -17103,6 +19032,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rejuvenation",
             sortOrder = 60,
             requiredSkill = 290,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 8846, count = 1 },
@@ -17119,6 +19051,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 6 },
@@ -17135,6 +19070,10 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 150,
             requiredSkill = 150,
+            faction = "horde",
+            sourceKind = "vendor",
+            sourceZones = { 15 },
+            sourceNames = { "Ogg'marr" },
             bopOutput = false,
             reagents = {
                 { itemId = 3667, count = 2 },
@@ -17149,6 +19088,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             specialization = 10656,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 28 },
@@ -17165,6 +19105,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             specialization = 10656,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 20 },
@@ -17182,6 +19123,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Aendel Windspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 4 },
@@ -17197,6 +19141,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 20452,
             category = "strength",
             sortOrder = 1,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 1 },
@@ -17212,6 +19157,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Aendel Windspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 2 },
@@ -17228,6 +19176,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Aendel Windspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 2 },
@@ -17245,6 +19196,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Aendel Windspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 2 },
@@ -17262,6 +19216,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Aendel Windspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 18512, count = 2 },
@@ -17278,6 +19235,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Aendel Windspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 15407, count = 1 },
@@ -17295,6 +19255,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Aendel Windspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 15407, count = 2 },
@@ -17312,6 +19275,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 6 },
@@ -17329,6 +19293,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 12810, count = 2 },
@@ -17347,6 +19312,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 12810, count = 2 },
@@ -17365,6 +19331,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 6 },
@@ -17382,6 +19349,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 8 },
@@ -17399,6 +19367,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 10 },
@@ -17415,6 +19384,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 100,
             requiredSkill = 100,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 27 },
+            sourceNames = { "Amy Davenport" },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 8 },
@@ -17431,6 +19404,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Almaador" },
             reagents = {
                 { itemId = 21886, count = 8 },
                 { itemId = 22446, count = 2 },
@@ -17501,6 +19477,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Alurmi" },
             reagents = {
                 { itemId = 22446, count = 3 },
                 { itemId = 22448, count = 3 },
@@ -17515,6 +19494,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Kania" },
             reagents = {
                 { itemId = 7078, count = 4 },
                 { itemId = 22446, count = 3 },
@@ -17529,6 +19511,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Kania" },
             reagents = {
                 { itemId = 12803, count = 4 },
                 { itemId = 22446, count = 3 },
@@ -17543,6 +19528,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             reagents = {
                 { itemId = 22446, count = 3 },
                 { itemId = 22448, count = 3 },
@@ -17557,6 +19545,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 59 },
+            sourceNames = { "Logistics Officer Ulrike", "Quartermaster Urgronn" },
             reagents = {
                 { itemId = 22446, count = 2 },
                 { itemId = 22448, count = 4 },
@@ -17571,6 +19562,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Nakodu" },
             reagents = {
                 { itemId = 22446, count = 3 },
                 { itemId = 22448, count = 3 },
@@ -17586,6 +19580,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wizard",
             sortOrder = 10,
             requiredSkill = 45,
+            sourceKind = "vendor",
+            sourceZones = { 60, 49, 33, 61 },
+            sourceNames = { "Ildine Sorrowspear", "Kania", "Thaddeus Webb" },
             bopOutput = false,
             reagents = {
                 { itemId = 3371, count = 1 },
@@ -17602,6 +19599,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mana",
             sortOrder = 10,
             requiredSkill = 150,
+            sourceKind = "vendor",
+            sourceZones = { 60, 49, 33, 61 },
+            sourceNames = { "Ildine Sorrowspear", "Kania", "Thaddeus Webb" },
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -17618,6 +19618,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wizard",
             sortOrder = 20,
             requiredSkill = 200,
+            sourceKind = "vendor",
+            sourceZones = { 60, 49, 33, 61 },
+            sourceNames = { "Ildine Sorrowspear", "Kania", "Thaddeus Webb" },
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -17634,6 +19637,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mana",
             sortOrder = 20,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Kania" },
             bopOutput = false,
             reagents = {
                 { itemId = 8831, count = 2 },
@@ -17650,6 +19656,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wizard",
             sortOrder = 30,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Kania" },
             bopOutput = false,
             reagents = {
                 { itemId = 4625, count = 2 },
@@ -17666,6 +19675,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wizard",
             sortOrder = 40,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 4625, count = 3 },
@@ -17682,6 +19694,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mana",
             sortOrder = 30,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 2 },
+            sourceNames = { "Rin'wosho the Trader" },
             bopOutput = false,
             reagents = {
                 { itemId = 8831, count = 3 },
@@ -17699,6 +19714,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 5,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 40 },
+            sourceNames = { "Lokhtos Darkbargainer" },
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 1 },
@@ -17721,6 +19739,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 20817,
             category = "materials",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 2 },
@@ -17733,6 +19752,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2842, count = 1 },
@@ -17745,6 +19765,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 774, count = 2 },
@@ -17758,6 +19779,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 2 },
@@ -17772,6 +19794,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1210, count = 2 },
@@ -17786,6 +19809,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -17801,6 +19825,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2842, count = 2 },
@@ -17813,6 +19838,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1210, count = 2 },
@@ -17828,6 +19854,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 150,
             requiredSkill = 150,
+            sourceKind = "vendor",
+            sourceZones = { 56, 62, 22, 1 },
+            sourceNames = { "Arred", "Gelanthis", "Felika" },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 2 },
@@ -17842,6 +19871,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "crown",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1705, count = 3 },
@@ -17860,6 +19890,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 125,
             requiredSkill = 125,
+            sourceKind = "vendor",
+            sourceZones = { 6, 4 },
+            sourceNames = { "Ranik", "Dalria" },
             bopOutput = false,
             reagents = {
                 { itemId = 1705, count = 1 },
@@ -17876,6 +19909,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 110,
             requiredSkill = 110,
+            sourceKind = "vendor",
+            sourceZones = { 62, 33, 23, 56 },
+            sourceNames = { "Gelanthis", "Daniel Bartlett", "Mythrin'dir" },
             bopOutput = false,
             reagents = {
                 { itemId = 1705, count = 2 },
@@ -17889,6 +19925,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 4 },
@@ -17913,6 +19950,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "necklace",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 8 },
@@ -17929,6 +19967,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 120,
             requiredSkill = 120,
+            sourceKind = "vendor",
+            sourceZones = { 13, 8 },
+            sourceNames = { "Neal Allen", "Jandia" },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -17943,6 +19984,9 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 125,
             requiredSkill = 125,
+            sourceKind = "vendor",
+            sourceZones = { 14 },
+            sourceNames = { "Micha Yance", "Christoph Jeffcoat" },
             bopOutput = false,
             reagents = {
                 { itemId = 3391, count = 2 },
@@ -17956,6 +20000,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 1 },
@@ -17986,6 +20031,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 20963,
             category = "materials",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 2 },
@@ -18000,6 +20046,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 150,
             requiredSkill = 150,
+            sourceKind = "vendor",
+            sourceZones = { 14, 5 },
+            sourceNames = { "Micha Yance", "Kireena" },
             bopOutput = false,
             reagents = {
                 { itemId = 3864, count = 1 },
@@ -18015,6 +20064,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 160,
             requiredSkill = 160,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 1 },
@@ -18030,6 +20081,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 170,
             requiredSkill = 170,
+            sourceKind = "vendor",
+            sourceZones = { 56, 62, 33, 24 },
+            sourceNames = { "Arred", "Gelanthis", "Felicia Doan" },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 1 },
@@ -18043,6 +20097,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 1 },
@@ -18056,6 +20111,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 2 },
@@ -18072,6 +20128,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 190,
             requiredSkill = 190,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3577, count = 2 },
@@ -18089,6 +20147,7 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -18105,6 +20164,9 @@ RecipeRegistryRecipeMetadata = {
             category = "mp5",
             sortOrder = 80,
             requiredSkill = 80,
+            sourceKind = "vendor",
+            sourceZones = { 14, 56, 27, 63 },
+            sourceNames = { "Derak Nightfall", "Phea", "Gloria Femmel" },
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 1 },
@@ -18119,6 +20181,9 @@ RecipeRegistryRecipeMetadata = {
             category = "mp5",
             sortOrder = 175,
             requiredSkill = 175,
+            sourceKind = "vendor",
+            sourceZones = { 14, 56, 27, 63 },
+            sourceNames = { "Derak Nightfall", "Phea", "Gloria Femmel" },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -18131,6 +20196,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 21277,
             category = "pets",
             sortOrder = 60,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 7079, count = 2 },
@@ -18148,6 +20214,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 260,
             requiredSkill = 260,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Vizzklick" },
             bopOutput = false,
             reagents = {
                 { itemId = 7972, count = 2 },
@@ -18164,6 +20233,7 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 12810, count = 6 },
@@ -18198,6 +20268,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 120,
             requiredSkill = 250,
+            sourceKind = "drop",
+            sourceZones = { 48 },
+            sourceNames = { "Dark Iron Slaver", "Dark Iron Taskmaster", "Dark Iron Watchman" },
             bopOutput = false,
             reagents = {
                 { itemId = 4625, count = 3 },
@@ -18214,6 +20287,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 4 },
@@ -18232,6 +20306,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Fariel Starsong" },
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -18248,6 +20325,9 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Fariel Starsong" },
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -18266,6 +20346,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rockets",
             sortOrder = 10,
             requiredSkill = 125,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Fariel Starsong" },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 1 },
@@ -18282,6 +20365,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rockets",
             sortOrder = 20,
             requiredSkill = 125,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Fariel Starsong" },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 1 },
@@ -18298,6 +20384,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rockets",
             sortOrder = 30,
             requiredSkill = 125,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Fariel Starsong" },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 1 },
@@ -18314,6 +20403,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rockets",
             sortOrder = 40,
             requiredSkill = 175,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Fariel Starsong" },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 1 },
@@ -18330,6 +20422,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rockets",
             sortOrder = 50,
             requiredSkill = 175,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Fariel Starsong" },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 1 },
@@ -18346,6 +20441,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rockets",
             sortOrder = 60,
             requiredSkill = 175,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Fariel Starsong" },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 1 },
@@ -18362,6 +20460,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rockets",
             sortOrder = 70,
             requiredSkill = 225,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Fariel Starsong" },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 1 },
@@ -18378,6 +20479,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rockets",
             sortOrder = 80,
             requiredSkill = 225,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Fariel Starsong" },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 1 },
@@ -18394,6 +20498,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rockets",
             sortOrder = 90,
             requiredSkill = 225,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Fariel Starsong" },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 1 },
@@ -18410,6 +20517,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rockets",
             sortOrder = 100,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Fariel Starsong" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 1 },
@@ -18426,6 +20536,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rockets",
             sortOrder = 110,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Fariel Starsong" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 1 },
@@ -18442,6 +20555,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rockets",
             sortOrder = 120,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Fariel Starsong" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 1 },
@@ -18457,6 +20573,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "launchers",
             sortOrder = 10,
             requiredSkill = 225,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Fariel Starsong" },
             bopOutput = false,
             reagents = {
                 { itemId = 9060, count = 1 },
@@ -18474,6 +20593,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "launchers",
             sortOrder = 20,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 47 },
+            sourceNames = { "Fariel Starsong" },
             bopOutput = false,
             reagents = {
                 { itemId = 9060, count = 4 },
@@ -18488,6 +20610,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 21840,
             category = "cloth",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 21877, count = 6 },
@@ -18499,6 +20622,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 21841,
             category = "bags",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -18513,6 +20637,9 @@ RecipeRegistryRecipeMetadata = {
             category = "cloth",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "vendor",
+            sourceZones = { 45, 56, 62 },
+            sourceNames = { "Eiin", "Neii", "Deynna" },
             bopOutput = false,
             reagents = {
                 { itemId = 21840, count = 3 },
@@ -18527,6 +20654,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 340,
             requiredSkill = 340,
+            sourceKind = "vendor",
+            sourceZones = { 64, 45 },
+            sourceNames = { "Mathar G'ochar", "Eiin" },
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 4 },
@@ -18542,6 +20672,9 @@ RecipeRegistryRecipeMetadata = {
             category = "cloth",
             sortOrder = 345,
             requiredSkill = 345,
+            sourceKind = "vendor",
+            sourceZones = { 64, 62, 56 },
+            sourceNames = { "Mathar G'ochar", "Deynna", "Borto" },
             bopOutput = false,
             reagents = {
                 { itemId = 21840, count = 1 },
@@ -18556,6 +20689,9 @@ RecipeRegistryRecipeMetadata = {
             category = "cloth",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 45, 60 },
+            sourceNames = { "Nasmara Moonsong", "Ainderu Summerleaf" },
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 1 },
@@ -18573,6 +20709,9 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 355,
             requiredSkill = 355,
             specialization = 26797,
+            sourceKind = "vendor",
+            sourceZones = { 45, 60 },
+            sourceNames = { "Gidge Spellweaver", "Lalla Brightweave" },
             bopOutput = true,
             reagents = {
                 { itemId = 21881, count = 2 },
@@ -18590,6 +20729,9 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             specialization = 26797,
+            sourceKind = "vendor",
+            sourceZones = { 45, 60 },
+            sourceNames = { "Gidge Spellweaver", "Lalla Brightweave" },
             bopOutput = true,
             reagents = {
                 { itemId = 21881, count = 4 },
@@ -18607,6 +20749,9 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             specialization = 26797,
+            sourceKind = "vendor",
+            sourceZones = { 45, 60 },
+            sourceNames = { "Gidge Spellweaver", "Lalla Brightweave" },
             bopOutput = true,
             reagents = {
                 { itemId = 21881, count = 4 },
@@ -18622,6 +20767,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 45, 60 },
+            sourceNames = { "Gidge Spellweaver", "Lalla Brightweave" },
             bopOutput = false,
             reagents = {
                 { itemId = 21881, count = 4 },
@@ -18639,6 +20787,9 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 355,
             requiredSkill = 355,
             specialization = 26801,
+            sourceKind = "vendor",
+            sourceZones = { 45, 60 },
+            sourceNames = { "Andrion Darkspinner", "Linna Bruder" },
             bopOutput = true,
             reagents = {
                 { itemId = 21881, count = 2 },
@@ -18656,6 +20807,9 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             specialization = 26801,
+            sourceKind = "vendor",
+            sourceZones = { 45, 60 },
+            sourceNames = { "Andrion Darkspinner", "Linna Bruder" },
             bopOutput = true,
             reagents = {
                 { itemId = 21881, count = 2 },
@@ -18673,6 +20827,9 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             specialization = 26801,
+            sourceKind = "vendor",
+            sourceZones = { 45, 60 },
+            sourceNames = { "Andrion Darkspinner", "Linna Bruder" },
             bopOutput = true,
             reagents = {
                 { itemId = 21881, count = 4 },
@@ -18688,6 +20845,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 45, 60 },
+            sourceNames = { "Andrion Darkspinner", "Linna Bruder" },
             bopOutput = false,
             reagents = {
                 { itemId = 21881, count = 4 },
@@ -18704,6 +20864,9 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 355,
             requiredSkill = 355,
             specialization = 26798,
+            sourceKind = "vendor",
+            sourceZones = { 45, 60 },
+            sourceNames = { "Nasmara Moonsong", "Ainderu Summerleaf" },
             bopOutput = true,
             reagents = {
                 { itemId = 21845, count = 4 },
@@ -18721,6 +20884,9 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             specialization = 26798,
+            sourceKind = "vendor",
+            sourceZones = { 45, 60 },
+            sourceNames = { "Nasmara Moonsong", "Ainderu Summerleaf" },
             bopOutput = true,
             reagents = {
                 { itemId = 21845, count = 8 },
@@ -18738,6 +20904,9 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             specialization = 26798,
+            sourceKind = "vendor",
+            sourceZones = { 45, 60 },
+            sourceNames = { "Nasmara Moonsong", "Ainderu Summerleaf" },
             bopOutput = true,
             reagents = {
                 { itemId = 21845, count = 14 },
@@ -18753,6 +20922,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 45, 60 },
+            sourceNames = { "Nasmara Moonsong", "Ainderu Summerleaf" },
             bopOutput = false,
             reagents = {
                 { itemId = 21845, count = 8 },
@@ -18766,6 +20938,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "wrist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -18779,6 +20952,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "waist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -18792,6 +20966,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -18806,6 +20981,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -18819,6 +20995,7 @@ RecipeRegistryRecipeMetadata = {
             category = "armor",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -18835,6 +21012,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 340,
             requiredSkill = 340,
+            sourceKind = "vendor",
+            sourceZones = { 45, 56, 62 },
+            sourceNames = { "Eiin", "Neii", "Deynna" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -18850,6 +21030,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 345,
             requiredSkill = 345,
+            sourceKind = "vendor",
+            sourceZones = { 45, 56, 62 },
+            sourceNames = { "Eiin", "Neii", "Deynna" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -18865,6 +21048,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 340,
             requiredSkill = 340,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Zurai", "Muheru the Weaver" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -18881,6 +21067,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Zurai", "Muheru the Weaver" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -18898,6 +21087,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 65 },
+            sourceNames = { "Arrond" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -18914,6 +21106,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 65 },
+            sourceNames = { "Arrond" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -18930,6 +21125,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 355,
             requiredSkill = 355,
+            sourceKind = "vendor",
+            sourceZones = { 64 },
+            sourceNames = { "Mathar G'ochar", "Borto" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 4 },
@@ -18946,6 +21144,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "drop",
+            sourceZones = { 66 },
+            sourceNames = { "Phantom Attendant" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 4 },
@@ -18961,6 +21162,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "drop",
+            sourceZones = { 66 },
+            sourceNames = { "Phantom Valet" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 4 },
@@ -18976,6 +21180,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "drop",
+            sourceZones = { 67 },
+            sourceNames = { "Arcatraz Sentinel" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -18992,6 +21199,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 68 },
+            sourceNames = { "Sunseeker Astromage" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -19008,6 +21218,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 370,
             requiredSkill = 370,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -19022,6 +21233,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "trinket",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 1529, count = 4 },
@@ -19039,6 +21251,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 200,
             requiredSkill = 200,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = true,
             reagents = {
                 { itemId = 3577, count = 6 },
@@ -19052,6 +21266,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7909, count = 3 },
@@ -19067,6 +21282,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 215,
             requiredSkill = 215,
+            sourceKind = "vendor",
+            sourceZones = { 35, 15 },
+            sourceNames = { "Banalash", "Helenia Olden" },
             bopOutput = true,
             reagents = {
                 { itemId = 7971, count = 4 },
@@ -19080,6 +21298,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "necklace",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7909, count = 1 },
@@ -19095,6 +21314,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "crown",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "vendor",
+            sourceZones = { 3 },
+            sourceNames = { "Hammon Karwn", "Keena" },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 4 },
@@ -19110,6 +21332,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 21752,
             category = "materials",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 1 },
@@ -19124,6 +21347,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "vendor",
+            sourceZones = { 2, 15 },
+            sourceNames = { "Nerrist", "Helenia Olden" },
             bopOutput = true,
             reagents = {
                 { itemId = 6037, count = 4 },
@@ -19142,6 +21368,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 235,
             requiredSkill = 235,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = true,
             reagents = {
                 { itemId = 6037, count = 4 },
@@ -19158,6 +21386,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "necklace",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 1 },
@@ -19171,6 +21400,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 2 },
@@ -19186,6 +21416,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 245,
             requiredSkill = 245,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 7909, count = 1 },
@@ -19201,6 +21433,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 3864, count = 2 },
@@ -19218,6 +21452,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 56, 24, 62, 26 },
+            sourceNames = { "Arred", "Burbik Gearspanner", "Gelanthis" },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 4 },
@@ -19236,6 +21473,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 260,
             requiredSkill = 260,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = true,
             reagents = {
                 { itemId = 6037, count = 2 },
@@ -19251,6 +21490,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12799, count = 1 },
@@ -19264,6 +21504,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 2 },
@@ -19280,6 +21521,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "crown",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Mishta" },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 2 },
@@ -19296,6 +21540,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 1 },
@@ -19310,6 +21555,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "necklace",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12361, count = 1 },
@@ -19326,6 +21572,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = true,
             reagents = {
                 { itemId = 12359, count = 2 },
@@ -19343,6 +21591,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "vendor",
+            sourceZones = { 43 },
+            sourceNames = { "Jase Farlane" },
             bopOutput = false,
             reagents = {
                 { itemId = 12363, count = 1 },
@@ -19357,6 +21608,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "necklace",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 12364, count = 2 },
@@ -19373,6 +21625,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
             bopOutput = true,
             reagents = {
                 { itemId = 11754, count = 4 },
@@ -19391,6 +21644,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
             bopOutput = true,
             reagents = {
                 { itemId = 7910, count = 2 },
@@ -19407,6 +21661,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 305,
             requiredSkill = 305,
+            sourceKind = "vendor",
+            sourceZones = { 42 },
+            sourceNames = { "Qia" },
             bopOutput = false,
             reagents = {
                 { itemId = 12360, count = 2 },
@@ -19421,6 +21678,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 4 },
@@ -19481,6 +21739,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 4 },
@@ -19494,6 +21753,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "necklace",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1210, count = 1 },
@@ -19508,6 +21768,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "necklace",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 818, count = 2 },
@@ -19524,6 +21785,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Vargus" },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 2 },
@@ -19539,6 +21803,7 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 30,
             requiredSkill = 300,
+            sourceKind = "vendor",
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 4 },
@@ -19556,6 +21821,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 10 },
@@ -19574,6 +21840,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Vargus" },
             bopOutput = false,
             reagents = {
                 { itemId = 12810, count = 4 },
@@ -19589,6 +21858,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 12810, count = 8 },
@@ -19606,6 +21876,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
             bopOutput = false,
             reagents = {
                 { itemId = 12800, count = 4 },
@@ -19623,6 +21894,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 225,
             requiredSkill = 225,
+            sourceKind = "vendor",
+            sourceZones = { 60, 49, 33, 61 },
+            sourceNames = { "Ildine Sorrowspear", "Kania", "Thaddeus Webb" },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 4 },
@@ -19638,6 +21912,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Kania" },
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 5 },
@@ -19653,6 +21930,7 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 12810, count = 4 },
@@ -19669,6 +21947,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 275,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Mishta" },
             bopOutput = false,
             reagents = {
                 { itemId = 8831, count = 10 },
@@ -19685,6 +21966,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Mishta" },
             bopOutput = false,
             reagents = {
                 { itemId = 13468, count = 1 },
@@ -19702,6 +21986,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 10 },
@@ -19719,6 +22005,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 10 },
@@ -19738,6 +22026,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 12360, count = 12 },
@@ -19754,6 +22044,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "2h_weapon",
             sortOrder = 290,
             requiredSkill = 290,
+            sourceKind = "vendor",
+            sourceZones = { 41 },
+            sourceNames = { "Meilosh" },
             reagents = {
                 { itemId = 7082, count = 4 },
                 { itemId = 14344, count = 10 },
@@ -19767,6 +22060,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "bracer",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 22445, count = 6 },
             },
@@ -19777,6 +22071,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "bracer",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 22445, count = 6 },
                 { itemId = 22447, count = 6 },
@@ -19790,6 +22085,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 320,
             requiredSkill = 320,
+            sourceKind = "drop",
+            sourceZones = { 69 },
+            sourceNames = { "Ethereum Nullifier", "Ethereum Jailor" },
             reagents = {
                 { itemId = 22445, count = 10 },
                 { itemId = 22448, count = 2 },
@@ -19803,6 +22101,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 325,
             requiredSkill = 325,
+            faction = "horde",
+            sourceKind = "vendor",
+            sourceZones = { 59 },
+            sourceNames = { "Logistics Officer Ulrike", "Quartermaster Urgronn" },
             reagents = {
                 { itemId = 21886, count = 4 },
                 { itemId = 22446, count = 4 },
@@ -19816,6 +22118,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 335,
             requiredSkill = 335,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 22446, count = 8 },
             },
@@ -19828,6 +22132,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "drop",
+            sourceZones = { 70 },
+            sourceNames = { "Coilfang Oracle" },
             reagents = {
                 { itemId = 22445, count = 20 },
                 { itemId = 22446, count = 10 },
@@ -19842,6 +22149,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 71 },
+            sourceNames = { "Bloodmaul Geomancer" },
             reagents = {
                 { itemId = 21884, count = 6 },
                 { itemId = 21885, count = 6 },
@@ -19856,6 +22166,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 66 },
+            sourceNames = { "Ythyar" },
             selfOnlyOutputless = true,
             reagents = {
                 { itemId = 22445, count = 6 },
@@ -19870,6 +22183,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Alurmi" },
             selfOnlyOutputless = true,
             reagents = {
                 { itemId = 22446, count = 2 },
@@ -19884,6 +22200,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 370,
             requiredSkill = 370,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Almaador" },
             selfOnlyOutputless = true,
             reagents = {
                 { itemId = 22445, count = 5 },
@@ -19899,6 +22218,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Nakodu" },
             selfOnlyOutputless = true,
             reagents = {
                 { itemId = 22449, count = 2 },
@@ -19911,6 +22233,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "shield",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 22445, count = 6 },
                 { itemId = 22452, count = 10 },
@@ -19924,6 +22247,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "vendor",
+            sourceZones = { 72 },
+            sourceNames = { "Aged Dalaran Wizard" },
             reagents = {
                 { itemId = 22446, count = 4 },
             },
@@ -19936,6 +22262,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield",
             sortOrder = 340,
             requiredSkill = 340,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 22445, count = 12 },
                 { itemId = 22446, count = 4 },
@@ -19950,6 +22278,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 22449, count = 2 },
                 { itemId = 22572, count = 1 },
@@ -19966,6 +22296,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "boots",
             sortOrder = 305,
             requiredSkill = 305,
+            sourceKind = "drop",
             reagents = {
                 { itemId = 13444, count = 4 },
                 { itemId = 13446, count = 4 },
@@ -19980,6 +22311,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "boots",
             sortOrder = 320,
             requiredSkill = 320,
+            sourceKind = "drop",
+            sourceZones = { 73 },
+            sourceNames = { "Ethereal Priest" },
             reagents = {
                 { itemId = 22445, count = 12 },
             },
@@ -19992,6 +22326,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "boots",
             sortOrder = 340,
             requiredSkill = 340,
+            sourceKind = "drop",
+            sourceZones = { 74 },
+            sourceNames = { "Raging Skeleton" },
             reagents = {
                 { itemId = 22445, count = 8 },
                 { itemId = 22446, count = 8 },
@@ -20005,6 +22342,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "boots",
             sortOrder = 370,
             requiredSkill = 370,
+            sourceKind = "drop",
+            sourceZones = { 66 },
+            sourceNames = { "Phantom Stagehand" },
             reagents = {
                 { itemId = 22449, count = 4 },
                 { itemId = 22450, count = 2 },
@@ -20017,6 +22357,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 13446, count = 4 },
                 { itemId = 14344, count = 2 },
@@ -20031,6 +22372,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 13444, count = 4 },
                 { itemId = 22446, count = 3 },
@@ -20045,6 +22387,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 345,
             requiredSkill = 345,
+            sourceKind = "vendor",
+            sourceZones = { 59 },
+            sourceNames = { "Logistics Officer Ulrike", "Quartermaster Urgronn" },
             reagents = {
                 { itemId = 22445, count = 4 },
                 { itemId = 22446, count = 4 },
@@ -20057,6 +22402,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "cloak",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 22445, count = 8 },
             },
@@ -20069,6 +22415,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 330,
             requiredSkill = 330,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 21884, count = 4 },
                 { itemId = 21885, count = 4 },
@@ -20085,6 +22433,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 340,
             requiredSkill = 340,
+            sourceKind = "vendor",
+            sourceZones = { 69, 64 },
+            sourceNames = { "Karaaz", "Paulsta'ats" },
             reagents = {
                 { itemId = 22445, count = 6 },
                 { itemId = 22446, count = 6 },
@@ -20099,6 +22450,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 340,
             requiredSkill = 340,
+            sourceKind = "drop",
+            sourceZones = { 69 },
+            sourceNames = { "Sunfury Researcher" },
             reagents = {
                 { itemId = 22446, count = 10 },
                 { itemId = 22449, count = 2 },
@@ -20112,6 +22466,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "2h_weapon",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "drop",
+            sourceZones = { 75 },
+            sourceNames = { "Shattered Hand Centurion" },
             reagents = {
                 { itemId = 22445, count = 40 },
                 { itemId = 22449, count = 4 },
@@ -20125,6 +22482,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 22445, count = 20 },
                 { itemId = 22446, count = 5 },
@@ -20139,6 +22498,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "drop",
+            sourceZones = { 71 },
+            sourceNames = { "Bash'ir Spell-Thief" },
             reagents = {
                 { itemId = 22446, count = 8 },
                 { itemId = 22449, count = 8 },
@@ -20152,6 +22514,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "2h_weapon",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 67 },
+            sourceNames = { "Eredar Deathbringer" },
             reagents = {
                 { itemId = 22445, count = 20 },
                 { itemId = 22446, count = 6 },
@@ -20166,6 +22531,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "drop",
             reagents = {
                 { itemId = 21884, count = 6 },
                 { itemId = 22446, count = 8 },
@@ -20182,6 +22548,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "drop",
             reagents = {
                 { itemId = 21885, count = 6 },
                 { itemId = 22446, count = 8 },
@@ -20198,6 +22565,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "drop",
             reagents = {
                 { itemId = 22445, count = 40 },
                 { itemId = 22446, count = 8 },
@@ -20213,6 +22581,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 22445, count = 20 },
                 { itemId = 22446, count = 10 },
@@ -20227,6 +22597,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 21885, count = 2 },
                 { itemId = 22449, count = 8 },
@@ -20242,6 +22614,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mana",
             sortOrder = 40,
             requiredSkill = 310,
+            sourceKind = "vendor",
+            sourceZones = { 45, 56, 62 },
+            sourceNames = { "Madame Ruby", "Egomis", "Lyna" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -20258,6 +22633,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wizard",
             sortOrder = 50,
             requiredSkill = 340,
+            sourceKind = "vendor",
+            sourceZones = { 45, 56, 62 },
+            sourceNames = { "Madame Ruby", "Egomis", "Lyna" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -20287,6 +22665,9 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 30,
             requiredSkill = 335,
+            sourceKind = "vendor",
+            sourceZones = { 45, 56, 62 },
+            sourceNames = { "Madame Ruby", "Egomis", "Lyna" },
             bopOutput = false,
             reagents = {
                 { itemId = 22448, count = 3 },
@@ -20298,6 +22679,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 22460,
             category = "materials",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 22449, count = 4 },
@@ -20309,6 +22691,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 22459,
             category = "materials",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 22450, count = 2 },
@@ -20323,6 +22706,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 76 },
+            sourceNames = { "Master Craftsman Omarion" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 4 },
@@ -20340,6 +22726,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 76 },
+            sourceNames = { "Master Craftsman Omarion" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 6 },
@@ -20357,6 +22746,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 76 },
+            sourceNames = { "Master Craftsman Omarion" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 2 },
@@ -20374,6 +22766,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 76 },
+            sourceNames = { "Master Craftsman Omarion" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 2 },
@@ -20391,6 +22786,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Mishta" },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 4 },
@@ -20408,6 +22806,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 76 },
+            sourceNames = { "Master Craftsman Omarion" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 2 },
@@ -20426,6 +22827,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 76 },
+            sourceNames = { "Master Craftsman Omarion" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 2 },
@@ -20444,6 +22848,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 76 },
+            sourceNames = { "Master Craftsman Omarion" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 2 },
@@ -20462,6 +22869,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 76 },
+            sourceNames = { "Master Craftsman Omarion" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 2 },
@@ -20480,6 +22890,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 76 },
+            sourceNames = { "Master Craftsman Omarion" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 2 },
@@ -20498,6 +22911,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 76 },
+            sourceNames = { "Master Craftsman Omarion" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 2 },
@@ -20516,6 +22932,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 76 },
+            sourceNames = { "Master Craftsman Omarion" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 4 },
@@ -20533,6 +22952,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 76 },
+            sourceNames = { "Master Craftsman Omarion" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 2 },
@@ -20550,6 +22972,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 76 },
+            sourceNames = { "Master Craftsman Omarion" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 2 },
@@ -20566,6 +22991,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 60,
             requiredSkill = 60,
+            sourceKind = "vendor",
+            sourceZones = { 25, 77 },
+            sourceNames = { "Master Chef Mouldier", "Fazu" },
             bopOutput = false,
             reagents = {
                 { itemId = 22644, count = 1 },
@@ -20580,6 +23008,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 220,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 22, 24 },
+            sourceNames = { "Sovik", "Gearcutter Cogspinner" },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 3 },
@@ -20595,6 +23026,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Vargus" },
             bopOutput = false,
             reagents = {
                 { itemId = 12360, count = 2 },
@@ -20612,6 +23046,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Vargus" },
             bopOutput = false,
             reagents = {
                 { itemId = 12655, count = 8 },
@@ -20628,6 +23065,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Vargus" },
             bopOutput = false,
             reagents = {
                 { itemId = 12655, count = 6 },
@@ -20643,6 +23083,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Aendel Windspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 2 },
@@ -20660,6 +23103,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Aendel Windspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 2 },
@@ -20677,6 +23123,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Aendel Windspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 2 },
@@ -20693,6 +23142,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Mishta" },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 2 },
@@ -20710,6 +23162,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Mishta" },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 2 },
@@ -20727,6 +23182,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 49 },
+            sourceNames = { "Mishta" },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 4 },
@@ -20743,6 +23201,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 90,
             requiredSkill = 305,
+            sourceKind = "vendor",
+            sourceZones = { 59, 56, 62 },
+            sourceNames = { "Alchemist Gribble", "Altaa", "Melaris" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -20757,6 +23218,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "battle",
             sortOrder = 280,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 13465, count = 1 },
@@ -20771,6 +23233,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "battle",
             sortOrder = 200,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 13464, count = 1 },
@@ -20787,6 +23250,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 110,
             requiredSkill = 315,
+            sourceKind = "vendor",
+            sourceZones = { 46, 55 },
+            sourceNames = { "Seer Janidi", "Leeli Longhaggle" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -20803,6 +23269,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 250,
             requiredSkill = 320,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Haalrun", "Seer Janidi" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -20819,6 +23288,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "combat",
             sortOrder = 100,
             requiredSkill = 320,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -20832,6 +23303,7 @@ RecipeRegistryRecipeMetadata = {
             category = "potions",
             subcategory = "healing",
             sortOrder = 70,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -20848,6 +23320,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 100,
             requiredSkill = 325,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -20864,6 +23338,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 260,
             requiredSkill = 330,
+            sourceKind = "vendor",
+            sourceZones = { 59 },
+            sourceNames = { "Logistics Officer Ulrike", "Quartermaster Urgronn" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -20880,6 +23357,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 120,
             requiredSkill = 335,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Mycah" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -20896,6 +23376,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mana",
             sortOrder = 70,
             requiredSkill = 340,
+            sourceKind = "vendor",
+            sourceZones = { 46, 71 },
+            sourceNames = { "Haalrun", "Daga Ramba" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -20912,6 +23395,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 290,
             requiredSkill = 345,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Enuril" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -20928,6 +23414,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "guardian",
             sortOrder = 80,
             requiredSkill = 345,
+            sourceKind = "vendor",
+            sourceZones = { 46, 71 },
+            sourceNames = { "Haalrun", "Daga Ramba" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -20944,6 +23433,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 300,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Nakodu" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -20960,6 +23452,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 130,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 55, 71 },
+            sourceNames = { "Leeli Longhaggle", "Daga Ramba" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -20976,6 +23471,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "combat",
             sortOrder = 110,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -20992,6 +23489,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "combat",
             sortOrder = 120,
             requiredSkill = 350,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -21008,6 +23506,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "combat",
             sortOrder = 130,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -21024,6 +23524,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 150,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Almaador" },
             bopOutput = false,
             reagents = {
                 { itemId = 22451, count = 1 },
@@ -21038,6 +23541,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 130,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Mycah" },
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 1 },
@@ -21052,6 +23558,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 160,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 64 },
+            sourceNames = { "Trader Narasu" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 1 },
@@ -21066,6 +23575,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 140,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 1 },
@@ -21080,6 +23592,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 240,
             requiredSkill = 355,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -21097,6 +23611,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 230,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 68 },
+            sourceNames = { "Sunseeker Astromage" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 5 },
@@ -21114,6 +23631,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 240,
             requiredSkill = 360,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 5 },
@@ -21131,6 +23649,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 250,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 5 },
@@ -21148,6 +23669,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 260,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 64 },
+            sourceNames = { "Vir'aani Arcanist" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 5 },
@@ -21165,6 +23689,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 220,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 65 },
+            sourceNames = { "Shadow Council Warlock" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 5 },
@@ -21182,6 +23709,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "protection",
             sortOrder = 210,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 71 },
+            sourceNames = { "Abyssal Flamebringer" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 5 },
@@ -21198,6 +23728,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 320,
             requiredSkill = 365,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -21214,6 +23745,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "combat",
             sortOrder = 140,
             requiredSkill = 365,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -21387,6 +23919,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23077, count = 1 },
@@ -21401,6 +23934,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 305,
             requiredSkill = 305,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23077, count = 1 },
@@ -21415,6 +23949,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 315,
             requiredSkill = 315,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Enuril" },
             bopOutput = false,
             reagents = {
                 { itemId = 23077, count = 1 },
@@ -21429,6 +23966,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "vendor",
+            sourceZones = { 69, 64 },
+            sourceNames = { "Karaaz", "Paulsta'ats" },
             bopOutput = false,
             reagents = {
                 { itemId = 23077, count = 1 },
@@ -21443,6 +23983,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 21929, count = 1 },
@@ -21457,6 +23998,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 305,
             requiredSkill = 305,
+            sourceKind = "vendor",
+            sourceZones = { 69, 64 },
+            sourceNames = { "Karaaz", "Paulsta'ats" },
             bopOutput = false,
             reagents = {
                 { itemId = 21929, count = 1 },
@@ -21471,6 +24015,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 315,
             requiredSkill = 315,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 21929, count = 1 },
@@ -21485,6 +24030,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Nakodu" },
             bopOutput = false,
             reagents = {
                 { itemId = 21929, count = 1 },
@@ -21499,6 +24047,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "green",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23079, count = 1 },
@@ -21513,6 +24062,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "green",
             sortOrder = 305,
             requiredSkill = 305,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23079, count = 1 },
@@ -21527,6 +24077,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "green",
             sortOrder = 315,
             requiredSkill = 315,
+            sourceKind = "vendor",
+            sourceZones = { 59 },
+            sourceNames = { "Logistics Officer Ulrike", "Quartermaster Urgronn" },
             bopOutput = false,
             reagents = {
                 { itemId = 23079, count = 1 },
@@ -21541,6 +24094,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "green",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Enuril" },
             bopOutput = false,
             reagents = {
                 { itemId = 23079, count = 1 },
@@ -21555,6 +24111,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23107, count = 1 },
@@ -21569,6 +24126,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 305,
             requiredSkill = 305,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 23107, count = 1 },
@@ -21583,6 +24144,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 315,
             requiredSkill = 315,
+            sourceKind = "vendor",
+            sourceZones = { 69, 64 },
+            sourceNames = { "Karaaz", "Paulsta'ats" },
             bopOutput = false,
             reagents = {
                 { itemId = 23107, count = 1 },
@@ -21597,6 +24161,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23107, count = 1 },
@@ -21611,6 +24176,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23112, count = 1 },
@@ -21625,6 +24191,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 305,
             requiredSkill = 305,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 23112, count = 1 },
@@ -21639,6 +24209,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 315,
             requiredSkill = 315,
+            sourceKind = "vendor",
+            sourceZones = { 69, 64 },
+            sourceNames = { "Karaaz", "Paulsta'ats" },
             bopOutput = false,
             reagents = {
                 { itemId = 23112, count = 1 },
@@ -21653,6 +24226,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23112, count = 1 },
@@ -21667,6 +24241,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "blue",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23117, count = 1 },
@@ -21681,6 +24256,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "blue",
             sortOrder = 305,
             requiredSkill = 305,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23117, count = 1 },
@@ -21695,6 +24271,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "blue",
             sortOrder = 315,
             requiredSkill = 315,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23117, count = 1 },
@@ -21709,6 +24287,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "blue",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "vendor",
+            sourceZones = { 69, 64 },
+            sourceNames = { "Karaaz", "Paulsta'ats" },
             bopOutput = false,
             reagents = {
                 { itemId = 23117, count = 1 },
@@ -21720,6 +24301,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 23445,
             category = "metals",
             sortOrder = 200,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23424, count = 2 },
@@ -21731,6 +24313,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 23446,
             category = "metals",
             sortOrder = 210,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23425, count = 2 },
@@ -21742,6 +24325,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 23447,
             category = "metals",
             sortOrder = 220,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23427, count = 2 },
@@ -21753,6 +24337,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 23448,
             category = "metals",
             sortOrder = 230,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 3 },
@@ -21765,6 +24350,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 23449,
             category = "metals",
             sortOrder = 240,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23426, count = 2 },
@@ -21777,6 +24363,7 @@ RecipeRegistryRecipeMetadata = {
             category = "plate",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 4 },
@@ -21789,6 +24376,7 @@ RecipeRegistryRecipeMetadata = {
             category = "plate",
             subcategory = "waist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 4 },
@@ -21801,6 +24389,7 @@ RecipeRegistryRecipeMetadata = {
             category = "plate",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 6 },
@@ -21813,6 +24402,7 @@ RecipeRegistryRecipeMetadata = {
             category = "plate",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 8 },
@@ -21825,6 +24415,7 @@ RecipeRegistryRecipeMetadata = {
             category = "plate",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 10 },
@@ -21837,6 +24428,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "head",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 4 },
@@ -21849,6 +24441,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 5 },
@@ -21861,6 +24454,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "wrist",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 6 },
@@ -21873,6 +24467,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 9 },
@@ -21885,6 +24480,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "axe",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 9 },
@@ -21897,6 +24493,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "mace",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 10 },
@@ -21909,6 +24506,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "sword",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 12 },
@@ -21923,6 +24521,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "vendor",
+            sourceZones = { 62, 56, 45 },
+            sourceNames = { "Eriden", "Arras", "Aaron Hollman" },
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 8 },
@@ -21937,6 +24538,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 330,
             requiredSkill = 330,
+            sourceKind = "vendor",
+            sourceZones = { 62, 56, 45 },
+            sourceNames = { "Eriden", "Arras", "Aaron Hollman" },
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 8 },
@@ -21951,6 +24555,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dagger",
             sortOrder = 330,
             requiredSkill = 330,
+            sourceKind = "vendor",
+            sourceZones = { 62, 56, 45 },
+            sourceNames = { "Eriden", "Arras", "Aaron Hollman" },
             bopOutput = false,
             reagents = {
                 { itemId = 21887, count = 2 },
@@ -21966,6 +24573,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 335,
             requiredSkill = 335,
+            sourceKind = "vendor",
+            sourceZones = { 62, 56, 45 },
+            sourceNames = { "Eriden", "Arras", "Aaron Hollman" },
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 12 },
@@ -21980,6 +24590,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 335,
             requiredSkill = 335,
+            sourceKind = "vendor",
+            sourceZones = { 65, 46 },
+            sourceNames = { "Krek Cragcrush", "Loolruna" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 2 },
@@ -21996,6 +24609,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 335,
             requiredSkill = 335,
+            sourceKind = "vendor",
+            sourceZones = { 65, 46 },
+            sourceNames = { "Krek Cragcrush", "Loolruna" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 2 },
@@ -22013,6 +24629,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 340,
             requiredSkill = 340,
+            sourceKind = "vendor",
+            sourceZones = { 65, 46 },
+            sourceNames = { "Krek Cragcrush", "Loolruna" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 2 },
@@ -22029,6 +24648,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 355,
             requiredSkill = 355,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Enuril" },
             bopOutput = false,
             reagents = {
                 { itemId = 22445, count = 8 },
@@ -22045,6 +24667,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Enuril" },
             bopOutput = false,
             reagents = {
                 { itemId = 22445, count = 20 },
@@ -22061,6 +24686,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 355,
             requiredSkill = 355,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Enuril" },
             bopOutput = false,
             reagents = {
                 { itemId = 22445, count = 12 },
@@ -22077,6 +24705,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Enuril" },
             bopOutput = false,
             reagents = {
                 { itemId = 22445, count = 24 },
@@ -22093,6 +24724,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 350,
             requiredSkill = 350,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 2 },
@@ -22109,6 +24744,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 355,
             requiredSkill = 355,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 3 },
@@ -22125,6 +24764,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 360,
             requiredSkill = 360,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 4 },
@@ -22141,6 +24784,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 365,
             requiredSkill = 365,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 4 },
@@ -22157,6 +24804,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 74 },
+            sourceNames = { "Auchenai Monk" },
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 6 },
@@ -22171,6 +24821,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 67 },
+            sourceNames = { "Unchained Doombringer" },
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 8 },
@@ -22185,6 +24838,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "drop",
+            sourceZones = { 78 },
+            sourceNames = { "Cabal Fanatic" },
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 8 },
@@ -22199,6 +24855,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 15 },
@@ -22216,6 +24874,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 64 },
+            sourceNames = { "Murkblood Raider" },
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 2 },
@@ -22232,6 +24893,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 65 },
+            sourceNames = { "Deathforge Guardian" },
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 4 },
@@ -22248,6 +24912,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "drop",
+            sourceZones = { 69 },
+            sourceNames = { "Disembodied Protector" },
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 3 },
@@ -22264,6 +24931,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "drop",
+            sourceZones = { 64 },
+            sourceNames = { "Boulderfist Warrior" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 6 },
@@ -22281,6 +24951,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "drop",
+            sourceZones = { 71 },
+            sourceNames = { "Anger Guard" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 10 },
@@ -22298,6 +24971,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 370,
             requiredSkill = 370,
+            sourceKind = "drop",
+            sourceZones = { 65 },
+            sourceNames = { "Crazed Murkblood Foreman", "Crazed Murkblood Miner", "Ashtongue Warrior" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 10 },
@@ -22315,6 +24991,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 370,
             requiredSkill = 370,
+            sourceKind = "drop",
+            sourceZones = { 73 },
+            sourceNames = { "Nexus Stalker" },
             bopOutput = false,
             reagents = {
                 { itemId = 22449, count = 2 },
@@ -22332,6 +25011,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 370,
             requiredSkill = 370,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 6 },
@@ -22346,6 +25026,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enhancements",
             subcategory = "sharpening",
             sortOrder = 70,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 22573, count = 1 },
@@ -22361,6 +25042,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sharpening",
             sortOrder = 80,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 22573, count = 2 },
@@ -22376,6 +25060,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield_spike",
             sortOrder = 40,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 59 },
+            sourceNames = { "Logistics Officer Ulrike", "Quartermaster Urgronn" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 4 },
@@ -22392,6 +25079,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 10 },
@@ -22408,6 +25097,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 10 },
@@ -22424,6 +25115,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 16 },
@@ -22441,6 +25134,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 22 },
@@ -22458,6 +25153,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 18 },
@@ -22475,6 +25172,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 22456, count = 15 },
@@ -22491,6 +25190,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 20 },
@@ -22507,6 +25208,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 15 },
@@ -22521,6 +25224,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 23573,
             category = "metals",
             sortOrder = 250,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 10 },
@@ -22535,6 +25239,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "special",
             sortOrder = 10,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 56, 62, 45 },
+            sourceNames = { "Altaa", "Melaris", "Skreah" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 1 },
@@ -22553,6 +25260,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 10 },
@@ -22570,6 +25279,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23449, count = 20 },
@@ -22587,6 +25298,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 10 },
@@ -22604,6 +25317,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 10 },
@@ -22621,6 +25336,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 10 },
@@ -22638,6 +25355,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 10 },
@@ -22655,6 +25374,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dagger",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23447, count = 10 },
@@ -22673,6 +25394,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dagger",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 10 },
@@ -22690,6 +25413,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23447, count = 10 },
@@ -22707,6 +25432,9 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 10,
             requiredSkill = 340,
+            sourceKind = "vendor",
+            sourceZones = { 59, 65 },
+            sourceNames = { "Rohok", "Mari Stonehand" },
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 1 },
@@ -22720,6 +25448,9 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 20,
             requiredSkill = 375,
+            sourceKind = "drop",
+            sourceZones = { 69 },
+            sourceNames = { "Sunfury Bloodwarder" },
             bopOutput = false,
             reagents = {
                 { itemId = 23447, count = 1 },
@@ -22733,6 +25464,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "powders",
             sortOrder = 60,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 22573, count = 2 },
@@ -22745,6 +25477,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 23782,
             category = "parts",
             sortOrder = 200,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 3 },
@@ -22756,6 +25489,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 23783,
             category = "parts",
             sortOrder = 210,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 1 },
@@ -22767,6 +25501,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 23784,
             category = "parts",
             sortOrder = 220,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 1 },
@@ -22779,6 +25514,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 23785,
             category = "parts",
             sortOrder = 230,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23573, count = 3 },
@@ -22790,6 +25526,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 23786,
             category = "parts",
             sortOrder = 240,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 1 },
@@ -22802,6 +25539,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 23787,
             category = "parts",
             sortOrder = 250,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 2 },
@@ -22815,6 +25553,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "bombs",
             sortOrder = 120,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23781, count = 1 },
@@ -22830,6 +25569,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "grenades",
             sortOrder = 40,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 4 },
@@ -22844,6 +25584,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "firearms",
             sortOrder = 120,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 4400, count = 1 },
@@ -22860,6 +25601,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "firearms",
             sortOrder = 130,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 56, 45, 62 },
+            sourceNames = { "Feera", "Viggz Shinesparked", "Yatheon" },
             bopOutput = false,
             reagents = {
                 { itemId = 23782, count = 3 },
@@ -22876,6 +25620,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "firearms",
             sortOrder = 140,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 71 },
+            sourceNames = { "Doomforge Engineer" },
             bopOutput = false,
             reagents = {
                 { itemId = 23783, count = 4 },
@@ -22892,6 +25639,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "firearms",
             sortOrder = 150,
             requiredSkill = 375,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23439, count = 2 },
@@ -22909,6 +25658,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "leather",
             sortOrder = 250,
             requiredSkill = 340,
+            sourceKind = "vendor",
+            sourceZones = { 59 },
+            sourceNames = { "Lebowski", "Mixie Farshot" },
             bopOutput = false,
             reagents = {
                 { itemId = 22445, count = 8 },
@@ -22925,6 +25677,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 260,
             requiredSkill = 340,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 21929, count = 2 },
@@ -22941,6 +25695,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 270,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 59, 46 },
+            sourceNames = { "Lebowski", "Captured Gnome" },
             bopOutput = false,
             reagents = {
                 { itemId = 22448, count = 2 },
@@ -22958,6 +25715,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "leather",
             sortOrder = 280,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 65 },
+            sourceNames = { "Mo'arg Weaponsmith" },
             bopOutput = false,
             reagents = {
                 { itemId = 22449, count = 2 },
@@ -22975,6 +25735,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "scopes",
             sortOrder = 80,
             requiredSkill = 335,
+            sourceKind = "vendor",
+            sourceZones = { 65, 59 },
+            sourceNames = { "Daggle Ironshaper", "Mixie Farshot" },
             bopOutput = false,
             reagents = {
                 { itemId = 23112, count = 2 },
@@ -22990,6 +25753,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "scopes",
             sortOrder = 90,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 69 },
+            sourceNames = { "Sunfury Bowman" },
             bopOutput = false,
             reagents = {
                 { itemId = 23440, count = 2 },
@@ -23006,6 +25772,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "scopes",
             sortOrder = 100,
             requiredSkill = 375,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 23438, count = 2 },
@@ -23021,6 +25788,8 @@ RecipeRegistryRecipeMetadata = {
             category = "pets",
             sortOrder = 70,
             requiredSkill = 325,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 10558, count = 1 },
@@ -23039,6 +25808,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 230,
             requiredSkill = 335,
+            sourceKind = "vendor",
+            sourceZones = { 56, 45, 46, 62 },
+            sourceNames = { "Feera", "Wind Trader Lathrai", "Captured Gnome" },
             bopOutput = false,
             reagents = {
                 { itemId = 21877, count = 1 },
@@ -23089,6 +25861,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 260,
             requiredSkill = 335,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 2605, count = 1 },
@@ -23103,6 +25878,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 200,
             category = "ammo",
             sortOrder = 80,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 2 },
@@ -23117,6 +25893,9 @@ RecipeRegistryRecipeMetadata = {
             category = "ammo",
             sortOrder = 90,
             requiredSkill = 335,
+            sourceKind = "vendor",
+            sourceZones = { 56, 62, 45 },
+            sourceNames = { "Feera", "Yatheon", "Wind Trader Lathrai" },
             bopOutput = false,
             reagents = {
                 { itemId = 4470, count = 4 },
@@ -23133,6 +25912,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "tools",
             sortOrder = 90,
             requiredSkill = 325,
+            sourceKind = "vendor",
+            sourceZones = { 56, 62, 45 },
+            sourceNames = { "Feera", "Yatheon", "Wind Trader Lathrai" },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 5 },
@@ -23149,6 +25931,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "tools",
             sortOrder = 100,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 60 },
+            sourceNames = { "Bryan Landers" },
             bopOutput = false,
             reagents = {
                 { itemId = 23449, count = 5 },
@@ -23166,6 +25951,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "charges",
             sortOrder = 50,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 69, 64 },
+            sourceNames = { "Karaaz", "Paulsta'ats" },
             bopOutput = false,
             reagents = {
                 { itemId = 23781, count = 2 },
@@ -23182,6 +25970,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinkets",
             sortOrder = 130,
             requiredSkill = 305,
+            sourceKind = "quest",
+            sourceZones = { 5 },
+            sourceNames = { "Kireena" },
             bopOutput = false,
             reagents = {
                 { itemId = 16006, count = 1 },
@@ -23216,6 +26007,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 280,
             requiredSkill = 330,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 21887, count = 2 },
@@ -23234,6 +26026,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 290,
             requiredSkill = 345,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 21887, count = 2 },
@@ -23251,6 +26044,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinkets",
             sortOrder = 140,
             requiredSkill = 355,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 23785, count = 2 },
@@ -23268,6 +26062,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bombs",
             sortOrder = 130,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 17020, count = 3 },
@@ -23285,6 +26080,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "charges",
             sortOrder = 60,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 21877, count = 4 },
@@ -23314,6 +26110,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "firearms",
             sortOrder = 160,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 16006, count = 2 },
@@ -23332,6 +26129,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 210,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 12 },
@@ -23347,6 +26145,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mail",
             sortOrder = 220,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 12 },
@@ -23363,6 +26162,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 310,
             specialization = 20219,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23781, count = 3 },
@@ -23379,6 +26179,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 320,
             specialization = 20219,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 22445, count = 10 },
@@ -23395,6 +26196,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinkets",
             sortOrder = 120,
             specialization = 20219,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 16006, count = 2 },
@@ -23426,6 +26228,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 230,
             specialization = 20219,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 8 },
@@ -23444,6 +26247,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "leather",
             sortOrder = 240,
             specialization = 20219,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 12 },
@@ -23460,6 +26264,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23077, count = 2 },
@@ -23473,6 +26278,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23112, count = 2 },
@@ -23486,6 +26292,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23079, count = 1 },
@@ -23500,6 +26307,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "necklace",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 2 },
@@ -23513,6 +26321,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 1 },
@@ -23528,6 +26337,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "drop",
+            sourceZones = { 65 },
+            sourceNames = { "Dark Conclave Shadowmancer" },
             bopOutput = false,
             reagents = {
                 { itemId = 22456, count = 3 },
@@ -23544,6 +26356,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 355,
             requiredSkill = 355,
+            sourceKind = "drop",
+            sourceZones = { 70 },
+            sourceNames = { "Coilfang Sorceress" },
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 3 },
@@ -23560,6 +26375,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 355,
             requiredSkill = 355,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 3 },
@@ -23576,6 +26392,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 71 },
+            sourceNames = { "Vekh'nir Dreadhawk" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 3 },
@@ -23592,6 +26411,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "drop",
+            sourceZones = { 69 },
+            sourceNames = { "Mageslayer" },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 3 },
@@ -23608,6 +26430,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 345,
             requiredSkill = 345,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 2 },
@@ -23623,6 +26447,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 355,
             requiredSkill = 355,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23447, count = 1 },
@@ -23638,6 +26464,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 4 },
@@ -23654,6 +26482,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Alurmi" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 4 },
@@ -23671,6 +26502,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Nakodu" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 6 },
@@ -23688,6 +26522,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Enuril" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 4 },
@@ -23705,6 +26542,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 360,
             requiredSkill = 360,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 6 },
@@ -23722,6 +26563,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 69, 64 },
+            sourceNames = { "Karaaz", "Paulsta'ats" },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 8 },
@@ -23738,6 +26582,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 355,
             requiredSkill = 355,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 2 },
@@ -23753,6 +26599,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 355,
             requiredSkill = 355,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23436, count = 1 },
@@ -23769,6 +26617,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23447, count = 2 },
@@ -23784,6 +26634,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23441, count = 1 },
@@ -23800,6 +26652,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23112, count = 2 },
@@ -23816,6 +26670,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23117, count = 2 },
@@ -23832,6 +26688,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "crown",
             sortOrder = 370,
             requiredSkill = 370,
+            sourceKind = "drop",
+            sourceZones = { 79 },
+            sourceNames = { "Sunseeker Botanist" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 20 },
@@ -23849,6 +26708,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "crown",
             sortOrder = 370,
             requiredSkill = 370,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 20 },
@@ -23866,6 +26726,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 370,
             requiredSkill = 370,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Nakodu" },
             bopOutput = true,
             reagents = {
                 { itemId = 22452, count = 4 },
@@ -23882,6 +26745,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 370,
             requiredSkill = 370,
+            sourceKind = "vendor",
+            sourceZones = { 59 },
+            sourceNames = { "Logistics Officer Ulrike", "Quartermaster Urgronn" },
             bopOutput = true,
             reagents = {
                 { itemId = 23112, count = 4 },
@@ -23898,6 +26764,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 370,
             requiredSkill = 370,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Alurmi" },
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 4 },
@@ -23914,6 +26783,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 370,
             requiredSkill = 370,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Almaador" },
             bopOutput = true,
             reagents = {
                 { itemId = 22457, count = 4 },
@@ -23930,6 +26802,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 370,
             requiredSkill = 370,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = true,
             reagents = {
                 { itemId = 22456, count = 2 },
@@ -23946,6 +26821,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23436, count = 1 },
@@ -23960,6 +26837,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23436, count = 1 },
@@ -23974,6 +26853,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23436, count = 1 },
@@ -23988,6 +26869,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 23436, count = 1 },
@@ -24002,6 +26884,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 23436, count = 1 },
@@ -24016,6 +26899,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23436, count = 1 },
@@ -24030,6 +26915,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23436, count = 1 },
@@ -24044,6 +26931,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "blue",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 23438, count = 1 },
@@ -24058,6 +26946,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "blue",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23438, count = 1 },
@@ -24072,6 +26962,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "blue",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23438, count = 1 },
@@ -24086,6 +26978,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23440, count = 1 },
@@ -24100,6 +26994,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23440, count = 1 },
@@ -24114,6 +27010,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 23440, count = 1 },
@@ -24128,6 +27025,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23440, count = 1 },
@@ -24142,6 +27041,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23440, count = 1 },
@@ -24156,6 +27057,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 64 },
+            sourceNames = { "Coreiel", "Aldraan" },
             bopOutput = false,
             reagents = {
                 { itemId = 23440, count = 1 },
@@ -24170,6 +27074,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23441, count = 1 },
@@ -24184,6 +27090,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23441, count = 1 },
@@ -24198,6 +27106,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23441, count = 1 },
@@ -24212,6 +27122,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23441, count = 1 },
@@ -24226,6 +27138,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23439, count = 1 },
@@ -24240,6 +27154,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23439, count = 1 },
@@ -24254,6 +27170,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23439, count = 1 },
@@ -24268,6 +27186,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23439, count = 1 },
@@ -24282,6 +27202,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "green",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23437, count = 1 },
@@ -24296,6 +27218,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "green",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23437, count = 1 },
@@ -24310,6 +27234,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "green",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23437, count = 1 },
@@ -24324,6 +27250,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "green",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23437, count = 1 },
@@ -24338,6 +27266,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "blue",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23438, count = 1 },
@@ -24351,6 +27281,9 @@ RecipeRegistryRecipeMetadata = {
             category = "cloth",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 45, 60 },
+            sourceNames = { "Gidge Spellweaver", "Lalla Brightweave" },
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 1 },
@@ -24366,6 +27299,9 @@ RecipeRegistryRecipeMetadata = {
             category = "spellthreads",
             sortOrder = 335,
             requiredSkill = 335,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Enuril" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -24380,6 +27316,10 @@ RecipeRegistryRecipeMetadata = {
             category = "spellthreads",
             sortOrder = 335,
             requiredSkill = 335,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -24394,6 +27334,9 @@ RecipeRegistryRecipeMetadata = {
             category = "spellthreads",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Enuril" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -24409,6 +27352,10 @@ RecipeRegistryRecipeMetadata = {
             category = "spellthreads",
             sortOrder = 375,
             requiredSkill = 375,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -24425,6 +27372,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 4 },
@@ -24440,6 +27388,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 4 },
@@ -24456,6 +27406,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 4 },
@@ -24471,6 +27423,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 6 },
@@ -24487,6 +27441,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 6 },
@@ -24502,6 +27458,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 6 },
@@ -24517,6 +27475,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 21845, count = 8 },
@@ -24533,6 +27492,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 16 },
@@ -24549,6 +27510,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 6 },
@@ -24565,6 +27528,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 21845, count = 10 },
@@ -24581,6 +27546,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 22451, count = 14 },
@@ -24597,6 +27564,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 12 },
@@ -24613,6 +27582,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 21845, count = 10 },
@@ -24629,6 +27599,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 23571, count = 5 },
@@ -24645,6 +27616,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 12 },
@@ -24661,6 +27633,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 21845, count = 10 },
@@ -24677,6 +27650,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 23571, count = 5 },
@@ -24693,6 +27667,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 12 },
@@ -24708,6 +27683,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 340,
             requiredSkill = 340,
+            sourceKind = "vendor",
+            sourceZones = { 69, 64 },
+            sourceNames = { "Karaaz", "Paulsta'ats" },
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 6 },
@@ -24721,6 +27699,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 2,
             category = "misc",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 21877, count = 3 },
@@ -24747,6 +27726,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "necklace",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 774, count = 1 },
@@ -24760,6 +27740,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 818, count = 1 },
@@ -24784,6 +27765,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enhancements",
             subcategory = "rune",
             sortOrder = 10,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 1 },
@@ -24798,6 +27780,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rune",
             sortOrder = 20,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 23449, count = 1 },
@@ -24809,6 +27794,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 21887,
             category = "materials",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 25649, count = 5 },
@@ -24822,6 +27808,9 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "vendor",
+            sourceZones = { 56, 62, 45 },
+            sourceNames = { "Haferet", "Zaralda", "Cro Threadstrong" },
             bopOutput = false,
             reagents = {
                 { itemId = 21887, count = 5 },
@@ -24834,6 +27823,7 @@ RecipeRegistryRecipeMetadata = {
             category = "kits",
             subcategory = "armor",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 21887, count = 4 },
@@ -24848,6 +27838,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "armor",
             sortOrder = 325,
             requiredSkill = 325,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 1 },
@@ -24863,6 +27857,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "armor",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Enuril" },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 1 },
@@ -24877,6 +27874,9 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 72 },
+            sourceNames = { "Thomas Yance" },
             bopOutput = false,
             reagents = {
                 { itemId = 22445, count = 6 },
@@ -24892,6 +27892,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -24906,6 +27907,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -24920,6 +27922,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -24934,6 +27937,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -24948,6 +27952,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -24962,6 +27967,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -24976,6 +27982,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -24990,6 +27997,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mail",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -25004,6 +28012,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -25017,6 +28026,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -25030,6 +28040,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -25043,6 +28054,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -25056,6 +28068,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "feet",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -25069,6 +28082,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "hands",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -25082,6 +28096,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "legs",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -25095,6 +28110,7 @@ RecipeRegistryRecipeMetadata = {
             category = "leather",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -25109,6 +28125,9 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 62, 56 },
+            sourceNames = { "Zaralda", "Haferet" },
             bopOutput = false,
             reagents = {
                 { itemId = 21887, count = 2 },
@@ -25123,6 +28142,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 4342, count = 4 },
@@ -25141,6 +28161,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "drop",
+            sourceZones = { 72 },
+            sourceNames = { "Durnholde Rifleman", "Don Carlos" },
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 4 },
@@ -25159,6 +28182,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "drop",
+            sourceZones = { 80 },
+            sourceNames = { "Sethekk Ravenguard" },
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 4 },
@@ -25177,6 +28203,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "drop",
+            sourceZones = { 81 },
+            sourceNames = { "Rift Lord", "Rift Keeper" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -25194,6 +28223,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 340,
             requiredSkill = 340,
+            sourceKind = "vendor",
+            sourceZones = { 69, 64 },
+            sourceNames = { "Karaaz", "Paulsta'ats" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -25211,6 +28243,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 69, 64 },
+            sourceNames = { "Karaaz", "Paulsta'ats" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -25228,6 +28263,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 69, 64 },
+            sourceNames = { "Karaaz", "Paulsta'ats" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -25245,6 +28283,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -25262,6 +28303,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 355,
             requiredSkill = 355,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -25279,6 +28323,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 355,
             requiredSkill = 355,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -25296,6 +28343,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 350,
             requiredSkill = 350,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 59 },
+            sourceNames = { "Logistics Officer Ulrike", "Quartermaster Urgronn" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -25314,6 +28365,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 360,
             requiredSkill = 360,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 59 },
+            sourceNames = { "Logistics Officer Ulrike", "Quartermaster Urgronn" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -25332,6 +28387,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 360,
             requiredSkill = 360,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 59 },
+            sourceNames = { "Logistics Officer Ulrike", "Quartermaster Urgronn" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -25350,6 +28409,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 340,
             requiredSkill = 340,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 64 },
+            sourceNames = { "Trader Narasu" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -25368,6 +28431,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 340,
             requiredSkill = 340,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 64 },
+            sourceNames = { "Trader Narasu" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -25386,6 +28453,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 350,
             requiredSkill = 350,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 64 },
+            sourceNames = { "Trader Narasu" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -25401,6 +28472,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 25843,
             category = "rods",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 6 },
@@ -25414,6 +28486,9 @@ RecipeRegistryRecipeMetadata = {
             category = "rods",
             sortOrder = 60,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Aaron Hollman" },
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 10 },
@@ -25427,6 +28502,9 @@ RecipeRegistryRecipeMetadata = {
             category = "rods",
             sortOrder = 70,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 59, 65 },
+            sourceNames = { "Rohok", "Mari Stonehand" },
             bopOutput = false,
             reagents = {
                 { itemId = 23447, count = 4 },
@@ -25438,6 +28516,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 22461,
             category = "rods",
             sortOrder = 60,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 14344, count = 6 },
@@ -25454,6 +28533,9 @@ RecipeRegistryRecipeMetadata = {
             category = "rods",
             sortOrder = 70,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 55, 59 },
+            sourceNames = { "Rungor", "Vodesiin" },
             bopOutput = true,
             reagents = {
                 { itemId = 22446, count = 8 },
@@ -25471,6 +28553,9 @@ RecipeRegistryRecipeMetadata = {
             category = "rods",
             sortOrder = 80,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Madame Ruby" },
             bopOutput = true,
             reagents = {
                 { itemId = 22446, count = 12 },
@@ -25489,6 +28574,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gem",
             sortOrder = 10,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 2 },
@@ -25507,6 +28595,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gem",
             sortOrder = 20,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 59 },
+            sourceNames = { "Logistics Officer Ulrike", "Quartermaster Urgronn" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 2 },
@@ -25522,6 +28613,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 25880,
             category = "statues",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 2836, count = 8 },
@@ -25533,6 +28625,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 25881,
             category = "statues",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 2838, count = 8 },
@@ -25544,6 +28637,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 25882,
             category = "statues",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 7912, count = 10 },
@@ -25555,6 +28649,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 25883,
             category = "statues",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 12365, count = 10 },
@@ -25583,6 +28678,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 265,
             requiredSkill = 335,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 4342, count = 1 },
@@ -25599,6 +28696,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "meta",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "vendor",
+            sourceZones = { 66 },
+            sourceNames = { "Ythyar" },
             bopOutput = false,
             reagents = {
                 { itemId = 25867, count = 1 },
@@ -25613,6 +28713,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "meta",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "vendor",
+            sourceZones = { 66 },
+            sourceNames = { "Ythyar" },
             bopOutput = false,
             reagents = {
                 { itemId = 25867, count = 1 },
@@ -25627,6 +28730,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "meta",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 25867, count = 1 },
@@ -25641,6 +28746,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "meta",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 25867, count = 1 },
@@ -25655,6 +28762,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "meta",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Almaador" },
             bopOutput = false,
             reagents = {
                 { itemId = 25867, count = 1 },
@@ -25669,6 +28779,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "meta",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 25868, count = 1 },
@@ -25683,6 +28795,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "meta",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 25868, count = 1 },
@@ -25697,6 +28811,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "meta",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "vendor",
+            sourceZones = { 69, 64 },
+            sourceNames = { "Karaaz", "Paulsta'ats" },
             bopOutput = false,
             reagents = {
                 { itemId = 25868, count = 1 },
@@ -25711,6 +28828,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "meta",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Alurmi" },
             bopOutput = false,
             reagents = {
                 { itemId = 25868, count = 1 },
@@ -25724,6 +28844,10 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 1,
             requiredSkill = 1,
+            faction = "horde",
+            sourceKind = "vendor",
+            sourceZones = { 61 },
+            sourceNames = { "Landraelanis" },
             bopOutput = false,
             reagents = {
                 { itemId = 27668, count = 1 },
@@ -25737,6 +28861,8 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 1,
             requiredSkill = 1,
+            faction = "alliance",
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 23676, count = 1 },
@@ -25750,6 +28876,10 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 50,
             requiredSkill = 50,
+            faction = "horde",
+            sourceKind = "vendor",
+            sourceZones = { 25 },
+            sourceNames = { "Master Chef Mouldier" },
             bopOutput = false,
             reagents = {
                 { itemId = 27669, count = 1 },
@@ -25763,6 +28893,7 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 27671, count = 1 },
@@ -25776,6 +28907,9 @@ RecipeRegistryRecipeMetadata = {
             category = "attack_power",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 59 },
+            sourceNames = { "Cookie One-Eye", "Sid Limbardi" },
             bopOutput = false,
             reagents = {
                 { itemId = 27674, count = 1 },
@@ -25789,6 +28923,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 310,
             requiredSkill = 310,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Mycah" },
             bopOutput = false,
             reagents = {
                 { itemId = 27676, count = 1 },
@@ -25802,6 +28939,9 @@ RecipeRegistryRecipeMetadata = {
             category = "spell_power",
             sortOrder = 315,
             requiredSkill = 315,
+            sourceKind = "vendor",
+            sourceZones = { 55 },
+            sourceNames = { "Innkeeper Grilka", "Supply Officer Mills" },
             bopOutput = false,
             reagents = {
                 { itemId = 27677, count = 1 },
@@ -25815,6 +28955,9 @@ RecipeRegistryRecipeMetadata = {
             category = "strength",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "vendor",
+            sourceZones = { 64 },
+            sourceNames = { "Uriku", "Nula the Butcher" },
             bopOutput = false,
             reagents = {
                 { itemId = 27678, count = 1 },
@@ -25828,6 +28971,9 @@ RecipeRegistryRecipeMetadata = {
             category = "agility",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "vendor",
+            sourceZones = { 55 },
+            sourceNames = { "Innkeeper Grilka", "Supply Officer Mills" },
             bopOutput = false,
             reagents = {
                 { itemId = 27681, count = 1 },
@@ -25841,6 +28987,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "vendor",
+            sourceZones = { 64 },
+            sourceNames = { "Uriku", "Nula the Butcher" },
             bopOutput = false,
             reagents = {
                 { itemId = 27682, count = 1 },
@@ -25854,6 +29003,9 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Gambarinka", "Doba" },
             bopOutput = false,
             reagents = {
                 { itemId = 27422, count = 1 },
@@ -25867,6 +29019,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Zurai", "Doba" },
             bopOutput = false,
             reagents = {
                 { itemId = 27425, count = 1 },
@@ -25880,6 +29035,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 310,
             requiredSkill = 310,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Juno Dufrain" },
             bopOutput = false,
             reagents = {
                 { itemId = 27429, count = 1 },
@@ -25893,6 +29051,9 @@ RecipeRegistryRecipeMetadata = {
             category = "agility",
             sortOrder = 320,
             requiredSkill = 320,
+            sourceKind = "vendor",
+            sourceZones = { 64 },
+            sourceNames = { "Uriku", "Nula the Butcher" },
             bopOutput = false,
             reagents = {
                 { itemId = 27435, count = 1 },
@@ -25906,6 +29067,9 @@ RecipeRegistryRecipeMetadata = {
             category = "spell_power",
             sortOrder = 320,
             requiredSkill = 320,
+            sourceKind = "vendor",
+            sourceZones = { 64 },
+            sourceNames = { "Uriku", "Nula the Butcher" },
             bopOutput = false,
             reagents = {
                 { itemId = 27437, count = 1 },
@@ -25919,6 +29083,9 @@ RecipeRegistryRecipeMetadata = {
             category = "spirit",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "vendor",
+            sourceZones = { 55 },
+            sourceNames = { "Rungor", "Innkeeper Biribi" },
             bopOutput = false,
             reagents = {
                 { itemId = 27438, count = 1 },
@@ -25932,6 +29099,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 55 },
+            sourceNames = { "Rungor", "Innkeeper Biribi" },
             bopOutput = false,
             reagents = {
                 { itemId = 27439, count = 1 },
@@ -25944,6 +29114,7 @@ RecipeRegistryRecipeMetadata = {
             category = "potions",
             subcategory = "healing",
             sortOrder = 80,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 13464, count = 1 },
@@ -25958,6 +29129,7 @@ RecipeRegistryRecipeMetadata = {
             category = "potions",
             subcategory = "mana",
             sortOrder = 80,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -25972,6 +29144,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "battle",
             sortOrder = 310,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 13465, count = 1 },
@@ -25986,6 +29159,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "battle",
             sortOrder = 220,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 13463, count = 1 },
@@ -26000,6 +29174,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "battle",
             sortOrder = 210,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -26013,6 +29188,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 22446, count = 2 },
             },
@@ -26023,6 +29199,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "chest",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 22445, count = 2 },
                 { itemId = 22447, count = 2 },
@@ -26036,6 +29213,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 345,
             requiredSkill = 345,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             reagents = {
                 { itemId = 22445, count = 10 },
                 { itemId = 22446, count = 4 },
@@ -26047,6 +29226,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "gloves",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 22445, count = 4 },
                 { itemId = 22447, count = 1 },
@@ -26060,6 +29240,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             reagents = {
                 { itemId = 22445, count = 2 },
                 { itemId = 22446, count = 8 },
@@ -26072,6 +29255,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "gloves",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 22445, count = 12 },
                 { itemId = 22446, count = 1 },
@@ -26083,6 +29267,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "gloves",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 22445, count = 8 },
             },
@@ -26095,6 +29280,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Alurmi" },
             reagents = {
                 { itemId = 22446, count = 6 },
                 { itemId = 22449, count = 6 },
@@ -26109,6 +29297,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Almaador" },
             reagents = {
                 { itemId = 21886, count = 6 },
                 { itemId = 22446, count = 6 },
@@ -26121,6 +29312,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "bracer",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 22447, count = 3 },
             },
@@ -26131,6 +29323,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "bracer",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 22445, count = 6 },
             },
@@ -26143,6 +29336,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "vendor",
+            sourceZones = { 69, 64 },
+            sourceNames = { "Karaaz", "Paulsta'ats" },
             reagents = {
                 { itemId = 22445, count = 6 },
                 { itemId = 22446, count = 2 },
@@ -26155,6 +29351,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "cloak",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 22445, count = 4 },
                 { itemId = 22446, count = 1 },
@@ -26169,6 +29366,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "drop",
+            sourceZones = { 65 },
+            sourceNames = { "Eclipsion Archmage" },
             reagents = {
                 { itemId = 22449, count = 4 },
                 { itemId = 22457, count = 8 },
@@ -26182,6 +29382,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "drop",
+            sourceZones = { 69 },
+            sourceNames = { "Voidshrieker" },
             reagents = {
                 { itemId = 22449, count = 4 },
                 { itemId = 22456, count = 8 },
@@ -26195,6 +29398,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "boots",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "drop",
             reagents = {
                 { itemId = 22449, count = 8 },
                 { itemId = 22451, count = 8 },
@@ -26208,6 +29412,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "boots",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "drop",
             reagents = {
                 { itemId = 22449, count = 8 },
                 { itemId = 22452, count = 8 },
@@ -26221,6 +29426,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Madame Ruby" },
             reagents = {
                 { itemId = 22445, count = 15 },
             },
@@ -26233,6 +29441,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Almaador" },
             reagents = {
                 { itemId = 21885, count = 8 },
                 { itemId = 21886, count = 8 },
@@ -26248,6 +29459,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23112, count = 1 },
@@ -26261,6 +29473,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 9788,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 20 },
@@ -26278,6 +29491,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 9788,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22457, count = 10 },
@@ -26293,6 +29507,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 9788,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23447, count = 6 },
@@ -26309,6 +29524,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 9788,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22457, count = 10 },
@@ -26324,6 +29540,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 1,
             specialization = 17039,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22456, count = 20 },
@@ -26339,6 +29556,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 1,
             specialization = 17039,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 10 },
@@ -26354,6 +29572,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 1,
             specialization = 17039,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23449, count = 14 },
@@ -26369,6 +29588,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 1,
             specialization = 17039,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23571, count = 2 },
@@ -26384,6 +29604,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 1,
             specialization = 17041,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22456, count = 20 },
@@ -26400,6 +29621,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 1,
             specialization = 17041,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23448, count = 6 },
@@ -26415,6 +29637,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 1,
             specialization = 17041,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 12 },
@@ -26431,6 +29654,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 1,
             specialization = 17041,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22457, count = 10 },
@@ -26446,6 +29670,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 1,
             specialization = 17040,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 20 },
@@ -26462,6 +29687,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 1,
             specialization = 17040,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23571, count = 2 },
@@ -26477,6 +29703,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 1,
             specialization = 17040,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 21885, count = 20 },
@@ -26493,6 +29720,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 1,
             specialization = 17040,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22457, count = 10 },
@@ -26509,6 +29737,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 305,
             requiredSkill = 305,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23077, count = 1 },
@@ -26521,6 +29750,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enhancements",
             subcategory = "weightstone",
             sortOrder = 60,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 21877, count = 1 },
@@ -26536,6 +29766,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weightstone",
             sortOrder = 70,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 21877, count = 2 },
@@ -26549,6 +29782,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 1 },
@@ -26564,6 +29798,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3864, count = 2 },
@@ -26578,6 +29813,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12800, count = 2 },
@@ -26591,6 +29827,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12364, count = 2 },
@@ -26604,6 +29841,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "thrown",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 1 },
@@ -26618,6 +29856,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "thrown",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 2 },
@@ -26633,6 +29872,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "thrown",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 1 },
@@ -26647,6 +29887,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "thrown",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 2 },
@@ -26664,6 +29905,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "armor",
             sortOrder = 340,
             requiredSkill = 340,
+            sourceKind = "drop",
+            sourceZones = { 80 },
+            sourceNames = { "Time-Lost Shadowmage" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 4 },
@@ -26679,6 +29923,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "armor",
             sortOrder = 340,
             requiredSkill = 340,
+            sourceKind = "drop",
+            sourceZones = { 67 },
+            sourceNames = { "Gargantuan Abyssal" },
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 4 },
@@ -26694,6 +29941,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "armor",
             sortOrder = 340,
             requiredSkill = 340,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 4 },
@@ -26709,6 +29957,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "armor",
             sortOrder = 340,
             requiredSkill = 340,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 22456, count = 4 },
@@ -26724,6 +29973,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "armor",
             sortOrder = 340,
             requiredSkill = 340,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 4 },
@@ -26739,6 +29989,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Enuril" },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 8 },
@@ -26755,6 +30008,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Enuril" },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 6 },
@@ -26771,6 +30027,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Enuril" },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 6 },
@@ -26787,6 +30046,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 350,
             requiredSkill = 350,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 3 },
@@ -26804,6 +30067,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 350,
             requiredSkill = 350,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 4 },
@@ -26820,6 +30087,10 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 325,
             requiredSkill = 325,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 64 },
+            sourceNames = { "Trader Narasu" },
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 4 },
@@ -26835,6 +30106,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 350,
             requiredSkill = 350,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 3 },
@@ -26852,6 +30127,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Enuril" },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 8 },
@@ -26868,6 +30146,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Enuril" },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 6 },
@@ -26884,6 +30165,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Enuril" },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 6 },
@@ -26900,6 +30184,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 350,
             requiredSkill = 350,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 4 },
@@ -26917,6 +30205,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 350,
             requiredSkill = 350,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 3 },
@@ -26934,6 +30226,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 350,
             requiredSkill = 350,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 3 },
@@ -26950,6 +30246,9 @@ RecipeRegistryRecipeMetadata = {
             category = "drums",
             sortOrder = 370,
             requiredSkill = 370,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Alurmi" },
             bopOutput = false,
             reagents = {
                 { itemId = 23793, count = 6 },
@@ -26964,6 +30263,10 @@ RecipeRegistryRecipeMetadata = {
             category = "drums",
             sortOrder = 350,
             requiredSkill = 350,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 64 },
+            sourceNames = { "Trader Narasu" },
             bopOutput = false,
             reagents = {
                 { itemId = 23793, count = 6 },
@@ -26976,6 +30279,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 29528,
             category = "drums",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23793, count = 3 },
@@ -26990,6 +30294,9 @@ RecipeRegistryRecipeMetadata = {
             category = "drums",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Almaador" },
             bopOutput = false,
             reagents = {
                 { itemId = 23793, count = 6 },
@@ -27004,6 +30311,9 @@ RecipeRegistryRecipeMetadata = {
             category = "drums",
             sortOrder = 345,
             requiredSkill = 345,
+            sourceKind = "vendor",
+            sourceZones = { 64 },
+            sourceNames = { "Provisioner Nasela", "Trader Narasu" },
             bopOutput = false,
             reagents = {
                 { itemId = 23793, count = 6 },
@@ -27019,6 +30329,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "slot",
             sortOrder = 335,
             requiredSkill = 335,
+            sourceKind = "vendor",
+            sourceZones = { 59 },
+            sourceNames = { "Logistics Officer Ulrike", "Quartermaster Urgronn" },
             bopOutput = false,
             reagents = {
                 { itemId = 22451, count = 4 },
@@ -27035,6 +30348,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "slot",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "vendor",
+            sourceZones = { 59 },
+            sourceNames = { "Logistics Officer Ulrike", "Quartermaster Urgronn" },
             bopOutput = false,
             reagents = {
                 { itemId = 22451, count = 8 },
@@ -27052,6 +30368,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "slot",
             sortOrder = 335,
             requiredSkill = 335,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 4 },
@@ -27068,6 +30387,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "slot",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 8 },
@@ -27085,6 +30407,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 22451, count = 15 },
@@ -27103,6 +30427,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 22451, count = 12 },
@@ -27121,6 +30446,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 22451, count = 18 },
@@ -27139,6 +30466,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 8 },
@@ -27156,6 +30485,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 16 },
@@ -27173,6 +30503,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 22451, count = 8 },
@@ -27191,6 +30523,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 12 },
@@ -27209,6 +30543,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 22 },
@@ -27227,6 +30563,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 10 },
@@ -27245,6 +30582,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 18 },
@@ -27263,6 +30602,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 14 },
@@ -27281,6 +30621,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 22451, count = 8 },
@@ -27298,6 +30640,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 10656,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 16 },
@@ -27315,6 +30658,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 1,
             specialization = 10656,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 12 },
@@ -27332,6 +30676,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 1,
             specialization = 10656,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 8 },
@@ -27348,6 +30693,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 10656,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 16 },
@@ -27365,6 +30711,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 1,
             specialization = 10656,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 12 },
@@ -27382,6 +30729,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 1,
             specialization = 10656,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 8 },
@@ -27398,6 +30746,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 10660,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 16 },
@@ -27415,6 +30764,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 1,
             specialization = 10660,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 12 },
@@ -27432,6 +30782,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 1,
             specialization = 10660,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 8 },
@@ -27448,6 +30799,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 10658,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23571, count = 6 },
@@ -27463,6 +30815,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 1,
             specialization = 10658,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23571, count = 5 },
@@ -27478,6 +30831,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 1,
             specialization = 10658,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23571, count = 3 },
@@ -27491,6 +30845,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 10,
             category = "elementals",
             sortOrder = 10,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 1 },
@@ -27503,6 +30858,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 10,
             category = "elementals",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 1 },
@@ -27516,6 +30872,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             specialization = 10658,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 7081, count = 8 },
@@ -27532,6 +30889,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             specialization = 10660,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 8153, count = 4 },
@@ -27549,6 +30907,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             specialization = 10656,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 7077, count = 2 },
@@ -27566,6 +30925,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 10658,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -27582,6 +30942,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 10660,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -27598,6 +30959,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 10656,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -27614,6 +30976,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             specialization = 9788,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 3860, count = 16 },
@@ -27628,6 +30991,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             specialization = 9788,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 3860, count = 16 },
@@ -27642,6 +31006,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 1,
             specialization = 9787,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -27656,6 +31021,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 1,
             specialization = 9787,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -27670,6 +31036,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 1,
             specialization = 9787,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -27684,6 +31051,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 9788,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22452, count = 4 },
@@ -27698,6 +31066,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 9788,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 21885, count = 2 },
@@ -27713,6 +31082,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 1,
             specialization = 17039,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 6 },
@@ -27727,6 +31097,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 1,
             specialization = 17039,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22452, count = 6 },
@@ -27741,6 +31112,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 1,
             specialization = 17041,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 21885, count = 3 },
@@ -27756,6 +31128,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 1,
             specialization = 17041,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 6 },
@@ -27770,6 +31143,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 1,
             specialization = 17040,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 6 },
@@ -27784,6 +31158,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 1,
             specialization = 17040,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 22452, count = 6 },
@@ -27798,6 +31173,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Mycah" },
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 1 },
@@ -27812,6 +31190,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 9788,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23564, count = 1 },
@@ -27826,6 +31205,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             specialization = 9788,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 28484, count = 1 },
@@ -27840,6 +31220,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 1,
             specialization = 17039,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 28426, count = 1 },
@@ -27854,6 +31235,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 1,
             specialization = 17039,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 28429, count = 1 },
@@ -27868,6 +31250,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 1,
             specialization = 17041,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 28432, count = 1 },
@@ -27882,6 +31265,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 1,
             specialization = 17041,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 28435, count = 1 },
@@ -27896,6 +31280,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 1,
             specialization = 17040,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 28438, count = 1 },
@@ -27910,6 +31295,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 1,
             specialization = 17040,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 28441, count = 1 },
@@ -28199,6 +31585,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "necklace",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -28213,6 +31600,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 1 },
@@ -28227,6 +31615,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 1 },
@@ -28240,6 +31629,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 12800, count = 1 },
@@ -28360,6 +31750,9 @@ RecipeRegistryRecipeMetadata = {
             category = "cloth",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 45, 60 },
+            sourceNames = { "Andrion Darkspinner", "Linna Bruder" },
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 1 },
@@ -28375,6 +31768,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "transporters",
             sortOrder = 30,
             specialization = 20222,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 2 },
@@ -28392,6 +31786,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "transporters",
             sortOrder = 40,
             specialization = 20219,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 22451, count = 2 },
@@ -28408,6 +31803,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 774, count = 3 },
@@ -28423,6 +31819,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 30816,
             category = "basic",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 1 },
@@ -28438,6 +31835,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Almaador" },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 8 },
@@ -28453,6 +31853,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Nakodu" },
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 4 },
@@ -28470,6 +31873,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 350,
             requiredSkill = 350,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -28486,6 +31893,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 360,
             requiredSkill = 360,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -28502,6 +31913,10 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 370,
             requiredSkill = 370,
+            faction = "alliance",
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Quartermaster Endarin" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -28515,6 +31930,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 31079,
             category = "materials",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 1 },
@@ -28528,6 +31944,7 @@ RecipeRegistryRecipeMetadata = {
             category = "transmutes",
             subcategory = "special",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 1 },
@@ -28542,6 +31959,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "necklace",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 1705, count = 1 },
@@ -28558,6 +31976,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 12 },
@@ -28575,6 +31996,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 12 },
@@ -28592,6 +32016,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 12 },
@@ -28609,6 +32036,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 66 },
+            sourceNames = { "Koren" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 12 },
@@ -28626,6 +32056,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 66 },
+            sourceNames = { "Koren" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 12 },
@@ -28643,6 +32076,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 66 },
+            sourceNames = { "Koren" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 12 },
@@ -28660,6 +32096,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 53 },
+            sourceNames = { "Apprentice Darius" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 6 },
@@ -28677,6 +32116,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 6 },
@@ -28693,6 +32135,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 335,
             requiredSkill = 335,
+            sourceKind = "vendor",
+            sourceZones = { 71 },
+            sourceNames = { "Xerintha Ravenoak", "Sassa Weldwell" },
             bopOutput = false,
             reagents = {
                 { itemId = 31670, count = 1 },
@@ -28706,6 +32151,9 @@ RecipeRegistryRecipeMetadata = {
             category = "spell_power",
             sortOrder = 335,
             requiredSkill = 335,
+            sourceKind = "vendor",
+            sourceZones = { 71 },
+            sourceNames = { "Xerintha Ravenoak", "Sassa Weldwell" },
             bopOutput = false,
             reagents = {
                 { itemId = 31671, count = 1 },
@@ -28720,6 +32168,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 270,
             requiredSkill = 335,
+            sourceKind = "drop",
+            sourceZones = { 65 },
+            sourceNames = { "Wrathwalker", "Shadow Council Warlock", "Mo'arg Weaponsmith" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -28736,6 +32187,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mana",
             sortOrder = 85,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 65 },
+            sourceNames = { "Eclipsion Blood Knight", "Eclipsion Centurion", "Torloth the Magnificent" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -28752,6 +32206,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "combat",
             sortOrder = 90,
             requiredSkill = 345,
+            sourceKind = "drop",
+            sourceZones = { 65 },
+            sourceNames = { "Deathforge Smith", "Deathforge Tinkerer", "Deathforge Guardian" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -28782,6 +32239,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23440, count = 1 },
@@ -28824,6 +32283,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23441, count = 1 },
@@ -28838,6 +32299,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23441, count = 1 },
@@ -28880,6 +32343,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23439, count = 1 },
@@ -28894,6 +32359,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23439, count = 1 },
@@ -28906,6 +32373,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "guardian",
             sortOrder = 70,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -28922,6 +32390,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "guardian",
             sortOrder = 100,
             requiredSkill = 320,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Fedryen Swiftspear" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -28936,6 +32407,7 @@ RecipeRegistryRecipeMetadata = {
             category = "elixirs",
             subcategory = "battle",
             sortOrder = 230,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -28952,6 +32424,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "guardian",
             sortOrder = 90,
             requiredSkill = 330,
+            sourceKind = "vendor",
+            sourceZones = { 64 },
+            sourceNames = { "Quartermaster Jaffrey Noreliqe", "Quartermaster Davian Vaclav" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -28968,6 +32443,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32227, count = 1 },
@@ -28982,6 +32460,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32227, count = 1 },
@@ -28996,6 +32477,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32227, count = 1 },
@@ -29010,6 +32494,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32227, count = 1 },
@@ -29024,6 +32511,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32227, count = 1 },
@@ -29038,6 +32528,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32227, count = 1 },
@@ -29052,6 +32545,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 45, 82 },
+            sourceNames = { "Ontuvo", "Shaani" },
             bopOutput = false,
             reagents = {
                 { itemId = 32227, count = 1 },
@@ -29066,6 +32562,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "blue",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32228, count = 1 },
@@ -29080,6 +32579,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "blue",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32228, count = 1 },
@@ -29094,6 +32596,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "blue",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32228, count = 1 },
@@ -29108,6 +32613,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "blue",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 45, 82 },
+            sourceNames = { "Ontuvo", "Shaani" },
             bopOutput = false,
             reagents = {
                 { itemId = 32228, count = 1 },
@@ -29122,6 +32630,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32229, count = 1 },
@@ -29136,6 +32647,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32229, count = 1 },
@@ -29150,6 +32664,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32229, count = 1 },
@@ -29164,6 +32681,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32229, count = 1 },
@@ -29178,6 +32698,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32229, count = 1 },
@@ -29192,6 +32715,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 45, 82 },
+            sourceNames = { "Ontuvo", "Shaani" },
             bopOutput = false,
             reagents = {
                 { itemId = 32229, count = 1 },
@@ -29206,6 +32732,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 45, 82 },
+            sourceNames = { "Ontuvo", "Shaani" },
             bopOutput = false,
             reagents = {
                 { itemId = 32229, count = 1 },
@@ -29220,6 +32749,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 45, 82 },
+            sourceNames = { "Ontuvo", "Shaani" },
             bopOutput = false,
             reagents = {
                 { itemId = 32230, count = 1 },
@@ -29234,6 +32766,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 45, 82 },
+            sourceNames = { "Ontuvo", "Shaani" },
             bopOutput = false,
             reagents = {
                 { itemId = 32230, count = 1 },
@@ -29248,6 +32783,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32230, count = 1 },
@@ -29262,6 +32800,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32230, count = 1 },
@@ -29276,6 +32817,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32230, count = 1 },
@@ -29290,6 +32834,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32230, count = 1 },
@@ -29304,6 +32851,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 45, 82 },
+            sourceNames = { "Ontuvo", "Shaani" },
             bopOutput = false,
             reagents = {
                 { itemId = 32231, count = 1 },
@@ -29318,6 +32868,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32231, count = 1 },
@@ -29332,6 +32885,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32231, count = 1 },
@@ -29346,6 +32902,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32231, count = 1 },
@@ -29360,6 +32919,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 45, 82 },
+            sourceNames = { "Ontuvo", "Shaani" },
             bopOutput = false,
             reagents = {
                 { itemId = 32231, count = 1 },
@@ -29374,6 +32936,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32231, count = 1 },
@@ -29388,6 +32953,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "green",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32249, count = 1 },
@@ -29402,6 +32970,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "green",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32249, count = 1 },
@@ -29416,6 +32987,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "green",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32249, count = 1 },
@@ -29430,6 +33004,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "green",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Shaani", "Ontuvo", "Indormi" },
             bopOutput = false,
             reagents = {
                 { itemId = 32249, count = 1 },
@@ -29443,6 +33020,9 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 260,
             requiredSkill = 275,
+            sourceKind = "vendor",
+            sourceZones = { 42, 45 },
+            sourceNames = { "Xizzer Fizzbolt", "Viggz Shinesparked" },
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 2 },
@@ -29458,6 +33038,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "meta",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "vendor",
+            sourceZones = { 69, 64 },
+            sourceNames = { "Karaaz", "Paulsta'ats" },
             bopOutput = false,
             reagents = {
                 { itemId = 25867, count = 1 },
@@ -29472,6 +33055,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "meta",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 25868, count = 1 },
@@ -29485,6 +33070,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "powders",
             sortOrder = 70,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 21877, count = 2 },
@@ -29500,6 +33086,7 @@ RecipeRegistryRecipeMetadata = {
             category = "explosives",
             subcategory = "grenades",
             sortOrder = 50,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23782, count = 1 },
@@ -29516,6 +33103,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 84 },
+            sourceNames = { "Okuno" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 2 },
@@ -29552,6 +33142,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 84 },
+            sourceNames = { "Okuno" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 4 },
@@ -29570,6 +33163,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 84 },
+            sourceNames = { "Okuno" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 3 },
@@ -29588,6 +33184,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 84 },
+            sourceNames = { "Okuno" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 2 },
@@ -29606,6 +33205,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 84 },
+            sourceNames = { "Okuno" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 2 },
@@ -29624,6 +33226,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 84 },
+            sourceNames = { "Okuno" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 4 },
@@ -29642,6 +33247,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 84 },
+            sourceNames = { "Okuno" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 3 },
@@ -29660,6 +33268,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 84 },
+            sourceNames = { "Okuno" },
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 1 },
@@ -29678,6 +33289,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 84 },
+            sourceNames = { "Okuno" },
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 1 },
@@ -29696,6 +33310,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 84 },
+            sourceNames = { "Okuno" },
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 2 },
@@ -29714,6 +33331,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 84 },
+            sourceNames = { "Okuno" },
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 1 },
@@ -29732,6 +33352,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 84 },
+            sourceNames = { "Okuno" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 2 },
@@ -29750,6 +33373,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 84 },
+            sourceNames = { "Okuno" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 2 },
@@ -29768,6 +33394,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 84 },
+            sourceNames = { "Okuno" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 4 },
@@ -29786,6 +33415,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 84 },
+            sourceNames = { "Okuno" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 3 },
@@ -29804,6 +33436,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 84 },
+            sourceNames = { "Okuno" },
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 1 },
@@ -29820,6 +33455,7 @@ RecipeRegistryRecipeMetadata = {
             category = "goggles",
             subcategory = "plate",
             sortOrder = 290,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23436, count = 2 },
@@ -29837,6 +33473,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "necklace",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 22578, count = 3 },
@@ -30125,6 +33762,7 @@ RecipeRegistryRecipeMetadata = {
             category = "weapons",
             subcategory = "firearms",
             sortOrder = 170,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 12 },
@@ -30142,6 +33780,7 @@ RecipeRegistryRecipeMetadata = {
             category = "goggles",
             subcategory = "plate",
             sortOrder = 300,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23440, count = 2 },
@@ -30159,6 +33798,7 @@ RecipeRegistryRecipeMetadata = {
             category = "goggles",
             subcategory = "plate",
             sortOrder = 310,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23437, count = 2 },
@@ -30176,6 +33816,7 @@ RecipeRegistryRecipeMetadata = {
             category = "goggles",
             subcategory = "mail",
             sortOrder = 320,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23441, count = 2 },
@@ -30193,6 +33834,7 @@ RecipeRegistryRecipeMetadata = {
             category = "goggles",
             subcategory = "mail",
             sortOrder = 330,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23436, count = 2 },
@@ -30210,6 +33852,7 @@ RecipeRegistryRecipeMetadata = {
             category = "goggles",
             subcategory = "mail",
             sortOrder = 340,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23439, count = 2 },
@@ -30227,6 +33870,7 @@ RecipeRegistryRecipeMetadata = {
             category = "goggles",
             subcategory = "leather",
             sortOrder = 350,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23436, count = 2 },
@@ -30244,6 +33888,7 @@ RecipeRegistryRecipeMetadata = {
             category = "goggles",
             subcategory = "leather",
             sortOrder = 360,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23440, count = 2 },
@@ -30261,6 +33906,7 @@ RecipeRegistryRecipeMetadata = {
             category = "goggles",
             subcategory = "leather",
             sortOrder = 370,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23437, count = 2 },
@@ -30278,6 +33924,7 @@ RecipeRegistryRecipeMetadata = {
             category = "goggles",
             subcategory = "cloth",
             sortOrder = 380,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23438, count = 2 },
@@ -30295,6 +33942,7 @@ RecipeRegistryRecipeMetadata = {
             category = "goggles",
             subcategory = "cloth",
             sortOrder = 390,
+            sourceKind = "trainer",
             bopOutput = true,
             reagents = {
                 { itemId = 23439, count = 2 },
@@ -30312,6 +33960,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23447, count = 2 },
@@ -30325,6 +33974,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "ring",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 24479, count = 1 },
@@ -30338,6 +33988,7 @@ RecipeRegistryRecipeMetadata = {
             category = "jewelry",
             subcategory = "crown",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23449, count = 12 },
@@ -30353,6 +34004,7 @@ RecipeRegistryRecipeMetadata = {
             category = "gems",
             subcategory = "purple",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 24478, count = 1 },
@@ -30366,6 +34018,7 @@ RecipeRegistryRecipeMetadata = {
             category = "gems",
             subcategory = "purple",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 24479, count = 1 },
@@ -30443,6 +34096,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 33048,
             category = "basic",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 2593, count = 1 },
@@ -30457,6 +34111,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 6,
             category = "stamina",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 5 },
@@ -30471,6 +34126,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 2,
             category = "mp5",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 2 },
@@ -30485,6 +34141,9 @@ RecipeRegistryRecipeMetadata = {
             category = "cloaks",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 53 },
+            sourceNames = { "Apprentice Darius" },
             bopOutput = false,
             reagents = {
                 { itemId = 21844, count = 12 },
@@ -30502,6 +34161,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 69, 64 },
+            sourceNames = { "Karaaz", "Paulsta'ats" },
             bopOutput = true,
             reagents = {
                 { itemId = 23436, count = 1 },
@@ -30516,6 +34178,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Almaador" },
             bopOutput = true,
             reagents = {
                 { itemId = 23436, count = 1 },
@@ -30530,6 +34195,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "red",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 69, 64 },
+            sourceNames = { "Karaaz", "Paulsta'ats" },
             bopOutput = true,
             reagents = {
                 { itemId = 23436, count = 1 },
@@ -30544,6 +34212,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "blue",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Nakodu" },
             bopOutput = true,
             reagents = {
                 { itemId = 23438, count = 1 },
@@ -30558,6 +34229,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Alurmi" },
             bopOutput = true,
             reagents = {
                 { itemId = 23440, count = 1 },
@@ -30572,6 +34246,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Almaador" },
             bopOutput = true,
             reagents = {
                 { itemId = 23440, count = 1 },
@@ -30586,6 +34263,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Alurmi" },
             bopOutput = true,
             reagents = {
                 { itemId = 23440, count = 1 },
@@ -30597,6 +34277,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 22448,
             category = "materials",
             sortOrder = 20,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 20725, count = 1 },
@@ -30609,6 +34290,7 @@ RecipeRegistryRecipeMetadata = {
             createdCount = 3,
             category = "materials",
             sortOrder = 21,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 22449, count = 1 },
@@ -30622,6 +34304,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 53 },
+            sourceNames = { "Apprentice Darius" },
             reagents = {
                 { itemId = 22445, count = 8 },
                 { itemId = 22446, count = 4 },
@@ -30638,6 +34323,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "drop",
+            sourceZones = { 65 },
+            sourceNames = { "Enraged Fire Spirit", "Enraged Water Spirit", "Enraged Air Spirit" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 2 },
@@ -30655,6 +34343,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon_chain",
             sortOrder = 20,
             requiredSkill = 335,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 23449, count = 1 },
@@ -30670,6 +34359,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "vendor",
+            sourceZones = { 53 },
+            sourceNames = { "Apprentice Darius" },
             bopOutput = false,
             reagents = {
                 { itemId = 21844, count = 16 },
@@ -30688,6 +34380,9 @@ RecipeRegistryRecipeMetadata = {
             category = "flasks",
             sortOrder = 110,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 53 },
+            sourceNames = { "Apprentice Darius" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -30721,6 +34416,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "green",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 64 },
+            sourceNames = { "Quartermaster Jaffrey Noreliqe", "Quartermaster Davian Vaclav" },
             bopOutput = false,
             reagents = {
                 { itemId = 23437, count = 1 },
@@ -30735,6 +34433,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 35,
             requiredSkill = 35,
+            faction = "alliance",
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 818, count = 1 },
@@ -30750,6 +34450,9 @@ RecipeRegistryRecipeMetadata = {
             category = "ammo",
             sortOrder = 100,
             requiredSkill = 335,
+            sourceKind = "drop",
+            sourceZones = { 69 },
+            sourceNames = { "Sunfury Archer" },
             bopOutput = false,
             reagents = {
                 { itemId = 4470, count = 4 },
@@ -30765,6 +34468,7 @@ RecipeRegistryRecipeMetadata = {
             category = "crit",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 33824, count = 1 },
@@ -30778,6 +34482,7 @@ RecipeRegistryRecipeMetadata = {
             category = "special",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 13757, count = 1 },
@@ -30792,6 +34497,7 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 33823, count = 1 },
@@ -30805,6 +34511,7 @@ RecipeRegistryRecipeMetadata = {
             category = "hit",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -30819,6 +34526,7 @@ RecipeRegistryRecipeMetadata = {
             category = "special",
             sortOrder = 300,
             requiredSkill = 300,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 27671, count = 1 },
@@ -30832,6 +34540,7 @@ RecipeRegistryRecipeMetadata = {
             category = "special",
             sortOrder = 1,
             requiredSkill = 1,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 785, count = 3 },
@@ -30851,6 +34560,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "worldDrop",
+            worldDrop = true,
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 12 },
@@ -30865,6 +34576,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 34060,
             category = "parts",
             sortOrder = 270,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 11291, count = 8 },
@@ -30881,6 +34593,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 34061,
             category = "parts",
             sortOrder = 280,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23786, count = 8 },
@@ -30896,6 +34609,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 34099,
             category = "bags",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 4 },
@@ -30910,6 +34624,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 34100,
             category = "bags",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -30925,6 +34640,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 45 },
+            sourceNames = { "Nakodu" },
             bopOutput = false,
             reagents = {
                 { itemId = 17056, count = 99 },
@@ -30939,6 +34657,7 @@ RecipeRegistryRecipeMetadata = {
             category = "enchants",
             subcategory = "shield",
             sortOrder = 1,
+            sourceKind = "trainer",
             reagents = {
                 { itemId = 22447, count = 4 },
                 { itemId = 22449, count = 1 },
@@ -30954,6 +34673,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "tools",
             sortOrder = 110,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 71 },
+            sourceNames = { "Simon Unit", "Gan'arg Analyzer" },
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 8 },
@@ -30969,6 +34691,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 59 },
+            sourceNames = { "Quartermaster Urgronn", "Logistics Officer Ulrike" },
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 4 },
@@ -30984,6 +34709,7 @@ RecipeRegistryRecipeMetadata = {
             category = "kits",
             subcategory = "slot",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 3 },
@@ -30999,6 +34725,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "meta",
             sortOrder = 365,
             requiredSkill = 365,
+            sourceKind = "drop",
+            sourceZones = { 65 },
+            sourceNames = { "Coilskar Siren" },
             bopOutput = false,
             reagents = {
                 { itemId = 25868, count = 1 },
@@ -31013,6 +34742,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 22 },
+            sourceNames = { "Penney Copperpinch" },
             bopOutput = false,
             reagents = {
                 { itemId = 2605, count = 2 },
@@ -31029,6 +34761,9 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 285,
             requiredSkill = 285,
+            sourceKind = "vendor",
+            sourceZones = { 22, 24 },
+            sourceNames = { "Penney Copperpinch", "Wulmort Jinglepocket" },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 1 },
@@ -31046,6 +34781,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 24 },
+            sourceNames = { "Wulmort Jinglepocket" },
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -31061,6 +34799,7 @@ RecipeRegistryRecipeMetadata = {
             category = "kits",
             subcategory = "armor",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 23793, count = 3 },
@@ -31075,6 +34814,9 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 325,
             requiredSkill = 325,
+            sourceKind = "vendor",
+            sourceZones = { 22, 24 },
+            sourceNames = { "Penney Copperpinch", "Wulmort Jinglepocket" },
             bopOutput = false,
             reagents = {
                 { itemId = 17194, count = 1 },
@@ -31091,6 +34833,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 140,
             requiredSkill = 325,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -31103,6 +34846,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 34482,
             category = "bags",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -31119,6 +34863,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "drop",
+            sourceZones = { 55 },
+            sourceNames = { "Gordunni Elementalist", "Gordunni Head-Splitter", "Gordunni Back-Breaker" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -31138,6 +34885,7 @@ RecipeRegistryRecipeMetadata = {
             category = "special",
             sortOrder = 100,
             requiredSkill = 100,
+            sourceKind = "quest",
             bopOutput = false,
             reagents = {
                 { itemId = 2594, count = 1 },
@@ -31153,6 +34901,9 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 31,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82 },
+            sourceNames = { "Eldara Dawnrunner" },
             bopOutput = false,
             reagents = {
                 { itemId = 22450, count = 1 },
@@ -31740,6 +35491,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45 },
+            sourceNames = { "Shaani", "Ontuvo" },
             bopOutput = false,
             reagents = {
                 { itemId = 23440, count = 1 },
@@ -31754,6 +35508,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45 },
+            sourceNames = { "Shaani", "Ontuvo" },
             bopOutput = false,
             reagents = {
                 { itemId = 23439, count = 1 },
@@ -31768,6 +35525,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "green",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45 },
+            sourceNames = { "Shaani", "Ontuvo" },
             bopOutput = false,
             reagents = {
                 { itemId = 23437, count = 1 },
@@ -31794,6 +35554,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 360,
             requiredSkill = 360,
+            sourceKind = "vendor",
+            sourceZones = { 82 },
+            sourceNames = { "Eldara Dawnrunner" },
             reagents = {
                 { itemId = 22445, count = 8 },
                 { itemId = 22446, count = 4 },
@@ -31809,6 +35572,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "meta",
             sortOrder = 370,
             requiredSkill = 370,
+            sourceKind = "vendor",
+            sourceZones = { 82 },
+            sourceNames = { "Eldara Dawnrunner" },
             bopOutput = false,
             reagents = {
                 { itemId = 25867, count = 1 },
@@ -31823,6 +35589,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "meta",
             sortOrder = 370,
             requiredSkill = 370,
+            sourceKind = "vendor",
+            sourceZones = { 82 },
+            sourceNames = { "Eldara Dawnrunner" },
             bopOutput = false,
             reagents = {
                 { itemId = 25868, count = 1 },
@@ -31836,6 +35605,9 @@ RecipeRegistryRecipeMetadata = {
             category = "attack_power",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 41 },
+            sourceNames = { "Malygen", "Bale" },
             bopOutput = false,
             reagents = {
                 { itemId = 35562, count = 1 },
@@ -31849,6 +35621,9 @@ RecipeRegistryRecipeMetadata = {
             category = "spell_power",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 41 },
+            sourceNames = { "Malygen", "Bale" },
             bopOutput = false,
             reagents = {
                 { itemId = 35562, count = 1 },
@@ -31863,6 +35638,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinkets",
             sortOrder = 150,
             requiredSkill = 355,
+            sourceKind = "drop",
             bopOutput = false,
             reagents = {
                 { itemId = 21840, count = 8 },
@@ -31880,6 +35656,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82 },
+            sourceNames = { "Eldara Dawnrunner" },
             bopOutput = true,
             reagents = {
                 { itemId = 23440, count = 6 },
@@ -31896,6 +35675,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82 },
+            sourceNames = { "Eldara Dawnrunner" },
             bopOutput = true,
             reagents = {
                 { itemId = 22452, count = 8 },
@@ -31912,6 +35694,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82 },
+            sourceNames = { "Eldara Dawnrunner" },
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 8 },
@@ -31928,6 +35713,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82 },
+            sourceNames = { "Eldara Dawnrunner" },
             bopOutput = true,
             reagents = {
                 { itemId = 22456, count = 8 },
@@ -31944,6 +35732,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82 },
+            sourceNames = { "Eldara Dawnrunner" },
             bopOutput = true,
             reagents = {
                 { itemId = 22457, count = 8 },
@@ -31960,6 +35751,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 350,
             requiredSkill = 350,
+            sourceKind = "vendor",
+            sourceZones = { 82 },
+            sourceNames = { "Eldara Dawnrunner" },
             bopOutput = false,
             reagents = {
                 { itemId = 23441, count = 1 },
@@ -31974,6 +35768,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "specialty",
             sortOrder = 10,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82 },
+            sourceNames = { "Eldara Dawnrunner" },
             bopOutput = true,
             reagents = {
                 { itemId = 13503, count = 1 },
@@ -31990,6 +35787,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "specialty",
             sortOrder = 20,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82 },
+            sourceNames = { "Eldara Dawnrunner" },
             bopOutput = true,
             reagents = {
                 { itemId = 13503, count = 1 },
@@ -32006,6 +35806,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "specialty",
             sortOrder = 30,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82 },
+            sourceNames = { "Eldara Dawnrunner" },
             bopOutput = true,
             reagents = {
                 { itemId = 13503, count = 1 },
@@ -32022,6 +35825,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "specialty",
             sortOrder = 40,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82 },
+            sourceNames = { "Eldara Dawnrunner" },
             bopOutput = true,
             reagents = {
                 { itemId = 13503, count = 1 },
@@ -32037,6 +35843,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "drop",
             reagents = {
                 { itemId = 22446, count = 8 },
                 { itemId = 22452, count = 8 },
@@ -32051,6 +35858,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "green",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Eldara Dawnrunner", "Shaani", "Ontuvo" },
             bopOutput = false,
             reagents = {
                 { itemId = 32249, count = 1 },
@@ -32065,6 +35875,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "green",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 83, 82, 45 },
+            sourceNames = { "Indormi", "Eldara Dawnrunner", "Shaani" },
             bopOutput = false,
             reagents = {
                 { itemId = 32249, count = 1 },
@@ -32079,6 +35892,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "orange",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Eldara Dawnrunner", "Shaani", "Ontuvo" },
             bopOutput = false,
             reagents = {
                 { itemId = 32231, count = 1 },
@@ -32093,6 +35909,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "yellow",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45, 83 },
+            sourceNames = { "Eldara Dawnrunner", "Shaani", "Ontuvo" },
             bopOutput = false,
             reagents = {
                 { itemId = 32229, count = 1 },
@@ -32104,6 +35923,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 35945,
             category = "materials",
             sortOrder = 1,
+            sourceKind = "trainer",
             bopOutput = false,
             reagents = {
                 { itemId = 21929, count = 3 },
@@ -32123,6 +35943,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 82, 45 },
+            sourceNames = { "Shaani", "Ontuvo" },
             bopOutput = false,
             reagents = {
                 { itemId = 32230, count = 1 },
@@ -32137,6 +35960,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Haughty Modiste" },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 2 },
@@ -32151,6 +35977,9 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 375,
             requiredSkill = 375,
+            sourceKind = "vendor",
+            sourceZones = { 46 },
+            sourceNames = { "Mycah" },
             bopOutput = false,
             reagents = {
                 { itemId = 21845, count = 4 },
@@ -32166,6 +35995,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 250,
             requiredSkill = 250,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Haughty Modiste" },
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 2 },
@@ -32183,6 +36015,9 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 245,
             requiredSkill = 245,
+            sourceKind = "vendor",
+            sourceZones = { 12 },
+            sourceNames = { "Haughty Modiste" },
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 3 },
@@ -35940,6 +39775,93 @@ RecipeRegistryRecipeMetadata = {
                 { key = "back", label = "Back", order = 90 },
             },
         },
+    },
+
+    zoneNamesById = {
+        [1] = "Stormwind City",
+        [2] = "Stranglethorn Vale",
+        [3] = "Arathi Highlands",
+        [4] = "Ashenvale",
+        [5] = "Desolace",
+        [6] = "The Barrens",
+        [7] = "Duskwood",
+        [8] = "Thousand Needles",
+        [9] = "Alterac Mountains",
+        [10] = "Badlands",
+        [11] = "Dun Morogh",
+        [12] = "Tanaris",
+        [13] = "Wetlands",
+        [14] = "Hillsbrad Foothills",
+        [15] = "Dustwallow Marsh",
+        [16] = "Gnomeregan",
+        [17] = "Durotar",
+        [18] = "Mulgore",
+        [19] = "Darkshore",
+        [20] = "Westfall",
+        [21] = "Loch Modan",
+        [22] = "Orgrimmar",
+        [23] = "Darnassus",
+        [24] = "Ironforge",
+        [25] = "Ghostlands",
+        [26] = "Thunder Bluff",
+        [27] = "Redridge Mountains",
+        [28] = "Silverpine Forest",
+        [29] = "Stonetalon Mountains",
+        [30] = "Feralas",
+        [31] = "Elwynn Forest",
+        [32] = "Tirisfal Glades",
+        [33] = "Undercity",
+        [34] = "The Hinterlands",
+        [35] = "Swamp of Sorrows",
+        [36] = "Western Plaguelands",
+        [37] = "Blasted Lands",
+        [38] = "Burning Steppes",
+        [39] = "Azshara",
+        [40] = "Blackrock Depths",
+        [41] = "Felwood",
+        [42] = "Winterspring",
+        [43] = "Eastern Plaguelands",
+        [44] = "Blackrock Spire",
+        [45] = "Shattrath City",
+        [46] = "Zangarmarsh",
+        [47] = "Moonglade",
+        [48] = "Searing Gorge",
+        [49] = "Silithus",
+        [50] = "The Temple of Atal'Hakkar",
+        [51] = "Un'Goro Crater",
+        [52] = "Stratholme",
+        [53] = "Deadwind Pass",
+        [54] = "Scholomance",
+        [55] = "Terokkar Forest",
+        [56] = "The Exodar",
+        [57] = "Dire Maul",
+        [58] = "Blackwing Lair",
+        [59] = "Hellfire Peninsula",
+        [60] = "Dalaran",
+        [61] = "Eversong Woods",
+        [62] = "Silvermoon City",
+        [63] = "Azuremyst Isle",
+        [64] = "Nagrand",
+        [65] = "Shadowmoon Valley",
+        [66] = "Karazhan",
+        [67] = "The Arcatraz",
+        [68] = "The Mechanar",
+        [69] = "Netherstorm",
+        [70] = "The Steamvault",
+        [71] = "Blade's Edge Mountains",
+        [72] = "Old Hillsbrad Foothills",
+        [73] = "Mana-Tombs",
+        [74] = "Auchenai Crypts",
+        [75] = "The Shattered Halls",
+        [76] = "Naxxramas",
+        [77] = "Bloodmyst Isle",
+        [78] = "Shadow Labyrinth",
+        [79] = "The Botanica",
+        [80] = "Sethekk Halls",
+        [81] = "The Black Morass",
+        [82] = "Isle of Quel'Danas",
+        [83] = "Hyjal Summit",
+        [84] = "Black Temple",
     },
 
     navTree = {

@@ -23,6 +23,11 @@ from recipe_sources.wowhead_specialization_provider import (
     fetch_specializations,
     write_specialization_snapshot,
 )
+from recipe_sources.arl_source_provider import (
+    build_snapshot as build_acquisition_snapshot,
+    fetch_acquisition,
+    write_snapshot as write_acquisition_snapshot,
+)
 from recipe_sources.wowhead_source_provider import (
     build_snapshot as build_source_snapshot,
     fetch_sources,
@@ -226,6 +231,22 @@ def _build_pipeline(snapshot=DEFAULT_SNAPSHOT, flavor="tbc"):
 
 
 def command_fetch(args):
+    if args.source == "arl-acquisition":
+        # A dozen small files, not a crawl: the whole dataset arrives in one
+        # pass, so there is no cache to resume from and no partial state.
+        snapshot_dir = SNAPSHOT_ROOT / args.snapshot
+        by_spell_id, per_profession, lookups = fetch_acquisition(
+            timeout=args.timeout,
+            delay=args.request_delay,
+        )
+        if not by_spell_id:
+            print("no acquisition rows parsed; refusing to overwrite the snapshot", file=sys.stderr)
+            return 2
+        payload = build_acquisition_snapshot(by_spell_id, per_profession, len(lookups))
+        path = write_acquisition_snapshot(payload, snapshot_dir)
+        print("wrote {0} ({1} recipes, {2} NPCs)".format(path, len(by_spell_id), len(lookups)))
+        return 0
+
     if args.source == "wowhead-sources":
         # One request per recipe item, and 1436 recipes have one, so the
         # snapshot doubles as the cache: items already in it are skipped and
@@ -419,7 +440,7 @@ def build_parser():
     fetch = subparsers.add_parser("fetch")
     fetch.add_argument("--flavor", default="tbc")
     fetch.add_argument("--snapshot", default=DEFAULT_SNAPSHOT)
-    fetch.add_argument("--source", default="normalized-dir", choices=("normalized-dir", "wago-anniversary", "wowhead-specializations", "wowhead-sources"))
+    fetch.add_argument("--source", default="normalized-dir", choices=("normalized-dir", "wago-anniversary", "wowhead-specializations", "wowhead-sources", "arl-acquisition"))
     fetch.add_argument("--limit", type=int, default=None,
                        help="wowhead-sources: stop after this many newly fetched items")
     fetch.add_argument("--verbose", action="store_true",

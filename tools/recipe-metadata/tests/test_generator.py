@@ -19,6 +19,11 @@ from recipe_pipeline.validate import validate_records
 from recipe_sources.wago_anniversary_provider import build_normalized_snapshot
 from recipe_pipeline.emit_lua import emit_lua
 from recipe_pipeline.normalize import summarize_source
+from recipe_sources.arl_source_provider import (
+    parse_lookup,
+    parse_profession,
+    summarize_recipe,
+)
 from recipe_sources.wowhead_source_provider import (
     FetchOutcome,
     derive_faction,
@@ -769,90 +774,6 @@ class WowheadSourceTests(unittest.TestCase):
         self.assertEqual(parsed["containers"], [])
 
 
-class SourceSummaryTests(unittest.TestCase):
-    def test_vendor_wins_over_drop_as_the_actionable_answer(self):
-        source = {
-            "faction": "both",
-            "kinds": ["vendor", "drop"],
-            "zones": [1519, 40],
-            "vendors": [{"name": "Edna Mullby", "zones": [1519]}],
-            "drops": [{"name": "Harvest Golem", "zones": [40]}],
-        }
-        faction, kind, zones, names, world_drop, trash = summarize_source(source)
-        self.assertIsNone(faction)  # "both" is the default reading of absent
-        self.assertEqual(kind, "vendor")
-        self.assertEqual(names, ("Edna Mullby",))
-        self.assertFalse(world_drop)
-
-    def test_many_droppers_collapse_to_a_world_drop(self):
-        drops = [{"name": "Mob %d" % index, "zones": [index]} for index in range(12)]
-        faction, kind, zones, names, world_drop, trash = summarize_source({
-            "faction": "both",
-            "kinds": ["drop"],
-            "zones": list(range(12)),
-            "drops": drops,
-        })
-        self.assertEqual(kind, "drop")
-        self.assertTrue(world_drop)
-        # Naming a dozen creatures across a dozen zones answers nothing, so
-        # the payload carries neither.
-        self.assertEqual(zones, ())
-        self.assertEqual(names, ())
-
-    def test_no_source_data_stays_empty(self):
-        self.assertEqual(summarize_source({}), (None, None, (), (), False, False))
-
-
-class InstanceDropTests(unittest.TestCase):
-    """A drop is not one answer: a boss, instance trash and a world drop are
-    three different things to tell the player."""
-
-    def test_a_boss_is_named(self):
-        faction, kind, zones, names, world_drop, trash = summarize_source({
-            "faction": "both",
-            "kinds": ["drop"],
-            "zones": [3457],
-            "drops": [
-                {"name": "Nightbane", "zones": [3457], "boss": True, "instance": True},
-                {"name": "Phase Hunter", "zones": [3457], "instance": True},
-            ],
-        })
-        self.assertEqual(kind, "boss")
-        self.assertEqual(names, ("Nightbane",))
-        self.assertFalse(trash)
-        self.assertEqual(zones, (3457,))
-
-    def test_instance_non_bosses_collapse_to_trash_without_a_list(self):
-        drops = [
-            {"name": "Servant %d" % index, "zones": [3457], "instance": True}
-            for index in range(4)
-        ]
-        faction, kind, zones, names, world_drop, trash = summarize_source({
-            "faction": "both", "kinds": ["drop"], "zones": [3457], "drops": drops,
-        })
-        self.assertEqual(kind, "trash")
-        self.assertTrue(trash)
-        # The instance name is the answer; the creature list is not.
-        self.assertEqual(names, ())
-        self.assertEqual(zones, (3457,))
-        self.assertFalse(world_drop)
-
-    def test_two_creatures_out_in_the_world_are_still_named(self):
-        faction, kind, zones, names, world_drop, trash = summarize_source({
-            "faction": "both",
-            "kinds": ["drop"],
-            "zones": [40],
-            "drops": [
-                {"name": "Harvest Golem", "zones": [40]},
-                {"name": "Harvest Watcher", "zones": [40]},
-            ],
-        })
-        self.assertEqual(kind, "drop")
-        self.assertEqual(names, ("Harvest Golem", "Harvest Watcher"))
-        self.assertFalse(trash)
-        self.assertFalse(world_drop)
-
-
 class FetchOutcomeTests(unittest.TestCase):
     """A crawl that gets refused must not look like one that worked."""
 
@@ -872,26 +793,118 @@ class FetchOutcomeTests(unittest.TestCase):
         self.assertFalse(outcome.mostly_failed())
 
 
+class AcquisitionSummaryTests(unittest.TestCase):
+    """What summarize_source keeps, now that the provider states the rest."""
+
+    def test_keeps_names_and_zones_and_drops_a_neutral_faction(self):
+        faction, kind, zones, names, world_drop, trash = summarize_source({
+            "faction": "both",
+            "kind": "vendor",
+            "worldDrop": False,
+            "names": ["Kendor Kabonka"],
+            "zones": ["Stormwind City"],
+        })
+        # "both" is the default reading of an absent field, so it is not stored.
+        self.assertIsNone(faction)
+        self.assertEqual(kind, "vendor")
+        self.assertEqual(names, ("Kendor Kabonka",))
+        self.assertEqual(zones, ("Stormwind City",))
+        self.assertFalse(world_drop)
+
+    def test_a_world_drop_points_nowhere(self):
+        faction, kind, zones, names, world_drop, trash = summarize_source({
+            "faction": "both", "kind": "worldDrop", "worldDrop": True,
+            "names": ["Some Mob"], "zones": ["Everywhere"],
+        })
+        self.assertEqual(kind, "worldDrop")
+        self.assertTrue(world_drop)
+        self.assertEqual(names, ())
+        self.assertEqual(zones, ())
+
+    def test_a_faction_restriction_survives(self):
+        faction, _kind, _zones, _names, _wd, _t = summarize_source({
+            "faction": "horde", "kind": "vendor", "names": [], "zones": [],
+        })
+        self.assertEqual(faction, "horde")
+
+    def test_nothing_known_stays_empty(self):
+        self.assertEqual(summarize_source({}), (None, None, (), (), False, False))
+
+
+class ArlProviderTests(unittest.TestCase):
+    PROFESSION = """
+        AddRecipe(2661, 35, 2851, Q.COMMON, V.ORIG, 35, 75, 95, 115)
+        self:AddRecipeFlags(2661, F.ALLIANCE, F.HORDE, F.TRAINER)
+        self:AddRecipeTrainer(2661, 3355, 3174, 29924, 1241)
+
+        AddRecipe(9811, 200, 7961, Q.COMMON, V.ORIG, 200, 220, 230, 240)
+        self:AddRecipeFlags(9811, F.HORDE, F.VENDOR)
+        self:AddRecipeVendor(9811, 340)
+
+        AddRecipe(12906, 230, 10725, Q.COMMON, V.ORIG, 230, 250, 260, 270)
+        self:AddRecipeFlags(12906, F.ALLIANCE, F.HORDE, F.WORLD_DROP)
+        self:AddRecipeWorldDrop(12906, 1)
+    """
+    LOOKUP = """
+        AddVendor(340, L["Kendor Kabonka"], BZ["Stormwind City"], 77.5, 53.5, ALLIANCE)
+        AddMob(2242, L["Syndicate Spy"], BZ["Alterac Mountains"], 63.0, 40.6)
+    """
+
+    def test_reads_the_faction_off_the_flags(self):
+        recipes = parse_profession(self.PROFESSION)
+        self.assertEqual(recipes[2661]["faction"], "both")
+        self.assertEqual(recipes[9811]["faction"], "horde")
+
+    def test_reads_the_acquire_kind_and_its_npcs(self):
+        recipes = parse_profession(self.PROFESSION)
+        self.assertEqual(recipes[9811]["acquires"], {"vendor": [340]})
+        self.assertEqual(recipes[2661]["acquires"]["trainer"], [3355, 3174, 29924, 1241])
+
+    def test_resolves_an_npc_to_a_name_and_zone(self):
+        lookups = parse_lookup(self.LOOKUP)
+        summary = summarize_recipe(parse_profession(self.PROFESSION)[9811], lookups)
+        self.assertEqual(summary["kind"], "vendor")
+        self.assertEqual(summary["names"], ["Kendor Kabonka"])
+        self.assertEqual(summary["zones"], ["Stormwind City"])
+        self.assertEqual(summary["faction"], "horde")
+
+    def test_a_recipe_every_trainer_teaches_names_none_of_them(self):
+        # Four trainers listed against a cap of three: naming the one whose
+        # id happens to resolve is worse than naming none.
+        summary = summarize_recipe(parse_profession(self.PROFESSION)[2661],
+                                   parse_lookup(self.LOOKUP), max_names=3)
+        self.assertEqual(summary["kind"], "trainer")
+        self.assertEqual(summary["names"], [])
+        self.assertEqual(summary["zones"], [])
+
+    def test_a_world_drop_is_marked_and_named_nowhere(self):
+        summary = summarize_recipe(parse_profession(self.PROFESSION)[12906],
+                                   parse_lookup(self.LOOKUP))
+        self.assertTrue(summary["worldDrop"])
+        self.assertEqual(summary["names"], [])
+
+
 class SourceEmitTests(unittest.TestCase):
     def test_emits_faction_zones_and_names_but_omits_both(self):
         alliance = _record(spell_id=1, faction="alliance", source_kind="vendor",
-                           source_zones=(1519,), source_names=("Edna Mullby",))
+                           source_zones=("Stormwind City",), source_names=("Edna Mullby",))
         neutral = _record(spell_id=2)
-        lua = emit_lua([alliance, neutral], {}, {}, "1", 1, "tbc", {1519: "Stormwind City"})
+        lua = emit_lua([alliance, neutral], {}, {}, "1", 1, "tbc")
         self.assertIn('faction = "alliance"', lua)
         self.assertIn('sourceKind = "vendor"', lua)
-        self.assertIn("sourceZones = { 1519 }", lua)
+        self.assertIn("sourceZones = { 1 }", lua)
         self.assertIn('sourceNames = { "Edna Mullby" }', lua)
-        self.assertIn('[1519] = "Stormwind City"', lua)
+        self.assertIn('[1] = "Stormwind City"', lua)
         # The neutral record carries no faction line at all.
         self.assertEqual(lua.count("faction ="), 1)
 
-    def test_only_cited_zones_reach_the_name_table(self):
-        record = _record(spell_id=1, source_zones=(1519,))
-        lua = emit_lua([record], {}, {}, "1", 1, "tbc",
-                       {1519: "Stormwind City", 1637: "Orgrimmar"})
-        self.assertIn('[1519] = "Stormwind City"', lua)
-        self.assertNotIn("Orgrimmar", lua)
+    def test_zone_names_are_interned_once_however_many_records_cite_them(self):
+        records = [_record(spell_id=index, source_zones=("Stormwind City",))
+                   for index in range(1, 4)]
+        lua = emit_lua(records, {}, {}, "1", 1, "tbc")
+        # One entry in the table, three records pointing at it.
+        self.assertEqual(lua.count('= "Stormwind City"'), 1)
+        self.assertEqual(lua.count("sourceZones = { 1 }"), 3)
 
 
 if __name__ == "__main__":

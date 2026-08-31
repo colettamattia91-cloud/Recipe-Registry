@@ -79,6 +79,33 @@ Test.it("returns category labels with cloned subcategory rows", function()
     Test.eq(fresh[1].label, "Combat")
 end)
 
+Test.it("reports where a recipe is obtained", function()
+    -- Sold by a vendor only the Horde can reach: a faction restriction in
+    -- TBC is a fact about the vendor, not a race lock on the item.
+    local source = metadata:GetSource(-28596)
+    Test.truthy(source ~= nil, "a vendor-sold recipe should carry a source")
+    Test.eq(source.faction, "horde")
+    Test.eq(source.kind, "vendor")
+    Test.eq(source.names[1], "Abigail Shiel")
+    Test.eq(source.zones[1], "Tirisfal Glades")
+    Test.eq(source.worldDrop, false)
+end)
+
+Test.it("leaves the faction unset when both sides can get the recipe", function()
+    -- Absent means both, which is the common case: stating it on most of the
+    -- dataset would be pure payload bloat.
+    local source = metadata:GetSource(-30303)
+    Test.eq(source.faction, nil)
+end)
+
+Test.it("points a world drop nowhere", function()
+    local source = metadata:GetSource(-30303)
+    Test.eq(source.worldDrop, true)
+    Test.eq(source.kind, "worldDrop")
+    Test.eq(source.names, nil)
+    Test.eq(source.zones, nil)
+end)
+
 Test.it("reports outputless and BoP metadata without requiring Recipe Registry integration", function()
     local outputless = metadata:GetRecipeInfo(-27924)
     Test.eq(outputless.spellId, 27924)

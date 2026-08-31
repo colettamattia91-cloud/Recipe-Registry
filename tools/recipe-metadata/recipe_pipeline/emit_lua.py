@@ -13,7 +13,7 @@ def _lua_bool(value):
     return "nil"
 
 
-def _emit_record(record, indent="        "):
+def _emit_record(record, zone_ids, indent="        "):
     lines = [indent + "[" + str(record.spell_id) + "] = {"]
     lines.append(indent + "    profession = " + _lua_string(record.profession_key) + ",")
     lines.append(indent + "    expansion = " + _lua_string(record.expansion) + ",")
@@ -47,7 +47,8 @@ def _emit_record(record, indent="        "):
     if record.trash_drop:
         lines.append(indent + "    trashDrop = true,")
     if record.source_zones:
-        lines.append(indent + "    sourceZones = { " + ", ".join(str(zone) for zone in record.source_zones) + " },")
+        lines.append(indent + "    sourceZones = { "
+                     + ", ".join(str(zone_ids[zone]) for zone in record.source_zones) + " },")
     if record.source_names:
         lines.append(indent + "    sourceNames = { " + ", ".join(_lua_string(name) for name in record.source_names) + " },")
     if record.is_outputless_self_only:
@@ -168,8 +169,16 @@ def emit_lua(records, categories_by_profession, subcategories_by_profession, met
         "    recipesBySpellId = {",
     ]
 
+    # Zone names are interned into small integers: a popular vendor city is
+    # cited by hundreds of records, and repeating the string on each of them
+    # is the single biggest thing that would bloat the generated file.
+    zone_ids = {}
+    for record in sorted(records, key=lambda item: item.spell_id):
+        for zone in record.source_zones:
+            zone_ids.setdefault(zone, len(zone_ids) + 1)
+
     for record in records:
-        lines.extend(_emit_record(record))
+        lines.extend(_emit_record(record, zone_ids))
         if record.created_item_id is not None:
             created_item_to_spell_ids[record.created_item_id].append(record.spell_id)
 
@@ -198,15 +207,9 @@ def emit_lua(records, categories_by_profession, subcategories_by_profession, met
     # Zone names live once at the top level rather than being repeated on
     # every record that points at them: a popular vendor zone is referenced by
     # hundreds of recipes. Only zones some record actually cites are emitted.
-    cited_zones = set()
-    for record in records:
-        cited_zones.update(record.source_zones)
-    zone_names = zone_names or {}
     lines.append("    zoneNamesById = {")
-    for zone_id in sorted(cited_zones):
-        name = zone_names.get(zone_id)
-        if name:
-            lines.append("        [" + str(zone_id) + "] = " + _lua_string(name) + ",")
+    for zone, zone_id in sorted(zone_ids.items(), key=lambda item: item[1]):
+        lines.append("        [" + str(zone_id) + "] = " + _lua_string(zone) + ",")
     lines.append("    },")
     lines.append("")
     lines.extend(_emit_nav_tree(_build_nav_tree(records)))
