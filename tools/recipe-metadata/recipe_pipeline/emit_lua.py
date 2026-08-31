@@ -21,12 +21,21 @@ def _emit_record(record, indent="        "):
         lines.append(indent + "    recipeItemId = " + str(record.recipe_item_id) + ",")
     if record.created_item_id is not None:
         lines.append(indent + "    createdItemId = " + str(record.created_item_id) + ",")
+    # Only emitted when the craft yields more than one unit: the overwhelming
+    # majority produce exactly one, and a `createdCount = 1` on every record
+    # would bloat the generated file for no reader benefit.
+    if record.created_count is not None and record.created_count > 1:
+        lines.append(indent + "    createdCount = " + str(record.created_count) + ",")
+    if record.created_count_max is not None and record.created_count_max != record.created_count:
+        lines.append(indent + "    createdCountMax = " + str(record.created_count_max) + ",")
     lines.append(indent + "    category = " + _lua_string(record.category_key or "misc") + ",")
     if record.subcategory_key is not None:
         lines.append(indent + "    subcategory = " + _lua_string(record.subcategory_key) + ",")
     lines.append(indent + "    sortOrder = " + str(record.sort_order) + ",")
     if record.required_skill is not None:
         lines.append(indent + "    requiredSkill = " + str(record.required_skill) + ",")
+    if record.specialization is not None:
+        lines.append(indent + "    specialization = " + str(record.specialization) + ",")
     if record.is_outputless_self_only:
         lines.append(indent + "    selfOnlyOutputless = true,")
     if record.bop_output is not None:

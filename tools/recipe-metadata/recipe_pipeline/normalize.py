@@ -49,6 +49,10 @@ def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tb
             if bind_type is not None:
                 bop_output = int(bind_type) == 1
 
+        specialization = overrides.get("specializationBySpellId", {}).get(spell_id)
+        if specialization is None:
+            specialization = secondary.get("specializationBySpellId", {}).get(spell_id)
+
         records.append(RecipeRecord(
             spell_id=spell_id,
             profession_key=profession_key,
@@ -62,6 +66,9 @@ def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tb
             required_skill=recipe.get("requiredSkill"),
             is_outputless_self_only=outputless is True,
             bop_output=bop_output,
+            created_count=recipe.get("createdCount"),
+            created_count_max=recipe.get("createdCountMax"),
+            specialization=specialization,
         ))
 
     return tuple(records), diagnostics

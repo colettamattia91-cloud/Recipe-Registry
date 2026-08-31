@@ -84,6 +84,17 @@ def _as_int(value, default=0):
         return default
 
 
+def _as_number(value, default=0):
+    """Like _as_int, but tolerates the float rendering DB2 CSV uses for
+    some numeric columns ("199.0")."""
+    try:
+        if value is None or value == "":
+            return default
+        return int(float(value))
+    except (TypeError, ValueError):
+        return default
+
+
 def _csv_rows(text):
     return list(csv.DictReader(io.StringIO(text)))
 
@@ -143,6 +154,30 @@ def _created_items_by_spell(spell_effects):
         if spell_id and effect == CREATE_ITEM_EFFECT and item_id > 0 and spell_id not in created:
             created[spell_id] = item_id
     return created
+
+
+def _created_amounts_by_spell(spell_effects):
+    """Crafted output quantity, read off the same CREATE_ITEM effect row.
+
+    DB2 stores the amount as EffectBasePoints = quantity - 1, with an
+    optional random spread in EffectDieSides (<= 1 means a fixed amount).
+    This matters for pricing: Crafted Light Shot carries EffectBasePoints
+    199, i.e. 200 shots per craft, so treating every recipe as producing a
+    single item makes the cost-per-unit wrong by that factor.
+    """
+    amounts = {}
+    for row in spell_effects:
+        spell_id = _as_int(row.get("SpellID"))
+        effect = _as_int(row.get("Effect"))
+        item_id = _as_int(row.get("EffectItemType"))
+        if not spell_id or effect != CREATE_ITEM_EFFECT or item_id <= 0 or spell_id in amounts:
+            continue
+        base_points = _as_number(row.get("EffectBasePoints"))
+        die_sides = _as_number(row.get("EffectDieSides"))
+        minimum = base_points + 1
+        maximum = base_points + (die_sides if die_sides > 1 else 1)
+        amounts[spell_id] = (minimum, maximum)
+    return amounts
 
 
 def _enchant_spells(spell_effects):
@@ -388,6 +423,7 @@ def build_normalized_snapshot(
     vanilla_skill_line_ability = tables.get(VANILLA_SKILL_LINE_ABILITY_TABLE, ())
 
     created_items = _created_items_by_spell(spell_effects)
+    created_amounts = _created_amounts_by_spell(spell_effects)
     enchant_spells = _enchant_spells(spell_effects)
     reagents_by_spell = _reagent_rows_by_spell(spell_reagents)
     recipe_items = _recipe_items_by_spell(item_effects)
@@ -433,12 +469,16 @@ def build_normalized_snapshot(
         for reagent in reagents_by_spell.get(spell_id, ()):
             used_item_ids.add(reagent["itemId"])
 
+        created_min, created_max = created_amounts.get(spell_id, (None, None))
+
         recipes.append({
             "spellId": spell_id,
             "profession": profession,
             "firstSeenExpansion": first_seen_expansion,
             "recipeItemId": recipe_item_id,
             "createdItemId": created_item_id,
+            "createdCount": created_min,
+            "createdCountMax": created_max if created_max != created_min else None,
             "requiredSkill": _required_skill(recipe_item_id, row, items_by_id),
             "categoryHint": _category_hint(profession, spell_name, created_item_id, items_by_id),
         })
@@ -479,6 +519,7 @@ def build_normalized_snapshot(
             ),
             "recipeItemPolicy": "primary recipeItemId comes from DB2 ItemEffect ParentItemID; alternate teaching sources are intentionally not modeled",
             "createdItemPolicy": "createdItemId comes from DB2 SpellEffect Effect=24 EffectItemType",
+            "createdCountPolicy": "createdCount = EffectBasePoints + 1 on the same Effect=24 row; createdCountMax is set only when EffectDieSides > 1 gives a random spread",
         },
         "sourceStats": {
             "rawRows": {

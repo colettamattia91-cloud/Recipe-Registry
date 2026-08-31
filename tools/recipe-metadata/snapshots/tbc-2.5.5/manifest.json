@@ -61,6 +61,7 @@
   "snapshot": "tbc-2.5.5",
   "source": {
     "branch": "wow_anniversary",
+    "createdCountPolicy": "createdCount = EffectBasePoints + 1 on the same Effect=24 row; createdCountMax is set only when EffectDieSides > 1 gives a random spread",
     "createdItemPolicy": "createdItemId comes from DB2 SpellEffect Effect=24 EffectItemType",
     "expansionRule": "spell present in Vanilla SkillLineAbility build 1.15.7.61582 => vanilla; otherwise tbc",
     "product": "wow_anniversary",
