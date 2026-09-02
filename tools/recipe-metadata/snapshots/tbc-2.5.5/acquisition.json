@@ -169,12 +169,10 @@
     "10529": {
       "faction": "both",
       "kind": "quest",
-      "names": [
-        "Glyx Brewright"
-      ],
+      "names": [],
       "worldDrop": false,
       "zones": [
-        "Stranglethorn Vale"
+        "Feralas"
       ]
     },
     "10531": {
@@ -211,14 +209,18 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Feralas"
+      ]
     },
     "10546": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Feralas"
+      ]
     },
     "10548": {
       "faction": "both",
@@ -291,7 +293,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Feralas"
+      ]
     },
     "10568": {
       "faction": "both",
@@ -322,56 +326,108 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Feralas"
+      ]
     },
     "10574": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Feralas"
+      ]
     },
     "10619": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Peter Galen",
+        "Thorkaf Dragoneye",
+        "Andellion"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Azshara",
+        "Badlands",
+        "Dalaran"
+      ]
     },
     "10621": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Namha Moonwater",
+        "Caryssia Moonhunter",
+        "Se'Jib"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dalaran",
+        "Feralas",
+        "Stranglethorn Vale"
+      ]
     },
     "10630": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Brumn Winterhoof",
+        "Manfred Staller",
+        "Sarah Tanner"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Arathi Highlands",
+        "Dalaran",
+        "Searing Gorge"
+      ]
     },
     "10632": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Brumn Winterhoof",
+        "Manfred Staller",
+        "Sarah Tanner"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Arathi Highlands",
+        "Dalaran",
+        "Searing Gorge"
+      ]
     },
     "10647": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Namha Moonwater",
+        "Caryssia Moonhunter",
+        "Se'Jib"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dalaran",
+        "Feralas",
+        "Stranglethorn Vale"
+      ]
     },
     "10650": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Peter Galen",
+        "Thorkaf Dragoneye",
+        "Andellion"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Azshara",
+        "Badlands",
+        "Dalaran"
+      ]
     },
     "11448": {
       "faction": "both",
@@ -406,7 +462,10 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Badlands",
+        "Loch Modan"
+      ]
     },
     "11453": {
       "faction": "both",
@@ -417,14 +476,14 @@
     },
     "11454": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "11456": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -587,11 +646,13 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Stormwind City"
+      ]
     },
     "12044": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -641,9 +702,15 @@
     "12052": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Josephine Lister",
+        "Jalane Ayrole"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Undercity",
+        "Stormwind City"
+      ]
     },
     "12053": {
       "faction": "both",
@@ -655,9 +722,15 @@
     "12055": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Josephine Lister",
+        "Jalane Ayrole"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Undercity",
+        "Stormwind City"
+      ]
     },
     "12056": {
       "faction": "both",
@@ -738,9 +811,15 @@
     "12071": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Josephine Lister",
+        "Jalane Ayrole"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Undercity",
+        "Stormwind City"
+      ]
     },
     "12072": {
       "faction": "both",
@@ -779,9 +858,15 @@
     "12076": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Josephine Lister",
+        "Jalane Ayrole"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Undercity",
+        "Stormwind City"
+      ]
     },
     "12077": {
       "faction": "both",
@@ -831,9 +916,15 @@
     "12082": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Josephine Lister",
+        "Jalane Ayrole"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Undercity",
+        "Stormwind City"
+      ]
     },
     "12084": {
       "faction": "both",
@@ -860,7 +951,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Searing Gorge"
+      ]
     },
     "12088": {
       "faction": "both",
@@ -924,7 +1017,7 @@
     },
     "12260": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -1121,142 +1214,290 @@
     "12715": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Nixx Sprocketspring",
+        "Didi the Wrench"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Tanaris",
+        "Dalaran"
+      ]
     },
     "12716": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Vazario Linkgrease",
+        "Didi the Wrench",
+        "Nixx Sprocketspring"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Barrens",
+        "Dalaran",
+        "Tanaris"
+      ]
     },
     "12717": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Vazario Linkgrease",
+        "Didi the Wrench",
+        "Nixx Sprocketspring"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Barrens",
+        "Dalaran",
+        "Tanaris"
+      ]
     },
     "12718": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Vazario Linkgrease",
+        "Didi the Wrench",
+        "Nixx Sprocketspring"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Barrens",
+        "Dalaran",
+        "Tanaris"
+      ]
     },
     "12754": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Vazario Linkgrease",
+        "Didi the Wrench",
+        "Nixx Sprocketspring"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Barrens",
+        "Dalaran",
+        "Tanaris"
+      ]
     },
     "12755": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Vazario Linkgrease",
+        "Didi the Wrench",
+        "Nixx Sprocketspring"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Barrens",
+        "Dalaran",
+        "Tanaris"
+      ]
     },
     "12758": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Vazario Linkgrease",
+        "Didi the Wrench",
+        "Nixx Sprocketspring"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Barrens",
+        "Dalaran",
+        "Tanaris"
+      ]
     },
     "12759": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Tinkmaster Overspark",
+        "Oglethorpe Obnoticus",
+        "Findle Whistlesteam"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Stranglethorn Vale",
+        "Dalaran"
+      ]
     },
     "12760": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Nixx Sprocketspring",
+        "Didi the Wrench"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Tanaris",
+        "Dalaran"
+      ]
     },
     "12895": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Tinkmaster Overspark",
+        "Oglethorpe Obnoticus",
+        "Findle Whistlesteam"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Stranglethorn Vale",
+        "Dalaran"
+      ]
     },
     "12897": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Tinkmaster Overspark",
+        "Oglethorpe Obnoticus",
+        "Findle Whistlesteam"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Stranglethorn Vale",
+        "Dalaran"
+      ]
     },
     "12899": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Tinkmaster Overspark",
+        "Oglethorpe Obnoticus",
+        "Findle Whistlesteam"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Stranglethorn Vale",
+        "Dalaran"
+      ]
     },
     "12902": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Tinkmaster Overspark",
+        "Oglethorpe Obnoticus",
+        "Findle Whistlesteam"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Stranglethorn Vale",
+        "Dalaran"
+      ]
     },
     "12903": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Tinkmaster Overspark",
+        "Oglethorpe Obnoticus",
+        "Findle Whistlesteam"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Stranglethorn Vale",
+        "Dalaran"
+      ]
     },
     "12905": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Tinkmaster Overspark",
+        "Oglethorpe Obnoticus",
+        "Findle Whistlesteam"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Stranglethorn Vale",
+        "Dalaran"
+      ]
     },
     "12906": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Tinkmaster Overspark",
+        "Oglethorpe Obnoticus",
+        "Findle Whistlesteam"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Stranglethorn Vale",
+        "Dalaran"
+      ]
     },
     "12907": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Tinkmaster Overspark",
+        "Oglethorpe Obnoticus",
+        "Findle Whistlesteam"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Stranglethorn Vale",
+        "Dalaran"
+      ]
     },
     "12908": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Vazario Linkgrease",
+        "Didi the Wrench",
+        "Nixx Sprocketspring"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Barrens",
+        "Dalaran",
+        "Tanaris"
+      ]
     },
     "13028": {
-      "faction": "both",
-      "kind": null,
-      "names": [],
-      "worldDrop": false,
-      "zones": []
-    },
-    "13240": {
       "faction": "both",
       "kind": "trainer",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Razorfen Downs"
+      ]
+    },
+    "13240": {
+      "faction": "both",
+      "kind": "trainer",
+      "names": [
+        "Nixx Sprocketspring",
+        "Vazario Linkgrease"
+      ],
+      "worldDrop": false,
+      "zones": [
+        "Tanaris",
+        "The Barrens"
+      ]
     },
     "13378": {
       "faction": "both",
@@ -1692,9 +1933,13 @@
     "13898": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Pyromancer Loregrain"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Depths"
+      ]
     },
     "13905": {
       "faction": "both",
@@ -1838,12 +2083,10 @@
     "14891": {
       "faction": "both",
       "kind": "quest",
-      "names": [
-        "Jeeda"
-      ],
+      "names": [],
       "worldDrop": false,
       "zones": [
-        "Stonetalon Mountains"
+        "Blackrock Depths"
       ]
     },
     "14930": {
@@ -1870,16 +2113,22 @@
     "15292": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Grizzle"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Depths"
+      ]
     },
     "15293": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Depths"
+      ]
     },
     "15294": {
       "faction": "both",
@@ -1895,38 +2144,52 @@
     },
     "15295": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Depths"
+      ]
     },
     "15296": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Ribbly Screwspigot"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Depths"
+      ]
     },
     "15596": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Lord Roccor"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Depths"
+      ]
     },
     "15628": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Gnomeregan"
+      ]
     },
     "15633": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Gnomeregan"
+      ]
     },
     "15833": {
       "faction": "both",
@@ -2161,14 +2424,18 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Tanaris"
+      ]
     },
     "16647": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Tanaris"
+      ]
     },
     "16648": {
       "faction": "both",
@@ -2182,7 +2449,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Tanaris"
+      ]
     },
     "16650": {
       "faction": "both",
@@ -2224,7 +2493,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Winterspring"
+      ]
     },
     "16656": {
       "faction": "both",
@@ -2238,14 +2509,18 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Tanaris"
+      ]
     },
     "16658": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Tanaris"
+      ]
     },
     "16659": {
       "faction": "both",
@@ -2284,7 +2559,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Tanaris"
+      ]
     },
     "16664": {
       "faction": "both",
@@ -2313,7 +2590,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Winterspring"
+      ]
     },
     "16724": {
       "faction": "both",
@@ -2359,7 +2638,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Tanaris"
+      ]
     },
     "16731": {
       "faction": "both",
@@ -2396,21 +2677,27 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "16744": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "16745": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "16746": {
       "faction": "both",
@@ -2435,7 +2722,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Winterspring"
+      ]
     },
     "16971": {
       "faction": "both",
@@ -2453,21 +2742,27 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Winterspring"
+      ]
     },
     "16978": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Winterspring"
+      ]
     },
     "16983": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Stratholme"
+      ]
     },
     "16984": {
       "faction": "both",
@@ -2482,31 +2777,45 @@
     },
     "16985": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Stratholme"
+      ]
     },
     "16988": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Maleki the Pallid"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Stratholme"
+      ]
     },
     "16990": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Goraluk Anvilcrack"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Spire"
+      ]
     },
     "16991": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Quartermaster Zigris"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Spire"
+      ]
     },
     "16992": {
       "faction": "both",
@@ -2522,23 +2831,35 @@
     "16993": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Goraluk Anvilcrack"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Spire"
+      ]
     },
     "16994": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Bannok Grimaxe"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Spire"
+      ]
     },
     "16995": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Cannon Master Willey"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Stratholme"
+      ]
     },
     "17180": {
       "faction": "both",
@@ -2638,9 +2959,13 @@
     "17560": {
       "faction": "both",
       "kind": "vendor",
-      "names": [],
+      "names": [
+        "Plugger Spazzring"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Depths"
+      ]
     },
     "17561": {
       "faction": "both",
@@ -3148,9 +3473,13 @@
     "18422": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Overmaster Pyron"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Searing Gorge"
+      ]
     },
     "18423": {
       "faction": "both",
@@ -3317,9 +3646,13 @@
     "18456": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Balnazzar"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Stratholme"
+      ]
     },
     "18457": {
       "faction": "both",
@@ -3335,9 +3668,13 @@
     "18458": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Darkmaster Gandling"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Scholomance"
+      ]
     },
     "18560": {
       "faction": "both",
@@ -3425,9 +3762,13 @@
     "19054": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "General Drakkisath"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Spire"
+      ]
     },
     "19055": {
       "faction": "both",
@@ -3688,9 +4029,13 @@
     "19085": {
       "faction": "both",
       "kind": "vendor",
-      "names": [],
+      "names": [
+        "Plugger Spazzring"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Depths"
+      ]
     },
     "19086": {
       "faction": "both",
@@ -3766,7 +4111,10 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Orgrimmar",
+        "Stormwind City"
+      ]
     },
     "19094": {
       "faction": "both",
@@ -3873,7 +4221,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Felwood"
+      ]
     },
     "19567": {
       "faction": "both",
@@ -4503,7 +4853,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Depths"
+      ]
     },
     "21175": {
       "faction": "both",
@@ -4514,14 +4866,14 @@
     },
     "2149": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "2152": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -4619,42 +4971,42 @@
     },
     "21913": {
       "faction": "both",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "21923": {
       "faction": "both",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "21931": {
       "faction": "both",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "21940": {
       "faction": "both",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "21943": {
       "faction": "both",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "21945": {
       "faction": "both",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -4682,10 +5034,12 @@
     },
     "22704": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Depths"
+      ]
     },
     "22711": {
       "faction": "both",
@@ -4700,73 +5054,95 @@
     },
     "22727": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Molten Core"
+      ]
     },
     "22732": {
-      "faction": "both",
-      "kind": null,
-      "names": [],
-      "worldDrop": false,
-      "zones": []
-    },
-    "22749": {
-      "faction": "both",
-      "kind": null,
-      "names": [],
-      "worldDrop": false,
-      "zones": []
-    },
-    "22750": {
-      "faction": "both",
-      "kind": null,
-      "names": [],
-      "worldDrop": false,
-      "zones": []
-    },
-    "22757": {
-      "faction": "both",
-      "kind": null,
-      "names": [],
-      "worldDrop": false,
-      "zones": []
-    },
-    "22759": {
-      "faction": "both",
-      "kind": null,
-      "names": [],
-      "worldDrop": false,
-      "zones": []
-    },
-    "22761": {
       "faction": "both",
       "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Molten Core"
+      ]
+    },
+    "22749": {
+      "faction": "both",
+      "kind": "drop",
+      "names": [],
+      "worldDrop": false,
+      "zones": [
+        "Molten Core"
+      ]
+    },
+    "22750": {
+      "faction": "both",
+      "kind": "drop",
+      "names": [],
+      "worldDrop": false,
+      "zones": [
+        "Molten Core"
+      ]
+    },
+    "22757": {
+      "faction": "both",
+      "kind": "drop",
+      "names": [],
+      "worldDrop": false,
+      "zones": [
+        "Molten Core"
+      ]
+    },
+    "22759": {
+      "faction": "both",
+      "kind": "drop",
+      "names": [],
+      "worldDrop": false,
+      "zones": [
+        "Molten Core"
+      ]
+    },
+    "22761": {
+      "faction": "both",
+      "kind": "drop",
+      "names": [
+        "Pusillin"
+      ],
+      "worldDrop": false,
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "22793": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Molten Core"
+      ]
     },
     "22795": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Molten Core"
+      ]
     },
     "22797": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Molten Core"
+      ]
     },
     "22808": {
       "faction": "both",
@@ -4780,49 +5156,63 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "22815": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "22866": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "22867": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "22868": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "22869": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "22870": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "22902": {
       "faction": "both",
@@ -4837,45 +5227,57 @@
     },
     "22921": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "22922": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "22923": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "22926": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "22927": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "22928": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "22967": {
       "faction": "both",
@@ -4962,16 +5364,22 @@
     "23078": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Plugger Spazzring"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Depths"
+      ]
     },
     "23079": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "23080": {
       "faction": "both",
@@ -4987,9 +5395,13 @@
     "23081": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Solakar Flamewreath"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Spire"
+      ]
     },
     "23082": {
       "faction": "both",
@@ -5039,14 +5451,14 @@
     },
     "2329": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "2330": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -5109,16 +5521,24 @@
     "23486": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Zap Farflinger"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Winterspring"
+      ]
     },
     "23489": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Jhordy Lapforge"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Tanaris"
+      ]
     },
     "23507": {
       "faction": "both",
@@ -5520,7 +5940,7 @@
     },
     "2387": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -5765,10 +6185,12 @@
     },
     "24266": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Zul'Gurub"
+      ]
     },
     "24356": {
       "faction": "both",
@@ -5861,16 +6283,32 @@
     "24654": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Peter Galen",
+        "Thorkaf Dragoneye",
+        "Andellion"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Azshara",
+        "Badlands",
+        "Dalaran"
+      ]
     },
     "24655": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Peter Galen",
+        "Thorkaf Dragoneye",
+        "Andellion"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Azshara",
+        "Badlands",
+        "Dalaran"
+      ]
     },
     "24703": {
       "faction": "both",
@@ -5888,7 +6326,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Silithus"
+      ]
     },
     "24846": {
       "faction": "both",
@@ -5961,42 +6401,54 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Silithus"
+      ]
     },
     "24902": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Silithus"
+      ]
     },
     "24903": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Silithus"
+      ]
     },
     "24912": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Silithus"
+      ]
     },
     "24913": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Silithus"
+      ]
     },
     "24914": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Silithus"
+      ]
     },
     "24940": {
       "faction": "alliance",
@@ -6022,31 +6474,39 @@
     },
     "25073": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Temple of Ahn'Qiraj"
+      ]
     },
     "25074": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Temple of Ahn'Qiraj"
+      ]
     },
     "25078": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Temple of Ahn'Qiraj"
+      ]
     },
     "25079": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Temple of Ahn'Qiraj"
+      ]
     },
     "25080": {
       "faction": "both",
@@ -6220,7 +6680,7 @@
     },
     "25255": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -6335,7 +6795,7 @@
     },
     "2538": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -6349,7 +6809,7 @@
     },
     "2540": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -6450,7 +6910,7 @@
     },
     "25493": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -6563,7 +7023,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Tanaris"
+      ]
     },
     "25704": {
       "faction": "both",
@@ -6602,7 +7064,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Winterspring"
+      ]
     },
     "26085": {
       "faction": "both",
@@ -6618,16 +7082,22 @@
     "26086": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Jandice Barov"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Scholomance"
+      ]
     },
     "26087": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Molten Core"
+      ]
     },
     "26277": {
       "faction": "both",
@@ -6645,9 +7115,15 @@
     "26279": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "The Windreaver",
+        "Princess Tempestria"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Silithus",
+        "Winterspring"
+      ]
     },
     "26403": {
       "faction": "both",
@@ -6827,7 +7303,7 @@
     },
     "2657": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -6848,7 +7324,7 @@
     },
     "2660": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -6869,7 +7345,7 @@
     },
     "2663": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -7340,9 +7816,13 @@
     "26784": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Pathaleon the Calculator"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Mechanar"
+      ]
     },
     "26872": {
       "faction": "both",
@@ -7542,16 +8022,24 @@
     "26912": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Quartermaster Zigris"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Spire"
+      ]
     },
     "26914": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Golem Lord Argelmach"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blackrock Depths"
+      ]
     },
     "26915": {
       "faction": "both",
@@ -7573,7 +8061,7 @@
     },
     "26925": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -7655,16 +8143,24 @@
     "27586": {
       "faction": "both",
       "kind": "vendor",
-      "names": [],
+      "names": [
+        "Lieutenant General Andorov"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ruins of Ahn'Qiraj"
+      ]
     },
     "27587": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "The Prophet Skeram"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Temple of Ahn'Qiraj"
+      ]
     },
     "27588": {
       "faction": "both",
@@ -7680,16 +8176,24 @@
     "27589": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Moam"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ruins of Ahn'Qiraj"
+      ]
     },
     "27590": {
       "faction": "both",
       "kind": "vendor",
-      "names": [],
+      "names": [
+        "Lieutenant General Andorov"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ruins of Ahn'Qiraj"
+      ]
     },
     "27658": {
       "faction": "both",
@@ -7721,9 +8225,13 @@
     "27660": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Magister Kalendris"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dire Maul"
+      ]
     },
     "27724": {
       "faction": "both",
@@ -7925,9 +8433,13 @@
     "27948": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "2795": {
       "faction": "alliance",
@@ -8080,23 +8592,35 @@
     "27981": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Shade of Aran"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Karazhan"
+      ]
     },
     "27982": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Terestian Illhoof"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Karazhan"
+      ]
     },
     "27984": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Moroes"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Karazhan"
+      ]
     },
     "28003": {
       "faction": "both",
@@ -8619,9 +9143,13 @@
     "28564": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "28565": {
       "faction": "both",
@@ -8685,7 +9213,8 @@
       "faction": "both",
       "kind": "drop",
       "names": [
-        "Sunseeker Astromage"
+        "Sunseeker Astromage",
+        "Nethermancer Sepethrea"
       ],
       "worldDrop": false,
       "zones": [
@@ -8695,9 +9224,13 @@
     "28572": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Nexus-Prince Shaffar"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Mana-Tombs"
+      ]
     },
     "28573": {
       "faction": "both",
@@ -8746,104 +9279,112 @@
     "28578": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "28579": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Captain Skarloc"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Old Hillsbrad Foothills"
+      ]
     },
     "28580": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "28581": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "28582": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "28583": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "28584": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "28585": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "28586": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "28587": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "28588": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "28589": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "28590": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "28591": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "2881": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -9441,7 +9982,7 @@
     },
     "2963": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -9513,9 +10054,13 @@
     "29649": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "High Botanist Freywinn"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Botanica"
+      ]
     },
     "29654": {
       "faction": "both",
@@ -9885,9 +10430,13 @@
     "30334": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Attumen the Huntsman"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Karazhan"
+      ]
     },
     "30337": {
       "faction": "both",
@@ -9987,104 +10536,194 @@
     "30548": {
       "faction": "both",
       "kind": "quest",
-      "names": [
-        "Kireena"
-      ],
+      "names": [],
       "worldDrop": false,
       "zones": [
-        "Desolace"
+        "Zangarmarsh"
       ]
     },
     "30551": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "30552": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "30556": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Mekgineer Steamrigger"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Steamvault"
+      ]
     },
     "30558": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Vazario Linkgrease",
+        "Didi the Wrench",
+        "Nixx Sprocketspring"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Barrens",
+        "Dalaran",
+        "Tanaris"
+      ]
     },
     "30560": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Vazario Linkgrease",
+        "Didi the Wrench",
+        "Nixx Sprocketspring"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Barrens",
+        "Dalaran",
+        "Tanaris"
+      ]
     },
     "30563": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Vazario Linkgrease",
+        "Didi the Wrench",
+        "Nixx Sprocketspring"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Barrens",
+        "Dalaran",
+        "Tanaris"
+      ]
     },
     "30565": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Vazario Linkgrease",
+        "Didi the Wrench",
+        "Nixx Sprocketspring"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Barrens",
+        "Dalaran",
+        "Tanaris"
+      ]
     },
     "30566": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Vazario Linkgrease",
+        "Didi the Wrench",
+        "Nixx Sprocketspring"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Barrens",
+        "Dalaran",
+        "Tanaris"
+      ]
     },
     "30568": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Tinkmaster Overspark",
+        "Oglethorpe Obnoticus",
+        "Findle Whistlesteam"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Stranglethorn Vale",
+        "Dalaran"
+      ]
     },
     "30569": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Tinkmaster Overspark",
+        "Oglethorpe Obnoticus",
+        "Findle Whistlesteam"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Stranglethorn Vale",
+        "Dalaran"
+      ]
     },
     "30570": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Tinkmaster Overspark",
+        "Oglethorpe Obnoticus",
+        "Findle Whistlesteam"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Stranglethorn Vale",
+        "Dalaran"
+      ]
     },
     "30574": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Tinkmaster Overspark",
+        "Oglethorpe Obnoticus",
+        "Findle Whistlesteam"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Stranglethorn Vale",
+        "Dalaran"
+      ]
     },
     "30575": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Tinkmaster Overspark",
+        "Oglethorpe Obnoticus",
+        "Findle Whistlesteam"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Stranglethorn Vale",
+        "Dalaran"
+      ]
     },
     "31048": {
       "faction": "both",
@@ -10146,9 +10785,13 @@
     "31055": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Darkweaver Syth"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sethekk Halls"
+      ]
     },
     "31056": {
       "faction": "both",
@@ -10306,9 +10949,13 @@
     "31078": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Epoch Hunter"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Old Hillsbrad Foothills"
+      ]
     },
     "31079": {
       "faction": "both",
@@ -10390,16 +11037,24 @@
     "31088": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "31089": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "31090": {
       "faction": "both",
@@ -10418,9 +11073,13 @@
     "31092": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "31094": {
       "faction": "both",
@@ -10453,9 +11112,13 @@
     "31098": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "31099": {
       "faction": "both",
@@ -10576,7 +11239,7 @@
     },
     "3115": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -10655,9 +11318,13 @@
     "31434": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "31435": {
       "faction": "both",
@@ -10697,9 +11364,13 @@
     "31442": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "31443": {
       "faction": "both",
@@ -10739,44 +11410,68 @@
     "31451": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Dalliah the Doomsayer"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Arcatraz"
+      ]
     },
     "31452": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Murmur"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shadow Labyrinth"
+      ]
     },
     "31453": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Thorngrin the Tender"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Botanica"
+      ]
     },
     "31454": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Warp Splinter"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Botanica"
+      ]
     },
     "31455": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Grand Warlock Nethekurse"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Shattered Halls"
+      ]
     },
     "31456": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Warlord Kalithresh"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Steamvault"
+      ]
     },
     "31459": {
       "faction": "both",
@@ -10877,7 +11572,7 @@
     },
     "32259": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -11097,9 +11792,13 @@
     "32485": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Blackheart the Inciter"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shadow Labyrinth"
+      ]
     },
     "32487": {
       "faction": "both",
@@ -11610,7 +12309,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Azuremyst Isle"
+      ]
     },
     "33278": {
       "faction": "horde",
@@ -11628,7 +12329,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula"
+      ]
     },
     "3328": {
       "faction": "both",
@@ -11969,7 +12672,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hillsbrad Foothills"
+      ]
     },
     "33990": {
       "faction": "both",
@@ -12051,7 +12756,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hillsbrad Foothills"
+      ]
     },
     "34001": {
       "faction": "both",
@@ -12112,16 +12819,24 @@
     "34007": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "34008": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "34009": {
       "faction": "both",
@@ -12604,23 +13319,35 @@
     "35522": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Hydromancer Thespia"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Steamvault"
+      ]
     },
     "35523": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Mennu the Betrayer"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Slave Pens"
+      ]
     },
     "35524": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Chrono Lord Deja"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Black Morass"
+      ]
     },
     "35525": {
       "faction": "both",
@@ -12873,9 +13600,13 @@
     "35559": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "35560": {
       "faction": "both",
@@ -12894,9 +13625,13 @@
     "35562": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "35563": {
       "faction": "both",
@@ -12922,9 +13657,13 @@
     "35568": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "35572": {
       "faction": "both",
@@ -12936,9 +13675,13 @@
     "35573": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "35574": {
       "faction": "both",
@@ -12950,86 +13693,182 @@
     "35575": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Peter Galen",
+        "Thorkaf Dragoneye",
+        "Andellion"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Azshara",
+        "Badlands",
+        "Dalaran"
+      ]
     },
     "35576": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Peter Galen",
+        "Thorkaf Dragoneye",
+        "Andellion"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Azshara",
+        "Badlands",
+        "Dalaran"
+      ]
     },
     "35577": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Peter Galen",
+        "Thorkaf Dragoneye",
+        "Andellion"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Azshara",
+        "Badlands",
+        "Dalaran"
+      ]
     },
     "35580": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Peter Galen",
+        "Thorkaf Dragoneye",
+        "Andellion"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Azshara",
+        "Badlands",
+        "Dalaran"
+      ]
     },
     "35582": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Peter Galen",
+        "Thorkaf Dragoneye",
+        "Andellion"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Azshara",
+        "Badlands",
+        "Dalaran"
+      ]
     },
     "35584": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Peter Galen",
+        "Thorkaf Dragoneye",
+        "Andellion"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Azshara",
+        "Badlands",
+        "Dalaran"
+      ]
     },
     "35585": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Namha Moonwater",
+        "Caryssia Moonhunter",
+        "Se'Jib"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dalaran",
+        "Feralas",
+        "Stranglethorn Vale"
+      ]
     },
     "35587": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Namha Moonwater",
+        "Caryssia Moonhunter",
+        "Se'Jib"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dalaran",
+        "Feralas",
+        "Stranglethorn Vale"
+      ]
     },
     "35588": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Namha Moonwater",
+        "Caryssia Moonhunter",
+        "Se'Jib"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dalaran",
+        "Feralas",
+        "Stranglethorn Vale"
+      ]
     },
     "35589": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Brumn Winterhoof",
+        "Manfred Staller",
+        "Sarah Tanner"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Arathi Highlands",
+        "Dalaran",
+        "Searing Gorge"
+      ]
     },
     "35590": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Brumn Winterhoof",
+        "Manfred Staller",
+        "Sarah Tanner"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Arathi Highlands",
+        "Dalaran",
+        "Searing Gorge"
+      ]
     },
     "35591": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Brumn Winterhoof",
+        "Manfred Staller",
+        "Sarah Tanner"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Arathi Highlands",
+        "Dalaran",
+        "Searing Gorge"
+      ]
     },
     "3569": {
       "faction": "both",
@@ -13055,44 +13894,92 @@
     "36074": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Brumn Winterhoof",
+        "Manfred Staller",
+        "Sarah Tanner"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Arathi Highlands",
+        "Dalaran",
+        "Searing Gorge"
+      ]
     },
     "36075": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Namha Moonwater",
+        "Caryssia Moonhunter",
+        "Se'Jib"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dalaran",
+        "Feralas",
+        "Stranglethorn Vale"
+      ]
     },
     "36076": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Peter Galen",
+        "Thorkaf Dragoneye",
+        "Andellion"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Azshara",
+        "Badlands",
+        "Dalaran"
+      ]
     },
     "36077": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Brumn Winterhoof",
+        "Manfred Staller",
+        "Sarah Tanner"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Arathi Highlands",
+        "Dalaran",
+        "Searing Gorge"
+      ]
     },
     "36078": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Namha Moonwater",
+        "Caryssia Moonhunter",
+        "Se'Jib"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dalaran",
+        "Feralas",
+        "Stranglethorn Vale"
+      ]
     },
     "36079": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Peter Galen",
+        "Thorkaf Dragoneye",
+        "Andellion"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Azshara",
+        "Badlands",
+        "Dalaran"
+      ]
     },
     "36122": {
       "faction": "both",
@@ -13254,115 +14141,163 @@
     },
     "36315": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Serpentshrine Cavern",
+        "The Eye"
+      ]
     },
     "36316": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Serpentshrine Cavern",
+        "The Eye"
+      ]
     },
     "36317": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Serpentshrine Cavern",
+        "The Eye"
+      ]
     },
     "36318": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Serpentshrine Cavern",
+        "The Eye"
+      ]
     },
     "36349": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Serpentshrine Cavern",
+        "The Eye"
+      ]
     },
     "36351": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Serpentshrine Cavern",
+        "The Eye"
+      ]
     },
     "36352": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Serpentshrine Cavern",
+        "The Eye"
+      ]
     },
     "36353": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Serpentshrine Cavern",
+        "The Eye"
+      ]
     },
     "36355": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Serpentshrine Cavern",
+        "The Eye"
+      ]
     },
     "36357": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Serpentshrine Cavern",
+        "The Eye"
+      ]
     },
     "36358": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Serpentshrine Cavern",
+        "The Eye"
+      ]
     },
     "36359": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Serpentshrine Cavern",
+        "The Eye"
+      ]
     },
     "36389": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Serpentshrine Cavern",
+        "The Eye"
+      ]
     },
     "36390": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Serpentshrine Cavern",
+        "The Eye"
+      ]
     },
     "36391": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Serpentshrine Cavern",
+        "The Eye"
+      ]
     },
     "36392": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Serpentshrine Cavern",
+        "The Eye"
+      ]
     },
     "36523": {
       "faction": "both",
@@ -13408,16 +14343,24 @@
     "36954": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Kablamm Farflinger"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Netherstorm"
+      ]
     },
     "36955": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Smiles O'Byron"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Blade's Edge Mountains"
+      ]
     },
     "3753": {
       "faction": "both",
@@ -14150,28 +15093,28 @@
     },
     "3915": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "3918": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "3919": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "3920": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -14318,9 +15261,13 @@
     "3944": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Mekgineer Thermaplugg"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Gnomeregan"
+      ]
     },
     "3945": {
       "faction": "both",
@@ -14331,7 +15278,7 @@
     },
     "39451": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -14345,14 +15292,14 @@
     },
     "39455": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "39458": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -14380,14 +15327,14 @@
     },
     "39466": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "39467": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -14491,9 +15438,13 @@
     "3959": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Mekgineer Thermaplugg"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Gnomeregan"
+      ]
     },
     "3960": {
       "faction": "both",
@@ -15417,115 +16368,155 @@
     },
     "41132": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hyjal Summit",
+        "Black Temple"
+      ]
     },
     "41133": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Black Temple"
+      ]
     },
     "41134": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Black Temple"
+      ]
     },
     "41135": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hyjal Summit",
+        "Black Temple"
+      ]
     },
     "41156": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Black Temple"
+      ]
     },
     "41157": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hyjal Summit",
+        "Black Temple"
+      ]
     },
     "41158": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hyjal Summit",
+        "Black Temple"
+      ]
     },
     "41160": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Black Temple"
+      ]
     },
     "41161": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hyjal Summit",
+        "Black Temple"
+      ]
     },
     "41162": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Black Temple"
+      ]
     },
     "41163": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Black Temple"
+      ]
     },
     "41164": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hyjal Summit",
+        "Black Temple"
+      ]
     },
     "41205": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Black Temple"
+      ]
     },
     "41206": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hyjal Summit",
+        "Black Temple"
+      ]
     },
     "41207": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hyjal Summit",
+        "Black Temple"
+      ]
     },
     "41208": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Black Temple"
+      ]
     },
     "41307": {
       "faction": "both",
@@ -15641,35 +16632,35 @@
     },
     "41458": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "41500": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "41501": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "41502": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "41503": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -15677,23 +16668,35 @@
     "42296": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Kylene"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath City"
+      ]
     },
     "42302": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Kylene"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath City"
+      ]
     },
     "42305": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Kylene"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath City"
+      ]
     },
     "42546": {
       "faction": "both",
@@ -15828,9 +16831,13 @@
     "42688": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Kael'thas Sunstrider"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "42731": {
       "faction": "both",
@@ -15856,10 +16863,12 @@
     },
     "42974": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Zul'Aman"
+      ]
     },
     "43493": {
       "faction": "both",
@@ -15878,7 +16887,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge"
+      ]
     },
     "43676": {
       "faction": "both",
@@ -15896,42 +16907,56 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath City"
+      ]
     },
     "43758": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath City",
+        "Dalaran"
+      ]
     },
     "43761": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath City"
+      ]
     },
     "43765": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath City"
+      ]
     },
     "43772": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath City"
+      ]
     },
     "43779": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath City",
+        "Dalaran"
+      ]
     },
     "43846": {
       "faction": "both",
@@ -15950,9 +16975,14 @@
     "44157": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Niobe Whizzlespark",
+        "Jonathan Garrett"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shadowmoon Valley"
+      ]
     },
     "44343": {
       "faction": "both",
@@ -16439,7 +17469,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Silverpine Forest"
+      ]
     },
     "45100": {
       "faction": "both",
@@ -16690,7 +17722,10 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Terokkar Forest",
+        "Dalaran"
+      ]
     },
     "45765": {
       "faction": "both",
@@ -16705,241 +17740,309 @@
     },
     "46106": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46107": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46108": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46109": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46110": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46111": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46112": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46113": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46114": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46115": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46116": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46122": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46123": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46124": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46125": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46126": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46127": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46128": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46129": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46130": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46131": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46132": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46133": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46134": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46135": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46136": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46137": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46138": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46139": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46140": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46141": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46142": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46144": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46353": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Sunwell Plateau"
+      ]
     },
     "46403": {
       "faction": "both",
@@ -16982,7 +18085,7 @@
     },
     "46578": {
       "faction": "both",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -17047,9 +18150,13 @@
     "46697": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Mechano-Lord Capacitus"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Mechanar"
+      ]
     },
     "46775": {
       "faction": "both",
@@ -17164,9 +18271,13 @@
     "47051": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Priestess Delrissa"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Magisters' Terrace"
+      ]
     },
     "47053": {
       "faction": "both",
@@ -17325,7 +18436,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Badlands"
+      ]
     },
     "49677": {
       "faction": "both",
@@ -17652,7 +18765,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Thunder Bluff"
+      ]
     },
     "52567": {
       "faction": "both",
@@ -17712,7 +18827,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dalaran"
+      ]
     },
     "53281": {
       "faction": "both",
@@ -17723,84 +18840,84 @@
     },
     "53771": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "53773": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "53774": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "53775": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "53776": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "53777": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "53779": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "53780": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "53781": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "53782": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "53783": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "53784": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -18283,7 +19400,7 @@
     },
     "53895": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -18332,7 +19449,7 @@
     },
     "53904": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -18671,9 +19788,13 @@
     "53951": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Herald Volazj"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ahn'kahet: The Old Kingdom"
+      ]
     },
     "53952": {
       "faction": "both",
@@ -18755,9 +19876,13 @@
     "53959": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Cyanigosa"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Violet Hold"
+      ]
     },
     "53960": {
       "faction": "both",
@@ -18866,9 +19991,13 @@
     "53970": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Anub'arak"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Azjol-Nerub"
+      ]
     },
     "53971": {
       "faction": "both",
@@ -18957,9 +20086,13 @@
     "53979": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Keristrasza"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Nexus"
+      ]
     },
     "53980": {
       "faction": "both",
@@ -18990,9 +20123,13 @@
     "53982": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Sjonnir The Ironshaper"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Halls of Stone"
+      ]
     },
     "53983": {
       "faction": "both",
@@ -19139,9 +20276,13 @@
     "53995": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "The Prophet Tharon'ja"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Drak'Tharon Keep"
+      ]
     },
     "53996": {
       "faction": "both",
@@ -19364,9 +20505,13 @@
     "54019": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Ingvar the Plunderer"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Utgarde Keep"
+      ]
     },
     "54023": {
       "faction": "both",
@@ -19391,21 +20536,21 @@
     },
     "54220": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "54221": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "54222": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -19816,7 +20961,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Storm Peaks"
+      ]
     },
     "55298": {
       "faction": "both",
@@ -20101,16 +21248,24 @@
     "55397": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Ley-Guardian Eregos"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Oculus"
+      ]
     },
     "55398": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "Loken"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Halls of Lightning"
+      ]
     },
     "55399": {
       "faction": "both",
@@ -20135,9 +21290,13 @@
     "55401": {
       "faction": "both",
       "kind": "drop",
-      "names": [],
+      "names": [
+        "King Ymiron"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Utgarde Pinnacle"
+      ]
     },
     "55402": {
       "faction": "both",
@@ -20593,16 +21752,28 @@
     "56016": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Benjamin Clegg",
+        "Charles Worth"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Howling Fjord",
+        "Dalaran"
+      ]
     },
     "56017": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Benjamin Clegg",
+        "Charles Worth"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Howling Fjord",
+        "Dalaran"
+      ]
     },
     "56018": {
       "faction": "both",
@@ -21170,9 +22341,16 @@
     "56473": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Tisha Longbridge",
+        "Jamesina Watterly",
+        "Findle Whistlesteam"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Howling Fjord",
+        "Dalaran"
+      ]
     },
     "56474": {
       "faction": "both",
@@ -21339,13 +22517,19 @@
     "56514": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Chief Engineer Leveny",
+        "Didi the Wrench"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Borean Tundra",
+        "Dalaran"
+      ]
     },
     "56519": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -21432,7 +22616,10 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Borean Tundra",
+        "Howling Fjord"
+      ]
     },
     "57423": {
       "faction": "both",
@@ -22064,42 +23251,42 @@
     },
     "60354": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "60355": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "60356": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "60357": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "60365": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "60366": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -22957,7 +24144,7 @@
     },
     "60867": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "vendor",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -23128,38 +24315,48 @@
     },
     "62044": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath"
+      ]
     },
     "62045": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath"
+      ]
     },
     "62049": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath"
+      ]
     },
     "62050": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath"
+      ]
     },
     "62051": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath"
+      ]
     },
     "62176": {
       "faction": "both",
@@ -23225,9 +24422,16 @@
     "62271": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Chief Engineer Leveny",
+        "Tisha Longbridge",
+        "Jamesina Watterly"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Borean Tundra",
+        "Howling Fjord"
+      ]
     },
     "62350": {
       "faction": "both",
@@ -23252,7 +24456,7 @@
     },
     "62410": {
       "faction": "both",
-      "kind": null,
+      "kind": "discovery",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -23298,129 +24502,165 @@
     },
     "63187": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63188": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63189": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63190": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63191": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63192": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63194": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63195": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63196": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63197": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63198": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63199": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63200": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63201": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63203": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63204": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63205": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63206": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "63732": {
       "faction": "both",
@@ -23489,14 +24729,18 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Tanaris"
+      ]
     },
     "6412": {
       "faction": "alliance",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Teldrassil"
+      ]
     },
     "6413": {
       "faction": "horde",
@@ -23586,17 +24830,21 @@
     },
     "64441": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "64579": {
       "faction": "both",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ulduar"
+      ]
     },
     "6458": {
       "faction": "both",
@@ -23704,45 +24952,57 @@
     },
     "65454": {
       "faction": "both",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath"
+      ]
     },
     "66034": {
       "faction": "horde",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath"
+      ]
     },
     "66035": {
       "faction": "horde",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath"
+      ]
     },
     "66036": {
       "faction": "horde",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath"
+      ]
     },
     "66037": {
       "faction": "horde",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath"
+      ]
     },
     "66038": {
       "faction": "horde",
-      "kind": null,
+      "kind": "worldEvent",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shattrath"
+      ]
     },
     "6617": {
       "faction": "both",
@@ -24815,7 +26075,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dalaran"
+      ]
     },
     "66660": {
       "faction": "both",
@@ -24985,252 +26247,252 @@
     },
     "67064": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67065": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67066": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67079": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67080": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67081": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67082": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67083": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67084": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67085": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67086": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67087": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67091": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67092": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67093": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67094": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67095": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67096": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67130": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67131": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67132": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67133": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67134": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67135": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67136": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67137": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67138": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67139": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67140": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67141": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67142": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67143": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67144": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67145": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67146": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "67147": {
       "faction": "horde",
-      "kind": null,
+      "kind": "drop",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -25301,9 +26563,13 @@
     "70524": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Jedidiah Handers"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Dalaran"
+      ]
     },
     "70550": {
       "faction": "both",
@@ -25505,7 +26771,7 @@
     },
     "7126": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -25596,7 +26862,7 @@
     },
     "7183": {
       "faction": "alliance",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -25740,7 +27006,7 @@
     },
     "7418": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -25754,7 +27020,7 @@
     },
     "7421": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -25768,7 +27034,7 @@
     },
     "7428": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -26220,7 +27486,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "The Barrens"
+      ]
     },
     "8238": {
       "faction": "both",
@@ -26241,14 +27509,18 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Badlands"
+      ]
     },
     "8322": {
       "faction": "alliance",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Darnassus"
+      ]
     },
     "8334": {
       "faction": "both",
@@ -26269,7 +27541,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge"
+      ]
     },
     "8465": {
       "faction": "both",
@@ -26301,7 +27575,7 @@
     },
     "8604": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -26497,20 +27771,26 @@
     "8895": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Nixx Sprocketspring",
+        "Didi the Wrench"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Tanaris",
+        "Dalaran"
+      ]
     },
     "9058": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
     },
     "9059": {
       "faction": "both",
-      "kind": null,
+      "kind": "trainer",
       "names": [],
       "worldDrop": false,
       "zones": []
@@ -26758,35 +28038,45 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Orgrimmar"
+      ]
     },
     "9813": {
       "faction": "horde",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Orgrimmar"
+      ]
     },
     "9814": {
       "faction": "horde",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Orgrimmar"
+      ]
     },
     "9818": {
       "faction": "horde",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Orgrimmar"
+      ]
     },
     "9820": {
       "faction": "horde",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Orgrimmar"
+      ]
     },
     "9916": {
       "faction": "both",
@@ -26876,21 +28166,27 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Stranglethorn Vale"
+      ]
     },
     "9950": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Stranglethorn Vale"
+      ]
     },
     "9952": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Stranglethorn Vale"
+      ]
     },
     "9954": {
       "faction": "both",
@@ -26904,7 +28200,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Orgrimmar"
+      ]
     },
     "9959": {
       "faction": "both",
@@ -26953,7 +28251,9 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Tanaris"
+      ]
     },
     "9974": {
       "faction": "both",
@@ -26967,14 +28267,18 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Tanaris"
+      ]
     },
     "9980": {
       "faction": "both",
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Tanaris"
+      ]
     },
     "9983": {
       "faction": "both",
@@ -27035,12 +28339,13 @@
       "horde": 44
     },
     "byKind": {
-      "drop": 229,
+      "discovery": 42,
+      "drop": 391,
       "quest": 77,
-      "trainer": 1225,
-      "unknown": 257,
-      "vendor": 949,
-      "worldDrop": 313
+      "trainer": 1259,
+      "vendor": 950,
+      "worldDrop": 313,
+      "worldEvent": 18
     },
     "byProfession": {
       "Alchemy": 251,
@@ -27053,7 +28358,7 @@
       "Smelting": 26,
       "Tailoring": 413
     },
-    "npcsResolved": 587,
+    "npcsResolved": 1136,
     "records": 3050
   }
 }

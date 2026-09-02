@@ -20,8 +20,10 @@ from recipe_sources.wago_anniversary_provider import build_normalized_snapshot
 from recipe_pipeline.emit_lua import emit_lua
 from recipe_pipeline.normalize import summarize_source
 from recipe_sources.arl_source_provider import (
+    parse_custom_places,
     parse_lookup,
     parse_profession,
+    parse_source_flags,
     summarize_recipe,
 )
 from recipe_sources.wowhead_source_provider import (
@@ -882,6 +884,105 @@ class ArlProviderTests(unittest.TestCase):
                                    parse_lookup(self.LOOKUP))
         self.assertTrue(summary["worldDrop"])
         self.assertEqual(summary["names"], [])
+
+
+class ArlGenericAcquireTests(unittest.TestCase):
+    """Recipes ARL places with a flag and a place rather than an NPC.
+
+    Several hundred recipes carry no acquire call naming anybody: the raid
+    drops, the discoveries, the recipes every trainer sells. Reading only the
+    NPC-naming calls left every one of them looking like a recipe nothing in
+    the world knows about.
+    """
+
+    PROFESSION = """
+        AddRecipe(46140, 365, 35556, Q.EPIC, V.TBC, 365, 365, 375, 385)
+        self:AddRecipeFlags(46140, F.ALLIANCE, F.HORDE, F.RAID, F.IBOE)
+        self:AddRecipeAcquire(46140, A.CUSTOM, 24)
+
+        AddRecipe(36389, 375, 30321, Q.EPIC, V.TBC, 375, 375, 385, 395)
+        self:AddRecipeFlags(36389, F.ALLIANCE, F.HORDE, F.RAID)
+        self:AddRecipeAcquire(36389, A.CUSTOM, 37, A.CUSTOM, 43)
+
+        AddRecipe(28580, 350, 22452, Q.COMMON, V.TBC, 350, 350, 360, 370)
+        self:AddRecipeFlags(28580, F.ALLIANCE, F.HORDE, F.DISC)
+        self:AddRecipeAcquire(28580, A.CUSTOM, 3)
+
+        AddRecipe(21923, 1, 17722, Q.COMMON, V.ORIG, 1, 1, 1, 1)
+        self:AddRecipeFlags(21923, F.ALLIANCE, F.HORDE, F.SEASONAL)
+        self:AddRecipeAcquire(21923, A.SEASONAL, 1)
+
+        AddRecipe(13501, 1, 1, Q.COMMON, V.ORIG, 1, 1, 1, 1)
+        self:AddRecipeFlags(13501, F.ALLIANCE, F.HORDE, F.TRAINER, F.INSTANCE)
+        self:AddRecipeAcquire(13501, A.CUSTOM, 13)
+    """
+    CUSTOM = """
+        self:addLookupList(DB, 3, L["DISCOVERY_ALCH_XMUTE"])
+        self:addLookupList(DB, 13, L["HENRY_STERN_RFD"], BZ["Razorfen Downs"], 0, 0)
+        self:addLookupList(DB, 24, L["SUNWELL_RANDOM"], BZ["Sunwell Plateau"], 0, 0)
+        self:addLookupList(DB, 37, L["SSC_RANDOM"], BZ["Serpentshrine Cavern"], 0, 0)
+        self:addLookupList(DB, 43, L["TK_RANDOM"], BZ["The Eye"], 0, 0)
+    """
+
+    def _summary(self, spell_id):
+        return summarize_recipe(parse_profession(self.PROFESSION)[spell_id],
+                                {}, parse_custom_places(self.CUSTOM))
+
+    def test_a_place_without_a_zone_is_not_a_place(self):
+        places = parse_custom_places(self.CUSTOM)
+        # A discovery happens at the cauldron; there is nowhere to send anyone.
+        self.assertNotIn(3, places)
+        self.assertEqual(places[24], "Sunwell Plateau")
+
+    def test_the_flag_states_the_kind_when_no_call_names_anybody(self):
+        self.assertEqual(parse_source_flags("F.ALLIANCE, F.HORDE, F.RAID"), "drop")
+        self.assertEqual(parse_source_flags("F.HORDE, F.DISC"), "discovery")
+        self.assertEqual(parse_source_flags("F.SEASONAL"), "worldEvent")
+        self.assertEqual(parse_source_flags("F.ALLIANCE, F.IBOE"), None)
+
+    def test_a_trainer_inside_an_instance_is_still_a_trainer(self):
+        summary = self._summary(13501)
+        self.assertEqual(summary["kind"], "trainer")
+        self.assertEqual(summary["zones"], ["Razorfen Downs"])
+
+    def test_a_raid_drop_lands_in_its_raid(self):
+        summary = self._summary(46140)
+        self.assertEqual(summary["kind"], "drop")
+        self.assertEqual(summary["zones"], ["Sunwell Plateau"])
+        # Nobody is named: the recipe drops off the instance, not off a name.
+        self.assertEqual(summary["names"], [])
+
+    def test_a_recipe_that_drops_in_two_raids_names_both(self):
+        self.assertEqual(self._summary(36389)["zones"],
+                         ["Serpentshrine Cavern", "The Eye"])
+
+    def test_a_discovery_is_its_own_kind_and_points_nowhere(self):
+        summary = self._summary(28580)
+        self.assertEqual(summary["kind"], "discovery")
+        self.assertEqual(summary["zones"], [])
+        self.assertFalse(summary["worldDrop"])
+
+    def test_a_world_event_is_its_own_kind(self):
+        self.assertEqual(self._summary(21923)["kind"], "worldEvent")
+
+    def test_the_custom_ids_never_reach_the_npc_lookup(self):
+        # Custom id 24 must not be read as NPC 24.
+        recipes = parse_profession(self.PROFESSION)
+        self.assertEqual(recipes[46140]["acquires"], {})
+        self.assertEqual(recipes[46140]["places"], [24])
+
+    def test_an_acquire_call_that_names_npcs_still_wins(self):
+        text = self.PROFESSION + """
+        AddRecipe(9811, 200, 7961, Q.COMMON, V.ORIG, 200, 220, 230, 240)
+        self:AddRecipeFlags(9811, F.HORDE, F.RAID)
+        self:AddRecipeVendor(9811, 340)
+        """
+        lookups = parse_lookup(
+            'AddVendor(340, L["Kendor Kabonka"], BZ["Stormwind City"], 77.5, 53.5, ALLIANCE)')
+        summary = summarize_recipe(parse_profession(text)[9811], lookups,
+                                   parse_custom_places(self.CUSTOM))
+        self.assertEqual(summary["kind"], "vendor")
+        self.assertEqual(summary["names"], ["Kendor Kabonka"])
 
 
 class SourceEmitTests(unittest.TestCase):
