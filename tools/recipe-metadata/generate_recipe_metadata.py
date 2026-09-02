@@ -245,7 +245,6 @@ def _build_pipeline(snapshot=DEFAULT_SNAPSHOT, flavor="tbc"):
         metadata_version,
         SCHEMA_VERSION,
         flavor,
-        secondary.get("zonesById"),
     )
     reports = build_reports(records, diagnostics, primary)
     return primary, records, diagnostics, lua, reports

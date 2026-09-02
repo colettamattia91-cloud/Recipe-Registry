@@ -80,3 +80,91 @@ shape:
   }
 }
 ```
+
+## Where a recipe comes from
+
+Every recipe in the dataset says where it is obtained. Four sources, in
+precedence order:
+
+| source | fetch | gives |
+|---|---|---|
+| Ackis Recipe List | `fetch --source arl-acquisition` | kind, faction, NPC names, zones |
+| CraftLib removed list | `fetch --source removed-recipes` | recipes that are not in the game |
+| hand-verified | `acquisition_worksheet.py apply` | one whole record, wins over ARL |
+| `manual_overrides.yaml` | — | `removedBySpellId`, either direction |
+
+ARL is the bulk source and the only one that resolves an NPC to a zone; the
+emulator databases store spawn coordinates against a map, and turning those
+into a zone name needs the client's terrain files. Read its five lookup files
+carefully: they come in five different call shapes, and reading only the
+first leaves three of them resolving nothing at all.
+
+Kinds are `trainer`, `vendor`, `drop`, `quest`, `worldDrop`, `discovery` and
+`worldEvent`. The last four point nowhere on purpose: a world drop has no
+place to name, a discovery happens at your own workbench, and a world event
+recipe is only there while the event runs. A recipe every trainer in the game
+teaches names none of them, because naming the one whose id happened to
+resolve, out of thirty-two, is worse than naming none.
+
+## Filling the remaining gaps by hand
+
+The bulk sources leave a residue: recipes with no source at all, and vendor or
+creature drops where the kind is known but the place is not. `"Sold by
+somebody somewhere"` is not an answer a player can act on, so both count as
+gaps.
+
+```powershell
+python acquisition_worksheet.py emit          # what still needs an answer
+python acquisition_worksheet.py open --band 1 # open the pages to read
+python acquisition_worksheet.py fill          # or let the browser read them
+python acquisition_worksheet.py apply
+python generate_recipe_metadata.py generate
+```
+
+`emit` writes the sheet at `remediation/acquisition_worksheet.csv`, one row
+per gap with the page to open in the last column, plus the same links as a
+plain list under `artifacts/`. Fill `kind`, and where the page says so
+`faction`, `names` and `zones`; names and zones hold several values separated
+by a pipe. Everything else is context and is regenerated.
+
+Rows are banded by how much the answer is worth, band 1 first: a TBC recipe
+with a real skill requirement is what the Missing recipes tab exists to show,
+while a vanilla recipe with no skill requirement is usually a discovery or a
+quest reward. The sheet can be filled top-down and abandoned anywhere.
+
+`emit` is safe to re-run: a filled row is never overwritten, and rows a later
+refetch answers simply drop off the sheet. An empty sheet means there is
+nothing left to answer.
+
+`fill` opens the pages in a real browser -- see `recipe_sources/browser_bridge.py`
+-- and reads the same listviews the item-page parser already knows, writing
+what it finds into the sheet rather than straight into the data, so the
+answers can be looked over first. A page with no source section leaves its row
+empty: Wowhead not knowing is a real outcome, and often means the recipe was
+never released.
+
+`apply` writes `snapshots/tbc-2.5.5/acquisition_manual.json`, which the
+secondary provider overlays on ARL -- whole record at a time, since a reading
+of a page is one coherent answer and splicing half of it onto an automated
+record would produce a row neither source ever stated. An unknown `kind` or
+`faction` refuses the whole write rather than silently dropping the row.
+
+## Recipes that are not in the game
+
+Some recipes exist in the client data but were never implemented, or were
+removed and never came back. No source will ever place them, and offering one
+in the Missing recipes tab sends a player looking for a trainer who does not
+exist.
+
+They are flagged, never deleted. `fetch --source removed-recipes` writes
+`snapshots/tbc-2.5.5/removed.json`, the record keeps a `removed = true` field,
+and putting one back is one line in `manual_overrides.yaml`:
+
+```yaml
+removedBySpellId:
+  12345: false   # actually obtainable
+```
+
+The list identifies a removed recipe by the absence of difficulty data on
+Wowhead, which is a good signal but not a complete one -- a recipe cut in beta
+can still carry that data. The override flags those in the other direction.

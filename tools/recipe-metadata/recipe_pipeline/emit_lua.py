@@ -157,7 +157,7 @@ def _emit_nav_tree(tree, indent="    "):
     return lines
 
 
-def emit_lua(records, categories_by_profession, subcategories_by_profession, metadata_version, schema_version=1, flavor="tbc", zone_names=None):
+def emit_lua(records, categories_by_profession, subcategories_by_profession, metadata_version, schema_version=1, flavor="tbc"):
     records = sorted(records, key=lambda record: record.spell_id)
     created_item_to_spell_ids = defaultdict(list)
 

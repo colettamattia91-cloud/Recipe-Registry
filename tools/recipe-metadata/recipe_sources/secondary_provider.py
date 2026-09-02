@@ -14,7 +14,6 @@ from recipe_sources.manual_acquisition import (
     merge_acquisition,
 )
 from recipe_sources.removed_recipes import load_removed
-from recipe_sources.wowhead_source_provider import load_sources
 from recipe_sources.wowhead_specialization_provider import load_specializations
 
 
@@ -24,9 +23,6 @@ def load_secondary_sources(snapshot_dir):
     # refresh cadence, and secondary_static.json is rewritten wholesale by a
     # Wago refetch, which would silently drop them.
     specializations = load_specializations(snapshot_dir)
-    # Same reasoning for the obtain-side data: its own file, its own refresh
-    # cadence, and safe from a Wago refetch rewriting secondary_static.json.
-    sources, zones = load_sources(snapshot_dir)
     # Where a recipe is obtained, keyed by spell ID. Its own file for the
     # same reason as the others: a different source on a different cadence,
     # and safe from a Wago refetch rewriting secondary_static.json.
@@ -51,8 +47,6 @@ def load_secondary_sources(snapshot_dir):
             "createdItemBySpellId": {},
             "expansionBySpellId": {},
             "specializationBySpellId": specializations,
-            "sourcesByRecipeItemId": sources,
-            "zonesById": zones,
             "acquisitionBySpellId": acquisition,
             "removedBySpellId": removed,
         }
@@ -70,8 +64,6 @@ def load_secondary_sources(snapshot_dir):
         "createdItemBySpellId": int_keyed("createdItemBySpellId"),
         "expansionBySpellId": int_keyed("expansionBySpellId"),
         "specializationBySpellId": specializations,
-        "sourcesByRecipeItemId": sources,
-        "zonesById": zones,
         "acquisitionBySpellId": acquisition,
         "removedBySpellId": removed,
     }
