@@ -81,7 +81,7 @@ local function cloneRecord(spellId, record)
         faction = record.faction,
         sourceKind = record.sourceKind,
         worldDrop = record.worldDrop == true,
-        trashDrop = record.trashDrop == true,
+        bossDrop = record.bossDrop == true,
         sourceZones = cloneStringList(record.sourceZones),
         sourceNames = cloneStringList(record.sourceNames),
         -- In the client data but not in the game. Kept on the record rather
@@ -667,7 +667,7 @@ end
 function RecipeMetadata:GetSource(recipeKey, info)
     info = getInfo(self, recipeKey, info)
     if not info then return nil end
-    if not (info.faction or info.sourceKind or info.worldDrop or info.trashDrop) then
+    if not (info.faction or info.sourceKind or info.worldDrop or info.bossDrop) then
         return nil
     end
 
@@ -685,7 +685,7 @@ function RecipeMetadata:GetSource(recipeKey, info)
         faction = info.faction,
         kind = info.sourceKind,
         worldDrop = info.worldDrop == true,
-        trashDrop = info.trashDrop == true,
+        bossDrop = info.bossDrop == true,
         zones = zones,
         names = cloneStringList(info.sourceNames),
     }

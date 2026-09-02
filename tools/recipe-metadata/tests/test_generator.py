@@ -958,6 +958,101 @@ class ArlDroppedNpcTests(unittest.TestCase):
         self.assertEqual(summary["names"], ["Nixx Sprocketspring"])
 
 
+class DropNamingTests(unittest.TestCase):
+    """Naming a creature is only worth it when there is one creature to find."""
+
+    PROFESSION = """
+        AddRecipe(1, 1, 1, Q.COMMON, V.ORIG, 1, 1, 1, 1)
+        self:AddRecipeFlags(1, F.ALLIANCE, F.HORDE, F.MOB_DROP)
+        self:AddRecipeMobDrop(1, 7800)
+
+        AddRecipe(2, 1, 1, Q.COMMON, V.ORIG, 1, 1, 1, 1)
+        self:AddRecipeFlags(2, F.ALLIANCE, F.HORDE, F.MOB_DROP)
+        self:AddRecipeMobDrop(2, 5000)
+
+        AddRecipe(3, 1, 1, Q.COMMON, V.ORIG, 1, 1, 1, 1)
+        self:AddRecipeFlags(3, F.ALLIANCE, F.HORDE, F.MOB_DROP)
+        self:AddRecipeMobDrop(3, 5000, 5001, 5002)
+
+        AddRecipe(4, 1, 1, Q.COMMON, V.ORIG, 1, 1, 1, 1)
+        self:AddRecipeFlags(4, F.ALLIANCE, F.HORDE, F.MOB_DROP)
+        self:AddRecipeMobDrop(4, 7800, 7801)
+    """
+    LOOKUP = """
+        AddMob(7800, BB["Mekgineer Thermaplugg"], BZ["Gnomeregan"], 0, 0)
+        AddMob(7801, BB["Viscous Fallout"], BZ["Gnomeregan"], 0, 0)
+        AddMob(5000, L["Wastewander Bandit"], BZ["Tanaris"], 0, 0)
+        AddMob(5001, L["Wastewander Thief"], BZ["Tanaris"], 0, 0)
+        AddMob(5002, L["Wastewander Rogue"], BZ["Tanaris"], 0, 0)
+    """
+
+    def _summary(self, spell_id):
+        return summarize_recipe(parse_profession(self.PROFESSION)[spell_id],
+                                {"Mob": parse_lookup(self.LOOKUP)})
+
+    def test_the_boss_table_is_what_marks_a_name_worth_keeping(self):
+        lookups = parse_lookup(self.LOOKUP)
+        self.assertTrue(lookups[7800]["boss"])
+        self.assertFalse(lookups[5000]["boss"])
+
+    def test_one_boss_is_named(self):
+        summary = self._summary(1)
+        self.assertEqual(summary["names"], ["Mekgineer Thermaplugg"])
+        self.assertEqual(summary["zones"], ["Gnomeregan"])
+        self.assertFalse(summary["bossDrop"])
+
+    def test_one_ordinary_mob_is_not_named(self):
+        # There are thirteen Wastewander Bandits in Tanaris; naming the one ARL
+        # happened to list implies a precision the source does not have.
+        summary = self._summary(2)
+        self.assertEqual(summary["names"], [])
+        self.assertEqual(summary["zones"], ["Tanaris"])
+
+    def test_several_ordinary_mobs_leave_only_the_zone(self):
+        summary = self._summary(3)
+        self.assertEqual(summary["names"], [])
+        self.assertEqual(summary["zones"], ["Tanaris"])
+        self.assertFalse(summary["bossDrop"])
+
+    def test_several_bosses_are_flagged_rather_than_listed(self):
+        summary = self._summary(4)
+        self.assertEqual(summary["names"], [])
+        self.assertTrue(summary["bossDrop"])
+        self.assertEqual(summary["zones"], ["Gnomeregan"])
+
+
+class ContainerPlaceTests(unittest.TestCase):
+    """A chest is not a drop, whatever the flag says."""
+
+    PROFESSION = """
+        AddRecipe(1, 1, 1, Q.COMMON, V.ORIG, 1, 1, 1, 1)
+        self:AddRecipeFlags(1, F.ALLIANCE, F.HORDE, F.INSTANCE)
+        self:AddRecipeAcquire(1, A.CUSTOM, 23)
+
+        AddRecipe(2, 1, 1, Q.COMMON, V.ORIG, 1, 1, 1, 1)
+        self:AddRecipeFlags(2, F.ALLIANCE, F.HORDE, F.RAID)
+        self:AddRecipeAcquire(2, A.CUSTOM, 24)
+    """
+    CUSTOM = """
+        self:addLookupList(DB, 23, L["DM_CACHE"], BZ["Dire Maul"], 59.04, 48.82)
+        self:addLookupList(DB, 24, L["SUNWELL_RANDOM"], BZ["Sunwell Plateau"], 0, 0)
+    """
+
+    def _summary(self, spell_id):
+        return summarize_recipe(parse_profession(self.PROFESSION)[spell_id],
+                                {}, parse_custom_places(self.CUSTOM))
+
+    def test_a_chest_is_a_container_not_a_drop(self):
+        # The flag only knows the recipe is in a dungeon; the place is the only
+        # thing that knows nobody has to die for it.
+        summary = self._summary(1)
+        self.assertEqual(summary["kind"], "container")
+        self.assertEqual(summary["zones"], ["Dire Maul"])
+
+    def test_a_random_instance_drop_stays_a_drop(self):
+        self.assertEqual(self._summary(2)["kind"], "drop")
+
+
 class ArlGenericAcquireTests(unittest.TestCase):
     """Recipes ARL places with a flag and a place rather than an NPC.
 
@@ -1004,7 +1099,9 @@ class ArlGenericAcquireTests(unittest.TestCase):
         places = parse_custom_places(self.CUSTOM)
         # A discovery happens at the cauldron; there is nowhere to send anyone.
         self.assertNotIn(3, places)
-        self.assertEqual(places[24], "Sunwell Plateau")
+        self.assertEqual(places[24]["zone"], "Sunwell Plateau")
+        # The locale key rides along: it is what separates a chest from a kill.
+        self.assertEqual(places[24]["key"], "SUNWELL_RANDOM")
 
     def test_the_flag_states_the_kind_when_no_call_names_anybody(self):
         self.assertEqual(parse_source_flags("F.ALLIANCE, F.HORDE, F.RAID"), "drop")

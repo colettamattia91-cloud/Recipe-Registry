@@ -4849,7 +4849,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 150,
             sourceKind = "drop",
             sourceZones = { 9, 8, 22 },
-            sourceNames = { "Grimtotem Geomancer", "Defias Enchanter", "Dark Strand Voidcaller" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -4885,7 +4884,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 185,
             sourceKind = "drop",
             sourceZones = { 15, 7, 10 },
-            sourceNames = { "Theramore Infiltrator", "Shadowy Assassin", "Syndicate Spy" },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 4 },
@@ -8263,7 +8261,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 220,
             sourceKind = "drop",
             sourceZones = { 13 },
-            sourceNames = { "Wastewander Bandit" },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 4 },
@@ -8318,7 +8315,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 220,
             sourceKind = "drop",
             sourceZones = { 13 },
-            sourceNames = { "Wastewander Shadow Mage" },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 2 },
@@ -8337,7 +8333,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 225,
             sourceKind = "drop",
             sourceZones = { 13 },
-            sourceNames = { "Wastewander Thief" },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 2 },
@@ -8436,7 +8431,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 235,
             sourceKind = "drop",
             sourceZones = { 13 },
-            sourceNames = { "Wastewander Rogue" },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 6 },
@@ -8519,7 +8513,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 240,
             sourceKind = "drop",
             sourceZones = { 13 },
-            sourceNames = { "Wastewander Assassin", "Wastewander Scofflaw", "Andre Firebeard" },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 12 },
@@ -8556,7 +8549,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 245,
             sourceKind = "drop",
             sourceZones = { 13 },
-            sourceNames = { "Wastewander Rogue" },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 14 },
@@ -8575,7 +8567,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 250,
             sourceKind = "drop",
             sourceZones = { 13 },
-            sourceNames = { "Wastewander Assassin", "Wastewander Scofflaw", "Andre Firebeard" },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 10 },
@@ -9003,7 +8994,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 240,
             sourceKind = "drop",
             sourceZones = { 37 },
-            sourceNames = { "Skeletal Flayer", "Slavering Ghoul" },
             bopOutput = false,
             reagents = {
                 { itemId = 8836, count = 1 },
@@ -11009,7 +10999,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 145,
             sourceKind = "drop",
             sourceZones = { 14 },
-            sourceNames = { "Dark Iron Demolitionist", "Dark Iron Dwarf", "Dark Iron Saboteur" },
             reagents = {
                 { itemId = 2772, count = 3 },
                 { itemId = 11083, count = 1 },
@@ -11025,7 +11014,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 145,
             sourceKind = "drop",
             sourceZones = { 30, 4 },
-            sourceNames = { "Blackened Ancient", "Crazed Ancient", "Withered Ancient" },
             reagents = {
                 { itemId = 3356, count = 3 },
                 { itemId = 11083, count = 1 },
@@ -11041,7 +11029,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 145,
             sourceKind = "drop",
             sourceZones = { 7 },
-            sourceNames = { "Torn Fin Tidehunter", "Torn Fin Muckdweller", "Torn Fin Coastrunner" },
             reagents = {
                 { itemId = 6370, count = 3 },
                 { itemId = 11083, count = 1 },
@@ -11326,7 +11313,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 200,
             sourceKind = "drop",
             sourceZones = { 3 },
-            sourceNames = { "Witherbark Headhunter", "Witherbark Berserker", "Witherbark Shadow Hunter" },
             reagents = {
                 { itemId = 7392, count = 3 },
                 { itemId = 11137, count = 1 },
@@ -11441,7 +11427,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 215,
             sourceKind = "drop",
             sourceZones = { 2 },
-            sourceNames = { "Venture Co. Strip Miner" },
             reagents = {
                 { itemId = 6037, count = 3 },
                 { itemId = 11137, count = 3 },
@@ -11483,7 +11468,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 225,
             sourceKind = "drop",
             sourceZones = { 36 },
-            sourceNames = { "Swampwalker", "Tangled Horror", "Molt Thorn" },
             reagents = {
                 { itemId = 8838, count = 3 },
                 { itemId = 11137, count = 3 },
@@ -11499,7 +11483,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 225,
             sourceKind = "drop",
             sourceZones = { 13, 10 },
-            sourceNames = { "Wastewander Assassin", "Wastewander Scofflaw", "Syndicate Assassin" },
             reagents = {
                 { itemId = 11174, count = 2 },
             },
@@ -11882,7 +11865,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 270,
             requiredSkill = 270,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 43 },
             bopOutput = false,
             reagents = {
@@ -11901,7 +11884,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 275,
             sourceKind = "drop",
             sourceZones = { 43 },
-            sourceNames = { "Hammered Patron", "Ribbly's Crony" },
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 4 },
@@ -11917,7 +11899,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 280,
             requiredSkill = 280,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 43 },
             bopOutput = false,
             reagents = {
@@ -11970,7 +11952,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 205,
             specialization = 20222,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 16 },
             bopOutput = true,
             reagents = {
@@ -11989,7 +11971,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 205,
             specialization = 20219,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 16 },
             bopOutput = true,
             reagents = {
@@ -12685,7 +12667,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 15 },
-            sourceNames = { "Strashaz Serpent Guard" },
             bopOutput = false,
             reagents = {
                 { itemId = 3577, count = 6 },
@@ -12704,7 +12685,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 37 },
-            sourceNames = { "Scarlet Cavalier" },
             bopOutput = false,
             reagents = {
                 { itemId = 2842, count = 10 },
@@ -12779,7 +12759,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 15 },
-            sourceNames = { "Strashaz Warrior" },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 2 },
@@ -12855,7 +12834,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 15 },
-            sourceNames = { "Strashaz Myrmidon", "Tidelord Rrurgaz" },
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 1 },
@@ -12874,7 +12852,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 37 },
-            sourceNames = { "Scarlet Smith" },
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 1 },
@@ -13165,7 +13142,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 285,
             requiredSkill = 285,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 47 },
             bopOutput = false,
             reagents = {
@@ -13188,7 +13165,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 290,
             sourceKind = "drop",
             sourceZones = { 41 },
-            sourceNames = { "Volchan" },
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 4 },
@@ -13206,7 +13182,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 290,
             requiredSkill = 290,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 47 },
             bopOutput = true,
             reagents = {
@@ -13333,7 +13309,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 37 },
-            sourceNames = { "Foreman Marcrid" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 4 },
@@ -13728,7 +13703,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 280,
             sourceKind = "drop",
             sourceZones = { 38, 44 },
-            sourceNames = { "Legashi Rogue", "Jadefire Rogue" },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -13781,7 +13755,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 290,
             sourceKind = "drop",
             sourceZones = { 48 },
-            sourceNames = { "Firebrand Invoker", "Firebrand Pyromancer" },
             bopOutput = false,
             reagents = {
                 { itemId = 7068, count = 1 },
@@ -13800,7 +13773,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 290,
             sourceKind = "drop",
             sourceZones = { 45 },
-            sourceNames = { "Frostmaul Giant" },
             bopOutput = false,
             reagents = {
                 { itemId = 7070, count = 1 },
@@ -13819,7 +13791,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 290,
             sourceKind = "drop",
             sourceZones = { 37 },
-            sourceNames = { "Rotting Behemoth", "Decaying Horror" },
             bopOutput = false,
             reagents = {
                 { itemId = 7067, count = 1 },
@@ -13838,7 +13809,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 290,
             sourceKind = "drop",
             sourceZones = { 45 },
-            sourceNames = { "Cobalt Mageweaver" },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -13857,7 +13827,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 290,
             sourceKind = "drop",
             sourceZones = { 49 },
-            sourceNames = { "Dark Adept", "Shadowmage" },
             bopOutput = false,
             reagents = {
                 { itemId = 3824, count = 1 },
@@ -14310,7 +14279,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 260,
             sourceKind = "drop",
             sourceZones = { 39 },
-            sourceNames = { "Twilight Fire Guard" },
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 2 },
@@ -14383,7 +14351,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 270,
             sourceKind = "drop",
             sourceZones = { 39 },
-            sourceNames = { "Twilight Fire Guard" },
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 2 },
@@ -14489,7 +14456,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 275,
             sourceKind = "drop",
             sourceZones = { 41 },
-            sourceNames = { "Thaurissan Firewalker" },
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 1 },
@@ -14617,7 +14583,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 280,
             sourceKind = "drop",
             sourceZones = { 41 },
-            sourceNames = { "Thaurissan Firewalker" },
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 1 },
@@ -14636,7 +14601,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 285,
             sourceKind = "drop",
             sourceZones = { 45 },
-            sourceNames = { "Cobalt Mageweaver" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 4 },
@@ -15006,7 +14970,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 48 },
-            sourceNames = { "Firebrand Pyromancer" },
             bopOutput = true,
             reagents = {
                 { itemId = 7076, count = 10 },
@@ -15136,7 +15099,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 265,
             sourceKind = "drop",
             sourceZones = { 40 },
-            sourceNames = { "Portal Seeker", "Shadowsworn Thug" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 6 },
@@ -15240,7 +15202,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 270,
             sourceKind = "drop",
             sourceZones = { 41 },
-            sourceNames = { "Firegut Brute" },
             bopOutput = false,
             reagents = {
                 { itemId = 7075, count = 1 },
@@ -15260,7 +15221,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 270,
             sourceKind = "drop",
             sourceZones = { 55 },
-            sourceNames = { "Murk Worm" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 20 },
@@ -15336,7 +15296,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 275,
             sourceKind = "drop",
             sourceZones = { 41 },
-            sourceNames = { "Blackrock Soldier" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 6 },
@@ -15501,7 +15460,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 285,
             sourceKind = "drop",
             sourceZones = { 45 },
-            sourceNames = { "Winterfall Den Watcher" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 6 },
@@ -15520,7 +15478,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 285,
             sourceKind = "drop",
             sourceZones = { 41 },
-            sourceNames = { "Blackrock Slayer" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 8 },
@@ -15539,7 +15496,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 285,
             sourceKind = "drop",
             sourceZones = { 48 },
-            sourceNames = { "Firebrand Grunt" },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 1 },
@@ -15579,7 +15535,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 285,
             sourceKind = "drop",
             sourceZones = { 44 },
-            sourceNames = { "Deadwood Shaman" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 16 },
@@ -15599,7 +15554,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 285,
             sourceKind = "drop",
             sourceZones = { 38 },
-            sourceNames = { "Arkkoran Oracle" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 3 },
@@ -15732,7 +15686,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 290,
             sourceKind = "drop",
             sourceZones = { 35 },
-            sourceNames = { "Vilebranch Hideskinner" },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 1 },
@@ -15753,7 +15706,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 295,
             sourceKind = "drop",
             sourceZones = { 44 },
-            sourceNames = { "Winterfall Totemic" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 6 },
@@ -15792,7 +15744,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 295,
             sourceKind = "drop",
             sourceZones = { 38 },
-            sourceNames = { "Cliff Breaker" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 28 },
@@ -15813,7 +15764,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 295,
             sourceKind = "drop",
             sourceZones = { 38 },
-            sourceNames = { "Son of Arkkoroc" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 3 },
@@ -15886,7 +15836,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 43 },
-            sourceNames = { "Anvilrage Marshal" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 44 },
@@ -15907,7 +15856,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 37 },
-            sourceNames = { "Decaying Horror" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 16 },
@@ -15928,7 +15876,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 56 },
-            sourceNames = { "Glutinous Ooze", "Muculent Ooze", "Cloned Ooze" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 30 },
@@ -15967,7 +15914,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 41 },
-            sourceNames = { "Blackrock Battlemaster" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 14 },
@@ -15987,7 +15933,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 48 },
-            sourceNames = { "Firebrand Legionnaire" },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 1 },
@@ -16045,7 +15990,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 45 },
-            sourceNames = { "Winterfall Ursa" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 12 },
@@ -16083,7 +16027,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 43 },
-            sourceNames = { "Anvilrage Captain" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 40 },
@@ -16309,7 +16252,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 275,
             sourceKind = "drop",
             sourceZones = { 43 },
-            sourceNames = { "Doomforge Craftsman" },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -16332,7 +16274,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 285,
             sourceKind = "drop",
             sourceZones = { 43 },
-            sourceNames = { "Weapon Technician" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 1 },
@@ -16406,7 +16347,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 290,
             sourceKind = "drop",
             sourceZones = { 47 },
-            sourceNames = { "Crimson Inquisitor" },
             bopOutput = false,
             reagents = {
                 { itemId = 10558, count = 1 },
@@ -16443,7 +16383,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 45 },
-            sourceNames = { "Cobalt Mageweaver" },
             bopOutput = false,
             reagents = {
                 { itemId = 10558, count = 4 },
@@ -16484,7 +16423,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 49 },
-            sourceNames = { "Mossflayer Shadowhunter" },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 2 },
@@ -16533,7 +16471,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 295,
             sourceKind = "drop",
             sourceZones = { 57 },
-            sourceNames = { "Deadwind Warlock" },
             reagents = {
                 { itemId = 16203, count = 6 },
                 { itemId = 16204, count = 6 },
@@ -16741,7 +16678,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 285,
             sourceKind = "drop",
             sourceZones = { 45 },
-            sourceNames = { "Anguished Highborne" },
             reagents = {
                 { itemId = 7080, count = 1 },
                 { itemId = 7082, count = 1 },
@@ -16759,7 +16695,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 295,
             sourceKind = "drop",
             sourceZones = { 48 },
-            sourceNames = { "Blackhand Elite" },
             reagents = {
                 { itemId = 14344, count = 4 },
                 { itemId = 16204, count = 10 },
@@ -16775,7 +16710,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 48 },
-            sourceNames = { "Spirestone Warlord" },
             reagents = {
                 { itemId = 14344, count = 2 },
                 { itemId = 16203, count = 10 },
@@ -16791,7 +16725,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 53 },
-            sourceNames = { "Spectral Researcher" },
             reagents = {
                 { itemId = 12803, count = 6 },
                 { itemId = 12808, count = 6 },
@@ -16808,7 +16741,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 295,
             sourceKind = "drop",
             sourceZones = { 47, 58 },
-            sourceNames = { "Thuzadin Shadowcaster", "Bonechewer Backbreaker" },
             reagents = {
                 { itemId = 12808, count = 4 },
                 { itemId = 14344, count = 4 },
@@ -16824,7 +16756,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 37, 49 },
-            sourceNames = { "Scarlet Spellbinder", "Scarlet Archmage" },
             reagents = {
                 { itemId = 12811, count = 2 },
                 { itemId = 14344, count = 4 },
@@ -16840,7 +16771,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 53 },
-            sourceNames = { "Scholomance Adept" },
             reagents = {
                 { itemId = 14344, count = 2 },
                 { itemId = 16203, count = 12 },
@@ -16856,7 +16786,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 47 },
-            sourceNames = { "Crimson Sorcerer" },
             reagents = {
                 { itemId = 14344, count = 2 },
                 { itemId = 16203, count = 12 },
@@ -17397,7 +17326,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "tools",
             sortOrder = 80,
             requiredSkill = 300,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 43 },
             bopOutput = false,
             reagents = {
@@ -17670,7 +17599,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 300,
             requiredSkill = 300,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 46 },
             bopOutput = false,
             reagents = {
@@ -17692,7 +17621,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 46 },
             bopOutput = false,
             reagents = {
@@ -17712,7 +17641,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 46 },
             bopOutput = false,
             reagents = {
@@ -17731,7 +17660,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 300,
             requiredSkill = 300,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 46 },
             bopOutput = false,
             reagents = {
@@ -17750,7 +17679,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 300,
             requiredSkill = 300,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 46 },
             bopOutput = false,
             reagents = {
@@ -17789,7 +17718,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 300,
             requiredSkill = 300,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 46 },
             bopOutput = false,
             reagents = {
@@ -17808,7 +17737,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 300,
             requiredSkill = 300,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 46 },
             bopOutput = false,
             reagents = {
@@ -17828,7 +17757,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 300,
             requiredSkill = 300,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 46 },
             bopOutput = false,
             reagents = {
@@ -17847,7 +17776,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cloaks",
             sortOrder = 300,
             requiredSkill = 300,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 46 },
             bopOutput = false,
             reagents = {
@@ -17867,7 +17796,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cloaks",
             sortOrder = 300,
             requiredSkill = 300,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 46 },
             bopOutput = false,
             reagents = {
@@ -17887,7 +17816,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cloaks",
             sortOrder = 300,
             requiredSkill = 300,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 46 },
             bopOutput = false,
             reagents = {
@@ -18077,7 +18006,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinkets",
             sortOrder = 90,
             requiredSkill = 275,
-            sourceKind = "drop",
+            sourceKind = "container",
             sourceZones = { 46 },
             bopOutput = false,
             reagents = {
@@ -18138,7 +18067,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             sourceKind = "drop",
             sourceZones = { 47 },
-            sourceNames = { "Crimson Inquisitor" },
             bopOutput = false,
             reagents = {
                 { itemId = 11371, count = 8 },
@@ -18161,7 +18089,6 @@ RecipeRegistryRecipeMetadata = {
             specialization = 20219,
             sourceKind = "drop",
             sourceZones = { 43 },
-            sourceNames = { "Weapon Technician" },
             bopOutput = false,
             reagents = {
                 { itemId = 7191, count = 1 },
@@ -18183,7 +18110,6 @@ RecipeRegistryRecipeMetadata = {
             specialization = 20219,
             sourceKind = "drop",
             sourceZones = { 43 },
-            sourceNames = { "Weapon Technician" },
             bopOutput = false,
             reagents = {
                 { itemId = 3864, count = 1 },
@@ -20580,7 +20506,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 250,
             sourceKind = "drop",
             sourceZones = { 39 },
-            sourceNames = { "Dark Iron Slaver", "Dark Iron Taskmaster", "Dark Iron Watchman" },
             bopOutput = false,
             reagents = {
                 { itemId = 4625, count = 3 },
@@ -20598,8 +20523,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            bossDrop = true,
             sourceZones = { 54, 45 },
-            sourceNames = { "The Windreaver", "Princess Tempestria" },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 4 },
@@ -21472,7 +21397,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 365,
             sourceKind = "drop",
             sourceZones = { 70 },
-            sourceNames = { "Phantom Attendant" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 4 },
@@ -21490,7 +21414,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 375,
             sourceKind = "drop",
             sourceZones = { 70 },
-            sourceNames = { "Phantom Valet" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 4 },
@@ -21508,7 +21431,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             sourceKind = "drop",
             sourceZones = { 71 },
-            sourceNames = { "Arcatraz Sentinel" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -21527,7 +21449,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 72 },
-            sourceNames = { "Sunseeker Astromage" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -22432,7 +22353,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 320,
             sourceKind = "drop",
             sourceZones = { 74 },
-            sourceNames = { "Ethereum Nullifier", "Ethereum Jailor" },
             reagents = {
                 { itemId = 22445, count = 10 },
                 { itemId = 22448, count = 2 },
@@ -22479,7 +22399,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             sourceKind = "drop",
             sourceZones = { 75 },
-            sourceNames = { "Coilfang Oracle" },
             reagents = {
                 { itemId = 22445, count = 20 },
                 { itemId = 22446, count = 10 },
@@ -22496,7 +22415,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 76 },
-            sourceNames = { "Bloodmaul Geomancer" },
             reagents = {
                 { itemId = 21884, count = 6 },
                 { itemId = 21885, count = 6 },
@@ -22660,7 +22578,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 320,
             sourceKind = "drop",
             sourceZones = { 79 },
-            sourceNames = { "Ethereal Priest" },
             reagents = {
                 { itemId = 22445, count = 12 },
             },
@@ -22675,7 +22592,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 340,
             sourceKind = "drop",
             sourceZones = { 80 },
-            sourceNames = { "Raging Skeleton" },
             reagents = {
                 { itemId = 22445, count = 8 },
                 { itemId = 22446, count = 8 },
@@ -22691,7 +22607,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 370,
             sourceKind = "drop",
             sourceZones = { 70 },
-            sourceNames = { "Phantom Stagehand" },
             reagents = {
                 { itemId = 22449, count = 4 },
                 { itemId = 22450, count = 2 },
@@ -22799,7 +22714,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 340,
             sourceKind = "drop",
             sourceZones = { 74 },
-            sourceNames = { "Sunfury Researcher" },
             reagents = {
                 { itemId = 22446, count = 10 },
                 { itemId = 22449, count = 2 },
@@ -22815,7 +22729,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             sourceKind = "drop",
             sourceZones = { 81 },
-            sourceNames = { "Shattered Hand Centurion" },
             reagents = {
                 { itemId = 22445, count = 40 },
                 { itemId = 22449, count = 4 },
@@ -22847,7 +22760,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             sourceKind = "drop",
             sourceZones = { 76 },
-            sourceNames = { "Bash'ir Spell-Thief" },
             reagents = {
                 { itemId = 22446, count = 8 },
                 { itemId = 22449, count = 8 },
@@ -22863,7 +22775,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 71 },
-            sourceNames = { "Eredar Deathbringer" },
             reagents = {
                 { itemId = 22445, count = 20 },
                 { itemId = 22446, count = 6 },
@@ -23976,7 +23887,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 72 },
-            sourceNames = { "Sunseeker Astromage", "Nethermancer Sepethrea" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 5 },
@@ -24036,7 +23946,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 68 },
-            sourceNames = { "Vir'aani Arcanist" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 5 },
@@ -24056,7 +23965,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 69 },
-            sourceNames = { "Shadow Council Warlock" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 5 },
@@ -24076,7 +23984,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 76 },
-            sourceNames = { "Abyssal Flamebringer" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 5 },
@@ -25221,7 +25128,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 80 },
-            sourceNames = { "Auchenai Monk" },
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 6 },
@@ -25238,7 +25144,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 71 },
-            sourceNames = { "Unchained Doombringer" },
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 8 },
@@ -25255,7 +25160,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 365,
             sourceKind = "drop",
             sourceZones = { 84 },
-            sourceNames = { "Cabal Fanatic" },
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 8 },
@@ -25291,7 +25195,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 68 },
-            sourceNames = { "Murkblood Raider" },
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 2 },
@@ -25310,7 +25213,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 69 },
-            sourceNames = { "Deathforge Guardian" },
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 4 },
@@ -25329,7 +25231,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 365,
             sourceKind = "drop",
             sourceZones = { 74 },
-            sourceNames = { "Disembodied Protector" },
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 3 },
@@ -25348,7 +25249,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 365,
             sourceKind = "drop",
             sourceZones = { 68 },
-            sourceNames = { "Boulderfist Warrior" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 6 },
@@ -25368,7 +25268,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 365,
             sourceKind = "drop",
             sourceZones = { 76 },
-            sourceNames = { "Anger Guard" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 10 },
@@ -25388,7 +25287,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 370,
             sourceKind = "drop",
             sourceZones = { 69 },
-            sourceNames = { "Crazed Murkblood Foreman", "Crazed Murkblood Miner", "Ashtongue Warrior" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 10 },
@@ -25408,7 +25306,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 370,
             sourceKind = "drop",
             sourceZones = { 79 },
-            sourceNames = { "Nexus Stalker" },
             bopOutput = false,
             reagents = {
                 { itemId = 22449, count = 2 },
@@ -25871,7 +25768,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 375,
             sourceKind = "drop",
             sourceZones = { 74 },
-            sourceNames = { "Sunfury Bloodwarder" },
             bopOutput = false,
             reagents = {
                 { itemId = 23447, count = 1 },
@@ -26043,7 +25939,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 76 },
-            sourceNames = { "Doomforge Engineer" },
             bopOutput = false,
             reagents = {
                 { itemId = 23783, count = 4 },
@@ -26138,7 +26033,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 69 },
-            sourceNames = { "Mo'arg Weaponsmith" },
             bopOutput = false,
             reagents = {
                 { itemId = 22449, count = 2 },
@@ -26176,7 +26070,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 74 },
-            sourceNames = { "Sunfury Bowman" },
             bopOutput = false,
             reagents = {
                 { itemId = 23440, count = 2 },
@@ -26791,7 +26684,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             sourceKind = "drop",
             sourceZones = { 69 },
-            sourceNames = { "Dark Conclave Shadowmancer" },
             bopOutput = false,
             reagents = {
                 { itemId = 22456, count = 3 },
@@ -26810,7 +26702,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 355,
             sourceKind = "drop",
             sourceZones = { 75 },
-            sourceNames = { "Coilfang Sorceress" },
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 3 },
@@ -26848,7 +26739,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 76 },
-            sourceNames = { "Vekh'nir Dreadhawk" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 3 },
@@ -26867,7 +26757,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 365,
             sourceKind = "drop",
             sourceZones = { 74 },
-            sourceNames = { "Mageslayer" },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 3 },
@@ -27144,7 +27033,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 370,
             sourceKind = "drop",
             sourceZones = { 85 },
-            sourceNames = { "Sunseeker Botanist" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 20 },
@@ -28651,7 +28539,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             sourceKind = "drop",
             sourceZones = { 77 },
-            sourceNames = { "Durnholde Rifleman", "Don Carlos" },
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 4 },
@@ -28672,7 +28559,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             sourceKind = "drop",
             sourceZones = { 86 },
-            sourceNames = { "Sethekk Ravenguard" },
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 4 },
@@ -28693,7 +28579,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             sourceKind = "drop",
             sourceZones = { 87 },
-            sourceNames = { "Rift Lord", "Rift Keeper" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -29871,7 +29756,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             sourceKind = "drop",
             sourceZones = { 69 },
-            sourceNames = { "Eclipsion Archmage" },
             reagents = {
                 { itemId = 22449, count = 4 },
                 { itemId = 22457, count = 8 },
@@ -29887,7 +29771,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             sourceKind = "drop",
             sourceZones = { 74 },
-            sourceNames = { "Voidshrieker" },
             reagents = {
                 { itemId = 22449, count = 4 },
                 { itemId = 22456, count = 8 },
@@ -30418,7 +30301,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 340,
             sourceKind = "drop",
             sourceZones = { 86 },
-            sourceNames = { "Time-Lost Shadowmage" },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 4 },
@@ -30436,7 +30318,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 340,
             sourceKind = "drop",
             sourceZones = { 71 },
-            sourceNames = { "Gargantuan Abyssal" },
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 4 },
@@ -32779,7 +32660,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 335,
             sourceKind = "drop",
             sourceZones = { 69 },
-            sourceNames = { "Wrathwalker", "Shadow Council Warlock", "Mo'arg Weaponsmith" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -32798,7 +32678,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 69 },
-            sourceNames = { "Eclipsion Blood Knight", "Eclipsion Centurion", "Torloth the Magnificent" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -32817,7 +32696,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 345,
             sourceKind = "drop",
             sourceZones = { 69 },
-            sourceNames = { "Deathforge Smith", "Deathforge Tinkerer", "Deathforge Guardian" },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -35000,7 +34878,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 365,
             sourceKind = "drop",
             sourceZones = { 69 },
-            sourceNames = { "Enraged Fire Spirit", "Enraged Water Spirit", "Enraged Air Spirit" },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 2 },
@@ -35132,7 +35009,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 335,
             sourceKind = "drop",
             sourceZones = { 74 },
-            sourceNames = { "Sunfury Archer" },
             bopOutput = false,
             reagents = {
                 { itemId = 4470, count = 4 },
@@ -35365,7 +35241,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 76 },
-            sourceNames = { "Simon Unit", "Gan'arg Analyzer" },
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 8 },
@@ -35417,7 +35292,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 365,
             sourceKind = "drop",
             sourceZones = { 69 },
-            sourceNames = { "Coilskar Siren" },
             bopOutput = false,
             reagents = {
                 { itemId = 25868, count = 1 },
@@ -35557,7 +35431,6 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             sourceKind = "drop",
             sourceZones = { 58 },
-            sourceNames = { "Gordunni Elementalist", "Gordunni Head-Splitter", "Gordunni Back-Breaker" },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },

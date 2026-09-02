@@ -208,7 +208,7 @@ _LOOKUP_CALL_RE = re.compile(
     """,
     re.VERBOSE,
 )
-_LOOKUP_NAME_RE = re.compile(r"""(?:L|BB|BFAC)\["((?:[^"\\]|\\.)*)"\]""")
+_LOOKUP_NAME_RE = re.compile(r"""(L|BB|BFAC)\["((?:[^"\\]|\\.)*)"\]""")
 _LOOKUP_ZONE_RE = re.compile(r"""BZ\["((?:[^"\\]|\\.)*)"\]""")
 
 
@@ -219,19 +219,32 @@ def fetch_file(name, timeout=90, user_agent=DEFAULT_USER_AGENT):
         return response.read().decode("utf-8", "replace")
 
 
-def parse_custom_places(text):
-    """id -> zone name, for the places the generic acquire calls point at.
+# Custom places that are not creatures at all. The recipe is picked up: a
+# chest, a book that spawns on a shelf, a schematic lying on the floor. Calling
+# any of them a drop sends a player to kill something for an item nothing is
+# holding.
+CONTAINER_PLACE_KEYS = frozenset((
+    "DM_CACHE",             # the Dire Maul library cache
+    "DM_TRIBUTE",           # the tribute run chest
+    "BRD_RANDOM_ROOM",      # the plans that spawn in the Blackrock Depths rooms
+    "STRATH_BS_PLANS",      # plans that spawn in Stratholme
+    "ENG_GNOMER",           # floor items in Gnomeregan
+    "ENG_FLOOR_ITEM_BRD",   # the Field Repair Bot schematic, on the floor
+))
 
-    Only the zone is kept. The name beside it is a locale key -- SUNWELL_RANDOM,
-    DISCOVERY_ALCH_XMUTE -- that resolves through ARL's own translation files;
-    the zone is already a real name, and the flag has already said what kind of
-    thing it is, so the key would add a lookup and no information.
+
+def parse_custom_places(text):
+    """id -> {key, zone}, for the places the generic acquire calls point at.
+
+    The key is ARL's locale string -- SUNWELL_RANDOM, DM_CACHE -- and it says
+    what kind of place this is where the flag only says "raid". The zone is
+    already a real name and needs no translation.
     """
     out = {}
     for match in _CUSTOM_LOOKUP_RE.finditer(text or ""):
-        zone = match.group(3)
-        if zone:
-            out[int(match.group(1))] = zone
+        key, zone = match.group(2), match.group(3)
+        if zone or key in CONTAINER_PLACE_KEYS:
+            out[int(match.group(1))] = {"key": key, "zone": zone}
     return out
 
 
@@ -258,8 +271,14 @@ def parse_lookup(text):
         if not name and not zone:
             continue
         out[int(match.group(1))] = {
-            "name": name.group(1) if name else None,
+            "name": name.group(2) if name else None,
             "zone": zone.group(1) if zone else None,
+            # Which Babble table the name came from. BB is LibBabble-Boss, and
+            # it is ARL's own judgement about which creatures are worth naming
+            # -- 63 of the 286 in Mob.lua are in it. That judgement is the
+            # difference between "Drop: Mekgineer Thermaplugg (Gnomeregan)"
+            # and naming one of the thirteen Wastewander Bandits in Tanaris.
+            "boss": bool(name) and name.group(1) == "BB",
         }
     return out
 
@@ -359,17 +378,24 @@ def summarize_recipe(entry, lookups, custom_places=None, max_names=3, max_zones=
         # are the whole answer for a raid drop, where there was never an NPC to
         # name in the first place.
         kind = entry.get("flagKind")
-        places = [custom_place for custom_place in (
+        places = [place for place in (
             (custom_places or {}).get(place_id) for place_id in entry.get("places") or ())
-            if custom_place]
+            if place]
+        # A chest or a floor item is not a drop, however the flag reads: the
+        # flag only knows the recipe is in a raid or a dungeon, and the place
+        # is the only thing that knows nobody has to die for it.
+        if kind == "drop" and places and all(
+                place["key"] in CONTAINER_PLACE_KEYS for place in places):
+            kind = "container"
         seen = []
         for place in places:
-            if place not in seen:
-                seen.append(place)
+            if place["zone"] and place["zone"] not in seen:
+                seen.append(place["zone"])
         return {
             "faction": entry.get("faction", FACTION_BOTH),
             "kind": kind,
             "worldDrop": kind == "worldDrop",
+            "bossDrop": False,
             "names": [],
             "zones": [] if kind == "worldDrop" else seen[:max_zones],
         }
@@ -379,6 +405,7 @@ def summarize_recipe(entry, lookups, custom_places=None, max_names=3, max_zones=
     # TBC trainer and three WotLK ones would look like a recipe four trainers
     # teach, and name none of them.
     kept_ids, names, zones = [], [], []
+    every_name_a_boss = True
     for npc_id in acquires.get(kind or "", []):
         npc = _resolve(lookups, kind, npc_id)
         if npc and is_post_tbc(npc_id, npc.get("zone")):
@@ -388,6 +415,8 @@ def summarize_recipe(entry, lookups, custom_places=None, max_names=3, max_zones=
             continue
         if npc["name"] and npc["name"] not in names:
             names.append(npc["name"])
+            if not npc.get("boss"):
+                every_name_a_boss = False
         if npc["zone"] and npc["zone"] not in zones:
             zones.append(npc["zone"])
     npc_ids = kept_ids
@@ -401,10 +430,23 @@ def summarize_recipe(entry, lookups, custom_places=None, max_names=3, max_zones=
     if world_drop or (kind == "trainer" and len(npc_ids) > max_names):
         names, zones = [], []
 
+    # Naming a creature is only worth it when there is one creature to find.
+    # An ordinary mob is a species -- there are thirteen Wastewander Bandits in
+    # Tanaris -- so naming the one ARL happened to list implies a precision the
+    # source does not have, and the zone is the real answer. Several bosses
+    # keep neither name nor pretence: the row says they are bosses and where.
+    boss_drop = False
+    if kind == "drop" and names:
+        if not every_name_a_boss:
+            names = []
+        elif len(names) > 1:
+            names, boss_drop = [], True
+
     return {
         "faction": entry.get("faction", FACTION_BOTH),
         "kind": kind,
         "worldDrop": world_drop,
+        "bossDrop": boss_drop,
         "names": names[:max_names],
         "zones": zones[:max_zones],
     }

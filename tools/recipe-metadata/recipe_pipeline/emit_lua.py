@@ -44,8 +44,8 @@ def _emit_record(record, zone_ids, indent="        "):
         lines.append(indent + "    sourceKind = " + _lua_string(record.source_kind) + ",")
     if record.world_drop:
         lines.append(indent + "    worldDrop = true,")
-    if record.trash_drop:
-        lines.append(indent + "    trashDrop = true,")
+    if record.boss_drop:
+        lines.append(indent + "    bossDrop = true,")
     if record.removed:
         lines.append(indent + "    removed = true,")
     if record.source_zones:

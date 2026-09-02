@@ -32,9 +32,7 @@ def summarize_source(source):
     # "both" is the default reading of an absent field, so it is not stored.
     if faction == "both":
         faction = None
-    # The sixth value is the instance-trash flag, kept so callers that unpack
-    # six values keep working; the current source does not distinguish it.
-    return faction, kind, zones, names, world_drop, False
+    return faction, kind, zones, names, world_drop, source.get("bossDrop") is True
 
 
 def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tbc"):
@@ -98,7 +96,7 @@ def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tb
         source = secondary.get("acquisitionBySpellId", {}).get(spell_id) or {}
         source = overrides.get("acquisitionBySpellId", {}).get(spell_id, source)
         (faction, source_kind, source_zones, source_names,
-         world_drop, trash_drop) = summarize_source(source)
+         world_drop, boss_drop) = summarize_source(source)
 
         records.append(RecipeRecord(
             spell_id=spell_id,
@@ -121,7 +119,7 @@ def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tb
             source_zones=source_zones,
             source_names=source_names,
             world_drop=world_drop,
-            trash_drop=trash_drop,
+            boss_drop=boss_drop,
             removed=removed is True,
         ))
 

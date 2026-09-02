@@ -46,9 +46,9 @@ class RecipeRecord:
     # Set when the recipe drops from so many creatures across so many zones
     # that naming them is noise rather than an answer.
     world_drop: bool = False
-    # Set when it drops off non-boss creatures inside an instance: the
-    # instance name is the answer, the creature list is not.
-    trash_drop: bool = False
+    # Set when several bosses drop it: the row says so and names the places,
+    # rather than listing creatures a player would have to cross-reference.
+    boss_drop: bool = False
     # In the client data but not in the game: never implemented, or taken out
     # and never returned. The record is kept whole rather than dropped, so
     # putting one back is an override and a regenerate rather than an

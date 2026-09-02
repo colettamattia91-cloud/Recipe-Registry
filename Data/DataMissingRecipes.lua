@@ -130,22 +130,27 @@ local function describeSource(meta, recipeKey, info)
     if source.worldDrop then
         return "worldDrop", "World drop", source
     end
-    if source.trashDrop then
-        -- Deliberately no creature list: the instance name is the answer,
-        -- and twenty names of Karazhan servants are not.
-        return "trash", where and ("Trash: " .. where) or "Instance trash", source
-    end
-    if source.kind == "boss" and who then
-        return "boss", label("Boss"), source
-    end
     if source.kind == "vendor" and (who or where) then
         return "vendor", label("Vendor"), source
     end
-    if source.kind == "drop" and (who or where) then
-        return "drop", label("Drop"), source
+    if source.kind == "container" then
+        -- A chest, a book on a shelf, a schematic on the floor. "Found in"
+        -- covers all six without promising a creature to kill or a particular
+        -- chest to look for.
+        return "container", where and ("Found in: " .. where) or "Found in an instance", source
     end
-    if source.kind == "container" and (who or where) then
-        return "container", label("Container"), source
+    if source.kind == "drop" then
+        -- Only one creature is ever named, and only when it is a boss. An
+        -- ordinary mob is a species -- there are thirteen Wastewander Bandits
+        -- in Tanaris -- so the provider strips those names and leaves the
+        -- zone, which is the real answer.
+        if who then
+            return "drop", label("Drop"), source
+        end
+        if source.bossDrop then
+            return "drop", where and ("Drop: bosses in " .. where) or "Drop: bosses", source
+        end
+        return "drop", where and ("Drop: " .. where) or "Drop", source
     end
     -- No place and nobody to find: a discovery happens at your own cauldron
     -- or anvil, and a world event recipe is only there for the week the
@@ -156,12 +161,6 @@ local function describeSource(meta, recipeKey, info)
     if source.kind == "worldEvent" then
         return "worldEvent", "World event", source
     end
-    -- The kinds below can arrive with nothing but a zone -- a recipe that
-    -- drops somewhere in Sunwell Plateau names no creature, because it drops
-    -- off the instance rather than off anybody in particular.
-    if source.kind == "drop" and where then
-        return "drop", "Drop: " .. where, source
-    end
     if source.kind == "quest" then
         return "quest", where and ("Quest: " .. where) or "Quest", source
     end
@@ -171,8 +170,11 @@ local function describeSource(meta, recipeKey, info)
         -- ones that DO carry a name are the specialization trainers -- Nixx
         -- Sprocketspring, Peter Galen -- where the name is the whole point,
         -- because your own city trainer will not teach you.
-        if who or where then
+        if who then
             return "trainer", label("Trainer"), source
+        end
+        if where then
+            return "trainer", string.format("Trainer (%s)", where), source
         end
         return "trainer", "Trainer", source
     end
