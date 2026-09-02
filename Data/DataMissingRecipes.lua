@@ -119,10 +119,10 @@ local function describeSource(meta, recipeKey, info)
     -- where: "Xandar Goodbeard (Loch Modan), Hagrus (Orgrimmar)". Vendor stock
     -- is often limited, which is why the alternatives are listed rather than
     -- collapsed to the first one.
-    local named, zonesOnly = {}, {}
+    local withNames, zonesOnly = {}, {}
     for _, place in ipairs(source.places or {}) do
         if place.name then
-            named[#named + 1] = place.zone
+            withNames[#withNames + 1] = place.zone
                 and string.format("%s (%s)", place.name, place.zone)
                 or place.name
         elseif place.zone then
@@ -130,24 +130,32 @@ local function describeSource(meta, recipeKey, info)
         end
     end
 
-    local who = #named > 0 and table.concat(named, ", ") or nil
+    local who = #withNames > 0 and table.concat(withNames, ", ") or nil
     local where = #zonesOnly > 0 and table.concat(zonesOnly, ", ") or nil
 
-    local function label(prefix)
-        return string.format("%s: %s", prefix, who or where or "?")
+    -- A colon introduces WHO, a preposition introduces WHERE. "Quest:
+    -- Hillsbrad Foothills" reads as a quest by that name; "Quest at Hillsbrad
+    -- Foothills" reads as what it is.
+    local function named(prefix)
+        return string.format("%s: %s", prefix, who)
+    end
+
+    local function placed(prefix, preposition)
+        return string.format("%s %s %s", prefix, preposition, where)
     end
 
     if source.worldDrop then
         return "worldDrop", "World drop", source
     end
-    if source.kind == "vendor" and (who or where) then
-        return "vendor", label("Vendor"), source
+    if source.kind == "vendor" then
+        if who then return "vendor", named("Vendor"), source end
+        if where then return "vendor", placed("Vendor", "in"), source end
     end
     if source.kind == "container" then
         -- A chest, a book on a shelf, a schematic on the floor. "Found in"
         -- covers all six without promising a creature to kill or a particular
         -- chest to look for.
-        return "container", where and ("Found in: " .. where) or "Found in an instance", source
+        return "container", where and ("Found in " .. where) or "Found in an instance", source
     end
     if source.kind == "drop" then
         -- Only one creature is ever named, and only when it is a boss. An
@@ -155,12 +163,12 @@ local function describeSource(meta, recipeKey, info)
         -- in Tanaris -- so the provider strips those names and leaves the
         -- zone, which is the real answer.
         if who then
-            return "drop", label("Drop"), source
+            return "drop", named("Drop"), source
         end
         if source.bossDrop then
-            return "drop", where and ("Drop: bosses in " .. where) or "Drop: bosses", source
+            return "drop", where and ("Drop from bosses in " .. where) or "Drop from bosses", source
         end
-        return "drop", where and ("Drop: " .. where) or "Drop", source
+        return "drop", where and placed("Drop", "in") or "Drop", source
     end
     -- No place and nobody to find: a discovery happens at your own cauldron
     -- or anvil, and a world event recipe is only there for the week the
@@ -172,7 +180,8 @@ local function describeSource(meta, recipeKey, info)
         return "worldEvent", "World event", source
     end
     if source.kind == "quest" then
-        return "quest", where and ("Quest: " .. where) or "Quest", source
+        if who then return "quest", named("Quest"), source end
+        return "quest", where and placed("Quest", "at") or "Quest", source
     end
     if source.kind == "trainer" then
         -- Most trainer-taught recipes name nobody, on purpose: every trainer
@@ -181,10 +190,10 @@ local function describeSource(meta, recipeKey, info)
         -- Sprocketspring, Peter Galen -- where the name is the whole point,
         -- because your own city trainer will not teach you.
         if who then
-            return "trainer", label("Trainer"), source
+            return "trainer", named("Trainer"), source
         end
         if where then
-            return "trainer", string.format("Trainer (%s)", where), source
+            return "trainer", placed("Trainer", "at"), source
         end
         return "trainer", "Trainer", source
     end

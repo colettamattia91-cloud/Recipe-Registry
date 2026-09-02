@@ -353,4 +353,30 @@ Test.it("keeps every vendor next to its own zone", function()
     end
 end)
 
+-- A colon introduces who, a preposition introduces where. "Quest: Hillsbrad
+-- Foothills" reads as a quest by that name, which is not what the row means:
+-- the source knows the zone and no quest name at all.
+Test.it("does not write a place where a name would go", function()
+    setLocalProfession("Alchemy", { skillRank = 375 })
+    local prefilters = addon.db.profile.recipePrefilters
+    prefilters.expansionDefaults.vanilla = true
+    addon.RecipeUiFilters:InvalidateProfessionProjection("alchemy", "spec")
+
+    local seen = {}
+    for _, row in ipairs(data:BuildMissingRecipeRows()) do
+        local source = addon.RecipeMetadata:GetSource(row.recipeKey)
+        local hasName = false
+        for _, place in ipairs(source and source.places or {}) do
+            hasName = hasName or place.name ~= nil
+        end
+        if not hasName then
+            -- Nothing is named, so nothing may follow a colon.
+            Test.eq(row.missing.sourceLabel:find(": "), nil)
+            seen[row.missing.sourceKind] = row.missing.sourceLabel
+        end
+    end
+    Test.truthy(seen.quest ~= nil, "expected a quest known only by its zone")
+    Test.truthy(seen.quest:find("^Quest at ") == 1, "got: " .. tostring(seen.quest))
+end)
+
 io.write(string.format("Missing recipes: %d test(s) passed\n", Test.count))
