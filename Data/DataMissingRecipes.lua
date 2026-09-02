@@ -135,6 +135,27 @@ local function describeSource(meta, recipeKey, info)
     if source.kind == "container" and (who or where) then
         return "container", label("Container"), source
     end
+    -- No place and nobody to find: a discovery happens at your own cauldron
+    -- or anvil, and a world event recipe is only there for the week the
+    -- event runs. Sending a player to look for either would be wrong.
+    if source.kind == "discovery" then
+        return "discovery", "Discovery", source
+    end
+    if source.kind == "worldEvent" then
+        return "worldEvent", "World event", source
+    end
+    -- The kinds below can arrive with nothing but a zone -- a recipe that
+    -- drops somewhere in Sunwell Plateau names no creature, because it drops
+    -- off the instance rather than off anybody in particular.
+    if source.kind == "drop" and where then
+        return "drop", "Drop: " .. where, source
+    end
+    if source.kind == "quest" then
+        return "quest", where and ("Quest: " .. where) or "Quest", source
+    end
+    if source.kind == "trainer" then
+        return "trainer", where and ("Trainer: " .. where) or "Trainer", source
+    end
     return "item", "Recipe item", source
 end
 
@@ -202,7 +223,12 @@ function Data:BuildMissingRecipeRowsForProfession(professionName, prof)
             -- soulbound craft YOU could learn is the opposite: exactly what
             -- this view is for. The profit filter has no business here
             -- either; you cannot craft what you have not learned.
-            do
+            --
+            -- Recipes that are in the client data but not in the game are the
+            -- one exclusion this view does make. There is nowhere to go and
+            -- learn them, so listing them is not an opportunity, it is a
+            -- player walking Azeroth looking for a trainer who does not exist.
+            if not (meta.IsRemoved and meta:IsRemoved(recipeKey, info)) then
                 local requiredSkill = tonumber(info and info.requiredSkill) or nil
                 local specializationId = meta.GetSpecialization
                     and meta:GetSpecialization(recipeKey, info) or nil

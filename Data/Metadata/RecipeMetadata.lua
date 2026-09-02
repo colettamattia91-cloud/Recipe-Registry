@@ -84,6 +84,10 @@ local function cloneRecord(spellId, record)
         trashDrop = record.trashDrop == true,
         sourceZones = cloneStringList(record.sourceZones),
         sourceNames = cloneStringList(record.sourceNames),
+        -- In the client data but not in the game. Kept on the record rather
+        -- than left out of the payload, so a recipe flagged wrongly comes
+        -- back through the generator's override instead of an investigation.
+        removed = record.removed == true,
         reagents = cloneReagents(record.reagents),
     }
 end
@@ -610,6 +614,15 @@ end
 function RecipeMetadata:GetSpecialization(recipeKey, info)
     info = getInfo(self, recipeKey, info)
     return info and info.specialization or nil
+end
+
+--- True for a recipe that is in the client data but not in the game: never
+--- implemented, or taken out and never returned. There is nowhere to go and
+--- learn one, so listing it among what a character could still learn is a
+--- wild goose chase. Absent data reads as false, not as unknown.
+function RecipeMetadata:IsRemoved(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info ~= nil and info.removed == true
 end
 
 -- Units produced per craft. The generated data omits the field for the

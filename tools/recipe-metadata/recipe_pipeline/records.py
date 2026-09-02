@@ -49,3 +49,8 @@ class RecipeRecord:
     # Set when it drops off non-boss creatures inside an instance: the
     # instance name is the answer, the creature list is not.
     trash_drop: bool = False
+    # In the client data but not in the game: never implemented, or taken out
+    # and never returned. The record is kept whole rather than dropped, so
+    # putting one back is an override and a regenerate rather than an
+    # archaeology exercise. See removed_recipes.
+    removed: bool = False

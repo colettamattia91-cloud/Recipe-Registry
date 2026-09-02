@@ -6,3 +6,16 @@ categoryBySpellId: {}
 selfOnlyOutputlessBySpellId: {}
 bopOutputBySpellId: {}
 bindTypeByCreatedItemId: {}
+
+# Recipes in the client data but not in the game. `false` puts one back that
+# the removed list flagged wrongly; `true` flags one it missed.
+#
+# These two were cut during the TBC beta and, in the wiki's words, "never made
+# available". The generated removed list misses them because it identifies a
+# removed recipe by the absence of difficulty data on Wowhead, and these two
+# have it. Everything else agrees they cannot be obtained: no vendor, no loot
+# table, no trainer and no quest in the emulator database, and no source
+# section on their item pages.
+removedBySpellId:
+  26918: true   # Design: Arcanite Sword Pendant
+  26920: true   # Design: Blood Crown

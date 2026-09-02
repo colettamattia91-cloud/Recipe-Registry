@@ -26,6 +26,21 @@ from recipe_sources.arl_source_provider import (
     parse_source_flags,
     summarize_recipe,
 )
+from recipe_sources.manual_acquisition import (
+    build_entry,
+    build_snapshot as build_manual_snapshot,
+    load_manual_acquisition,
+    merge_acquisition,
+    validate_entry,
+    write_snapshot as write_manual_snapshot,
+)
+import acquisition_worksheet
+from recipe_sources.removed_recipes import (
+    build_snapshot as build_removed_snapshot,
+    load_removed,
+    parse_removed,
+    write_snapshot as write_removed_snapshot,
+)
 from recipe_sources.wowhead_source_provider import (
     FetchOutcome,
     derive_faction,
@@ -985,6 +1000,101 @@ class ArlGenericAcquireTests(unittest.TestCase):
         self.assertEqual(summary["names"], ["Kendor Kabonka"])
 
 
+class RemovedRecipeTests(unittest.TestCase):
+    """Recipes in the client data but not in the game.
+
+    Flagged, never deleted: the point of keeping the record is that putting
+    one back costs an override line, not an investigation.
+    """
+
+    PAYLOAD = {
+        "_reason": "No Wowhead difficulty data available",
+        "recipes": {
+            "Alchemy": [{"spellId": 2336, "name": "Elixir of Tongues",
+                         "notes": "No Wowhead data"}],
+            "Tailoring": [{"spellId": 31461, "name": "Heavy Netherweave Net"}],
+        },
+    }
+
+    def test_parses_every_profession_into_one_map(self):
+        parsed = parse_removed(self.PAYLOAD)
+        self.assertEqual(sorted(parsed), [2336, 31461])
+        self.assertEqual(parsed[2336]["profession"], "Alchemy")
+
+    def test_snapshot_round_trips_to_a_flag(self):
+        with tempfile.TemporaryDirectory() as directory:
+            write_removed_snapshot(
+                build_removed_snapshot(parse_removed(self.PAYLOAD)), directory)
+            loaded = load_removed(directory)
+            self.assertEqual(loaded, {2336: True, 31461: True})
+            # Nothing flagged is the honest reading of no file at all.
+            self.assertEqual(load_removed(Path(directory) / "nope"), {})
+
+    def _normalize(self, secondary=None, overrides=None):
+        primary = {"recipes": [{
+            "spellId": 2336, "profession": "alchemy", "requiredSkill": 1,
+            "createdItemId": 1, "firstSeenExpansion": "vanilla",
+        }]}
+        return normalize_records(primary, secondary or {}, {},
+                                 overrides=overrides or {})[0]
+
+    def test_the_flag_reaches_the_record(self):
+        records = self._normalize({"removedBySpellId": {2336: True}})
+        self.assertTrue(records[0].removed)
+
+    def test_a_recipe_nothing_flags_is_not_removed(self):
+        self.assertFalse(self._normalize()[0].removed)
+
+    def test_an_override_puts_a_recipe_back(self):
+        records = self._normalize({"removedBySpellId": {2336: True}},
+                                  {"removedBySpellId": {2336: False}})
+        self.assertFalse(records[0].removed)
+
+    def test_an_override_can_also_flag_one_the_list_missed(self):
+        records = self._normalize({}, {"removedBySpellId": {2336: True}})
+        self.assertTrue(records[0].removed)
+
+    def test_the_flag_is_emitted_only_when_set(self):
+        removed = _record(spell_id=1, removed=True)
+        kept = _record(spell_id=2)
+        lua = emit_lua([removed, kept], {}, {}, "1", 1, "tbc")
+        self.assertEqual(lua.count("removed = true"), 1)
+
+
+class OverrideParsingTests(unittest.TestCase):
+    """The override file is hand-edited, so it has to survive being annotated."""
+
+    def _load(self, body):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "manual_overrides.yaml"
+            path.write_text(body, encoding="utf-8")
+            return generator._load_overrides(path)
+
+    def test_a_trailing_comment_is_not_part_of_the_value(self):
+        # Without this, the value parsed as the string "true  # never
+        # released", the caller's `is True` check failed, and the override was
+        # read, accepted, and quietly did nothing.
+        loaded = self._load(
+            "removedBySpellId:\n  26918: true  # Design: Arcanite Sword Pendant\n")
+        self.assertEqual(loaded["removedBySpellId"], {26918: True})
+
+    def test_false_survives_a_comment_too(self):
+        loaded = self._load("removedBySpellId:\n  1: false  # actually in the game\n")
+        self.assertIs(loaded["removedBySpellId"][1], False)
+
+    def test_a_number_survives_a_comment(self):
+        loaded = self._load("createdItemBySpellId:\n  1: 4321  # the real item\n")
+        self.assertEqual(loaded["createdItemBySpellId"][1], 4321)
+
+    def test_a_hash_inside_a_quoted_value_is_kept(self):
+        loaded = self._load('categoryBySpellId:\n  1: "weapons#swords"\n')
+        self.assertEqual(loaded["categoryBySpellId"][1], "weapons#swords")
+
+    def test_a_whole_line_comment_is_still_ignored(self):
+        loaded = self._load("# nothing to see\nremovedBySpellId:\n  7: true\n")
+        self.assertEqual(loaded["removedBySpellId"], {7: True})
+
+
 class SourceEmitTests(unittest.TestCase):
     def test_emits_faction_zones_and_names_but_omits_both(self):
         alliance = _record(spell_id=1, faction="alliance", source_kind="vendor",
@@ -1006,6 +1116,223 @@ class SourceEmitTests(unittest.TestCase):
         # One entry in the table, three records pointing at it.
         self.assertEqual(lua.count('= "Stormwind City"'), 1)
         self.assertEqual(lua.count("sourceZones = { 1 }"), 3)
+
+
+class ManualAcquisitionTests(unittest.TestCase):
+    """Hand-read records outrank the bulk sources, whole record at a time."""
+
+    def test_a_world_drop_keeps_neither_names_nor_zones(self):
+        entry = build_entry("worldDrop", names=("Somebody",), zones=("Somewhere",))
+        self.assertTrue(entry["worldDrop"])
+        self.assertEqual(entry["names"], [])
+        self.assertEqual(entry["zones"], [])
+
+    def test_an_absent_faction_reads_as_both(self):
+        self.assertEqual(build_entry("vendor", faction="")["faction"], "both")
+
+    def test_an_unknown_kind_is_rejected(self):
+        problems = validate_entry(123, build_entry("sold-by-a-guy"))
+        self.assertTrue(any("is not one of" in problem for problem in problems))
+
+    def test_a_hand_record_replaces_the_automated_one_outright(self):
+        arl = {1: {"kind": None, "faction": "both", "names": [], "zones": [],
+                   "worldDrop": False}}
+        manual = {1: build_entry("vendor", faction="horde",
+                                 names=("Ongrom Black Tooth",),
+                                 zones=("Hellfire Peninsula",))}
+        merged = merge_acquisition(arl, manual)
+        self.assertEqual(merged[1]["kind"], "vendor")
+        self.assertEqual(merged[1]["faction"], "horde")
+        # Nothing of the automated record survives inside the hand one.
+        self.assertEqual(merged[1]["names"], ["Ongrom Black Tooth"])
+
+    def test_recipes_the_bulk_source_placed_are_left_alone(self):
+        arl = {1: {"kind": "trainer", "faction": "both", "names": [],
+                   "zones": [], "worldDrop": False}}
+        merged = merge_acquisition(arl, {2: build_entry("quest")})
+        self.assertEqual(merged[1]["kind"], "trainer")
+        self.assertEqual(merged[2]["kind"], "quest")
+
+    def test_snapshot_round_trips(self):
+        with tempfile.TemporaryDirectory() as directory:
+            write_manual_snapshot(
+                build_manual_snapshot({7: build_entry("quest")}), directory)
+            loaded = load_manual_acquisition(directory)
+        self.assertEqual(loaded[7]["kind"], "quest")
+
+
+class AcquisitionWorksheetTests(unittest.TestCase):
+    """The sheet is a person's working file: regenerating it must be safe."""
+
+    RECIPES = {
+        "recipes": [
+            {"spellId": 1, "profession": "tailoring", "firstSeenExpansion": "tbc",
+             "requiredSkill": 350, "recipeItemId": 100},
+            {"spellId": 2, "profession": "cooking", "firstSeenExpansion": "vanilla",
+             "requiredSkill": None, "createdItemId": 200},
+            {"spellId": 3, "profession": "alchemy", "firstSeenExpansion": "tbc",
+             "requiredSkill": 300},
+        ],
+    }
+    ITEMS = [{"itemId": 100, "name": "Pattern: Something"},
+             {"itemId": 200, "name": "Some Food"}]
+
+    def _snapshot(self, directory, acquisition=None):
+        directory = Path(directory)
+        (directory / "recipes.json").write_text(json.dumps(self.RECIPES), encoding="utf-8")
+        (directory / "item_sparse.json").write_text(json.dumps(self.ITEMS), encoding="utf-8")
+        (directory / "acquisition.json").write_text(
+            json.dumps({"acquisitionBySpellId": acquisition or {}}), encoding="utf-8")
+        return directory
+
+    def _emit(self, directory):
+        sheet = Path(directory) / "worksheet.csv"
+        links = Path(directory) / "links.txt"
+        out = StringIO()
+        with redirect_stdout(out):
+            rows = acquisition_worksheet.emit(directory, sheet, links)
+        return rows, sheet, links
+
+    def _fill(self, sheet, spell_id, **values):
+        """Answer one row, the way a person would in a spreadsheet.
+
+        Through the csv module rather than by splicing a literal line: a test
+        that counts commas by hand breaks whenever a column is added or
+        removed, which says nothing about the behaviour under test.
+        """
+        import csv as csv_module
+        with open(sheet, "r", encoding="utf-8-sig", newline="") as handle:
+            reader = csv_module.DictReader(handle)
+            fieldnames = reader.fieldnames
+            rows = list(reader)
+        for row in rows:
+            if int(row["spellId"]) == spell_id:
+                row.update(values)
+        with open(sheet, "w", encoding="utf-8-sig", newline="") as handle:
+            writer = csv_module.DictWriter(handle, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(rows)
+
+    def test_only_unplaced_recipes_reach_the_sheet(self):
+        with tempfile.TemporaryDirectory() as directory:
+            self._snapshot(directory, {
+                # Placed: it says where it comes from, and who.
+                "1": {"kind": "vendor", "faction": "both", "names": ["Somebody"],
+                      "zones": ["Somewhere"], "worldDrop": False},
+                # Unplaced: a record, but it never says where.
+                "2": {"kind": None, "faction": "alliance", "names": [], "zones": [],
+                      "worldDrop": False},
+            })
+            rows, _, _ = self._emit(directory)
+        # Spell 3 has no record at all, spell 2 has one that places nothing.
+        self.assertEqual(sorted(row["spellId"] for row in rows), [2, 3])
+
+    def test_a_kind_that_needs_a_place_and_has_none_is_still_a_gap(self):
+        # "Sold by somebody somewhere" is not an answer a player can act on,
+        # so it belongs on the sheet even though the kind is known.
+        with tempfile.TemporaryDirectory() as directory:
+            self._snapshot(directory, {
+                "1": {"kind": "vendor", "faction": "both", "names": [], "zones": [],
+                      "worldDrop": False},
+            })
+            rows, _, _ = self._emit(directory)
+        self.assertIn(1, [row["spellId"] for row in rows])
+
+    def test_a_kind_that_is_a_whole_answer_on_its_own_is_not_a_gap(self):
+        # You go to your own trainer; a world drop has nowhere to go; a
+        # discovery happens at your own workbench. None of them wants a place.
+        for kind in ("trainer", "worldDrop", "discovery", "worldEvent", "quest"):
+            with tempfile.TemporaryDirectory() as directory:
+                self._snapshot(directory, {
+                    "1": {"kind": kind, "faction": "both", "names": [], "zones": [],
+                          "worldDrop": kind == "worldDrop"},
+                })
+                rows, _, _ = self._emit(directory)
+            self.assertNotIn(1, [row["spellId"] for row in rows],
+                             "{0} should not need a place".format(kind))
+
+    def test_rows_are_banded_and_the_tbc_skilled_ones_come_first(self):
+        with tempfile.TemporaryDirectory() as directory:
+            self._snapshot(directory)
+            rows, _, _ = self._emit(directory)
+        self.assertEqual([row["priority"] for row in rows], [1, 1, 4])
+
+    def test_a_recipe_without_a_pattern_is_labelled_by_what_it_makes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            self._snapshot(directory)
+            rows, _, _ = self._emit(directory)
+        by_spell = {row["spellId"]: row for row in rows}
+        self.assertEqual(by_spell[1]["name"], "Pattern: Something")
+        self.assertEqual(by_spell[2]["name"], "makes: Some Food")
+        # No pattern means the spell page is the one to open.
+        self.assertIn("spell=3", by_spell[3]["url"])
+        self.assertIn("item=100", by_spell[1]["url"])
+
+    def test_re_emitting_keeps_answers_already_filled_in(self):
+        with tempfile.TemporaryDirectory() as directory:
+            self._snapshot(directory)
+            _, sheet, links = self._emit(directory)
+            self._fill(sheet, 1, kind="vendor", faction="horde",
+                       names="Ongrom|Hurnak", zones="Orgrimmar")
+
+            out = StringIO()
+            with redirect_stdout(out):
+                rows = acquisition_worksheet.emit(directory, sheet, links)
+            kept = next(row for row in rows if row["spellId"] == 1)
+        self.assertEqual(kept["kind"], "vendor")
+        self.assertEqual(kept["names"], "Ongrom|Hurnak")
+
+    def test_a_filled_row_becomes_a_snapshot_record(self):
+        with tempfile.TemporaryDirectory() as directory:
+            self._snapshot(directory)
+            _, sheet, links = self._emit(directory)
+            self._fill(sheet, 1, kind="vendor", faction="horde",
+                       names="Ongrom|Hurnak", zones="Orgrimmar")
+
+            out, err = StringIO(), StringIO()
+            with redirect_stdout(out), redirect_stderr(err):
+                code = acquisition_worksheet.apply(directory, sheet)
+            self.assertEqual(code, 0)
+            records = load_manual_acquisition(directory)
+        self.assertEqual(records[1]["kind"], "vendor")
+        self.assertEqual(records[1]["faction"], "horde")
+        self.assertEqual(records[1]["names"], ["Ongrom", "Hurnak"])
+        self.assertEqual(records[1]["zones"], ["Orgrimmar"])
+        # An empty row is not an answer.
+        self.assertNotIn(3, records)
+
+    def test_a_bad_kind_refuses_to_write_anything(self):
+        with tempfile.TemporaryDirectory() as directory:
+            self._snapshot(directory)
+            _, sheet, links = self._emit(directory)
+            self._fill(sheet, 1, kind="dunno")
+
+            out, err = StringIO(), StringIO()
+            with redirect_stdout(out), redirect_stderr(err):
+                code = acquisition_worksheet.apply(directory, sheet)
+            self.assertEqual(code, 1)
+            self.assertFalse((Path(directory) / "acquisition_manual.json").exists())
+
+    def test_a_recipe_flagged_removed_by_hand_leaves_the_sheet(self):
+        # The sheet tracks what still needs an answer, and a recipe that is
+        # not in the game never will -- however it came to be flagged.
+        with tempfile.TemporaryDirectory() as directory:
+            self._snapshot(directory)
+            (Path(directory) / "removed.json").write_text(
+                json.dumps({"removedBySpellId": {"3": {"name": "Gone"}}}), encoding="utf-8")
+            rows, _, _ = self._emit(directory)
+        self.assertNotIn(3, [row["spellId"] for row in rows])
+
+    def test_the_link_list_drops_rows_already_answered(self):
+        with tempfile.TemporaryDirectory() as directory:
+            self._snapshot(directory)
+            _, sheet, links = self._emit(directory)
+            self.assertIn("item=100", links.read_text(encoding="utf-8"))
+            self._fill(sheet, 1, kind="vendor")
+            out = StringIO()
+            with redirect_stdout(out):
+                acquisition_worksheet.emit(directory, sheet, links)
+            self.assertNotIn("item=100", links.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,141 @@
+{
+  "acquisitionBySpellId": {
+    "351766": {
+      "faction": "both",
+      "kind": "trainer",
+      "names": [],
+      "worldDrop": false,
+      "zones": []
+    },
+    "351768": {
+      "faction": "horde",
+      "kind": "vendor",
+      "names": [
+        "Provisioner Nasela"
+      ],
+      "worldDrop": false,
+      "zones": [
+        "Nagrand"
+      ]
+    },
+    "351769": {
+      "faction": "horde",
+      "kind": "vendor",
+      "names": [
+        "Provisioner Nasela"
+      ],
+      "worldDrop": false,
+      "zones": [
+        "Nagrand"
+      ]
+    },
+    "351770": {
+      "faction": "both",
+      "kind": "vendor",
+      "names": [
+        "Alurmi"
+      ],
+      "worldDrop": false,
+      "zones": [
+        "Tanaris"
+      ]
+    },
+    "351771": {
+      "faction": "both",
+      "kind": "vendor",
+      "names": [
+        "Almaador"
+      ],
+      "worldDrop": false,
+      "zones": [
+        "Shattrath City"
+      ]
+    },
+    "39451": {
+      "faction": "both",
+      "kind": "drop",
+      "names": [
+        "Apexis Guardian",
+        "Bash'ir",
+        "Bash'ir Reckoner"
+      ],
+      "worldDrop": false,
+      "zones": [
+        "Blade's Edge Mountains"
+      ]
+    },
+    "39455": {
+      "faction": "both",
+      "kind": "drop",
+      "names": [
+        "Apexis Guardian",
+        "Bash'ir",
+        "Bash'ir Reckoner"
+      ],
+      "worldDrop": false,
+      "zones": [
+        "Blade's Edge Mountains"
+      ]
+    },
+    "39458": {
+      "faction": "both",
+      "kind": "drop",
+      "names": [
+        "Apexis Guardian",
+        "Bash'ir",
+        "Bash'ir Reckoner"
+      ],
+      "worldDrop": false,
+      "zones": [
+        "Blade's Edge Mountains"
+      ]
+    },
+    "39466": {
+      "faction": "both",
+      "kind": "drop",
+      "names": [
+        "Apexis Guardian",
+        "Bash'ir",
+        "Bash'ir Reckoner"
+      ],
+      "worldDrop": false,
+      "zones": [
+        "Blade's Edge Mountains"
+      ]
+    },
+    "39467": {
+      "faction": "both",
+      "kind": "drop",
+      "names": [
+        "Apexis Guardian",
+        "Bash'ir",
+        "Bash'ir Reckoner"
+      ],
+      "worldDrop": false,
+      "zones": [
+        "Blade's Edge Mountains"
+      ]
+    },
+    "40000": {
+      "faction": "both",
+      "kind": "vendor",
+      "names": [
+        "Okuno"
+      ],
+      "worldDrop": false,
+      "zones": [
+        "Black Temple"
+      ]
+    }
+  },
+  "parserVersion": 1,
+  "source": "hand-verified",
+  "sourceStats": {
+    "byKind": {
+      "drop": 5,
+      "trainer": 1,
+      "vendor": 5
+    },
+    "records": 11
+  }
+}

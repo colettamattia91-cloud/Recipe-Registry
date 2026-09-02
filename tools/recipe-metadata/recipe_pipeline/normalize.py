@@ -88,6 +88,13 @@ def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tb
         # Obtain-side data is keyed by the spell, which is this project's own
         # recipe key, so trainer-taught recipes are covered too rather than
         # only the ones that come from a pattern.
+        # A recipe in the client data but not in the game. The override can
+        # force it either way, so putting one back is one line and a
+        # regenerate -- which is the whole reason the record is kept.
+        removed = overrides.get("removedBySpellId", {}).get(spell_id)
+        if removed is None:
+            removed = secondary.get("removedBySpellId", {}).get(spell_id, False)
+
         source = secondary.get("acquisitionBySpellId", {}).get(spell_id) or {}
         source = overrides.get("acquisitionBySpellId", {}).get(spell_id, source)
         (faction, source_kind, source_zones, source_names,
@@ -115,6 +122,7 @@ def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tb
             source_names=source_names,
             world_drop=world_drop,
             trash_drop=trash_drop,
+            removed=removed is True,
         ))
 
     return tuple(records), diagnostics

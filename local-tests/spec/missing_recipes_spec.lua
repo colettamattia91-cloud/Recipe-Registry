@@ -81,15 +81,24 @@ Test.it("reports how the recipe is taught", function()
     setLocalProfession("Blacksmithing", { skillRank = 375 })
 
     local rows = data:BuildMissingRecipeRows()
-    local trainer, item = 0, 0
+    local counts, distinct = {}, 0
     for _, row in ipairs(rows) do
-        if row.missing.sourceKind == "trainer" then trainer = trainer + 1 end
-        if row.missing.sourceKind == "item" then item = item + 1 end
+        local kind = row.missing.sourceKind
+        Test.truthy(kind ~= nil, "every row should say where the recipe comes from")
+        if not counts[kind] then distinct = distinct + 1 end
+        counts[kind] = (counts[kind] or 0) + 1
     end
-    -- Blacksmithing has both kinds; a proxy that collapsed to one value
-    -- would be useless.
-    Test.gte(trainer, 1)
-    Test.gte(item, 1)
+
+    -- Blacksmithing spans several kinds; a projection that collapsed to one
+    -- value would be useless.
+    Test.gte(distinct, 3)
+    Test.gte(counts.trainer or 0, 1)
+    Test.gte(counts.vendor or 0, 1)
+
+    -- "Recipe item" is the fallback for a recipe whose source is unknown.
+    -- Nothing in the dataset should reach it any more: a row landing there
+    -- means the metadata lost its source, not that the recipe has none.
+    Test.eq(counts.item, nil)
 end)
 
 Test.it("marks a specialization the character does not have", function()
@@ -207,6 +216,45 @@ Test.it("keeps a stable order between rebuilds", function()
     for index = 1, #first do
         Test.eq(first[index].recipeKey, second[index].recipeKey)
     end
+end)
+
+
+-- Recipes that are in the client data but not in the game. There is nowhere
+-- to go and learn one, so offering it is not an opportunity: it is a player
+-- looking for a trainer who does not exist.
+-- 9942 = Mithril Scale Gloves, a vanilla blacksmithing plan requiring skill
+-- 220, flagged removed by the generator.
+local REMOVED = -9942
+
+Test.it("never offers a recipe that is not in the game", function()
+    setLocalProfession("Blacksmithing", { skillRank = 375 })
+
+    local meta = addon.RecipeMetadata
+    Test.eq(meta:IsRemoved(REMOVED), true)
+
+    local rows = data:BuildMissingRecipeRows()
+    Test.eq(findRow(rows, REMOVED), nil)
+end)
+
+Test.it("still offers a recipe of the same skill that is in the game", function()
+    setLocalProfession("Blacksmithing", { skillRank = 375 })
+
+    -- Guards the exclusion against being a blanket one: the removed flag has
+    -- to be what removed the row, not the skill or the expansion.
+    local rows = data:BuildMissingRecipeRows()
+    Test.truthy(#rows > 0, "some vanilla plans should still be offered")
+
+    local anyRemoved = false
+    for _, row in ipairs(rows) do
+        if addon.RecipeMetadata:IsRemoved(row.recipeKey) then anyRemoved = true end
+    end
+    Test.eq(anyRemoved, false)
+end)
+
+Test.it("reads an absent flag as present in the game, not as unknown", function()
+    Test.eq(addon.RecipeMetadata:IsRemoved(PLAN), false)
+    -- A recipe the metadata knows nothing about is not claimed to be removed.
+    Test.eq(addon.RecipeMetadata:IsRemoved(-999999999), false)
 end)
 
 io.write(string.format("Missing recipes: %d test(s) passed\n", Test.count))

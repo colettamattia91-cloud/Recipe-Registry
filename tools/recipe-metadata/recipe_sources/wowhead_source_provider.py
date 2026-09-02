@@ -309,6 +309,60 @@ def fetch_item_page(item_id, flavor=DEFAULT_FLAVOR, timeout=90, user_agent=DEFAU
         return response.read().decode("utf-8", "replace")
 
 
+class BrowserPageFetcher(object):
+    """A `fetch_page` backed by tabs in a real browser.
+
+    `fetch_sources` asks for one item at a time, but a browser is at its most
+    natural opening a batch of tabs at once, so this reads a batch ahead and
+    serves the rest from what it already holds. That makes it a drop-in for
+    the urllib fetcher while still behaving like somebody working through a
+    page of open tabs.
+
+    Single-threaded by construction: pass `workers=1`, since the batching here
+    is what paces the run.
+    """
+
+    def __init__(self, browser, item_ids, flavor=DEFAULT_FLAVOR,
+                 batch=None, batch_delay=None, load_timeout=None, progress=None):
+        from recipe_sources.browser_bridge import (
+            DEFAULT_BATCH, DEFAULT_BATCH_DELAY, DEFAULT_LOAD_TIMEOUT)
+        self._browser = browser
+        self._flavor = flavor
+        self._pending = list(item_ids)
+        self._batch = batch or DEFAULT_BATCH
+        self._batch_delay = DEFAULT_BATCH_DELAY if batch_delay is None else batch_delay
+        self._load_timeout = load_timeout or DEFAULT_LOAD_TIMEOUT
+        self._progress = progress
+        self._cache = {}
+
+    def url_for(self, item_id):
+        return "{0}/{1}/item={2}".format(WOWHEAD_BASE_URL, self._flavor, item_id)
+
+    def _fill(self, item_id):
+        # Take the next batch, always including the item actually asked for.
+        window = [item_id] + [other for other in self._pending
+                              if other != item_id][:self._batch - 1]
+        for taken in window:
+            if taken in self._pending:
+                self._pending.remove(taken)
+        by_url = {self.url_for(taken): taken for taken in window}
+        if self._progress:
+            self._progress("opening {0} tabs".format(len(window)))
+        for url, html in self._browser.read_pages(
+                list(by_url), batch=self._batch, batch_delay=self._batch_delay,
+                load_timeout=self._load_timeout):
+            self._cache[by_url[url]] = html
+
+    def __call__(self, item_id, flavor=None, timeout=None):
+        if item_id not in self._cache:
+            self._fill(item_id)
+        html = self._cache.pop(item_id, None)
+        if html is None:
+            raise RuntimeError(
+                "the browser returned nothing for item {0}".format(item_id))
+        return html
+
+
 def fetch_zone_index(flavor=DEFAULT_FLAVOR, slugs=ZONE_INDEX_SLUGS, timeout=90,
                      delay=DEFAULT_REQUEST_DELAY, fetch_page=None):
     """Zone ID to name, plus the set of zone IDs that are instances.

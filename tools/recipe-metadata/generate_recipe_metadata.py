@@ -54,8 +54,26 @@ REPORT_DIR = REPO_ROOT / "artifacts" / "recipe-metadata"
 SCHEMA_VERSION = 1
 
 
-def _coerce_scalar(value):
+def _strip_comment(value):
+    """Drop a trailing `# ...` from a value.
+
+    This file is meant to be edited by hand, and a hand-written override is
+    worth an explanation beside it. Without this, `26918: true  # never
+    released` parsed as the string "true  # never released", which is not the
+    boolean the caller checks for -- so the override would be read, accepted,
+    and quietly do nothing.
+    """
     value = value.strip()
+    if value.startswith('"'):
+        closing = value.find('"', 1)
+        if closing != -1:
+            return value[:closing + 1]
+    head, hash_mark, _ = value.partition("#")
+    return head.strip() if hash_mark else value
+
+
+def _coerce_scalar(value):
+    value = _strip_comment(value)
     if value in ("true", "True"):
         return True
     if value in ("false", "False"):
@@ -80,6 +98,9 @@ def _load_overrides(path=OVERRIDES_PATH):
         "bopOutputBySpellId": {},
         "bindTypeByCreatedItemId": {},
         "specializationBySpellId": {},
+        # `removedBySpellId: {12345: false}` puts a recipe back that the
+        # removed list flagged wrongly -- one line, then regenerate.
+        "removedBySpellId": {},
     }
     if not Path(path).exists():
         return buckets
@@ -231,6 +252,26 @@ def _build_pipeline(snapshot=DEFAULT_SNAPSHOT, flavor="tbc"):
 
 
 def command_fetch(args):
+    if args.source == "removed-recipes":
+        # One curated file. Nothing here deletes anything: the list becomes a
+        # flag on the record, and an override puts any of them back.
+        from recipe_sources.removed_recipes import (
+            build_snapshot as build_removed_snapshot,
+            fetch_removed,
+            parse_removed,
+            write_snapshot as write_removed_snapshot,
+        )
+        snapshot_dir = SNAPSHOT_ROOT / args.snapshot
+        payload = fetch_removed(timeout=args.timeout)
+        by_spell_id = parse_removed(payload)
+        if not by_spell_id:
+            print("no removed rows parsed; refusing to overwrite the snapshot", file=sys.stderr)
+            return 2
+        path = write_removed_snapshot(
+            build_removed_snapshot(by_spell_id, payload.get("_reason")), snapshot_dir)
+        print("wrote {0} ({1} recipes flagged)".format(path, len(by_spell_id)))
+        return 0
+
     if args.source == "arl-acquisition":
         # A dozen small files, not a crawl: the whole dataset arrives in one
         # pass, so there is no cache to resume from and no partial state.
@@ -440,7 +481,8 @@ def build_parser():
     fetch = subparsers.add_parser("fetch")
     fetch.add_argument("--flavor", default="tbc")
     fetch.add_argument("--snapshot", default=DEFAULT_SNAPSHOT)
-    fetch.add_argument("--source", default="normalized-dir", choices=("normalized-dir", "wago-anniversary", "wowhead-specializations", "wowhead-sources", "arl-acquisition"))
+    fetch.add_argument("--source", default="normalized-dir", choices=("normalized-dir", "wago-anniversary", "wowhead-specializations", "wowhead-sources", "arl-acquisition",
+                                       "removed-recipes"))
     fetch.add_argument("--limit", type=int, default=None,
                        help="wowhead-sources: stop after this many newly fetched items")
     fetch.add_argument("--verbose", action="store_true",
