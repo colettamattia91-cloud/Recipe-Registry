@@ -257,4 +257,38 @@ Test.it("reads an absent flag as present in the game, not as unknown", function(
     Test.eq(addon.RecipeMetadata:IsRemoved(-999999999), false)
 end)
 
+-- The metadata says where a recipe comes from; the recipe-item proxy is only
+-- a guess for when it does not. Checking the proxy first, as this view used
+-- to, meant the guess beat the data for every recipe with no pattern -- and
+-- an alchemy discovery has none, so all seventeen were reported as taught by
+-- a trainer who does not teach them.
+-- 28580 = an alchemy discovery: no pattern to buy, learned at the cauldron.
+local DISCOVERY = -28580
+
+Test.it("lets the recorded source beat the recipe-item guess", function()
+    setLocalProfession("Alchemy", { skillRank = 375 })
+
+    local info = addon.RecipeMetadata:GetRecipeInfo(DISCOVERY, "alchemy")
+    Test.eq(info.recipeItemId, nil)
+    Test.eq(addon.RecipeMetadata:GetSource(DISCOVERY, info).kind, "discovery")
+
+    local row = findRow(data:BuildMissingRecipeRows(), DISCOVERY)
+    Test.truthy(row ~= nil, "expected the discovery to be listed")
+    Test.eq(row.missing.sourceKind, "discovery")
+    Test.eq(row.missing.sourceLabel, "Discovery")
+end)
+
+Test.it("still guesses from the pattern when nothing is recorded", function()
+    setLocalProfession("Alchemy", { skillRank = 375 })
+
+    -- A recipe the metadata cannot place falls back to the old proxy rather
+    -- than showing nothing: no pattern reads as trainer-taught.
+    local kinds = {}
+    for _, row in ipairs(data:BuildMissingRecipeRows()) do
+        kinds[row.missing.sourceKind] = true
+    end
+    Test.truthy(kinds.trainer, "trainer-taught recipes should still be reported")
+    Test.eq(kinds.item, nil)
+end)
+
 io.write(string.format("Missing recipes: %d test(s) passed\n", Test.count))

@@ -93,14 +93,26 @@ end
 -- data imported from Wowhead: who sells it or drops it, and where. When that
 -- import has not been run the label falls back to the shape it had before,
 -- which says only that a recipe item exists.
-local function describeSource(meta, recipeKey, info)
-    if not (info and info.recipeItemId) then
-        return "trainer", "Trainer", nil
+-- The proxy this view started with, for a recipe the metadata cannot place:
+-- a recipe taught by an item has one, and one taught by a trainer does not.
+-- It is a guess, so it runs last -- see describeSource.
+local function guessFromRecipeItem(info)
+    if info and info.recipeItemId then
+        return "item", "Recipe item"
     end
+    return "trainer", "Trainer"
+end
 
+local function describeSource(meta, recipeKey, info)
     local source = meta.GetSource and meta:GetSource(recipeKey, info) or nil
-    if not source then
-        return "item", "Recipe item", nil
+    if not (source and source.kind) then
+        -- Nothing recorded: fall back to guessing from whether a pattern
+        -- exists. Checking that first, as this used to, meant the guess beat
+        -- the data for every recipe with no pattern -- and an alchemy
+        -- discovery has none, so all seventeen of them were reported as
+        -- taught by a trainer who does not teach them.
+        local kind, label = guessFromRecipeItem(info)
+        return kind, label, source
     end
 
     -- Who, then where. The name is the actionable half -- you go and find
@@ -156,7 +168,10 @@ local function describeSource(meta, recipeKey, info)
     if source.kind == "trainer" then
         return "trainer", where and ("Trainer: " .. where) or "Trainer", source
     end
-    return "item", "Recipe item", source
+    -- A kind nothing above handles. Better to guess than to say nothing, but
+    -- reaching here means the metadata grew a kind this view does not render.
+    local kind, label = guessFromRecipeItem(info)
+    return kind, label, source
 end
 
 -- Names, icons and item quality come from Data:GetRecipeDisplayInfo, which
