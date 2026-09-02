@@ -3,140 +3,129 @@
     "22967": {
       "faction": "both",
       "kind": "trainer",
-      "names": [
-        "Master Elemental Shaper Krixix"
+      "places": [
+        {
+          "name": "Master Elemental Shaper Krixix",
+          "zone": "Blackwing Lair"
+        }
       ],
-      "worldDrop": false,
-      "zones": [
-        "Blackwing Lair"
-      ]
+      "worldDrop": false
     },
     "351766": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
-      "worldDrop": false,
-      "zones": []
+      "places": [],
+      "worldDrop": false
     },
     "351768": {
       "faction": "horde",
       "kind": "vendor",
-      "names": [
-        "Provisioner Nasela"
+      "places": [
+        {
+          "name": "Provisioner Nasela",
+          "zone": "Nagrand"
+        }
       ],
-      "worldDrop": false,
-      "zones": [
-        "Nagrand"
-      ]
+      "worldDrop": false
     },
     "351769": {
       "faction": "horde",
       "kind": "vendor",
-      "names": [
-        "Provisioner Nasela"
+      "places": [
+        {
+          "name": "Provisioner Nasela",
+          "zone": "Nagrand"
+        }
       ],
-      "worldDrop": false,
-      "zones": [
-        "Nagrand"
-      ]
+      "worldDrop": false
     },
     "351770": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alurmi"
+      "places": [
+        {
+          "name": "Alurmi",
+          "zone": "Tanaris"
+        }
       ],
-      "worldDrop": false,
-      "zones": [
-        "Tanaris"
-      ]
+      "worldDrop": false
     },
     "351771": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Almaador"
+      "places": [
+        {
+          "name": "Almaador",
+          "zone": "Shattrath City"
+        }
       ],
-      "worldDrop": false,
-      "zones": [
-        "Shattrath City"
-      ]
+      "worldDrop": false
     },
     "39451": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Apexis Guardian",
-        "Bash'ir",
-        "Bash'ir Reckoner"
+      "places": [
+        {
+          "name": null,
+          "zone": "Blade's Edge Mountains"
+        }
       ],
-      "worldDrop": false,
-      "zones": [
-        "Blade's Edge Mountains"
-      ]
+      "worldDrop": false
     },
     "39455": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Apexis Guardian",
-        "Bash'ir",
-        "Bash'ir Reckoner"
+      "places": [
+        {
+          "name": null,
+          "zone": "Blade's Edge Mountains"
+        }
       ],
-      "worldDrop": false,
-      "zones": [
-        "Blade's Edge Mountains"
-      ]
+      "worldDrop": false
     },
     "39458": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Apexis Guardian",
-        "Bash'ir",
-        "Bash'ir Reckoner"
+      "places": [
+        {
+          "name": null,
+          "zone": "Blade's Edge Mountains"
+        }
       ],
-      "worldDrop": false,
-      "zones": [
-        "Blade's Edge Mountains"
-      ]
+      "worldDrop": false
     },
     "39466": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Apexis Guardian",
-        "Bash'ir",
-        "Bash'ir Reckoner"
+      "places": [
+        {
+          "name": null,
+          "zone": "Blade's Edge Mountains"
+        }
       ],
-      "worldDrop": false,
-      "zones": [
-        "Blade's Edge Mountains"
-      ]
+      "worldDrop": false
     },
     "39467": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Apexis Guardian",
-        "Bash'ir",
-        "Bash'ir Reckoner"
+      "places": [
+        {
+          "name": null,
+          "zone": "Blade's Edge Mountains"
+        }
       ],
-      "worldDrop": false,
-      "zones": [
-        "Blade's Edge Mountains"
-      ]
+      "worldDrop": false
     },
     "40000": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Okuno"
+      "places": [
+        {
+          "name": "Okuno",
+          "zone": "Black Temple"
+        }
       ],
-      "worldDrop": false,
-      "zones": [
-        "Black Temple"
-      ]
+      "worldDrop": false
     }
   },
   "parserVersion": 1,

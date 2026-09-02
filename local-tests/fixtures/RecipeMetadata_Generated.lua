@@ -176,8 +176,7 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 300,
             faction = "horde",
             sourceKind = "vendor",
-            sourceZones = { 1 },
-            sourceNames = { "Abigail Shiel" },
+            sourcePlaces = { { name = "Abigail Shiel", zone = 1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22790, count = 7 },

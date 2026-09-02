@@ -55,6 +55,20 @@ from recipe_sources.wowhead_specialization_provider import (
 )
 
 
+def names_of(summary):
+    """The names a summary carries, in order."""
+    return [place["name"] for place in summary["places"] if place["name"]]
+
+
+def zones_of(summary):
+    """The distinct zones a summary carries, in order."""
+    out = []
+    for place in summary["places"]:
+        if place["zone"] and place["zone"] not in out:
+            out.append(place["zone"])
+    return out
+
+
 def load_fixture_snapshot():
     recipes = [
         {"spellId": 2329, "profession": "alchemy", "firstSeenExpansion": "vanilla", "recipeItemId": None, "createdItemId": 2454, "requiredSkill": 1, "categoryHint": "alchemy.potions.combat"},
@@ -814,39 +828,50 @@ class FetchOutcomeTests(unittest.TestCase):
 class AcquisitionSummaryTests(unittest.TestCase):
     """What summarize_source keeps, now that the provider states the rest."""
 
-    def test_keeps_names_and_zones_and_drops_a_neutral_faction(self):
-        faction, kind, zones, names, world_drop, trash = summarize_source({
+    def test_keeps_each_place_whole_and_drops_a_neutral_faction(self):
+        faction, kind, places, world_drop, boss = summarize_source({
             "faction": "both",
             "kind": "vendor",
             "worldDrop": False,
-            "names": ["Kendor Kabonka"],
-            "zones": ["Stormwind City"],
+            "places": [{"name": "Kendor Kabonka", "zone": "Stormwind City"}],
         })
         # "both" is the default reading of an absent field, so it is not stored.
         self.assertIsNone(faction)
         self.assertEqual(kind, "vendor")
-        self.assertEqual(names, ("Kendor Kabonka",))
-        self.assertEqual(zones, ("Stormwind City",))
+        self.assertEqual(places, (("Kendor Kabonka", "Stormwind City"),))
         self.assertFalse(world_drop)
 
+    def test_a_place_keeps_the_half_it_has(self):
+        # A quest gives a zone and no name; a trainer can give neither.
+        _f, _k, places, _wd, _b = summarize_source({
+            "kind": "quest", "places": [{"zone": "Hillsbrad Foothills"},
+                                        {"name": "Somebody"}],
+        })
+        self.assertEqual(places, ((None, "Hillsbrad Foothills"), ("Somebody", None)))
+
+    def test_a_place_with_neither_half_is_not_a_place(self):
+        _f, _k, places, _wd, _b = summarize_source({
+            "kind": "quest", "places": [{"name": None, "zone": None}],
+        })
+        self.assertEqual(places, ())
+
     def test_a_world_drop_points_nowhere(self):
-        faction, kind, zones, names, world_drop, trash = summarize_source({
+        faction, kind, places, world_drop, boss = summarize_source({
             "faction": "both", "kind": "worldDrop", "worldDrop": True,
-            "names": ["Some Mob"], "zones": ["Everywhere"],
+            "places": [{"name": "Some Mob", "zone": "Everywhere"}],
         })
         self.assertEqual(kind, "worldDrop")
         self.assertTrue(world_drop)
-        self.assertEqual(names, ())
-        self.assertEqual(zones, ())
+        self.assertEqual(places, ())
 
     def test_a_faction_restriction_survives(self):
-        faction, _kind, _zones, _names, _wd, _t = summarize_source({
-            "faction": "horde", "kind": "vendor", "names": [], "zones": [],
+        faction, _kind, _places, _wd, _b = summarize_source({
+            "faction": "horde", "kind": "vendor", "places": [],
         })
         self.assertEqual(faction, "horde")
 
     def test_nothing_known_stays_empty(self):
-        self.assertEqual(summarize_source({}), (None, None, (), (), False, False))
+        self.assertEqual(summarize_source({}), (None, None, (), False, False))
 
 
 class ArlProviderTests(unittest.TestCase):
@@ -882,8 +907,8 @@ class ArlProviderTests(unittest.TestCase):
         lookups = parse_lookup(self.LOOKUP)
         summary = summarize_recipe(parse_profession(self.PROFESSION)[9811], lookups)
         self.assertEqual(summary["kind"], "vendor")
-        self.assertEqual(summary["names"], ["Kendor Kabonka"])
-        self.assertEqual(summary["zones"], ["Stormwind City"])
+        self.assertEqual(names_of(summary), ["Kendor Kabonka"])
+        self.assertEqual(zones_of(summary), ["Stormwind City"])
         self.assertEqual(summary["faction"], "horde")
 
     def test_a_recipe_every_trainer_teaches_names_none_of_them(self):
@@ -892,14 +917,14 @@ class ArlProviderTests(unittest.TestCase):
         summary = summarize_recipe(parse_profession(self.PROFESSION)[2661],
                                    parse_lookup(self.LOOKUP), max_names=3)
         self.assertEqual(summary["kind"], "trainer")
-        self.assertEqual(summary["names"], [])
-        self.assertEqual(summary["zones"], [])
+        self.assertEqual(names_of(summary), [])
+        self.assertEqual(zones_of(summary), [])
 
     def test_a_world_drop_is_marked_and_named_nowhere(self):
         summary = summarize_recipe(parse_profession(self.PROFESSION)[12906],
                                    parse_lookup(self.LOOKUP))
         self.assertTrue(summary["worldDrop"])
-        self.assertEqual(summary["names"], [])
+        self.assertEqual(names_of(summary), [])
 
 
 class PostTbcNpcTests(unittest.TestCase):
@@ -945,8 +970,8 @@ class ArlDroppedNpcTests(unittest.TestCase):
     def test_the_later_trainer_is_dropped_and_the_tbc_one_named(self):
         lookups = {"Trainer": parse_lookup(self.LOOKUP)}
         summary = summarize_recipe(parse_profession(self.PROFESSION)[8895], lookups)
-        self.assertEqual(summary["names"], ["Nixx Sprocketspring"])
-        self.assertEqual(summary["zones"], ["Tanaris"])
+        self.assertEqual(names_of(summary), ["Nixx Sprocketspring"])
+        self.assertEqual(zones_of(summary), ["Tanaris"])
 
     def test_dropping_it_also_takes_it_out_of_the_naming_cap(self):
         # Two trainers listed, one of them not in this expansion: with a cap of
@@ -955,7 +980,7 @@ class ArlDroppedNpcTests(unittest.TestCase):
         lookups = {"Trainer": parse_lookup(self.LOOKUP)}
         summary = summarize_recipe(parse_profession(self.PROFESSION)[8895],
                                    lookups, max_names=1)
-        self.assertEqual(summary["names"], ["Nixx Sprocketspring"])
+        self.assertEqual(names_of(summary), ["Nixx Sprocketspring"])
 
 
 class DropNamingTests(unittest.TestCase):
@@ -997,28 +1022,28 @@ class DropNamingTests(unittest.TestCase):
 
     def test_one_boss_is_named(self):
         summary = self._summary(1)
-        self.assertEqual(summary["names"], ["Mekgineer Thermaplugg"])
-        self.assertEqual(summary["zones"], ["Gnomeregan"])
+        self.assertEqual(names_of(summary), ["Mekgineer Thermaplugg"])
+        self.assertEqual(zones_of(summary), ["Gnomeregan"])
         self.assertFalse(summary["bossDrop"])
 
     def test_one_ordinary_mob_is_not_named(self):
         # There are thirteen Wastewander Bandits in Tanaris; naming the one ARL
         # happened to list implies a precision the source does not have.
         summary = self._summary(2)
-        self.assertEqual(summary["names"], [])
-        self.assertEqual(summary["zones"], ["Tanaris"])
+        self.assertEqual(names_of(summary), [])
+        self.assertEqual(zones_of(summary), ["Tanaris"])
 
     def test_several_ordinary_mobs_leave_only_the_zone(self):
         summary = self._summary(3)
-        self.assertEqual(summary["names"], [])
-        self.assertEqual(summary["zones"], ["Tanaris"])
+        self.assertEqual(names_of(summary), [])
+        self.assertEqual(zones_of(summary), ["Tanaris"])
         self.assertFalse(summary["bossDrop"])
 
     def test_several_bosses_are_flagged_rather_than_listed(self):
         summary = self._summary(4)
-        self.assertEqual(summary["names"], [])
+        self.assertEqual(names_of(summary), [])
         self.assertTrue(summary["bossDrop"])
-        self.assertEqual(summary["zones"], ["Gnomeregan"])
+        self.assertEqual(zones_of(summary), ["Gnomeregan"])
 
 
 class ContainerPlaceTests(unittest.TestCase):
@@ -1047,7 +1072,7 @@ class ContainerPlaceTests(unittest.TestCase):
         # thing that knows nobody has to die for it.
         summary = self._summary(1)
         self.assertEqual(summary["kind"], "container")
-        self.assertEqual(summary["zones"], ["Dire Maul"])
+        self.assertEqual(zones_of(summary), ["Dire Maul"])
 
     def test_a_random_instance_drop_stays_a_drop(self):
         self.assertEqual(self._summary(2)["kind"], "drop")
@@ -1112,23 +1137,23 @@ class ArlGenericAcquireTests(unittest.TestCase):
     def test_a_trainer_inside_an_instance_is_still_a_trainer(self):
         summary = self._summary(13501)
         self.assertEqual(summary["kind"], "trainer")
-        self.assertEqual(summary["zones"], ["Razorfen Downs"])
+        self.assertEqual(zones_of(summary), ["Razorfen Downs"])
 
     def test_a_raid_drop_lands_in_its_raid(self):
         summary = self._summary(46140)
         self.assertEqual(summary["kind"], "drop")
-        self.assertEqual(summary["zones"], ["Sunwell Plateau"])
+        self.assertEqual(zones_of(summary), ["Sunwell Plateau"])
         # Nobody is named: the recipe drops off the instance, not off a name.
-        self.assertEqual(summary["names"], [])
+        self.assertEqual(names_of(summary), [])
 
     def test_a_recipe_that_drops_in_two_raids_names_both(self):
-        self.assertEqual(self._summary(36389)["zones"],
+        self.assertEqual(zones_of(self._summary(36389)),
                          ["Serpentshrine Cavern", "The Eye"])
 
     def test_a_discovery_is_its_own_kind_and_points_nowhere(self):
         summary = self._summary(28580)
         self.assertEqual(summary["kind"], "discovery")
-        self.assertEqual(summary["zones"], [])
+        self.assertEqual(zones_of(summary), [])
         self.assertFalse(summary["worldDrop"])
 
     def test_a_world_event_is_its_own_kind(self):
@@ -1151,7 +1176,7 @@ class ArlGenericAcquireTests(unittest.TestCase):
         summary = summarize_recipe(parse_profession(text)[9811], lookups,
                                    parse_custom_places(self.CUSTOM))
         self.assertEqual(summary["kind"], "vendor")
-        self.assertEqual(summary["names"], ["Kendor Kabonka"])
+        self.assertEqual(names_of(summary), ["Kendor Kabonka"])
 
 
 class RemovedRecipeTests(unittest.TestCase):
@@ -1250,36 +1275,59 @@ class OverrideParsingTests(unittest.TestCase):
 
 
 class SourceEmitTests(unittest.TestCase):
-    def test_emits_faction_zones_and_names_but_omits_both(self):
+    def test_emits_each_place_as_a_pair_and_omits_a_neutral_faction(self):
         alliance = _record(spell_id=1, faction="alliance", source_kind="vendor",
-                           source_zones=("Stormwind City",), source_names=("Edna Mullby",))
+                           source_places=(("Edna Mullby", "Stormwind City"),))
         neutral = _record(spell_id=2)
         lua = emit_lua([alliance, neutral], {}, {}, "1", 1, "tbc")
         self.assertIn('faction = "alliance"', lua)
         self.assertIn('sourceKind = "vendor"', lua)
-        self.assertIn("sourceZones = { 1 }", lua)
-        self.assertIn('sourceNames = { "Edna Mullby" }', lua)
+        # Name and zone in one entry: which vendor stands where.
+        self.assertIn('sourcePlaces = { { name = "Edna Mullby", zone = 1 } }', lua)
         self.assertIn('[1] = "Stormwind City"', lua)
         # The neutral record carries no faction line at all.
         self.assertEqual(lua.count("faction ="), 1)
 
+    def test_a_place_emits_only_the_half_it_has(self):
+        zone_only = _record(spell_id=1, source_kind="quest",
+                            source_places=((None, "Hillsbrad Foothills"),))
+        name_only = _record(spell_id=2, source_kind="vendor",
+                            source_places=(("Somebody", None),))
+        lua = emit_lua([zone_only, name_only], {}, {}, "1", 1, "tbc")
+        self.assertIn("sourcePlaces = { { zone = 1 } }", lua)
+        self.assertIn('sourcePlaces = { { name = "Somebody" } }', lua)
+
     def test_zone_names_are_interned_once_however_many_records_cite_them(self):
-        records = [_record(spell_id=index, source_zones=("Stormwind City",))
+        records = [_record(spell_id=index, source_places=((None, "Stormwind City"),))
                    for index in range(1, 4)]
         lua = emit_lua(records, {}, {}, "1", 1, "tbc")
         # One entry in the table, three records pointing at it.
-        self.assertEqual(lua.count('= "Stormwind City"'), 1)
-        self.assertEqual(lua.count("sourceZones = { 1 }"), 3)
+        self.assertEqual(lua.count('] = "Stormwind City"'), 1)
+        self.assertEqual(lua.count("sourcePlaces = { { zone = 1 } }"), 3)
 
 
 class ManualAcquisitionTests(unittest.TestCase):
     """Hand-read records outrank the bulk sources, whole record at a time."""
 
-    def test_a_world_drop_keeps_neither_names_nor_zones(self):
+    def test_a_world_drop_keeps_no_places(self):
         entry = build_entry("worldDrop", names=("Somebody",), zones=("Somewhere",))
         self.assertTrue(entry["worldDrop"])
-        self.assertEqual(entry["names"], [])
-        self.assertEqual(entry["zones"], [])
+        self.assertEqual(entry["places"], [])
+
+    def test_names_and_zones_pair_up_by_position(self):
+        entry = build_entry("vendor", names=("Ongrom", "Hurnak"),
+                            zones=("Orgrimmar", "Durotar"))
+        self.assertEqual(entry["places"], [
+            {"name": "Ongrom", "zone": "Orgrimmar"},
+            {"name": "Hurnak", "zone": "Durotar"},
+        ])
+
+    def test_one_zone_against_several_names_covers_them_all(self):
+        # Three creatures in Blade's Edge Mountains, not one there and two
+        # nowhere.
+        entry = build_entry("drop", names=("A", "B"), zones=("Blade's Edge",))
+        self.assertEqual([place["zone"] for place in entry["places"]],
+                         ["Blade's Edge", "Blade's Edge"])
 
     def test_an_absent_faction_reads_as_both(self):
         self.assertEqual(build_entry("vendor", faction="")["faction"], "both")
@@ -1289,7 +1337,7 @@ class ManualAcquisitionTests(unittest.TestCase):
         self.assertTrue(any("is not one of" in problem for problem in problems))
 
     def test_a_hand_record_replaces_the_automated_one_outright(self):
-        arl = {1: {"kind": None, "faction": "both", "names": [], "zones": [],
+        arl = {1: {"kind": None, "faction": "both", "places": [],
                    "worldDrop": False}}
         manual = {1: build_entry("vendor", faction="horde",
                                  names=("Ongrom Black Tooth",),
@@ -1298,11 +1346,12 @@ class ManualAcquisitionTests(unittest.TestCase):
         self.assertEqual(merged[1]["kind"], "vendor")
         self.assertEqual(merged[1]["faction"], "horde")
         # Nothing of the automated record survives inside the hand one.
-        self.assertEqual(merged[1]["names"], ["Ongrom Black Tooth"])
+        self.assertEqual(merged[1]["places"],
+                         [{"name": "Ongrom Black Tooth", "zone": "Hellfire Peninsula"}])
 
     def test_recipes_the_bulk_source_placed_are_left_alone(self):
-        arl = {1: {"kind": "trainer", "faction": "both", "names": [],
-                   "zones": [], "worldDrop": False}}
+        arl = {1: {"kind": "trainer", "faction": "both", "places": [],
+                   "worldDrop": False}}
         merged = merge_acquisition(arl, {2: build_entry("quest")})
         self.assertEqual(merged[1]["kind"], "trainer")
         self.assertEqual(merged[2]["kind"], "quest")
@@ -1450,8 +1499,11 @@ class AcquisitionWorksheetTests(unittest.TestCase):
             records = load_manual_acquisition(directory)
         self.assertEqual(records[1]["kind"], "vendor")
         self.assertEqual(records[1]["faction"], "horde")
-        self.assertEqual(records[1]["names"], ["Ongrom", "Hurnak"])
-        self.assertEqual(records[1]["zones"], ["Orgrimmar"])
+        # One zone against two names puts both of them in it.
+        self.assertEqual(records[1]["places"], [
+            {"name": "Ongrom", "zone": "Orgrimmar"},
+            {"name": "Hurnak", "zone": "Orgrimmar"},
+        ])
         # An empty row is not an answer.
         self.assertNotIn(3, records)
 

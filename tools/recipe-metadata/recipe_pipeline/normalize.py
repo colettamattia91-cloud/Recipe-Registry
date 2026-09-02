@@ -4,35 +4,39 @@ from recipe_pipeline.derive_items import derive_created_item_id, derive_recipe_i
 from recipe_pipeline.derive_reagents import derive_reagents
 from recipe_pipeline.records import RecipeRecord
 
-MAX_SOURCE_ZONES = 4
-MAX_SOURCE_NAMES = 3
+MAX_SOURCE_PLACES = 4
 
 
 def summarize_source(source):
     """Flatten one obtain-side record into the fields the addon renders.
 
-    The source already states the kind, the faction and the NPCs; what is
+    The source already states the kind, the faction and the places; what is
     decided here is only what to keep. A world drop has nowhere to point at,
-    so it keeps neither names nor zones. Everything else keeps both, capped:
-    three names and four zones are as much as a table row can carry, and as
-    much as a player needs in order to go and look.
+    so it keeps none. Everything else is capped at four places, which is as
+    much as a table row can carry and as much as a player needs in order to
+    go and look.
     """
     if not source:
-        return None, None, (), (), False, False
+        return None, None, (), False, False
 
     kind = source.get("kind")
     world_drop = source.get("worldDrop") is True
     if world_drop:
         kind = "worldDrop"
 
-    names = () if world_drop else tuple((source.get("names") or [])[:MAX_SOURCE_NAMES])
-    zones = () if world_drop else tuple((source.get("zones") or [])[:MAX_SOURCE_ZONES])
+    places = ()
+    if not world_drop:
+        places = tuple(
+            (place.get("name") or None, place.get("zone") or None)
+            for place in (source.get("places") or [])[:MAX_SOURCE_PLACES]
+            if place.get("name") or place.get("zone")
+        )
 
     faction = source.get("faction")
     # "both" is the default reading of an absent field, so it is not stored.
     if faction == "both":
         faction = None
-    return faction, kind, zones, names, world_drop, source.get("bossDrop") is True
+    return faction, kind, places, world_drop, source.get("bossDrop") is True
 
 
 def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tbc"):
@@ -95,7 +99,7 @@ def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tb
 
         source = secondary.get("acquisitionBySpellId", {}).get(spell_id) or {}
         source = overrides.get("acquisitionBySpellId", {}).get(spell_id, source)
-        (faction, source_kind, source_zones, source_names,
+        (faction, source_kind, source_places,
          world_drop, boss_drop) = summarize_source(source)
 
         records.append(RecipeRecord(
@@ -116,8 +120,7 @@ def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tb
             specialization=specialization,
             faction=faction,
             source_kind=source_kind,
-            source_zones=source_zones,
-            source_names=source_names,
+            source_places=source_places,
             world_drop=world_drop,
             boss_drop=boss_drop,
             removed=removed is True,

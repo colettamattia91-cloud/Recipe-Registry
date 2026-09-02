@@ -367,7 +367,29 @@ def _resolve(lookups, kind, entity_id):
     return None
 
 
-def summarize_recipe(entry, lookups, custom_places=None, max_names=3, max_zones=4):
+def _add_place(places, name, zone):
+    """Append one place, unless the same pair is already there."""
+    if not (name or zone):
+        return
+    place = {"name": name or None, "zone": zone or None}
+    if place not in places:
+        places.append(place)
+
+
+def _zones_only(places):
+    """Strip the names, keeping each distinct zone once.
+
+    Three Wastewander mobs in Tanaris are three places while their names are
+    kept and one place once they are not.
+    """
+    stripped = []
+    for place in places:
+        if place["zone"]:
+            _add_place(stripped, None, place["zone"])
+    return stripped
+
+
+def summarize_recipe(entry, lookups, custom_places=None, max_places=4, max_names=3):
     """Flatten one recipe into the fields the addon renders."""
     acquires = entry.get("acquires") or {}
     kind = next((candidate for candidate in KIND_PRIORITY if candidate in acquires), None)
@@ -388,23 +410,27 @@ def summarize_recipe(entry, lookups, custom_places=None, max_names=3, max_zones=
                 place["key"] in CONTAINER_PLACE_KEYS for place in places):
             kind = "container"
         seen = []
-        for place in places:
-            if place["zone"] and place["zone"] not in seen:
-                seen.append(place["zone"])
+        if kind != "worldDrop":
+            for place in places:
+                _add_place(seen, None, place["zone"])
         return {
             "faction": entry.get("faction", FACTION_BOTH),
             "kind": kind,
             "worldDrop": kind == "worldDrop",
             "bossDrop": False,
-            "names": [],
-            "zones": [] if kind == "worldDrop" else seen[:max_zones],
+            "places": seen[:max_places],
         }
 
     # An NPC from a later expansion is not one of this recipe's sources, so it
     # is dropped before anything counts them -- otherwise a recipe with one
     # TBC trainer and three WotLK ones would look like a recipe four trainers
     # teach, and name none of them.
-    kept_ids, names, zones = [], [], []
+    # Each NPC becomes one place, name and zone together. Two independent
+    # lists cannot express "Xandar Goodbeard in Loch Modan, Hagrus in
+    # Orgrimmar" -- a reader is left to guess which name belongs to which
+    # zone -- and vendor stock is often limited, so the alternatives are worth
+    # showing rather than collapsing.
+    kept_ids, places = [], []
     every_name_a_boss = True
     for npc_id in acquires.get(kind or "", []):
         npc = _resolve(lookups, kind, npc_id)
@@ -413,12 +439,9 @@ def summarize_recipe(entry, lookups, custom_places=None, max_names=3, max_zones=
         kept_ids.append(npc_id)
         if not npc:
             continue
-        if npc["name"] and npc["name"] not in names:
-            names.append(npc["name"])
-            if not npc.get("boss"):
-                every_name_a_boss = False
-        if npc["zone"] and npc["zone"] not in zones:
-            zones.append(npc["zone"])
+        if npc["name"] and not npc.get("boss"):
+            every_name_a_boss = False
+        _add_place(places, npc["name"], npc["zone"])
     npc_ids = kept_ids
 
     # A world drop has nowhere to point at, and a recipe every trainer in the
@@ -428,7 +451,7 @@ def summarize_recipe(entry, lookups, custom_places=None, max_names=3, max_zones=
     # than naming none.
     world_drop = kind == "worldDrop"
     if world_drop or (kind == "trainer" and len(npc_ids) > max_names):
-        names, zones = [], []
+        places = []
 
     # Naming a creature is only worth it when there is one creature to find.
     # An ordinary mob is a species -- there are thirteen Wastewander Bandits in
@@ -436,19 +459,19 @@ def summarize_recipe(entry, lookups, custom_places=None, max_names=3, max_zones=
     # source does not have, and the zone is the real answer. Several bosses
     # keep neither name nor pretence: the row says they are bosses and where.
     boss_drop = False
-    if kind == "drop" and names:
+    named = [place for place in places if place["name"]]
+    if kind == "drop" and named:
         if not every_name_a_boss:
-            names = []
-        elif len(names) > 1:
-            names, boss_drop = [], True
+            places = _zones_only(places)
+        elif len(named) > 1:
+            places, boss_drop = _zones_only(places), True
 
     return {
         "faction": entry.get("faction", FACTION_BOTH),
         "kind": kind,
         "worldDrop": world_drop,
         "bossDrop": boss_drop,
-        "names": names[:max_names],
-        "zones": zones[:max_zones],
+        "places": places[:max_places],
     }
 
 

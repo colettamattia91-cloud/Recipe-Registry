@@ -333,15 +333,24 @@ def fill_from_browser(count=None, band=None, batch=20, headless=False, port=9222
                 silent.append(row)
                 continue
 
-            names = [entry["name"] for entry in
-                     (summary["vendors"] if kind == "vendor" else summary["drops"])
-                     if entry.get("name")]
-            zones = [zones_by_id.get(str(zone_id)) or zones_by_id.get(zone_id)
-                     for zone_id in summary["zones"]]
+            # Name and zone must line up: apply pairs them by position, and
+            # each entry on the page carries its own zone.
+            names, zones = [], []
+            for entry in (summary["vendors"] if kind == "vendor" else summary["drops"]):
+                if not entry.get("name"):
+                    continue
+                zone_ids = entry.get("zones") or []
+                zone = None
+                for zone_id in zone_ids:
+                    zone = zones_by_id.get(str(zone_id)) or zones_by_id.get(zone_id)
+                    if zone:
+                        break
+                names.append(entry["name"])
+                zones.append(zone or "")
             row["kind"] = kind
             row["faction"] = summary["faction"]
             row["names"] = "|".join(names[:3])
-            row["zones"] = "|".join(zone for zone in zones if zone)
+            row["zones"] = "|".join(zones[:3])
             row["notes"] = BROWSER_NOTE
             answered += 1
 

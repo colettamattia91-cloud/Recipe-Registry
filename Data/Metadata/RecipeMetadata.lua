@@ -47,6 +47,17 @@ local function cloneReagents(reagents)
     return out
 end
 
+-- One entry per place: { name, zone }, either half optional. The zone is
+-- still an interned id here; GetSource resolves it to a name.
+local function clonePlaces(list)
+    if type(list) ~= "table" then return nil end
+    local out = {}
+    for index, place in ipairs(list) do
+        out[index] = { name = place.name, zone = place.zone }
+    end
+    return out
+end
+
 local function cloneStringList(list)
     if type(list) ~= "table" then return nil end
     local out = {}
@@ -82,8 +93,7 @@ local function cloneRecord(spellId, record)
         sourceKind = record.sourceKind,
         worldDrop = record.worldDrop == true,
         bossDrop = record.bossDrop == true,
-        sourceZones = cloneStringList(record.sourceZones),
-        sourceNames = cloneStringList(record.sourceNames),
+        sourcePlaces = clonePlaces(record.sourcePlaces),
         -- In the client data but not in the game. Kept on the record rather
         -- than left out of the payload, so a recipe flagged wrongly comes
         -- back through the generator's override instead of an investigation.
@@ -671,13 +681,16 @@ function RecipeMetadata:GetSource(recipeKey, info)
         return nil
     end
 
+    -- Places come back as { name, zone } pairs with the zone resolved. Either
+    -- half can be missing: a quest names a zone and nobody, and a recipe every
+    -- trainer teaches names neither.
     local zoneNames = self._generated and self._generated.zoneNamesById or nil
-    local zones
-    for _, zoneId in ipairs(info.sourceZones or {}) do
-        local name = zoneNames and zoneNames[zoneId] or nil
-        if name then
-            zones = zones or {}
-            zones[#zones + 1] = name
+    local places
+    for _, place in ipairs(info.sourcePlaces or {}) do
+        local zone = place.zone and zoneNames and zoneNames[place.zone] or nil
+        if place.name or zone then
+            places = places or {}
+            places[#places + 1] = { name = place.name, zone = zone }
         end
     end
 
@@ -686,8 +699,7 @@ function RecipeMetadata:GetSource(recipeKey, info)
         kind = info.sourceKind,
         worldDrop = info.worldDrop == true,
         bossDrop = info.bossDrop == true,
-        zones = zones,
-        names = cloneStringList(info.sourceNames),
+        places = places,
     }
 end
 

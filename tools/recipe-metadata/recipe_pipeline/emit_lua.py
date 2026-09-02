@@ -48,11 +48,18 @@ def _emit_record(record, zone_ids, indent="        "):
         lines.append(indent + "    bossDrop = true,")
     if record.removed:
         lines.append(indent + "    removed = true,")
-    if record.source_zones:
-        lines.append(indent + "    sourceZones = { "
-                     + ", ".join(str(zone_ids[zone]) for zone in record.source_zones) + " },")
-    if record.source_names:
-        lines.append(indent + "    sourceNames = { " + ", ".join(_lua_string(name) for name in record.source_names) + " },")
+    if record.source_places:
+        # Name and zone travel together: two parallel lists could not say
+        # which vendor stands in which city.
+        parts = []
+        for name, zone in record.source_places:
+            fields = []
+            if name:
+                fields.append("name = " + _lua_string(name))
+            if zone:
+                fields.append("zone = " + str(zone_ids[zone]))
+            parts.append("{ " + ", ".join(fields) + " }")
+        lines.append(indent + "    sourcePlaces = { " + ", ".join(parts) + " },")
     if record.is_outputless_self_only:
         lines.append(indent + "    selfOnlyOutputless = true,")
     if record.bop_output is not None:
@@ -176,8 +183,9 @@ def emit_lua(records, categories_by_profession, subcategories_by_profession, met
     # is the single biggest thing that would bloat the generated file.
     zone_ids = {}
     for record in sorted(records, key=lambda item: item.spell_id):
-        for zone in record.source_zones:
-            zone_ids.setdefault(zone, len(zone_ids) + 1)
+        for _name, zone in record.source_places:
+            if zone:
+                zone_ids.setdefault(zone, len(zone_ids) + 1)
 
     for record in records:
         lines.extend(_emit_record(record, zone_ids))

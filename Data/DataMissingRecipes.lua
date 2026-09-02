@@ -115,15 +115,25 @@ local function describeSource(meta, recipeKey, info)
         return kind, label, source
     end
 
-    -- Who, then where. The name is the actionable half -- you go and find
-    -- Nightbane, or Edna Mullby -- and the zone tells you where to look.
-    local who = source.names and #source.names > 0 and table.concat(source.names, ", ") or nil
-    local where = source.zones and #source.zones > 0 and table.concat(source.zones, ", ") or nil
+    -- Each place carries its own zone, so a row can say which vendor stands
+    -- where: "Xandar Goodbeard (Loch Modan), Hagrus (Orgrimmar)". Vendor stock
+    -- is often limited, which is why the alternatives are listed rather than
+    -- collapsed to the first one.
+    local named, zonesOnly = {}, {}
+    for _, place in ipairs(source.places or {}) do
+        if place.name then
+            named[#named + 1] = place.zone
+                and string.format("%s (%s)", place.name, place.zone)
+                or place.name
+        elseif place.zone then
+            zonesOnly[#zonesOnly + 1] = place.zone
+        end
+    end
+
+    local who = #named > 0 and table.concat(named, ", ") or nil
+    local where = #zonesOnly > 0 and table.concat(zonesOnly, ", ") or nil
 
     local function label(prefix)
-        if who and where then
-            return string.format("%s: %s (%s)", prefix, who, where)
-        end
         return string.format("%s: %s", prefix, who or where or "?")
     end
 
@@ -278,8 +288,7 @@ function Data:BuildMissingRecipeRowsForProfession(professionName, prof)
                         -- the generator omits the field rather than repeating
                         -- it on most of the dataset.
                         faction = source and source.faction or nil,
-                        sourceNames = source and source.names or nil,
-                        sourceZones = source and source.zones or nil,
+                        sourcePlaces = source and source.places or nil,
                         specializationSpellId = specializationId,
                         specializationName = specializationId
                             and self:GetSpecializationName(professionName, specializationId) or nil,

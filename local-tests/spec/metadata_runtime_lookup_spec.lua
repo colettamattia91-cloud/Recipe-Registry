@@ -86,8 +86,10 @@ Test.it("reports where a recipe is obtained", function()
     Test.truthy(source ~= nil, "a vendor-sold recipe should carry a source")
     Test.eq(source.faction, "horde")
     Test.eq(source.kind, "vendor")
-    Test.eq(source.names[1], "Abigail Shiel")
-    Test.eq(source.zones[1], "Tirisfal Glades")
+    -- Name and zone arrive together, so a row can say which vendor stands
+    -- where rather than leaving the reader to pair two lists.
+    Test.eq(source.places[1].name, "Abigail Shiel")
+    Test.eq(source.places[1].zone, "Tirisfal Glades")
     Test.eq(source.worldDrop, false)
 end)
 
@@ -102,8 +104,7 @@ Test.it("points a world drop nowhere", function()
     local source = metadata:GetSource(-30303)
     Test.eq(source.worldDrop, true)
     Test.eq(source.kind, "worldDrop")
-    Test.eq(source.names, nil)
-    Test.eq(source.zones, nil)
+    Test.eq(source.places, nil)
 end)
 
 Test.it("reports outputless and BoP metadata without requiring Recipe Registry integration", function()

@@ -322,4 +322,35 @@ Test.it("keeps the bare label for a recipe every trainer teaches", function()
     Test.gte(bare, 1)
 end)
 
+-- Two independent lists could not say which vendor stands in which city:
+-- "Xandar Goodbeard, Hagrus, Defias Profiteer (Loch Modan, Orgrimmar,
+-- Westfall)" leaves the reader to guess the pairing. Vendor stock is often
+-- limited, so the alternatives have to be listed rather than collapsed.
+Test.it("keeps every vendor next to its own zone", function()
+    setLocalProfession("Alchemy", { skillRank = 375 })
+
+    local multi
+    for _, row in ipairs(data:BuildMissingRecipeRows()) do
+        local source = addon.RecipeMetadata:GetSource(row.recipeKey)
+        if row.missing.sourceKind == "vendor" and source and source.places
+            and #source.places > 1 then
+            multi = row
+            break
+        end
+    end
+    Test.truthy(multi ~= nil, "expected a recipe sold by more than one vendor")
+
+    local source = addon.RecipeMetadata:GetSource(multi.recipeKey)
+    local label = multi.missing.sourceLabel
+    for _, place in ipairs(source.places) do
+        -- Every vendor is named, and its own zone follows it in brackets.
+        Test.truthy(label:find(place.name, 1, true) ~= nil,
+            "the label should name " .. tostring(place.name))
+        if place.zone then
+            Test.truthy(label:find(place.name .. " (" .. place.zone .. ")", 1, true) ~= nil,
+                tostring(place.name) .. " should carry its own zone")
+        end
+    end
+end)
+
 io.write(string.format("Missing recipes: %d test(s) passed\n", Test.count))

@@ -27,24 +27,46 @@ PARSER_VERSION = 1
 # The vocabulary normalize.summarize_source understands. A world drop is
 # spelled as its own kind here even though the flag decides it downstream,
 # because the person filling the sheet writes a kind, not a flag.
-KINDS = ("trainer", "vendor", "drop", "quest", "worldDrop")
+KINDS = ("trainer", "vendor", "drop", "quest", "worldDrop",
+         "discovery", "worldEvent", "container")
 FACTIONS = ("both", "alliance", "horde")
 
 
 def build_entry(kind, faction="both", names=(), zones=()):
     """One record, in the shape ARL emits.
 
-    A world drop has nowhere to point at, so it carries neither names nor
-    zones -- normalize drops them anyway, and keeping them in the snapshot
-    would only invite the reader to trust something the addon never shows.
+    Names and zones pair up by position: the first name is in the first zone.
+    That is how a person fills the worksheet -- "Ongrom|Hurnak" against
+    "Orgrimmar|Durotar" -- and it is what the row needs in order to say which
+    vendor stands where. A name with no zone, or a zone with no name, is a
+    place all the same.
+
+    A world drop has nowhere to point at, so it carries no places at all;
+    keeping them would invite the reader to trust something the addon never
+    shows.
     """
     world_drop = kind == "worldDrop"
+    if world_drop:
+        return {"faction": faction or "both", "kind": kind,
+                "worldDrop": True, "places": []}
+
+    names = [name for name in names]
+    zones = [zone for zone in zones]
+    # One zone against several names means they all stand in it -- three
+    # creatures in Blade's Edge Mountains, not one there and two nowhere.
+    if len(zones) == 1 and len(names) > 1:
+        zones = zones * len(names)
+    places = []
+    for index in range(max(len(names), len(zones))):
+        name = names[index] if index < len(names) else None
+        zone = zones[index] if index < len(zones) else None
+        if name or zone:
+            places.append({"name": name or None, "zone": zone or None})
     return {
         "faction": faction or "both",
         "kind": kind,
-        "names": [] if world_drop else [name for name in names if name],
-        "zones": [] if world_drop else [zone for zone in zones if zone],
-        "worldDrop": world_drop,
+        "worldDrop": False,
+        "places": places,
     }
 
 
@@ -59,7 +81,8 @@ def validate_entry(spell_id, entry):
     if faction not in FACTIONS:
         problems.append("{0}: faction {1!r} is not one of {2}".format(
             spell_id, faction, ", ".join(FACTIONS)))
-    if kind in ("vendor", "drop") and not entry.get("names"):
+    if kind in ("vendor", "drop") and not any(
+            place.get("name") for place in entry.get("places") or ()):
         # Not fatal: a vendor whose name the page does not give is still
         # better recorded as a vendor than left unknown.
         problems.append("{0}: {1} with no name (kept, but the row will "

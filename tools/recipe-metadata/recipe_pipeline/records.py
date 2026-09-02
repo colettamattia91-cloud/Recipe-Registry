@@ -38,11 +38,13 @@ class RecipeRecord:
     # See wowhead_source_provider.
     faction: Optional[str] = None
     source_kind: Optional[str] = None
-    # Zone NAMES, not IDs: the sources that carry this data each number
-    # zones differently, so names are the only shared vocabulary. The
-    # emitter interns them into its own table.
-    source_zones: Tuple[str, ...] = ()
-    source_names: Tuple[str, ...] = ()
+    # Where the recipe comes from, one entry per place, as (name, zone).
+    # Either half may be None: a quest gives a zone and no name, and a recipe
+    # every trainer teaches gives neither. They are pairs rather than two
+    # lists because two lists cannot say which vendor stands in which zone.
+    # Zones are NAMES, not IDs -- each source numbers zones differently, so
+    # names are the only shared vocabulary; the emitter interns them.
+    source_places: Tuple[Tuple[Optional[str], Optional[str]], ...] = ()
     # Set when the recipe drops from so many creatures across so many zones
     # that naming them is noise rather than an answer.
     world_drop: bool = False
