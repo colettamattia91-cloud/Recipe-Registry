@@ -166,7 +166,15 @@ local function describeSource(meta, recipeKey, info)
         return "quest", where and ("Quest: " .. where) or "Quest", source
     end
     if source.kind == "trainer" then
-        return "trainer", where and ("Trainer: " .. where) or "Trainer", source
+        -- Most trainer-taught recipes name nobody, on purpose: every trainer
+        -- in the game teaches them and "go to your trainer" is the answer. The
+        -- ones that DO carry a name are the specialization trainers -- Nixx
+        -- Sprocketspring, Peter Galen -- where the name is the whole point,
+        -- because your own city trainer will not teach you.
+        if who or where then
+            return "trainer", label("Trainer"), source
+        end
+        return "trainer", "Trainer", source
     end
     -- A kind nothing above handles. Better to guess than to say nothing, but
     -- reaching here means the metadata grew a kind this view does not render.

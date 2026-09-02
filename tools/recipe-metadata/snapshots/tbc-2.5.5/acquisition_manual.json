@@ -1,5 +1,16 @@
 {
   "acquisitionBySpellId": {
+    "22967": {
+      "faction": "both",
+      "kind": "trainer",
+      "names": [
+        "Master Elemental Shaper Krixix"
+      ],
+      "worldDrop": false,
+      "zones": [
+        "Blackwing Lair"
+      ]
+    },
     "351766": {
       "faction": "both",
       "kind": "trainer",
@@ -133,9 +144,9 @@
   "sourceStats": {
     "byKind": {
       "drop": 5,
-      "trainer": 1,
+      "trainer": 2,
       "vendor": 5
     },
-    "records": 11
+    "records": 12
   }
 }

@@ -291,4 +291,35 @@ Test.it("still guesses from the pattern when nothing is recorded", function()
     Test.eq(kinds.item, nil)
 end)
 
+-- Most trainer-taught recipes name nobody on purpose, but the specialization
+-- trainers are named, and there the name is the whole answer: your own city
+-- trainer will not teach you a Gnomish schematic.
+Test.it("names the trainer when the source knows one", function()
+    setLocalProfession("Engineering", { skillRank = 375 })
+
+    local named
+    for _, row in ipairs(data:BuildMissingRecipeRows()) do
+        if row.missing.sourceKind == "trainer" and row.missing.sourceLabel ~= "Trainer" then
+            named = row.missing.sourceLabel
+            break
+        end
+    end
+    Test.truthy(named ~= nil, "a specialization trainer should be named, not just placed")
+    -- Name first, place in brackets: the name is what you act on.
+    Test.truthy(named:find("Trainer: ") == 1, "the label should lead with the kind")
+    Test.truthy(named:find("%(") ~= nil, "the zone should follow the name in brackets")
+end)
+
+Test.it("keeps the bare label for a recipe every trainer teaches", function()
+    setLocalProfession("Engineering", { skillRank = 375 })
+
+    local bare = 0
+    for _, row in ipairs(data:BuildMissingRecipeRows()) do
+        if row.missing.sourceLabel == "Trainer" then bare = bare + 1 end
+    end
+    -- Naming three of the thirty-two trainers who teach a recipe is worse
+    -- than naming none, so those rows stay unadorned.
+    Test.gte(bare, 1)
+end)
+
 io.write(string.format("Missing recipes: %d test(s) passed\n", Test.count))
