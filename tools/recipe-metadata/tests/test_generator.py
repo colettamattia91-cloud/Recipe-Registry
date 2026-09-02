@@ -20,6 +20,7 @@ from recipe_sources.wago_anniversary_provider import build_normalized_snapshot
 from recipe_pipeline.emit_lua import emit_lua
 from recipe_pipeline.normalize import summarize_source
 from recipe_sources.arl_source_provider import (
+    is_post_tbc,
     parse_custom_places,
     parse_lookup,
     parse_profession,
@@ -899,6 +900,62 @@ class ArlProviderTests(unittest.TestCase):
                                    parse_lookup(self.LOOKUP))
         self.assertTrue(summary["worldDrop"])
         self.assertEqual(summary["names"], [])
+
+
+class PostTbcNpcTests(unittest.TestCase):
+    """ARL covers later expansions than this project targets."""
+
+    def test_an_npc_numbered_past_the_end_of_tbc_is_rejected(self):
+        # Didi the Wrench, 29513, against a last TBC creature of 29095.
+        self.assertTrue(is_post_tbc(29513, "Dalaran"))
+        self.assertFalse(is_post_tbc(8126, "Tanaris"))
+
+    def test_a_northrend_zone_is_rejected_whatever_the_id(self):
+        # 87 of the offenders have ids inside TBC's range but stand in
+        # Northrend, so the id test alone would keep them.
+        self.assertTrue(is_post_tbc(26569, "Dragonblight"))
+        self.assertTrue(is_post_tbc(1, "Borean Tundra"))
+
+    def test_a_wotlk_npc_standing_in_a_tbc_zone_is_still_rejected(self):
+        # The Inscription trainers WotLK put in old cities: a zone test alone
+        # would keep every one of them.
+        self.assertTrue(is_post_tbc(33637, "Shattrath City"))
+        self.assertTrue(is_post_tbc(30717, "Ironforge"))
+        self.assertFalse(is_post_tbc(340, "Stormwind City"))
+
+    def test_tbc_dalaran_is_treated_as_the_northrend_one(self):
+        # TBC has a Dalaran, the ruined bubble over Alterac, but nobody in it
+        # teaches or sells a recipe -- every ARL entry there is the later city.
+        self.assertTrue(is_post_tbc(100, "Dalaran"))
+
+
+class ArlDroppedNpcTests(unittest.TestCase):
+    """A later-expansion trainer must not count towards the naming cap."""
+
+    PROFESSION = """
+        AddRecipe(8895, 1, 1, Q.COMMON, V.ORIG, 1, 1, 1, 1)
+        self:AddRecipeFlags(8895, F.ALLIANCE, F.HORDE, F.TRAINER)
+        self:AddRecipeTrainer(8895, 8126, 29513)
+    """
+    LOOKUP = """
+        self:addLookupList(DB, 8126, L["Nixx Sprocketspring"], BZ["Tanaris"], 52.5, 27.3, 0)
+        self:addLookupList(DB, 29513, L["Didi the Wrench"], BZ["Dalaran"], 39.5, 25.5, 0)
+    """
+
+    def test_the_later_trainer_is_dropped_and_the_tbc_one_named(self):
+        lookups = {"Trainer": parse_lookup(self.LOOKUP)}
+        summary = summarize_recipe(parse_profession(self.PROFESSION)[8895], lookups)
+        self.assertEqual(summary["names"], ["Nixx Sprocketspring"])
+        self.assertEqual(summary["zones"], ["Tanaris"])
+
+    def test_dropping_it_also_takes_it_out_of_the_naming_cap(self):
+        # Two trainers listed, one of them not in this expansion: with a cap of
+        # one, counting the dropped one would blank the name of the one that
+        # does exist.
+        lookups = {"Trainer": parse_lookup(self.LOOKUP)}
+        summary = summarize_recipe(parse_profession(self.PROFESSION)[8895],
+                                   lookups, max_names=1)
+        self.assertEqual(summary["names"], ["Nixx Sprocketspring"])
 
 
 class ArlGenericAcquireTests(unittest.TestCase):

@@ -344,27 +344,23 @@
       "kind": "trainer",
       "names": [
         "Peter Galen",
-        "Thorkaf Dragoneye",
-        "Andellion"
+        "Thorkaf Dragoneye"
       ],
       "worldDrop": false,
       "zones": [
         "Azshara",
-        "Badlands",
-        "Dalaran"
+        "Badlands"
       ]
     },
     "10621": {
       "faction": "both",
       "kind": "trainer",
       "names": [
-        "Namha Moonwater",
         "Caryssia Moonhunter",
         "Se'Jib"
       ],
       "worldDrop": false,
       "zones": [
-        "Dalaran",
         "Feralas",
         "Stranglethorn Vale"
       ]
@@ -374,13 +370,11 @@
       "kind": "trainer",
       "names": [
         "Brumn Winterhoof",
-        "Manfred Staller",
         "Sarah Tanner"
       ],
       "worldDrop": false,
       "zones": [
         "Arathi Highlands",
-        "Dalaran",
         "Searing Gorge"
       ]
     },
@@ -389,13 +383,11 @@
       "kind": "trainer",
       "names": [
         "Brumn Winterhoof",
-        "Manfred Staller",
         "Sarah Tanner"
       ],
       "worldDrop": false,
       "zones": [
         "Arathi Highlands",
-        "Dalaran",
         "Searing Gorge"
       ]
     },
@@ -403,13 +395,11 @@
       "faction": "both",
       "kind": "trainer",
       "names": [
-        "Namha Moonwater",
         "Caryssia Moonhunter",
         "Se'Jib"
       ],
       "worldDrop": false,
       "zones": [
-        "Dalaran",
         "Feralas",
         "Stranglethorn Vale"
       ]
@@ -419,14 +409,12 @@
       "kind": "trainer",
       "names": [
         "Peter Galen",
-        "Thorkaf Dragoneye",
-        "Andellion"
+        "Thorkaf Dragoneye"
       ],
       "worldDrop": false,
       "zones": [
         "Azshara",
-        "Badlands",
-        "Dalaran"
+        "Badlands"
       ]
     },
     "11448": {
@@ -1215,13 +1203,11 @@
       "faction": "both",
       "kind": "trainer",
       "names": [
-        "Nixx Sprocketspring",
-        "Didi the Wrench"
+        "Nixx Sprocketspring"
       ],
       "worldDrop": false,
       "zones": [
-        "Tanaris",
-        "Dalaran"
+        "Tanaris"
       ]
     },
     "12716": {
@@ -1229,13 +1215,11 @@
       "kind": "trainer",
       "names": [
         "Vazario Linkgrease",
-        "Didi the Wrench",
         "Nixx Sprocketspring"
       ],
       "worldDrop": false,
       "zones": [
         "The Barrens",
-        "Dalaran",
         "Tanaris"
       ]
     },
@@ -1244,13 +1228,11 @@
       "kind": "trainer",
       "names": [
         "Vazario Linkgrease",
-        "Didi the Wrench",
         "Nixx Sprocketspring"
       ],
       "worldDrop": false,
       "zones": [
         "The Barrens",
-        "Dalaran",
         "Tanaris"
       ]
     },
@@ -1259,13 +1241,11 @@
       "kind": "trainer",
       "names": [
         "Vazario Linkgrease",
-        "Didi the Wrench",
         "Nixx Sprocketspring"
       ],
       "worldDrop": false,
       "zones": [
         "The Barrens",
-        "Dalaran",
         "Tanaris"
       ]
     },
@@ -1274,13 +1254,11 @@
       "kind": "trainer",
       "names": [
         "Vazario Linkgrease",
-        "Didi the Wrench",
         "Nixx Sprocketspring"
       ],
       "worldDrop": false,
       "zones": [
         "The Barrens",
-        "Dalaran",
         "Tanaris"
       ]
     },
@@ -1289,13 +1267,11 @@
       "kind": "trainer",
       "names": [
         "Vazario Linkgrease",
-        "Didi the Wrench",
         "Nixx Sprocketspring"
       ],
       "worldDrop": false,
       "zones": [
         "The Barrens",
-        "Dalaran",
         "Tanaris"
       ]
     },
@@ -1304,13 +1280,11 @@
       "kind": "trainer",
       "names": [
         "Vazario Linkgrease",
-        "Didi the Wrench",
         "Nixx Sprocketspring"
       ],
       "worldDrop": false,
       "zones": [
         "The Barrens",
-        "Dalaran",
         "Tanaris"
       ]
     },
@@ -1319,27 +1293,23 @@
       "kind": "trainer",
       "names": [
         "Tinkmaster Overspark",
-        "Oglethorpe Obnoticus",
-        "Findle Whistlesteam"
+        "Oglethorpe Obnoticus"
       ],
       "worldDrop": false,
       "zones": [
         "Ironforge",
-        "Stranglethorn Vale",
-        "Dalaran"
+        "Stranglethorn Vale"
       ]
     },
     "12760": {
       "faction": "both",
       "kind": "trainer",
       "names": [
-        "Nixx Sprocketspring",
-        "Didi the Wrench"
+        "Nixx Sprocketspring"
       ],
       "worldDrop": false,
       "zones": [
-        "Tanaris",
-        "Dalaran"
+        "Tanaris"
       ]
     },
     "12895": {
@@ -1347,14 +1317,12 @@
       "kind": "trainer",
       "names": [
         "Tinkmaster Overspark",
-        "Oglethorpe Obnoticus",
-        "Findle Whistlesteam"
+        "Oglethorpe Obnoticus"
       ],
       "worldDrop": false,
       "zones": [
         "Ironforge",
-        "Stranglethorn Vale",
-        "Dalaran"
+        "Stranglethorn Vale"
       ]
     },
     "12897": {
@@ -1362,14 +1330,12 @@
       "kind": "trainer",
       "names": [
         "Tinkmaster Overspark",
-        "Oglethorpe Obnoticus",
-        "Findle Whistlesteam"
+        "Oglethorpe Obnoticus"
       ],
       "worldDrop": false,
       "zones": [
         "Ironforge",
-        "Stranglethorn Vale",
-        "Dalaran"
+        "Stranglethorn Vale"
       ]
     },
     "12899": {
@@ -1377,14 +1343,12 @@
       "kind": "trainer",
       "names": [
         "Tinkmaster Overspark",
-        "Oglethorpe Obnoticus",
-        "Findle Whistlesteam"
+        "Oglethorpe Obnoticus"
       ],
       "worldDrop": false,
       "zones": [
         "Ironforge",
-        "Stranglethorn Vale",
-        "Dalaran"
+        "Stranglethorn Vale"
       ]
     },
     "12902": {
@@ -1392,14 +1356,12 @@
       "kind": "trainer",
       "names": [
         "Tinkmaster Overspark",
-        "Oglethorpe Obnoticus",
-        "Findle Whistlesteam"
+        "Oglethorpe Obnoticus"
       ],
       "worldDrop": false,
       "zones": [
         "Ironforge",
-        "Stranglethorn Vale",
-        "Dalaran"
+        "Stranglethorn Vale"
       ]
     },
     "12903": {
@@ -1407,14 +1369,12 @@
       "kind": "trainer",
       "names": [
         "Tinkmaster Overspark",
-        "Oglethorpe Obnoticus",
-        "Findle Whistlesteam"
+        "Oglethorpe Obnoticus"
       ],
       "worldDrop": false,
       "zones": [
         "Ironforge",
-        "Stranglethorn Vale",
-        "Dalaran"
+        "Stranglethorn Vale"
       ]
     },
     "12905": {
@@ -1422,14 +1382,12 @@
       "kind": "trainer",
       "names": [
         "Tinkmaster Overspark",
-        "Oglethorpe Obnoticus",
-        "Findle Whistlesteam"
+        "Oglethorpe Obnoticus"
       ],
       "worldDrop": false,
       "zones": [
         "Ironforge",
-        "Stranglethorn Vale",
-        "Dalaran"
+        "Stranglethorn Vale"
       ]
     },
     "12906": {
@@ -1437,14 +1395,12 @@
       "kind": "trainer",
       "names": [
         "Tinkmaster Overspark",
-        "Oglethorpe Obnoticus",
-        "Findle Whistlesteam"
+        "Oglethorpe Obnoticus"
       ],
       "worldDrop": false,
       "zones": [
         "Ironforge",
-        "Stranglethorn Vale",
-        "Dalaran"
+        "Stranglethorn Vale"
       ]
     },
     "12907": {
@@ -1452,14 +1408,12 @@
       "kind": "trainer",
       "names": [
         "Tinkmaster Overspark",
-        "Oglethorpe Obnoticus",
-        "Findle Whistlesteam"
+        "Oglethorpe Obnoticus"
       ],
       "worldDrop": false,
       "zones": [
         "Ironforge",
-        "Stranglethorn Vale",
-        "Dalaran"
+        "Stranglethorn Vale"
       ]
     },
     "12908": {
@@ -1467,13 +1421,11 @@
       "kind": "trainer",
       "names": [
         "Vazario Linkgrease",
-        "Didi the Wrench",
         "Nixx Sprocketspring"
       ],
       "worldDrop": false,
       "zones": [
         "The Barrens",
-        "Dalaran",
         "Tanaris"
       ]
     },
@@ -6285,14 +6237,12 @@
       "kind": "trainer",
       "names": [
         "Peter Galen",
-        "Thorkaf Dragoneye",
-        "Andellion"
+        "Thorkaf Dragoneye"
       ],
       "worldDrop": false,
       "zones": [
         "Azshara",
-        "Badlands",
-        "Dalaran"
+        "Badlands"
       ]
     },
     "24655": {
@@ -6300,14 +6250,12 @@
       "kind": "trainer",
       "names": [
         "Peter Galen",
-        "Thorkaf Dragoneye",
-        "Andellion"
+        "Thorkaf Dragoneye"
       ],
       "worldDrop": false,
       "zones": [
         "Azshara",
-        "Badlands",
-        "Dalaran"
+        "Badlands"
       ]
     },
     "24703": {
@@ -6579,48 +6527,48 @@
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Ildine Sorrowspear",
         "Kania",
-        "Thaddeus Webb"
+        "Thaddeus Webb",
+        "Erilia"
       ],
       "worldDrop": false,
       "zones": [
-        "Dalaran",
         "Silithus",
         "Undercity",
-        "Eversong Woods"
+        "Eversong Woods",
+        "Silverpine Forest"
       ]
     },
     "25125": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Ildine Sorrowspear",
         "Kania",
-        "Thaddeus Webb"
+        "Thaddeus Webb",
+        "Erilia"
       ],
       "worldDrop": false,
       "zones": [
-        "Dalaran",
         "Silithus",
         "Undercity",
-        "Eversong Woods"
+        "Eversong Woods",
+        "Silverpine Forest"
       ]
     },
     "25126": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Ildine Sorrowspear",
         "Kania",
-        "Thaddeus Webb"
+        "Thaddeus Webb",
+        "Erilia"
       ],
       "worldDrop": false,
       "zones": [
-        "Dalaran",
         "Silithus",
         "Undercity",
-        "Eversong Woods"
+        "Eversong Woods",
+        "Silverpine Forest"
       ]
     },
     "25127": {
@@ -7416,16 +7364,26 @@
     "26745": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Dalinna",
+        "Hama"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula"
+      ]
     },
     "26746": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Dalinna",
+        "Hama"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula"
+      ]
     },
     "26747": {
       "faction": "both",
@@ -7481,205 +7439,204 @@
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Nasmara Moonsong",
-        "Ainderu Summerleaf"
+        "Nasmara Moonsong"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "26752": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Gidge Spellweaver",
-        "Lalla Brightweave"
+        "Gidge Spellweaver"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "26753": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Gidge Spellweaver",
-        "Lalla Brightweave"
+        "Gidge Spellweaver"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "26754": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Gidge Spellweaver",
-        "Lalla Brightweave"
+        "Gidge Spellweaver"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "26755": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Gidge Spellweaver",
-        "Lalla Brightweave"
+        "Gidge Spellweaver"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "26756": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Andrion Darkspinner",
-        "Linna Bruder"
+        "Andrion Darkspinner"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "26757": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Andrion Darkspinner",
-        "Linna Bruder"
+        "Andrion Darkspinner"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "26758": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Andrion Darkspinner",
-        "Linna Bruder"
+        "Andrion Darkspinner"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "26759": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Andrion Darkspinner",
-        "Linna Bruder"
+        "Andrion Darkspinner"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "26760": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Nasmara Moonsong",
-        "Ainderu Summerleaf"
+        "Nasmara Moonsong"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "26761": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Nasmara Moonsong",
-        "Ainderu Summerleaf"
+        "Nasmara Moonsong"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "26762": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Nasmara Moonsong",
-        "Ainderu Summerleaf"
+        "Nasmara Moonsong"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "26763": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Nasmara Moonsong",
-        "Ainderu Summerleaf"
+        "Nasmara Moonsong"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "26764": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Dalinna",
+        "Hama"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula"
+      ]
     },
     "26765": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Dalinna",
+        "Hama"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula"
+      ]
     },
     "26770": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Dalinna",
+        "Hama"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula"
+      ]
     },
     "26771": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Dalinna",
+        "Hama"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula"
+      ]
     },
     "26772": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Dalinna",
+        "Hama"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula"
+      ]
     },
     "26773": {
       "faction": "both",
@@ -8199,16 +8156,16 @@
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Ildine Sorrowspear",
         "Kania",
-        "Thaddeus Webb"
+        "Thaddeus Webb",
+        "Erilia"
       ],
       "worldDrop": false,
       "zones": [
-        "Dalaran",
         "Silithus",
         "Undercity",
-        "Eversong Woods"
+        "Eversong Woods",
+        "Silverpine Forest"
       ]
     },
     "27659": {
@@ -8992,16 +8949,30 @@
     "28544": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Alchemist Gribble",
+        "Lorokeem",
+        "Apothecary Antonivich"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shattrath City"
+      ]
     },
     "28545": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Alchemist Gribble",
+        "Lorokeem",
+        "Apothecary Antonivich"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shattrath City"
+      ]
     },
     "28546": {
       "faction": "both",
@@ -9038,9 +9009,16 @@
     "28551": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Alchemist Gribble",
+        "Lorokeem",
+        "Apothecary Antonivich"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shattrath City"
+      ]
     },
     "28552": {
       "faction": "both",
@@ -9615,121 +9593,230 @@
     "29356": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Hurnak Grimmord",
+        "Krugosh"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula"
+      ]
     },
     "29358": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Hurnak Grimmord",
+        "Krugosh"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula"
+      ]
     },
     "29359": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Hurnak Grimmord",
+        "Krugosh"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula"
+      ]
     },
     "29360": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Hurnak Grimmord",
+        "Krugosh"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula"
+      ]
     },
     "29361": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Hurnak Grimmord",
+        "Krugosh"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula"
+      ]
     },
     "29545": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Humphry",
+        "Rohok",
+        "Grutah"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shadowmoon Valley"
+      ]
     },
     "29547": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Humphry",
+        "Rohok",
+        "Grutah"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shadowmoon Valley"
+      ]
     },
     "29548": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Humphry",
+        "Rohok",
+        "Grutah"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shadowmoon Valley"
+      ]
     },
     "29549": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Humphry",
+        "Rohok",
+        "Grutah"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shadowmoon Valley"
+      ]
     },
     "29550": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Humphry",
+        "Rohok",
+        "Grutah"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shadowmoon Valley"
+      ]
     },
     "29551": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Humphry",
+        "Rohok",
+        "Grutah"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shadowmoon Valley"
+      ]
     },
     "29552": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Humphry",
+        "Rohok",
+        "Grutah"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shadowmoon Valley"
+      ]
     },
     "29553": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Humphry",
+        "Rohok",
+        "Grutah"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shadowmoon Valley"
+      ]
     },
     "29556": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Humphry",
+        "Rohok",
+        "Grutah"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shadowmoon Valley"
+      ]
     },
     "29557": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Humphry",
+        "Rohok",
+        "Grutah"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shadowmoon Valley"
+      ]
     },
     "29558": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Humphry",
+        "Rohok",
+        "Grutah"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shadowmoon Valley"
+      ]
     },
     "29565": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Humphry",
+        "Rohok",
+        "Grutah"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shadowmoon Valley"
+      ]
     },
     "29566": {
       "faction": "both",
@@ -10065,9 +10152,16 @@
     "29654": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Humphry",
+        "Rohok",
+        "Grutah"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shadowmoon Valley"
+      ]
     },
     "29656": {
       "faction": "both",
@@ -10151,9 +10245,14 @@
     "29686": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Hurnak Grimmord",
+        "Krugosh"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula"
+      ]
     },
     "29688": {
       "faction": "both",
@@ -10512,13 +10611,9 @@
     "30349": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Bryan Landers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "30547": {
       "faction": "both",
@@ -10580,13 +10675,11 @@
       "kind": "trainer",
       "names": [
         "Vazario Linkgrease",
-        "Didi the Wrench",
         "Nixx Sprocketspring"
       ],
       "worldDrop": false,
       "zones": [
         "The Barrens",
-        "Dalaran",
         "Tanaris"
       ]
     },
@@ -10595,13 +10688,11 @@
       "kind": "trainer",
       "names": [
         "Vazario Linkgrease",
-        "Didi the Wrench",
         "Nixx Sprocketspring"
       ],
       "worldDrop": false,
       "zones": [
         "The Barrens",
-        "Dalaran",
         "Tanaris"
       ]
     },
@@ -10610,13 +10701,11 @@
       "kind": "trainer",
       "names": [
         "Vazario Linkgrease",
-        "Didi the Wrench",
         "Nixx Sprocketspring"
       ],
       "worldDrop": false,
       "zones": [
         "The Barrens",
-        "Dalaran",
         "Tanaris"
       ]
     },
@@ -10625,13 +10714,11 @@
       "kind": "trainer",
       "names": [
         "Vazario Linkgrease",
-        "Didi the Wrench",
         "Nixx Sprocketspring"
       ],
       "worldDrop": false,
       "zones": [
         "The Barrens",
-        "Dalaran",
         "Tanaris"
       ]
     },
@@ -10640,13 +10727,11 @@
       "kind": "trainer",
       "names": [
         "Vazario Linkgrease",
-        "Didi the Wrench",
         "Nixx Sprocketspring"
       ],
       "worldDrop": false,
       "zones": [
         "The Barrens",
-        "Dalaran",
         "Tanaris"
       ]
     },
@@ -10655,14 +10740,12 @@
       "kind": "trainer",
       "names": [
         "Tinkmaster Overspark",
-        "Oglethorpe Obnoticus",
-        "Findle Whistlesteam"
+        "Oglethorpe Obnoticus"
       ],
       "worldDrop": false,
       "zones": [
         "Ironforge",
-        "Stranglethorn Vale",
-        "Dalaran"
+        "Stranglethorn Vale"
       ]
     },
     "30569": {
@@ -10670,14 +10753,12 @@
       "kind": "trainer",
       "names": [
         "Tinkmaster Overspark",
-        "Oglethorpe Obnoticus",
-        "Findle Whistlesteam"
+        "Oglethorpe Obnoticus"
       ],
       "worldDrop": false,
       "zones": [
         "Ironforge",
-        "Stranglethorn Vale",
-        "Dalaran"
+        "Stranglethorn Vale"
       ]
     },
     "30570": {
@@ -10685,14 +10766,12 @@
       "kind": "trainer",
       "names": [
         "Tinkmaster Overspark",
-        "Oglethorpe Obnoticus",
-        "Findle Whistlesteam"
+        "Oglethorpe Obnoticus"
       ],
       "worldDrop": false,
       "zones": [
         "Ironforge",
-        "Stranglethorn Vale",
-        "Dalaran"
+        "Stranglethorn Vale"
       ]
     },
     "30574": {
@@ -10700,14 +10779,12 @@
       "kind": "trainer",
       "names": [
         "Tinkmaster Overspark",
-        "Oglethorpe Obnoticus",
-        "Findle Whistlesteam"
+        "Oglethorpe Obnoticus"
       ],
       "worldDrop": false,
       "zones": [
         "Ironforge",
-        "Stranglethorn Vale",
-        "Dalaran"
+        "Stranglethorn Vale"
       ]
     },
     "30575": {
@@ -10715,14 +10792,12 @@
       "kind": "trainer",
       "names": [
         "Tinkmaster Overspark",
-        "Oglethorpe Obnoticus",
-        "Findle Whistlesteam"
+        "Oglethorpe Obnoticus"
       ],
       "worldDrop": false,
       "zones": [
         "Ironforge",
-        "Stranglethorn Vale",
-        "Dalaran"
+        "Stranglethorn Vale"
       ]
     },
     "31048": {
@@ -11262,13 +11337,11 @@
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Gidge Spellweaver",
-        "Lalla Brightweave"
+        "Gidge Spellweaver"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "31430": {
@@ -11489,9 +11562,14 @@
     "31460": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Dalinna",
+        "Hama"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula"
+      ]
     },
     "3170": {
       "faction": "both",
@@ -11580,9 +11658,16 @@
     "32284": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Humphry",
+        "Rohok",
+        "Grutah"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shadowmoon Valley"
+      ]
     },
     "32285": {
       "faction": "both",
@@ -11979,9 +12064,16 @@
     "32655": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Humphry",
+        "Rohok",
+        "Grutah"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shadowmoon Valley"
+      ]
     },
     "32656": {
       "faction": "both",
@@ -12583,37 +12675,72 @@
     "33732": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Alchemist Gribble",
+        "Lorokeem",
+        "Apothecary Antonivich"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shattrath City"
+      ]
     },
     "33733": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Alchemist Gribble",
+        "Lorokeem",
+        "Apothecary Antonivich"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shattrath City"
+      ]
     },
     "33738": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Alchemist Gribble",
+        "Lorokeem",
+        "Apothecary Antonivich"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shattrath City"
+      ]
     },
     "33740": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Alchemist Gribble",
+        "Lorokeem",
+        "Apothecary Antonivich"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shattrath City"
+      ]
     },
     "33741": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Alchemist Gribble",
+        "Lorokeem",
+        "Apothecary Antonivich"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shattrath City"
+      ]
     },
     "3376": {
       "faction": "both",
@@ -13055,9 +13182,16 @@
     "34607": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Humphry",
+        "Rohok",
+        "Grutah"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shadowmoon Valley"
+      ]
     },
     "34608": {
       "faction": "both",
@@ -13202,9 +13336,16 @@
     "34983": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Humphry",
+        "Rohok",
+        "Grutah"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shadowmoon Valley"
+      ]
     },
     "3500": {
       "faction": "both",
@@ -13695,14 +13836,12 @@
       "kind": "trainer",
       "names": [
         "Peter Galen",
-        "Thorkaf Dragoneye",
-        "Andellion"
+        "Thorkaf Dragoneye"
       ],
       "worldDrop": false,
       "zones": [
         "Azshara",
-        "Badlands",
-        "Dalaran"
+        "Badlands"
       ]
     },
     "35576": {
@@ -13710,14 +13849,12 @@
       "kind": "trainer",
       "names": [
         "Peter Galen",
-        "Thorkaf Dragoneye",
-        "Andellion"
+        "Thorkaf Dragoneye"
       ],
       "worldDrop": false,
       "zones": [
         "Azshara",
-        "Badlands",
-        "Dalaran"
+        "Badlands"
       ]
     },
     "35577": {
@@ -13725,14 +13862,12 @@
       "kind": "trainer",
       "names": [
         "Peter Galen",
-        "Thorkaf Dragoneye",
-        "Andellion"
+        "Thorkaf Dragoneye"
       ],
       "worldDrop": false,
       "zones": [
         "Azshara",
-        "Badlands",
-        "Dalaran"
+        "Badlands"
       ]
     },
     "35580": {
@@ -13740,14 +13875,12 @@
       "kind": "trainer",
       "names": [
         "Peter Galen",
-        "Thorkaf Dragoneye",
-        "Andellion"
+        "Thorkaf Dragoneye"
       ],
       "worldDrop": false,
       "zones": [
         "Azshara",
-        "Badlands",
-        "Dalaran"
+        "Badlands"
       ]
     },
     "35582": {
@@ -13755,14 +13888,12 @@
       "kind": "trainer",
       "names": [
         "Peter Galen",
-        "Thorkaf Dragoneye",
-        "Andellion"
+        "Thorkaf Dragoneye"
       ],
       "worldDrop": false,
       "zones": [
         "Azshara",
-        "Badlands",
-        "Dalaran"
+        "Badlands"
       ]
     },
     "35584": {
@@ -13770,27 +13901,23 @@
       "kind": "trainer",
       "names": [
         "Peter Galen",
-        "Thorkaf Dragoneye",
-        "Andellion"
+        "Thorkaf Dragoneye"
       ],
       "worldDrop": false,
       "zones": [
         "Azshara",
-        "Badlands",
-        "Dalaran"
+        "Badlands"
       ]
     },
     "35585": {
       "faction": "both",
       "kind": "trainer",
       "names": [
-        "Namha Moonwater",
         "Caryssia Moonhunter",
         "Se'Jib"
       ],
       "worldDrop": false,
       "zones": [
-        "Dalaran",
         "Feralas",
         "Stranglethorn Vale"
       ]
@@ -13799,13 +13926,11 @@
       "faction": "both",
       "kind": "trainer",
       "names": [
-        "Namha Moonwater",
         "Caryssia Moonhunter",
         "Se'Jib"
       ],
       "worldDrop": false,
       "zones": [
-        "Dalaran",
         "Feralas",
         "Stranglethorn Vale"
       ]
@@ -13814,13 +13939,11 @@
       "faction": "both",
       "kind": "trainer",
       "names": [
-        "Namha Moonwater",
         "Caryssia Moonhunter",
         "Se'Jib"
       ],
       "worldDrop": false,
       "zones": [
-        "Dalaran",
         "Feralas",
         "Stranglethorn Vale"
       ]
@@ -13830,13 +13953,11 @@
       "kind": "trainer",
       "names": [
         "Brumn Winterhoof",
-        "Manfred Staller",
         "Sarah Tanner"
       ],
       "worldDrop": false,
       "zones": [
         "Arathi Highlands",
-        "Dalaran",
         "Searing Gorge"
       ]
     },
@@ -13845,13 +13966,11 @@
       "kind": "trainer",
       "names": [
         "Brumn Winterhoof",
-        "Manfred Staller",
         "Sarah Tanner"
       ],
       "worldDrop": false,
       "zones": [
         "Arathi Highlands",
-        "Dalaran",
         "Searing Gorge"
       ]
     },
@@ -13860,13 +13979,11 @@
       "kind": "trainer",
       "names": [
         "Brumn Winterhoof",
-        "Manfred Staller",
         "Sarah Tanner"
       ],
       "worldDrop": false,
       "zones": [
         "Arathi Highlands",
-        "Dalaran",
         "Searing Gorge"
       ]
     },
@@ -13880,29 +13997,37 @@
     "35750": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Hurnak Grimmord",
+        "Krugosh"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula"
+      ]
     },
     "35751": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Hurnak Grimmord",
+        "Krugosh"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula"
+      ]
     },
     "36074": {
       "faction": "both",
       "kind": "trainer",
       "names": [
         "Brumn Winterhoof",
-        "Manfred Staller",
         "Sarah Tanner"
       ],
       "worldDrop": false,
       "zones": [
         "Arathi Highlands",
-        "Dalaran",
         "Searing Gorge"
       ]
     },
@@ -13910,13 +14035,11 @@
       "faction": "both",
       "kind": "trainer",
       "names": [
-        "Namha Moonwater",
         "Caryssia Moonhunter",
         "Se'Jib"
       ],
       "worldDrop": false,
       "zones": [
-        "Dalaran",
         "Feralas",
         "Stranglethorn Vale"
       ]
@@ -13926,14 +14049,12 @@
       "kind": "trainer",
       "names": [
         "Peter Galen",
-        "Thorkaf Dragoneye",
-        "Andellion"
+        "Thorkaf Dragoneye"
       ],
       "worldDrop": false,
       "zones": [
         "Azshara",
-        "Badlands",
-        "Dalaran"
+        "Badlands"
       ]
     },
     "36077": {
@@ -13941,13 +14062,11 @@
       "kind": "trainer",
       "names": [
         "Brumn Winterhoof",
-        "Manfred Staller",
         "Sarah Tanner"
       ],
       "worldDrop": false,
       "zones": [
         "Arathi Highlands",
-        "Dalaran",
         "Searing Gorge"
       ]
     },
@@ -13955,13 +14074,11 @@
       "faction": "both",
       "kind": "trainer",
       "names": [
-        "Namha Moonwater",
         "Caryssia Moonhunter",
         "Se'Jib"
       ],
       "worldDrop": false,
       "zones": [
-        "Dalaran",
         "Feralas",
         "Stranglethorn Vale"
       ]
@@ -13971,14 +14088,12 @@
       "kind": "trainer",
       "names": [
         "Peter Galen",
-        "Thorkaf Dragoneye",
-        "Andellion"
+        "Thorkaf Dragoneye"
       ],
       "worldDrop": false,
       "zones": [
         "Azshara",
-        "Badlands",
-        "Dalaran"
+        "Badlands"
       ]
     },
     "36122": {
@@ -14331,13 +14446,11 @@
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Andrion Darkspinner",
-        "Linna Bruder"
+        "Andrion Darkspinner"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "36954": {
@@ -14640,9 +14753,16 @@
     "38070": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Alchemist Gribble",
+        "Lorokeem",
+        "Apothecary Antonivich"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shattrath City"
+      ]
     },
     "3813": {
       "faction": "both",
@@ -15477,9 +15597,16 @@
     "39636": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Alchemist Gribble",
+        "Lorokeem",
+        "Apothecary Antonivich"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shattrath City"
+      ]
     },
     "39637": {
       "faction": "both",
@@ -15495,9 +15622,16 @@
     "39638": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Alchemist Gribble",
+        "Lorokeem",
+        "Apothecary Antonivich"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shattrath City"
+      ]
     },
     "39639": {
       "faction": "both",
@@ -16917,8 +17051,7 @@
       "names": [],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "43761": {
@@ -16954,8 +17087,7 @@
       "names": [],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "43846": {
@@ -16968,9 +17100,14 @@
     "44155": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Jonathan Garrett",
+        "Niobe Whizzlespark"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Shadowmoon Valley"
+      ]
     },
     "44157": {
       "faction": "both",
@@ -17031,13 +17168,9 @@
     "44483": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Damned Apothecary"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "44484": {
       "faction": "both",
@@ -17070,13 +17203,9 @@
     "44494": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Cult Alchemist"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "44500": {
       "faction": "both",
@@ -17123,13 +17252,9 @@
     "44524": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "44528": {
       "faction": "both",
@@ -17155,35 +17280,23 @@
     "44556": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Skeletal Runesmith"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "44575": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "44576": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "44582": {
       "faction": "both",
@@ -17202,13 +17315,9 @@
     "44588": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "44589": {
       "faction": "both",
@@ -17220,24 +17329,16 @@
     "44590": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Cultist Shard Watcher"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "44591": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "44592": {
       "faction": "both",
@@ -17256,25 +17357,16 @@
     "44595": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "44596": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Frostbrood Spawn",
-        "Cult Researcher"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "44598": {
       "faction": "both",
@@ -17293,13 +17385,9 @@
     "44621": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "44623": {
       "faction": "both",
@@ -17311,13 +17399,9 @@
     "44625": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "44629": {
       "faction": "both",
@@ -17336,13 +17420,9 @@
     "44631": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "44633": {
       "faction": "both",
@@ -17460,9 +17540,16 @@
     "45061": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Alchemist Gribble",
+        "Lorokeem",
+        "Apothecary Antonivich"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Hellfire Peninsula",
+        "Shattrath City"
+      ]
     },
     "4508": {
       "faction": "horde",
@@ -17538,72 +17625,37 @@
     "45555": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "45556": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "45557": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "45558": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "45559": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "45560": {
       "faction": "both",
@@ -17657,30 +17709,16 @@
     "45567": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "45568": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "45569": {
       "faction": "both",
@@ -17692,30 +17730,16 @@
     "45570": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "45571": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "45695": {
       "faction": "both",
@@ -17723,8 +17747,7 @@
       "names": [],
       "worldDrop": false,
       "zones": [
-        "Terokkar Forest",
-        "Dalaran"
+        "Terokkar Forest"
       ]
     },
     "45765": {
@@ -18349,13 +18372,9 @@
     "47672": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "47766": {
       "faction": "both",
@@ -18367,24 +18386,16 @@
     "47898": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "47899": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "47900": {
       "faction": "both",
@@ -18396,13 +18407,9 @@
     "47901": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "48789": {
       "faction": "both",
@@ -18704,26 +18711,16 @@
     "50970": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tanaika",
-        "Sairuk"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Howling Fjord",
-        "Dragonblight"
-      ]
+      "zones": []
     },
     "50971": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Lillehoff"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "The Storm Peaks"
-      ]
+      "zones": []
     },
     "51568": {
       "faction": "both",
@@ -18827,9 +18824,7 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "53281": {
       "faction": "both",
@@ -18932,15 +18927,9 @@
     "53830": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53831": {
       "faction": "both",
@@ -19092,15 +19081,9 @@
     "53857": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Captain O'Neal",
-        "Lady Palanseer"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Stormwind City",
-        "Orgrimmar"
-      ]
+      "zones": []
     },
     "53859": {
       "faction": "both",
@@ -19147,15 +19130,9 @@
     "53865": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Captain O'Neal",
-        "Lady Palanseer"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Stormwind City",
-        "Orgrimmar"
-      ]
+      "zones": []
     },
     "53866": {
       "faction": "both",
@@ -19181,15 +19158,9 @@
     "53869": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tanaika",
-        "Sairuk"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Howling Fjord",
-        "Dragonblight"
-      ]
+      "zones": []
     },
     "53870": {
       "faction": "both",
@@ -19229,15 +19200,9 @@
     "53875": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Captain O'Neal",
-        "Lady Palanseer"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Stormwind City",
-        "Orgrimmar"
-      ]
+      "zones": []
     },
     "53876": {
       "faction": "both",
@@ -19249,13 +19214,9 @@
     "53877": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Duchess Mynx"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53878": {
       "faction": "both",
@@ -19267,15 +19228,9 @@
     "53879": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Captain O'Neal",
-        "Lady Palanseer"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Stormwind City",
-        "Orgrimmar"
-      ]
+      "zones": []
     },
     "53880": {
       "faction": "both",
@@ -19308,26 +19263,16 @@
     "53884": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Captain O'Neal",
-        "Lady Palanseer"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Stormwind City",
-        "Orgrimmar"
-      ]
+      "zones": []
     },
     "53885": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tanak"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Sholazar Basin"
-      ]
+      "zones": []
     },
     "53886": {
       "faction": "both",
@@ -19346,15 +19291,9 @@
     "53888": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Captain O'Neal",
-        "Lady Palanseer"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Stormwind City",
-        "Orgrimmar"
-      ]
+      "zones": []
     },
     "53889": {
       "faction": "both",
@@ -19471,13 +19410,9 @@
     "53917": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Geen"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Sholazar Basin"
-      ]
+      "zones": []
     },
     "53918": {
       "faction": "both",
@@ -19489,15 +19424,9 @@
     "53919": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Captain O'Neal",
-        "Lady Palanseer"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Stormwind City",
-        "Orgrimmar"
-      ]
+      "zones": []
     },
     "53920": {
       "faction": "both",
@@ -19509,15 +19438,9 @@
     "53921": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tanaika",
-        "Sairuk"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Howling Fjord",
-        "Dragonblight"
-      ]
+      "zones": []
     },
     "53922": {
       "faction": "both",
@@ -19536,15 +19459,9 @@
     "53924": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Captain O'Neal",
-        "Lady Palanseer"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Stormwind City",
-        "Orgrimmar"
-      ]
+      "zones": []
     },
     "53925": {
       "faction": "both",
@@ -19577,15 +19494,9 @@
     "53929": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Captain O'Neal",
-        "Lady Palanseer"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Stormwind City",
-        "Orgrimmar"
-      ]
+      "zones": []
     },
     "53930": {
       "faction": "both",
@@ -19604,28 +19515,16 @@
     "53932": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Captain O'Neal",
-        "Lady Palanseer"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Stormwind City",
-        "Orgrimmar"
-      ]
+      "zones": []
     },
     "53933": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Captain O'Neal",
-        "Lady Palanseer"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Stormwind City",
-        "Orgrimmar"
-      ]
+      "zones": []
     },
     "53934": {
       "faction": "both",
@@ -19637,47 +19536,30 @@
     "53936": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Cult Researcher",
-        "Frostbrood Spawn"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53937": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Damned Apothecary"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53938": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Cultist Shard Watcher"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53939": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Skeletal Runesmith"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53940": {
       "faction": "both",
@@ -19696,50 +19578,30 @@
     "53942": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Cult Alchemist"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53943": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Captain O'Neal",
-        "Lady Palanseer"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Stormwind City",
-        "Orgrimmar"
-      ]
+      "zones": []
     },
     "53945": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53946": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Archmage Alvareaux"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "53947": {
       "faction": "both",
@@ -19751,63 +19613,37 @@
     "53948": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53949": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53950": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Nascent Val'kyr"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "The Storm Peaks"
-      ]
+      "zones": []
     },
     "53951": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Herald Volazj"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Ahn'kahet: The Old Kingdom"
-      ]
+      "zones": []
     },
     "53952": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53953": {
       "faction": "both",
@@ -19819,28 +19655,16 @@
     "53954": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53955": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Stone Guard Mukar",
-        "Knight Dameron",
-        "Morgan Day"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Wintergrasp"
-      ]
+      "zones": []
     },
     "53956": {
       "faction": "both",
@@ -19852,63 +19676,37 @@
     "53957": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Lillehoff"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "The Storm Peaks"
-      ]
+      "zones": []
     },
     "53958": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53959": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Cyanigosa"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "The Violet Hold"
-      ]
+      "zones": []
     },
     "53960": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Stone Guard Mukar",
-        "Knight Dameron",
-        "Morgan Day"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Wintergrasp"
-      ]
+      "zones": []
     },
     "53961": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53962": {
       "faction": "both",
@@ -19920,15 +19718,9 @@
     "53963": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53964": {
       "faction": "both",
@@ -19940,13 +19732,9 @@
     "53965": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Duchess Mynx"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53966": {
       "faction": "both",
@@ -19958,28 +19746,16 @@
     "53967": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53968": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Stone Guard Mukar",
-        "Knight Dameron",
-        "Morgan Day"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Wintergrasp"
-      ]
+      "zones": []
     },
     "53969": {
       "faction": "both",
@@ -19991,63 +19767,37 @@
     "53970": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Anub'arak"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Azjol-Nerub"
-      ]
+      "zones": []
     },
     "53971": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53972": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Stormforged Ambusher",
-        "Stormforged Champion",
-        "Stormforged Infiltrator"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "The Storm Peaks"
-      ]
+      "zones": []
     },
     "53973": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53974": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Veteran Crusader Aliocha Segard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53975": {
       "faction": "both",
@@ -20073,139 +19823,79 @@
     "53978": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Stone Guard Mukar",
-        "Knight Dameron",
-        "Morgan Day"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Wintergrasp"
-      ]
+      "zones": []
     },
     "53979": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Keristrasza"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "The Nexus"
-      ]
+      "zones": []
     },
     "53980": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53981": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Stone Guard Mukar",
-        "Knight Dameron",
-        "Morgan Day"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Wintergrasp"
-      ]
+      "zones": []
     },
     "53982": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Sjonnir The Ironshaper"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Halls of Stone"
-      ]
+      "zones": []
     },
     "53983": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53984": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53985": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53986": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Stone Guard Mukar",
-        "Knight Dameron",
-        "Morgan Day"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Wintergrasp"
-      ]
+      "zones": []
     },
     "53987": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53988": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Duchess Mynx"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53989": {
       "faction": "both",
@@ -20217,28 +19907,16 @@
     "53990": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Stone Guard Mukar",
-        "Knight Dameron",
-        "Morgan Day"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Wintergrasp"
-      ]
+      "zones": []
     },
     "53991": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53992": {
       "faction": "both",
@@ -20250,115 +19928,65 @@
     "53993": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Cielstrasza"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dragonblight"
-      ]
+      "zones": []
     },
     "53994": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Stoic Mammoth",
-        "Shattertusk Mammoth",
-        "Ironwool Mammoth"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "The Storm Peaks",
-        "Sholazar Basin",
-        "Zul'Drak"
-      ]
+      "zones": []
     },
     "53995": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "The Prophet Tharon'ja"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Drak'Tharon Keep"
-      ]
+      "zones": []
     },
     "53996": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tanak"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Sholazar Basin"
-      ]
+      "zones": []
     },
     "53997": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "53998": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "54000": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Stone Guard Mukar",
-        "Knight Dameron",
-        "Morgan Day"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Wintergrasp"
-      ]
+      "zones": []
     },
     "54001": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "54002": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "54003": {
       "faction": "both",
@@ -20377,28 +20005,16 @@
     "54005": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Stone Guard Mukar",
-        "Knight Dameron",
-        "Morgan Day"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Wintergrasp"
-      ]
+      "zones": []
     },
     "54006": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "54007": {
       "faction": "both",
@@ -20410,90 +20026,51 @@
     "54008": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Geen"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Sholazar Basin"
-      ]
+      "zones": []
     },
     "54009": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "54010": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Stone Guard Mukar",
-        "Knight Dameron",
-        "Morgan Day"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Wintergrasp"
-      ]
+      "zones": []
     },
     "54011": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "54012": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Frostfeather Screecher",
-        "Frostfeather Witch"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "The Storm Peaks"
-      ]
+      "zones": []
     },
     "54013": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Stone Guard Mukar",
-        "Knight Dameron",
-        "Morgan Day"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Wintergrasp"
-      ]
+      "zones": []
     },
     "54014": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Stone Guard Mukar",
-        "Knight Dameron",
-        "Morgan Day"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Wintergrasp"
-      ]
+      "zones": []
     },
     "54017": {
       "faction": "both",
@@ -20505,13 +20082,9 @@
     "54019": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Ingvar the Plunderer"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Utgarde Keep"
-      ]
+      "zones": []
     },
     "54023": {
       "faction": "both",
@@ -20698,46 +20271,30 @@
     "54978": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Onslaught Mason"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dragonblight"
-      ]
+      "zones": []
     },
     "54979": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Iron Rune-Shaper"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Grizzly Hills"
-      ]
+      "zones": []
     },
     "54980": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Gundrak Savage"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Zul'Drak"
-      ]
+      "zones": []
     },
     "54981": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Venture Co. Excavator"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Sholazar Basin"
-      ]
+      "zones": []
     },
     "54998": {
       "faction": "both",
@@ -20861,37 +20418,77 @@
     "55183": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Ironus Coldsteel",
+        "Borgosh Corebender",
+        "Kradu Grimblade"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Orgrimmar",
+        "Shattrath City"
+      ]
     },
     "55184": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Ironus Coldsteel",
+        "Borgosh Corebender",
+        "Kradu Grimblade"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Orgrimmar",
+        "Shattrath City"
+      ]
     },
     "55185": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Ironus Coldsteel",
+        "Borgosh Corebender",
+        "Kradu Grimblade"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Orgrimmar",
+        "Shattrath City"
+      ]
     },
     "55186": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Grumnus Steelshaper",
+        "Okothos Ironrager",
+        "Zula Slagfury"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Orgrimmar",
+        "Shattrath City"
+      ]
     },
     "55187": {
       "faction": "both",
       "kind": "trainer",
-      "names": [],
+      "names": [
+        "Grumnus Steelshaper",
+        "Okothos Ironrager",
+        "Zula Slagfury"
+      ],
       "worldDrop": false,
-      "zones": []
+      "zones": [
+        "Ironforge",
+        "Orgrimmar",
+        "Shattrath City"
+      ]
     },
     "55199": {
       "faction": "both",
@@ -20961,9 +20558,7 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": [
-        "The Storm Peaks"
-      ]
+      "zones": []
     },
     "55298": {
       "faction": "both",
@@ -21129,15 +20724,9 @@
     "55384": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "55386": {
       "faction": "both",
@@ -21149,41 +20738,23 @@
     "55387": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Stone Guard Mukar",
-        "Knight Dameron",
-        "Morgan Day"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Wintergrasp"
-      ]
+      "zones": []
     },
     "55388": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Stone Guard Mukar",
-        "Knight Dameron",
-        "Morgan Day"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Wintergrasp"
-      ]
+      "zones": []
     },
     "55389": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "55390": {
       "faction": "both",
@@ -21195,28 +20766,16 @@
     "55392": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "55393": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Stone Guard Mukar",
-        "Knight Dameron",
-        "Morgan Day"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Wintergrasp"
-      ]
+      "zones": []
     },
     "55394": {
       "faction": "both",
@@ -21235,37 +20794,23 @@
     "55396": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "55397": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Ley-Guardian Eregos"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "The Oculus"
-      ]
+      "zones": []
     },
     "55398": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Loken"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Halls of Lightning"
-      ]
+      "zones": []
     },
     "55399": {
       "faction": "both",
@@ -21277,26 +20822,16 @@
     "55400": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "55401": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "King Ymiron"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Utgarde Pinnacle"
-      ]
+      "zones": []
     },
     "55402": {
       "faction": "both",
@@ -21308,28 +20843,16 @@
     "55403": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "55404": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "55405": {
       "faction": "both",
@@ -21341,15 +20864,9 @@
     "55407": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "55628": {
       "faction": "both",
@@ -21662,35 +21179,23 @@
     "56004": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Duchess Mynx"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56005": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Lillehoff"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "The Storm Peaks"
-      ]
+      "zones": []
     },
     "56006": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Cielstrasza"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dragonblight"
-      ]
+      "zones": []
     },
     "56007": {
       "faction": "both",
@@ -21709,13 +21214,9 @@
     "56009": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Veteran Crusader Aliocha Segard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56010": {
       "faction": "both",
@@ -21727,13 +21228,9 @@
     "56011": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Archmage Alvareaux"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "56014": {
       "faction": "both",
@@ -21752,28 +21249,16 @@
     "56016": {
       "faction": "both",
       "kind": "trainer",
-      "names": [
-        "Benjamin Clegg",
-        "Charles Worth"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Howling Fjord",
-        "Dalaran"
-      ]
+      "zones": []
     },
     "56017": {
       "faction": "both",
       "kind": "trainer",
-      "names": [
-        "Benjamin Clegg",
-        "Charles Worth"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Howling Fjord",
-        "Dalaran"
-      ]
+      "zones": []
     },
     "56018": {
       "faction": "both",
@@ -21890,236 +21375,128 @@
     "56049": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56052": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56053": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56054": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56055": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56056": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56074": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56076": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56077": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56079": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56081": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56083": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56084": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56085": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56086": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56087": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56088": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56089": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56193": {
       "faction": "both",
@@ -22341,16 +21718,9 @@
     "56473": {
       "faction": "both",
       "kind": "trainer",
-      "names": [
-        "Tisha Longbridge",
-        "Jamesina Watterly",
-        "Findle Whistlesteam"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Howling Fjord",
-        "Dalaran"
-      ]
+      "zones": []
     },
     "56474": {
       "faction": "both",
@@ -22439,93 +21809,51 @@
     "56496": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56497": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56498": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56499": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56500": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56501": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "56514": {
       "faction": "both",
       "kind": "trainer",
-      "names": [
-        "Chief Engineer Leveny",
-        "Didi the Wrench"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Borean Tundra",
-        "Dalaran"
-      ]
+      "zones": []
     },
     "56519": {
       "faction": "both",
@@ -22616,24 +21944,14 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": [
-        "Borean Tundra",
-        "Howling Fjord"
-      ]
+      "zones": []
     },
     "57423": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "57425": {
       "faction": "both",
@@ -22652,156 +21970,79 @@
     "57433": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "57434": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "57435": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "57436": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "57437": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "57438": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "57439": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "57440": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "57441": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "57442": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "57443": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "57683": {
       "faction": "both",
@@ -22827,58 +22068,37 @@
     "57692": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Skeletal Runesmith"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "57694": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Damned Apothecary"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "57696": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Cultist Shard Watcher"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "57699": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Cult Alchemist"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "57701": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Frostbrood Spawn",
-        "Cult Researcher"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "58065": {
       "faction": "both",
@@ -22932,80 +22152,44 @@
     "58147": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "58148": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "58149": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "58150": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "58492": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "58507": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "58512": {
       "faction": "both",
@@ -23038,30 +22222,16 @@
     "58527": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "58528": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "58868": {
       "faction": "both",
@@ -23080,15 +22250,9 @@
     "58954": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tiffany Cartier",
-        "Anuur"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "59405": {
       "faction": "both",
@@ -23198,35 +22362,23 @@
     "59619": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "59621": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "59625": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "59636": {
       "faction": "both",
@@ -23511,26 +22663,16 @@
     "60645": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tanaika",
-        "Sairuk"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Howling Fjord",
-        "Dragonblight"
-      ]
+      "zones": []
     },
     "60647": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Duchess Mynx"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown"
-      ]
+      "zones": []
     },
     "60649": {
       "faction": "both",
@@ -23626,521 +22768,331 @@
     "60691": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60692": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60697": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60702": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60703": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60704": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60705": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60706": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60707": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60711": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60712": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60714": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60715": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60716": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60718": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60720": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60721": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60723": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60725": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60727": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60728": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60729": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60730": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60731": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60732": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60734": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60735": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60737": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60743": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60746": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60747": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60748": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60749": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60750": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60751": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60752": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60754": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60755": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60756": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60757": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60758": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60759": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60760": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60761": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60763": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60767": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60866": {
       "faction": "horde",
       "kind": "vendor",
-      "names": [
-        "Gara Skullcrush",
-        "Sebastian Crane"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Borean Tundra",
-        "Howling Fjord"
-      ]
+      "zones": []
     },
     "60867": {
       "faction": "alliance",
@@ -24201,68 +23153,44 @@
     "60996": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60997": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60998": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "60999": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "61000": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "61002": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "61008": {
       "faction": "both",
@@ -24361,38 +23289,23 @@
     "62176": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "62177": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Braeg Stoutbeard"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "62202": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Gara Skullcrush",
-        "Sebastian Crane",
-        "Logistics Officer Silverstone"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Borean Tundra",
-        "Howling Fjord"
-      ]
+      "zones": []
     },
     "62213": {
       "faction": "both",
@@ -24411,41 +23324,23 @@
     "62256": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "62271": {
       "faction": "both",
       "kind": "trainer",
-      "names": [
-        "Chief Engineer Leveny",
-        "Tisha Longbridge",
-        "Jamesina Watterly"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Borean Tundra",
-        "Howling Fjord"
-      ]
+      "zones": []
     },
     "62350": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Misensi",
-        "Derek Odds",
-        "Mera Mistrunner"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran",
-        "Icecrown"
-      ]
+      "zones": []
     },
     "62409": {
       "faction": "both",
@@ -24478,13 +23373,9 @@
     "62948": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Vanessa Sellers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "62959": {
       "faction": "both",
@@ -24714,15 +23605,9 @@
     "63924": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Tanaika",
-        "Sairuk"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Howling Fjord",
-        "Dragonblight"
-      ]
+      "zones": []
     },
     "64054": {
       "faction": "both",
@@ -25052,1008 +23937,792 @@
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66428": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66429": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66430": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66431": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66432": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66433": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66434": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66435": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66436": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66437": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66438": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66439": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66440": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66441": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66442": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66443": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66444": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66445": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66446": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66447": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66448": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66449": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66450": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66451": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66452": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66453": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66497": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66498": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66499": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66500": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66501": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66502": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66503": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66504": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66505": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66506": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66553": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66554": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66555": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66556": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66557": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66558": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66559": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66560": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66561": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66562": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66563": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66564": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66565": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66566": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66567": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66568": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66569": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66570": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66571": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66572": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66573": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66574": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66575": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66576": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66577": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66578": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66579": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66580": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66581": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66582": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66583": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66584": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66585": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66586": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "66587": {
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "6661": {
@@ -26075,9 +24744,7 @@
       "kind": "quest",
       "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "66660": {
       "faction": "both",
@@ -26529,14 +25196,11 @@
       "faction": "both",
       "kind": "vendor",
       "names": [
-        "Kirembri Silvermane",
-        "Nemiha",
-        "Timothy Jones"
+        "Inessera"
       ],
       "worldDrop": false,
       "zones": [
-        "Shattrath City",
-        "Dalaran"
+        "Shattrath City"
       ]
     },
     "69386": {
@@ -26563,211 +25227,135 @@
     "70524": {
       "faction": "both",
       "kind": "trainer",
-      "names": [
-        "Jedidiah Handers"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "70550": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "70551": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "70552": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "70553": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "70554": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "70555": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "70556": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "70557": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "70558": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "70559": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "70560": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "70561": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "70562": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "70563": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "70565": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "70566": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "70567": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "70568": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "7126": {
       "faction": "both",
@@ -26836,15 +25424,9 @@
     "71692": {
       "faction": "both",
       "kind": "drop",
-      "names": [
-        "Indu'le Fisherman",
-        "Indu'le Mystic",
-        "Indu'le Warrior"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dragonblight"
-      ]
+      "zones": []
     },
     "7179": {
       "faction": "both",
@@ -26978,24 +25560,16 @@
     "72952": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "72953": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Alchemist Finklestein"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Icecrown Citadel"
-      ]
+      "zones": []
     },
     "7408": {
       "faction": "both",
@@ -27070,13 +25644,9 @@
     "75597": {
       "faction": "both",
       "kind": "vendor",
-      "names": [
-        "Frozo the Renowned"
-      ],
+      "names": [],
       "worldDrop": false,
-      "zones": [
-        "Dalaran"
-      ]
+      "zones": []
     },
     "7623": {
       "faction": "both",
@@ -27772,13 +26342,11 @@
       "faction": "both",
       "kind": "trainer",
       "names": [
-        "Nixx Sprocketspring",
-        "Didi the Wrench"
+        "Nixx Sprocketspring"
       ],
       "worldDrop": false,
       "zones": [
-        "Tanaris",
-        "Dalaran"
+        "Tanaris"
       ]
     },
     "9058": {

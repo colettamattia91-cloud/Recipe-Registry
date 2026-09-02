@@ -77,6 +77,43 @@ KIND_LOOKUPS = {
 # listed as a boss resolves either way round.
 NPC_LOOKUPS = ("Vendor", "Mob", "Trainer")
 
+# ARL is a multi-expansion addon and its lookup files carry NPCs from later
+# expansions than this project targets. Left in, they send a TBC player to
+# Northrend: the engineering recipe Nixx Sprocketspring teaches in Tanaris was
+# also listing Didi the Wrench in Dalaran, an NPC who does not exist yet.
+#
+# Two tests, because neither alone is enough. 110 of the 197 offenders are
+# simply numbered past the end of TBC's creature range; the other 87 have ids
+# inside it but stand in Northrend. And a zone test alone would miss the
+# worst of them -- the Inscription trainers WotLK added to Shattrath City,
+# Orgrimmar and Ironforge, standing in TBC zones with ids in the 30000s.
+#
+# Both numbers were checked against the TBC emulator's creature roster: the
+# pair catches all 197 with nothing left over, and drops no NPC that roster
+# says exists.
+LAST_TBC_CREATURE_ID = 29095
+
+POST_TBC_ZONES = frozenset((
+    "Borean Tundra", "Howling Fjord", "Dragonblight", "Grizzly Hills",
+    "Zul'Drak", "Sholazar Basin", "The Storm Peaks", "Icecrown",
+    "Crystalsong Forest", "Wintergrasp", "Hrothgar's Landing",
+    # TBC has a Dalaran -- the ruined bubble over Alterac -- but nobody in it
+    # teaches or sells a recipe. Every ARL entry placed there is the Northrend
+    # city.
+    "Dalaran",
+    "Icecrown Citadel", "Ahn'kahet: The Old Kingdom", "Azjol-Nerub",
+    "Drak'Tharon Keep", "Halls of Lightning", "Halls of Stone",
+    "The Oculus", "The Nexus", "The Violet Hold",
+    "Utgarde Keep", "Utgarde Pinnacle", "Ulduar", "Trial of the Crusader",
+))
+
+
+def is_post_tbc(npc_id, zone):
+    """True for an NPC this expansion does not have yet."""
+    if npc_id is not None and int(npc_id) > LAST_TBC_CREATURE_ID:
+        return True
+    return zone in POST_TBC_ZONES
+
 # Custom.lua is a lookup too, but of places rather than NPCs: it is what the
 # generic AddRecipeAcquire calls point at, and it is where the raid and
 # instance zones live.
@@ -337,16 +374,23 @@ def summarize_recipe(entry, lookups, custom_places=None, max_names=3, max_zones=
             "zones": [] if kind == "worldDrop" else seen[:max_zones],
         }
 
-    npc_ids = acquires.get(kind or "", [])
-    names, zones = [], []
-    for npc_id in npc_ids:
+    # An NPC from a later expansion is not one of this recipe's sources, so it
+    # is dropped before anything counts them -- otherwise a recipe with one
+    # TBC trainer and three WotLK ones would look like a recipe four trainers
+    # teach, and name none of them.
+    kept_ids, names, zones = [], [], []
+    for npc_id in acquires.get(kind or "", []):
         npc = _resolve(lookups, kind, npc_id)
+        if npc and is_post_tbc(npc_id, npc.get("zone")):
+            continue
+        kept_ids.append(npc_id)
         if not npc:
             continue
         if npc["name"] and npc["name"] not in names:
             names.append(npc["name"])
         if npc["zone"] and npc["zone"] not in zones:
             zones.append(npc["zone"])
+    npc_ids = kept_ids
 
     # A world drop has nowhere to point at, and a recipe every trainer in the
     # game teaches is not helped by naming three of them. The test counts the
