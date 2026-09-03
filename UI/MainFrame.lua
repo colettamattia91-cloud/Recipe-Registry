@@ -196,6 +196,19 @@ local HORDE_TAG = textureTag("Interface\\Icons\\INV_BannerPVP_01", 14)
 -- frame art is not 64x64, so the crop textureTag applies would cut it wrong.
 local CHECK_TAG = "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14:0:0|t"
 
+-- The collapse toggle a section header carries. This used to be a pair of
+-- UTF-8 triangles (U+25B8 / U+25BE) and WoW's fonts do not carry that range:
+-- every header in the collection, in guild members, and the detail panel's
+-- Offline toggle drew an empty box instead. The plus/minus art is what the
+-- game's own collapsible headers use, it is full-frame so it needs no crop,
+-- and it has shipped since vanilla.
+local COLLAPSED_TAG = "|TInterface\\Buttons\\UI-PlusButton-Up:12:12:0:0|t"
+local EXPANDED_TAG = "|TInterface\\Buttons\\UI-MinusButton-Up:12:12:0:0|t"
+
+local function collapseTag(collapsed)
+    return collapsed and COLLAPSED_TAG or EXPANDED_TAG
+end
+
 -- What the player has to do to get the recipe, as a colour: visit somebody
 -- (blue), buy it (gold), go and take it (orange), or run an errand (yellow).
 -- Everything else -- a discovery at your own anvil, a world event, a pattern
@@ -1389,6 +1402,13 @@ function UI:ApplyMainLayout()
         f.center:SetPoint("TOPLEFT", 10, -94)
         f.center:SetPoint("BOTTOMRIGHT", -10, 34)
         setShownIfChanged(f.right, false)
+        -- The hidden-expansion hint is a button parented to the centre panel,
+        -- and the centre panel is exactly what these views take over. Nothing
+        -- else puts it away on the way in: both of its refresh calls sit in
+        -- the recipe-list build, which does not run for these views, so a hint
+        -- left showing in Recipes stayed painted over the guild members and
+        -- collection tables. Its own refresh knows to hide it here.
+        self:RefreshHiddenExpansionHint(self.selectedProfession)
         if f.recipeClip then
             f.recipeClip._rrAnchorMode = nil
             f.recipeClip:ClearAllPoints()
@@ -3464,15 +3484,20 @@ end
 --
 -- Red is not a WoW trade colour: the game never lists a recipe you cannot
 -- learn, and this view exists precisely to list them.
+--
+-- The first spacing was far too generous: a 335 recipe read green at skill
+-- 375, forty points past it, when the game would have greyed it out long
+-- before. A TBC recipe's four thresholds are typically packed into about
+-- thirty points above its requirement, so that is what the bands say now.
 local COLLECTION_DIFFICULTY_BANDS = {
-    { over = 45, colour = "|cff808080" },  -- grey: no skill from it any more
-    { over = 30, colour = "|cff40bf40" },  -- green
-    { over = 15, colour = "|cffffff00" },  -- yellow
+    { over = 30, colour = "|cff808080" },  -- grey: no skill from it any more
+    { over = 20, colour = "|cff40bf40" },  -- green
+    { over = 10, colour = "|cffffff00" },  -- yellow
     { over = 0,  colour = "|cffff8040" },  -- orange: best skill-up odds
 }
 local COLLECTION_UNREACHABLE_COLOUR = "|cffff4040"
 
-local function collectionSkillText(collection, known)
+function UI:CollectionSkillText(collection, known)
     local required = collection.requiredSkill
     if not required then
         return "|cff8f949c-|r"
@@ -3499,7 +3524,7 @@ end
 -- restriction hung on the first line rather than given a column of its own:
 -- 74 recipes out of 2150 carry one, and a column that is 96% dashes is a
 -- column that earns nothing.
-local function collectionSourceText(collection, known)
+function UI:CollectionSourceText(collection, known)
     local lines = collection.sourceLines
     if not lines or #lines == 0 then
         lines = { collection.sourceLabel or "" }
@@ -3546,7 +3571,7 @@ end
 -- first line rather than drifting down the taller rows.
 local COLLECTION_COLUMN_TOP = -7
 
-local function makeCollectionColumn(row, anchorTo, width)
+local function makeCollectionColumn(row, anchorTo, width, multiline)
     local fs = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     if anchorTo then
         fs:SetPoint("TOPLEFT", anchorTo, "TOPRIGHT", COLLECTION_COLUMN_GAP, 0)
@@ -3556,9 +3581,13 @@ local function makeCollectionColumn(row, anchorTo, width)
     fs:SetWidth(width)
     fs:SetJustifyH("LEFT")
     fs:SetJustifyV("TOP")
-    -- Wrapping is off so a long line clips rather than reflowing into its
-    -- neighbour; the stacked source uses explicit newlines instead.
-    if fs.SetWordWrap then fs:SetWordWrap(false) end
+    -- SetWordWrap(false) does not merely stop reflowing: it collapses the
+    -- font string to ONE line, so the explicit newlines the stacked source
+    -- writes were being thrown away with the wrapping. Every column that is
+    -- genuinely single-line still clips on its own; the source column keeps
+    -- wrapping on and is fenced by SetMaxLines instead, which is what bounds
+    -- it to the height the list already reserved for it.
+    if not multiline and fs.SetWordWrap then fs:SetWordWrap(false) end
     return fs
 end
 
@@ -3574,7 +3603,7 @@ function UI:EnsureCollectionRowParts(row)
     row.collectionName = makeCollectionColumn(row, nil, nameWidth)
     row.collectionStatus = makeCollectionColumn(row, row.collectionName, statusWidth)
     row.collectionSkill = makeCollectionColumn(row, row.collectionStatus, skillWidth)
-    row.collectionSource = makeCollectionColumn(row, row.collectionSkill, sourceWidth)
+    row.collectionSource = makeCollectionColumn(row, row.collectionSkill, sourceWidth, true)
     row.collectionSpec = makeCollectionColumn(row, row.collectionSource, specWidth)
     -- The source is the one column allowed to be several lines tall.
     if row.collectionSource.SetMaxLines then
@@ -3736,7 +3765,7 @@ function UI:BindCollectionGroupRow(row, rowData)
     -- two numbers. Both come from the whole book, never from the rows the
     -- current filter happens to draw. The profession's own spell icon carries
     -- the recognition; the name alone made every section header look alike.
-    local arrow = rowData.collapsed and "|cff9fa6b2\226\150\184|r" or "|cff9fa6b2\226\150\190|r"
+    local arrow = collapseTag(rowData.collapsed)
     local icon = getProfessionIcon(rowData.groupLabel)
     setTextIfChanged(row.collectionSectionTitle, string.format("%s %s%s |cffffffff(%d/%d)|r",
         arrow, icon and (textureTag(icon, 16) .. " ") or "",
@@ -3755,6 +3784,7 @@ function UI:BindCollectionHeaderRow(row, rowData)
     setTextIfChanged(row.collectionName, "Recipe")
     setTextIfChanged(row.collectionStatus, "Status")
     setTextIfChanged(row.collectionSkill, "Skill")
+    if row.collectionSource.SetMaxLines then row.collectionSource:SetMaxLines(1) end
     setTextIfChanged(row.collectionSource, "Learned from")
     setTextIfChanged(row.collectionSpec, "Specialization")
     row.collectionName:SetTextColor(0.72, 0.72, 0.72)
@@ -3832,11 +3862,20 @@ function UI:BindCollectionRow(row, rowIdx, rowData)
         setTextIfChanged(row.collectionStatus, "|cffd8d8d8Can learn|r")
     end
 
-    setTextIfChanged(row.collectionSkill, collectionSkillText(collection, known))
+    setTextIfChanged(row.collectionSkill, self:CollectionSkillText(collection, known))
 
     -- One line per place. 82% of recipes have a single source, 4 is the
     -- dataset's maximum, so the list is bounded and needs no "+N more".
-    local sourceText = collectionSourceText(collection, known)
+    local sourceText = self:CollectionSourceText(collection, known)
+    if row.collectionSource.SetMaxLines then
+        -- The row was measured for this many lines (see the height pass in
+        -- BuildCollectionRows); hold the column to the same number so a
+        -- wrapped long name eats into its own row rather than the next one.
+        local lineCount = collection.sourceLines and #collection.sourceLines or 1
+        if lineCount > COLLECTION_MAX_SOURCE_LINES then lineCount = COLLECTION_MAX_SOURCE_LINES end
+        if lineCount < 1 then lineCount = 1 end
+        row.collectionSource:SetMaxLines(lineCount)
+    end
     setTextIfChanged(row.collectionSource, sourceText)
 
     if collection.specializationName then
@@ -3900,7 +3939,7 @@ function UI:BindAddonStatusGroupRow(row, rowIdx, rowData)
     self:SetAddonStatusHeaderButtonsVisible(row, false)
     setShownIfChanged(row.addonSectionTitle, true)
 
-    local arrow = rowData.collapsed and "|cff9fa6b2\226\150\184|r" or "|cff9fa6b2\226\150\190|r"
+    local arrow = collapseTag(rowData.collapsed)
     setTextIfChanged(row.addonSectionTitle, string.format("%s %s (%d)", arrow, rowData.groupLabel or "Group", rowData.count or 0))
     row.addonSectionTitle:SetTextColor(1.0, 0.82, 0.0)
     setVertexColorIfChanged(row.stripe, 1, 0.82, 0, 1)
@@ -5251,8 +5290,8 @@ function UI:RefreshDetailPanel()
             if self._offlineCraftersExpanded == nil then
                 self._offlineCraftersExpanded = (#onlineCrafters == 0)
             end
-            local arrow = self._offlineCraftersExpanded and "|cff9fa6b2\226\150\190" or "|cff9fa6b2\226\150\184"
-            lines[#lines + 1] = string.format("%s Offline (%d)|r", arrow, #offlineCrafters)
+            local arrow = collapseTag(not self._offlineCraftersExpanded)
+            lines[#lines + 1] = string.format("%s |cff9fa6b2Offline (%d)|r", arrow, #offlineCrafters)
             lineMeta[#lines] = { isOfflineToggle = true }
             if self._offlineCraftersExpanded then
                 for _, crafter in ipairs(offlineCrafters) do

@@ -535,4 +535,106 @@ Test.it("still names the recipe when there is no item to hang the tooltip on", f
     Test.truthy(joined:find("Discovery", 1, true) ~= nil)
 end)
 
+-- WoW's fonts do not carry the geometric-shapes block, so the UTF-8 triangles
+-- these headers used to draw came out as empty boxes -- in the collection, in
+-- guild members, and in the detail panel's Offline toggle alike. Nothing at
+-- runtime can tell a missing glyph from a drawn one, so the guard is that the
+-- source no longer asks for one.
+Test.it("draws collapse toggles with art, not with a glyph the font lacks", function()
+    Test.eq(mainFrameSource:find("\\226\\150", 1, true), nil,
+        "the UTF-8 triangles do not render in WoW; use collapseTag instead")
+    for _, name in ipairs({
+        "function UI:BindCollectionGroupRow(",
+        "function UI:BindAddonStatusGroupRow(",
+    }) do
+        local body = bodyOf(name)
+        Test.truthy(body ~= nil, "expected " .. name)
+        Test.truthy(body:find("collapseTag(", 1, true) ~= nil,
+            name .. " must take its arrow from the shared tag")
+    end
+end)
+
+-- SetWordWrap(false) collapses a font string to a single line, which threw
+-- away the newlines the stacked source writes: a recipe sold by two vendors
+-- showed one. The source column is the one column that keeps wrapping on.
+Test.it("lets the source column keep its newlines", function()
+    local body = bodyOf("local function makeCollectionColumn(")
+    Test.truthy(body ~= nil)
+    Test.truthy(body:find("if not multiline and fs.SetWordWrap", 1, true) ~= nil,
+        "wrapping must stay on for the multiline column")
+    local parts = bodyOf("function UI:EnsureCollectionRowParts(")
+    Test.truthy(parts ~= nil)
+    Test.truthy(parts:find("makeCollectionColumn(row, row.collectionSkill, sourceWidth, true)", 1, true) ~= nil,
+        "the source column must be built as the multiline one")
+end)
+
+-- Two vendors are two lines. The row was already measured for them; what had
+-- gone missing was the text ever reaching the screen as two lines.
+Test.it("stacks every place the recipe can be learned from", function()
+    local text = ui:CollectionSourceText({
+        sourceKind = "vendor",
+        sourceLines = {
+            "Vendor: Kradu Grimblade (Hellfire Peninsula)",
+            "Vendor: Zula Slagfury (Hellfire Peninsula)",
+        },
+    }, false)
+    Test.truthy(text:find("Kradu Grimblade", 1, true) ~= nil)
+    Test.truthy(text:find("Zula Slagfury", 1, true) ~= nil)
+    Test.truthy(text:find("\n", 1, true) ~= nil, "the two vendors must be on two lines")
+end)
+
+-- Four is the dataset's maximum and the row height stops there, so the text
+-- has to stop there too.
+Test.it("stops the stacked source where the row height stops", function()
+    local lines = {}
+    for i = 1, 9 do lines[i] = "Vendor: Somebody " .. i .. " (Somewhere)" end
+    local text = ui:CollectionSourceText({ sourceKind = "vendor", sourceLines = lines }, false)
+    local count = 1
+    for _ in text:gmatch("\n") do count = count + 1 end
+    Test.eq(count, 4)
+end)
+
+-- The bands were wide enough that a 335 recipe still read green at skill 375,
+-- forty points past it. Grey means "this will not move the bar any more", and
+-- forty points past the requirement is squarely that.
+local GREY, GREEN, YELLOW, ORANGE, RED = "|cff808080", "|cff40bf40", "|cffffff00", "|cffff8040", "|cffff4040"
+
+local function skillColour(required, rank)
+    local text = ui:CollectionSkillText({ requiredSkill = required, skillRank = rank }, false)
+    return text:sub(1, 10)
+end
+
+Test.it("greys a recipe the character has long outgrown", function()
+    -- The case Mattia reported: Engineering 375, recipe 335.
+    Test.eq(skillColour(335, 375), GREY)
+    Test.eq(skillColour(345, 375), GREY)
+    Test.eq(skillColour(350, 375), GREEN)
+    Test.eq(skillColour(360, 375), YELLOW)
+    Test.eq(skillColour(370, 375), ORANGE)
+    Test.eq(skillColour(375, 375), ORANGE)
+    -- Out of reach is the one colour WoW itself never shows, because the game
+    -- never lists a recipe you cannot learn. This view exists to list them.
+    Test.eq(skillColour(380, 375), RED)
+end)
+
+Test.it("says nothing rather than guessing when the skill is unknown", function()
+    local text = ui:CollectionSkillText({ skillRank = 375 }, false)
+    Test.truthy(text:find("-", 1, true) ~= nil,
+        "686 of 2151 records carry no requiredSkill; the column must not invent one")
+end)
+
+-- The hint is a button parented to the centre panel, and the full-width views
+-- take that panel over. Both of its refresh calls live in the recipe-list
+-- build, which never runs for those views -- so the layout switch is the only
+-- place that can put it away on the way in.
+Test.it("puts the hidden-expansion hint away when a full-width view takes over", function()
+    local body = bodyOf("function UI:ApplyMainLayout(")
+    Test.truthy(body ~= nil)
+    local branch = body:find("if self:IsFullWidthView() then", 1, true)
+    local otherwise = body:find("\n    else", 1, true)
+    Test.truthy(branch ~= nil and otherwise ~= nil and otherwise > branch)
+    Test.truthy(body:sub(branch, otherwise):find("RefreshHiddenExpansionHint", 1, true) ~= nil,
+        "the full-width branch must refresh the hint, which hides it there")
+end)
+
 io.write(string.format("Collection tab view: %d test(s) passed\n", Test.count))
