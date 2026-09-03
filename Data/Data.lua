@@ -90,7 +90,7 @@ local DB_DEFAULTS = {
         -- Recipes tab is not listed because it cannot be switched off.
         tabs = {
             addon = true,
-            missing = true,
+            collection = true,
         },
         -- Gross by default: the "Sells for" figure doubles as the price to
         -- list an auction at, and taxing it silently would make it useless
@@ -608,7 +608,7 @@ Private.shouldRefreshItemName = shouldRefreshItemName
 Private.isValidRecipeKey = isValidRecipeKey
 Private.formatReagents = formatReagents
 Private.detectSpecialization = detectSpecialization
--- Published on the module so the missing-recipe projection can map a
+-- Published on the module so the collection projection can map a
 -- stored specialization name back to the spell ID the metadata library
 -- reports as a recipe requirement.
 Data.PROFESSION_SPECIALIZATIONS = PROFESSION_SPECIALIZATIONS
@@ -675,6 +675,36 @@ function Data:OnInitialize()
     if categoryView ~= "expanded" and categoryView ~= "accordion" and categoryView ~= "categoriesOnly" then
         self.db.profile.recipeCategoryView = "expanded"
     end
+    -- The collection tab was called "Missing recipes" until 2.3.0, and its
+    -- three settings were stored under that name. Carried over rather than
+    -- defaulted, because two of them are choices the user made: a profession
+    -- they switched off would come back on, and a tab they hid would reappear.
+    -- The old key still being present is itself the signal that nothing has
+    -- been written under the new name yet, so the carried value wins outright.
+    -- Checking the new key for nil instead would lose the tab setting, whose
+    -- default AceDB has already filled in by the time this runs.
+    local profile = self.db.profile
+    if profile.missingRecipesDisabledProfessions ~= nil then
+        profile.collectionDisabledProfessions = profile.missingRecipesDisabledProfessions
+        profile.missingRecipesDisabledProfessions = nil
+    end
+    if profile.missingRecipesLearnableOnly ~= nil then
+        -- The old switch had two states over a list that never showed a
+        -- learned recipe, so its "on" is the new "ready" and its "off" is
+        -- "unlearned" -- not "all", which shows a half of the tab the user has
+        -- never seen.
+        profile.collectionFilter = profile.missingRecipesLearnableOnly == true
+            and "ready" or "unlearned"
+        profile.missingRecipesLearnableOnly = nil
+    end
+    if type(profile.tabs) == "table" and profile.tabs.missing ~= nil then
+        profile.tabs.collection = profile.tabs.missing
+        profile.tabs.missing = nil
+    end
+    if profile.selectedProfession == "Missing recipes" then
+        profile.selectedProfession = "Collection"
+    end
+
     if type(self.db.profile.recipePrefilters) ~= "table" then
         self.db.profile.recipePrefilters = {
             showRemoteBopOutputRecipes = false,

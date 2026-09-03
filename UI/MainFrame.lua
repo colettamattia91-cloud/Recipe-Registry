@@ -15,11 +15,14 @@ local GLOBAL_SEARCH_MIN_CHARS = 3
 -- the tab shows.
 local ADDON_STATUS_VIEW = "Guild members"
 local FAVORITES_VIEW = "Favorites"
--- Answers a different question from every other view: not "who can craft
--- this" but "what can this character still learn". Kept as its own sidebar
--- entry rather than mixed into a profession list, because a recipe nobody
+-- Answers a different question from every other view: not "who in the guild
+-- can craft this" but "how much of my own profession do I have". It gets its
+-- own tab rather than a place in a profession list, because a recipe nobody
 -- knows and a recipe you personally lack are not the same row.
-local MISSING_VIEW = "Missing recipes"
+local COLLECTION_VIEW = "Collection"
+local COLLECTION_LEGACY_VIEWS = {
+    ["Missing recipes"] = true,
+}
 -- Saved profiles carry the view name verbatim, so every name this tab has
 -- ever had has to keep resolving to it.
 local ADDON_STATUS_LEGACY_VIEWS = {
@@ -75,7 +78,7 @@ local PROFESSION_SPELL_IDS = {
 local MAIN_TAB_DEFINITIONS = {
     { key = "recipes", label = "Recipes",         width = 112, optional = false },
     { key = "addon",   label = ADDON_STATUS_VIEW, width = 132, optional = true },
-    { key = "missing", label = MISSING_VIEW,      width = 132, optional = true },
+    { key = "collection", label = COLLECTION_VIEW,      width = 110, optional = true },
 }
 
 local GOLD = {1, 0.82, 0}
@@ -189,11 +192,15 @@ end
 local ALLIANCE_TAG = textureTag("Interface\\Icons\\INV_BannerPVP_02", 14)
 local HORDE_TAG = textureTag("Interface\\Icons\\INV_BannerPVP_01", 14)
 
+-- The green tick a ready check draws. Uncropped, like statusTag: the raid
+-- frame art is not 64x64, so the crop textureTag applies would cut it wrong.
+local CHECK_TAG = "|TInterface\\RaidFrame\\ReadyCheck-Ready:14:14:0:0|t"
+
 -- What the player has to do to get the recipe, as a colour: visit somebody
 -- (blue), buy it (gold), go and take it (orange), or run an errand (yellow).
 -- Everything else -- a discovery at your own anvil, a world event, a pattern
 -- the data cannot place -- asks for none of those and stays grey.
-local MISSING_SOURCE_COLORS = {
+local COLLECTION_SOURCE_COLORS = {
     trainer   = "|cff8fc6ff",
     vendor    = "|cffffd100",
     drop      = "|cffff9d5a",
@@ -202,8 +209,8 @@ local MISSING_SOURCE_COLORS = {
     quest     = "|cffffe066",
 }
 
-local function missingSourceColor(sourceKind)
-    return MISSING_SOURCE_COLORS[sourceKind or ""] or "|cffb6b6b6"
+local function collectionSourceColor(sourceKind)
+    return COLLECTION_SOURCE_COLORS[sourceKind or ""] or "|cffb6b6b6"
 end
 
 local function statusTag(online)
@@ -234,7 +241,7 @@ local function addonStatusLabelColor(row)
     return colorText(row and row.addonStatusLabel or "Never seen", r, g, b)
 end
 
--- True once this character has at least one scanned profession the missing
+-- True once this character has at least one scanned profession the collection
 -- view could report on.
 local function hasLocalProfessions()
     local data = Addon.Data
@@ -749,11 +756,13 @@ function UI:OnInitialize()
     self.selectedProfession = Addon.db and Addon.db.profile and Addon.db.profile.selectedProfession or nil
     if ADDON_STATUS_LEGACY_VIEWS[self.selectedProfession] then
         self.selectedProfession = ADDON_STATUS_VIEW
+    elseif COLLECTION_LEGACY_VIEWS[self.selectedProfession] then
+        self.selectedProfession = COLLECTION_VIEW
     end
     -- The saved view may have been switched off since it was stored.
     if self.selectedProfession == ADDON_STATUS_VIEW and not self:IsMainTabEnabled("addon") then
         self.selectedProfession = nil
-    elseif self.selectedProfession == MISSING_VIEW and not self:IsMainTabEnabled("missing") then
+    elseif self.selectedProfession == COLLECTION_VIEW and not self:IsMainTabEnabled("collection") then
         self.selectedProfession = nil
     end
     self.addonStatusSortKey = ADDON_STATUS_DEFAULT_SORT
@@ -773,7 +782,7 @@ function UI:OnInitialize()
     self.expandedCategory = nil
     self.recipeSearchText = ""
     self.addonStatusSearchText = ""
-    self.missingSearchText = ""
+    self.collectionSearchText = ""
     self.searchText = ""
 end
 
@@ -781,22 +790,22 @@ function UI:IsAddonStatusView()
     return self.selectedProfession == ADDON_STATUS_VIEW
 end
 
-function UI:IsMissingView()
-    return self.selectedProfession == MISSING_VIEW
+function UI:IsCollectionView()
+    return self.selectedProfession == COLLECTION_VIEW
 end
 
 -- Both alternate views take the whole window: they are tables, not a
 -- browser with a detail panel beside it.
 function UI:IsFullWidthView()
-    return self:IsAddonStatusView() or self:IsMissingView()
+    return self:IsAddonStatusView() or self:IsCollectionView()
 end
 
 function UI:GetMainView()
     if self:IsAddonStatusView() then
         return "addon"
     end
-    if self:IsMissingView() then
-        return "missing"
+    if self:IsCollectionView() then
+        return "collection"
     end
     return "recipes"
 end
@@ -809,9 +818,9 @@ function UI:SetMainView(view)
     end
     if view == "addon" then
         self.selectedProfession = ADDON_STATUS_VIEW
-    elseif view == "missing" then
-        self.selectedProfession = MISSING_VIEW
-    elseif self.selectedProfession == ADDON_STATUS_VIEW or self.selectedProfession == MISSING_VIEW then
+    elseif view == "collection" then
+        self.selectedProfession = COLLECTION_VIEW
+    elseif self.selectedProfession == ADDON_STATUS_VIEW or self.selectedProfession == COLLECTION_VIEW then
         self.selectedProfession = nil
     end
     self:ActivateSearchForCurrentView()
@@ -917,8 +926,8 @@ end
 function UI:ActivateSearchForCurrentView()
     if self:IsAddonStatusView() then
         self.searchText = self.addonStatusSearchText or ""
-    elseif self:IsMissingView() then
-        self.searchText = self.missingSearchText or ""
+    elseif self:IsCollectionView() then
+        self.searchText = self.collectionSearchText or ""
     else
         self.searchText = self.recipeSearchText or ""
     end
@@ -929,7 +938,7 @@ function UI:RefreshSearchClearButtons()
     if not self.frame then return end
     setShownIfChanged(self.frame.searchClearButton, (self.recipeSearchText or "") ~= "")
     setShownIfChanged(self.frame.addonStatusSearchClearButton, (self.addonStatusSearchText or "") ~= "")
-    setShownIfChanged(self.frame.missingSearchClearButton, (self.missingSearchText or "") ~= "")
+    setShownIfChanged(self.frame.collectionSearchClearButton, (self.collectionSearchText or "") ~= "")
 end
 
 function UI:SetSearchBoxValue(box, text)
@@ -945,7 +954,7 @@ function UI:SyncSearchControls()
     if not self.frame then return end
     self:SetSearchBoxValue(self.frame.searchBox, self.recipeSearchText or "")
     self:SetSearchBoxValue(self.frame.addonStatusSearchBox, self.addonStatusSearchText or "")
-    self:SetSearchBoxValue(self.frame.missingSearchBox, self.missingSearchText or "")
+    self:SetSearchBoxValue(self.frame.collectionSearchBox, self.collectionSearchText or "")
     self:RefreshSearchClearButtons()
 end
 
@@ -1298,51 +1307,68 @@ function UI:RefreshAddonStatusControls()
     if not self.frame then return end
     local f = self.frame
     local addonStatusView = self:IsAddonStatusView()
-    local missingView = self:IsMissingView()
+    local collectionView = self:IsCollectionView()
     setShownIfChanged(f.addonStatusControls, addonStatusView)
     setShownIfChanged(f.addonStatusHelp, addonStatusView)
-    setShownIfChanged(f.missingControls, missingView)
-    setShownIfChanged(f.missingHelp, missingView)
-    if missingView then
-        self:RefreshMissingControls()
+    setShownIfChanged(f.collectionControls, collectionView)
+    setShownIfChanged(f.collectionHelp, collectionView)
+    if collectionView then
+        self:RefreshCollectionControls()
     end
-    -- The missing view has its own title inside the control strip, anchored
+    -- The collection view has its own title inside the control strip, anchored
     -- to the same corner of the same frame as the recipe header: showing both
     -- drew one on top of the other. The strip's title wins and takes the
     -- count with it, the same way the guild members table already works.
     --
     -- Neither table gets a sort switch: their order is fixed to the one that
     -- answers the question -- what you can learn right now, first.
-    setShownIfChanged(f.recipeHeader, not (addonStatusView or missingView))
-    setShownIfChanged(f.sortSwitch, not (addonStatusView or missingView))
+    setShownIfChanged(f.recipeHeader, not (addonStatusView or collectionView))
+    setShownIfChanged(f.sortSwitch, not (addonStatusView or collectionView))
     self:SyncSearchControls()
 end
 
--- The toggle state and the help line under the strip. The help line is the
--- only place that can explain an empty list, so it has to know both whether
--- the character has been scanned and whether the filter is the reason
+-- What the one control says in each of its three states, and what the help
+-- line under it says about the list those states produce.
+local COLLECTION_FILTER_LABELS = {
+    all       = "Show: All",
+    unlearned = "Show: Not learned",
+    ready     = "Show: Ready to learn",
+}
+
+local COLLECTION_FILTER_HELP = {
+    all       = "Every recipe your professions can learn. The ones you already know are ticked.",
+    unlearned = "Only the recipes you have still to learn.",
+    ready     = "Only the recipes whose skill and specialization you already meet.",
+}
+
+-- The filter button and the help line under the strip. The help line is the
+-- only place that can explain an empty list, so it has to know whether the
+-- character has been scanned at all, and whether the filter is the reason
 -- nothing is showing.
-function UI:RefreshMissingControls()
+function UI:RefreshCollectionControls()
     if not self.frame then return end
     local f = self.frame
     local data = Addon.Data
-    local learnableOnly = (data and data.IsMissingRecipesLearnableOnly
-        and data:IsMissingRecipesLearnableOnly()) == true
-    if f.missingLearnableToggle and f.missingLearnableToggle.SetSelected then
-        f.missingLearnableToggle:SetSelected(learnableOnly)
+    local filter = (data and data.GetCollectionFilter and data:GetCollectionFilter()) or "all"
+    if f.collectionFilterButton and f.collectionFilterButton.SetLabel then
+        f.collectionFilterButton:SetLabel(COLLECTION_FILTER_LABELS[filter] or COLLECTION_FILTER_LABELS.all)
+        if f.collectionFilterButton.SetSelected then
+            -- Highlighted whenever the list is narrower than the collection,
+            -- so a filtered view never looks like the whole book.
+            f.collectionFilterButton:SetSelected(filter ~= "all")
+        end
     end
-    if not f.missingHelp then return end
+    if not f.collectionHelp then return end
     local helpText
     if not hasLocalProfessions() then
         helpText = "Open your profession windows once so Recipe Registry knows what this character has learned."
-    elseif learnableOnly and (self._missingRecipeCount or 0) == 0 then
-        helpText = "Nothing left that you already meet the requirements for. Switch off \"Ready to learn\" to see the rest."
-    elseif learnableOnly then
-        helpText = "Recipes you can go and learn right now. Click a profession header to collapse it."
+    elseif (self._collectionShownCount or 0) == 0 and filter ~= "all" then
+        helpText = "Nothing matches this filter. Click the button above to widen it."
     else
-        helpText = "Recipes your professions can still learn. Click a profession header to collapse it."
+        helpText = (COLLECTION_FILTER_HELP[filter] or COLLECTION_FILTER_HELP.all)
+            .. " Click a profession header to collapse it."
     end
-    setTextIfChanged(f.missingHelp, helpText)
+    setTextIfChanged(f.collectionHelp, helpText)
 end
 
 function UI:ApplyMainLayout()
@@ -1366,9 +1392,9 @@ function UI:ApplyMainLayout()
         if f.recipeClip then
             f.recipeClip._rrAnchorMode = nil
             f.recipeClip:ClearAllPoints()
-            -- The missing view needs an extra band for its own header and
+            -- The collection view needs an extra band for its own header and
             -- search strip, the same way the addon status view does.
-            f.recipeClip:SetPoint("TOPLEFT", 8, self:IsMissingView() and -70 or -58)
+            f.recipeClip:SetPoint("TOPLEFT", 8, self:IsCollectionView() and -70 or -58)
             f.recipeClip:SetPoint("BOTTOMRIGHT", -8, 10)
         end
     else
@@ -1563,7 +1589,7 @@ function UI:CreateMainFrame()
         end)
         f.mainTabs[tabKey] = button
     end
-    f.missingTab = f.mainTabs.missing
+    f.collectionTab = f.mainTabs.collection
 
     local topBand = CreateFrame("Frame", nil, f)
     topBand:SetPoint("TOPLEFT", 10, -94)
@@ -1860,103 +1886,118 @@ function UI:CreateMainFrame()
     end)
     f.addonStatusSearchClearButton = addonStatusSearchClearButton
 
-    -- The missing view gets its own control strip rather than borrowing the
+    -- The collection view gets its own control strip rather than borrowing the
     -- sidebar search box: the sidebar is hidden while this view is up, the
     -- same way it is for the addon status table.
-    local missingControls = CreateFrame("Frame", nil, center)
-    missingControls:SetPoint("TOPLEFT", 8, -8)
-    missingControls:SetPoint("TOPRIGHT", -8, -8)
-    missingControls:SetHeight(26)
-    f.missingControls = missingControls
+    local collectionControls = CreateFrame("Frame", nil, center)
+    collectionControls:SetPoint("TOPLEFT", 8, -8)
+    collectionControls:SetPoint("TOPRIGHT", -8, -8)
+    collectionControls:SetHeight(26)
+    f.collectionControls = collectionControls
 
-    local missingTitle = missingControls:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    missingTitle:SetPoint("LEFT", 4, 0)
-    missingTitle:SetText(MISSING_VIEW)
-    missingTitle:SetTextColor(1.0, 0.82, 0)
-    missingTitle:SetJustifyH("LEFT")
-    if missingTitle.SetWordWrap then missingTitle:SetWordWrap(false) end
-    f.missingTitle = missingTitle
+    local collectionTitle = collectionControls:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    collectionTitle:SetPoint("LEFT", 4, 0)
+    collectionTitle:SetText(COLLECTION_VIEW)
+    collectionTitle:SetTextColor(1.0, 0.82, 0)
+    collectionTitle:SetJustifyH("LEFT")
+    if collectionTitle.SetWordWrap then collectionTitle:SetWordWrap(false) end
+    f.collectionTitle = collectionTitle
 
-    local missingHelp = center:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    missingHelp:SetPoint("TOPLEFT", missingControls, "BOTTOMLEFT", 4, -6)
-    missingHelp:SetPoint("TOPRIGHT", missingControls, "BOTTOMRIGHT", -4, -6)
-    missingHelp:SetJustifyH("LEFT")
-    missingHelp:SetText("Recipes your professions can still learn. Click a profession header to collapse it.")
-    missingHelp:SetTextColor(0.70, 0.70, 0.70)
-    f.missingHelp = missingHelp
+    local collectionHelp = center:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    collectionHelp:SetPoint("TOPLEFT", collectionControls, "BOTTOMLEFT", 4, -6)
+    collectionHelp:SetPoint("TOPRIGHT", collectionControls, "BOTTOMRIGHT", -4, -6)
+    collectionHelp:SetJustifyH("LEFT")
+    collectionHelp:SetText(COLLECTION_FILTER_HELP.all .. " Click a profession header to collapse it.")
+    collectionHelp:SetTextColor(0.70, 0.70, 0.70)
+    f.collectionHelp = collectionHelp
 
-    local missingSearchBox = CreateFrame("EditBox", nil, missingControls, "InputBoxTemplate")
-    missingSearchBox:SetPoint("RIGHT", -8, 0)
-    missingSearchBox:SetSize(240, 22)
-    missingSearchBox:SetAutoFocus(false)
-    missingSearchBox:SetTextInsets(6, 22, 0, 0)
-    missingSearchBox:SetScript("OnEscapePressed", function()
+    local collectionSearchBox = CreateFrame("EditBox", nil, collectionControls, "InputBoxTemplate")
+    collectionSearchBox:SetPoint("RIGHT", -8, 0)
+    collectionSearchBox:SetSize(240, 22)
+    collectionSearchBox:SetAutoFocus(false)
+    collectionSearchBox:SetTextInsets(6, 22, 0, 0)
+    collectionSearchBox:SetScript("OnEscapePressed", function()
         UI:ClearSearchFocus()
     end)
-    missingSearchBox:SetScript("OnEnterPressed", function()
+    collectionSearchBox:SetScript("OnEnterPressed", function()
         UI:ApplySearchNow()
         UI:ClearSearchFocus()
         UI:OpenChatAfterSearch()
     end)
-    missingSearchBox:SetScript("OnTextChanged", function(box)
+    collectionSearchBox:SetScript("OnTextChanged", function(box)
         if UI._syncingSearchBoxes then return end
-        UI.missingSearchText = box:GetText() or ""
-        UI.searchText = UI.missingSearchText
+        UI.collectionSearchText = box:GetText() or ""
+        UI.searchText = UI.collectionSearchText
         UI:ResetRecipeScroll()
         UI:SyncSearchControls()
         UI:ScheduleSearchRefresh()
     end)
-    f.missingSearchBox = missingSearchBox
+    f.collectionSearchBox = collectionSearchBox
 
-    local missingSearchLabel = missingControls:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    missingSearchLabel:SetPoint("RIGHT", missingSearchBox, "LEFT", -8, 0)
-    missingSearchLabel:SetText("Search")
-    missingSearchLabel:SetTextColor(0.72, 0.72, 0.72)
-    f.missingSearchLabel = missingSearchLabel
+    local collectionSearchLabel = collectionControls:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    collectionSearchLabel:SetPoint("RIGHT", collectionSearchBox, "LEFT", -8, 0)
+    collectionSearchLabel:SetText("Search")
+    collectionSearchLabel:SetTextColor(0.72, 0.72, 0.72)
+    f.collectionSearchLabel = collectionSearchLabel
 
-    -- The view's only filter, and deliberately the only one: grouping by
-    -- profession is already the profession filter, and every further axis
-    -- would be chrome on a table whose whole job is to be scanned.
-    local missingLearnableToggle = createCardStyleButton(missingControls, 150, 22)
-    missingLearnableToggle:SetPoint("RIGHT", missingSearchLabel, "LEFT", -12, 0)
-    missingLearnableToggle:SetLabel("Ready to learn")
-    missingLearnableToggle:SetScript("OnClick", function()
+    -- One control, three states, and deliberately not two checkboxes: the
+    -- states are a strict narrowing -- the whole book, then the holes, then
+    -- the holes you can fill today -- so a button that cycles says everything
+    -- two switches would without asking the reader what their four
+    -- combinations mean. Grouping by profession is already the profession
+    -- filter, and any further axis would be chrome on a table whose whole job
+    -- is to be scanned.
+    local collectionFilterButton = createCardStyleButton(collectionControls, 168, 22)
+    collectionFilterButton:SetPoint("RIGHT", collectionSearchLabel, "LEFT", -12, 0)
+    collectionFilterButton:SetLabel(COLLECTION_FILTER_LABELS.all)
+    collectionFilterButton:SetScript("OnClick", function()
         local data = Addon.Data
-        if not (data and data.SetMissingRecipesLearnableOnly) then return end
-        data:SetMissingRecipesLearnableOnly(not data:IsMissingRecipesLearnableOnly())
-        UI:RefreshMissingControls()
+        if not (data and data.CycleCollectionFilter) then return end
+        data:CycleCollectionFilter()
+        UI:RefreshCollectionControls()
         UI:RefreshRecipeList()
     end)
-    missingLearnableToggle:SetScript("OnEnter", function(self)
+    collectionFilterButton:SetScript("OnEnter", function(self)
+        local data = Addon.Data
+        local current = (data and data.GetCollectionFilter and data:GetCollectionFilter()) or "all"
         GameTooltip:SetOwner(self, "ANCHOR_TOP")
-        GameTooltip:AddLine("Ready to learn")
-        GameTooltip:AddLine("Show only recipes whose skill and specialization you already meet.", 0.8, 0.8, 0.8, true)
+        GameTooltip:AddLine("Collection filter")
+        for _, filter in ipairs((data and data.COLLECTION_FILTER_ORDER) or {}) do
+            local isCurrent = filter == current
+            GameTooltip:AddLine(
+                string.format("%s %s", isCurrent and "•" or "  ",
+                    COLLECTION_FILTER_HELP[filter] or filter),
+                isCurrent and 1 or 0.65,
+                isCurrent and 0.82 or 0.65,
+                isCurrent and 0 or 0.65,
+                true)
+        end
         GameTooltip:Show()
     end)
-    missingLearnableToggle:SetScript("OnLeave", function()
+    collectionFilterButton:SetScript("OnLeave", function()
         GameTooltip:Hide()
     end)
-    f.missingLearnableToggle = missingLearnableToggle
-    -- Bounded on the right so a long count cannot run under the toggle.
-    missingTitle:SetPoint("RIGHT", missingLearnableToggle, "LEFT", -12, 0)
+    f.collectionFilterButton = collectionFilterButton
+    -- Bounded on the right so a long count cannot run under the button.
+    collectionTitle:SetPoint("RIGHT", collectionFilterButton, "LEFT", -12, 0)
 
-    local missingSearchClearButton = CreateFrame("Button", nil, missingSearchBox)
-    missingSearchClearButton:SetSize(14, 14)
-    missingSearchClearButton:SetPoint("RIGHT", -4, 0)
-    missingSearchClearButton:SetNormalTexture("Interface\\Buttons\\UI-StopButton")
-    if missingSearchClearButton.GetNormalTexture then
-        local tex = missingSearchClearButton:GetNormalTexture()
+    local collectionSearchClearButton = CreateFrame("Button", nil, collectionSearchBox)
+    collectionSearchClearButton:SetSize(14, 14)
+    collectionSearchClearButton:SetPoint("RIGHT", -4, 0)
+    collectionSearchClearButton:SetNormalTexture("Interface\\Buttons\\UI-StopButton")
+    if collectionSearchClearButton.GetNormalTexture then
+        local tex = collectionSearchClearButton:GetNormalTexture()
         if tex and tex.SetVertexColor then
             tex:SetVertexColor(0.85, 0.85, 0.85, 0.85)
         end
     end
-    missingSearchClearButton:SetHighlightTexture("Interface\\Buttons\\UI-StopButton", "ADD")
-    missingSearchClearButton:Hide()
-    missingSearchClearButton:SetScript("OnClick", function()
+    collectionSearchClearButton:SetHighlightTexture("Interface\\Buttons\\UI-StopButton", "ADD")
+    collectionSearchClearButton:Hide()
+    collectionSearchClearButton:SetScript("OnClick", function()
         UI:ClearSearch()
         UI:RefreshRecipeList()
     end)
-    f.missingSearchClearButton = missingSearchClearButton
+    f.collectionSearchClearButton = collectionSearchClearButton
 
     -- Discoverability hint: when a profession's view is restricted by the
     -- expansion filter, surface a one-click "N <expansion> recipes hidden"
@@ -2434,8 +2475,8 @@ function UI:EnsureRecipeRow(index)
         if self.addonStatusGroupKey then
             return
         end
-        if self.missingGroupKey then
-            UI:ToggleMissingGroup(self.missingGroupKey)
+        if self.collectionGroupKey then
+            UI:ToggleCollectionGroup(self.collectionGroupKey)
             return
         end
         if self.addonStatusMemberKey then
@@ -2454,8 +2495,8 @@ function UI:EnsureRecipeRow(index)
     end)
     row:SetScript("OnEnter", function(self)
         if self.addonStatusMemberKey then return end
-        if self.missingInfo then
-            UI:ShowMissingRowTooltip(self)
+        if self.collectionInfo then
+            UI:ShowCollectionRowTooltip(self)
             return
         end
         if not self.tooltipLink then return end
@@ -3120,18 +3161,19 @@ end
 
 local RECIPE_ROW_HEIGHT = 70
 local ADDON_STATUS_ROW_HEIGHT = 28
--- The missing view is a table, not a browser: one line of text per row, no
+-- The collection view is a table, not a browser: one line of text per row, no
 -- crafter list and no second metadata line. At the browser's 70px it showed
--- nine recipes in a full-height window while a blacksmith is missing three
--- hundred, so it gets the compact height the guild members table uses.
-local MISSING_ROW_HEIGHT = 30
-local MISSING_ROW_ICON_SIZE = 24
+-- nine recipes in a full-height window while a blacksmith's book runs to
+-- nearly four hundred, so it gets the compact height the guild members table
+-- uses.
+local COLLECTION_ROW_HEIGHT = 30
+local COLLECTION_ROW_ICON_SIZE = 24
 local RECIPE_ROW_ICON_SIZE = 30
 local RECIPE_ROW_BUFFER = 2
 
 function UI:GetListRowHeight()
     if self:IsAddonStatusView() then return ADDON_STATUS_ROW_HEIGHT end
-    if self:IsMissingView() then return MISSING_ROW_HEIGHT end
+    if self:IsCollectionView() then return COLLECTION_ROW_HEIGHT end
     return RECIPE_ROW_HEIGHT
 end
 
@@ -3153,7 +3195,7 @@ function UI:GetListRowWidth()
     local width = scroll and scroll.GetWidth and scroll:GetWidth() or nil
     if type(width) ~= "number" or width <= 0 then
         -- Both full-width tables share the fallback: before the first
-        -- layout the missing view would otherwise size its columns for the
+        -- layout the collection view would otherwise size its columns for the
         -- 314px browser column it is not in.
         width = self:IsFullWidthView() and 860 or 314
     end
@@ -3380,7 +3422,7 @@ function UI:SetAddonStatusPartsVisible(row, visible)
     setShownIfChanged(row.addonZone, visible)
 end
 
--- Column layout for the missing-recipe table. Built lazily per pooled row,
+-- Column layout for the collection table. Built lazily per pooled row,
 -- the same way the addon status columns are: most sessions never open this
 -- view, and the pool is shared with the ordinary recipe list.
 --
@@ -3389,31 +3431,31 @@ end
 -- recipe name and the source, because those are the two that get cut off,
 -- and the source ("Vendor: Xandar Goodbeard (Loch Modan), Hagrus
 -- (Orgrimmar)") is the longest string in the table.
-local MISSING_COLUMN_GAP = 8
-local MISSING_NAME_INSET = 40
-local MISSING_SKILL_WIDTH = 104
-local MISSING_SPEC_WIDTH = 148
-local MISSING_FACTION_WIDTH = 86
-local MISSING_NAME_MIN_WIDTH = 190
-local MISSING_SOURCE_MIN_WIDTH = 140
+local COLLECTION_COLUMN_GAP = 8
+local COLLECTION_NAME_INSET = 40
+local COLLECTION_SKILL_WIDTH = 104
+local COLLECTION_SPEC_WIDTH = 148
+local COLLECTION_FACTION_WIDTH = 86
+local COLLECTION_NAME_MIN_WIDTH = 190
+local COLLECTION_SOURCE_MIN_WIDTH = 140
 
-function UI:GetMissingColumnWidths()
-    local fixed = MISSING_SKILL_WIDTH + MISSING_SPEC_WIDTH + MISSING_FACTION_WIDTH
+function UI:GetCollectionColumnWidths()
+    local fixed = COLLECTION_SKILL_WIDTH + COLLECTION_SPEC_WIDTH + COLLECTION_FACTION_WIDTH
     local flexible = self:GetListRowWidth()
-        - MISSING_NAME_INSET - 10 - (MISSING_COLUMN_GAP * 4) - fixed
-    local nameWidth = math.max(MISSING_NAME_MIN_WIDTH, math.floor(flexible * 0.45))
-    local sourceWidth = math.max(MISSING_SOURCE_MIN_WIDTH, flexible - nameWidth)
-    return nameWidth, MISSING_SKILL_WIDTH, sourceWidth, MISSING_SPEC_WIDTH, MISSING_FACTION_WIDTH
+        - COLLECTION_NAME_INSET - 10 - (COLLECTION_COLUMN_GAP * 4) - fixed
+    local nameWidth = math.max(COLLECTION_NAME_MIN_WIDTH, math.floor(flexible * 0.45))
+    local sourceWidth = math.max(COLLECTION_SOURCE_MIN_WIDTH, flexible - nameWidth)
+    return nameWidth, COLLECTION_SKILL_WIDTH, sourceWidth, COLLECTION_SPEC_WIDTH, COLLECTION_FACTION_WIDTH
 end
 
 -- Single-line, clipped columns: the row is 30px tall, so a string that wrapped
 -- would spill into its neighbour. The full text is in the row tooltip.
-local function makeMissingColumn(row, anchorTo, width)
+local function makeCollectionColumn(row, anchorTo, width)
     local fs = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     if anchorTo then
-        fs:SetPoint("LEFT", anchorTo, "RIGHT", MISSING_COLUMN_GAP, 0)
+        fs:SetPoint("LEFT", anchorTo, "RIGHT", COLLECTION_COLUMN_GAP, 0)
     else
-        fs:SetPoint("LEFT", MISSING_NAME_INSET, 0)
+        fs:SetPoint("LEFT", COLLECTION_NAME_INSET, 0)
     end
     fs:SetWidth(width)
     fs:SetJustifyH("LEFT")
@@ -3422,60 +3464,60 @@ local function makeMissingColumn(row, anchorTo, width)
     return fs
 end
 
-function UI:EnsureMissingRowParts(row)
-    if row.missingPartsReady then return end
+function UI:EnsureCollectionRowParts(row)
+    if row.collectionPartsReady then return end
 
-    row.missingSectionTitle = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    row.missingSectionTitle:SetPoint("LEFT", 10, 0)
-    row.missingSectionTitle:SetPoint("RIGHT", -10, 0)
-    row.missingSectionTitle:SetJustifyH("LEFT")
+    row.collectionSectionTitle = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.collectionSectionTitle:SetPoint("LEFT", 10, 0)
+    row.collectionSectionTitle:SetPoint("RIGHT", -10, 0)
+    row.collectionSectionTitle:SetJustifyH("LEFT")
 
-    local nameWidth, skillWidth, sourceWidth, specWidth, factionWidth = self:GetMissingColumnWidths()
+    local nameWidth, skillWidth, sourceWidth, specWidth, factionWidth = self:GetCollectionColumnWidths()
     -- The left inset leaves room for the recipe icon, which is the shared row
     -- icon the ordinary list uses.
-    row.missingName = makeMissingColumn(row, nil, nameWidth)
-    row.missingSkill = makeMissingColumn(row, row.missingName, skillWidth)
-    row.missingSource = makeMissingColumn(row, row.missingSkill, sourceWidth)
-    row.missingSpec = makeMissingColumn(row, row.missingSource, specWidth)
-    row.missingFaction = makeMissingColumn(row, row.missingSpec, factionWidth)
+    row.collectionName = makeCollectionColumn(row, nil, nameWidth)
+    row.collectionSkill = makeCollectionColumn(row, row.collectionName, skillWidth)
+    row.collectionSource = makeCollectionColumn(row, row.collectionSkill, sourceWidth)
+    row.collectionSpec = makeCollectionColumn(row, row.collectionSource, specWidth)
+    row.collectionFaction = makeCollectionColumn(row, row.collectionSpec, factionWidth)
 
-    row.missingPartsReady = true
+    row.collectionPartsReady = true
 end
 
 -- Re-applied on bind rather than at build time: the window is resizable, and
 -- the two flexible columns follow its width.
-function UI:ApplyMissingColumnWidths(row)
-    local nameWidth, skillWidth, sourceWidth, specWidth, factionWidth = self:GetMissingColumnWidths()
-    if row._rrMissingNameWidth == nameWidth and row._rrMissingSourceWidth == sourceWidth then
+function UI:ApplyCollectionColumnWidths(row)
+    local nameWidth, skillWidth, sourceWidth, specWidth, factionWidth = self:GetCollectionColumnWidths()
+    if row._rrCollectionNameWidth == nameWidth and row._rrCollectionSourceWidth == sourceWidth then
         return
     end
-    row._rrMissingNameWidth = nameWidth
-    row._rrMissingSourceWidth = sourceWidth
-    row.missingName:SetWidth(nameWidth)
-    row.missingSkill:SetWidth(skillWidth)
-    row.missingSource:SetWidth(sourceWidth)
-    row.missingSpec:SetWidth(specWidth)
-    row.missingFaction:SetWidth(factionWidth)
+    row._rrCollectionNameWidth = nameWidth
+    row._rrCollectionSourceWidth = sourceWidth
+    row.collectionName:SetWidth(nameWidth)
+    row.collectionSkill:SetWidth(skillWidth)
+    row.collectionSource:SetWidth(sourceWidth)
+    row.collectionSpec:SetWidth(specWidth)
+    row.collectionFaction:SetWidth(factionWidth)
 end
 
-function UI:SetMissingPartsVisible(row, visible)
-    self:EnsureMissingRowParts(row)
-    setShownIfChanged(row.missingSectionTitle, visible)
-    setShownIfChanged(row.missingName, visible)
-    setShownIfChanged(row.missingSkill, visible)
-    setShownIfChanged(row.missingSource, visible)
-    setShownIfChanged(row.missingSpec, visible)
-    setShownIfChanged(row.missingFaction, visible)
+function UI:SetCollectionPartsVisible(row, visible)
+    self:EnsureCollectionRowParts(row)
+    setShownIfChanged(row.collectionSectionTitle, visible)
+    setShownIfChanged(row.collectionName, visible)
+    setShownIfChanged(row.collectionSkill, visible)
+    setShownIfChanged(row.collectionSource, visible)
+    setShownIfChanged(row.collectionSpec, visible)
+    setShownIfChanged(row.collectionFaction, visible)
 end
 
-function UI:HideMissingRowParts(row)
-    if not row.missingPartsReady then return end
-    setShownIfChanged(row.missingSectionTitle, false)
-    setShownIfChanged(row.missingName, false)
-    setShownIfChanged(row.missingSkill, false)
-    setShownIfChanged(row.missingSource, false)
-    setShownIfChanged(row.missingSpec, false)
-    setShownIfChanged(row.missingFaction, false)
+function UI:HideCollectionRowParts(row)
+    if not row.collectionPartsReady then return end
+    setShownIfChanged(row.collectionSectionTitle, false)
+    setShownIfChanged(row.collectionName, false)
+    setShownIfChanged(row.collectionSkill, false)
+    setShownIfChanged(row.collectionSource, false)
+    setShownIfChanged(row.collectionSpec, false)
+    setShownIfChanged(row.collectionFaction, false)
 end
 
 function UI:HideRecipeRowParts(row)
@@ -3486,7 +3528,7 @@ function UI:HideRecipeRowParts(row)
     setShownIfChanged(row.meta, false)
 end
 
-local function prepareMissingRow(ui, row, rowIdx)
+local function prepareCollectionRow(ui, row, rowIdx)
     local rowHeight = ui:GetListRowHeight()
     row:SetPoint("TOPLEFT", 0, -((rowIdx - 1) * rowHeight))
     row:SetSize(ui:GetListRowWidth(), rowHeight - 2)
@@ -3494,121 +3536,140 @@ local function prepareMissingRow(ui, row, rowIdx)
     row.addonStatusMemberKey = nil
     row.addonStatusGroupKey = nil
     row.addonStatusHeaderRow = false
-    row.missingGroupKey = nil
-    row.missingInfo = nil
-    row.missingLabel = nil
+    row.collectionGroupKey = nil
+    row.collectionInfo = nil
+    row.collectionLabel = nil
     row.tooltipLink = nil
     ui:HideRecipeRowParts(row)
     if row.addonStatusPartsReady then
         ui:SetAddonStatusPartsVisible(row, false)
         ui:SetAddonStatusHeaderButtonsVisible(row, false)
     end
-    ui:SetMissingPartsVisible(row, true)
-    ui:ApplyMissingColumnWidths(row)
-    setRowIconGeometry(row, MISSING_ROW_ICON_SIZE, 10)
+    ui:SetCollectionPartsVisible(row, true)
+    ui:ApplyCollectionColumnWidths(row)
+    setRowIconGeometry(row, COLLECTION_ROW_ICON_SIZE, 10)
 end
 
--- The whole answer for one missing recipe, since the table columns clip.
+-- The whole answer for one collection recipe, since the table columns clip.
 -- Built on top of the recipe's own tooltip when there is an item or spell to
 -- hang it on, so hovering a row still shows what the recipe makes.
-function UI:ShowMissingRowTooltip(row)
-    local missing = row.missingInfo
-    if not missing then return end
+function UI:ShowCollectionRowTooltip(row)
+    local collection = row.collectionInfo
+    if not collection then return end
     GameTooltip:SetOwner(row, "ANCHOR_CURSOR")
     if row.tooltipLink then
         GameTooltip:SetHyperlink(row.tooltipLink)
     else
-        GameTooltip:AddLine(safeText(row.missingLabel))
+        GameTooltip:AddLine(safeText(row.collectionLabel))
     end
 
+    local known = collection.known == true
     GameTooltip:AddLine(" ")
-    GameTooltip:AddLine("Where to learn", 1, 0.82, 0)
-    for _, line in ipairs(missing.sourceLines or { missing.sourceLabel or "" }) do
+    -- A recipe already in the book is not somewhere to go, it is somewhere it
+    -- came from -- worth keeping, because "where did I get this" is a real
+    -- question when a guildmate asks.
+    GameTooltip:AddLine(known and "Where it comes from" or "Where to learn", 1, 0.82, 0)
+    for _, line in ipairs(collection.sourceLines or { collection.sourceLabel or "" }) do
         GameTooltip:AddLine(safeText(line), 0.85, 0.85, 0.85, true)
     end
-    if missing.faction == "alliance" then
+    if collection.faction == "alliance" then
         GameTooltip:AddLine("Alliance only", 0.40, 0.60, 1.0)
-    elseif missing.faction == "horde" then
+    elseif collection.faction == "horde" then
         GameTooltip:AddLine("Horde only", 0.88, 0.33, 0.38)
     end
 
     GameTooltip:AddLine(" ")
-    if missing.requiredSkill then
+    if known then
+        GameTooltip:AddDoubleLine("Learned", collection.professionName or "",
+            0.35, 0.85, 0.45, 0.7, 0.7, 0.7)
+    elseif collection.requiredSkill then
         -- Green or red rather than a bare number: the question the row is
         -- answering is whether you can go and learn it, not what the number is.
         local r, g, b = 0.35, 0.85, 0.45
-        if not missing.skillMet then r, g, b = 0.95, 0.35, 0.35 end
+        if not collection.skillMet then r, g, b = 0.95, 0.35, 0.35 end
         GameTooltip:AddDoubleLine(
-            string.format("%s %d", missing.professionName or "Skill", missing.requiredSkill),
-            string.format("you: %d", missing.skillRank or 0), r, g, b, 0.7, 0.7, 0.7)
-    elseif missing.professionName then
-        GameTooltip:AddLine(missing.professionName, 0.7, 0.7, 0.7)
+            string.format("%s %d", collection.professionName or "Skill", collection.requiredSkill),
+            string.format("you: %d", collection.skillRank or 0), r, g, b, 0.7, 0.7, 0.7)
+    elseif collection.professionName then
+        GameTooltip:AddLine(collection.professionName, 0.7, 0.7, 0.7)
     end
-    if missing.specializationName then
+    if collection.specializationName then
         local r, g, b = 0.35, 0.85, 0.45
-        if not missing.specializationMet then r, g, b = 0.95, 0.35, 0.35 end
-        GameTooltip:AddLine("Requires " .. missing.specializationName, r, g, b)
+        if not known and not collection.specializationMet then r, g, b = 0.95, 0.35, 0.35 end
+        GameTooltip:AddLine("Requires " .. collection.specializationName, r, g, b)
     end
     GameTooltip:Show()
 end
 
-function UI:BindMissingGroupRow(row, rowIdx, rowData)
-    prepareMissingRow(self, row, rowIdx)
-    setShownIfChanged(row.missingName, false)
-    setShownIfChanged(row.missingSkill, false)
-    setShownIfChanged(row.missingSource, false)
-    setShownIfChanged(row.missingSpec, false)
-    setShownIfChanged(row.missingFaction, false)
-    row.missingGroupKey = rowData.groupKey
+function UI:BindCollectionGroupRow(row, rowIdx, rowData)
+    prepareCollectionRow(self, row, rowIdx)
+    setShownIfChanged(row.collectionName, false)
+    setShownIfChanged(row.collectionSkill, false)
+    setShownIfChanged(row.collectionSource, false)
+    setShownIfChanged(row.collectionSpec, false)
+    setShownIfChanged(row.collectionFaction, false)
+    row.collectionGroupKey = rowData.groupKey
 
+    -- "Blacksmithing (185/385)" -- the progress bar of a collection written
+    -- as two numbers. Both come from the whole book, never from the rows the
+    -- current filter happens to draw.
     local arrow = rowData.collapsed and "|cff9fa6b2\226\150\184|r" or "|cff9fa6b2\226\150\190|r"
-    setTextIfChanged(row.missingSectionTitle, string.format("%s %s (%d)", arrow, rowData.groupLabel or "", rowData.count or 0))
-    row.missingSectionTitle:SetTextColor(1.0, 0.82, 0.0)
+    setTextIfChanged(row.collectionSectionTitle, string.format("%s %s |cffffffff(%d/%d)|r",
+        arrow, rowData.groupLabel or "", rowData.known or 0, rowData.count or 0))
+    row.collectionSectionTitle:SetTextColor(1.0, 0.82, 0.0)
     setVertexColorIfChanged(row.stripe, 1, 0.82, 0, 1)
     setBackdropColorsIfChanged(row, 0.10, 0.09, 0.07, 0.98, 0.28, 0.24, 0.12, 0.95)
     setShownIfChanged(row, true)
 end
 
-function UI:BindMissingHeaderRow(row, rowIdx)
-    prepareMissingRow(self, row, rowIdx)
-    setShownIfChanged(row.missingSectionTitle, false)
+function UI:BindCollectionHeaderRow(row, rowIdx)
+    prepareCollectionRow(self, row, rowIdx)
+    setShownIfChanged(row.collectionSectionTitle, false)
 
-    setTextIfChanged(row.missingName, "Recipe")
-    setTextIfChanged(row.missingSkill, "Skill")
-    setTextIfChanged(row.missingSource, "Learned from")
-    setTextIfChanged(row.missingSpec, "Specialization")
-    setTextIfChanged(row.missingFaction, "Faction")
-    row.missingName:SetTextColor(0.72, 0.72, 0.72)
-    row.missingSkill:SetTextColor(0.72, 0.72, 0.72)
-    row.missingSource:SetTextColor(0.72, 0.72, 0.72)
-    row.missingSpec:SetTextColor(0.72, 0.72, 0.72)
-    row.missingFaction:SetTextColor(0.72, 0.72, 0.72)
+    setTextIfChanged(row.collectionName, "Recipe")
+    -- Not "Skill": the column answers "is it in my book, and if not can I get
+    -- it", and the skill numbers are only how it answers the second half.
+    setTextIfChanged(row.collectionSkill, "Status")
+    setTextIfChanged(row.collectionSource, "Learned from")
+    setTextIfChanged(row.collectionSpec, "Specialization")
+    setTextIfChanged(row.collectionFaction, "Faction")
+    row.collectionName:SetTextColor(0.72, 0.72, 0.72)
+    row.collectionSkill:SetTextColor(0.72, 0.72, 0.72)
+    row.collectionSource:SetTextColor(0.72, 0.72, 0.72)
+    row.collectionSpec:SetTextColor(0.72, 0.72, 0.72)
+    row.collectionFaction:SetTextColor(0.72, 0.72, 0.72)
     setVertexColorIfChanged(row.stripe, 0.35, 0.35, 0.35, 1)
     setBackdropColorsIfChanged(row, 0.06, 0.06, 0.06, 0.98, 0.20, 0.20, 0.20, 0.95)
     setShownIfChanged(row, true)
 end
 
-function UI:BindMissingRow(row, rowIdx, rowData)
-    if rowData.rowType == "missingGroup" then
-        self:BindMissingGroupRow(row, rowIdx, rowData)
+-- A recipe already in the book still shows every column -- a collector may
+-- well want to remember where a plan came from -- but it is drawn quiet, so
+-- the eye slides over the collected half and lands on the holes.
+local COLLECTION_KNOWN_DIM = "|cff6f7480"
+
+function UI:BindCollectionRow(row, rowIdx, rowData)
+    if rowData.rowType == "collectionGroup" then
+        self:BindCollectionGroupRow(row, rowIdx, rowData)
         return
     end
-    if rowData.rowType == "missingHeader" then
-        self:BindMissingHeaderRow(row, rowIdx)
+    if rowData.rowType == "collectionHeader" then
+        self:BindCollectionHeaderRow(row, rowIdx)
         return
     end
 
-    prepareMissingRow(self, row, rowIdx)
-    setShownIfChanged(row.missingSectionTitle, false)
+    prepareCollectionRow(self, row, rowIdx)
+    setShownIfChanged(row.collectionSectionTitle, false)
 
     -- Rows arrive unresolved: this is where the name, icon and quality are
     -- actually looked up, for the ~15 rows on screen rather than the several
     -- hundred in the list.
-    if Addon.Data and Addon.Data.ResolveMissingRow then
-        Addon.Data:ResolveMissingRow(rowData)
+    if Addon.Data and Addon.Data.ResolveCollectionRow then
+        Addon.Data:ResolveCollectionRow(rowData)
     end
 
-    local missing = rowData.missing or {}
+    local collection = rowData.collection or {}
+    local known = collection.known == true
     local detail = rowData.detail or {}
     local colorItemID = detail.createdItemID or detail.recipeItemID
     row.tooltipLink = (detail.createdItemID and ("item:" .. detail.createdItemID))
@@ -3616,61 +3677,91 @@ function UI:BindMissingRow(row, rowIdx, rowData)
         or (detail.spellID and ("spell:" .. detail.spellID))
         or nil
 
-    setTextIfChanged(row.missingName, colorItemID
-        and getItemColorizedName(colorItemID, rowData.label)
-        or safeText(rowData.label))
+    setTextIfChanged(row.collectionName, known
+        and string.format("%s%s|r", COLLECTION_KNOWN_DIM, safeText(rowData.label))
+        or (colorItemID
+            and getItemColorizedName(colorItemID, rowData.label)
+            or safeText(rowData.label)))
 
+    -- Desaturated rather than hidden: the icon is how you recognise a recipe
+    -- at a glance, and greying it is what "already collected" looks like
+    -- everywhere else in the game.
     local rowIcon = detail.createdItemIcon or detail.recipeItemIcon or detail.spellIcon
         or getItemIcon(colorItemID)
     setTextureIfChanged(row.icon, rowIcon or "Interface\\Icons\\INV_Misc_QuestionMark")
     if row.icon.SetTexCoord then row.icon:SetTexCoord(0, 1, 0, 1) end
-    setVertexColorIfChanged(row.icon, 1, 1, 1, 1)
+    if row.icon.SetDesaturated then row.icon:SetDesaturated(known) end
+    if known then
+        setVertexColorIfChanged(row.icon, 0.62, 0.62, 0.62, 1)
+    else
+        setVertexColorIfChanged(row.icon, 1, 1, 1, 1)
+    end
     setShownIfChanged(row.icon, true)
 
-    if missing.requiredSkill then
+    if known then
+        -- The one column that changes meaning: for a recipe you have, the
+        -- skill you once needed is history.
+        setTextIfChanged(row.collectionSkill, CHECK_TAG .. " |cff55d66bLearned|r")
+    elseif collection.requiredSkill then
         -- Red only when the character cannot learn it yet: the number alone
         -- does not say whether it is out of reach.
-        local colour = missing.skillMet and "|cffd8d8d8" or COLOR_LOSS_TEXT
-        setTextIfChanged(row.missingSkill, string.format("%s%d|r |cff8f949c/ %d|r",
-            colour, missing.requiredSkill, missing.skillRank or 0))
+        local colour = collection.skillMet and "|cffd8d8d8" or COLOR_LOSS_TEXT
+        setTextIfChanged(row.collectionSkill, string.format("%s%d|r |cff8f949c/ %d|r",
+            colour, collection.requiredSkill, collection.skillRank or 0))
     else
-        setTextIfChanged(row.missingSkill, "|cff8f949c-|r")
+        setTextIfChanged(row.collectionSkill, "|cff8f949c-|r")
     end
 
     -- Colour by what the player has to DO, not by kind for its own sake:
     -- visit somebody, buy something, or go and kill for it. Kinds that ask
-    -- for none of the three stay grey rather than adding another hue.
-    setTextIfChanged(row.missingSource, string.format("%s%s|r",
-        missingSourceColor(missing.sourceKind), safeText(missing.sourceLabel)))
-    if missing.specializationName then
-        local colour = missing.specializationMet and "|cff55d66b" or COLOR_LOSS_TEXT
-        setTextIfChanged(row.missingSpec, string.format("%s%s|r", colour, missing.specializationName))
+    -- for none of the three stay grey rather than adding another hue. A
+    -- recipe already in the book asks for nothing, so it keeps no colour.
+    setTextIfChanged(row.collectionSource, string.format("%s%s|r",
+        known and COLLECTION_KNOWN_DIM or collectionSourceColor(collection.sourceKind),
+        safeText(collection.sourceLabel)))
+    if collection.specializationName then
+        local colour = COLLECTION_KNOWN_DIM
+        if not known then
+            colour = collection.specializationMet and "|cff55d66b" or COLOR_LOSS_TEXT
+        end
+        setTextIfChanged(row.collectionSpec, string.format("%s%s|r", colour, collection.specializationName))
     else
-        setTextIfChanged(row.missingSpec, "|cff8f949c-|r")
+        setTextIfChanged(row.collectionSpec, "|cff8f949c-|r")
     end
 
     -- Nil faction means both sides can get it, which is the common case and
     -- deserves no ink. Only a restriction is worth a word -- and a banner,
     -- which is what the eye actually catches while scanning the column.
-    if missing.faction == "alliance" then
-        setTextIfChanged(row.missingFaction, ALLIANCE_TAG .. " |cff6699ffAlliance|r")
-    elseif missing.faction == "horde" then
-        setTextIfChanged(row.missingFaction, HORDE_TAG .. " |cffe05561Horde|r")
+    if collection.faction == "alliance" then
+        setTextIfChanged(row.collectionFaction, known
+            and (COLLECTION_KNOWN_DIM .. "Alliance|r")
+            or (ALLIANCE_TAG .. " |cff6699ffAlliance|r"))
+    elseif collection.faction == "horde" then
+        setTextIfChanged(row.collectionFaction, known
+            and (COLLECTION_KNOWN_DIM .. "Horde|r")
+            or (HORDE_TAG .. " |cffe05561Horde|r"))
     else
-        setTextIfChanged(row.missingFaction, "|cff8f949c-|r")
+        setTextIfChanged(row.collectionFaction, "|cff8f949c-|r")
     end
 
     -- The columns clip; the tooltip is where the whole answer lives.
-    row.missingInfo = missing
-    row.missingLabel = rowData.label
+    row.collectionInfo = collection
+    row.collectionLabel = rowData.label
 
-    -- The stripe reads as "can I go and get this now?" at a glance.
-    if missing.skillMet and missing.specializationMet then
+    -- The stripe reads as "where does this row stand?" at a glance: collected,
+    -- ready to collect, or out of reach for now.
+    if known then
+        setVertexColorIfChanged(row.stripe, 0.34, 0.40, 0.48, 1)
+    elseif collection.skillMet and collection.specializationMet then
         setVertexColorIfChanged(row.stripe, 0.35, 0.75, 0.45, 1)
     else
         setVertexColorIfChanged(row.stripe, 0.55, 0.35, 0.35, 1)
     end
-    setBackdropColorsIfChanged(row, COLOR_ROW[1], COLOR_ROW[2], COLOR_ROW[3], COLOR_ROW[4], 0.22, 0.22, 0.22, 1)
+    if known then
+        setBackdropColorsIfChanged(row, 0.07, 0.07, 0.08, 0.92, 0.16, 0.16, 0.18, 1)
+    else
+        setBackdropColorsIfChanged(row, COLOR_ROW[1], COLOR_ROW[2], COLOR_ROW[3], COLOR_ROW[4], 0.22, 0.22, 0.22, 1)
+    end
     setShownIfChanged(row, true)
 end
 
@@ -3808,10 +3899,10 @@ function UI:BindRecipeRow(row, recipeIdx, rowData)
         self:BindAddonStatusRow(row, recipeIdx, rowData)
         return
     end
-    if rowData and (rowData.rowType == "missing"
-        or rowData.rowType == "missingGroup"
-        or rowData.rowType == "missingHeader") then
-        self:BindMissingRow(row, recipeIdx, rowData)
+    if rowData and (rowData.rowType == "collection"
+        or rowData.rowType == "collectionGroup"
+        or rowData.rowType == "collectionHeader") then
+        self:BindCollectionRow(row, recipeIdx, rowData)
         return
     end
     rowData = self:RefreshRecipeRowAssets(rowData) or rowData
@@ -3826,10 +3917,10 @@ function UI:BindRecipeRow(row, recipeIdx, rowData)
         self:SetAddonStatusPartsVisible(row, false)
         self:SetAddonStatusHeaderButtonsVisible(row, false)
     end
-    self:HideMissingRowParts(row)
-    row.missingGroupKey = nil
-    row.missingInfo = nil
-    row.missingLabel = nil
+    self:HideCollectionRowParts(row)
+    row.collectionGroupKey = nil
+    row.collectionInfo = nil
+    row.collectionLabel = nil
     setRowIconGeometry(row, RECIPE_ROW_ICON_SIZE, 14)
     setShownIfChanged(row.icon, true)
     setShownIfChanged(row.title, true)
@@ -4039,14 +4130,15 @@ function UI:RefreshRecipeList()
         return
     end
 
-    if self:IsMissingView() then
-        local rows = (Addon.Data and Addon.Data.BuildMissingRecipeRows
-            and Addon.Data:BuildMissingRecipeRows()) or {}
+    if self:IsCollectionView() then
+        local rows = (Addon.Data and Addon.Data.BuildCollectionRows
+            and Addon.Data:BuildCollectionRows()) or {}
         rows = self:FilterRowsBySearch(rows)
-        -- Stashed before the group and header rows are folded in, so the
-        -- header reports recipes rather than table rows.
-        self._missingRecipeCount = #rows
-        self:_FinalizeRecipeList(self:BuildMissingDisplayRows(rows), context, generation)
+        -- The rows arrive unfiltered, because the profession headers have to
+        -- count what the filter hides: "Blacksmithing (185/385)" is the whole
+        -- point of a collection, and it cannot be read off the drawn rows.
+        -- BuildCollectionDisplayRows counts first, then filters.
+        self:_FinalizeRecipeList(self:BuildCollectionDisplayRows(rows), context, generation)
         return
     end
 
@@ -4094,8 +4186,8 @@ function UI:_ShowRecipeListLoadingState(context, generation)
     local headerText
     if context.selectedProfession == "Favorites" then
         headerText = "Favorites - loading..."
-    elseif context.selectedProfession == MISSING_VIEW then
-        headerText = MISSING_VIEW .. " - loading..."
+    elseif context.selectedProfession == COLLECTION_VIEW then
+        headerText = COLLECTION_VIEW .. " - reading your professions..."
     elseif context.selectedProfession and context.categoryFilter then
         headerText = context.selectedProfession .. ": " .. tostring(context.categoryLabel or context.categoryFilter) .. " - loading..."
     elseif context.selectedProfession then
@@ -4174,14 +4266,15 @@ function UI:_FinalizeRecipeList(rows, context, generation)
     local headerText
     if context.selectedProfession == "Favorites" then
         headerText = "Favorite recipes"
-    elseif context.selectedProfession == MISSING_VIEW then
+    elseif context.selectedProfession == COLLECTION_VIEW then
         -- The count is the point of the view, so it goes in the header
         -- rather than making the user scroll to the bottom to find it.
-        headerText = string.format("%s - %d to learn", MISSING_VIEW, self._missingRecipeCount or 0)
-        setTextIfChanged(self.frame.missingTitle, headerText)
+        headerText = string.format("%s - %d of %d learned",
+            COLLECTION_VIEW, self._collectionKnownCount or 0, self._collectionTotalCount or 0)
+        setTextIfChanged(self.frame.collectionTitle, headerText)
         -- Re-run now that the count is known: the help line under the strip
         -- explains an empty list, and only this point knows it is empty.
-        self:RefreshMissingControls()
+        self:RefreshCollectionControls()
     elseif context.selectedProfession and context.categoryFilter then
         headerText = context.selectedProfession .. ": " .. tostring(context.categoryLabel or context.categoryFilter)
     elseif context.selectedProfession then
@@ -4432,11 +4525,11 @@ function UI:FilterRowsBySearch(rows)
     if q == "" then return rows end
     local out = {}
     for _, row in ipairs(rows) do
-        -- Missing rows are built without names. Searching is the one action
+        -- Collection rows are built without names. Searching is the one action
         -- that genuinely needs all of them, and it is a deliberate keystroke
         -- rather than a background refresh, so the cost is paid here.
-        if row.missing and not row._missingResolved and Addon.Data and Addon.Data.ResolveMissingRow then
-            Addon.Data:ResolveMissingRow(row)
+        if row.collection and not row._collectionResolved and Addon.Data and Addon.Data.ResolveCollectionRow then
+            Addon.Data:ResolveCollectionRow(row)
         end
         local searchText
         if self.searchMode == "materials" then
@@ -4451,57 +4544,81 @@ function UI:FilterRowsBySearch(rows)
     return out
 end
 
-function UI:IsMissingGroupCollapsed(groupKey)
-    return self._collapsedMissingGroups ~= nil and self._collapsedMissingGroups[groupKey] == true
+function UI:IsCollectionGroupCollapsed(groupKey)
+    return self._collapsedCollectionGroups ~= nil and self._collapsedCollectionGroups[groupKey] == true
 end
 
-function UI:ToggleMissingGroup(groupKey)
+function UI:ToggleCollectionGroup(groupKey)
     if not groupKey then return end
-    self._collapsedMissingGroups = self._collapsedMissingGroups or {}
-    self._collapsedMissingGroups[groupKey] = (not self._collapsedMissingGroups[groupKey]) or nil
+    self._collapsedCollectionGroups = self._collapsedCollectionGroups or {}
+    self._collapsedCollectionGroups[groupKey] = (not self._collapsedCollectionGroups[groupKey]) or nil
     self:RefreshRecipeList()
 end
 
--- Turns the flat row list from the data layer into the displayed table:
--- one column header, then a collapsible section per profession. Grouping is
--- the profession filter for this view -- with two professions on a
--- character, a filter control would be more chrome than it is worth.
-function UI:BuildMissingDisplayRows(rows)
+-- Turns the flat row list from the data layer into the displayed table: one
+-- column header, then a collapsible section per profession. Grouping is the
+-- profession filter for this view -- with two professions on a character, a
+-- filter control would be more chrome than it is worth.
+--
+-- Counting happens before filtering, deliberately. A profession header reads
+-- "Blacksmithing (185/385)", and both halves of that come from the whole
+-- book: the filter decides what is drawn, never what is counted. When a
+-- search is running the counts follow the matches, which is the honest
+-- reading of "185 of the 385 that match".
+function UI:BuildCollectionDisplayRows(rows)
+    local data = Addon.Data
+    local filter = (data and data.GetCollectionFilter and data:GetCollectionFilter()) or "all"
+
     local order = {}
     local byProfession = {}
+    local totalCount, knownCount, shownCount = 0, 0, 0
     for _, row in ipairs(rows) do
-        local professionName = (row.missing and row.missing.professionName) or "Unknown"
+        local professionName = (row.collection and row.collection.professionName) or "Unknown"
         local bucket = byProfession[professionName]
         if not bucket then
-            bucket = {}
+            bucket = { rows = {}, total = 0, known = 0 }
             byProfession[professionName] = bucket
             order[#order + 1] = professionName
         end
-        bucket[#bucket + 1] = row
+        bucket.rows[#bucket.rows + 1] = row
+        bucket.total = bucket.total + 1
+        totalCount = totalCount + 1
+        if row.collection and row.collection.known then
+            bucket.known = bucket.known + 1
+            knownCount = knownCount + 1
+        end
     end
     table.sort(order)
 
     local out = {}
     if #rows > 0 then
-        out[#out + 1] = { rowType = "missingHeader" }
+        out[#out + 1] = { rowType = "collectionHeader" }
     end
     for _, professionName in ipairs(order) do
         local bucket = byProfession[professionName]
-        local collapsed = self:IsMissingGroupCollapsed(professionName)
+        local collapsed = self:IsCollectionGroupCollapsed(professionName)
         out[#out + 1] = {
-            rowType = "missingGroup",
+            rowType = "collectionGroup",
             groupKey = professionName,
             groupLabel = professionName,
-            count = #bucket,
+            known = bucket.known,
+            count = bucket.total,
             collapsed = collapsed,
         }
-        if not collapsed then
-            for _, row in ipairs(bucket) do
-                row.rowType = "missing"
-                out[#out + 1] = row
+        for _, row in ipairs(bucket.rows) do
+            if not data or not data.CollectionRowPasses or data:CollectionRowPasses(row, filter) then
+                shownCount = shownCount + 1
+                if not collapsed then
+                    row.rowType = "collection"
+                    out[#out + 1] = row
+                end
             end
         end
     end
+
+    self._collectionTotalCount = totalCount
+    self._collectionKnownCount = knownCount
+    self._collectionShownCount = shownCount
     return out
 end
 
@@ -5018,7 +5135,7 @@ function UI:RefreshDetailPanel()
     -- it answers the other half of "can I have this": either somebody in the
     -- guild makes it, or you go and learn it yourself.
     --
-    -- The list form is used here rather than the Missing tab's single joined
+    -- The list form is used here rather than the Collection tab's single joined
     -- line: a recipe sold by four vendors in four cities is four errands, and
     -- the panel has the room to say so.
     local source = detail.source
@@ -5174,10 +5291,10 @@ function UI:Refresh(reasons)
     elseif plan.visibleRows then
         self:RefreshVisibleRecipeRowAssets()
     end
-    -- The missing view takes the full window, so there is no detail panel
+    -- The collection view takes the full window, so there is no detail panel
     -- to refresh; skipping keeps it from rebuilding a hidden panel on every
     -- price or roster tick.
-    if plan.detail and not self:IsMissingView() then
+    if plan.detail and not self:IsCollectionView() then
         self:RefreshDetailPanel()
     end
 end

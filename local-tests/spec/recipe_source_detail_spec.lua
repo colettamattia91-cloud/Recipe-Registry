@@ -1,7 +1,7 @@
 -- Where a recipe comes from, on the recipe detail.
 --
 -- The obtain-side data has been on disk since the source import, but until
--- now only the Missing tab read it, and only as one joined line. The
+-- now only the Collection tab read it, and only as one joined line. The
 -- describer is shared so the two views cannot drift apart, and the detail
 -- panel takes the per-place list form because it has the room for it.
 local Loader = dofile("local-tests/harness/load-addon.lua")
@@ -49,7 +49,7 @@ Test.it("puts the source on the recipe detail", function()
         "got: " .. tostring(detail.source.label))
 end)
 
--- The Missing tab's column is one line, so it joins the places with commas.
+-- The Collection tab's column is one line, so it joins the places with commas.
 -- The panel lists them, because a recipe sold in four cities is four errands
 -- and the reader has to be able to pick one.
 Test.it("gives every place its own line", function()
@@ -148,7 +148,7 @@ Test.it("leaves the specialization empty for a plain recipe", function()
     Test.eq(detail.specializationName, nil)
 end)
 
--- The Missing tab and the detail panel must never disagree about a recipe:
+-- The Collection tab and the detail panel must never disagree about a recipe:
 -- both read the one describer.
 Test.it("describes a recipe the same way for both views", function()
     data:GetOrCreateMember(data:GetPlayerKey()).professions = {}
@@ -168,12 +168,12 @@ Test.it("describes a recipe the same way for both views", function()
     }
     data:InvalidateRecipeCaches()
 
-    local rows = data:BuildMissingRecipeRows()
+    local rows = data:BuildCollectionRows()
     Test.gte(#rows, 1)
     for _, row in ipairs(rows) do
         local source = data:DescribeRecipeSource(row.recipeKey, "alchemy")
-        Test.eq(row.missing.sourceLabel, source.label)
-        Test.eq(row.missing.sourceKind, source.kind)
+        Test.eq(row.collection.sourceLabel, source.label)
+        Test.eq(row.collection.sourceKind, source.kind)
     end
 end)
 

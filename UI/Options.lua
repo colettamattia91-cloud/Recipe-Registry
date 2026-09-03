@@ -346,12 +346,12 @@ local function setProfitableOnly(enabled)
     invalidateRecipeFilters(nil, "filters:profitable-only")
 end
 
--- The missing-recipes tab lists every profession this character has. Some
+-- The collection tab lists every profession this character has. Some
 -- people level a profession they have no intention of completing, so each
 -- one can be dropped from that view without touching the recipe browser.
-local function setMissingRecipesEnabled(professionLabel, enabled)
-    if Addon.Data and Addon.Data.SetMissingRecipesEnabledForProfession then
-        Addon.Data:SetMissingRecipesEnabledForProfession(professionLabel, enabled)
+local function setCollectionEnabled(professionLabel, enabled)
+    if Addon.Data and Addon.Data.SetCollectionEnabledForProfession then
+        Addon.Data:SetCollectionEnabledForProfession(professionLabel, enabled)
     end
     if Addon.UI and Addon.UI.RefreshRecipeList then
         Addon.UI:RefreshRecipeList()
@@ -572,12 +572,12 @@ function Options:RefreshControls()
                 local override = filters.professionExpansionOverrides[profession.key]
                 local custom = type(override) == "table" and override.inherit == false
                 row.customCheck:SetChecked(custom)
-                if row.missingCheck then
+                if row.collectionCheck then
                     local enabled = true
-                    if Addon.Data and Addon.Data.IsMissingRecipesEnabledForProfession then
-                        enabled = Addon.Data:IsMissingRecipesEnabledForProfession(row.professionLabel) ~= false
+                    if Addon.Data and Addon.Data.IsCollectionEnabledForProfession then
+                        enabled = Addon.Data:IsCollectionEnabledForProfession(row.professionLabel) ~= false
                     end
-                    row.missingCheck:SetChecked(enabled)
+                    row.collectionCheck:SetChecked(enabled)
                 end
                 if custom then
                     row.vanillaCheck:SetChecked(override.vanilla ~= false)
@@ -750,14 +750,14 @@ function Options:EnsurePanel()
         local headerTbc = createColumnHeader(content, "TBC")
         headerTbc:SetPoint("CENTER", headerProfession, "LEFT", 372 + 12, 0)
 
-        local headerMissing = createColumnHeader(content, "Missing")
-        headerMissing:SetPoint("CENTER", headerProfession, "LEFT", 460 + 12, 0)
+        local headerCollection = createColumnHeader(content, "Collection")
+        headerCollection:SetPoint("CENTER", headerProfession, "LEFT", 460 + 12, 0)
 
         local separator = content:CreateTexture(nil, "ARTWORK")
         separator:SetColorTexture(0.4, 0.4, 0.4, 0.5)
         separator:SetHeight(1)
         separator:SetPoint("TOPLEFT", headerProfession, "BOTTOMLEFT", 0, -3)
-        separator:SetPoint("RIGHT", headerMissing, "RIGHT", 20, 0)
+        separator:SetPoint("RIGHT", headerCollection, "RIGHT", 20, 0)
 
         self.professionFilterControls = {}
         local previous = separator
@@ -791,20 +791,20 @@ function Options:EnsurePanel()
             setHoverTooltip(tbcCheck, "Show TBC recipes",
                 "Enable Custom on this row to change this value; otherwise it mirrors the global TBC default.")
 
-            local missingCheck = createCheck(content, "", function(self)
-                setMissingRecipesEnabled(profession.label, self:GetChecked() and true or false)
+            local collectionCheck = createCheck(content, "", function(self)
+                setCollectionEnabled(profession.label, self:GetChecked() and true or false)
                 Options:RefreshControls()
             end)
-            missingCheck:SetPoint("CENTER", label, "LEFT", 460 + 12, 0)
-            setHoverTooltip(missingCheck, "List in Missing recipes",
-                "When enabled, the Missing recipes tab lists what this character has still to learn in " .. profession.label .. ". Only professions this character actually has are ever listed.")
+            collectionCheck:SetPoint("CENTER", label, "LEFT", 460 + 12, 0)
+            setHoverTooltip(collectionCheck, "List in Collection",
+                "When enabled, the Collection tab lists this character's " .. profession.label .. " recipe book -- learned and not. Only professions this character actually has are ever listed.")
 
             self.professionFilterControls[professionKey] = {
                 label = label,
                 customCheck = customCheck,
                 vanillaCheck = vanillaCheck,
                 tbcCheck = tbcCheck,
-                missingCheck = missingCheck,
+                collectionCheck = collectionCheck,
                 professionLabel = profession.label,
             }
             previous = label

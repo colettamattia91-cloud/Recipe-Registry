@@ -239,4 +239,62 @@ Test.it("resets migrated prefilters from the panel defaults action", function()
     Test.eq(Test.countKeys(filters.professionExpansionOverrides), 0)
 end)
 
+-- The collection tab shipped as "Missing recipes" and stored its three
+-- settings under that name. Two of them are choices the user made, so they
+-- are carried over rather than defaulted: a profession they switched off
+-- would otherwise come back on, and a hidden tab would reappear.
+Test.it("carries the missing-recipes settings onto the collection tab", function()
+    local addon = Loader.Load({
+        savedVariables = {
+            db = {
+                profile = {
+                    selectedProfession = "Missing recipes",
+                    missingRecipesDisabledProfessions = { Blacksmithing = true },
+                    missingRecipesLearnableOnly = true,
+                    tabs = { addon = false, missing = false },
+                },
+            },
+        },
+    })
+
+    local profile = addon.db.profile
+    Test.eq(profile.selectedProfession, "Collection")
+    Test.eq(profile.collectionDisabledProfessions.Blacksmithing, true)
+    Test.eq(profile.tabs.collection, false)
+    Test.eq(profile.tabs.addon, false)
+    -- The old switch had two states over a list that never showed a learned
+    -- recipe, so its "on" is the new "ready".
+    Test.eq(profile.collectionFilter, "ready")
+
+    -- The old keys are gone, so a later load cannot re-apply them over a
+    -- choice made since.
+    Test.eq(profile.missingRecipesDisabledProfessions, nil)
+    Test.eq(profile.missingRecipesLearnableOnly, nil)
+    Test.eq(profile.tabs.missing, nil)
+end)
+
+-- "Off" on the old switch meant a list of what you had still to learn, which
+-- is the new "unlearned" -- not "all", which shows a half of the tab the user
+-- has never seen.
+Test.it("maps the old switch being off onto the not-learned filter", function()
+    local addon = Loader.Load({
+        savedVariables = {
+            db = {
+                profile = {
+                    missingRecipesLearnableOnly = false,
+                },
+            },
+        },
+    })
+
+    Test.eq(addon.db.profile.collectionFilter, "unlearned")
+end)
+
+Test.it("shows the whole collection for a profile that never had the old tab", function()
+    local addon = Loader.Load()
+    Test.eq(addon.db.profile.collectionFilter, nil)
+    Test.eq(addon.Data:GetCollectionFilter(), "all")
+    Test.eq(addon.db.profile.tabs.collection, true)
+end)
+
 io.write(string.format("Options profile migration: %d test(s) passed\n", Test.count))
