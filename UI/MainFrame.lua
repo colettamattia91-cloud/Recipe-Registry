@@ -2898,6 +2898,10 @@ function UI:EnsureRecipeRow(index)
     return row
 end
 
+-- Wide enough for "1234g 56s 78c", which is more gold than a TBC craft is
+-- ever worth, and narrow enough to leave a reagent name room to breathe.
+local DETAIL_VALUE_WIDTH = 96
+
 function UI:EnsureDetailLine(index)
     local line = self.frame.detailLines[index]
     if line then return line end
@@ -2911,6 +2915,17 @@ function UI:EnsureDetailLine(index)
     if line.text.SetWordWrap then
         line.text:SetWordWrap(true)
     end
+
+    -- A right-hand column for money. The cost block used to write its numbers
+    -- into the same run of prose as their labels, which left three figures a
+    -- reader wants to compare -- what it costs, what it sells for, what is
+    -- left -- starting at three different x positions. Right-aligned they line
+    -- up on the units, which is how money is read.
+    line.value = line:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    line.value:SetPoint("TOPRIGHT", -4, 0)
+    line.value:SetWidth(DETAIL_VALUE_WIDTH)
+    line.value:SetJustifyH("RIGHT")
+    line.value:Hide()
 
     -- Compact text button matching the addon's gold/dark theme. The
     -- previous icon-only square (a 16x16 tinted FriendsList chat sprite)
@@ -3974,7 +3989,12 @@ end
 -- longest possible content and no wider; what is left over goes to the recipe
 -- name and the source, because those are the two that get cut off.
 local COLLECTION_COLUMN_GAP = 8
-local COLLECTION_NAME_INSET = 40
+-- The rows are indented under the profession header they belong to. A header
+-- with a warmer background and a taller row was still reading as one more row
+-- in a list of four hundred; an indent is what a list uses to say "these
+-- belong to that", and it costs the name column sixteen pixels.
+local COLLECTION_GROUP_INDENT = 16
+local COLLECTION_NAME_INSET = 40 + COLLECTION_GROUP_INDENT
 local COLLECTION_STATUS_WIDTH = 92
 local COLLECTION_SKILL_WIDTH = 62
 local COLLECTION_SPEC_WIDTH = 148
@@ -4019,6 +4039,8 @@ function UI:EnsureCollectionRowParts(row)
     if row.collectionPartsReady then return end
 
     row.collectionSectionTitle = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    -- Deliberately outside the indent: the header is the thing the rows are
+    -- indented from, so it keeps the left margin to itself.
     row.collectionSectionTitle:SetPoint("LEFT", 10, 0)
     row.collectionSectionTitle:SetPoint("RIGHT", -10, 0)
     row.collectionSectionTitle:SetJustifyH("LEFT")
@@ -4171,7 +4193,7 @@ local function prepareCollectionRow(ui, row, rowData)
     ui:SetCollectionPartsVisible(row, true)
     ui:SetCollectionHeaderButtonsVisible(row, false)
     ui:ApplyCollectionColumnWidths(row)
-    setRowIconGeometry(row, COLLECTION_ROW_ICON_SIZE, 10)
+    setRowIconGeometry(row, COLLECTION_ROW_ICON_SIZE, 10 + COLLECTION_GROUP_INDENT)
 end
 
 -- The whole answer for one recipe, since the columns still clip sideways.
@@ -5571,13 +5593,22 @@ function UI:RenderDetailLines(lines, lineLinks, lineMeta)
             line.requestTarget = whisperTargetFromMemberKey(meta.memberKey)
             local showActionButton = meta.canRequest == true
             setShownIfChanged(line.actionButton, showActionButton)
+            setShownIfChanged(line.value, false)
             line.text:ClearAllPoints()
             line.text:SetPoint("TOPLEFT", 0, 0)
             -- Reserve room for the 36px-wide Ask button + 4px breathing
             -- room. -4 still applies when the button is hidden.
             line.text:SetPoint("TOPRIGHT", showActionButton and -44 or -4, 0)
+        elseif meta and meta.value then
+            setShownIfChanged(line.actionButton, false)
+            setTextIfChanged(line.value, meta.value)
+            setShownIfChanged(line.value, true)
+            line.text:ClearAllPoints()
+            line.text:SetPoint("TOPLEFT", 0, 0)
+            line.text:SetPoint("TOPRIGHT", -(DETAIL_VALUE_WIDTH + 12), 0)
         else
             setShownIfChanged(line.actionButton, false)
+            setShownIfChanged(line.value, false)
             line.text:ClearAllPoints()
             line.text:SetPoint("TOPLEFT", 0, 0)
             line.text:SetPoint("TOPRIGHT", -4, 0)
@@ -5892,14 +5923,22 @@ function UI:RefreshDetailPanel()
         for _, reagent in ipairs(detail.reagents) do
             local icon = reagent.icon or getItemIcon(reagent.itemID)
             local name = getItemColorizedName(reagent.itemID, safeText(reagent.name))
-            local unitCost = formatMoney(reagent.unitCost)
-            local lineCost = formatMoney(reagent.totalCost)
-            lines[#lines + 1] = string.format("%s  %s x%d", materialTextureTag(icon), name, reagent.count or 1)
+            local count = reagent.count or 1
+            lines[#lines + 1] = string.format("%s  %s x%d", materialTextureTag(icon), name, count)
             lineLinks[#lines] = getItemLinkByID(reagent.itemID)
             lineMeta[#lines] = {
                 tooltipLink = getItemLinkByID(reagent.itemID),
+                -- What this reagent costs for this craft, in the money column
+                -- rather than on a line of its own: the materials list was
+                -- twice as tall as it needed to be, and half of it was the
+                -- word "Total".
+                value = "|cff9fa6b2" .. formatMoney(reagent.totalCost) .. "|r",
             }
-            lines[#lines + 1] = string.format("|cff9fa6b2   Unit: %s   Total: %s|r", unitCost, lineCost)
+            -- The unit price only says something the total does not when more
+            -- than one is needed.
+            if count > 1 then
+                lines[#lines + 1] = string.format("|cff6f7480   %s each|r", formatMoney(reagent.unitCost))
+            end
         end
     elseif detail.directEnchant then
         lines[#lines + 1] = "No material mapping available for this enchant."
@@ -5907,54 +5946,76 @@ function UI:RefreshDetailPanel()
         lines[#lines + 1] = "No material mapping available."
     end
 
-    if detail.cost and (detail.cost.pricedCount or 0) > 0 then
-        lines[#lines + 1] = " "
-        lines[#lines + 1] = "|cffffd100Cost estimate|r"
-        lines[#lines + 1] = string.format("|cffffffffTotal: %s|r", formatMoney(detail.cost.total))
-        lines[#lines + 1] = string.format("|cff8f949cSources: %s|r", tostring(detail.cost.source or "N/A"))
-        if (detail.cost.missingCount or 0) > 0 then
-            lines[#lines + 1] = string.format("|cff8f949cMissing prices: %d reagent(s)|r", detail.cost.missingCount)
-        end
-    end
-
-    -- Craft value sits directly under the cost estimate so the two numbers
-    -- profit is derived from are read together. Shown whenever the created
-    -- item has a market price, even if the reagents don't -- "what does this
-    -- sell for" is useful on its own, and the profit line says so when it
-    -- can only be an upper bound.
-    if detail.value then
+    -- Cost, value and profit are one question asked three ways, so they are
+    -- one block with one column of numbers rather than two headed sections
+    -- with the provenance of each repeated in the middle of them. Everything
+    -- that is not a figure -- where the prices came from, what the yield is,
+    -- what is missing -- goes underneath, once.
+    local hasCost = detail.cost and (detail.cost.pricedCount or 0) > 0
+    if hasCost or detail.value then
         local value = detail.value
-        local hasYieldRange = (value.countMax or value.count) > value.count
-        lines[#lines + 1] = " "
-        lines[#lines + 1] = "|cffffd100Craft value|r"
-        if hasYieldRange then
-            lines[#lines + 1] = string.format("|cffffffffSells for: %s - %s   (x%d-%d @ %s)|r",
-                formatMoney(value.total), formatMoney(value.totalMax),
-                value.count, value.countMax, formatMoney(value.unitPrice))
-        elseif value.count > 1 then
-            lines[#lines + 1] = string.format("|cffffffffSells for: %s   (x%d @ %s)|r",
-                formatMoney(value.total), value.count, formatMoney(value.unitPrice))
-        else
-            lines[#lines + 1] = string.format("|cffffffffSells for: %s|r", formatMoney(value.total))
-        end
-        lines[#lines + 1] = string.format("|cff8f949cSource: %s|r", tostring(value.source or "N/A"))
+        local hasYieldRange = value and (value.countMax or value.count) > value.count
 
-        local profit = detail.profit
-        if profit then
-            -- Coloured by the low end: a range that straddles zero is not a
-            -- profitable craft, it is a gamble.
-            local colour = (profit.total >= 0) and COLOR_PROFIT_TEXT or COLOR_LOSS_TEXT
-            local amount = formatSignedMoney(profit.total)
+        lines[#lines + 1] = " "
+        lines[#lines + 1] = "|cffffd100Cost and profit|r"
+
+        if hasCost then
+            lines[#lines + 1] = "|cffd8d8d8Materials|r"
+            lineMeta[#lines] = { value = "|cffffffff" .. formatMoney(detail.cost.total) .. "|r" }
+        end
+
+        if value then
+            lines[#lines + 1] = "|cffd8d8d8Sells for|r"
+            local sells = formatMoney(value.total)
             if hasYieldRange then
-                amount = string.format("%s - %s", amount, formatSignedMoney(profit.totalMax))
+                sells = sells .. " - " .. formatMoney(value.totalMax)
             end
-            local label = profit.taxed and "Profit (after 5% AH cut)" or "Profit"
-            lines[#lines + 1] = string.format("%s%s: %s|r", colour, label, amount)
-            if not profit.complete then
-                lines[#lines + 1] = "|cff8f949cSome reagents have no price: profit is an upper bound.|r"
+            lineMeta[#lines] = { value = "|cffffffff" .. sells .. "|r" }
+
+            local profit = detail.profit
+            if profit then
+                -- Coloured by the low end: a range that straddles zero is not
+                -- a profitable craft, it is a gamble.
+                local colour = (profit.total >= 0) and COLOR_PROFIT_TEXT or COLOR_LOSS_TEXT
+                local amount = formatSignedMoney(profit.total)
+                if hasYieldRange then
+                    amount = amount .. " - " .. formatSignedMoney(profit.totalMax)
+                end
+                lines[#lines + 1] = string.format("%s%s|r", colour,
+                    profit.taxed and "Profit (after 5% AH cut)" or "Profit")
+                lineMeta[#lines] = { value = colour .. amount .. "|r" }
             end
-        else
-            lines[#lines + 1] = "|cff8f949cProfit: no reagent prices available.|r"
+        end
+
+        -- The footnotes, in one run: what the yield is, where the prices came
+        -- from, and what the answer is missing.
+        local notes = {}
+        if value then
+            if hasYieldRange then
+                notes[#notes + 1] = string.format("x%d-%d @ %s",
+                    value.count, value.countMax, formatMoney(value.unitPrice))
+            elseif value.count > 1 then
+                notes[#notes + 1] = string.format("x%d @ %s", value.count, formatMoney(value.unitPrice))
+            end
+        end
+        local priceSource = (hasCost and detail.cost.source) or (value and value.source)
+        if priceSource then
+            notes[#notes + 1] = "prices from " .. tostring(priceSource)
+        end
+        if #notes > 0 then
+            -- Separated by spaces, not by a glyph: WoW's fonts do not carry
+            -- the punctuation that would look right here.
+            lines[#lines + 1] = "|cff8f949c" .. table.concat(notes, "   ") .. "|r"
+        end
+
+        if hasCost and (detail.cost.missingCount or 0) > 0 then
+            lines[#lines + 1] = string.format(
+                "|cff8f949c%d reagent(s) have no price, so these figures are a best case.|r",
+                detail.cost.missingCount)
+        elseif value and not detail.profit then
+            lines[#lines + 1] = "|cff8f949cNo reagent prices, so there is no profit to work out.|r"
+        elseif detail.profit and not detail.profit.complete then
+            lines[#lines + 1] = "|cff8f949cSome reagents have no price: profit is an upper bound.|r"
         end
     end
 

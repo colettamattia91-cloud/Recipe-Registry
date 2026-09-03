@@ -70,8 +70,9 @@ Test.it("lays out five columns that fit the row", function()
     for _, width in ipairs({ nameWidth, statusWidth, skillWidth, sourceWidth, specWidth }) do
         Test.gte(width, 1)
     end
-    -- 40px icon inset, four 8px gaps, 10px of right margin.
-    local total = 40 + nameWidth + statusWidth + skillWidth + sourceWidth + specWidth + (8 * 4) + 10
+    -- 40px icon inset plus the 16px the rows are indented under their
+    -- profession header, four 8px gaps, 10px of right margin.
+    local total = 56 + nameWidth + statusWidth + skillWidth + sourceWidth + specWidth + (8 * 4) + 10
     Test.lte(total, ui:GetListRowWidth() + 1)
 end)
 
@@ -990,6 +991,62 @@ Test.it("ships the four thresholds and the per-NPC places in the metadata", func
     -- Nearly all of them; the handful without are what the fallback is for.
     Test.gte(withLevels, math.floor(total * 0.9))
     Test.gte(withCoords, 500)
+end)
+
+-- A header with a warmer background and a taller row was still reading as one
+-- more row in a list of four hundred. Indenting what belongs to it is what a
+-- list does instead.
+Test.it("indents the recipes under the profession they belong to", function()
+    local parts = bodyOf("function UI:EnsureCollectionRowParts(")
+    Test.truthy(parts ~= nil)
+    Test.truthy(parts:find('row.collectionSectionTitle:SetPoint("LEFT", 10, 0)', 1, true) ~= nil,
+        "the profession header keeps the left margin")
+    local prepare = bodyOf("local function prepareCollectionRow(")
+    Test.truthy(prepare:find("COLLECTION_GROUP_INDENT", 1, true) ~= nil,
+        "a recipe row starts further in than its header")
+    Test.truthy(mainFrameSource:find("local COLLECTION_NAME_INSET = 40 + COLLECTION_GROUP_INDENT", 1, true) ~= nil,
+        "the name column moves with the icon, or the two come apart")
+end)
+
+-- Three figures a reader compares -- what it costs, what it sells for, what is
+-- left -- used to start at three different x positions, in two headed blocks,
+-- with the price provenance repeated in the middle of them.
+Test.it("gives the money block a column of its own to line up in", function()
+    local ensure = bodyOf("function UI:EnsureDetailLine(")
+    Test.truthy(ensure ~= nil)
+    Test.truthy(ensure:find("line.value", 1, true) ~= nil, "a detail line needs a value column")
+    Test.truthy(ensure:find('line.value:SetJustifyH("RIGHT")', 1, true) ~= nil,
+        "money lines up on its units, so the column is right-justified")
+
+    local render = bodyOf("function UI:RenderDetailLines(")
+    Test.truthy(render:find("meta.value", 1, true) ~= nil,
+        "the renderer has to be told which lines carry a figure")
+    -- The Ask button and the value column both want the right-hand end of the
+    -- line, so exactly one of them can be showing.
+    Test.truthy(render:find("setShownIfChanged(line.value, false)", 1, true) ~= nil,
+        "a crafter line must put the value column away")
+
+    Test.eq(mainFrameSource:find("Cost estimate", 1, true), nil,
+        "cost, value and profit are one block now")
+    Test.truthy(mainFrameSource:find("Cost and profit", 1, true) ~= nil)
+end)
+
+-- Seven sections in one eleven-hundred-pixel column put the sync sliders below
+-- the fold on most resolutions.
+Test.it("splits the options panel into pages", function()
+    local handle = assert(io.open("UI/Options.lua", "r"))
+    local optionsSource = handle:read("*a")
+    handle:close()
+
+    for _, page in ipairs({ "browsing", "filters", "interface", "sync", "tools" }) do
+        Test.truthy(optionsSource:find('key = "' .. page .. '"', 1, true) ~= nil,
+            "expected an options page for " .. page)
+    end
+    -- Every section header now opens a page rather than continuing a column.
+    Test.eq(optionsSource:find('createHeader(content,', 1, true), nil,
+        "no section may still be anchored to the one before it across pages")
+    Test.truthy(optionsSource:find("createPageHeader(pageFilters", 1, true) ~= nil)
+    Test.truthy(optionsSource:find("createPageHeader(pageSync", 1, true) ~= nil)
 end)
 
 io.write(string.format("Collection tab view: %d test(s) passed\n", Test.count))

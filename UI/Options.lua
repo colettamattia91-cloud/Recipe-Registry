@@ -173,6 +173,15 @@ local function createHeader(parent, text, anchor, yOffset)
     return header
 end
 
+-- A header that opens a page rather than continuing a column: the first
+-- section on a page has nothing above it to hang from.
+local function createPageHeader(page, text)
+    local header = page:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    header:SetPoint("TOPLEFT", page, "TOPLEFT", SECTION_LEFT_X, -4)
+    header:SetText(text)
+    return header
+end
+
 local function createText(parent, text, template)
     local fs = parent:CreateFontString(nil, "ARTWORK", template or "GameFontDisableSmall")
     fs:SetWidth(560)
@@ -207,6 +216,73 @@ local function createColumnHeader(parent, text, width)
     fs:SetJustifyH("CENTER")
     fs:SetText(text or "")
     return fs
+end
+
+-- The panel was one column eleven hundred pixels tall: seven unrelated
+-- sections, scrolled past each other, with the sync sliders below the fold on
+-- most resolutions. These are the same sections, grouped by what a person came
+-- to change and put on pages, so each one is a screenful and the tab strip is
+-- the table of contents.
+--
+-- Pages carry their own height because a WoW frame does not size itself to its
+-- children; the scroll child is resized to the open page, which is also what
+-- stops a short page from scrolling into empty space.
+local OPTION_PAGES = {
+    { key = "browsing",  label = "Browsing",  height = 300 },
+    { key = "filters",   label = "Filters",   height = 560 },
+    { key = "interface", label = "Interface", height = 380 },
+    { key = "sync",      label = "Sync",      height = 320 },
+    { key = "tools",     label = "Tools",     height = 260 },
+}
+local OPTION_PAGE_TOP = -96
+
+local function createOptionPages(content, scrollFrame)
+    local pages, buttons = {}, {}
+
+    local function show(key)
+        for pageKey, page in pairs(pages) do
+            if pageKey == key then page:Show() else page:Hide() end
+        end
+        for buttonKey, button in pairs(buttons) do
+            -- The open page's button is held down, which is how a Blizzard
+            -- panel says "you are here" without a second widget for it.
+            if button.SetButtonState then
+                button:SetButtonState(buttonKey == key and "PUSHED" or "NORMAL", buttonKey == key)
+            end
+        end
+        for _, definition in ipairs(OPTION_PAGES) do
+            if definition.key == key and content.SetHeight then
+                content:SetHeight(definition.height - OPTION_PAGE_TOP)
+            end
+        end
+        if scrollFrame and scrollFrame.SetVerticalScroll then
+            scrollFrame:SetVerticalScroll(0)
+        end
+    end
+
+    local previous = nil
+    for _, definition in ipairs(OPTION_PAGES) do
+        local page = CreateFrame("Frame", nil, content)
+        page:SetPoint("TOPLEFT", content, "TOPLEFT", 0, OPTION_PAGE_TOP)
+        page:SetPoint("TOPRIGHT", content, "TOPRIGHT", 0, OPTION_PAGE_TOP)
+        page:SetHeight(definition.height)
+        page:Hide()
+        pages[definition.key] = page
+
+        local button = createButton(content, definition.label, 96, function()
+            show(definition.key)
+        end)
+        if previous then
+            button:SetPoint("LEFT", previous, "RIGHT", 4, 0)
+        else
+            button:SetPoint("TOPLEFT", content, "TOPLEFT", SECTION_LEFT_X, -64)
+        end
+        buttons[definition.key] = button
+        previous = button
+    end
+
+    show(OPTION_PAGES[1].key)
+    return pages, buttons, show
 end
 
 local function setHoverTooltip(frame, title, body)
@@ -644,7 +720,8 @@ function Options:EnsurePanel()
         scrollFrame:SetPoint("TOPLEFT", 0, 0)
         scrollFrame:SetPoint("BOTTOMRIGHT", -28, 0)
         content = CreateFrame("Frame", nil, scrollFrame)
-        content:SetSize(560, 1180)
+        -- Resized to whichever page is open; see createOptionPages.
+        content:SetSize(560, 420)
         scrollFrame:SetScrollChild(content)
     else
         content = panel
@@ -665,81 +742,91 @@ function Options:EnsurePanel()
     local version = createText(content, "Version: " .. tostring(Addon.DISPLAY_VERSION or "?"))
     version:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -8)
 
-    local layoutHeader = createHeader(content, "Directory Layout", version, -18)
-    local categoryCheck = createCheck(content, "Show recipe categories when available", function(self)
+    local pages, pageButtons, showPage = createOptionPages(content, scrollFrame)
+    self.pages = pages
+    self.pageButtons = pageButtons
+    self.ShowPage = function(_, key) showPage(key) end
+    local pageBrowsing = pages.browsing
+    local pageFilters = pages.filters
+    local pageInterface = pages.interface
+    local pageSync = pages.sync
+    local pageTools = pages.tools
+
+    local layoutHeader = createPageHeader(pageBrowsing, "Directory Layout")
+    local categoryCheck = createCheck(pageBrowsing, "Show recipe categories when available", function(self)
         setRecipeCategoriesEnabled(self:GetChecked() and true or false)
         Options:RefreshControls()
     end)
     categoryCheck:SetPoint("TOPLEFT", layoutHeader, "BOTTOMLEFT", -2, -8)
     self.categoryCheck = categoryCheck
 
-    local categoryHelp = createText(content, "When enabled, selecting a profession can expand into All plus metadata categories.")
+    local categoryHelp = createText(pageBrowsing, "When enabled, selecting a profession can expand into All plus metadata categories.")
     categoryHelp:SetPoint("TOPLEFT", categoryCheck, "BOTTOMLEFT", 28, 0)
 
-    local categoryViewLabel = createText(content, "Category view", "GameFontHighlightSmall")
+    local categoryViewLabel = createText(pageBrowsing, "Category view", "GameFontHighlightSmall")
     categoryViewLabel:SetPoint("TOPLEFT", categoryHelp, "BOTTOMLEFT", 0, -8)
 
-    local expandedViewRadio = createRadio(content, "Expanded tree (all subcategories shown)", function()
+    local expandedViewRadio = createRadio(pageBrowsing, "Expanded tree (all subcategories shown)", function()
         setRecipeCategoryView("expanded")
         Options:RefreshControls()
     end)
     expandedViewRadio:SetPoint("TOPLEFT", categoryViewLabel, "BOTTOMLEFT", -2, -6)
     self.categoryViewExpandedRadio = expandedViewRadio
 
-    local accordionViewRadio = createRadio(content, "Collapsible (one category expanded at a time)", function()
+    local accordionViewRadio = createRadio(pageBrowsing, "Collapsible (one category expanded at a time)", function()
         setRecipeCategoryView("accordion")
         Options:RefreshControls()
     end)
     accordionViewRadio:SetPoint("TOPLEFT", expandedViewRadio, "BOTTOMLEFT", 0, -2)
     self.categoryViewAccordionRadio = accordionViewRadio
 
-    local categoriesOnlyViewRadio = createRadio(content, "Categories only (hide subcategories)", function()
+    local categoriesOnlyViewRadio = createRadio(pageBrowsing, "Categories only (hide subcategories)", function()
         setRecipeCategoryView("categoriesOnly")
         Options:RefreshControls()
     end)
     categoriesOnlyViewRadio:SetPoint("TOPLEFT", accordionViewRadio, "BOTTOMLEFT", 0, -2)
     self.categoryViewCategoriesOnlyRadio = categoriesOnlyViewRadio
 
-    local searchHeader = createHeader(content, "Search Defaults", categoriesOnlyViewRadio, -18)
-    local recipeSearchRadio = createRadio(content, "Recipe names only", function()
+    local searchHeader = createHeader(pageBrowsing, "Search Defaults", categoriesOnlyViewRadio, -18)
+    local recipeSearchRadio = createRadio(pageBrowsing, "Recipe names only", function()
         setSearchMode("recipe")
         Options:RefreshControls()
     end)
     recipeSearchRadio:SetPoint("TOPLEFT", searchHeader, "BOTTOMLEFT", -2, -8)
     self.recipeSearchRadio = recipeSearchRadio
 
-    local materialSearchRadio = createRadio(content, "Recipe names and materials", function()
+    local materialSearchRadio = createRadio(pageBrowsing, "Recipe names and materials", function()
         setSearchMode("materials")
         Options:RefreshControls()
     end)
     materialSearchRadio:SetPoint("TOPLEFT", recipeSearchRadio, "BOTTOMLEFT", 0, -2)
     self.materialSearchRadio = materialSearchRadio
 
-    local searchHelp = createText(content, "This sets the default scope. The search bar can still be changed quickly while browsing.")
+    local searchHelp = createText(pageBrowsing, "This sets the default scope. The search bar can still be changed quickly while browsing.")
     searchHelp:SetPoint("TOPLEFT", materialSearchRadio, "BOTTOMLEFT", 28, 0)
 
-    local filterHeader = createHeader(content, "Recipe Filters", searchHelp, -18)
-    local filterPluginHint = createText(content, "")
+    local filterHeader = createPageHeader(pageFilters, "Recipe Filters")
+    local filterPluginHint = createText(pageFilters, "")
     filterPluginHint:SetPoint("TOPLEFT", filterHeader, "BOTTOMLEFT", 0, -6)
     self.filterPluginHint = filterPluginHint
 
     local filterAnchor = filterPluginHint
     if hasMetadataPlugin() then
-        local globalVanillaCheck = createCheck(content, "Show Vanilla recipes by default", function(self)
+        local globalVanillaCheck = createCheck(pageFilters, "Show Vanilla recipes by default", function(self)
             setFilterExpansionDefault("vanilla", self:GetChecked() and true or false)
             Options:RefreshControls()
         end)
         globalVanillaCheck:SetPoint("TOPLEFT", filterPluginHint, "BOTTOMLEFT", -2, -8)
         self.globalVanillaCheck = globalVanillaCheck
 
-        local globalTbcCheck = createCheck(content, "Show TBC recipes by default", function(self)
+        local globalTbcCheck = createCheck(pageFilters, "Show TBC recipes by default", function(self)
             setFilterExpansionDefault("tbc", self:GetChecked() and true or false)
             Options:RefreshControls()
         end)
         globalTbcCheck:SetPoint("TOPLEFT", globalVanillaCheck, "BOTTOMLEFT", 0, -2)
         self.globalTbcCheck = globalTbcCheck
 
-        local remoteBopCheck = createCheck(content, "Show remote BoP and self-only recipes", function(self)
+        local remoteBopCheck = createCheck(pageFilters, "Show remote BoP and self-only recipes", function(self)
             setRemoteBopVisible(self:GetChecked() and true or false)
             Options:RefreshControls()
         end)
@@ -750,33 +837,33 @@ function Options:EnsurePanel()
         -- sells for more than its reagents, and out otherwise. Recipes whose
         -- price cannot be resolved end to end are out too, which is why this
         -- is opt-in -- without TSM or Auctionator data it empties the list.
-        local profitableOnlyCheck = createCheck(content, "Show only profitable recipes (needs TSM or Auctionator)", function(self)
+        local profitableOnlyCheck = createCheck(pageFilters, "Show only profitable recipes (needs TSM or Auctionator)", function(self)
             setProfitableOnly(self:GetChecked() and true or false)
             Options:RefreshControls()
         end)
         profitableOnlyCheck:SetPoint("TOPLEFT", remoteBopCheck, "BOTTOMLEFT", 0, -2)
         self.profitableOnlyCheck = profitableOnlyCheck
 
-        local matrixHeader = createText(content, "Profession overrides", "GameFontNormalSmall")
+        local matrixHeader = createText(pageFilters, "Profession overrides", "GameFontNormalSmall")
         matrixHeader:SetPoint("TOPLEFT", profitableOnlyCheck, "BOTTOMLEFT", 28, -10)
 
-        local headerProfession = createColumnHeader(content, "Profession", 132)
+        local headerProfession = createColumnHeader(pageFilters, "Profession", 132)
         headerProfession:SetJustifyH("LEFT")
         headerProfession:SetPoint("TOPLEFT", matrixHeader, "BOTTOMLEFT", 0, -8)
 
-        local headerCustom = createColumnHeader(content, "Custom")
+        local headerCustom = createColumnHeader(pageFilters, "Custom")
         headerCustom:SetPoint("CENTER", headerProfession, "LEFT", 190 + 12, 0)
 
-        local headerVanilla = createColumnHeader(content, "Vanilla")
+        local headerVanilla = createColumnHeader(pageFilters, "Vanilla")
         headerVanilla:SetPoint("CENTER", headerProfession, "LEFT", 284 + 12, 0)
 
-        local headerTbc = createColumnHeader(content, "TBC")
+        local headerTbc = createColumnHeader(pageFilters, "TBC")
         headerTbc:SetPoint("CENTER", headerProfession, "LEFT", 372 + 12, 0)
 
-        local headerCollection = createColumnHeader(content, "Collection")
+        local headerCollection = createColumnHeader(pageFilters, "Collection")
         headerCollection:SetPoint("CENTER", headerProfession, "LEFT", 460 + 12, 0)
 
-        local separator = content:CreateTexture(nil, "ARTWORK")
+        local separator = pageFilters:CreateTexture(nil, "ARTWORK")
         separator:SetColorTexture(0.4, 0.4, 0.4, 0.5)
         separator:SetHeight(1)
         separator:SetPoint("TOPLEFT", headerProfession, "BOTTOMLEFT", 0, -3)
@@ -786,11 +873,11 @@ function Options:EnsurePanel()
         local previous = separator
         for _, profession in ipairs(FILTER_PROFESSIONS) do
             local professionKey = profession.key
-            local label = createText(content, profession.label, "GameFontHighlightSmall")
+            local label = createText(pageFilters, profession.label, "GameFontHighlightSmall")
             label:SetWidth(132)
             label:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -6)
 
-            local customCheck = createCheck(content, "", function(self)
+            local customCheck = createCheck(pageFilters, "", function(self)
                 setProfessionCustom(professionKey, self:GetChecked() and true or false)
                 Options:RefreshControls()
             end)
@@ -798,7 +885,7 @@ function Options:EnsurePanel()
             setHoverTooltip(customCheck, "Custom override",
                 "When enabled, " .. profession.label .. " uses its own Vanilla/TBC visibility instead of the global defaults above.")
 
-            local vanillaCheck = createCheck(content, "", function(self)
+            local vanillaCheck = createCheck(pageFilters, "", function(self)
                 setProfessionExpansion(professionKey, "vanilla", self:GetChecked() and true or false)
                 Options:RefreshControls()
             end)
@@ -806,7 +893,7 @@ function Options:EnsurePanel()
             setHoverTooltip(vanillaCheck, "Show Vanilla recipes",
                 "Enable Custom on this row to change this value; otherwise it mirrors the global Vanilla default.")
 
-            local tbcCheck = createCheck(content, "", function(self)
+            local tbcCheck = createCheck(pageFilters, "", function(self)
                 setProfessionExpansion(professionKey, "tbc", self:GetChecked() and true or false)
                 Options:RefreshControls()
             end)
@@ -814,7 +901,7 @@ function Options:EnsurePanel()
             setHoverTooltip(tbcCheck, "Show TBC recipes",
                 "Enable Custom on this row to change this value; otherwise it mirrors the global TBC default.")
 
-            local collectionCheck = createCheck(content, "", function(self)
+            local collectionCheck = createCheck(pageFilters, "", function(self)
                 setCollectionEnabled(profession.label, self:GetChecked() and true or false)
                 Options:RefreshControls()
             end)
@@ -833,7 +920,7 @@ function Options:EnsurePanel()
             previous = label
         end
 
-        local filterWarning = createText(content, "", "GameFontDisableSmall")
+        local filterWarning = createText(pageFilters, "", "GameFontDisableSmall")
         filterWarning:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -10)
         self.filterWarning = filterWarning
         filterAnchor = filterWarning
@@ -841,7 +928,7 @@ function Options:EnsurePanel()
 
     -- Driven off the UI module's tab registry, so a tab added there shows up
     -- here without touching this panel.
-    local tabsHeader = createHeader(content, "Tabs", filterAnchor, -18)
+    local tabsHeader = createPageHeader(pageInterface, "Tabs")
     local tabDefinitions = (Addon.UI and Addon.UI.GetMainTabDefinitions
         and Addon.UI:GetMainTabDefinitions()) or {}
     local previousTabCheck = nil
@@ -849,7 +936,7 @@ function Options:EnsurePanel()
     for _, definition in ipairs(tabDefinitions) do
         if definition.optional then
             local tabKey = definition.key
-            local tabCheck = createCheck(content, "Show the " .. definition.label .. " tab", function(self)
+            local tabCheck = createCheck(pageInterface, "Show the " .. definition.label .. " tab", function(self)
                 setMainTabEnabled(tabKey, self:GetChecked() and true or false)
                 Options:RefreshControls()
             end)
@@ -865,15 +952,15 @@ function Options:EnsurePanel()
         end
     end
 
-    local accessHeader = createHeader(content, "Access", previousTabCheck or tabsHeader, -18)
-    local minimapCheck = createCheck(content, "Show minimap button", function(self)
+    local accessHeader = createHeader(pageInterface, "Access", previousTabCheck or tabsHeader, -18)
+    local minimapCheck = createCheck(pageInterface, "Show minimap button", function(self)
         setMinimapShown(self:GetChecked() and true or false)
         Options:RefreshControls()
     end)
     minimapCheck:SetPoint("TOPLEFT", accessHeader, "BOTTOMLEFT", -2, -8)
     self.minimapCheck = minimapCheck
 
-    local tooltipCraftersCheck = createCheck(content, "Show known crafters on item and spell tooltips", function(self)
+    local tooltipCraftersCheck = createCheck(pageInterface, "Show known crafters on item and spell tooltips", function(self)
         setTooltipCraftersShown(self:GetChecked() and true or false)
         Options:RefreshControls()
     end)
@@ -882,7 +969,7 @@ function Options:EnsurePanel()
         "Adds a Recipe Registry section to item, recipe, spell, and enchant tooltips listing guildmates who can craft them. Disable for leaner tooltips.")
     self.tooltipCraftersCheck = tooltipCraftersCheck
 
-    local auctionCutCheck = createCheck(content, "Subtract the 5% auction house cut from profit", function(self)
+    local auctionCutCheck = createCheck(pageInterface, "Subtract the 5% auction house cut from profit", function(self)
         setAuctionCutSubtracted(self:GetChecked() and true or false)
         Options:RefreshControls()
     end)
@@ -891,7 +978,7 @@ function Options:EnsurePanel()
         "Off by default: the \"Sells for\" figure stays gross, which is also the price to list your auction at. Turn this on to net the 5% the auction house keeps out of the profit line and the \"only profitable\" filter.")
     self.auctionCutCheck = auctionCutCheck
 
-    local scaleSlider = createSlider(content,
+    local scaleSlider = createSlider(pageInterface,
         "Main window scale",
         60, 120, 5,
         "%d%%",
@@ -906,15 +993,15 @@ function Options:EnsurePanel()
         "Shrinks or enlarges the whole Recipe Registry window. Useful on small screens; you can also drag the grip in the window's bottom-right corner to resize it.")
     self.scaleSlider = scaleSlider
 
-    local openButton = createButton(content, "Open Recipe Registry", 180, function()
+    local openButton = createButton(pageInterface, "Open Recipe Registry", 180, function()
         if Addon.UI then
             Addon.UI:Toggle()
         end
     end)
     openButton:SetPoint("TOPLEFT", scaleSlider, "BOTTOMLEFT", -6, -30)
 
-    local tuningHeader = createHeader(content, "Sync Tuning", openButton, -28)
-    local tuningHelp = createText(content,
+    local tuningHeader = createPageHeader(pageSync, "Sync Tuning")
+    local tuningHelp = createText(pageSync,
         "Advanced. Defaults work for most setups; lower the pull delay only on fast PCs, raise it if you see stutter during massive syncs.")
     tuningHelp:SetPoint("TOPLEFT", tuningHeader, "BOTTOMLEFT", 0, -6)
 
@@ -924,7 +1011,7 @@ function Options:EnsurePanel()
     -- slider's title text overlaps the previous slider's tick labels.
     local SLIDER_VERTICAL_GAP = 56
 
-    local pullDelaySlider = createSlider(content,
+    local pullDelaySlider = createSlider(pageSync,
         "Pull cadence",
         TUNING_BOUNDS.blockPullDelaySeconds.min,
         TUNING_BOUNDS.blockPullDelaySeconds.max,
@@ -937,7 +1024,7 @@ function Options:EnsurePanel()
     pullDelaySlider:SetPoint("TOPLEFT", tuningHelp, "BOTTOMLEFT", 6, -28)
     self.pullDelaySlider = pullDelaySlider
 
-    local maxSeedSlider = createSlider(content,
+    local maxSeedSlider = createSlider(pageSync,
         "Max peers served in parallel",
         TUNING_BOUNDS.maxInboundSeedSessions.min,
         TUNING_BOUNDS.maxInboundSeedSessions.max,
@@ -950,7 +1037,7 @@ function Options:EnsurePanel()
     maxSeedSlider:SetPoint("TOPLEFT", pullDelaySlider, "BOTTOMLEFT", 0, -SLIDER_VERTICAL_GAP)
     self.maxSeedSlider = maxSeedSlider
 
-    local pullTimeoutSlider = createSlider(content,
+    local pullTimeoutSlider = createSlider(pageSync,
         "Block pull response timeout",
         TUNING_BOUNDS.blockPullResponseTimeoutSeconds.min,
         TUNING_BOUNDS.blockPullResponseTimeoutSeconds.max,
@@ -963,25 +1050,25 @@ function Options:EnsurePanel()
     pullTimeoutSlider:SetPoint("TOPLEFT", maxSeedSlider, "BOTTOMLEFT", 0, -SLIDER_VERTICAL_GAP)
     self.pullTimeoutSlider = pullTimeoutSlider
 
-    local toolsHeader = createHeader(content, "Tools", pullTimeoutSlider, -44)
-    local priceDiagButton = createButton(content, "Price Providers Status", 180, function()
+    local toolsHeader = createPageHeader(pageTools, "Tools")
+    local priceDiagButton = createButton(pageTools, "Price Providers Status", 180, function()
         if Addon.Market and Addon.Market.DumpStatus then
             Addon.Market:DumpStatus("")
         end
     end)
     priceDiagButton:SetPoint("TOPLEFT", toolsHeader, "BOTTOMLEFT", -6, -8)
 
-    local perfButton = createButton(content, "Toggle Perf Debug", 180, function()
+    local perfButton = createButton(pageTools, "Toggle Perf Debug", 180, function()
         Addon:SlashHandler("perf toggle")
     end)
     perfButton:SetPoint("TOPLEFT", priceDiagButton, "BOTTOMLEFT", 0, -8)
 
-    local perfDumpButton = createButton(content, "Dump Perf Status", 180, function()
+    local perfDumpButton = createButton(pageTools, "Dump Perf Status", 180, function()
         Addon:SlashHandler("perf dump")
     end)
     perfDumpButton:SetPoint("TOPLEFT", perfButton, "BOTTOMLEFT", 0, -8)
 
-    local help = createText(content, "Slash commands: /rr, /rr options, /rr perf [toggle|dump|reset], /rr prices <item name|item link>, /rr share [guild|party|raid|say].")
+    local help = createText(pageTools, "Slash commands: /rr, /rr options, /rr perf [toggle|dump|reset], /rr prices <item name|item link>, /rr share [guild|party|raid|say].")
     help:SetPoint("TOPLEFT", perfDumpButton, "BOTTOMLEFT", 0, -14)
 
     panel.refresh = function()
