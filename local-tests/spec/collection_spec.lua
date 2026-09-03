@@ -7,8 +7,16 @@ local Test = dofile("local-tests/harness/test.lua")
 local _metadataAddon, _wow, addon = Loader.LoadMetadata()
 local data = addon.Data
 
--- spell 36391 = a TBC blacksmithing plan requiring skill 375.
+-- spell 36391 = a TBC blacksmithing plan requiring skill 375, creating item
+-- 30033. Two keys, and the difference between them is the whole point of the
+-- fixture below: the CATALOGUE is indexed by spell id, but a profession scan
+-- keys a recipe by the item it creates, falling back to the negative spell id
+-- only for a craft that makes no item. Writing the scan fixture in the
+-- catalogue's key shape -- as this spec used to -- asserts a convention the
+-- game never produces, and hid a bug that reported every learned recipe of
+-- every item-making profession as missing.
 local PLAN = -36391
+local PLAN_SPELL = PLAN
 
 local function setLocalProfession(professionName, opts)
     opts = opts or {}
@@ -95,6 +103,80 @@ Test.it("counts the learned half against the whole book", function()
         if row.collection.known then known = known + 1 end
     end
     Test.eq(known, 1)
+end)
+
+-- The two key shapes, which is what the first build of this view got wrong.
+--
+-- The catalogue is indexed by spell id. A profession scan is not: it keys a
+-- recipe by the item it creates and uses the negative spell id only when the
+-- craft makes no item. Enchanting is the one profession where the two agree,
+-- which is exactly why the bug survived -- the old fixture wrote scan data in
+-- the catalogue's shape, so the suite stayed green while every item-making
+-- profession in the game reported nothing learned.
+Test.it("finds a recipe the scan recorded by its created item", function()
+    setLocalProfession("Blacksmithing", { skillRank = 375, recipes = { [30033] = true } })
+
+    local row = findRow(data:BuildCollectionRows(), PLAN_SPELL)
+    Test.truthy(row ~= nil, "the plan should still be listed")
+    Test.eq(row.collection.known, true)
+end)
+
+-- The same recipe recorded the other way: an ambiguous created item makes the
+-- scanner write both keys, so a variant recorded only under the spell id
+-- counts too.
+Test.it("finds a recipe recorded under the spell id alone", function()
+    setLocalProfession("Blacksmithing", { skillRank = 375, recipes = { [-36391] = true } })
+
+    local row = findRow(data:BuildCollectionRows(), PLAN_SPELL)
+    Test.truthy(row ~= nil)
+    Test.eq(row.collection.known, true)
+end)
+
+-- The row itself keeps the CATALOGUE key, and that is not a detail: a created
+-- item shared by more than one recipe is dropped from the by-item index, so a
+-- row keyed by its item would come back with no name, no icon and no source.
+-- 21885 is such an item; -28580 resolves, 21885 does not.
+Test.it("keys a row so that it always resolves", function()
+    clearLocalProfessions()
+    setLocalProfession("Alchemy", { skillRank = 375 })
+
+    -- Spelled out rather than using the DISCOVERY constant, which this file
+    -- declares further down next to the tests that read it.
+    local meta = addon.RecipeMetadata
+    Test.eq(meta:GetRecipeInfo(-28580, "alchemy").sourceKind, "discovery")
+    Test.eq(meta:GetRecipeInfo(21885, "alchemy"), nil)
+
+    local row = findRow(data:BuildCollectionRows(), -28580)
+    Test.truthy(row ~= nil, "the discovery should be listed under its spell key")
+    data:ResolveCollectionRow(row)
+    Test.truthy(row.detail ~= nil, "a row must resolve to a display record")
+    Test.eq(row.collection.sourceKind, "discovery")
+    clearLocalProfessions()
+end)
+
+-- The count that read 0/385 while the key shape was wrong.
+Test.it("counts a real scan against the catalogue", function()
+    setLocalProfession("Blacksmithing", {
+        skillRank = 375,
+        recipes = { [30033] = true, [7925] = true },
+    })
+    -- 7925 is a vanilla plan, so vanilla has to be visible for it to be a
+    -- candidate at all.
+    local prefilters = addon.db.profile.recipePrefilters
+    prefilters.expansionDefaults.vanilla = true
+    prefilters.expansionDefaults.tbc = true
+    addon.RecipeUiFilters:InvalidateProfessionProjection("blacksmithing", "spec")
+
+    local known = 0
+    for _, row in ipairs(data:BuildCollectionRows()) do
+        if row.collection.known then known = known + 1 end
+    end
+    -- 7925 is the removed recipe: excluded when you do not have it, kept when
+    -- you do, so both scanned recipes are found.
+    Test.eq(known, 2)
+
+    prefilters.expansionDefaults.vanilla = false
+    addon.RecipeUiFilters:InvalidateProfessionProjection("blacksmithing", "spec")
 end)
 
 Test.it("flags a recipe the skill rank cannot reach yet", function()
@@ -263,14 +345,16 @@ end)
 -- to go and learn one, so offering it is not an opportunity: it is a player
 -- looking for a trainer who does not exist.
 -- 9942 = Mithril Scale Gloves, a vanilla blacksmithing plan requiring skill
--- 220, flagged removed by the generator.
+-- 220, flagged removed by the generator. Named by its created item, like
+-- every other row key in this view.
 local REMOVED = -9942
+local REMOVED_SPELL = REMOVED
 
 Test.it("never offers a recipe that is not in the game", function()
     setLocalProfession("Blacksmithing", { skillRank = 375 })
 
     local meta = addon.RecipeMetadata
-    Test.eq(meta:IsRemoved(REMOVED), true)
+    Test.eq(meta:IsRemoved(REMOVED_SPELL), true)
 
     local rows = data:BuildCollectionRows()
     Test.eq(findRow(rows, REMOVED), nil)
@@ -292,7 +376,7 @@ Test.it("still offers a recipe of the same skill that is in the game", function(
 end)
 
 Test.it("reads an absent flag as present in the game, not as unknown", function()
-    Test.eq(addon.RecipeMetadata:IsRemoved(PLAN), false)
+    Test.eq(addon.RecipeMetadata:IsRemoved(PLAN_SPELL), false)
     -- A recipe the metadata knows nothing about is not claimed to be removed.
     Test.eq(addon.RecipeMetadata:IsRemoved(-999999999), false)
 end)
@@ -303,14 +387,16 @@ end)
 -- an alchemy discovery has none, so all seventeen were reported as taught by
 -- a trainer who does not teach them.
 -- 28580 = an alchemy discovery: no pattern to buy, learned at the cauldron.
+-- It creates item 21885, which is the key the row carries.
 local DISCOVERY = -28580
+local DISCOVERY_SPELL = DISCOVERY
 
 Test.it("lets the recorded source beat the recipe-item guess", function()
     setLocalProfession("Alchemy", { skillRank = 375 })
 
-    local info = addon.RecipeMetadata:GetRecipeInfo(DISCOVERY, "alchemy")
+    local info = addon.RecipeMetadata:GetRecipeInfo(DISCOVERY_SPELL, "alchemy")
     Test.eq(info.recipeItemId, nil)
-    Test.eq(addon.RecipeMetadata:GetSource(DISCOVERY, info).kind, "discovery")
+    Test.eq(addon.RecipeMetadata:GetSource(DISCOVERY_SPELL, info).kind, "discovery")
 
     local row = findRow(data:BuildCollectionRows(), DISCOVERY)
     Test.truthy(row ~= nil, "expected the discovery to be listed")
@@ -369,20 +455,21 @@ end)
 Test.it("keeps every vendor next to its own zone", function()
     setLocalProfession("Alchemy", { skillRank = 375 })
 
+    -- Read the places off the ROW, not back out of the metadata by its key:
+    -- a row is keyed by its created item, and an unhinted lookup on an
+    -- ambiguous item can land on a different profession's record.
     local multi
     for _, row in ipairs(data:BuildCollectionRows()) do
-        local source = addon.RecipeMetadata:GetSource(row.recipeKey)
-        if row.collection.sourceKind == "vendor" and source and source.places
-            and #source.places > 1 then
+        local places = row.collection.sourcePlaces
+        if row.collection.sourceKind == "vendor" and places and #places > 1 then
             multi = row
             break
         end
     end
     Test.truthy(multi ~= nil, "expected a recipe sold by more than one vendor")
 
-    local source = addon.RecipeMetadata:GetSource(multi.recipeKey)
     local label = multi.collection.sourceLabel
-    for _, place in ipairs(source.places) do
+    for _, place in ipairs(multi.collection.sourcePlaces) do
         -- Every vendor is named, and its own zone follows it in brackets.
         Test.truthy(label:find(place.name, 1, true) ~= nil,
             "the label should name " .. tostring(place.name))
@@ -404,9 +491,8 @@ Test.it("does not write a place where a name would go", function()
 
     local seen = {}
     for _, row in ipairs(data:BuildCollectionRows()) do
-        local source = addon.RecipeMetadata:GetSource(row.recipeKey)
         local hasName = false
-        for _, place in ipairs(source and source.places or {}) do
+        for _, place in ipairs(row.collection.sourcePlaces or {}) do
             hasName = hasName or place.name ~= nil
         end
         if not hasName then

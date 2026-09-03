@@ -1766,6 +1766,7 @@ function UI:CreateMainFrame()
             UI.selectedAddonStatusKey = nil
             UI.selectedCategory = nil
             UI.expandedCategory = nil
+            UI:ResetRecipeScroll()
             UI:Refresh()
         end)
         f.profButtons[profName] = b
@@ -2386,6 +2387,7 @@ function UI:EnsureCategoryButton(index)
         end
         UI.selectedCategory = self.categoryToken
         UI.selectedRecipeKey = nil
+        UI:ResetRecipeScroll()
         UI:Refresh()
     end)
     self.frame.categoryButtons[index] = button
@@ -4332,6 +4334,13 @@ end
 function UI:RefreshHiddenExpansionHint(profession)
     local hint = self.frame and self.frame.hiddenExpansionHint
     if not hint then return end
+    -- The full-width views are not a profession browser, and the hint is
+    -- parented to the centre panel they take over: left showing, it painted
+    -- across the guild members and collection tables.
+    if self:IsFullWidthView() then
+        if hint.IsShown and hint:IsShown() then hint:Hide() end
+        return
+    end
     if not profession or profession == "All" or profession == "Favorites" then
         self:_SetRecipeScrollAnchor(false)
         if hint.IsShown and hint:IsShown() then hint:Hide() end

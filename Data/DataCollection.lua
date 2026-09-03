@@ -218,9 +218,27 @@ function Data:BuildCollectionRowsForProfession(professionName, prof)
 
     local rows = {}
     for spellId in pairs(candidates) do
+        -- Two key shapes, and they are not interchangeable.
+        --
+        -- The catalogue is indexed by spell id. A profession SCAN is not: it
+        -- keys a recipe by the item it creates, and falls back to the negative
+        -- spell id only for a craft that makes no item. Enchanting is the one
+        -- profession where the two agree, which is why it alone looked right
+        -- while every other profession reported nothing learned.
+        --
+        -- The row keeps the catalogue key, because that is the one that always
+        -- resolves: a created item shared by more than one recipe is dropped
+        -- from the by-item index, so an alchemy discovery looked up by its
+        -- item comes back empty and loses its name, icon and source. Only the
+        -- ownership question is asked in the scan's shape -- both shapes, in
+        -- fact, since for an ambiguous created item the scanner writes the
+        -- item key and the spell key.
         local recipeKey = -spellId
-        local known = self:IsRecipeKnownByCurrentPlayer(recipeKey) and true or false
         local info = meta:GetRecipeInfo(recipeKey, professionKey)
+        local createdItemId = meta:GetCreatedItemId(recipeKey, info)
+        local known = self:IsRecipeKnownByCurrentPlayer(recipeKey)
+            or (createdItemId ~= nil and self:IsRecipeKnownByCurrentPlayer(createdItemId))
+            or false
         -- Deliberately NOT run through RecipePasses. The expansion prefilter
         -- is already applied above, via the candidate hash, and every
         -- candidate is catalogued by construction. What is left in that

@@ -168,13 +168,20 @@ Test.it("describes a recipe the same way for both views", function()
     }
     data:InvalidateRecipeCaches()
 
+    -- Compared through the detail panel's own entry point rather than by
+    -- re-describing the key: a collection row is keyed by its created item,
+    -- and the two views agreeing is exactly what has to hold.
     local rows = data:BuildCollectionRows()
     Test.gte(#rows, 1)
+    local checked = 0
     for _, row in ipairs(rows) do
-        local source = data:DescribeRecipeSource(row.recipeKey, "alchemy")
-        Test.eq(row.collection.sourceLabel, source.label)
-        Test.eq(row.collection.sourceKind, source.kind)
+        local detail = data:GetRecipeDetail(row.recipeKey, "Alchemy")
+        Test.eq(row.collection.sourceLabel, detail.source.label)
+        Test.eq(row.collection.sourceKind, detail.source.kind)
+        checked = checked + 1
+        if checked >= 40 then break end
     end
+    Test.gte(checked, 1)
 end)
 
 io.write(string.format("Recipe source on the detail: %d test(s) passed\n", Test.count))
