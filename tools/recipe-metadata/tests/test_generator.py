@@ -829,7 +829,7 @@ class AcquisitionSummaryTests(unittest.TestCase):
     """What summarize_source keeps, now that the provider states the rest."""
 
     def test_keeps_each_place_whole_and_drops_a_neutral_faction(self):
-        faction, kind, places, world_drop, boss, _levels = summarize_source({
+        faction, kind, places, world_drop, boss, _levels, _req = summarize_source({
             "faction": "both",
             "kind": "vendor",
             "worldDrop": False,
@@ -843,20 +843,20 @@ class AcquisitionSummaryTests(unittest.TestCase):
 
     def test_a_place_keeps_the_half_it_has(self):
         # A quest gives a zone and no name; a trainer can give neither.
-        _f, _k, places, _wd, _b, _levels = summarize_source({
+        _f, _k, places, _wd, _b, _levels, _req = summarize_source({
             "kind": "quest", "places": [{"zone": "Hillsbrad Foothills"},
                                         {"name": "Somebody"}],
         })
         self.assertEqual(places, (SourcePlace(None, "Hillsbrad Foothills"), SourcePlace("Somebody", None)))
 
     def test_a_place_with_neither_half_is_not_a_place(self):
-        _f, _k, places, _wd, _b, _levels = summarize_source({
+        _f, _k, places, _wd, _b, _levels, _req = summarize_source({
             "kind": "quest", "places": [{"name": None, "zone": None}],
         })
         self.assertEqual(places, ())
 
     def test_a_world_drop_points_nowhere(self):
-        faction, kind, places, world_drop, boss, _levels = summarize_source({
+        faction, kind, places, world_drop, boss, _levels, _req = summarize_source({
             "faction": "both", "kind": "worldDrop", "worldDrop": True,
             "places": [{"name": "Some Mob", "zone": "Everywhere"}],
         })
@@ -865,13 +865,13 @@ class AcquisitionSummaryTests(unittest.TestCase):
         self.assertEqual(places, ())
 
     def test_a_faction_restriction_survives(self):
-        faction, _kind, _places, _wd, _b, _levels = summarize_source({
+        faction, _kind, _places, _wd, _b, _levels, _req = summarize_source({
             "faction": "horde", "kind": "vendor", "places": [],
         })
         self.assertEqual(faction, "horde")
 
     def test_nothing_known_stays_empty(self):
-        self.assertEqual(summarize_source({}), (None, None, (), False, False, None))
+        self.assertEqual(summarize_source({}), (None, None, (), False, False, None, None))
 
 
 class ArlProviderTests(unittest.TestCase):

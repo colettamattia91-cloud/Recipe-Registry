@@ -17,7 +17,7 @@ def summarize_source(source):
     go and look.
     """
     if not source:
-        return None, None, (), False, False, None
+        return None, None, (), False, False, None, None
 
     kind = source.get("kind")
     world_drop = source.get("worldDrop") is True
@@ -47,7 +47,10 @@ def summarize_source(source):
         levels = tuple(int(value) for value in levels)
     else:
         levels = None
-    return faction, kind, places, world_drop, source.get("bossDrop") is True, levels
+    required = source.get("skillLevel")
+    if required is not None:
+        required = int(required)
+    return faction, kind, places, world_drop, source.get("bossDrop") is True, levels, required
 
 
 def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tbc"):
@@ -111,7 +114,7 @@ def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tb
         source = secondary.get("acquisitionBySpellId", {}).get(spell_id) or {}
         source = overrides.get("acquisitionBySpellId", {}).get(spell_id, source)
         (faction, source_kind, source_places,
-         world_drop, boss_drop, skill_levels) = summarize_source(source)
+         world_drop, boss_drop, skill_levels, sourced_skill) = summarize_source(source)
 
         records.append(RecipeRecord(
             spell_id=spell_id,
@@ -123,7 +126,13 @@ def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tb
             category_key=category_key,
             subcategory_key=subcategory_key,
             sort_order=sort_order,
-            required_skill=recipe.get("requiredSkill"),
+            # The primary snapshot leaves this unset on a third of the
+            # records -- SkillLineAbility does not carry it for a
+            # trainer-taught recipe -- and a third of the Skill column read as
+            # a dash because of it. The obtain-side source states the number on
+            # the same line the difficulty ladder comes from, and it is only
+            # ever a fallback: where the primary states one, the primary wins.
+            required_skill=recipe.get("requiredSkill") or sourced_skill,
             is_outputless_self_only=outputless is True,
             bop_output=bop_output,
             created_count=recipe.get("createdCount"),

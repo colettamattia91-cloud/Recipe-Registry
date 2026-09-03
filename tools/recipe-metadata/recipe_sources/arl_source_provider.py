@@ -180,6 +180,26 @@ _RECIPE_RE = re.compile(r"\bAddRecipe\((\d+)\s*,([^)\n]*)\)")
 _LEVEL_ARG_RE = re.compile(r"^-?\d+$")
 
 
+def parse_skill_requirement(argument_text):
+    """The skill the recipe takes to learn, as the same line states it.
+
+    The primary snapshot leaves requiredSkill unset on 686 of the 2151
+    records -- SkillLineAbility does not carry it for a recipe learned from a
+    trainer -- and the Skill column reads as a dash on a third of the table
+    because of it. ARL states the number one argument along from the spell id
+    that is already being read here.
+    """
+    # The match starts after the spell id and its comma, so the skill is the
+    # first argument here, not the second.
+    parts = [part.strip() for part in (argument_text or "").split(",")]
+    if not parts or not _LEVEL_ARG_RE.match(parts[0]):
+        return None
+    value = int(parts[0])
+    if value < 0 or value > 450:
+        return None
+    return value
+
+
 def parse_skill_levels(argument_text):
     """The four difficulty thresholds, or None when the call does not state them.
 
@@ -392,9 +412,12 @@ def parse_profession(text):
             "flagKind": None,
             "places": [],
             "skillLevels": None,
+            "skillLevel": None,
         })
         if entry["skillLevels"] is None:
             entry["skillLevels"] = parse_skill_levels(match.group(2))
+        if entry["skillLevel"] is None:
+            entry["skillLevel"] = parse_skill_requirement(match.group(2))
 
     for match in _FLAGS_RE.finditer(text or ""):
         spell_id = int(match.group(1))
@@ -519,6 +542,7 @@ def summarize_recipe(entry, lookups, custom_places=None, max_places=4, max_names
             "bossDrop": False,
             "places": seen[:max_places],
             "skillLevels": entry.get("skillLevels"),
+            "skillLevel": entry.get("skillLevel"),
         }
 
     # An NPC from a later expansion is not one of this recipe's sources, so it
@@ -573,6 +597,7 @@ def summarize_recipe(entry, lookups, custom_places=None, max_places=4, max_names
         "bossDrop": boss_drop,
         "places": places[:max_places],
         "skillLevels": entry.get("skillLevels"),
+        "skillLevel": entry.get("skillLevel"),
     }
 
 

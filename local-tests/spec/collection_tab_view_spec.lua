@@ -1049,4 +1049,20 @@ Test.it("splits the options panel into pages", function()
     Test.truthy(optionsSource:find("createPageHeader(pageSync", 1, true) ~= nil)
 end)
 
+-- A third of the Skill column read as a dash: SkillLineAbility does not carry
+-- a required skill for a trainer-taught recipe, and the primary snapshot is
+-- the only place the pipeline was looking. The obtain-side source states the
+-- number on the same line the difficulty ladder comes from.
+Test.it("knows the skill a recipe takes for all but a handful", function()
+    local generated = _G.RecipeRegistryRecipeMetadata
+    Test.truthy(generated ~= nil)
+    local total, missing = 0, 0
+    for _, record in pairs(generated.recipesBySpellId or {}) do
+        total = total + 1
+        if record.requiredSkill == nil then missing = missing + 1 end
+    end
+    Test.gte(total, 2000)
+    Test.lte(missing, 40)
+end)
+
 io.write(string.format("Collection tab view: %d test(s) passed\n", Test.count))
