@@ -183,6 +183,29 @@ local function materialTextureTag(texture)
     return string.format("|T%s:18:18:0:0:64:64:5:59:5:59|t", texture)
 end
 
+-- Faction banners. Item icons rather than UI art: these two have shipped in
+-- every client since vanilla, so there is no build where they resolve to a
+-- green box.
+local ALLIANCE_TAG = textureTag("Interface\\Icons\\INV_BannerPVP_02", 14)
+local HORDE_TAG = textureTag("Interface\\Icons\\INV_BannerPVP_01", 14)
+
+-- What the player has to do to get the recipe, as a colour: visit somebody
+-- (blue), buy it (gold), go and take it (orange), or run an errand (yellow).
+-- Everything else -- a discovery at your own anvil, a world event, a pattern
+-- the data cannot place -- asks for none of those and stays grey.
+local MISSING_SOURCE_COLORS = {
+    trainer   = "|cff8fc6ff",
+    vendor    = "|cffffd100",
+    drop      = "|cffff9d5a",
+    worldDrop = "|cffff9d5a",
+    container = "|cffff9d5a",
+    quest     = "|cffffe066",
+}
+
+local function missingSourceColor(sourceKind)
+    return MISSING_SOURCE_COLORS[sourceKind or ""] or "|cffb6b6b6"
+end
+
 local function statusTag(online)
     if online then
         return "|TInterface\\COMMON\\Indicator-Green:12:12:0:0|t"
@@ -1280,17 +1303,46 @@ function UI:RefreshAddonStatusControls()
     setShownIfChanged(f.addonStatusHelp, addonStatusView)
     setShownIfChanged(f.missingControls, missingView)
     setShownIfChanged(f.missingHelp, missingView)
-    if missingView and f.missingHelp then
-        setTextIfChanged(f.missingHelp, hasLocalProfessions()
-            and "Recipes your professions can still learn. Click a profession header to collapse it."
-            or "Open your profession windows once so Recipe Registry knows what this character has learned.")
+    if missingView then
+        self:RefreshMissingControls()
     end
-    -- The missing view keeps the header (it carries the count) but has no
-    -- sort switch: its order is fixed to "what you can learn right now
-    -- first", which is the only ordering that answers the question.
-    setShownIfChanged(f.recipeHeader, not addonStatusView)
+    -- The missing view has its own title inside the control strip, anchored
+    -- to the same corner of the same frame as the recipe header: showing both
+    -- drew one on top of the other. The strip's title wins and takes the
+    -- count with it, the same way the guild members table already works.
+    --
+    -- Neither table gets a sort switch: their order is fixed to the one that
+    -- answers the question -- what you can learn right now, first.
+    setShownIfChanged(f.recipeHeader, not (addonStatusView or missingView))
     setShownIfChanged(f.sortSwitch, not (addonStatusView or missingView))
     self:SyncSearchControls()
+end
+
+-- The toggle state and the help line under the strip. The help line is the
+-- only place that can explain an empty list, so it has to know both whether
+-- the character has been scanned and whether the filter is the reason
+-- nothing is showing.
+function UI:RefreshMissingControls()
+    if not self.frame then return end
+    local f = self.frame
+    local data = Addon.Data
+    local learnableOnly = (data and data.IsMissingRecipesLearnableOnly
+        and data:IsMissingRecipesLearnableOnly()) == true
+    if f.missingLearnableToggle and f.missingLearnableToggle.SetSelected then
+        f.missingLearnableToggle:SetSelected(learnableOnly)
+    end
+    if not f.missingHelp then return end
+    local helpText
+    if not hasLocalProfessions() then
+        helpText = "Open your profession windows once so Recipe Registry knows what this character has learned."
+    elseif learnableOnly and (self._missingRecipeCount or 0) == 0 then
+        helpText = "Nothing left that you already meet the requirements for. Switch off \"Ready to learn\" to see the rest."
+    elseif learnableOnly then
+        helpText = "Recipes you can go and learn right now. Click a profession header to collapse it."
+    else
+        helpText = "Recipes your professions can still learn. Click a profession header to collapse it."
+    end
+    setTextIfChanged(f.missingHelp, helpText)
 end
 
 function UI:ApplyMainLayout()
@@ -1820,6 +1872,9 @@ function UI:CreateMainFrame()
     local missingTitle = missingControls:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     missingTitle:SetPoint("LEFT", 4, 0)
     missingTitle:SetText(MISSING_VIEW)
+    missingTitle:SetTextColor(1.0, 0.82, 0)
+    missingTitle:SetJustifyH("LEFT")
+    if missingTitle.SetWordWrap then missingTitle:SetWordWrap(false) end
     f.missingTitle = missingTitle
 
     local missingHelp = center:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
@@ -1858,6 +1913,32 @@ function UI:CreateMainFrame()
     missingSearchLabel:SetText("Search")
     missingSearchLabel:SetTextColor(0.72, 0.72, 0.72)
     f.missingSearchLabel = missingSearchLabel
+
+    -- The view's only filter, and deliberately the only one: grouping by
+    -- profession is already the profession filter, and every further axis
+    -- would be chrome on a table whose whole job is to be scanned.
+    local missingLearnableToggle = createCardStyleButton(missingControls, 150, 22)
+    missingLearnableToggle:SetPoint("RIGHT", missingSearchLabel, "LEFT", -12, 0)
+    missingLearnableToggle:SetLabel("Ready to learn")
+    missingLearnableToggle:SetScript("OnClick", function()
+        local data = Addon.Data
+        if not (data and data.SetMissingRecipesLearnableOnly) then return end
+        data:SetMissingRecipesLearnableOnly(not data:IsMissingRecipesLearnableOnly())
+        UI:RefreshMissingControls()
+        UI:RefreshRecipeList()
+    end)
+    missingLearnableToggle:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_TOP")
+        GameTooltip:AddLine("Ready to learn")
+        GameTooltip:AddLine("Show only recipes whose skill and specialization you already meet.", 0.8, 0.8, 0.8, true)
+        GameTooltip:Show()
+    end)
+    missingLearnableToggle:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    f.missingLearnableToggle = missingLearnableToggle
+    -- Bounded on the right so a long count cannot run under the toggle.
+    missingTitle:SetPoint("RIGHT", missingLearnableToggle, "LEFT", -12, 0)
 
     local missingSearchClearButton = CreateFrame("Button", nil, missingSearchBox)
     missingSearchClearButton:SetSize(14, 14)
@@ -2373,6 +2454,10 @@ function UI:EnsureRecipeRow(index)
     end)
     row:SetScript("OnEnter", function(self)
         if self.addonStatusMemberKey then return end
+        if self.missingInfo then
+            UI:ShowMissingRowTooltip(self)
+            return
+        end
         if not self.tooltipLink then return end
         GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
         GameTooltip:SetHyperlink(self.tooltipLink)
@@ -3035,17 +3120,42 @@ end
 
 local RECIPE_ROW_HEIGHT = 70
 local ADDON_STATUS_ROW_HEIGHT = 28
+-- The missing view is a table, not a browser: one line of text per row, no
+-- crafter list and no second metadata line. At the browser's 70px it showed
+-- nine recipes in a full-height window while a blacksmith is missing three
+-- hundred, so it gets the compact height the guild members table uses.
+local MISSING_ROW_HEIGHT = 30
+local MISSING_ROW_ICON_SIZE = 24
+local RECIPE_ROW_ICON_SIZE = 30
 local RECIPE_ROW_BUFFER = 2
 
 function UI:GetListRowHeight()
-    return self:IsAddonStatusView() and ADDON_STATUS_ROW_HEIGHT or RECIPE_ROW_HEIGHT
+    if self:IsAddonStatusView() then return ADDON_STATUS_ROW_HEIGHT end
+    if self:IsMissingView() then return MISSING_ROW_HEIGHT end
+    return RECIPE_ROW_HEIGHT
+end
+
+-- The row icon is shared with the recipe browser, so both sizes have to be
+-- re-applied on every bind: a pooled row arrives with whatever geometry the
+-- view that used it last left behind.
+local function setRowIconGeometry(row, size, inset)
+    if not row.icon then return end
+    if row._rrIconSize == size and row._rrIconInset == inset then return end
+    row._rrIconSize = size
+    row._rrIconInset = inset
+    row.icon:SetSize(size, size)
+    row.icon:ClearAllPoints()
+    row.icon:SetPoint("LEFT", inset, 0)
 end
 
 function UI:GetListRowWidth()
     local scroll = self.frame and self.frame.recipeScroll
     local width = scroll and scroll.GetWidth and scroll:GetWidth() or nil
     if type(width) ~= "number" or width <= 0 then
-        width = self:IsAddonStatusView() and 860 or 314
+        -- Both full-width tables share the fallback: before the first
+        -- layout the missing view would otherwise size its columns for the
+        -- 314px browser column it is not in.
+        width = self:IsFullWidthView() and 860 or 314
     end
     return math.max(300, width - 10)
 end
@@ -3273,6 +3383,45 @@ end
 -- Column layout for the missing-recipe table. Built lazily per pooled row,
 -- the same way the addon status columns are: most sessions never open this
 -- view, and the pool is shared with the ordinary recipe list.
+--
+-- Only two columns flex. Skill, specialization and faction are as wide as
+-- their longest possible content and no wider; what is left over goes to the
+-- recipe name and the source, because those are the two that get cut off,
+-- and the source ("Vendor: Xandar Goodbeard (Loch Modan), Hagrus
+-- (Orgrimmar)") is the longest string in the table.
+local MISSING_COLUMN_GAP = 8
+local MISSING_NAME_INSET = 40
+local MISSING_SKILL_WIDTH = 104
+local MISSING_SPEC_WIDTH = 148
+local MISSING_FACTION_WIDTH = 86
+local MISSING_NAME_MIN_WIDTH = 190
+local MISSING_SOURCE_MIN_WIDTH = 140
+
+function UI:GetMissingColumnWidths()
+    local fixed = MISSING_SKILL_WIDTH + MISSING_SPEC_WIDTH + MISSING_FACTION_WIDTH
+    local flexible = self:GetListRowWidth()
+        - MISSING_NAME_INSET - 10 - (MISSING_COLUMN_GAP * 4) - fixed
+    local nameWidth = math.max(MISSING_NAME_MIN_WIDTH, math.floor(flexible * 0.45))
+    local sourceWidth = math.max(MISSING_SOURCE_MIN_WIDTH, flexible - nameWidth)
+    return nameWidth, MISSING_SKILL_WIDTH, sourceWidth, MISSING_SPEC_WIDTH, MISSING_FACTION_WIDTH
+end
+
+-- Single-line, clipped columns: the row is 30px tall, so a string that wrapped
+-- would spill into its neighbour. The full text is in the row tooltip.
+local function makeMissingColumn(row, anchorTo, width)
+    local fs = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    if anchorTo then
+        fs:SetPoint("LEFT", anchorTo, "RIGHT", MISSING_COLUMN_GAP, 0)
+    else
+        fs:SetPoint("LEFT", MISSING_NAME_INSET, 0)
+    end
+    fs:SetWidth(width)
+    fs:SetJustifyH("LEFT")
+    if fs.SetWordWrap then fs:SetWordWrap(false) end
+    if fs.SetMaxLines then fs:SetMaxLines(1) end
+    return fs
+end
+
 function UI:EnsureMissingRowParts(row)
     if row.missingPartsReady then return end
 
@@ -3281,34 +3430,32 @@ function UI:EnsureMissingRowParts(row)
     row.missingSectionTitle:SetPoint("RIGHT", -10, 0)
     row.missingSectionTitle:SetJustifyH("LEFT")
 
-    row.missingName = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    -- Left inset leaves room for the recipe icon, which is the shared row
+    local nameWidth, skillWidth, sourceWidth, specWidth, factionWidth = self:GetMissingColumnWidths()
+    -- The left inset leaves room for the recipe icon, which is the shared row
     -- icon the ordinary list uses.
-    row.missingName:SetPoint("LEFT", 36, 0)
-    row.missingName:SetWidth(300)
-    row.missingName:SetJustifyH("LEFT")
-
-    row.missingSkill = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    row.missingSkill:SetPoint("LEFT", row.missingName, "RIGHT", 8, 0)
-    row.missingSkill:SetWidth(150)
-    row.missingSkill:SetJustifyH("LEFT")
-
-    row.missingSource = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    row.missingSource:SetPoint("LEFT", row.missingSkill, "RIGHT", 8, 0)
-    row.missingSource:SetWidth(170)
-    row.missingSource:SetJustifyH("LEFT")
-
-    row.missingSpec = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    row.missingSpec:SetPoint("LEFT", row.missingSource, "RIGHT", 8, 0)
-    row.missingSpec:SetWidth(180)
-    row.missingSpec:SetJustifyH("LEFT")
-
-    row.missingFaction = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    row.missingFaction:SetPoint("LEFT", row.missingSpec, "RIGHT", 8, 0)
-    row.missingFaction:SetWidth(90)
-    row.missingFaction:SetJustifyH("LEFT")
+    row.missingName = makeMissingColumn(row, nil, nameWidth)
+    row.missingSkill = makeMissingColumn(row, row.missingName, skillWidth)
+    row.missingSource = makeMissingColumn(row, row.missingSkill, sourceWidth)
+    row.missingSpec = makeMissingColumn(row, row.missingSource, specWidth)
+    row.missingFaction = makeMissingColumn(row, row.missingSpec, factionWidth)
 
     row.missingPartsReady = true
+end
+
+-- Re-applied on bind rather than at build time: the window is resizable, and
+-- the two flexible columns follow its width.
+function UI:ApplyMissingColumnWidths(row)
+    local nameWidth, skillWidth, sourceWidth, specWidth, factionWidth = self:GetMissingColumnWidths()
+    if row._rrMissingNameWidth == nameWidth and row._rrMissingSourceWidth == sourceWidth then
+        return
+    end
+    row._rrMissingNameWidth = nameWidth
+    row._rrMissingSourceWidth = sourceWidth
+    row.missingName:SetWidth(nameWidth)
+    row.missingSkill:SetWidth(skillWidth)
+    row.missingSource:SetWidth(sourceWidth)
+    row.missingSpec:SetWidth(specWidth)
+    row.missingFaction:SetWidth(factionWidth)
 end
 
 function UI:SetMissingPartsVisible(row, visible)
@@ -3348,6 +3495,8 @@ local function prepareMissingRow(ui, row, rowIdx)
     row.addonStatusGroupKey = nil
     row.addonStatusHeaderRow = false
     row.missingGroupKey = nil
+    row.missingInfo = nil
+    row.missingLabel = nil
     row.tooltipLink = nil
     ui:HideRecipeRowParts(row)
     if row.addonStatusPartsReady then
@@ -3355,6 +3504,52 @@ local function prepareMissingRow(ui, row, rowIdx)
         ui:SetAddonStatusHeaderButtonsVisible(row, false)
     end
     ui:SetMissingPartsVisible(row, true)
+    ui:ApplyMissingColumnWidths(row)
+    setRowIconGeometry(row, MISSING_ROW_ICON_SIZE, 10)
+end
+
+-- The whole answer for one missing recipe, since the table columns clip.
+-- Built on top of the recipe's own tooltip when there is an item or spell to
+-- hang it on, so hovering a row still shows what the recipe makes.
+function UI:ShowMissingRowTooltip(row)
+    local missing = row.missingInfo
+    if not missing then return end
+    GameTooltip:SetOwner(row, "ANCHOR_CURSOR")
+    if row.tooltipLink then
+        GameTooltip:SetHyperlink(row.tooltipLink)
+    else
+        GameTooltip:AddLine(safeText(row.missingLabel))
+    end
+
+    GameTooltip:AddLine(" ")
+    GameTooltip:AddLine("Where to learn", 1, 0.82, 0)
+    for _, line in ipairs(missing.sourceLines or { missing.sourceLabel or "" }) do
+        GameTooltip:AddLine(safeText(line), 0.85, 0.85, 0.85, true)
+    end
+    if missing.faction == "alliance" then
+        GameTooltip:AddLine("Alliance only", 0.40, 0.60, 1.0)
+    elseif missing.faction == "horde" then
+        GameTooltip:AddLine("Horde only", 0.88, 0.33, 0.38)
+    end
+
+    GameTooltip:AddLine(" ")
+    if missing.requiredSkill then
+        -- Green or red rather than a bare number: the question the row is
+        -- answering is whether you can go and learn it, not what the number is.
+        local r, g, b = 0.35, 0.85, 0.45
+        if not missing.skillMet then r, g, b = 0.95, 0.35, 0.35 end
+        GameTooltip:AddDoubleLine(
+            string.format("%s %d", missing.professionName or "Skill", missing.requiredSkill),
+            string.format("you: %d", missing.skillRank or 0), r, g, b, 0.7, 0.7, 0.7)
+    elseif missing.professionName then
+        GameTooltip:AddLine(missing.professionName, 0.7, 0.7, 0.7)
+    end
+    if missing.specializationName then
+        local r, g, b = 0.35, 0.85, 0.45
+        if not missing.specializationMet then r, g, b = 0.95, 0.35, 0.35 end
+        GameTooltip:AddLine("Requires " .. missing.specializationName, r, g, b)
+    end
+    GameTooltip:Show()
 end
 
 function UI:BindMissingGroupRow(row, rowIdx, rowData)
@@ -3442,24 +3637,32 @@ function UI:BindMissingRow(row, rowIdx, rowData)
         setTextIfChanged(row.missingSkill, "|cff8f949c-|r")
     end
 
-    setTextIfChanged(row.missingSource, safeText(missing.sourceLabel))
+    -- Colour by what the player has to DO, not by kind for its own sake:
+    -- visit somebody, buy something, or go and kill for it. Kinds that ask
+    -- for none of the three stay grey rather than adding another hue.
+    setTextIfChanged(row.missingSource, string.format("%s%s|r",
+        missingSourceColor(missing.sourceKind), safeText(missing.sourceLabel)))
     if missing.specializationName then
         local colour = missing.specializationMet and "|cff55d66b" or COLOR_LOSS_TEXT
         setTextIfChanged(row.missingSpec, string.format("%s%s|r", colour, missing.specializationName))
     else
         setTextIfChanged(row.missingSpec, "|cff8f949c-|r")
     end
-    row.missingSource:SetTextColor(0.82, 0.82, 0.82)
 
     -- Nil faction means both sides can get it, which is the common case and
-    -- deserves no ink. Only a restriction is worth a word.
+    -- deserves no ink. Only a restriction is worth a word -- and a banner,
+    -- which is what the eye actually catches while scanning the column.
     if missing.faction == "alliance" then
-        setTextIfChanged(row.missingFaction, "|cff6699ffAlliance|r")
+        setTextIfChanged(row.missingFaction, ALLIANCE_TAG .. " |cff6699ffAlliance|r")
     elseif missing.faction == "horde" then
-        setTextIfChanged(row.missingFaction, "|cffe05561Horde|r")
+        setTextIfChanged(row.missingFaction, HORDE_TAG .. " |cffe05561Horde|r")
     else
         setTextIfChanged(row.missingFaction, "|cff8f949c-|r")
     end
+
+    -- The columns clip; the tooltip is where the whole answer lives.
+    row.missingInfo = missing
+    row.missingLabel = rowData.label
 
     -- The stripe reads as "can I go and get this now?" at a glance.
     if missing.skillMet and missing.specializationMet then
@@ -3625,6 +3828,9 @@ function UI:BindRecipeRow(row, recipeIdx, rowData)
     end
     self:HideMissingRowParts(row)
     row.missingGroupKey = nil
+    row.missingInfo = nil
+    row.missingLabel = nil
+    setRowIconGeometry(row, RECIPE_ROW_ICON_SIZE, 14)
     setShownIfChanged(row.icon, true)
     setShownIfChanged(row.title, true)
     setShownIfChanged(row.stats, true)
@@ -3665,21 +3871,8 @@ function UI:BindRecipeRow(row, recipeIdx, rowData)
     end
     setTextIfChanged(row.title, titleText)
 
-    -- A missing-recipe row answers "can I learn this, and where", so its
-    -- stats column carries the requirements instead of the crafter count --
-    -- which is always zero here and would say nothing.
-    local missing = rowData.missing
     local statsParts = {}
-    if missing then
-        if missing.requiredSkill then
-            local skillColour = missing.skillMet and "|cff9fa6b2" or COLOR_LOSS_TEXT
-            statsParts[#statsParts + 1] = string.format("%sSkill %d|r  |cff8f949c(you: %d)|r",
-                skillColour, missing.requiredSkill, missing.skillRank or 0)
-        end
-        statsParts[#statsParts + 1] = string.format("|cff8f949c%s|r", missing.sourceLabel or "")
-    else
-        statsParts[#statsParts + 1] = string.format("%d crafter(s)", rowData.crafterCount or 0)
-    end
+    statsParts[#statsParts + 1] = string.format("%d crafter(s)", rowData.crafterCount or 0)
     if (rowData.onlineCount or 0) > 0 then
         statsParts[#statsParts + 1] = string.format("|cff55d66b%d online|r", rowData.onlineCount or 0)
     end
@@ -3692,15 +3885,7 @@ function UI:BindRecipeRow(row, recipeIdx, rowData)
     setTextIfChanged(row.stats, table.concat(statsParts, "\n"))
 
     local metaParts = {}
-    if missing then
-        metaParts[#metaParts + 1] = missing.professionName or ""
-        if missing.specializationName then
-            -- The specialization is the hard gate: unlike skill, you cannot
-            -- grind your way to it later without abandoning the other one.
-            local colour = missing.specializationMet and "|cff55d66b" or COLOR_LOSS_TEXT
-            metaParts[#metaParts + 1] = string.format("%s%s|r", colour, missing.specializationName)
-        end
-    elseif self.selectedProfession == nil and rowData.professionList and #rowData.professionList > 0 then
+    if self.selectedProfession == nil and rowData.professionList and #rowData.professionList > 0 then
         metaParts[#metaParts + 1] = table.concat(rowData.professionList, ", ")
     end
     setTextIfChanged(row.meta, table.concat(metaParts, " - "))
@@ -3993,6 +4178,10 @@ function UI:_FinalizeRecipeList(rows, context, generation)
         -- The count is the point of the view, so it goes in the header
         -- rather than making the user scroll to the bottom to find it.
         headerText = string.format("%s - %d to learn", MISSING_VIEW, self._missingRecipeCount or 0)
+        setTextIfChanged(self.frame.missingTitle, headerText)
+        -- Re-run now that the count is known: the help line under the strip
+        -- explains an empty list, and only this point knows it is empty.
+        self:RefreshMissingControls()
     elseif context.selectedProfession and context.categoryFilter then
         headerText = context.selectedProfession .. ": " .. tostring(context.categoryLabel or context.categoryFilter)
     elseif context.selectedProfession then
@@ -4822,6 +5011,41 @@ function UI:RefreshDetailPanel()
                     lines[#lines + 1] = string.format("%s %s", state, nameText)
                 end
             end
+        end
+    end
+
+    -- Where to learn it. Sits between the crafters and the materials because
+    -- it answers the other half of "can I have this": either somebody in the
+    -- guild makes it, or you go and learn it yourself.
+    --
+    -- The list form is used here rather than the Missing tab's single joined
+    -- line: a recipe sold by four vendors in four cities is four errands, and
+    -- the panel has the room to say so.
+    local source = detail.source
+    if source then
+        lines[#lines + 1] = " "
+        lines[#lines + 1] = "|cffffd100Where to learn|r"
+        for _, sourceLine in ipairs(source.lines or { source.label }) do
+            lines[#lines + 1] = string.format("|cffd8d8d8%s|r", safeText(sourceLine))
+        end
+        -- Nil faction means both sides can get it, which is the common case
+        -- and deserves no ink. Only a restriction is worth a line.
+        if source.faction == "alliance" then
+            lines[#lines + 1] = "|cff6699ffAlliance only|r"
+        elseif source.faction == "horde" then
+            lines[#lines + 1] = "|cffe05561Horde only|r"
+        end
+        local requirements = {}
+        if detail.minRank then
+            requirements[#requirements + 1] = string.format("%s %d",
+                detail.professionName or "Skill", detail.minRank)
+        end
+        if detail.specializationName then
+            requirements[#requirements + 1] = detail.specializationName
+        end
+        if #requirements > 0 then
+            lines[#lines + 1] = string.format("|cff8f949cRequires %s|r",
+                table.concat(requirements, "  •  "))
         end
     end
 

@@ -2045,10 +2045,193 @@ function Data:EnsureRecipeReagents(info)
     return info
 end
 
+-- Where a recipe comes from, as one line of English plus the structured
+-- parts behind it.
+--
+-- Two views ask this question -- the Missing tab, which asks it about a
+-- recipe you could still learn, and the detail panel, which asks it about
+-- any recipe in the browser -- so the vocabulary lives here rather than in
+-- either of them. The governing rule, decided case by case against real
+-- counts: a colon introduces WHO, a preposition introduces WHERE. "Vendor:
+-- Kendor Kabonka (Stormwind City)" but "Quest at Hillsbrad Foothills",
+-- because "Quest: Hillsbrad Foothills" reads as a quest by that name.
+--
+-- The returned `label` is the one-line form, with every place joined into it.
+-- Callers with vertical room read `lines` instead: the same rule applied once
+-- per place, so a recipe sold in four cities reads as four errands.
+
+-- The proxy this started with, for a recipe the metadata cannot place: a
+-- recipe taught by an item has one, and one taught by a trainer does not.
+-- It is a guess, so it runs last -- see DescribeRecipeSource.
+local function guessSourceFromRecipeItem(metadataInfo)
+    if metadataInfo and metadataInfo.recipeItemId then
+        return "item", "Recipe item"
+    end
+    return "trainer", "Trainer"
+end
+
+-- The one-line form for a single set of who/where strings. Every caller of
+-- the describer -- the joined label and the per-place lines alike -- goes
+-- through here, so a rule stated once cannot drift between the two.
+local function sourceLabelFor(source, who, where)
+    local function named(prefix)
+        return string.format("%s: %s", prefix, who)
+    end
+
+    local function placed(prefix, preposition)
+        return string.format("%s %s %s", prefix, preposition, where)
+    end
+
+    if source.worldDrop then
+        return "worldDrop", "World drop"
+    end
+    if source.kind == "vendor" then
+        if who then return "vendor", named("Vendor") end
+        if where then return "vendor", placed("Vendor", "in") end
+        return "vendor", nil
+    end
+    if source.kind == "container" then
+        -- A chest, a book on a shelf, a schematic on the floor. "Found in"
+        -- covers all six without promising a creature to kill or a particular
+        -- chest to look for.
+        return "container", where and ("Found in " .. where) or "Found in an instance"
+    end
+    if source.kind == "drop" then
+        -- Only one creature is ever named, and only when it is a boss. An
+        -- ordinary mob is a species -- there are thirteen Wastewander Bandits
+        -- in Tanaris -- so the provider strips those names and leaves the
+        -- zone, which is the real answer.
+        if who then return "drop", named("Drop") end
+        if source.bossDrop then
+            return "drop", where and ("Drop from bosses in " .. where) or "Drop from bosses"
+        end
+        return "drop", where and placed("Drop", "in") or "Drop"
+    end
+    -- No place and nobody to find: a discovery happens at your own cauldron
+    -- or anvil, and a world event recipe is only there for the week the event
+    -- runs. Sending a player to look for either would be wrong.
+    if source.kind == "discovery" then
+        return "discovery", "Discovery"
+    end
+    if source.kind == "worldEvent" then
+        return "worldEvent", "World event"
+    end
+    if source.kind == "quest" then
+        if who then return "quest", named("Quest") end
+        return "quest", where and placed("Quest", "at") or "Quest"
+    end
+    if source.kind == "trainer" then
+        -- Most trainer-taught recipes name nobody, on purpose: every trainer
+        -- in the game teaches them and "go to your trainer" is the answer. The
+        -- ones that DO carry a name are the specialization trainers -- Nixx
+        -- Sprocketspring, Peter Galen -- where the name is the whole point,
+        -- because your own city trainer will not teach you.
+        if who then return "trainer", named("Trainer") end
+        if where then return "trainer", placed("Trainer", "at") end
+        return "trainer", "Trainer"
+    end
+    return source.kind, nil
+end
+
+function Data:DescribeRecipeSource(recipeKey, professionHint, metadataInfo)
+    local metadata = getRecipeMetadata()
+    if not metadata then
+        return { kind = "trainer", label = "Trainer", lines = { "Trainer" }, known = false }
+    end
+    if metadataInfo == nil then
+        metadataInfo = metadata.GetRecipeInfo and metadata:GetRecipeInfo(recipeKey, professionHint) or nil
+    end
+
+    local source = metadata.GetSource and metadata:GetSource(recipeKey, metadataInfo) or nil
+    if not (source and source.kind) then
+        -- Nothing recorded: fall back to guessing from whether a pattern
+        -- exists. Checking that first, as this used to, meant the guess beat
+        -- the data for every recipe with no pattern -- and an alchemy
+        -- discovery has none, so all seventeen of them were reported as
+        -- taught by a trainer who does not teach them.
+        local kind, label = guessSourceFromRecipeItem(metadataInfo)
+        return {
+            kind = kind,
+            label = label,
+            lines = { label },
+            known = false,
+            faction = source and source.faction or nil,
+        }
+    end
+
+    -- Each place carries its own zone, so a row can say which vendor stands
+    -- where: "Xandar Goodbeard (Loch Modan), Hagrus (Orgrimmar)". Vendor stock
+    -- is often limited, which is why the alternatives are listed rather than
+    -- collapsed to the first one.
+    local withNames, zonesOnly, lines = {}, {}, {}
+    -- A kind whose label names no place -- a world drop, a discovery -- would
+    -- otherwise repeat the same sentence once per place.
+    local seenLines = {}
+    for _, place in ipairs(source.places or {}) do
+        local who, where = nil, nil
+        if place.name then
+            who = place.zone and string.format("%s (%s)", place.name, place.zone) or place.name
+            withNames[#withNames + 1] = who
+        elseif place.zone then
+            where = place.zone
+            zonesOnly[#zonesOnly + 1] = where
+        end
+        -- One line per place, for the views with the room to list them.
+        local _, line = sourceLabelFor(source, who, where)
+        if line and not seenLines[line] then
+            seenLines[line] = true
+            lines[#lines + 1] = line
+        end
+    end
+
+    local kind, label = sourceLabelFor(source,
+        #withNames > 0 and table.concat(withNames, ", ") or nil,
+        #zonesOnly > 0 and table.concat(zonesOnly, ", ") or nil)
+
+    if not label then
+        -- A kind nothing above handles, or a known kind whose places came
+        -- back empty. Better to guess than to say nothing, but reaching here
+        -- means the metadata grew a shape this describer does not render.
+        kind, label = guessSourceFromRecipeItem(metadataInfo)
+        lines = nil
+    end
+    if not lines or #lines == 0 then
+        lines = { label }
+    end
+
+    return {
+        kind = kind,
+        label = label,
+        lines = lines,
+        known = true,
+        faction = source.faction,
+        places = source.places,
+        worldDrop = source.worldDrop == true,
+        bossDrop = source.bossDrop == true,
+    }
+end
+
 function Data:GetRecipeDetail(recipeKey, professionName)
     local detail = self:GetRecipeDisplayInfo(recipeKey, professionName) or { recipeKey = recipeKey, label = tostring(recipeKey) }
     refreshDetailAssets(detail)
     self:EnsureRecipeReagents(detail)
+    -- Where to learn it. Resolved here rather than in GetRecipeDisplayInfo
+    -- because that one is built for lists of hundreds and its result is
+    -- cached: the detail panel looks at one recipe at a time, so the small
+    -- table GetSource allocates per call is paid once per selection.
+    local metadata = getRecipeMetadata()
+    -- Resolved once and handed to both lookups: an ambiguous created-item
+    -- key (Gold Bar under Mining vs Alchemy) must land on the same record
+    -- the display info was built from, and only the stored hint says which.
+    local metadataInfo = metadata and metadata.GetRecipeInfo
+        and metadata:GetRecipeInfo(recipeKey, detail._professionHintKey or professionName) or nil
+    detail.source = self:DescribeRecipeSource(recipeKey, detail._professionHintKey or professionName, metadataInfo)
+    local specializationSpellId = metadata and metadata.GetSpecialization
+        and metadata:GetSpecialization(recipeKey, metadataInfo) or nil
+    detail.specializationSpellId = specializationSpellId
+    detail.specializationName = specializationSpellId
+        and self.GetSpecializationName
+        and self:GetSpecializationName(detail.professionName, specializationSpellId) or nil
     detail.crafters = self:GetRecipeCrafters(recipeKey)
     detail.crafterCount = #detail.crafters
     if Addon.Market and Addon.Market.ApplyRecipeCosts then

@@ -77,6 +77,22 @@ function Data:IsMissingRecipesEnabledForProfession(professionName)
     return disabled[professionName] ~= true
 end
 
+-- The one filter this view has. With three hundred candidates on a maxed
+-- profession, "what can I go and learn right now" is a different question
+-- from "what does this profession have left", and the sort alone does not
+-- answer it once the ready recipes run past the bottom of the window.
+-- Off by default: the full list is the honest answer.
+function Data:IsMissingRecipesLearnableOnly()
+    local profile = Addon.db and Addon.db.profile
+    return (profile and profile.missingRecipesLearnableOnly) == true
+end
+
+function Data:SetMissingRecipesLearnableOnly(enabled)
+    local profile = Addon.db and Addon.db.profile
+    if not profile then return end
+    profile.missingRecipesLearnableOnly = (enabled == true) or nil
+end
+
 function Data:SetMissingRecipesEnabledForProfession(professionName, enabled)
     local profile = Addon.db and Addon.db.profile
     if not profile or not professionName then return end
@@ -86,122 +102,10 @@ function Data:SetMissingRecipesEnabledForProfession(professionName, enabled)
     profile.missingRecipesDisabledProfessions[professionName] = (enabled == false) or nil
 end
 
--- How the recipe reaches the player.
---
--- A recipe with no teaching item is taught directly by a trainer, and that is
--- the whole answer. For the rest the metadata now carries the obtain-side
--- data imported from Wowhead: who sells it or drops it, and where. When that
--- import has not been run the label falls back to the shape it had before,
--- which says only that a recipe item exists.
--- The proxy this view started with, for a recipe the metadata cannot place:
--- a recipe taught by an item has one, and one taught by a trainer does not.
--- It is a guess, so it runs last -- see describeSource.
-local function guessFromRecipeItem(info)
-    if info and info.recipeItemId then
-        return "item", "Recipe item"
-    end
-    return "trainer", "Trainer"
-end
-
-local function describeSource(meta, recipeKey, info)
-    local source = meta.GetSource and meta:GetSource(recipeKey, info) or nil
-    if not (source and source.kind) then
-        -- Nothing recorded: fall back to guessing from whether a pattern
-        -- exists. Checking that first, as this used to, meant the guess beat
-        -- the data for every recipe with no pattern -- and an alchemy
-        -- discovery has none, so all seventeen of them were reported as
-        -- taught by a trainer who does not teach them.
-        local kind, label = guessFromRecipeItem(info)
-        return kind, label, source
-    end
-
-    -- Each place carries its own zone, so a row can say which vendor stands
-    -- where: "Xandar Goodbeard (Loch Modan), Hagrus (Orgrimmar)". Vendor stock
-    -- is often limited, which is why the alternatives are listed rather than
-    -- collapsed to the first one.
-    local withNames, zonesOnly = {}, {}
-    for _, place in ipairs(source.places or {}) do
-        if place.name then
-            withNames[#withNames + 1] = place.zone
-                and string.format("%s (%s)", place.name, place.zone)
-                or place.name
-        elseif place.zone then
-            zonesOnly[#zonesOnly + 1] = place.zone
-        end
-    end
-
-    local who = #withNames > 0 and table.concat(withNames, ", ") or nil
-    local where = #zonesOnly > 0 and table.concat(zonesOnly, ", ") or nil
-
-    -- A colon introduces WHO, a preposition introduces WHERE. "Quest:
-    -- Hillsbrad Foothills" reads as a quest by that name; "Quest at Hillsbrad
-    -- Foothills" reads as what it is.
-    local function named(prefix)
-        return string.format("%s: %s", prefix, who)
-    end
-
-    local function placed(prefix, preposition)
-        return string.format("%s %s %s", prefix, preposition, where)
-    end
-
-    if source.worldDrop then
-        return "worldDrop", "World drop", source
-    end
-    if source.kind == "vendor" then
-        if who then return "vendor", named("Vendor"), source end
-        if where then return "vendor", placed("Vendor", "in"), source end
-    end
-    if source.kind == "container" then
-        -- A chest, a book on a shelf, a schematic on the floor. "Found in"
-        -- covers all six without promising a creature to kill or a particular
-        -- chest to look for.
-        return "container", where and ("Found in " .. where) or "Found in an instance", source
-    end
-    if source.kind == "drop" then
-        -- Only one creature is ever named, and only when it is a boss. An
-        -- ordinary mob is a species -- there are thirteen Wastewander Bandits
-        -- in Tanaris -- so the provider strips those names and leaves the
-        -- zone, which is the real answer.
-        if who then
-            return "drop", named("Drop"), source
-        end
-        if source.bossDrop then
-            return "drop", where and ("Drop from bosses in " .. where) or "Drop from bosses", source
-        end
-        return "drop", where and placed("Drop", "in") or "Drop", source
-    end
-    -- No place and nobody to find: a discovery happens at your own cauldron
-    -- or anvil, and a world event recipe is only there for the week the
-    -- event runs. Sending a player to look for either would be wrong.
-    if source.kind == "discovery" then
-        return "discovery", "Discovery", source
-    end
-    if source.kind == "worldEvent" then
-        return "worldEvent", "World event", source
-    end
-    if source.kind == "quest" then
-        if who then return "quest", named("Quest"), source end
-        return "quest", where and placed("Quest", "at") or "Quest", source
-    end
-    if source.kind == "trainer" then
-        -- Most trainer-taught recipes name nobody, on purpose: every trainer
-        -- in the game teaches them and "go to your trainer" is the answer. The
-        -- ones that DO carry a name are the specialization trainers -- Nixx
-        -- Sprocketspring, Peter Galen -- where the name is the whole point,
-        -- because your own city trainer will not teach you.
-        if who then
-            return "trainer", named("Trainer"), source
-        end
-        if where then
-            return "trainer", placed("Trainer", "at"), source
-        end
-        return "trainer", "Trainer", source
-    end
-    -- A kind nothing above handles. Better to guess than to say nothing, but
-    -- reaching here means the metadata grew a kind this view does not render.
-    local kind, label = guessFromRecipeItem(info)
-    return kind, label, source
-end
+-- How the recipe reaches the player lives in Data:DescribeRecipeSource, next
+-- to the recipe display data rather than here: the detail panel asks the same
+-- question about recipes that are not missing at all, and the two views must
+-- not drift into two vocabularies.
 
 -- Names, icons and item quality come from Data:GetRecipeDisplayInfo, which
 -- costs two GetItemInfo calls per recipe and takes a slot in a 256-entry
@@ -276,7 +180,7 @@ function Data:BuildMissingRecipeRowsForProfession(professionName, prof)
                 local requiredSkill = tonumber(info and info.requiredSkill) or nil
                 local specializationId = meta.GetSpecialization
                     and meta:GetSpecialization(recipeKey, info) or nil
-                local sourceKind, sourceLabel, source = describeSource(meta, recipeKey, info)
+                local source = self:DescribeRecipeSource(recipeKey, professionKey, info)
                 rows[#rows + 1] = {
                     recipeKey = recipeKey,
                     -- detail and label are filled in by ResolveMissingRow,
@@ -291,13 +195,17 @@ function Data:BuildMissingRecipeRowsForProfession(professionName, prof)
                         -- Learnable now, or does the character have to level
                         -- the profession further first?
                         skillMet = requiredSkill == nil or skillRank >= requiredSkill,
-                        sourceKind = sourceKind,
-                        sourceLabel = sourceLabel,
+                        sourceKind = source.kind,
+                        sourceLabel = source.label,
+                        -- One line per place, for the row tooltip: the table
+                        -- column clips, and a recipe sold in four cities is
+                        -- exactly the case where the clipped half matters.
+                        sourceLines = source.lines,
                         -- nil means both factions, which is the common case:
                         -- the generator omits the field rather than repeating
                         -- it on most of the dataset.
-                        faction = source and source.faction or nil,
-                        sourcePlaces = source and source.places or nil,
+                        faction = source.faction,
+                        sourcePlaces = source.places,
                         specializationSpellId = specializationId,
                         specializationName = specializationId
                             and self:GetSpecializationName(professionName, specializationId) or nil,
@@ -322,11 +230,14 @@ end
 -- the order is still stable between rebuilds.
 function Data:BuildMissingRecipeRows()
     local rows = {}
+    local learnableOnly = self:IsMissingRecipesLearnableOnly()
     for professionName, prof in pairs(self:GetLocalProfessionBlocks()) do
         if self:IsMissingRecipesEnabledForProfession(professionName) then
             local professionRows = self:BuildMissingRecipeRowsForProfession(professionName, prof)
             for _, row in ipairs(professionRows) do
-                rows[#rows + 1] = row
+                if not learnableOnly or (row.missing.skillMet and row.missing.specializationMet) then
+                    rows[#rows + 1] = row
+                end
             end
         end
     end

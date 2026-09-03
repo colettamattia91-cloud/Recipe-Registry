@@ -379,4 +379,57 @@ Test.it("does not write a place where a name would go", function()
     Test.truthy(seen.quest:find("^Quest at ") == 1, "got: " .. tostring(seen.quest))
 end)
 
+-- The view's one filter. Off by default: the full list is the honest answer
+-- to "what does this profession still have", and the toggle narrows it to the
+-- question you can act on today.
+Test.it("shows everything until the ready-to-learn filter is switched on", function()
+    setLocalProfession("Blacksmithing", { skillRank = 300 })
+    Test.eq(data:IsMissingRecipesLearnableOnly(), false)
+
+    local all = data:BuildMissingRecipeRows()
+    local outOfReach = 0
+    for _, row in ipairs(all) do
+        if not (row.missing.skillMet and row.missing.specializationMet) then
+            outOfReach = outOfReach + 1
+        end
+    end
+    Test.gte(outOfReach, 1)
+
+    data:SetMissingRecipesLearnableOnly(true)
+    local ready = data:BuildMissingRecipeRows()
+    Test.eq(#ready, #all - outOfReach)
+    for _, row in ipairs(ready) do
+        Test.eq(row.missing.skillMet, true)
+        Test.eq(row.missing.specializationMet, true)
+    end
+
+    data:SetMissingRecipesLearnableOnly(false)
+    Test.eq(#data:BuildMissingRecipeRows(), #all)
+end)
+
+Test.it("drops the ready-to-learn flag rather than storing a false", function()
+    data:SetMissingRecipesLearnableOnly(true)
+    Test.eq(addon.db.profile.missingRecipesLearnableOnly, true)
+    data:SetMissingRecipesLearnableOnly(false)
+    -- Same shape as the per-profession opt-out: absence is the default, so a
+    -- profile that never touched the toggle and one that switched it back off
+    -- are the same profile.
+    Test.eq(addon.db.profile.missingRecipesLearnableOnly, nil)
+end)
+
+-- The tooltip lists the places one per line, because the table column clips.
+Test.it("carries one source line per place onto the row", function()
+    setLocalProfession("Alchemy", { skillRank = 375 })
+
+    local multi
+    for _, row in ipairs(data:BuildMissingRecipeRows()) do
+        if row.missing.sourcePlaces and #row.missing.sourcePlaces > 1 then
+            multi = row
+            break
+        end
+    end
+    Test.truthy(multi ~= nil, "expected a recipe with more than one place")
+    Test.eq(#multi.missing.sourceLines, #multi.missing.sourcePlaces)
+end)
+
 io.write(string.format("Missing recipes: %d test(s) passed\n", Test.count))
