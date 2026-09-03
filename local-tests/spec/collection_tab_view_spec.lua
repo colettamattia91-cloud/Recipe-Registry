@@ -353,6 +353,79 @@ Test.it("gives a group header its own height", function()
         "a profession header should stand out from the rows under it")
 end)
 
+-- The row pool is shared by three tables that draw nothing alike: the recipe
+-- browser, the guild members table and the collection table. A row arrives
+-- owning whatever font strings the view that used it last left showing, so
+-- every bind has to put the other two views away before it draws. Missing one
+-- direction put the collection's columns on top of the guild members table.
+--
+-- Checked against the source rather than by building three frame hierarchies:
+-- what has to hold is that no bind path can be added without the reset, and
+-- that is a property of the code, not of one rendered row.
+local function readMainFrame()
+    local handle = assert(io.open("UI/MainFrame.lua", "r"))
+    local content = handle:read("*a")
+    handle:close()
+    return content
+end
+
+local mainFrameSource = readMainFrame()
+
+local function bodyOf(signature)
+    local startAt = mainFrameSource:find(signature, 1, true)
+    if not startAt then return nil end
+    local stopAt = mainFrameSource:find("\nend", startAt, true)
+    if not stopAt then return nil end
+    return mainFrameSource:sub(startAt, stopAt)
+end
+
+Test.it("puts the other tables away before drawing a guild members row", function()
+    local reset = bodyOf("local function prepareAddonStatusRow(")
+    Test.truthy(reset ~= nil, "expected a shared reset for guild members rows")
+    Test.truthy(reset:find("HideCollectionRowParts", 1, true) ~= nil,
+        "the reset must hide the collection columns")
+    Test.truthy(reset:find("HideRecipeRowParts", 1, true) ~= nil,
+        "the reset must hide the recipe browser parts")
+    -- The state behind the columns goes too, or a guild members row still
+    -- answers as a collection row when the mouse crosses it.
+    Test.truthy(reset:find("row.collectionInfo = nil", 1, true) ~= nil)
+
+    for _, name in ipairs({
+        "function UI:BindAddonStatusGroupRow(",
+        "function UI:BindAddonStatusHeaderRow(",
+        "function UI:BindAddonStatusRow(",
+    }) do
+        local body = bodyOf(name)
+        Test.truthy(body ~= nil, "expected " .. name)
+        Test.truthy(body:find("prepareAddonStatusRow(", 1, true) ~= nil,
+            name .. " must go through the shared reset")
+    end
+end)
+
+Test.it("puts the other tables away before drawing a collection row", function()
+    local reset = bodyOf("local function prepareCollectionRow(")
+    Test.truthy(reset ~= nil, "expected a shared reset for collection rows")
+    Test.truthy(reset:find("HideRecipeRowParts", 1, true) ~= nil)
+    Test.truthy(reset:find("SetAddonStatusPartsVisible", 1, true) ~= nil,
+        "the reset must hide the guild members columns")
+end)
+
+Test.it("puts the other tables away before drawing a browser row", function()
+    local body = bodyOf("function UI:BindRecipeRow(")
+    Test.truthy(body ~= nil)
+    Test.truthy(body:find("HideCollectionRowParts", 1, true) ~= nil)
+    Test.truthy(body:find("SetAddonStatusPartsVisible", 1, true) ~= nil)
+end)
+
+-- The hit area is a Button, not a font string: left showing over another
+-- table it would swallow that table's mouse events, not merely draw over them.
+Test.it("hides the name hit area with the rest of the collection row", function()
+    local body = bodyOf("function UI:HideCollectionRowParts(")
+    Test.truthy(body ~= nil)
+    Test.truthy(body:find("collectionNameHit", 1, true) ~= nil,
+        "the tooltip hit area must be hidden too")
+end)
+
 -- The columns clip on purpose; everything they cut is in the tooltip.
 Test.it("puts the whole source in the row tooltip", function()
     local lines = {}

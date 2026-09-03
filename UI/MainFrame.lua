@@ -3869,16 +3869,33 @@ function UI:BindCollectionRow(row, rowIdx, rowData)
     setShownIfChanged(row, true)
 end
 
-function UI:BindAddonStatusGroupRow(row, rowIdx, rowData)
-    local rowHeight = self:GetListRowHeight()
+-- Reset a pooled row before it draws a guild members row.
+--
+-- The pool is shared with the collection table and the recipe browser, so a
+-- row arrives owning whatever font strings the view that used it last left
+-- showing -- and those paint straight over these columns. Factored out of the
+-- three bind functions that used to repeat it, because repeating it is how
+-- the collection's columns ended up on top of this table.
+local function prepareAddonStatusRow(ui, row, rowIdx)
+    local rowHeight = ui:GetListRowHeight()
+    row:ClearAllPoints()
     row:SetPoint("TOPLEFT", 0, -((rowIdx - 1) * rowHeight))
-    row:SetSize(self:GetListRowWidth(), rowHeight - 2)
+    row:SetSize(ui:GetListRowWidth(), rowHeight - 2)
     row.recipeKey = nil
     row.addonStatusMemberKey = nil
-    row.addonStatusGroupKey = rowData.groupKey
+    row.addonStatusGroupKey = nil
     row.addonStatusHeaderRow = false
     row.tooltipLink = nil
-    self:HideRecipeRowParts(row)
+    row.collectionGroupKey = nil
+    row.collectionInfo = nil
+    row.collectionLabel = nil
+    ui:HideRecipeRowParts(row)
+    ui:HideCollectionRowParts(row)
+end
+
+function UI:BindAddonStatusGroupRow(row, rowIdx, rowData)
+    prepareAddonStatusRow(self, row, rowIdx)
+    row.addonStatusGroupKey = rowData.groupKey
     self:SetAddonStatusPartsVisible(row, false)
     self:SetAddonStatusHeaderButtonsVisible(row, false)
     setShownIfChanged(row.addonSectionTitle, true)
@@ -3907,15 +3924,8 @@ function UI:GetAddonStatusHeaderText(columnKey, baseLabel)
 end
 
 function UI:BindAddonStatusHeaderRow(row, rowIdx)
-    local rowHeight = self:GetListRowHeight()
-    row:SetPoint("TOPLEFT", 0, -((rowIdx - 1) * rowHeight))
-    row:SetSize(self:GetListRowWidth(), rowHeight - 2)
-    row.recipeKey = nil
-    row.addonStatusMemberKey = nil
-    row.addonStatusGroupKey = nil
+    prepareAddonStatusRow(self, row, rowIdx)
     row.addonStatusHeaderRow = true
-    row.tooltipLink = nil
-    self:HideRecipeRowParts(row)
     self:SetAddonStatusPartsVisible(row, true)
     self:SetAddonStatusHeaderButtonsVisible(row, true)
     setShownIfChanged(row.addonSectionTitle, false)
@@ -3948,15 +3958,8 @@ function UI:BindAddonStatusRow(row, rowIdx, rowData)
         self:BindAddonStatusHeaderRow(row, rowIdx)
         return
     end
-    local rowHeight = self:GetListRowHeight()
-    row:SetPoint("TOPLEFT", 0, -((rowIdx - 1) * rowHeight))
-    row:SetSize(self:GetListRowWidth(), rowHeight - 2)
-    row.recipeKey = nil
+    prepareAddonStatusRow(self, row, rowIdx)
     row.addonStatusMemberKey = rowData.memberKey
-    row.addonStatusGroupKey = nil
-    row.addonStatusHeaderRow = false
-    row.tooltipLink = nil
-    self:HideRecipeRowParts(row)
     self:SetAddonStatusPartsVisible(row, true)
     self:SetAddonStatusHeaderButtonsVisible(row, false)
     setShownIfChanged(row.addonSectionTitle, false)
