@@ -322,10 +322,27 @@ local function invalidateRecipeFilters(professionKey, reason)
     refreshOpenDirectory()
 end
 
+-- Both of these now go through RecipeUiFilters, which is where the collection
+-- strip and the recipe header write the same two settings. The panel keeps its
+-- own refresh of the open directory; the module handles the cache
+-- invalidation that every writer needs.
 local function setFilterExpansionDefault(expansion, enabled)
     local profile = getProfile()
     if not profile then return end
     local filters = ensureRecipePrefilters(profile)
+    local module = Addon.RecipeUiFilters
+    if module and module.SetExpansionDefaults then
+        local vanilla = filters.expansionDefaults.vanilla ~= false
+        local tbc = filters.expansionDefaults.tbc ~= false
+        if expansion == "vanilla" then vanilla = enabled == true else tbc = enabled == true end
+        -- The panel is allowed to switch both off: it shows a warning line for
+        -- exactly that state, and a checkbox that refuses to move is worse.
+        if not module:SetExpansionDefaults(vanilla, tbc, "filters:global-" .. tostring(expansion)) then
+            filters.expansionDefaults[expansion] = enabled == true
+        end
+        refreshOpenDirectory()
+        return
+    end
     filters.expansionDefaults[expansion] = enabled == true
     invalidateRecipeFilters(nil, "filters:global-" .. tostring(expansion))
 end
@@ -342,6 +359,12 @@ local function setProfitableOnly(enabled)
     local profile = getProfile()
     if not profile then return end
     local filters = ensureRecipePrefilters(profile)
+    local module = Addon.RecipeUiFilters
+    if module and module.SetProfitableOnly then
+        module:SetProfitableOnly(enabled)
+        refreshOpenDirectory()
+        return
+    end
     filters.showOnlyProfitableRecipes = enabled == true
     invalidateRecipeFilters(nil, "filters:profitable-only")
 end

@@ -637,4 +637,230 @@ Test.it("puts the hidden-expansion hint away when a full-width view takes over",
         "the full-width branch must refresh the hint, which hides it there")
 end)
 
+-- The column headers: the guild members table has sorted and filtered from its
+-- headers since it was built, and the collection table -- which is longer, and
+-- the one people scan looking for a hole -- had neither.
+local function columnRow(profession, opts)
+    opts = opts or {}
+    return {
+        recipeKey = opts.recipeKey or -1,
+        label = opts.label,
+        _collectionResolved = opts.label ~= nil or nil,
+        collection = {
+            professionName = profession,
+            known = opts.known or false,
+            requiredSkill = opts.requiredSkill,
+            skillRank = opts.skillRank or 375,
+            skillMet = opts.skillMet ~= false,
+            specializationMet = opts.specializationMet ~= false,
+            specializationSpellId = opts.specializationSpellId,
+            specializationName = opts.specializationName,
+            sourceKind = opts.sourceKind,
+            sourceLabel = opts.sourceLabel,
+            sourceLines = opts.sourceLines,
+        },
+    }
+end
+
+local function drawnRows(display)
+    local out = {}
+    for _, row in ipairs(display) do
+        if row.rowType == "collection" then out[#out + 1] = row end
+    end
+    return out
+end
+
+local function resetColumnState()
+    ui.frame = nil
+    useView(COLLECTION_VIEW)
+    ui.collectionFilters = { skill = "all", source = "all", spec = "all" }
+    ui.collectionSortKey = "default"
+    ui.collectionSortDir = "asc"
+    data:SetCollectionFilter("all")
+end
+
+Test.it("narrows the table one column at a time", function()
+    resetColumnState()
+    local rows = {
+        columnRow("Engineering", { recipeKey = -1, requiredSkill = 300, sourceKind = "trainer" }),
+        columnRow("Engineering", { recipeKey = -2, requiredSkill = 400, skillMet = false, sourceKind = "vendor" }),
+        columnRow("Engineering", { recipeKey = -3, sourceKind = "vendor" }),
+        columnRow("Engineering", { recipeKey = -4, requiredSkill = 350, sourceKind = "drop",
+            specializationSpellId = 20222, specializationName = "Gnomish", specializationMet = false }),
+    }
+
+    Test.eq(#drawnRows(ui:BuildCollectionDisplayRows(rows)), 4)
+
+    -- Skill asks only about the number, so it stays orthogonal to status.
+    ui.collectionFilters.skill = "outofreach"
+    Test.eq(#drawnRows(ui:BuildCollectionDisplayRows(rows)), 1)
+    ui.collectionFilters.skill = "noskill"
+    Test.eq(#drawnRows(ui:BuildCollectionDisplayRows(rows)), 1)
+    ui.collectionFilters.skill = "inreach"
+    Test.eq(#drawnRows(ui:BuildCollectionDisplayRows(rows)), 2)
+    ui.collectionFilters.skill = "all"
+
+    ui.collectionFilters.source = "vendor"
+    Test.eq(#drawnRows(ui:BuildCollectionDisplayRows(rows)), 2)
+    ui.collectionFilters.source = "all"
+
+    ui.collectionFilters.spec = "required"
+    Test.eq(#drawnRows(ui:BuildCollectionDisplayRows(rows)), 1)
+    ui.collectionFilters.spec = "have"
+    Test.eq(#drawnRows(ui:BuildCollectionDisplayRows(rows)), 0)
+    ui.collectionFilters.spec = "none"
+    Test.eq(#drawnRows(ui:BuildCollectionDisplayRows(rows)), 3)
+
+    -- Whatever the columns hide, the profession header still counts the book.
+    local display = ui:BuildCollectionDisplayRows(rows)
+    for _, row in ipairs(display) do
+        if row.rowType == "collectionGroup" then Test.eq(row.count, 4) end
+    end
+    resetColumnState()
+end)
+
+-- Two controls a few pixels apart that both say "status" must not be able to
+-- disagree, so the header reads and writes the strip button's setting.
+Test.it("gives the status column the filter the strip button already had", function()
+    resetColumnState()
+    Test.eq(ui:GetCollectionColumnFilter("status"), "all")
+
+    ui:CycleCollectionColumnFilter("status")
+    Test.eq(data:GetCollectionFilter(), "unlearned")
+    Test.eq(ui:GetCollectionColumnFilter("status"), "unlearned")
+
+    data:SetCollectionFilter("ready")
+    Test.eq(ui:GetCollectionColumnFilter("status"), "ready")
+    resetColumnState()
+end)
+
+Test.it("cycles a column filter back round to everything", function()
+    resetColumnState()
+    for _ = 1, 4 do ui:CycleCollectionColumnFilter("skill") end
+    Test.eq(ui:GetCollectionColumnFilter("skill"), "all")
+    Test.eq(ui:HasCollectionColumnFilter(), false)
+
+    ui:CycleCollectionColumnFilter("source")
+    Test.eq(ui:HasCollectionColumnFilter(), true)
+    ui:ClearCollectionColumnFilters()
+    Test.eq(ui:HasCollectionColumnFilter(), false)
+    resetColumnState()
+end)
+
+Test.it("sorts by a column, then the other way, then back to the built order", function()
+    resetColumnState()
+    local rows = {
+        columnRow("Engineering", { recipeKey = -1, requiredSkill = 350 }),
+        columnRow("Engineering", { recipeKey = -2, requiredSkill = 300 }),
+        columnRow("Engineering", { recipeKey = -3, requiredSkill = 375 }),
+    }
+
+    ui:SetCollectionSort("skill")
+    Test.eq(ui.collectionSortDir, "asc")
+    local drawn = drawnRows(ui:BuildCollectionDisplayRows(rows))
+    Test.eq(drawn[1].collection.requiredSkill, 300)
+    Test.eq(drawn[3].collection.requiredSkill, 375)
+
+    ui:SetCollectionSort("skill")
+    Test.eq(ui.collectionSortDir, "desc")
+    drawn = drawnRows(ui:BuildCollectionDisplayRows(rows))
+    Test.eq(drawn[1].collection.requiredSkill, 375)
+
+    -- A third click is not a fourth sort order: it hands the list back to the
+    -- order the data layer built, which is the one the view opens on.
+    ui:SetCollectionSort("skill")
+    Test.eq(ui.collectionSortKey, "default")
+    resetColumnState()
+end)
+
+-- Names are resolved lazily by design, so sorting by them has to ask for them.
+Test.it("resolves the names it needs to sort by name", function()
+    resetColumnState()
+    local rows = {
+        columnRow("Engineering", { recipeKey = -1, label = "Zapthrottle Mote Extractor" }),
+        columnRow("Engineering", { recipeKey = -2, label = "Adamantite Rifle" }),
+        columnRow("Engineering", { recipeKey = -3, label = "Mechanical Yeti" }),
+    }
+
+    ui:SetCollectionSort("name")
+    local drawn = drawnRows(ui:BuildCollectionDisplayRows(rows))
+    Test.eq(drawn[1].label, "Adamantite Rifle")
+    Test.eq(drawn[3].label, "Zapthrottle Mote Extractor")
+    resetColumnState()
+end)
+
+Test.it("says on the header which way it is sorted and what it is filtering", function()
+    resetColumnState()
+    Test.eq(ui:GetCollectionHeaderText("name", "Recipe"), "Recipe")
+
+    ui:SetCollectionSort("name")
+    Test.truthy(ui:GetCollectionHeaderText("name", "Recipe"):find("^", 1, true) ~= nil)
+
+    ui.collectionFilters.source = "vendor"
+    local text = ui:GetCollectionHeaderText("source", "Learned from")
+    Test.truthy(text:find("Vendor", 1, true) ~= nil, "got: " .. text)
+    -- The [F] marker is the guild members table's own way of saying a column
+    -- can be filtered; the collection table borrows it rather than inventing
+    -- a second vocabulary.
+    Test.truthy(text:find("[F]", 1, true) ~= nil, "got: " .. text)
+    resetColumnState()
+end)
+
+-- Header buttons are Buttons on a pooled row shared with two other tables: one
+-- left showing swallows the clicks of whatever is drawn there next.
+Test.it("puts the collection header buttons away with the rest of the row", function()
+    local hide = bodyOf("function UI:HideCollectionRowParts(")
+    Test.truthy(hide ~= nil)
+    Test.truthy(hide:find("SetCollectionHeaderButtonsVisible", 1, true) ~= nil,
+        "the shared reset must hide the header buttons too")
+    local prepare = bodyOf("local function prepareCollectionRow(")
+    Test.truthy(prepare:find("SetCollectionHeaderButtonsVisible(row, false)", 1, true) ~= nil,
+        "every collection row starts without them")
+    local header = bodyOf("function UI:BindCollectionHeaderRow(")
+    Test.truthy(header:find("SetCollectionHeaderButtonsVisible(row, true)", 1, true) ~= nil,
+        "only the header row shows them")
+end)
+
+-- The recipe browser's search box has always been the top-left control. The
+-- two full-width tables pinned theirs to the opposite edge, on top of a button.
+Test.it("puts every search box on the left of its strip", function()
+    for _, name in ipairs({ "collectionSearchBox", "addonStatusSearchBox" }) do
+        local at = mainFrameSource:find(name .. ':SetPoint%("LEFT"')
+        Test.truthy(at ~= nil, name .. " must be anchored to the left of its strip")
+    end
+    for _, name in ipairs({ "collectionSearchLabel", "addonStatusSearchLabel" }) do
+        local at = mainFrameSource:find(name .. ':SetPoint%("LEFT"')
+        Test.truthy(at ~= nil, name .. " must sit beside its box on the left")
+    end
+end)
+
+-- Three states, and the fourth combination is an empty browser.
+Test.it("never cycles the expansion filter into showing nothing", function()
+    local filters = addon.RecipeUiFilters
+    Test.truthy(filters ~= nil)
+    Test.eq(filters:SetExpansionDefaults(false, false), false)
+
+    local seen = {}
+    for _ = 1, 6 do
+        ui:CycleExpansionFilter()
+        local vanilla, tbc = filters:GetExpansionDefaults()
+        Test.truthy(vanilla or tbc, "at least one expansion has to stay visible")
+        seen[ui:GetExpansionFilterState().key] = true
+    end
+    Test.eq(seen.all, true)
+    Test.eq(seen.tbc, true)
+    Test.eq(seen.vanilla, true)
+
+    filters:SetExpansionDefaults(false, true)
+end)
+
+Test.it("toggles the profit filter from the browser, not only the options panel", function()
+    local filters = addon.RecipeUiFilters
+    Test.eq(ui:IsProfitableOnly(), false)
+    ui:ToggleProfitableOnly()
+    Test.eq(filters:IsProfitableOnly(), true)
+    ui:ToggleProfitableOnly()
+    Test.eq(ui:IsProfitableOnly(), false)
+end)
+
 io.write(string.format("Collection tab view: %d test(s) passed\n", Test.count))

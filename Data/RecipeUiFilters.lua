@@ -107,6 +107,57 @@ function RecipeUiFilters:IsSupportedProfession(professionKey)
     return false
 end
 
+-- The expansion prefilter and the profit filter are settings, not options-panel
+-- state. The collection strip and the recipe header drive the same two
+-- switches the options panel does, so both the reading and the writing live
+-- here, next to the code that consumes them: one setter, one invalidation
+-- path, rather than one of each per surface.
+--
+-- Expansion is written as a pair rather than one flag at a time because the
+-- pair has an illegal combination -- neither expansion visible is an empty
+-- browser -- and a two-step write would pass through it.
+function RecipeUiFilters:GetExpansionDefaults()
+    local defaults = getProfilePrefilters().expansionDefaults or {}
+    return defaults.vanilla ~= false, defaults.tbc ~= false
+end
+
+-- The reason is the caller's, not this function's: the options panel moves one
+-- checkbox and names that checkbox, while the strip cycles the pair. Both
+-- reach the same invalidation, and the scope string stays true to what the
+-- player actually did.
+function RecipeUiFilters:SetExpansionDefaults(vanilla, tbc, reason)
+    if vanilla ~= true and tbc ~= true then return false end
+    local filters = getProfilePrefilters()
+    filters.expansionDefaults.vanilla = vanilla == true
+    filters.expansionDefaults.tbc = tbc == true
+    self:InvalidateProfessionProjection(nil, reason or "filters:expansion-defaults")
+    return true
+end
+
+-- Which professions answer to their own expansion setting rather than the
+-- global one. The in-tab control writes the global pair, so it has to be able
+-- to say when a profession will not follow it.
+function RecipeUiFilters:GetProfessionsWithExpansionOverride()
+    local filters = getProfilePrefilters()
+    local out = {}
+    for professionKey, override in pairs(filters.professionExpansionOverrides or {}) do
+        if type(override) == "table" and override.inherit == false then
+            out[#out + 1] = professionKey
+        end
+    end
+    sort(out)
+    return out
+end
+
+function RecipeUiFilters:IsProfitableOnly()
+    return getProfilePrefilters().showOnlyProfitableRecipes == true
+end
+
+function RecipeUiFilters:SetProfitableOnly(enabled)
+    getProfilePrefilters().showOnlyProfitableRecipes = enabled == true
+    self:InvalidateProfessionProjection(nil, "filters:profitable-only")
+end
+
 function RecipeUiFilters:GetEffectiveExpansionVisibility(professionKey)
     local filters = getProfilePrefilters()
     local normalizedProfession = normalizeProfessionKey(professionKey)

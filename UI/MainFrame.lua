@@ -50,6 +50,46 @@ local ADDON_STATUS_FILTER_LABELS = {
 }
 local ADDON_STATUS_FILTER_MARKER = "|cffffd100[F]|r"
 
+-- The collection table's own columns, in the shape the guild members table
+-- already uses: left-click a header to sort by it, right-click one marked [F]
+-- to cycle its filter.
+--
+-- Status has a cycle here but no state of its own. It reads and writes
+-- Data:GetCollectionFilter -- the same three-way narrowing the strip's button
+-- cycles -- so the header and the button drive one setting instead of two that
+-- could disagree while sitting a few pixels apart.
+--
+-- The other three are orthogonal to it on purpose. Skill asks only about the
+-- number, so "out of reach" still means something while status is showing the
+-- whole book; source and specialization ask about the recipe, not about you.
+local COLLECTION_DEFAULT_SORT = "default"
+local COLLECTION_SORT_KEYS = {
+    name = true, status = true, skill = true, source = true, spec = true,
+}
+local COLLECTION_FILTER_CYCLES = {
+    status = { "all", "unlearned", "ready" },
+    skill  = { "all", "inreach", "outofreach", "noskill" },
+    source = { "all", "trainer", "vendor", "drop", "quest", "worldDrop", "discovery", "worldEvent" },
+    spec   = { "all", "none", "required", "have" },
+}
+local COLLECTION_COLUMN_FILTER_LABELS = {
+    unlearned  = "Not learned",
+    ready      = "Ready",
+    inreach    = "In reach",
+    outofreach = "Out of reach",
+    noskill    = "Not listed",
+    trainer    = "Trainer",
+    vendor     = "Vendor",
+    drop       = "Drop",
+    quest      = "Quest",
+    worldDrop  = "World drop",
+    discovery  = "Discovery",
+    worldEvent = "World event",
+    none       = "None",
+    required   = "Required",
+    have       = "Mine",
+}
+
 local PROF_ORDER = {
     FAVORITES_VIEW, "Alchemy", "Blacksmithing", "Cooking", "Enchanting", "Engineering",
     "Jewelcrafting", "Leatherworking", "Mining", "Tailoring"
@@ -785,6 +825,13 @@ function UI:OnInitialize()
         roster = "all",
         version = "all",
     }
+    self.collectionSortKey = COLLECTION_DEFAULT_SORT
+    self.collectionSortDir = "asc"
+    self.collectionFilters = {
+        skill = "all",
+        source = "all",
+        spec = "all",
+    }
     self.sortMode = (Addon.db and Addon.db.profile and Addon.db.profile.sortMode) or "alpha"
     self.searchMode = (Addon.db and Addon.db.profile and (Addon.db.profile.defaultSearchMode or Addon.db.profile.searchMode)) or "recipe"
     if self.searchMode ~= "materials" then
@@ -898,6 +945,226 @@ function UI:HandleAddonStatusHeaderClick(columnKey, mouseButton)
     else
         self:SetAddonStatusSort(columnKey)
     end
+end
+
+-- Status is not stored here: it is the profile-level collection filter, so
+-- that one column reads and writes through the data layer while the rest keep
+-- their state on the view. A view-local filter is right for the other three --
+-- they narrow a reading of the table, not a preference about it.
+function UI:GetCollectionColumnFilter(columnKey)
+    if columnKey == "status" then
+        local data = Addon.Data
+        return (data and data.GetCollectionFilter and data:GetCollectionFilter()) or "all"
+    end
+    self.collectionFilters = self.collectionFilters or {}
+    return self.collectionFilters[columnKey] or "all"
+end
+
+function UI:CycleCollectionColumnFilter(columnKey)
+    local cycle = COLLECTION_FILTER_CYCLES[columnKey]
+    if not cycle then
+        self:SetCollectionSort(columnKey)
+        return
+    end
+    if columnKey == "status" then
+        local data = Addon.Data
+        if data and data.CycleCollectionFilter then data:CycleCollectionFilter() end
+    else
+        self.collectionFilters = self.collectionFilters or {}
+        local current = self.collectionFilters[columnKey] or "all"
+        local nextIndex = 1
+        for index, value in ipairs(cycle) do
+            if value == current then
+                nextIndex = index + 1
+                break
+            end
+        end
+        if nextIndex > #cycle then nextIndex = 1 end
+        self.collectionFilters[columnKey] = cycle[nextIndex]
+    end
+    self:ResetRecipeScroll()
+    self:RefreshCollectionControls()
+    self:RefreshRecipeList()
+end
+
+function UI:SetCollectionSort(columnKey)
+    if not COLLECTION_SORT_KEYS[columnKey] then
+        columnKey = COLLECTION_DEFAULT_SORT
+    end
+    if self.collectionSortKey == columnKey then
+        if self.collectionSortDir == "desc" then
+            -- Third click on the same header goes back to the order the data
+            -- layer built: skill order within reach first, which is the order
+            -- a profession is actually levelled in and a better default than
+            -- anything the columns can say.
+            self.collectionSortKey = COLLECTION_DEFAULT_SORT
+            self.collectionSortDir = "asc"
+        else
+            self.collectionSortDir = "desc"
+        end
+    else
+        self.collectionSortKey = columnKey
+        self.collectionSortDir = "asc"
+    end
+    self:ResetRecipeScroll()
+    self:RefreshRecipeList()
+end
+
+-- The expansion prefilter and the profit filter used to be reachable only
+-- through the options panel, two windows away from the list they change.
+-- These drive the same profile settings the panel does, through the one
+-- setter in RecipeUiFilters, so the panel and the strip cannot disagree.
+--
+-- Three states, not two switches: "neither expansion" is an empty browser, so
+-- it is not one of the states you can cycle into.
+local EXPANSION_STATES = {
+    { key = "all",     vanilla = true,  tbc = true,  label = "Expansion: All" },
+    { key = "tbc",     vanilla = false, tbc = true,  label = "Expansion: TBC only" },
+    { key = "vanilla", vanilla = true,  tbc = false, label = "Expansion: Vanilla only" },
+}
+
+function UI:GetExpansionFilterState()
+    local filters = Addon.RecipeUiFilters
+    if not (filters and filters.GetExpansionDefaults) then return EXPANSION_STATES[1] end
+    local vanilla, tbc = filters:GetExpansionDefaults()
+    for _, state in ipairs(EXPANSION_STATES) do
+        if state.vanilla == vanilla and state.tbc == tbc then return state end
+    end
+    return EXPANSION_STATES[1]
+end
+
+function UI:CycleExpansionFilter()
+    local filters = Addon.RecipeUiFilters
+    if not (filters and filters.SetExpansionDefaults) then return end
+    local current = self:GetExpansionFilterState()
+    local nextIndex = 1
+    for index, state in ipairs(EXPANSION_STATES) do
+        if state.key == current.key then
+            nextIndex = index + 1
+            break
+        end
+    end
+    if nextIndex > #EXPANSION_STATES then nextIndex = 1 end
+    local target = EXPANSION_STATES[nextIndex]
+    filters:SetExpansionDefaults(target.vanilla, target.tbc)
+    self:ResetRecipeScroll()
+    self:RefreshFilterControls()
+    self:RefreshRecipeList()
+end
+
+function UI:IsProfitableOnly()
+    local filters = Addon.RecipeUiFilters
+    return (filters and filters.IsProfitableOnly and filters:IsProfitableOnly()) == true
+end
+
+function UI:ToggleProfitableOnly()
+    local filters = Addon.RecipeUiFilters
+    if not (filters and filters.SetProfitableOnly) then return end
+    filters:SetProfitableOnly(not self:IsProfitableOnly())
+    self:ResetRecipeScroll()
+    self:RefreshFilterControls()
+    self:RefreshRecipeList()
+end
+
+-- One tooltip for both copies of the expansion control, because both write the
+-- same setting and a player who meets them in two tabs must not be left
+-- wondering whether they are two.
+function UI:ShowExpansionFilterTooltip(owner)
+    GameTooltip:SetOwner(owner, "ANCHOR_TOP")
+    GameTooltip:AddLine("Which expansions to list")
+    GameTooltip:AddLine("The same setting as the options panel, and it applies to every tab.",
+        0.75, 0.75, 0.75, true)
+    local filters = Addon.RecipeUiFilters
+    local overridden = filters and filters.GetProfessionsWithExpansionOverride
+        and filters:GetProfessionsWithExpansionOverride() or {}
+    if #overridden > 0 then
+        GameTooltip:AddLine(" ")
+        -- A per-profession override wins over this control, so it has to say
+        -- which professions will not follow it rather than appear not to work.
+        GameTooltip:AddLine("Set per profession, and not following this: "
+            .. table.concat(overridden, ", "), 0.95, 0.75, 0.30, true)
+    end
+    GameTooltip:Show()
+end
+
+function UI:HandleCollectionHeaderClick(columnKey, mouseButton)
+    if mouseButton == "RightButton" then
+        self:CycleCollectionColumnFilter(columnKey)
+    else
+        self:SetCollectionSort(columnKey)
+    end
+end
+
+-- Whether a row survives the column filters. The status filter is applied by
+-- the data layer next to it (Data:CollectionRowPasses), not here, so the two
+-- halves of "what is drawn" stay where their state lives.
+function UI:CollectionRowPassesColumns(row)
+    local collection = row and row.collection
+    if not collection then return false end
+
+    local skill = self:GetCollectionColumnFilter("skill")
+    if skill ~= "all" then
+        local required = collection.requiredSkill
+        if skill == "noskill" then
+            if required ~= nil then return false end
+        elseif required == nil then
+            return false
+        elseif skill == "inreach" then
+            if collection.skillMet ~= true then return false end
+        elseif skill == "outofreach" then
+            if collection.skillMet == true then return false end
+        end
+    end
+
+    local source = self:GetCollectionColumnFilter("source")
+    if source ~= "all" and collection.sourceKind ~= source then
+        return false
+    end
+
+    local spec = self:GetCollectionColumnFilter("spec")
+    if spec ~= "all" then
+        local required = collection.specializationSpellId ~= nil
+        if spec == "none" then
+            if required then return false end
+        elseif spec == "required" then
+            if not required then return false end
+        elseif spec == "have" then
+            if not required or collection.specializationMet ~= true then return false end
+        end
+    end
+
+    return true
+end
+
+function UI:GetCollectionHeaderText(columnKey, baseLabel)
+    local text = baseLabel
+    local filter = self:GetCollectionColumnFilter(columnKey)
+    if filter ~= "all" then
+        text = string.format("%s: %s", baseLabel, COLLECTION_COLUMN_FILTER_LABELS[filter] or filter)
+    end
+    if self.collectionSortKey == columnKey then
+        text = text .. (self.collectionSortDir == "desc" and " v" or " ^")
+    end
+    if COLLECTION_FILTER_CYCLES[columnKey] then
+        text = text .. " " .. ADDON_STATUS_FILTER_MARKER
+    end
+    return text
+end
+
+function UI:HasCollectionColumnFilter()
+    for columnKey in pairs(COLLECTION_FILTER_CYCLES) do
+        if self:GetCollectionColumnFilter(columnKey) ~= "all" then return true end
+    end
+    return false
+end
+
+function UI:ClearCollectionColumnFilters()
+    self.collectionFilters = { skill = "all", source = "all", spec = "all" }
+    local data = Addon.Data
+    if data and data.SetCollectionFilter then data:SetCollectionFilter("all") end
+    self:ResetRecipeScroll()
+    self:RefreshCollectionControls()
+    self:RefreshRecipeList()
 end
 
 function UI:ResetRecipeScroll()
@@ -1358,6 +1625,28 @@ local COLLECTION_FILTER_HELP = {
 -- only place that can explain an empty list, so it has to know whether the
 -- character has been scanned at all, and whether the filter is the reason
 -- nothing is showing.
+-- The expansion and profit controls exist twice -- sidebar and collection
+-- strip -- because they belong in both places, but they are one setting, so
+-- one function paints every copy of them.
+function UI:RefreshFilterControls()
+    if not self.frame then return end
+    local f = self.frame
+    local state = self:GetExpansionFilterState()
+    for _, button in ipairs({ f.expansionButton, f.collectionExpansionButton }) do
+        if button and button.SetLabel then
+            button:SetLabel(state.label)
+            if button.SetSelected then
+                -- Highlighted whenever an expansion is being held back, so a
+                -- narrowed list never looks like the whole catalogue.
+                button:SetSelected(state.key ~= "all")
+            end
+        end
+    end
+    if f.profitButton and f.profitButton.SetSelected then
+        f.profitButton:SetSelected(self:IsProfitableOnly())
+    end
+end
+
 function UI:RefreshCollectionControls()
     if not self.frame then return end
     local f = self.frame
@@ -1371,15 +1660,20 @@ function UI:RefreshCollectionControls()
             f.collectionFilterButton:SetSelected(filter ~= "all")
         end
     end
+    self:RefreshFilterControls()
+    local narrowed = self:HasCollectionColumnFilter()
+    if f.collectionResetButton then
+        setShownIfChanged(f.collectionResetButton, narrowed)
+    end
     if not f.collectionHelp then return end
     local helpText
     if not hasLocalProfessions() then
         helpText = "Open your profession windows once so Recipe Registry knows what this character has learned."
-    elseif (self._collectionShownCount or 0) == 0 and filter ~= "all" then
-        helpText = "Nothing matches this filter. Click the button above to widen it."
+    elseif (self._collectionShownCount or 0) == 0 and narrowed then
+        helpText = "Nothing matches these filters. Clear filters, or right-click a column header marked [F] to widen one."
     else
         helpText = (COLLECTION_FILTER_HELP[filter] or COLLECTION_FILTER_HELP.all)
-            .. " Click a profession header to collapse it."
+            .. " Left-click a column header to sort, right-click one marked [F] to filter."
     end
     setTextIfChanged(f.collectionHelp, helpText)
 end
@@ -1438,6 +1732,7 @@ function UI:ApplyMainLayout()
         end
     end
     self:RefreshAddonStatusControls()
+    self:RefreshFilterControls()
     self:InvalidateRecipeWindowCache()
 end
 
@@ -1753,8 +2048,44 @@ function UI:CreateMainFrame()
     end)
     f.searchMaterials = searchMaterials
 
+    -- The two prefilters that used to live only in the options panel. They
+    -- are here because they change what this list shows, and a filter you
+    -- cannot see is a filter you forget you set.
+    local recipeFilterLabel = left:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    recipeFilterLabel:SetPoint("TOPLEFT", searchRecipes, "BOTTOMLEFT", 2, -14)
+    recipeFilterLabel:SetText("Recipe filters")
+    f.recipeFilterLabel = recipeFilterLabel
+
+    local expansionButton = createCardStyleButton(left, 216, 22)
+    expansionButton:SetPoint("TOPLEFT", recipeFilterLabel, "BOTTOMLEFT", -2, -6)
+    expansionButton:SetLabel(EXPANSION_STATES[1].label)
+    expansionButton:SetScript("OnClick", function()
+        UI:CycleExpansionFilter()
+    end)
+    expansionButton:SetScript("OnEnter", function(self)
+        UI:ShowExpansionFilterTooltip(self)
+    end)
+    expansionButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    f.expansionButton = expansionButton
+
+    local profitButton = createCardStyleButton(left, 216, 22)
+    profitButton:SetPoint("TOPLEFT", expansionButton, "BOTTOMLEFT", 0, -6)
+    profitButton:SetLabel("Profitable only")
+    profitButton:SetScript("OnClick", function()
+        UI:ToggleProfitableOnly()
+    end)
+    profitButton:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_TOP")
+        GameTooltip:AddLine("Profitable crafts only")
+        GameTooltip:AddLine("Hides recipes whose materials cost more than what they make, using your auction addon's prices. Recipes with no price data are kept.",
+            0.75, 0.75, 0.75, true)
+        GameTooltip:Show()
+    end)
+    profitButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    f.profitButton = profitButton
+
     local profLabel = left:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    profLabel:SetPoint("TOPLEFT", searchRecipes, "BOTTOMLEFT", 2, -14)
+    profLabel:SetPoint("TOPLEFT", profitButton, "BOTTOMLEFT", 2, -12)
     profLabel:SetText("Profession filter")
     f.profLabel = profLabel
 
@@ -1844,7 +2175,8 @@ function UI:CreateMainFrame()
     f.addonStatusControls = addonStatusControls
 
     local addonStatusTitle = addonStatusControls:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    addonStatusTitle:SetPoint("LEFT", 4, 0)
+    addonStatusTitle:SetPoint("LEFT", 298, 0)
+    addonStatusTitle:SetJustifyH("LEFT")
     addonStatusTitle:SetText(ADDON_STATUS_VIEW)
     addonStatusTitle:SetTextColor(1.0, 0.82, 0)
     f.addonStatusTitle = addonStatusTitle
@@ -1857,8 +2189,12 @@ function UI:CreateMainFrame()
     addonStatusHelp:SetTextColor(0.66, 0.66, 0.66)
     f.addonStatusHelp = addonStatusHelp
 
+    -- Search sits at the LEFT of every control strip, where the recipe
+    -- browser's own search box is. It used to be pinned to the right edge,
+    -- which put it on the opposite side of the window from the one place the
+    -- addon had trained the eye to look for it.
     local addonStatusSearchBox = CreateFrame("EditBox", nil, addonStatusControls, "InputBoxTemplate")
-    addonStatusSearchBox:SetPoint("RIGHT", 0, 0)
+    addonStatusSearchBox:SetPoint("LEFT", 54, 0)
     addonStatusSearchBox:SetSize(230, 24)
     addonStatusSearchBox:SetAutoFocus(false)
     addonStatusSearchBox:SetTextInsets(6, 22, 0, 0)
@@ -1883,7 +2219,7 @@ function UI:CreateMainFrame()
     f.addonStatusSearchBox = addonStatusSearchBox
 
     local addonStatusSearchLabel = addonStatusControls:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    addonStatusSearchLabel:SetPoint("RIGHT", addonStatusSearchBox, "LEFT", -8, 0)
+    addonStatusSearchLabel:SetPoint("LEFT", 4, 0)
     addonStatusSearchLabel:SetText("Search")
     addonStatusSearchLabel:SetTextColor(0.72, 0.72, 0.72)
     f.addonStatusSearchLabel = addonStatusSearchLabel
@@ -1917,7 +2253,7 @@ function UI:CreateMainFrame()
     f.collectionControls = collectionControls
 
     local collectionTitle = collectionControls:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    collectionTitle:SetPoint("LEFT", 4, 0)
+    collectionTitle:SetPoint("LEFT", 308, 0)
     collectionTitle:SetText(COLLECTION_VIEW)
     collectionTitle:SetTextColor(1.0, 0.82, 0)
     collectionTitle:SetJustifyH("LEFT")
@@ -1928,12 +2264,13 @@ function UI:CreateMainFrame()
     collectionHelp:SetPoint("TOPLEFT", collectionControls, "BOTTOMLEFT", 4, -6)
     collectionHelp:SetPoint("TOPRIGHT", collectionControls, "BOTTOMRIGHT", -4, -6)
     collectionHelp:SetJustifyH("LEFT")
-    collectionHelp:SetText(COLLECTION_FILTER_HELP.all .. " Click a profession header to collapse it.")
+    collectionHelp:SetText(COLLECTION_FILTER_HELP.all
+        .. " Left-click a column header to sort, right-click one marked [F] to filter.")
     collectionHelp:SetTextColor(0.70, 0.70, 0.70)
     f.collectionHelp = collectionHelp
 
     local collectionSearchBox = CreateFrame("EditBox", nil, collectionControls, "InputBoxTemplate")
-    collectionSearchBox:SetPoint("RIGHT", -8, 0)
+    collectionSearchBox:SetPoint("LEFT", 54, 0)
     collectionSearchBox:SetSize(240, 22)
     collectionSearchBox:SetAutoFocus(false)
     collectionSearchBox:SetTextInsets(6, 22, 0, 0)
@@ -1956,7 +2293,7 @@ function UI:CreateMainFrame()
     f.collectionSearchBox = collectionSearchBox
 
     local collectionSearchLabel = collectionControls:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    collectionSearchLabel:SetPoint("RIGHT", collectionSearchBox, "LEFT", -8, 0)
+    collectionSearchLabel:SetPoint("LEFT", 4, 0)
     collectionSearchLabel:SetText("Search")
     collectionSearchLabel:SetTextColor(0.72, 0.72, 0.72)
     f.collectionSearchLabel = collectionSearchLabel
@@ -1969,7 +2306,7 @@ function UI:CreateMainFrame()
     -- filter, and any further axis would be chrome on a table whose whole job
     -- is to be scanned.
     local collectionFilterButton = createCardStyleButton(collectionControls, 168, 22)
-    collectionFilterButton:SetPoint("RIGHT", collectionSearchLabel, "LEFT", -12, 0)
+    collectionFilterButton:SetPoint("RIGHT", -8, 0)
     collectionFilterButton:SetLabel(COLLECTION_FILTER_LABELS.all)
     collectionFilterButton:SetScript("OnClick", function()
         local data = Addon.Data
@@ -1999,8 +2336,35 @@ function UI:CreateMainFrame()
         GameTooltip:Hide()
     end)
     f.collectionFilterButton = collectionFilterButton
-    -- Bounded on the right so a long count cannot run under the button.
-    collectionTitle:SetPoint("RIGHT", collectionFilterButton, "LEFT", -12, 0)
+
+    -- The expansion prefilter, in the tab it changes. It writes the same
+    -- profile setting the options panel does; see UI:CycleExpansionFilter.
+    local collectionExpansionButton = createCardStyleButton(collectionControls, 176, 22)
+    collectionExpansionButton:SetPoint("RIGHT", collectionFilterButton, "LEFT", -8, 0)
+    collectionExpansionButton:SetLabel(EXPANSION_STATES[1].label)
+    collectionExpansionButton:SetScript("OnClick", function()
+        UI:CycleExpansionFilter()
+    end)
+    collectionExpansionButton:SetScript("OnEnter", function(self)
+        UI:ShowExpansionFilterTooltip(self)
+    end)
+    collectionExpansionButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    f.collectionExpansionButton = collectionExpansionButton
+
+    -- Four filters can be on at once -- the strip's own plus three column
+    -- filters -- and an empty table is the one state a player cannot read
+    -- their way out of. Shown only while something is narrowing the list.
+    local collectionResetButton = createCardStyleButton(collectionControls, 108, 22)
+    collectionResetButton:SetPoint("RIGHT", collectionExpansionButton, "LEFT", -8, 0)
+    collectionResetButton:SetLabel("Clear filters")
+    collectionResetButton:SetScript("OnClick", function()
+        UI:ClearCollectionColumnFilters()
+    end)
+    collectionResetButton:Hide()
+    f.collectionResetButton = collectionResetButton
+
+    -- Bounded on the right so a long count cannot run under the buttons.
+    collectionTitle:SetPoint("RIGHT", collectionResetButton, "LEFT", -12, 0)
 
     local collectionSearchClearButton = CreateFrame("Button", nil, collectionSearchBox)
     collectionSearchClearButton:SetSize(14, 14)
@@ -3111,7 +3475,9 @@ function UI:RefreshProfessionButtons(opts)
                     categoryButton.categoryLabel = categoryLabel
                     if viewMode == "accordion" and hasSubcategories then
                         categoryButton.toggleExpandKey = categoryToken
-                        local arrow = expanded and "|cff808080v|r " or "|cff808080>|r "
+                        -- Same toggle art as every other collapsible header
+                        -- in the addon; see collapseTag.
+                        local arrow = collapseTag(not expanded) .. " "
                         categoryButton:SetLabel(arrow .. categoryLabel)
                     else
                         categoryButton.toggleExpandKey = nil
@@ -3631,6 +3997,45 @@ function UI:EnsureCollectionRowParts(row)
         if handler then handler(parent, button) end
     end)
 
+    -- One transparent button per column on the header row, exactly as the
+    -- guild members table does it: left-click sorts, right-click cycles the
+    -- filter. They live on every pooled row and are shown only while the row
+    -- is bound as the header.
+    row.collectionHeaderButtons = {}
+    for _, column in ipairs({
+        { key = "name",   region = row.collectionName },
+        { key = "status", region = row.collectionStatus },
+        { key = "skill",  region = row.collectionSkill },
+        { key = "source", region = row.collectionSource },
+        { key = "spec",   region = row.collectionSpec },
+    }) do
+        local button = CreateFrame("Button", nil, row)
+        button.collectionColumnKey = column.key
+        button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+        button:SetPoint("TOPLEFT", column.region, "TOPLEFT", -4, 2)
+        button:SetPoint("BOTTOMRIGHT", column.region, "BOTTOMRIGHT", 4, -2)
+        button.highlight = button:CreateTexture(nil, "HIGHLIGHT")
+        button.highlight:SetAllPoints()
+        button.highlight:SetTexture("Interface\\Buttons\\WHITE8x8")
+        button.highlight:SetVertexColor(1, 1, 1, 0.06)
+        button:SetScript("OnClick", function(self, mouseButton)
+            UI:HandleCollectionHeaderClick(self.collectionColumnKey, mouseButton)
+        end)
+        button:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+            GameTooltip:AddLine("Left-click to sort")
+            if COLLECTION_FILTER_CYCLES[self.collectionColumnKey] then
+                GameTooltip:AddLine("Right-click to filter", 0.8, 0.8, 0.8)
+            end
+            GameTooltip:Show()
+        end)
+        button:SetScript("OnLeave", function()
+            GameTooltip:Hide()
+        end)
+        button:Hide()
+        row.collectionHeaderButtons[column.key] = button
+    end
+
     row.collectionPartsReady = true
 end
 
@@ -3650,6 +4055,13 @@ function UI:ApplyCollectionColumnWidths(row)
     row.collectionSpec:SetWidth(specWidth)
 end
 
+function UI:SetCollectionHeaderButtonsVisible(row, visible)
+    self:EnsureCollectionRowParts(row)
+    for _, button in pairs(row.collectionHeaderButtons or {}) do
+        setShownIfChanged(button, visible)
+    end
+end
+
 function UI:SetCollectionPartsVisible(row, visible)
     self:EnsureCollectionRowParts(row)
     setShownIfChanged(row.collectionSectionTitle, visible)
@@ -3663,6 +4075,7 @@ end
 
 function UI:HideCollectionRowParts(row)
     if not row.collectionPartsReady then return end
+    self:SetCollectionHeaderButtonsVisible(row, false)
     setShownIfChanged(row.collectionSectionTitle, false)
     setShownIfChanged(row.collectionName, false)
     setShownIfChanged(row.collectionStatus, false)
@@ -3698,6 +4111,7 @@ local function prepareCollectionRow(ui, row, rowData)
         ui:SetAddonStatusHeaderButtonsVisible(row, false)
     end
     ui:SetCollectionPartsVisible(row, true)
+    ui:SetCollectionHeaderButtonsVisible(row, false)
     ui:ApplyCollectionColumnWidths(row)
     setRowIconGeometry(row, COLLECTION_ROW_ICON_SIZE, 10)
 end
@@ -3781,12 +4195,13 @@ function UI:BindCollectionHeaderRow(row, rowData)
     setShownIfChanged(row.collectionSectionTitle, false)
     setShownIfChanged(row.collectionNameHit, false)
 
-    setTextIfChanged(row.collectionName, "Recipe")
-    setTextIfChanged(row.collectionStatus, "Status")
-    setTextIfChanged(row.collectionSkill, "Skill")
+    setTextIfChanged(row.collectionName, self:GetCollectionHeaderText("name", "Recipe"))
+    setTextIfChanged(row.collectionStatus, self:GetCollectionHeaderText("status", "Status"))
+    setTextIfChanged(row.collectionSkill, self:GetCollectionHeaderText("skill", "Skill"))
     if row.collectionSource.SetMaxLines then row.collectionSource:SetMaxLines(1) end
-    setTextIfChanged(row.collectionSource, "Learned from")
-    setTextIfChanged(row.collectionSpec, "Specialization")
+    setTextIfChanged(row.collectionSource, self:GetCollectionHeaderText("source", "Learned from"))
+    setTextIfChanged(row.collectionSpec, self:GetCollectionHeaderText("spec", "Specialization"))
+    self:SetCollectionHeaderButtonsVisible(row, true)
     row.collectionName:SetTextColor(0.72, 0.72, 0.72)
     row.collectionStatus:SetTextColor(0.72, 0.72, 0.72)
     row.collectionSkill:SetTextColor(0.72, 0.72, 0.72)
@@ -4720,6 +5135,58 @@ end
 -- book: the filter decides what is drawn, never what is counted. When a
 -- search is running the counts follow the matches, which is the honest
 -- reading of "185 of the 385 that match".
+-- The comparators for the sortable headers. Everything except the name reads
+-- the cheap `collection` block the data layer already filled in; the name has
+-- to be resolved, which is why sorting by it says so below.
+local COLLECTION_STATUS_RANK = { ready = 0, blocked = 1, known = 2 }
+
+local function collectionStatusRank(collection)
+    if collection.known then return COLLECTION_STATUS_RANK.known end
+    if collection.skillMet and collection.specializationMet then return COLLECTION_STATUS_RANK.ready end
+    return COLLECTION_STATUS_RANK.blocked
+end
+
+local COLLECTION_SORT_VALUES = {
+    status = function(collection) return collectionStatusRank(collection) end,
+    skill = function(collection) return collection.requiredSkill or -1 end,
+    source = function(collection) return collection.sourceLabel or "" end,
+    spec = function(collection) return collection.specializationName or "" end,
+    name = function(_, row) return lowerSafe(row.label) end,
+}
+
+-- Sorting by name needs every row's name, and a collection row is built
+-- without one on purpose (see Data:ResolveCollectionRow). Resolving them all
+-- is the same bargain the search box already strikes: a deliberate click, paid
+-- once here, rather than a cost every background refresh carries.
+function UI:SortCollectionRows(rows)
+    local sortKey = self.collectionSortKey
+    if not sortKey or sortKey == COLLECTION_DEFAULT_SORT then return end
+    local value = COLLECTION_SORT_VALUES[sortKey]
+    if not value then return end
+
+    if sortKey == "name" then
+        local data = Addon.Data
+        for _, row in ipairs(rows) do
+            if not row._collectionResolved and data and data.ResolveCollectionRow then
+                data:ResolveCollectionRow(row)
+            end
+        end
+    end
+
+    local descending = self.collectionSortDir == "desc"
+    table.sort(rows, function(a, b)
+        local av = value(a.collection or {}, a)
+        local bv = value(b.collection or {}, b)
+        if av ~= bv then
+            if descending then return av > bv end
+            return av < bv
+        end
+        -- The recipe key is the final tiebreak so the order is stable between
+        -- rebuilds, exactly as the data layer's own sort does it.
+        return (tonumber(a.recipeKey) or 0) < (tonumber(b.recipeKey) or 0)
+    end)
+end
+
 function UI:BuildCollectionDisplayRows(rows)
     local data = Addon.Data
     local filter = (data and data.GetCollectionFilter and data:GetCollectionFilter()) or "all"
@@ -4760,8 +5227,10 @@ function UI:BuildCollectionDisplayRows(rows)
             count = bucket.total,
             collapsed = collapsed,
         }
+        self:SortCollectionRows(bucket.rows)
         for _, row in ipairs(bucket.rows) do
-            if not data or not data.CollectionRowPasses or data:CollectionRowPasses(row, filter) then
+            if (not data or not data.CollectionRowPasses or data:CollectionRowPasses(row, filter))
+                and self:CollectionRowPassesColumns(row) then
                 shownCount = shownCount + 1
                 if not collapsed then
                     row.rowType = "collection"
