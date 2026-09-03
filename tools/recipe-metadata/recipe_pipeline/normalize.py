@@ -2,7 +2,7 @@ from recipe_pipeline.classify_expansion import classify_expansion
 from recipe_pipeline.derive_categories import derive_category
 from recipe_pipeline.derive_items import derive_created_item_id, derive_recipe_item_id
 from recipe_pipeline.derive_reagents import derive_reagents
-from recipe_pipeline.records import RecipeRecord
+from recipe_pipeline.records import RecipeRecord, SourcePlace
 
 MAX_SOURCE_PLACES = 4
 
@@ -17,7 +17,7 @@ def summarize_source(source):
     go and look.
     """
     if not source:
-        return None, None, (), False, False
+        return None, None, (), False, False, None
 
     kind = source.get("kind")
     world_drop = source.get("worldDrop") is True
@@ -27,7 +27,13 @@ def summarize_source(source):
     places = ()
     if not world_drop:
         places = tuple(
-            (place.get("name") or None, place.get("zone") or None)
+            SourcePlace(
+                name=place.get("name") or None,
+                zone=place.get("zone") or None,
+                x=place.get("x"),
+                y=place.get("y"),
+                faction=place.get("faction") or None,
+            )
             for place in (source.get("places") or [])[:MAX_SOURCE_PLACES]
             if place.get("name") or place.get("zone")
         )
@@ -36,7 +42,12 @@ def summarize_source(source):
     # "both" is the default reading of an absent field, so it is not stored.
     if faction == "both":
         faction = None
-    return faction, kind, places, world_drop, source.get("bossDrop") is True
+    levels = source.get("skillLevels")
+    if levels and len(levels) == 4:
+        levels = tuple(int(value) for value in levels)
+    else:
+        levels = None
+    return faction, kind, places, world_drop, source.get("bossDrop") is True, levels
 
 
 def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tbc"):
@@ -100,7 +111,7 @@ def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tb
         source = secondary.get("acquisitionBySpellId", {}).get(spell_id) or {}
         source = overrides.get("acquisitionBySpellId", {}).get(spell_id, source)
         (faction, source_kind, source_places,
-         world_drop, boss_drop) = summarize_source(source)
+         world_drop, boss_drop, skill_levels) = summarize_source(source)
 
         records.append(RecipeRecord(
             spell_id=spell_id,
@@ -121,6 +132,7 @@ def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tb
             faction=faction,
             source_kind=source_kind,
             source_places=source_places,
+            skill_levels=skill_levels,
             world_drop=world_drop,
             boss_drop=boss_drop,
             removed=removed is True,

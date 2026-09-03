@@ -2166,7 +2166,11 @@ function Data:DescribeRecipeSource(recipeKey, professionHint, metadataInfo)
     -- where: "Xandar Goodbeard (Loch Modan), Hagrus (Orgrimmar)". Vendor stock
     -- is often limited, which is why the alternatives are listed rather than
     -- collapsed to the first one.
-    local withNames, zonesOnly, lines = {}, {}, {}
+    -- lineInfo runs alongside lines: one entry per line, carrying the NPC
+    -- that line is about. A line's faction is the NPC's, not the recipe's --
+    -- "sold by an Alliance vendor and a Horde one" is a recipe both sides can
+    -- have and two lines only one side each can use.
+    local withNames, zonesOnly, lines, lineInfo = {}, {}, {}, {}
     -- A kind whose label names no place -- a world drop, a discovery -- would
     -- otherwise repeat the same sentence once per place.
     local seenLines = {}
@@ -2184,6 +2188,13 @@ function Data:DescribeRecipeSource(recipeKey, professionHint, metadataInfo)
         if line and not seenLines[line] then
             seenLines[line] = true
             lines[#lines + 1] = line
+            lineInfo[#lines] = {
+                name = place.name,
+                zone = place.zone,
+                x = place.x,
+                y = place.y,
+                faction = place.faction,
+            }
         end
     end
 
@@ -2197,15 +2208,18 @@ function Data:DescribeRecipeSource(recipeKey, professionHint, metadataInfo)
         -- means the metadata grew a shape this describer does not render.
         kind, label = guessSourceFromRecipeItem(metadataInfo)
         lines = nil
+        lineInfo = nil
     end
     if not lines or #lines == 0 then
         lines = { label }
+        lineInfo = nil
     end
 
     return {
         kind = kind,
         label = label,
         lines = lines,
+        lineInfo = lineInfo,
         known = true,
         faction = source.faction,
         places = source.places,

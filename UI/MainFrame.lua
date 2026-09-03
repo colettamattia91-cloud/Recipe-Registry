@@ -3839,29 +3839,77 @@ function UI:SetAddonStatusPartsVisible(row, visible)
     setShownIfChanged(row.addonZone, visible)
 end
 
--- Recipe difficulty, in the colours WoW itself uses in a trade window.
---
--- WoW colours a recipe by four per-recipe ranks -- optimal, medium, easy,
--- trivial -- and we have exactly one of them: the skill it takes to learn it.
--- So these bands are an approximation from that single number, using the
--- spacing TBC recipes typically follow. It is right about the two ends, which
--- are the ones that matter: a recipe you cannot learn yet, and one that has
--- stopped giving skill.
+-- Recipe difficulty, in the colours WoW itself uses in a trade window and
+-- against the recipe's own four thresholds.
 --
 -- Red is not a WoW trade colour: the game never lists a recipe you cannot
 -- learn, and this view exists precisely to list them.
---
--- The first spacing was far too generous: a 335 recipe read green at skill
--- 375, forty points past it, when the game would have greyed it out long
--- before. A TBC recipe's four thresholds are typically packed into about
--- thirty points above its requirement, so that is what the bands say now.
-local COLLECTION_DIFFICULTY_BANDS = {
-    { over = 30, colour = "|cff808080" },  -- grey: no skill from it any more
-    { over = 20, colour = "|cff40bf40" },  -- green
-    { over = 10, colour = "|cffffff00" },  -- yellow
-    { over = 0,  colour = "|cffff8040" },  -- orange: best skill-up odds
-}
 local COLLECTION_UNREACHABLE_COLOUR = "|cffff4040"
+
+-- The four colours the game paints trade skill difficulty in. TradeSkillTypeColor
+-- is Blizzard's own table, defined by the client, so this reads the game's
+-- colours rather than picking four of its own -- and a client that restyles
+-- them restyles this column with them.
+--
+-- The literals are the fallback for a client that has not defined the global
+-- yet (and for the test harness, which has no client at all). They are the
+-- stock TBC values.
+local TRADE_DIFFICULTY_FALLBACK = {
+    optimal = { r = 1.00, g = 0.50, b = 0.25 },
+    medium  = { r = 1.00, g = 1.00, b = 0.00 },
+    easy    = { r = 0.25, g = 0.75, b = 0.25 },
+    trivial = { r = 0.50, g = 0.50, b = 0.50 },
+}
+
+local tradeDifficultyCodes = nil
+
+local function tradeDifficultyColour(difficulty)
+    if not tradeDifficultyCodes then
+        tradeDifficultyCodes = {}
+        local source = _G.TradeSkillTypeColor
+        for key, fallback in pairs(TRADE_DIFFICULTY_FALLBACK) do
+            local colour = type(source) == "table" and source[key] or nil
+            if type(colour) ~= "table" or not colour.r then colour = fallback end
+            tradeDifficultyCodes[key] = string.format("|cff%02x%02x%02x",
+                math.floor((colour.r or 0) * 255 + 0.5),
+                math.floor((colour.g or 0) * 255 + 0.5),
+                math.floor((colour.b or 0) * 255 + 0.5))
+        end
+    end
+    return tradeDifficultyCodes[difficulty] or tradeDifficultyCodes.optimal
+end
+
+-- Which of the four a recipe is at a given skill. The thresholds come from the
+-- recipe itself -- the generator reads the same four numbers every recipe
+-- guide carries -- because they are not derivable from the skill requirement:
+-- the spread between "still worth doing" and "grey" runs from ten points to
+-- sixty depending on the recipe.
+--
+-- 59 of the 2151 records state no ladder. For those, and only those, the
+-- spacing below stands in: it is the median shape of the ones that do state
+-- one, which is the best an approximation can be.
+local COLLECTION_DIFFICULTY_BANDS = {
+    { over = 30, difficulty = "trivial" },
+    { over = 20, difficulty = "easy" },
+    { over = 10, difficulty = "medium" },
+    { over = 0,  difficulty = "optimal" },
+}
+
+local function collectionDifficulty(collection, rank)
+    local levels = collection.skillLevels
+    if type(levels) == "table" and #levels == 4 then
+        -- orange up to levels[2], then yellow, green, and grey from levels[4].
+        if rank >= levels[4] then return "trivial" end
+        if rank >= levels[3] then return "easy" end
+        if rank >= levels[2] then return "medium" end
+        return "optimal"
+    end
+    local over = rank - (collection.requiredSkill or rank)
+    for _, band in ipairs(COLLECTION_DIFFICULTY_BANDS) do
+        if over >= band.over then return band.difficulty end
+    end
+    return "optimal"
+end
 
 function UI:CollectionSkillText(collection, known)
     local required = collection.requiredSkill
@@ -3877,13 +3925,7 @@ function UI:CollectionSkillText(collection, known)
     if known then
         return string.format("%s%d|r", COLLECTION_KNOWN_DIM_SKILL, required)
     end
-    local over = rank - required
-    for _, band in ipairs(COLLECTION_DIFFICULTY_BANDS) do
-        if over >= band.over then
-            return string.format("%s%d|r", band.colour, required)
-        end
-    end
-    return string.format("|cffff8040%d|r", required)
+    return string.format("%s%d|r", tradeDifficultyColour(collectionDifficulty(collection, rank)), required)
 end
 
 -- The source as a stacked list, one place per line, with the faction
@@ -3896,14 +3938,30 @@ function UI:CollectionSourceText(collection, known)
         lines = { collection.sourceLabel or "" }
     end
     local colour = known and COLLECTION_KNOWN_DIM or collectionSourceColor(collection.sourceKind)
+    local lineInfo = collection.sourceLineInfo
     local out = {}
     for index = 1, math.min(#lines, COLLECTION_MAX_SOURCE_LINES) do
         out[index] = string.format("%s%s|r", colour, safeText(lines[index]))
+        -- The banner belongs to the line, not to the recipe. A recipe sold by
+        -- an Alliance vendor in Stormwind and a Horde one in Orgrimmar is one
+        -- both sides can have, and hanging one banner on the whole recipe
+        -- either lies about it or says nothing about which vendor is yours.
+        local info = lineInfo and lineInfo[index]
+        local faction = info and info.faction
+        if faction == "alliance" then
+            out[index] = out[index] .. " " .. ALLIANCE_TAG
+        elseif faction == "horde" then
+            out[index] = out[index] .. " " .. HORDE_TAG
+        end
     end
-    if collection.faction == "alliance" then
-        out[1] = out[1] .. " " .. ALLIANCE_TAG
-    elseif collection.faction == "horde" then
-        out[1] = out[1] .. " " .. HORDE_TAG
+    -- A recipe-level restriction still exists -- a quest only one side can
+    -- take -- and with no per-line answer it goes where it used to.
+    if not lineInfo then
+        if collection.faction == "alliance" then
+            out[1] = out[1] .. " " .. ALLIANCE_TAG
+        elseif collection.faction == "horde" then
+            out[1] = out[1] .. " " .. HORDE_TAG
+        end
     end
     return table.concat(out, "\n")
 end
@@ -4135,8 +4193,22 @@ function UI:ShowCollectionRowTooltip(row)
     -- came from -- worth keeping, because "where did I get this" is a real
     -- question when a guildmate asks.
     GameTooltip:AddLine(known and "Where it comes from" or "Where to learn", 1, 0.82, 0)
-    for _, line in ipairs(collection.sourceLines or { collection.sourceLabel or "" }) do
-        GameTooltip:AddLine(safeText(line), 0.85, 0.85, 0.85, true)
+    local lineInfo = collection.sourceLineInfo
+    for index, line in ipairs(collection.sourceLines or { collection.sourceLabel or "" }) do
+        local text = safeText(line)
+        local info = lineInfo and lineInfo[index]
+        -- The map position, where the source knew one. The table column has no
+        -- room for it and it is exactly what a player about to walk there
+        -- wants, so it lives in the tooltip.
+        if info and info.x and info.y then
+            text = string.format("%s |cff8f949c%.1f, %.1f|r", text, info.x, info.y)
+        end
+        if info and info.faction == "alliance" then
+            text = text .. " " .. ALLIANCE_TAG
+        elseif info and info.faction == "horde" then
+            text = text .. " " .. HORDE_TAG
+        end
+        GameTooltip:AddLine(text, 0.85, 0.85, 0.85, true)
     end
     if collection.faction == "alliance" then
         GameTooltip:AddLine("Alliance only", 0.40, 0.60, 1.0)

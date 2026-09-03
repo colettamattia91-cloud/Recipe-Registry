@@ -14,7 +14,7 @@ sys.path.insert(0, str(ROOT))
 import generate_recipe_metadata as generator
 from recipe_pipeline.derive_categories import load_taxonomies
 from recipe_pipeline.normalize import normalize_records
-from recipe_pipeline.records import ReagentRecord, RecipeRecord
+from recipe_pipeline.records import ReagentRecord, RecipeRecord, SourcePlace
 from recipe_pipeline.validate import validate_records
 from recipe_sources.wago_anniversary_provider import build_normalized_snapshot
 from recipe_pipeline.emit_lua import emit_lua
@@ -829,7 +829,7 @@ class AcquisitionSummaryTests(unittest.TestCase):
     """What summarize_source keeps, now that the provider states the rest."""
 
     def test_keeps_each_place_whole_and_drops_a_neutral_faction(self):
-        faction, kind, places, world_drop, boss = summarize_source({
+        faction, kind, places, world_drop, boss, _levels = summarize_source({
             "faction": "both",
             "kind": "vendor",
             "worldDrop": False,
@@ -838,25 +838,25 @@ class AcquisitionSummaryTests(unittest.TestCase):
         # "both" is the default reading of an absent field, so it is not stored.
         self.assertIsNone(faction)
         self.assertEqual(kind, "vendor")
-        self.assertEqual(places, (("Kendor Kabonka", "Stormwind City"),))
+        self.assertEqual(places, (SourcePlace("Kendor Kabonka", "Stormwind City"),))
         self.assertFalse(world_drop)
 
     def test_a_place_keeps_the_half_it_has(self):
         # A quest gives a zone and no name; a trainer can give neither.
-        _f, _k, places, _wd, _b = summarize_source({
+        _f, _k, places, _wd, _b, _levels = summarize_source({
             "kind": "quest", "places": [{"zone": "Hillsbrad Foothills"},
                                         {"name": "Somebody"}],
         })
-        self.assertEqual(places, ((None, "Hillsbrad Foothills"), ("Somebody", None)))
+        self.assertEqual(places, (SourcePlace(None, "Hillsbrad Foothills"), SourcePlace("Somebody", None)))
 
     def test_a_place_with_neither_half_is_not_a_place(self):
-        _f, _k, places, _wd, _b = summarize_source({
+        _f, _k, places, _wd, _b, _levels = summarize_source({
             "kind": "quest", "places": [{"name": None, "zone": None}],
         })
         self.assertEqual(places, ())
 
     def test_a_world_drop_points_nowhere(self):
-        faction, kind, places, world_drop, boss = summarize_source({
+        faction, kind, places, world_drop, boss, _levels = summarize_source({
             "faction": "both", "kind": "worldDrop", "worldDrop": True,
             "places": [{"name": "Some Mob", "zone": "Everywhere"}],
         })
@@ -865,13 +865,13 @@ class AcquisitionSummaryTests(unittest.TestCase):
         self.assertEqual(places, ())
 
     def test_a_faction_restriction_survives(self):
-        faction, _kind, _places, _wd, _b = summarize_source({
+        faction, _kind, _places, _wd, _b, _levels = summarize_source({
             "faction": "horde", "kind": "vendor", "places": [],
         })
         self.assertEqual(faction, "horde")
 
     def test_nothing_known_stays_empty(self):
-        self.assertEqual(summarize_source({}), (None, None, (), False, False))
+        self.assertEqual(summarize_source({}), (None, None, (), False, False, None))
 
 
 class ArlProviderTests(unittest.TestCase):
@@ -1277,7 +1277,7 @@ class OverrideParsingTests(unittest.TestCase):
 class SourceEmitTests(unittest.TestCase):
     def test_emits_each_place_as_a_pair_and_omits_a_neutral_faction(self):
         alliance = _record(spell_id=1, faction="alliance", source_kind="vendor",
-                           source_places=(("Edna Mullby", "Stormwind City"),))
+                           source_places=(SourcePlace("Edna Mullby", "Stormwind City"),))
         neutral = _record(spell_id=2)
         lua = emit_lua([alliance, neutral], {}, {}, "1", 1, "tbc")
         self.assertIn('faction = "alliance"', lua)
@@ -1290,15 +1290,15 @@ class SourceEmitTests(unittest.TestCase):
 
     def test_a_place_emits_only_the_half_it_has(self):
         zone_only = _record(spell_id=1, source_kind="quest",
-                            source_places=((None, "Hillsbrad Foothills"),))
+                            source_places=(SourcePlace(None, "Hillsbrad Foothills"),))
         name_only = _record(spell_id=2, source_kind="vendor",
-                            source_places=(("Somebody", None),))
+                            source_places=(SourcePlace("Somebody", None),))
         lua = emit_lua([zone_only, name_only], {}, {}, "1", 1, "tbc")
         self.assertIn("sourcePlaces = { { zone = 1 } }", lua)
         self.assertIn('sourcePlaces = { { name = "Somebody" } }', lua)
 
     def test_zone_names_are_interned_once_however_many_records_cite_them(self):
-        records = [_record(spell_id=index, source_places=((None, "Stormwind City"),))
+        records = [_record(spell_id=index, source_places=(SourcePlace(None, "Stormwind City"),))
                    for index in range(1, 4)]
         lua = emit_lua(records, {}, {}, "1", 1, "tbc")
         # One entry in the table, three records pointing at it.

@@ -13,6 +13,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 40, 55, 70 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 2 },
@@ -27,6 +28,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "armor",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 30, 45, 60 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 1 },
@@ -41,6 +43,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 30,
             sourceKind = "trainer",
+            skillLevels = { 15, 45, 60, 75 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 4 },
@@ -57,6 +60,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             requiredSkill = 90,
             sourceKind = "worldDrop",
+            skillLevels = { 90, 120, 135, 150 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -71,6 +75,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cloaks",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 85, 105, 120, 135 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 10 },
@@ -86,6 +91,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 50,
             sourceKind = "trainer",
+            skillLevels = { 40, 70, 85, 100 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 8 },
@@ -101,6 +107,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 65,
             requiredSkill = 65,
             sourceKind = "trainer",
+            skillLevels = { 55, 85, 100, 115 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 8 },
@@ -115,6 +122,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 65,
             requiredSkill = 65,
             sourceKind = "trainer",
+            skillLevels = { 60, 90, 105, 120 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 5 },
@@ -131,6 +139,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 60,
             sourceKind = "worldDrop",
+            skillLevels = { 60, 90, 105, 120 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -149,6 +158,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 75,
             requiredSkill = 75,
             sourceKind = "worldDrop",
+            skillLevels = { 75, 105, 120, 135 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -166,6 +176,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 75,
             requiredSkill = 75,
             sourceKind = "trainer",
+            skillLevels = { 100, 115, 122, 130 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 4 },
@@ -181,6 +192,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 125,
             requiredSkill = 125,
             sourceKind = "trainer",
+            skillLevels = { 120, 145, 157, 170 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 10 },
@@ -197,6 +209,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 100,
             sourceKind = "trainer",
+            skillLevels = { 100, 125, 137, 150 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 4 },
@@ -212,6 +225,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             requiredSkill = 110,
             sourceKind = "trainer",
+            skillLevels = { 110, 135, 147, 160 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 8 },
@@ -229,6 +243,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 100,
             sourceKind = "worldDrop",
+            skillLevels = { 100, 125, 137, 150 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -245,6 +260,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 1, 55, 75, 95 },
             bopOutput = false,
             reagents = {
                 { itemId = 765, count = 1 },
@@ -260,6 +276,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "healing",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 1, 55, 75, 95 },
             bopOutput = false,
             reagents = {
                 { itemId = 765, count = 1 },
@@ -276,6 +293,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 30,
             sourceKind = "trainer",
+            skillLevels = { 25, 65, 85, 105 },
             bopOutput = false,
             reagents = {
                 { itemId = 765, count = 1 },
@@ -292,6 +310,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 40,
             sourceKind = "trainer",
+            skillLevels = { 40, 70, 90, 110 },
             bopOutput = false,
             reagents = {
                 { itemId = 785, count = 2 },
@@ -309,6 +328,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 140,
             sourceKind = "worldDrop",
+            skillLevels = { 140, 165, 185, 205 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -327,6 +347,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 50,
             sourceKind = "trainer",
+            skillLevels = { 50, 80, 100, 120 },
             bopOutput = false,
             reagents = {
                 { itemId = 2447, count = 1 },
@@ -344,6 +365,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 60,
             sourceKind = "worldDrop",
+            skillLevels = { 60, 90, 110, 130 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -378,6 +400,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 80,
             sourceKind = "trainer",
+            skillLevels = { 55, 85, 105, 125 },
             bopOutput = false,
             reagents = {
                 { itemId = 118, count = 1 },
@@ -392,6 +415,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 10, 45, 57, 70 },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -406,6 +430,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 65, 90, 107, 125 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 1 },
@@ -421,6 +446,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 35, 47, 60 },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -437,6 +463,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 40,
             sourceKind = "worldDrop",
+            skillLevels = { 40, 65, 82, 100 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -452,6 +479,7 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 40, 65, 82, 100 },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -466,6 +494,7 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 35, 47, 60 },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -480,6 +509,7 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 40, 65, 82, 100 },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -495,6 +525,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 70, 95, 112, 130 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 1 },
@@ -509,6 +540,7 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 70, 95, 112, 130 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -524,6 +556,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 60, 85, 102, 120 },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 3 },
@@ -538,6 +571,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 85, 110, 127, 145 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -553,6 +587,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 95, 120, 137, 155 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 2 },
@@ -568,6 +603,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 75, 100, 117, 135 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -584,6 +620,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 105,
             requiredSkill = 105,
             sourceKind = "worldDrop",
+            skillLevels = { 105, 130, 147, 165 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -599,6 +636,7 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 100, 110, 120, 130 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -613,6 +651,7 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 45, 65, 85 },
             bopOutput = false,
             reagents = {
                 { itemId = 2672, count = 1 },
@@ -626,6 +665,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 30,
             sourceKind = "trainer",
+            skillLevels = { 10, 50, 70, 90 },
             bopOutput = false,
             reagents = {
                 { itemId = 2672, count = 1 },
@@ -639,6 +679,7 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 45, 65, 85 },
             bopOutput = false,
             reagents = {
                 { itemId = 769, count = 1 },
@@ -652,6 +693,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 65,
             requiredSkill = 65,
             sourceKind = "trainer",
+            skillLevels = { 50, 90, 110, 130 },
             bopOutput = false,
             reagents = {
                 { itemId = 2673, count = 1 },
@@ -667,7 +709,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 50,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kendor Kabonka", zone = 1 } },
+            skillLevels = { 50, 90, 110, 130 },
+            sourcePlaces = { { name = "Kendor Kabonka", zone = 1, x = 77.5, y = 53.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 723, count = 1 },
@@ -684,7 +727,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 75,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kendor Kabonka", zone = 1 } },
+            skillLevels = { 75, 115, 135, 155 },
+            sourcePlaces = { { name = "Kendor Kabonka", zone = 1, x = 77.5, y = 53.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 729, count = 1 },
@@ -700,6 +744,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 75,
             requiredSkill = 75,
             sourceKind = "trainer",
+            skillLevels = { 75, 115, 135, 155 },
             bopOutput = false,
             reagents = {
                 { itemId = 2674, count = 1 },
@@ -715,7 +760,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 85,
             requiredSkill = 85,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kendor Kabonka", zone = 1 } },
+            skillLevels = { 85, 125, 145, 165 },
+            sourcePlaces = { { name = "Kendor Kabonka", zone = 1, x = 77.5, y = 53.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2675, count = 1 },
@@ -730,6 +776,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             requiredSkill = 110,
             sourceKind = "trainer",
+            skillLevels = { 80, 120, 140, 160 },
             bopOutput = false,
             reagents = {
                 { itemId = 2677, count = 1 },
@@ -746,7 +793,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 100,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kendor Kabonka", zone = 1 } },
+            skillLevels = { 100, 135, 155, 175 },
+            sourcePlaces = { { name = "Kendor Kabonka", zone = 1, x = 77.5, y = 53.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 1080, count = 1 },
@@ -762,7 +810,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             requiredSkill = 110,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kendor Kabonka", zone = 1 } },
+            skillLevels = { 110, 130, 150, 170 },
+            sourcePlaces = { { name = "Kendor Kabonka", zone = 1, x = 77.5, y = 53.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2677, count = 2 },
@@ -780,7 +829,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 100,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kendor Kabonka", zone = 1 } },
+            skillLevels = { 100, 140, 160, 180 },
+            sourcePlaces = { { name = "Kendor Kabonka", zone = 1, x = 77.5, y = 53.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 1015, count = 2 },
@@ -794,6 +844,7 @@ RecipeRegistryRecipeMetadata = {
             category = "metals",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 1, 25, 47, 70 },
             bopOutput = false,
             reagents = {
                 { itemId = 2770, count = 1 },
@@ -806,6 +857,7 @@ RecipeRegistryRecipeMetadata = {
             category = "metals",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 75, 115, 122, 130 },
             bopOutput = false,
             reagents = {
                 { itemId = 2775, count = 1 },
@@ -819,6 +871,7 @@ RecipeRegistryRecipeMetadata = {
             category = "metals",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 65, 65, 90, 115 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 1 },
@@ -833,6 +886,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sharpening",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 1, 15, 35, 55 },
             bopOutput = false,
             reagents = {
                 { itemId = 2835, count = 1 },
@@ -847,6 +901,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 55,
             requiredSkill = 55,
             sourceKind = "trainer",
+            skillLevels = { 35, 75, 95, 115 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 6 },
@@ -861,6 +916,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 40,
             sourceKind = "trainer",
+            skillLevels = { 1, 50, 70, 90 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 4 },
@@ -874,6 +930,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 20, 40, 60 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 2 },
@@ -888,6 +945,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 65,
             requiredSkill = 65,
             sourceKind = "trainer",
+            skillLevels = { 90, 115, 127, 140 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 10 },
@@ -903,6 +961,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 75,
             sourceKind = "trainer",
+            skillLevels = { 65, 65, 72, 80 },
             bopOutput = false,
             reagents = {
                 { itemId = 2836, count = 1 },
@@ -917,6 +976,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 80,
             requiredSkill = 80,
             sourceKind = "trainer",
+            skillLevels = { 70, 110, 130, 150 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 10 },
@@ -932,6 +992,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 80,
             requiredSkill = 80,
             sourceKind = "worldDrop",
+            skillLevels = { 80, 120, 140, 160 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -949,6 +1010,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 95,
             requiredSkill = 95,
             sourceKind = "trainer",
+            skillLevels = { 105, 145, 160, 175 },
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 6 },
@@ -963,6 +1025,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 105,
             requiredSkill = 105,
             sourceKind = "trainer",
+            skillLevels = { 105, 145, 160, 175 },
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 7 },
@@ -992,6 +1055,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 120,
             requiredSkill = 120,
             sourceKind = "trainer",
+            skillLevels = { 120, 150, 165, 180 },
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 5 },
@@ -1008,6 +1072,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 130,
             requiredSkill = 130,
             sourceKind = "worldDrop",
+            skillLevels = { 130, 160, 175, 190 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -1025,6 +1090,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 125,
             sourceKind = "trainer",
+            skillLevels = { 125, 125, 132, 140 },
             bopOutput = false,
             reagents = {
                 { itemId = 2838, count = 1 },
@@ -1039,6 +1105,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 135,
             requiredSkill = 135,
             sourceKind = "trainer",
+            skillLevels = { 145, 175, 190, 205 },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 2 },
@@ -1057,6 +1124,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 30,
             sourceKind = "trainer",
+            skillLevels = { 15, 55, 75, 95 },
             bopOutput = false,
             reagents = {
                 { itemId = 2589, count = 2 },
@@ -1073,6 +1141,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 35,
             requiredSkill = 35,
             sourceKind = "trainer",
+            skillLevels = { 20, 60, 80, 100 },
             bopOutput = false,
             reagents = {
                 { itemId = 2589, count = 2 },
@@ -1089,6 +1158,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 40,
             sourceKind = "trainer",
+            skillLevels = { 25, 65, 85, 105 },
             bopOutput = false,
             reagents = {
                 { itemId = 2589, count = 2 },
@@ -1105,6 +1175,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 75,
             requiredSkill = 75,
             sourceKind = "trainer",
+            skillLevels = { 110, 140, 155, 170 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 1 },
@@ -1121,6 +1192,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 85,
             requiredSkill = 85,
             sourceKind = "trainer",
+            skillLevels = { 115, 145, 160, 175 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 1 },
@@ -1137,6 +1209,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 95,
             requiredSkill = 95,
             sourceKind = "trainer",
+            skillLevels = { 120, 150, 165, 180 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 2 },
@@ -1154,7 +1227,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 10,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kendor Kabonka", zone = 1 } },
+            skillLevels = { 10, 60, 80, 100 },
+            sourcePlaces = { { name = "Kendor Kabonka", zone = 1, x = 77.5, y = 53.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2886, count = 1 },
@@ -1168,6 +1242,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 20, 30, 40 },
             bopOutput = false,
             reagents = {
                 { itemId = 2934, count = 3 },
@@ -1180,6 +1255,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cloth",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 25, 37, 50 },
             bopOutput = false,
             reagents = {
                 { itemId = 2589, count = 2 },
@@ -1192,6 +1268,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cloth",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 75, 90, 97, 105 },
             bopOutput = false,
             reagents = {
                 { itemId = 2592, count = 3 },
@@ -1205,6 +1282,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weightstone",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 1, 15, 35, 55 },
             bopOutput = false,
             reagents = {
                 { itemId = 2589, count = 1 },
@@ -1219,6 +1297,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weightstone",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 65, 65, 72, 80 },
             bopOutput = false,
             reagents = {
                 { itemId = 2592, count = 1 },
@@ -1233,6 +1312,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weightstone",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 125, 125, 132, 140 },
             bopOutput = false,
             reagents = {
                 { itemId = 2592, count = 1 },
@@ -1247,6 +1327,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rejuvenation",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 15, 60, 80, 100 },
             bopOutput = false,
             reagents = {
                 { itemId = 2447, count = 1 },
@@ -1262,6 +1343,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 90, 120, 140, 160 },
             bopOutput = false,
             reagents = {
                 { itemId = 785, count = 1 },
@@ -1279,6 +1361,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 55,
             requiredSkill = 110,
             sourceKind = "worldDrop",
+            skillLevels = { 110, 135, 155, 175 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -1295,6 +1378,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mana",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 120, 145, 165, 185 },
             bopOutput = false,
             reagents = {
                 { itemId = 785, count = 1 },
@@ -1312,6 +1396,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 120,
             sourceKind = "worldDrop",
+            skillLevels = { 120, 145, 165, 185 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -1330,6 +1415,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 80,
             requiredSkill = 250,
             sourceKind = "worldDrop",
+            skillLevels = { 250, 275, 295, 315 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -1346,6 +1432,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rejuvenation",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 125, 150, 170, 190 },
             bopOutput = false,
             reagents = {
                 { itemId = 2450, count = 2 },
@@ -1361,6 +1448,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "guardian",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 130, 155, 175, 195 },
             bopOutput = false,
             reagents = {
                 { itemId = 3355, count = 1 },
@@ -1378,6 +1466,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 25,
             requiredSkill = 150,
             sourceKind = "worldDrop",
+            skillLevels = { 150, 175, 195, 215 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -1396,6 +1485,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 15,
             requiredSkill = 50,
             sourceKind = "worldDrop",
+            skillLevels = { 50, 80, 100, 120 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -1412,6 +1502,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 95, 135, 155, 175 },
             bopOutput = false,
             reagents = {
                 { itemId = 818, count = 2 },
@@ -1428,6 +1519,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 35, 75, 95, 115 },
             bopOutput = false,
             reagents = {
                 { itemId = 774, count = 2 },
@@ -1445,6 +1537,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 70, 110, 130, 150 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 2 },
@@ -1464,6 +1557,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 125,
             requiredSkill = 125,
             sourceKind = "worldDrop",
+            skillLevels = { 125, 155, 170, 195 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -1483,6 +1577,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 130, 160, 175, 190 },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -1503,6 +1598,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 145,
             requiredSkill = 145,
             sourceKind = "worldDrop",
+            skillLevels = { 145, 175, 190, 205 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -1521,6 +1617,7 @@ RecipeRegistryRecipeMetadata = {
             category = "metals",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 65, 65, 70, 75 },
             bopOutput = false,
             reagents = {
                 { itemId = 2771, count = 1 },
@@ -1533,6 +1630,7 @@ RecipeRegistryRecipeMetadata = {
             category = "metals",
             sortOrder = 50,
             sourceKind = "trainer",
+            skillLevels = { 125, 130, 145, 160 },
             bopOutput = false,
             reagents = {
                 { itemId = 2772, count = 1 },
@@ -1545,6 +1643,7 @@ RecipeRegistryRecipeMetadata = {
             category = "metals",
             sortOrder = 60,
             sourceKind = "trainer",
+            skillLevels = { 155, 170, 177, 185 },
             bopOutput = false,
             reagents = {
                 { itemId = 2776, count = 1 },
@@ -1558,6 +1657,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 20, 60, 80, 100 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 8 },
@@ -1570,6 +1670,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 25, 45, 65, 85 },
             bopOutput = false,
             reagents = {
                 { itemId = 2835, count = 2 },
@@ -1585,6 +1686,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 35,
             requiredSkill = 35,
             sourceKind = "worldDrop",
+            skillLevels = { 35, 75, 95, 115 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -1600,6 +1702,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 40, 80, 100, 120 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 8 },
@@ -1614,6 +1717,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 45, 85, 105, 125 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -1631,6 +1735,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 60,
             sourceKind = "worldDrop",
+            skillLevels = { 60, 100, 120, 140 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -1646,6 +1751,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 75, 75, 87, 100 },
             bopOutput = false,
             reagents = {
                 { itemId = 2836, count = 2 },
@@ -1659,6 +1765,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 110, 140, 155, 170 },
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 5 },
@@ -1675,6 +1782,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 125,
             requiredSkill = 125,
             sourceKind = "worldDrop",
+            skillLevels = { 125, 155, 170, 185 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -1691,6 +1799,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 130, 160, 175, 190 },
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 6 },
@@ -1706,6 +1815,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 135, 165, 180, 195 },
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 8 },
@@ -1723,6 +1833,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 145,
             requiredSkill = 145,
             sourceKind = "worldDrop",
+            skillLevels = { 145, 175, 190, 205 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -1741,6 +1852,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 150,
             requiredSkill = 150,
             sourceKind = "worldDrop",
+            skillLevels = { 150, 180, 195, 210 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -1757,6 +1869,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 125, 125, 137, 150 },
             bopOutput = false,
             reagents = {
                 { itemId = 2838, count = 3 },
@@ -1771,7 +1884,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 80,
             requiredSkill = 80,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kendor Kabonka", zone = 1 } },
+            skillLevels = { 80, 120, 140, 160 },
+            sourcePlaces = { { name = "Kendor Kabonka", zone = 1, x = 77.5, y = 53.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 1 },
@@ -1789,7 +1903,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 60,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kendor Kabonka", zone = 1 } },
+            skillLevels = { 60, 100, 120, 140 },
+            sourcePlaces = { { name = "Kendor Kabonka", zone = 1, x = 77.5, y = 53.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3172, count = 1 },
@@ -1807,7 +1922,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 90,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kendor Kabonka", zone = 1 } },
+            skillLevels = { 90, 130, 150, 170 },
+            sourcePlaces = { { name = "Kendor Kabonka", zone = 1, x = 77.5, y = 53.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 1468, count = 2 },
@@ -1824,7 +1940,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 120,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kendor Kabonka", zone = 1 } },
+            skillLevels = { 120, 160, 180, 200 },
+            sourcePlaces = { { name = "Kendor Kabonka", zone = 1, x = 77.5, y = 53.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -1840,7 +1957,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 130,
             requiredSkill = 130,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nerrist", zone = 2 }, { name = "Keena", zone = 3 }, { name = "Kendor Kabonka", zone = 1 } },
+            skillLevels = { 130, 170, 190, 210 },
+            sourcePlaces = { { name = "Nerrist", zone = 2, x = 32.7, y = 29.2, faction = "horde" }, { name = "Keena", zone = 3, x = 74, y = 32.7, faction = "horde" }, { name = "Kendor Kabonka", zone = 1, x = 77.5, y = 53.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -1857,7 +1975,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 110,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kendor Kabonka", zone = 1 } },
+            skillLevels = { 110, 150, 170, 190 },
+            sourcePlaces = { { name = "Kendor Kabonka", zone = 1, x = 77.5, y = 53.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2251, count = 2 },
@@ -1873,7 +1992,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             requiredSkill = 110,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Ulthaan", zone = 4 }, { name = "Super-Seller 680", zone = 5 } },
+            skillLevels = { 110, 150, 170, 190 },
+            sourcePlaces = { { name = "Ulthaan", zone = 4, x = 50, y = 66.7, faction = "alliance" }, { name = "Super-Seller 680", zone = 5, x = 40.5, y = 79.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -1889,7 +2009,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 125,
             requiredSkill = 125,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Zargh", zone = 6 }, { name = "Vendor-Tron 1000", zone = 5 } },
+            skillLevels = { 125, 175, 195, 215 },
+            sourcePlaces = { { name = "Zargh", zone = 6, x = 52.6, y = 29.9, faction = "horde" }, { name = "Vendor-Tron 1000", zone = 5, x = 60.3, y = 38.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -1906,7 +2027,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 150,
             faction = "alliance",
             sourceKind = "quest",
-            sourcePlaces = { { zone = 7 } },
+            skillLevels = { 150, 190, 210, 230 },
+            sourcePlaces = { { zone = 7, x = 52.4, y = 56, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 1 },
@@ -1922,7 +2044,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 7 } },
+            skillLevels = { 175, 215, 235, 255 },
+            sourcePlaces = { { zone = 7, x = 51.8, y = 58.7, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3712, count = 1 },
@@ -1937,6 +2060,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "healing",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 110, 135, 155, 175 },
             bopOutput = false,
             reagents = {
                 { itemId = 2450, count = 1 },
@@ -1952,6 +2076,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 165, 185, 205, 225 },
             bopOutput = false,
             reagents = {
                 { itemId = 3355, count = 1 },
@@ -1968,7 +2093,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 165,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Bliztik", zone = 8 }, { name = "Montarr", zone = 9 } },
+            skillLevels = { 165, 190, 210, 230 },
+            sourcePlaces = { { name = "Bliztik", zone = 8, x = 18, y = 54.5 }, { name = "Montarr", zone = 9, x = 45.2, y = 50.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3369, count = 4 },
@@ -1986,6 +2112,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 175,
             sourceKind = "trainer",
+            skillLevels = { 175, 195, 215, 235 },
             bopOutput = false,
             reagents = {
                 { itemId = 3355, count = 1 },
@@ -2003,6 +2130,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 180,
             sourceKind = "worldDrop",
+            skillLevels = { 180, 200, 220, 240 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2019,6 +2147,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mana",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 160, 180, 200, 220 },
             bopOutput = false,
             reagents = {
                 { itemId = 3356, count = 1 },
@@ -2036,6 +2165,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 195,
             sourceKind = "worldDrop",
+            skillLevels = { 195, 215, 235, 255 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2053,7 +2183,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 200,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Bro'kin", zone = 10 } },
+            skillLevels = { 200, 220, 240, 260 },
+            sourcePlaces = { { name = "Bro'kin", zone = 10, x = 38.3, y = 38.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3358, count = 4 },
@@ -2069,6 +2200,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dagger",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 105, 135, 150, 165 },
             bopOutput = false,
             reagents = {
                 { itemId = 818, count = 1 },
@@ -2088,7 +2220,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 160,
             requiredSkill = 160,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Jutak", zone = 2 }, { name = "Kaita Deepforge", zone = 1 } },
+            skillLevels = { 160, 185, 197, 210 },
+            sourcePlaces = { { name = "Jutak", zone = 2, x = 27.5, y = 77.5 }, { name = "Kaita Deepforge", zone = 1, x = 63.5, y = 37.6, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 1705, count = 2 },
@@ -2108,6 +2241,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "worldDrop",
+            skillLevels = { 175, 200, 212, 225 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2128,7 +2262,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 155,
             requiredSkill = 155,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Jazzrik", zone = 11 }, { name = "Muuran", zone = 5 }, { name = "Jannos Ironwill", zone = 3 }, { name = "High Admiral \\\"Shelly\\\" Jorrik", zone = 12 } },
+            skillLevels = { 155, 180, 192, 205 },
+            sourcePlaces = { { name = "Jazzrik", zone = 11, x = 42.5, y = 52.6, faction = "horde" }, { name = "Muuran", zone = 5, x = 55.6, y = 56.5, faction = "horde" }, { name = "Jannos Ironwill", zone = 3, x = 46, y = 47.7, faction = "alliance" }, { name = "High Admiral \\\"Shelly\\\" Jorrik", zone = 12, x = 10.9, y = 76.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2842, count = 4 },
@@ -2148,6 +2283,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 170,
             requiredSkill = 170,
             sourceKind = "worldDrop",
+            skillLevels = { 170, 195, 207, 220 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2169,7 +2305,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 180,
             requiredSkill = 180,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Zarena Cromwind", zone = 2 } },
+            skillLevels = { 180, 205, 217, 230 },
+            sourcePlaces = { { name = "Zarena Cromwind", zone = 2, x = 28.4, y = 75.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 1705, count = 3 },
@@ -2189,6 +2326,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 200,
             requiredSkill = 200,
             sourceKind = "worldDrop",
+            skillLevels = { 200, 210, 215, 220 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2210,7 +2348,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 185,
             requiredSkill = 185,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Jaquilina Dramet", zone = 2 }, { name = "Vharr", zone = 2 } },
+            skillLevels = { 185, 210, 222, 235 },
+            sourcePlaces = { { name = "Jaquilina Dramet", zone = 2, x = 35.7, y = 10.7 }, { name = "Vharr", zone = 2, x = 32.3, y = 28, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3466, count = 2 },
@@ -2230,6 +2369,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 200,
             requiredSkill = 200,
             sourceKind = "worldDrop",
+            skillLevels = { 200, 225, 237, 250 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2249,6 +2389,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 165, 190, 202, 215 },
             bopOutput = false,
             reagents = {
                 { itemId = 2605, count = 1 },
@@ -2263,6 +2404,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 170, 195, 207, 220 },
             bopOutput = false,
             reagents = {
                 { itemId = 2605, count = 1 },
@@ -2280,7 +2422,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 190,
             requiredSkill = 190,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Krinkle Goodsteel", zone = 13 } },
+            skillLevels = { 190, 215, 227, 240 },
+            sourcePlaces = { { name = "Krinkle Goodsteel", zone = 13, x = 51.5, y = 28.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 2 },
@@ -2298,6 +2441,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 160,
             requiredSkill = 160,
             sourceKind = "worldDrop",
+            skillLevels = { 160, 185, 197, 210 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2316,6 +2460,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "worldDrop",
+            skillLevels = { 175, 200, 212, 225 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2332,6 +2477,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 155, 180, 192, 205 },
             bopOutput = false,
             reagents = {
                 { itemId = 2605, count = 1 },
@@ -2349,6 +2495,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 170,
             requiredSkill = 170,
             sourceKind = "worldDrop",
+            skillLevels = { 170, 195, 207, 220 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2365,6 +2512,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 180, 205, 217, 230 },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 2 },
@@ -2384,6 +2532,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 195,
             requiredSkill = 195,
             sourceKind = "worldDrop",
+            skillLevels = { 195, 220, 232, 245 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2402,6 +2551,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 185,
             requiredSkill = 185,
             sourceKind = "worldDrop",
+            skillLevels = { 185, 210, 222, 235 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2421,6 +2571,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 200,
             requiredSkill = 200,
             sourceKind = "worldDrop",
+            skillLevels = { 200, 210, 215, 220 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2436,6 +2587,7 @@ RecipeRegistryRecipeMetadata = {
             category = "metals",
             sortOrder = 70,
             sourceKind = "trainer",
+            skillLevels = { 165, 165, 165, 165 },
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 1 },
@@ -2450,6 +2602,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 25, 55, 70, 85 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 6 },
@@ -2463,6 +2616,7 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 45, 70, 87, 105 },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 3 },
@@ -2477,6 +2631,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 55, 85, 100, 115 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 3 },
@@ -2490,6 +2645,7 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 80, 105, 122, 140 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -2505,6 +2661,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 95,
             requiredSkill = 95,
             sourceKind = "worldDrop",
+            skillLevels = { 95, 120, 137, 155 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2521,6 +2678,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 75, 105, 120, 135 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 6 },
@@ -2535,6 +2693,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cloaks",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 150, 170, 180, 190 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -2549,6 +2708,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 85, 115, 130, 145 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 6 },
@@ -2566,6 +2726,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 100,
             sourceKind = "worldDrop",
+            skillLevels = { 100, 125, 137, 150 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2582,6 +2743,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 80, 110, 125, 140 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 6 },
@@ -2596,6 +2758,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 145, 170, 182, 195 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 14 },
@@ -2612,6 +2775,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 120,
             requiredSkill = 120,
             sourceKind = "worldDrop",
+            skillLevels = { 120, 155, 167, 180 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2629,6 +2793,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 125, 150, 162, 175 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -2647,6 +2812,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 120,
             requiredSkill = 120,
             sourceKind = "worldDrop",
+            skillLevels = { 120, 145, 157, 170 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2663,6 +2829,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 130, 155, 167, 180 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 4 },
@@ -2680,6 +2847,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 140,
             requiredSkill = 140,
             sourceKind = "worldDrop",
+            skillLevels = { 140, 165, 177, 190 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2697,6 +2865,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 135, 160, 172, 185 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 4 },
@@ -2716,6 +2885,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 150,
             requiredSkill = 150,
             sourceKind = "worldDrop",
+            skillLevels = { 150, 170, 180, 190 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2734,7 +2904,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 155,
             requiredSkill = 155,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Wenna Silkbeard", zone = 14 }, { name = "George Candarte", zone = 7 } },
+            skillLevels = { 155, 175, 185, 195 },
+            sourcePlaces = { { name = "Wenna Silkbeard", zone = 14, x = 25.7, y = 25.8, faction = "alliance" }, { name = "George Candarte", zone = 7, x = 92, y = 38.4, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 4 },
@@ -2752,6 +2923,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "worldDrop",
+            skillLevels = { 175, 195, 205, 215 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2769,6 +2941,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 160, 180, 190, 200 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -2788,6 +2961,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 170,
             requiredSkill = 170,
             sourceKind = "worldDrop",
+            skillLevels = { 170, 190, 200, 210 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2805,6 +2979,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 180, 200, 210, 220 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -2823,6 +2998,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 195,
             requiredSkill = 195,
             sourceKind = "worldDrop",
+            skillLevels = { 195, 215, 225, 235 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2841,7 +3017,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 185,
             requiredSkill = 185,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rikqiz", zone = 2 } },
+            skillLevels = { 185, 205, 215, 225 },
+            sourcePlaces = { { name = "Rikqiz", zone = 2, x = 28.5, y = 76 } },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 2 },
@@ -2861,6 +3038,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 200,
             requiredSkill = 200,
             sourceKind = "worldDrop",
+            skillLevels = { 200, 220, 230, 240 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -2880,6 +3058,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "armor",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 150, 170, 180, 190 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -2893,6 +3072,7 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 150, 170, 185, 200 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 3 },
@@ -2907,6 +3087,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 35, 55, 65, 75 },
             bopOutput = false,
             reagents = {
                 { itemId = 783, count = 1 },
@@ -2920,6 +3101,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 100, 115, 122, 130 },
             bopOutput = false,
             reagents = {
                 { itemId = 4232, count = 1 },
@@ -2933,6 +3115,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 150, 160, 165, 170 },
             bopOutput = false,
             reagents = {
                 { itemId = 4235, count = 1 },
@@ -2946,6 +3129,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cloth",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 125, 135, 140, 145 },
             bopOutput = false,
             reagents = {
                 { itemId = 4306, count = 4 },
@@ -2959,6 +3143,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 35, 60, 77, 95 },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -2973,6 +3158,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 60, 85, 102, 120 },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 2 },
@@ -2988,6 +3174,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 70, 95, 112, 130 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -3002,6 +3189,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 85, 110, 127, 145 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -3018,6 +3206,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 100,
             sourceKind = "worldDrop",
+            skillLevels = { 100, 125, 142, 160 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -3034,6 +3223,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 80, 105, 122, 140 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 2 },
@@ -3051,6 +3241,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 95,
             requiredSkill = 95,
             sourceKind = "worldDrop",
+            skillLevels = { 95, 120, 137, 155 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -3068,6 +3259,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 110, 135, 152, 170 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -3084,6 +3276,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 120,
             requiredSkill = 120,
             sourceKind = "worldDrop",
+            skillLevels = { 120, 145, 162, 180 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -3100,6 +3293,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 110, 135, 152, 170 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 4 },
@@ -3116,6 +3310,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 125,
             requiredSkill = 125,
             sourceKind = "worldDrop",
+            skillLevels = { 125, 150, 167, 185 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -3132,6 +3327,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 130, 150, 165, 180 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 3 },
@@ -3149,7 +3345,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 145,
             requiredSkill = 145,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Wenna Silkbeard", zone = 14 }, { name = "Kireena", zone = 5 } },
+            skillLevels = { 145, 165, 180, 195 },
+            sourcePlaces = { { name = "Wenna Silkbeard", zone = 14, x = 25.7, y = 25.8, faction = "alliance" }, { name = "Kireena", zone = 5, x = 51, y = 53.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -3166,6 +3363,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 125, 150, 167, 185 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 4 },
@@ -3184,6 +3382,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 140,
             requiredSkill = 140,
             sourceKind = "worldDrop",
+            skillLevels = { 140, 160, 175, 190 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -3202,7 +3401,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 165,
             requiredSkill = 165,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Xizk Goodstitch", zone = 2 } },
+            skillLevels = { 165, 185, 200, 215 },
+            sourcePlaces = { { name = "Xizk Goodstitch", zone = 2, x = 28.7, y = 76.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -3220,6 +3420,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 170,
             requiredSkill = 170,
             sourceKind = "worldDrop",
+            skillLevels = { 170, 190, 205, 220 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -3236,6 +3437,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 150, 170, 185, 200 },
             bopOutput = false,
             reagents = {
                 { itemId = 4305, count = 5 },
@@ -3252,6 +3454,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "worldDrop",
+            skillLevels = { 175, 195, 210, 225 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -3268,6 +3471,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 185, 205, 220, 235 },
             bopOutput = false,
             reagents = {
                 { itemId = 3827, count = 1 },
@@ -3285,7 +3489,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 200,
             requiredSkill = 200,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Micha Yance", zone = 7 }, { name = "Ghok'kah", zone = 15 } },
+            skillLevels = { 200, 220, 235, 250 },
+            sourcePlaces = { { name = "Micha Yance", zone = 7, x = 49, y = 55.1, faction = "alliance" }, { name = "Ghok'kah", zone = 15, x = 35.2, y = 30.8, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3829, count = 1 },
@@ -3304,6 +3509,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 180,
             requiredSkill = 180,
             sourceKind = "worldDrop",
+            skillLevels = { 180, 200, 215, 230 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -3322,6 +3528,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 200,
             requiredSkill = 200,
             sourceKind = "worldDrop",
+            skillLevels = { 200, 220, 235, 250 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -3339,6 +3546,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cloth",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 175, 180, 182, 185 },
             bopOutput = false,
             reagents = {
                 { itemId = 4338, count = 5 },
@@ -3351,6 +3559,7 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 110, 135, 152, 170 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -3368,6 +3577,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 125,
             requiredSkill = 125,
             sourceKind = "worldDrop",
+            skillLevels = { 125, 150, 167, 185 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -3387,7 +3597,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 135,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Danielle Zipstitch", zone = 8 } },
+            skillLevels = { 135, 145, 150, 155 },
+            sourcePlaces = { { name = "Danielle Zipstitch", zone = 8, x = 75.8, y = 45.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -3404,7 +3615,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 155,
             requiredSkill = 155,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mallen Swain", zone = 7 }, { name = "Sheri Zipstitch", zone = 8 } },
+            skillLevels = { 155, 165, 170, 175 },
+            sourcePlaces = { { name = "Mallen Swain", zone = 7, x = 62, y = 20.9, faction = "horde" }, { name = "Sheri Zipstitch", zone = 8, x = 75.7, y = 45.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -3419,6 +3631,7 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 170, 180, 185, 190 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -3435,6 +3648,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 185,
             requiredSkill = 185,
             sourceKind = "worldDrop",
+            skillLevels = { 185, 195, 200, 205 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -3452,7 +3666,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 200,
             requiredSkill = 200,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Narkk", zone = 2 } },
+            skillLevels = { 200, 210, 215, 220 },
+            sourcePlaces = { { name = "Narkk", zone = 2, x = 28.2, y = 74.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 1 },
@@ -3468,6 +3683,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 30, 55, 72, 90 },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -3481,6 +3697,7 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 35, 47, 60 },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -3495,6 +3712,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "powders",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 1, 20, 30, 40 },
             bopOutput = false,
             reagents = {
                 { itemId = 2835, count = 1 },
@@ -3509,6 +3727,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dynamite",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 1, 30, 45, 60 },
             bopOutput = false,
             reagents = {
                 { itemId = 2589, count = 1 },
@@ -3523,6 +3742,7 @@ RecipeRegistryRecipeMetadata = {
             category = "ammo",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 1, 30, 45, 60 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 1 },
@@ -3536,6 +3756,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 30, 45, 52, 60 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 1 },
@@ -3550,6 +3771,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bombs",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 30, 60, 75, 90 },
             bopOutput = false,
             reagents = {
                 { itemId = 2589, count = 1 },
@@ -3565,6 +3787,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 50, 80, 95, 110 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 2 },
@@ -3579,6 +3802,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "firearms",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 50, 80, 95, 110 },
             bopOutput = false,
             reagents = {
                 { itemId = 4359, count = 1 },
@@ -3593,6 +3817,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 65, 95, 110, 125 },
             bopOutput = false,
             reagents = {
                 { itemId = 2589, count = 2 },
@@ -3609,6 +3834,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 75,
             sourceKind = "worldDrop",
+            skillLevels = { 75, 105, 120, 135 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -3626,6 +3852,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "powders",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 75, 85, 90, 95 },
             bopOutput = false,
             reagents = {
                 { itemId = 2836, count = 1 },
@@ -3639,6 +3866,7 @@ RecipeRegistryRecipeMetadata = {
             category = "ammo",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 75, 85, 90, 95 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 1 },
@@ -3654,6 +3882,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dynamite",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 75, 90, 97, 105 },
             bopOutput = false,
             reagents = {
                 { itemId = 2589, count = 1 },
@@ -3668,6 +3897,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "tools",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 85, 115, 130, 145 },
             bopOutput = false,
             reagents = {
                 { itemId = 2592, count = 1 },
@@ -3686,6 +3916,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 100,
             sourceKind = "worldDrop",
+            skillLevels = { 100, 130, 145, 160 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -3703,6 +3934,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 100, 130, 145, 160 },
             bopOutput = false,
             reagents = {
                 { itemId = 818, count = 2 },
@@ -3717,6 +3949,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "firearms",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 105, 130, 142, 155 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 2 },
@@ -3735,6 +3968,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bombs",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 105, 105, 130, 155 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 3 },
@@ -3749,6 +3983,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 105, 105, 130, 155 },
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 2 },
@@ -3765,7 +4000,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 120,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fradd Swiftgear", zone = 14 }, { name = "Jinky Twizzlefixxit", zone = 9 } },
+            skillLevels = { 120, 145, 157, 170 },
+            sourcePlaces = { { name = "Fradd Swiftgear", zone = 14, x = 26.4, y = 25.8, faction = "alliance" }, { name = "Jinky Twizzlefixxit", zone = 9, x = 77.7, y = 77.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 3 },
@@ -3784,6 +4020,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 120,
             sourceKind = "worldDrop",
+            skillLevels = { 120, 145, 157, 170 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -3800,6 +4037,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bombs",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 120, 120, 145, 170 },
             bopOutput = false,
             reagents = {
                 { itemId = 2592, count = 1 },
@@ -3815,6 +4053,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 50,
             sourceKind = "trainer",
+            skillLevels = { 125, 125, 150, 175 },
             bopOutput = false,
             reagents = {
                 { itemId = 2592, count = 1 },
@@ -3831,6 +4070,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 125,
             sourceKind = "drop",
+            skillLevels = { 125, 125, 150, 175 },
             sourcePlaces = { { name = "Mekgineer Thermaplugg", zone = 16 } },
             bopOutput = false,
             reagents = {
@@ -3846,6 +4086,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "powders",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 125, 125, 135, 145 },
             bopOutput = false,
             reagents = {
                 { itemId = 2838, count = 1 },
@@ -3860,6 +4101,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dynamite",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 125, 125, 135, 145 },
             bopOutput = false,
             reagents = {
                 { itemId = 2592, count = 1 },
@@ -3874,6 +4116,7 @@ RecipeRegistryRecipeMetadata = {
             category = "ammo",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 125, 125, 135, 145 },
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 1 },
@@ -3888,6 +4131,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "firearms",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 130, 155, 167, 180 },
             bopOutput = false,
             reagents = {
                 { itemId = 2842, count = 3 },
@@ -3906,6 +4150,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bombs",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 140, 140, 165, 190 },
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 3 },
@@ -3923,7 +4168,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 140,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gagsprocket", zone = 6 }, { name = "Namdo Bizzfizzle", zone = 16 }, { name = "Fradd Swiftgear", zone = 14 } },
+            skillLevels = { 140, 165, 177, 190 },
+            sourcePlaces = { { name = "Gagsprocket", zone = 6, x = 62.7, y = 36.3 }, { name = "Namdo Bizzfizzle", zone = 16, faction = "alliance" }, { name = "Fradd Swiftgear", zone = 14, x = 26.4, y = 25.8, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -3939,6 +4185,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 60,
             sourceKind = "trainer",
+            skillLevels = { 145, 145, 170, 195 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 1 },
@@ -3956,6 +4203,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 145,
             sourceKind = "worldDrop",
+            skillLevels = { 145, 170, 182, 195 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -3973,6 +4221,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 150, 175, 187, 200 },
             bopOutput = false,
             reagents = {
                 { itemId = 2592, count = 2 },
@@ -3989,6 +4238,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 150, 175, 187, 200 },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 2 },
@@ -4006,7 +4256,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 155,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rizz Loosebolt", zone = 10 } },
+            skillLevels = { 155, 175, 185, 195 },
+            sourcePlaces = { { name = "Rizz Loosebolt", zone = 10, x = 47.4, y = 35.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3829, count = 1 },
@@ -4020,6 +4271,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 70,
             sourceKind = "trainer",
+            skillLevels = { 160, 160, 170, 180 },
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 2 },
@@ -4035,6 +4287,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 140,
             requiredSkill = 160,
             sourceKind = "drop",
+            skillLevels = { 160, 180, 190, 200 },
             sourcePlaces = { { name = "Mekgineer Thermaplugg", zone = 16 } },
             bopOutput = false,
             reagents = {
@@ -4054,6 +4307,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 150,
             requiredSkill = 165,
             sourceKind = "worldDrop",
+            skillLevels = { 165, 185, 195, 210 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -4070,6 +4324,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 80,
             sourceKind = "trainer",
+            skillLevels = { 170, 170, 190, 210 },
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 1 },
@@ -4086,6 +4341,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "grenades",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 175, 175, 195, 215 },
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 1 },
@@ -4101,6 +4357,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 175, 175, 195, 215 },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 4 },
@@ -4117,6 +4374,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "tools",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 185, 185, 205, 225 },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 4 },
@@ -4135,6 +4393,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 185,
             sourceKind = "worldDrop",
+            skillLevels = { 185, 205, 215, 225 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -4151,6 +4410,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bombs",
             sortOrder = 50,
             sourceKind = "trainer",
+            skillLevels = { 190, 190, 210, 230 },
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 3 },
@@ -4168,6 +4428,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 180,
             requiredSkill = 195,
             sourceKind = "worldDrop",
+            skillLevels = { 195, 215, 225, 235 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -4186,7 +4447,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 200,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gnaz Blunderflame", zone = 2 } },
+            skillLevels = { 200, 220, 230, 240 },
+            sourcePlaces = { { name = "Gnaz Blunderflame", zone = 2, x = 51, y = 35.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3864, count = 2 },
@@ -4206,7 +4468,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 200,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Zan Shivsproket", zone = 10 } },
+            skillLevels = { 200, 220, 230, 240 },
+            sourcePlaces = { { name = "Zan Shivsproket", zone = 10, x = 86, y = 80.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 2 },
@@ -4226,6 +4489,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 200,
             sourceKind = "worldDrop",
+            skillLevels = { 200, 200, 220, 240 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -4242,6 +4506,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 90,
             sourceKind = "trainer",
+            skillLevels = { 90, 110, 125, 140 },
             bopOutput = false,
             reagents = {
                 { itemId = 2842, count = 1 },
@@ -4255,6 +4520,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "scopes",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 60, 90, 105, 120 },
             bopOutput = false,
             reagents = {
                 { itemId = 774, count = 1 },
@@ -4270,6 +4536,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "scopes",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 110, 135, 147, 160 },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -4286,7 +4553,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 180,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mazk Snipeshot", zone = 2 } },
+            skillLevels = { 180, 200, 210, 220 },
+            sourcePlaces = { { name = "Mazk Snipeshot", zone = 2, x = 28.5, y = 75.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 1 },
@@ -4303,7 +4571,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Narj Deepslice", zone = 3 }, { name = "Super-Seller 680", zone = 5 } },
+            skillLevels = { 175, 215, 235, 255 },
+            sourcePlaces = { { name = "Narj Deepslice", zone = 3, x = 45.6, y = 47.6, faction = "alliance" }, { name = "Super-Seller 680", zone = 5, x = 40.5, y = 79.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -4321,7 +4590,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 165,
             faction = "horde",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Tunkk", zone = 3 } },
+            skillLevels = { 165, 185, 195, 205 },
+            sourcePlaces = { { name = "Tunkk", zone = 3, x = 74.8, y = 34.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -4340,7 +4610,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 165,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Androd Fadran", zone = 3 } },
+            skillLevels = { 165, 185, 195, 205 },
+            sourcePlaces = { { name = "Androd Fadran", zone = 3, x = 45, y = 46.9, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -4359,7 +4630,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 50,
             faction = "horde",
             sourceKind = "quest",
-            sourcePlaces = { { zone = 17 } },
+            skillLevels = { 50, 80, 100, 120 },
+            sourcePlaces = { { zone = 17, x = 53.5, y = 13.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2447, count = 1 },
@@ -4377,7 +4649,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 215,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 11 } },
+            skillLevels = { 215, 230, 250, 270 },
+            sourcePlaces = { { zone = 11, x = 25.8, y = 44.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -4395,7 +4668,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 40,
             faction = "horde",
             sourceKind = "quest",
-            sourcePlaces = { { zone = 18 } },
+            skillLevels = { 40, 70, 85, 100 },
+            sourcePlaces = { { zone = 18, x = 44.1, y = 44.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 4 },
@@ -4413,7 +4687,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 10,
             faction = "alliance",
             sourceKind = "quest",
-            sourcePlaces = { { zone = 19 } },
+            skillLevels = { 10, 50, 70, 90 },
+            sourcePlaces = { { zone = 19, x = 57.1, y = 61.3, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 5465, count = 1 },
@@ -4429,7 +4704,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 20,
             faction = "horde",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Grimtak", zone = 20 } },
+            skillLevels = { 20, 60, 80, 100 },
+            sourcePlaces = { { name = "Grimtak", zone = 20, x = 51.2, y = 42.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 5466, count = 1 },
@@ -4446,7 +4722,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 35,
             faction = "horde",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Wunna Darkmane", zone = 21 } },
+            skillLevels = { 35, 75, 95, 115 },
+            sourcePlaces = { { name = "Wunna Darkmane", zone = 21, x = 46.1, y = 58.2, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 1 },
@@ -4464,7 +4741,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 50,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Laird", zone = 22 } },
+            skillLevels = { 50, 90, 110, 130 },
+            sourcePlaces = { { name = "Laird", zone = 22, x = 36.8, y = 44.3, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 1 },
@@ -4481,7 +4759,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 50,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Tari'qa", zone = 6 } },
+            skillLevels = { 50, 90, 110, 130 },
+            sourcePlaces = { { name = "Tari'qa", zone = 6, x = 51.7, y = 30.1, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4536, count = 1 },
@@ -4498,7 +4777,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             requiredSkill = 90,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Prospector Khazgorm", zone = 6 } },
+            skillLevels = { 90, 130, 150, 170 },
+            sourcePlaces = { { name = "Prospector Khazgorm", zone = 6, x = 47.4, y = 84.8, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 5051, count = 1 },
@@ -4515,7 +4795,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 100,
             faction = "horde",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Tari'qa", zone = 6 } },
+            skillLevels = { 100, 140, 160, 180 },
+            sourcePlaces = { { name = "Tari'qa", zone = 6, x = 51.7, y = 30.1, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -4532,7 +4813,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             requiredSkill = 110,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Ulthaan", zone = 4 }, { name = "Vendor-Tron 1000", zone = 5 } },
+            skillLevels = { 110, 150, 170, 190 },
+            sourcePlaces = { { name = "Ulthaan", zone = 4, x = 50, y = 66.7, faction = "alliance" }, { name = "Vendor-Tron 1000", zone = 5, x = 60.3, y = 38.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 4 },
@@ -4547,6 +4829,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "scopes",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 135, 160, 172, 185 },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -4562,6 +4845,7 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 50, 90, 110, 130 },
             bopOutput = false,
             reagents = {
                 { itemId = 159, count = 1 },
@@ -4575,6 +4859,7 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 125, 165, 185, 205 },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -4591,7 +4876,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 90,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kriggon Talsone", zone = 23 }, { name = "Heldan Galesong", zone = 22 } },
+            skillLevels = { 90, 130, 150, 170 },
+            sourcePlaces = { { name = "Kriggon Talsone", zone = 23, x = 36.2, y = 90.1, faction = "alliance" }, { name = "Heldan Galesong", zone = 22, x = 37, y = 56.3, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 1179, count = 1 },
@@ -4607,6 +4893,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dagger",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 110, 140, 155, 170 },
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 6 },
@@ -4625,6 +4912,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 140,
             requiredSkill = 140,
             sourceKind = "worldDrop",
+            skillLevels = { 140, 170, 185, 200 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -4643,6 +4931,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "back",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 90, 115, 132, 150 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -4660,7 +4949,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 60,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Xandar Goodbeard", zone = 24 }, { name = "Hagrus", zone = 25 }, { name = "Defias Profiteer", zone = 23 }, { name = "Ranik", zone = 6 } },
+            skillLevels = { 60, 90, 110, 130 },
+            sourcePlaces = { { name = "Xandar Goodbeard", zone = 24, x = 82.5, y = 63.5, faction = "alliance" }, { name = "Hagrus", zone = 25, x = 46, y = 45.9, faction = "horde" }, { name = "Defias Profiteer", zone = 23, x = 43.5, y = 66.9 }, { name = "Ranik", zone = 6, x = 61.9, y = 38.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3371, count = 1 },
@@ -4677,7 +4967,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 175,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Hagrus", zone = 25 }, { name = "Ulthir", zone = 26 } },
+            skillLevels = { 175, 195, 215, 235 },
+            sourcePlaces = { { name = "Hagrus", zone = 25, x = 46, y = 45.9, faction = "horde" }, { name = "Ulthir", zone = 26, x = 56, y = 24.6, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3356, count = 1 },
@@ -4712,7 +5003,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 150,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Soolie Berryfizz", zone = 27 }, { name = "Ulthir", zone = 26 }, { name = "Kor'geld", zone = 25 } },
+            skillLevels = { 150, 175, 195, 215 },
+            sourcePlaces = { { name = "Soolie Berryfizz", zone = 27, x = 66.6, y = 54.5, faction = "alliance" }, { name = "Ulthir", zone = 26, x = 56, y = 24.6, faction = "alliance" }, { name = "Kor'geld", zone = 25, x = 56.1, y = 35.8, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -4728,6 +5020,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 190, 210, 220, 230 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -4744,7 +5037,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             requiredSkill = 70,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rathis Tomber", zone = 28 }, { name = "Gina MacGregor", zone = 23 }, { name = "Mahu", zone = 18 }, { name = "Valdaron", zone = 22 } },
+            skillLevels = { 70, 95, 112, 130 },
+            sourcePlaces = { { name = "Rathis Tomber", zone = 28, x = 47.2, y = 28.7, faction = "horde" }, { name = "Gina MacGregor", zone = 23, x = 57.6, y = 54, faction = "alliance" }, { name = "Mahu", zone = 18, x = 43.8, y = 44.6, faction = "horde" }, { name = "Valdaron", zone = 22, x = 38.1, y = 40.6, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -4761,7 +5055,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 115,
             requiredSkill = 115,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Amy Davenport", zone = 29 }, { name = "Jennabink Powerseam", zone = 14 }, { name = "Rann Flamespinner", zone = 24 }, { name = "Mahu", zone = 18 } },
+            skillLevels = { 115, 140, 157, 175 },
+            sourcePlaces = { { name = "Amy Davenport", zone = 29, x = 29.1, y = 47.5, faction = "alliance" }, { name = "Jennabink Powerseam", zone = 14, x = 8.1, y = 55.9, faction = "alliance" }, { name = "Rann Flamespinner", zone = 24, x = 36, y = 46, faction = "alliance" }, { name = "Mahu", zone = 18, x = 43.8, y = 44.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -4777,6 +5072,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 135, 155, 170, 185 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -4794,6 +5090,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 150,
             requiredSkill = 150,
             sourceKind = "drop",
+            skillLevels = { 150, 170, 185, 200 },
             sourcePlaces = { { zone = 9 }, { zone = 8 }, { zone = 22 } },
             bopOutput = false,
             reagents = {
@@ -4811,6 +5108,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "worldDrop",
+            skillLevels = { 175, 195, 210, 225 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -4829,6 +5127,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 185,
             requiredSkill = 185,
             sourceKind = "drop",
+            skillLevels = { 185, 205, 220, 235 },
             sourcePlaces = { { zone = 15 }, { zone = 7 }, { zone = 10 } },
             bopOutput = false,
             reagents = {
@@ -4847,7 +5146,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             requiredSkill = 90,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gina MacGregor", zone = 23 }, { name = "Andrew Hilbert", zone = 17 }, { name = "Mavralyn", zone = 22 } },
+            skillLevels = { 90, 120, 135, 150 },
+            sourcePlaces = { { name = "Gina MacGregor", zone = 23, x = 57.6, y = 54, faction = "alliance" }, { name = "Andrew Hilbert", zone = 17, x = 43.2, y = 40.7, faction = "horde" }, { name = "Mavralyn", zone = 22, x = 37, y = 41.2, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 6 },
@@ -4865,7 +5165,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 95,
             requiredSkill = 95,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gina MacGregor", zone = 23 }, { name = "Andrew Hilbert", zone = 17 }, { name = "Mavralyn", zone = 22 } },
+            skillLevels = { 95, 125, 140, 155 },
+            sourcePlaces = { { name = "Gina MacGregor", zone = 23, x = 57.6, y = 54, faction = "alliance" }, { name = "Andrew Hilbert", zone = 17, x = 43.2, y = 40.7, faction = "horde" }, { name = "Mavralyn", zone = 22, x = 37, y = 41.2, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 8 },
@@ -4884,7 +5185,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 170,
             requiredSkill = 170,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Micha Yance", zone = 7 }, { name = "Christoph Jeffcoat", zone = 7 }, { name = "Blixrez Goodstitch", zone = 2 } },
+            skillLevels = { 170, 190, 200, 210 },
+            sourcePlaces = { { name = "Micha Yance", zone = 7, x = 49, y = 55.1, faction = "alliance" }, { name = "Christoph Jeffcoat", zone = 7, x = 62.4, y = 19.1, faction = "horde" }, { name = "Blixrez Goodstitch", zone = 2, x = 28.2, y = 77.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 3 },
@@ -4903,7 +5205,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 190,
             requiredSkill = 190,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Helenia Olden", zone = 15 } },
+            skillLevels = { 190, 210, 220, 230 },
+            sourcePlaces = { { name = "Helenia Olden", zone = 15, x = 66.4, y = 51.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 14 },
@@ -4920,6 +5223,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 40, 55, 70 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 3 },
@@ -4936,6 +5240,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 105,
             requiredSkill = 105,
             sourceKind = "worldDrop",
+            skillLevels = { 105, 130, 142, 155 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -4952,6 +5257,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 115, 140, 152, 165 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 12 },
@@ -4967,6 +5273,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 160, 180, 190, 200 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -4984,7 +5291,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 170,
             requiredSkill = 170,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Lardan", zone = 4 }, { name = "Hammon Karwn", zone = 3 }, { name = "Jandia", zone = 9 }, { name = "Keena", zone = 3 } },
+            skillLevels = { 170, 190, 200, 210 },
+            sourcePlaces = { { name = "Lardan", zone = 4, x = 34.8, y = 49.8, faction = "alliance" }, { name = "Hammon Karwn", zone = 3, x = 46.5, y = 47.3, faction = "alliance" }, { name = "Jandia", zone = 9, x = 46.1, y = 51.5, faction = "horde" }, { name = "Keena", zone = 3, x = 74, y = 32.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -5000,6 +5308,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 175, 195, 205, 215 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -5016,6 +5325,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 125,
             requiredSkill = 125,
             sourceKind = "worldDrop",
+            skillLevels = { 185, 205, 215, 225 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -5032,6 +5342,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 190, 210, 220, 230 },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 4 },
@@ -5047,6 +5358,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 90, 120, 140, 160 },
             bopOutput = false,
             reagents = {
                 { itemId = 3371, count = 1 },
@@ -5062,6 +5374,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "healing",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 155, 175, 195, 215 },
             bopOutput = false,
             reagents = {
                 { itemId = 3356, count = 1 },
@@ -5078,6 +5391,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             faction = "alliance",
             sourceKind = "trainer",
+            skillLevels = { 1, 55, 75, 95 },
             bopOutput = false,
             reagents = {
                 { itemId = 765, count = 2 },
@@ -5093,7 +5407,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kelsey Yance", zone = 2 } },
+            skillLevels = { 175, 215, 235, 255 },
+            sourcePlaces = { { name = "Kelsey Yance", zone = 2, x = 28.2, y = 74.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -5110,6 +5425,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 150,
             sourceKind = "worldDrop",
+            skillLevels = { 150, 180, 195, 210 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -5126,6 +5442,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             requiredSkill = 165,
             sourceKind = "worldDrop",
+            skillLevels = { 165, 190, 202, 215 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -5142,6 +5459,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 185, 210, 222, 235 },
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 2 },
@@ -5158,6 +5476,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 190,
             sourceKind = "worldDrop",
+            skillLevels = { 190, 215, 227, 240 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -5176,7 +5495,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 100,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Xandar Goodbeard", zone = 24 }, { name = "Kzixx", zone = 8 }, { name = "Hula'mahi", zone = 6 } },
+            skillLevels = { 100, 130, 150, 170 },
+            sourcePlaces = { { name = "Xandar Goodbeard", zone = 24, x = 82.5, y = 63.5, faction = "alliance" }, { name = "Kzixx", zone = 8, x = 81.9, y = 19.9 }, { name = "Hula'mahi", zone = 6, x = 51.4, y = 30.2, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2452, count = 1 },
@@ -5194,7 +5514,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 135,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Christoph Jeffcoat", zone = 7 }, { name = "Harklan Moongrove", zone = 4 } },
+            skillLevels = { 135, 160, 180, 200 },
+            sourcePlaces = { { name = "Christoph Jeffcoat", zone = 7, x = 62.4, y = 19.1, faction = "horde" }, { name = "Harklan Moongrove", zone = 4, x = 50.8, y = 67, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3356, count = 1 },
@@ -5212,7 +5533,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 165,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Jeeda", zone = 30 }, { name = "Nandar Branson", zone = 7 } },
+            skillLevels = { 165, 210, 230, 250 },
+            sourcePlaces = { { name = "Jeeda", zone = 30, x = 47.6, y = 61.7, faction = "horde" }, { name = "Nandar Branson", zone = 7, x = 50.9, y = 57.1, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -5230,7 +5552,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 190,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Drovnar Strongbrew", zone = 3 }, { name = "Glyx Brewright", zone = 2 } },
+            skillLevels = { 190, 205, 225, 245 },
+            sourcePlaces = { { name = "Drovnar Strongbrew", zone = 3, x = 46.4, y = 47.1, faction = "alliance" }, { name = "Glyx Brewright", zone = 2, x = 28.1, y = 78 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -5248,7 +5571,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 190,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Logannas", zone = 31 }, { name = "Bronk", zone = 31 }, { name = "Glyx Brewright", zone = 2 }, { name = "Alchemist Pestlezugg", zone = 13 } },
+            skillLevels = { 190, 210, 230, 250 },
+            sourcePlaces = { { name = "Logannas", zone = 31, x = 32.7, y = 44, faction = "alliance" }, { name = "Bronk", zone = 31, x = 76.1, y = 43.3, faction = "horde" }, { name = "Glyx Brewright", zone = 2, x = 28.1, y = 78 }, { name = "Alchemist Pestlezugg", zone = 13, x = 50.9, y = 27 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3357, count = 1 },
@@ -5264,6 +5588,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 65, 105, 125, 145 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 2 },
@@ -5278,6 +5603,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 70, 90, 110 },
             reagents = {
                 { itemId = 10940, count = 1 },
             },
@@ -5289,6 +5615,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 15, 70, 90, 110 },
             reagents = {
                 { itemId = 10940, count = 1 },
             },
@@ -5300,6 +5627,7 @@ RecipeRegistryRecipeMetadata = {
             category = "rods",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 1, 5, 7, 10 },
             bopOutput = true,
             reagents = {
                 { itemId = 6217, count = 1 },
@@ -5314,6 +5642,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 40, 90, 110, 130 },
             reagents = {
                 { itemId = 10938, count = 1 },
                 { itemId = 10940, count = 2 },
@@ -5326,6 +5655,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 80, 100, 120 },
             reagents = {
                 { itemId = 10938, count = 1 },
                 { itemId = 10940, count = 1 },
@@ -5339,6 +5669,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "tools",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 50, 70, 80, 90 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 6 },
@@ -5353,6 +5684,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 20,
             sourceKind = "worldDrop",
+            skillLevels = { 20, 80, 100, 120 },
             worldDrop = true,
             reagents = {
                 { itemId = 10938, count = 1 },
@@ -5365,6 +5697,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 45, 95, 115, 135 },
             reagents = {
                 { itemId = 10938, count = 2 },
                 { itemId = 10940, count = 1 },
@@ -5377,6 +5710,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 50, 100, 120, 140 },
             reagents = {
                 { itemId = 10940, count = 3 },
             },
@@ -5389,6 +5723,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 30, 55, 72, 90 },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -5403,6 +5738,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 30, 55, 72, 90 },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -5420,6 +5756,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 55,
             requiredSkill = 55,
             sourceKind = "worldDrop",
+            skillLevels = { 55, 80, 97, 115 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -5438,7 +5775,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 55,
             requiredSkill = 55,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Tharynn Bouden", zone = 32 }, { name = "Borya", zone = 25 }, { name = "Valdaron", zone = 22 }, { name = "Wrahk", zone = 6 } },
+            skillLevels = { 55, 80, 97, 115 },
+            sourcePlaces = { { name = "Tharynn Bouden", zone = 32, x = 41.9, y = 67.1, faction = "alliance" }, { name = "Borya", zone = 25, x = 63, y = 51.2, faction = "horde" }, { name = "Valdaron", zone = 22, x = 38.1, y = 40.6, faction = "alliance" }, { name = "Wrahk", zone = 6, x = 52.2, y = 31.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -5456,7 +5794,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             requiredSkill = 70,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Elynna", zone = 26 }, { name = "Ranik", zone = 6 }, { name = "Andrew Hilbert", zone = 17 }, { name = "Wrahk", zone = 6 } },
+            skillLevels = { 70, 95, 112, 130 },
+            sourcePlaces = { { name = "Elynna", zone = 26, x = 64.4, y = 21.6, faction = "alliance" }, { name = "Ranik", zone = 6, x = 61.9, y = 38.7 }, { name = "Andrew Hilbert", zone = 17, x = 43.2, y = 40.7, faction = "horde" }, { name = "Wrahk", zone = 6, x = 52.2, y = 31.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 2 },
@@ -5491,7 +5830,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 100,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gina MacGregor", zone = 23 }, { name = "Alexandra Bolero", zone = 1 }, { name = "Mallen Swain", zone = 7 }, { name = "Borya", zone = 25 } },
+            skillLevels = { 100, 125, 142, 160 },
+            sourcePlaces = { { name = "Gina MacGregor", zone = 23, x = 57.6, y = 54, faction = "alliance" }, { name = "Alexandra Bolero", zone = 1, x = 53.3, y = 81.7, faction = "alliance" }, { name = "Mallen Swain", zone = 7, x = 62, y = 20.9, faction = "horde" }, { name = "Borya", zone = 25, x = 63, y = 51.2, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -5509,7 +5849,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 115,
             requiredSkill = 115,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rann Flamespinner", zone = 24 }, { name = "Ranik", zone = 6 }, { name = "Jennabink Powerseam", zone = 14 }, { name = "Sheri Zipstitch", zone = 8 } },
+            skillLevels = { 115, 140, 157, 175 },
+            sourcePlaces = { { name = "Rann Flamespinner", zone = 24, x = 36, y = 46, faction = "alliance" }, { name = "Ranik", zone = 6, x = 61.9, y = 38.7 }, { name = "Jennabink Powerseam", zone = 14, x = 8.1, y = 55.9, faction = "alliance" }, { name = "Sheri Zipstitch", zone = 8, x = 75.7, y = 45.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 3 },
@@ -5524,6 +5865,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "2h_weapon",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 100, 130, 150, 170 },
             reagents = {
                 { itemId = 10940, count = 4 },
                 { itemId = 10978, count = 1 },
@@ -5536,6 +5878,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 60, 105, 125, 145 },
             reagents = {
                 { itemId = 10938, count = 2 },
                 { itemId = 10940, count = 2 },
@@ -5550,7 +5893,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             requiredSkill = 1,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Harn Longcast", zone = 21 }, { name = "Gretta Ganter", zone = 12 }, { name = "Catherine Leland", zone = 1 }, { name = "Martine Tramblay", zone = 33 } },
+            skillLevels = { 1, 45, 65, 85 },
+            sourcePlaces = { { name = "Harn Longcast", zone = 21, x = 47.5, y = 55.1, faction = "horde" }, { name = "Gretta Ganter", zone = 12, x = 31.5, y = 44.7, faction = "alliance" }, { name = "Catherine Leland", zone = 1, x = 55.1, y = 69.5, faction = "alliance" }, { name = "Martine Tramblay", zone = 33, x = 65.8, y = 59.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 6291, count = 1 },
@@ -5565,7 +5909,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             requiredSkill = 1,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Tansy Puddlefizz", zone = 27 }, { name = "Kriggon Talsone", zone = 23 }, { name = "Martine Tramblay", zone = 33 }, { name = "Zansoa", zone = 20 } },
+            skillLevels = { 1, 45, 65, 85 },
+            sourcePlaces = { { name = "Tansy Puddlefizz", zone = 27, x = 48, y = 6.3, faction = "alliance" }, { name = "Kriggon Talsone", zone = 23, x = 36.2, y = 90.1, faction = "alliance" }, { name = "Martine Tramblay", zone = 33, x = 65.8, y = 59.7, faction = "horde" }, { name = "Zansoa", zone = 20, x = 56.1, y = 73.4, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 6303, count = 1 },
@@ -5580,7 +5925,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 50,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Killian Sanatha", zone = 17 }, { name = "Khara Deepwater", zone = 24 }, { name = "Lizbeth Cromwell", zone = 34 }, { name = "Tharynn Bouden", zone = 32 } },
+            skillLevels = { 50, 90, 110, 130 },
+            sourcePlaces = { { name = "Killian Sanatha", zone = 17, x = 33, y = 17.8, faction = "horde" }, { name = "Khara Deepwater", zone = 24, x = 39.5, y = 39.3, faction = "alliance" }, { name = "Lizbeth Cromwell", zone = 34, x = 81.2, y = 31, faction = "horde" }, { name = "Tharynn Bouden", zone = 32, x = 41.9, y = 67.1, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 6289, count = 1 },
@@ -5596,7 +5942,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 50,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Khara Deepwater", zone = 24 } },
+            skillLevels = { 50, 90, 110, 130 },
+            sourcePlaces = { { name = "Khara Deepwater", zone = 24, x = 39.5, y = 39.3, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 1 },
@@ -5612,7 +5959,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 100,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kilxx", zone = 6 }, { name = "Ronald Burch", zone = 34 }, { name = "Lindea Rabonne", zone = 7 }, { name = "Naal Mistrunner", zone = 18 } },
+            skillLevels = { 100, 140, 160, 180 },
+            sourcePlaces = { { name = "Kilxx", zone = 6, x = 62.8, y = 38.2 }, { name = "Ronald Burch", zone = 34, x = 62.4, y = 43.4, faction = "horde" }, { name = "Lindea Rabonne", zone = 7, x = 50.6, y = 61, faction = "alliance" }, { name = "Naal Mistrunner", zone = 18, x = 51.1, y = 52.2, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 6308, count = 1 },
@@ -5627,6 +5975,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 60,
             sourceKind = "worldDrop",
+            skillLevels = { 60, 105, 125, 145 },
             worldDrop = true,
             reagents = {
                 { itemId = 10938, count = 2 },
@@ -5641,6 +5990,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             requiredSkill = 90,
             sourceKind = "trainer",
+            skillLevels = { 70, 110, 130, 150 },
             reagents = {
                 { itemId = 10939, count = 1 },
                 { itemId = 10940, count = 3 },
@@ -5656,7 +6006,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 80,
             faction = "horde",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kithas", zone = 25 }, { name = "Lilly", zone = 17 } },
+            skillLevels = { 80, 115, 135, 155 },
+            sourcePlaces = { { name = "Kithas", zone = 25, x = 53.7, y = 38, faction = "horde" }, { name = "Lilly", zone = 17, x = 43.1, y = 50.8, faction = "horde" } },
             reagents = {
                 { itemId = 10938, count = 1 },
                 { itemId = 10939, count = 1 },
@@ -5669,6 +6020,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 80, 115, 135, 155 },
             reagents = {
                 { itemId = 10939, count = 1 },
                 { itemId = 10940, count = 2 },
@@ -5683,6 +6035,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 80,
             requiredSkill = 80,
             sourceKind = "worldDrop",
+            skillLevels = { 80, 115, 135, 155 },
             worldDrop = true,
             reagents = {
                 { itemId = 10940, count = 5 },
@@ -5697,6 +6050,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             requiredSkill = 90,
             sourceKind = "worldDrop",
+            skillLevels = { 90, 120, 140, 160 },
             worldDrop = true,
             reagents = {
                 { itemId = 10939, count = 2 },
@@ -5710,6 +6064,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 90, 120, 140, 160 },
             reagents = {
                 { itemId = 10939, count = 1 },
                 { itemId = 10940, count = 2 },
@@ -5725,7 +6080,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 100,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nata Dawnstrider", zone = 18 }, { name = "Tilli Thistlefuzz", zone = 27 }, { name = "Kithas", zone = 25 }, { name = "Leo Sarn", zone = 17 } },
+            skillLevels = { 100, 130, 150, 170 },
+            sourcePlaces = { { name = "Nata Dawnstrider", zone = 18, x = 46.5, y = 38.8, faction = "horde" }, { name = "Tilli Thistlefuzz", zone = 27, x = 60.7, y = 44.2, faction = "alliance" }, { name = "Kithas", zone = 25, x = 53.7, y = 38, faction = "horde" }, { name = "Leo Sarn", zone = 17, x = 53.9, y = 82.3, faction = "horde" } },
             reagents = {
                 { itemId = 10939, count = 3 },
             },
@@ -5737,6 +6093,7 @@ RecipeRegistryRecipeMetadata = {
             category = "rods",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 100, 130, 150, 170 },
             bopOutput = true,
             reagents = {
                 { itemId = 6218, count = 1 },
@@ -5753,6 +6110,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 95, 125, 140, 155 },
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 6 },
@@ -5766,6 +6124,7 @@ RecipeRegistryRecipeMetadata = {
             category = "rods",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 100, 105, 107, 110 },
             bopOutput = false,
             reagents = {
                 { itemId = 2842, count = 1 },
@@ -5781,7 +6140,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 50,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kriggon Talsone", zone = 23 }, { name = "Heldan Galesong", zone = 22 }, { name = "Killian Sanatha", zone = 17 }, { name = "Catherine Leland", zone = 1 } },
+            skillLevels = { 50, 90, 110, 130 },
+            sourcePlaces = { { name = "Kriggon Talsone", zone = 23, x = 36.2, y = 90.1, faction = "alliance" }, { name = "Heldan Galesong", zone = 22, x = 37, y = 56.3, faction = "alliance" }, { name = "Killian Sanatha", zone = 17, x = 33, y = 17.8, faction = "horde" }, { name = "Catherine Leland", zone = 1, x = 55.1, y = 69.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 6361, count = 1 },
@@ -5796,7 +6156,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Heldan Galesong", zone = 22 }, { name = "Kelsey Yance", zone = 2 }, { name = "Shankys", zone = 25 }, { name = "Wik'Tar", zone = 4 } },
+            skillLevels = { 175, 190, 210, 230 },
+            sourcePlaces = { { name = "Heldan Galesong", zone = 22, x = 37, y = 56.3, faction = "alliance" }, { name = "Kelsey Yance", zone = 2, x = 28.2, y = 74.4 }, { name = "Shankys", zone = 25, x = 69.1, y = 31.4, faction = "horde" }, { name = "Wik'Tar", zone = 4, x = 11.8, y = 34.1, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 6362, count = 1 },
@@ -5809,6 +6170,7 @@ RecipeRegistryRecipeMetadata = {
             category = "oils",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 80, 80, 90, 100 },
             bopOutput = false,
             reagents = {
                 { itemId = 3371, count = 1 },
@@ -5822,6 +6184,7 @@ RecipeRegistryRecipeMetadata = {
             category = "oils",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 130, 150, 160, 170 },
             bopOutput = false,
             reagents = {
                 { itemId = 3371, count = 1 },
@@ -5836,6 +6199,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 100, 130, 150, 170 },
             bopOutput = false,
             reagents = {
                 { itemId = 2452, count = 1 },
@@ -5851,6 +6215,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 140, 165, 185, 205 },
             bopOutput = false,
             reagents = {
                 { itemId = 3356, count = 1 },
@@ -5865,6 +6230,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 120, 145, 165, 185 },
             reagents = {
                 { itemId = 10940, count = 4 },
                 { itemId = 10998, count = 1 },
@@ -5879,6 +6245,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 120,
             requiredSkill = 120,
             sourceKind = "worldDrop",
+            skillLevels = { 120, 145, 165, 185 },
             worldDrop = true,
             reagents = {
                 { itemId = 10998, count = 2 },
@@ -5891,6 +6258,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 125, 150, 170, 190 },
             reagents = {
                 { itemId = 6371, count = 1 },
                 { itemId = 10998, count = 1 },
@@ -5905,6 +6273,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 125,
             requiredSkill = 125,
             sourceKind = "trainer",
+            skillLevels = { 125, 150, 170, 190 },
             reagents = {
                 { itemId = 10940, count = 8 },
             },
@@ -5918,7 +6287,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 125,
             requiredSkill = 125,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nata Dawnstrider", zone = 18 }, { name = "Zixil", zone = 7 } },
+            skillLevels = { 125, 150, 170, 190 },
+            sourcePlaces = { { name = "Nata Dawnstrider", zone = 18, x = 46.5, y = 38.8, faction = "horde" }, { name = "Zixil", zone = 7, x = 53.5, y = 38.3 } },
             reagents = {
                 { itemId = 10940, count = 6 },
                 { itemId = 10998, count = 2 },
@@ -5933,6 +6303,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 120,
             requiredSkill = 120,
             sourceKind = "worldDrop",
+            skillLevels = { 120, 145, 162, 180 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -5951,6 +6322,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 120,
             requiredSkill = 120,
             sourceKind = "worldDrop",
+            skillLevels = { 120, 145, 162, 180 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -5969,7 +6341,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             requiredSkill = 90,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kalldan Felmoon", zone = 6 } },
+            skillLevels = { 90, 120, 135, 150 },
+            sourcePlaces = { { name = "Kalldan Felmoon", zone = 6, x = 46.2, y = 36.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -5987,7 +6360,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 105,
             requiredSkill = 105,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kalldan Felmoon", zone = 6 } },
+            skillLevels = { 105, 130, 142, 155 },
+            sourcePlaces = { { name = "Kalldan Felmoon", zone = 6, x = 46.2, y = 36.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -6004,7 +6378,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 115,
             requiredSkill = 115,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 6 } },
+            skillLevels = { 115, 140, 152, 165 },
+            sourcePlaces = { { zone = 6, x = 45.8, y = 36.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -6021,6 +6396,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 85,
             requiredSkill = 85,
             sourceKind = "worldDrop",
+            skillLevels = { 85, 125, 145, 165 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -6038,6 +6414,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 90,
             sourceKind = "worldDrop",
+            skillLevels = { 90, 120, 140, 160 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -6056,7 +6433,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 185,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 11 } },
+            skillLevels = { 185, 185, 205, 225 },
+            sourcePlaces = { { zone = 11, x = 42.4, y = 52.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4306, count = 1 },
@@ -6075,7 +6453,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 90,
             faction = "alliance",
             sourceKind = "quest",
-            sourcePlaces = { { zone = 26 } },
+            skillLevels = { 90, 115, 130, 145 },
+            sourcePlaces = { { zone = 26, x = 64.3, y = 21.9, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 6 },
@@ -6092,6 +6471,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "tools",
             sortOrder = 50,
             sourceKind = "trainer",
+            skillLevels = { 100, 115, 122, 130 },
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 1 },
@@ -6110,6 +6490,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 100,
             sourceKind = "worldDrop",
+            skillLevels = { 100, 115, 122, 130 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -6145,7 +6526,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 100,
             faction = "alliance",
             sourceKind = "quest",
-            sourcePlaces = { { zone = 27 } },
+            skillLevels = { 100, 140, 160, 180 },
+            sourcePlaces = { { zone = 27, x = 48.5, y = 43, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 818, count = 2 },
@@ -6177,6 +6559,7 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 40, 65, 82, 100 },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -6193,6 +6576,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 110, 135, 152, 170 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -6207,6 +6591,7 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 160, 170, 175, 180 },
             bopOutput = false,
             reagents = {
                 { itemId = 2324, count = 2 },
@@ -6221,6 +6606,7 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 175, 185, 190, 195 },
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -6237,6 +6623,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             requiredSkill = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 45, 65, 85 },
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 1 },
@@ -6252,7 +6639,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 40,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Drac Roughcut", zone = 24 }, { name = "Andrew Hilbert", zone = 17 } },
+            skillLevels = { 40, 80, 100, 120 },
+            sourcePlaces = { { name = "Drac Roughcut", zone = 24, x = 35.6, y = 49, faction = "alliance" }, { name = "Andrew Hilbert", zone = 17, x = 43.2, y = 40.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3173, count = 1 },
@@ -6266,6 +6654,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 140, 160, 175, 190 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 3 },
@@ -6281,6 +6670,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 145, 155, 160, 165 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -6296,6 +6686,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 160, 170, 175, 180 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -6310,6 +6701,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 170, 190, 205, 220 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -6325,6 +6717,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 175, 195, 210, 225 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -6342,6 +6735,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 60,
             sourceKind = "trainer",
+            skillLevels = { 150, 150, 152, 155 },
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 1 },
@@ -6355,6 +6749,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 190, 210, 225, 240 },
             bopOutput = true,
             reagents = {
                 { itemId = 4291, count = 2 },
@@ -6373,6 +6768,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 175, 195, 210, 225 },
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -6389,6 +6785,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 180, 200, 215, 230 },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 2 },
@@ -6403,6 +6800,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 15, 50, 67, 85 },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -6437,6 +6835,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 145,
             requiredSkill = 145,
             sourceKind = "worldDrop",
+            skillLevels = { 145, 165, 180, 195 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -6456,6 +6855,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 150,
             requiredSkill = 150,
             sourceKind = "worldDrop",
+            skillLevels = { 150, 170, 185, 200 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -6475,6 +6875,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 165,
             requiredSkill = 165,
             sourceKind = "worldDrop",
+            skillLevels = { 165, 185, 200, 215 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -6493,7 +6894,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Jun'ha", zone = 3 }, { name = "Brienna Starglow", zone = 31 } },
+            skillLevels = { 175, 195, 210, 225 },
+            sourcePlaces = { { name = "Jun'ha", zone = 3, x = 72.7, y = 36.5, faction = "horde" }, { name = "Brienna Starglow", zone = 31, x = 89, y = 45.9, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -6511,7 +6913,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 180,
             requiredSkill = 180,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Xizk Goodstitch", zone = 2 } },
+            skillLevels = { 180, 200, 215, 230 },
+            sourcePlaces = { { name = "Xizk Goodstitch", zone = 2, x = 28.7, y = 76.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -6528,6 +6931,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 185, 205, 215, 225 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -6545,6 +6949,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 190,
             requiredSkill = 190,
             sourceKind = "worldDrop",
+            skillLevels = { 190, 210, 225, 240 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -6564,6 +6969,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 190,
             requiredSkill = 190,
             sourceKind = "worldDrop",
+            skillLevels = { 190, 210, 225, 240 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -6583,6 +6989,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 195,
             requiredSkill = 195,
             sourceKind = "worldDrop",
+            skillLevels = { 195, 215, 230, 245 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -6601,6 +7008,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 195, 215, 225, 235 },
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -6618,7 +7026,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 205,
             requiredSkill = 205,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Vizzklick", zone = 13 } },
+            skillLevels = { 205, 220, 235, 250 },
+            sourcePlaces = { { name = "Vizzklick", zone = 13, x = 51, y = 27.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 4 },
@@ -6636,6 +7045,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 210, 225, 240, 255 },
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 4 },
@@ -6654,6 +7064,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dagger",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 30, 70, 90, 110 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 1 },
@@ -6673,7 +7084,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 130,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Nixx Sprocketspring", zone = 13 } },
+            skillLevels = { 225, 245, 255, 265 },
+            sourcePlaces = { { name = "Nixx Sprocketspring", zone = 13, x = 52.5, y = 27.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 4 },
@@ -6690,6 +7102,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cloaks",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 40, 55, 70 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 2 },
@@ -6704,6 +7117,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 40, 55, 70 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 2 },
@@ -6717,6 +7131,7 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 30, 60, 75, 90 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 4 },
@@ -6730,6 +7145,7 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 30, 60, 75, 90 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 3 },
@@ -6746,6 +7162,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 35,
             requiredSkill = 35,
             sourceKind = "worldDrop",
+            skillLevels = { 35, 65, 80, 95 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -6761,6 +7178,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 70, 100, 115, 130 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 6 },
@@ -6775,6 +7193,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 95, 125, 140, 155 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 10 },
@@ -6792,7 +7211,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 100,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Clyde Ranthal", zone = 29 } },
+            skillLevels = { 100, 125, 137, 150 },
+            sourcePlaces = { { name = "Clyde Ranthal", zone = 29, x = 88.9, y = 70.9, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 4 },
@@ -6811,7 +7231,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 120,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Wenna Silkbeard", zone = 14 } },
+            skillLevels = { 120, 145, 157, 170 },
+            sourcePlaces = { { name = "Wenna Silkbeard", zone = 14, x = 25.7, y = 25.8, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 4 },
@@ -6827,6 +7248,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 120, 145, 157, 170 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 6 },
@@ -6842,6 +7264,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 125, 150, 162, 175 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 8 },
@@ -6860,7 +7283,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 135,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Harlown Darkweave", zone = 4 } },
+            skillLevels = { 135, 160, 172, 185 },
+            sourcePlaces = { { name = "Harlown Darkweave", zone = 4, x = 18.2, y = 60, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 8 },
@@ -6878,7 +7302,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 135,
             requiredSkill = 135,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Zixil", zone = 7 } },
+            skillLevels = { 135, 160, 172, 185 },
+            sourcePlaces = { { name = "Zixil", zone = 7, x = 53.5, y = 38.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 6 },
@@ -6896,6 +7321,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 140,
             requiredSkill = 140,
             sourceKind = "worldDrop",
+            skillLevels = { 140, 165, 177, 190 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -6914,6 +7340,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 145,
             requiredSkill = 145,
             sourceKind = "worldDrop",
+            skillLevels = { 145, 170, 182, 195 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -6930,6 +7357,7 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 150, 170, 180, 190 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -6943,6 +7371,7 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 150, 170, 180, 190 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -6959,6 +7388,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 165,
             requiredSkill = 165,
             sourceKind = "worldDrop",
+            skillLevels = { 165, 185, 195, 205 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -6975,6 +7405,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 175, 195, 205, 215 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -6992,6 +7423,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "worldDrop",
+            skillLevels = { 175, 195, 205, 215 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -7007,6 +7439,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cloaks",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 180, 200, 210, 220 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 2 },
@@ -7023,6 +7456,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 185, 205, 215, 225 },
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 1 },
@@ -7040,7 +7474,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 190,
             requiredSkill = 190,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Jangdor Swiftstrider", zone = 31 }, { name = "Pratt McGrubben", zone = 31 }, { name = "Joseph Moore", zone = 34 }, { name = "Saenorion", zone = 26 } },
+            skillLevels = { 190, 210, 220, 230 },
+            sourcePlaces = { { name = "Jangdor Swiftstrider", zone = 31, x = 74.5, y = 42.9, faction = "horde" }, { name = "Pratt McGrubben", zone = 31, x = 30.6, y = 42.7, faction = "alliance" }, { name = "Joseph Moore", zone = 34, x = 70.2, y = 57.8, faction = "horde" }, { name = "Saenorion", zone = 26, x = 63.8, y = 22.1, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 8 },
@@ -7056,6 +7491,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 195, 215, 225, 235 },
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 2 },
@@ -7074,6 +7510,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 200,
             requiredSkill = 200,
             sourceKind = "worldDrop",
+            skillLevels = { 200, 220, 230, 240 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -7093,6 +7530,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 200,
             requiredSkill = 200,
             sourceKind = "worldDrop",
+            skillLevels = { 200, 220, 230, 240 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -7112,7 +7550,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 130,
             requiredSkill = 125,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gearcutter Cogspinner", zone = 27 }, { name = "Jinky Twizzlefixxit", zone = 9 } },
+            skillLevels = { 125, 150, 162, 175 },
+            sourcePlaces = { { name = "Gearcutter Cogspinner", zone = 27, x = 68, y = 43.1, faction = "alliance" }, { name = "Jinky Twizzlefixxit", zone = 9, x = 77.7, y = 77.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 774, count = 1 },
@@ -7131,6 +7570,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "tools",
             sortOrder = 60,
             sourceKind = "trainer",
+            skillLevels = { 150, 150, 160, 170 },
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 2 },
@@ -7148,7 +7588,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 160,
             requiredSkill = 165,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Veenix", zone = 30 }, { name = "Kzixx", zone = 8 }, { name = "Zixil", zone = 7 } },
+            skillLevels = { 165, 165, 180, 200 },
+            sourcePlaces = { { name = "Veenix", zone = 30, x = 58.3, y = 51.7 }, { name = "Kzixx", zone = 8, x = 81.9, y = 19.9 }, { name = "Zixil", zone = 7, x = 53.5, y = 38.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 814, count = 2 },
@@ -7168,7 +7609,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 60,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Smudge Thunderwood", zone = 10 } },
+            skillLevels = { 60, 100, 120, 140 },
+            sourcePlaces = { { name = "Smudge Thunderwood", zone = 10, x = 86.1, y = 79.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 159, count = 1 },
@@ -7186,7 +7628,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 160,
             faction = "horde",
             sourceKind = "quest",
-            sourcePlaces = { { zone = 25 } },
+            skillLevels = { 160, 185, 197, 210 },
+            sourcePlaces = { { zone = 25, x = 78, y = 21.4, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 2 },
@@ -7205,7 +7648,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 160,
             faction = "horde",
             sourceKind = "quest",
-            sourcePlaces = { { zone = 25 } },
+            skillLevels = { 160, 185, 197, 210 },
+            sourcePlaces = { { zone = 25, x = 78, y = 21.4, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 4 },
@@ -7223,7 +7667,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 175,
             faction = "horde",
             sourceKind = "quest",
-            sourcePlaces = { { zone = 25 } },
+            skillLevels = { 175, 200, 212, 225 },
+            sourcePlaces = { { zone = 25, x = 78, y = 21.4, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 10 },
@@ -7242,7 +7687,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 180,
             faction = "horde",
             sourceKind = "quest",
-            sourcePlaces = { { zone = 25 } },
+            skillLevels = { 180, 205, 217, 230 },
+            sourcePlaces = { { zone = 25, x = 78, y = 21.4, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 2 },
@@ -7261,7 +7707,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 185,
             faction = "horde",
             sourceKind = "quest",
-            sourcePlaces = { { zone = 25 } },
+            skillLevels = { 185, 210, 222, 235 },
+            sourcePlaces = { { zone = 25, x = 78, y = 21.4, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 3 },
@@ -7277,6 +7724,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 200, 225, 237, 250 },
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 3 },
@@ -7291,6 +7739,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sharpening",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 200, 200, 205, 210 },
             bopOutput = false,
             reagents = {
                 { itemId = 7912, count = 1 },
@@ -7303,6 +7752,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 200, 200, 205, 210 },
             bopOutput = false,
             reagents = {
                 { itemId = 7912, count = 4 },
@@ -7316,6 +7766,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weightstone",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 200, 200, 205, 210 },
             bopOutput = false,
             reagents = {
                 { itemId = 4306, count = 1 },
@@ -7330,6 +7781,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 205, 225, 235, 245 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 8 },
@@ -7344,6 +7796,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 205, 225, 235, 245 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 6 },
@@ -7358,6 +7811,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 210, 230, 240, 250 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -7373,6 +7827,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 210,
             requiredSkill = 210,
             sourceKind = "worldDrop",
+            skillLevels = { 210, 230, 240, 250 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -7387,6 +7842,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 215, 235, 245, 255 },
             bopOutput = false,
             reagents = {
                 { itemId = 3859, count = 14 },
@@ -7403,7 +7859,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 215,
             requiredSkill = 215,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Harggan", zone = 35 }, { name = "Gharash", zone = 36 } },
+            skillLevels = { 215, 235, 245, 255 },
+            sourcePlaces = { { name = "Harggan", zone = 35, x = 13.4, y = 44, faction = "alliance" }, { name = "Gharash", zone = 36, x = 45.5, y = 51.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 8 },
@@ -7419,6 +7876,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 215,
             sourceKind = "worldDrop",
+            skillLevels = { 215, 235, 245, 255 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -7454,7 +7912,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 220,
             requiredSkill = 220,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 2 } },
+            skillLevels = { 220, 240, 250, 260 },
+            sourcePlaces = { { zone = 2, x = 50.6, y = 20.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -7472,7 +7931,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 220,
             requiredSkill = 220,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 2 } },
+            skillLevels = { 220, 240, 250, 260 },
+            sourcePlaces = { { zone = 2, x = 50.6, y = 20.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 10 },
@@ -7491,7 +7951,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 2 } },
+            skillLevels = { 225, 245, 255, 265 },
+            sourcePlaces = { { zone = 2, x = 50.6, y = 20.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -7508,6 +7969,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9788,
             sourceKind = "trainer",
+            skillLevels = { 225, 245, 255, 265 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 10 },
@@ -7529,7 +7991,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 230,
             faction = "horde",
             sourceKind = "quest",
-            sourcePlaces = { { zone = 25 } },
+            skillLevels = { 250, 250, 260, 270 },
+            sourcePlaces = { { zone = 25, x = 80.7, y = 23.4, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -7544,6 +8007,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 230, 250, 260, 270 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 16 },
@@ -7557,6 +8021,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 230, 250, 260, 270 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 10 },
@@ -7572,6 +8037,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 80,
             requiredSkill = 235,
             sourceKind = "worldDrop",
+            skillLevels = { 235, 255, 265, 275 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -7589,6 +8055,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 235,
             requiredSkill = 235,
             sourceKind = "worldDrop",
+            skillLevels = { 235, 255, 265, 275 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -7604,6 +8071,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 235, 255, 265, 275 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 14 },
@@ -7620,6 +8088,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 245,
             requiredSkill = 245,
             sourceKind = "worldDrop",
+            skillLevels = { 245, 255, 265, 275 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -7637,7 +8106,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 240,
             requiredSkill = 240,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 13 } },
+            skillLevels = { 260, 260, 270, 280 },
+            sourcePlaces = { { zone = 13, x = 51.5, y = 28.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 16 },
@@ -7655,6 +8125,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9788,
             sourceKind = "trainer",
+            skillLevels = { 245, 265, 275, 285 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -7674,7 +8145,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 245,
             requiredSkill = 245,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 13 } },
+            skillLevels = { 265, 265, 275, 285 },
+            sourcePlaces = { { zone = 13, x = 51.5, y = 28.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 14 },
@@ -7694,7 +8166,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 245,
             requiredSkill = 245,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 13 } },
+            skillLevels = { 265, 265, 275, 285 },
+            sourcePlaces = { { zone = 13, x = 51.5, y = 28.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 16 },
@@ -7710,6 +8183,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 30, 70, 90, 110 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 1 },
@@ -7726,6 +8200,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 125, 155, 170, 185 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 1 },
@@ -7741,6 +8216,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 130, 160, 175, 190 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 2 },
@@ -7756,6 +8232,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 135, 165, 180, 195 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 2 },
@@ -7771,6 +8248,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 210, 235, 247, 260 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -7789,6 +8267,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 220,
             requiredSkill = 220,
             sourceKind = "worldDrop",
+            skillLevels = { 220, 245, 257, 270 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -7808,6 +8287,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "worldDrop",
+            skillLevels = { 225, 250, 262, 275 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -7825,6 +8305,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 230, 255, 267, 280 },
             bopOutput = false,
             reagents = {
                 { itemId = 1210, count = 4 },
@@ -7843,6 +8324,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9787,
             sourceKind = "trainer",
+            skillLevels = { 235, 260, 272, 285 },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 5 },
@@ -7864,6 +8346,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 240,
             requiredSkill = 240,
             sourceKind = "worldDrop",
+            skillLevels = { 240, 265, 277, 290 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -7884,6 +8367,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9787,
             sourceKind = "trainer",
+            skillLevels = { 245, 270, 282, 295 },
             bopOutput = false,
             reagents = {
                 { itemId = 3823, count = 2 },
@@ -7905,6 +8389,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 245,
             requiredSkill = 245,
             sourceKind = "worldDrop",
+            skillLevels = { 245, 270, 282, 295 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -7923,6 +8408,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9787,
             sourceKind = "trainer",
+            skillLevels = { 250, 275, 287, 300 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 28 },
@@ -7942,7 +8428,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 255,
             requiredSkill = 255,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Magnus Frostwake", zone = 37 } },
+            skillLevels = { 255, 280, 292, 305 },
+            sourcePlaces = { { name = "Magnus Frostwake", zone = 37, x = 68.1, y = 77.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -7961,6 +8448,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9787,
             sourceKind = "trainer",
+            skillLevels = { 260, 285, 297, 310 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 30 },
@@ -7978,6 +8466,7 @@ RecipeRegistryRecipeMetadata = {
             category = "metals",
             sortOrder = 80,
             sourceKind = "trainer",
+            skillLevels = { 175, 175, 202, 230 },
             bopOutput = false,
             reagents = {
                 { itemId = 3858, count = 1 },
@@ -7990,6 +8479,7 @@ RecipeRegistryRecipeMetadata = {
             category = "metals",
             sortOrder = 90,
             sourceKind = "trainer",
+            skillLevels = { 230, 250, 270, 290 },
             bopOutput = false,
             reagents = {
                 { itemId = 7911, count = 1 },
@@ -8002,6 +8492,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 200, 200, 200, 200 },
             bopOutput = false,
             reagents = {
                 { itemId = 8150, count = 1 },
@@ -8016,6 +8507,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "armor",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 200, 220, 230, 240 },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 1 },
@@ -8032,6 +8524,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 200,
             requiredSkill = 200,
             sourceKind = "worldDrop",
+            skillLevels = { 200, 220, 230, 240 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -8048,6 +8541,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 205, 225, 235, 245 },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 2 },
@@ -8062,6 +8556,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 205, 225, 235, 245 },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 2 },
@@ -8078,7 +8573,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 205,
             requiredSkill = 205,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Pratt McGrubben", zone = 31 }, { name = "Jangdor Swiftstrider", zone = 31 } },
+            skillLevels = { 205, 225, 235, 245 },
+            sourcePlaces = { { name = "Pratt McGrubben", zone = 31, x = 30.6, y = 42.7, faction = "alliance" }, { name = "Jangdor Swiftstrider", zone = 31, x = 74.5, y = 42.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 6 },
@@ -8094,6 +8590,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 210, 230, 240, 250 },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 6 },
@@ -8111,7 +8608,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 210,
             requiredSkill = 210,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Jangdor Swiftstrider", zone = 31 }, { name = "Nioma", zone = 35 } },
+            skillLevels = { 210, 230, 240, 250 },
+            sourcePlaces = { { name = "Jangdor Swiftstrider", zone = 31, x = 74.5, y = 42.9, faction = "horde" }, { name = "Nioma", zone = 35, x = 13.4, y = 43.3, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 3 },
@@ -8127,6 +8625,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 210, 230, 240, 250 },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 8 },
@@ -8144,6 +8643,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 215,
             requiredSkill = 215,
             sourceKind = "worldDrop",
+            skillLevels = { 215, 235, 245, 255 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -8162,6 +8662,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 220,
             requiredSkill = 220,
             sourceKind = "drop",
+            skillLevels = { 220, 240, 250, 260 },
             sourcePlaces = { { zone = 13 } },
             bopOutput = false,
             reagents = {
@@ -8180,7 +8681,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 220,
             requiredSkill = 220,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 31 } },
+            skillLevels = { 220, 240, 250, 260 },
+            sourcePlaces = { { zone = 31, x = 30.6, y = 42.7, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 10 },
@@ -8198,6 +8700,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 220,
             requiredSkill = 220,
             sourceKind = "worldDrop",
+            skillLevels = { 220, 240, 250, 260 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -8216,6 +8719,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 220,
             requiredSkill = 220,
             sourceKind = "drop",
+            skillLevels = { 220, 240, 250, 260 },
             sourcePlaces = { { zone = 13 } },
             bopOutput = false,
             reagents = {
@@ -8234,6 +8738,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "drop",
+            skillLevels = { 225, 245, 255, 265 },
             sourcePlaces = { { zone = 13 } },
             bopOutput = false,
             reagents = {
@@ -8252,7 +8757,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 31 } },
+            skillLevels = { 225, 245, 255, 265 },
+            sourcePlaces = { { zone = 31, x = 30.6, y = 42.7, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 12 },
@@ -8270,7 +8776,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 31 } },
+            skillLevels = { 225, 245, 255, 265 },
+            sourcePlaces = { { zone = 31, x = 30.6, y = 42.7, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 10 },
@@ -8286,6 +8793,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 230, 250, 260, 270 },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 4 },
@@ -8315,6 +8823,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 230, 250, 260, 270 },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 14 },
@@ -8332,6 +8841,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 235,
             requiredSkill = 235,
             sourceKind = "drop",
+            skillLevels = { 235, 255, 265, 275 },
             sourcePlaces = { { zone = 13 } },
             bopOutput = false,
             reagents = {
@@ -8348,6 +8858,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 235, 255, 265, 275 },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 14 },
@@ -8363,6 +8874,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 235, 255, 265, 275 },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 16 },
@@ -8379,6 +8891,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 240,
             requiredSkill = 240,
             sourceKind = "worldDrop",
+            skillLevels = { 240, 260, 270, 280 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -8396,6 +8909,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 240,
             requiredSkill = 240,
             sourceKind = "worldDrop",
+            skillLevels = { 240, 260, 270, 280 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -8414,6 +8928,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 240,
             requiredSkill = 240,
             sourceKind = "drop",
+            skillLevels = { 240, 260, 270, 280 },
             sourcePlaces = { { zone = 13 } },
             bopOutput = false,
             reagents = {
@@ -8432,7 +8947,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 245,
             requiredSkill = 245,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 31 } },
+            skillLevels = { 245, 265, 275, 285 },
+            sourcePlaces = { { zone = 31, x = 30.6, y = 42.7, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 14 },
@@ -8450,6 +8966,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 245,
             requiredSkill = 245,
             sourceKind = "drop",
+            skillLevels = { 245, 265, 275, 285 },
             sourcePlaces = { { zone = 13 } },
             bopOutput = false,
             reagents = {
@@ -8468,6 +8985,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "drop",
+            skillLevels = { 250, 270, 280, 290 },
             sourcePlaces = { { zone = 13 } },
             bopOutput = false,
             reagents = {
@@ -8486,7 +9004,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 31 } },
+            skillLevels = { 250, 270, 280, 290 },
+            sourcePlaces = { { zone = 31, x = 30.6, y = 42.7, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 16 },
@@ -8503,7 +9022,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 31 } },
+            skillLevels = { 250, 270, 280, 290 },
+            sourcePlaces = { { zone = 31, x = 30.6, y = 42.7, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 16 },
@@ -8520,7 +9040,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10656,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Peter Galen", zone = 38 }, { name = "Thorkaf Dragoneye", zone = 11 } },
+            skillLevels = { 225, 245, 255, 265 },
+            sourcePlaces = { { name = "Peter Galen", zone = 38, x = 37.5, y = 65.5, faction = "alliance" }, { name = "Thorkaf Dragoneye", zone = 11, x = 62.6, y = 57.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 24 },
@@ -8538,7 +9059,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10660,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Caryssia Moonhunter", zone = 31 }, { name = "Se'Jib", zone = 2 } },
+            skillLevels = { 225, 245, 255, 265 },
+            sourcePlaces = { { name = "Caryssia Moonhunter", zone = 31, x = 89.4, y = 46.5, faction = "alliance" }, { name = "Se'Jib", zone = 2, x = 36.6, y = 34.2, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 18 },
@@ -8557,7 +9079,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10658,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Brumn Winterhoof", zone = 3 }, { name = "Sarah Tanner", zone = 39 } },
+            skillLevels = { 230, 250, 260, 270 },
+            sourcePlaces = { { name = "Brumn Winterhoof", zone = 3, x = 28.2, y = 45, faction = "horde" }, { name = "Sarah Tanner", zone = 39, x = 63.7, y = 75.7, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 20 },
@@ -8576,7 +9099,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10658,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Brumn Winterhoof", zone = 3 }, { name = "Sarah Tanner", zone = 39 } },
+            skillLevels = { 250, 270, 280, 290 },
+            sourcePlaces = { { name = "Brumn Winterhoof", zone = 3, x = 28.2, y = 45, faction = "horde" }, { name = "Sarah Tanner", zone = 39, x = 63.7, y = 75.7, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 40 },
@@ -8595,7 +9119,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10660,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Caryssia Moonhunter", zone = 31 }, { name = "Se'Jib", zone = 2 } },
+            skillLevels = { 250, 270, 280, 290 },
+            sourcePlaces = { { name = "Caryssia Moonhunter", zone = 31, x = 89.4, y = 46.5, faction = "alliance" }, { name = "Se'Jib", zone = 2, x = 36.6, y = 34.2, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 40 },
@@ -8614,7 +9139,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10656,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Peter Galen", zone = 38 }, { name = "Thorkaf Dragoneye", zone = 11 } },
+            skillLevels = { 255, 275, 285, 295 },
+            sourcePlaces = { { name = "Peter Galen", zone = 38, x = 37.5, y = 65.5, faction = "alliance" }, { name = "Thorkaf Dragoneye", zone = 11, x = 62.6, y = 57.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 40 },
@@ -8646,6 +9172,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mana",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 205, 220, 240, 260 },
             bopOutput = false,
             reagents = {
                 { itemId = 3358, count = 1 },
@@ -8661,6 +9188,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 50,
             sourceKind = "trainer",
+            skillLevels = { 185, 205, 225, 245 },
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -8676,6 +9204,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "guardian",
             sortOrder = 50,
             sourceKind = "trainer",
+            skillLevels = { 195, 215, 235, 255 },
             bopOutput = false,
             reagents = {
                 { itemId = 3355, count = 1 },
@@ -8690,6 +9219,7 @@ RecipeRegistryRecipeMetadata = {
             category = "oils",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 205, 220, 240, 260 },
             bopOutput = false,
             reagents = {
                 { itemId = 3821, count = 1 },
@@ -8705,7 +9235,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rejuvenation",
             sortOrder = 20,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 11 }, { zone = 24 } },
+            skillLevels = { 210, 225, 245, 265 },
+            sourcePlaces = { { zone = 11, x = 2.5, y = 46.1, faction = "horde" }, { zone = 24, x = 37, y = 49.2, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3821, count = 1 },
@@ -8723,6 +9254,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 210,
             sourceKind = "worldDrop",
+            skillLevels = { 210, 225, 245, 265 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -8740,6 +9272,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             requiredSkill = 200,
             sourceKind = "trainer",
+            skillLevels = { 200, 225, 237, 250 },
             removed = true,
             bopOutput = false,
             reagents = {
@@ -8758,6 +9291,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 210,
             sourceKind = "trainer",
+            skillLevels = { 210, 225, 245, 265 },
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -8773,6 +9307,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "healing",
             sortOrder = 50,
             sourceKind = "trainer",
+            skillLevels = { 215, 230, 250, 270 },
             bopOutput = false,
             reagents = {
                 { itemId = 3358, count = 1 },
@@ -8790,6 +9325,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 80,
             requiredSkill = 225,
             sourceKind = "worldDrop",
+            skillLevels = { 225, 240, 260, 280 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -8808,7 +9344,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 225,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alchemist Pestlezugg", zone = 13 } },
+            skillLevels = { 225, 240, 260, 280 },
+            sourcePlaces = { { name = "Alchemist Pestlezugg", zone = 13, x = 50.9, y = 27 } },
             bopOutput = true,
             reagents = {
                 { itemId = 3575, count = 4 },
@@ -8825,6 +9362,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 50,
             sourceKind = "trainer",
+            skillLevels = { 230, 245, 265, 285 },
             bopOutput = false,
             reagents = {
                 { itemId = 8836, count = 1 },
@@ -8839,6 +9377,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 60,
             sourceKind = "trainer",
+            skillLevels = { 235, 250, 270, 290 },
             bopOutput = false,
             reagents = {
                 { itemId = 3821, count = 1 },
@@ -8856,6 +9395,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 235,
             sourceKind = "worldDrop",
+            skillLevels = { 235, 250, 270, 290 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -8872,6 +9412,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 70,
             sourceKind = "trainer",
+            skillLevels = { 235, 250, 270, 290 },
             bopOutput = false,
             reagents = {
                 { itemId = 3358, count = 1 },
@@ -8888,6 +9429,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 240,
             sourceKind = "drop",
+            skillLevels = { 240, 255, 275, 295 },
             sourcePlaces = { { zone = 37 } },
             bopOutput = false,
             reagents = {
@@ -8904,6 +9446,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 80,
             sourceKind = "trainer",
+            skillLevels = { 240, 255, 275, 295 },
             bopOutput = false,
             reagents = {
                 { itemId = 3821, count = 1 },
@@ -8921,6 +9464,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 80,
             requiredSkill = 240,
             sourceKind = "worldDrop",
+            skillLevels = { 240, 255, 275, 295 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -8938,6 +9482,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             requiredSkill = 245,
             sourceKind = "worldDrop",
+            skillLevels = { 245, 260, 280, 300 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -8955,7 +9500,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 245,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Logannas", zone = 31 }, { name = "Bronk", zone = 31 } },
+            skillLevels = { 245, 260, 280, 300 },
+            sourcePlaces = { { name = "Logannas", zone = 31, x = 32.7, y = 44, faction = "alliance" }, { name = "Bronk", zone = 31, x = 76.1, y = 43.3, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4342, count = 1 },
@@ -8973,7 +9519,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Maria Lumere", zone = 1 }, { name = "Algernon", zone = 34 } },
+            skillLevels = { 250, 265, 285, 305 },
+            sourcePlaces = { { name = "Maria Lumere", zone = 1, x = 55.7, y = 85.5, faction = "alliance" }, { name = "Algernon", zone = 34, x = 51.9, y = 74.4, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 8845, count = 3 },
@@ -8990,7 +9537,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 105,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rartar", zone = 36 }, { name = "Nina Lightbrew", zone = 40 } },
+            skillLevels = { 250, 265, 285, 305 },
+            sourcePlaces = { { name = "Rartar", zone = 36, x = 45.4, y = 57, faction = "horde" }, { name = "Nina Lightbrew", zone = 40, x = 66.9, y = 18.3, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 8845, count = 1 },
@@ -9006,6 +9554,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 60,
             sourceKind = "trainer",
+            skillLevels = { 250, 265, 285, 305 },
             bopOutput = false,
             reagents = {
                 { itemId = 8846, count = 2 },
@@ -9022,7 +9571,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 225,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alchemist Pestlezugg", zone = 13 } },
+            skillLevels = { 225, 240, 260, 280 },
+            sourcePlaces = { { name = "Alchemist Pestlezugg", zone = 13, x = 50.9, y = 27 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 1 },
@@ -9038,7 +9588,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 225,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alchemist Pestlezugg", zone = 13 } },
+            skillLevels = { 225, 240, 260, 280 },
+            sourcePlaces = { { name = "Alchemist Pestlezugg", zone = 13, x = 50.9, y = 27 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 1 },
@@ -9055,7 +9606,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 205,
             faction = "alliance",
             sourceKind = "quest",
-            sourcePlaces = { { zone = 1 } },
+            skillLevels = { 205, 225, 235, 245 },
+            sourcePlaces = { { zone = 1, x = 63, y = 36.9, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 4 },
@@ -9071,6 +9623,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 35, 47, 60 },
             bopOutput = false,
             reagents = {
                 { itemId = 2320, count = 1 },
@@ -9085,6 +9638,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 20, 50, 67, 85 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 1 },
@@ -9100,6 +9654,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 75, 100, 117, 135 },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -9116,6 +9671,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 120,
             requiredSkill = 120,
             sourceKind = "worldDrop",
+            skillLevels = { 120, 145, 162, 180 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -9132,6 +9688,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 205, 220, 235, 250 },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 3 },
@@ -9146,6 +9703,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 205, 220, 235, 250 },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 3 },
@@ -9160,6 +9718,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 210, 225, 240, 255 },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 3 },
@@ -9174,7 +9733,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Josephine Lister", zone = 34 }, { name = "Jalane Ayrole", zone = 1 } },
+            skillLevels = { 210, 225, 240, 255 },
+            sourcePlaces = { { name = "Josephine Lister", zone = 34, x = 86.5, y = 22.3, faction = "horde" }, { name = "Jalane Ayrole", zone = 1, x = 40.6, y = 83.9, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 3 },
@@ -9190,6 +9750,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 215, 230, 245, 260 },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 2 },
@@ -9204,7 +9765,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Josephine Lister", zone = 34 }, { name = "Jalane Ayrole", zone = 1 } },
+            skillLevels = { 215, 230, 245, 260 },
+            sourcePlaces = { { name = "Josephine Lister", zone = 34, x = 86.5, y = 22.3, faction = "horde" }, { name = "Jalane Ayrole", zone = 1, x = 40.6, y = 83.9, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 3 },
@@ -9222,6 +9784,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 215,
             requiredSkill = 215,
             sourceKind = "worldDrop",
+            skillLevels = { 215, 230, 245, 260 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -9240,6 +9803,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 215,
             requiredSkill = 215,
             sourceKind = "worldDrop",
+            skillLevels = { 215, 220, 225, 230 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -9258,6 +9822,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 215,
             requiredSkill = 215,
             sourceKind = "worldDrop",
+            skillLevels = { 215, 230, 245, 260 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -9273,6 +9838,7 @@ RecipeRegistryRecipeMetadata = {
             category = "shirts",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 215, 220, 225, 230 },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 1 },
@@ -9323,7 +9889,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 220,
             requiredSkill = 220,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mahu", zone = 18 }, { name = "Elynna", zone = 26 } },
+            skillLevels = { 220, 225, 230, 235 },
+            sourcePlaces = { { name = "Mahu", zone = 18, x = 43.8, y = 44.6, faction = "horde" }, { name = "Elynna", zone = 26, x = 64.4, y = 21.6, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 2 },
@@ -9338,6 +9905,7 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 225, 240, 255, 270 },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 2 },
@@ -9354,6 +9922,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "worldDrop",
+            skillLevels = { 225, 240, 255, 270 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -9370,6 +9939,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 225, 240, 255, 270 },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 4 },
@@ -9403,6 +9973,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 225, 240, 255, 270 },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 5 },
@@ -9418,6 +9989,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 225, 240, 255, 270 },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 6 },
@@ -9434,7 +10006,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Josephine Lister", zone = 34 }, { name = "Jalane Ayrole", zone = 1 } },
+            skillLevels = { 225, 240, 255, 270 },
+            sourcePlaces = { { name = "Josephine Lister", zone = 34, x = 86.5, y = 22.3, faction = "horde" }, { name = "Jalane Ayrole", zone = 1, x = 40.6, y = 83.9, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 5 },
@@ -9450,6 +10023,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 230, 245, 260, 275 },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 3 },
@@ -9464,6 +10038,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 230, 245, 260, 275 },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 2 },
@@ -9479,6 +10054,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 230, 245, 260, 275 },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 3 },
@@ -9494,7 +10070,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 230,
             requiredSkill = 230,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Borya", zone = 25 }, { name = "Outfitter Eric", zone = 27 } },
+            skillLevels = { 230, 235, 240, 245 },
+            sourcePlaces = { { name = "Borya", zone = 25, x = 63, y = 51.2, faction = "horde" }, { name = "Outfitter Eric", zone = 27, x = 43.2, y = 29.2, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 2 },
@@ -9510,7 +10087,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shoulder",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Josephine Lister", zone = 34 }, { name = "Jalane Ayrole", zone = 1 } },
+            skillLevels = { 235, 250, 265, 280 },
+            sourcePlaces = { { name = "Josephine Lister", zone = 34, x = 86.5, y = 22.3, faction = "horde" }, { name = "Jalane Ayrole", zone = 1, x = 40.6, y = 83.9, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 5 },
@@ -9525,6 +10103,7 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 235, 240, 245, 250 },
             bopOutput = false,
             reagents = {
                 { itemId = 2324, count = 1 },
@@ -9543,6 +10122,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 235,
             requiredSkill = 235,
             sourceKind = "worldDrop",
+            skillLevels = { 235, 250, 265, 280 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -9558,6 +10138,7 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 235, 250, 265, 280 },
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -9574,7 +10155,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 235,
             requiredSkill = 235,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Borya", zone = 25 }, { name = "Outfitter Eric", zone = 27 } },
+            skillLevels = { 235, 240, 245, 250 },
+            sourcePlaces = { { name = "Borya", zone = 25, x = 63, y = 51.2, faction = "horde" }, { name = "Outfitter Eric", zone = 27, x = 43.2, y = 29.2, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 3 },
@@ -9592,7 +10174,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 240,
             requiredSkill = 240,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Cowardly Crosby", zone = 2 } },
+            skillLevels = { 240, 255, 270, 285 },
+            sourcePlaces = { { name = "Cowardly Crosby", zone = 2, x = 27, y = 82.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 3 },
@@ -9608,7 +10191,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Josephine Lister", zone = 34 }, { name = "Jalane Ayrole", zone = 1 } },
+            skillLevels = { 240, 255, 270, 285 },
+            sourcePlaces = { { name = "Josephine Lister", zone = 34, x = 86.5, y = 22.3, faction = "horde" }, { name = "Jalane Ayrole", zone = 1, x = 40.6, y = 83.9, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 2 },
@@ -9644,6 +10228,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 240,
             requiredSkill = 240,
             sourceKind = "worldDrop",
+            skillLevels = { 240, 255, 270, 285 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -9661,7 +10246,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 240,
             requiredSkill = 240,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Millie Gregorian", zone = 34 }, { name = "Outfitter Eric", zone = 27 } },
+            skillLevels = { 240, 245, 250, 255 },
+            sourcePlaces = { { name = "Millie Gregorian", zone = 34, x = 70.8, y = 29.6, faction = "horde" }, { name = "Outfitter Eric", zone = 27, x = 43.2, y = 29.2, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 4 },
@@ -9678,7 +10264,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 245,
             requiredSkill = 245,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 39 } },
+            skillLevels = { 245, 260, 275, 290 },
+            sourcePlaces = { { zone = 39, x = 41, y = 74.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 2 },
@@ -9711,6 +10298,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 245, 260, 275, 290 },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 2 },
@@ -9729,7 +10317,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 245,
             requiredSkill = 245,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Millie Gregorian", zone = 34 }, { name = "Outfitter Eric", zone = 27 } },
+            skillLevels = { 245, 250, 255, 260 },
+            sourcePlaces = { { name = "Millie Gregorian", zone = 34, x = 70.8, y = 29.6, faction = "horde" }, { name = "Outfitter Eric", zone = 27, x = 43.2, y = 29.2, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 4 },
@@ -9764,7 +10353,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alexandra Bolero", zone = 1 }, { name = "Mahu", zone = 18 } },
+            skillLevels = { 250, 255, 260, 265 },
+            sourcePlaces = { { name = "Alexandra Bolero", zone = 1, x = 53.3, y = 81.7, faction = "alliance" }, { name = "Mahu", zone = 18, x = 43.8, y = 44.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2324, count = 1 },
@@ -9780,6 +10370,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 250, 265, 280, 295 },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 1 },
@@ -9800,7 +10391,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Millie Gregorian", zone = 34 }, { name = "Outfitter Eric", zone = 27 } },
+            skillLevels = { 250, 265, 280, 295 },
+            sourcePlaces = { { name = "Millie Gregorian", zone = 34, x = 70.8, y = 29.6, faction = "horde" }, { name = "Outfitter Eric", zone = 27, x = 43.2, y = 29.2, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 5 },
@@ -9817,6 +10409,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 155,
             requiredSkill = 155,
             sourceKind = "worldDrop",
+            skillLevels = { 155, 180, 192, 205 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -9833,6 +10426,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 15, 35, 55 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 4 },
@@ -9846,6 +10440,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 100,
             sourceKind = "trainer",
+            skillLevels = { 150, 150, 170, 190 },
             bopOutput = false,
             reagents = {
                 { itemId = 3577, count = 1 },
@@ -9859,6 +10454,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "powders",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 175, 175, 185, 195 },
             bopOutput = false,
             reagents = {
                 { itemId = 7912, count = 2 },
@@ -9873,6 +10469,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dynamite",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 175, 175, 185, 195 },
             bopOutput = false,
             reagents = {
                 { itemId = 4306, count = 1 },
@@ -9889,6 +10486,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             requiredSkill = 175,
             sourceKind = "worldDrop",
+            skillLevels = { 175, 195, 205, 215 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -9903,6 +10501,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 110,
             sourceKind = "trainer",
+            skillLevels = { 195, 195, 215, 235 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 3 },
@@ -9915,6 +10514,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 120,
             sourceKind = "trainer",
+            skillLevels = { 175, 175, 195, 215 },
             bopOutput = false,
             reagents = {
                 { itemId = 3859, count = 4 },
@@ -9927,6 +10527,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 130,
             sourceKind = "trainer",
+            skillLevels = { 200, 200, 220, 240 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 1 },
@@ -9942,6 +10543,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 50,
             sourceKind = "trainer",
+            skillLevels = { 205, 225, 235, 245 },
             bopOutput = false,
             reagents = {
                 { itemId = 3864, count = 2 },
@@ -9958,6 +10560,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "firearms",
             sortOrder = 60,
             sourceKind = "trainer",
+            skillLevels = { 205, 225, 235, 245 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 4 },
@@ -9975,6 +10578,7 @@ RecipeRegistryRecipeMetadata = {
             category = "ammo",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 210, 210, 230, 250 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 1 },
@@ -9991,7 +10595,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 210,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Knaz Blunderflame", zone = 2 }, { name = "Yuka Screwspigot", zone = 41 } },
+            skillLevels = { 210, 230, 240, 250 },
+            sourcePlaces = { { name = "Knaz Blunderflame", zone = 2, x = 51, y = 35.3 }, { name = "Yuka Screwspigot", zone = 41, x = 66, y = 22 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 2 },
@@ -10006,6 +10611,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 140,
             sourceKind = "trainer",
+            skillLevels = { 215, 215, 235, 255 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 3 },
@@ -10020,6 +10626,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bombs",
             sortOrder = 60,
             sourceKind = "trainer",
+            skillLevels = { 215, 215, 235, 255 },
             bopOutput = false,
             reagents = {
                 { itemId = 10505, count = 1 },
@@ -10037,6 +10644,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 140,
             requiredSkill = 220,
             sourceKind = "worldDrop",
+            skillLevels = { 220, 240, 250, 260 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -10053,6 +10661,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 70,
             sourceKind = "trainer",
+            skillLevels = { 200, 220, 240, 260 },
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -10070,6 +10679,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             requiredSkill = 220,
             sourceKind = "worldDrop",
+            skillLevels = { 220, 240, 250, 260 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -10090,6 +10700,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 150,
             requiredSkill = 225,
             sourceKind = "trainer",
+            skillLevels = { 225, 245, 255, 265 },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 4 },
@@ -10106,6 +10717,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 225,
             sourceKind = "worldDrop",
+            skillLevels = { 225, 245, 255, 265 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -10125,7 +10737,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 160,
             requiredSkill = 230,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Jubie Gadgetspring", zone = 38 } },
+            skillLevels = { 230, 250, 260, 270 },
+            sourcePlaces = { { name = "Jubie Gadgetspring", zone = 38, x = 45.3, y = 90.9 } },
             bopOutput = false,
             reagents = {
                 { itemId = 774, count = 4 },
@@ -10143,6 +10756,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 60,
             sourceKind = "trainer",
+            skillLevels = { 230, 250, 260, 270 },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 6 },
@@ -10158,6 +10772,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bombs",
             sortOrder = 70,
             sourceKind = "trainer",
+            skillLevels = { 235, 235, 255, 275 },
             bopOutput = false,
             reagents = {
                 { itemId = 10505, count = 2 },
@@ -10175,6 +10790,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 240,
             sourceKind = "worldDrop",
+            skillLevels = { 240, 260, 270, 280 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -10191,6 +10807,7 @@ RecipeRegistryRecipeMetadata = {
             category = "ammo",
             sortOrder = 50,
             sourceKind = "trainer",
+            skillLevels = { 245, 245, 265, 285 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 2 },
@@ -10205,6 +10822,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 80,
             sourceKind = "trainer",
+            skillLevels = { 245, 265, 275, 285 },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 3 },
@@ -10224,7 +10842,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Ruppo Zipcoil", zone = 35 } },
+            skillLevels = { 250, 270, 280, 290 },
+            sourcePlaces = { { name = "Ruppo Zipcoil", zone = 35, x = 34.3, y = 37.9 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 14 },
@@ -10243,7 +10862,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Nixx Sprocketspring", zone = 13 } },
+            skillLevels = { 205, 205, 205, 205 },
+            sourcePlaces = { { name = "Nixx Sprocketspring", zone = 13, x = 52.5, y = 27.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 10647, count = 1 },
@@ -10259,7 +10879,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6 }, { name = "Nixx Sprocketspring", zone = 13 } },
+            skillLevels = { 205, 225, 235, 245 },
+            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6, x = 62.7, y = 36.3 }, { name = "Nixx Sprocketspring", zone = 13, x = 52.5, y = 27.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 4 },
@@ -10278,7 +10899,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6 }, { name = "Nixx Sprocketspring", zone = 13 } },
+            skillLevels = { 205, 225, 235, 245 },
+            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6, x = 62.7, y = 36.3 }, { name = "Nixx Sprocketspring", zone = 13, x = 52.5, y = 27.3 } },
             bopOutput = true,
             reagents = {
                 { itemId = 3860, count = 8 },
@@ -10295,7 +10917,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6 }, { name = "Nixx Sprocketspring", zone = 13 } },
+            skillLevels = { 205, 225, 235, 245 },
+            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6, x = 62.7, y = 36.3 }, { name = "Nixx Sprocketspring", zone = 13, x = 52.5, y = 27.3 } },
             bopOutput = true,
             reagents = {
                 { itemId = 3860, count = 8 },
@@ -10360,7 +10983,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6 }, { name = "Nixx Sprocketspring", zone = 13 } },
+            skillLevels = { 235, 235, 255, 275 },
+            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6, x = 62.7, y = 36.3 }, { name = "Nixx Sprocketspring", zone = 13, x = 52.5, y = 27.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 9061, count = 1 },
@@ -10378,7 +11002,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6 }, { name = "Nixx Sprocketspring", zone = 13 } },
+            skillLevels = { 230, 230, 250, 270 },
+            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6, x = 62.7, y = 36.3 }, { name = "Nixx Sprocketspring", zone = 13, x = 52.5, y = 27.3 } },
             bopOutput = true,
             reagents = {
                 { itemId = 4407, count = 2 },
@@ -10397,7 +11022,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6 }, { name = "Nixx Sprocketspring", zone = 13 } },
+            skillLevels = { 245, 265, 275, 285 },
+            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6, x = 62.7, y = 36.3 }, { name = "Nixx Sprocketspring", zone = 13, x = 52.5, y = 27.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 4 },
@@ -10415,7 +11041,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             specialization = 20219,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27 }, { name = "Oglethorpe Obnoticus", zone = 2 } },
+            skillLevels = { 240, 260, 270, 280 },
+            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27, x = 69.8, y = 50, faction = "alliance" }, { name = "Oglethorpe Obnoticus", zone = 2, x = 28.3, y = 76.3 } },
             bopOutput = true,
             reagents = {
                 { itemId = 7972, count = 4 },
@@ -10434,7 +11061,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Nixx Sprocketspring", zone = 13 } },
+            skillLevels = { 205, 205, 225, 245 },
+            sourcePlaces = { { name = "Nixx Sprocketspring", zone = 13, x = 52.5, y = 27.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4338, count = 1 },
@@ -10450,7 +11078,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             specialization = 20219,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27 }, { name = "Oglethorpe Obnoticus", zone = 2 } },
+            skillLevels = { 205, 205, 205, 205 },
+            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27, x = 69.8, y = 50, faction = "alliance" }, { name = "Oglethorpe Obnoticus", zone = 2, x = 28.3, y = 76.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 10647, count = 1 },
@@ -10466,7 +11095,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 120,
             specialization = 20219,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27 }, { name = "Oglethorpe Obnoticus", zone = 2 } },
+            skillLevels = { 210, 230, 240, 250 },
+            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27, x = 69.8, y = 50, faction = "alliance" }, { name = "Oglethorpe Obnoticus", zone = 2, x = 28.3, y = 76.3 } },
             bopOutput = true,
             reagents = {
                 { itemId = 4234, count = 2 },
@@ -10485,7 +11115,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             specialization = 20219,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27 }, { name = "Oglethorpe Obnoticus", zone = 2 } },
+            skillLevels = { 205, 225, 235, 245 },
+            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27, x = 69.8, y = 50, faction = "alliance" }, { name = "Oglethorpe Obnoticus", zone = 2, x = 28.3, y = 76.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 2 },
@@ -10519,7 +11150,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             specialization = 20219,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27 }, { name = "Oglethorpe Obnoticus", zone = 2 } },
+            skillLevels = { 210, 230, 240, 250 },
+            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27, x = 69.8, y = 50, faction = "alliance" }, { name = "Oglethorpe Obnoticus", zone = 2, x = 28.3, y = 76.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 4 },
@@ -10538,7 +11170,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             specialization = 20219,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27 }, { name = "Oglethorpe Obnoticus", zone = 2 } },
+            skillLevels = { 215, 235, 245, 255 },
+            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27, x = 69.8, y = 50, faction = "alliance" }, { name = "Oglethorpe Obnoticus", zone = 2, x = 28.3, y = 76.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 4 },
@@ -10573,7 +11206,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 80,
             specialization = 20219,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27 }, { name = "Oglethorpe Obnoticus", zone = 2 } },
+            skillLevels = { 225, 245, 255, 265 },
+            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27, x = 69.8, y = 50, faction = "alliance" }, { name = "Oglethorpe Obnoticus", zone = 2, x = 28.3, y = 76.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 4 },
@@ -10591,7 +11225,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             specialization = 20219,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27 }, { name = "Oglethorpe Obnoticus", zone = 2 } },
+            skillLevels = { 230, 250, 260, 270 },
+            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27, x = 69.8, y = 50, faction = "alliance" }, { name = "Oglethorpe Obnoticus", zone = 2, x = 28.3, y = 76.3 } },
             bopOutput = true,
             reagents = {
                 { itemId = 1529, count = 2 },
@@ -10611,7 +11246,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 130,
             specialization = 20219,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27 }, { name = "Oglethorpe Obnoticus", zone = 2 } },
+            skillLevels = { 235, 255, 265, 275 },
+            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27, x = 69.8, y = 50, faction = "alliance" }, { name = "Oglethorpe Obnoticus", zone = 2, x = 28.3, y = 76.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 10 },
@@ -10630,7 +11266,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6 }, { name = "Nixx Sprocketspring", zone = 13 } },
+            skillLevels = { 240, 260, 270, 280 },
+            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6, x = 62.7, y = 36.3 }, { name = "Nixx Sprocketspring", zone = 13, x = 52.5, y = 27.3 } },
             bopOutput = true,
             reagents = {
                 { itemId = 3860, count = 6 },
@@ -10648,6 +11285,7 @@ RecipeRegistryRecipeMetadata = {
             category = "mp5",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 175, 175, 190, 205 },
             sourcePlaces = { { zone = 42 } },
             bopOutput = false,
             reagents = {
@@ -10664,7 +11302,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 31,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Nixx Sprocketspring", zone = 13 }, { name = "Vazario Linkgrease", zone = 6 } },
+            skillLevels = { 205, 205, 205, 205 },
+            sourcePlaces = { { name = "Nixx Sprocketspring", zone = 13, x = 52.5, y = 27.3 }, { name = "Vazario Linkgrease", zone = 6, x = 62.7, y = 36.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 1 },
@@ -10679,6 +11318,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 105, 130, 150, 170 },
             reagents = {
                 { itemId = 10940, count = 2 },
                 { itemId = 10998, count = 1 },
@@ -10693,6 +11333,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             requiredSkill = 110,
             sourceKind = "worldDrop",
+            skillLevels = { 110, 135, 155, 175 },
             worldDrop = true,
             reagents = {
                 { itemId = 10940, count = 6 },
@@ -10708,7 +11349,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             requiredSkill = 110,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Dalria", zone = 4 }, { name = "Kulwia", zone = 30 } },
+            skillLevels = { 110, 135, 155, 175 },
+            sourcePlaces = { { name = "Dalria", zone = 4, x = 35.1, y = 52.1, faction = "alliance" }, { name = "Kulwia", zone = 30, x = 45.4, y = 59.4, faction = "horde" } },
             reagents = {
                 { itemId = 10998, count = 1 },
             },
@@ -10720,6 +11362,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 115, 140, 160, 180 },
             reagents = {
                 { itemId = 10940, count = 6 },
                 { itemId = 10978, count = 1 },
@@ -10734,6 +11377,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 115,
             requiredSkill = 115,
             sourceKind = "worldDrop",
+            skillLevels = { 115, 140, 160, 180 },
             worldDrop = true,
             reagents = {
                 { itemId = 10940, count = 1 },
@@ -10748,6 +11392,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 130, 155, 175, 195 },
             reagents = {
                 { itemId = 10940, count = 4 },
                 { itemId = 10998, count = 2 },
@@ -10760,6 +11405,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 130, 155, 175, 195 },
             reagents = {
                 { itemId = 11083, count = 2 },
             },
@@ -10771,6 +11417,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 140, 165, 185, 205 },
             reagents = {
                 { itemId = 11083, count = 2 },
                 { itemId = 11084, count = 1 },
@@ -10785,6 +11432,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 135,
             requiredSkill = 135,
             sourceKind = "worldDrop",
+            skillLevels = { 135, 160, 180, 200 },
             worldDrop = true,
             reagents = {
                 { itemId = 6048, count = 1 },
@@ -10798,6 +11446,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "2h_weapon",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 145, 170, 190, 210 },
             reagents = {
                 { itemId = 11083, count = 3 },
                 { itemId = 11084, count = 1 },
@@ -10812,7 +11461,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 140,
             requiredSkill = 140,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Dalria", zone = 4 }, { name = "Kulwia", zone = 30 } },
+            skillLevels = { 140, 165, 185, 205 },
+            sourcePlaces = { { name = "Dalria", zone = 4, x = 35.1, y = 52.1, faction = "alliance" }, { name = "Kulwia", zone = 30, x = 45.4, y = 59.4, faction = "horde" } },
             reagents = {
                 { itemId = 11083, count = 2 },
             },
@@ -10824,6 +11474,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 140, 165, 185, 205 },
             reagents = {
                 { itemId = 10940, count = 2 },
                 { itemId = 11082, count = 1 },
@@ -10837,6 +11488,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 145, 170, 190, 210 },
             reagents = {
                 { itemId = 10998, count = 2 },
                 { itemId = 11082, count = 1 },
@@ -10851,6 +11503,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 145,
             requiredSkill = 145,
             sourceKind = "drop",
+            skillLevels = { 145, 170, 190, 210 },
             sourcePlaces = { { zone = 14 } },
             reagents = {
                 { itemId = 2772, count = 3 },
@@ -10866,6 +11519,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 145,
             requiredSkill = 145,
             sourceKind = "drop",
+            skillLevels = { 145, 170, 190, 210 },
             sourcePlaces = { { zone = 30 }, { zone = 4 } },
             reagents = {
                 { itemId = 3356, count = 3 },
@@ -10881,6 +11535,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 145,
             requiredSkill = 145,
             sourceKind = "drop",
+            skillLevels = { 145, 170, 190, 210 },
             sourcePlaces = { { zone = 7 } },
             reagents = {
                 { itemId = 6370, count = 3 },
@@ -10894,6 +11549,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 150, 175, 195, 215 },
             reagents = {
                 { itemId = 11082, count = 2 },
             },
@@ -10905,6 +11561,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 150, 175, 195, 215 },
             reagents = {
                 { itemId = 11082, count = 1 },
                 { itemId = 11083, count = 1 },
@@ -10918,6 +11575,7 @@ RecipeRegistryRecipeMetadata = {
             category = "rods",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 150, 175, 195, 215 },
             bopOutput = true,
             reagents = {
                 { itemId = 5500, count = 1 },
@@ -10934,6 +11592,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 155, 175, 195, 215 },
             reagents = {
                 { itemId = 11083, count = 1 },
                 { itemId = 11134, count = 1 },
@@ -10946,6 +11605,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 155, 175, 195, 215 },
             reagents = {
                 { itemId = 11083, count = 3 },
                 { itemId = 11138, count = 1 },
@@ -10958,6 +11618,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "boots",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 160, 180, 200, 220 },
             reagents = {
                 { itemId = 11083, count = 1 },
                 { itemId = 11134, count = 1 },
@@ -10970,6 +11631,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 160, 180, 200, 220 },
             reagents = {
                 { itemId = 11083, count = 3 },
             },
@@ -10981,6 +11643,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 165, 185, 205, 225 },
             reagents = {
                 { itemId = 11134, count = 1 },
             },
@@ -10992,6 +11655,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "boots",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 170, 190, 210, 230 },
             reagents = {
                 { itemId = 11083, count = 4 },
             },
@@ -11005,7 +11669,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 170,
             requiredSkill = 170,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Micha Yance", zone = 7 }, { name = "Keena", zone = 3 } },
+            skillLevels = { 170, 190, 210, 230 },
+            sourcePlaces = { { name = "Micha Yance", zone = 7, x = 49, y = 55.1, faction = "alliance" }, { name = "Keena", zone = 3, x = 74, y = 32.7, faction = "horde" } },
             reagents = {
                 { itemId = 11083, count = 2 },
                 { itemId = 11134, count = 1 },
@@ -11018,6 +11683,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 170, 190, 210, 230 },
             reagents = {
                 { itemId = 11083, count = 6 },
             },
@@ -11031,6 +11697,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "worldDrop",
+            skillLevels = { 175, 195, 215, 235 },
             worldDrop = true,
             reagents = {
                 { itemId = 5637, count = 2 },
@@ -11047,6 +11714,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "worldDrop",
+            skillLevels = { 175, 195, 215, 235 },
             worldDrop = true,
             reagents = {
                 { itemId = 7067, count = 1 },
@@ -11061,6 +11729,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 175, 195, 215, 235 },
             reagents = {
                 { itemId = 7068, count = 1 },
                 { itemId = 11134, count = 1 },
@@ -11073,6 +11742,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 180, 200, 220, 240 },
             reagents = {
                 { itemId = 11135, count = 1 },
                 { itemId = 11137, count = 1 },
@@ -11085,6 +11755,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 180, 200, 220, 240 },
             reagents = {
                 { itemId = 11137, count = 1 },
             },
@@ -11096,6 +11767,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 185, 205, 225, 245 },
             reagents = {
                 { itemId = 11135, count = 1 },
             },
@@ -11109,6 +11781,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 190,
             requiredSkill = 190,
             sourceKind = "worldDrop",
+            skillLevels = { 190, 210, 230, 250 },
             worldDrop = true,
             reagents = {
                 { itemId = 11134, count = 2 },
@@ -11124,6 +11797,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 195,
             requiredSkill = 195,
             sourceKind = "worldDrop",
+            skillLevels = { 195, 215, 235, 255 },
             worldDrop = true,
             reagents = {
                 { itemId = 11135, count = 2 },
@@ -11138,6 +11812,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 195, 215, 235, 255 },
             reagents = {
                 { itemId = 11135, count = 2 },
                 { itemId = 11139, count = 1 },
@@ -11150,6 +11825,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "2h_weapon",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 200, 220, 240, 260 },
             reagents = {
                 { itemId = 11137, count = 4 },
                 { itemId = 11139, count = 1 },
@@ -11164,6 +11840,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 200,
             requiredSkill = 200,
             sourceKind = "drop",
+            skillLevels = { 200, 220, 240, 260 },
             sourcePlaces = { { zone = 3 } },
             reagents = {
                 { itemId = 7392, count = 3 },
@@ -11177,6 +11854,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 200, 220, 240, 260 },
             reagents = {
                 { itemId = 11135, count = 2 },
                 { itemId = 11137, count = 2 },
@@ -11190,6 +11868,7 @@ RecipeRegistryRecipeMetadata = {
             category = "rods",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 200, 220, 240, 260 },
             bopOutput = true,
             reagents = {
                 { itemId = 7971, count = 1 },
@@ -11206,6 +11885,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 205, 225, 245, 265 },
             reagents = {
                 { itemId = 11137, count = 3 },
             },
@@ -11217,6 +11897,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 205, 225, 245, 265 },
             reagents = {
                 { itemId = 11174, count = 1 },
             },
@@ -11228,6 +11909,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 210, 230, 250, 270 },
             reagents = {
                 { itemId = 11137, count = 1 },
                 { itemId = 11174, count = 1 },
@@ -11242,6 +11924,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 210,
             requiredSkill = 210,
             sourceKind = "worldDrop",
+            skillLevels = { 210, 230, 250, 270 },
             worldDrop = true,
             reagents = {
                 { itemId = 11137, count = 5 },
@@ -11254,6 +11937,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 210, 230, 250, 270 },
             reagents = {
                 { itemId = 11174, count = 2 },
             },
@@ -11265,6 +11949,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "boots",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 215, 235, 255, 275 },
             reagents = {
                 { itemId = 11137, count = 5 },
             },
@@ -11278,6 +11963,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 215,
             requiredSkill = 215,
             sourceKind = "drop",
+            skillLevels = { 215, 235, 255, 275 },
             sourcePlaces = { { zone = 2 } },
             reagents = {
                 { itemId = 6037, count = 3 },
@@ -11293,6 +11979,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 220,
             requiredSkill = 220,
             sourceKind = "worldDrop",
+            skillLevels = { 220, 240, 260, 280 },
             worldDrop = true,
             reagents = {
                 { itemId = 11137, count = 1 },
@@ -11306,6 +11993,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 220, 240, 260, 280 },
             reagents = {
                 { itemId = 11137, count = 6 },
             },
@@ -11319,6 +12007,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "drop",
+            skillLevels = { 225, 245, 265, 285 },
             sourcePlaces = { { zone = 36 } },
             reagents = {
                 { itemId = 8838, count = 3 },
@@ -11334,6 +12023,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "drop",
+            skillLevels = { 225, 245, 265, 285 },
             sourcePlaces = { { zone = 13 }, { zone = 10 } },
             reagents = {
                 { itemId = 11174, count = 2 },
@@ -11346,6 +12036,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 225, 245, 265, 285 },
             reagents = {
                 { itemId = 11137, count = 3 },
                 { itemId = 11174, count = 2 },
@@ -11358,6 +12049,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "boots",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 225, 245, 265, 285 },
             reagents = {
                 { itemId = 7909, count = 1 },
                 { itemId = 11174, count = 1 },
@@ -11373,6 +12065,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 265,
             requiredSkill = 265,
             sourceKind = "drop",
+            skillLevels = { 265, 285, 305, 325 },
             sourcePlaces = { { name = "Pyromancer Loregrain", zone = 43 } },
             reagents = {
                 { itemId = 7078, count = 1 },
@@ -11386,6 +12079,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 230, 250, 270, 290 },
             reagents = {
                 { itemId = 11175, count = 1 },
                 { itemId = 11176, count = 2 },
@@ -11400,6 +12094,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 230,
             requiredSkill = 230,
             sourceKind = "worldDrop",
+            skillLevels = { 230, 250, 270, 290 },
             worldDrop = true,
             reagents = {
                 { itemId = 9224, count = 1 },
@@ -11414,6 +12109,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 230, 250, 270, 290 },
             reagents = {
                 { itemId = 11174, count = 2 },
                 { itemId = 11175, count = 1 },
@@ -11428,7 +12124,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 235,
             requiredSkill = 235,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Banalash", zone = 36 }, { name = "Mythrin'dir", zone = 26 } },
+            skillLevels = { 235, 255, 275, 295 },
+            sourcePlaces = { { name = "Banalash", zone = 36, x = 44.7, y = 56.7, faction = "horde" }, { name = "Mythrin'dir", zone = 26, x = 60, y = 19.1, faction = "alliance" } },
             reagents = {
                 { itemId = 11175, count = 1 },
                 { itemId = 11176, count = 2 },
@@ -11443,6 +12140,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 235,
             requiredSkill = 235,
             sourceKind = "worldDrop",
+            skillLevels = { 235, 255, 275, 295 },
             worldDrop = true,
             reagents = {
                 { itemId = 3829, count = 1 },
@@ -11456,6 +12154,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "boots",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 235, 255, 275, 295 },
             reagents = {
                 { itemId = 11175, count = 2 },
             },
@@ -11467,6 +12166,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "2h_weapon",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 240, 260, 280, 300 },
             reagents = {
                 { itemId = 11176, count = 2 },
                 { itemId = 11178, count = 2 },
@@ -11479,6 +12179,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 240, 260, 280, 300 },
             reagents = {
                 { itemId = 11175, count = 1 },
                 { itemId = 11176, count = 2 },
@@ -11491,6 +12192,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 245, 265, 285, 305 },
             reagents = {
                 { itemId = 11175, count = 2 },
                 { itemId = 11176, count = 3 },
@@ -11504,6 +12206,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weapon",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 245, 265, 285, 305 },
             reagents = {
                 { itemId = 11175, count = 2 },
                 { itemId = 11178, count = 2 },
@@ -11518,6 +12221,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 245,
             requiredSkill = 245,
             sourceKind = "worldDrop",
+            skillLevels = { 245, 265, 285, 305 },
             worldDrop = true,
             reagents = {
                 { itemId = 11176, count = 5 },
@@ -11532,6 +12236,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "worldDrop",
+            skillLevels = { 250, 270, 290, 310 },
             worldDrop = true,
             reagents = {
                 { itemId = 11176, count = 3 },
@@ -11545,6 +12250,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 250, 270, 290, 310 },
             reagents = {
                 { itemId = 8153, count = 2 },
                 { itemId = 11178, count = 2 },
@@ -11557,6 +12263,7 @@ RecipeRegistryRecipeMetadata = {
             category = "wands",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 10, 75, 95, 115 },
             bopOutput = false,
             reagents = {
                 { itemId = 4470, count = 1 },
@@ -11570,6 +12277,7 @@ RecipeRegistryRecipeMetadata = {
             category = "rods",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 150, 155, 157, 160 },
             bopOutput = false,
             reagents = {
                 { itemId = 3478, count = 2 },
@@ -11583,6 +12291,7 @@ RecipeRegistryRecipeMetadata = {
             category = "rods",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 200, 205, 207, 210 },
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 1 },
@@ -11596,6 +12305,7 @@ RecipeRegistryRecipeMetadata = {
             category = "wands",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 70, 110, 130, 150 },
             bopOutput = false,
             reagents = {
                 { itemId = 4470, count = 1 },
@@ -11609,6 +12319,7 @@ RecipeRegistryRecipeMetadata = {
             category = "wands",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 155, 175, 195, 215 },
             bopOutput = false,
             reagents = {
                 { itemId = 11083, count = 1 },
@@ -11623,6 +12334,7 @@ RecipeRegistryRecipeMetadata = {
             category = "wands",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 175, 195, 215, 235 },
             bopOutput = false,
             reagents = {
                 { itemId = 11135, count = 1 },
@@ -11637,6 +12349,7 @@ RecipeRegistryRecipeMetadata = {
             category = "metals",
             sortOrder = 100,
             sourceKind = "quest",
+            skillLevels = { 230, 300, 305, 310 },
             sourcePlaces = { { zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -11650,6 +12363,7 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 225, 245, 255, 265 },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 4 },
@@ -11665,6 +12379,7 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 225, 245, 255, 265 },
             bopOutput = false,
             reagents = {
                 { itemId = 4291, count = 6 },
@@ -11681,6 +12396,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "tools",
             sortOrder = 70,
             sourceKind = "trainer",
+            skillLevels = { 200, 200, 220, 240 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 1 },
@@ -11698,6 +12414,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 265,
             requiredSkill = 265,
             sourceKind = "drop",
+            skillLevels = { 265, 285, 295, 305 },
             sourcePlaces = { { name = "Grizzle", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -11715,6 +12432,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 270,
             requiredSkill = 270,
             sourceKind = "container",
+            skillLevels = { 270, 290, 300, 310 },
             sourcePlaces = { { zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -11732,6 +12450,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "drop",
+            skillLevels = { 275, 295, 305, 315 },
             sourcePlaces = { { zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -11749,6 +12468,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 280,
             requiredSkill = 280,
             sourceKind = "container",
+            skillLevels = { 280, 300, 310, 320 },
             sourcePlaces = { { zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -11766,6 +12486,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "drop",
+            skillLevels = { 285, 305, 315, 325 },
             sourcePlaces = { { name = "Ribbly Screwspigot", zone = 43 } },
             bopOutput = true,
             reagents = {
@@ -11782,6 +12503,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 265,
             sourceKind = "drop",
+            skillLevels = { 265, 285, 305, 325 },
             sourcePlaces = { { name = "Lord Roccor", zone = 43 } },
             bopOutput = true,
             reagents = {
@@ -11800,6 +12522,7 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 205,
             specialization = 20222,
             sourceKind = "container",
+            skillLevels = { 205, 205, 205, 205 },
             sourcePlaces = { { zone = 16 } },
             bopOutput = true,
             reagents = {
@@ -11819,6 +12542,7 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 205,
             specialization = 20219,
             sourceKind = "container",
+            skillLevels = { 205, 205, 205, 205 },
             sourcePlaces = { { zone = 16 } },
             bopOutput = true,
             reagents = {
@@ -11837,6 +12561,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 60,
             sourceKind = "trainer",
+            skillLevels = { 230, 245, 265, 285 },
             bopOutput = false,
             reagents = {
                 { itemId = 8831, count = 3 },
@@ -11852,7 +12577,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 125,
             requiredSkill = 125,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Super-Seller 680", zone = 5 } },
+            skillLevels = { 125, 165, 185, 205 },
+            sourcePlaces = { { name = "Super-Seller 680", zone = 5, x = 40.5, y = 79.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 1015, count = 1 },
@@ -11868,7 +12594,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nerrist", zone = 2 }, { name = "Corporal Bluth", zone = 2 }, { name = "Vendor-Tron 1000", zone = 5 }, { name = "Keena", zone = 3 } },
+            skillLevels = { 175, 215, 235, 255 },
+            sourcePlaces = { { name = "Nerrist", zone = 2, x = 32.7, y = 29.2, faction = "horde" }, { name = "Corporal Bluth", zone = 2, x = 38, y = 3, faction = "alliance" }, { name = "Vendor-Tron 1000", zone = 5, x = 60.3, y = 38.1 }, { name = "Keena", zone = 3, x = 74, y = 32.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -11884,7 +12611,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Sheendra Tallgrass", zone = 31 }, { name = "Vivianna", zone = 31 }, { name = "Super-Seller 680", zone = 5 } },
+            skillLevels = { 175, 215, 235, 255 },
+            sourcePlaces = { { name = "Sheendra Tallgrass", zone = 31, x = 74.5, y = 42.8, faction = "horde" }, { name = "Vivianna", zone = 31, x = 31.3, y = 43.5, faction = "alliance" }, { name = "Super-Seller 680", zone = 5, x = 40.5, y = 79.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -11901,7 +12629,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nerrist", zone = 2 }, { name = "Corporal Bluth", zone = 2 }, { name = "Vendor-Tron 1000", zone = 5 } },
+            skillLevels = { 175, 215, 235, 255 },
+            sourcePlaces = { { name = "Nerrist", zone = 2, x = 32.7, y = 29.2, faction = "horde" }, { name = "Corporal Bluth", zone = 2, x = 38, y = 3, faction = "alliance" }, { name = "Vendor-Tron 1000", zone = 5, x = 60.3, y = 38.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 159, count = 1 },
@@ -11918,7 +12647,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Vendor-Tron 1000", zone = 5 }, { name = "Ogg'marr", zone = 15 }, { name = "Banalash", zone = 36 }, { name = "Kireena", zone = 5 } },
+            skillLevels = { 175, 215, 235, 255 },
+            sourcePlaces = { { name = "Vendor-Tron 1000", zone = 5, x = 60.3, y = 38.1 }, { name = "Ogg'marr", zone = 15, x = 36.7, y = 31, faction = "horde" }, { name = "Banalash", zone = 36, x = 44.7, y = 56.7, faction = "horde" }, { name = "Kireena", zone = 5, x = 51, y = 53.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -11934,7 +12664,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Helenia Olden", zone = 15 }, { name = "Janet Hommers", zone = 5 }, { name = "Super-Seller 680", zone = 5 } },
+            skillLevels = { 175, 215, 235, 255 },
+            sourcePlaces = { { name = "Helenia Olden", zone = 15, x = 66.4, y = 51.5, faction = "alliance" }, { name = "Janet Hommers", zone = 5, x = 66.2, y = 6.7, faction = "alliance" }, { name = "Super-Seller 680", zone = 5, x = 40.5, y = 79.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2596, count = 1 },
@@ -11950,7 +12681,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 200,
             requiredSkill = 200,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Helenia Olden", zone = 15 }, { name = "Ogg'marr", zone = 15 }, { name = "Super-Seller 680", zone = 5 } },
+            skillLevels = { 200, 225, 237, 250 },
+            sourcePlaces = { { name = "Helenia Olden", zone = 15, x = 66.4, y = 51.5, faction = "alliance" }, { name = "Ogg'marr", zone = 15, x = 36.7, y = 31, faction = "horde" }, { name = "Super-Seller 680", zone = 5, x = 40.5, y = 79.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -11968,7 +12700,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 200,
             requiredSkill = 200,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Vendor-Tron 1000", zone = 5 }, { name = "Kireena", zone = 5 }, { name = "Janet Hommers", zone = 5 } },
+            skillLevels = { 200, 225, 237, 250 },
+            sourcePlaces = { { name = "Vendor-Tron 1000", zone = 5, x = 60.3, y = 38.1 }, { name = "Kireena", zone = 5, x = 51, y = 53.5, faction = "horde" }, { name = "Janet Hommers", zone = 5, x = 66.2, y = 6.7, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 159, count = 1 },
@@ -11985,7 +12718,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kriggon Talsone", zone = 23 }, { name = "Uthok", zone = 2 }, { name = "Banalash", zone = 36 } },
+            skillLevels = { 225, 250, 262, 275 },
+            sourcePlaces = { { name = "Kriggon Talsone", zone = 23, x = 36.2, y = 90.1, faction = "alliance" }, { name = "Uthok", zone = 2, x = 31.6, y = 28, faction = "horde" }, { name = "Banalash", zone = 36, x = 44.7, y = 56.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 2 },
@@ -12001,7 +12735,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Malygen", zone = 44 }, { name = "Bale", zone = 44 }, { name = "Himmik", zone = 45 } },
+            skillLevels = { 225, 250, 262, 275 },
+            sourcePlaces = { { name = "Malygen", zone = 44, x = 62.3, y = 25.6, faction = "alliance" }, { name = "Bale", zone = 44, x = 34.8, y = 53.1, faction = "horde" }, { name = "Himmik", zone = 45, x = 61.3, y = 39.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 2 },
@@ -12018,7 +12753,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 1,
             faction = "horde",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Abigail Shiel", zone = 33 } },
+            skillLevels = { 1, 45, 65, 85 },
+            sourcePlaces = { { name = "Abigail Shiel", zone = 33, x = 61, y = 52.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 1 },
@@ -12033,6 +12769,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dagger",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 180, 205, 217, 230 },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -12052,6 +12789,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 190,
             requiredSkill = 190,
             sourceKind = "worldDrop",
+            skillLevels = { 190, 215, 227, 240 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -12068,6 +12806,7 @@ RecipeRegistryRecipeMetadata = {
             category = "metals",
             sortOrder = 110,
             sourceKind = "trainer",
+            skillLevels = { 230, 250, 270, 290 },
             bopOutput = false,
             reagents = {
                 { itemId = 10620, count = 1 },
@@ -12080,6 +12819,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 50,
             sourceKind = "trainer",
+            skillLevels = { 250, 255, 257, 260 },
             bopOutput = false,
             reagents = {
                 { itemId = 12365, count = 4 },
@@ -12093,6 +12833,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weightstone",
             sortOrder = 50,
             sourceKind = "trainer",
+            skillLevels = { 250, 255, 257, 260 },
             bopOutput = false,
             reagents = {
                 { itemId = 12365, count = 1 },
@@ -12107,6 +12848,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sharpening",
             sortOrder = 50,
             sourceKind = "trainer",
+            skillLevels = { 250, 255, 257, 260 },
             bopOutput = false,
             reagents = {
                 { itemId = 12365, count = 1 },
@@ -12122,6 +12864,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "trainer",
+            skillLevels = { 250, 270, 280, 290 },
             bopOutput = false,
             reagents = {
                 { itemId = 11188, count = 4 },
@@ -12139,6 +12882,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "trainer",
+            skillLevels = { 250, 270, 280, 290 },
             bopOutput = false,
             reagents = {
                 { itemId = 11186, count = 4 },
@@ -12155,6 +12899,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 255,
             requiredSkill = 255,
             sourceKind = "trainer",
+            skillLevels = { 255, 275, 285, 295 },
             bopOutput = false,
             reagents = {
                 { itemId = 11184, count = 4 },
@@ -12171,6 +12916,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 260,
             requiredSkill = 260,
             sourceKind = "worldDrop",
+            skillLevels = { 260, 280, 290, 300 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -12188,7 +12934,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 265,
             requiredSkill = 265,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 13 } },
+            skillLevels = { 265, 285, 295, 305 },
+            sourcePlaces = { { zone = 13, x = 51.4, y = 28.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 6 },
@@ -12205,7 +12952,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 265,
             requiredSkill = 265,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 13 } },
+            skillLevels = { 265, 285, 295, 305 },
+            sourcePlaces = { { zone = 13, x = 51.4, y = 28.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 6 },
@@ -12222,6 +12970,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 270,
             requiredSkill = 270,
             sourceKind = "worldDrop",
+            skillLevels = { 270, 290, 300, 310 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -12240,7 +12989,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 270,
             requiredSkill = 270,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 13 } },
+            skillLevels = { 270, 290, 300, 310 },
+            sourcePlaces = { { zone = 13, x = 51.4, y = 28.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 12 },
@@ -12256,6 +13006,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 270,
             requiredSkill = 270,
             sourceKind = "worldDrop",
+            skillLevels = { 270, 290, 300, 310 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -12276,6 +13027,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 275,
             sourceKind = "worldDrop",
+            skillLevels = { 275, 295, 305, 315 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -12294,6 +13046,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 280,
             requiredSkill = 280,
             sourceKind = "trainer",
+            skillLevels = { 280, 300, 310, 320 },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 8 },
@@ -12311,6 +13064,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 280,
             requiredSkill = 280,
             sourceKind = "trainer",
+            skillLevels = { 280, 300, 310, 320 },
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 1 },
@@ -12328,6 +13082,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "worldDrop",
+            skillLevels = { 285, 305, 315, 325 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -12345,7 +13100,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 45 } },
+            skillLevels = { 290, 310, 320, 330 },
+            sourcePlaces = { { zone = 45, x = 61, y = 38.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 2 },
@@ -12364,6 +13120,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "worldDrop",
+            skillLevels = { 290, 310, 320, 330 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -12381,7 +13138,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 295,
             requiredSkill = 295,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 13 } },
+            skillLevels = { 295, 315, 325, 335 },
+            sourcePlaces = { { zone = 13, x = 51.4, y = 28.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 18 },
@@ -12397,7 +13155,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 295,
             requiredSkill = 295,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 13 } },
+            skillLevels = { 295, 315, 325, 335 },
+            sourcePlaces = { { zone = 13, x = 51.4, y = 28.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 1 },
@@ -12414,6 +13173,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 295,
             requiredSkill = 295,
             sourceKind = "worldDrop",
+            skillLevels = { 295, 315, 325, 335 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -12431,6 +13191,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "worldDrop",
+            skillLevels = { 290, 310, 320, 330 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -12450,7 +13211,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 295,
             requiredSkill = 295,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Magnus Frostwake", zone = 37 } },
+            skillLevels = { 295, 315, 325, 335 },
+            sourcePlaces = { { name = "Magnus Frostwake", zone = 37, x = 68.1, y = 77.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 4 },
@@ -12469,6 +13231,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "trainer",
+            skillLevels = { 300, 320, 330, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 11186, count = 4 },
@@ -12485,7 +13248,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 13 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { zone = 13, x = 51.4, y = 28.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 20 },
@@ -12501,6 +13265,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 15 } },
             bopOutput = false,
             reagents = {
@@ -12519,6 +13284,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 37 } },
             bopOutput = false,
             reagents = {
@@ -12537,7 +13303,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 45 } },
+            skillLevels = { 285, 305, 315, 325 },
+            sourcePlaces = { { zone = 45, x = 63.8, y = 73.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 4 },
@@ -12556,6 +13323,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 320, 330, 340 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -12576,6 +13344,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 320, 330, 340 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -12593,6 +13362,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 15 } },
             bopOutput = false,
             reagents = {
@@ -12612,6 +13382,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 320, 330, 340 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -12632,6 +13403,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 320, 330, 340 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -12652,7 +13424,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 13 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { zone = 13, x = 51.4, y = 28.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 24 },
@@ -12668,6 +13441,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 15 } },
             bopOutput = false,
             reagents = {
@@ -12686,6 +13460,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 37 } },
             bopOutput = false,
             reagents = {
@@ -12704,6 +13479,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 320, 330, 340 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -12724,6 +13500,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -12744,6 +13521,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -12764,6 +13542,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -12785,6 +13564,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 320, 330, 340 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -12860,7 +13640,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Magnus Frostwake", zone = 37 } },
+            skillLevels = { 275, 300, 312, 325 },
+            sourcePlaces = { { name = "Magnus Frostwake", zone = 37, x = 68.1, y = 77.6 } },
             bopOutput = true,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -12879,7 +13660,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 45 } },
+            skillLevels = { 275, 300, 312, 325 },
+            sourcePlaces = { { zone = 45, x = 61.3, y = 37.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 4 },
@@ -12900,7 +13682,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 280,
             requiredSkill = 280,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Magnus Frostwake", zone = 37 } },
+            skillLevels = { 280, 305, 317, 330 },
+            sourcePlaces = { { name = "Magnus Frostwake", zone = 37, x = 68.1, y = 77.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 6 },
@@ -12918,7 +13701,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 280,
             requiredSkill = 280,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 45 } },
+            skillLevels = { 280, 305, 317, 330 },
+            sourcePlaces = { { zone = 45, x = 61.3, y = 37.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -12938,7 +13722,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 280,
             requiredSkill = 280,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 45 } },
+            skillLevels = { 280, 305, 317, 330 },
+            sourcePlaces = { { zone = 45, x = 61.3, y = 37.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7077, count = 4 },
@@ -12976,6 +13761,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "container",
+            skillLevels = { 285, 310, 322, 335 },
             sourcePlaces = { { zone = 47 } },
             bopOutput = false,
             reagents = {
@@ -12997,6 +13783,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "drop",
+            skillLevels = { 290, 315, 327, 340 },
             sourcePlaces = { { zone = 41 } },
             bopOutput = false,
             reagents = {
@@ -13016,6 +13803,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "container",
+            skillLevels = { 290, 315, 327, 340 },
             sourcePlaces = { { zone = 47 } },
             bopOutput = true,
             reagents = {
@@ -13076,6 +13864,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Maleki the Pallid", zone = 47 } },
             bopOutput = false,
             reagents = {
@@ -13096,6 +13885,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Goraluk Anvilcrack", zone = 48 } },
             bopOutput = false,
             reagents = {
@@ -13117,6 +13907,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Quartermaster Zigris", zone = 48 } },
             bopOutput = false,
             reagents = {
@@ -13138,6 +13929,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 37 } },
             bopOutput = false,
             reagents = {
@@ -13159,6 +13951,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Goraluk Anvilcrack", zone = 48 } },
             bopOutput = false,
             reagents = {
@@ -13179,6 +13972,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Bannok Grimaxe", zone = 48 } },
             bopOutput = false,
             reagents = {
@@ -13197,6 +13991,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Cannon Master Willey", zone = 47 } },
             bopOutput = false,
             reagents = {
@@ -13216,6 +14011,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 60,
             sourceKind = "trainer",
+            skillLevels = { 250, 250, 255, 260 },
             bopOutput = false,
             reagents = {
                 { itemId = 11176, count = 3 },
@@ -13229,6 +14025,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 70,
             sourceKind = "trainer",
+            skillLevels = { 250, 250, 255, 260 },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 1 },
@@ -13245,7 +14042,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alchemist Pestlezugg", zone = 13 } },
+            skillLevels = { 275, 275, 282, 290 },
+            sourcePlaces = { { name = "Alchemist Pestlezugg", zone = 13, x = 50.9, y = 27 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 1 },
@@ -13259,6 +14057,7 @@ RecipeRegistryRecipeMetadata = {
             category = "oils",
             sortOrder = 60,
             sourceKind = "trainer",
+            skillLevels = { 250, 250, 255, 260 },
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -13275,6 +14074,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 255,
             sourceKind = "trainer",
+            skillLevels = { 255, 270, 290, 310 },
             bopOutput = false,
             reagents = {
                 { itemId = 8846, count = 3 },
@@ -13291,6 +14091,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 260,
             sourceKind = "trainer",
+            skillLevels = { 260, 275, 295, 315 },
             bopOutput = false,
             reagents = {
                 { itemId = 8838, count = 2 },
@@ -13308,7 +14109,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 265,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Soolie Berryfizz", zone = 27 }, { name = "Kor'geld", zone = 25 } },
+            skillLevels = { 265, 280, 300, 320 },
+            sourcePlaces = { { name = "Soolie Berryfizz", zone = 27, x = 66.6, y = 54.5, faction = "alliance" }, { name = "Kor'geld", zone = 25, x = 56.1, y = 35.8, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 8838, count = 1 },
@@ -13326,6 +14128,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 130,
             requiredSkill = 270,
             sourceKind = "trainer",
+            skillLevels = { 270, 285, 305, 325 },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -13343,6 +14146,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 275,
             sourceKind = "trainer",
+            skillLevels = { 275, 290, 310, 330 },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -13360,6 +14164,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 140,
             requiredSkill = 275,
             sourceKind = "trainer",
+            skillLevels = { 275, 290, 310, 330 },
             bopOutput = false,
             reagents = {
                 { itemId = 8846, count = 2 },
@@ -13377,7 +14182,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33 }, { name = "Quartermaster Miranda Breechlock", zone = 49 }, { name = "Argent Quartermaster Lightspark", zone = 37 } },
+            skillLevels = { 275, 275, 282, 290 },
+            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33, x = 83.2, y = 68.1 }, { name = "Quartermaster Miranda Breechlock", zone = 49, x = 75.8, y = 54.1 }, { name = "Argent Quartermaster Lightspark", zone = 37, x = 42.8, y = 83.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7082, count = 1 },
@@ -13393,6 +14199,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 275,
             sourceKind = "vendor",
+            skillLevels = { 275, 275, 282, 290 },
             sourcePlaces = { { name = "Plugger Spazzring", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -13409,7 +14216,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Meilosh", zone = 44 } },
+            skillLevels = { 275, 275, 282, 290 },
+            sourcePlaces = { { name = "Meilosh", zone = 44, x = 65.7, y = 2.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 1 },
@@ -13425,7 +14233,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Magnus Frostwake", zone = 37 } },
+            skillLevels = { 275, 275, 282, 290 },
+            sourcePlaces = { { name = "Magnus Frostwake", zone = 37, x = 68.1, y = 77.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 1 },
@@ -13441,6 +14250,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 31,
             requiredSkill = 275,
             sourceKind = "worldDrop",
+            skillLevels = { 275, 275, 282, 290 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -13457,6 +14267,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 275,
             sourceKind = "worldDrop",
+            skillLevels = { 275, 275, 282, 290 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -13473,6 +14284,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 21,
             requiredSkill = 275,
             sourceKind = "worldDrop",
+            skillLevels = { 275, 275, 282, 290 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -13489,6 +14301,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 275,
             sourceKind = "worldDrop",
+            skillLevels = { 275, 275, 282, 290 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -13505,6 +14318,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             requiredSkill = 280,
             sourceKind = "worldDrop",
+            skillLevels = { 280, 295, 315, 335 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -13523,6 +14337,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 150,
             requiredSkill = 280,
             sourceKind = "drop",
+            skillLevels = { 280, 295, 315, 335 },
             sourcePlaces = { { zone = 38 }, { zone = 44 } },
             bopOutput = false,
             reagents = {
@@ -13541,6 +14356,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 35,
             requiredSkill = 285,
             sourceKind = "trainer",
+            skillLevels = { 285, 300, 320, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -13558,6 +14374,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 160,
             requiredSkill = 285,
             sourceKind = "trainer",
+            skillLevels = { 285, 300, 320, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -13575,6 +14392,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 130,
             requiredSkill = 290,
             sourceKind = "drop",
+            skillLevels = { 290, 305, 325, 345 },
             sourcePlaces = { { zone = 48 } },
             bopOutput = false,
             reagents = {
@@ -13593,6 +14411,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 140,
             requiredSkill = 290,
             sourceKind = "drop",
+            skillLevels = { 290, 305, 325, 345 },
             sourcePlaces = { { zone = 45 } },
             bopOutput = false,
             reagents = {
@@ -13611,6 +14430,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 150,
             requiredSkill = 290,
             sourceKind = "drop",
+            skillLevels = { 290, 305, 325, 345 },
             sourcePlaces = { { zone = 37 } },
             bopOutput = false,
             reagents = {
@@ -13629,6 +14449,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 160,
             requiredSkill = 290,
             sourceKind = "drop",
+            skillLevels = { 290, 305, 325, 345 },
             sourcePlaces = { { zone = 45 } },
             bopOutput = false,
             reagents = {
@@ -13647,6 +14468,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 120,
             requiredSkill = 290,
             sourceKind = "drop",
+            skillLevels = { 290, 305, 325, 345 },
             sourcePlaces = { { zone = 49 } },
             bopOutput = false,
             reagents = {
@@ -13682,7 +14504,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 295,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Magnus Frostwake", zone = 37 } },
+            skillLevels = { 295, 310, 330, 350 },
+            sourcePlaces = { { name = "Magnus Frostwake", zone = 37, x = 68.1, y = 77.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -13700,7 +14523,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Almaador", zone = 50 } },
+            skillLevels = { 350, 365, 372, 380 },
+            sourcePlaces = { { name = "Almaador", zone = 50, x = 51, y = 41.9 } },
             bopOutput = true,
             reagents = {
                 { itemId = 9149, count = 1 },
@@ -13719,6 +14543,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 315, 322, 330 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -13737,7 +14562,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Almaador", zone = 50 } },
+            skillLevels = { 300, 315, 322, 330 },
+            sourcePlaces = { { name = "Almaador", zone = 50, x = 51, y = 41.9 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8846, count = 7 },
@@ -13755,7 +14581,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 300, 315, 322, 330 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -13773,7 +14600,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alurmi", zone = 13 } },
+            skillLevels = { 300, 315, 322, 330 },
+            sourcePlaces = { { name = "Alurmi", zone = 13, x = 63.6, y = 57.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -13791,7 +14619,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nakodu", zone = 50 } },
+            skillLevels = { 300, 315, 322, 330 },
+            sourcePlaces = { { name = "Nakodu", zone = 50, x = 62.1, y = 69 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -13809,7 +14638,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gikkix", zone = 13 } },
+            skillLevels = { 225, 250, 262, 275 },
+            sourcePlaces = { { name = "Gikkix", zone = 13, x = 66.6, y = 22.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4603, count = 1 },
@@ -13824,7 +14654,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kelsey Yance", zone = 2 } },
+            skillLevels = { 225, 250, 262, 275 },
+            sourcePlaces = { { name = "Kelsey Yance", zone = 2, x = 28.2, y = 74.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 1 },
@@ -13840,7 +14671,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 240,
             requiredSkill = 240,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gikkix", zone = 13 } },
+            skillLevels = { 240, 265, 277, 290 },
+            sourcePlaces = { { name = "Gikkix", zone = 13, x = 66.6, y = 22.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 1 },
@@ -13856,7 +14688,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kelsey Yance", zone = 2 } },
+            skillLevels = { 225, 250, 262, 275 },
+            sourcePlaces = { { name = "Kelsey Yance", zone = 2, x = 28.2, y = 74.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 13758, count = 1 },
@@ -13871,7 +14704,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 240,
             requiredSkill = 240,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kelsey Yance", zone = 2 } },
+            skillLevels = { 240, 265, 277, 290 },
+            sourcePlaces = { { name = "Kelsey Yance", zone = 2, x = 28.2, y = 74.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 2 },
@@ -13887,7 +14721,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gikkix", zone = 13 } },
+            skillLevels = { 250, 275, 285, 295 },
+            sourcePlaces = { { name = "Gikkix", zone = 13, x = 66.6, y = 22.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 159, count = 1 },
@@ -13903,7 +14738,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gikkix", zone = 13 } },
+            skillLevels = { 250, 275, 285, 295 },
+            sourcePlaces = { { name = "Gikkix", zone = 13, x = 66.6, y = 22.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 13760, count = 1 },
@@ -13918,7 +14754,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Vivianna", zone = 31 }, { name = "Sheendra Tallgrass", zone = 31 } },
+            skillLevels = { 275, 300, 312, 325 },
+            sourcePlaces = { { name = "Vivianna", zone = 31, x = 31.3, y = 43.5, faction = "alliance" }, { name = "Sheendra Tallgrass", zone = 31, x = 74.5, y = 42.8, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 159, count = 1 },
@@ -13934,7 +14771,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Vivianna", zone = 31 }, { name = "Sheendra Tallgrass", zone = 31 } },
+            skillLevels = { 275, 300, 312, 325 },
+            sourcePlaces = { { name = "Vivianna", zone = 31, x = 31.3, y = 43.5, faction = "alliance" }, { name = "Sheendra Tallgrass", zone = 31, x = 74.5, y = 42.8, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -13951,7 +14789,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Vivianna", zone = 31 }, { name = "Sheendra Tallgrass", zone = 31 } },
+            skillLevels = { 275, 300, 312, 325 },
+            sourcePlaces = { { name = "Vivianna", zone = 31, x = 31.3, y = 43.5, faction = "alliance" }, { name = "Sheendra Tallgrass", zone = 31, x = 74.5, y = 42.8, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 1 },
@@ -13965,6 +14804,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cloth",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 250, 255, 257, 260 },
             bopOutput = false,
             reagents = {
                 { itemId = 14047, count = 5 },
@@ -13978,6 +14818,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 255, 270, 285, 300 },
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 3 },
@@ -13994,6 +14835,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 255,
             requiredSkill = 255,
             sourceKind = "trainer",
+            skillLevels = { 255, 270, 285, 300 },
             bopOutput = false,
             reagents = {
                 { itemId = 7079, count = 2 },
@@ -14011,6 +14853,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 255,
             requiredSkill = 255,
             sourceKind = "worldDrop",
+            skillLevels = { 255, 270, 285, 300 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -14028,7 +14871,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 260,
             requiredSkill = 260,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Qia", zone = 45 } },
+            skillLevels = { 260, 275, 290, 305 },
+            sourcePlaces = { { name = "Qia", zone = 45, x = 61.2, y = 37.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 2 },
@@ -14046,7 +14890,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 260,
             requiredSkill = 260,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Darnall", zone = 52 } },
+            skillLevels = { 260, 275, 290, 305 },
+            sourcePlaces = { { name = "Darnall", zone = 52, x = 51.6, y = 33.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 5 },
@@ -14064,6 +14909,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 260,
             requiredSkill = 260,
             sourceKind = "trainer",
+            skillLevels = { 260, 275, 290, 305 },
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 5 },
@@ -14081,6 +14927,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 260,
             requiredSkill = 260,
             sourceKind = "drop",
+            skillLevels = { 260, 275, 290, 305 },
             sourcePlaces = { { zone = 39 } },
             bopOutput = false,
             reagents = {
@@ -14099,7 +14946,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 265,
             requiredSkill = 265,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Darnall", zone = 52 } },
+            skillLevels = { 265, 280, 295, 310 },
+            sourcePlaces = { { name = "Darnall", zone = 52, x = 51.6, y = 33.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 4 },
@@ -14117,6 +14965,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 265,
             requiredSkill = 265,
             sourceKind = "trainer",
+            skillLevels = { 265, 280, 295, 310 },
             bopOutput = false,
             reagents = {
                 { itemId = 9210, count = 2 },
@@ -14135,6 +14984,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 265,
             requiredSkill = 265,
             sourceKind = "trainer",
+            skillLevels = { 265, 280, 295, 310 },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 1 },
@@ -14152,6 +15002,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 270,
             requiredSkill = 270,
             sourceKind = "drop",
+            skillLevels = { 270, 285, 300, 315 },
             sourcePlaces = { { zone = 39 } },
             bopOutput = false,
             reagents = {
@@ -14170,6 +15021,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 270,
             requiredSkill = 270,
             sourceKind = "trainer",
+            skillLevels = { 270, 285, 300, 315 },
             bopOutput = false,
             reagents = {
                 { itemId = 9210, count = 2 },
@@ -14188,6 +15040,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 270,
             requiredSkill = 270,
             sourceKind = "trainer",
+            skillLevels = { 270, 285, 300, 315 },
             bopOutput = false,
             reagents = {
                 { itemId = 3577, count = 2 },
@@ -14205,6 +15058,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 270,
             requiredSkill = 270,
             sourceKind = "trainer",
+            skillLevels = { 270, 285, 300, 315 },
             bopOutput = false,
             reagents = {
                 { itemId = 3577, count = 2 },
@@ -14222,6 +15076,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "trainer",
+            skillLevels = { 275, 290, 305, 320 },
             bopOutput = false,
             reagents = {
                 { itemId = 9210, count = 4 },
@@ -14240,6 +15095,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "trainer",
+            skillLevels = { 275, 290, 305, 320 },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -14257,6 +15113,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "drop",
+            skillLevels = { 275, 290, 305, 320 },
             sourcePlaces = { { zone = 41 } },
             bopOutput = false,
             reagents = {
@@ -14275,7 +15132,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Lorelae Wintersong", zone = 52 } },
+            skillLevels = { 275, 290, 305, 320 },
+            sourcePlaces = { { name = "Lorelae Wintersong", zone = 52, x = 48.3, y = 40.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 5 },
@@ -14293,6 +15151,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "trainer",
+            skillLevels = { 275, 290, 305, 320 },
             bopOutput = false,
             reagents = {
                 { itemId = 3577, count = 2 },
@@ -14310,6 +15169,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "trainer",
+            skillLevels = { 275, 290, 305, 320 },
             bopOutput = false,
             reagents = {
                 { itemId = 11176, count = 1 },
@@ -14327,7 +15187,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "drop",
-            sourcePlaces = { { name = "Overmaster Pyron", zone = 39 } },
+            skillLevels = { 275, 290, 305, 320 },
+            sourcePlaces = { { name = "Overmaster Pyron", zone = 39, x = 26.2, y = 74.9 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7068, count = 4 },
@@ -14347,6 +15208,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 280,
             requiredSkill = 280,
             sourceKind = "trainer",
+            skillLevels = { 280, 295, 310, 325 },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -14365,6 +15227,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 280,
             requiredSkill = 280,
             sourceKind = "trainer",
+            skillLevels = { 280, 295, 310, 325 },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 1 },
@@ -14382,6 +15245,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 280,
             requiredSkill = 280,
             sourceKind = "drop",
+            skillLevels = { 280, 295, 310, 325 },
             sourcePlaces = { { zone = 41 } },
             bopOutput = false,
             reagents = {
@@ -14400,6 +15264,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "drop",
+            skillLevels = { 285, 300, 315, 330 },
             sourcePlaces = { { zone = 45 } },
             bopOutput = false,
             reagents = {
@@ -14420,6 +15285,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "trainer",
+            skillLevels = { 285, 300, 315, 330 },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -14438,6 +15304,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "trainer",
+            skillLevels = { 285, 300, 315, 330 },
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 6 },
@@ -14455,6 +15322,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "worldDrop",
+            skillLevels = { 290, 305, 320, 335 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -14474,6 +15342,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "worldDrop",
+            skillLevels = { 290, 305, 320, 335 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -14492,6 +15361,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "trainer",
+            skillLevels = { 290, 305, 320, 335 },
             bopOutput = false,
             reagents = {
                 { itemId = 9210, count = 4 },
@@ -14509,6 +15379,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "trainer",
+            skillLevels = { 290, 305, 320, 335 },
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 5 },
@@ -14526,6 +15397,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 295,
             requiredSkill = 295,
             sourceKind = "trainer",
+            skillLevels = { 295, 310, 325, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 4 },
@@ -14542,6 +15414,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 315, 330, 345 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -14560,6 +15433,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "trainer",
+            skillLevels = { 300, 315, 330, 345 },
             bopOutput = false,
             reagents = {
                 { itemId = 11176, count = 2 },
@@ -14577,6 +15451,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 315, 330, 345 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -14595,6 +15470,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 315, 330, 345 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -14613,6 +15489,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "trainer",
+            skillLevels = { 300, 315, 330, 345 },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -14631,6 +15508,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "trainer",
+            skillLevels = { 300, 315, 330, 345 },
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 1 },
@@ -14649,6 +15527,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "trainer",
+            skillLevels = { 300, 315, 330, 345 },
             bopOutput = false,
             reagents = {
                 { itemId = 12662, count = 2 },
@@ -14667,6 +15546,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 315, 330, 345 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -14687,6 +15567,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "trainer",
+            skillLevels = { 300, 315, 330, 345 },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -14706,6 +15587,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 315, 330, 345 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -14727,6 +15609,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 315, 330, 345 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -14747,6 +15630,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { name = "Balnazzar", zone = 47 } },
             bopOutput = true,
             reagents = {
@@ -14768,6 +15652,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { zone = 48 } },
             bopOutput = true,
             reagents = {
@@ -14789,6 +15674,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { name = "Darkmaster Gandling", zone = 53 } },
             bopOutput = true,
             reagents = {
@@ -14809,7 +15695,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Qia", zone = 45 } },
+            skillLevels = { 250, 290, 305, 320 },
+            sourcePlaces = { { name = "Qia", zone = 45, x = 61.2, y = 37.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14256, count = 2 },
@@ -14822,6 +15709,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 250, 250, 255, 260 },
             bopOutput = false,
             reagents = {
                 { itemId = 8171, count = 1 },
@@ -14838,7 +15726,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 255,
             requiredSkill = 255,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Zannok Hidepiercer", zone = 54 } },
+            skillLevels = { 255, 275, 285, 295 },
+            sourcePlaces = { { name = "Zannok Hidepiercer", zone = 54, x = 81.9, y = 17.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -14856,7 +15745,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 260,
             requiredSkill = 260,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Leonard Porter", zone = 37 }, { name = "Werg Thickblade", zone = 33 } },
+            skillLevels = { 260, 280, 290, 300 },
+            sourcePlaces = { { name = "Leonard Porter", zone = 37, x = 43, y = 84.3, faction = "alliance" }, { name = "Werg Thickblade", zone = 33, x = 83.2, y = 69.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 1 },
@@ -14874,7 +15764,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 260,
             requiredSkill = 260,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Masat T'andr", zone = 36 } },
+            skillLevels = { 260, 280, 290, 300 },
+            sourcePlaces = { { name = "Masat T'andr", zone = 36, x = 26.3, y = 31.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 20 },
@@ -14892,6 +15783,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 265,
             requiredSkill = 265,
             sourceKind = "drop",
+            skillLevels = { 265, 285, 295, 305 },
             sourcePlaces = { { zone = 40 } },
             bopOutput = false,
             reagents = {
@@ -14910,6 +15802,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 265,
             requiredSkill = 265,
             sourceKind = "trainer",
+            skillLevels = { 265, 285, 295, 305 },
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 1 },
@@ -14927,7 +15820,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 265,
             requiredSkill = 265,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Blimo Gadgetspring", zone = 38 } },
+            skillLevels = { 265, 285, 295, 305 },
+            sourcePlaces = { { name = "Blimo Gadgetspring", zone = 38, x = 45.3, y = 90.9 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 6 },
@@ -14945,6 +15839,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "General Drakkisath", zone = 48 } },
             bopOutput = false,
             reagents = {
@@ -14963,6 +15858,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 270,
             requiredSkill = 270,
             sourceKind = "trainer",
+            skillLevels = { 270, 290, 300, 310 },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 10 },
@@ -14978,6 +15874,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "armor",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 250, 255, 265, 275 },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 5 },
@@ -14993,6 +15890,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 270,
             requiredSkill = 270,
             sourceKind = "drop",
+            skillLevels = { 270, 290, 300, 310 },
             sourcePlaces = { { zone = 41 } },
             bopOutput = false,
             reagents = {
@@ -15012,6 +15910,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 270,
             requiredSkill = 270,
             sourceKind = "drop",
+            skillLevels = { 270, 290, 300, 310 },
             sourcePlaces = { { zone = 55 } },
             bopOutput = false,
             reagents = {
@@ -15030,7 +15929,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 270,
             requiredSkill = 270,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Pratt McGrubben", zone = 31 }, { name = "Jangdor Swiftstrider", zone = 31 } },
+            skillLevels = { 270, 290, 300, 310 },
+            sourcePlaces = { { name = "Pratt McGrubben", zone = 31, x = 30.6, y = 42.7, faction = "alliance" }, { name = "Jangdor Swiftstrider", zone = 31, x = 74.5, y = 42.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 12 },
@@ -15048,7 +15948,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 270,
             requiredSkill = 270,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gigget Zipcoil", zone = 35 } },
+            skillLevels = { 270, 290, 300, 310 },
+            sourcePlaces = { { name = "Gigget Zipcoil", zone = 35, x = 34.5, y = 38.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 2 },
@@ -15067,6 +15968,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "worldDrop",
+            skillLevels = { 275, 295, 305, 315 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -15085,6 +15987,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "drop",
+            skillLevels = { 275, 295, 305, 315 },
             sourcePlaces = { { zone = 41 } },
             bopOutput = false,
             reagents = {
@@ -15103,6 +16006,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "trainer",
+            skillLevels = { 275, 295, 305, 315 },
             bopOutput = false,
             reagents = {
                 { itemId = 7971, count = 1 },
@@ -15121,7 +16025,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Qia", zone = 45 } },
+            skillLevels = { 275, 295, 305, 315 },
+            sourcePlaces = { { name = "Qia", zone = 45, x = 61.2, y = 37.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 4 },
@@ -15139,7 +16044,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Leonard Porter", zone = 37 }, { name = "Werg Thickblade", zone = 33 } },
+            skillLevels = { 275, 295, 305, 315 },
+            sourcePlaces = { { name = "Leonard Porter", zone = 37, x = 43, y = 84.3, faction = "alliance" }, { name = "Werg Thickblade", zone = 33, x = 83.2, y = 69.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 2 },
@@ -15158,7 +16064,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Meilosh", zone = 44 } },
+            skillLevels = { 275, 295, 305, 315 },
+            sourcePlaces = { { name = "Meilosh", zone = 44, x = 65.7, y = 2.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 28 },
@@ -15176,6 +16083,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 280,
             requiredSkill = 280,
             sourceKind = "worldDrop",
+            skillLevels = { 280, 300, 310, 320 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -15194,6 +16102,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 280,
             requiredSkill = 280,
             sourceKind = "trainer",
+            skillLevels = { 280, 300, 310, 320 },
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 1 },
@@ -15211,6 +16120,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 280,
             requiredSkill = 280,
             sourceKind = "trainer",
+            skillLevels = { 280, 300, 310, 320 },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 12 },
@@ -15228,6 +16138,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 280,
             requiredSkill = 280,
             sourceKind = "worldDrop",
+            skillLevels = { 280, 300, 310, 320 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -15246,6 +16157,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "drop",
+            skillLevels = { 285, 305, 315, 325 },
             sourcePlaces = { { zone = 45 } },
             bopOutput = false,
             reagents = {
@@ -15264,6 +16176,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "drop",
+            skillLevels = { 285, 305, 315, 325 },
             sourcePlaces = { { zone = 41 } },
             bopOutput = false,
             reagents = {
@@ -15282,6 +16195,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "drop",
+            skillLevels = { 285, 305, 315, 325 },
             sourcePlaces = { { zone = 48 } },
             bopOutput = false,
             reagents = {
@@ -15301,7 +16215,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Blimo Gadgetspring", zone = 38 } },
+            skillLevels = { 285, 305, 315, 325 },
+            sourcePlaces = { { name = "Blimo Gadgetspring", zone = 38, x = 45.3, y = 90.9 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 28 },
@@ -15320,6 +16235,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "drop",
+            skillLevels = { 285, 305, 315, 325 },
             sourcePlaces = { { zone = 44 } },
             bopOutput = false,
             reagents = {
@@ -15339,6 +16255,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "drop",
+            skillLevels = { 285, 305, 315, 325 },
             sourcePlaces = { { zone = 38 } },
             bopOutput = false,
             reagents = {
@@ -15359,8 +16276,9 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "vendor",
+            skillLevels = { 285, 305, 315, 325 },
             removed = true,
-            sourcePlaces = { { name = "Meilosh", zone = 44 } },
+            sourcePlaces = { { name = "Meilosh", zone = 44, x = 65.7, y = 2.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 24 },
@@ -15378,6 +16296,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "worldDrop",
+            skillLevels = { 290, 310, 320, 330 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -15396,6 +16315,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "trainer",
+            skillLevels = { 290, 310, 320, 330 },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 14 },
@@ -15413,6 +16333,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "trainer",
+            skillLevels = { 290, 315, 325, 335 },
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 3 },
@@ -15431,7 +16352,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nergal", zone = 56 } },
+            skillLevels = { 290, 310, 320, 330 },
+            sourcePlaces = { { name = "Nergal", zone = 56, x = 43.3, y = 7.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 30 },
@@ -15449,6 +16371,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "vendor",
+            skillLevels = { 290, 310, 320, 330 },
             sourcePlaces = { { name = "Plugger Spazzring", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -15468,6 +16391,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "drop",
+            skillLevels = { 290, 310, 320, 330 },
             sourcePlaces = { { zone = 35 } },
             bopOutput = false,
             reagents = {
@@ -15488,6 +16412,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 295,
             requiredSkill = 295,
             sourceKind = "drop",
+            skillLevels = { 295, 315, 325, 335 },
             sourcePlaces = { { zone = 44 } },
             bopOutput = false,
             reagents = {
@@ -15506,7 +16431,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 295,
             requiredSkill = 295,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Zannok Hidepiercer", zone = 54 } },
+            skillLevels = { 295, 315, 325, 335 },
+            sourcePlaces = { { name = "Zannok Hidepiercer", zone = 54, x = 81.9, y = 17.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 8 },
@@ -15525,6 +16451,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 295,
             requiredSkill = 295,
             sourceKind = "drop",
+            skillLevels = { 295, 315, 325, 335 },
             sourcePlaces = { { zone = 38 } },
             bopOutput = false,
             reagents = {
@@ -15545,6 +16472,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 295,
             requiredSkill = 295,
             sourceKind = "drop",
+            skillLevels = { 295, 315, 325, 335 },
             sourcePlaces = { { zone = 38 } },
             bopOutput = false,
             reagents = {
@@ -15565,6 +16493,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "trainer",
+            skillLevels = { 300, 320, 330, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 18 },
@@ -15583,6 +16512,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "trainer",
+            skillLevels = { 300, 320, 330, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 2 },
@@ -15599,7 +16529,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 25 }, { zone = 1 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { zone = 25, x = 51, y = 76.5, faction = "horde" }, { zone = 1, x = 67.2, y = 85.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14044, count = 1 },
@@ -15617,6 +16548,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -15637,6 +16569,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 37 } },
             bopOutput = false,
             reagents = {
@@ -15657,6 +16590,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 56 } },
             bopOutput = false,
             reagents = {
@@ -15676,6 +16610,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "trainer",
+            skillLevels = { 300, 320, 330, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 4 },
@@ -15695,6 +16630,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 41 } },
             bopOutput = false,
             reagents = {
@@ -15714,6 +16650,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 48 } },
             bopOutput = false,
             reagents = {
@@ -15733,6 +16670,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "trainer",
+            skillLevels = { 300, 320, 330, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 22 },
@@ -15752,6 +16690,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "trainer",
+            skillLevels = { 300, 320, 330, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 16 },
@@ -15771,6 +16710,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 45 } },
             bopOutput = false,
             reagents = {
@@ -15808,6 +16748,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -15826,7 +16767,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 44 } },
+            skillLevels = { 290, 295, 310, 325 },
+            sourcePlaces = { { zone = 44, x = 65.7, y = 2.9 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7971, count = 2 },
@@ -15843,6 +16785,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "consumables",
             sortOrder = 120,
             sourceKind = "trainer",
+            skillLevels = { 250, 270, 280, 290 },
             bopOutput = false,
             reagents = {
                 { itemId = 10558, count = 1 },
@@ -15859,6 +16802,7 @@ RecipeRegistryRecipeMetadata = {
             category = "keys",
             sortOrder = 10,
             sourceKind = "trainer",
+            skillLevels = { 100, 100, 110, 120 },
             bopOutput = false,
             reagents = {
                 { itemId = 2842, count = 1 },
@@ -15873,6 +16817,7 @@ RecipeRegistryRecipeMetadata = {
             category = "keys",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 150, 150, 160, 170 },
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 1 },
@@ -15887,6 +16832,7 @@ RecipeRegistryRecipeMetadata = {
             category = "keys",
             sortOrder = 30,
             sourceKind = "trainer",
+            skillLevels = { 200, 200, 210, 220 },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 1 },
@@ -15901,6 +16847,7 @@ RecipeRegistryRecipeMetadata = {
             category = "keys",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 275, 275, 280, 285 },
             bopOutput = false,
             reagents = {
                 { itemId = 12360, count = 1 },
@@ -15915,6 +16862,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "powders",
             sortOrder = 50,
             sourceKind = "trainer",
+            skillLevels = { 250, 250, 255, 260 },
             bopOutput = false,
             reagents = {
                 { itemId = 12365, count = 2 },
@@ -15931,6 +16879,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 260,
             sourceKind = "trainer",
+            skillLevels = { 260, 280, 290, 300 },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 3 },
@@ -15948,6 +16897,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 150,
             requiredSkill = 260,
             sourceKind = "trainer",
+            skillLevels = { 260, 280, 290, 300 },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 3 },
@@ -15964,6 +16914,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 80,
             requiredSkill = 260,
             sourceKind = "trainer",
+            skillLevels = { 260, 280, 290, 300 },
             bopOutput = false,
             reagents = {
                 { itemId = 10546, count = 1 },
@@ -15982,6 +16933,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 265,
             sourceKind = "worldDrop",
+            skillLevels = { 265, 285, 295, 305 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -16001,6 +16953,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 170,
             requiredSkill = 270,
             sourceKind = "trainer",
+            skillLevels = { 270, 290, 300, 310 },
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 4 },
@@ -16018,6 +16971,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 160,
             requiredSkill = 275,
             sourceKind = "trainer",
+            skillLevels = { 275, 295, 305, 315 },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 6 },
@@ -16033,6 +16987,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             requiredSkill = 275,
             sourceKind = "drop",
+            skillLevels = { 275, 295, 305, 315 },
             sourcePlaces = { { zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -16055,6 +17010,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 285,
             sourceKind = "drop",
+            skillLevels = { 285, 305, 315, 325 },
             sourcePlaces = { { zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -16074,6 +17030,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             requiredSkill = 285,
             sourceKind = "trainer",
+            skillLevels = { 285, 295, 300, 305 },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 2 },
@@ -16090,7 +17047,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Xizzer Fizzbolt", zone = 45 } },
+            skillLevels = { 275, 295, 305, 315 },
+            sourcePlaces = { { name = "Xizzer Fizzbolt", zone = 45, x = 60.8, y = 38.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 1 },
@@ -16110,7 +17068,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 170,
             requiredSkill = 285,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Xizzer Fizzbolt", zone = 45 } },
+            skillLevels = { 285, 305, 315, 325 },
+            sourcePlaces = { { name = "Xizzer Fizzbolt", zone = 45, x = 60.8, y = 38.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12360, count = 1 },
@@ -16126,6 +17085,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 180,
             requiredSkill = 290,
             sourceKind = "drop",
+            skillLevels = { 290, 310, 320, 330 },
             sourcePlaces = { { zone = 47 } },
             bopOutput = false,
             reagents = {
@@ -16145,6 +17105,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 180,
             requiredSkill = 290,
             sourceKind = "trainer",
+            skillLevels = { 290, 310, 320, 330 },
             bopOutput = false,
             reagents = {
                 { itemId = 10500, count = 1 },
@@ -16162,6 +17123,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 45 } },
             bopOutput = false,
             reagents = {
@@ -16184,6 +17146,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 320, 330, 340 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -16202,6 +17165,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 49 } },
             bopOutput = false,
             reagents = {
@@ -16222,6 +17186,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 255,
             requiredSkill = 255,
             sourceKind = "trainer",
+            skillLevels = { 255, 275, 295, 315 },
             reagents = {
                 { itemId = 16202, count = 3 },
             },
@@ -16235,6 +17200,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 270,
             requiredSkill = 270,
             sourceKind = "worldDrop",
+            skillLevels = { 270, 290, 310, 330 },
             worldDrop = true,
             reagents = {
                 { itemId = 11176, count = 10 },
@@ -16250,6 +17216,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 295,
             requiredSkill = 295,
             sourceKind = "drop",
+            skillLevels = { 295, 310, 325, 340 },
             sourcePlaces = { { zone = 57 } },
             reagents = {
                 { itemId = 16203, count = 6 },
@@ -16265,6 +17232,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 310, 325, 340 },
             worldDrop = true,
             reagents = {
                 { itemId = 16204, count = 15 },
@@ -16279,6 +17247,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 270,
             requiredSkill = 270,
             sourceKind = "trainer",
+            skillLevels = { 270, 290, 310, 330 },
             reagents = {
                 { itemId = 16202, count = 3 },
                 { itemId = 16204, count = 3 },
@@ -16293,6 +17262,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 295,
             requiredSkill = 295,
             sourceKind = "trainer",
+            skillLevels = { 295, 310, 325, 340 },
             reagents = {
                 { itemId = 16203, count = 4 },
                 { itemId = 16204, count = 4 },
@@ -16307,6 +17277,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 265,
             requiredSkill = 265,
             sourceKind = "trainer",
+            skillLevels = { 265, 285, 305, 325 },
             reagents = {
                 { itemId = 7075, count = 1 },
                 { itemId = 7077, count = 1 },
@@ -16325,7 +17296,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Lorelae Wintersong", zone = 52 } },
+            skillLevels = { 285, 300, 317, 335 },
+            sourcePlaces = { { name = "Lorelae Wintersong", zone = 52, x = 48.3, y = 40.1 } },
             reagents = {
                 { itemId = 16204, count = 8 },
             },
@@ -16339,6 +17311,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 280,
             requiredSkill = 280,
             sourceKind = "trainer",
+            skillLevels = { 280, 300, 320, 340 },
             reagents = {
                 { itemId = 16203, count = 2 },
                 { itemId = 16204, count = 4 },
@@ -16353,7 +17326,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 265,
             requiredSkill = 265,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mythrin'dir", zone = 26 }, { name = "Daniel Bartlett", zone = 34 } },
+            skillLevels = { 265, 285, 305, 325 },
+            sourcePlaces = { { name = "Mythrin'dir", zone = 26, x = 60, y = 19.1, faction = "alliance" }, { name = "Daniel Bartlett", zone = 34, x = 64.2, y = 37.7, faction = "horde" } },
             reagents = {
                 { itemId = 11176, count = 10 },
             },
@@ -16367,6 +17341,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 260,
             requiredSkill = 260,
             sourceKind = "worldDrop",
+            skillLevels = { 260, 280, 300, 320 },
             worldDrop = true,
             reagents = {
                 { itemId = 11176, count = 10 },
@@ -16381,6 +17356,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 295,
             requiredSkill = 295,
             sourceKind = "trainer",
+            skillLevels = { 295, 310, 325, 340 },
             reagents = {
                 { itemId = 16203, count = 8 },
             },
@@ -16394,6 +17370,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "worldDrop",
+            skillLevels = { 275, 295, 315, 335 },
             worldDrop = true,
             reagents = {
                 { itemId = 16202, count = 1 },
@@ -16409,6 +17386,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 310, 325, 340 },
             worldDrop = true,
             reagents = {
                 { itemId = 14344, count = 4 },
@@ -16425,7 +17403,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Qia", zone = 45 } },
+            skillLevels = { 275, 295, 315, 335 },
+            sourcePlaces = { { name = "Qia", zone = 45, x = 61.2, y = 37.2 } },
             reagents = {
                 { itemId = 14343, count = 1 },
                 { itemId = 16204, count = 6 },
@@ -16440,6 +17419,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "trainer",
+            skillLevels = { 290, 305, 322, 340 },
             reagents = {
                 { itemId = 14343, count = 1 },
                 { itemId = 16203, count = 3 },
@@ -16454,6 +17434,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "drop",
+            skillLevels = { 285, 300, 317, 335 },
             sourcePlaces = { { zone = 45 } },
             reagents = {
                 { itemId = 7080, count = 1 },
@@ -16471,6 +17452,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 295,
             requiredSkill = 295,
             sourceKind = "drop",
+            skillLevels = { 295, 310, 325, 340 },
             sourcePlaces = { { zone = 48 } },
             reagents = {
                 { itemId = 14344, count = 4 },
@@ -16486,6 +17468,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 310, 325, 340 },
             sourcePlaces = { { zone = 48 } },
             reagents = {
                 { itemId = 14344, count = 2 },
@@ -16501,6 +17484,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 310, 325, 340 },
             sourcePlaces = { { zone = 53 } },
             reagents = {
                 { itemId = 12803, count = 6 },
@@ -16517,6 +17501,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 295,
             requiredSkill = 295,
             sourceKind = "drop",
+            skillLevels = { 295, 310, 325, 340 },
             sourcePlaces = { { zone = 47 }, { zone = 58 } },
             reagents = {
                 { itemId = 12808, count = 4 },
@@ -16532,6 +17517,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 310, 325, 340 },
             sourcePlaces = { { zone = 37 }, { zone = 49 } },
             reagents = {
                 { itemId = 12811, count = 2 },
@@ -16547,6 +17533,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 310, 325, 340 },
             sourcePlaces = { { zone = 53 } },
             reagents = {
                 { itemId = 14344, count = 2 },
@@ -16562,6 +17549,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 310, 325, 340 },
             sourcePlaces = { { zone = 47 } },
             reagents = {
                 { itemId = 14344, count = 2 },
@@ -16577,7 +17565,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 290,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Lorelae Wintersong", zone = 52 } },
+            skillLevels = { 290, 305, 322, 340 },
+            sourcePlaces = { { name = "Lorelae Wintersong", zone = 52, x = 48.3, y = 40.1 } },
             bopOutput = true,
             reagents = {
                 { itemId = 11145, count = 1 },
@@ -16595,6 +17584,7 @@ RecipeRegistryRecipeMetadata = {
             category = "rods",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 275, 275, 280, 285 },
             bopOutput = false,
             reagents = {
                 { itemId = 12360, count = 3 },
@@ -16611,7 +17601,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Jabbey", zone = 13 } },
+            skillLevels = { 225, 250, 262, 275 },
+            sourcePlaces = { { name = "Jabbey", zone = 13, x = 67, y = 22 } },
             bopOutput = false,
             reagents = {
                 { itemId = 1179, count = 1 },
@@ -16626,6 +17617,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 100, 100, 105, 110 },
             bopOutput = false,
             reagents = {
                 { itemId = 2318, count = 4 },
@@ -16638,6 +17630,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 150, 150, 155, 160 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 5 },
@@ -16650,6 +17643,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 200, 200, 202, 205 },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 6 },
@@ -16665,6 +17659,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -16685,6 +17680,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -16705,6 +17701,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 295,
             requiredSkill = 295,
             sourceKind = "vendor",
+            skillLevels = { 295, 315, 325, 335 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -16724,6 +17721,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -16743,6 +17741,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -16763,6 +17762,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 295,
             requiredSkill = 295,
             sourceKind = "vendor",
+            skillLevels = { 295, 315, 325, 335 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -16781,6 +17781,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -16799,6 +17800,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 295,
             requiredSkill = 295,
             sourceKind = "vendor",
+            skillLevels = { 295, 315, 325, 335 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -16817,6 +17819,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -16835,6 +17838,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -16854,6 +17858,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -16872,7 +17877,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Heldan Galesong", zone = 22 }, { name = "Kelsey Yance", zone = 2 }, { name = "Shankys", zone = 25 }, { name = "Wik'Tar", zone = 4 } },
+            skillLevels = { 175, 215, 235, 255 },
+            sourcePlaces = { { name = "Heldan Galesong", zone = 22, x = 37, y = 56.3, faction = "alliance" }, { name = "Kelsey Yance", zone = 2, x = 28.2, y = 74.4 }, { name = "Shankys", zone = 25, x = 69.1, y = 31.4, faction = "horde" }, { name = "Wik'Tar", zone = 4, x = 11.8, y = 34.1, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 8365, count = 1 },
@@ -16887,7 +17893,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             requiredSkill = 1,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eebee Jinglepocket", zone = 50 }, { name = "Wolgren Jinglepocket", zone = 59 }, { name = "Khole Jinglepocket", zone = 1 }, { name = "Seersa Copperpinch", zone = 18 } },
+            skillLevels = { 1, 45, 65, 85 },
+            sourcePlaces = { { name = "Eebee Jinglepocket", zone = 50, x = 51, y = 31.3 }, { name = "Wolgren Jinglepocket", zone = 59, x = 54.5, y = 47.2, faction = "alliance" }, { name = "Khole Jinglepocket", zone = 1, x = 62.2, y = 70.6, faction = "alliance" }, { name = "Seersa Copperpinch", zone = 18, x = 42, y = 55.1, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 6889, count = 1 },
@@ -16903,7 +17910,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 35,
             requiredSkill = 35,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eebee Jinglepocket", zone = 50 }, { name = "Wolgren Jinglepocket", zone = 59 }, { name = "Khole Jinglepocket", zone = 1 }, { name = "Seersa Copperpinch", zone = 18 } },
+            skillLevels = { 35, 75, 95, 115 },
+            sourcePlaces = { { name = "Eebee Jinglepocket", zone = 50, x = 51, y = 31.3 }, { name = "Wolgren Jinglepocket", zone = 59, x = 54.5, y = 47.2, faction = "alliance" }, { name = "Khole Jinglepocket", zone = 1, x = 62.2, y = 70.6, faction = "alliance" }, { name = "Seersa Copperpinch", zone = 18, x = 42, y = 55.1, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 1179, count = 1 },
@@ -16922,6 +17930,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
+            skillLevels = { 300, 325, 337, 350 },
             sourcePlaces = { { zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -16941,6 +17950,7 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 200, 225, 237, 250 },
             bopOutput = false,
             reagents = {
                 { itemId = 12205, count = 2 },
@@ -16956,6 +17966,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 190,
             requiredSkill = 190,
             sourceKind = "worldEvent",
+            skillLevels = { 190, 215, 227, 240 },
             bopOutput = false,
             reagents = {
                 { itemId = 3829, count = 1 },
@@ -16975,6 +17986,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             requiredSkill = 190,
             sourceKind = "worldEvent",
+            skillLevels = { 190, 210, 230, 250 },
             bopOutput = false,
             reagents = {
                 { itemId = 3358, count = 1 },
@@ -16991,6 +18003,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 190,
             requiredSkill = 190,
             sourceKind = "worldEvent",
+            skillLevels = { 190, 210, 230, 250 },
             reagents = {
                 { itemId = 3819, count = 2 },
                 { itemId = 11135, count = 3 },
@@ -17008,6 +18021,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 170,
             requiredSkill = 190,
             sourceKind = "worldEvent",
+            skillLevels = { 190, 190, 210, 230 },
             bopOutput = false,
             reagents = {
                 { itemId = 3829, count = 1 },
@@ -17026,6 +18040,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 190,
             requiredSkill = 190,
             sourceKind = "worldEvent",
+            skillLevels = { 190, 210, 220, 230 },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 8 },
@@ -17042,6 +18057,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 190,
             requiredSkill = 190,
             sourceKind = "worldEvent",
+            skillLevels = { 190, 200, 205, 210 },
             bopOutput = false,
             reagents = {
                 { itemId = 2605, count = 4 },
@@ -17056,6 +18072,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 250, 250, 250, 250 },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 6 },
@@ -17070,7 +18087,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Truk Wildbeard", zone = 35 }, { name = "Dirge Quikcleave", zone = 13 }, { name = "Innkeeper Fizzgrimble", zone = 13 } },
+            skillLevels = { 225, 250, 262, 275 },
+            sourcePlaces = { { name = "Truk Wildbeard", zone = 35, x = 14.4, y = 42.5, faction = "alliance" }, { name = "Dirge Quikcleave", zone = 13, x = 52.6, y = 28.1 }, { name = "Innkeeper Fizzgrimble", zone = 13, x = 52.5, y = 27.9 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 1 },
@@ -17087,6 +18105,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 80,
             requiredSkill = 300,
             sourceKind = "container",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -17104,7 +18123,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 200,
             requiredSkill = 200,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rikqiz", zone = 2 } },
+            skillLevels = { 200, 210, 220, 230 },
+            sourcePlaces = { { name = "Rikqiz", zone = 2, x = 28.5, y = 76 } },
             bopOutput = false,
             reagents = {
                 { itemId = 1210, count = 4 },
@@ -17125,6 +18145,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 60 } },
             bopOutput = false,
             reagents = {
@@ -17142,6 +18163,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 310, 320, 330 },
             sourcePlaces = { { zone = 60 } },
             bopOutput = false,
             reagents = {
@@ -17160,6 +18182,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 310, 325, 340 },
             sourcePlaces = { { zone = 60 } },
             reagents = {
                 { itemId = 7078, count = 4 },
@@ -17179,6 +18202,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 310, 325, 340 },
             sourcePlaces = { { zone = 60 } },
             reagents = {
                 { itemId = 7080, count = 6 },
@@ -17198,6 +18222,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 300, 310, 320 },
             sourcePlaces = { { zone = 60 } },
             bopOutput = false,
             reagents = {
@@ -17215,6 +18240,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 335, 350 },
             sourcePlaces = { { zone = 60 } },
             bopOutput = false,
             reagents = {
@@ -17234,7 +18260,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "drop",
-            sourcePlaces = { { name = "Pusillin", zone = 46 } },
+            skillLevels = { 275, 300, 312, 325 },
+            sourcePlaces = { { name = "Pusillin", zone = 46, x = 59, y = 48.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 1 },
@@ -17251,6 +18278,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 60 } },
             bopOutput = false,
             reagents = {
@@ -17271,6 +18299,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 60 } },
             bopOutput = false,
             reagents = {
@@ -17291,6 +18320,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 60 } },
             bopOutput = false,
             reagents = {
@@ -17309,6 +18339,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 25,
             sourceKind = "trainer",
+            skillLevels = { 215, 230, 250, 270 },
             bopOutput = false,
             reagents = {
                 { itemId = 7972, count = 1 },
@@ -17323,6 +18354,7 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 1,
             sourceKind = "quest",
+            skillLevels = { 275, 285, 290, 295 },
             sourcePlaces = { { zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -17339,6 +18371,7 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 1,
             sourceKind = "quest",
+            skillLevels = { 275, 285, 290, 385 },
             sourcePlaces = { { zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -17358,6 +18391,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "container",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -17380,6 +18414,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "container",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -17400,6 +18435,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "container",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -17419,6 +18455,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "container",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -17438,6 +18475,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "container",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -17457,6 +18495,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { name = "Shen'dralar Provisioner", zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -17476,6 +18515,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "container",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -17495,6 +18535,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "container",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -17515,6 +18556,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "container",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -17534,6 +18576,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "container",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -17554,6 +18597,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "container",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -17574,6 +18618,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "container",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -17613,7 +18658,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 150,
             faction = "horde",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Sovik", zone = 25 } },
+            skillLevels = { 150, 150, 162, 175 },
+            sourcePlaces = { { name = "Sovik", zone = 25, x = 75.6, y = 25.2, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 1 },
@@ -17632,7 +18678,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 150,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gearcutter Cogspinner", zone = 27 } },
+            skillLevels = { 150, 150, 162, 175 },
+            sourcePlaces = { { name = "Gearcutter Cogspinner", zone = 27, x = 68, y = 43.1, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 1 },
@@ -17650,7 +18697,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 150,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Crazk Sparks", zone = 2 }, { name = "Gagsprocket", zone = 6 } },
+            skillLevels = { 150, 150, 162, 175 },
+            sourcePlaces = { { name = "Crazk Sparks", zone = 2, x = 28.3, y = 76.7 }, { name = "Gagsprocket", zone = 6, x = 62.7, y = 36.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 1 },
@@ -17667,7 +18715,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             requiredSkill = 200,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Blizrik Buckshot", zone = 13 } },
+            skillLevels = { 200, 200, 210, 220 },
+            sourcePlaces = { { name = "Blizrik Buckshot", zone = 13, x = 50.8, y = 27.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4338, count = 2 },
@@ -17683,6 +18732,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "dynamite",
             sortOrder = 50,
             sourceKind = "trainer",
+            skillLevels = { 250, 250, 260, 270 },
             bopOutput = false,
             reagents = {
                 { itemId = 14047, count = 3 },
@@ -17698,6 +18748,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 190,
             requiredSkill = 260,
             sourceKind = "trainer",
+            skillLevels = { 260, 270, 275, 280 },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 2 },
@@ -17715,7 +18766,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 260,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Xizzer Fizzbolt", zone = 45 } },
+            skillLevels = { 260, 280, 290, 300 },
+            sourcePlaces = { { name = "Xizzer Fizzbolt", zone = 45, x = 60.8, y = 38.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3829, count = 2 },
@@ -17737,6 +18789,7 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 265,
             specialization = 20222,
             sourceKind = "drop",
+            skillLevels = { 265, 285, 295, 305 },
             sourcePlaces = { { name = "Plugger Spazzring", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -17757,6 +18810,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             requiredSkill = 275,
             sourceKind = "container",
+            skillLevels = { 275, 285, 290, 295 },
             sourcePlaces = { { zone = 46 } },
             bopOutput = false,
             reagents = {
@@ -17775,7 +18829,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Xizzer Fizzbolt", zone = 45 } },
+            skillLevels = { 275, 275, 285, 295 },
+            sourcePlaces = { { name = "Xizzer Fizzbolt", zone = 45, x = 60.8, y = 38.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 159, count = 1 },
@@ -17794,6 +18849,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 290,
             sourceKind = "drop",
+            skillLevels = { 290, 310, 320, 330 },
             sourcePlaces = { { name = "Solakar Flamewreath", zone = 48 } },
             bopOutput = false,
             reagents = {
@@ -17814,6 +18870,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { zone = 47 } },
             bopOutput = false,
             reagents = {
@@ -17836,6 +18893,7 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 265,
             specialization = 20219,
             sourceKind = "drop",
+            skillLevels = { 265, 275, 280, 285 },
             sourcePlaces = { { zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -17857,6 +18915,7 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 260,
             specialization = 20219,
             sourceKind = "drop",
+            skillLevels = { 260, 260, 265, 270 },
             sourcePlaces = { { zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -17876,7 +18935,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 150,
             requiredSkill = 150,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Bombus Finespindle", zone = 27 }, { name = "Tamar", zone = 25 } },
+            skillLevels = { 150, 150, 155, 160 },
+            sourcePlaces = { { name = "Bombus Finespindle", zone = 27, x = 39.6, y = 34.1, faction = "alliance" }, { name = "Tamar", zone = 25, x = 63, y = 45.3, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2321, count = 1 },
@@ -17893,7 +18953,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 155,
             requiredSkill = 155,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Saenorion", zone = 26 }, { name = "Joseph Moore", zone = 34 } },
+            skillLevels = { 155, 175, 185, 195 },
+            sourcePlaces = { { name = "Saenorion", zone = 26, x = 63.8, y = 22.1, faction = "alliance" }, { name = "Joseph Moore", zone = 34, x = 70.2, y = 57.8, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 8 },
@@ -17912,7 +18973,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Zap Farflinger", zone = 45 } },
+            skillLevels = { 260, 285, 295, 305 },
+            sourcePlaces = { { name = "Zap Farflinger", zone = 45, x = 61.2, y = 37.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 10 },
@@ -17931,7 +18993,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             specialization = 20219,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Jhordy Lapforge", zone = 13 } },
+            skillLevels = { 260, 285, 295, 305 },
+            sourcePlaces = { { name = "Jhordy Lapforge", zone = 13, x = 52.3, y = 26.9 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -17953,7 +19016,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Zorbin Fandazzle", zone = 31 } },
+            skillLevels = { 250, 250, 260, 270 },
+            sourcePlaces = { { name = "Zorbin Fandazzle", zone = 31, x = 44.8, y = 43.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8150, count = 1 },
@@ -17971,7 +19035,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Meilosh", zone = 44 } },
+            skillLevels = { 290, 310, 320, 330 },
+            sourcePlaces = { { name = "Meilosh", zone = 44, x = 65.7, y = 2.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 3 },
@@ -17989,7 +19054,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Meilosh", zone = 44 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Meilosh", zone = 44, x = 65.7, y = 2.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 6 },
@@ -18007,7 +19073,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33 }, { name = "Quartermaster Miranda Breechlock", zone = 49 }, { name = "Argent Quartermaster Lightspark", zone = 37 } },
+            skillLevels = { 290, 310, 320, 330 },
+            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33, x = 83.2, y = 68.1 }, { name = "Quartermaster Miranda Breechlock", zone = 49, x = 75.8, y = 54.1 }, { name = "Argent Quartermaster Lightspark", zone = 37, x = 42.8, y = 83.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 6 },
@@ -18025,7 +19092,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33 }, { name = "Quartermaster Miranda Breechlock", zone = 49 }, { name = "Argent Quartermaster Lightspark", zone = 37 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33, x = 83.2, y = 68.1 }, { name = "Quartermaster Miranda Breechlock", zone = 49, x = 75.8, y = 54.1 }, { name = "Argent Quartermaster Lightspark", zone = 37, x = 42.8, y = 83.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 10 },
@@ -18043,6 +19111,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -18061,6 +19130,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -18081,6 +19151,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -18101,6 +19172,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -18120,6 +19192,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -18140,6 +19213,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -18160,6 +19234,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -18180,7 +19255,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Meilosh", zone = 44 } },
+            skillLevels = { 290, 305, 320, 335 },
+            sourcePlaces = { { name = "Meilosh", zone = 44, x = 65.7, y = 2.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 3 },
@@ -18199,7 +19275,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Meilosh", zone = 44 } },
+            skillLevels = { 300, 315, 330, 345 },
+            sourcePlaces = { { name = "Meilosh", zone = 44, x = 65.7, y = 2.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 5 },
@@ -18218,7 +19295,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33 }, { name = "Quartermaster Miranda Breechlock", zone = 49 }, { name = "Argent Quartermaster Lightspark", zone = 37 } },
+            skillLevels = { 290, 305, 320, 335 },
+            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33, x = 83.2, y = 68.1 }, { name = "Quartermaster Miranda Breechlock", zone = 49, x = 75.8, y = 54.1 }, { name = "Argent Quartermaster Lightspark", zone = 37, x = 42.8, y = 83.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12809, count = 2 },
@@ -18238,7 +19316,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33 }, { name = "Quartermaster Miranda Breechlock", zone = 49 }, { name = "Argent Quartermaster Lightspark", zone = 37 } },
+            skillLevels = { 300, 315, 330, 345 },
+            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33, x = 83.2, y = 68.1 }, { name = "Quartermaster Miranda Breechlock", zone = 49, x = 75.8, y = 54.1 }, { name = "Argent Quartermaster Lightspark", zone = 37, x = 42.8, y = 83.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12809, count = 2 },
@@ -18256,6 +19335,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -18276,6 +19356,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -18296,7 +19377,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Meilosh", zone = 44 } },
+            skillLevels = { 290, 310, 320, 330 },
+            sourcePlaces = { { name = "Meilosh", zone = 44, x = 65.7, y = 2.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 30 },
@@ -18316,7 +19398,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Meilosh", zone = 44 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Meilosh", zone = 44, x = 65.7, y = 2.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 6 },
@@ -18336,7 +19419,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33 }, { name = "Quartermaster Miranda Breechlock", zone = 49 }, { name = "Argent Quartermaster Lightspark", zone = 37 } },
+            skillLevels = { 290, 310, 320, 330 },
+            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33, x = 83.2, y = 68.1 }, { name = "Quartermaster Miranda Breechlock", zone = 49, x = 75.8, y = 54.1 }, { name = "Argent Quartermaster Lightspark", zone = 37, x = 42.8, y = 83.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7080, count = 4 },
@@ -18356,7 +19440,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33 }, { name = "Quartermaster Miranda Breechlock", zone = 49 }, { name = "Argent Quartermaster Lightspark", zone = 37 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33, x = 83.2, y = 68.1 }, { name = "Quartermaster Miranda Breechlock", zone = 49, x = 75.8, y = 54.1 }, { name = "Argent Quartermaster Lightspark", zone = 37, x = 42.8, y = 83.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 4 },
@@ -18376,6 +19461,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -18394,6 +19480,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -18415,6 +19502,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -18435,6 +19523,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -18454,6 +19543,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "vendor",
+            skillLevels = { 290, 305, 322, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             reagents = {
                 { itemId = 7076, count = 2 },
@@ -18472,7 +19562,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 290,
             faction = "horde",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Meilosh", zone = 44 } },
+            skillLevels = { 290, 305, 322, 340 },
+            sourcePlaces = { { name = "Meilosh", zone = 44, x = 65.7, y = 2.9, faction = "horde" } },
             reagents = {
                 { itemId = 7082, count = 2 },
                 { itemId = 14344, count = 6 },
@@ -18489,7 +19580,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33 }, { name = "Quartermaster Miranda Breechlock", zone = 49 }, { name = "Argent Quartermaster Lightspark", zone = 37 } },
+            skillLevels = { 290, 305, 322, 340 },
+            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33, x = 83.2, y = 68.1 }, { name = "Quartermaster Miranda Breechlock", zone = 49, x = 75.8, y = 54.1 }, { name = "Argent Quartermaster Lightspark", zone = 37, x = 42.8, y = 83.8 } },
             reagents = {
                 { itemId = 7080, count = 2 },
                 { itemId = 16203, count = 4 },
@@ -18505,7 +19597,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33 }, { name = "Quartermaster Miranda Breechlock", zone = 49 }, { name = "Argent Quartermaster Lightspark", zone = 37 } },
+            skillLevels = { 300, 310, 325, 340 },
+            sourcePlaces = { { name = "Argent Quartermaster Hasana", zone = 33, x = 83.2, y = 68.1 }, { name = "Quartermaster Miranda Breechlock", zone = 49, x = 75.8, y = 54.1 }, { name = "Argent Quartermaster Lightspark", zone = 37, x = 42.8, y = 83.8 } },
             reagents = {
                 { itemId = 12803, count = 6 },
                 { itemId = 14344, count = 2 },
@@ -18522,6 +19615,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 310, 325, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             reagents = {
                 { itemId = 14344, count = 10 },
@@ -18538,6 +19632,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 310, 325, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             reagents = {
                 { itemId = 14344, count = 15 },
@@ -18555,7 +19650,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 315, 330, 345 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12804, count = 4 },
@@ -18575,7 +19671,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 315, 330, 345 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12804, count = 4 },
@@ -18595,7 +19692,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 315, 330, 345 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12810, count = 4 },
@@ -18615,7 +19713,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 4 },
@@ -18634,7 +19733,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 4 },
@@ -18653,7 +19753,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 4 },
@@ -18672,7 +19773,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -18691,7 +19793,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -18710,7 +19813,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 2 },
@@ -18729,7 +19833,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 1 },
@@ -18748,7 +19853,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 12 },
@@ -18767,7 +19873,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 20 },
@@ -18785,7 +19892,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 18 },
@@ -18803,7 +19911,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 16 },
@@ -18820,6 +19929,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "utility",
             sortOrder = 90,
             sourceKind = "drop",
+            skillLevels = { 300, 315, 322, 330 },
             sourcePlaces = { { zone = 62 } },
             bopOutput = false,
             reagents = {
@@ -18839,7 +19949,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 190,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12804, count = 8 },
@@ -18859,7 +19970,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 200,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12804, count = 8 },
@@ -18879,7 +19991,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 170,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 275, 290, 310, 330 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -18897,7 +20010,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 275, 290, 310, 330 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -18915,7 +20029,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 285,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 285, 300, 320, 340 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -18934,7 +20049,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 290,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 290, 305, 325, 345 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8846, count = 1 },
@@ -18952,6 +20068,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -18971,7 +20088,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 150,
             faction = "horde",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Ogg'marr", zone = 15 } },
+            skillLevels = { 150, 160, 180, 200 },
+            sourcePlaces = { { name = "Ogg'marr", zone = 15, x = 36.7, y = 31, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3667, count = 2 },
@@ -18987,7 +20105,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10656,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Peter Galen", zone = 38 }, { name = "Thorkaf Dragoneye", zone = 11 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Peter Galen", zone = 38, x = 37.5, y = 65.5, faction = "alliance" }, { name = "Thorkaf Dragoneye", zone = 11, x = 62.6, y = 57.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 28 },
@@ -19005,7 +20124,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10656,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Peter Galen", zone = 38 }, { name = "Thorkaf Dragoneye", zone = 11 } },
+            skillLevels = { 260, 280, 290, 300 },
+            sourcePlaces = { { name = "Peter Galen", zone = 38, x = 37.5, y = 65.5, faction = "alliance" }, { name = "Thorkaf Dragoneye", zone = 11, x = 62.6, y = 57.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 20 },
@@ -19024,7 +20144,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Aendel Windspear", zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Aendel Windspear", zone = 54, x = 62.6, y = 49.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 4 },
@@ -19041,7 +20162,8 @@ RecipeRegistryRecipeMetadata = {
             category = "strength",
             sortOrder = 1,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 54 } },
+            skillLevels = { 285, 310, 322, 335 },
+            sourcePlaces = { { zone = 54, x = 38, y = 45.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 1 },
@@ -19058,7 +20180,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Aendel Windspear", zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Aendel Windspear", zone = 54, x = 62.6, y = 49.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 2 },
@@ -19076,7 +20199,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Aendel Windspear", zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Aendel Windspear", zone = 54, x = 62.6, y = 49.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 2 },
@@ -19095,7 +20219,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Aendel Windspear", zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Aendel Windspear", zone = 54, x = 62.6, y = 49.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 2 },
@@ -19114,7 +20239,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Aendel Windspear", zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Aendel Windspear", zone = 54, x = 62.6, y = 49.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 18512, count = 2 },
@@ -19132,7 +20258,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Aendel Windspear", zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Aendel Windspear", zone = 54, x = 62.6, y = 49.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 15407, count = 1 },
@@ -19151,7 +20278,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Aendel Windspear", zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Aendel Windspear", zone = 54, x = 62.6, y = 49.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 15407, count = 2 },
@@ -19170,7 +20298,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 54 } },
+            skillLevels = { 300, 315, 330, 345 },
+            sourcePlaces = { { zone = 54, x = 67.1, y = 69.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 6 },
@@ -19189,7 +20318,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 54 } },
+            skillLevels = { 300, 315, 330, 345 },
+            sourcePlaces = { { zone = 54, x = 67.1, y = 69.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12810, count = 2 },
@@ -19209,7 +20339,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 54 } },
+            skillLevels = { 300, 315, 330, 345 },
+            sourcePlaces = { { zone = 54, x = 67.1, y = 69.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12810, count = 2 },
@@ -19229,7 +20360,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { zone = 54, x = 67.1, y = 69.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 6 },
@@ -19248,7 +20380,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { zone = 54, x = 67.1, y = 69.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 8 },
@@ -19267,7 +20400,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { zone = 54, x = 67.1, y = 69.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 10 },
@@ -19286,7 +20420,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 100,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Amy Davenport", zone = 29 } },
+            skillLevels = { 100, 125, 137, 150 },
+            sourcePlaces = { { name = "Amy Davenport", zone = 29, x = 29.1, y = 47.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 8 },
@@ -19304,7 +20439,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Almaador", zone = 50 } },
+            skillLevels = { 300, 310, 325, 340 },
+            sourcePlaces = { { name = "Almaador", zone = 50, x = 51, y = 41.9 } },
             reagents = {
                 { itemId = 21886, count = 8 },
                 { itemId = 22446, count = 2 },
@@ -19320,6 +20456,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 310, 325, 340 },
             sourcePlaces = { { zone = 63 } },
             reagents = {
                 { itemId = 12808, count = 6 },
@@ -19336,6 +20473,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 310, 325, 340 },
             sourcePlaces = { { zone = 63 } },
             reagents = {
                 { itemId = 7080, count = 4 },
@@ -19352,6 +20490,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 310, 325, 340 },
             sourcePlaces = { { zone = 63 } },
             reagents = {
                 { itemId = 7078, count = 4 },
@@ -19368,6 +20507,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 310, 325, 340 },
             sourcePlaces = { { zone = 63 } },
             reagents = {
                 { itemId = 12811, count = 1 },
@@ -19384,7 +20524,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alurmi", zone = 13 } },
+            skillLevels = { 300, 310, 325, 340 },
+            sourcePlaces = { { name = "Alurmi", zone = 13, x = 63.6, y = 57.6 } },
             reagents = {
                 { itemId = 22446, count = 3 },
                 { itemId = 22448, count = 3 },
@@ -19400,7 +20541,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kania", zone = 54 } },
+            skillLevels = { 300, 310, 325, 340 },
+            sourcePlaces = { { name = "Kania", zone = 54, x = 52, y = 39.6 } },
             reagents = {
                 { itemId = 7078, count = 4 },
                 { itemId = 22446, count = 3 },
@@ -19416,7 +20558,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kania", zone = 54 } },
+            skillLevels = { 300, 310, 325, 340 },
+            sourcePlaces = { { name = "Kania", zone = 54, x = 52, y = 39.6 } },
             reagents = {
                 { itemId = 12803, count = 4 },
                 { itemId = 22446, count = 3 },
@@ -19432,7 +20575,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 300, 310, 325, 340 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             reagents = {
                 { itemId = 22446, count = 3 },
                 { itemId = 22448, count = 3 },
@@ -19448,7 +20592,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64 }, { name = "Quartermaster Urgronn", zone = 64 } },
+            skillLevels = { 300, 310, 325, 340 },
+            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64, x = 56.7, y = 62.6, faction = "alliance" }, { name = "Quartermaster Urgronn", zone = 64, x = 54.9, y = 37.9, faction = "horde" } },
             reagents = {
                 { itemId = 22446, count = 2 },
                 { itemId = 22448, count = 4 },
@@ -19464,7 +20609,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nakodu", zone = 50 } },
+            skillLevels = { 300, 310, 325, 340 },
+            sourcePlaces = { { name = "Nakodu", zone = 50, x = 62.1, y = 69 } },
             reagents = {
                 { itemId = 22446, count = 3 },
                 { itemId = 22448, count = 3 },
@@ -19481,7 +20627,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 45,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kania", zone = 54 }, { name = "Thaddeus Webb", zone = 34 }, { name = "Erilia", zone = 65 }, { name = "Lilly", zone = 17 } },
+            skillLevels = { 45, 55, 65, 75 },
+            sourcePlaces = { { name = "Kania", zone = 54, x = 52, y = 39.6 }, { name = "Thaddeus Webb", zone = 34, x = 62, y = 60.7, faction = "horde" }, { name = "Erilia", zone = 65, x = 55.5, y = 54, faction = "horde" }, { name = "Lilly", zone = 17, x = 43.1, y = 50.8, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3371, count = 1 },
@@ -19499,7 +20646,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 150,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kania", zone = 54 }, { name = "Thaddeus Webb", zone = 34 }, { name = "Erilia", zone = 65 }, { name = "Lilly", zone = 17 } },
+            skillLevels = { 150, 160, 170, 180 },
+            sourcePlaces = { { name = "Kania", zone = 54, x = 52, y = 39.6 }, { name = "Thaddeus Webb", zone = 34, x = 62, y = 60.7, faction = "horde" }, { name = "Erilia", zone = 65, x = 55.5, y = 54, faction = "horde" }, { name = "Lilly", zone = 17, x = 43.1, y = 50.8, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -19517,7 +20665,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 200,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kania", zone = 54 }, { name = "Thaddeus Webb", zone = 34 }, { name = "Erilia", zone = 65 }, { name = "Lilly", zone = 17 } },
+            skillLevels = { 200, 210, 220, 230 },
+            sourcePlaces = { { name = "Kania", zone = 54, x = 52, y = 39.6 }, { name = "Thaddeus Webb", zone = 34, x = 62, y = 60.7, faction = "horde" }, { name = "Erilia", zone = 65, x = 55.5, y = 54, faction = "horde" }, { name = "Lilly", zone = 17, x = 43.1, y = 50.8, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3372, count = 1 },
@@ -19535,7 +20684,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kania", zone = 54 } },
+            skillLevels = { 250, 260, 270, 280 },
+            sourcePlaces = { { name = "Kania", zone = 54, x = 52, y = 39.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8831, count = 2 },
@@ -19553,7 +20703,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kania", zone = 54 } },
+            skillLevels = { 275, 285, 295, 305 },
+            sourcePlaces = { { name = "Kania", zone = 54, x = 52, y = 39.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4625, count = 2 },
@@ -19571,7 +20722,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 310, 320, 330 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4625, count = 3 },
@@ -19589,7 +20741,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2 } },
+            skillLevels = { 300, 310, 320, 330 },
+            sourcePlaces = { { name = "Rin'wosho the Trader", zone = 2, x = 15.1, y = 16 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8831, count = 3 },
@@ -19608,6 +20761,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 5,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 301, 305, 310 },
             sourcePlaces = { { name = "Lokhtos Darkbargainer", zone = 43 } },
             bopOutput = false,
             reagents = {
@@ -19621,6 +20775,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 20, 35, 50 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 2 },
@@ -19633,6 +20788,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 50, 70, 80, 90 },
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 2 },
@@ -19646,6 +20802,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 50, 80, 95, 110 },
             bopOutput = false,
             reagents = {
                 { itemId = 2842, count = 1 },
@@ -19659,6 +20816,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 30, 60, 75, 90 },
             bopOutput = false,
             reagents = {
                 { itemId = 774, count = 2 },
@@ -19673,6 +20831,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 60, 90, 105, 120 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 2 },
@@ -19688,6 +20847,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 70, 100, 115, 130 },
             bopOutput = false,
             reagents = {
                 { itemId = 1210, count = 2 },
@@ -19703,6 +20863,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 90, 120, 135, 150 },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -19719,6 +20880,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 80, 110, 125, 140 },
             bopOutput = false,
             reagents = {
                 { itemId = 2842, count = 2 },
@@ -19732,6 +20894,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 100, 130, 145, 160 },
             bopOutput = false,
             reagents = {
                 { itemId = 1210, count = 2 },
@@ -19748,7 +20911,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 150,
             requiredSkill = 150,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Arred", zone = 59 }, { name = "Gelanthis", zone = 66 }, { name = "Felika", zone = 25 }, { name = "Edna Mullby", zone = 1 } },
+            skillLevels = { 150, 180, 195, 210 },
+            sourcePlaces = { { name = "Arred", zone = 59, x = 45, y = 26, faction = "alliance" }, { name = "Gelanthis", zone = 66, x = 90.8, y = 73.6, faction = "horde" }, { name = "Felika", zone = 25, x = 60.5, y = 50.7, faction = "horde" }, { name = "Edna Mullby", zone = 1, x = 64.6, y = 71.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 2 },
@@ -19764,6 +20928,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "crown",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 120, 150, 165, 180 },
             bopOutput = false,
             reagents = {
                 { itemId = 1705, count = 3 },
@@ -19783,7 +20948,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 125,
             requiredSkill = 125,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Ranik", zone = 6 }, { name = "Dalria", zone = 4 } },
+            skillLevels = { 125, 155, 170, 185 },
+            sourcePlaces = { { name = "Ranik", zone = 6, x = 61.9, y = 38.7 }, { name = "Dalria", zone = 4, x = 35.1, y = 52.1, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 1705, count = 1 },
@@ -19801,7 +20967,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             requiredSkill = 110,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gelanthis", zone = 66 }, { name = "Daniel Bartlett", zone = 34 }, { name = "Mythrin'dir", zone = 26 }, { name = "Arred", zone = 59 } },
+            skillLevels = { 110, 140, 155, 170 },
+            sourcePlaces = { { name = "Gelanthis", zone = 66, x = 90.8, y = 73.6, faction = "horde" }, { name = "Daniel Bartlett", zone = 34, x = 64.2, y = 37.7, faction = "horde" }, { name = "Mythrin'dir", zone = 26, x = 60, y = 19.1, faction = "alliance" }, { name = "Arred", zone = 59, x = 45, y = 26, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 1705, count = 2 },
@@ -19816,6 +20983,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 50, 80, 95, 110 },
             bopOutput = false,
             reagents = {
                 { itemId = 2841, count = 4 },
@@ -19829,6 +20997,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 30, 45, 60 },
             bopOutput = false,
             reagents = {
                 { itemId = 20816, count = 2 },
@@ -19842,6 +21011,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 110, 140, 155, 170 },
             bopOutput = false,
             reagents = {
                 { itemId = 3575, count = 8 },
@@ -19859,7 +21029,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 120,
             requiredSkill = 120,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Neal Allen", zone = 14 }, { name = "Jandia", zone = 9 } },
+            skillLevels = { 120, 150, 165, 180 },
+            sourcePlaces = { { name = "Neal Allen", zone = 14, x = 10.7, y = 56.8, faction = "alliance" }, { name = "Jandia", zone = 9, x = 46.1, y = 51.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -19875,7 +21046,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 125,
             requiredSkill = 125,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Micha Yance", zone = 7 }, { name = "Christoph Jeffcoat", zone = 7 } },
+            skillLevels = { 125, 155, 170, 185 },
+            sourcePlaces = { { name = "Micha Yance", zone = 7, x = 49, y = 55.1, faction = "alliance" }, { name = "Christoph Jeffcoat", zone = 7, x = 62.4, y = 19.1, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3391, count = 2 },
@@ -19890,6 +21062,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 135, 165, 180, 195 },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 1 },
@@ -19922,6 +21095,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 150, 170, 180, 190 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 2 },
@@ -19937,7 +21111,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 150,
             requiredSkill = 150,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Micha Yance", zone = 7 }, { name = "Kireena", zone = 5 } },
+            skillLevels = { 150, 180, 195, 210 },
+            sourcePlaces = { { name = "Micha Yance", zone = 7, x = 49, y = 55.1, faction = "alliance" }, { name = "Kireena", zone = 5, x = 51, y = 53.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3864, count = 1 },
@@ -19954,6 +21129,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 160,
             requiredSkill = 160,
             sourceKind = "worldDrop",
+            skillLevels = { 160, 190, 205, 220 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -19971,7 +21147,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 170,
             requiredSkill = 170,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Arred", zone = 59 }, { name = "Gelanthis", zone = 66 }, { name = "Felicia Doan", zone = 34 }, { name = "Burbik Gearspanner", zone = 27 } },
+            skillLevels = { 170, 200, 215, 230 },
+            sourcePlaces = { { name = "Arred", zone = 59, x = 45, y = 26, faction = "alliance" }, { name = "Gelanthis", zone = 66, x = 90.8, y = 73.6, faction = "horde" }, { name = "Felicia Doan", zone = 34, x = 64.3, y = 50.2, faction = "horde" }, { name = "Burbik Gearspanner", zone = 27, x = 46.5, y = 27.1, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 1 },
@@ -19986,6 +21163,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 170, 200, 215, 230 },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 1 },
@@ -20000,6 +21178,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 180, 210, 225, 240 },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 2 },
@@ -20017,6 +21196,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 190,
             requiredSkill = 190,
             sourceKind = "worldDrop",
+            skillLevels = { 190, 220, 235, 250 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -20036,7 +21216,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 13 } },
+            skillLevels = { 300, 325, 337, 350 },
+            sourcePlaces = { { zone = 13, x = 52.6, y = 28.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -20054,7 +21235,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 80,
             requiredSkill = 80,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Derak Nightfall", zone = 7 }, { name = "Phea", zone = 59 }, { name = "Gloria Femmel", zone = 29 }, { name = "\\\"Cookie\\\" McWeaksauce", zone = 67 } },
+            skillLevels = { 80, 120, 140, 160 },
+            sourcePlaces = { { name = "Derak Nightfall", zone = 7, x = 63, y = 18.5, faction = "horde" }, { name = "Phea", zone = 59, x = 54.7, y = 26.5, faction = "alliance" }, { name = "Gloria Femmel", zone = 29, x = 26.7, y = 43.5, faction = "alliance" }, { name = "\\\"Cookie\\\" McWeaksauce", zone = 67, x = 46.7, y = 70.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 1 },
@@ -20070,7 +21252,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 175,
             requiredSkill = 175,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Derak Nightfall", zone = 7 }, { name = "Phea", zone = 59 }, { name = "Gloria Femmel", zone = 29 }, { name = "\\\"Cookie\\\" McWeaksauce", zone = 67 } },
+            skillLevels = { 175, 215, 235, 255 },
+            sourcePlaces = { { name = "Derak Nightfall", zone = 7, x = 63, y = 18.5, faction = "horde" }, { name = "Phea", zone = 59, x = 54.7, y = 26.5, faction = "alliance" }, { name = "Gloria Femmel", zone = 29, x = 26.7, y = 43.5, faction = "alliance" }, { name = "\\\"Cookie\\\" McWeaksauce", zone = 67, x = 46.7, y = 70.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -20084,7 +21267,8 @@ RecipeRegistryRecipeMetadata = {
             category = "pets",
             sortOrder = 60,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 45 } },
+            skillLevels = { 250, 320, 330, 340 },
+            sourcePlaces = { { zone = 45, x = 60.9, y = 37.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7079, count = 2 },
@@ -20103,7 +21287,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 260,
             requiredSkill = 260,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Vizzklick", zone = 13 } },
+            skillLevels = { 260, 275, 290, 305 },
+            sourcePlaces = { { name = "Vizzklick", zone = 13, x = 51, y = 27.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7972, count = 2 },
@@ -20121,6 +21306,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "drop",
+            skillLevels = { 280, 300, 315, 330 },
             sourcePlaces = { { name = "Jandice Barov", zone = 53 } },
             bopOutput = false,
             reagents = {
@@ -20139,6 +21325,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { zone = 60 } },
             bopOutput = false,
             reagents = {
@@ -20159,6 +21346,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 120,
             requiredSkill = 250,
             sourceKind = "drop",
+            skillLevels = { 250, 265, 285, 305 },
             sourcePlaces = { { zone = 39 } },
             bopOutput = false,
             reagents = {
@@ -20177,6 +21365,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             bossDrop = true,
             sourcePlaces = { { zone = 54 }, { zone = 45 } },
             bopOutput = false,
@@ -20198,7 +21387,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fariel Starsong", zone = 52 } },
+            skillLevels = { 250, 265, 280, 295 },
+            sourcePlaces = { { name = "Fariel Starsong", zone = 52, x = 54, y = 35.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -20216,7 +21406,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fariel Starsong", zone = 52 } },
+            skillLevels = { 250, 265, 280, 295 },
+            sourcePlaces = { { name = "Fariel Starsong", zone = 52, x = 54, y = 35.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -20236,7 +21427,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 125,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fariel Starsong", zone = 52 } },
+            skillLevels = { 125, 125, 137, 150 },
+            sourcePlaces = { { name = "Fariel Starsong", zone = 52, x = 54, y = 35.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 1 },
@@ -20254,7 +21446,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 125,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fariel Starsong", zone = 52 } },
+            skillLevels = { 125, 125, 137, 150 },
+            sourcePlaces = { { name = "Fariel Starsong", zone = 52, x = 54, y = 35.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 1 },
@@ -20272,7 +21465,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 125,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fariel Starsong", zone = 52 } },
+            skillLevels = { 125, 125, 137, 150 },
+            sourcePlaces = { { name = "Fariel Starsong", zone = 52, x = 54, y = 35.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 1 },
@@ -20290,7 +21484,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 175,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fariel Starsong", zone = 52 } },
+            skillLevels = { 175, 175, 187, 200 },
+            sourcePlaces = { { name = "Fariel Starsong", zone = 52, x = 54, y = 35.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 1 },
@@ -20308,7 +21503,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 175,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fariel Starsong", zone = 52 } },
+            skillLevels = { 175, 175, 187, 200 },
+            sourcePlaces = { { name = "Fariel Starsong", zone = 52, x = 54, y = 35.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 1 },
@@ -20326,7 +21522,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 175,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fariel Starsong", zone = 52 } },
+            skillLevels = { 175, 175, 187, 200 },
+            sourcePlaces = { { name = "Fariel Starsong", zone = 52, x = 54, y = 35.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4234, count = 1 },
@@ -20344,7 +21541,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             requiredSkill = 225,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fariel Starsong", zone = 52 } },
+            skillLevels = { 225, 225, 237, 250 },
+            sourcePlaces = { { name = "Fariel Starsong", zone = 52, x = 54, y = 35.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 1 },
@@ -20362,7 +21560,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 80,
             requiredSkill = 225,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fariel Starsong", zone = 52 } },
+            skillLevels = { 225, 225, 237, 250 },
+            sourcePlaces = { { name = "Fariel Starsong", zone = 52, x = 54, y = 35.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 1 },
@@ -20380,7 +21579,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             requiredSkill = 225,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fariel Starsong", zone = 52 } },
+            skillLevels = { 225, 225, 237, 250 },
+            sourcePlaces = { { name = "Fariel Starsong", zone = 52, x = 54, y = 35.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 1 },
@@ -20398,7 +21598,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fariel Starsong", zone = 52 } },
+            skillLevels = { 275, 275, 280, 285 },
+            sourcePlaces = { { name = "Fariel Starsong", zone = 52, x = 54, y = 35.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 1 },
@@ -20416,7 +21617,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fariel Starsong", zone = 52 } },
+            skillLevels = { 275, 275, 280, 285 },
+            sourcePlaces = { { name = "Fariel Starsong", zone = 52, x = 54, y = 35.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 1 },
@@ -20434,7 +21636,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 120,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fariel Starsong", zone = 52 } },
+            skillLevels = { 275, 275, 280, 285 },
+            sourcePlaces = { { name = "Fariel Starsong", zone = 52, x = 54, y = 35.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 1 },
@@ -20451,7 +21654,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 225,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fariel Starsong", zone = 52 } },
+            skillLevels = { 225, 245, 255, 265 },
+            sourcePlaces = { { name = "Fariel Starsong", zone = 52, x = 54, y = 35.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 9060, count = 1 },
@@ -20470,7 +21674,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fariel Starsong", zone = 52 } },
+            skillLevels = { 275, 295, 305, 315 },
+            sourcePlaces = { { name = "Fariel Starsong", zone = 52, x = 54, y = 35.4 } },
             bopOutput = false,
             reagents = {
                 { itemId = 9060, count = 4 },
@@ -20486,7 +21691,8 @@ RecipeRegistryRecipeMetadata = {
             category = "cloth",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Dalinna", zone = 64 }, { name = "Hama", zone = 64 } },
+            skillLevels = { 300, 305, 315, 325 },
+            sourcePlaces = { { name = "Dalinna", zone = 64, x = 56.6, y = 37.1, faction = "horde" }, { name = "Hama", zone = 64, x = 54.1, y = 63.6, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 21877, count = 6 },
@@ -20499,7 +21705,8 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Dalinna", zone = 64 }, { name = "Hama", zone = 64 } },
+            skillLevels = { 315, 320, 330, 340 },
+            sourcePlaces = { { name = "Dalinna", zone = 64, x = 56.6, y = 37.1, faction = "horde" }, { name = "Hama", zone = 64, x = 54.1, y = 63.6, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -20515,7 +21722,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eiin", zone = 50 }, { name = "Neii", zone = 59 }, { name = "Deynna", zone = 66 } },
+            skillLevels = { 325, 330, 335, 340 },
+            sourcePlaces = { { name = "Eiin", zone = 50, x = 66.2, y = 68.7 }, { name = "Neii", zone = 59, x = 64.5, y = 68.5, faction = "alliance" }, { name = "Deynna", zone = 66, x = 55.8, y = 51, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 21840, count = 3 },
@@ -20531,7 +21739,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 340,
             requiredSkill = 340,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mathar G'ochar", zone = 68 }, { name = "Eiin", zone = 50 } },
+            skillLevels = { 340, 340, 345, 350 },
+            sourcePlaces = { { name = "Mathar G'ochar", zone = 68, x = 57, y = 39.6, faction = "horde" }, { name = "Eiin", zone = 50, x = 66.2, y = 68.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 4 },
@@ -20548,7 +21757,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 345,
             requiredSkill = 345,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mathar G'ochar", zone = 68 }, { name = "Deynna", zone = 66 }, { name = "Borto", zone = 68 }, { name = "Neii", zone = 59 } },
+            skillLevels = { 345, 345, 350, 355 },
+            sourcePlaces = { { name = "Mathar G'ochar", zone = 68, x = 57, y = 39.6, faction = "horde" }, { name = "Deynna", zone = 66, x = 55.8, y = 51, faction = "horde" }, { name = "Borto", zone = 68, x = 53.3, y = 71.9, faction = "alliance" }, { name = "Neii", zone = 59, x = 64.5, y = 68.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 21840, count = 1 },
@@ -20564,7 +21774,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nasmara Moonsong", zone = 50 } },
+            skillLevels = { 350, 350, 355, 360 },
+            sourcePlaces = { { name = "Nasmara Moonsong", zone = 50, x = 66, y = 69 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 1 },
@@ -20583,7 +21794,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 355,
             specialization = 26797,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gidge Spellweaver", zone = 50 } },
+            skillLevels = { 355, 365, 370, 375 },
+            sourcePlaces = { { name = "Gidge Spellweaver", zone = 50, x = 66, y = 67.9 } },
             bopOutput = true,
             reagents = {
                 { itemId = 21881, count = 2 },
@@ -20602,7 +21814,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 365,
             specialization = 26797,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gidge Spellweaver", zone = 50 } },
+            skillLevels = { 365, 375, 380, 385 },
+            sourcePlaces = { { name = "Gidge Spellweaver", zone = 50, x = 66, y = 67.9 } },
             bopOutput = true,
             reagents = {
                 { itemId = 21881, count = 4 },
@@ -20621,7 +21834,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 375,
             specialization = 26797,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gidge Spellweaver", zone = 50 } },
+            skillLevels = { 375, 385, 390, 395 },
+            sourcePlaces = { { name = "Gidge Spellweaver", zone = 50, x = 66, y = 67.9 } },
             bopOutput = true,
             reagents = {
                 { itemId = 21881, count = 4 },
@@ -20638,7 +21852,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gidge Spellweaver", zone = 50 } },
+            skillLevels = { 375, 385, 390, 395 },
+            sourcePlaces = { { name = "Gidge Spellweaver", zone = 50, x = 66, y = 67.9 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21881, count = 4 },
@@ -20657,7 +21872,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 355,
             specialization = 26801,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Andrion Darkspinner", zone = 50 } },
+            skillLevels = { 355, 365, 370, 375 },
+            sourcePlaces = { { name = "Andrion Darkspinner", zone = 50, x = 66, y = 67.8 } },
             bopOutput = true,
             reagents = {
                 { itemId = 21881, count = 2 },
@@ -20676,7 +21892,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 365,
             specialization = 26801,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Andrion Darkspinner", zone = 50 } },
+            skillLevels = { 365, 375, 380, 385 },
+            sourcePlaces = { { name = "Andrion Darkspinner", zone = 50, x = 66, y = 67.8 } },
             bopOutput = true,
             reagents = {
                 { itemId = 21881, count = 2 },
@@ -20695,7 +21912,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 375,
             specialization = 26801,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Andrion Darkspinner", zone = 50 } },
+            skillLevels = { 375, 385, 390, 395 },
+            sourcePlaces = { { name = "Andrion Darkspinner", zone = 50, x = 66, y = 67.8 } },
             bopOutput = true,
             reagents = {
                 { itemId = 21881, count = 4 },
@@ -20712,7 +21930,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Andrion Darkspinner", zone = 50 } },
+            skillLevels = { 375, 385, 390, 395 },
+            sourcePlaces = { { name = "Andrion Darkspinner", zone = 50, x = 66, y = 67.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21881, count = 4 },
@@ -20730,7 +21949,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 355,
             specialization = 26798,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nasmara Moonsong", zone = 50 } },
+            skillLevels = { 355, 365, 370, 375 },
+            sourcePlaces = { { name = "Nasmara Moonsong", zone = 50, x = 66, y = 69 } },
             bopOutput = true,
             reagents = {
                 { itemId = 21845, count = 4 },
@@ -20749,7 +21969,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 365,
             specialization = 26798,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nasmara Moonsong", zone = 50 } },
+            skillLevels = { 365, 375, 380, 385 },
+            sourcePlaces = { { name = "Nasmara Moonsong", zone = 50, x = 66, y = 69 } },
             bopOutput = true,
             reagents = {
                 { itemId = 21845, count = 8 },
@@ -20768,7 +21989,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 375,
             specialization = 26798,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nasmara Moonsong", zone = 50 } },
+            skillLevels = { 375, 385, 390, 395 },
+            sourcePlaces = { { name = "Nasmara Moonsong", zone = 50, x = 66, y = 69 } },
             bopOutput = true,
             reagents = {
                 { itemId = 21845, count = 14 },
@@ -20785,7 +22007,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nasmara Moonsong", zone = 50 } },
+            skillLevels = { 375, 385, 390, 395 },
+            sourcePlaces = { { name = "Nasmara Moonsong", zone = 50, x = 66, y = 69 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21845, count = 8 },
@@ -20800,7 +22023,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Dalinna", zone = 64 }, { name = "Hama", zone = 64 } },
+            skillLevels = { 310, 320, 325, 330 },
+            sourcePlaces = { { name = "Dalinna", zone = 64, x = 56.6, y = 37.1, faction = "horde" }, { name = "Hama", zone = 64, x = 54.1, y = 63.6, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -20815,7 +22039,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Dalinna", zone = 64 }, { name = "Hama", zone = 64 } },
+            skillLevels = { 310, 320, 325, 330 },
+            sourcePlaces = { { name = "Dalinna", zone = 64, x = 56.6, y = 37.1, faction = "horde" }, { name = "Hama", zone = 64, x = 54.1, y = 63.6, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -20830,7 +22055,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Dalinna", zone = 64 }, { name = "Hama", zone = 64 } },
+            skillLevels = { 320, 330, 335, 340 },
+            sourcePlaces = { { name = "Dalinna", zone = 64, x = 56.6, y = 37.1, faction = "horde" }, { name = "Hama", zone = 64, x = 54.1, y = 63.6, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -20846,7 +22072,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Dalinna", zone = 64 }, { name = "Hama", zone = 64 } },
+            skillLevels = { 325, 335, 340, 345 },
+            sourcePlaces = { { name = "Dalinna", zone = 64, x = 56.6, y = 37.1, faction = "horde" }, { name = "Hama", zone = 64, x = 54.1, y = 63.6, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -20861,7 +22088,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Dalinna", zone = 64 }, { name = "Hama", zone = 64 } },
+            skillLevels = { 335, 345, 350, 355 },
+            sourcePlaces = { { name = "Dalinna", zone = 64, x = 56.6, y = 37.1, faction = "horde" }, { name = "Hama", zone = 64, x = 54.1, y = 63.6, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -20879,7 +22107,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 340,
             requiredSkill = 340,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eiin", zone = 50 }, { name = "Neii", zone = 59 }, { name = "Deynna", zone = 66 } },
+            skillLevels = { 340, 350, 355, 360 },
+            sourcePlaces = { { name = "Eiin", zone = 50, x = 66.2, y = 68.7 }, { name = "Neii", zone = 59, x = 64.5, y = 68.5, faction = "alliance" }, { name = "Deynna", zone = 66, x = 55.8, y = 51, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -20896,7 +22125,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 345,
             requiredSkill = 345,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eiin", zone = 50 }, { name = "Neii", zone = 59 }, { name = "Deynna", zone = 66 } },
+            skillLevels = { 345, 355, 360, 365 },
+            sourcePlaces = { { name = "Eiin", zone = 50, x = 66.2, y = 68.7 }, { name = "Neii", zone = 59, x = 64.5, y = 68.5, faction = "alliance" }, { name = "Deynna", zone = 66, x = 55.8, y = 51, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -20913,7 +22143,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 340,
             requiredSkill = 340,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Zurai", zone = 51 }, { name = "Muheru the Weaver", zone = 51 } },
+            skillLevels = { 340, 350, 355, 360 },
+            sourcePlaces = { { name = "Zurai", zone = 51, x = 85.2, y = 54.7, faction = "horde" }, { name = "Muheru the Weaver", zone = 51, x = 40.6, y = 28.2, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -20931,7 +22162,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Zurai", zone = 51 }, { name = "Muheru the Weaver", zone = 51 } },
+            skillLevels = { 350, 360, 365, 370 },
+            sourcePlaces = { { name = "Zurai", zone = 51, x = 85.2, y = 54.7, faction = "horde" }, { name = "Muheru the Weaver", zone = 51, x = 40.6, y = 28.2, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -20950,7 +22182,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Arrond", zone = 69 } },
+            skillLevels = { 360, 370, 375, 380 },
+            sourcePlaces = { { name = "Arrond", zone = 69, x = 55.9, y = 58.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -20968,7 +22201,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Arrond", zone = 69 } },
+            skillLevels = { 360, 370, 375, 380 },
+            sourcePlaces = { { name = "Arrond", zone = 69, x = 55.9, y = 58.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -20986,7 +22220,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 355,
             requiredSkill = 355,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mathar G'ochar", zone = 68 }, { name = "Borto", zone = 68 } },
+            skillLevels = { 355, 365, 370, 375 },
+            sourcePlaces = { { name = "Mathar G'ochar", zone = 68, x = 57, y = 39.6, faction = "horde" }, { name = "Borto", zone = 68, x = 53.3, y = 71.9, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 4 },
@@ -21004,6 +22239,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 380, 385 },
             sourcePlaces = { { zone = 70 } },
             bopOutput = false,
             reagents = {
@@ -21021,6 +22257,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 380, 382, 385 },
             sourcePlaces = { { zone = 70 } },
             bopOutput = false,
             reagents = {
@@ -21038,6 +22275,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "drop",
+            skillLevels = { 350, 360, 365, 370 },
             sourcePlaces = { { zone = 71 } },
             bopOutput = false,
             reagents = {
@@ -21056,6 +22294,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 370, 375, 380 },
             sourcePlaces = { { zone = 72 } },
             bopOutput = false,
             reagents = {
@@ -21074,6 +22313,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 370,
             requiredSkill = 370,
             sourceKind = "drop",
+            skillLevels = { 370, 380, 385, 390 },
             sourcePlaces = { { name = "Pathaleon the Calculator", zone = 72 } },
             bopOutput = false,
             reagents = {
@@ -21090,6 +22330,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "trinket",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 200, 225, 240, 255 },
             bopOutput = true,
             reagents = {
                 { itemId = 1529, count = 4 },
@@ -21108,6 +22349,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 200,
             requiredSkill = 200,
             sourceKind = "worldDrop",
+            skillLevels = { 200, 225, 240, 255 },
             worldDrop = true,
             bopOutput = true,
             reagents = {
@@ -21123,6 +22365,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 210, 235, 250, 265 },
             bopOutput = false,
             reagents = {
                 { itemId = 7909, count = 3 },
@@ -21139,7 +22382,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 215,
             requiredSkill = 215,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Banalash", zone = 36 }, { name = "Helenia Olden", zone = 15 } },
+            skillLevels = { 215, 240, 255, 270 },
+            sourcePlaces = { { name = "Banalash", zone = 36, x = 44.7, y = 56.7, faction = "horde" }, { name = "Helenia Olden", zone = 15, x = 66.4, y = 51.5, faction = "alliance" } },
             bopOutput = true,
             reagents = {
                 { itemId = 7971, count = 4 },
@@ -21154,6 +22398,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 220, 245, 260, 275 },
             bopOutput = false,
             reagents = {
                 { itemId = 7909, count = 1 },
@@ -21170,7 +22415,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Hammon Karwn", zone = 3 }, { name = "Keena", zone = 3 } },
+            skillLevels = { 225, 250, 265, 280 },
+            sourcePlaces = { { name = "Hammon Karwn", zone = 3, x = 46.5, y = 47.3, faction = "alliance" }, { name = "Keena", zone = 3, x = 74, y = 32.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 4 },
@@ -21187,6 +22433,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 225, 235, 245, 255 },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 1 },
@@ -21202,7 +22449,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nerrist", zone = 2 }, { name = "Helenia Olden", zone = 15 } },
+            skillLevels = { 225, 250, 265, 280 },
+            sourcePlaces = { { name = "Nerrist", zone = 2, x = 32.7, y = 29.2, faction = "horde" }, { name = "Helenia Olden", zone = 15, x = 66.4, y = 51.5, faction = "alliance" } },
             bopOutput = true,
             reagents = {
                 { itemId = 6037, count = 4 },
@@ -21222,6 +22470,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 235,
             requiredSkill = 235,
             sourceKind = "worldDrop",
+            skillLevels = { 235, 260, 275, 290 },
             worldDrop = true,
             bopOutput = true,
             reagents = {
@@ -21240,6 +22489,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 235, 260, 275, 290 },
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 1 },
@@ -21254,6 +22504,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 240, 265, 280, 295 },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 2 },
@@ -21270,6 +22521,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 245,
             requiredSkill = 245,
             sourceKind = "worldDrop",
+            skillLevels = { 245, 270, 285, 300 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -21287,6 +22539,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "worldDrop",
+            skillLevels = { 250, 275, 290, 305 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -21306,7 +22559,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Arred", zone = 59 }, { name = "Burbik Gearspanner", zone = 27 }, { name = "Gelanthis", zone = 66 }, { name = "Shadi Mistrunner", zone = 18 } },
+            skillLevels = { 250, 275, 290, 305 },
+            sourcePlaces = { { name = "Arred", zone = 59, x = 45, y = 26, faction = "alliance" }, { name = "Burbik Gearspanner", zone = 27, x = 46.5, y = 27.1, faction = "alliance" }, { name = "Gelanthis", zone = 66, x = 90.8, y = 73.6, faction = "horde" }, { name = "Shadi Mistrunner", zone = 18, x = 40.4, y = 63.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 4 },
@@ -21326,6 +22580,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 260,
             requiredSkill = 260,
             sourceKind = "worldDrop",
+            skillLevels = { 260, 280, 290, 300 },
             worldDrop = true,
             bopOutput = true,
             reagents = {
@@ -21343,6 +22598,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 260, 280, 290, 300 },
             bopOutput = false,
             reagents = {
                 { itemId = 12799, count = 1 },
@@ -21357,6 +22613,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 275, 285, 295, 305 },
             bopOutput = false,
             reagents = {
                 { itemId = 6037, count = 2 },
@@ -21374,7 +22631,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mishta", zone = 54 } },
+            skillLevels = { 275, 285, 295, 305 },
+            sourcePlaces = { { name = "Mishta", zone = 54, x = 49.9, y = 36.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12359, count = 2 },
@@ -21392,6 +22650,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 280, 290, 300, 310 },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 1 },
@@ -21407,6 +22666,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 280, 290, 300, 310 },
             bopOutput = false,
             reagents = {
                 { itemId = 12361, count = 1 },
@@ -21424,6 +22684,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "worldDrop",
+            skillLevels = { 285, 295, 305, 315 },
             worldDrop = true,
             bopOutput = true,
             reagents = {
@@ -21443,7 +22704,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Jase Farlane", zone = 49 } },
+            skillLevels = { 285, 295, 305, 315 },
+            sourcePlaces = { { name = "Jase Farlane", zone = 49, x = 74.8, y = 51.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12363, count = 1 },
@@ -21459,6 +22721,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 290, 300, 310, 320 },
             bopOutput = true,
             reagents = {
                 { itemId = 12364, count = 2 },
@@ -21476,6 +22739,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 310, 320, 330 },
             sourcePlaces = { { name = "Quartermaster Zigris", zone = 48 } },
             bopOutput = true,
             reagents = {
@@ -21496,6 +22760,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 310, 320, 330 },
             sourcePlaces = { { name = "Golem Lord Argelmach", zone = 43 } },
             bopOutput = true,
             reagents = {
@@ -21514,7 +22779,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 305,
             requiredSkill = 305,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Qia", zone = 45 } },
+            skillLevels = { 305, 315, 325, 335 },
+            sourcePlaces = { { name = "Qia", zone = 45, x = 61.2, y = 37.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12360, count = 2 },
@@ -21530,6 +22796,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 310, 320, 330, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 4 },
@@ -21580,6 +22847,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 30, 45, 60 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 1 },
@@ -21594,6 +22862,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 5, 35, 50, 65 },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 4 },
@@ -21608,6 +22877,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 50, 80, 95, 110 },
             bopOutput = false,
             reagents = {
                 { itemId = 1210, count = 1 },
@@ -21623,6 +22893,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 30, 60, 75, 90 },
             bopOutput = false,
             reagents = {
                 { itemId = 818, count = 2 },
@@ -21640,7 +22911,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Vargus", zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Vargus", zone = 54, x = 51.2, y = 38.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7076, count = 2 },
@@ -21657,6 +22929,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lieutenant General Andorov", zone = 73 } },
             bopOutput = false,
             reagents = {
@@ -21676,6 +22949,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "The Prophet Skeram", zone = 63 } },
             bopOutput = false,
             reagents = {
@@ -21696,7 +22970,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Vargus", zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Vargus", zone = 54, x = 51.2, y = 38.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12810, count = 4 },
@@ -21713,6 +22988,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Moam", zone = 73 } },
             bopOutput = false,
             reagents = {
@@ -21732,6 +23008,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Lieutenant General Andorov", zone = 73 } },
             bopOutput = false,
             reagents = {
@@ -21751,7 +23028,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 225,
             requiredSkill = 225,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kania", zone = 54 }, { name = "Thaddeus Webb", zone = 34 }, { name = "Erilia", zone = 65 }, { name = "Lilly", zone = 17 } },
+            skillLevels = { 225, 240, 255, 270 },
+            sourcePlaces = { { name = "Kania", zone = 54, x = 52, y = 39.6 }, { name = "Thaddeus Webb", zone = 34, x = 62, y = 60.7, faction = "horde" }, { name = "Erilia", zone = 65, x = 55.5, y = 54, faction = "horde" }, { name = "Lilly", zone = 17, x = 43.1, y = 50.8, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 4339, count = 4 },
@@ -21768,7 +23046,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Kania", zone = 54 } },
+            skillLevels = { 275, 290, 305, 320 },
+            sourcePlaces = { { name = "Kania", zone = 54, x = 52, y = 39.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14048, count = 5 },
@@ -21785,7 +23064,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "drop",
-            sourcePlaces = { { name = "Magister Kalendris", zone = 46 } },
+            skillLevels = { 300, 315, 330, 345 },
+            sourcePlaces = { { name = "Magister Kalendris", zone = 46, x = 59, y = 48.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12810, count = 4 },
@@ -21803,7 +23083,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 275,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mishta", zone = 54 } },
+            skillLevels = { 275, 290, 305, 320 },
+            sourcePlaces = { { name = "Mishta", zone = 54, x = 49.9, y = 36.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 8831, count = 10 },
@@ -21821,7 +23102,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mishta", zone = 54 } },
+            skillLevels = { 300, 315, 330, 345 },
+            sourcePlaces = { { name = "Mishta", zone = 54, x = 49.9, y = 36.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 13468, count = 1 },
@@ -21840,6 +23122,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 320, 330, 340 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -21859,6 +23142,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 320, 330, 340 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -21880,6 +23164,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "worldDrop",
+            skillLevels = { 300, 320, 330, 340 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -21898,7 +23183,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 290,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Meilosh", zone = 44 } },
+            skillLevels = { 290, 305, 322, 340 },
+            sourcePlaces = { { name = "Meilosh", zone = 44, x = 65.7, y = 2.9, faction = "horde" } },
             reagents = {
                 { itemId = 7082, count = 4 },
                 { itemId = 14344, count = 10 },
@@ -21913,6 +23199,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 305, 315, 330, 345 },
             reagents = {
                 { itemId = 22445, count = 6 },
             },
@@ -21924,6 +23211,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 315, 325, 340, 355 },
             reagents = {
                 { itemId = 22445, count = 6 },
                 { itemId = 22447, count = 6 },
@@ -21938,6 +23226,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 320,
             requiredSkill = 320,
             sourceKind = "drop",
+            skillLevels = { 320, 330, 345, 360 },
             sourcePlaces = { { zone = 74 } },
             reagents = {
                 { itemId = 22445, count = 10 },
@@ -21954,7 +23243,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 325,
             faction = "horde",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64 }, { name = "Quartermaster Urgronn", zone = 64 } },
+            skillLevels = { 325, 335, 350, 365 },
+            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64, x = 56.7, y = 62.6, faction = "alliance" }, { name = "Quartermaster Urgronn", zone = 64, x = 54.9, y = 37.9, faction = "horde" } },
             reagents = {
                 { itemId = 21886, count = 4 },
                 { itemId = 22446, count = 4 },
@@ -21969,6 +23259,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 335,
             requiredSkill = 335,
             sourceKind = "worldDrop",
+            skillLevels = { 335, 345, 360, 375 },
             worldDrop = true,
             reagents = {
                 { itemId = 22446, count = 8 },
@@ -21983,6 +23274,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "drop",
+            skillLevels = { 350, 370, 375, 380 },
             sourcePlaces = { { zone = 75 } },
             reagents = {
                 { itemId = 22445, count = 20 },
@@ -21999,6 +23291,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 370, 385, 400 },
             sourcePlaces = { { zone = 76 } },
             reagents = {
                 { itemId = 21884, count = 6 },
@@ -22015,6 +23308,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
+            skillLevels = { 360, 370, 377, 385 },
             sourcePlaces = { { name = "Ythyar", zone = 70 } },
             selfOnlyOutputless = true,
             reagents = {
@@ -22031,7 +23325,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alurmi", zone = 13 } },
+            skillLevels = { 360, 370, 377, 385 },
+            sourcePlaces = { { name = "Alurmi", zone = 13, x = 63.6, y = 57.6 } },
             selfOnlyOutputless = true,
             reagents = {
                 { itemId = 22446, count = 2 },
@@ -22047,7 +23342,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 370,
             requiredSkill = 370,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Almaador", zone = 50 } },
+            skillLevels = { 370, 380, 385, 390 },
+            sourcePlaces = { { name = "Almaador", zone = 50, x = 51, y = 41.9 } },
             selfOnlyOutputless = true,
             reagents = {
                 { itemId = 22445, count = 5 },
@@ -22064,7 +23360,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nakodu", zone = 50 } },
+            skillLevels = { 375, 380, 385, 390 },
+            sourcePlaces = { { name = "Nakodu", zone = 50, x = 62.1, y = 69 } },
             selfOnlyOutputless = true,
             reagents = {
                 { itemId = 22449, count = 2 },
@@ -22078,6 +23375,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 310, 320, 335, 350 },
             reagents = {
                 { itemId = 22445, count = 6 },
                 { itemId = 22452, count = 10 },
@@ -22092,6 +23390,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "vendor",
+            skillLevels = { 325, 335, 350, 365 },
             sourcePlaces = { { name = "Aged Dalaran Wizard", zone = 77 } },
             reagents = {
                 { itemId = 22446, count = 4 },
@@ -22106,6 +23405,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 340,
             requiredSkill = 340,
             sourceKind = "worldDrop",
+            skillLevels = { 340, 350, 365, 380 },
             worldDrop = true,
             reagents = {
                 { itemId = 22445, count = 12 },
@@ -22122,6 +23422,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "worldDrop",
+            skillLevels = { 360, 370, 375, 380 },
             worldDrop = true,
             reagents = {
                 { itemId = 22449, count = 2 },
@@ -22140,6 +23441,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 305,
             requiredSkill = 305,
             sourceKind = "drop",
+            skillLevels = { 305, 315, 330, 345 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             reagents = {
                 { itemId = 13444, count = 4 },
@@ -22156,6 +23458,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 320,
             requiredSkill = 320,
             sourceKind = "drop",
+            skillLevels = { 320, 330, 345, 360 },
             sourcePlaces = { { zone = 79 } },
             reagents = {
                 { itemId = 22445, count = 12 },
@@ -22170,6 +23473,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 340,
             requiredSkill = 340,
             sourceKind = "drop",
+            skillLevels = { 340, 350, 365, 380 },
             sourcePlaces = { { zone = 80 } },
             reagents = {
                 { itemId = 22445, count = 8 },
@@ -22185,6 +23489,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 370,
             requiredSkill = 370,
             sourceKind = "drop",
+            skillLevels = { 370, 380, 385, 390 },
             sourcePlaces = { { zone = 70 } },
             reagents = {
                 { itemId = 22449, count = 4 },
@@ -22199,6 +23504,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 315, 325, 340, 355 },
             reagents = {
                 { itemId = 13446, count = 4 },
                 { itemId = 14344, count = 2 },
@@ -22214,6 +23520,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "trainer",
+            skillLevels = { 350, 360, 370, 380 },
             reagents = {
                 { itemId = 13444, count = 4 },
                 { itemId = 22446, count = 3 },
@@ -22229,7 +23536,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 345,
             requiredSkill = 345,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64 }, { name = "Quartermaster Urgronn", zone = 64 } },
+            skillLevels = { 345, 355, 367, 380 },
+            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64, x = 56.7, y = 62.6, faction = "alliance" }, { name = "Quartermaster Urgronn", zone = 64, x = 54.9, y = 37.9, faction = "horde" } },
             reagents = {
                 { itemId = 22445, count = 4 },
                 { itemId = 22446, count = 4 },
@@ -22243,6 +23551,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 310, 320, 335, 350 },
             reagents = {
                 { itemId = 22445, count = 8 },
             },
@@ -22256,6 +23565,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 330,
             requiredSkill = 330,
             sourceKind = "worldDrop",
+            skillLevels = { 330, 340, 355, 370 },
             worldDrop = true,
             reagents = {
                 { itemId = 21884, count = 4 },
@@ -22274,7 +23584,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 340,
             requiredSkill = 340,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Karaaz", zone = 74 }, { name = "Paulsta'ats", zone = 68 } },
+            skillLevels = { 340, 350, 365, 380 },
+            sourcePlaces = { { name = "Karaaz", zone = 74, x = 43.6, y = 34.3 }, { name = "Paulsta'ats", zone = 68, x = 30.6, y = 57 } },
             reagents = {
                 { itemId = 22445, count = 6 },
                 { itemId = 22446, count = 6 },
@@ -22290,6 +23601,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 340,
             requiredSkill = 340,
             sourceKind = "drop",
+            skillLevels = { 340, 350, 365, 380 },
             sourcePlaces = { { zone = 74 } },
             reagents = {
                 { itemId = 22446, count = 10 },
@@ -22305,6 +23617,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "drop",
+            skillLevels = { 350, 370, 375, 380 },
             sourcePlaces = { { zone = 81 } },
             reagents = {
                 { itemId = 22445, count = 40 },
@@ -22320,6 +23633,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 370, 375, 380 },
             worldDrop = true,
             reagents = {
                 { itemId = 22445, count = 20 },
@@ -22336,6 +23650,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "drop",
+            skillLevels = { 350, 370, 375, 380 },
             sourcePlaces = { { zone = 76 } },
             reagents = {
                 { itemId = 22446, count = 8 },
@@ -22351,6 +23666,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 370, 377, 385 },
             sourcePlaces = { { zone = 71 } },
             reagents = {
                 { itemId = 22445, count = 20 },
@@ -22367,6 +23683,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 375, 375, 390 },
             sourcePlaces = { { name = "Shade of Aran", zone = 70 } },
             reagents = {
                 { itemId = 21884, count = 6 },
@@ -22385,6 +23702,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 380, 385, 390 },
             sourcePlaces = { { name = "Terestian Illhoof", zone = 70 } },
             reagents = {
                 { itemId = 21885, count = 6 },
@@ -22403,6 +23721,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 380, 385, 390 },
             sourcePlaces = { { name = "Moroes", zone = 70 } },
             reagents = {
                 { itemId = 22445, count = 40 },
@@ -22420,6 +23739,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "worldDrop",
+            skillLevels = { 360, 370, 377, 385 },
             worldDrop = true,
             reagents = {
                 { itemId = 22445, count = 20 },
@@ -22436,6 +23756,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "worldDrop",
+            skillLevels = { 360, 370, 377, 385 },
             worldDrop = true,
             reagents = {
                 { itemId = 21885, count = 2 },
@@ -22453,7 +23774,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 310,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Madame Ruby", zone = 50 }, { name = "Egomis", zone = 59 }, { name = "Lyna", zone = 66 } },
+            skillLevels = { 310, 310, 320, 330 },
+            sourcePlaces = { { name = "Madame Ruby", zone = 50, x = 63.1, y = 69.3 }, { name = "Egomis", zone = 59, x = 39.1, y = 39.4, faction = "alliance" }, { name = "Lyna", zone = 66, x = 69.1, y = 24.4, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -22471,7 +23793,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 340,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Madame Ruby", zone = 50 }, { name = "Egomis", zone = 59 }, { name = "Lyna", zone = 66 } },
+            skillLevels = { 340, 340, 350, 360 },
+            sourcePlaces = { { name = "Madame Ruby", zone = 50, x = 63.1, y = 69.3 }, { name = "Egomis", zone = 59, x = 39.1, y = 39.4, faction = "alliance" }, { name = "Lyna", zone = 66, x = 69.1, y = 24.4, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -22503,8 +23826,9 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 335,
             sourceKind = "vendor",
+            skillLevels = { 335, 335, 335, 335 },
             removed = true,
-            sourcePlaces = { { name = "Madame Ruby", zone = 50 }, { name = "Egomis", zone = 59 }, { name = "Lyna", zone = 66 } },
+            sourcePlaces = { { name = "Madame Ruby", zone = 50, x = 63.1, y = 69.3 }, { name = "Egomis", zone = 59, x = 39.1, y = 39.4, faction = "alliance" }, { name = "Lyna", zone = 66, x = 69.1, y = 24.4, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 22448, count = 3 },
@@ -22517,6 +23841,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 325, 325, 330, 335 },
             bopOutput = false,
             reagents = {
                 { itemId = 22449, count = 4 },
@@ -22529,6 +23854,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 50,
             sourceKind = "trainer",
+            skillLevels = { 350, 370, 375, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 22450, count = 2 },
@@ -22544,6 +23870,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { name = "Master Craftsman Omarion", zone = 82 } },
             bopOutput = false,
             reagents = {
@@ -22563,6 +23890,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { name = "Master Craftsman Omarion", zone = 82 } },
             bopOutput = false,
             reagents = {
@@ -22582,6 +23910,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { name = "Master Craftsman Omarion", zone = 82 } },
             bopOutput = false,
             reagents = {
@@ -22601,6 +23930,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 315, 330, 345 },
             sourcePlaces = { { name = "Master Craftsman Omarion", zone = 82 } },
             bopOutput = false,
             reagents = {
@@ -22620,7 +23950,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mishta", zone = 54 } },
+            skillLevels = { 300, 315, 330, 345 },
+            sourcePlaces = { { name = "Mishta", zone = 54, x = 49.9, y = 36.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 4 },
@@ -22639,6 +23970,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Master Craftsman Omarion", zone = 82 } },
             bopOutput = false,
             reagents = {
@@ -22659,6 +23991,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Master Craftsman Omarion", zone = 82 } },
             bopOutput = false,
             reagents = {
@@ -22679,6 +24012,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Master Craftsman Omarion", zone = 82 } },
             bopOutput = false,
             reagents = {
@@ -22699,6 +24033,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Master Craftsman Omarion", zone = 82 } },
             bopOutput = false,
             reagents = {
@@ -22719,6 +24054,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Master Craftsman Omarion", zone = 82 } },
             bopOutput = false,
             reagents = {
@@ -22739,6 +24075,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Master Craftsman Omarion", zone = 82 } },
             bopOutput = false,
             reagents = {
@@ -22759,6 +24096,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Master Craftsman Omarion", zone = 82 } },
             bopOutput = false,
             reagents = {
@@ -22778,6 +24116,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Master Craftsman Omarion", zone = 82 } },
             bopOutput = false,
             reagents = {
@@ -22797,6 +24136,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
+            skillLevels = { 300, 320, 330, 340 },
             sourcePlaces = { { name = "Master Craftsman Omarion", zone = 82 } },
             bopOutput = false,
             reagents = {
@@ -22815,7 +24155,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 60,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Master Chef Mouldier", zone = 28 }, { name = "Fazu", zone = 83 } },
+            skillLevels = { 60, 100, 120, 140 },
+            sourcePlaces = { { name = "Master Chef Mouldier", zone = 28, x = 48.3, y = 30.9, faction = "horde" }, { name = "Fazu", zone = 83, x = 53.5, y = 56.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 22644, count = 1 },
@@ -22831,7 +24172,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 220,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Sovik", zone = 25 }, { name = "Gearcutter Cogspinner", zone = 27 } },
+            skillLevels = { 275, 275, 280, 285 },
+            sourcePlaces = { { name = "Sovik", zone = 25, x = 75.6, y = 25.2, faction = "horde" }, { name = "Gearcutter Cogspinner", zone = 27, x = 68, y = 43.1, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 3860, count = 3 },
@@ -22848,7 +24190,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Vargus", zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Vargus", zone = 54, x = 51.2, y = 38.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12360, count = 2 },
@@ -22867,7 +24210,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Vargus", zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Vargus", zone = 54, x = 51.2, y = 38.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12655, count = 8 },
@@ -22885,7 +24229,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Vargus", zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Vargus", zone = 54, x = 51.2, y = 38.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12655, count = 6 },
@@ -22902,7 +24247,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Aendel Windspear", zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Aendel Windspear", zone = 54, x = 62.6, y = 49.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 2 },
@@ -22921,7 +24267,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Aendel Windspear", zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Aendel Windspear", zone = 54, x = 62.6, y = 49.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 2 },
@@ -22940,7 +24287,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Aendel Windspear", zone = 54 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Aendel Windspear", zone = 54, x = 62.6, y = 49.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 2 },
@@ -22958,7 +24306,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mishta", zone = 54 } },
+            skillLevels = { 300, 315, 330, 345 },
+            sourcePlaces = { { name = "Mishta", zone = 54, x = 49.9, y = 36.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 2 },
@@ -22977,7 +24326,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mishta", zone = 54 } },
+            skillLevels = { 300, 315, 330, 345 },
+            sourcePlaces = { { name = "Mishta", zone = 54, x = 49.9, y = 36.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 2 },
@@ -22996,7 +24346,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mishta", zone = 54 } },
+            skillLevels = { 300, 315, 330, 345 },
+            sourcePlaces = { { name = "Mishta", zone = 54, x = 49.9, y = 36.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 12803, count = 4 },
@@ -23014,7 +24365,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             requiredSkill = 305,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alchemist Gribble", zone = 64 }, { name = "Altaa", zone = 59 }, { name = "Melaris", zone = 66 }, { name = "Apothecary Antonivich", zone = 64 } },
+            skillLevels = { 305, 320, 327, 335 },
+            sourcePlaces = { { name = "Alchemist Gribble", zone = 64, x = 53.8, y = 65.8, faction = "alliance" }, { name = "Altaa", zone = 59, x = 27.5, y = 62.1, faction = "alliance" }, { name = "Melaris", zone = 66, x = 66, y = 20.6, faction = "horde" }, { name = "Apothecary Antonivich", zone = 64, x = 52.4, y = 36.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -23030,7 +24382,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 280,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Alchemist Gribble", zone = 64 }, { name = "Lorokeem", zone = 50 }, { name = "Apothecary Antonivich", zone = 64 } },
+            skillLevels = { 305, 320, 327, 335 },
+            sourcePlaces = { { name = "Alchemist Gribble", zone = 64, x = 53.8, y = 65.8, faction = "alliance" }, { name = "Lorokeem", zone = 50, x = 45.4, y = 19.5 }, { name = "Apothecary Antonivich", zone = 64, x = 52.4, y = 36.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 13465, count = 1 },
@@ -23046,7 +24399,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 200,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Alchemist Gribble", zone = 64 }, { name = "Lorokeem", zone = 50 }, { name = "Apothecary Antonivich", zone = 64 } },
+            skillLevels = { 310, 325, 332, 340 },
+            sourcePlaces = { { name = "Alchemist Gribble", zone = 64, x = 53.8, y = 65.8, faction = "alliance" }, { name = "Lorokeem", zone = 50, x = 45.4, y = 19.5 }, { name = "Apothecary Antonivich", zone = 64, x = 52.4, y = 36.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 13464, count = 1 },
@@ -23064,7 +24418,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             requiredSkill = 315,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Seer Janidi", zone = 51 }, { name = "Leeli Longhaggle", zone = 58 } },
+            skillLevels = { 315, 330, 337, 345 },
+            sourcePlaces = { { name = "Seer Janidi", zone = 51, x = 32.4, y = 51.9, faction = "horde" }, { name = "Leeli Longhaggle", zone = 58, x = 57.7, y = 53.4, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -23082,7 +24437,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 320,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Haalrun", zone = 51 }, { name = "Seer Janidi", zone = 51 } },
+            skillLevels = { 320, 335, 342, 350 },
+            sourcePlaces = { { name = "Haalrun", zone = 51, x = 67.8, y = 48, faction = "alliance" }, { name = "Seer Janidi", zone = 51, x = 32.4, y = 51.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -23100,6 +24456,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 320,
             sourceKind = "worldDrop",
+            skillLevels = { 320, 335, 342, 350 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -23115,7 +24472,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "healing",
             sortOrder = 70,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Alchemist Gribble", zone = 64 }, { name = "Lorokeem", zone = 50 }, { name = "Apothecary Antonivich", zone = 64 } },
+            skillLevels = { 325, 340, 347, 355 },
+            sourcePlaces = { { name = "Alchemist Gribble", zone = 64, x = 53.8, y = 65.8, faction = "alliance" }, { name = "Lorokeem", zone = 50, x = 45.4, y = 19.5 }, { name = "Apothecary Antonivich", zone = 64, x = 52.4, y = 36.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -23133,6 +24491,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 325,
             sourceKind = "worldDrop",
+            skillLevels = { 325, 340, 347, 355 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -23151,7 +24510,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 260,
             requiredSkill = 330,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64 }, { name = "Quartermaster Urgronn", zone = 64 } },
+            skillLevels = { 330, 345, 352, 360 },
+            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64, x = 56.7, y = 62.6, faction = "alliance" }, { name = "Quartermaster Urgronn", zone = 64, x = 54.9, y = 37.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -23169,7 +24529,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 120,
             requiredSkill = 335,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mycah", zone = 51 } },
+            skillLevels = { 335, 350, 357, 365 },
+            sourcePlaces = { { name = "Mycah", zone = 51, x = 17.9, y = 51.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -23187,7 +24548,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             requiredSkill = 340,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Haalrun", zone = 51 }, { name = "Daga Ramba", zone = 76 } },
+            skillLevels = { 340, 355, 362, 370 },
+            sourcePlaces = { { name = "Haalrun", zone = 51, x = 67.8, y = 48, faction = "alliance" }, { name = "Daga Ramba", zone = 76, x = 51.1, y = 57.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -23205,7 +24567,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 345,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50 } },
+            skillLevels = { 345, 360, 367, 375 },
+            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50, x = 60.5, y = 64.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -23223,7 +24586,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 80,
             requiredSkill = 345,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Haalrun", zone = 51 }, { name = "Daga Ramba", zone = 76 } },
+            skillLevels = { 345, 360, 367, 375 },
+            sourcePlaces = { { name = "Haalrun", zone = 51, x = 67.8, y = 48, faction = "alliance" }, { name = "Daga Ramba", zone = 76, x = 51.1, y = 57.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -23241,7 +24605,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nakodu", zone = 50 } },
+            skillLevels = { 350, 365, 372, 380 },
+            sourcePlaces = { { name = "Nakodu", zone = 50, x = 62.1, y = 69 } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -23259,7 +24624,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 130,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Leeli Longhaggle", zone = 58 }, { name = "Daga Ramba", zone = 76 } },
+            skillLevels = { 350, 365, 372, 380 },
+            sourcePlaces = { { name = "Leeli Longhaggle", zone = 58, x = 57.7, y = 53.4, faction = "alliance" }, { name = "Daga Ramba", zone = 76, x = 51.1, y = 57.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -23277,6 +24643,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 365, 372, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -23295,6 +24662,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 120,
             requiredSkill = 350,
             sourceKind = "drop",
+            skillLevels = { 350, 365, 372, 380 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             bopOutput = false,
             reagents = {
@@ -23313,6 +24681,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 130,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 365, 372, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -23331,7 +24700,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 150,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Almaador", zone = 50 } },
+            skillLevels = { 350, 365, 372, 380 },
+            sourcePlaces = { { name = "Almaador", zone = 50, x = 51, y = 41.9 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22451, count = 1 },
@@ -23347,7 +24717,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 130,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mycah", zone = 51 } },
+            skillLevels = { 350, 365, 372, 380 },
+            sourcePlaces = { { name = "Mycah", zone = 51, x = 17.9, y = 51.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 1 },
@@ -23363,7 +24734,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 160,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Trader Narasu", zone = 68 } },
+            skillLevels = { 350, 365, 372, 380 },
+            sourcePlaces = { { name = "Trader Narasu", zone = 68, x = 54.6, y = 75.2, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 1 },
@@ -23379,7 +24751,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 140,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 350, 365, 372, 380 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 1 },
@@ -23395,6 +24768,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 240,
             requiredSkill = 355,
             sourceKind = "worldDrop",
+            skillLevels = { 355, 370, 375, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -23414,6 +24788,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 230,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 375, 377, 380 },
             sourcePlaces = { { zone = 72 } },
             bopOutput = false,
             reagents = {
@@ -23433,6 +24808,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 240,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 375, 377, 380 },
             sourcePlaces = { { name = "Nexus-Prince Shaffar", zone = 79 } },
             bopOutput = false,
             reagents = {
@@ -23452,7 +24828,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 360, 375, 377, 380 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 5 },
@@ -23471,6 +24848,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 260,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 375, 377, 380 },
             sourcePlaces = { { zone = 68 } },
             bopOutput = false,
             reagents = {
@@ -23490,6 +24868,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 220,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 375, 377, 380 },
             sourcePlaces = { { zone = 69 } },
             bopOutput = false,
             reagents = {
@@ -23509,6 +24888,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 210,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 375, 377, 380 },
             sourcePlaces = { { zone = 76 } },
             bopOutput = false,
             reagents = {
@@ -23527,6 +24907,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 320,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 377, 380 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             bopOutput = false,
             reagents = {
@@ -23545,6 +24926,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 140,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 377, 380 },
             sourcePlaces = { { name = "Captain Skarloc", zone = 77 } },
             bopOutput = false,
             reagents = {
@@ -23561,6 +24943,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 70,
             sourceKind = "discovery",
+            skillLevels = { 375, 375, 377, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 22456, count = 1 },
@@ -23574,6 +24957,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 80,
             sourceKind = "discovery",
+            skillLevels = { 375, 375, 377, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 1 },
@@ -23587,6 +24971,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 90,
             sourceKind = "discovery",
+            skillLevels = { 375, 375, 377, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 1 },
@@ -23600,6 +24985,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 100,
             sourceKind = "discovery",
+            skillLevels = { 375, 375, 377, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 1 },
@@ -23613,6 +24999,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 110,
             sourceKind = "discovery",
+            skillLevels = { 375, 375, 377, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 1 },
@@ -23626,6 +25013,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "elemental",
             sortOrder = 120,
             sourceKind = "discovery",
+            skillLevels = { 375, 375, 377, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 1 },
@@ -23639,6 +25027,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rejuvenation",
             sortOrder = 80,
             sourceKind = "discovery",
+            skillLevels = { 375, 375, 377, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -23654,6 +25043,7 @@ RecipeRegistryRecipeMetadata = {
             category = "flasks",
             sortOrder = 60,
             sourceKind = "discovery",
+            skillLevels = { 375, 375, 377, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -23669,6 +25059,7 @@ RecipeRegistryRecipeMetadata = {
             category = "flasks",
             sortOrder = 70,
             sourceKind = "discovery",
+            skillLevels = { 375, 375, 377, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -23684,6 +25075,7 @@ RecipeRegistryRecipeMetadata = {
             category = "flasks",
             sortOrder = 80,
             sourceKind = "discovery",
+            skillLevels = { 375, 375, 377, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -23699,6 +25091,7 @@ RecipeRegistryRecipeMetadata = {
             category = "flasks",
             sortOrder = 90,
             sourceKind = "discovery",
+            skillLevels = { 375, 375, 377, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -23714,6 +25107,7 @@ RecipeRegistryRecipeMetadata = {
             category = "flasks",
             sortOrder = 100,
             sourceKind = "discovery",
+            skillLevels = { 375, 375, 377, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -23732,6 +25126,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "trainer",
+            skillLevels = { 300, 300, 320, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 23077, count = 1 },
@@ -23747,6 +25142,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 305,
             requiredSkill = 305,
             sourceKind = "trainer",
+            skillLevels = { 305, 305, 325, 345 },
             bopOutput = false,
             reagents = {
                 { itemId = 23077, count = 1 },
@@ -23762,7 +25158,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 315,
             requiredSkill = 315,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50 } },
+            skillLevels = { 315, 315, 335, 355 },
+            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50, x = 60.5, y = 64.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23077, count = 1 },
@@ -23778,7 +25175,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Karaaz", zone = 74 }, { name = "Paulsta'ats", zone = 68 } },
+            skillLevels = { 325, 325, 340, 355 },
+            sourcePlaces = { { name = "Karaaz", zone = 74, x = 43.6, y = 34.3 }, { name = "Paulsta'ats", zone = 68, x = 30.6, y = 57 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23077, count = 1 },
@@ -23794,6 +25192,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "trainer",
+            skillLevels = { 300, 300, 320, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 21929, count = 1 },
@@ -23809,7 +25208,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 305,
             requiredSkill = 305,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Karaaz", zone = 74 }, { name = "Paulsta'ats", zone = 68 } },
+            skillLevels = { 305, 305, 325, 345 },
+            sourcePlaces = { { name = "Karaaz", zone = 74, x = 43.6, y = 34.3 }, { name = "Paulsta'ats", zone = 68, x = 30.6, y = 57 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21929, count = 1 },
@@ -23825,6 +25225,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 315,
             requiredSkill = 315,
             sourceKind = "trainer",
+            skillLevels = { 315, 315, 335, 355 },
             bopOutput = false,
             reagents = {
                 { itemId = 21929, count = 1 },
@@ -23840,7 +25241,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nakodu", zone = 50 } },
+            skillLevels = { 325, 325, 340, 355 },
+            sourcePlaces = { { name = "Nakodu", zone = 50, x = 62.1, y = 69 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21929, count = 1 },
@@ -23856,6 +25258,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "trainer",
+            skillLevels = { 300, 300, 320, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 23079, count = 1 },
@@ -23871,6 +25274,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 305,
             requiredSkill = 305,
             sourceKind = "trainer",
+            skillLevels = { 305, 305, 325, 345 },
             bopOutput = false,
             reagents = {
                 { itemId = 23079, count = 1 },
@@ -23886,7 +25290,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 315,
             requiredSkill = 315,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64 }, { name = "Quartermaster Urgronn", zone = 64 } },
+            skillLevels = { 315, 315, 335, 355 },
+            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64, x = 56.7, y = 62.6, faction = "alliance" }, { name = "Quartermaster Urgronn", zone = 64, x = 54.9, y = 37.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23079, count = 1 },
@@ -23902,7 +25307,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50 } },
+            skillLevels = { 325, 325, 340, 355 },
+            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50, x = 60.5, y = 64.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23079, count = 1 },
@@ -23918,6 +25324,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "trainer",
+            skillLevels = { 300, 300, 320, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 23107, count = 1 },
@@ -23934,7 +25341,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 305,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 305, 305, 325, 345 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23107, count = 1 },
@@ -23950,7 +25358,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 315,
             requiredSkill = 315,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Karaaz", zone = 74 }, { name = "Paulsta'ats", zone = 68 } },
+            skillLevels = { 315, 315, 335, 355 },
+            sourcePlaces = { { name = "Karaaz", zone = 74, x = 43.6, y = 34.3 }, { name = "Paulsta'ats", zone = 68, x = 30.6, y = 57 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23107, count = 1 },
@@ -23966,6 +25375,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "trainer",
+            skillLevels = { 325, 325, 340, 355 },
             bopOutput = false,
             reagents = {
                 { itemId = 23107, count = 1 },
@@ -23981,6 +25391,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "trainer",
+            skillLevels = { 300, 300, 320, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 23112, count = 1 },
@@ -23997,7 +25408,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 305,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 305, 305, 325, 345 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23112, count = 1 },
@@ -24013,7 +25425,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 315,
             requiredSkill = 315,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Karaaz", zone = 74 }, { name = "Paulsta'ats", zone = 68 } },
+            skillLevels = { 315, 315, 335, 355 },
+            sourcePlaces = { { name = "Karaaz", zone = 74, x = 43.6, y = 34.3 }, { name = "Paulsta'ats", zone = 68, x = 30.6, y = 57 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23112, count = 1 },
@@ -24029,6 +25442,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "trainer",
+            skillLevels = { 325, 325, 340, 355 },
             bopOutput = false,
             reagents = {
                 { itemId = 23112, count = 1 },
@@ -24044,6 +25458,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "trainer",
+            skillLevels = { 300, 300, 320, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 23117, count = 1 },
@@ -24059,6 +25474,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 305,
             requiredSkill = 305,
             sourceKind = "trainer",
+            skillLevels = { 305, 305, 325, 345 },
             bopOutput = false,
             reagents = {
                 { itemId = 23117, count = 1 },
@@ -24074,6 +25490,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 315,
             requiredSkill = 315,
             sourceKind = "worldDrop",
+            skillLevels = { 315, 315, 335, 355 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -24090,7 +25507,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Karaaz", zone = 74 }, { name = "Paulsta'ats", zone = 68 } },
+            skillLevels = { 325, 325, 340, 355 },
+            sourcePlaces = { { name = "Karaaz", zone = 74, x = 43.6, y = 34.3 }, { name = "Paulsta'ats", zone = 68, x = 30.6, y = 57 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23117, count = 1 },
@@ -24103,7 +25521,8 @@ RecipeRegistryRecipeMetadata = {
             category = "metals",
             sortOrder = 200,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Hurnak Grimmord", zone = 64 }, { name = "Krugosh", zone = 64 } },
+            skillLevels = { 275, 275, 300, 325 },
+            sourcePlaces = { { name = "Hurnak Grimmord", zone = 64, x = 56.7, y = 63.8, faction = "alliance" }, { name = "Krugosh", zone = 64, x = 55.5, y = 37.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23424, count = 2 },
@@ -24116,7 +25535,8 @@ RecipeRegistryRecipeMetadata = {
             category = "metals",
             sortOrder = 210,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Hurnak Grimmord", zone = 64 }, { name = "Krugosh", zone = 64 } },
+            skillLevels = { 325, 325, 332, 340 },
+            sourcePlaces = { { name = "Hurnak Grimmord", zone = 64, x = 56.7, y = 63.8, faction = "alliance" }, { name = "Krugosh", zone = 64, x = 55.5, y = 37.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23425, count = 2 },
@@ -24129,7 +25549,8 @@ RecipeRegistryRecipeMetadata = {
             category = "metals",
             sortOrder = 220,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Hurnak Grimmord", zone = 64 }, { name = "Krugosh", zone = 64 } },
+            skillLevels = { 350, 350, 357, 365 },
+            sourcePlaces = { { name = "Hurnak Grimmord", zone = 64, x = 56.7, y = 63.8, faction = "alliance" }, { name = "Krugosh", zone = 64, x = 55.5, y = 37.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23427, count = 2 },
@@ -24142,7 +25563,8 @@ RecipeRegistryRecipeMetadata = {
             category = "metals",
             sortOrder = 230,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Hurnak Grimmord", zone = 64 }, { name = "Krugosh", zone = 64 } },
+            skillLevels = { 350, 350, 357, 375 },
+            sourcePlaces = { { name = "Hurnak Grimmord", zone = 64, x = 56.7, y = 63.8, faction = "alliance" }, { name = "Krugosh", zone = 64, x = 55.5, y = 37.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 3 },
@@ -24156,7 +25578,8 @@ RecipeRegistryRecipeMetadata = {
             category = "metals",
             sortOrder = 240,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Hurnak Grimmord", zone = 64 }, { name = "Krugosh", zone = 64 } },
+            skillLevels = { 375, 375, 375, 375 },
+            sourcePlaces = { { name = "Hurnak Grimmord", zone = 64, x = 56.7, y = 63.8, faction = "alliance" }, { name = "Krugosh", zone = 64, x = 55.5, y = 37.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23426, count = 2 },
@@ -24170,7 +25593,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Humphry", zone = 64 }, { name = "Rohok", zone = 64 }, { name = "Grutah", zone = 69 } },
+            skillLevels = { 300, 310, 320, 330 },
+            sourcePlaces = { { name = "Humphry", zone = 64, x = 56.8, y = 63.8, faction = "alliance" }, { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Grutah", zone = 69, x = 29.7, y = 31.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 4 },
@@ -24184,7 +25608,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "waist",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Humphry", zone = 64 }, { name = "Rohok", zone = 64 }, { name = "Grutah", zone = 69 } },
+            skillLevels = { 305, 315, 325, 335 },
+            sourcePlaces = { { name = "Humphry", zone = 64, x = 56.8, y = 63.8, faction = "alliance" }, { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Grutah", zone = 69, x = 29.7, y = 31.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 4 },
@@ -24198,7 +25623,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Humphry", zone = 64 }, { name = "Rohok", zone = 64 }, { name = "Grutah", zone = 69 } },
+            skillLevels = { 315, 325, 335, 345 },
+            sourcePlaces = { { name = "Humphry", zone = 64, x = 56.8, y = 63.8, faction = "alliance" }, { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Grutah", zone = 69, x = 29.7, y = 31.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 6 },
@@ -24212,7 +25638,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Humphry", zone = 64 }, { name = "Rohok", zone = 64 }, { name = "Grutah", zone = 69 } },
+            skillLevels = { 315, 325, 335, 345 },
+            sourcePlaces = { { name = "Humphry", zone = 64, x = 56.8, y = 63.8, faction = "alliance" }, { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Grutah", zone = 69, x = 29.7, y = 31.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 8 },
@@ -24226,7 +25653,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Humphry", zone = 64 }, { name = "Rohok", zone = 64 }, { name = "Grutah", zone = 69 } },
+            skillLevels = { 325, 335, 345, 355 },
+            sourcePlaces = { { name = "Humphry", zone = 64, x = 56.8, y = 63.8, faction = "alliance" }, { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Grutah", zone = 69, x = 29.7, y = 31.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 10 },
@@ -24240,7 +25668,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "head",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Humphry", zone = 64 }, { name = "Rohok", zone = 64 }, { name = "Grutah", zone = 69 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Humphry", zone = 64, x = 56.8, y = 63.8, faction = "alliance" }, { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Grutah", zone = 69, x = 29.7, y = 31.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 4 },
@@ -24254,7 +25683,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Humphry", zone = 64 }, { name = "Rohok", zone = 64 }, { name = "Grutah", zone = 69 } },
+            skillLevels = { 310, 320, 330, 340 },
+            sourcePlaces = { { name = "Humphry", zone = 64, x = 56.8, y = 63.8, faction = "alliance" }, { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Grutah", zone = 69, x = 29.7, y = 31.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 5 },
@@ -24268,7 +25698,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "wrist",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Humphry", zone = 64 }, { name = "Rohok", zone = 64 }, { name = "Grutah", zone = 69 } },
+            skillLevels = { 315, 325, 335, 345 },
+            sourcePlaces = { { name = "Humphry", zone = 64, x = 56.8, y = 63.8, faction = "alliance" }, { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Grutah", zone = 69, x = 29.7, y = 31.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 6 },
@@ -24282,7 +25713,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Humphry", zone = 64 }, { name = "Rohok", zone = 64 }, { name = "Grutah", zone = 69 } },
+            skillLevels = { 320, 330, 340, 350 },
+            sourcePlaces = { { name = "Humphry", zone = 64, x = 56.8, y = 63.8, faction = "alliance" }, { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Grutah", zone = 69, x = 29.7, y = 31.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 9 },
@@ -24296,7 +25728,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "axe",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Humphry", zone = 64 }, { name = "Rohok", zone = 64 }, { name = "Grutah", zone = 69 } },
+            skillLevels = { 310, 320, 330, 340 },
+            sourcePlaces = { { name = "Humphry", zone = 64, x = 56.8, y = 63.8, faction = "alliance" }, { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Grutah", zone = 69, x = 29.7, y = 31.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 9 },
@@ -24310,7 +25743,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mace",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Humphry", zone = 64 }, { name = "Rohok", zone = 64 }, { name = "Grutah", zone = 69 } },
+            skillLevels = { 315, 325, 335, 345 },
+            sourcePlaces = { { name = "Humphry", zone = 64, x = 56.8, y = 63.8, faction = "alliance" }, { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Grutah", zone = 69, x = 29.7, y = 31.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 10 },
@@ -24324,7 +25758,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sword",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Humphry", zone = 64 }, { name = "Rohok", zone = 64 }, { name = "Grutah", zone = 69 } },
+            skillLevels = { 320, 330, 340, 350 },
+            sourcePlaces = { { name = "Humphry", zone = 64, x = 56.8, y = 63.8, faction = "alliance" }, { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Grutah", zone = 69, x = 29.7, y = 31.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 12 },
@@ -24340,7 +25775,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eriden", zone = 66 }, { name = "Arras", zone = 59 }, { name = "Aaron Hollman", zone = 50 } },
+            skillLevels = { 325, 335, 345, 355 },
+            sourcePlaces = { { name = "Eriden", zone = 66, x = 79.5, y = 36.2, faction = "horde" }, { name = "Arras", zone = 59, x = 60, y = 89.5, faction = "alliance" }, { name = "Aaron Hollman", zone = 50, x = 63.1, y = 71.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 8 },
@@ -24356,7 +25792,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 330,
             requiredSkill = 330,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eriden", zone = 66 }, { name = "Arras", zone = 59 }, { name = "Aaron Hollman", zone = 50 } },
+            skillLevels = { 330, 340, 350, 360 },
+            sourcePlaces = { { name = "Eriden", zone = 66, x = 79.5, y = 36.2, faction = "horde" }, { name = "Arras", zone = 59, x = 60, y = 89.5, faction = "alliance" }, { name = "Aaron Hollman", zone = 50, x = 63.1, y = 71.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 8 },
@@ -24372,7 +25809,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 330,
             requiredSkill = 330,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eriden", zone = 66 }, { name = "Arras", zone = 59 }, { name = "Aaron Hollman", zone = 50 } },
+            skillLevels = { 330, 340, 350, 360 },
+            sourcePlaces = { { name = "Eriden", zone = 66, x = 79.5, y = 36.2, faction = "horde" }, { name = "Arras", zone = 59, x = 60, y = 89.5, faction = "alliance" }, { name = "Aaron Hollman", zone = 50, x = 63.1, y = 71.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21887, count = 2 },
@@ -24389,7 +25827,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 335,
             requiredSkill = 335,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eriden", zone = 66 }, { name = "Arras", zone = 59 }, { name = "Aaron Hollman", zone = 50 } },
+            skillLevels = { 335, 345, 355, 365 },
+            sourcePlaces = { { name = "Eriden", zone = 66, x = 79.5, y = 36.2, faction = "horde" }, { name = "Arras", zone = 59, x = 60, y = 89.5, faction = "alliance" }, { name = "Aaron Hollman", zone = 50, x = 63.1, y = 71.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 12 },
@@ -24405,7 +25844,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 335,
             requiredSkill = 335,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Krek Cragcrush", zone = 69 }, { name = "Loolruna", zone = 51 } },
+            skillLevels = { 335, 345, 355, 365 },
+            sourcePlaces = { { name = "Krek Cragcrush", zone = 69, x = 28.9, y = 30.8, faction = "horde" }, { name = "Loolruna", zone = 51, x = 68.5, y = 50.1, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 2 },
@@ -24423,7 +25863,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 335,
             requiredSkill = 335,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Krek Cragcrush", zone = 69 }, { name = "Loolruna", zone = 51 } },
+            skillLevels = { 335, 345, 355, 365 },
+            sourcePlaces = { { name = "Krek Cragcrush", zone = 69, x = 28.9, y = 30.8, faction = "horde" }, { name = "Loolruna", zone = 51, x = 68.5, y = 50.1, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 2 },
@@ -24442,7 +25883,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 340,
             requiredSkill = 340,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Krek Cragcrush", zone = 69 }, { name = "Loolruna", zone = 51 } },
+            skillLevels = { 340, 350, 360, 370 },
+            sourcePlaces = { { name = "Krek Cragcrush", zone = 69, x = 28.9, y = 30.8, faction = "horde" }, { name = "Loolruna", zone = 51, x = 68.5, y = 50.1, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 2 },
@@ -24460,7 +25902,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 355,
             requiredSkill = 355,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50 } },
+            skillLevels = { 355, 365, 375, 385 },
+            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50, x = 60.5, y = 64.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22445, count = 8 },
@@ -24478,7 +25921,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50 } },
+            skillLevels = { 360, 370, 380, 390 },
+            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50, x = 60.5, y = 64.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22445, count = 20 },
@@ -24496,7 +25940,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 355,
             requiredSkill = 355,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50 } },
+            skillLevels = { 355, 365, 375, 385 },
+            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50, x = 60.5, y = 64.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22445, count = 12 },
@@ -24514,7 +25959,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50 } },
+            skillLevels = { 365, 375, 385, 395 },
+            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50, x = 60.5, y = 64.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22445, count = 24 },
@@ -24533,7 +25979,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 2 },
@@ -24552,7 +25999,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 355,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 355, 365, 375, 385 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 3 },
@@ -24571,7 +26019,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 360, 370, 380, 390 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 4 },
@@ -24590,7 +26039,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 365,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 365, 375, 385, 395 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 4 },
@@ -24608,6 +26058,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 370, 380, 390 },
             sourcePlaces = { { zone = 80 } },
             bopOutput = false,
             reagents = {
@@ -24624,6 +26075,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 370, 380, 390 },
             sourcePlaces = { { zone = 71 } },
             bopOutput = false,
             reagents = {
@@ -24640,6 +26092,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 385, 395 },
             sourcePlaces = { { zone = 84 } },
             bopOutput = false,
             reagents = {
@@ -24656,6 +26109,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -24675,6 +26129,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 370, 380, 390 },
             sourcePlaces = { { zone = 68 } },
             bopOutput = false,
             reagents = {
@@ -24693,6 +26148,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 370, 380, 390 },
             sourcePlaces = { { zone = 69 } },
             bopOutput = false,
             reagents = {
@@ -24711,6 +26167,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 385, 395 },
             sourcePlaces = { { zone = 74 } },
             bopOutput = false,
             reagents = {
@@ -24729,6 +26186,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 385, 395 },
             sourcePlaces = { { zone = 68 } },
             bopOutput = false,
             reagents = {
@@ -24748,6 +26206,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 385, 395 },
             sourcePlaces = { { zone = 76 } },
             bopOutput = false,
             reagents = {
@@ -24767,6 +26226,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 370,
             requiredSkill = 370,
             sourceKind = "drop",
+            skillLevels = { 370, 380, 390, 400 },
             sourcePlaces = { { zone = 69 } },
             bopOutput = false,
             reagents = {
@@ -24786,6 +26246,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 370,
             requiredSkill = 370,
             sourceKind = "drop",
+            skillLevels = { 370, 380, 390, 400 },
             sourcePlaces = { { zone = 79 } },
             bopOutput = false,
             reagents = {
@@ -24805,6 +26266,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 370,
             requiredSkill = 370,
             sourceKind = "drop",
+            skillLevels = { 370, 380, 390, 400 },
             sourcePlaces = { { name = "High Botanist Freywinn", zone = 85 } },
             bopOutput = false,
             reagents = {
@@ -24821,7 +26283,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "sharpening",
             sortOrder = 70,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Humphry", zone = 64 }, { name = "Rohok", zone = 64 }, { name = "Grutah", zone = 69 } },
+            skillLevels = { 300, 300, 305, 310 },
+            sourcePlaces = { { name = "Humphry", zone = 64, x = 56.8, y = 63.8, faction = "alliance" }, { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Grutah", zone = 69, x = 29.7, y = 31.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 22573, count = 1 },
@@ -24838,7 +26301,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 80,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 350, 350, 355, 360 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22573, count = 2 },
@@ -24855,7 +26319,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64 }, { name = "Quartermaster Urgronn", zone = 64 } },
+            skillLevels = { 360, 370, 380, 390 },
+            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64, x = 56.7, y = 62.6, faction = "alliance" }, { name = "Quartermaster Urgronn", zone = 64, x = 54.9, y = 37.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 4 },
@@ -24873,6 +26338,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -24891,6 +26357,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -24909,6 +26376,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -24928,6 +26396,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -24947,6 +26416,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -24966,6 +26436,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -24984,6 +26455,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -25002,6 +26474,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -25018,7 +26491,8 @@ RecipeRegistryRecipeMetadata = {
             category = "metals",
             sortOrder = 250,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Hurnak Grimmord", zone = 64 }, { name = "Krugosh", zone = 64 } },
+            skillLevels = { 375, 375, 375, 375 },
+            sourcePlaces = { { name = "Hurnak Grimmord", zone = 64, x = 56.7, y = 63.8, faction = "alliance" }, { name = "Krugosh", zone = 64, x = 55.5, y = 37.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 10 },
@@ -25034,7 +26508,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Altaa", zone = 59 }, { name = "Melaris", zone = 66 }, { name = "Skreah", zone = 50 } },
+            skillLevels = { 350, 365, 372, 380 },
+            sourcePlaces = { { name = "Altaa", zone = 59, x = 27.5, y = 62.1, faction = "alliance" }, { name = "Melaris", zone = 66, x = 66, y = 20.6, faction = "horde" }, { name = "Skreah", zone = 50, x = 46, y = 20.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 1 },
@@ -25054,6 +26529,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -25073,6 +26549,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -25092,6 +26569,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -25111,6 +26589,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -25130,6 +26609,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -25149,6 +26629,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -25168,6 +26649,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -25188,6 +26670,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -25207,6 +26690,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -25226,7 +26710,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 340,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rohok", zone = 64 }, { name = "Mari Stonehand", zone = 69 } },
+            skillLevels = { 340, 340, 345, 350 },
+            sourcePlaces = { { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Mari Stonehand", zone = 69, x = 36.8, y = 55.1, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 1 },
@@ -25241,6 +26726,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 375, 375, 375 },
             sourcePlaces = { { zone = 74 } },
             bopOutput = false,
             reagents = {
@@ -25256,6 +26742,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "powders",
             sortOrder = 60,
             sourceKind = "trainer",
+            skillLevels = { 300, 300, 310, 320 },
             bopOutput = false,
             reagents = {
                 { itemId = 22573, count = 2 },
@@ -25269,6 +26756,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 200,
             sourceKind = "trainer",
+            skillLevels = { 300, 300, 310, 320 },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 3 },
@@ -25281,6 +26769,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 210,
             sourceKind = "trainer",
+            skillLevels = { 300, 300, 305, 310 },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 1 },
@@ -25293,6 +26782,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 220,
             sourceKind = "trainer",
+            skillLevels = { 325, 325, 330, 335 },
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 1 },
@@ -25306,6 +26796,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 230,
             sourceKind = "trainer",
+            skillLevels = { 340, 350, 360, 370 },
             bopOutput = false,
             reagents = {
                 { itemId = 23573, count = 3 },
@@ -25318,6 +26809,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 240,
             sourceKind = "trainer",
+            skillLevels = { 340, 350, 360, 370 },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 1 },
@@ -25331,6 +26823,7 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 250,
             sourceKind = "trainer",
+            skillLevels = { 340, 350, 360, 370 },
             bopOutput = false,
             reagents = {
                 { itemId = 23448, count = 2 },
@@ -25345,6 +26838,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bombs",
             sortOrder = 120,
             sourceKind = "trainer",
+            skillLevels = { 300, 320, 330, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 23781, count = 1 },
@@ -25361,6 +26855,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "grenades",
             sortOrder = 40,
             sourceKind = "trainer",
+            skillLevels = { 325, 335, 345, 355 },
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 4 },
@@ -25376,6 +26871,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "firearms",
             sortOrder = 120,
             sourceKind = "trainer",
+            skillLevels = { 320, 330, 340, 350 },
             bopOutput = false,
             reagents = {
                 { itemId = 4400, count = 1 },
@@ -25393,7 +26889,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 130,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Feera", zone = 59 }, { name = "Viggz Shinesparked", zone = 50 }, { name = "Yatheon", zone = 66 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Feera", zone = 59, x = 54, y = 90.5, faction = "alliance" }, { name = "Viggz Shinesparked", zone = 50, x = 64.9, y = 69.1 }, { name = "Yatheon", zone = 66, x = 76, y = 37.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23782, count = 3 },
@@ -25411,6 +26908,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 140,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 370, 380, 390 },
             sourcePlaces = { { zone = 76 } },
             bopOutput = false,
             reagents = {
@@ -25429,6 +26927,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 150,
             requiredSkill = 375,
             sourceKind = "worldDrop",
+            skillLevels = { 375, 385, 395, 405 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -25448,7 +26947,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 340,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Lebowski", zone = 64 }, { name = "Mixie Farshot", zone = 64 } },
+            skillLevels = { 340, 350, 360, 370 },
+            sourcePlaces = { { name = "Lebowski", zone = 64, x = 55.7, y = 65.5, faction = "alliance" }, { name = "Mixie Farshot", zone = 64, x = 61.1, y = 81.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 22445, count = 8 },
@@ -25466,6 +26966,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 260,
             requiredSkill = 340,
             sourceKind = "worldDrop",
+            skillLevels = { 340, 350, 360, 370 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -25484,7 +26985,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 270,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Lebowski", zone = 64 }, { name = "Captured Gnome", zone = 51 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Lebowski", zone = 64, x = 55.7, y = 65.5, faction = "alliance" }, { name = "Captured Gnome", zone = 51, x = 32.5, y = 48.1, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 22448, count = 2 },
@@ -25503,6 +27005,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 280,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 370, 380, 390 },
             sourcePlaces = { { zone = 69 } },
             bopOutput = false,
             reagents = {
@@ -25522,7 +27025,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 80,
             requiredSkill = 335,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Daggle Ironshaper", zone = 69 }, { name = "Mixie Farshot", zone = 64 } },
+            skillLevels = { 335, 345, 355, 365 },
+            sourcePlaces = { { name = "Daggle Ironshaper", zone = 69, x = 36.8, y = 54.4, faction = "alliance" }, { name = "Mixie Farshot", zone = 64, x = 61.1, y = 81.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23112, count = 2 },
@@ -25539,6 +27043,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 370, 380, 390 },
             sourcePlaces = { { zone = 74 } },
             bopOutput = false,
             reagents = {
@@ -25557,6 +27062,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { name = "Attumen the Huntsman", zone = 70 } },
             bopOutput = false,
             reagents = {
@@ -25574,6 +27080,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             requiredSkill = 325,
             sourceKind = "worldDrop",
+            skillLevels = { 325, 335, 345, 355 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -25594,7 +27101,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 230,
             requiredSkill = 335,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Feera", zone = 59 }, { name = "Wind Trader Lathrai", zone = 50 }, { name = "Captured Gnome", zone = 51 }, { name = "Yatheon", zone = 66 } },
+            skillLevels = { 335, 335, 345, 355 },
+            sourcePlaces = { { name = "Feera", zone = 59, x = 54, y = 90.5, faction = "alliance" }, { name = "Wind Trader Lathrai", zone = 50, x = 72.3, y = 31 }, { name = "Captured Gnome", zone = 51, x = 32.5, y = 48.1, faction = "horde" }, { name = "Yatheon", zone = 66, x = 76, y = 37.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 21877, count = 1 },
@@ -25648,7 +27156,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 260,
             requiredSkill = 335,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 335, 335, 345, 355 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2605, count = 1 },
@@ -25664,6 +27173,7 @@ RecipeRegistryRecipeMetadata = {
             category = "ammo",
             sortOrder = 80,
             sourceKind = "trainer",
+            skillLevels = { 310, 310, 320, 330 },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 2 },
@@ -25679,7 +27189,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             requiredSkill = 335,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Feera", zone = 59 }, { name = "Yatheon", zone = 66 }, { name = "Wind Trader Lathrai", zone = 50 } },
+            skillLevels = { 335, 335, 345, 355 },
+            sourcePlaces = { { name = "Feera", zone = 59, x = 54, y = 90.5, faction = "alliance" }, { name = "Yatheon", zone = 66, x = 76, y = 37.7, faction = "horde" }, { name = "Wind Trader Lathrai", zone = 50, x = 72.3, y = 31 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4470, count = 4 },
@@ -25697,7 +27208,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             requiredSkill = 325,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Feera", zone = 59 }, { name = "Yatheon", zone = 66 }, { name = "Wind Trader Lathrai", zone = 50 } },
+            skillLevels = { 325, 325, 335, 345 },
+            sourcePlaces = { { name = "Feera", zone = 59, x = 54, y = 90.5, faction = "alliance" }, { name = "Yatheon", zone = 66, x = 76, y = 37.7, faction = "horde" }, { name = "Wind Trader Lathrai", zone = 50, x = 72.3, y = 31 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 5 },
@@ -25715,6 +27227,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 350,
             sourceKind = "vendor",
+            skillLevels = { 405, 425, 432, 440 },
             removed = true,
             bopOutput = false,
             reagents = {
@@ -25734,7 +27247,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 50,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Karaaz", zone = 74 }, { name = "Paulsta'ats", zone = 68 } },
+            skillLevels = { 350, 350, 355, 360 },
+            sourcePlaces = { { name = "Karaaz", zone = 74, x = 43.6, y = 34.3 }, { name = "Paulsta'ats", zone = 68, x = 30.6, y = 57 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23781, count = 2 },
@@ -25752,7 +27266,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 130,
             requiredSkill = 305,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 51 } },
+            skillLevels = { 305, 305, 315, 325 },
+            sourcePlaces = { { zone = 51, x = 33.7, y = 50.2, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 16006, count = 1 },
@@ -25789,6 +27304,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 280,
             requiredSkill = 330,
             sourceKind = "drop",
+            skillLevels = { 330, 330, 340, 350 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             bopOutput = false,
             reagents = {
@@ -25809,6 +27325,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 290,
             requiredSkill = 345,
             sourceKind = "drop",
+            skillLevels = { 345, 345, 355, 365 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             bopOutput = false,
             reagents = {
@@ -25828,6 +27345,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 140,
             requiredSkill = 355,
             sourceKind = "drop",
+            skillLevels = { 355, 365, 375, 385 },
             sourcePlaces = { { name = "Mekgineer Steamrigger", zone = 75 } },
             bopOutput = false,
             reagents = {
@@ -25847,7 +27365,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 130,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6 }, { name = "Nixx Sprocketspring", zone = 13 } },
+            skillLevels = { 325, 325, 335, 345 },
+            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6, x = 62.7, y = 36.3 }, { name = "Nixx Sprocketspring", zone = 13, x = 52.5, y = 27.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 17020, count = 3 },
@@ -25866,7 +27385,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6 }, { name = "Nixx Sprocketspring", zone = 13 } },
+            skillLevels = { 340, 340, 350, 360 },
+            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6, x = 62.7, y = 36.3 }, { name = "Nixx Sprocketspring", zone = 13, x = 52.5, y = 27.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21877, count = 4 },
@@ -25898,7 +27418,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 160,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6 }, { name = "Nixx Sprocketspring", zone = 13 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6, x = 62.7, y = 36.3 }, { name = "Nixx Sprocketspring", zone = 13, x = 52.5, y = 27.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 16006, count = 2 },
@@ -25918,7 +27439,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 210,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6 }, { name = "Nixx Sprocketspring", zone = 13 } },
+            skillLevels = { 375, 375, 385, 395 },
+            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6, x = 62.7, y = 36.3 }, { name = "Nixx Sprocketspring", zone = 13, x = 52.5, y = 27.3 } },
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 12 },
@@ -25935,7 +27457,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 220,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6 }, { name = "Nixx Sprocketspring", zone = 13 } },
+            skillLevels = { 375, 375, 385, 395 },
+            sourcePlaces = { { name = "Vazario Linkgrease", zone = 6, x = 62.7, y = 36.3 }, { name = "Nixx Sprocketspring", zone = 13, x = 52.5, y = 27.3 } },
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 12 },
@@ -25953,7 +27476,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 310,
             specialization = 20219,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27 }, { name = "Oglethorpe Obnoticus", zone = 2 } },
+            skillLevels = { 325, 335, 345, 355 },
+            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27, x = 69.8, y = 50, faction = "alliance" }, { name = "Oglethorpe Obnoticus", zone = 2, x = 28.3, y = 76.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23781, count = 3 },
@@ -25971,7 +27495,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 320,
             specialization = 20219,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27 }, { name = "Oglethorpe Obnoticus", zone = 2 } },
+            skillLevels = { 340, 360, 370, 380 },
+            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27, x = 69.8, y = 50, faction = "alliance" }, { name = "Oglethorpe Obnoticus", zone = 2, x = 28.3, y = 76.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22445, count = 10 },
@@ -25989,7 +27514,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 120,
             specialization = 20219,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27 }, { name = "Oglethorpe Obnoticus", zone = 2 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27, x = 69.8, y = 50, faction = "alliance" }, { name = "Oglethorpe Obnoticus", zone = 2, x = 28.3, y = 76.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 16006, count = 2 },
@@ -26023,7 +27549,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 230,
             specialization = 20219,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27 }, { name = "Oglethorpe Obnoticus", zone = 2 } },
+            skillLevels = { 375, 375, 385, 395 },
+            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27, x = 69.8, y = 50, faction = "alliance" }, { name = "Oglethorpe Obnoticus", zone = 2, x = 28.3, y = 76.3 } },
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 8 },
@@ -26043,7 +27570,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 240,
             specialization = 20219,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27 }, { name = "Oglethorpe Obnoticus", zone = 2 } },
+            skillLevels = { 375, 375, 385, 395 },
+            sourcePlaces = { { name = "Tinkmaster Overspark", zone = 27, x = 69.8, y = 50, faction = "alliance" }, { name = "Oglethorpe Obnoticus", zone = 2, x = 28.3, y = 76.3 } },
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 12 },
@@ -26061,6 +27589,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 310, 320, 330, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 23077, count = 2 },
@@ -26075,6 +27604,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 310, 320, 335, 350 },
             bopOutput = false,
             reagents = {
                 { itemId = 23112, count = 2 },
@@ -26089,6 +27619,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 320, 330, 340, 350 },
             bopOutput = false,
             reagents = {
                 { itemId = 23079, count = 1 },
@@ -26104,6 +27635,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 335, 345, 355, 365 },
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 2 },
@@ -26118,6 +27650,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 335, 345, 355, 365 },
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 1 },
@@ -26134,6 +27667,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "drop",
+            skillLevels = { 350, 360, 370, 380 },
             sourcePlaces = { { zone = 69 } },
             bopOutput = false,
             reagents = {
@@ -26152,6 +27686,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 355,
             requiredSkill = 355,
             sourceKind = "drop",
+            skillLevels = { 355, 365, 372, 380 },
             sourcePlaces = { { zone = 75 } },
             bopOutput = false,
             reagents = {
@@ -26170,6 +27705,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 355,
             requiredSkill = 355,
             sourceKind = "drop",
+            skillLevels = { 355, 365, 372, 380 },
             sourcePlaces = { { name = "Darkweaver Syth", zone = 86 } },
             bopOutput = false,
             reagents = {
@@ -26188,6 +27724,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 370, 375, 380 },
             sourcePlaces = { { zone = 76 } },
             bopOutput = false,
             reagents = {
@@ -26206,6 +27743,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 370, 375, 380 },
             sourcePlaces = { { zone = 74 } },
             bopOutput = false,
             reagents = {
@@ -26224,6 +27762,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 345,
             requiredSkill = 345,
             sourceKind = "worldDrop",
+            skillLevels = { 345, 355, 365, 375 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26241,6 +27780,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 355,
             requiredSkill = 355,
             sourceKind = "worldDrop",
+            skillLevels = { 355, 365, 375, 385 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26258,6 +27798,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 377, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26276,7 +27817,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alurmi", zone = 13 } },
+            skillLevels = { 360, 370, 375, 380 },
+            sourcePlaces = { { name = "Alurmi", zone = 13, x = 63.6, y = 57.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 4 },
@@ -26295,7 +27837,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nakodu", zone = 50 } },
+            skillLevels = { 360, 370, 375, 380 },
+            sourcePlaces = { { name = "Nakodu", zone = 50, x = 62.1, y = 69 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 6 },
@@ -26314,7 +27857,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50 } },
+            skillLevels = { 360, 370, 375, 380 },
+            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50, x = 60.5, y = 64.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 4 },
@@ -26334,7 +27878,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 360, 370, 375, 380 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 6 },
@@ -26353,7 +27898,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Karaaz", zone = 74 }, { name = "Paulsta'ats", zone = 68 } },
+            skillLevels = { 360, 370, 375, 380 },
+            sourcePlaces = { { name = "Karaaz", zone = 74, x = 43.6, y = 34.3 }, { name = "Paulsta'ats", zone = 68, x = 30.6, y = 57 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 8 },
@@ -26371,6 +27917,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 355,
             requiredSkill = 355,
             sourceKind = "worldDrop",
+            skillLevels = { 355, 365, 375, 385 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26388,6 +27935,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 355,
             requiredSkill = 355,
             sourceKind = "worldDrop",
+            skillLevels = { 355, 365, 375, 385 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26406,6 +27954,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "worldDrop",
+            skillLevels = { 360, 370, 377, 385 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26423,6 +27972,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "worldDrop",
+            skillLevels = { 360, 370, 375, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26441,6 +27991,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 380, 385 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26459,6 +28010,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 380, 385 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26477,6 +28029,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 370,
             requiredSkill = 370,
             sourceKind = "drop",
+            skillLevels = { 370, 375, 380, 385 },
             sourcePlaces = { { zone = 85 } },
             bopOutput = false,
             reagents = {
@@ -26496,6 +28049,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 370,
             requiredSkill = 370,
             sourceKind = "drop",
+            skillLevels = { 370, 375, 380, 385 },
             sourcePlaces = { { name = "Epoch Hunter", zone = 77 } },
             bopOutput = false,
             reagents = {
@@ -26515,7 +28069,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 370,
             requiredSkill = 370,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nakodu", zone = 50 } },
+            skillLevels = { 370, 375, 380, 385 },
+            sourcePlaces = { { name = "Nakodu", zone = 50, x = 62.1, y = 69 } },
             bopOutput = true,
             reagents = {
                 { itemId = 22452, count = 4 },
@@ -26533,7 +28088,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 370,
             requiredSkill = 370,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64 }, { name = "Quartermaster Urgronn", zone = 64 } },
+            skillLevels = { 370, 375, 380, 385 },
+            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64, x = 56.7, y = 62.6, faction = "alliance" }, { name = "Quartermaster Urgronn", zone = 64, x = 54.9, y = 37.9, faction = "horde" } },
             bopOutput = true,
             reagents = {
                 { itemId = 23112, count = 4 },
@@ -26551,7 +28107,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 370,
             requiredSkill = 370,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alurmi", zone = 13 } },
+            skillLevels = { 370, 375, 380, 385 },
+            sourcePlaces = { { name = "Alurmi", zone = 13, x = 63.6, y = 57.6 } },
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 4 },
@@ -26569,7 +28126,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 370,
             requiredSkill = 370,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Almaador", zone = 50 } },
+            skillLevels = { 370, 375, 380, 385 },
+            sourcePlaces = { { name = "Almaador", zone = 50, x = 51, y = 41.9 } },
             bopOutput = true,
             reagents = {
                 { itemId = 22457, count = 4 },
@@ -26587,7 +28145,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 370,
             requiredSkill = 370,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 370, 375, 380, 385 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = true,
             reagents = {
                 { itemId = 22456, count = 2 },
@@ -26605,6 +28164,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26621,6 +28181,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26637,6 +28198,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26653,6 +28215,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "drop",
+            skillLevels = { 350, 350, 365, 380 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             bopOutput = false,
             reagents = {
@@ -26669,6 +28232,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "drop",
+            skillLevels = { 350, 350, 365, 380 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             bopOutput = false,
             reagents = {
@@ -26685,6 +28249,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26701,6 +28266,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26717,6 +28283,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "drop",
+            skillLevels = { 350, 350, 365, 380 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             bopOutput = false,
             reagents = {
@@ -26733,6 +28300,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26749,6 +28317,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26765,6 +28334,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26781,6 +28351,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26797,6 +28368,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "drop",
+            skillLevels = { 350, 350, 365, 380 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             bopOutput = false,
             reagents = {
@@ -26813,6 +28385,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26829,6 +28402,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26845,7 +28419,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Coreiel", zone = 68 }, { name = "Aldraan", zone = 68 } },
+            skillLevels = { 350, 350, 365, 380 },
+            sourcePlaces = { { name = "Coreiel", zone = 68, x = 42.8, y = 42.6, faction = "horde" }, { name = "Aldraan", zone = 68, x = 42.9, y = 42.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23440, count = 1 },
@@ -26861,6 +28436,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26877,6 +28453,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26893,6 +28470,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26909,6 +28487,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26925,6 +28504,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26941,6 +28521,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26957,6 +28538,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26973,6 +28555,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -26989,6 +28572,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -27005,6 +28589,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -27021,6 +28606,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -27037,6 +28623,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -27053,6 +28640,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -27068,7 +28656,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gidge Spellweaver", zone = 50 } },
+            skillLevels = { 350, 350, 355, 360 },
+            sourcePlaces = { { name = "Gidge Spellweaver", zone = 50, x = 66, y = 67.9 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 1 },
@@ -27085,7 +28674,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 335,
             requiredSkill = 335,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50 } },
+            skillLevels = { 335, 345, 350, 355 },
+            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50, x = 60.5, y = 64.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -27102,7 +28692,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 335,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 335, 345, 350, 355 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -27118,7 +28709,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50 } },
+            skillLevels = { 375, 385, 390, 395 },
+            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50, x = 60.5, y = 64.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -27136,7 +28728,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 375,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 375, 385, 390, 395 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 1 },
@@ -27154,6 +28747,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "drop",
+            skillLevels = { 350, 360, 365, 370 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             bopOutput = false,
             reagents = {
@@ -27171,6 +28765,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 360, 365, 370 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -27189,6 +28784,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 360, 365, 370 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -27206,6 +28802,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 360, 365, 370 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -27224,6 +28821,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 360, 365, 370 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -27241,6 +28839,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 360, 365, 370 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -27258,6 +28857,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 380, 385 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             bopOutput = false,
             reagents = {
@@ -27276,6 +28876,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 380, 385 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -27294,6 +28895,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 380, 385 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -27312,6 +28914,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 380, 385 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -27330,6 +28933,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 380, 385 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -27348,6 +28952,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 380, 385 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -27366,6 +28971,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { name = "Dalliah the Doomsayer", zone = 71 } },
             bopOutput = false,
             reagents = {
@@ -27384,6 +28990,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { name = "Murmur", zone = 84 } },
             bopOutput = false,
             reagents = {
@@ -27402,6 +29009,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { name = "Thorngrin the Tender", zone = 85 } },
             bopOutput = false,
             reagents = {
@@ -27420,6 +29028,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { name = "Warp Splinter", zone = 85 } },
             bopOutput = false,
             reagents = {
@@ -27438,6 +29047,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { name = "Grand Warlock Nethekurse", zone = 81 } },
             bopOutput = false,
             reagents = {
@@ -27456,6 +29066,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { name = "Warlord Kalithresh", zone = 75 } },
             bopOutput = false,
             reagents = {
@@ -27473,7 +29084,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 340,
             requiredSkill = 340,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Karaaz", zone = 74 }, { name = "Paulsta'ats", zone = 68 } },
+            skillLevels = { 340, 350, 355, 360 },
+            sourcePlaces = { { name = "Karaaz", zone = 74, x = 43.6, y = 34.3 }, { name = "Paulsta'ats", zone = 68, x = 30.6, y = 57 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 6 },
@@ -27488,7 +29100,8 @@ RecipeRegistryRecipeMetadata = {
             category = "misc",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Dalinna", zone = 64 }, { name = "Hama", zone = 64 } },
+            skillLevels = { 300, 300, 310, 320 },
+            sourcePlaces = { { name = "Dalinna", zone = 64, x = 56.6, y = 37.1, faction = "horde" }, { name = "Hama", zone = 64, x = 54.1, y = 63.6, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 21877, count = 3 },
@@ -27517,6 +29130,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 20, 50, 65, 80 },
             bopOutput = false,
             reagents = {
                 { itemId = 774, count = 1 },
@@ -27531,6 +29145,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 20, 50, 65, 80 },
             bopOutput = false,
             reagents = {
                 { itemId = 818, count = 1 },
@@ -27544,6 +29159,7 @@ RecipeRegistryRecipeMetadata = {
             category = "statues",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 30, 40, 50 },
             bopOutput = true,
             reagents = {
                 { itemId = 2835, count = 8 },
@@ -27557,7 +29173,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "rune",
             sortOrder = 10,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Humphry", zone = 64 }, { name = "Rohok", zone = 64 }, { name = "Grutah", zone = 69 } },
+            skillLevels = { 325, 325, 330, 335 },
+            sourcePlaces = { { name = "Humphry", zone = 64, x = 56.8, y = 63.8, faction = "alliance" }, { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Grutah", zone = 69, x = 29.7, y = 31.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 1 },
@@ -27573,7 +29190,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 350, 350, 355, 360 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23449, count = 1 },
@@ -27586,6 +29204,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 300, 300, 305, 310 },
             bopOutput = false,
             reagents = {
                 { itemId = 25649, count = 5 },
@@ -27600,7 +29219,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Haferet", zone = 59 }, { name = "Zaralda", zone = 66 }, { name = "Cro Threadstrong", zone = 50 } },
+            skillLevels = { 325, 325, 330, 335 },
+            sourcePlaces = { { name = "Haferet", zone = 59, x = 66, y = 74.6, faction = "alliance" }, { name = "Zaralda", zone = 66, x = 84, y = 78.8, faction = "horde" }, { name = "Cro Threadstrong", zone = 50, x = 66.1, y = 68.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21887, count = 5 },
@@ -27614,6 +29234,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "armor",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 300, 310, 325, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 21887, count = 4 },
@@ -27630,7 +29251,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 325,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 325, 335, 340, 345 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 1 },
@@ -27647,7 +29269,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50 } },
+            skillLevels = { 325, 335, 340, 345 },
+            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50, x = 60.5, y = 64.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 1 },
@@ -27663,6 +29286,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
+            skillLevels = { 350, 360, 370, 380 },
             sourcePlaces = { { name = "Thomas Yance", zone = 77 } },
             bopOutput = false,
             reagents = {
@@ -27680,6 +29304,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 300, 310, 320, 330 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -27695,6 +29320,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 310, 320, 330, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -27710,6 +29336,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 320, 330, 340, 350 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -27725,6 +29352,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 335, 345, 355, 365 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -27740,6 +29368,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 300, 310, 320, 330 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -27755,6 +29384,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 310, 320, 330, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -27770,6 +29400,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 325, 335, 345, 355 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -27785,6 +29416,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 335, 345, 355, 365 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -27800,6 +29432,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 300, 310, 320, 330 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -27814,6 +29447,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 315, 325, 335, 345 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -27828,6 +29462,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 320, 330, 340, 350 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -27842,6 +29477,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 330, 340, 350, 360 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -27856,6 +29492,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "feet",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 300, 310, 320, 330 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -27870,6 +29507,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "hands",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 310, 320, 330, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -27884,6 +29522,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "legs",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 320, 330, 340, 350 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -27898,6 +29537,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 330, 340, 350, 360 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -27913,7 +29553,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Zaralda", zone = 66 }, { name = "Haferet", zone = 59 } },
+            skillLevels = { 300, 300, 305, 310 },
+            sourcePlaces = { { name = "Zaralda", zone = 66, x = 84, y = 78.8, faction = "horde" }, { name = "Haferet", zone = 59, x = 66, y = 74.6, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 21887, count = 2 },
@@ -27929,6 +29570,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "drop",
+            skillLevels = { 350, 360, 370, 380 },
             sourcePlaces = { { name = "Blackheart the Inciter", zone = 84 } },
             bopOutput = false,
             reagents = {
@@ -27949,6 +29591,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "drop",
+            skillLevels = { 350, 360, 370, 380 },
             sourcePlaces = { { zone = 77 } },
             bopOutput = false,
             reagents = {
@@ -27969,6 +29612,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "drop",
+            skillLevels = { 350, 360, 370, 380 },
             sourcePlaces = { { zone = 86 } },
             bopOutput = false,
             reagents = {
@@ -27989,6 +29633,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "drop",
+            skillLevels = { 350, 360, 370, 380 },
             sourcePlaces = { { zone = 87 } },
             bopOutput = false,
             reagents = {
@@ -28008,7 +29653,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 340,
             requiredSkill = 340,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Karaaz", zone = 74 }, { name = "Paulsta'ats", zone = 68 } },
+            skillLevels = { 340, 350, 360, 370 },
+            sourcePlaces = { { name = "Karaaz", zone = 74, x = 43.6, y = 34.3 }, { name = "Paulsta'ats", zone = 68, x = 30.6, y = 57 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -28027,7 +29673,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Karaaz", zone = 74 }, { name = "Paulsta'ats", zone = 68 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Karaaz", zone = 74, x = 43.6, y = 34.3 }, { name = "Paulsta'ats", zone = 68, x = 30.6, y = 57 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -28046,7 +29693,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Karaaz", zone = 74 }, { name = "Paulsta'ats", zone = 68 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Karaaz", zone = 74, x = 43.6, y = 34.3 }, { name = "Paulsta'ats", zone = 68, x = 30.6, y = 57 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -28065,7 +29713,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 360, 370, 380, 390 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -28084,7 +29733,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 355,
             requiredSkill = 355,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 355, 365, 375, 385 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -28103,7 +29753,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 355,
             requiredSkill = 355,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 355, 365, 375, 385 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -28123,7 +29774,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64 }, { name = "Quartermaster Urgronn", zone = 64 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64, x = 56.7, y = 62.6, faction = "alliance" }, { name = "Quartermaster Urgronn", zone = 64, x = 54.9, y = 37.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -28144,7 +29796,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64 }, { name = "Quartermaster Urgronn", zone = 64 } },
+            skillLevels = { 360, 370, 380, 390 },
+            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64, x = 56.7, y = 62.6, faction = "alliance" }, { name = "Quartermaster Urgronn", zone = 64, x = 54.9, y = 37.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -28165,7 +29818,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64 }, { name = "Quartermaster Urgronn", zone = 64 } },
+            skillLevels = { 360, 370, 380, 390 },
+            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64, x = 56.7, y = 62.6, faction = "alliance" }, { name = "Quartermaster Urgronn", zone = 64, x = 54.9, y = 37.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -28186,7 +29840,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 340,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Trader Narasu", zone = 68 } },
+            skillLevels = { 340, 350, 360, 370 },
+            sourcePlaces = { { name = "Trader Narasu", zone = 68, x = 54.6, y = 75.2, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -28207,7 +29862,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 340,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Trader Narasu", zone = 68 } },
+            skillLevels = { 340, 350, 360, 370 },
+            sourcePlaces = { { name = "Trader Narasu", zone = 68, x = 54.6, y = 75.2, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -28228,7 +29884,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Trader Narasu", zone = 68 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Trader Narasu", zone = 68, x = 54.6, y = 75.2, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -28245,7 +29902,8 @@ RecipeRegistryRecipeMetadata = {
             category = "rods",
             sortOrder = 50,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Humphry", zone = 64 }, { name = "Rohok", zone = 64 }, { name = "Grutah", zone = 69 } },
+            skillLevels = { 300, 300, 305, 310 },
+            sourcePlaces = { { name = "Humphry", zone = 64, x = 56.8, y = 63.8, faction = "alliance" }, { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Grutah", zone = 69, x = 29.7, y = 31.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23445, count = 6 },
@@ -28260,7 +29918,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 60,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Aaron Hollman", zone = 50 } },
+            skillLevels = { 350, 350, 355, 360 },
+            sourcePlaces = { { name = "Aaron Hollman", zone = 50, x = 63.1, y = 71.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23446, count = 10 },
@@ -28275,7 +29934,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rohok", zone = 64 }, { name = "Mari Stonehand", zone = 69 } },
+            skillLevels = { 360, 365, 370, 375 },
+            sourcePlaces = { { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Mari Stonehand", zone = 69, x = 36.8, y = 55.1, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23447, count = 4 },
@@ -28288,6 +29948,7 @@ RecipeRegistryRecipeMetadata = {
             category = "rods",
             sortOrder = 60,
             sourceKind = "trainer",
+            skillLevels = { 300, 310, 325, 340 },
             bopOutput = true,
             reagents = {
                 { itemId = 14344, count = 6 },
@@ -28305,7 +29966,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rungor", zone = 58 }, { name = "Vodesiin", zone = 64 } },
+            skillLevels = { 350, 370, 375, 380 },
+            sourcePlaces = { { name = "Rungor", zone = 58, x = 48.8, y = 46.1, faction = "horde" }, { name = "Vodesiin", zone = 64, x = 24.4, y = 38.8, faction = "alliance" } },
             bopOutput = true,
             reagents = {
                 { itemId = 22446, count = 8 },
@@ -28324,7 +29986,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 80,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Madame Ruby", zone = 50 } },
+            skillLevels = { 375, 375, 377, 385 },
+            sourcePlaces = { { name = "Madame Ruby", zone = 50, x = 63.1, y = 69.3 } },
             bopOutput = true,
             reagents = {
                 { itemId = 22446, count = 12 },
@@ -28344,7 +30007,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 350, 365, 372, 380 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 2 },
@@ -28364,7 +30028,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64 }, { name = "Quartermaster Urgronn", zone = 64 } },
+            skillLevels = { 350, 365, 372, 380 },
+            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64, x = 56.7, y = 62.6, faction = "alliance" }, { name = "Quartermaster Urgronn", zone = 64, x = 54.9, y = 37.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 2 },
@@ -28381,6 +30046,7 @@ RecipeRegistryRecipeMetadata = {
             category = "statues",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 50, 70, 80, 90 },
             bopOutput = true,
             reagents = {
                 { itemId = 2836, count = 8 },
@@ -28393,6 +30059,7 @@ RecipeRegistryRecipeMetadata = {
             category = "statues",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 110, 120, 130, 140 },
             bopOutput = true,
             reagents = {
                 { itemId = 2838, count = 8 },
@@ -28405,6 +30072,7 @@ RecipeRegistryRecipeMetadata = {
             category = "statues",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 175, 175, 185, 195 },
             bopOutput = true,
             reagents = {
                 { itemId = 7912, count = 10 },
@@ -28417,6 +30085,7 @@ RecipeRegistryRecipeMetadata = {
             category = "statues",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 225, 225, 235, 245 },
             bopOutput = true,
             reagents = {
                 { itemId = 12365, count = 10 },
@@ -28447,6 +30116,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 265,
             requiredSkill = 335,
             sourceKind = "worldDrop",
+            skillLevels = { 335, 335, 345, 355 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -28465,6 +30135,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "vendor",
+            skillLevels = { 365, 375, 377, 380 },
             sourcePlaces = { { name = "Ythyar", zone = 70 } },
             bopOutput = false,
             reagents = {
@@ -28481,6 +30152,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "vendor",
+            skillLevels = { 365, 375, 377, 380 },
             sourcePlaces = { { name = "Ythyar", zone = 70 } },
             bopOutput = false,
             reagents = {
@@ -28497,6 +30169,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 377, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -28513,6 +30186,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 377, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -28529,7 +30203,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Almaador", zone = 50 } },
+            skillLevels = { 365, 375, 377, 380 },
+            sourcePlaces = { { name = "Almaador", zone = 50, x = 51, y = 41.9 } },
             bopOutput = false,
             reagents = {
                 { itemId = 25867, count = 1 },
@@ -28545,6 +30220,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 377, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -28561,6 +30237,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 377, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -28577,7 +30254,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Karaaz", zone = 74 }, { name = "Paulsta'ats", zone = 68 } },
+            skillLevels = { 365, 375, 377, 380 },
+            sourcePlaces = { { name = "Karaaz", zone = 74, x = 43.6, y = 34.3 }, { name = "Paulsta'ats", zone = 68, x = 30.6, y = 57 } },
             bopOutput = false,
             reagents = {
                 { itemId = 25868, count = 1 },
@@ -28593,7 +30271,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alurmi", zone = 13 } },
+            skillLevels = { 365, 375, 377, 380 },
+            sourcePlaces = { { name = "Alurmi", zone = 13, x = 63.6, y = 57.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 25868, count = 1 },
@@ -28609,7 +30288,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 1,
             faction = "horde",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Landraelanis", zone = 65 } },
+            skillLevels = { 1, 45, 65, 85 },
+            sourcePlaces = { { name = "Landraelanis", zone = 65, x = 49, y = 47, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 27668, count = 1 },
@@ -28625,7 +30305,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 1,
             faction = "alliance",
             sourceKind = "quest",
-            sourcePlaces = { { zone = 67 } },
+            skillLevels = { 1, 45, 65, 85 },
+            sourcePlaces = { { zone = 67, x = 49.8, y = 51.9, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23676, count = 1 },
@@ -28641,7 +30322,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 50,
             faction = "horde",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Master Chef Mouldier", zone = 28 } },
+            skillLevels = { 50, 90, 110, 130 },
+            sourcePlaces = { { name = "Master Chef Mouldier", zone = 28, x = 48.3, y = 30.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 27669, count = 1 },
@@ -28656,7 +30338,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 64 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { zone = 64, x = 49.2, y = 74.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 27671, count = 1 },
@@ -28671,7 +30354,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Cookie One-Eye", zone = 64 }, { name = "Sid Limbardi", zone = 64 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Cookie One-Eye", zone = 64, x = 54.6, y = 41.1, faction = "horde" }, { name = "Sid Limbardi", zone = 64, x = 54.3, y = 63.6, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 27674, count = 1 },
@@ -28686,7 +30370,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 310,
             requiredSkill = 310,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mycah", zone = 51 } },
+            skillLevels = { 310, 330, 340, 350 },
+            sourcePlaces = { { name = "Mycah", zone = 51, x = 17.9, y = 51.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 27676, count = 1 },
@@ -28701,7 +30386,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 315,
             requiredSkill = 315,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Innkeeper Grilka", zone = 58 }, { name = "Supply Officer Mills", zone = 58 } },
+            skillLevels = { 315, 335, 345, 355 },
+            sourcePlaces = { { name = "Innkeeper Grilka", zone = 58, x = 48.8, y = 45.1, faction = "horde" }, { name = "Supply Officer Mills", zone = 58, x = 55.7, y = 53.1, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 27677, count = 1 },
@@ -28716,7 +30402,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Uriku", zone = 68 }, { name = "Nula the Butcher", zone = 68 } },
+            skillLevels = { 325, 345, 355, 365 },
+            sourcePlaces = { { name = "Uriku", zone = 68, x = 56.2, y = 73.3, faction = "alliance" }, { name = "Nula the Butcher", zone = 68, x = 58, y = 35.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 27678, count = 1 },
@@ -28731,7 +30418,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Innkeeper Grilka", zone = 58 }, { name = "Supply Officer Mills", zone = 58 } },
+            skillLevels = { 325, 345, 355, 365 },
+            sourcePlaces = { { name = "Innkeeper Grilka", zone = 58, x = 48.8, y = 45.1, faction = "horde" }, { name = "Supply Officer Mills", zone = 58, x = 55.7, y = 53.1, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 27681, count = 1 },
@@ -28746,7 +30434,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Uriku", zone = 68 }, { name = "Nula the Butcher", zone = 68 } },
+            skillLevels = { 325, 345, 355, 365 },
+            sourcePlaces = { { name = "Uriku", zone = 68, x = 56.2, y = 73.3, faction = "alliance" }, { name = "Nula the Butcher", zone = 68, x = 58, y = 35.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 27682, count = 1 },
@@ -28761,7 +30450,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gambarinka", zone = 51 }, { name = "Doba", zone = 51 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Gambarinka", zone = 51, x = 31.7, y = 49.3, faction = "horde" }, { name = "Doba", zone = 51, x = 42.3, y = 27.9, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 27422, count = 1 },
@@ -28776,7 +30466,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Zurai", zone = 51 }, { name = "Doba", zone = 51 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Zurai", zone = 51, x = 85.2, y = 54.7, faction = "horde" }, { name = "Doba", zone = 51, x = 42.3, y = 27.9, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 27425, count = 1 },
@@ -28791,7 +30482,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 310,
             requiredSkill = 310,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Juno Dufrain", zone = 51 } },
+            skillLevels = { 310, 330, 340, 350 },
+            sourcePlaces = { { name = "Juno Dufrain", zone = 51, x = 78, y = 66.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 27429, count = 1 },
@@ -28806,7 +30498,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 320,
             requiredSkill = 320,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Uriku", zone = 68 }, { name = "Nula the Butcher", zone = 68 } },
+            skillLevels = { 320, 340, 350, 360 },
+            sourcePlaces = { { name = "Uriku", zone = 68, x = 56.2, y = 73.3, faction = "alliance" }, { name = "Nula the Butcher", zone = 68, x = 58, y = 35.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 27435, count = 1 },
@@ -28821,7 +30514,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 320,
             requiredSkill = 320,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Uriku", zone = 68 }, { name = "Nula the Butcher", zone = 68 } },
+            skillLevels = { 320, 340, 350, 360 },
+            sourcePlaces = { { name = "Uriku", zone = 68, x = 56.2, y = 73.3, faction = "alliance" }, { name = "Nula the Butcher", zone = 68, x = 58, y = 35.7, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 27437, count = 1 },
@@ -28836,7 +30530,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rungor", zone = 58 }, { name = "Innkeeper Biribi", zone = 58 } },
+            skillLevels = { 325, 345, 355, 365 },
+            sourcePlaces = { { name = "Rungor", zone = 58, x = 48.8, y = 46.1, faction = "horde" }, { name = "Innkeeper Biribi", zone = 58, x = 56.7, y = 53.3, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 27438, count = 1 },
@@ -28851,7 +30546,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Rungor", zone = 58 }, { name = "Innkeeper Biribi", zone = 58 } },
+            skillLevels = { 350, 370, 375, 380 },
+            sourcePlaces = { { name = "Rungor", zone = 58, x = 48.8, y = 46.1, faction = "horde" }, { name = "Innkeeper Biribi", zone = 58, x = 56.7, y = 53.3, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 27439, count = 1 },
@@ -28865,7 +30561,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "healing",
             sortOrder = 80,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Alchemist Gribble", zone = 64 }, { name = "Lorokeem", zone = 50 }, { name = "Apothecary Antonivich", zone = 64 } },
+            skillLevels = { 300, 315, 322, 330 },
+            sourcePlaces = { { name = "Alchemist Gribble", zone = 64, x = 53.8, y = 65.8, faction = "alliance" }, { name = "Lorokeem", zone = 50, x = 45.4, y = 19.5 }, { name = "Apothecary Antonivich", zone = 64, x = 52.4, y = 36.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 13464, count = 1 },
@@ -28881,7 +30578,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mana",
             sortOrder = 80,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Alchemist Gribble", zone = 64 }, { name = "Lorokeem", zone = 50 }, { name = "Apothecary Antonivich", zone = 64 } },
+            skillLevels = { 310, 325, 332, 340 },
+            sourcePlaces = { { name = "Alchemist Gribble", zone = 64, x = 53.8, y = 65.8, faction = "alliance" }, { name = "Lorokeem", zone = 50, x = 45.4, y = 19.5 }, { name = "Apothecary Antonivich", zone = 64, x = 52.4, y = 36.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -28897,7 +30595,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 310,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Alchemist Gribble", zone = 64 }, { name = "Lorokeem", zone = 50 }, { name = "Apothecary Antonivich", zone = 64 } },
+            skillLevels = { 300, 315, 322, 330 },
+            sourcePlaces = { { name = "Alchemist Gribble", zone = 64, x = 53.8, y = 65.8, faction = "alliance" }, { name = "Lorokeem", zone = 50, x = 45.4, y = 19.5 }, { name = "Apothecary Antonivich", zone = 64, x = 52.4, y = 36.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 13465, count = 1 },
@@ -28913,7 +30612,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 220,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Alchemist Gribble", zone = 64 }, { name = "Lorokeem", zone = 50 }, { name = "Apothecary Antonivich", zone = 64 } },
+            skillLevels = { 300, 315, 322, 330 },
+            sourcePlaces = { { name = "Alchemist Gribble", zone = 64, x = 53.8, y = 65.8, faction = "alliance" }, { name = "Lorokeem", zone = 50, x = 45.4, y = 19.5 }, { name = "Apothecary Antonivich", zone = 64, x = 52.4, y = 36.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 13463, count = 1 },
@@ -28929,7 +30629,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 210,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Alchemist Gribble", zone = 64 }, { name = "Lorokeem", zone = 50 }, { name = "Apothecary Antonivich", zone = 64 } },
+            skillLevels = { 315, 330, 337, 345 },
+            sourcePlaces = { { name = "Alchemist Gribble", zone = 64, x = 53.8, y = 65.8, faction = "alliance" }, { name = "Lorokeem", zone = 50, x = 45.4, y = 19.5 }, { name = "Apothecary Antonivich", zone = 64, x = 52.4, y = 36.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -28944,6 +30645,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 320, 330, 345, 360 },
             reagents = {
                 { itemId = 22446, count = 2 },
             },
@@ -28955,6 +30657,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "chest",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 300, 310, 325, 340 },
             reagents = {
                 { itemId = 22445, count = 2 },
                 { itemId = 22447, count = 2 },
@@ -28969,6 +30672,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 345,
             requiredSkill = 345,
             sourceKind = "worldDrop",
+            skillLevels = { 345, 355, 367, 380 },
             worldDrop = true,
             reagents = {
                 { itemId = 22445, count = 10 },
@@ -28982,6 +30686,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 305, 315, 330, 345 },
             reagents = {
                 { itemId = 22445, count = 4 },
                 { itemId = 22447, count = 1 },
@@ -28996,7 +30701,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 360, 370, 377, 385 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             reagents = {
                 { itemId = 22445, count = 2 },
                 { itemId = 22446, count = 8 },
@@ -29010,6 +30716,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 340, 350, 365, 380 },
             reagents = {
                 { itemId = 22445, count = 12 },
                 { itemId = 22446, count = 1 },
@@ -29022,6 +30729,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "gloves",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 310, 320, 335, 350 },
             reagents = {
                 { itemId = 22445, count = 8 },
             },
@@ -29035,7 +30743,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alurmi", zone = 13 } },
+            skillLevels = { 360, 370, 377, 385 },
+            sourcePlaces = { { name = "Alurmi", zone = 13, x = 63.6, y = 57.6 } },
             reagents = {
                 { itemId = 22446, count = 6 },
                 { itemId = 22449, count = 6 },
@@ -29051,7 +30760,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Almaador", zone = 50 } },
+            skillLevels = { 350, 370, 375, 380 },
+            sourcePlaces = { { name = "Almaador", zone = 50, x = 51, y = 41.9 } },
             reagents = {
                 { itemId = 21886, count = 6 },
                 { itemId = 22446, count = 6 },
@@ -29065,6 +30775,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 305, 315, 330, 345 },
             reagents = {
                 { itemId = 22447, count = 3 },
             },
@@ -29076,6 +30787,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "bracer",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 300, 310, 325, 340 },
             reagents = {
                 { itemId = 22445, count = 6 },
             },
@@ -29089,7 +30801,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Karaaz", zone = 74 }, { name = "Paulsta'ats", zone = 68 } },
+            skillLevels = { 325, 335, 350, 365 },
+            sourcePlaces = { { name = "Karaaz", zone = 74, x = 43.6, y = 34.3 }, { name = "Paulsta'ats", zone = 68, x = 30.6, y = 57 } },
             reagents = {
                 { itemId = 22445, count = 6 },
                 { itemId = 22446, count = 2 },
@@ -29103,6 +30816,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloak",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 310, 320, 335, 350 },
             reagents = {
                 { itemId = 22445, count = 4 },
                 { itemId = 22446, count = 1 },
@@ -29118,6 +30832,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "drop",
+            skillLevels = { 350, 370, 375, 380 },
             sourcePlaces = { { zone = 69 } },
             reagents = {
                 { itemId = 22449, count = 4 },
@@ -29133,6 +30848,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "drop",
+            skillLevels = { 350, 370, 375, 380 },
             sourcePlaces = { { zone = 74 } },
             reagents = {
                 { itemId = 22449, count = 4 },
@@ -29148,6 +30864,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 370, 377, 385 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             reagents = {
                 { itemId = 22449, count = 8 },
@@ -29163,6 +30880,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 370, 377, 385 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             reagents = {
                 { itemId = 22449, count = 8 },
@@ -29178,7 +30896,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Madame Ruby", zone = 50 } },
+            skillLevels = { 325, 335, 350, 365 },
+            sourcePlaces = { { name = "Madame Ruby", zone = 50, x = 63.1, y = 69.3 } },
             reagents = {
                 { itemId = 22445, count = 15 },
             },
@@ -29192,7 +30911,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Almaador", zone = 50 } },
+            skillLevels = { 350, 370, 375, 380 },
+            sourcePlaces = { { name = "Almaador", zone = 50, x = 51, y = 41.9 } },
             reagents = {
                 { itemId = 21885, count = 8 },
                 { itemId = 21886, count = 8 },
@@ -29209,6 +30929,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "trainer",
+            skillLevels = { 325, 325, 340, 355 },
             bopOutput = false,
             reagents = {
                 { itemId = 23112, count = 1 },
@@ -29223,6 +30944,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9788,
             sourceKind = "trainer",
+            skillLevels = { 350, 360, 370, 380 },
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 20 },
@@ -29241,6 +30963,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9788,
             sourceKind = "trainer",
+            skillLevels = { 375, 385, 395, 405 },
             bopOutput = true,
             reagents = {
                 { itemId = 22457, count = 10 },
@@ -29257,6 +30980,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9788,
             sourceKind = "trainer",
+            skillLevels = { 350, 360, 370, 380 },
             bopOutput = true,
             reagents = {
                 { itemId = 23447, count = 6 },
@@ -29274,6 +30998,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9788,
             sourceKind = "trainer",
+            skillLevels = { 375, 385, 395, 405 },
             bopOutput = true,
             reagents = {
                 { itemId = 22457, count = 10 },
@@ -29290,6 +31015,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17039,
             sourceKind = "trainer",
+            skillLevels = { 350, 360, 370, 380 },
             bopOutput = true,
             reagents = {
                 { itemId = 22456, count = 20 },
@@ -29306,6 +31032,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17039,
             sourceKind = "trainer",
+            skillLevels = { 375, 385, 395, 405 },
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 10 },
@@ -29322,6 +31049,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17039,
             sourceKind = "trainer",
+            skillLevels = { 350, 360, 370, 380 },
             bopOutput = true,
             reagents = {
                 { itemId = 23449, count = 14 },
@@ -29338,6 +31066,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17039,
             sourceKind = "trainer",
+            skillLevels = { 375, 385, 395, 405 },
             bopOutput = true,
             reagents = {
                 { itemId = 23571, count = 2 },
@@ -29354,6 +31083,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17041,
             sourceKind = "trainer",
+            skillLevels = { 350, 360, 370, 380 },
             bopOutput = true,
             reagents = {
                 { itemId = 22456, count = 20 },
@@ -29371,6 +31101,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17041,
             sourceKind = "trainer",
+            skillLevels = { 375, 385, 395, 405 },
             bopOutput = true,
             reagents = {
                 { itemId = 23448, count = 6 },
@@ -29387,6 +31118,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17041,
             sourceKind = "trainer",
+            skillLevels = { 350, 360, 370, 380 },
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 12 },
@@ -29404,6 +31136,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17041,
             sourceKind = "trainer",
+            skillLevels = { 375, 385, 395, 405 },
             bopOutput = true,
             reagents = {
                 { itemId = 22457, count = 10 },
@@ -29420,6 +31153,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17040,
             sourceKind = "trainer",
+            skillLevels = { 350, 360, 370, 380 },
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 20 },
@@ -29437,6 +31171,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17040,
             sourceKind = "trainer",
+            skillLevels = { 375, 385, 395, 405 },
             bopOutput = true,
             reagents = {
                 { itemId = 23571, count = 2 },
@@ -29453,6 +31188,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17040,
             sourceKind = "trainer",
+            skillLevels = { 350, 360, 370, 380 },
             bopOutput = true,
             reagents = {
                 { itemId = 21885, count = 20 },
@@ -29470,6 +31206,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17040,
             sourceKind = "trainer",
+            skillLevels = { 375, 385, 395, 405 },
             bopOutput = true,
             reagents = {
                 { itemId = 22457, count = 10 },
@@ -29487,6 +31224,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 305,
             requiredSkill = 305,
             sourceKind = "trainer",
+            skillLevels = { 305, 305, 325, 345 },
             bopOutput = false,
             reagents = {
                 { itemId = 23077, count = 1 },
@@ -29500,7 +31238,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "weightstone",
             sortOrder = 60,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Humphry", zone = 64 }, { name = "Rohok", zone = 64 }, { name = "Grutah", zone = 69 } },
+            skillLevels = { 300, 300, 305, 310 },
+            sourcePlaces = { { name = "Humphry", zone = 64, x = 56.8, y = 63.8, faction = "alliance" }, { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Grutah", zone = 69, x = 29.7, y = 31.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 21877, count = 1 },
@@ -29517,7 +31256,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 70,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 350, 350, 355, 360 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21877, count = 2 },
@@ -29532,6 +31272,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 180, 190, 200, 210 },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 1 },
@@ -29548,6 +31289,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 200, 210, 220, 230 },
             bopOutput = false,
             reagents = {
                 { itemId = 3864, count = 2 },
@@ -29563,6 +31305,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 280, 290, 300, 310 },
             bopOutput = false,
             reagents = {
                 { itemId = 12800, count = 2 },
@@ -29577,6 +31320,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 290, 300, 310, 320 },
             bopOutput = false,
             reagents = {
                 { itemId = 12364, count = 2 },
@@ -29591,6 +31335,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "thrown",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 100, 130, 145, 160 },
             bopOutput = false,
             reagents = {
                 { itemId = 2319, count = 1 },
@@ -29606,6 +31351,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "thrown",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 200, 220, 230, 240 },
             bopOutput = false,
             reagents = {
                 { itemId = 3486, count = 2 },
@@ -29622,6 +31368,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "thrown",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 300, 320, 330, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 8170, count = 1 },
@@ -29637,7 +31384,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "thrown",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Humphry", zone = 64 }, { name = "Rohok", zone = 64 }, { name = "Grutah", zone = 69 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Humphry", zone = 64, x = 56.8, y = 63.8, faction = "alliance" }, { name = "Rohok", zone = 64, x = 53.2, y = 38.2, faction = "horde" }, { name = "Grutah", zone = 69, x = 29.7, y = 31.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 2 },
@@ -29656,6 +31404,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 340,
             requiredSkill = 340,
             sourceKind = "drop",
+            skillLevels = { 340, 350, 355, 360 },
             sourcePlaces = { { zone = 86 } },
             bopOutput = false,
             reagents = {
@@ -29673,6 +31422,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 340,
             requiredSkill = 340,
             sourceKind = "drop",
+            skillLevels = { 340, 350, 355, 360 },
             sourcePlaces = { { zone = 71 } },
             bopOutput = false,
             reagents = {
@@ -29690,6 +31440,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 340,
             requiredSkill = 340,
             sourceKind = "drop",
+            skillLevels = { 340, 350, 355, 360 },
             sourcePlaces = { { name = "Hydromancer Thespia", zone = 75 } },
             bopOutput = false,
             reagents = {
@@ -29707,6 +31458,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 340,
             requiredSkill = 340,
             sourceKind = "drop",
+            skillLevels = { 340, 350, 355, 360 },
             sourcePlaces = { { name = "Mennu the Betrayer", zone = 88 } },
             bopOutput = false,
             reagents = {
@@ -29724,6 +31476,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 340,
             requiredSkill = 340,
             sourceKind = "drop",
+            skillLevels = { 340, 350, 355, 360 },
             sourcePlaces = { { name = "Chrono Lord Deja", zone = 87 } },
             bopOutput = false,
             reagents = {
@@ -29741,7 +31494,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50, x = 60.5, y = 64.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 8 },
@@ -29759,7 +31513,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50, x = 60.5, y = 64.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 6 },
@@ -29777,7 +31532,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50, x = 60.5, y = 64.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 6 },
@@ -29796,7 +31552,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 3 },
@@ -29816,7 +31573,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 4 },
@@ -29835,7 +31593,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 325,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Trader Narasu", zone = 68 } },
+            skillLevels = { 325, 335, 340, 345 },
+            sourcePlaces = { { name = "Trader Narasu", zone = 68, x = 54.6, y = 75.2, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 4 },
@@ -29853,7 +31612,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 3 },
@@ -29872,7 +31632,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50, x = 60.5, y = 64.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 8 },
@@ -29890,7 +31651,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50, x = 60.5, y = 64.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 6 },
@@ -29908,7 +31670,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Quartermaster Enuril", zone = 50, x = 60.5, y = 64.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 6 },
@@ -29927,7 +31690,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 4 },
@@ -29947,7 +31711,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 3 },
@@ -29967,7 +31732,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 3 },
@@ -29985,7 +31751,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 370,
             requiredSkill = 370,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alurmi", zone = 13 } },
+            skillLevels = { 370, 370, 377, 385 },
+            sourcePlaces = { { name = "Alurmi", zone = 13, x = 63.6, y = 57.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23793, count = 6 },
@@ -30002,7 +31769,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Trader Narasu", zone = 68 } },
+            skillLevels = { 350, 350, 357, 365 },
+            sourcePlaces = { { name = "Trader Narasu", zone = 68, x = 54.6, y = 75.2, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23793, count = 6 },
@@ -30016,6 +31784,7 @@ RecipeRegistryRecipeMetadata = {
             category = "drums",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 340, 340, 347, 355 },
             bopOutput = false,
             reagents = {
                 { itemId = 23793, count = 3 },
@@ -30031,7 +31800,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Almaador", zone = 50 } },
+            skillLevels = { 365, 365, 372, 380 },
+            sourcePlaces = { { name = "Almaador", zone = 50, x = 51, y = 41.9 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23793, count = 6 },
@@ -30047,7 +31817,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 345,
             requiredSkill = 345,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Provisioner Nasela", zone = 68 }, { name = "Trader Narasu", zone = 68 } },
+            skillLevels = { 345, 345, 352, 360 },
+            sourcePlaces = { { name = "Provisioner Nasela", zone = 68, x = 53.5, y = 36.9, faction = "horde" }, { name = "Trader Narasu", zone = 68, x = 54.6, y = 75.2, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23793, count = 6 },
@@ -30064,7 +31835,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 335,
             requiredSkill = 335,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64 }, { name = "Quartermaster Urgronn", zone = 64 } },
+            skillLevels = { 335, 335, 345, 355 },
+            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64, x = 56.7, y = 62.6, faction = "alliance" }, { name = "Quartermaster Urgronn", zone = 64, x = 54.9, y = 37.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 22451, count = 4 },
@@ -30082,7 +31854,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64 }, { name = "Quartermaster Urgronn", zone = 64 } },
+            skillLevels = { 365, 365, 375, 385 },
+            sourcePlaces = { { name = "Logistics Officer Ulrike", zone = 64, x = 56.7, y = 62.6, faction = "alliance" }, { name = "Quartermaster Urgronn", zone = 64, x = 54.9, y = 37.9, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 22451, count = 8 },
@@ -30101,7 +31874,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 335,
             requiredSkill = 335,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 335, 335, 345, 355 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 4 },
@@ -30119,7 +31893,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 365, 365, 375, 385 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 8 },
@@ -30138,6 +31913,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -30158,6 +31934,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 385, 395 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             bopOutput = false,
             reagents = {
@@ -30178,6 +31955,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -30198,6 +31976,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -30217,6 +31996,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 385, 395 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             bopOutput = false,
             reagents = {
@@ -30236,6 +32016,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -30256,6 +32037,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -30276,6 +32058,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -30296,6 +32079,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 385, 395 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             bopOutput = false,
             reagents = {
@@ -30316,6 +32100,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -30336,6 +32121,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 385, 395 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             bopOutput = false,
             reagents = {
@@ -30356,6 +32142,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -30375,7 +32162,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10656,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Peter Galen", zone = 38 }, { name = "Thorkaf Dragoneye", zone = 11 } },
+            skillLevels = { 375, 385, 395, 405 },
+            sourcePlaces = { { name = "Peter Galen", zone = 38, x = 37.5, y = 65.5, faction = "alliance" }, { name = "Thorkaf Dragoneye", zone = 11, x = 62.6, y = 57.6, faction = "horde" } },
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 16 },
@@ -30394,7 +32182,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10656,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Peter Galen", zone = 38 }, { name = "Thorkaf Dragoneye", zone = 11 } },
+            skillLevels = { 375, 385, 395, 405 },
+            sourcePlaces = { { name = "Peter Galen", zone = 38, x = 37.5, y = 65.5, faction = "alliance" }, { name = "Thorkaf Dragoneye", zone = 11, x = 62.6, y = 57.6, faction = "horde" } },
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 12 },
@@ -30413,7 +32202,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10656,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Peter Galen", zone = 38 }, { name = "Thorkaf Dragoneye", zone = 11 } },
+            skillLevels = { 375, 385, 395, 405 },
+            sourcePlaces = { { name = "Peter Galen", zone = 38, x = 37.5, y = 65.5, faction = "alliance" }, { name = "Thorkaf Dragoneye", zone = 11, x = 62.6, y = 57.6, faction = "horde" } },
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 8 },
@@ -30431,7 +32221,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10656,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Peter Galen", zone = 38 }, { name = "Thorkaf Dragoneye", zone = 11 } },
+            skillLevels = { 375, 385, 395, 405 },
+            sourcePlaces = { { name = "Peter Galen", zone = 38, x = 37.5, y = 65.5, faction = "alliance" }, { name = "Thorkaf Dragoneye", zone = 11, x = 62.6, y = 57.6, faction = "horde" } },
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 16 },
@@ -30450,7 +32241,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10656,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Peter Galen", zone = 38 }, { name = "Thorkaf Dragoneye", zone = 11 } },
+            skillLevels = { 375, 385, 395, 405 },
+            sourcePlaces = { { name = "Peter Galen", zone = 38, x = 37.5, y = 65.5, faction = "alliance" }, { name = "Thorkaf Dragoneye", zone = 11, x = 62.6, y = 57.6, faction = "horde" } },
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 12 },
@@ -30469,7 +32261,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10656,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Peter Galen", zone = 38 }, { name = "Thorkaf Dragoneye", zone = 11 } },
+            skillLevels = { 375, 385, 395, 405 },
+            sourcePlaces = { { name = "Peter Galen", zone = 38, x = 37.5, y = 65.5, faction = "alliance" }, { name = "Thorkaf Dragoneye", zone = 11, x = 62.6, y = 57.6, faction = "horde" } },
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 8 },
@@ -30487,7 +32280,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10660,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Caryssia Moonhunter", zone = 31 }, { name = "Se'Jib", zone = 2 } },
+            skillLevels = { 375, 385, 395, 405 },
+            sourcePlaces = { { name = "Caryssia Moonhunter", zone = 31, x = 89.4, y = 46.5, faction = "alliance" }, { name = "Se'Jib", zone = 2, x = 36.6, y = 34.2, faction = "horde" } },
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 16 },
@@ -30506,7 +32300,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10660,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Caryssia Moonhunter", zone = 31 }, { name = "Se'Jib", zone = 2 } },
+            skillLevels = { 375, 385, 395, 405 },
+            sourcePlaces = { { name = "Caryssia Moonhunter", zone = 31, x = 89.4, y = 46.5, faction = "alliance" }, { name = "Se'Jib", zone = 2, x = 36.6, y = 34.2, faction = "horde" } },
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 12 },
@@ -30525,7 +32320,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10660,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Caryssia Moonhunter", zone = 31 }, { name = "Se'Jib", zone = 2 } },
+            skillLevels = { 375, 385, 395, 405 },
+            sourcePlaces = { { name = "Caryssia Moonhunter", zone = 31, x = 89.4, y = 46.5, faction = "alliance" }, { name = "Se'Jib", zone = 2, x = 36.6, y = 34.2, faction = "horde" } },
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 8 },
@@ -30543,7 +32339,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10658,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Brumn Winterhoof", zone = 3 }, { name = "Sarah Tanner", zone = 39 } },
+            skillLevels = { 375, 385, 395, 405 },
+            sourcePlaces = { { name = "Brumn Winterhoof", zone = 3, x = 28.2, y = 45, faction = "horde" }, { name = "Sarah Tanner", zone = 39, x = 63.7, y = 75.7, faction = "alliance" } },
             bopOutput = true,
             reagents = {
                 { itemId = 23571, count = 6 },
@@ -30560,7 +32357,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10658,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Brumn Winterhoof", zone = 3 }, { name = "Sarah Tanner", zone = 39 } },
+            skillLevels = { 375, 385, 395, 405 },
+            sourcePlaces = { { name = "Brumn Winterhoof", zone = 3, x = 28.2, y = 45, faction = "horde" }, { name = "Sarah Tanner", zone = 39, x = 63.7, y = 75.7, faction = "alliance" } },
             bopOutput = true,
             reagents = {
                 { itemId = 23571, count = 5 },
@@ -30577,7 +32375,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10658,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Brumn Winterhoof", zone = 3 }, { name = "Sarah Tanner", zone = 39 } },
+            skillLevels = { 375, 385, 395, 405 },
+            sourcePlaces = { { name = "Brumn Winterhoof", zone = 3, x = 28.2, y = 45, faction = "horde" }, { name = "Sarah Tanner", zone = 39, x = 63.7, y = 75.7, faction = "alliance" } },
             bopOutput = true,
             reagents = {
                 { itemId = 23571, count = 3 },
@@ -30592,7 +32391,8 @@ RecipeRegistryRecipeMetadata = {
             category = "elementals",
             sortOrder = 10,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Hurnak Grimmord", zone = 64 }, { name = "Krugosh", zone = 64 } },
+            skillLevels = { 300, 300, 300, 300 },
+            sourcePlaces = { { name = "Hurnak Grimmord", zone = 64, x = 56.7, y = 63.8, faction = "alliance" }, { name = "Krugosh", zone = 64, x = 55.5, y = 37.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 1 },
@@ -30606,7 +32406,8 @@ RecipeRegistryRecipeMetadata = {
             category = "elementals",
             sortOrder = 20,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Hurnak Grimmord", zone = 64 }, { name = "Krugosh", zone = 64 } },
+            skillLevels = { 300, 300, 300, 300 },
+            sourcePlaces = { { name = "Hurnak Grimmord", zone = 64, x = 56.7, y = 63.8, faction = "alliance" }, { name = "Krugosh", zone = 64, x = 55.5, y = 37.6, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 1 },
@@ -30621,7 +32422,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10658,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Brumn Winterhoof", zone = 3 }, { name = "Sarah Tanner", zone = 39 } },
+            skillLevels = { 260, 280, 290, 300 },
+            sourcePlaces = { { name = "Brumn Winterhoof", zone = 3, x = 28.2, y = 45, faction = "horde" }, { name = "Sarah Tanner", zone = 39, x = 63.7, y = 75.7, faction = "alliance" } },
             bopOutput = true,
             reagents = {
                 { itemId = 7081, count = 8 },
@@ -30639,7 +32441,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10660,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Caryssia Moonhunter", zone = 31 }, { name = "Se'Jib", zone = 2 } },
+            skillLevels = { 260, 280, 290, 300 },
+            sourcePlaces = { { name = "Caryssia Moonhunter", zone = 31, x = 89.4, y = 46.5, faction = "alliance" }, { name = "Se'Jib", zone = 2, x = 36.6, y = 34.2, faction = "horde" } },
             bopOutput = true,
             reagents = {
                 { itemId = 8153, count = 4 },
@@ -30658,7 +32461,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10656,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Peter Galen", zone = 38 }, { name = "Thorkaf Dragoneye", zone = 11 } },
+            skillLevels = { 260, 280, 290, 300 },
+            sourcePlaces = { { name = "Peter Galen", zone = 38, x = 37.5, y = 65.5, faction = "alliance" }, { name = "Thorkaf Dragoneye", zone = 11, x = 62.6, y = 57.6, faction = "horde" } },
             bopOutput = true,
             reagents = {
                 { itemId = 7077, count = 2 },
@@ -30677,7 +32481,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10658,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Brumn Winterhoof", zone = 3 }, { name = "Sarah Tanner", zone = 39 } },
+            skillLevels = { 330, 350, 360, 370 },
+            sourcePlaces = { { name = "Brumn Winterhoof", zone = 3, x = 28.2, y = 45, faction = "horde" }, { name = "Sarah Tanner", zone = 39, x = 63.7, y = 75.7, faction = "alliance" } },
             bopOutput = true,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -30695,7 +32500,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10660,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Caryssia Moonhunter", zone = 31 }, { name = "Se'Jib", zone = 2 } },
+            skillLevels = { 330, 350, 360, 370 },
+            sourcePlaces = { { name = "Caryssia Moonhunter", zone = 31, x = 89.4, y = 46.5, faction = "alliance" }, { name = "Se'Jib", zone = 2, x = 36.6, y = 34.2, faction = "horde" } },
             bopOutput = true,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -30713,7 +32519,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 10656,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Peter Galen", zone = 38 }, { name = "Thorkaf Dragoneye", zone = 11 } },
+            skillLevels = { 330, 350, 360, 370 },
+            sourcePlaces = { { name = "Peter Galen", zone = 38, x = 37.5, y = 65.5, faction = "alliance" }, { name = "Thorkaf Dragoneye", zone = 11, x = 62.6, y = 57.6, faction = "horde" } },
             bopOutput = true,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -30731,6 +32538,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9788,
             sourceKind = "trainer",
+            skillLevels = { 260, 280, 290, 300 },
             bopOutput = true,
             reagents = {
                 { itemId = 3860, count = 16 },
@@ -30746,6 +32554,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9788,
             sourceKind = "trainer",
+            skillLevels = { 260, 280, 290, 300 },
             bopOutput = true,
             reagents = {
                 { itemId = 3860, count = 16 },
@@ -30761,6 +32570,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9787,
             sourceKind = "trainer",
+            skillLevels = { 260, 280, 290, 300 },
             bopOutput = true,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -30776,6 +32586,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9787,
             sourceKind = "trainer",
+            skillLevels = { 260, 280, 290, 300 },
             bopOutput = true,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -30791,6 +32602,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9787,
             sourceKind = "trainer",
+            skillLevels = { 260, 280, 290, 300 },
             bopOutput = true,
             reagents = {
                 { itemId = 3860, count = 12 },
@@ -30806,6 +32618,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9788,
             sourceKind = "trainer",
+            skillLevels = { 330, 340, 350, 360 },
             bopOutput = true,
             reagents = {
                 { itemId = 22452, count = 4 },
@@ -30821,6 +32634,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9788,
             sourceKind = "trainer",
+            skillLevels = { 330, 340, 350, 360 },
             bopOutput = true,
             reagents = {
                 { itemId = 21885, count = 2 },
@@ -30837,6 +32651,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17039,
             sourceKind = "trainer",
+            skillLevels = { 330, 340, 350, 360 },
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 6 },
@@ -30852,6 +32667,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17039,
             sourceKind = "trainer",
+            skillLevels = { 330, 340, 350, 360 },
             bopOutput = true,
             reagents = {
                 { itemId = 22452, count = 6 },
@@ -30867,6 +32683,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17041,
             sourceKind = "trainer",
+            skillLevels = { 330, 340, 350, 360 },
             bopOutput = true,
             reagents = {
                 { itemId = 21885, count = 3 },
@@ -30883,6 +32700,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17041,
             sourceKind = "trainer",
+            skillLevels = { 330, 340, 350, 360 },
             bopOutput = true,
             reagents = {
                 { itemId = 22451, count = 6 },
@@ -30898,6 +32716,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17040,
             sourceKind = "trainer",
+            skillLevels = { 330, 340, 350, 360 },
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 6 },
@@ -30913,6 +32732,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17040,
             sourceKind = "trainer",
+            skillLevels = { 330, 340, 350, 360 },
             bopOutput = true,
             reagents = {
                 { itemId = 22452, count = 6 },
@@ -30928,7 +32748,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mycah", zone = 51 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { name = "Mycah", zone = 51, x = 17.9, y = 51.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 1 },
@@ -30944,6 +32765,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9788,
             sourceKind = "trainer",
+            skillLevels = { 375, 385, 395, 405 },
             bopOutput = true,
             reagents = {
                 { itemId = 23564, count = 1 },
@@ -30959,6 +32781,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 9788,
             sourceKind = "trainer",
+            skillLevels = { 375, 385, 395, 405 },
             bopOutput = true,
             reagents = {
                 { itemId = 28484, count = 1 },
@@ -30974,6 +32797,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17039,
             sourceKind = "trainer",
+            skillLevels = { 375, 385, 395, 405 },
             bopOutput = true,
             reagents = {
                 { itemId = 28426, count = 1 },
@@ -30989,6 +32813,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17039,
             sourceKind = "trainer",
+            skillLevels = { 375, 385, 395, 405 },
             bopOutput = true,
             reagents = {
                 { itemId = 28429, count = 1 },
@@ -31004,6 +32829,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17041,
             sourceKind = "trainer",
+            skillLevels = { 375, 385, 395, 405 },
             bopOutput = true,
             reagents = {
                 { itemId = 28432, count = 1 },
@@ -31019,6 +32845,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17041,
             sourceKind = "trainer",
+            skillLevels = { 375, 385, 395, 405 },
             bopOutput = true,
             reagents = {
                 { itemId = 28435, count = 1 },
@@ -31034,6 +32861,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17040,
             sourceKind = "trainer",
+            skillLevels = { 375, 385, 395, 405 },
             bopOutput = true,
             reagents = {
                 { itemId = 28438, count = 1 },
@@ -31049,6 +32877,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             specialization = 17040,
             sourceKind = "trainer",
+            skillLevels = { 375, 385, 395, 405 },
             bopOutput = true,
             reagents = {
                 { itemId = 28441, count = 1 },
@@ -31065,6 +32894,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { zone = 89 }, { zone = 90 } },
             bopOutput = false,
             reagents = {
@@ -31084,6 +32914,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { zone = 89 }, { zone = 90 } },
             bopOutput = false,
             reagents = {
@@ -31104,6 +32935,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { zone = 89 }, { zone = 90 } },
             bopOutput = true,
             reagents = {
@@ -31123,6 +32955,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { zone = 89 }, { zone = 90 } },
             bopOutput = true,
             reagents = {
@@ -31142,6 +32975,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 89 }, { zone = 90 } },
             bopOutput = false,
             reagents = {
@@ -31162,6 +32996,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 89 }, { zone = 90 } },
             bopOutput = false,
             reagents = {
@@ -31182,6 +33017,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 89 }, { zone = 90 } },
             bopOutput = false,
             reagents = {
@@ -31202,6 +33038,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 89 }, { zone = 90 } },
             bopOutput = false,
             reagents = {
@@ -31222,6 +33059,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 89 }, { zone = 90 } },
             bopOutput = true,
             reagents = {
@@ -31241,6 +33079,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 89 }, { zone = 90 } },
             bopOutput = true,
             reagents = {
@@ -31260,6 +33099,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 89 }, { zone = 90 } },
             bopOutput = true,
             reagents = {
@@ -31280,6 +33120,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 89 }, { zone = 90 } },
             bopOutput = true,
             reagents = {
@@ -31300,6 +33141,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 89 }, { zone = 90 } },
             bopOutput = false,
             reagents = {
@@ -31319,6 +33161,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 89 }, { zone = 90 } },
             bopOutput = false,
             reagents = {
@@ -31337,6 +33180,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 89 }, { zone = 90 } },
             bopOutput = true,
             reagents = {
@@ -31355,6 +33199,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 89 }, { zone = 90 } },
             bopOutput = true,
             reagents = {
@@ -31371,6 +33216,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 75, 105, 120, 135 },
             bopOutput = false,
             reagents = {
                 { itemId = 1206, count = 1 },
@@ -31386,6 +33232,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 105, 135, 150, 165 },
             bopOutput = false,
             reagents = {
                 { itemId = 1529, count = 1 },
@@ -31401,6 +33248,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 230, 255, 270, 285 },
             bopOutput = false,
             reagents = {
                 { itemId = 7910, count = 1 },
@@ -31415,6 +33263,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 265, 285, 295, 305 },
             bopOutput = false,
             reagents = {
                 { itemId = 12800, count = 1 },
@@ -31542,7 +33391,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Andrion Darkspinner", zone = 50 } },
+            skillLevels = { 350, 350, 355, 360 },
+            sourcePlaces = { { name = "Andrion Darkspinner", zone = 50, x = 66, y = 67.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 1 },
@@ -31559,7 +33409,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             specialization = 20222,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Kablamm Farflinger", zone = 74 } },
+            skillLevels = { 350, 350, 360, 370 },
+            sourcePlaces = { { name = "Kablamm Farflinger", zone = 74, x = 32.9, y = 63.7 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 2 },
@@ -31578,7 +33429,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             specialization = 20219,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Smiles O'Byron", zone = 76 } },
+            skillLevels = { 350, 350, 360, 370 },
+            sourcePlaces = { { name = "Smiles O'Byron", zone = 76, x = 60.3, y = 65.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22451, count = 2 },
@@ -31596,6 +33448,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 65, 95, 110, 125 },
             bopOutput = false,
             reagents = {
                 { itemId = 774, count = 3 },
@@ -31612,6 +33465,7 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 1, 30, 35, 38 },
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 1 },
@@ -31628,7 +33482,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Almaador", zone = 50 } },
+            skillLevels = { 360, 370, 375, 380 },
+            sourcePlaces = { { name = "Almaador", zone = 50, x = 51, y = 41.9 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 8 },
@@ -31645,7 +33500,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nakodu", zone = 50 } },
+            skillLevels = { 350, 360, 365, 370 },
+            sourcePlaces = { { name = "Nakodu", zone = 50, x = 62.1, y = 69 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21842, count = 4 },
@@ -31665,7 +33521,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 350,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 350, 360, 365, 370 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -31684,7 +33541,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 360,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 360, 370, 375, 380 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -31703,7 +33561,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 370,
             faction = "alliance",
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50 } },
+            skillLevels = { 370, 380, 385, 390 },
+            sourcePlaces = { { name = "Quartermaster Endarin", zone = 50, x = 47.9, y = 26.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -31718,6 +33577,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 325, 325, 335, 345 },
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 1 },
@@ -31732,7 +33592,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "special",
             sortOrder = 20,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Alchemist Gribble", zone = 64 }, { name = "Lorokeem", zone = 50 }, { name = "Apothecary Antonivich", zone = 64 } },
+            skillLevels = { 325, 340, 347, 355 },
+            sourcePlaces = { { name = "Alchemist Gribble", zone = 64, x = 53.8, y = 65.8, faction = "alliance" }, { name = "Lorokeem", zone = 50, x = 45.4, y = 19.5 }, { name = "Apothecary Antonivich", zone = 64, x = 52.4, y = 36.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 1 },
@@ -31748,6 +33609,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 80, 110, 125, 140 },
             bopOutput = false,
             reagents = {
                 { itemId = 1705, count = 1 },
@@ -31765,7 +33627,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 375, 385, 395, 405 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 12 },
@@ -31784,7 +33647,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 375, 385, 395, 405 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 12 },
@@ -31803,7 +33667,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 375, 385, 395, 405 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 12 },
@@ -31822,6 +33687,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { name = "Koren", zone = 70 } },
             bopOutput = false,
             reagents = {
@@ -31841,6 +33707,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { name = "Koren", zone = 70 } },
             bopOutput = false,
             reagents = {
@@ -31860,6 +33727,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { name = "Koren", zone = 70 } },
             bopOutput = false,
             reagents = {
@@ -31879,7 +33747,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Apprentice Darius", zone = 57 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Apprentice Darius", zone = 57, x = 47, y = 75.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 6 },
@@ -31898,7 +33767,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 6 },
@@ -31916,7 +33786,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 335,
             requiredSkill = 335,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Xerintha Ravenoak", zone = 76 }, { name = "Sassa Weldwell", zone = 76 } },
+            skillLevels = { 335, 355, 365, 375 },
+            sourcePlaces = { { name = "Xerintha Ravenoak", zone = 76, x = 62.5, y = 40.3 }, { name = "Sassa Weldwell", zone = 76, x = 61.3, y = 68.9, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 31670, count = 1 },
@@ -31931,7 +33802,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 335,
             requiredSkill = 335,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Xerintha Ravenoak", zone = 76 }, { name = "Sassa Weldwell", zone = 76 } },
+            skillLevels = { 335, 355, 365, 375 },
+            sourcePlaces = { { name = "Xerintha Ravenoak", zone = 76, x = 62.5, y = 40.3 }, { name = "Sassa Weldwell", zone = 76, x = 61.3, y = 68.9, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 31671, count = 1 },
@@ -31947,6 +33819,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 270,
             requiredSkill = 335,
             sourceKind = "drop",
+            skillLevels = { 335, 350, 357, 365 },
             sourcePlaces = { { zone = 69 } },
             bopOutput = false,
             reagents = {
@@ -31965,6 +33838,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 85,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 375, 377, 380 },
             sourcePlaces = { { zone = 69 } },
             bopOutput = false,
             reagents = {
@@ -31983,6 +33857,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             requiredSkill = 345,
             sourceKind = "drop",
+            skillLevels = { 345, 360, 367, 375 },
             sourcePlaces = { { zone = 69 } },
             bopOutput = false,
             reagents = {
@@ -32017,6 +33892,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -32065,6 +33941,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -32081,6 +33958,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -32129,6 +34007,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -32145,6 +34024,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldDrop",
+            skillLevels = { 350, 350, 365, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -32159,7 +34039,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "guardian",
             sortOrder = 70,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Alchemist Gribble", zone = 64 }, { name = "Lorokeem", zone = 50 }, { name = "Apothecary Antonivich", zone = 64 } },
+            skillLevels = { 310, 325, 332, 340 },
+            sourcePlaces = { { name = "Alchemist Gribble", zone = 64, x = 53.8, y = 65.8, faction = "alliance" }, { name = "Lorokeem", zone = 50, x = 45.4, y = 19.5 }, { name = "Apothecary Antonivich", zone = 64, x = 52.4, y = 36.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -32177,7 +34058,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 320,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51 } },
+            skillLevels = { 320, 335, 342, 350 },
+            sourcePlaces = { { name = "Fedryen Swiftspear", zone = 51, x = 79.3, y = 63.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -32193,7 +34075,8 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "battle",
             sortOrder = 230,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Alchemist Gribble", zone = 64 }, { name = "Lorokeem", zone = 50 }, { name = "Apothecary Antonivich", zone = 64 } },
+            skillLevels = { 320, 335, 342, 350 },
+            sourcePlaces = { { name = "Alchemist Gribble", zone = 64, x = 53.8, y = 65.8, faction = "alliance" }, { name = "Lorokeem", zone = 50, x = 45.4, y = 19.5 }, { name = "Apothecary Antonivich", zone = 64, x = 52.4, y = 36.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -32211,7 +34094,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 90,
             requiredSkill = 330,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Jaffrey Noreliqe", zone = 68 }, { name = "Quartermaster Davian Vaclav", zone = 68 } },
+            skillLevels = { 330, 345, 352, 360 },
+            sourcePlaces = { { name = "Quartermaster Jaffrey Noreliqe", zone = 68, x = 41.2, y = 44.3, faction = "horde" }, { name = "Quartermaster Davian Vaclav", zone = 68, x = 41.2, y = 44.3, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -32229,7 +34113,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32227, count = 1 },
@@ -32245,7 +34130,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32227, count = 1 },
@@ -32261,7 +34147,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32227, count = 1 },
@@ -32277,7 +34164,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32227, count = 1 },
@@ -32293,7 +34181,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32227, count = 1 },
@@ -32309,7 +34198,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32227, count = 1 },
@@ -32325,7 +34215,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Ontuvo", zone = 50 }, { name = "Shaani", zone = 91 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Shaani", zone = 91, x = 51.5, y = 32.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32227, count = 1 },
@@ -32341,7 +34232,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32228, count = 1 },
@@ -32357,7 +34249,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32228, count = 1 },
@@ -32373,7 +34266,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32228, count = 1 },
@@ -32389,7 +34283,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Ontuvo", zone = 50 }, { name = "Shaani", zone = 91 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Shaani", zone = 91, x = 51.5, y = 32.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32228, count = 1 },
@@ -32405,7 +34300,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32229, count = 1 },
@@ -32421,7 +34317,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32229, count = 1 },
@@ -32437,7 +34334,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32229, count = 1 },
@@ -32453,7 +34351,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32229, count = 1 },
@@ -32469,7 +34368,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32229, count = 1 },
@@ -32485,7 +34385,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Ontuvo", zone = 50 }, { name = "Shaani", zone = 91 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Shaani", zone = 91, x = 51.5, y = 32.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32229, count = 1 },
@@ -32501,7 +34402,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Ontuvo", zone = 50 }, { name = "Shaani", zone = 91 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Shaani", zone = 91, x = 51.5, y = 32.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32229, count = 1 },
@@ -32517,7 +34419,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Ontuvo", zone = 50 }, { name = "Shaani", zone = 91 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Shaani", zone = 91, x = 51.5, y = 32.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32230, count = 1 },
@@ -32533,7 +34436,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Ontuvo", zone = 50 }, { name = "Shaani", zone = 91 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Shaani", zone = 91, x = 51.5, y = 32.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32230, count = 1 },
@@ -32549,7 +34453,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32230, count = 1 },
@@ -32565,7 +34470,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32230, count = 1 },
@@ -32581,7 +34487,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32230, count = 1 },
@@ -32597,7 +34504,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32230, count = 1 },
@@ -32613,7 +34521,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Ontuvo", zone = 50 }, { name = "Shaani", zone = 91 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Shaani", zone = 91, x = 51.5, y = 32.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32231, count = 1 },
@@ -32629,7 +34538,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32231, count = 1 },
@@ -32645,7 +34555,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32231, count = 1 },
@@ -32661,7 +34572,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32231, count = 1 },
@@ -32677,7 +34589,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Ontuvo", zone = 50 }, { name = "Shaani", zone = 91 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Shaani", zone = 91, x = 51.5, y = 32.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32231, count = 1 },
@@ -32693,7 +34606,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32231, count = 1 },
@@ -32709,7 +34623,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32249, count = 1 },
@@ -32725,7 +34640,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32249, count = 1 },
@@ -32741,7 +34657,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32249, count = 1 },
@@ -32757,7 +34674,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32249, count = 1 },
@@ -32772,7 +34690,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 260,
             requiredSkill = 275,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Xizzer Fizzbolt", zone = 45 }, { name = "Viggz Shinesparked", zone = 50 } },
+            skillLevels = { 275, 275, 280, 285 },
+            sourcePlaces = { { name = "Xizzer Fizzbolt", zone = 45, x = 60.8, y = 38.6 }, { name = "Viggz Shinesparked", zone = 50, x = 64.9, y = 69.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 7078, count = 2 },
@@ -32789,7 +34708,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Karaaz", zone = 74 }, { name = "Paulsta'ats", zone = 68 } },
+            skillLevels = { 365, 375, 377, 380 },
+            sourcePlaces = { { name = "Karaaz", zone = 74, x = 43.6, y = 34.3 }, { name = "Paulsta'ats", zone = 68, x = 30.6, y = 57 } },
             bopOutput = false,
             reagents = {
                 { itemId = 25867, count = 1 },
@@ -32805,6 +34725,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 377, 380 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -32820,6 +34741,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "powders",
             sortOrder = 70,
             sourceKind = "trainer",
+            skillLevels = { 335, 335, 340, 345 },
             bopOutput = false,
             reagents = {
                 { itemId = 21877, count = 2 },
@@ -32836,6 +34758,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "grenades",
             sortOrder = 50,
             sourceKind = "trainer",
+            skillLevels = { 335, 345, 355, 365 },
             bopOutput = false,
             reagents = {
                 { itemId = 23782, count = 1 },
@@ -32853,6 +34776,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { name = "Okuno", zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -32893,6 +34817,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { name = "Okuno", zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -32913,6 +34838,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { name = "Okuno", zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -32933,6 +34859,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { name = "Okuno", zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -32953,6 +34880,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { name = "Okuno", zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -32973,6 +34901,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { name = "Okuno", zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -32993,6 +34922,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { name = "Okuno", zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33013,6 +34943,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { name = "Okuno", zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33033,6 +34964,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { name = "Okuno", zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33053,6 +34985,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { name = "Okuno", zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33073,6 +35006,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { name = "Okuno", zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33093,6 +35027,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { name = "Okuno", zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33113,6 +35048,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { name = "Okuno", zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33133,6 +35069,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { name = "Okuno", zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33153,6 +35090,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { name = "Okuno", zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33173,6 +35111,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { name = "Okuno", zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33191,6 +35130,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "plate",
             sortOrder = 290,
             sourceKind = "trainer",
+            skillLevels = { 350, 370, 380, 390 },
             bopOutput = true,
             reagents = {
                 { itemId = 23436, count = 2 },
@@ -33209,6 +35149,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "necklace",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 340, 340, 355, 370 },
             bopOutput = false,
             reagents = {
                 { itemId = 22578, count = 3 },
@@ -33226,6 +35167,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 92 }, { zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33245,6 +35187,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 93 } },
             bopOutput = true,
             reagents = {
@@ -33264,6 +35207,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33283,6 +35227,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 92 }, { zone = 93 } },
             bopOutput = true,
             reagents = {
@@ -33302,6 +35247,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33321,6 +35267,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 92 }, { zone = 93 } },
             bopOutput = true,
             reagents = {
@@ -33340,6 +35287,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 92 }, { zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33358,6 +35306,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 93 } },
             bopOutput = true,
             reagents = {
@@ -33376,6 +35325,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 92 }, { zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33396,6 +35346,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 93 } },
             bopOutput = true,
             reagents = {
@@ -33416,6 +35367,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33436,6 +35388,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 395, 405 },
             sourcePlaces = { { zone = 92 }, { zone = 93 } },
             bopOutput = true,
             reagents = {
@@ -33456,6 +35409,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33475,6 +35429,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { zone = 92 }, { zone = 93 } },
             bopOutput = true,
             reagents = {
@@ -33494,6 +35449,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { zone = 92 }, { zone = 93 } },
             bopOutput = false,
             reagents = {
@@ -33513,6 +35469,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 385, 390, 395 },
             sourcePlaces = { { zone = 93 } },
             bopOutput = true,
             reagents = {
@@ -33530,6 +35487,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "firearms",
             sortOrder = 170,
             sourceKind = "trainer",
+            skillLevels = { 375, 375, 392, 410 },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 12 },
@@ -33548,6 +35506,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "plate",
             sortOrder = 300,
             sourceKind = "trainer",
+            skillLevels = { 350, 370, 380, 390 },
             bopOutput = true,
             reagents = {
                 { itemId = 23440, count = 2 },
@@ -33566,6 +35525,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "plate",
             sortOrder = 310,
             sourceKind = "trainer",
+            skillLevels = { 350, 370, 380, 390 },
             bopOutput = true,
             reagents = {
                 { itemId = 23437, count = 2 },
@@ -33584,6 +35544,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mail",
             sortOrder = 320,
             sourceKind = "trainer",
+            skillLevels = { 350, 370, 380, 390 },
             bopOutput = true,
             reagents = {
                 { itemId = 23441, count = 2 },
@@ -33602,6 +35563,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mail",
             sortOrder = 330,
             sourceKind = "trainer",
+            skillLevels = { 350, 370, 380, 390 },
             bopOutput = true,
             reagents = {
                 { itemId = 23436, count = 2 },
@@ -33620,6 +35582,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "mail",
             sortOrder = 340,
             sourceKind = "trainer",
+            skillLevels = { 350, 370, 380, 390 },
             bopOutput = true,
             reagents = {
                 { itemId = 23439, count = 2 },
@@ -33638,6 +35601,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "leather",
             sortOrder = 350,
             sourceKind = "trainer",
+            skillLevels = { 350, 370, 380, 390 },
             bopOutput = true,
             reagents = {
                 { itemId = 23436, count = 2 },
@@ -33656,6 +35620,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "leather",
             sortOrder = 360,
             sourceKind = "trainer",
+            skillLevels = { 350, 370, 380, 390 },
             bopOutput = true,
             reagents = {
                 { itemId = 23440, count = 2 },
@@ -33674,6 +35639,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "leather",
             sortOrder = 370,
             sourceKind = "trainer",
+            skillLevels = { 350, 370, 380, 390 },
             bopOutput = true,
             reagents = {
                 { itemId = 23437, count = 2 },
@@ -33692,6 +35658,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 380,
             sourceKind = "trainer",
+            skillLevels = { 350, 370, 380, 390 },
             bopOutput = true,
             reagents = {
                 { itemId = 23438, count = 2 },
@@ -33710,6 +35677,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "cloth",
             sortOrder = 390,
             sourceKind = "trainer",
+            skillLevels = { 350, 370, 380, 390 },
             bopOutput = true,
             reagents = {
                 { itemId = 23439, count = 2 },
@@ -33728,6 +35696,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 325, 335, 345, 355 },
             bopOutput = false,
             reagents = {
                 { itemId = 23447, count = 2 },
@@ -33742,6 +35711,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "ring",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 330, 340, 350, 360 },
             bopOutput = false,
             reagents = {
                 { itemId = 24479, count = 1 },
@@ -33756,6 +35726,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "crown",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 365, 375, 380, 385 },
             bopOutput = false,
             reagents = {
                 { itemId = 23449, count = 12 },
@@ -33772,6 +35743,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 325, 325, 332, 340 },
             bopOutput = false,
             reagents = {
                 { itemId = 24478, count = 1 },
@@ -33786,6 +35758,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "purple",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 350, 350, 365, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 24479, count = 1 },
@@ -33799,6 +35772,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cauldrons",
             sortOrder = 10,
             sourceKind = "discovery",
+            skillLevels = { 360, 360, 370, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 22457, count = 2 },
@@ -33813,6 +35787,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cauldrons",
             sortOrder = 20,
             sourceKind = "discovery",
+            skillLevels = { 360, 360, 370, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 21884, count = 2 },
@@ -33827,6 +35802,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cauldrons",
             sortOrder = 30,
             sourceKind = "discovery",
+            skillLevels = { 360, 360, 370, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 21885, count = 2 },
@@ -33841,6 +35817,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cauldrons",
             sortOrder = 40,
             sourceKind = "discovery",
+            skillLevels = { 360, 360, 370, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 21886, count = 2 },
@@ -33855,6 +35832,7 @@ RecipeRegistryRecipeMetadata = {
             category = "cauldrons",
             sortOrder = 50,
             sourceKind = "discovery",
+            skillLevels = { 360, 360, 370, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 22456, count = 2 },
@@ -33869,7 +35847,8 @@ RecipeRegistryRecipeMetadata = {
             category = "basic",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Kylene", zone = 50 } },
+            skillLevels = { 320, 335, 345, 355 },
+            sourcePlaces = { { name = "Kylene", zone = 50, x = 76.5, y = 33 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2593, count = 1 },
@@ -33885,7 +35864,8 @@ RecipeRegistryRecipeMetadata = {
             category = "stamina",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Kylene", zone = 50 } },
+            skillLevels = { 350, 375, 380, 385 },
+            sourcePlaces = { { name = "Kylene", zone = 50, x = 76.5, y = 33 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 5 },
@@ -33901,7 +35881,8 @@ RecipeRegistryRecipeMetadata = {
             category = "mp5",
             sortOrder = 1,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Kylene", zone = 50 } },
+            skillLevels = { 350, 375, 380, 385 },
+            sourcePlaces = { { name = "Kylene", zone = 50, x = 76.5, y = 33 } },
             bopOutput = false,
             reagents = {
                 { itemId = 3713, count = 2 },
@@ -33917,7 +35898,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Apprentice Darius", zone = 57 } },
+            skillLevels = { 360, 370, 380, 390 },
+            sourcePlaces = { { name = "Apprentice Darius", zone = 57, x = 47, y = 75.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21844, count = 12 },
@@ -33936,7 +35918,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Karaaz", zone = 74 }, { name = "Paulsta'ats", zone = 68 } },
+            skillLevels = { 360, 365, 370, 375 },
+            sourcePlaces = { { name = "Karaaz", zone = 74, x = 43.6, y = 34.3 }, { name = "Paulsta'ats", zone = 68, x = 30.6, y = 57 } },
             bopOutput = true,
             reagents = {
                 { itemId = 23436, count = 1 },
@@ -33952,7 +35935,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Almaador", zone = 50 } },
+            skillLevels = { 360, 365, 370, 375 },
+            sourcePlaces = { { name = "Almaador", zone = 50, x = 51, y = 41.9 } },
             bopOutput = true,
             reagents = {
                 { itemId = 23436, count = 1 },
@@ -33968,7 +35952,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Karaaz", zone = 74 }, { name = "Paulsta'ats", zone = 68 } },
+            skillLevels = { 360, 365, 370, 375 },
+            sourcePlaces = { { name = "Karaaz", zone = 74, x = 43.6, y = 34.3 }, { name = "Paulsta'ats", zone = 68, x = 30.6, y = 57 } },
             bopOutput = true,
             reagents = {
                 { itemId = 23436, count = 1 },
@@ -33984,7 +35969,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nakodu", zone = 50 } },
+            skillLevels = { 360, 365, 370, 375 },
+            sourcePlaces = { { name = "Nakodu", zone = 50, x = 62.1, y = 69 } },
             bopOutput = true,
             reagents = {
                 { itemId = 23438, count = 1 },
@@ -34000,7 +35986,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alurmi", zone = 13 } },
+            skillLevels = { 360, 365, 370, 375 },
+            sourcePlaces = { { name = "Alurmi", zone = 13, x = 63.6, y = 57.6 } },
             bopOutput = true,
             reagents = {
                 { itemId = 23440, count = 1 },
@@ -34016,7 +36003,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Almaador", zone = 50 } },
+            skillLevels = { 360, 365, 370, 375 },
+            sourcePlaces = { { name = "Almaador", zone = 50, x = 51, y = 41.9 } },
             bopOutput = true,
             reagents = {
                 { itemId = 23440, count = 1 },
@@ -34032,7 +36020,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alurmi", zone = 13 } },
+            skillLevels = { 360, 365, 370, 375 },
+            sourcePlaces = { { name = "Alurmi", zone = 13, x = 63.6, y = 57.6 } },
             bopOutput = true,
             reagents = {
                 { itemId = 23440, count = 1 },
@@ -34045,6 +36034,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 20,
             sourceKind = "trainer",
+            skillLevels = { 300, 300, 300, 305 },
             bopOutput = false,
             reagents = {
                 { itemId = 20725, count = 1 },
@@ -34058,6 +36048,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 21,
             sourceKind = "trainer",
+            skillLevels = { 335, 335, 335, 335 },
             removed = true,
             bopOutput = false,
             reagents = {
@@ -34073,7 +36064,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Apprentice Darius", zone = 57 } },
+            skillLevels = { 350, 360, 367, 375 },
+            sourcePlaces = { { name = "Apprentice Darius", zone = 57, x = 47, y = 75.3 } },
             reagents = {
                 { itemId = 22445, count = 8 },
                 { itemId = 22446, count = 4 },
@@ -34091,6 +36083,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 385, 395 },
             sourcePlaces = { { zone = 69 } },
             bopOutput = false,
             reagents = {
@@ -34110,6 +36103,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 335,
             sourceKind = "drop",
+            skillLevels = { 335, 345, 350, 355 },
             sourcePlaces = { { name = "Kael'thas Sunstrider", zone = 78 } },
             bopOutput = false,
             reagents = {
@@ -34127,7 +36121,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Apprentice Darius", zone = 57 } },
+            skillLevels = { 365, 375, 385, 395 },
+            sourcePlaces = { { name = "Apprentice Darius", zone = 57, x = 47, y = 75.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21844, count = 16 },
@@ -34147,7 +36142,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Apprentice Darius", zone = 57 } },
+            skillLevels = { 375, 390, 397, 405 },
+            sourcePlaces = { { name = "Apprentice Darius", zone = 57, x = 47, y = 75.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 18256, count = 1 },
@@ -34165,6 +36161,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 380, 385, 390 },
             sourcePlaces = { { zone = 94 } },
             reagents = {
                 { itemId = 22445, count = 30 },
@@ -34184,7 +36181,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Jaffrey Noreliqe", zone = 68 }, { name = "Quartermaster Davian Vaclav", zone = 68 } },
+            skillLevels = { 350, 350, 365, 380 },
+            sourcePlaces = { { name = "Quartermaster Jaffrey Noreliqe", zone = 68, x = 41.2, y = 44.3, faction = "horde" }, { name = "Quartermaster Davian Vaclav", zone = 68, x = 41.2, y = 44.3, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23437, count = 1 },
@@ -34201,7 +36199,8 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 35,
             faction = "alliance",
             sourceKind = "quest",
-            sourcePlaces = { { zone = 27 } },
+            skillLevels = { 35, 75, 95, 115 },
+            sourcePlaces = { { zone = 27, x = 48.5, y = 43, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 818, count = 1 },
@@ -34218,6 +36217,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 335,
             sourceKind = "drop",
+            skillLevels = { 335, 335, 345, 355 },
             sourcePlaces = { { zone = 74 } },
             bopOutput = false,
             reagents = {
@@ -34235,7 +36235,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 50 } },
+            skillLevels = { 325, 335, 345, 355 },
+            sourcePlaces = { { zone = 50, x = 61.6, y = 16.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 33824, count = 1 },
@@ -34250,7 +36251,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 50 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { zone = 50, x = 61.6, y = 16.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 13757, count = 1 },
@@ -34266,7 +36268,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 50 } },
+            skillLevels = { 300, 320, 330, 340 },
+            sourcePlaces = { { zone = 50, x = 61.6, y = 16.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 33823, count = 1 },
@@ -34281,7 +36284,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 50 } },
+            skillLevels = { 325, 335, 345, 355 },
+            sourcePlaces = { { zone = 50, x = 61.6, y = 16.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },
@@ -34297,7 +36301,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 300,
             requiredSkill = 300,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 50 } },
+            skillLevels = { 300, 345, 355, 365 },
+            sourcePlaces = { { zone = 50, x = 61.6, y = 16.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 27671, count = 1 },
@@ -34312,7 +36317,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 1,
             requiredSkill = 1,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 50 } },
+            skillLevels = { 1, 50, 62, 75 },
+            sourcePlaces = { { zone = 50, x = 61.6, y = 16.5 } },
             bopOutput = false,
             reagents = {
                 { itemId = 785, count = 3 },
@@ -34333,6 +36339,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "worldDrop",
+            skillLevels = { 365, 375, 385, 395 },
             worldDrop = true,
             bopOutput = false,
             reagents = {
@@ -34349,7 +36356,8 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 270,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Jonathan Garrett", zone = 69 }, { name = "Niobe Whizzlespark", zone = 69 } },
+            skillLevels = { 300, 330, 340, 350 },
+            sourcePlaces = { { name = "Jonathan Garrett", zone = 69, x = 29.2, y = 28.5, faction = "horde" }, { name = "Niobe Whizzlespark", zone = 69, x = 36.7, y = 54.8, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 11291, count = 8 },
@@ -34367,7 +36375,8 @@ RecipeRegistryRecipeMetadata = {
             category = "parts",
             sortOrder = 280,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Niobe Whizzlespark", zone = 69 }, { name = "Jonathan Garrett", zone = 69 } },
+            skillLevels = { 375, 385, 390, 395 },
+            sourcePlaces = { { name = "Niobe Whizzlespark", zone = 69, x = 36.7, y = 54.8, faction = "alliance" }, { name = "Jonathan Garrett", zone = 69, x = 29.2, y = 28.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 23786, count = 8 },
@@ -34384,6 +36393,7 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 315, 325, 335, 345 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 4 },
@@ -34399,6 +36409,7 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 315, 325, 335, 345 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 2 },
@@ -34415,7 +36426,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Nakodu", zone = 50 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Nakodu", zone = 50, x = 62.1, y = 69 } },
             bopOutput = false,
             reagents = {
                 { itemId = 17056, count = 99 },
@@ -34431,6 +36443,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "shield",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 330, 340, 355, 370 },
             reagents = {
                 { itemId = 22447, count = 4 },
                 { itemId = 22449, count = 1 },
@@ -34447,6 +36460,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 110,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 370, 380, 390 },
             sourcePlaces = { { zone = 76 } },
             bopOutput = false,
             reagents = {
@@ -34464,7 +36478,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Quartermaster Urgronn", zone = 64 }, { name = "Logistics Officer Ulrike", zone = 64 } },
+            skillLevels = { 350, 360, 370, 380 },
+            sourcePlaces = { { name = "Quartermaster Urgronn", zone = 64, x = 54.9, y = 37.9, faction = "horde" }, { name = "Logistics Officer Ulrike", zone = 64, x = 56.7, y = 62.6, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 4 },
@@ -34481,6 +36496,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "slot",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 350, 355, 360, 365 },
             bopOutput = false,
             reagents = {
                 { itemId = 22452, count = 3 },
@@ -34497,6 +36513,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 377, 380 },
             sourcePlaces = { { zone = 69 } },
             bopOutput = false,
             reagents = {
@@ -34513,7 +36530,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Penney Copperpinch", zone = 25 } },
+            skillLevels = { 250, 250, 250, 250 },
+            sourcePlaces = { { name = "Penney Copperpinch", zone = 25, x = 53.5, y = 66.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2605, count = 2 },
@@ -34531,7 +36549,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 285,
             requiredSkill = 285,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Penney Copperpinch", zone = 25 }, { name = "Wulmort Jinglepocket", zone = 27 } },
+            skillLevels = { 285, 285, 285, 285 },
+            sourcePlaces = { { name = "Penney Copperpinch", zone = 25, x = 53.5, y = 66.1 }, { name = "Wulmort Jinglepocket", zone = 27, x = 33, y = 67.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2840, count = 1 },
@@ -34550,7 +36569,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Wulmort Jinglepocket", zone = 27 } },
+            skillLevels = { 250, 250, 250, 250 },
+            sourcePlaces = { { name = "Wulmort Jinglepocket", zone = 27, x = 33, y = 67.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2604, count = 2 },
@@ -34567,6 +36587,7 @@ RecipeRegistryRecipeMetadata = {
             subcategory = "armor",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 350, 355, 360, 365 },
             bopOutput = false,
             reagents = {
                 { itemId = 23793, count = 3 },
@@ -34582,7 +36603,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 325,
             requiredSkill = 325,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Penney Copperpinch", zone = 25 }, { name = "Wulmort Jinglepocket", zone = 27 } },
+            skillLevels = { 325, 325, 325, 325 },
+            sourcePlaces = { { name = "Penney Copperpinch", zone = 25, x = 53.5, y = 66.1 }, { name = "Wulmort Jinglepocket", zone = 27, x = 33, y = 67.6 } },
             bopOutput = false,
             reagents = {
                 { itemId = 17194, count = 1 },
@@ -34600,7 +36622,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 140,
             requiredSkill = 325,
             sourceKind = "trainer",
-            sourcePlaces = { { name = "Alchemist Gribble", zone = 64 }, { name = "Lorokeem", zone = 50 }, { name = "Apothecary Antonivich", zone = 64 } },
+            skillLevels = { 325, 335, 342, 350 },
+            sourcePlaces = { { name = "Alchemist Gribble", zone = 64, x = 53.8, y = 65.8, faction = "alliance" }, { name = "Lorokeem", zone = 50, x = 45.4, y = 19.5 }, { name = "Apothecary Antonivich", zone = 64, x = 52.4, y = 36.5, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 8925, count = 1 },
@@ -34614,6 +36637,7 @@ RecipeRegistryRecipeMetadata = {
             category = "bags",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 300, 310, 320, 330 },
             bopOutput = false,
             reagents = {
                 { itemId = 14341, count = 3 },
@@ -34631,6 +36655,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "drop",
+            skillLevels = { 360, 370, 380, 390 },
             sourcePlaces = { { zone = 58 } },
             bopOutput = false,
             reagents = {
@@ -34652,7 +36677,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 100,
             requiredSkill = 100,
             sourceKind = "quest",
-            sourcePlaces = { { zone = 58 } },
+            skillLevels = { 100, 100, 105, 110 },
+            sourcePlaces = { { zone = 58, x = 38.7, y = 12.8 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2594, count = 1 },
@@ -34669,8 +36695,9 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 31,
             requiredSkill = 375,
             sourceKind = "vendor",
+            skillLevels = { 375, 375, 375, 375 },
             removed = true,
-            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91 } },
+            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 } },
             bopOutput = false,
             reagents = {
                 { itemId = 22450, count = 1 },
@@ -34686,6 +36713,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 400,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 390, 410, 430 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -34705,6 +36733,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 410,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 390, 410, 430 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -34725,6 +36754,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 420,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 390, 410, 430 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -34744,6 +36774,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 430,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 390, 410, 430 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -34763,6 +36794,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 440,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 390, 410, 430 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -34783,6 +36815,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 450,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 390, 410, 430 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -34803,6 +36836,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 460,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 390, 410, 430 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -34822,6 +36856,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 470,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 390, 410, 430 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -34840,6 +36875,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 480,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 390, 410, 430 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -34858,6 +36894,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 490,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 390, 410, 430 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -34877,6 +36914,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 500,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 390, 410, 430 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -34895,6 +36933,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 380, 385 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = false,
             reagents = {
@@ -34914,6 +36953,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 380, 385 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = false,
             reagents = {
@@ -34933,6 +36973,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 380, 385 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = false,
             reagents = {
@@ -34952,6 +36993,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 380, 385 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -34970,6 +37012,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 380, 385 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -34987,6 +37030,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 380, 385 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -35004,6 +37048,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 392, 410 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = false,
             reagents = {
@@ -35022,6 +37067,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 392, 410 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = false,
             reagents = {
@@ -35041,6 +37087,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 392, 410 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -35059,6 +37106,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 392, 410 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -35076,6 +37124,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 392, 410 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = false,
             reagents = {
@@ -35096,6 +37145,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 392, 410 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = false,
             reagents = {
@@ -35116,6 +37166,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 392, 410 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = false,
             reagents = {
@@ -35136,6 +37187,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 392, 410 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = false,
             reagents = {
@@ -35156,6 +37208,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 392, 410 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -35175,6 +37228,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 392, 410 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -35194,6 +37248,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 392, 410 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -35213,6 +37268,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 392, 410 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -35232,6 +37288,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 392, 410 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = false,
             reagents = {
@@ -35251,6 +37308,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 392, 410 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = false,
             reagents = {
@@ -35271,6 +37329,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 392, 410 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -35291,6 +37350,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 365,
             requiredSkill = 365,
             sourceKind = "drop",
+            skillLevels = { 365, 375, 392, 410 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = true,
             reagents = {
@@ -35310,6 +37370,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 260,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 375, 375, 375 },
             sourcePlaces = { { zone = 95 } },
             bopOutput = false,
             reagents = {
@@ -35327,7 +37388,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 } },
+            skillLevels = { 350, 350, 365, 380 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23440, count = 1 },
@@ -35343,7 +37405,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 } },
+            skillLevels = { 350, 350, 365, 380 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23439, count = 1 },
@@ -35359,7 +37422,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 } },
+            skillLevels = { 350, 350, 365, 380 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23437, count = 1 },
@@ -35374,6 +37438,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "worldEvent",
+            skillLevels = { 350, 350, 357, 365 },
             removed = true,
             reagents = {
                 { itemId = 21885, count = 2 },
@@ -35389,7 +37454,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 360,
             requiredSkill = 360,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91 } },
+            skillLevels = { 360, 370, 385, 400 },
+            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 } },
             reagents = {
                 { itemId = 22445, count = 8 },
                 { itemId = 22446, count = 4 },
@@ -35406,7 +37472,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 370,
             requiredSkill = 370,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91 } },
+            skillLevels = { 370, 375, 377, 380 },
+            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 } },
             bopOutput = false,
             reagents = {
                 { itemId = 25867, count = 1 },
@@ -35422,7 +37489,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 370,
             requiredSkill = 370,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91 } },
+            skillLevels = { 370, 375, 377, 380 },
+            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 } },
             bopOutput = false,
             reagents = {
                 { itemId = 25868, count = 1 },
@@ -35437,7 +37505,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Malygen", zone = 44 }, { name = "Bale", zone = 44 } },
+            skillLevels = { 250, 275, 285, 295 },
+            sourcePlaces = { { name = "Malygen", zone = 44, x = 62.3, y = 25.6, faction = "alliance" }, { name = "Bale", zone = 44, x = 34.8, y = 53.1, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 35562, count = 1 },
@@ -35452,7 +37521,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Malygen", zone = 44 }, { name = "Bale", zone = 44 } },
+            skillLevels = { 250, 275, 285, 295 },
+            sourcePlaces = { { name = "Malygen", zone = 44, x = 62.3, y = 25.6, faction = "alliance" }, { name = "Bale", zone = 44, x = 34.8, y = 53.1, faction = "horde" } },
             bopOutput = false,
             reagents = {
                 { itemId = 35562, count = 1 },
@@ -35468,6 +37538,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 150,
             requiredSkill = 355,
             sourceKind = "drop",
+            skillLevels = { 355, 365, 375, 385 },
             sourcePlaces = { { name = "Mechano-Lord Capacitus", zone = 72 } },
             bopOutput = false,
             reagents = {
@@ -35487,7 +37558,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 } },
             bopOutput = true,
             reagents = {
                 { itemId = 23440, count = 6 },
@@ -35505,7 +37577,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 } },
             bopOutput = true,
             reagents = {
                 { itemId = 22452, count = 8 },
@@ -35523,7 +37596,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 } },
             bopOutput = true,
             reagents = {
                 { itemId = 21884, count = 8 },
@@ -35541,7 +37615,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 } },
             bopOutput = true,
             reagents = {
                 { itemId = 22456, count = 8 },
@@ -35559,7 +37634,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 } },
             bopOutput = true,
             reagents = {
                 { itemId = 22457, count = 8 },
@@ -35577,7 +37653,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 350,
             requiredSkill = 350,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91 } },
+            skillLevels = { 350, 350, 365, 380 },
+            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 } },
             bopOutput = false,
             reagents = {
                 { itemId = 23441, count = 1 },
@@ -35593,7 +37670,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 10,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91 } },
+            skillLevels = { 375, 380, 385, 390 },
+            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 } },
             bopOutput = true,
             reagents = {
                 { itemId = 13503, count = 1 },
@@ -35611,7 +37689,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 20,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91 } },
+            skillLevels = { 375, 380, 385, 390 },
+            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 } },
             bopOutput = true,
             reagents = {
                 { itemId = 13503, count = 1 },
@@ -35629,7 +37708,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 30,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91 } },
+            skillLevels = { 375, 380, 385, 390 },
+            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 } },
             bopOutput = true,
             reagents = {
                 { itemId = 13503, count = 1 },
@@ -35647,7 +37727,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 40,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91 } },
+            skillLevels = { 375, 380, 385, 390 },
+            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 } },
             bopOutput = true,
             reagents = {
                 { itemId = 13503, count = 1 },
@@ -35664,6 +37745,7 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "drop",
+            skillLevels = { 375, 380, 385, 390 },
             sourcePlaces = { { name = "Priestess Delrissa", zone = 78 } },
             reagents = {
                 { itemId = 22446, count = 8 },
@@ -35680,7 +37762,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91 }, { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 }, { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32249, count = 1 },
@@ -35696,7 +37779,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Indormi", zone = 92 }, { name = "Eldara Dawnrunner", zone = 91 }, { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Indormi", zone = 92 }, { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 }, { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32249, count = 1 },
@@ -35712,7 +37796,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91 }, { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 }, { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32231, count = 1 },
@@ -35728,7 +37813,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91 }, { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 }, { name = "Indormi", zone = 92 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Eldara Dawnrunner", zone = 91, x = 47.1, y = 30 }, { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 }, { name = "Indormi", zone = 92 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32229, count = 1 },
@@ -35741,6 +37827,7 @@ RecipeRegistryRecipeMetadata = {
             category = "materials",
             sortOrder = 1,
             sourceKind = "trainer",
+            skillLevels = { 350, 350, 365, 380 },
             bopOutput = false,
             reagents = {
                 { itemId = 21929, count = 3 },
@@ -35761,7 +37848,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Shaani", zone = 91 }, { name = "Ontuvo", zone = 50 } },
+            skillLevels = { 375, 375, 380, 385 },
+            sourcePlaces = { { name = "Shaani", zone = 91, x = 51.5, y = 32.6 }, { name = "Ontuvo", zone = 50, x = 48.7, y = 41.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 32230, count = 1 },
@@ -35777,7 +37865,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Haughty Modiste", zone = 13 } },
+            skillLevels = { 250, 255, 270, 285 },
+            sourcePlaces = { { name = "Haughty Modiste", zone = 13, x = 66.5, y = 22.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 4304, count = 2 },
@@ -35793,7 +37882,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 375,
             requiredSkill = 375,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Mycah", zone = 51 } },
+            skillLevels = { 375, 385, 390, 395 },
+            sourcePlaces = { { name = "Mycah", zone = 51, x = 17.9, y = 51.2 } },
             bopOutput = false,
             reagents = {
                 { itemId = 21845, count = 4 },
@@ -35810,7 +37900,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 250,
             requiredSkill = 250,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Haughty Modiste", zone = 13 } },
+            skillLevels = { 250, 265, 280, 295 },
+            sourcePlaces = { { name = "Haughty Modiste", zone = 13, x = 66.5, y = 22.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 2 },
@@ -35829,7 +37920,8 @@ RecipeRegistryRecipeMetadata = {
             sortOrder = 245,
             requiredSkill = 245,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Haughty Modiste", zone = 13 } },
+            skillLevels = { 245, 250, 255, 260 },
+            sourcePlaces = { { name = "Haughty Modiste", zone = 13, x = 66.5, y = 22.3 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2325, count = 3 },

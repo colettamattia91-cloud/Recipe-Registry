@@ -47,13 +47,25 @@ local function cloneReagents(reagents)
     return out
 end
 
--- One entry per place: { name, zone }, either half optional. The zone is
--- still an interned id here; GetSource resolves it to a name.
+-- One entry per place: { name, zone, x, y, faction }, every field optional
+-- but the pair of them. The zone is still an interned id here; GetSource
+-- resolves it to a name.
+--
+-- The position and the faction are per NPC and not per recipe: a recipe sold
+-- by one vendor in Stormwind and another in Orgrimmar is available to both
+-- sides, and the recipe-level faction says exactly that -- which tells a Horde
+-- player nothing about which of the two they can walk up to.
 local function clonePlaces(list)
     if type(list) ~= "table" then return nil end
     local out = {}
     for index, place in ipairs(list) do
-        out[index] = { name = place.name, zone = place.zone }
+        out[index] = {
+            name = place.name,
+            zone = place.zone,
+            x = place.x,
+            y = place.y,
+            faction = place.faction,
+        }
     end
     return out
 end
@@ -94,6 +106,10 @@ local function cloneRecord(spellId, record)
         worldDrop = record.worldDrop == true,
         bossDrop = record.bossDrop == true,
         sourcePlaces = clonePlaces(record.sourcePlaces),
+        -- The four thresholds the game itself colours this recipe by. Four
+        -- numbers per recipe, stated by the source: orange up to the first,
+        -- then yellow, green, and grey from the last on.
+        skillLevels = cloneStringList(record.skillLevels),
         -- In the client data but not in the game. Kept on the record rather
         -- than left out of the payload, so a recipe flagged wrongly comes
         -- back through the generator's override instead of an investigation.
@@ -690,7 +706,13 @@ function RecipeMetadata:GetSource(recipeKey, info)
         local zone = place.zone and zoneNames and zoneNames[place.zone] or nil
         if place.name or zone then
             places = places or {}
-            places[#places + 1] = { name = place.name, zone = zone }
+            places[#places + 1] = {
+                name = place.name,
+                zone = zone,
+                x = place.x,
+                y = place.y,
+                faction = place.faction,
+            }
         end
     end
 
@@ -701,6 +723,16 @@ function RecipeMetadata:GetSource(recipeKey, info)
         bossDrop = info.bossDrop == true,
         places = places,
     }
+end
+
+-- The four difficulty thresholds, when the source stated a usable ladder.
+-- 2092 of the 2151 records carry one; the rest have to be approximated from
+-- the skill requirement, which is the caller's problem and not this one's.
+function RecipeMetadata:GetSkillLevels(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    local levels = info and info.skillLevels or nil
+    if type(levels) ~= "table" or #levels ~= 4 then return nil end
+    return levels
 end
 
 function RecipeMetadata:GetRecipeItemId(recipeKey, info)

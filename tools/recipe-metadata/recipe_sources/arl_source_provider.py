@@ -44,7 +44,7 @@ ARL_RAW_BASE = "https://raw.githubusercontent.com/Xurkon/AckisRecipeList/HEAD/"
 DEFAULT_USER_AGENT = "RecipeRegistry metadata importer"
 DEFAULT_REQUEST_DELAY = 0.5
 SNAPSHOT_FILENAME = "acquisition.json"
-PARSER_VERSION = 1
+PARSER_VERSION = 2
 
 # Professions this project supports. ARL also ships Inscription, Runeforging
 # and First Aid, which are out of scope here.
@@ -166,7 +166,42 @@ FACTION_ALLIANCE = "alliance"
 FACTION_HORDE = "horde"
 FACTION_BOTH = "both"
 
-_RECIPE_RE = re.compile(r"\bAddRecipe\((\d+)\s*,")
+# AddRecipe(spell_id, skill_level, item_id, quality, genesis,
+#           optimal_level, medium_level, easy_level, trivial_level)
+#
+# The last four are the difficulty thresholds the game itself colours a recipe
+# by: orange until optimal, yellow until medium, green until easy, grey from
+# trivial on. They are per recipe and they are not derivable from the skill
+# requirement -- the spread runs from ten points to sixty -- which is why an
+# approximation from requiredSkill alone got a 335 recipe reading green at
+# skill 375. Every guide addon carries these four numbers; there is nothing to
+# invent, only something to read.
+_RECIPE_RE = re.compile(r"\bAddRecipe\((\d+)\s*,([^)\n]*)\)")
+_LEVEL_ARG_RE = re.compile(r"^-?\d+$")
+
+
+def parse_skill_levels(argument_text):
+    """The four difficulty thresholds, or None when the call does not state them.
+
+    Arguments after the spell id are skill_level, item_id, quality, genesis,
+    then the four. Quality and genesis are Q./V. constants rather than numbers,
+    so the four are taken by position and each is required to be an integer:
+    a call that has been shortened, or one whose arguments have moved, yields
+    nothing rather than four numbers read off the wrong slots.
+    """
+    parts = [part.strip() for part in (argument_text or "").split(",")]
+    if len(parts) < 8:
+        return None
+    levels = parts[4:8]
+    if not all(_LEVEL_ARG_RE.match(part) for part in levels):
+        return None
+    values = [int(part) for part in levels]
+    # Non-decreasing and non-negative, which is what a threshold ladder is.
+    # ARL has a handful of rows with zeros in them, and four zeros says
+    # nothing at all.
+    if values[0] <= 0 or any(values[index] > values[index + 1] for index in range(3)):
+        return None
+    return values
 _FLAGS_RE = re.compile(r"AddRecipeFlags\((\d+)\s*,([^)]*)\)")
 _ACQUIRE_RE = re.compile(r"self:(AddRecipe\w+)\((\d+)\s*,([^)]*)\)")
 _NPC_ID_RE = re.compile(r"\b(\d+)\b")
@@ -210,6 +245,44 @@ _LOOKUP_CALL_RE = re.compile(
 )
 _LOOKUP_NAME_RE = re.compile(r"""(L|BB|BFAC)\["((?:[^"\\]|\\.)*)"\]""")
 _LOOKUP_ZONE_RE = re.compile(r"""BZ\["((?:[^"\\]|\\.)*)"\]""")
+# The two numbers after the zone are the map coordinates, and the argument
+# after them is the faction the NPC belongs to. Vendor.lua and Mob.lua spell
+# the faction with ARL's own locals (NEUTRAL = 0, ALLIANCE = 1, HORDE = 2);
+# Trainer.lua passes the number. Both are read.
+_LOOKUP_COORD_RE = re.compile(
+    r"""BZ\["(?:[^"\\]|\\.)*"\]\s*,\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)""")
+_LOOKUP_FACTION_RE = re.compile(
+    r"""BZ\["(?:[^"\\]|\\.)*"\]\s*,\s*-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\s*,\s*(ALLIANCE|HORDE|NEUTRAL|\d)""")
+_LOOKUP_FACTION_BY_TOKEN = {
+    "ALLIANCE": FACTION_ALLIANCE, "1": FACTION_ALLIANCE,
+    "HORDE": FACTION_HORDE, "2": FACTION_HORDE,
+    "NEUTRAL": None, "0": None,
+}
+
+
+def parse_place_faction(arguments):
+    match = _LOOKUP_FACTION_RE.search(arguments)
+    if not match:
+        return None
+    return _LOOKUP_FACTION_BY_TOKEN.get(match.group(1))
+
+
+def parse_place_coords(arguments):
+    """The NPC's position in its zone, or None when there is not one.
+
+    ARL writes 0, 0 for an entity it has no position for -- a world drop, a
+    faction quartermaster whose stall moves -- and the map's own origin is not
+    a place, so that pair is read as absent rather than as the top-left corner.
+    """
+    match = _LOOKUP_COORD_RE.search(arguments)
+    if not match:
+        return None, None
+    x, y = float(match.group(1)), float(match.group(2))
+    if x == 0 and y == 0:
+        return None, None
+    if not (0 <= x <= 100 and 0 <= y <= 100):
+        return None, None
+    return round(x, 1), round(y, 1)
 
 
 def fetch_file(name, timeout=90, user_agent=DEFAULT_USER_AGENT):
@@ -270,9 +343,18 @@ def parse_lookup(text):
         zone = _LOOKUP_ZONE_RE.search(arguments)
         if not name and not zone:
             continue
+        x, y = parse_place_coords(arguments)
         out[int(match.group(1))] = {
             "name": name.group(2) if name else None,
             "zone": zone.group(1) if zone else None,
+            # Where in the zone, and whose side of the war they are on. Both
+            # are per NPC: a recipe sold by one vendor in Stormwind and another
+            # in Orgrimmar is available to everyone, and saying so at the
+            # recipe level tells a Horde player nothing about which of the two
+            # they can actually walk up to.
+            "x": x,
+            "y": y,
+            "faction": parse_place_faction(arguments),
             # Which Babble table the name came from. BB is LibBabble-Boss, and
             # it is ARL's own judgement about which creatures are worth naming
             # -- 63 of the 286 in Mob.lua are in it. That judgement is the
@@ -304,12 +386,15 @@ def parse_profession(text):
     """
     recipes = {}
     for match in _RECIPE_RE.finditer(text or ""):
-        recipes.setdefault(int(match.group(1)), {
+        entry = recipes.setdefault(int(match.group(1)), {
             "faction": FACTION_BOTH,
             "acquires": {},
             "flagKind": None,
             "places": [],
+            "skillLevels": None,
         })
+        if entry["skillLevels"] is None:
+            entry["skillLevels"] = parse_skill_levels(match.group(2))
 
     for match in _FLAGS_RE.finditer(text or ""):
         spell_id = int(match.group(1))
@@ -367,13 +452,25 @@ def _resolve(lookups, kind, entity_id):
     return None
 
 
-def _add_place(places, name, zone):
+def _add_place(places, name, zone, x=None, y=None, faction=None):
     """Append one place, unless the same pair is already there."""
     if not (name or zone):
         return
     place = {"name": name or None, "zone": zone or None}
-    if place not in places:
-        places.append(place)
+    if x is not None and y is not None:
+        place["x"] = x
+        place["y"] = y
+    if faction:
+        place["faction"] = faction
+    # Identity is still the name and the zone: the same NPC read twice must not
+    # become two places because one reading carried coordinates.
+    for existing in places:
+        if existing.get("name") == place["name"] and existing.get("zone") == place["zone"]:
+            for field in ("x", "y", "faction"):
+                if field in place and existing.get(field) is None:
+                    existing[field] = place[field]
+            return
+    places.append(place)
 
 
 def _zones_only(places):
@@ -385,6 +482,8 @@ def _zones_only(places):
     stripped = []
     for place in places:
         if place["zone"]:
+            # A zone with the names dropped is no longer one NPC, so its
+            # position and its faction go with the name.
             _add_place(stripped, None, place["zone"])
     return stripped
 
@@ -419,6 +518,7 @@ def summarize_recipe(entry, lookups, custom_places=None, max_places=4, max_names
             "worldDrop": kind == "worldDrop",
             "bossDrop": False,
             "places": seen[:max_places],
+            "skillLevels": entry.get("skillLevels"),
         }
 
     # An NPC from a later expansion is not one of this recipe's sources, so it
@@ -441,7 +541,7 @@ def summarize_recipe(entry, lookups, custom_places=None, max_places=4, max_names
             continue
         if npc["name"] and not npc.get("boss"):
             every_name_a_boss = False
-        _add_place(places, npc["name"], npc["zone"])
+        _add_place(places, npc["name"], npc["zone"], npc.get("x"), npc.get("y"), npc.get("faction"))
     npc_ids = kept_ids
 
     # A world drop has nowhere to point at, and a recipe every trainer in the
@@ -472,6 +572,7 @@ def summarize_recipe(entry, lookups, custom_places=None, max_places=4, max_names
         "worldDrop": world_drop,
         "bossDrop": boss_drop,
         "places": places[:max_places],
+        "skillLevels": entry.get("skillLevels"),
     }
 
 
@@ -510,10 +611,16 @@ def build_snapshot(by_spell_id, per_profession, lookup_count):
     produces a byte-identical file and an empty diff."""
     factions = {}
     kinds = {}
+    with_levels = 0
+    with_coords = 0
     for entry in by_spell_id.values():
         factions[entry["faction"]] = factions.get(entry["faction"], 0) + 1
         key = entry["kind"] or "unknown"
         kinds[key] = kinds.get(key, 0) + 1
+        if entry.get("skillLevels"):
+            with_levels = with_levels + 1
+        if any(place.get("x") is not None for place in entry.get("places") or ()):
+            with_coords = with_coords + 1
     return {
         "source": "ackis-recipe-list",
         "parserVersion": PARSER_VERSION,
@@ -523,6 +630,8 @@ def build_snapshot(by_spell_id, per_profession, lookup_count):
             "byProfession": dict(sorted(per_profession.items())),
             "byFaction": dict(sorted(factions.items())),
             "byKind": dict(sorted(kinds.items())),
+            "withSkillLevels": with_levels,
+            "withPlaceCoords": with_coords,
         },
         "acquisitionBySpellId": {
             str(spell_id): entry for spell_id, entry in sorted(by_spell_id.items())

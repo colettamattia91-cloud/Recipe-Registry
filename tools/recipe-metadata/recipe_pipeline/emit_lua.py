@@ -1,6 +1,13 @@
 from collections import defaultdict
 
 
+def _lua_number(value):
+    """A coordinate, written without a trailing .0 when it has none."""
+    if value == int(value):
+        return str(int(value))
+    return repr(round(float(value), 1))
+
+
 def _lua_string(value):
     return '"' + str(value).replace("\\", "\\\\").replace('"', '\\"') + '"'
 
@@ -42,6 +49,11 @@ def _emit_record(record, zone_ids, indent="        "):
         lines.append(indent + "    faction = " + _lua_string(record.faction) + ",")
     if record.source_kind is not None:
         lines.append(indent + "    sourceKind = " + _lua_string(record.source_kind) + ",")
+    # The four thresholds the game colours the recipe by. Emitted as a flat
+    # array because they are always four and always in this order.
+    if record.skill_levels:
+        lines.append(indent + "    skillLevels = { "
+                     + ", ".join(str(value) for value in record.skill_levels) + " },")
     if record.world_drop:
         lines.append(indent + "    worldDrop = true,")
     if record.boss_drop:
@@ -52,12 +64,21 @@ def _emit_record(record, zone_ids, indent="        "):
         # Name and zone travel together: two parallel lists could not say
         # which vendor stands in which city.
         parts = []
-        for name, zone in record.source_places:
+        for place in record.source_places:
             fields = []
-            if name:
-                fields.append("name = " + _lua_string(name))
-            if zone:
-                fields.append("zone = " + str(zone_ids[zone]))
+            if place.name:
+                fields.append("name = " + _lua_string(place.name))
+            if place.zone:
+                fields.append("zone = " + str(zone_ids[place.zone]))
+            # A position is only a position with both halves, and only worth
+            # the bytes when there is a zone for it to be a position in.
+            if place.zone and place.x is not None and place.y is not None:
+                fields.append("x = " + _lua_number(place.x))
+                fields.append("y = " + _lua_number(place.y))
+            # Per-NPC faction. Absent means no restriction, exactly as it does
+            # on the record itself.
+            if place.faction:
+                fields.append("faction = " + _lua_string(place.faction))
             parts.append("{ " + ", ".join(fields) + " }")
         lines.append(indent + "    sourcePlaces = { " + ", ".join(parts) + " },")
     if record.is_outputless_self_only:
@@ -183,9 +204,9 @@ def emit_lua(records, categories_by_profession, subcategories_by_profession, met
     # is the single biggest thing that would bloat the generated file.
     zone_ids = {}
     for record in sorted(records, key=lambda item: item.spell_id):
-        for _name, zone in record.source_places:
-            if zone:
-                zone_ids.setdefault(zone, len(zone_ids) + 1)
+        for place in record.source_places:
+            if place.zone:
+                zone_ids.setdefault(place.zone, len(zone_ids) + 1)
 
     for record in records:
         lines.extend(_emit_record(record, zone_ids))

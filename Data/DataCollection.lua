@@ -281,11 +281,20 @@ function Data:BuildCollectionRowsForProfession(professionName, prof)
                     -- column clips, and a recipe sold in four cities is
                     -- exactly the case where the clipped half matters.
                     sourceLines = source.lines,
+                    -- One entry per line: which NPC it names, where they
+                    -- stand, and whose side they are on.
+                    sourceLineInfo = source.lineInfo,
                     -- nil means both factions, which is the common case:
                     -- the generator omits the field rather than repeating
                     -- it on most of the dataset.
                     faction = source.faction,
                     sourcePlaces = source.places,
+                    -- The game's own four difficulty thresholds for this
+                    -- recipe, when the source stated them. The colour of the
+                    -- skill column is read off these rather than guessed from
+                    -- requiredSkill; see UI:CollectionSkillText.
+                    skillLevels = meta.GetSkillLevels
+                        and meta:GetSkillLevels(recipeKey, info) or nil,
                     specializationSpellId = specializationId,
                     specializationName = specializationId
                         and self:GetSpecializationName(professionName, specializationId) or nil,

@@ -1,5 +1,23 @@
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Optional, Tuple, NamedTuple
+
+
+class SourcePlace(NamedTuple):
+    """One place a recipe can be had, as one entity rather than as columns.
+
+    Name and zone travel together because two parallel lists cannot say which
+    vendor stands in which city. The position and the faction travel with them
+    for the same reason: a recipe sold by an Alliance vendor in Stormwind and a
+    Horde one in Orgrimmar is available to everybody, and saying so at the
+    recipe level tells a Horde player nothing about which of the two they can
+    walk up to. Either half of the position may be absent; so may the faction,
+    which then means "no restriction" rather than "unknown".
+    """
+    name: Optional[str] = None
+    zone: Optional[str] = None
+    x: Optional[float] = None
+    y: Optional[float] = None
+    faction: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -44,7 +62,13 @@ class RecipeRecord:
     # lists because two lists cannot say which vendor stands in which zone.
     # Zones are NAMES, not IDs -- each source numbers zones differently, so
     # names are the only shared vocabulary; the emitter interns them.
-    source_places: Tuple[Tuple[Optional[str], Optional[str]], ...] = ()
+    source_places: Tuple["SourcePlace", ...] = ()
+    # The four difficulty thresholds the game colours a recipe by: orange up to
+    # optimal, yellow up to medium, green up to easy, grey from trivial on.
+    # Stated per recipe by the source -- the spread runs from ten points to
+    # sixty, so it cannot be derived from required_skill. None when the source
+    # did not state a usable ladder.
+    skill_levels: Optional[Tuple[int, int, int, int]] = None
     # Set when the recipe drops from so many creatures across so many zones
     # that naming them is noise rather than an answer.
     world_drop: bool = False

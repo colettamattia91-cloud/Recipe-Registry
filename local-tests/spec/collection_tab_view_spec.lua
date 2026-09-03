@@ -863,4 +863,133 @@ Test.it("toggles the profit filter from the browser, not only the options panel"
     Test.eq(ui:IsProfitableOnly(), false)
 end)
 
+-- Difficulty is not something this addon gets to invent. The game colours a
+-- recipe against four thresholds the recipe itself carries, every recipe guide
+-- ships those four numbers, and TradeSkillTypeColor is Blizzard's own colour
+-- table. The generator now reads the four off the source; this checks the
+-- column uses them rather than guessing from the skill requirement.
+local function levelledSkill(levels, required, rank)
+    return ui:CollectionSkillText({
+        requiredSkill = required,
+        skillRank = rank,
+        skillLevels = levels,
+    }, false):sub(1, 10)
+end
+
+Test.it("colours a recipe against its own four thresholds", function()
+    -- Orange 300-324, yellow 325-339, green 340-354, grey from 355.
+    local levels = { 300, 325, 340, 355 }
+    Test.eq(levelledSkill(levels, 300, 300), ORANGE)
+    Test.eq(levelledSkill(levels, 300, 324), ORANGE)
+    Test.eq(levelledSkill(levels, 300, 325), YELLOW)
+    Test.eq(levelledSkill(levels, 300, 339), YELLOW)
+    Test.eq(levelledSkill(levels, 300, 340), GREEN)
+    Test.eq(levelledSkill(levels, 300, 354), GREEN)
+    Test.eq(levelledSkill(levels, 300, 355), GREY)
+    Test.eq(levelledSkill(levels, 300, 375), GREY)
+end)
+
+-- The whole point of reading the real numbers: the spread is per recipe, so
+-- two recipes with the same requirement can be different colours at the same
+-- skill, and no approximation from the requirement can produce that.
+Test.it("lets two recipes of the same requirement differ in colour", function()
+    local tight = { 300, 305, 310, 315 }
+    local wide = { 300, 330, 350, 370 }
+    Test.eq(levelledSkill(tight, 300, 320), GREY)
+    Test.eq(levelledSkill(wide, 300, 320), ORANGE)
+end)
+
+-- 59 of the 2151 records state no ladder, and they still need a colour.
+Test.it("falls back to the spacing only when the recipe states no ladder", function()
+    Test.eq(levelledSkill(nil, 335, 375), GREY)
+    Test.eq(levelledSkill({ 335 }, 335, 375), GREY)
+end)
+
+Test.it("still refuses to colour a recipe it cannot learn as a trade colour", function()
+    Test.eq(levelledSkill({ 380, 390, 400, 410 }, 380, 375), RED)
+end)
+
+-- Faction belongs to the vendor, not to the recipe: the pair of vendors that
+-- makes a recipe available to both sides is exactly the case a recipe-level
+-- banner cannot describe.
+Test.it("hangs the faction banner on the line whose NPC it belongs to", function()
+    local text = ui:CollectionSourceText({
+        sourceKind = "vendor",
+        sourceLines = {
+            "Vendor: Pratt McGrubben (Feralas)",
+            "Vendor: Jangdor Swiftstrider (Feralas)",
+        },
+        sourceLineInfo = {
+            { name = "Pratt McGrubben", faction = "alliance", x = 30.6, y = 42.7 },
+            { name = "Jangdor Swiftstrider", faction = "horde", x = 74.5, y = 42.9 },
+        },
+    }, false)
+
+    local first, second = text:match("^(.-)\n(.*)$")
+    Test.truthy(first ~= nil, "two vendors are two lines")
+    Test.truthy(first:find("BannerPVP_02", 1, true) ~= nil, "the Alliance vendor carries the Alliance banner")
+    Test.truthy(second:find("BannerPVP_01", 1, true) ~= nil, "the Horde vendor carries the Horde banner")
+end)
+
+Test.it("keeps the recipe-level banner when no line claims one", function()
+    local text = ui:CollectionSourceText({
+        sourceKind = "quest",
+        faction = "horde",
+        sourceLines = { "Quest in Durotar" },
+    }, false)
+    Test.truthy(text:find("BannerPVP_01", 1, true) ~= nil)
+end)
+
+Test.it("puts the map position in the tooltip, where there is room for it", function()
+    local lines = {}
+    _G.GameTooltip = {
+        SetOwner = function() end,
+        SetHyperlink = function() end,
+        AddLine = function(_, text) lines[#lines + 1] = tostring(text) end,
+        AddDoubleLine = function(_, left, right) lines[#lines + 1] = tostring(left) .. "|" .. tostring(right) end,
+        Show = function() end,
+        Hide = function() end,
+    }
+
+    ui:ShowCollectionRowTooltip({
+        collectionLabel = "Plans: Something",
+        collectionInfo = {
+            professionName = "Blacksmithing",
+            sourceKind = "vendor",
+            sourceLines = { "Vendor: Kendor Kabonka (Stormwind City)" },
+            sourceLineInfo = { { name = "Kendor Kabonka", x = 77.5, y = 53.5, faction = "alliance" } },
+        },
+    })
+
+    local joined = table.concat(lines, "\n")
+    Test.truthy(joined:find("77.5, 53.5", 1, true) ~= nil, "got: " .. joined)
+end)
+
+-- The data behind all of the above: without it the column is back to guessing.
+Test.it("ships the four thresholds and the per-NPC places in the metadata", function()
+    local metadata = addon.RecipeMetadata
+    Test.truthy(metadata ~= nil)
+    Test.truthy(metadata.GetSkillLevels ~= nil, "the reader must expose the ladder")
+
+    local generated = _G.RecipeRegistryRecipeMetadata
+    Test.truthy(generated ~= nil, "the generated payload should be loaded")
+    local withLevels, withCoords, total = 0, 0, 0
+    for _, record in pairs(generated.recipesBySpellId or {}) do
+        total = total + 1
+        if type(record.skillLevels) == "table" and #record.skillLevels == 4 then
+            withLevels = withLevels + 1
+        end
+        for _, place in ipairs(record.sourcePlaces or {}) do
+            if place.x and place.y then
+                withCoords = withCoords + 1
+                break
+            end
+        end
+    end
+    Test.gte(total, 2000)
+    -- Nearly all of them; the handful without are what the fallback is for.
+    Test.gte(withLevels, math.floor(total * 0.9))
+    Test.gte(withCoords, 500)
+end)
+
 io.write(string.format("Collection tab view: %d test(s) passed\n", Test.count))
