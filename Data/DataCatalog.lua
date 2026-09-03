@@ -2067,7 +2067,7 @@ local function guessSourceFromRecipeItem(metadataInfo)
     if metadataInfo and metadataInfo.recipeItemId then
         return "item", "Recipe item"
     end
-    return "trainer", "Trainer"
+    return "trainer", "Any trainer"
 end
 
 -- The one-line form for a single set of who/where strings. Every caller of
@@ -2128,7 +2128,10 @@ local function sourceLabelFor(source, who, where)
         -- because your own city trainer will not teach you.
         if who then return "trainer", named("Trainer") end
         if where then return "trainer", placed("Trainer", "at") end
-        return "trainer", "Trainer"
+        -- Not a bare "Trainer", which reads as a field nobody filled in. The
+        -- answer really is "whichever one you use", and saying so is the
+        -- difference between an answer and a gap.
+        return "trainer", "Any trainer"
     end
     return source.kind, nil
 end
@@ -2136,7 +2139,7 @@ end
 function Data:DescribeRecipeSource(recipeKey, professionHint, metadataInfo)
     local metadata = getRecipeMetadata()
     if not metadata then
-        return { kind = "trainer", label = "Trainer", lines = { "Trainer" }, known = false }
+        return { kind = "trainer", label = "Any trainer", lines = { "Any trainer" }, known = false }
     end
     if metadataInfo == nil then
         metadataInfo = metadata.GetRecipeInfo and metadata:GetRecipeInfo(recipeKey, professionHint) or nil

@@ -2497,10 +2497,10 @@ function UI:EnsureRecipeRow(index)
     end)
     row:SetScript("OnEnter", function(self)
         if self.addonStatusMemberKey then return end
-        if self.collectionInfo then
-            UI:ShowCollectionRowTooltip(self)
-            return
-        end
+        -- A collection row hands its tooltip to the button over the recipe
+        -- name: sweeping the cursor down a dense table popped one over every
+        -- row it crossed.
+        if self.collectionInfo then return end
         if not self.tooltipLink then return end
         GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
         GameTooltip:SetHyperlink(self.tooltipLink)
@@ -3169,7 +3169,15 @@ local ADDON_STATUS_ROW_HEIGHT = 28
 -- nearly four hundred, so it gets the compact height the guild members table
 -- uses.
 local COLLECTION_ROW_HEIGHT = 30
+-- Each further source line past the first adds one text line to the row. The
+-- dataset's own maximum is four places, so the tallest row is bounded and
+-- there is nothing to elide.
+local COLLECTION_ROW_LINE_HEIGHT = 14
+local COLLECTION_MAX_SOURCE_LINES = 4
+local COLLECTION_GROUP_ROW_HEIGHT = 34
 local COLLECTION_ROW_ICON_SIZE = 24
+-- Learned rows keep their skill number, without the difficulty emphasis.
+local COLLECTION_KNOWN_DIM_SKILL = "|cff6f7480"
 local RECIPE_ROW_ICON_SIZE = 30
 local RECIPE_ROW_BUFFER = 2
 
@@ -3315,6 +3323,27 @@ local function getVisibleRecipeWindow(ui, total)
         viewHeight = 600
     end
 
+    -- Variable-height lists (the collection, whose rows are as tall as their
+    -- source list) carry a precomputed offset per row. Binary search rather
+    -- than a walk: OnVerticalScroll fires per pixel of a drag.
+    local rows = ui and ui.currentRecipeRows
+    if rows and rows[1] and rows[1]._rowOffset then
+        local bottom = offset + viewHeight
+        local lo, hi = 1, total
+        while lo < hi do
+            local mid = math.floor((lo + hi) / 2)
+            local row = rows[mid]
+            if (row._rowOffset + row._rowHeight) <= offset then lo = mid + 1 else hi = mid end
+        end
+        local firstIdx = lo
+        local lastIdx = firstIdx
+        while lastIdx < total and rows[lastIdx]._rowOffset < bottom do
+            lastIdx = lastIdx + 1
+        end
+        return math.max(1, firstIdx - RECIPE_ROW_BUFFER),
+            math.min(total, lastIdx + RECIPE_ROW_BUFFER)
+    end
+
     local rowHeight = ui and ui.GetListRowHeight and ui:GetListRowHeight() or RECIPE_ROW_HEIGHT
     local firstIdx = math.max(1, math.floor(offset / rowHeight) + 1 - RECIPE_ROW_BUFFER)
     local lastIdx = math.min(total, math.ceil((offset + viewHeight) / rowHeight) + RECIPE_ROW_BUFFER)
@@ -3424,45 +3453,112 @@ function UI:SetAddonStatusPartsVisible(row, visible)
     setShownIfChanged(row.addonZone, visible)
 end
 
--- Column layout for the collection table. Built lazily per pooled row,
--- the same way the addon status columns are: most sessions never open this
--- view, and the pool is shared with the ordinary recipe list.
+-- Recipe difficulty, in the colours WoW itself uses in a trade window.
 --
--- Only two columns flex. Skill, specialization and faction are as wide as
--- their longest possible content and no wider; what is left over goes to the
--- recipe name and the source, because those are the two that get cut off,
--- and the source ("Vendor: Xandar Goodbeard (Loch Modan), Hagrus
--- (Orgrimmar)") is the longest string in the table.
+-- WoW colours a recipe by four per-recipe ranks -- optimal, medium, easy,
+-- trivial -- and we have exactly one of them: the skill it takes to learn it.
+-- So these bands are an approximation from that single number, using the
+-- spacing TBC recipes typically follow. It is right about the two ends, which
+-- are the ones that matter: a recipe you cannot learn yet, and one that has
+-- stopped giving skill.
+--
+-- Red is not a WoW trade colour: the game never lists a recipe you cannot
+-- learn, and this view exists precisely to list them.
+local COLLECTION_DIFFICULTY_BANDS = {
+    { over = 45, colour = "|cff808080" },  -- grey: no skill from it any more
+    { over = 30, colour = "|cff40bf40" },  -- green
+    { over = 15, colour = "|cffffff00" },  -- yellow
+    { over = 0,  colour = "|cffff8040" },  -- orange: best skill-up odds
+}
+local COLLECTION_UNREACHABLE_COLOUR = "|cffff4040"
+
+local function collectionSkillText(collection, known)
+    local required = collection.requiredSkill
+    if not required then
+        return "|cff8f949c-|r"
+    end
+    local rank = collection.skillRank or 0
+    if rank < required then
+        return string.format("%s%d|r", COLLECTION_UNREACHABLE_COLOUR, required)
+    end
+    -- A recipe already in the book is history; it keeps its number so the
+    -- column stays readable as a column, but not the emphasis.
+    if known then
+        return string.format("%s%d|r", COLLECTION_KNOWN_DIM_SKILL, required)
+    end
+    local over = rank - required
+    for _, band in ipairs(COLLECTION_DIFFICULTY_BANDS) do
+        if over >= band.over then
+            return string.format("%s%d|r", band.colour, required)
+        end
+    end
+    return string.format("|cffff8040%d|r", required)
+end
+
+-- The source as a stacked list, one place per line, with the faction
+-- restriction hung on the first line rather than given a column of its own:
+-- 74 recipes out of 2150 carry one, and a column that is 96% dashes is a
+-- column that earns nothing.
+local function collectionSourceText(collection, known)
+    local lines = collection.sourceLines
+    if not lines or #lines == 0 then
+        lines = { collection.sourceLabel or "" }
+    end
+    local colour = known and COLLECTION_KNOWN_DIM or collectionSourceColor(collection.sourceKind)
+    local out = {}
+    for index = 1, math.min(#lines, COLLECTION_MAX_SOURCE_LINES) do
+        out[index] = string.format("%s%s|r", colour, safeText(lines[index]))
+    end
+    if collection.faction == "alliance" then
+        out[1] = out[1] .. " " .. ALLIANCE_TAG
+    elseif collection.faction == "horde" then
+        out[1] = out[1] .. " " .. HORDE_TAG
+    end
+    return table.concat(out, "\n")
+end
+
+-- Column layout for the collection table. Built lazily per pooled row, the
+-- same way the addon status columns are: most sessions never open this view,
+-- and the pool is shared with the ordinary recipe list.
+--
+-- Only two columns flex. Status, Skill and Specialization are as wide as their
+-- longest possible content and no wider; what is left over goes to the recipe
+-- name and the source, because those are the two that get cut off.
 local COLLECTION_COLUMN_GAP = 8
 local COLLECTION_NAME_INSET = 40
-local COLLECTION_SKILL_WIDTH = 104
+local COLLECTION_STATUS_WIDTH = 92
+local COLLECTION_SKILL_WIDTH = 62
 local COLLECTION_SPEC_WIDTH = 148
-local COLLECTION_FACTION_WIDTH = 86
 local COLLECTION_NAME_MIN_WIDTH = 190
-local COLLECTION_SOURCE_MIN_WIDTH = 140
+local COLLECTION_SOURCE_MIN_WIDTH = 150
 
 function UI:GetCollectionColumnWidths()
-    local fixed = COLLECTION_SKILL_WIDTH + COLLECTION_SPEC_WIDTH + COLLECTION_FACTION_WIDTH
+    local fixed = COLLECTION_STATUS_WIDTH + COLLECTION_SKILL_WIDTH + COLLECTION_SPEC_WIDTH
     local flexible = self:GetListRowWidth()
         - COLLECTION_NAME_INSET - 10 - (COLLECTION_COLUMN_GAP * 4) - fixed
     local nameWidth = math.max(COLLECTION_NAME_MIN_WIDTH, math.floor(flexible * 0.45))
     local sourceWidth = math.max(COLLECTION_SOURCE_MIN_WIDTH, flexible - nameWidth)
-    return nameWidth, COLLECTION_SKILL_WIDTH, sourceWidth, COLLECTION_SPEC_WIDTH, COLLECTION_FACTION_WIDTH
+    return nameWidth, COLLECTION_STATUS_WIDTH, COLLECTION_SKILL_WIDTH, sourceWidth, COLLECTION_SPEC_WIDTH
 end
 
--- Single-line, clipped columns: the row is 30px tall, so a string that wrapped
--- would spill into its neighbour. The full text is in the row tooltip.
+-- Columns hang from the TOP of the row, not its middle: a row is as tall as
+-- its source list, and everything else has to stay level with that list's
+-- first line rather than drifting down the taller rows.
+local COLLECTION_COLUMN_TOP = -7
+
 local function makeCollectionColumn(row, anchorTo, width)
     local fs = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     if anchorTo then
-        fs:SetPoint("LEFT", anchorTo, "RIGHT", COLLECTION_COLUMN_GAP, 0)
+        fs:SetPoint("TOPLEFT", anchorTo, "TOPRIGHT", COLLECTION_COLUMN_GAP, 0)
     else
-        fs:SetPoint("LEFT", COLLECTION_NAME_INSET, 0)
+        fs:SetPoint("TOPLEFT", COLLECTION_NAME_INSET, COLLECTION_COLUMN_TOP)
     end
     fs:SetWidth(width)
     fs:SetJustifyH("LEFT")
+    fs:SetJustifyV("TOP")
+    -- Wrapping is off so a long line clips rather than reflowing into its
+    -- neighbour; the stacked source uses explicit newlines instead.
     if fs.SetWordWrap then fs:SetWordWrap(false) end
-    if fs.SetMaxLines then fs:SetMaxLines(1) end
     return fs
 end
 
@@ -3474,14 +3570,37 @@ function UI:EnsureCollectionRowParts(row)
     row.collectionSectionTitle:SetPoint("RIGHT", -10, 0)
     row.collectionSectionTitle:SetJustifyH("LEFT")
 
-    local nameWidth, skillWidth, sourceWidth, specWidth, factionWidth = self:GetCollectionColumnWidths()
-    -- The left inset leaves room for the recipe icon, which is the shared row
-    -- icon the ordinary list uses.
+    local nameWidth, statusWidth, skillWidth, sourceWidth, specWidth = self:GetCollectionColumnWidths()
     row.collectionName = makeCollectionColumn(row, nil, nameWidth)
-    row.collectionSkill = makeCollectionColumn(row, row.collectionName, skillWidth)
+    row.collectionStatus = makeCollectionColumn(row, row.collectionName, statusWidth)
+    row.collectionSkill = makeCollectionColumn(row, row.collectionStatus, skillWidth)
     row.collectionSource = makeCollectionColumn(row, row.collectionSkill, sourceWidth)
     row.collectionSpec = makeCollectionColumn(row, row.collectionSource, specWidth)
-    row.collectionFaction = makeCollectionColumn(row, row.collectionSpec, factionWidth)
+    -- The source is the one column allowed to be several lines tall.
+    if row.collectionSource.SetMaxLines then
+        row.collectionSource:SetMaxLines(COLLECTION_MAX_SOURCE_LINES)
+    end
+    row.collectionSource:SetSpacing(2)
+
+    -- The tooltip belongs to the NAME, not to the whole row: sweeping the
+    -- cursor down a dense table popped a tooltip over every row it crossed.
+    -- A transparent button over the name column carries the hover, and passes
+    -- its clicks up so the row still behaves like one row.
+    row.collectionNameHit = CreateFrame("Button", nil, row)
+    row.collectionNameHit:SetPoint("TOPLEFT", row.collectionName, "TOPLEFT", 0, 2)
+    row.collectionNameHit:SetPoint("BOTTOMRIGHT", row.collectionName, "BOTTOMRIGHT", 0, -2)
+    row.collectionNameHit:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+    row.collectionNameHit:SetScript("OnEnter", function(hit)
+        UI:ShowCollectionRowTooltip(hit:GetParent())
+    end)
+    row.collectionNameHit:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    row.collectionNameHit:SetScript("OnClick", function(hit, button)
+        local parent = hit:GetParent()
+        local handler = parent:GetScript("OnClick")
+        if handler then handler(parent, button) end
+    end)
 
     row.collectionPartsReady = true
 end
@@ -3489,37 +3608,39 @@ end
 -- Re-applied on bind rather than at build time: the window is resizable, and
 -- the two flexible columns follow its width.
 function UI:ApplyCollectionColumnWidths(row)
-    local nameWidth, skillWidth, sourceWidth, specWidth, factionWidth = self:GetCollectionColumnWidths()
+    local nameWidth, statusWidth, skillWidth, sourceWidth, specWidth = self:GetCollectionColumnWidths()
     if row._rrCollectionNameWidth == nameWidth and row._rrCollectionSourceWidth == sourceWidth then
         return
     end
     row._rrCollectionNameWidth = nameWidth
     row._rrCollectionSourceWidth = sourceWidth
     row.collectionName:SetWidth(nameWidth)
+    row.collectionStatus:SetWidth(statusWidth)
     row.collectionSkill:SetWidth(skillWidth)
     row.collectionSource:SetWidth(sourceWidth)
     row.collectionSpec:SetWidth(specWidth)
-    row.collectionFaction:SetWidth(factionWidth)
 end
 
 function UI:SetCollectionPartsVisible(row, visible)
     self:EnsureCollectionRowParts(row)
     setShownIfChanged(row.collectionSectionTitle, visible)
     setShownIfChanged(row.collectionName, visible)
+    setShownIfChanged(row.collectionStatus, visible)
     setShownIfChanged(row.collectionSkill, visible)
     setShownIfChanged(row.collectionSource, visible)
     setShownIfChanged(row.collectionSpec, visible)
-    setShownIfChanged(row.collectionFaction, visible)
+    setShownIfChanged(row.collectionNameHit, visible)
 end
 
 function UI:HideCollectionRowParts(row)
     if not row.collectionPartsReady then return end
     setShownIfChanged(row.collectionSectionTitle, false)
     setShownIfChanged(row.collectionName, false)
+    setShownIfChanged(row.collectionStatus, false)
     setShownIfChanged(row.collectionSkill, false)
     setShownIfChanged(row.collectionSource, false)
     setShownIfChanged(row.collectionSpec, false)
-    setShownIfChanged(row.collectionFaction, false)
+    setShownIfChanged(row.collectionNameHit, false)
 end
 
 function UI:HideRecipeRowParts(row)
@@ -3530,10 +3651,10 @@ function UI:HideRecipeRowParts(row)
     setShownIfChanged(row.meta, false)
 end
 
-local function prepareCollectionRow(ui, row, rowIdx)
-    local rowHeight = ui:GetListRowHeight()
-    row:SetPoint("TOPLEFT", 0, -((rowIdx - 1) * rowHeight))
-    row:SetSize(ui:GetListRowWidth(), rowHeight - 2)
+local function prepareCollectionRow(ui, row, rowData)
+    row:ClearAllPoints()
+    row:SetPoint("TOPLEFT", 0, -(rowData._rowOffset or 0))
+    row:SetSize(ui:GetListRowWidth(), (rowData._rowHeight or COLLECTION_ROW_HEIGHT) - 2)
     row.recipeKey = nil
     row.addonStatusMemberKey = nil
     row.addonStatusGroupKey = nil
@@ -3552,9 +3673,9 @@ local function prepareCollectionRow(ui, row, rowIdx)
     setRowIconGeometry(row, COLLECTION_ROW_ICON_SIZE, 10)
 end
 
--- The whole answer for one collection recipe, since the table columns clip.
+-- The whole answer for one recipe, since the columns still clip sideways.
 -- Built on top of the recipe's own tooltip when there is an item or spell to
--- hang it on, so hovering a row still shows what the recipe makes.
+-- hang it on, so hovering a name still shows what the recipe makes.
 function UI:ShowCollectionRowTooltip(row)
     local collection = row.collectionInfo
     if not collection then return end
@@ -3585,8 +3706,6 @@ function UI:ShowCollectionRowTooltip(row)
         GameTooltip:AddDoubleLine("Learned", collection.professionName or "",
             0.35, 0.85, 0.45, 0.7, 0.7, 0.7)
     elseif collection.requiredSkill then
-        -- Green or red rather than a bare number: the question the row is
-        -- answering is whether you can go and learn it, not what the number is.
         local r, g, b = 0.35, 0.85, 0.45
         if not collection.skillMet then r, g, b = 0.95, 0.35, 0.35 end
         GameTooltip:AddDoubleLine(
@@ -3603,43 +3722,46 @@ function UI:ShowCollectionRowTooltip(row)
     GameTooltip:Show()
 end
 
-function UI:BindCollectionGroupRow(row, rowIdx, rowData)
-    prepareCollectionRow(self, row, rowIdx)
+function UI:BindCollectionGroupRow(row, rowData)
+    prepareCollectionRow(self, row, rowData)
     setShownIfChanged(row.collectionName, false)
+    setShownIfChanged(row.collectionStatus, false)
     setShownIfChanged(row.collectionSkill, false)
     setShownIfChanged(row.collectionSource, false)
     setShownIfChanged(row.collectionSpec, false)
-    setShownIfChanged(row.collectionFaction, false)
+    setShownIfChanged(row.collectionNameHit, false)
     row.collectionGroupKey = rowData.groupKey
 
-    -- "Blacksmithing (185/385)" -- the progress bar of a collection written
-    -- as two numbers. Both come from the whole book, never from the rows the
-    -- current filter happens to draw.
+    -- "Blacksmithing (185/385)" -- the progress bar of a collection written as
+    -- two numbers. Both come from the whole book, never from the rows the
+    -- current filter happens to draw. The profession's own spell icon carries
+    -- the recognition; the name alone made every section header look alike.
     local arrow = rowData.collapsed and "|cff9fa6b2\226\150\184|r" or "|cff9fa6b2\226\150\190|r"
-    setTextIfChanged(row.collectionSectionTitle, string.format("%s %s |cffffffff(%d/%d)|r",
-        arrow, rowData.groupLabel or "", rowData.known or 0, rowData.count or 0))
+    local icon = getProfessionIcon(rowData.groupLabel)
+    setTextIfChanged(row.collectionSectionTitle, string.format("%s %s%s |cffffffff(%d/%d)|r",
+        arrow, icon and (textureTag(icon, 16) .. " ") or "",
+        rowData.groupLabel or "", rowData.known or 0, rowData.count or 0))
     row.collectionSectionTitle:SetTextColor(1.0, 0.82, 0.0)
     setVertexColorIfChanged(row.stripe, 1, 0.82, 0, 1)
-    setBackdropColorsIfChanged(row, 0.10, 0.09, 0.07, 0.98, 0.28, 0.24, 0.12, 0.95)
+    setBackdropColorsIfChanged(row, 0.16, 0.13, 0.07, 1, 1, 0.82, 0, 0.55)
     setShownIfChanged(row, true)
 end
 
-function UI:BindCollectionHeaderRow(row, rowIdx)
-    prepareCollectionRow(self, row, rowIdx)
+function UI:BindCollectionHeaderRow(row, rowData)
+    prepareCollectionRow(self, row, rowData)
     setShownIfChanged(row.collectionSectionTitle, false)
+    setShownIfChanged(row.collectionNameHit, false)
 
     setTextIfChanged(row.collectionName, "Recipe")
-    -- Not "Skill": the column answers "is it in my book, and if not can I get
-    -- it", and the skill numbers are only how it answers the second half.
-    setTextIfChanged(row.collectionSkill, "Status")
+    setTextIfChanged(row.collectionStatus, "Status")
+    setTextIfChanged(row.collectionSkill, "Skill")
     setTextIfChanged(row.collectionSource, "Learned from")
     setTextIfChanged(row.collectionSpec, "Specialization")
-    setTextIfChanged(row.collectionFaction, "Faction")
     row.collectionName:SetTextColor(0.72, 0.72, 0.72)
+    row.collectionStatus:SetTextColor(0.72, 0.72, 0.72)
     row.collectionSkill:SetTextColor(0.72, 0.72, 0.72)
     row.collectionSource:SetTextColor(0.72, 0.72, 0.72)
     row.collectionSpec:SetTextColor(0.72, 0.72, 0.72)
-    row.collectionFaction:SetTextColor(0.72, 0.72, 0.72)
     setVertexColorIfChanged(row.stripe, 0.35, 0.35, 0.35, 1)
     setBackdropColorsIfChanged(row, 0.06, 0.06, 0.06, 0.98, 0.20, 0.20, 0.20, 0.95)
     setShownIfChanged(row, true)
@@ -3652,15 +3774,15 @@ local COLLECTION_KNOWN_DIM = "|cff6f7480"
 
 function UI:BindCollectionRow(row, rowIdx, rowData)
     if rowData.rowType == "collectionGroup" then
-        self:BindCollectionGroupRow(row, rowIdx, rowData)
+        self:BindCollectionGroupRow(row, rowData)
         return
     end
     if rowData.rowType == "collectionHeader" then
-        self:BindCollectionHeaderRow(row, rowIdx)
+        self:BindCollectionHeaderRow(row, rowData)
         return
     end
 
-    prepareCollectionRow(self, row, rowIdx)
+    prepareCollectionRow(self, row, rowData)
     setShownIfChanged(row.collectionSectionTitle, false)
 
     -- Rows arrive unresolved: this is where the name, icon and quality are
@@ -3700,27 +3822,23 @@ function UI:BindCollectionRow(row, rowIdx, rowData)
     end
     setShownIfChanged(row.icon, true)
 
+    -- Status answers one question and only one: is it in the book. The skill
+    -- lives in its own column now, because a number is not an answer to that.
     if known then
-        -- The one column that changes meaning: for a recipe you have, the
-        -- skill you once needed is history.
-        setTextIfChanged(row.collectionSkill, CHECK_TAG .. " |cff55d66bLearned|r")
-    elseif collection.requiredSkill then
-        -- Red only when the character cannot learn it yet: the number alone
-        -- does not say whether it is out of reach.
-        local colour = collection.skillMet and "|cffd8d8d8" or COLOR_LOSS_TEXT
-        setTextIfChanged(row.collectionSkill, string.format("%s%d|r |cff8f949c/ %d|r",
-            colour, collection.requiredSkill, collection.skillRank or 0))
+        setTextIfChanged(row.collectionStatus, CHECK_TAG .. " |cff55d66bLearned|r")
+    elseif not collection.skillMet or not collection.specializationMet then
+        setTextIfChanged(row.collectionStatus, "|cff8f949cOut of reach|r")
     else
-        setTextIfChanged(row.collectionSkill, "|cff8f949c-|r")
+        setTextIfChanged(row.collectionStatus, "|cffd8d8d8Can learn|r")
     end
 
-    -- Colour by what the player has to DO, not by kind for its own sake:
-    -- visit somebody, buy something, or go and kill for it. Kinds that ask
-    -- for none of the three stay grey rather than adding another hue. A
-    -- recipe already in the book asks for nothing, so it keeps no colour.
-    setTextIfChanged(row.collectionSource, string.format("%s%s|r",
-        known and COLLECTION_KNOWN_DIM or collectionSourceColor(collection.sourceKind),
-        safeText(collection.sourceLabel)))
+    setTextIfChanged(row.collectionSkill, collectionSkillText(collection, known))
+
+    -- One line per place. 82% of recipes have a single source, 4 is the
+    -- dataset's maximum, so the list is bounded and needs no "+N more".
+    local sourceText = collectionSourceText(collection, known)
+    setTextIfChanged(row.collectionSource, sourceText)
+
     if collection.specializationName then
         local colour = COLLECTION_KNOWN_DIM
         if not known then
@@ -3731,22 +3849,6 @@ function UI:BindCollectionRow(row, rowIdx, rowData)
         setTextIfChanged(row.collectionSpec, "|cff8f949c-|r")
     end
 
-    -- Nil faction means both sides can get it, which is the common case and
-    -- deserves no ink. Only a restriction is worth a word -- and a banner,
-    -- which is what the eye actually catches while scanning the column.
-    if collection.faction == "alliance" then
-        setTextIfChanged(row.collectionFaction, known
-            and (COLLECTION_KNOWN_DIM .. "Alliance|r")
-            or (ALLIANCE_TAG .. " |cff6699ffAlliance|r"))
-    elseif collection.faction == "horde" then
-        setTextIfChanged(row.collectionFaction, known
-            and (COLLECTION_KNOWN_DIM .. "Horde|r")
-            or (HORDE_TAG .. " |cffe05561Horde|r"))
-    else
-        setTextIfChanged(row.collectionFaction, "|cff8f949c-|r")
-    end
-
-    -- The columns clip; the tooltip is where the whole answer lives.
     row.collectionInfo = collection
     row.collectionLabel = rowData.label
 
@@ -4309,7 +4411,9 @@ function UI:_FinalizeRecipeList(rows, context, generation)
         self.selectedRecipeKey = nil
     end
 
-    local contentHeight = math.max(1, #rows * self:GetListRowHeight() + 10)
+    local contentHeight = math.max(1, (rows[1] and rows[1]._rowOffset
+        and (self._collectionContentHeight or 0)
+        or (#rows * self:GetListRowHeight())) + 10)
     if self.frame.recipeContent._rrHeight ~= contentHeight then
         self.frame.recipeContent._rrHeight = contentHeight
         self.frame.recipeContent:SetHeight(contentHeight)
@@ -4624,6 +4728,30 @@ function UI:BuildCollectionDisplayRows(rows)
             end
         end
     end
+
+    -- Rows are not a uniform height any more: a recipe sold in four cities is
+    -- four lines tall. Each row carries its own height and its offset from the
+    -- top, so the virtualiser can find the visible window without assuming a
+    -- constant, and the content height is the last row's far edge.
+    local offset = 0
+    for _, row in ipairs(out) do
+        local height
+        if row.rowType == "collectionGroup" then
+            height = COLLECTION_GROUP_ROW_HEIGHT
+        elseif row.rowType == "collectionHeader" then
+            height = COLLECTION_ROW_HEIGHT
+        else
+            local lines = row.collection and row.collection.sourceLines
+            local count = lines and #lines or 1
+            if count > COLLECTION_MAX_SOURCE_LINES then count = COLLECTION_MAX_SOURCE_LINES end
+            if count < 1 then count = 1 end
+            height = COLLECTION_ROW_HEIGHT + ((count - 1) * COLLECTION_ROW_LINE_HEIGHT)
+        end
+        row._rowHeight = height
+        row._rowOffset = offset
+        offset = offset + height
+    end
+    self._collectionContentHeight = offset
 
     self._collectionTotalCount = totalCount
     self._collectionKnownCount = knownCount

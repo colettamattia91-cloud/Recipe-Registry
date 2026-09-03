@@ -425,7 +425,7 @@ Test.it("names the trainer when the source knows one", function()
 
     local named
     for _, row in ipairs(data:BuildCollectionRows()) do
-        if row.collection.sourceKind == "trainer" and row.collection.sourceLabel ~= "Trainer" then
+        if row.collection.sourceKind == "trainer" and row.collection.sourceLabel ~= "Any trainer" then
             named = row.collection.sourceLabel
             break
         end
@@ -441,7 +441,7 @@ Test.it("keeps the bare label for a recipe every trainer teaches", function()
 
     local bare = 0
     for _, row in ipairs(data:BuildCollectionRows()) do
-        if row.collection.sourceLabel == "Trainer" then bare = bare + 1 end
+        if row.collection.sourceLabel == "Any trainer" then bare = bare + 1 end
     end
     -- Naming three of the thirty-two trainers who teach a recipe is worse
     -- than naming none, so those rows stay unadorned.

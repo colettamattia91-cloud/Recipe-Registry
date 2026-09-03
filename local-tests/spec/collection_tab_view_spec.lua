@@ -66,39 +66,39 @@ Test.it("lays out five columns that fit the row", function()
     useView(COLLECTION_VIEW)
     withScrollWidth(1170)
 
-    local nameWidth, skillWidth, sourceWidth, specWidth, factionWidth = ui:GetCollectionColumnWidths()
-    for _, width in ipairs({ nameWidth, skillWidth, sourceWidth, specWidth, factionWidth }) do
+    local nameWidth, statusWidth, skillWidth, sourceWidth, specWidth = ui:GetCollectionColumnWidths()
+    for _, width in ipairs({ nameWidth, statusWidth, skillWidth, sourceWidth, specWidth }) do
         Test.gte(width, 1)
     end
     -- 40px icon inset, four 8px gaps, 10px of right margin.
-    local total = 40 + nameWidth + skillWidth + sourceWidth + specWidth + factionWidth + (8 * 4) + 10
+    local total = 40 + nameWidth + statusWidth + skillWidth + sourceWidth + specWidth + (8 * 4) + 10
     Test.lte(total, ui:GetListRowWidth() + 1)
 end)
 
--- Skill, specialization and faction are as wide as their longest content and
+-- Status, skill and specialization are as wide as their longest content and
 -- no wider. The recipe name and the source are the two that get cut off, so
 -- they take everything the window gains.
 Test.it("gives the extra width to the name and the source", function()
     useView(COLLECTION_VIEW)
     withScrollWidth(1170)
-    local narrowName, narrowSkill, narrowSource, narrowSpec, narrowFaction = ui:GetCollectionColumnWidths()
+    local narrowName, narrowStatus, narrowSkill, narrowSource, narrowSpec = ui:GetCollectionColumnWidths()
 
     withScrollWidth(1570)
-    local wideName, wideSkill, wideSource, wideSpec, wideFaction = ui:GetCollectionColumnWidths()
+    local wideName, wideStatus, wideSkill, wideSource, wideSpec = ui:GetCollectionColumnWidths()
 
     Test.truthy(wideName > narrowName, "the name column should grow")
     Test.truthy(wideSource > narrowSource, "the source column should grow")
+    Test.eq(wideStatus, narrowStatus)
     Test.eq(wideSkill, narrowSkill)
     Test.eq(wideSpec, narrowSpec)
-    Test.eq(wideFaction, narrowFaction)
 end)
 
 Test.it("keeps both flexible columns readable at the minimum window size", function()
     useView(COLLECTION_VIEW)
     withScrollWidth(990)
-    local nameWidth, _, sourceWidth = ui:GetCollectionColumnWidths()
+    local nameWidth, _, _, sourceWidth = ui:GetCollectionColumnWidths()
     Test.gte(nameWidth, 190)
-    Test.gte(sourceWidth, 140)
+    Test.gte(sourceWidth, 150)
 end)
 
 -- The help line under the control strip is the only place that can explain an
@@ -262,6 +262,95 @@ Test.it("shows one title in the collection view, not two", function()
     ui:RefreshAddonStatusControls()
     Test.eq(header.visible, true)
     Test.eq(controls.visible, false)
+end)
+
+-- Rows are no longer a uniform height: a recipe sold in four cities is four
+-- lines tall, so each row carries its own height and its offset from the top
+-- of the list. Everything that used to multiply an index by a constant now
+-- reads those two numbers instead.
+local function sourceRow(profession, lineCount, known)
+    local lines = {}
+    for i = 1, lineCount do lines[i] = "Vendor: Somebody " .. i .. " (Somewhere)" end
+    return {
+        collection = {
+            professionName = profession,
+            known = known or false,
+            skillMet = true,
+            specializationMet = true,
+            sourceLines = lines,
+        },
+    }
+end
+
+Test.it("makes a row as tall as its source list", function()
+    ui.frame = nil
+    useView(COLLECTION_VIEW)
+    data:SetCollectionFilter("all")
+
+    local display = ui:BuildCollectionDisplayRows({
+        sourceRow("Alchemy", 1),
+        sourceRow("Alchemy", 3),
+    })
+
+    local drawn = {}
+    for _, row in ipairs(display) do
+        if row.rowType == "collection" then drawn[#drawn + 1] = row end
+    end
+    Test.eq(#drawn, 2)
+    Test.truthy(drawn[2]._rowHeight > drawn[1]._rowHeight,
+        "a three-place recipe should be taller than a one-place recipe")
+    -- Two extra lines at 14px on top of the 30px single-line row.
+    Test.eq(drawn[2]._rowHeight - drawn[1]._rowHeight, 28)
+end)
+
+Test.it("stacks every row against the one above it", function()
+    ui.frame = nil
+    useView(COLLECTION_VIEW)
+
+    local display = ui:BuildCollectionDisplayRows({
+        sourceRow("Alchemy", 2),
+        sourceRow("Alchemy", 1),
+        sourceRow("Alchemy", 4),
+    })
+
+    local expected = 0
+    for _, row in ipairs(display) do
+        Test.eq(row._rowOffset, expected)
+        expected = expected + row._rowHeight
+    end
+    -- The content height is the far edge of the last row, not a row count
+    -- times a constant.
+    Test.eq(ui._collectionContentHeight, expected)
+end)
+
+-- The dataset's own maximum is four places. A row is capped there so a future
+-- data change cannot produce a row taller than the window.
+Test.it("caps how tall one row can get", function()
+    ui.frame = nil
+    useView(COLLECTION_VIEW)
+
+    local display = ui:BuildCollectionDisplayRows({ sourceRow("Alchemy", 4), sourceRow("Alchemy", 12) })
+    local drawn = {}
+    for _, row in ipairs(display) do
+        if row.rowType == "collection" then drawn[#drawn + 1] = row end
+    end
+    Test.eq(drawn[1]._rowHeight, drawn[2]._rowHeight)
+end)
+
+Test.it("gives a group header its own height", function()
+    ui.frame = nil
+    useView(COLLECTION_VIEW)
+
+    local display = ui:BuildCollectionDisplayRows({ sourceRow("Alchemy", 1) })
+    local header, group, recipe
+    for _, row in ipairs(display) do
+        if row.rowType == "collectionHeader" then header = row end
+        if row.rowType == "collectionGroup" then group = row end
+        if row.rowType == "collection" then recipe = row end
+    end
+    Test.truthy(header ~= nil and group ~= nil and recipe ~= nil)
+    Test.truthy(group._rowHeight > recipe._rowHeight,
+        "a profession header should stand out from the rows under it")
 end)
 
 -- The columns clip on purpose; everything they cut is in the tooltip.
