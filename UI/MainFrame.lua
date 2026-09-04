@@ -50,9 +50,11 @@ local ADDON_STATUS_FILTER_LABELS = {
 }
 local ADDON_STATUS_FILTER_MARKER = "|cffffd100[F]|r"
 
--- The collection table's own columns, in the shape the guild members table
--- already uses: left-click a header to sort by it, right-click one marked [F]
--- to cycle its filter.
+-- The collection table's own columns: left-click a header to sort by it,
+-- right-click one to open its filter as a menu. The guild members table cycles
+-- its filters in place and marks those columns [F]; this one does not, because
+-- its narrowest column is 62 pixels and a cycled value written into the header
+-- clipped exactly the half that said what was going on.
 --
 -- Status has a cycle here but no state of its own. It reads and writes
 -- Data:GetCollectionFilter -- the same three-way narrowing the strip's button
@@ -71,6 +73,13 @@ local COLLECTION_FILTER_CYCLES = {
     skill  = { "all", "inreach", "outofreach", "noskill" },
     source = { "all", "trainer", "vendor", "drop", "quest", "worldDrop", "discovery", "worldEvent" },
     spec   = { "all", "none", "required", "have" },
+}
+local COLLECTION_COLUMN_TITLES = {
+    name = "Recipe",
+    status = "Show",
+    skill = "Skill needed",
+    source = "Learned from",
+    spec = "Specialization",
 }
 local COLLECTION_COLUMN_FILTER_LABELS = {
     unlearned  = "Not learned",
@@ -231,6 +240,17 @@ end
 -- green box.
 local ALLIANCE_TAG = textureTag("Interface\\Icons\\INV_BannerPVP_02", 14)
 local HORDE_TAG = textureTag("Interface\\Icons\\INV_BannerPVP_01", 14)
+
+-- The same two banners for use inside a line of text rather than beside one.
+-- At 14px with no offset they sat above the letters they follow and, on a
+-- multi-line source column, crowded the line below; 11px dropped two pixels
+-- sits on the text instead of over it.
+local function inlineTextureTag(texture)
+    return string.format("|T%s:11:11:0:-2:64:64:5:59:5:59|t", texture)
+end
+
+local ALLIANCE_INLINE_TAG = inlineTextureTag("Interface\\Icons\\INV_BannerPVP_02")
+local HORDE_INLINE_TAG = inlineTextureTag("Interface\\Icons\\INV_BannerPVP_01")
 
 -- The green tick a ready check draws. Uncropped, like statusTag: the raid
 -- frame art is not 64x64, so the crop textureTag applies would cut it wrong.
@@ -1023,9 +1043,16 @@ local EXPANSION_STATES = {
     { key = "vanilla", vanilla = true,  tbc = false, label = "Expansion: Vanilla only" },
 }
 
+local EXPANSION_MIXED = { key = "mixed", label = "Expansion: Per profession" }
+
 function UI:GetExpansionFilterState()
     local filters = Addon.RecipeUiFilters
     if not (filters and filters.GetExpansionDefaults) then return EXPANSION_STATES[1] end
+    -- An override outranks the global pair, so a window that reported the
+    -- pair would be telling the reader something the list does not obey.
+    local overridden = filters.GetProfessionsWithExpansionOverride
+        and filters:GetProfessionsWithExpansionOverride() or {}
+    if #overridden > 0 then return EXPANSION_MIXED end
     local vanilla, tbc = filters:GetExpansionDefaults()
     for _, state in ipairs(EXPANSION_STATES) do
         if state.vanilla == vanilla and state.tbc == tbc then return state end
@@ -1033,23 +1060,58 @@ function UI:GetExpansionFilterState()
     return EXPANSION_STATES[1]
 end
 
-function UI:CycleExpansionFilter()
+-- Chosen from the window rather than cycled: the menu says what the three
+-- states are, and picking one applies it to every profession.
+function UI:SetExpansionFilter(key)
     local filters = Addon.RecipeUiFilters
     if not (filters and filters.SetExpansionDefaults) then return end
-    local current = self:GetExpansionFilterState()
-    local nextIndex = 1
-    for index, state in ipairs(EXPANSION_STATES) do
-        if state.key == current.key then
-            nextIndex = index + 1
-            break
+    for _, state in ipairs(EXPANSION_STATES) do
+        if state.key == key then
+            filters:SetExpansionDefaults(state.vanilla, state.tbc, "filters:expansion-" .. key)
+            if filters.ClearProfessionExpansionOverrides then
+                filters:ClearProfessionExpansionOverrides()
+            end
+            self:ResetRecipeScroll()
+            self:RefreshFilterControls()
+            self:RefreshRecipeList()
+            return
         end
     end
-    if nextIndex > #EXPANSION_STATES then nextIndex = 1 end
-    local target = EXPANSION_STATES[nextIndex]
-    filters:SetExpansionDefaults(target.vanilla, target.tbc)
-    self:ResetRecipeScroll()
-    self:RefreshFilterControls()
-    self:RefreshRecipeList()
+end
+
+-- The expansion choices, as menu items, for whichever control opened the menu.
+function UI:BuildExpansionMenuItems()
+    local current = self:GetExpansionFilterState()
+    local items = { { text = "Expansions", isTitle = true } }
+    for _, state in ipairs(EXPANSION_STATES) do
+        local key = state.key
+        items[#items + 1] = {
+            -- The label inside the menu drops the "Expansion:" prefix the
+            -- button carries: the title above it already said that.
+            text = state.label:gsub("^Expansion: ", ""),
+            checked = current.key == key,
+            func = function() UI:SetExpansionFilter(key) end,
+        }
+    end
+    if current.key == EXPANSION_MIXED.key then
+        items[#items + 1] = {
+            text = "Some professions are set on their own, in the options.",
+            isTitle = true,
+        }
+    end
+    return items
+end
+
+function UI:OpenRecipeFilterMenu(anchor)
+    local items = self:BuildExpansionMenuItems()
+    items[#items + 1] = { isSeparator = true }
+    items[#items + 1] = { text = "Prices", isTitle = true }
+    items[#items + 1] = {
+        text = "Profitable crafts only",
+        checked = self:IsProfitableOnly(),
+        func = function() UI:ToggleProfitableOnly() end,
+    }
+    self:OpenDropdown(anchor, items, 210)
 end
 
 function UI:IsProfitableOnly()
@@ -1071,26 +1133,26 @@ end
 -- wondering whether they are two.
 function UI:ShowExpansionFilterTooltip(owner)
     GameTooltip:SetOwner(owner, "ANCHOR_TOP")
-    GameTooltip:AddLine("Which expansions to list")
-    GameTooltip:AddLine("The same setting as the options panel, and it applies to every tab.",
+    GameTooltip:AddLine("What this list is showing")
+    GameTooltip:AddLine("Which expansions to list, and whether to keep only the crafts worth more than their materials. The same settings as the options panel, and they apply to every tab.",
         0.75, 0.75, 0.75, true)
     local filters = Addon.RecipeUiFilters
     local overridden = filters and filters.GetProfessionsWithExpansionOverride
         and filters:GetProfessionsWithExpansionOverride() or {}
     if #overridden > 0 then
         GameTooltip:AddLine(" ")
-        -- A per-profession override wins over this control, so it has to say
-        -- which professions will not follow it rather than appear not to work.
-        GameTooltip:AddLine("Set per profession, and not following this: "
-            .. table.concat(overridden, ", "), 0.95, 0.75, 0.30, true)
+        GameTooltip:AddLine("These professions are set on their own and are not following it: "
+            .. table.concat(overridden, ", ") .. ". Choosing an expansion here puts them back in step.",
+            0.95, 0.75, 0.30, true)
     end
     GameTooltip:Show()
 end
 
-function UI:HandleCollectionHeaderClick(columnKey, mouseButton)
+function UI:HandleCollectionHeaderClick(columnKey, mouseButton, anchor)
     if mouseButton == "RightButton" then
-        self:CycleCollectionColumnFilter(columnKey)
+        self:OpenCollectionColumnMenu(columnKey, anchor)
     else
+        self:CloseDropdown()
         self:SetCollectionSort(columnKey)
     end
 end
@@ -1136,17 +1198,79 @@ function UI:CollectionRowPassesColumns(row)
     return true
 end
 
+function UI:OpenCollectionFilterMenu(anchor)
+    local data = Addon.Data
+    local current = (data and data.GetCollectionFilter and data:GetCollectionFilter()) or "all"
+    local items = { { text = "Show", isTitle = true } }
+    for _, filter in ipairs((data and data.COLLECTION_FILTER_ORDER) or { "all" }) do
+        items[#items + 1] = {
+            text = (COLLECTION_FILTER_LABELS[filter] or filter):gsub("^Show: ", ""),
+            checked = current == filter,
+            func = function()
+                if data and data.SetCollectionFilter then data:SetCollectionFilter(filter) end
+                UI:ResetRecipeScroll()
+                UI:RefreshCollectionControls()
+                UI:RefreshRecipeList()
+            end,
+        }
+    end
+
+    items[#items + 1] = { isSeparator = true }
+    for _, item in ipairs(self:BuildExpansionMenuItems()) do
+        items[#items + 1] = item
+    end
+
+    local narrowed = self:HasCollectionColumnFilter()
+    items[#items + 1] = { isSeparator = true }
+    items[#items + 1] = {
+        text = narrowed and "Clear every filter" or "No filters set",
+        disabled = not narrowed,
+        func = function() UI:ClearCollectionColumnFilters() end,
+    }
+    self:OpenDropdown(anchor, items, 210)
+end
+
+-- One column's filter, as a menu. It used to be written into the header text
+-- itself -- "Status: Ready ^ [F]" -- in a column 92 pixels wide, which clipped
+-- exactly the half that said what was going on.
+function UI:OpenCollectionColumnMenu(columnKey, anchor)
+    local cycle = COLLECTION_FILTER_CYCLES[columnKey]
+    if not cycle then return end
+    local current = self:GetCollectionColumnFilter(columnKey)
+    local items = { { text = COLLECTION_COLUMN_TITLES[columnKey] or columnKey, isTitle = true } }
+    for _, value in ipairs(cycle) do
+        items[#items + 1] = {
+            text = value == "all" and "Everything"
+                or (COLLECTION_COLUMN_FILTER_LABELS[value] or value),
+            checked = current == value,
+            func = function()
+                if columnKey == "status" then
+                    local data = Addon.Data
+                    if data and data.SetCollectionFilter then data:SetCollectionFilter(value) end
+                else
+                    UI.collectionFilters = UI.collectionFilters or {}
+                    UI.collectionFilters[columnKey] = value
+                end
+                UI:ResetRecipeScroll()
+                UI:RefreshCollectionControls()
+                UI:RefreshRecipeList()
+            end,
+        }
+    end
+    self:OpenDropdown(anchor, items, 180)
+end
+
+-- The header is a label, a sort marker and nothing else. The narrowest column
+-- is 62 pixels wide, so anything longer than the word is a header that says
+-- half of something. Which filter is in force is said by the colour -- gold
+-- for narrowed -- and by the tick in the column's own menu.
 function UI:GetCollectionHeaderText(columnKey, baseLabel)
     local text = baseLabel
-    local filter = self:GetCollectionColumnFilter(columnKey)
-    if filter ~= "all" then
-        text = string.format("%s: %s", baseLabel, COLLECTION_COLUMN_FILTER_LABELS[filter] or filter)
+    if self:GetCollectionColumnFilter(columnKey) ~= "all" then
+        text = "|cffffd100" .. baseLabel .. "|r"
     end
     if self.collectionSortKey == columnKey then
         text = text .. (self.collectionSortDir == "desc" and " v" or " ^")
-    end
-    if COLLECTION_FILTER_CYCLES[columnKey] then
-        text = text .. " " .. ADDON_STATUS_FILTER_MARKER
     end
     return text
 end
@@ -1628,22 +1752,22 @@ local COLLECTION_FILTER_HELP = {
 -- The expansion and profit controls exist twice -- sidebar and collection
 -- strip -- because they belong in both places, but they are one setting, so
 -- one function paints every copy of them.
+-- The sidebar control carries both of the browser's prefilters, so its label
+-- has to say when either one is narrowing the list -- a filter you cannot see
+-- is a filter you forget you set.
 function UI:RefreshFilterControls()
     if not self.frame then return end
-    local f = self.frame
+    local button = self.frame.recipeFilterButton
+    if not (button and button.SetLabel) then return end
     local state = self:GetExpansionFilterState()
-    for _, button in ipairs({ f.expansionButton, f.collectionExpansionButton }) do
-        if button and button.SetLabel then
-            button:SetLabel(state.label)
-            if button.SetSelected then
-                -- Highlighted whenever an expansion is being held back, so a
-                -- narrowed list never looks like the whole catalogue.
-                button:SetSelected(state.key ~= "all")
-            end
-        end
+    local profitable = self:IsProfitableOnly()
+    local label = state.label:gsub("^Expansion: ", "")
+    if profitable then
+        label = label .. ", profitable"
     end
-    if f.profitButton and f.profitButton.SetSelected then
-        f.profitButton:SetSelected(self:IsProfitableOnly())
+    button:SetLabel(label)
+    if button.SetSelected then
+        button:SetSelected(state.key ~= "all" or profitable)
     end
 end
 
@@ -1653,27 +1777,33 @@ function UI:RefreshCollectionControls()
     local data = Addon.Data
     local filter = (data and data.GetCollectionFilter and data:GetCollectionFilter()) or "all"
     if f.collectionFilterButton and f.collectionFilterButton.SetLabel then
-        f.collectionFilterButton:SetLabel(COLLECTION_FILTER_LABELS[filter] or COLLECTION_FILTER_LABELS.all)
+        local label = (COLLECTION_FILTER_LABELS[filter] or COLLECTION_FILTER_LABELS.all)
+        local expansion = self:GetExpansionFilterState()
+        if expansion.key ~= "all" then
+            label = label .. ", " .. expansion.label:gsub("^Expansion: ", "")
+        end
+        if self:HasCollectionColumnFilter() and filter == "all" then
+            label = label .. " (filtered)"
+        end
+        f.collectionFilterButton:SetLabel(label)
         if f.collectionFilterButton.SetSelected then
             -- Highlighted whenever the list is narrower than the collection,
             -- so a filtered view never looks like the whole book.
-            f.collectionFilterButton:SetSelected(filter ~= "all")
+            f.collectionFilterButton:SetSelected(filter ~= "all"
+                or expansion.key ~= "all" or self:HasCollectionColumnFilter())
         end
     end
     self:RefreshFilterControls()
     local narrowed = self:HasCollectionColumnFilter()
-    if f.collectionResetButton then
-        setShownIfChanged(f.collectionResetButton, narrowed)
-    end
     if not f.collectionHelp then return end
     local helpText
     if not hasLocalProfessions() then
         helpText = "Open your profession windows once so Recipe Registry knows what this character has learned."
     elseif (self._collectionShownCount or 0) == 0 and narrowed then
-        helpText = "Nothing matches these filters. Clear filters, or right-click a column header marked [F] to widen one."
+        helpText = "Nothing matches these filters. Clear them from the button above, or right-click a column header to widen that one."
     else
         helpText = (COLLECTION_FILTER_HELP[filter] or COLLECTION_FILTER_HELP.all)
-            .. " Left-click a column header to sort, right-click one marked [F] to filter."
+            .. " Left-click a column header to sort by it, right-click one to filter by it."
     end
     setTextIfChanged(f.collectionHelp, helpText)
 end
@@ -2056,36 +2186,20 @@ function UI:CreateMainFrame()
     recipeFilterLabel:SetText("Recipe filters")
     f.recipeFilterLabel = recipeFilterLabel
 
-    local expansionButton = createCardStyleButton(left, 216, 22)
-    expansionButton:SetPoint("TOPLEFT", recipeFilterLabel, "BOTTOMLEFT", -2, -6)
-    expansionButton:SetLabel(EXPANSION_STATES[1].label)
-    expansionButton:SetScript("OnClick", function()
-        UI:CycleExpansionFilter()
+    local recipeFilterButton = createCardStyleButton(left, 216, 22)
+    recipeFilterButton:SetPoint("TOPLEFT", recipeFilterLabel, "BOTTOMLEFT", -2, -6)
+    recipeFilterButton:SetLabel("All expansions")
+    recipeFilterButton:SetScript("OnClick", function(self)
+        UI:OpenRecipeFilterMenu(self)
     end)
-    expansionButton:SetScript("OnEnter", function(self)
+    recipeFilterButton:SetScript("OnEnter", function(self)
         UI:ShowExpansionFilterTooltip(self)
     end)
-    expansionButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
-    f.expansionButton = expansionButton
-
-    local profitButton = createCardStyleButton(left, 216, 22)
-    profitButton:SetPoint("TOPLEFT", expansionButton, "BOTTOMLEFT", 0, -6)
-    profitButton:SetLabel("Profitable only")
-    profitButton:SetScript("OnClick", function()
-        UI:ToggleProfitableOnly()
-    end)
-    profitButton:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_TOP")
-        GameTooltip:AddLine("Profitable crafts only")
-        GameTooltip:AddLine("Hides recipes whose materials cost more than what they make, using your auction addon's prices. Recipes with no price data are kept.",
-            0.75, 0.75, 0.75, true)
-        GameTooltip:Show()
-    end)
-    profitButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
-    f.profitButton = profitButton
+    recipeFilterButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    f.recipeFilterButton = recipeFilterButton
 
     local profLabel = left:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    profLabel:SetPoint("TOPLEFT", profitButton, "BOTTOMLEFT", 2, -12)
+    profLabel:SetPoint("TOPLEFT", recipeFilterButton, "BOTTOMLEFT", 2, -14)
     profLabel:SetText("Profession filter")
     f.profLabel = profLabel
 
@@ -2265,7 +2379,7 @@ function UI:CreateMainFrame()
     collectionHelp:SetPoint("TOPRIGHT", collectionControls, "BOTTOMRIGHT", -4, -6)
     collectionHelp:SetJustifyH("LEFT")
     collectionHelp:SetText(COLLECTION_FILTER_HELP.all
-        .. " Left-click a column header to sort, right-click one marked [F] to filter.")
+        .. " Left-click a column header to sort by it, right-click one to filter by it.")
     collectionHelp:SetTextColor(0.70, 0.70, 0.70)
     f.collectionHelp = collectionHelp
 
@@ -2305,31 +2419,20 @@ function UI:CreateMainFrame()
     -- combinations mean. Grouping by profession is already the profession
     -- filter, and any further axis would be chrome on a table whose whole job
     -- is to be scanned.
-    local collectionFilterButton = createCardStyleButton(collectionControls, 168, 22)
+    -- One control for the whole strip. Three card buttons side by side was
+    -- three axes competing for the same corner, and the one that happened to
+    -- be hidden still left its gap.
+    local collectionFilterButton = createCardStyleButton(collectionControls, 200, 22)
     collectionFilterButton:SetPoint("RIGHT", -8, 0)
     collectionFilterButton:SetLabel(COLLECTION_FILTER_LABELS.all)
-    collectionFilterButton:SetScript("OnClick", function()
-        local data = Addon.Data
-        if not (data and data.CycleCollectionFilter) then return end
-        data:CycleCollectionFilter()
-        UI:RefreshCollectionControls()
-        UI:RefreshRecipeList()
+    collectionFilterButton:SetScript("OnClick", function(self)
+        UI:OpenCollectionFilterMenu(self)
     end)
     collectionFilterButton:SetScript("OnEnter", function(self)
-        local data = Addon.Data
-        local current = (data and data.GetCollectionFilter and data:GetCollectionFilter()) or "all"
         GameTooltip:SetOwner(self, "ANCHOR_TOP")
-        GameTooltip:AddLine("Collection filter")
-        for _, filter in ipairs((data and data.COLLECTION_FILTER_ORDER) or {}) do
-            local isCurrent = filter == current
-            GameTooltip:AddLine(
-                string.format("%s %s", isCurrent and "•" or "  ",
-                    COLLECTION_FILTER_HELP[filter] or filter),
-                isCurrent and 1 or 0.65,
-                isCurrent and 0.82 or 0.65,
-                isCurrent and 0 or 0.65,
-                true)
-        end
+        GameTooltip:AddLine("What this table is showing")
+        GameTooltip:AddLine("How much of the collection to list, which expansions to include, and a way to drop every column filter at once.",
+            0.75, 0.75, 0.75, true)
         GameTooltip:Show()
     end)
     collectionFilterButton:SetScript("OnLeave", function()
@@ -2337,34 +2440,8 @@ function UI:CreateMainFrame()
     end)
     f.collectionFilterButton = collectionFilterButton
 
-    -- The expansion prefilter, in the tab it changes. It writes the same
-    -- profile setting the options panel does; see UI:CycleExpansionFilter.
-    local collectionExpansionButton = createCardStyleButton(collectionControls, 176, 22)
-    collectionExpansionButton:SetPoint("RIGHT", collectionFilterButton, "LEFT", -8, 0)
-    collectionExpansionButton:SetLabel(EXPANSION_STATES[1].label)
-    collectionExpansionButton:SetScript("OnClick", function()
-        UI:CycleExpansionFilter()
-    end)
-    collectionExpansionButton:SetScript("OnEnter", function(self)
-        UI:ShowExpansionFilterTooltip(self)
-    end)
-    collectionExpansionButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
-    f.collectionExpansionButton = collectionExpansionButton
-
-    -- Four filters can be on at once -- the strip's own plus three column
-    -- filters -- and an empty table is the one state a player cannot read
-    -- their way out of. Shown only while something is narrowing the list.
-    local collectionResetButton = createCardStyleButton(collectionControls, 108, 22)
-    collectionResetButton:SetPoint("RIGHT", collectionExpansionButton, "LEFT", -8, 0)
-    collectionResetButton:SetLabel("Clear filters")
-    collectionResetButton:SetScript("OnClick", function()
-        UI:ClearCollectionColumnFilters()
-    end)
-    collectionResetButton:Hide()
-    f.collectionResetButton = collectionResetButton
-
-    -- Bounded on the right so a long count cannot run under the buttons.
-    collectionTitle:SetPoint("RIGHT", collectionResetButton, "LEFT", -12, 0)
+    -- Bounded on the right so a long count cannot run under the control.
+    collectionTitle:SetPoint("RIGHT", collectionFilterButton, "LEFT", -12, 0)
 
     local collectionSearchClearButton = CreateFrame("Button", nil, collectionSearchBox)
     collectionSearchClearButton:SetSize(14, 14)
@@ -2898,9 +2975,10 @@ function UI:EnsureRecipeRow(index)
     return row
 end
 
--- Wide enough for "1234g 56s 78c", which is more gold than a TBC craft is
--- ever worth, and narrow enough to leave a reagent name room to breathe.
-local DETAIL_VALUE_WIDTH = 96
+-- Wide enough for "1234g 56s 78c" with its three coin icons on ONE line.
+-- At 96 the figure wrapped, and a wrapped money string puts each coin under
+-- the number it does not belong to.
+local DETAIL_VALUE_WIDTH = 132
 
 function UI:EnsureDetailLine(index)
     local line = self.frame.detailLines[index]
@@ -2925,6 +3003,9 @@ function UI:EnsureDetailLine(index)
     line.value:SetPoint("TOPRIGHT", -4, 0)
     line.value:SetWidth(DETAIL_VALUE_WIDTH)
     line.value:SetJustifyH("RIGHT")
+    -- Never wrapped: a money string is one line or it is nonsense.
+    if line.value.SetWordWrap then line.value:SetWordWrap(false) end
+    if line.value.SetMaxLines then line.value:SetMaxLines(1) end
     line.value:Hide()
 
     -- Compact text button matching the addon's gold/dark theme. The
@@ -3033,6 +3114,146 @@ end
 
 function UI:GetAvailableShareChannels()
     return buildAvailableShareChannels()
+end
+
+-- One dropdown for the whole window. Filters used to be one card button per
+-- axis and they multiplied: three in the collection strip, two more in the
+-- sidebar, each one cycling through states you could only discover by clicking
+-- it. A menu says what the choices ARE, marks the one in force, and costs one
+-- control instead of one per axis.
+--
+-- Items are { text, checked, isTitle, isSeparator, disabled, func }. A title
+-- and a separator are drawn, not clickable; everything else is a row.
+local DROPDOWN_ROW_HEIGHT = 18
+local DROPDOWN_TITLE_HEIGHT = 16
+local DROPDOWN_SEPARATOR_HEIGHT = 7
+
+local function dropdownItemHeight(item)
+    if item.isSeparator then return DROPDOWN_SEPARATOR_HEIGHT end
+    if item.isTitle then return DROPDOWN_TITLE_HEIGHT end
+    return DROPDOWN_ROW_HEIGHT
+end
+
+function UI:CloseDropdown()
+    local popup = self.frame and self.frame.dropdown
+    if popup and popup.IsShown and popup:IsShown() then
+        popup:Hide()
+    end
+end
+
+function UI:OpenDropdown(anchor, items, width)
+    if type(CreateFrame) ~= "function" or not self.frame then return false end
+    width = width or 190
+
+    local popup = self.frame.dropdown
+    if not popup then
+        popup = CreateFrame("Frame", nil, self.frame, "BackdropTemplate")
+        createBackdrop(popup, 0.05, 0.05, 0.05, 0.98, 0.42, 0.34, 0.16, 0.95)
+        popup.rows = {}
+        popup.labels = {}
+        popup.separators = {}
+        if popup.SetFrameStrata then popup:SetFrameStrata("DIALOG") end
+        if popup.SetClampedToScreen then popup:SetClampedToScreen(true) end
+        -- Anywhere else closes it, the way every menu in the game behaves.
+        popup:SetScript("OnHide", function() UI._dropdownOwner = nil end)
+        self.frame.dropdown = popup
+    end
+
+    -- Clicking the control that opened it closes it again.
+    if popup:IsShown() and self._dropdownOwner == anchor then
+        popup:Hide()
+        return true
+    end
+    self._dropdownOwner = anchor
+
+    for _, row in ipairs(popup.rows) do row:Hide() end
+    for _, label in ipairs(popup.labels) do label:Hide() end
+    for _, texture in ipairs(popup.separators) do texture:Hide() end
+
+    local yOffset = 5
+    local rowIndex, labelIndex, separatorIndex = 0, 0, 0
+    for _, item in ipairs(items) do
+        local height = dropdownItemHeight(item)
+        if item.isSeparator then
+            separatorIndex = separatorIndex + 1
+            local texture = popup.separators[separatorIndex]
+            if not texture then
+                texture = popup:CreateTexture(nil, "ARTWORK")
+                texture:SetHeight(1)
+                popup.separators[separatorIndex] = texture
+            end
+            texture:ClearAllPoints()
+            texture:SetPoint("TOPLEFT", 6, -(yOffset + 3))
+            texture:SetPoint("TOPRIGHT", -6, -(yOffset + 3))
+            texture:SetColorTexture(0.35, 0.30, 0.16, 0.8)
+            texture:Show()
+        elseif item.isTitle then
+            labelIndex = labelIndex + 1
+            local label = popup.labels[labelIndex]
+            if not label then
+                label = popup:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+                label:SetJustifyH("LEFT")
+                popup.labels[labelIndex] = label
+            end
+            label:ClearAllPoints()
+            label:SetPoint("TOPLEFT", 8, -yOffset)
+            label:SetText(item.text or "")
+            label:SetTextColor(1, 0.82, 0)
+            label:Show()
+        else
+            rowIndex = rowIndex + 1
+            local row = popup.rows[rowIndex]
+            if not row then
+                row = CreateFrame("Button", nil, popup)
+                row.label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+                row.label:SetPoint("LEFT", 20, 0)
+                row.label:SetPoint("RIGHT", -6, 0)
+                row.label:SetJustifyH("LEFT")
+                row.check = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+                row.check:SetPoint("LEFT", 6, 0)
+                row.highlight = row:CreateTexture(nil, "HIGHLIGHT")
+                row.highlight:SetAllPoints()
+                row.highlight:SetTexture("Interface\\Buttons\\WHITE8x8")
+                row.highlight:SetVertexColor(1, 0.82, 0, 0.14)
+                popup.rows[rowIndex] = row
+            end
+            row:ClearAllPoints()
+            row:SetPoint("TOPLEFT", 4, -yOffset)
+            row:SetPoint("TOPRIGHT", -4, -yOffset)
+            row:SetHeight(height)
+            row.label:SetText(item.text or "")
+            -- A tick rather than a texture: the row is 18px tall and the
+            -- ready-check art at that size reads as a smudge.
+            row.check:SetText(item.checked and "|cffffd100*|r" or "")
+            if item.disabled then
+                row.label:SetTextColor(0.45, 0.45, 0.45)
+                row:SetScript("OnClick", nil)
+            else
+                row.label:SetTextColor(item.checked and 1 or 0.94, item.checked and 0.92 or 0.92,
+                    item.checked and 0.75 or 0.88)
+                local func = item.func
+                row:SetScript("OnClick", function()
+                    popup:Hide()
+                    if func then func() end
+                end)
+            end
+            row:Show()
+        end
+        yOffset = yOffset + height
+    end
+
+    popup:SetSize(width, yOffset + 5)
+    popup:ClearAllPoints()
+    if anchor then
+        popup:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -2)
+    else
+        popup:SetPoint("CENTER", self.frame, "CENTER", 0, 0)
+    end
+    if popup.SetFrameLevel then
+        popup:SetFrameLevel((self.frame.GetFrameLevel and self.frame:GetFrameLevel() or 1) + 40)
+    end
+    popup:Show()
+    return true
 end
 
 function UI:OpenFallbackShareMenu(anchor, menu)
@@ -3192,7 +3413,7 @@ function UI:RefreshStatusBar()
         summary = summary or {}
         local counts = summary.statusCounts or {}
         subtitle = string.format(
-            "%s • %d roster member(s) • %d using Recipe Registry now • refreshed %s",
+            "%s - %d roster member(s) - %d using Recipe Registry now - refreshed %s",
             ADDON_STATUS_VIEW,
             summary.rosterTotal or 0,
             counts.online_with_addon or 0,
@@ -3200,15 +3421,15 @@ function UI:RefreshStatusBar()
         )
     else
         subtitle = string.format(
-            "Automatic sync • %d guild addon node(s) • %d known crafter(s)",
+            "Automatic sync - %d guild addon node(s) - %d known crafter(s)",
             onlineNodes,
             members
         )
     end
     if inFlight then
-        subtitle = subtitle .. string.format(" • syncing %s", tostring(inFlight))
+        subtitle = subtitle .. string.format(" - syncing %s", tostring(inFlight))
     elseif queued and queued > 0 then
-        subtitle = subtitle .. string.format(" • %d update(s) queued", queued)
+        subtitle = subtitle .. string.format(" - %d update(s) queued", queued)
     end
     if paused then
         subtitle = subtitle .. " | paused"
@@ -3368,8 +3589,15 @@ function UI:RefreshProfessionButtons(opts)
         setShownIfChanged(self.frame.searchMaterials, true)
         setShownIfChanged(self.frame.profScroll, true)
         setShownIfChanged(self.frame.sidebarHint, true)
+        -- Re-anchored here as well as at build time, and it has to name the
+        -- same neighbour: anchoring it back to the search buttons put it on
+        -- top of the filter control below them, and dragged the profession
+        -- scroll up over that control with it.
+        local above = self.frame.recipeFilterButton or self.frame.searchRecipes
+        setShownIfChanged(self.frame.recipeFilterLabel, true)
+        setShownIfChanged(self.frame.recipeFilterButton, true)
         self.frame.profLabel:ClearAllPoints()
-        self.frame.profLabel:SetPoint("TOPLEFT", self.frame.searchRecipes, "BOTTOMLEFT", 2, -14)
+        self.frame.profLabel:SetPoint("TOPLEFT", above, "BOTTOMLEFT", 2, -14)
         self.frame.profLabel:SetText("Profession filter")
     end
 
@@ -3964,18 +4192,18 @@ function UI:CollectionSourceText(collection, known)
         local info = lineInfo and lineInfo[index]
         local faction = info and info.faction
         if faction == "alliance" then
-            out[index] = out[index] .. " " .. ALLIANCE_TAG
+            out[index] = out[index] .. " " .. ALLIANCE_INLINE_TAG
         elseif faction == "horde" then
-            out[index] = out[index] .. " " .. HORDE_TAG
+            out[index] = out[index] .. " " .. HORDE_INLINE_TAG
         end
     end
     -- A recipe-level restriction still exists -- a quest only one side can
     -- take -- and with no per-line answer it goes where it used to.
     if not lineInfo then
         if collection.faction == "alliance" then
-            out[1] = out[1] .. " " .. ALLIANCE_TAG
+            out[1] = out[1] .. " " .. ALLIANCE_INLINE_TAG
         elseif collection.faction == "horde" then
-            out[1] = out[1] .. " " .. HORDE_TAG
+            out[1] = out[1] .. " " .. HORDE_INLINE_TAG
         end
     end
     return table.concat(out, "\n")
@@ -4099,13 +4327,19 @@ function UI:EnsureCollectionRowParts(row)
         button.highlight:SetTexture("Interface\\Buttons\\WHITE8x8")
         button.highlight:SetVertexColor(1, 1, 1, 0.06)
         button:SetScript("OnClick", function(self, mouseButton)
-            UI:HandleCollectionHeaderClick(self.collectionColumnKey, mouseButton)
+            UI:HandleCollectionHeaderClick(self.collectionColumnKey, mouseButton, self)
         end)
         button:SetScript("OnEnter", function(self)
             GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
-            GameTooltip:AddLine("Left-click to sort")
+            GameTooltip:AddLine(COLLECTION_COLUMN_TITLES[self.collectionColumnKey] or "Column")
+            GameTooltip:AddLine("Left-click to sort", 0.8, 0.8, 0.8)
             if COLLECTION_FILTER_CYCLES[self.collectionColumnKey] then
+                local current = UI:GetCollectionColumnFilter(self.collectionColumnKey)
                 GameTooltip:AddLine("Right-click to filter", 0.8, 0.8, 0.8)
+                if current ~= "all" then
+                    GameTooltip:AddLine("Showing: "
+                        .. (COLLECTION_COLUMN_FILTER_LABELS[current] or current), 1, 0.82, 0)
+                end
             end
             GameTooltip:Show()
         end)
@@ -4226,9 +4460,9 @@ function UI:ShowCollectionRowTooltip(row)
             text = string.format("%s |cff8f949c%.1f, %.1f|r", text, info.x, info.y)
         end
         if info and info.faction == "alliance" then
-            text = text .. " " .. ALLIANCE_TAG
+            text = text .. " " .. ALLIANCE_INLINE_TAG
         elseif info and info.faction == "horde" then
-            text = text .. " " .. HORDE_TAG
+            text = text .. " " .. HORDE_INLINE_TAG
         end
         GameTooltip:AddLine(text, 0.85, 0.85, 0.85, true)
     end
@@ -4715,7 +4949,9 @@ function UI:RefreshRecipeList()
         self:RefreshAddonStatusList()
         return
     end
-    self.searchText = self.recipeSearchText or ""
+    -- Each view has its own search box and its own text; reading the recipe
+    -- browser's here made the collection's box do nothing at all.
+    self:ActivateSearchForCurrentView()
     self.currentAddonStatusSummary = nil
     self.selectedAddonStatusKey = nil
     local effectiveProfession = self.selectedProfession
@@ -4854,7 +5090,10 @@ function UI:_ShowRecipeListLoadingState(context, generation)
     end
     setTextIfChanged(self.frame.recipeHeader, headerText)
     if self.frame.sortSwitch then
-        setShownIfChanged(self.frame.sortSwitch, true)
+        -- Never in a full-width view: it lives in the same corner the guild
+        -- members and collection strips take over, and left showing it peered
+        -- out from behind their buttons.
+        setShownIfChanged(self.frame.sortSwitch, not self:IsFullWidthView())
         if self.frame.sortSwitch.Enable then
             self.frame.sortSwitch:Enable()
         end
@@ -4943,7 +5182,10 @@ function UI:_FinalizeRecipeList(rows, context, generation)
     end
     setTextIfChanged(self.frame.recipeHeader, headerText)
     if self.frame.sortSwitch then
-        setShownIfChanged(self.frame.sortSwitch, true)
+        -- Never in a full-width view: it lives in the same corner the guild
+        -- members and collection strips take over, and left showing it peered
+        -- out from behind their buttons.
+        setShownIfChanged(self.frame.sortSwitch, not self:IsFullWidthView())
         if self.frame.sortSwitch.Enable then
             self.frame.sortSwitch:Enable()
         end
@@ -5054,7 +5296,7 @@ function UI:RefreshHiddenExpansionHint(profession)
     local label = hiddenExpansion == "vanilla" and "Vanilla" or "TBC"
     if hint.text then
         hint.text:SetText(string.format(
-            "%d %s recipe%s hidden by filter — click to show",
+            "%d %s recipe%s hidden by filter -- click to show",
             hiddenCount,
             label,
             hiddenCount == 1 and "" or "s"
@@ -5810,7 +6052,7 @@ function UI:RefreshDetailPanel()
     if detail.professionName then subtitleParts[#subtitleParts + 1] = detail.professionName end
     if detail.directEnchant then subtitleParts[#subtitleParts + 1] = "Direct enchant" end
     subtitleParts[#subtitleParts + 1] = string.format("%d crafter(s)", detail.crafterCount or 0)
-    setTextIfChanged(self.frame.detailSub, table.concat(subtitleParts, "  •  "))
+    setTextIfChanged(self.frame.detailSub, table.concat(subtitleParts, "  -  "))
 
     -- Reset offline accordion state when recipe changes
     if self._lastDetailRecipeKey ~= self.selectedRecipeKey then
@@ -5913,7 +6155,7 @@ function UI:RefreshDetailPanel()
         end
         if #requirements > 0 then
             lines[#lines + 1] = string.format("|cff8f949cRequires %s|r",
-                table.concat(requirements, "  •  "))
+                table.concat(requirements, "  -  "))
         end
     end
 

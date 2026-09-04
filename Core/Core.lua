@@ -780,11 +780,11 @@ function Addon:MaybeShowDeferredScanNotice()
     self._pendingDeferredScanProfession = nil
     if profession and profession ~= "" then
         self:Print(string.format(
-            "You may have learned a %s recipe — open the profession panel to refresh the list.",
+            "You may have learned a %s recipe -- open the profession panel to refresh the list.",
             profession
         ))
     else
-        self:Print("You may have learned a recipe — open the relevant profession panel to refresh the list.")
+        self:Print("You may have learned a recipe -- open the relevant profession panel to refresh the list.")
     end
     return true
 end

@@ -227,14 +227,62 @@ end
 -- Pages carry their own height because a WoW frame does not size itself to its
 -- children; the scroll child is resized to the open page, which is also what
 -- stops a short page from scrolling into empty space.
+-- Grouped by what a setting IS, not by where it used to sit in the column.
+-- The auction house cut is not an interface preference and the profit filter
+-- is not a filing preference: both are about money, so both are on the page
+-- that says so. What belongs to a passing question -- "is this craft worth
+-- doing right now" -- is not a setting at all and has left the panel for the
+-- browser's own filter control.
 local OPTION_PAGES = {
     { key = "browsing",  label = "Browsing",  height = 300 },
-    { key = "filters",   label = "Filters",   height = 560 },
-    { key = "interface", label = "Interface", height = 380 },
+    { key = "filters",   label = "Filters",   height = 540 },
+    { key = "economy",   label = "Economy",   height = 280 },
+    { key = "interface", label = "Interface", height = 360 },
     { key = "sync",      label = "Sync",      height = 320 },
-    { key = "tools",     label = "Tools",     height = 260 },
+    { key = "tools",     label = "Tools",     height = 240 },
 }
-local OPTION_PAGE_TOP = -96
+-- Clear of the title, subtitle and version block above, plus the tab row.
+local OPTION_PAGE_TOP = -132
+local OPTION_TAB_TOP = -104
+
+local OPTION_TAB_HEIGHT = 24
+
+local function createOptionTab(parent, label)
+    local tab = CreateFrame("Button", nil, parent)
+    tab:SetSize(86, OPTION_TAB_HEIGHT)
+
+    tab.bg = tab:CreateTexture(nil, "BACKGROUND")
+    tab.bg:SetAllPoints()
+
+    -- The lit edge along the bottom is what makes a tab read as attached to
+    -- what is under it rather than as a button floating above it.
+    tab.underline = tab:CreateTexture(nil, "ARTWORK")
+    tab.underline:SetHeight(2)
+    tab.underline:SetPoint("BOTTOMLEFT", 0, 0)
+    tab.underline:SetPoint("BOTTOMRIGHT", 0, 0)
+
+    tab.text = tab:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    tab.text:SetPoint("CENTER", 0, 1)
+    tab.text:SetText(label or "")
+
+    tab.highlight = tab:CreateTexture(nil, "HIGHLIGHT")
+    tab.highlight:SetAllPoints()
+    tab.highlight:SetColorTexture(1, 0.82, 0, 0.10)
+
+    function tab:SetSelected(selected)
+        if selected then
+            self.bg:SetColorTexture(0.20, 0.17, 0.09, 0.95)
+            self.underline:SetColorTexture(1, 0.82, 0, 1)
+            self.text:SetTextColor(1, 0.92, 0.75)
+        else
+            self.bg:SetColorTexture(0.10, 0.10, 0.10, 0.85)
+            self.underline:SetColorTexture(0.35, 0.32, 0.24, 0.7)
+            self.text:SetTextColor(0.70, 0.70, 0.70)
+        end
+    end
+    tab:SetSelected(false)
+    return tab
+end
 
 local function createOptionPages(content, scrollFrame)
     local pages, buttons = {}, {}
@@ -243,12 +291,8 @@ local function createOptionPages(content, scrollFrame)
         for pageKey, page in pairs(pages) do
             if pageKey == key then page:Show() else page:Hide() end
         end
-        for buttonKey, button in pairs(buttons) do
-            -- The open page's button is held down, which is how a Blizzard
-            -- panel says "you are here" without a second widget for it.
-            if button.SetButtonState then
-                button:SetButtonState(buttonKey == key and "PUSHED" or "NORMAL", buttonKey == key)
-            end
+        for buttonKey, tab in pairs(buttons) do
+            if tab.SetSelected then tab:SetSelected(buttonKey == key) end
         end
         for _, definition in ipairs(OPTION_PAGES) do
             if definition.key == key and content.SetHeight then
@@ -269,16 +313,15 @@ local function createOptionPages(content, scrollFrame)
         page:Hide()
         pages[definition.key] = page
 
-        local button = createButton(content, definition.label, 96, function()
-            show(definition.key)
-        end)
+        local tab = createOptionTab(content, definition.label)
         if previous then
-            button:SetPoint("LEFT", previous, "RIGHT", 4, 0)
+            tab:SetPoint("TOPLEFT", previous, "TOPRIGHT", 2, 0)
         else
-            button:SetPoint("TOPLEFT", content, "TOPLEFT", SECTION_LEFT_X, -64)
+            tab:SetPoint("TOPLEFT", content, "TOPLEFT", SECTION_LEFT_X, OPTION_TAB_TOP)
         end
-        buttons[definition.key] = button
-        previous = button
+        tab:SetScript("OnClick", function() show(definition.key) end)
+        buttons[definition.key] = tab
+        previous = tab
     end
 
     show(OPTION_PAGES[1].key)
@@ -661,9 +704,6 @@ function Options:RefreshControls()
     if self.remoteBopCheck then
         self.remoteBopCheck:SetChecked(filters.showRemoteBopOutputRecipes == true)
     end
-    if self.profitableOnlyCheck then
-        self.profitableOnlyCheck:SetChecked(filters.showOnlyProfitableRecipes == true)
-    end
     if self.professionFilterControls then
         for _, profession in ipairs(FILTER_PROFESSIONS) do
             local row = self.professionFilterControls[profession.key]
@@ -748,6 +788,7 @@ function Options:EnsurePanel()
     self.ShowPage = function(_, key) showPage(key) end
     local pageBrowsing = pages.browsing
     local pageFilters = pages.filters
+    local pageEconomy = pages.economy
     local pageInterface = pages.interface
     local pageSync = pages.sync
     local pageTools = pages.tools
@@ -833,19 +874,14 @@ function Options:EnsurePanel()
         remoteBopCheck:SetPoint("TOPLEFT", globalTbcCheck, "BOTTOMLEFT", 0, -2)
         self.remoteBopCheck = remoteBopCheck
 
-        -- One switch, not a filter axis: a craft is in when the created item
-        -- sells for more than its reagents, and out otherwise. Recipes whose
-        -- price cannot be resolved end to end are out too, which is why this
-        -- is opt-in -- without TSM or Auctionator data it empties the list.
-        local profitableOnlyCheck = createCheck(pageFilters, "Show only profitable recipes (needs TSM or Auctionator)", function(self)
-            setProfitableOnly(self:GetChecked() and true or false)
-            Options:RefreshControls()
-        end)
-        profitableOnlyCheck:SetPoint("TOPLEFT", remoteBopCheck, "BOTTOMLEFT", 0, -2)
-        self.profitableOnlyCheck = profitableOnlyCheck
+        -- "Show only profitable" is not here any more. It answers a passing
+        -- question -- is this craft worth doing right now -- rather than
+        -- stating a preference about the collection, and a passing question
+        -- belongs next to the list it changes. It lives in the recipe
+        -- browser's own filter control; see the Economy page.
 
         local matrixHeader = createText(pageFilters, "Profession overrides", "GameFontNormalSmall")
-        matrixHeader:SetPoint("TOPLEFT", profitableOnlyCheck, "BOTTOMLEFT", 28, -10)
+        matrixHeader:SetPoint("TOPLEFT", remoteBopCheck, "BOTTOMLEFT", 28, -10)
 
         local headerProfession = createColumnHeader(pageFilters, "Profession", 132)
         headerProfession:SetJustifyH("LEFT")
@@ -969,15 +1005,6 @@ function Options:EnsurePanel()
         "Adds a Recipe Registry section to item, recipe, spell, and enchant tooltips listing guildmates who can craft them. Disable for leaner tooltips.")
     self.tooltipCraftersCheck = tooltipCraftersCheck
 
-    local auctionCutCheck = createCheck(pageInterface, "Subtract the 5% auction house cut from profit", function(self)
-        setAuctionCutSubtracted(self:GetChecked() and true or false)
-        Options:RefreshControls()
-    end)
-    auctionCutCheck:SetPoint("TOPLEFT", tooltipCraftersCheck, "BOTTOMLEFT", 0, -4)
-    setHoverTooltip(auctionCutCheck, "Auction house cut",
-        "Off by default: the \"Sells for\" figure stays gross, which is also the price to list your auction at. Turn this on to net the 5% the auction house keeps out of the profit line and the \"only profitable\" filter.")
-    self.auctionCutCheck = auctionCutCheck
-
     local scaleSlider = createSlider(pageInterface,
         "Main window scale",
         60, 120, 5,
@@ -988,7 +1015,7 @@ function Options:EnsurePanel()
             end
         end
     )
-    scaleSlider:SetPoint("TOPLEFT", auctionCutCheck, "BOTTOMLEFT", 8, -26)
+    scaleSlider:SetPoint("TOPLEFT", tooltipCraftersCheck, "BOTTOMLEFT", 8, -26)
     setHoverTooltip(scaleSlider, "Main window scale",
         "Shrinks or enlarges the whole Recipe Registry window. Useful on small screens; you can also drag the grip in the window's bottom-right corner to resize it.")
     self.scaleSlider = scaleSlider
@@ -999,6 +1026,35 @@ function Options:EnsurePanel()
         end
     end)
     openButton:SetPoint("TOPLEFT", scaleSlider, "BOTTOMLEFT", -6, -30)
+
+    -- Everything about money in one place: what a craft is worth, what the
+    -- auction house keeps, and where the prices come from. None of it was a
+    -- filing preference or an interface preference, which is where it had
+    -- ended up.
+    local economyHeader = createPageHeader(pageEconomy, "Economy")
+    local economyHelp = createText(pageEconomy,
+        "Recipe Registry reads prices from TSM or Auctionator, and from every merchant window you open.")
+    economyHelp:SetPoint("TOPLEFT", economyHeader, "BOTTOMLEFT", 0, -6)
+
+    local auctionCutCheck = createCheck(pageEconomy, "Subtract the 5% auction house cut from profit", function(self)
+        setAuctionCutSubtracted(self:GetChecked() and true or false)
+        Options:RefreshControls()
+    end)
+    auctionCutCheck:SetPoint("TOPLEFT", economyHelp, "BOTTOMLEFT", -2, -10)
+    setHoverTooltip(auctionCutCheck, "Auction house cut",
+        "Off by default: the \"Sells for\" figure stays gross, which is also the price to list your auction at. Turn this on to net the 5% the auction house keeps out of the profit line and the \"only profitable\" filter.")
+    self.auctionCutCheck = auctionCutCheck
+
+    local profitFilterNote = createText(pageEconomy,
+        "Showing only the crafts worth more than their materials is a question you ask now and then, not a preference: it is on the filter control above the recipe list.")
+    profitFilterNote:SetPoint("TOPLEFT", auctionCutCheck, "BOTTOMLEFT", 28, -8)
+
+    local priceDiagButton = createButton(pageEconomy, "Price Providers Status", 180, function()
+        if Addon.Market and Addon.Market.DumpStatus then
+            Addon.Market:DumpStatus("")
+        end
+    end)
+    priceDiagButton:SetPoint("TOPLEFT", profitFilterNote, "BOTTOMLEFT", -6, -16)
 
     local tuningHeader = createPageHeader(pageSync, "Sync Tuning")
     local tuningHelp = createText(pageSync,
@@ -1051,17 +1107,10 @@ function Options:EnsurePanel()
     self.pullTimeoutSlider = pullTimeoutSlider
 
     local toolsHeader = createPageHeader(pageTools, "Tools")
-    local priceDiagButton = createButton(pageTools, "Price Providers Status", 180, function()
-        if Addon.Market and Addon.Market.DumpStatus then
-            Addon.Market:DumpStatus("")
-        end
-    end)
-    priceDiagButton:SetPoint("TOPLEFT", toolsHeader, "BOTTOMLEFT", -6, -8)
-
     local perfButton = createButton(pageTools, "Toggle Perf Debug", 180, function()
         Addon:SlashHandler("perf toggle")
     end)
-    perfButton:SetPoint("TOPLEFT", priceDiagButton, "BOTTOMLEFT", 0, -8)
+    perfButton:SetPoint("TOPLEFT", toolsHeader, "BOTTOMLEFT", -6, -8)
 
     local perfDumpButton = createButton(pageTools, "Dump Perf Status", 180, function()
         Addon:SlashHandler("perf dump")

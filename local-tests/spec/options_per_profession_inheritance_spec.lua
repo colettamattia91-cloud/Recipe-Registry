@@ -32,6 +32,14 @@ local function makeFrame()
     function frame:SetColorTexture(r, g, b, a)
         self.colorTexture = { r, g, b, a }
     end
+    -- The page tabs paint themselves rather than borrowing a Blizzard tab
+    -- template, so the double has to answer the calls that painting makes.
+    function frame:SetAllPoints()
+        self.allPoints = true
+    end
+    function frame:SetTextColor(r, g, b, a)
+        self.textColor = { r, g, b, a }
+    end
     function frame:SetScript(scriptName, callback)
         self.scripts[scriptName] = callback
     end

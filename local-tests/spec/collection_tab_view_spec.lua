@@ -140,6 +140,14 @@ Test.it("says what the filter is showing, and why the list is empty", function()
     data:InvalidateRecipeCaches()
 
     ui._collectionShownCount = 40
+    -- The one control now stands for every axis the table can be narrowed by,
+    -- so "unfiltered" means the expansions are open too.
+    -- Both of these refresh the list, which wants a real frame; the stub is
+    -- put back straight after.
+    ui.frame = nil
+    ui:SetExpansionFilter("all")
+    ui:ClearCollectionColumnFilters()
+    ui.frame = { collectionHelp = help, collectionFilterButton = button }
     ui:RefreshCollectionControls()
     -- The unfiltered state is never highlighted: a full book must not look
     -- like a filtered one.
@@ -799,11 +807,12 @@ Test.it("says on the header which way it is sorted and what it is filtering", fu
 
     ui.collectionFilters.source = "vendor"
     local text = ui:GetCollectionHeaderText("source", "Learned from")
-    Test.truthy(text:find("Vendor", 1, true) ~= nil, "got: " .. text)
-    -- The [F] marker is the guild members table's own way of saying a column
-    -- can be filtered; the collection table borrows it rather than inventing
-    -- a second vocabulary.
-    Test.truthy(text:find("[F]", 1, true) ~= nil, "got: " .. text)
+    Test.truthy(text:find("ffffd100", 1, true) ~= nil,
+        "a narrowed column says so in its colour, got: " .. text)
+    -- Which filter is in force is said by the colour and by the tick in the
+    -- column's menu, not by the header text: the narrowest column is 62 pixels
+    -- and the value written in clipped the half that mattered.
+    Test.truthy(#text < 40, "a header has to fit its column, got: " .. text)
     resetColumnState()
 end)
 
@@ -836,23 +845,41 @@ Test.it("puts every search box on the left of its strip", function()
 end)
 
 -- Three states, and the fourth combination is an empty browser.
-Test.it("never cycles the expansion filter into showing nothing", function()
+Test.it("never lets the expansion filter show nothing", function()
+    ui.frame = nil
     local filters = addon.RecipeUiFilters
     Test.truthy(filters ~= nil)
     Test.eq(filters:SetExpansionDefaults(false, false), false)
 
-    local seen = {}
-    for _ = 1, 6 do
-        ui:CycleExpansionFilter()
+    for _, key in ipairs({ "all", "tbc", "vanilla" }) do
+        ui:SetExpansionFilter(key)
         local vanilla, tbc = filters:GetExpansionDefaults()
         Test.truthy(vanilla or tbc, "at least one expansion has to stay visible")
-        seen[ui:GetExpansionFilterState().key] = true
+        Test.eq(ui:GetExpansionFilterState().key, key)
     end
-    Test.eq(seen.all, true)
-    Test.eq(seen.tbc, true)
-    Test.eq(seen.vanilla, true)
 
     filters:SetExpansionDefaults(false, true)
+end)
+
+-- A per-profession override outranks the global pair, which is what made the
+-- in-window control look broken: "TBC only" left every Vanilla recipe of an
+-- overridden profession in the list. The control has to mean what it says.
+Test.it("puts an overriding profession back in step when an expansion is chosen", function()
+    ui.frame = nil
+    local filters = addon.RecipeUiFilters
+    local prefilters = addon.db.profile.recipePrefilters
+    prefilters.professionExpansionOverrides = {
+        engineering = { inherit = false, vanilla = true, tbc = true },
+    }
+    -- While one disagrees, the control refuses to report a state the list does
+    -- not obey.
+    Test.eq(ui:GetExpansionFilterState().key, "mixed")
+
+    ui:SetExpansionFilter("tbc")
+    Test.eq(next(prefilters.professionExpansionOverrides), nil)
+    Test.eq(ui:GetExpansionFilterState().key, "tbc")
+    local visibility = filters:GetEffectiveExpansionVisibility("engineering")
+    Test.eq(visibility.vanilla, false)
 end)
 
 Test.it("toggles the profit filter from the browser, not only the options panel", function()
@@ -1063,6 +1090,116 @@ Test.it("knows the skill a recipe takes for all but a handful", function()
     end
     Test.gte(total, 2000)
     Test.lte(missing, 40)
+end)
+
+-- Guards for the regressions the first in-game pass of this work turned up.
+-- Every one of them was invisible to the suite as it stood, which is why they
+-- reached the client.
+
+-- The sidebar re-anchors its own profession label on every refresh. Anchoring
+-- it back to the search buttons put it on top of the filter control below
+-- them, and dragged the profession scroll up over that control with it.
+Test.it("re-anchors the profession label below the filter control, not over it", function()
+    local body = bodyOf("function UI:RefreshProfessionButtons(")
+    Test.truthy(body ~= nil)
+    Test.truthy(body:find("recipeFilterButton", 1, true) ~= nil,
+        "the refresh has to know what sits above the profession list")
+    Test.eq(body:find('profLabel:SetPoint("TOPLEFT", self.frame.searchRecipes', 1, true), nil,
+        "anchoring it back to the search buttons is what buried the filter control")
+end)
+
+-- Each view has its own search box and its own text. The list was reading the
+-- recipe browser's over the top of whichever view was open, so the collection's
+-- box did nothing at all.
+Test.it("searches with the text belonging to the view being drawn", function()
+    local body = bodyOf("function UI:RefreshRecipeList(")
+    Test.truthy(body ~= nil)
+    Test.truthy(body:find("ActivateSearchForCurrentView", 1, true) ~= nil,
+        "the list must ask the view which search text is its own")
+    Test.eq(body:find("self.searchText = self.recipeSearchText", 1, true), nil,
+        "one view's search text must not be written over another's")
+end)
+
+-- The sort switch lives in the corner the full-width strips take over, so
+-- left showing it peered out from behind their buttons.
+Test.it("keeps the sort switch out of the full-width views", function()
+    local count = 0
+    local at = 1
+    while true do
+        local found = mainFrameSource:find("setShownIfChanged(self.frame.sortSwitch, not self:IsFullWidthView())", at, true)
+        if not found then break end
+        count = count + 1
+        at = found + 1
+    end
+    Test.eq(count, 2, "both list-finalise paths show it, so both have to gate it")
+end)
+
+-- A money string is one line or it is nonsense: wrapped, each coin icon ends
+-- up under a number it does not belong to.
+Test.it("never wraps a figure in the money column", function()
+    local body = bodyOf("function UI:EnsureDetailLine(")
+    Test.truthy(body ~= nil)
+    Test.truthy(body:find("line.value:SetWordWrap(false)", 1, true) ~= nil,
+        "the money column must not wrap")
+    Test.truthy(mainFrameSource:find("local DETAIL_VALUE_WIDTH = 132", 1, true) ~= nil,
+        "and it must be wide enough for gold, silver and copper with their icons")
+end)
+
+-- WoW's fonts carry Latin-1 and little else. The earlier sweep for this used a
+-- grep that silently did nothing, so em dashes and bullets shipped in header
+-- subtitles and chat prints. This one reads the bytes.
+Test.it("keeps every string the player can see inside ASCII", function()
+    local offenders = {}
+    for _, path in ipairs({ "UI/MainFrame.lua", "UI/Options.lua", "UI/Tooltip.lua", "Core/Core.lua" }) do
+        local handle = assert(io.open(path, "r"))
+        local lineNumber = 0
+        for line in handle:lines() do
+            lineNumber = lineNumber + 1
+            -- Comments are never drawn, so they may say what they like.
+            if not line:match("^%s*%-%-") then
+                for index = 1, #line do
+                    if line:byte(index) > 127 then
+                        offenders[#offenders + 1] = path .. ":" .. lineNumber
+                        break
+                    end
+                end
+            end
+        end
+        handle:close()
+    end
+    Test.eq(#offenders, 0, "non-ASCII in a drawn string: " .. table.concat(offenders, ", "))
+end)
+
+-- Filters were one card button per axis and they multiplied: three in the
+-- collection strip, two more in the sidebar.
+Test.it("gives each view one filter control, not one per axis", function()
+    for _, name in ipairs({
+        "collectionExpansionButton", "collectionResetButton", "expansionButton", "profitButton",
+    }) do
+        Test.eq(mainFrameSource:find("f." .. name .. " =", 1, true), nil,
+            name .. " should have been folded into the one filter menu")
+    end
+    Test.truthy(bodyOf("function UI:OpenCollectionFilterMenu(") ~= nil)
+    Test.truthy(bodyOf("function UI:OpenRecipeFilterMenu(") ~= nil)
+    Test.truthy(bodyOf("function UI:OpenDropdown(") ~= nil)
+end)
+
+-- The auction house cut is not an interface preference and the profit filter
+-- is not a filing preference.
+Test.it("files the money settings under money", function()
+    local handle = assert(io.open("UI/Options.lua", "r"))
+    local optionsSource = handle:read("*a")
+    handle:close()
+
+    Test.truthy(optionsSource:find('key = "economy"', 1, true) ~= nil,
+        "the panel needs somewhere for the money settings to live")
+    Test.truthy(optionsSource:find("createCheck(pageEconomy, \"Subtract the 5%", 1, true) ~= nil,
+        "the auction house cut belongs there, not next to the minimap switch")
+    Test.truthy(optionsSource:find("createButton(pageEconomy, \"Price Providers Status\"", 1, true) ~= nil,
+        "so does where the prices come from")
+    -- A passing question is not a setting: it left the panel for the browser.
+    Test.eq(optionsSource:find("profitableOnlyCheck", 1, true), nil,
+        "the profit filter is a filter control now, not an option")
 end)
 
 io.write(string.format("Collection tab view: %d test(s) passed\n", Test.count))

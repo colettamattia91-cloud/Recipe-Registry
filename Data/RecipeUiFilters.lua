@@ -149,6 +149,46 @@ function RecipeUiFilters:GetProfessionsWithExpansionOverride()
     return out
 end
 
+-- A profession override outranks the global default, which made the in-window
+-- expansion control look broken: setting "TBC only" left every Vanilla recipe
+-- of an overridden profession in the list, because that profession had been
+-- told to answer for itself. A control that says "TBC only" has to mean it, so
+-- choosing an expansion from the window clears the overrides it would
+-- otherwise be silently losing to. The per-profession table in the options
+-- panel is where they are set, and it is where they can be set again.
+function RecipeUiFilters:ClearProfessionExpansionOverrides()
+    local filters = getProfilePrefilters()
+    local cleared = false
+    for professionKey in pairs(filters.professionExpansionOverrides or {}) do
+        filters.professionExpansionOverrides[professionKey] = nil
+        cleared = true
+    end
+    if cleared then
+        self:InvalidateProfessionProjection(nil, "filters:overrides-cleared")
+    end
+    return cleared
+end
+
+-- A profession override outranks the global default, which made the in-window
+-- expansion control look broken: setting "TBC only" left every Vanilla recipe
+-- of an overridden profession in the list, because that profession had been
+-- told to answer for itself. A control that says "TBC only" has to mean it, so
+-- choosing an expansion from the window clears the overrides it would
+-- otherwise be silently losing to. The per-profession table in the options
+-- panel is where they are set, and it is where they can be set again.
+function RecipeUiFilters:ClearProfessionExpansionOverrides()
+    local filters = getProfilePrefilters()
+    local cleared = false
+    for professionKey in pairs(filters.professionExpansionOverrides or {}) do
+        filters.professionExpansionOverrides[professionKey] = nil
+        cleared = true
+    end
+    if cleared then
+        self:InvalidateProfessionProjection(nil, "filters:overrides-cleared")
+    end
+    return cleared
+end
+
 function RecipeUiFilters:IsProfitableOnly()
     return getProfilePrefilters().showOnlyProfitableRecipes == true
 end
