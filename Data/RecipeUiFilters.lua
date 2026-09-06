@@ -257,16 +257,23 @@ end
 -- the unpriceable would quietly empty whole professions -- every flask
 -- needs a vial -- and the filter would be hiding recipes out of ignorance
 -- rather than out of a verdict.
+-- Four answers, not three. A craft whose best case already loses money is
+-- unprofitable whatever the missing reagent costs, so a partial estimate is
+-- still grounds to hide it; a partial estimate in the black is not, because
+-- the missing reagent could take it back under.
 local function profitVerdict(recipeKey, info)
     local market = Addon.Market
     if not (market and market.EstimateRecipeProfit) then
         return "unpriceable"
     end
-    local profit = market:EstimateRecipeProfit(recipeKey, info)
+    local profit, quality = market:EstimateRecipeProfit(recipeKey, info)
     if type(profit) ~= "number" then
         return "unpriceable"
     end
-    return profit > 0 and "profitable" or "unprofitable"
+    if profit <= 0 then
+        return "unprofitable"
+    end
+    return quality == "partial" and "partial" or "profitable"
 end
 
 function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
@@ -283,6 +290,9 @@ function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
     if verdict == "unprofitable" then
         Addon:Trace("filters", "recipe hidden by profit filter", recipeKey)
         return false, "hidden-not-profitable"
+    end
+    if verdict == "partial" then
+        return true, "visible-partial-price"
     end
     if verdict == "unpriceable" then
         return true, "visible-unpriced"

@@ -1413,6 +1413,29 @@ function Data:InvalidateRecipeCaches(scope)
         end
         return
     end
+    -- Prices change what a detail SHOWS, and -- only while the profitable-only
+    -- filter is on -- which recipes the list contains. They change neither who
+    -- knows what nor how a recipe is catalogued, so the ownership index and the
+    -- by-profession map survive: rebuilding those walks every member of the
+    -- guild, and an auction scan sends an update every few hundred
+    -- milliseconds. The detail cache does have to go, because the cost block
+    -- is written into the cached record itself.
+    if scope == "prices" then
+        self._recipeDetailCache = nil
+        self._recipeDetailCacheOrder = nil
+        self._recipeDetailCacheReady = nil
+        if self.db and self.db.global then
+            self.db.global.recipeDetailCache = nil
+            self.db.global.recipeDetailCacheOrder = nil
+        end
+        local prefilters = Addon.db and Addon.db.profile and Addon.db.profile.recipePrefilters
+        if prefilters and prefilters.showOnlyProfitableRecipes == true then
+            self._recipeListCacheGeneration = (self._recipeListCacheGeneration or 0) + 1
+            self._recipeListCache = nil
+            self._recipeListCacheOrder = nil
+        end
+        return
+    end
     self._recipeListCacheGeneration = (self._recipeListCacheGeneration or 0) + 1
     if scope == "list" then
         -- Content changed (new recipes / new owner / status flip): the

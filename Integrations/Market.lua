@@ -1,5 +1,5 @@
 local Addon = _G.RecipeRegistry
-local Market = Addon:NewModule("Market", "AceEvent-3.0")
+local Market = Addon:NewModule("Market", "AceEvent-3.0", "AceTimer-3.0")
 Addon.Market = Market
 
 local GetItemInfo = Addon.Compat.GetItemInfo
@@ -189,7 +189,14 @@ function Market:ScanMerchantPrices()
     local learned = 0
     local count = getNum() or 0
     for index = 1, count do
-        local ok, _name, _texture, price, quantity, _available, _usable, extendedCost = pcall(getInfo, index)
+        -- Eight returns, and they have to be counted: name, texture, price,
+        -- quantity, numAvailable, isPurchasable, isUsable, extendedCost. One
+        -- slot short and `extendedCost` reads `isUsable` instead -- which is
+        -- true for anything the character can use, so every vial, thread and
+        -- spice was skipped as though it cost honor points, and the store was
+        -- never written at all.
+        local ok, _name, _texture, price, quantity, _available, _purchasable, _usable, extendedCost =
+            pcall(getInfo, index)
         if ok and extendedCost ~= true then
             local unit = clampCopper((tonumber(price) or 0) / math.max(1, tonumber(quantity) or 1))
             local itemID
@@ -197,7 +204,16 @@ function Market:ScanMerchantPrices()
                 local okLink, link = pcall(getLink, index)
                 itemID = okLink and link and extractItemIDFromQuery(link) or nil
             end
-            if itemID and reagentIds[itemID] and unit and unit > 0 and store[itemID] ~= unit then
+            -- numAvailable is -1 for unlimited stock and a count for limited.
+            -- Only the unlimited kind is a price: an Adamantite Frame sitting
+            -- on a merchant for a few silver is two of them, gone, and then a
+            -- respawn timer -- costing a craft at that price would promise
+            -- materials that are not actually for sale. In practice this
+            -- leaves the vials, threads and spices, which is exactly the set
+            -- the auction house prices badly.
+            local unlimited = tonumber(_available) == -1
+            if unlimited and itemID and reagentIds[itemID] and unit and unit > 0
+                and store[itemID] ~= unit then
                 store[itemID] = unit
                 learned = learned + 1
             end
@@ -212,6 +228,23 @@ function Market:ScanMerchantPrices()
     return learned
 end
 
+-- An event name the client does not know makes RegisterEvent THROW, and that
+-- aborts whatever is left of OnEnable. REPLICATE_ITEM_LIST_UPDATE went in on
+-- the strength of a memory rather than a check -- it is a retail event, absent
+-- from 2.5.x -- and because it sat above the merchant registration it took the
+-- vendor scan down with it. So anything the addon can live without is
+-- registered through here, after everything it cannot.
+--
+-- Returns whether the client knew the event. A miss is not a failure: the
+-- addon simply refreshes prices at the moments this flavour does report.
+function Market:RegisterOptionalEvent(event, handler)
+    local ok = pcall(self.RegisterEvent, self, event, handler)
+    if not ok then
+        Addon:Trace("market", "client has no event", event)
+    end
+    return ok
+end
+
 function Market:OnEnable()
     -- TSM and Auctionator refresh their price data when the player runs
     -- an auction-house scan. The cleanest moment to drop our derived
@@ -219,8 +252,19 @@ function Market:OnEnable()
     -- (if any) has finished writing. We also invalidate the recipe
     -- detail cache so an open recipe panel recomputes its cost block
     -- on next refresh.
+    -- The events this addon cannot work without go first, and unguarded: if
+    -- one of these is missing the client is not one we support.
     self:RegisterEvent("AUCTION_HOUSE_CLOSED", "OnAuctionHouseClosed")
     self:RegisterEvent("MERCHANT_SHOW", "OnMerchantShow")
+
+    -- Closing the window is not the only moment the numbers change: a scan
+    -- rewrites the provider's database while the window is still open, and a
+    -- player who alt-tabs to this addon without closing the auction house was
+    -- reading whatever was cached before the scan. This one fires as the data
+    -- lands, once per result page, so it goes through a throttle -- and
+    -- through the guarded registration, since auction events differ by
+    -- flavour. See RegisterOptionalEvent.
+    self:RegisterOptionalEvent("AUCTION_ITEM_LIST_UPDATE", "OnAuctionDataUpdated")
 end
 
 function Market:OnMerchantShow()
@@ -228,14 +272,51 @@ function Market:OnMerchantShow()
 end
 
 function Market:OnAuctionHouseClosed()
+    -- Closing settles the scan by itself; a pending timer would only drop the
+    -- caches a second time for nothing.
+    if self._auctionSettleTimer then
+        self:CancelTimer(self._auctionSettleTimer, true)
+        self._auctionSettleTimer = nil
+    end
     self:InvalidatePriceCache("auction-house-closed")
 end
+
+-- How long the page events have to stop before the scan counts as finished.
+local AUCTION_SETTLE_DELAY = 2
+
+-- Debounced, not throttled, and the difference matters. A full scan sends a
+-- page event every few hundred milliseconds for minutes; a throttle would drop
+-- the caches every few seconds throughout, and the panel a player is reading
+-- at the auction house -- to look up what a craft needs, which is exactly why
+-- it would be open -- would churn under them the whole time. Each event
+-- instead pushes the deadline out, so a scan of any length costs exactly one
+-- refresh, once the numbers have stopped moving.
+function Market:OnAuctionDataUpdated()
+    -- An empty cache holds nothing stale, so there is nothing to schedule.
+    if not next(self.priceCache or {}) and not next(self.vendorCache or {}) then
+        return false
+    end
+    if self._auctionSettleTimer then
+        self:CancelTimer(self._auctionSettleTimer, true)
+    end
+    self._auctionSettleTimer = self:ScheduleTimer("OnAuctionScanSettled", AUCTION_SETTLE_DELAY)
+    return true
+end
+
+function Market:OnAuctionScanSettled()
+    self._auctionSettleTimer = nil
+    self:InvalidatePriceCache("auction-data-settled")
+end
+
 
 function Market:InvalidatePriceCache(reason)
     self.priceCache = {}
     self.vendorCache = {}
     if Addon.Data and Addon.Data.InvalidateRecipeCaches then
-        Addon.Data:InvalidateRecipeCaches("metadata")
+        -- Deliberately not "metadata": that scope also drops the recipe index
+        -- and the by-profession map, which cost a full member walk to rebuild
+        -- and have nothing to do with what anything costs.
+        Addon.Data:InvalidateRecipeCaches("prices")
     end
     if Addon.RequestRefresh then
         Addon:RequestRefresh(reason or "prices")
@@ -519,19 +600,29 @@ function Market:EstimateRecipeProfit(recipeKey, info)
     local reagents = info.reagents
     if type(reagents) ~= "table" or #reagents == 0 then return nil, "unpriceable" end
 
-    local cost = 0
+    -- A reagent nobody has listed does not make the craft unknowable. Every
+    -- other reagent still costs what it costs, so the sum is a floor on the
+    -- spend and the profit computed from it is a ceiling -- and a ceiling is
+    -- a real answer: a craft that loses money at its best case loses money.
+    -- Only a recipe where NOTHING priced is genuinely unknown.
+    local cost, missing = 0, 0
     for index = 1, #reagents do
         local reagent = reagents[index]
         local price = reagent.itemId and self:GetMaterialCost(reagent.itemId) or nil
-        if not price then
-            return nil, "unpriceable"
+        if price then
+            cost = cost + price * (tonumber(reagent.count) or 1)
+        else
+            missing = missing + 1
         end
-        cost = cost + price * (tonumber(reagent.count) or 1)
+    end
+    if missing >= #reagents then
+        return nil, "unpriceable"
     end
 
     -- Conservative on random yields: the guaranteed quantity, not the lucky one.
     local count = tonumber(info.createdCount) or 1
-    return math.floor(unitPrice * count * self:GetSaleMultiplier()) - cost
+    local profit = math.floor(unitPrice * count * self:GetSaleMultiplier()) - cost
+    return profit, missing > 0 and "partial" or "priced"
 end
 
 function Market:ApplyRecipeCosts(detail)

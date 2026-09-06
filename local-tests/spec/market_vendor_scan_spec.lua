@@ -7,13 +7,25 @@ local Test = dofile("local-tests/harness/test.lua")
 
 local _metadataAddon, _wow, addon = Loader.LoadMetadata()
 
--- name, texture, price, quantity, numAvailable, isUsable, extendedCost
+-- The real signature, all eight of it:
+--   name, texture, price, quantity, numAvailable, isPurchasable, isUsable,
+--   extendedCost
+--
+-- This fixture used to return seven, leaving isPurchasable out -- the same
+-- slot the scanner was missing. Written to the shape of the bug, it asserted
+-- a convention the game does not have, and five specs passed over code that
+-- could not work in the client: extendedCost read isUsable, which is true for
+-- anything the character can use, so every vial and thread was skipped as
+-- though it cost honor points.
 local function stockMerchant(rows)
     _G.GetMerchantNumItems = function() return #rows end
     _G.GetMerchantItemInfo = function(index)
         local row = rows[index]
         if not row then return nil end
-        return row.name, "texture", row.price, row.quantity or 1, -1, true, row.extendedCost == true
+        -- numAvailable: -1 is unlimited stock, anything else is a count.
+        return row.name, "texture", row.price, row.quantity or 1,
+            row.available or -1,
+            true, row.isUsable ~= false, row.extendedCost == true
     end
     _G.GetMerchantItemLink = function(index)
         local row = rows[index]
@@ -105,6 +117,125 @@ Test.it("bounds the reagent set to the metadata", function()
     Test.gte(count, 50)
     Test.lte(count, 2000)
     Test.eq(ids[3371], true)
+end)
+
+-- The bug this fixture used to hide. A vial the character can drink is
+-- exactly the case: usable, bought with money, and skipped.
+Test.it("records a reagent the character can use", function()
+    resetStore()
+    stockMerchant({
+        { name = "Imbued Vial", itemID = 18256, price = 16000, quantity = 5, isUsable = true },
+    })
+    Test.eq(addon.Market:ScanMerchantPrices(), 1,
+        "usable is not the same question as bought with something other than money")
+    Test.eq(addon.db.global.vendorPrices[18256], 3200,
+        "and the price is per item, not per stack of five")
+end)
+
+Test.it("still refuses anything bought with something other than money", function()
+    resetStore()
+    stockMerchant({
+        { name = "Imbued Vial", itemID = 18256, price = 16000, quantity = 5, extendedCost = true },
+    })
+    Test.eq(addon.Market:ScanMerchantPrices(), 0)
+    Test.eq(addon.db.global.vendorPrices[18256], nil)
+end)
+
+-- The scanner has to name every return it skips over, or the ones it reads
+-- are somebody else's values.
+Test.it("counts all eight returns of GetMerchantItemInfo", function()
+    local handle = assert(io.open("Integrations/Market.lua", "r"))
+    local source = handle:read("*a")
+    handle:close()
+    Test.truthy(source:find("_available, _purchasable, _usable, extendedCost", 1, true) ~= nil,
+        "isPurchasable sits between numAvailable and isUsable and cannot be skipped")
+end)
+
+-- An Adamantite Frame sitting on a merchant for a few silver is two of them,
+-- gone, and then a respawn timer. Costing a craft at that price promises
+-- materials that are not for sale.
+Test.it("prices only what the merchant always has in stock", function()
+    resetStore()
+    stockMerchant({
+        { name = "Imbued Vial", itemID = 18256, price = 16000, quantity = 5, available = -1 },
+        { name = "Adamantite Frame", itemID = 23782, price = 12000, available = 2 },
+    })
+    Test.eq(addon.Market:ScanMerchantPrices(), 1)
+    Test.eq(addon.db.global.vendorPrices[18256], 3200, "unlimited stock is a price")
+    Test.eq(addon.db.global.vendorPrices[23782], nil, "two in the world is not")
+end)
+
+Test.it("does not treat a stock of one as unlimited", function()
+    resetStore()
+    stockMerchant({
+        { name = "Imbued Vial", itemID = 18256, price = 3200, available = 1 },
+    })
+    Test.eq(addon.Market:ScanMerchantPrices(), 0)
+end)
+
+-- A full scan sends a page event every few hundred milliseconds for minutes.
+-- The addon window is often open at the auction house -- looking up what a
+-- craft needs is exactly why you would have it open -- so dropping the caches
+-- on a timer would churn the panel under the player for the whole scan.
+-- Debounced instead: every event pushes the deadline out, and the refresh
+-- lands once, after the numbers stop moving.
+local function countingInvalidation()
+    local calls = { n = 0 }
+    local real = addon.Market.InvalidatePriceCache
+    addon.Market.InvalidatePriceCache = function(self, reason)
+        calls.n = calls.n + 1
+        calls.last = reason
+        return real(self, reason)
+    end
+    calls.restore = function() addon.Market.InvalidatePriceCache = real end
+    return calls
+end
+
+Test.it("refreshes once when a scan settles, not once per page", function()
+    resetStore()
+    -- Something has to be cached, or there is nothing stale to schedule for.
+    addon.Market.priceCache = { [22573] = { price = 100, source = "spec" } }
+    local calls = countingInvalidation()
+
+    for _ = 1, 12 do
+        addon.Market:OnAuctionDataUpdated()
+        _wow.AdvanceTime(0.4)
+        _wow.RunDueTimers()
+    end
+    Test.eq(calls.n, 0, "nothing is dropped while the pages are still arriving")
+
+    _wow.AdvanceTime(3)
+    _wow.RunDueTimers()
+    Test.eq(calls.n, 1, "and exactly once after they stop")
+    Test.eq(calls.last, "auction-data-settled")
+    calls.restore()
+end)
+
+Test.it("schedules nothing when there is nothing cached", function()
+    resetStore()
+    addon.Market.priceCache = {}
+    addon.Market.vendorCache = {}
+    local calls = countingInvalidation()
+
+    Test.eq(addon.Market:OnAuctionDataUpdated(), false)
+    _wow.AdvanceTime(5)
+    _wow.RunDueTimers()
+    Test.eq(calls.n, 0)
+    calls.restore()
+end)
+
+Test.it("does not refresh twice when the window closes mid-scan", function()
+    resetStore()
+    addon.Market.priceCache = { [22573] = { price = 100, source = "spec" } }
+    local calls = countingInvalidation()
+
+    addon.Market:OnAuctionDataUpdated()
+    addon.Market:OnAuctionHouseClosed()
+    _wow.AdvanceTime(5)
+    _wow.RunDueTimers()
+    Test.eq(calls.n, 1, "closing settles the scan; the pending timer is dropped")
+    Test.eq(calls.last, "auction-house-closed")
+    calls.restore()
 end)
 
 io.write(string.format("Merchant vendor scan: %d test(s) passed\n", Test.count))

@@ -67,9 +67,45 @@ end)
 -- Vendor reagents (vials, thread, spices) often have no auctions at all.
 -- Hiding what cannot be priced would quietly empty whole professions, so
 -- the filter only drops a craft it has actually judged unprofitable.
-Test.it("keeps a craft it cannot price and marks it instead", function()
+--
+-- One missing reagent does not make a craft unknowable: everything else
+-- still costs what it costs, so the sum is a floor on the spend and the
+-- profit is a ceiling. The row is kept and marked as the best case it is --
+-- "no price data" said the addon knew nothing about a craft it had costed
+-- to the silver.
+Test.it("prices what it can and calls the answer a best case", function()
     setProfitableOnly(true)
     usePrices({ ["i:22573"] = 100, ["i:23781"] = 10000 })
+
+    local profit, why = addon.Market:EstimateRecipeProfit(STONE)
+    Test.eq(type(profit), "number", "the priced reagents still cost something")
+    Test.eq(why, "partial")
+
+    local passes, reason = filters:RecipePasses(STONE)
+    Test.eq(passes, true)
+    Test.eq(reason, "visible-partial-price")
+end)
+
+-- A ceiling is a real judgement in one direction: a craft that loses money
+-- at its best case loses money whatever the missing reagent costs.
+Test.it("hides a craft that is already losing at its best case", function()
+    setProfitableOnly(true)
+    -- Output worth almost nothing, one reagent priced high, one unpriced.
+    usePrices({ ["i:22573"] = 100000, ["i:23781"] = 1 })
+
+    local profit, why = addon.Market:EstimateRecipeProfit(STONE)
+    Test.eq(why, "partial")
+    Test.truthy(profit < 0)
+
+    local passes, reason = filters:RecipePasses(STONE)
+    Test.eq(passes, false)
+    Test.eq(reason, "hidden-not-profitable")
+end)
+
+-- "No price data" is kept for the case it describes: nothing priced at all.
+Test.it("still says nothing is known when nothing is", function()
+    setProfitableOnly(true)
+    usePrices({ ["i:23781"] = 10000 })
 
     local profit, why = addon.Market:EstimateRecipeProfit(STONE)
     Test.eq(profit, nil)
