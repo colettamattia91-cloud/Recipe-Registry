@@ -65,6 +65,9 @@ local function getProfilePrefilters()
     if filters.hideUncataloguedRecipes == nil then
         filters.hideUncataloguedRecipes = true
     end
+    if filters.showOnlyProfitableRecipes == nil then
+        filters.showOnlyProfitableRecipes = false
+    end
     return filters
 end
 
@@ -102,6 +105,97 @@ function RecipeUiFilters:IsSupportedProfession(professionKey)
         if canonical == professionKey then return true end
     end
     return false
+end
+
+-- The expansion prefilter and the profit filter are settings, not options-panel
+-- state. The collection strip and the recipe header drive the same two
+-- switches the options panel does, so both the reading and the writing live
+-- here, next to the code that consumes them: one setter, one invalidation
+-- path, rather than one of each per surface.
+--
+-- Expansion is written as a pair rather than one flag at a time because the
+-- pair has an illegal combination -- neither expansion visible is an empty
+-- browser -- and a two-step write would pass through it.
+function RecipeUiFilters:GetExpansionDefaults()
+    local defaults = getProfilePrefilters().expansionDefaults or {}
+    return defaults.vanilla ~= false, defaults.tbc ~= false
+end
+
+-- The reason is the caller's, not this function's: the options panel moves one
+-- checkbox and names that checkbox, while the strip cycles the pair. Both
+-- reach the same invalidation, and the scope string stays true to what the
+-- player actually did.
+function RecipeUiFilters:SetExpansionDefaults(vanilla, tbc, reason)
+    if vanilla ~= true and tbc ~= true then return false end
+    local filters = getProfilePrefilters()
+    filters.expansionDefaults.vanilla = vanilla == true
+    filters.expansionDefaults.tbc = tbc == true
+    self:InvalidateProfessionProjection(nil, reason or "filters:expansion-defaults")
+    return true
+end
+
+-- Which professions answer to their own expansion setting rather than the
+-- global one. The in-tab control writes the global pair, so it has to be able
+-- to say when a profession will not follow it.
+function RecipeUiFilters:GetProfessionsWithExpansionOverride()
+    local filters = getProfilePrefilters()
+    local out = {}
+    for professionKey, override in pairs(filters.professionExpansionOverrides or {}) do
+        if type(override) == "table" and override.inherit == false then
+            out[#out + 1] = professionKey
+        end
+    end
+    sort(out)
+    return out
+end
+
+-- A profession override outranks the global default, which made the in-window
+-- expansion control look broken: setting "TBC only" left every Vanilla recipe
+-- of an overridden profession in the list, because that profession had been
+-- told to answer for itself. A control that says "TBC only" has to mean it, so
+-- choosing an expansion from the window clears the overrides it would
+-- otherwise be silently losing to. The per-profession table in the options
+-- panel is where they are set, and it is where they can be set again.
+function RecipeUiFilters:ClearProfessionExpansionOverrides()
+    local filters = getProfilePrefilters()
+    local cleared = false
+    for professionKey in pairs(filters.professionExpansionOverrides or {}) do
+        filters.professionExpansionOverrides[professionKey] = nil
+        cleared = true
+    end
+    if cleared then
+        self:InvalidateProfessionProjection(nil, "filters:overrides-cleared")
+    end
+    return cleared
+end
+
+-- A profession override outranks the global default, which made the in-window
+-- expansion control look broken: setting "TBC only" left every Vanilla recipe
+-- of an overridden profession in the list, because that profession had been
+-- told to answer for itself. A control that says "TBC only" has to mean it, so
+-- choosing an expansion from the window clears the overrides it would
+-- otherwise be silently losing to. The per-profession table in the options
+-- panel is where they are set, and it is where they can be set again.
+function RecipeUiFilters:ClearProfessionExpansionOverrides()
+    local filters = getProfilePrefilters()
+    local cleared = false
+    for professionKey in pairs(filters.professionExpansionOverrides or {}) do
+        filters.professionExpansionOverrides[professionKey] = nil
+        cleared = true
+    end
+    if cleared then
+        self:InvalidateProfessionProjection(nil, "filters:overrides-cleared")
+    end
+    return cleared
+end
+
+function RecipeUiFilters:IsProfitableOnly()
+    return getProfilePrefilters().showOnlyProfitableRecipes == true
+end
+
+function RecipeUiFilters:SetProfitableOnly(enabled)
+    getProfilePrefilters().showOnlyProfitableRecipes = enabled == true
+    self:InvalidateProfessionProjection(nil, "filters:profitable-only")
 end
 
 function RecipeUiFilters:GetEffectiveExpansionVisibility(professionKey)
@@ -152,7 +246,64 @@ local function ambiguousConsensusHiddenByExpansion(self, metadata, recipeKey, fi
         or (expansion == "tbc" and visibility.tbc == false)
 end
 
+-- Profit gate for the "only profitable recipes" toggle. Deliberately the
+-- last thing RecipePasses does, and only when the toggle is on: it is the
+-- one predicate that costs price lookups, so the default path never pays
+-- for it.
+--
+-- Only a craft that prices out at a loss is dropped. One that cannot be
+-- priced at all stays visible and is marked in the list instead: reagents
+-- with no auctions (vials, thread, spices) are common enough that hiding
+-- the unpriceable would quietly empty whole professions -- every flask
+-- needs a vial -- and the filter would be hiding recipes out of ignorance
+-- rather than out of a verdict.
+-- Four answers, not three. A craft whose best case already loses money is
+-- unprofitable whatever the missing reagent costs, so a partial estimate is
+-- still grounds to hide it; a partial estimate in the black is not, because
+-- the missing reagent could take it back under.
+local function profitVerdict(recipeKey, info)
+    local market = Addon.Market
+    if not (market and market.EstimateRecipeProfit) then
+        return "unpriceable"
+    end
+    local profit, quality = market:EstimateRecipeProfit(recipeKey, info)
+    if type(profit) ~= "number" then
+        return "unpriceable"
+    end
+    if profit <= 0 then
+        return "unprofitable"
+    end
+    return quality == "partial" and "partial" or "profitable"
+end
+
 function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
+    local passes, reason = self:EvaluateVisibility(recipeKey, recipeInfo, filterContext)
+    if passes ~= true then
+        return passes, reason
+    end
+    if getProfilePrefilters().showOnlyProfitableRecipes ~= true then
+        return true, reason
+    end
+    local metadata = getMetadata()
+    local info = recipeInfo or (metadata and metadata:GetRecipeInfo(recipeKey)) or nil
+    local verdict = profitVerdict(recipeKey, info)
+    if verdict == "unprofitable" then
+        Addon:Trace("filters", "recipe hidden by profit filter", recipeKey)
+        return false, "hidden-not-profitable"
+    end
+    if verdict == "partial" then
+        return true, "visible-partial-price"
+    end
+    if verdict == "unpriceable" then
+        return true, "visible-unpriced"
+    end
+    return true, reason
+end
+
+-- Everything except the profit gate: expansion, ownership, BoP/outputless
+-- and the uncatalogued cleanup. Split out so the expensive gate can run
+-- once, last, on the survivors.
+function RecipeUiFilters:EvaluateVisibility(recipeKey, recipeInfo, filterContext)
     local metadata = getMetadata()
     if not metadata then
         return true, "visible-no-plugin"
@@ -320,6 +471,10 @@ function RecipeUiFilters:BuildFilterCacheKey(ctx)
         "flavor=" .. tostring(metadata.flavor or ""),
         "remoteBop=" .. boolToken(filters.showRemoteBopOutputRecipes == true),
         "hideUncat=" .. boolToken(filters.hideUncataloguedRecipes ~= false),
+        -- Price data itself is not in the key: Market:InvalidatePriceCache
+        -- drops the recipe list caches wholesale when the auction house
+        -- closes, which is the only moment the underlying prices move.
+        "profitOnly=" .. boolToken(filters.showOnlyProfitableRecipes == true),
         "ownership=" .. tostring(data._recipeOwnershipIndexGeneration or 0),
     }
 

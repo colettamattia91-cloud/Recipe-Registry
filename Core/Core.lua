@@ -337,12 +337,13 @@ local function dumpFilterStatus(self)
     local counts = metadata:GetRecordCounts()
     local defaults = filters.expansionDefaults or {}
     self:Print(string.format(
-        "Recipe filters: metadata=%s unresolved=%d vanilla=%s tbc=%s remoteBop=%s",
+        "Recipe filters: metadata=%s unresolved=%d vanilla=%s tbc=%s remoteBop=%s profitOnly=%s",
         tostring(metadata.metadataVersion or "unknown"),
         counts.unresolved or 0,
         defaults.vanilla ~= false and "on" or "off",
         defaults.tbc ~= false and "on" or "off",
-        filters.showRemoteBopOutputRecipes == true and "show" or "hide"
+        filters.showRemoteBopOutputRecipes == true and "show" or "hide",
+        filters.showOnlyProfitableRecipes == true and "on" or "off"
     ))
 end
 
@@ -779,11 +780,11 @@ function Addon:MaybeShowDeferredScanNotice()
     self._pendingDeferredScanProfession = nil
     if profession and profession ~= "" then
         self:Print(string.format(
-            "You may have learned a %s recipe — open the profession panel to refresh the list.",
+            "You may have learned a %s recipe -- open the profession panel to refresh the list.",
             profession
         ))
     else
-        self:Print("You may have learned a recipe — open the relevant profession panel to refresh the list.")
+        self:Print("You may have learned a recipe -- open the relevant profession panel to refresh the list.")
     end
     return true
 end

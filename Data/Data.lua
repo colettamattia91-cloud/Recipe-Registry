@@ -68,6 +68,11 @@ local DB_DEFAULTS = {
         },
         members = {},
         addonPeers = {},
+        -- itemID -> copper, learned from merchant windows. Account-wide on
+        -- purpose: what a vendor charges is a fact about the item, not about
+        -- the character, so one alt visiting a trade-goods vendor fixes the
+        -- reagent cost for every character on the account.
+        vendorPrices = {},
         syncSaturation = {
             -- [blockKey][fingerprint] = { noProgressCount, saturatedUntil }
             blockFingerprints = {},
@@ -81,9 +86,23 @@ local DB_DEFAULTS = {
         useRecipeCategories = true,
         recipeCategoryView = "expanded",
         showTooltipCrafters = true,
+        -- Which top-level tabs are shown. Absent or true means shown; the
+        -- Recipes tab is not listed because it cannot be switched off.
+        tabs = {
+            addon = true,
+            collection = true,
+        },
+        -- Gross by default: the "Sells for" figure doubles as the price to
+        -- list an auction at, and taxing it silently would make it useless
+        -- for that. Turning this on nets the profit line instead.
+        subtractAuctionHouseCut = false,
         recipePrefilters = {
             showRemoteBopOutputRecipes = false,
             hideUncataloguedRecipes = true,
+            -- Off by default: it is the one prefilter that needs auction
+            -- prices, so with no TSM/Auctionator data it would empty the
+            -- list rather than filter it.
+            showOnlyProfitableRecipes = false,
             expansionDefaults = {
                 -- TBC-only by default. The vast majority of players land
                 -- on TBC content; surfacing 1248 vanilla recipes by
@@ -589,6 +608,10 @@ Private.shouldRefreshItemName = shouldRefreshItemName
 Private.isValidRecipeKey = isValidRecipeKey
 Private.formatReagents = formatReagents
 Private.detectSpecialization = detectSpecialization
+-- Published on the module so the collection projection can map a
+-- stored specialization name back to the spell ID the metadata library
+-- reports as a recipe requirement.
+Data.PROFESSION_SPECIALIZATIONS = PROFESSION_SPECIALIZATIONS
 Private.buildLocaleMap = buildLocaleMap
 Private.lowerSafe = lowerSafe
 Private.extractItemID = extractItemID
@@ -652,10 +675,41 @@ function Data:OnInitialize()
     if categoryView ~= "expanded" and categoryView ~= "accordion" and categoryView ~= "categoriesOnly" then
         self.db.profile.recipeCategoryView = "expanded"
     end
+    -- The collection tab was called "Missing recipes" until 2.3.0, and its
+    -- three settings were stored under that name. Carried over rather than
+    -- defaulted, because two of them are choices the user made: a profession
+    -- they switched off would come back on, and a tab they hid would reappear.
+    -- The old key still being present is itself the signal that nothing has
+    -- been written under the new name yet, so the carried value wins outright.
+    -- Checking the new key for nil instead would lose the tab setting, whose
+    -- default AceDB has already filled in by the time this runs.
+    local profile = self.db.profile
+    if profile.missingRecipesDisabledProfessions ~= nil then
+        profile.collectionDisabledProfessions = profile.missingRecipesDisabledProfessions
+        profile.missingRecipesDisabledProfessions = nil
+    end
+    if profile.missingRecipesLearnableOnly ~= nil then
+        -- The old switch had two states over a list that never showed a
+        -- learned recipe, so its "on" is the new "ready" and its "off" is
+        -- "unlearned" -- not "all", which shows a half of the tab the user has
+        -- never seen.
+        profile.collectionFilter = profile.missingRecipesLearnableOnly == true
+            and "ready" or "unlearned"
+        profile.missingRecipesLearnableOnly = nil
+    end
+    if type(profile.tabs) == "table" and profile.tabs.missing ~= nil then
+        profile.tabs.collection = profile.tabs.missing
+        profile.tabs.missing = nil
+    end
+    if profile.selectedProfession == "Missing recipes" then
+        profile.selectedProfession = "Collection"
+    end
+
     if type(self.db.profile.recipePrefilters) ~= "table" then
         self.db.profile.recipePrefilters = {
             showRemoteBopOutputRecipes = false,
             hideUncataloguedRecipes = true,
+            showOnlyProfitableRecipes = false,
             expansionDefaults = { vanilla = true, tbc = true },
             professionExpansionOverrides = {},
         }
@@ -666,6 +720,9 @@ function Data:OnInitialize()
         end
         if prefilters.hideUncataloguedRecipes == nil then
             prefilters.hideUncataloguedRecipes = true
+        end
+        if prefilters.showOnlyProfitableRecipes == nil then
+            prefilters.showOnlyProfitableRecipes = false
         end
         if type(prefilters.expansionDefaults) ~= "table" then
             prefilters.expansionDefaults = { vanilla = true, tbc = true }
@@ -1353,6 +1410,29 @@ function Data:InvalidateRecipeCaches(scope)
         self._recipeListCacheOrder = nil
         if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
             Addon.Tooltip:InvalidateIndex("presence")
+        end
+        return
+    end
+    -- Prices change what a detail SHOWS, and -- only while the profitable-only
+    -- filter is on -- which recipes the list contains. They change neither who
+    -- knows what nor how a recipe is catalogued, so the ownership index and the
+    -- by-profession map survive: rebuilding those walks every member of the
+    -- guild, and an auction scan sends an update every few hundred
+    -- milliseconds. The detail cache does have to go, because the cost block
+    -- is written into the cached record itself.
+    if scope == "prices" then
+        self._recipeDetailCache = nil
+        self._recipeDetailCacheOrder = nil
+        self._recipeDetailCacheReady = nil
+        if self.db and self.db.global then
+            self.db.global.recipeDetailCache = nil
+            self.db.global.recipeDetailCacheOrder = nil
+        end
+        local prefilters = Addon.db and Addon.db.profile and Addon.db.profile.recipePrefilters
+        if prefilters and prefilters.showOnlyProfitableRecipes == true then
+            self._recipeListCacheGeneration = (self._recipeListCacheGeneration or 0) + 1
+            self._recipeListCache = nil
+            self._recipeListCacheOrder = nil
         end
         return
     end

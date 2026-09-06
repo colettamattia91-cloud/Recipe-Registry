@@ -47,6 +47,38 @@ local function cloneReagents(reagents)
     return out
 end
 
+-- One entry per place: { name, zone, x, y, faction }, every field optional
+-- but the pair of them. The zone is still an interned id here; GetSource
+-- resolves it to a name.
+--
+-- The position and the faction are per NPC and not per recipe: a recipe sold
+-- by one vendor in Stormwind and another in Orgrimmar is available to both
+-- sides, and the recipe-level faction says exactly that -- which tells a Horde
+-- player nothing about which of the two they can walk up to.
+local function clonePlaces(list)
+    if type(list) ~= "table" then return nil end
+    local out = {}
+    for index, place in ipairs(list) do
+        out[index] = {
+            name = place.name,
+            zone = place.zone,
+            x = place.x,
+            y = place.y,
+            faction = place.faction,
+        }
+    end
+    return out
+end
+
+local function cloneStringList(list)
+    if type(list) ~= "table" then return nil end
+    local out = {}
+    for index, value in ipairs(list) do
+        out[index] = value
+    end
+    return out
+end
+
 local function cloneRecord(spellId, record)
     if type(record) ~= "table" then
         return nil
@@ -57,12 +89,42 @@ local function cloneRecord(spellId, record)
         expansion = record.expansion,
         recipeItemId = record.recipeItemId,
         createdItemId = record.createdItemId,
+        createdCount = record.createdCount,
+        createdCountMax = record.createdCountMax,
+        specialization = record.specialization,
         category = record.category,
         subcategory = record.subcategory,
         sortOrder = record.sortOrder,
         requiredSkill = record.requiredSkill,
+        -- Which classes a trainer will teach this to, as the client's own
+        -- bitmask. Absent means every class.
+        classMask = record.classMask,
+        -- The content phase it first becomes obtainable in. Absent means base
+        -- content, which is most of the dataset.
+        phase = record.phase,
+        -- The title every trainer of this recipe carries, and the continents
+        -- they stand on. Absent means several ranks of trainer teach it, which
+        -- is the case where "from a trainer" is the right answer.
+        trainerTitle = record.trainerTitle,
+        trainerContinents = cloneStringList(record.trainerContinents),
         selfOnlyOutputless = record.selfOnlyOutputless == true,
         bopOutput = record.bopOutput,
+        -- Obtain-side fields. An absent faction means both: that is the
+        -- common case and the generator omits it rather than repeating it on
+        -- most of the dataset.
+        faction = record.faction,
+        sourceKind = record.sourceKind,
+        worldDrop = record.worldDrop == true,
+        bossDrop = record.bossDrop == true,
+        sourcePlaces = clonePlaces(record.sourcePlaces),
+        -- The four thresholds the game itself colours this recipe by. Four
+        -- numbers per recipe, stated by the source: orange up to the first,
+        -- then yellow, green, and grey from the last on.
+        skillLevels = cloneStringList(record.skillLevels),
+        -- In the client data but not in the game. Kept on the record rather
+        -- than left out of the payload, so a recipe flagged wrongly comes
+        -- back through the generator's override instead of an investigation.
+        removed = record.removed == true,
         reagents = cloneReagents(record.reagents),
     }
 end
@@ -261,6 +323,7 @@ function RecipeMetadata:_Rebuild()
     self._recordsBySpellId = {}
     self._recipeItemToSpellId = {}
     self._createdItemToSpellIds = {}
+    self._reagentItemIds = nil
     -- Drop the resolution-status memo so the next predicate call rebuilds
     -- it against the fresh record set.
     self._unresolvedSpellIdSet = nil
@@ -577,6 +640,133 @@ end
 function RecipeMetadata:GetCreatedItemId(recipeKey, info)
     info = getInfo(self, recipeKey, info)
     return info and info.createdItemId or nil
+end
+
+-- Spell ID of the profession specialization required to learn this recipe,
+-- or nil when any practitioner can learn it. The IDs match the ones
+-- Data.lua PROFESSION_SPECIALIZATIONS detects on the local character, so a
+-- caller can compare this directly against a scanned profession's
+-- specialization. Note this means "required to learn" — specializations that
+-- only improve yield (the TBC cloth cooldowns) are deliberately not flagged.
+function RecipeMetadata:GetSpecialization(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info and info.specialization or nil
+end
+
+-- Which classes a trainer will teach the recipe to, as the client's own class
+-- bitmask, or nil when every class can learn it. The gate is on the RECIPE,
+-- not on what it makes: a warrior can learn to craft a druid-only helm, but no
+-- trainer will teach a warrior the Deathblow X11 Goggles. Twenty-two recipes
+-- carry one and all of them are engineering goggles.
+function RecipeMetadata:GetClassMask(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info and info.classMask or nil
+end
+
+-- The content phase a recipe first becomes obtainable in, or nil for anything
+-- available from the start -- which is the whole of Vanilla and most of
+-- Burning Crusade. Absent means base content, never "unknown".
+function RecipeMetadata:GetPhase(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info and info.phase or nil
+end
+
+--- True for a recipe that is in the client data but not in the game: never
+--- implemented, or taken out and never returned. There is nowhere to go and
+--- learn one, so listing it among what a character could still learn is a
+--- wild goose chase. Absent data reads as false, not as unknown.
+function RecipeMetadata:IsRemoved(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info ~= nil and info.removed == true
+end
+
+-- Units produced per craft. The generated data omits the field for the
+-- common single-output case, so absence means 1 rather than "unknown".
+-- Returns min, max; the two differ only for the handful of recipes with a
+-- random yield.
+function RecipeMetadata:GetCreatedCount(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    if not info then
+        return nil
+    end
+    local minimum = tonumber(info.createdCount) or 1
+    return minimum, tonumber(info.createdCountMax) or minimum
+end
+
+-- Every item that appears as a reagent of some recipe, as a set. Consumers
+-- use it to bound their own per-item stores to things the addon will ever
+-- actually price. Memoized and dropped on rebuild; the returned table is
+-- freshly built, so callers may keep it.
+function RecipeMetadata:GetReagentItemIds()
+    if self._reagentItemIds then return self._reagentItemIds end
+    local ids = {}
+    for _, record in pairs(self._recordsBySpellId or {}) do
+        for _, reagent in ipairs(record.reagents or {}) do
+            if reagent.itemId then
+                ids[reagent.itemId] = true
+            end
+        end
+    end
+    self._reagentItemIds = ids
+    return ids
+end
+
+-- Where a recipe is obtained, for the ones taught by an item. Returns nil
+-- when nothing is known -- a trainer-taught recipe has no recipe item and so
+-- no entry, which is itself the answer.
+--
+-- `faction` is nil when both factions can get it, which is the common case;
+-- callers must not read nil as "unknown". Zone IDs are resolved to names
+-- here, from the table the generator emits once at the top level rather than
+-- repeating a popular vendor city on hundreds of records.
+function RecipeMetadata:GetSource(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    if not info then return nil end
+    if not (info.faction or info.sourceKind or info.worldDrop or info.bossDrop) then
+        return nil
+    end
+
+    -- Places come back as { name, zone } pairs with the zone resolved. Either
+    -- half can be missing: a quest names a zone and nobody, and a recipe every
+    -- trainer teaches names neither.
+    local zoneNames = self._generated and self._generated.zoneNamesById or nil
+    local places
+    for _, place in ipairs(info.sourcePlaces or {}) do
+        local zone = place.zone and zoneNames and zoneNames[place.zone] or nil
+        if place.name or zone then
+            places = places or {}
+            places[#places + 1] = {
+                name = place.name,
+                zone = zone,
+                x = place.x,
+                y = place.y,
+                faction = place.faction,
+            }
+        end
+    end
+
+    return {
+        faction = info.faction,
+        kind = info.sourceKind,
+        worldDrop = info.worldDrop == true,
+        bossDrop = info.bossDrop == true,
+        places = places,
+        -- Trainer-taught recipes have no places -- no source names the NPCs --
+        -- so the answer they do have is the title every one of their trainers
+        -- carries, which is the line the player reads under the NPC in game.
+        trainerTitle = info.trainerTitle,
+        trainerContinents = info.trainerContinents,
+    }
+end
+
+-- The four difficulty thresholds, when the source stated a usable ladder.
+-- 2092 of the 2151 records carry one; the rest have to be approximated from
+-- the skill requirement, which is the caller's problem and not this one's.
+function RecipeMetadata:GetSkillLevels(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    local levels = info and info.skillLevels or nil
+    if type(levels) ~= "table" or #levels ~= 4 then return nil end
+    return levels
 end
 
 function RecipeMetadata:GetRecipeItemId(recipeKey, info)
