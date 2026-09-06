@@ -48,7 +48,22 @@ local ADDON_STATUS_FILTER_LABELS = {
     old = "Old",
     unknown = "Unknown",
 }
-local ADDON_STATUS_FILTER_MARKER = "|cffffd100[F]|r"
+-- The guild members table's columns, on the collection's terms: left-click a
+-- header to sort by it, right-click one to open its filter as a menu. The
+-- header carries the column's name and nothing else. It used to carry the
+-- filter's value and an [F] marker as well -- "Version: Unknown ^ [F]" -- and
+-- a column that narrow clipped exactly the half that said what was going on.
+-- Which filter is in force is said by the colour, gold for narrowed, and by
+-- the tick in the column's own menu.
+local ADDON_STATUS_COLUMN_TITLES = {
+    name = "Name",
+    status = "Addon",
+    roster = "Presence",
+    version = "Version",
+    lastSeen = "Last seen",
+    rank = "Rank",
+    zone = "Zone",
+}
 
 -- The collection table's own columns: left-click a header to sort by it,
 -- right-click one to open its filter as a menu. The guild members table cycles
@@ -66,13 +81,14 @@ local ADDON_STATUS_FILTER_MARKER = "|cffffd100[F]|r"
 -- whole book; source and specialization ask about the recipe, not about you.
 local COLLECTION_DEFAULT_SORT = "default"
 local COLLECTION_SORT_KEYS = {
-    name = true, status = true, skill = true, source = true, spec = true,
+    name = true, status = true, skill = true, source = true, spec = true, phase = true,
 }
 local COLLECTION_FILTER_CYCLES = {
     status = { "all", "unlearned", "ready" },
     skill  = { "all", "inreach", "outofreach", "noskill" },
     source = { "all", "trainer", "vendor", "drop", "quest", "worldDrop", "discovery", "worldEvent" },
     spec   = { "all", "none", "required", "have" },
+    phase  = { "all", "base", "later", "p2", "p3", "p4", "p5" },
 }
 local COLLECTION_COLUMN_TITLES = {
     name = "Recipe",
@@ -80,6 +96,7 @@ local COLLECTION_COLUMN_TITLES = {
     skill = "Skill needed",
     source = "Learned from",
     spec = "Specialization",
+    phase = "Content phase",
 }
 local COLLECTION_COLUMN_FILTER_LABELS = {
     unlearned  = "Not learned",
@@ -97,6 +114,23 @@ local COLLECTION_COLUMN_FILTER_LABELS = {
     none       = "None",
     required   = "Required",
     have       = "Mine",
+    base       = "From the start",
+    later      = "Any later phase",
+    p2         = "Phase 2",
+    p3         = "Phase 3",
+    p4         = "Phase 4",
+    p5         = "Phase 5",
+}
+
+-- What the Phase column writes. A recipe obtainable from the start says
+-- nothing at all: that is most of the book, and a column that repeats "1" four
+-- hundred times is a column that has stopped being read. The number appears
+-- only when the answer is "not yet", which is the whole reason to have it.
+local COLLECTION_PHASE_TEXT = {
+    [2] = "P2",
+    [3] = "P3",
+    [4] = "P4",
+    [5] = "P5",
 }
 
 local PROF_ORDER = {
@@ -475,13 +509,28 @@ local function formatMoney(copper)
     local g = math.floor(copper / 10000)
     local s = math.floor((copper % 10000) / 100)
     local c = copper % 100
-    local goldIcon = "|TInterface\\MoneyFrame\\UI-GoldIcon:12:12:0:-5|t"
-    local silverIcon = "|TInterface\\MoneyFrame\\UI-SilverIcon:12:12:0:-5|t"
-    local copperIcon = "|TInterface\\MoneyFrame\\UI-CopperIcon:12:12:0:-5|t"
+    -- The last number in the escape is a vertical offset, and -5 sank the
+    -- coins well below the digits they belong to. -1 sits them on the same
+    -- optical line without clipping the row above.
+    local goldIcon = "|TInterface\\MoneyFrame\\UI-GoldIcon:12:12:0:-1|t"
+    local silverIcon = "|TInterface\\MoneyFrame\\UI-SilverIcon:12:12:0:-1|t"
+    local copperIcon = "|TInterface\\MoneyFrame\\UI-CopperIcon:12:12:0:-1|t"
+    -- Once a denomination appears, every smaller one appears too and is
+    -- padded to two digits. Dropping a zero silver, or writing "4" where the
+    -- row above writes "76", shifts every coin icon after it -- which is why
+    -- a column of prices had its icons landing at four different x positions.
+    -- This is also how the game writes money in its own frames.
     local parts = {}
-    if g > 0 then parts[#parts + 1] = string.format("%d %s", g, goldIcon) end
-    if s > 0 then parts[#parts + 1] = string.format("%d %s", s, silverIcon) end
-    if c > 0 then parts[#parts + 1] = string.format("%d %s", c, copperIcon) end
+    if g > 0 then
+        parts[#parts + 1] = string.format("%d %s", g, goldIcon)
+        parts[#parts + 1] = string.format("%02d %s", s, silverIcon)
+        parts[#parts + 1] = string.format("%02d %s", c, copperIcon)
+    elseif s > 0 then
+        parts[#parts + 1] = string.format("%d %s", s, silverIcon)
+        parts[#parts + 1] = string.format("%02d %s", c, copperIcon)
+    elseif c > 0 then
+        parts[#parts + 1] = string.format("%d %s", c, copperIcon)
+    end
     if #parts == 0 then return "0" end
     return table.concat(parts, " ")
 end
@@ -712,6 +761,25 @@ local function getItemLinkByID(itemID)
     return link
 end
 
+-- What a recipe hands over when it is linked: the item it makes, else the
+-- pattern that teaches it, else the spell itself.
+--
+-- The last step is not a consolation prize. An enchant creates no item, and
+-- one learned from a trainer has no pattern either, so the spell is the only
+-- thing there is -- and it is the right thing, because for an enchant the
+-- spell IS the recipe. The order holds for everything else: what you would
+-- paste into an auction house search is the thing being bought or sold, and
+-- that is the craft's output before it is the formula on the shelf.
+--
+-- Takes ids rather than a detail table so a pooled list row can keep three
+-- numbers instead of a reference to a record it does not own.
+local function recipeLinkFor(createdItemID, recipeItemID, spellID)
+    return getItemLinkByID(createdItemID)
+        or getItemLinkByID(recipeItemID)
+        or (spellID and GetSpellLink and GetSpellLink(spellID))
+        or nil
+end
+
 local function whisperTargetFromMemberKey(memberKey)
     if not memberKey then return nil end
     local short = tostring(memberKey):match("^([^%-]+)")
@@ -734,13 +802,26 @@ end
 -- has focus: chat edit boxes, the auction house search field, dressing
 -- room, profession windows, etc. Falls back to ChatEdit_InsertLink only
 -- if the routing helper is unavailable (very old clients).
+--
+-- The fallback is fenced behind the chat-link modifier. HandleModifiedItemClick
+-- decides for itself whether a modifier is down and says no when none is, but
+-- ChatEdit_InsertLink does not ask: reached on every unmodified click, it
+-- pasted the link into whatever chat box happened to be open.
+local function isChatLinkModifierDown()
+    if type(IsModifiedClick) == "function" then
+        local ok, down = pcall(IsModifiedClick, "CHATLINK")
+        if ok then return down == true end
+    end
+    return type(IsShiftKeyDown) == "function" and IsShiftKeyDown() == true
+end
+
 local function insertLinkInChat(link)
     if not link then return false end
     if type(HandleModifiedItemClick) == "function" then
         local ok = HandleModifiedItemClick(link)
         if ok then return true end
     end
-    if type(ChatEdit_InsertLink) == "function" then
+    if isChatLinkModifierDown() and type(ChatEdit_InsertLink) == "function" then
         local ok = ChatEdit_InsertLink(link)
         return ok and true or false
     end
@@ -891,6 +972,10 @@ function UI:GetMainView()
 end
 
 function UI:SetMainView(view)
+    -- A menu belongs to the control that opened it, and that control is about
+    -- to be hidden along with the view it sits in. Left open it floats over
+    -- the tab you switched to, still writing the settings of the one you left.
+    self:CloseDropdown()
     -- A disabled tab is not reachable, including through a stale saved
     -- profile or a slash command.
     if view and view ~= "recipes" and not self:IsMainTabEnabled(view) then
@@ -920,38 +1005,93 @@ function UI:GetAddonStatusFilter(columnKey)
     return self.addonStatusFilters[columnKey] or "all"
 end
 
-function UI:CycleAddonStatusFilter(columnKey)
-    local cycle = ADDON_STATUS_FILTER_CYCLES[columnKey]
-    if not cycle then
-        self:SetAddonStatusSort(columnKey)
-        return
-    end
+function UI:SetAddonStatusColumnFilter(columnKey, value)
+    if not ADDON_STATUS_FILTER_CYCLES[columnKey] then return end
     self.addonStatusFilters = self.addonStatusFilters or {}
-    local current = self.addonStatusFilters[columnKey] or "all"
-    local nextIndex = 1
-    for index, value in ipairs(cycle) do
-        if value == current then
-            nextIndex = index + 1
-            break
-        end
-    end
-    if nextIndex > #cycle then
-        nextIndex = 1
-    end
-    self.addonStatusFilters[columnKey] = cycle[nextIndex]
+    self.addonStatusFilters[columnKey] = value
     self.selectedAddonStatusKey = nil
     self:ResetRecipeScroll()
+    self:RefreshAddonStatusControls()
     self:RefreshRecipeList()
     self:RefreshSummaryCards()
+end
+
+-- One column's filter, as a menu: the choices are written out and the one in
+-- force is ticked, rather than cycled through in place where the only way to
+-- learn what the states are is to click until they come round again.
+function UI:OpenAddonStatusColumnMenu(columnKey, anchor)
+    local cycle = ADDON_STATUS_FILTER_CYCLES[columnKey]
+    if not cycle then return end
+    local current = self:GetAddonStatusFilter(columnKey)
+    local items = { { text = ADDON_STATUS_COLUMN_TITLES[columnKey] or columnKey, isTitle = true } }
+    for _, value in ipairs(cycle) do
+        items[#items + 1] = {
+            text = value == "all" and "Everything"
+                or (ADDON_STATUS_FILTER_LABELS[value] or value),
+            checked = current == value,
+            func = function() UI:SetAddonStatusColumnFilter(columnKey, value) end,
+        }
+    end
+    self:OpenDropdown(anchor, items, 180)
+end
+
+function UI:HasAddonStatusColumnFilter()
+    for columnKey in pairs(ADDON_STATUS_FILTER_CYCLES) do
+        if self:GetAddonStatusFilter(columnKey) ~= "all" then return true end
+    end
+    return false
+end
+
+function UI:ClearAddonStatusColumnFilters()
+    self.addonStatusFilters = { status = "all", roster = "all", version = "all" }
+    self.selectedAddonStatusKey = nil
+    self:ResetRecipeScroll()
+    self:RefreshAddonStatusControls()
+    self:RefreshRecipeList()
+    self:RefreshSummaryCards()
+end
+
+-- The strip's own control, the counterpart of the collection's: presence is
+-- the axis a guild list is actually read along -- who is here now -- and it is
+-- a column filter as well, so both write the same state. Everything else the
+-- menu holds is the way back out of a narrowed table.
+function UI:OpenAddonStatusFilterMenu(anchor)
+    local current = self:GetAddonStatusFilter("roster")
+    local items = { { text = "Show", isTitle = true } }
+    for _, value in ipairs(ADDON_STATUS_FILTER_CYCLES.roster) do
+        items[#items + 1] = {
+            text = value == "all" and "Everyone" or (ADDON_STATUS_FILTER_LABELS[value] or value),
+            checked = current == value,
+            func = function() UI:SetAddonStatusColumnFilter("roster", value) end,
+        }
+    end
+    local narrowed = self:HasAddonStatusColumnFilter()
+    items[#items + 1] = { isSeparator = true }
+    items[#items + 1] = {
+        text = narrowed and "Clear every filter" or "No filters set",
+        disabled = not narrowed,
+        func = function() UI:ClearAddonStatusColumnFilters() end,
+    }
+    self:OpenDropdown(anchor, items, 200)
 end
 
 function UI:SetAddonStatusSort(columnKey)
     columnKey = columnKey or ADDON_STATUS_DEFAULT_SORT
+    -- Last seen reads backwards from the rest: its useful end is the most
+    -- recent, so that is the way it opens.
+    local firstDir = columnKey == "lastSeen" and "desc" or "asc"
     if self.addonStatusSortKey == columnKey then
-        self.addonStatusSortDir = self.addonStatusSortDir == "asc" and "desc" or "asc"
+        if self.addonStatusSortDir ~= firstDir then
+            -- Third click on the same header hands the table back to the order
+            -- it is built in, the way the collection's headers do.
+            self.addonStatusSortKey = ADDON_STATUS_DEFAULT_SORT
+            self.addonStatusSortDir = "asc"
+        else
+            self.addonStatusSortDir = firstDir == "asc" and "desc" or "asc"
+        end
     else
         self.addonStatusSortKey = columnKey
-        self.addonStatusSortDir = columnKey == "lastSeen" and "desc" or "asc"
+        self.addonStatusSortDir = firstDir
     end
     self.selectedAddonStatusKey = nil
     self:ResetRecipeScroll()
@@ -959,10 +1099,11 @@ function UI:SetAddonStatusSort(columnKey)
     self:RefreshSummaryCards()
 end
 
-function UI:HandleAddonStatusHeaderClick(columnKey, mouseButton)
+function UI:HandleAddonStatusHeaderClick(columnKey, mouseButton, anchor)
     if mouseButton == "RightButton" then
-        self:CycleAddonStatusFilter(columnKey)
+        self:OpenAddonStatusColumnMenu(columnKey, anchor)
     else
+        self:CloseDropdown()
         self:SetAddonStatusSort(columnKey)
     end
 end
@@ -1102,16 +1243,26 @@ function UI:BuildExpansionMenuItems()
     return items
 end
 
+-- The browser's only filter besides the search box. Which expansions to list
+-- is asked in the collection, the tab whose whole subject is a profession's
+-- book: here the banner over the list already says when an expansion is being
+-- held back, and says it against the profession actually being looked at,
+-- which a control in the sidebar cannot do.
 function UI:OpenRecipeFilterMenu(anchor)
-    local items = self:BuildExpansionMenuItems()
-    items[#items + 1] = { isSeparator = true }
-    items[#items + 1] = { text = "Prices", isTitle = true }
-    items[#items + 1] = {
-        text = "Profitable crafts only",
-        checked = self:IsProfitableOnly(),
-        func = function() UI:ToggleProfitableOnly() end,
-    }
-    self:OpenDropdown(anchor, items, 210)
+    local profitable = self:IsProfitableOnly()
+    self:OpenDropdown(anchor, {
+        { text = "Prices", isTitle = true },
+        {
+            text = "Every craft",
+            checked = not profitable,
+            func = function() UI:SetProfitableOnly(false) end,
+        },
+        {
+            text = "Profitable crafts only",
+            checked = profitable,
+            func = function() UI:SetProfitableOnly(true) end,
+        },
+    }, 210)
 end
 
 function UI:IsProfitableOnly()
@@ -1119,22 +1270,34 @@ function UI:IsProfitableOnly()
     return (filters and filters.IsProfitableOnly and filters:IsProfitableOnly()) == true
 end
 
-function UI:ToggleProfitableOnly()
+function UI:SetProfitableOnly(value)
     local filters = Addon.RecipeUiFilters
     if not (filters and filters.SetProfitableOnly) then return end
-    filters:SetProfitableOnly(not self:IsProfitableOnly())
+    filters:SetProfitableOnly(value == true)
     self:ResetRecipeScroll()
     self:RefreshFilterControls()
     self:RefreshRecipeList()
 end
 
--- One tooltip for both copies of the expansion control, because both write the
--- same setting and a player who meets them in two tabs must not be left
--- wondering whether they are two.
-function UI:ShowExpansionFilterTooltip(owner)
+function UI:ToggleProfitableOnly()
+    self:SetProfitableOnly(not self:IsProfitableOnly())
+end
+
+function UI:ShowRecipeFilterTooltip(owner)
     GameTooltip:SetOwner(owner, "ANCHOR_TOP")
     GameTooltip:AddLine("What this list is showing")
-    GameTooltip:AddLine("Which expansions to list, and whether to keep only the crafts worth more than their materials. The same settings as the options panel, and they apply to every tab.",
+    GameTooltip:AddLine("Whether to keep only the crafts worth more than their materials. The same setting as the options panel, and it applies to every tab.",
+        0.75, 0.75, 0.75, true)
+    GameTooltip:Show()
+end
+
+-- The expansion filter lives here alone now, so this is the only tooltip that
+-- has to warn about a profession set on its own: a setting nobody can see is
+-- a setting that reads as a broken window.
+function UI:ShowCollectionFilterTooltip(owner)
+    GameTooltip:SetOwner(owner, "ANCHOR_TOP")
+    GameTooltip:AddLine("What this table is showing")
+    GameTooltip:AddLine("How much of the collection to list, which expansions to include, and a way to drop every column filter at once. The expansions are the same setting as the options panel, and they apply to every tab.",
         0.75, 0.75, 0.75, true)
     local filters = Addon.RecipeUiFilters
     local overridden = filters and filters.GetProfessionsWithExpansionOverride
@@ -1183,6 +1346,18 @@ function UI:CollectionRowPassesColumns(row)
         return false
     end
 
+    local phase = self:GetCollectionColumnFilter("phase")
+    if phase ~= "all" then
+        local value = collection.phase
+        if phase == "base" then
+            if value ~= nil then return false end
+        elseif phase == "later" then
+            if value == nil then return false end
+        elseif tostring(value or "") ~= phase:sub(2) then
+            return false
+        end
+    end
+
     local spec = self:GetCollectionColumnFilter("spec")
     if spec ~= "all" then
         local required = collection.specializationSpellId ~= nil
@@ -1197,6 +1372,20 @@ function UI:CollectionRowPassesColumns(row)
 
     return true
 end
+
+-- What the one control says in each of its three states, and what the help
+-- line under it says about the list those states produce.
+local COLLECTION_FILTER_LABELS = {
+    all       = "Show: All",
+    unlearned = "Show: Not learned",
+    ready     = "Show: Ready to learn",
+}
+
+local COLLECTION_FILTER_HELP = {
+    all       = "Every recipe your professions can learn. The ones you already know are ticked.",
+    unlearned = "Only the recipes you have still to learn. Not the ones behind a specialization you did not take: no amount of levelling opens those.",
+    ready     = "Only the recipes whose skill and specialization you already meet.",
+}
 
 function UI:OpenCollectionFilterMenu(anchor)
     local data = Addon.Data
@@ -1283,7 +1472,7 @@ function UI:HasCollectionColumnFilter()
 end
 
 function UI:ClearCollectionColumnFilters()
-    self.collectionFilters = { skill = "all", source = "all", spec = "all" }
+    self.collectionFilters = { skill = "all", source = "all", spec = "all", phase = "all" }
     local data = Addon.Data
     if data and data.SetCollectionFilter then data:SetCollectionFilter("all") end
     self:ResetRecipeScroll()
@@ -1315,6 +1504,10 @@ function UI:ClearSearchFocus()
         searchBox:ClearFocus()
     end
     searchBox = self.frame.addonStatusSearchBox
+    if searchBox and searchBox.HasFocus and searchBox:HasFocus() then
+        searchBox:ClearFocus()
+    end
+    searchBox = self.frame.collectionSearchBox
     if searchBox and searchBox.HasFocus and searchBox:HasFocus() then
         searchBox:ClearFocus()
     end
@@ -1397,6 +1590,8 @@ end
 function UI:ClearSearch()
     if self:IsAddonStatusView() then
         self.addonStatusSearchText = ""
+    elseif self:IsCollectionView() then
+        self.collectionSearchText = ""
     else
         self.recipeSearchText = ""
     end
@@ -1719,6 +1914,9 @@ function UI:RefreshAddonStatusControls()
     if collectionView then
         self:RefreshCollectionControls()
     end
+    if addonStatusView then
+        self:RefreshAddonStatusFilterControl()
+    end
     -- The collection view has its own title inside the control strip, anchored
     -- to the same corner of the same frame as the recipe header: showing both
     -- drew one on top of the other. The strip's title wins and takes the
@@ -1731,43 +1929,39 @@ function UI:RefreshAddonStatusControls()
     self:SyncSearchControls()
 end
 
--- What the one control says in each of its three states, and what the help
--- line under it says about the list those states produce.
-local COLLECTION_FILTER_LABELS = {
-    all       = "Show: All",
-    unlearned = "Show: Not learned",
-    ready     = "Show: Ready to learn",
-}
-
-local COLLECTION_FILTER_HELP = {
-    all       = "Every recipe your professions can learn. The ones you already know are ticked.",
-    unlearned = "Only the recipes you have still to learn.",
-    ready     = "Only the recipes whose skill and specialization you already meet.",
-}
+-- The strip control says which way its own axis is set, and adds a word when
+-- a column is narrowing the table on top of it -- otherwise a table filtered
+-- from a header reads as a table that has lost rows.
+function UI:RefreshAddonStatusFilterControl()
+    local button = self.frame and self.frame.addonStatusFilterButton
+    if not (button and button.SetLabel) then return end
+    local roster = self:GetAddonStatusFilter("roster")
+    local label = roster == "all" and "Everyone"
+        or (ADDON_STATUS_FILTER_LABELS[roster] or roster)
+    local narrowed = self:HasAddonStatusColumnFilter()
+    if narrowed and roster == "all" then
+        label = label .. " (filtered)"
+    end
+    button:SetLabel(label)
+    if button.SetSelected then
+        button:SetSelected(narrowed)
+    end
+end
 
 -- The filter button and the help line under the strip. The help line is the
 -- only place that can explain an empty list, so it has to know whether the
 -- character has been scanned at all, and whether the filter is the reason
 -- nothing is showing.
--- The expansion and profit controls exist twice -- sidebar and collection
--- strip -- because they belong in both places, but they are one setting, so
--- one function paints every copy of them.
--- The sidebar control carries both of the browser's prefilters, so its label
--- has to say when either one is narrowing the list -- a filter you cannot see
--- is a filter you forget you set.
+-- The sidebar control carries one axis and its label says which way that axis
+-- is set, always -- a filter you cannot see is a filter you forget you set.
 function UI:RefreshFilterControls()
     if not self.frame then return end
     local button = self.frame.recipeFilterButton
     if not (button and button.SetLabel) then return end
-    local state = self:GetExpansionFilterState()
     local profitable = self:IsProfitableOnly()
-    local label = state.label:gsub("^Expansion: ", "")
-    if profitable then
-        label = label .. ", profitable"
-    end
-    button:SetLabel(label)
+    button:SetLabel(profitable and "Profitable crafts only" or "Every craft")
     if button.SetSelected then
-        button:SetSelected(state.key ~= "all" or profitable)
+        button:SetSelected(profitable)
     end
 end
 
@@ -1908,7 +2102,8 @@ function UI:CreateMainFrame()
         f:SetMinResize(1000, 620)
     end
     f:SetClampedToScreen(true)
-    f:SetFrameStrata("HIGH")
+    f:SetFrameStrata("MEDIUM")
+    if f.SetToplevel then f:SetToplevel(true) end
     createBackdrop(f, COLOR_BG[1], COLOR_BG[2], COLOR_BG[3], COLOR_BG[4], COLOR_BORDER[1], COLOR_BORDER[2], COLOR_BORDER[3], COLOR_BORDER[4])
 
     local shareMenuClickCatcher = CreateFrame("Frame", nil, UIParent)
@@ -2178,22 +2373,22 @@ function UI:CreateMainFrame()
     end)
     f.searchMaterials = searchMaterials
 
-    -- The two prefilters that used to live only in the options panel. They
-    -- are here because they change what this list shows, and a filter you
-    -- cannot see is a filter you forget you set.
+    -- The one prefilter that belongs to the browser. It is here rather than
+    -- only in the options panel because it changes what this list shows, and
+    -- a filter you cannot see is a filter you forget you set.
     local recipeFilterLabel = left:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     recipeFilterLabel:SetPoint("TOPLEFT", searchRecipes, "BOTTOMLEFT", 2, -14)
-    recipeFilterLabel:SetText("Recipe filters")
+    recipeFilterLabel:SetText("Recipe filter")
     f.recipeFilterLabel = recipeFilterLabel
 
     local recipeFilterButton = createCardStyleButton(left, 216, 22)
     recipeFilterButton:SetPoint("TOPLEFT", recipeFilterLabel, "BOTTOMLEFT", -2, -6)
-    recipeFilterButton:SetLabel("All expansions")
+    recipeFilterButton:SetLabel("Every craft")
     recipeFilterButton:SetScript("OnClick", function(self)
         UI:OpenRecipeFilterMenu(self)
     end)
     recipeFilterButton:SetScript("OnEnter", function(self)
-        UI:ShowExpansionFilterTooltip(self)
+        UI:ShowRecipeFilterTooltip(self)
     end)
     recipeFilterButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
     f.recipeFilterButton = recipeFilterButton
@@ -2221,6 +2416,7 @@ function UI:CreateMainFrame()
         local b = createCardStyleButton(profContent, 192, 24)
         b:SetPoint("TOPLEFT", 0, -((i - 1) * 30))
         b:SetScript("OnClick", function()
+            UI:CloseDropdown()
             if UI.selectedProfession == profName then
                 UI.selectedProfession = nil
             else
@@ -2293,13 +2489,14 @@ function UI:CreateMainFrame()
     addonStatusTitle:SetJustifyH("LEFT")
     addonStatusTitle:SetText(ADDON_STATUS_VIEW)
     addonStatusTitle:SetTextColor(1.0, 0.82, 0)
+    if addonStatusTitle.SetWordWrap then addonStatusTitle:SetWordWrap(false) end
     f.addonStatusTitle = addonStatusTitle
 
     local addonStatusHelp = center:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     addonStatusHelp:SetPoint("TOPLEFT", addonStatusControls, "BOTTOMLEFT", 4, -6)
     addonStatusHelp:SetPoint("TOPRIGHT", addonStatusControls, "BOTTOMRIGHT", -4, -6)
     addonStatusHelp:SetJustifyH("LEFT")
-    addonStatusHelp:SetText("Left-click column headers to sort; right-click headers marked [F] to filter.")
+    addonStatusHelp:SetText("Left-click a column header to sort by it, right-click one to filter by it.")
     addonStatusHelp:SetTextColor(0.66, 0.66, 0.66)
     f.addonStatusHelp = addonStatusHelp
 
@@ -2356,6 +2553,30 @@ function UI:CreateMainFrame()
         UI:RefreshSummaryCards()
     end)
     f.addonStatusSearchClearButton = addonStatusSearchClearButton
+
+    -- One control for the whole strip, the shape the collection strip already
+    -- uses: it says what is narrowing the table, and it is the one place that
+    -- drops all of it at once.
+    local addonStatusFilterButton = createCardStyleButton(addonStatusControls, 200, 22)
+    addonStatusFilterButton:SetPoint("RIGHT", -8, 0)
+    addonStatusFilterButton:SetLabel("Everyone")
+    addonStatusFilterButton:SetScript("OnClick", function(self)
+        UI:OpenAddonStatusFilterMenu(self)
+    end)
+    addonStatusFilterButton:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_TOP")
+        GameTooltip:AddLine("What this table is showing")
+        GameTooltip:AddLine("Which of your guildmates to list, and a way to drop every column filter at once.",
+            0.75, 0.75, 0.75, true)
+        GameTooltip:Show()
+    end)
+    addonStatusFilterButton:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    f.addonStatusFilterButton = addonStatusFilterButton
+
+    -- Bounded on the right so a long title cannot run under the control.
+    addonStatusTitle:SetPoint("RIGHT", addonStatusFilterButton, "LEFT", -12, 0)
 
     -- The collection view gets its own control strip rather than borrowing the
     -- sidebar search box: the sidebar is hidden while this view is up, the
@@ -2429,11 +2650,7 @@ function UI:CreateMainFrame()
         UI:OpenCollectionFilterMenu(self)
     end)
     collectionFilterButton:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_TOP")
-        GameTooltip:AddLine("What this table is showing")
-        GameTooltip:AddLine("How much of the collection to list, which expansions to include, and a way to drop every column filter at once.",
-            0.75, 0.75, 0.75, true)
-        GameTooltip:Show()
+        UI:ShowCollectionFilterTooltip(self)
     end)
     collectionFilterButton:SetScript("OnLeave", function()
         GameTooltip:Hide()
@@ -2661,10 +2878,7 @@ function UI:CreateMainFrame()
         if button ~= "LeftButton" or not IsShiftKeyDown() then return end
         local detail = UI.currentDetail
         if not detail then return end
-        local link = getItemLinkByID(detail.createdItemID)
-            or getItemLinkByID(detail.recipeItemID)
-            or (detail.spellID and GetSpellLink and GetSpellLink(detail.spellID))
-        insertLinkInChat(link)
+        insertLinkInChat(recipeLinkFor(detail.createdItemID, detail.recipeItemID, detail.spellID))
     end)
     detailTitleButton:SetScript("OnEnter", function(self)
         local detail = UI.currentDetail
@@ -2951,6 +3165,16 @@ function UI:EnsureRecipeRow(index)
         if button == "RightButton" then
             UI:ToggleFavorite(self.recipeKey)
         else
+            -- Shift-click the row itself rather than selecting it and then
+            -- reaching for the item at the top of the details panel. The
+            -- game's own router puts the link wherever something is waiting
+            -- for one -- a chat box, or the auction house search field, which
+            -- is the reason to want it. Without a modifier it declines, and
+            -- the click selects the row as it always did.
+            if insertLinkInChat(recipeLinkFor(
+                    self.linkCreatedItemID, self.linkRecipeItemID, self.linkSpellID)) then
+                return
+            end
             UI.selectedRecipeKey = self.recipeKey
             UI:RefreshRecipeList()
             UI:RefreshDetailPanel()
@@ -2979,6 +3203,11 @@ end
 -- At 96 the figure wrapped, and a wrapped money string puts each coin under
 -- the number it does not belong to.
 local DETAIL_VALUE_WIDTH = 132
+-- The panel is as wide as the window lets it be, and a price pinned to its
+-- right edge ended up half a screen from the reagent it belonged to. The lines
+-- keep to a readable measure and the money column right-aligns at the end of
+-- THAT, so the figure sits beside its label however wide the window gets.
+local DETAIL_MAX_MEASURE = 560
 
 function UI:EnsureDetailLine(index)
     local line = self.frame.detailLines[index]
@@ -3197,9 +3426,19 @@ function UI:OpenDropdown(anchor, items, width)
             end
             label:ClearAllPoints()
             label:SetPoint("TOPLEFT", 8, -yOffset)
+            -- A title is the only item that can be a sentence rather than a
+            -- word, and a FontString with no width does not stop at the frame
+            -- edge: the note about professions set on their own ran clean out
+            -- of the menu. Bounded to the width the popup is about to get, and
+            -- the row grows to however many lines that takes.
+            label:SetWidth(width - 16)
+            if label.SetWordWrap then label:SetWordWrap(true) end
             label:SetText(item.text or "")
             label:SetTextColor(1, 0.82, 0)
             label:Show()
+            if label.GetStringHeight then
+                height = math.max(height, math.ceil(label:GetStringHeight() or 0) + 4)
+            end
         else
             rowIndex = rowIndex + 1
             local row = popup.rows[rowIndex]
@@ -3528,6 +3767,9 @@ function UI:RefreshDebugPanel()
 end
 
 function UI:RefreshSummaryCards()
+    -- Every other refresh here checks first; this one reached straight for
+    -- self.frame.cards, so it was only ever callable once the window existed.
+    if not (self.frame and self.frame.cards) then return end
     if self:IsAddonStatusView() then
         local summary = self.currentAddonStatusSummary
         if not summary and Addon.Data and Addon.Data.GetGuildAddonStatusRows then
@@ -3805,8 +4047,11 @@ local COLLECTION_ROW_LINE_HEIGHT = 14
 local COLLECTION_MAX_SOURCE_LINES = 4
 local COLLECTION_GROUP_ROW_HEIGHT = 34
 local COLLECTION_ROW_ICON_SIZE = 24
--- Learned rows keep their skill number, without the difficulty emphasis.
-local COLLECTION_KNOWN_DIM_SKILL = "|cff6f7480"
+-- A recipe already in the book still shows every column -- a collector may
+-- well want to remember where a plan came from -- but it is drawn quiet, so
+-- the eye slides over the collected half and lands on the holes. Learned rows
+-- keep their skill number too, without the difficulty emphasis.
+local COLLECTION_KNOWN_DIM = "|cff6f7480"
 local RECIPE_ROW_ICON_SIZE = 30
 local RECIPE_ROW_BUFFER = 2
 
@@ -4043,13 +4288,20 @@ function UI:EnsureAddonStatusRowParts(row)
         button.highlight:SetTexture("Interface\\Buttons\\WHITE8x8")
         button.highlight:SetVertexColor(1, 1, 1, 0.06)
         button:SetScript("OnClick", function(self, mouseButton)
-            UI:HandleAddonStatusHeaderClick(self.addonStatusColumnKey, mouseButton)
+            UI:HandleAddonStatusHeaderClick(self.addonStatusColumnKey, mouseButton, self)
         end)
         button:SetScript("OnEnter", function(self)
+            local columnKey = self.addonStatusColumnKey
             GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
-            GameTooltip:AddLine("Left-click to sort")
-            if ADDON_STATUS_FILTER_CYCLES[self.addonStatusColumnKey] then
+            GameTooltip:AddLine(ADDON_STATUS_COLUMN_TITLES[columnKey] or "Column")
+            GameTooltip:AddLine("Left-click to sort", 0.8, 0.8, 0.8)
+            if ADDON_STATUS_FILTER_CYCLES[columnKey] then
+                local current = UI:GetAddonStatusFilter(columnKey)
                 GameTooltip:AddLine("Right-click to filter", 0.8, 0.8, 0.8)
+                if current ~= "all" then
+                    GameTooltip:AddLine("Showing: "
+                        .. (ADDON_STATUS_FILTER_LABELS[current] or current), 1, 0.82, 0)
+                end
             end
             GameTooltip:Show()
         end)
@@ -4154,6 +4406,18 @@ local function collectionDifficulty(collection, rank)
     return "optimal"
 end
 
+-- What colour a skill requirement is written in, for a character standing at
+-- `rank`. Shared by the Collection column and the detail panel's "Requires"
+-- line: the same number in two places must not be two different colours.
+-- nil rank means the character does not have the profession at all, and a
+-- difficulty is meaningless then.
+local function skillRequirementColour(requiredSkill, skillLevels, rank)
+    if not requiredSkill or type(rank) ~= "number" then return nil end
+    if rank < requiredSkill then return COLLECTION_UNREACHABLE_COLOUR end
+    return tradeDifficultyColour(collectionDifficulty(
+        { requiredSkill = requiredSkill, skillLevels = skillLevels }, rank))
+end
+
 function UI:CollectionSkillText(collection, known)
     local required = collection.requiredSkill
     if not required then
@@ -4166,9 +4430,11 @@ function UI:CollectionSkillText(collection, known)
     -- A recipe already in the book is history; it keeps its number so the
     -- column stays readable as a column, but not the emphasis.
     if known then
-        return string.format("%s%d|r", COLLECTION_KNOWN_DIM_SKILL, required)
+        return string.format("%s%d|r", COLLECTION_KNOWN_DIM, required)
     end
-    return string.format("%s%d|r", tradeDifficultyColour(collectionDifficulty(collection, rank)), required)
+    return string.format("%s%d|r",
+        skillRequirementColour(required, collection.skillLevels, rank) or COLLECTION_KNOWN_DIM,
+        required)
 end
 
 -- The source as a stacked list, one place per line, with the faction
@@ -4226,16 +4492,22 @@ local COLLECTION_NAME_INSET = 40 + COLLECTION_GROUP_INDENT
 local COLLECTION_STATUS_WIDTH = 92
 local COLLECTION_SKILL_WIDTH = 62
 local COLLECTION_SPEC_WIDTH = 148
+-- Wide enough for "P5" and its header arrow and no wider: the column is blank
+-- on everything obtainable from the start, so it earns its place by being the
+-- flag for what is not, not by being readable at a distance.
+local COLLECTION_PHASE_WIDTH = 46
 local COLLECTION_NAME_MIN_WIDTH = 190
 local COLLECTION_SOURCE_MIN_WIDTH = 150
 
 function UI:GetCollectionColumnWidths()
     local fixed = COLLECTION_STATUS_WIDTH + COLLECTION_SKILL_WIDTH + COLLECTION_SPEC_WIDTH
+        + COLLECTION_PHASE_WIDTH
     local flexible = self:GetListRowWidth()
-        - COLLECTION_NAME_INSET - 10 - (COLLECTION_COLUMN_GAP * 4) - fixed
+        - COLLECTION_NAME_INSET - 10 - (COLLECTION_COLUMN_GAP * 5) - fixed
     local nameWidth = math.max(COLLECTION_NAME_MIN_WIDTH, math.floor(flexible * 0.45))
     local sourceWidth = math.max(COLLECTION_SOURCE_MIN_WIDTH, flexible - nameWidth)
-    return nameWidth, COLLECTION_STATUS_WIDTH, COLLECTION_SKILL_WIDTH, sourceWidth, COLLECTION_SPEC_WIDTH
+    return nameWidth, COLLECTION_STATUS_WIDTH, COLLECTION_SKILL_WIDTH, sourceWidth,
+        COLLECTION_SPEC_WIDTH, COLLECTION_PHASE_WIDTH
 end
 
 -- Columns hang from the TOP of the row, not its middle: a row is as tall as
@@ -4273,12 +4545,14 @@ function UI:EnsureCollectionRowParts(row)
     row.collectionSectionTitle:SetPoint("RIGHT", -10, 0)
     row.collectionSectionTitle:SetJustifyH("LEFT")
 
-    local nameWidth, statusWidth, skillWidth, sourceWidth, specWidth = self:GetCollectionColumnWidths()
+    local nameWidth, statusWidth, skillWidth, sourceWidth, specWidth, phaseWidth =
+        self:GetCollectionColumnWidths()
     row.collectionName = makeCollectionColumn(row, nil, nameWidth)
     row.collectionStatus = makeCollectionColumn(row, row.collectionName, statusWidth)
     row.collectionSkill = makeCollectionColumn(row, row.collectionStatus, skillWidth)
     row.collectionSource = makeCollectionColumn(row, row.collectionSkill, sourceWidth, true)
     row.collectionSpec = makeCollectionColumn(row, row.collectionSource, specWidth)
+    row.collectionPhase = makeCollectionColumn(row, row.collectionSpec, phaseWidth)
     -- The source is the one column allowed to be several lines tall.
     if row.collectionSource.SetMaxLines then
         row.collectionSource:SetMaxLines(COLLECTION_MAX_SOURCE_LINES)
@@ -4316,6 +4590,7 @@ function UI:EnsureCollectionRowParts(row)
         { key = "skill",  region = row.collectionSkill },
         { key = "source", region = row.collectionSource },
         { key = "spec",   region = row.collectionSpec },
+        { key = "phase",  region = row.collectionPhase },
     }) do
         local button = CreateFrame("Button", nil, row)
         button.collectionColumnKey = column.key
@@ -4356,7 +4631,8 @@ end
 -- Re-applied on bind rather than at build time: the window is resizable, and
 -- the two flexible columns follow its width.
 function UI:ApplyCollectionColumnWidths(row)
-    local nameWidth, statusWidth, skillWidth, sourceWidth, specWidth = self:GetCollectionColumnWidths()
+    local nameWidth, statusWidth, skillWidth, sourceWidth, specWidth, phaseWidth =
+        self:GetCollectionColumnWidths()
     if row._rrCollectionNameWidth == nameWidth and row._rrCollectionSourceWidth == sourceWidth then
         return
     end
@@ -4367,6 +4643,7 @@ function UI:ApplyCollectionColumnWidths(row)
     row.collectionSkill:SetWidth(skillWidth)
     row.collectionSource:SetWidth(sourceWidth)
     row.collectionSpec:SetWidth(specWidth)
+    row.collectionPhase:SetWidth(phaseWidth)
 end
 
 function UI:SetCollectionHeaderButtonsVisible(row, visible)
@@ -4384,6 +4661,7 @@ function UI:SetCollectionPartsVisible(row, visible)
     setShownIfChanged(row.collectionSkill, visible)
     setShownIfChanged(row.collectionSource, visible)
     setShownIfChanged(row.collectionSpec, visible)
+    setShownIfChanged(row.collectionPhase, visible)
     setShownIfChanged(row.collectionNameHit, visible)
 end
 
@@ -4396,6 +4674,7 @@ function UI:HideCollectionRowParts(row)
     setShownIfChanged(row.collectionSkill, false)
     setShownIfChanged(row.collectionSource, false)
     setShownIfChanged(row.collectionSpec, false)
+    setShownIfChanged(row.collectionPhase, false)
     setShownIfChanged(row.collectionNameHit, false)
 end
 
@@ -4466,6 +4745,13 @@ function UI:ShowCollectionRowTooltip(row)
         end
         GameTooltip:AddLine(text, 0.85, 0.85, 0.85, true)
     end
+    -- The source line says "from a trainer" because that is all the data
+    -- records. When the trainer only teaches it to some classes, that is the
+    -- rest of the answer, and without it the row reads as a recipe any
+    -- engineer could walk up and buy.
+    if collection.classNames then
+        GameTooltip:AddLine("Taught only to " .. collection.classNames, 0.95, 0.75, 0.30, true)
+    end
     if collection.faction == "alliance" then
         GameTooltip:AddLine("Alliance only", 0.40, 0.60, 1.0)
     elseif collection.faction == "horde" then
@@ -4500,6 +4786,7 @@ function UI:BindCollectionGroupRow(row, rowData)
     setShownIfChanged(row.collectionSkill, false)
     setShownIfChanged(row.collectionSource, false)
     setShownIfChanged(row.collectionSpec, false)
+    setShownIfChanged(row.collectionPhase, false)
     setShownIfChanged(row.collectionNameHit, false)
     row.collectionGroupKey = rowData.groupKey
 
@@ -4529,21 +4816,18 @@ function UI:BindCollectionHeaderRow(row, rowData)
     if row.collectionSource.SetMaxLines then row.collectionSource:SetMaxLines(1) end
     setTextIfChanged(row.collectionSource, self:GetCollectionHeaderText("source", "Learned from"))
     setTextIfChanged(row.collectionSpec, self:GetCollectionHeaderText("spec", "Specialization"))
+    setTextIfChanged(row.collectionPhase, self:GetCollectionHeaderText("phase", "Phase"))
     self:SetCollectionHeaderButtonsVisible(row, true)
     row.collectionName:SetTextColor(0.72, 0.72, 0.72)
     row.collectionStatus:SetTextColor(0.72, 0.72, 0.72)
     row.collectionSkill:SetTextColor(0.72, 0.72, 0.72)
     row.collectionSource:SetTextColor(0.72, 0.72, 0.72)
     row.collectionSpec:SetTextColor(0.72, 0.72, 0.72)
+    row.collectionPhase:SetTextColor(0.72, 0.72, 0.72)
     setVertexColorIfChanged(row.stripe, 0.35, 0.35, 0.35, 1)
     setBackdropColorsIfChanged(row, 0.06, 0.06, 0.06, 0.98, 0.20, 0.20, 0.20, 0.95)
     setShownIfChanged(row, true)
 end
-
--- A recipe already in the book still shows every column -- a collector may
--- well want to remember where a plan came from -- but it is drawn quiet, so
--- the eye slides over the collected half and lands on the holes.
-local COLLECTION_KNOWN_DIM = "|cff6f7480"
 
 function UI:BindCollectionRow(row, rowIdx, rowData)
     if rowData.rowType == "collectionGroup" then
@@ -4573,6 +4857,11 @@ function UI:BindCollectionRow(row, rowIdx, rowData)
         or (detail.recipeItemID and ("item:" .. detail.recipeItemID))
         or (detail.spellID and ("spell:" .. detail.spellID))
         or nil
+    -- What a shift-click on the row hands over. Three ids rather than a link:
+    -- building one costs an item query, and a row is bound on every scroll.
+    row.linkCreatedItemID = detail.createdItemID
+    row.linkRecipeItemID = detail.recipeItemID
+    row.linkSpellID = detail.spellID
 
     setTextIfChanged(row.collectionName, known
         and string.format("%s%s|r", COLLECTION_KNOWN_DIM, safeText(rowData.label))
@@ -4629,6 +4918,17 @@ function UI:BindCollectionRow(row, rowIdx, rowData)
         setTextIfChanged(row.collectionSpec, string.format("%s%s|r", colour, collection.specializationName))
     else
         setTextIfChanged(row.collectionSpec, "|cff8f949c-|r")
+    end
+
+    -- Amber rather than the row's own colour: a phase is not a property of the
+    -- recipe the way its skill is, it is a date, and the one thing worth
+    -- saying about it is that the date has not arrived on every realm.
+    local phaseText = COLLECTION_PHASE_TEXT[collection.phase or 0]
+    if phaseText then
+        setTextIfChanged(row.collectionPhase,
+            string.format("%s%s|r", known and COLLECTION_KNOWN_DIM or "|cffe6a94d", phaseText))
+    else
+        setTextIfChanged(row.collectionPhase, "")
     end
 
     row.collectionInfo = collection
@@ -4692,15 +4992,11 @@ end
 
 function UI:GetAddonStatusHeaderText(columnKey, baseLabel)
     local text = baseLabel
-    local filter = self:GetAddonStatusFilter(columnKey)
-    if filter ~= "all" then
-        text = string.format("%s: %s", baseLabel, ADDON_STATUS_FILTER_LABELS[filter] or filter)
+    if self:GetAddonStatusFilter(columnKey) ~= "all" then
+        text = "|cffffd100" .. baseLabel .. "|r"
     end
     if (self.addonStatusSortKey or ADDON_STATUS_DEFAULT_SORT) == columnKey then
         text = text .. (self.addonStatusSortDir == "desc" and " v" or " ^")
-    end
-    if ADDON_STATUS_FILTER_CYCLES[columnKey] then
-        text = text .. " " .. ADDON_STATUS_FILTER_MARKER
     end
     return text
 end
@@ -4829,6 +5125,9 @@ function UI:BindRecipeRow(row, recipeIdx, rowData)
         or (detail.spellID and ("spell:" .. detail.spellID))
         or nil
     row.tooltipLink = tooltipLink
+    row.linkCreatedItemID = detail.createdItemID
+    row.linkRecipeItemID = detail.recipeItemID
+    row.linkSpellID = detail.spellID
     local titleText = rowData.label
     local rowIcon = detail.createdItemIcon or detail.recipeItemIcon or detail.spellIcon or getItemIcon(colorItemID)
     if rowIcon then
@@ -4857,12 +5156,24 @@ function UI:BindRecipeRow(row, recipeIdx, rowData)
         statsParts[#statsParts + 1] = string.format("|cff55d66b%d online|r", rowData.onlineCount or 0)
     end
     -- Only ever set while the profitable-only filter is on: the row survived
-    -- the filter because its price could not be worked out, not because it
-    -- was judged profitable. Saying so keeps the filtered list honest.
-    if rowData.visibilityReason == "visible-unpriced" then
+    -- the filter without being judged profitable, and saying which of the two
+    -- reasons keeps the filtered list honest.
+    --
+    -- "No price data" used to cover both, which read as though the addon knew
+    -- nothing about a craft it had costed to the silver. It is kept for the
+    -- case it describes -- nothing priced at all -- and a craft missing one
+    -- reagent says what its figure actually is.
+    if rowData.visibilityReason == "visible-partial-price" then
+        statsParts[#statsParts + 1] = "|cff8f949cbest case|r"
+    elseif rowData.visibilityReason == "visible-unpriced" then
         statsParts[#statsParts + 1] = "|cff8f949cno price data|r"
     end
-    setTextIfChanged(row.stats, table.concat(statsParts, "\n"))
+    -- One line, not one per fact. The row is 70 pixels and holds three lines:
+    -- title, stats, profession. Stacking the crafter count above the online
+    -- count made stats two lines on its own, which pushed the profession out
+    -- through the bottom border -- visible in a global search, where the
+    -- profession is the line that gets written.
+    setTextIfChanged(row.stats, table.concat(statsParts, "  -  "))
 
     local metaParts = {}
     if self.selectedProfession == nil and rowData.professionList and #rowData.professionList > 0 then
@@ -5487,6 +5798,9 @@ local COLLECTION_SORT_VALUES = {
     skill = function(collection) return collection.requiredSkill or -1 end,
     source = function(collection) return collection.sourceLabel or "" end,
     spec = function(collection) return collection.specializationName or "" end,
+    -- Base content sorts first because it is the phase that has already
+    -- arrived, and 1 is the number it would carry if the field were written.
+    phase = function(collection) return collection.phase or 1 end,
     name = function(_, row) return lowerSafe(row.label) end,
 }
 
@@ -5813,6 +6127,9 @@ end
 function UI:RenderDetailLines(lines, lineLinks, lineMeta)
     local yOffset = 0
     local lineWidth = self:GetDetailLineWidth()
+    -- Everything past the readable measure is left empty on the right rather
+    -- than spent pushing the money column away from the label it prices.
+    local slack = math.max(0, lineWidth - DETAIL_MAX_MEASURE)
     if self.frame.detailContent and self.frame.detailContent.SetWidth then
         self.frame.detailContent:SetWidth(lineWidth)
     end
@@ -5845,9 +6162,11 @@ function UI:RenderDetailLines(lines, lineLinks, lineMeta)
             setShownIfChanged(line.actionButton, false)
             setTextIfChanged(line.value, meta.value)
             setShownIfChanged(line.value, true)
+            line.value:ClearAllPoints()
+            line.value:SetPoint("TOPRIGHT", -(4 + slack), 0)
             line.text:ClearAllPoints()
             line.text:SetPoint("TOPLEFT", 0, 0)
-            line.text:SetPoint("TOPRIGHT", -(DETAIL_VALUE_WIDTH + 12), 0)
+            line.text:SetPoint("TOPRIGHT", -(DETAIL_VALUE_WIDTH + 12 + slack), 0)
         else
             setShownIfChanged(line.actionButton, false)
             setShownIfChanged(line.value, false)
@@ -6135,8 +6454,22 @@ function UI:RefreshDetailPanel()
     if source then
         lines[#lines + 1] = " "
         lines[#lines + 1] = "|cffffd100Where to learn|r"
-        for _, sourceLine in ipairs(source.lines or { source.label }) do
-            lines[#lines + 1] = string.format("|cffd8d8d8%s|r", safeText(sourceLine))
+        -- The banner belongs to the line whose NPC it is, not to the recipe:
+        -- a pattern sold by an Alliance vendor in one city and a Horde one in
+        -- another is available to both sides, and hanging one flag on the
+        -- whole recipe tells a Horde reader nothing about which to walk to.
+        -- An icon rather than a colour, so the panel does not turn into a
+        -- paint chart.
+        local lineInfo = source.lineInfo
+        for index, sourceLine in ipairs(source.lines or { source.label }) do
+            local text = string.format("|cffd8d8d8%s|r", safeText(sourceLine))
+            local info = lineInfo and lineInfo[index]
+            if info and info.faction == "alliance" then
+                text = text .. " " .. ALLIANCE_INLINE_TAG
+            elseif info and info.faction == "horde" then
+                text = text .. " " .. HORDE_INLINE_TAG
+            end
+            lines[#lines + 1] = text
         end
         -- Nil faction means both sides can get it, which is the common case
         -- and deserves no ink. Only a restriction is worth a line.
@@ -6145,17 +6478,21 @@ function UI:RefreshDetailPanel()
         elseif source.faction == "horde" then
             lines[#lines + 1] = "|cffe05561Horde only|r"
         end
+        -- The skill number carries the game's own difficulty colour, the same
+        -- one the Collection column uses, so the same recipe does not read as
+        -- orange in one tab and grey in the other. Colour codes do not nest,
+        -- so the line is built in segments rather than wrapped in one.
         local requirements = {}
         if detail.minRank then
-            requirements[#requirements + 1] = string.format("%s %d",
-                detail.professionName or "Skill", detail.minRank)
+            local colour = skillRequirementColour(detail.minRank, detail.skillLevels, detail.skillRank)
+            requirements[#requirements + 1] = string.format("%s%s %d|r",
+                colour or "|cff8f949c", detail.professionName or "Skill", detail.minRank)
         end
         if detail.specializationName then
-            requirements[#requirements + 1] = detail.specializationName
+            requirements[#requirements + 1] = string.format("|cff8f949c%s|r", detail.specializationName)
         end
         if #requirements > 0 then
-            lines[#lines + 1] = string.format("|cff8f949cRequires %s|r",
-                table.concat(requirements, "  -  "))
+            lines[#lines + 1] = "|cff8f949cRequires|r " .. table.concat(requirements, "|cff8f949c  -  |r")
         end
     end
 
@@ -6166,7 +6503,21 @@ function UI:RefreshDetailPanel()
             local icon = reagent.icon or getItemIcon(reagent.itemID)
             local name = getItemColorizedName(reagent.itemID, safeText(reagent.name))
             local count = reagent.count or 1
-            lines[#lines + 1] = string.format("%s  %s x%d", materialTextureTag(icon), name, count)
+            -- One line per reagent. The unit price used to sit on a second
+            -- line of its own, which put the multiplier and the number it
+            -- multiplies four inches apart; inline it reads as the sum it is.
+            -- Only written when more than one is needed -- for a single
+            -- reagent the unit price IS the total, printed twice.
+            local text = string.format("%s  %s x%d", materialTextureTag(icon), name, count)
+            if count > 1 and reagent.unitCost then
+                text = text .. string.format("   |cff6f7480%s each|r", formatMoney(reagent.unitCost))
+            end
+            -- A price watched at a merchant is worth marking: it is fixed and
+            -- repeatable, where an auction price is one snapshot of a market.
+            if reagent.unitCostSource == "Vendor" then
+                text = text .. "   |cff7f9f6fvendor|r"
+            end
+            lines[#lines + 1] = text
             lineLinks[#lines] = getItemLinkByID(reagent.itemID)
             lineMeta[#lines] = {
                 tooltipLink = getItemLinkByID(reagent.itemID),
@@ -6176,11 +6527,6 @@ function UI:RefreshDetailPanel()
                 -- word "Total".
                 value = "|cff9fa6b2" .. formatMoney(reagent.totalCost) .. "|r",
             }
-            -- The unit price only says something the total does not when more
-            -- than one is needed.
-            if count > 1 then
-                lines[#lines + 1] = string.format("|cff6f7480   %s each|r", formatMoney(reagent.unitCost))
-            end
         end
     elseif detail.directEnchant then
         lines[#lines + 1] = "No material mapping available for this enchant."

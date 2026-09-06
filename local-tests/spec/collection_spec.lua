@@ -425,7 +425,7 @@ Test.it("names the trainer when the source knows one", function()
 
     local named
     for _, row in ipairs(data:BuildCollectionRows()) do
-        if row.collection.sourceKind == "trainer" and row.collection.sourceLabel ~= "Any trainer" then
+        if row.collection.sourceKind == "trainer" and row.collection.sourceLabel ~= "From a trainer" then
             named = row.collection.sourceLabel
             break
         end
@@ -436,16 +436,86 @@ Test.it("names the trainer when the source knows one", function()
     Test.truthy(named:find("%(") ~= nil, "the zone should follow the name in brackets")
 end)
 
-Test.it("keeps the bare label for a recipe every trainer teaches", function()
+-- Where every trainer of a recipe carries the same title, that title is the
+-- answer -- and a better one than the names: there are five Master Engineering
+-- Trainers spread across Outland, and the title is what the player reads under
+-- each of them in the world.
+Test.it("names the kind of trainer when every one of them is the same kind", function()
+    local source = data:DescribeRecipeSource(-41314, "engineering")
+    Test.eq(source.kind, "trainer")
+    Test.eq(source.label, "Master Engineering Trainer (Outland)")
+
+    -- A named specialization trainer still wins: a name you can walk up to
+    -- beats a title you have to go looking for.
+    local named = data:DescribeRecipeSource(-12906, "engineering")
+    Test.truthy(named.label:find("Trainer: ") == 1,
+        "the named trainers must not be replaced by their title")
+
+    -- And a recipe several ranks of trainer teach keeps the honest fallback.
+    local any = data:DescribeRecipeSource(-2149, "leatherworking")
+    Test.eq(any.label, "From a trainer")
+end)
+
+-- AckisRecipeList names no trainer at all for any of the 770 trainer-taught
+-- recipes in this dataset: it records that a trainer teaches the recipe, and
+-- nothing more. The label has to stop at what was recorded -- "Any trainer"
+-- turned that silence into a promise that every trainer stocks it, which is
+-- flatly false for the class-gated goggles and unverified for the rest.
+Test.it("says a trainer teaches it, not that every trainer does", function()
     setLocalProfession("Engineering", { skillRank = 375 })
 
     local bare = 0
     for _, row in ipairs(data:BuildCollectionRows()) do
-        if row.collection.sourceLabel == "Any trainer" then bare = bare + 1 end
+        Test.ne(row.collection.sourceLabel, "Any trainer",
+            "the label must not claim a ubiquity the source never stated")
+        if row.collection.sourceLabel == "From a trainer" then bare = bare + 1 end
     end
-    -- Naming three of the thirty-two trainers who teach a recipe is worse
-    -- than naming none, so those rows stay unadorned.
     Test.gte(bare, 1)
+end)
+
+-- The source line is all the data records, so when the trainer teaches it to
+-- some classes and not others, that is the rest of the answer. Without it the
+-- row reads as a recipe any engineer could walk up and buy.
+Test.it("names the classes a gated recipe is taught to", function()
+    _wow.SetPlayerClass("ROGUE")
+    setLocalProfession("Engineering", { skillRank = 375 })
+    data:InvalidateRecipeCaches()
+
+    local row = findRow(data:BuildCollectionRows(), -41317)
+    Test.truthy(row ~= nil, "a rogue can learn the Deathblow X11 Goggles")
+    Test.eq(row.collection.classMask, 1032)
+    Test.eq(row.collection.classNames, "Rogue, Druid")
+
+    Test.eq(data:DescribeClassMask(68), "Hunter, Shaman")
+    Test.eq(data:DescribeClassMask(nil), nil)
+    Test.eq(data:DescribeClassMask(0), nil, "a mask that restricts nothing says nothing")
+    clearLocalProfessions()
+end)
+
+-- A specialization is not a hole you can fill by levelling: only being a
+-- different smith would open it, so it is not one of the recipes you have
+-- still to learn. A skill number IS a hole, and closes on its own.
+Test.it("leaves a specialization you do not have out of the unlearned count", function()
+    local blocked = {
+        collection = { known = false, skillMet = true, specializationMet = false },
+    }
+    local reachable = {
+        collection = { known = false, skillMet = false, specializationMet = true },
+    }
+    local mine = {
+        collection = { known = true, skillMet = true, specializationMet = true },
+    }
+
+    Test.eq(data:CollectionRowPasses(blocked, "unlearned"), false)
+    Test.eq(data:CollectionRowPasses(reachable, "unlearned"), true,
+        "out of skill reach is still a hole: the profession goes up")
+    Test.eq(data:CollectionRowPasses(mine, "unlearned"), false)
+
+    -- The three states stay a strict narrowing: ready is a subset of unlearned.
+    Test.eq(data:CollectionRowPasses(blocked, "ready"), false)
+    Test.eq(data:CollectionRowPasses(reachable, "ready"), false)
+    Test.eq(data:CollectionRowPasses(blocked, "all"), true,
+        "and the whole book still shows it -- a specialization can be changed")
 end)
 
 -- Two independent lists could not say which vendor stands in which city:
@@ -592,6 +662,79 @@ Test.it("carries one source line per place onto the row", function()
     end
     Test.truthy(multi ~= nil, "expected a recipe with more than one place")
     Test.eq(#multi.collection.sourceLines, #multi.collection.sourcePlaces)
+end)
+
+-- The predicate is two lines; the wiring is where the bug would be. 41317 is
+-- the Deathblow X11 Goggles, whose ClassMask in the client data is 1032 --
+-- Rogue and Druid -- and it is the only place the gate is exercised against
+-- the real dataset rather than a fixture.
+Test.it("keeps a class-gated recipe out of the book of a class that cannot learn it", function()
+    local GOGGLES = -41317
+    setLocalProfession("Engineering", { skillRank = 375 })
+
+    _wow.SetPlayerClass("ROGUE")
+    data:InvalidateRecipeCaches()
+    Test.truthy(findRow(data:BuildCollectionRows(), GOGGLES) ~= nil,
+        "a rogue's engineering trainer does teach these")
+
+    _wow.SetPlayerClass("WARRIOR")
+    data:InvalidateRecipeCaches()
+    Test.eq(findRow(data:BuildCollectionRows(), GOGGLES), nil,
+        "and a warrior's never will, so it is not a hole in the warrior's book")
+
+    -- The ungated recipes of the same profession are untouched: the gate is a
+    -- gate, not a profession filter.
+    Test.truthy(#data:BuildCollectionRows() > 100,
+        "hiding twenty-two recipes must not empty engineering")
+
+    _wow.SetPlayerClass("ROGUE")
+    data:InvalidateRecipeCaches()
+    clearLocalProfessions()
+end)
+
+-- The detail panel colours its skill requirement against the character's own
+-- rank, which means it needs one. nil and zero are different answers.
+Test.it("reports this character's rank in a profession, or nothing", function()
+    clearLocalProfessions()
+    Test.eq(data:GetLocalProfessionRank("Engineering"), nil,
+        "not an engineer is not an engineer at zero")
+    Test.eq(data:GetLocalProfessionRank(nil), nil)
+
+    setLocalProfession("Engineering", { skillRank = 340 })
+    Test.eq(data:GetLocalProfessionRank("Engineering"), 340)
+    Test.eq(data:GetLocalProfessionRank("Tailoring"), nil)
+    clearLocalProfessions()
+end)
+
+-- Twenty-two engineering recipes are taught only to certain classes. For
+-- everybody else they are not an unfilled hole in the collection: they are a
+-- book that was never theirs, and listing them is a false positive nobody can
+-- ever close.
+Test.it("asks whether this character's class could learn the recipe at all", function()
+    local addon, wow = Loader.Load()
+    local data = addon.Data
+
+    wow.SetPlayerClass("ROGUE")
+    -- 1032 is Rogue plus Druid: the Deathblow X11 Goggles.
+    Test.eq(data:CanCurrentClassLearn(1032), true)
+    Test.eq(data:CanCurrentClassLearn(8), true, "rogue alone")
+    Test.eq(data:CanCurrentClassLearn(1024), false, "druid alone")
+    Test.eq(data:CanCurrentClassLearn(3), false, "warrior and paladin")
+
+    wow.SetPlayerClass("DRUID")
+    Test.eq(data:CanCurrentClassLearn(1032), true)
+    Test.eq(data:CanCurrentClassLearn(8), false)
+
+    -- No mask is not a gate, and neither is a zero one.
+    wow.SetPlayerClass("WARRIOR")
+    Test.eq(data:CanCurrentClassLearn(nil), true)
+    Test.eq(data:CanCurrentClassLearn(0), true)
+
+    -- A client that cannot say lets everything through: hiding a whole book on
+    -- a guess is a worse failure than showing a row that does not apply.
+    wow.SetPlayerClass(nil)
+    Test.eq(data:CanCurrentClassLearn(1032), true)
+    wow.SetPlayerClass("ROGUE")
 end)
 
 io.write(string.format("Collection: %d test(s) passed\n", Test.count))

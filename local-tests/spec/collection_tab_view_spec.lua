@@ -667,6 +667,7 @@ local function columnRow(profession, opts)
             sourceKind = opts.sourceKind,
             sourceLabel = opts.sourceLabel,
             sourceLines = opts.sourceLines,
+            phase = opts.phase,
         },
     }
 end
@@ -682,7 +683,7 @@ end
 local function resetColumnState()
     ui.frame = nil
     useView(COLLECTION_VIEW)
-    ui.collectionFilters = { skill = "all", source = "all", spec = "all" }
+    ui.collectionFilters = { skill = "all", source = "all", spec = "all", phase = "all" }
     ui.collectionSortKey = "default"
     ui.collectionSortDir = "asc"
     data:SetCollectionFilter("all")
@@ -1200,6 +1201,410 @@ Test.it("files the money settings under money", function()
     -- A passing question is not a setting: it left the panel for the browser.
     Test.eq(optionsSource:find("profitableOnlyCheck", 1, true), nil,
         "the profit filter is a filter control now, not an option")
+end)
+
+-- The files the game actually loads, in the TOC's own order, so a new file is
+-- guarded the day it is added rather than the day somebody remembers to list
+-- it here. The libraries are somebody else's code.
+local function loadedSourcePaths()
+    local paths = {}
+    local handle = assert(io.open("RecipeRegistry.toc", "r"))
+    for line in handle:lines() do
+        local entry = line:match("^([^#%s][^%s]*%.lua)%s*$")
+        if entry and not entry:match("^Libs") then
+            paths[#paths + 1] = (entry:gsub("\\", "/"))
+        end
+    end
+    handle:close()
+    Test.gte(#paths, 20, "the TOC should list the whole addon")
+    return paths
+end
+
+-- A menu is anchored to the control that opened it, and that control is
+-- hidden with its view. Left open, it floated over the tab you had just
+-- switched to, still writing the settings of the one you left.
+Test.it("takes the open menu away with the view it belongs to", function()
+    local body = bodyOf("function UI:SetMainView(")
+    Test.truthy(body ~= nil)
+    Test.truthy(body:find("self:CloseDropdown()", 1, true) ~= nil,
+        "switching tabs has to close whatever menu is open")
+    Test.truthy(bodyOf("function UI:CloseDropdown(") ~= nil)
+end)
+
+-- Which expansions to list is a question about a profession's whole book, so
+-- it is asked in the tab that lists one. The browser answers it with the
+-- banner over the list, against the profession actually being looked at.
+Test.it("asks about expansions in the collection and about prices in the browser", function()
+    local browser = bodyOf("function UI:OpenRecipeFilterMenu(")
+    Test.truthy(browser ~= nil)
+    Test.eq(browser:find("BuildExpansionMenuItems", 1, true), nil,
+        "the expansion filter left the sidebar")
+    Test.truthy(browser:find("Profitable crafts only", 1, true) ~= nil,
+        "and the price filter is what stayed")
+
+    local collection = bodyOf("function UI:OpenCollectionFilterMenu(")
+    Test.truthy(collection ~= nil)
+    Test.truthy(collection:find("BuildExpansionMenuItems", 1, true) ~= nil,
+        "which is where the expansion filter went")
+
+    -- The warning about a profession set on its own has to travel with the
+    -- control: it is the only thing that explains a list that looks wrong.
+    Test.truthy(bodyOf("function UI:ShowCollectionFilterTooltip(") ~= nil)
+    Test.eq(mainFrameSource:find("function UI:ShowExpansionFilterTooltip(", 1, true), nil,
+        "one tooltip for two controls made sense only while both carried expansions")
+end)
+
+Test.it("says which way the browser's one filter is set", function()
+    local body = bodyOf("function UI:RefreshFilterControls(")
+    Test.truthy(body ~= nil)
+    Test.truthy(body:find("Profitable crafts only", 1, true) ~= nil)
+    Test.truthy(body:find("Every craft", 1, true) ~= nil)
+    Test.eq(body:find("GetExpansionFilterState", 1, true), nil,
+        "the sidebar control no longer carries the expansion axis")
+end)
+
+-- A title is the only menu item that can be a sentence, and a FontString with
+-- no width does not stop at the frame edge: the note about professions set on
+-- their own ran clean out of the menu.
+Test.it("keeps a menu title inside the menu", function()
+    local body = bodyOf("function UI:OpenDropdown(")
+    Test.truthy(body ~= nil)
+    Test.truthy(body:find("label:SetWidth(width - 16)", 1, true) ~= nil,
+        "a title has to be bounded by the width the popup is about to get")
+    Test.truthy(body:find("label:SetWordWrap(true)", 1, true) ~= nil,
+        "and it has to wrap rather than run on")
+    Test.truthy(body:find("label:GetStringHeight()", 1, true) ~= nil,
+        "and the row has to grow to however many lines that takes")
+end)
+
+-- The X beside the collection's search box wiped the browser's text and left
+-- the collection's where it was. Three boxes, three cases: the two-way branch
+-- is the same one that made the collection's box do nothing at all.
+Test.it("clears the search box belonging to the view being drawn", function()
+    local body = bodyOf("function UI:ClearSearch(")
+    Test.truthy(body ~= nil)
+    Test.truthy(body:find("IsCollectionView", 1, true) ~= nil,
+        "the collection has its own search text and the clear button has to name it")
+    Test.truthy(body:find("self.collectionSearchText = \"\"", 1, true) ~= nil)
+
+    local focus = bodyOf("function UI:ClearSearchFocus(")
+    Test.truthy(focus ~= nil)
+    Test.truthy(focus:find("collectionSearchBox", 1, true) ~= nil,
+        "and the box it belongs to has to give up focus with it")
+end)
+
+-- A window nothing can be raised above is a window that is always in the way.
+-- MEDIUM is where the game's own panels live; Toplevel is the mechanism by
+-- which whichever window you clicked last comes to the front.
+Test.it("lets another window come in front of this one", function()
+    local body = bodyOf("function UI:CreateMainFrame(")
+    Test.truthy(body ~= nil)
+    Test.truthy(body:find('f:SetFrameStrata("MEDIUM")', 1, true) ~= nil,
+        "HIGH put the window above the bags and every other panel, always")
+    Test.truthy(body:find("f:SetToplevel(true)", 1, true) ~= nil,
+        "and without Toplevel nothing in its own strata can be raised over it")
+end)
+
+-- A phase is a release date, not a property of the recipe, so most of the book
+-- has none: the column says something only when the answer is "not yet".
+Test.it("narrows the table to a content phase", function()
+    resetColumnState()
+    local rows = {
+        columnRow("Engineering", { recipeKey = -1 }),
+        columnRow("Engineering", { recipeKey = -2, phase = 3 }),
+        columnRow("Engineering", { recipeKey = -3, phase = 5 }),
+        columnRow("Engineering", { recipeKey = -4, phase = 5 }),
+    }
+    Test.eq(#drawnRows(ui:BuildCollectionDisplayRows(rows)), 4)
+
+    ui.collectionFilters.phase = "base"
+    local drawn = drawnRows(ui:BuildCollectionDisplayRows(rows))
+    Test.eq(#drawn, 1, "only what was there from the start")
+    Test.eq(drawn[1].recipeKey, -1)
+
+    ui.collectionFilters.phase = "later"
+    Test.eq(#drawnRows(ui:BuildCollectionDisplayRows(rows)), 3,
+        "everything that arrived after launch, whichever phase")
+
+    ui.collectionFilters.phase = "p5"
+    Test.eq(#drawnRows(ui:BuildCollectionDisplayRows(rows)), 2)
+
+    ui.collectionFilters.phase = "p2"
+    Test.eq(#drawnRows(ui:BuildCollectionDisplayRows(rows)), 0,
+        "a phase nothing in the list belongs to empties it rather than ignoring it")
+
+    ui:ClearCollectionColumnFilters()
+    Test.eq(ui:GetCollectionColumnFilter("phase"), "all",
+        "and the one clear button has to know about the new column")
+end)
+
+Test.it("sorts the phase column with base content first", function()
+    resetColumnState()
+    local rows = {
+        columnRow("Engineering", { recipeKey = -1, phase = 5 }),
+        columnRow("Engineering", { recipeKey = -2 }),
+        columnRow("Engineering", { recipeKey = -3, phase = 3 }),
+    }
+
+    ui:SetCollectionSort("phase")
+    local drawn = drawnRows(ui:BuildCollectionDisplayRows(rows))
+    -- Absent is 1: it is the phase base content would carry if the field were
+    -- written, and it belongs at the near end of the ladder, not off it.
+    Test.eq(drawn[1].recipeKey, -2)
+    Test.eq(drawn[2].collection.phase, 3)
+    Test.eq(drawn[3].collection.phase, 5)
+
+    ui:SetCollectionSort("phase")
+    drawn = drawnRows(ui:BuildCollectionDisplayRows(rows))
+    Test.eq(drawn[1].collection.phase, 5)
+end)
+
+Test.it("writes the phase only when it is not from the start", function()
+    Test.truthy(mainFrameSource:find("local COLLECTION_PHASE_TEXT", 1, true) ~= nil)
+    local body = bodyOf("function UI:BindCollectionRow(")
+    Test.truthy(body ~= nil)
+    Test.truthy(body:find("COLLECTION_PHASE_TEXT[collection.phase or 0]", 1, true) ~= nil,
+        "the row reads the phase off the collection record")
+    Test.truthy(body:find('setTextIfChanged(row.collectionPhase, "")', 1, true) ~= nil,
+        "and base content leaves the column empty rather than writing a 1")
+end)
+
+-- A column of prices had its coin icons landing at four different x
+-- positions: a zero silver was dropped entirely and a single-digit copper
+-- shifted everything after it.
+Test.it("pads money so the coins line up down a column", function()
+    local body = bodyOf("local function formatMoney(")
+    Test.truthy(body ~= nil)
+    Test.truthy(body:find('string.format("%02d %s", s, silverIcon)', 1, true) ~= nil,
+        "silver is written once gold is there, padded")
+    Test.truthy(body:find('string.format("%02d %s", c, copperIcon)', 1, true) ~= nil,
+        "and so is copper")
+    -- The smallest denomination present still leads without a pad: "5 c",
+    -- not "05 c".
+    Test.truthy(body:find('string.format("%d %s", c, copperIcon)', 1, true) ~= nil)
+end)
+
+-- The panel is as wide as the window allows, and a price pinned to its right
+-- edge ended up half a screen from the reagent it belonged to.
+Test.it("keeps the money column beside its label, not at the window edge", function()
+    Test.truthy(mainFrameSource:find("local DETAIL_MAX_MEASURE = 560", 1, true) ~= nil)
+    local body = bodyOf("function UI:RenderDetailLines(")
+    Test.truthy(body ~= nil)
+    Test.truthy(body:find("local slack = math.max(0, lineWidth - DETAIL_MAX_MEASURE)", 1, true) ~= nil)
+    Test.truthy(body:find('line.value:SetPoint("TOPRIGHT", -(4 + slack), 0)', 1, true) ~= nil,
+        "the value column moves in by the slack")
+    Test.truthy(body:find("DETAIL_VALUE_WIDTH + 12 + slack", 1, true) ~= nil,
+        "and the text column stops where it starts")
+end)
+
+-- The browser row is 70 pixels and holds three lines. Stacking the crafter
+-- count above the online count made stats two lines by itself, which pushed
+-- the profession out through the bottom border -- visible in a global search,
+-- which is the only view that writes the profession.
+Test.it("keeps a browser row inside its own border", function()
+    local body = bodyOf("function UI:BindRecipeRow(")
+        or bodyOf("function UI:BindRecipeListRow(")
+        or mainFrameSource
+    Test.eq(body:find('table.concat(statsParts, "\\n")', 1, true), nil,
+        "a stacked stats block is a second line the row has no room for")
+    Test.truthy(mainFrameSource:find('table.concat(statsParts, "  -  ")', 1, true) ~= nil)
+end)
+
+-- The same number in two tabs must not be two different colours, and the
+-- banner belongs to the line whose NPC it is.
+Test.it("colours the detail panel's skill line the way the table does", function()
+    Test.truthy(bodyOf("local function skillRequirementColour(") ~= nil)
+    local collection = bodyOf("function UI:CollectionSkillText(")
+    Test.truthy(collection:find("skillRequirementColour(", 1, true) ~= nil,
+        "the column reads the shared rule rather than its own copy")
+
+    -- Colour codes do not nest: an inner |r would end the outer grey and drop
+    -- the rest of the line back to white.
+    Test.truthy(mainFrameSource:find('"|cff8f949cRequires|r " .. table.concat(requirements', 1, true) ~= nil,
+        "the line is built in segments, not wrapped in one colour")
+    Test.eq(mainFrameSource:find('"|cff8f949cRequires %s|r"', 1, true), nil)
+end)
+
+Test.it("hangs the faction banner on the place it belongs to in the detail panel", function()
+    Test.truthy(mainFrameSource:find("local lineInfo = source.lineInfo", 1, true) ~= nil,
+        "the detail panel has the same per-place information the tooltip uses")
+    Test.truthy(mainFrameSource:find("ALLIANCE_INLINE_TAG", 1, true) ~= nil)
+    Test.truthy(mainFrameSource:find("HORDE_INLINE_TAG", 1, true) ~= nil)
+end)
+
+-- The unit price used to sit on a second line of its own, which put the
+-- multiplier and the number it multiplies an inch apart, and doubled the
+-- height of the materials block.
+Test.it("writes a reagent, its multiplier and its unit price on one line", function()
+    Test.truthy(mainFrameSource:find('text .. string.format("   |cff6f7480%s each|r", formatMoney(reagent.unitCost))', 1, true) ~= nil,
+        "the unit price joins the name line rather than starting a new one")
+    Test.eq(mainFrameSource:find('lines[#lines + 1] = string.format("|cff6f7480   %s each|r"', 1, true), nil,
+        "and no longer costs the block a line per reagent")
+end)
+
+-- A price watched at a merchant is fixed and repeatable; an auction price is
+-- one snapshot of a market. Worth saying which the figure is.
+Test.it("marks a price that came from a merchant", function()
+    Test.truthy(mainFrameSource:find('reagent.unitCostSource == "Vendor"', 1, true) ~= nil)
+    Test.truthy(mainFrameSource:find('"   |cff7f9f6fvendor|r"', 1, true) ~= nil)
+end)
+
+-- The last number in a texture escape is a vertical offset, and -5 sank the
+-- coins well below the digits they belong to.
+Test.it("sits the coin icons on the same line as their numbers", function()
+    local body = bodyOf("local function formatMoney(")
+    Test.truthy(body ~= nil)
+    Test.eq(body:find("UI-GoldIcon:12:12:0:-5", 1, true), nil)
+    Test.truthy(body:find("UI-GoldIcon:12:12:0:-1", 1, true) ~= nil)
+    Test.truthy(body:find("UI-CopperIcon:12:12:0:-1", 1, true) ~= nil)
+end)
+
+-- "No price data" covered two different states, and read as though the addon
+-- knew nothing about a craft it had costed to the silver.
+Test.it("tells a partial price apart from no price at all", function()
+    Test.truthy(mainFrameSource:find('rowData.visibilityReason == "visible-partial-price"', 1, true) ~= nil)
+    Test.truthy(mainFrameSource:find('"|cff8f949cbest case|r"', 1, true) ~= nil,
+        "one missing reagent makes the figure a ceiling, not an unknown")
+    Test.truthy(mainFrameSource:find('"|cff8f949cno price data|r"', 1, true) ~= nil,
+        "and the old label is kept for the case it actually describes")
+end)
+
+-- Closing the auction house is not the only moment the numbers change: a scan
+-- rewrites the provider's database while the window is still open.
+Test.it("follows an auction scan, not only the window closing", function()
+    local handle = assert(io.open("Integrations/Market.lua", "r"))
+    local market = handle:read("*a")
+    handle:close()
+    -- RegisterEvent THROWS on a name the client does not know, and that
+    -- aborts the rest of OnEnable: REPLICATE_ITEM_LIST_UPDATE does not exist
+    -- in 2.5.x, and registering it above MERCHANT_SHOW took the merchant scan
+    -- down with it. Anything optional goes through the guarded call, and the
+    -- events the addon cannot work without are registered first.
+    local enable = market:match("function Market:OnEnable%(%)(.-)\nend")
+    Test.truthy(enable ~= nil)
+    Test.eq(enable:find("REPLICATE_ITEM_LIST_UPDATE", 1, true), nil,
+        "an event this client does not have must not be registered")
+    Test.truthy(enable:find('RegisterOptionalEvent("AUCTION_ITEM_LIST_UPDATE"', 1, true) ~= nil)
+    Test.truthy(market:find("local ok = pcall(self.RegisterEvent, self, event, handler)", 1, true) ~= nil)
+    Test.truthy(enable:find('RegisterEvent("MERCHANT_SHOW"', 1, true)
+        < enable:find("RegisterOptionalEvent(", 1, true),
+        "the scan the addon needs is registered before anything that may throw")
+    -- Debounced rather than throttled: the panel is often open at the auction
+    -- house, and a throttle would churn it under the reader for the whole scan.
+    Test.truthy(market:find("AUCTION_SETTLE_DELAY", 1, true) ~= nil)
+    Test.truthy(market:find("function Market:OnAuctionScanSettled(", 1, true) ~= nil)
+    -- A price refresh must cost what a price refresh costs: the "metadata"
+    -- scope also drops the ownership index, which is a full member walk to
+    -- rebuild and has nothing to do with what anything costs.
+    Test.truthy(market:find('InvalidateRecipeCaches("prices")', 1, true) ~= nil)
+    Test.eq(market:find('InvalidateRecipeCaches("metadata")', 1, true), nil)
+    -- And an empty cache holds nothing stale, so the events after the first
+    -- one cost a table lookup instead of a rebuild.
+    Test.truthy(market:find("if not next(self.priceCache or {})", 1, true) ~= nil)
+end)
+
+-- Linking a craft used to mean selecting the row, then reaching for the item
+-- at the top of the details panel. The row itself is where the cursor already
+-- is, and the auction house search field is the reason to want it.
+Test.it("links the craft from the list row itself", function()
+    for _, fn in ipairs({ "function UI:BindRecipeRow(", "function UI:BindCollectionRow(" }) do
+        local body = bodyOf(fn)
+        Test.truthy(body ~= nil, fn)
+        for _, field in ipairs({ "linkCreatedItemID", "linkRecipeItemID", "linkSpellID" }) do
+            Test.truthy(body:find("row." .. field .. " = detail.", 1, true) ~= nil,
+                fn .. " has to carry " .. field)
+        end
+    end
+    Test.truthy(mainFrameSource:find("insertLinkInChat(recipeLinkFor(", 1, true) ~= nil)
+end)
+
+-- An enchant creates no item, and one learned from a trainer has no pattern
+-- either -- so a shift-click on it used to hand over nothing at all. The spell
+-- is not a consolation prize there: for an enchant the spell IS the recipe.
+Test.it("falls back to the spell for a recipe that makes no item", function()
+    local body = bodyOf("local function recipeLinkFor(")
+    Test.truthy(body ~= nil)
+    Test.truthy(body:find("getItemLinkByID(createdItemID)", 1, true) ~= nil)
+    Test.truthy(body:find("getItemLinkByID(recipeItemID)", 1, true) ~= nil)
+    Test.truthy(body:find("GetSpellLink(spellID)", 1, true) ~= nil)
+    -- Order matters: what an auction house search wants is the thing being
+    -- bought, which is the output before the formula on the shelf.
+    Test.truthy(body:find("createdItemID", 1, true) < body:find("recipeItemID", 1, true))
+    Test.truthy(body:find("recipeItemID", 1, true) < body:find("spellID", 1, true))
+
+    -- And the rule is stated once: the detail panel's own link button reads
+    -- it rather than keeping a second copy that could drift.
+    Test.truthy(mainFrameSource:find("insertLinkInChat(recipeLinkFor(detail.createdItemID", 1, true) ~= nil)
+end)
+
+-- HandleModifiedItemClick decides for itself whether a modifier is down and
+-- says no when none is. ChatEdit_InsertLink does not ask, so reached on every
+-- unmodified click it pasted the link into whatever chat box was open.
+Test.it("keeps the chat fallback behind the modifier", function()
+    local body = bodyOf("local function insertLinkInChat(")
+    Test.truthy(body ~= nil)
+    Test.truthy(body:find("if isChatLinkModifierDown() and type(ChatEdit_InsertLink)", 1, true) ~= nil)
+    Test.truthy(bodyOf("local function isChatLinkModifierDown(") ~= nil)
+end)
+
+-- A file-level local is an upvalue only for the code written below it. A
+-- function written above the declaration sees the name as a global, which is
+-- nil: OpenCollectionFilterMenu read COLLECTION_FILTER_LABELS that way and
+-- threw on the first click of the filter button, and CollectionSourceText read
+-- COLLECTION_KNOWN_DIM that way and silently painted learned rows in the
+-- source colour instead of the dim one. Lua warns about neither.
+local function readsName(line, name)
+    local from = 1
+    while true do
+        local first, last = line:find(name, from, true)
+        if not first then return false end
+        local before = first > 1 and line:sub(first - 1, first - 1) or ""
+        local after = line:sub(last + 1, last + 1)
+        -- A field or a method of the same name is somebody else's.
+        if not before:match("[%w_.:]") and not after:match("[%w_]") then
+            return true
+        end
+        from = last + 1
+    end
+end
+
+Test.it("declares every file-level local above the code that reads it", function()
+    local offenders = {}
+    for _, path in ipairs(loadedSourcePaths()) do
+        local lines = {}
+        local handle = assert(io.open(path, "r"))
+        for line in handle:lines() do
+            -- Comments and string literals are not code; a name inside one is
+            -- not a read of it.
+            lines[#lines + 1] = line:gsub("%-%-.*$", ""):gsub("[\"\'][^\"\']*[\"\']", "")
+        end
+        handle:close()
+
+        local declaredAt, shadowed = {}, {}
+        for number, line in ipairs(lines) do
+            local name = line:match("^local%s+function%s+([%a_][%w_]*)")
+                or line:match("^local%s+([%a_][%w_]*)")
+            if name and not declaredAt[name] then declaredAt[name] = number end
+            local inner = line:match("^%s+local%s+function%s+([%a_][%w_]*)")
+                or line:match("^%s+local%s+([%a_][%w_]*)")
+            if inner then shadowed[inner] = true end
+        end
+
+        for name, declaration in pairs(declaredAt) do
+            -- A name that is also a local inside some function cannot be told
+            -- apart from that one by reading the file line by line.
+            if not shadowed[name] then
+                for number = 1, declaration - 1 do
+                    if readsName(lines[number], name) then
+                        offenders[#offenders + 1] = string.format(
+                            "%s:%d reads %s, declared at :%d", path, number, name, declaration)
+                        break
+                    end
+                end
+            end
+        end
+    end
+    Test.eq(#offenders, 0, "local read above its declaration: " .. table.concat(offenders, ", "))
 end)
 
 io.write(string.format("Collection tab view: %d test(s) passed\n", Test.count))

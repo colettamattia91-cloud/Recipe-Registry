@@ -311,6 +311,14 @@ local function applyMetadataInfo(info, metadata, recipeKey, numericKey, metadata
     info.professionID = PROFESSION_IDS[professionKey]
     info.professionName = PROFESSION_LABELS[professionKey] or professionKey
     info.minRank = metadataInfo.requiredSkill
+    -- The recipe's own four difficulty thresholds, and where this character
+    -- stands against them. Both are needed to colour the requirement the way
+    -- the trade window colours it; skillRank is nil when the character does
+    -- not have the profession, which is not the same as being at zero.
+    info.skillLevels = metadata.GetSkillLevels
+        and metadata:GetSkillLevels(recipeKey, metadataInfo) or nil
+    info.skillRank = Data.GetLocalProfessionRank
+        and Data:GetLocalProfessionRank(info.professionName) or nil
     -- Units produced per craft, straight from the metadata library. Absence
     -- of the generated field means 1, not unknown, so the fallback is safe.
     -- min and max differ only for the handful of random-yield recipes.
@@ -2067,7 +2075,7 @@ local function guessSourceFromRecipeItem(metadataInfo)
     if metadataInfo and metadataInfo.recipeItemId then
         return "item", "Recipe item"
     end
-    return "trainer", "Any trainer"
+    return "trainer", "From a trainer"
 end
 
 -- The one-line form for a single set of who/where strings. Every caller of
@@ -2128,10 +2136,26 @@ local function sourceLabelFor(source, who, where)
         -- because your own city trainer will not teach you.
         if who then return "trainer", named("Trainer") end
         if where then return "trainer", placed("Trainer", "at") end
-        -- Not a bare "Trainer", which reads as a field nobody filled in. The
-        -- answer really is "whichever one you use", and saying so is the
-        -- difference between an answer and a gap.
-        return "trainer", "Any trainer"
+        -- No source names the trainers, but where every one of them carries
+        -- the same title that title is the answer, and a better one than the
+        -- names would be: there are five Master Engineering Trainers spread
+        -- across Outland, and "Master Engineering Trainer" is what the player
+        -- reads under each of them. The continents come with it when there
+        -- are one or two; more than that and the list is longer than the
+        -- answer it carries, so the provider drops them.
+        if source.trainerTitle then
+            local continents = source.trainerContinents
+            if type(continents) == "table" and #continents > 0 then
+                return "trainer", string.format("%s (%s)", source.trainerTitle,
+                    table.concat(continents, ", "))
+            end
+            return "trainer", source.trainerTitle
+        end
+        -- Several ranks of trainer teach this one, so there is no single title
+        -- to name. Not a bare "Trainer", which reads as a field nobody filled
+        -- in, and no longer "Any trainer", which read as a promise the source
+        -- never made.
+        return "trainer", "From a trainer"
     end
     return source.kind, nil
 end
@@ -2139,7 +2163,7 @@ end
 function Data:DescribeRecipeSource(recipeKey, professionHint, metadataInfo)
     local metadata = getRecipeMetadata()
     if not metadata then
-        return { kind = "trainer", label = "Any trainer", lines = { "Any trainer" }, known = false }
+        return { kind = "trainer", label = "From a trainer", lines = { "From a trainer" }, known = false }
     end
     if metadataInfo == nil then
         metadataInfo = metadata.GetRecipeInfo and metadata:GetRecipeInfo(recipeKey, professionHint) or nil

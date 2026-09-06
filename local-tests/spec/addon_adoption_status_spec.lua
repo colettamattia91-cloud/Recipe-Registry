@@ -316,4 +316,114 @@ Test.it("builds favorites without launching a global recipe-list job", function(
     Test.eq(ui.currentRecipeRows[1].crafterCount, 1, "favorite row should keep crafter counts")
 end)
 
+-- The guild members table on the collection's terms: a header carries the
+-- column's name, gold when that column is narrowing the list, plus the sort
+-- marker. It used to write the filter's value and an [F] into the header, in a
+-- column too narrow to hold either.
+Test.it("writes a column name in the header, not the filter's value", function()
+    local _, _, _, ui = freshAddonWithUi()
+    ui.addonStatusFilters = { status = "all", roster = "all", version = "all" }
+    ui.addonStatusSortKey = "name"
+    ui.addonStatusSortDir = "asc"
+
+    Test.eq(ui:GetAddonStatusHeaderText("version", "Version"), "Version")
+    Test.eq(ui:GetAddonStatusHeaderText("name", "Name"), "Name ^")
+
+    ui.addonStatusFilters.version = "old"
+    local narrowed = ui:GetAddonStatusHeaderText("version", "Version")
+    Test.eq(narrowed, "|cffffd100Version|r", "a narrowed column says so in gold, not in words")
+    Test.eq(narrowed:find("[F]", 1, true), nil, "the marker went with the inline value")
+end)
+
+Test.it("sorts by a column, then the other way, then back to the built order", function()
+    local _, _, _, ui = freshAddonWithUi()
+
+    ui:SetAddonStatusSort("rank")
+    Test.eq(ui.addonStatusSortKey, "rank")
+    Test.eq(ui.addonStatusSortDir, "asc")
+
+    ui:SetAddonStatusSort("rank")
+    Test.eq(ui.addonStatusSortDir, "desc")
+
+    -- A third click is not a fourth order: it hands the table back to the one
+    -- it opens on, exactly as the collection's headers do.
+    ui:SetAddonStatusSort("rank")
+    Test.eq(ui.addonStatusSortKey, "name")
+    Test.eq(ui.addonStatusSortDir, "asc")
+end)
+
+-- Last seen is the one column whose useful end is the far one, so it opens
+-- descending -- and the round trip has to start from there, not from asc.
+Test.it("opens last seen at the most recent and still gets back to the built order", function()
+    local _, _, _, ui = freshAddonWithUi()
+
+    ui:SetAddonStatusSort("lastSeen")
+    Test.eq(ui.addonStatusSortDir, "desc")
+    ui:SetAddonStatusSort("lastSeen")
+    Test.eq(ui.addonStatusSortDir, "asc")
+    ui:SetAddonStatusSort("lastSeen")
+    Test.eq(ui.addonStatusSortKey, "name")
+end)
+
+Test.it("chooses a column filter rather than cycling it", function()
+    local _, _, _, ui = freshAddonWithUi()
+    ui.addonStatusFilters = { status = "all", roster = "all", version = "all" }
+
+    Test.eq(ui:HasAddonStatusColumnFilter(), false)
+    ui:SetAddonStatusColumnFilter("version", "old")
+    Test.eq(ui:GetAddonStatusFilter("version"), "old")
+    Test.eq(ui:HasAddonStatusColumnFilter(), true)
+
+    -- Naming a value sets that value: there is no order to walk through, so
+    -- going back to everything is one click and not five.
+    ui:SetAddonStatusColumnFilter("version", "all")
+    Test.eq(ui:GetAddonStatusFilter("version"), "all")
+    Test.eq(ui:HasAddonStatusColumnFilter(), false)
+
+    -- A column the table does not filter on cannot be given one by mistake.
+    ui:SetAddonStatusColumnFilter("zone", "somewhere")
+    Test.eq(ui:GetAddonStatusFilter("zone"), "all")
+end)
+
+Test.it("drops every column filter from one place", function()
+    local _, _, _, ui = freshAddonWithUi()
+    ui:SetAddonStatusColumnFilter("status", "never_seen")
+    ui:SetAddonStatusColumnFilter("roster", "offline")
+    Test.eq(ui:HasAddonStatusColumnFilter(), true)
+
+    ui:ClearAddonStatusColumnFilters()
+    Test.eq(ui:GetAddonStatusFilter("status"), "all")
+    Test.eq(ui:GetAddonStatusFilter("roster"), "all")
+    Test.eq(ui:HasAddonStatusColumnFilter(), false)
+end)
+
+-- The strip control and the presence column are one axis written twice, the
+-- way the collection's strip and its status column are.
+Test.it("puts one control on the strip and points it at the presence column", function()
+    local _, _, _, ui = freshAddonWithUi()
+    local labels = {}
+    local button = {
+        SetLabel = function(_, text) labels[#labels + 1] = text end,
+        SetSelected = function(_, value) labels.selected = value end,
+    }
+    ui.frame = { addonStatusFilterButton = button }
+
+    ui:RefreshAddonStatusFilterControl()
+    Test.eq(labels[#labels], "Everyone")
+    Test.eq(labels.selected, false)
+
+    ui.addonStatusFilters = { status = "all", roster = "offline", version = "all" }
+    ui:RefreshAddonStatusFilterControl()
+    Test.eq(labels[#labels], "Offline")
+    Test.eq(labels.selected, true)
+
+    -- A table narrowed from a header and not from the strip still has to say
+    -- so, or it reads as a table that has simply lost rows.
+    ui.addonStatusFilters = { status = "all", roster = "all", version = "old" }
+    ui:RefreshAddonStatusFilterControl()
+    Test.eq(labels[#labels], "Everyone (filtered)")
+    Test.eq(labels.selected, true)
+    ui.frame = nil
+end)
+
 io.write(string.format("Addon adoption status: %d test(s) passed\n", Test.count))

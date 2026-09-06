@@ -28,6 +28,90 @@ local function metadata()
     return Addon.RecipeMetadata
 end
 
+-- The client's class bitmask, by the token UnitClass returns. Taken from the
+-- token rather than from the numeric class id: the id is an index into a list
+-- that has grown twice since Burning Crusade, while the token is the same
+-- string in every locale and every build.
+local CLASS_BIT = {
+    WARRIOR = 1,
+    PALADIN = 2,
+    HUNTER = 4,
+    ROGUE = 8,
+    PRIEST = 16,
+    DEATHKNIGHT = 32,
+    SHAMAN = 64,
+    MAGE = 128,
+    WARLOCK = 256,
+    DRUID = 1024,
+}
+
+-- Lua 5.1 as the client ships it has no bitwise operators, so membership is
+-- arithmetic: shift the mask down to the bit in question and ask whether it
+-- is odd.
+local function maskHasBit(mask, bit)
+    if not mask or not bit then return false end
+    return math.floor(mask / bit) % 2 == 1
+end
+
+local function playerClassBit()
+    if type(_G.UnitClass) ~= "function" then return nil end
+    local _, token = _G.UnitClass("player")
+    return token and CLASS_BIT[token] or nil
+end
+
+local CLASS_NAME_BY_BIT = {
+    [1] = "Warrior",
+    [2] = "Paladin",
+    [4] = "Hunter",
+    [8] = "Rogue",
+    [16] = "Priest",
+    [32] = "Death Knight",
+    [64] = "Shaman",
+    [128] = "Mage",
+    [256] = "Warlock",
+    [1024] = "Druid",
+}
+local CLASS_BIT_ORDER = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 1024 }
+
+-- The classes in a mask, named, for the one place it is worth saying out loud:
+-- the row tooltip of a recipe whose trainer teaches it to some classes and not
+-- others. Returns nil when the mask restricts nothing.
+function Data:DescribeClassMask(classMask)
+    if not classMask or classMask == 0 then return nil end
+    local names = {}
+    for _, bit in ipairs(CLASS_BIT_ORDER) do
+        if maskHasBit(classMask, bit) then
+            names[#names + 1] = CLASS_NAME_BY_BIT[bit]
+        end
+    end
+    if #names == 0 then return nil end
+    return table.concat(names, ", ")
+end
+
+-- What this character's rank in a profession is, or nil when they do not have
+-- it. Nil and zero are different answers: one is "not a blacksmith", the other
+-- is "a blacksmith who has not started", and only the second can be measured
+-- against a recipe's difficulty.
+function Data:GetLocalProfessionRank(professionName)
+    if not professionName then return nil end
+    local entry = self:GetMembersDB()[self:GetPlayerKey()]
+    local prof = entry and entry.professions and entry.professions[professionName]
+    if not prof then return nil end
+    return tonumber(prof.skillRank) or 0
+end
+
+-- Whether this character's trainer would ever offer the recipe. A mask the
+-- character is outside of means the row is not a hole in their collection: it
+-- is somebody else's book, and listing it is a false positive they can never
+-- close. An unreadable class -- no UnitClass, an unknown token -- lets
+-- everything through rather than hiding a book on a guess.
+function Data:CanCurrentClassLearn(classMask)
+    if not classMask or classMask == 0 then return true end
+    local bit = playerClassBit()
+    if not bit then return true end
+    return maskHasBit(classMask, bit)
+end
+
 local function specializationsFor(professionName)
     local specs = Data.PROFESSION_SPECIALIZATIONS
     return specs and specs[professionName] or nil
@@ -151,7 +235,11 @@ function Data:CollectionRowPasses(row, filter)
     if not collection then return false end
     filter = filter or self:GetCollectionFilter()
     if filter == "unlearned" then
-        return not collection.known
+        -- A recipe behind a specialization the character does not have is not
+        -- a hole in their collection: no amount of levelling opens it, only
+        -- being a different smith would. A skill number IS a hole -- it closes
+        -- on its own as the profession goes up -- so that one stays in.
+        return not collection.known and collection.specializationMet == true
     end
     if filter == "ready" then
         return not collection.known
@@ -255,7 +343,13 @@ function Data:BuildCollectionRowsForProfession(professionName, prof)
         -- opportunity, it is a player walking Azeroth looking for a trainer
         -- who does not exist. One you somehow DO know stays, because it is
         -- genuinely in your book.
-        if known or not (meta.IsRemoved and meta:IsRemoved(recipeKey, info)) then
+        -- The second exclusion, and the same shape as the first: twenty-two
+        -- engineering recipes are taught only to certain classes, so for
+        -- everybody else they are not an unfilled hole but a book that was
+        -- never theirs. One you somehow DO know stays, as above.
+        local classMask = meta.GetClassMask and meta:GetClassMask(recipeKey, info) or nil
+        local learnable = known or self:CanCurrentClassLearn(classMask)
+        if learnable and (known or not (meta.IsRemoved and meta:IsRemoved(recipeKey, info))) then
             local requiredSkill = tonumber(info and info.requiredSkill) or nil
             local specializationId = meta.GetSpecialization
                 and meta:GetSpecialization(recipeKey, info) or nil
@@ -300,6 +394,17 @@ function Data:BuildCollectionRowsForProfession(professionName, prof)
                         and self:GetSpecializationName(professionName, specializationId) or nil,
                     specializationMet = specializationId == nil
                         or specializationId == ownedSpecializationId,
+                    -- The content phase this one arrives in. nil is the answer
+                    -- for everything obtainable from the start, which is most
+                    -- of the book, and the column stays blank for those.
+                    phase = meta.GetPhase and meta:GetPhase(recipeKey, info) or nil,
+                    -- Kept on the row even though the gate has already let it
+                    -- through: "who else can have this" is the question the
+                    -- tooltip answers, and a trainer that teaches a recipe to
+                    -- two classes out of nine is exactly the case where "from
+                    -- a trainer" is not the whole answer.
+                    classMask = classMask,
+                    classNames = classMask and self:DescribeClassMask(classMask) or nil,
                 },
             }
         end

@@ -531,6 +531,16 @@ local function normalizeLastOnlineValue(row, key, legacyKey)
     return value
 end
 
+local CLASS_NAMES_BY_TOKEN = {
+    WARRIOR = "Warrior", PALADIN = "Paladin", HUNTER = "Hunter", ROGUE = "Rogue",
+    PRIEST = "Priest", SHAMAN = "Shaman", MAGE = "Mage", WARLOCK = "Warlock",
+    DRUID = "Druid",
+}
+local CLASS_IDS_BY_TOKEN = {
+    WARRIOR = 1, PALADIN = 2, HUNTER = 3, ROGUE = 4, PRIEST = 5,
+    SHAMAN = 7, MAGE = 8, WARLOCK = 9, DRUID = 11,
+}
+
 local function installWowGlobals()
     _G.DEFAULT_CHAT_FRAME = {
         AddMessage = function(_, message)
@@ -566,6 +576,15 @@ local function installWowGlobals()
     _G.UnitFullName = function(unit)
         if unit == "player" then return state.playerName, state.realm end
         return nil
+    end
+    -- Localized name, class token, class id -- the three the real one returns.
+    -- Only the token is ever read: it is the same string in every locale and
+    -- every build, while the id indexes a list that has grown since TBC.
+    _G.UnitClass = function(unit)
+        if unit ~= "player" then return nil end
+        local token = state.playerClass
+        if not token then return nil end
+        return CLASS_NAMES_BY_TOKEN[token] or token, token, CLASS_IDS_BY_TOKEN[token]
     end
     _G.IsInGuild = function() return state.inGuild == true end
     _G.IsInRaid = function() return state.inRaid == true end
@@ -756,6 +775,7 @@ function Wow.Reset(opts)
         sentComm = {},
         realm = "TestRealm",
         playerName = "Tester",
+        playerClass = "ROGUE",
         inGuild = true,
         inCombat = false,
         inRaid = false,
@@ -853,6 +873,12 @@ end
 function Wow.SetPlayer(name, realm)
     state.playerName = name or state.playerName
     state.realm = realm or state.realm
+end
+
+-- The class token, as UnitClass reports it: "ROGUE", "DRUID", and so on.
+-- Passing nil is a client that cannot answer, which the addon has to survive.
+function Wow.SetPlayerClass(token)
+    state.playerClass = token
 end
 
 function Wow.SetAddonMetadata(metadata)
