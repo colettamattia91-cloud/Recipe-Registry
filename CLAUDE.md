@@ -126,7 +126,7 @@ Managed by AceDB-3.0. Schema version is in `DB_DEFAULTS.global.meta.schemaVersio
 
 Tests run as plain Lua 5.1 scripts — no external test framework. Each spec file `dofile`s the harness directly.
 
-- `local-tests/harness/wow.lua` (`Wow`): full WoW API mock — timers, events, guild roster, comm bus, GetItemInfo, etc. `Wow.Reset()` clears state between tests. `Wow.RunDueTimers(seconds)` advances virtual time.
+- `local-tests/harness/wow.lua` (`Wow`): full WoW API mock — timers, events, guild roster, comm bus, GetItemInfo, etc. `Wow.Reset()` clears state between tests. `Wow.AdvanceTime(seconds)` moves the virtual clock; `Wow.RunDueTimers(maxRuns)` then fires whatever has come due (its argument is a run cap, not seconds, and it does not advance time by itself).
 - `local-tests/harness/load-addon.lua` (`Loader`): loads all backend Lua files in order, runs `OnInitialize`/`OnEnable` lifecycle. `Loader.PrimeSyncReady(addon)` drives all readiness gates to `true` for sync tests.
 - `local-tests/harness/comm-bus.lua` (`CommBus`): intercepts addon comms, allows simulating multi-peer scenarios.
 - `local-tests/harness/test.lua` (`Test`): minimal assertion library (`Test.it`, `Test.eq`, `Test.ne`, `Test.gte`, `Test.lte`, `Test.truthy`, `Test.falsy`, `Test.hasKey`, `Test.noKey`, `Test.countKeys`). There is no `isNil`/`deepEq`/`contains` — use `Test.eq(value, nil)` and friends.
