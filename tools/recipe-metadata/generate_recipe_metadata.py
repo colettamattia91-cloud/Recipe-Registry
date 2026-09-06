@@ -98,6 +98,20 @@ def _load_overrides(path=OVERRIDES_PATH):
         "bopOutputBySpellId": {},
         "bindTypeByCreatedItemId": {},
         "specializationBySpellId": {},
+        # Where a recipe is obtained, for one the bulk sources place wrongly.
+        # Read by normalize since the obtain-side work landed; the loader had
+        # never heard of it, so the override was a no-op that looked like one.
+        "acquisitionBySpellId": {},
+        # The content phase a recipe becomes obtainable in. derive_phase can
+        # only see the zone a recipe is obtained in, so a launch-zone recipe
+        # Blizzard held back for a later phase has to be stated here.
+        "phaseBySpellId": {},
+        # Which classes a trainer teaches a recipe to, as the client's own
+        # bitmask. The client states it; this is here for when it is wrong.
+        "classMaskBySpellId": {},
+        # The trainer title and where they stand, for a recipe cmangos places
+        # differently from the live 2.5.x client.
+        "trainerBySpellId": {},
         # `removedBySpellId: {12345: false}` puts a recipe back that the
         # removed list flagged wrongly -- one line, then regenerate.
         "removedBySpellId": {},
@@ -353,6 +367,72 @@ def command_fetch(args):
         print("wrote {0} ({1} specialization records)".format(path, len(by_spell_id)))
         return 0
 
+    if args.source == "atlasloot-phases":
+        from recipe_sources.atlasloot_phase_provider import (
+            SOURCE_FILES,
+            build_phases,
+            build_snapshot as build_phase_snapshot,
+            fetch_file as fetch_atlasloot_file,
+            write_snapshot as write_phase_snapshot,
+        )
+
+        snapshot_dir = SNAPSHOT_ROOT / args.snapshot
+        recipes_path = snapshot_dir / "recipes.json"
+        if not recipes_path.exists():
+            print("no recipes.json in {0}; fetch the primary snapshot first".format(snapshot_dir), file=sys.stderr)
+            return 2
+        with recipes_path.open("r", encoding="utf-8") as handle:
+            # Keyed by the RECIPE item -- the pattern that drops -- never by
+            # what the recipe creates.
+            by_recipe_item = {
+                int(record["recipeItemId"]): int(record["spellId"])
+                for record in json.load(handle) if record.get("recipeItemId")
+            }
+
+        texts = [fetch_atlasloot_file(name, timeout=args.timeout) for name in SOURCE_FILES]
+        by_spell_id, tables = build_phases(texts, by_recipe_item)
+        if not by_spell_id:
+            print("no phase rows parsed; refusing to overwrite the snapshot", file=sys.stderr)
+            return 2
+        path = write_phase_snapshot(build_phase_snapshot(by_spell_id, tables), snapshot_dir)
+        print("wrote {0} ({1} recipes placed by {2} tables)".format(
+            path, len(by_spell_id), len(tables)))
+        return 0
+
+    if args.source == "cmangos-trainers":
+        # One archive, not a crawl. The recipes it is asked about come from the
+        # committed snapshot, so the answer is scoped to what this addon ships
+        # rather than to every spell an emulator knows.
+        from recipe_sources.cmangos_trainer_provider import (
+            build_snapshot as build_trainer_snapshot,
+            build_trainers,
+            fetch_world_db,
+            write_snapshot as write_trainer_snapshot,
+        )
+
+        snapshot_dir = SNAPSHOT_ROOT / args.snapshot
+        recipes_path = snapshot_dir / "recipes.json"
+        if not recipes_path.exists():
+            print("no recipes.json in {0}; fetch the primary snapshot first".format(snapshot_dir), file=sys.stderr)
+            return 2
+        with recipes_path.open("r", encoding="utf-8") as handle:
+            professions = {
+                int(record["spellId"]): record.get("profession")
+                for record in json.load(handle)
+            }
+
+        world_db = fetch_world_db(args.work_dir or (snapshot_dir / ".cmangos"), timeout=args.timeout)
+        by_spell_id, stats = build_trainers(world_db, professions)
+        if not by_spell_id:
+            print("no trainer rows resolved; refusing to overwrite the snapshot", file=sys.stderr)
+            return 2
+        path = write_trainer_snapshot(build_trainer_snapshot(by_spell_id, stats), snapshot_dir)
+        print("wrote {0} ({1} titled, {2} resolved, {3} taught by several ranks, "
+              "{4} titled only by their profession, {5} unknown)".format(
+                  path, stats["titled"], stats["resolved"], stats["manyTitles"],
+                  stats["kindOnly"], stats["unresolved"]))
+        return 0
+
     if args.source == "wago-anniversary":
         snapshot_data = build_normalized_snapshot(
             fetch_wago_tables(
@@ -481,7 +561,9 @@ def build_parser():
     fetch.add_argument("--flavor", default="tbc")
     fetch.add_argument("--snapshot", default=DEFAULT_SNAPSHOT)
     fetch.add_argument("--source", default="normalized-dir", choices=("normalized-dir", "wago-anniversary", "wowhead-specializations", "wowhead-sources", "arl-acquisition",
-                                       "removed-recipes"))
+                                       "cmangos-trainers", "atlasloot-phases", "removed-recipes"))
+    fetch.add_argument("--work-dir", default=None,
+                       help="cmangos-trainers: where to keep the downloaded world DB")
     fetch.add_argument("--limit", type=int, default=None,
                        help="wowhead-sources: stop after this many newly fetched items")
     fetch.add_argument("--verbose", action="store_true",

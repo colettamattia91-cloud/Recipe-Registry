@@ -1,3 +1,5 @@
+import re
+import sqlite3
 import tempfile
 import unittest
 import json
@@ -13,6 +15,9 @@ sys.path.insert(0, str(ROOT))
 
 import generate_recipe_metadata as generator
 from recipe_pipeline.derive_categories import load_taxonomies
+from recipe_pipeline.derive_phase import derive_phase
+from recipe_sources.atlasloot_phase_provider import build_phases, phase_tables
+from recipe_sources.cmangos_trainer_provider import build_trainers
 from recipe_pipeline.normalize import normalize_records
 from recipe_pipeline.records import ReagentRecord, RecipeRecord, SourcePlace
 from recipe_pipeline.validate import validate_records
@@ -1539,6 +1544,246 @@ class AcquisitionWorksheetTests(unittest.TestCase):
             with redirect_stdout(out):
                 acquisition_worksheet.emit(directory, sheet, links)
             self.assertNotIn("item=100", links.read_text(encoding="utf-8"))
+
+
+class TrainerTitleTests(unittest.TestCase):
+    """The trainer half of "where do I learn this", from the world DB."""
+
+    def _db(self, directory, creatures, template_rows, direct_rows=(), spawns=()):
+        path = Path(directory) / "world.sqlite"
+        con = sqlite3.connect(str(path))
+        con.execute("CREATE TABLE creature_template "
+                    "(entry INT, name TEXT, subname TEXT, TrainerTemplateId INT)")
+        con.execute("CREATE TABLE npc_trainer_template (entry INT, spell INT)")
+        con.execute("CREATE TABLE npc_trainer (entry INT, spell INT)")
+        con.execute("CREATE TABLE creature (id INT, map INT)")
+        con.executemany("INSERT INTO creature_template VALUES (?,?,?,?)", creatures)
+        con.executemany("INSERT INTO npc_trainer_template VALUES (?,?)", template_rows)
+        con.executemany("INSERT INTO npc_trainer VALUES (?,?)", direct_rows)
+        con.executemany("INSERT INTO creature VALUES (?,?)", spawns)
+        con.commit()
+        con.close()
+        return path
+
+    def test_one_shared_title_is_the_answer(self):
+        with tempfile.TemporaryDirectory() as directory:
+            db = self._db(
+                directory,
+                creatures=[(1, "K. Lee Smallfry", "Master Engineering Trainer", 1001),
+                           (2, "Zebig", "Master Engineering Trainer", 1001)],
+                template_rows=[(1001, 41314)],
+                spawns=[(1, 530), (2, 530)],
+            )
+            out, stats = build_trainers(db, {41314: "engineering"})
+            self.assertEqual(out[41314]["title"], "Master Engineering Trainer")
+            self.assertEqual(out[41314]["continents"], ["Outland"])
+            self.assertEqual(stats["titled"], 1)
+
+    def test_several_titles_answer_nothing(self):
+        # A recipe an apprentice trainer and a master both teach has no single
+        # title, and naming the master would say the apprentice refuses it.
+        with tempfile.TemporaryDirectory() as directory:
+            db = self._db(
+                directory,
+                creatures=[(1, "Somebody", "Engineering Trainer", 1),
+                           (2, "Somebody Else", "Master Engineering Trainer", 2)],
+                template_rows=[(1, 200), (2, 200)],
+                spawns=[(1, 0), (2, 530)],
+            )
+            out, stats = build_trainers(db, {200: "engineering"})
+            self.assertEqual(out, {})
+            self.assertEqual(stats["manyTitles"], 1)
+
+    def test_a_title_that_only_repeats_the_profession_says_nothing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            db = self._db(
+                directory,
+                creatures=[(1, "Somebody", "Engineering Trainer", 1)],
+                template_rows=[(1, 200)],
+                spawns=[(1, 0)],
+            )
+            out, stats = build_trainers(db, {200: "engineering"})
+            self.assertEqual(out, {})
+            self.assertEqual(stats["kindOnly"], 1)
+
+    def test_a_rank_or_a_specialization_in_front_of_it_does_say_something(self):
+        with tempfile.TemporaryDirectory() as directory:
+            db = self._db(
+                directory,
+                creatures=[(1, "Somebody", "Goblin Engineering Trainer", 1)],
+                template_rows=[(1, 200)],
+                spawns=[(1, 1)],
+            )
+            out, _ = build_trainers(db, {200: "engineering"})
+            self.assertEqual(out[200]["title"], "Goblin Engineering Trainer")
+            self.assertEqual(out[200]["continents"], ["Kalimdor"])
+
+    def test_a_trainer_on_every_continent_drops_the_continents(self):
+        with tempfile.TemporaryDirectory() as directory:
+            db = self._db(
+                directory,
+                creatures=[(1, "A", "Master Cooking Trainer", 1),
+                           (2, "B", "Master Cooking Trainer", 1),
+                           (3, "C", "Master Cooking Trainer", 1)],
+                template_rows=[(1, 300)],
+                spawns=[(1, 0), (2, 1), (3, 530)],
+            )
+            out, _ = build_trainers(db, {300: "cooking"})
+            # The title still answers the question; three continents do not.
+            self.assertEqual(out[300]["title"], "Master Cooking Trainer")
+            self.assertEqual(out[300]["continents"], [])
+
+    def test_a_recipe_no_trainer_teaches_is_left_alone(self):
+        with tempfile.TemporaryDirectory() as directory:
+            db = self._db(directory, creatures=[], template_rows=[])
+            out, stats = build_trainers(db, {999: "tailoring"})
+            self.assertEqual(out, {})
+            self.assertEqual(stats["unresolved"], 1)
+
+
+class DerivePhaseTests(unittest.TestCase):
+    """A phase is a release date, so the rules are about obtainability."""
+
+    def _place(self, zone):
+        return SourcePlace(name="Somebody", zone=zone)
+
+    def test_base_content_has_no_phase(self):
+        self.assertIsNone(derive_phase("tbc", (self._place("Shattrath City"),)))
+
+    def test_vanilla_predates_the_phases_entirely(self):
+        self.assertIsNone(derive_phase("vanilla", (self._place("Black Temple"),)))
+
+    def test_a_raid_zone_carries_the_phase_that_opened_it(self):
+        self.assertEqual(derive_phase("tbc", (self._place("Black Temple"),)), 3)
+        self.assertEqual(derive_phase("tbc", (self._place("Sunwell Plateau"),)), 5)
+        self.assertEqual(derive_phase("tbc", (self._place("The Eye"),)), 2)
+
+    def test_one_place_available_at_launch_settles_the_recipe(self):
+        # Sold in Shattrath AND dropped in the Black Temple means you can have
+        # it on day one. Taking the maximum would call it phase 3 and hide a
+        # recipe that is already obtainable.
+        places = (self._place("Black Temple"), self._place("Shattrath City"))
+        self.assertIsNone(derive_phase("tbc", places))
+
+    def test_the_earliest_late_place_wins(self):
+        places = (self._place("Sunwell Plateau"), self._place("Serpentshrine Cavern"))
+        self.assertEqual(derive_phase("tbc", places), 2)
+
+    def test_nowhere_to_point_at_is_base_content(self):
+        # A world drop has always dropped, and a recipe whose places we never
+        # resolved is not evidence of a later phase.
+        self.assertIsNone(derive_phase("tbc", (), world_drop=True))
+        self.assertIsNone(derive_phase("tbc", ()))
+        self.assertIsNone(derive_phase("tbc", (SourcePlace(name="Somebody"),)))
+
+    def test_an_undated_zone_is_base_content(self):
+        self.assertIsNone(derive_phase("tbc", (self._place("Nowhere In Particular"),)))
+
+
+class OverrideBucketTests(unittest.TestCase):
+    """Every override key the pipeline reads must be one the loader produces.
+
+    The loader whitelists bucket names and skips the rest in silence, so a key
+    normalize reads but the loader has never heard of is a no-op that looks
+    exactly like a working escape hatch. Two of them shipped that way.
+    """
+
+    def test_every_bucket_normalize_reads_is_a_bucket_the_loader_makes(self):
+        source = (ROOT / "recipe_pipeline" / "normalize.py").read_text(encoding="utf-8")
+        read = set(re.findall(r'overrides\.get\(\s*"([A-Za-z]+)"', source))
+        read |= set(re.findall(r'overrides\[\s*"([A-Za-z]+)"\s*\]', source))
+        self.assertTrue(read, "the scan found no override reads at all")
+        known = set(generator._load_overrides(path=Path("does-not-exist")))
+        self.assertEqual(read - known, set(),
+                         "normalize reads override buckets the loader drops in silence")
+
+    def test_the_committed_overrides_file_declares_only_known_buckets(self):
+        path = ROOT / "remediation" / "manual_overrides.yaml"
+        declared = set()
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if line and not line.startswith((" ", "#")) and ":" in line:
+                declared.add(line.split(":", 1)[0].strip())
+        known = set(generator._load_overrides(path=Path("does-not-exist")))
+        self.assertEqual(declared - known, set(),
+                         "a bucket in the file the loader ignores is a silent no-op")
+
+
+class AtlasLootPhaseTests(unittest.TestCase):
+    """Phase from a curated loot table, where reading the zone cannot reach."""
+
+    SAMPLE = """
+data["BlackTemple"] = {
+	ContentType = RAID_CONTENT,
+	ContentPhaseBC = 3,
+	items = {
+		{ 1, 32385 },
+		{ 2, "f1077rep8" },
+		{ 3, 32386 },
+	},
+}
+data["Karazhan"] = {
+	ContentType = RAID_CONTENT,
+	items = {
+		{ 1, 30281 },
+	},
+}
+data["ShatteredSunOffensive"] = {
+	FactionID = 1077,
+	-- ContentPhaseBC = 4,
+	ContentPhaseBC = 5,
+	items = {
+		{ 1, 32386 },
+		{ 2, 34599 },
+	},
+}
+"""
+
+    def test_only_tables_that_carry_a_marker_place_anything(self):
+        tables = {name: phase for name, phase, _ in phase_tables(self.SAMPLE)}
+        self.assertEqual(tables, {"BlackTemple": 3, "ShatteredSunOffensive": 5})
+        self.assertNotIn("Karazhan", tables,
+                         "a table with no marker is launch content, not phase 0")
+
+    def test_a_string_entry_is_not_an_item(self):
+        items = dict((name, ids) for name, _, ids in phase_tables(self.SAMPLE))
+        self.assertEqual(items["BlackTemple"], {32385, 32386})
+
+    def test_the_earliest_table_that_places_an_item_wins(self):
+        # 32386 sits in the Black Temple and in the Shattered Sun list; it is
+        # obtainable as soon as the first of the two opens.
+        out, _ = build_phases([self.SAMPLE], {32385: 111, 32386: 222, 34599: 333})
+        self.assertEqual(out[32386 and 222], 3)
+        self.assertEqual(out[111], 3)
+        self.assertEqual(out[333], 5)
+
+    def test_an_item_that_is_not_a_recipe_pattern_is_dropped(self):
+        out, _ = build_phases([self.SAMPLE], {32385: 111})
+        self.assertEqual(out, {111: 3})
+
+    def test_matching_is_on_the_recipe_item_never_the_created_one(self):
+        # The map handed in is recipeItemId -> spellId. Feeding a created item
+        # would place a recipe by where its OUTPUT turns up, which is a
+        # different question with a different answer.
+        source = (ROOT / "generate_recipe_metadata.py").read_text(encoding="utf-8")
+        block = source.split('if args.source == "atlasloot-phases":')[1].split("if args.source ==")[0]
+        self.assertIn("recipeItemId", block)
+        self.assertNotIn("createdItemId", block)
+
+
+class PhasePrecedenceTests(unittest.TestCase):
+    """A curated placement outranks reading the zone, and both outrank nothing."""
+
+    def test_normalize_prefers_the_override_then_atlasloot_then_the_zone(self):
+        source = (ROOT / "recipe_pipeline" / "normalize.py").read_text(encoding="utf-8")
+        block = source.split("phase=")[1].split(",\n")[0]
+        override = block.index('overrides.get("phaseBySpellId"')
+        curated = block.index('secondary.get("phaseBySpellId"')
+        derived = block.index("derive_phase(")
+        self.assertLess(override, curated,
+                        "a person's decision has to beat every source")
+        self.assertLess(curated, derived,
+                        "AtlasLoot places the item; the zone rule only knows the zone, "
+                        "and a vendor added in a later patch can stand in a launch city")
 
 
 if __name__ == "__main__":

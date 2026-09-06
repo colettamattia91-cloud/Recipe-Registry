@@ -43,6 +43,22 @@ SOURCE_TABLES = (
 )
 VANILLA_SKILL_LINE_ABILITY_TABLE = "VanillaSkillLineAbility"
 
+# SkillLineAbility.ClassMask: which classes a trainer will teach the recipe to.
+# Zero means everybody. The mask is the modern eleven-class one, so it has to
+# be intersected with the nine classes that exist in Burning Crusade or the
+# Wolfshead Helm reads as "Monk and Druid".
+TBC_CLASS_MASK = (
+    1        # Warrior
+    | 2      # Paladin
+    | 4      # Hunter
+    | 8      # Rogue
+    | 16     # Priest
+    | 64     # Shaman
+    | 128    # Mage
+    | 256    # Warlock
+    | 1024   # Druid
+)
+
 # DB2 Item.ClassID values relevant to crafted output classification.
 ITEM_CLASS_WEAPON = 2
 ITEM_CLASS_ARMOR = 4
@@ -239,6 +255,14 @@ def _item_class_by_id(item_table):
             _as_int(row.get("SubclassID"), None),
         )
     return out
+
+
+def _class_mask(row):
+    """The classes that can learn this recipe, or None when every class can."""
+    mask = _as_int(row.get("ClassMask")) & TBC_CLASS_MASK
+    if mask == 0 or mask == TBC_CLASS_MASK:
+        return None
+    return mask
 
 
 def _armor_type(item_id, item_class_by_id):
@@ -481,6 +505,7 @@ def build_normalized_snapshot(
             "createdCountMax": created_max if created_max != created_min else None,
             "requiredSkill": _required_skill(recipe_item_id, row, items_by_id),
             "categoryHint": _category_hint(profession, spell_name, created_item_id, items_by_id),
+            "classMask": _class_mask(row),
         })
 
     recipes.sort(key=lambda item: (item["profession"], item["spellId"]))

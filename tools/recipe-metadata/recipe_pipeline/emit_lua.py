@@ -43,6 +43,13 @@ def _emit_record(record, zone_ids, indent="        "):
         lines.append(indent + "    requiredSkill = " + str(record.required_skill) + ",")
     if record.specialization is not None:
         lines.append(indent + "    specialization = " + str(record.specialization) + ",")
+    # The class gate is on the recipe, so a character outside it never sees the
+    # row at all rather than one it can never tick off.
+    if record.class_mask is not None:
+        lines.append(indent + "    classMask = " + str(record.class_mask) + ",")
+    # Absent means base content, which is most of the dataset.
+    if record.phase is not None:
+        lines.append(indent + "    phase = " + str(record.phase) + ",")
     # Obtain-side fields. Absent faction means both, which is the common case,
     # so emitting it on every record would be pure bloat.
     if record.faction is not None:
@@ -54,6 +61,14 @@ def _emit_record(record, zone_ids, indent="        "):
     if record.skill_levels:
         lines.append(indent + "    skillLevels = { "
                      + ", ".join(str(value) for value in record.skill_levels) + " },")
+    # The title is the answer where every trainer shares one; where they do
+    # not, nothing is written and the addon says "from a trainer".
+    if record.trainer_title:
+        lines.append(indent + "    trainerTitle = " + _lua_string(record.trainer_title) + ",")
+        if record.trainer_continents:
+            lines.append(indent + "    trainerContinents = { "
+                         + ", ".join(_lua_string(value) for value in record.trainer_continents)
+                         + " },")
     if record.world_drop:
         lines.append(indent + "    worldDrop = true,")
     if record.boss_drop:

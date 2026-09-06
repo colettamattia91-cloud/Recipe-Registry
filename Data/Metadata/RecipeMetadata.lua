@@ -96,6 +96,17 @@ local function cloneRecord(spellId, record)
         subcategory = record.subcategory,
         sortOrder = record.sortOrder,
         requiredSkill = record.requiredSkill,
+        -- Which classes a trainer will teach this to, as the client's own
+        -- bitmask. Absent means every class.
+        classMask = record.classMask,
+        -- The content phase it first becomes obtainable in. Absent means base
+        -- content, which is most of the dataset.
+        phase = record.phase,
+        -- The title every trainer of this recipe carries, and the continents
+        -- they stand on. Absent means several ranks of trainer teach it, which
+        -- is the case where "from a trainer" is the right answer.
+        trainerTitle = record.trainerTitle,
+        trainerContinents = cloneStringList(record.trainerContinents),
         selfOnlyOutputless = record.selfOnlyOutputless == true,
         bopOutput = record.bopOutput,
         -- Obtain-side fields. An absent faction means both: that is the
@@ -642,6 +653,24 @@ function RecipeMetadata:GetSpecialization(recipeKey, info)
     return info and info.specialization or nil
 end
 
+-- Which classes a trainer will teach the recipe to, as the client's own class
+-- bitmask, or nil when every class can learn it. The gate is on the RECIPE,
+-- not on what it makes: a warrior can learn to craft a druid-only helm, but no
+-- trainer will teach a warrior the Deathblow X11 Goggles. Twenty-two recipes
+-- carry one and all of them are engineering goggles.
+function RecipeMetadata:GetClassMask(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info and info.classMask or nil
+end
+
+-- The content phase a recipe first becomes obtainable in, or nil for anything
+-- available from the start -- which is the whole of Vanilla and most of
+-- Burning Crusade. Absent means base content, never "unknown".
+function RecipeMetadata:GetPhase(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info and info.phase or nil
+end
+
 --- True for a recipe that is in the client data but not in the game: never
 --- implemented, or taken out and never returned. There is nowhere to go and
 --- learn one, so listing it among what a character could still learn is a
@@ -722,6 +751,11 @@ function RecipeMetadata:GetSource(recipeKey, info)
         worldDrop = info.worldDrop == true,
         bossDrop = info.bossDrop == true,
         places = places,
+        -- Trainer-taught recipes have no places -- no source names the NPCs --
+        -- so the answer they do have is the title every one of their trainers
+        -- carries, which is the line the player reads under the NPC in game.
+        trainerTitle = info.trainerTitle,
+        trainerContinents = info.trainerContinents,
     }
 end
 

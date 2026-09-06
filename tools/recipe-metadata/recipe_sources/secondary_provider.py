@@ -14,6 +14,8 @@ from recipe_sources.manual_acquisition import (
     merge_acquisition,
 )
 from recipe_sources.removed_recipes import load_removed
+from recipe_sources.atlasloot_phase_provider import load_phases
+from recipe_sources.cmangos_trainer_provider import load_trainers
 from recipe_sources.wowhead_specialization_provider import load_specializations
 
 
@@ -37,6 +39,13 @@ def load_secondary_sources(snapshot_dir):
     # the record rather than a deletion, so one that turns out to be real is
     # put back with an override instead of a refetch.
     removed = load_removed(snapshot_dir)
+    # Which trainer teaches a recipe. Its own file for the same reason as the
+    # rest: a different source on a different cadence, and safe from a Wago
+    # refetch rewriting secondary_static.json.
+    trainers = load_trainers(snapshot_dir)
+    # Which content phase places a recipe, where a curated loot table says so.
+    # Its own file for the same reason as the rest.
+    phases = load_phases(snapshot_dir)
 
     path = Path(snapshot_dir) / "secondary_static.json"
     if not path.exists():
@@ -49,6 +58,8 @@ def load_secondary_sources(snapshot_dir):
             "specializationBySpellId": specializations,
             "acquisitionBySpellId": acquisition,
             "removedBySpellId": removed,
+            "trainerBySpellId": trainers,
+            "phaseBySpellId": phases,
         }
 
     with path.open("r", encoding="utf-8") as handle:
@@ -66,4 +77,6 @@ def load_secondary_sources(snapshot_dir):
         "specializationBySpellId": specializations,
         "acquisitionBySpellId": acquisition,
         "removedBySpellId": removed,
+        "trainerBySpellId": trainers,
+        "phaseBySpellId": phases,
     }

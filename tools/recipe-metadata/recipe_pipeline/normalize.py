@@ -2,6 +2,7 @@ from recipe_pipeline.classify_expansion import classify_expansion
 from recipe_pipeline.derive_categories import derive_category
 from recipe_pipeline.derive_items import derive_created_item_id, derive_recipe_item_id
 from recipe_pipeline.derive_reagents import derive_reagents
+from recipe_pipeline.derive_phase import derive_phase
 from recipe_pipeline.records import RecipeRecord, SourcePlace
 
 MAX_SOURCE_PLACES = 4
@@ -51,6 +52,17 @@ def summarize_source(source):
     if required is not None:
         required = int(required)
     return faction, kind, places, world_drop, source.get("bossDrop") is True, levels, required
+
+
+def _class_mask(recipe, overrides, spell_id):
+    """The recipe's class gate, with the override winning over the client."""
+    if spell_id in overrides.get("classMaskBySpellId", {}):
+        mask = overrides["classMaskBySpellId"][spell_id]
+    else:
+        mask = recipe.get("classMask")
+    if mask in (None, 0):
+        return None
+    return int(mask)
 
 
 def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tbc"):
@@ -116,6 +128,14 @@ def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tb
         (faction, source_kind, source_places,
          world_drop, boss_drop, skill_levels, sourced_skill) = summarize_source(source)
 
+        # Only for a recipe the obtain-side source actually calls trainer-taught:
+        # cmangos will happily say which trainer teaches a recipe that is really
+        # bought from a vendor, and the vendor is the answer the player needs.
+        trainer = {}
+        if source_kind == "trainer":
+            trainer = secondary.get("trainerBySpellId", {}).get(spell_id) or {}
+            trainer = overrides.get("trainerBySpellId", {}).get(spell_id, trainer)
+
         records.append(RecipeRecord(
             spell_id=spell_id,
             profession_key=profession_key,
@@ -144,6 +164,18 @@ def normalize_records(primary, secondary, taxonomies, overrides=None, flavor="tb
             skill_levels=skill_levels,
             world_drop=world_drop,
             boss_drop=boss_drop,
+            trainer_title=trainer.get("title") or None,
+            trainer_continents=tuple(trainer.get("continents") or ()),
+            class_mask=_class_mask(recipe, overrides, spell_id),
+            # Three sources, in order of how directly they answer the
+            # question. The override is a person's decision. AtlasLoot places
+            # the ITEM in a phase-gated table, which beats reading the zone:
+            # Ontuvo stands in Shattrath, a day-one city, and sells nothing
+            # until the Isle opens. The zone derivation is last and covers the
+            # raid drops AtlasLoot's tables do not reach.
+            phase=overrides.get("phaseBySpellId", {}).get(spell_id)
+                or secondary.get("phaseBySpellId", {}).get(spell_id)
+                or derive_phase(expansion, source_places, world_drop),
             removed=removed is True,
         ))
 

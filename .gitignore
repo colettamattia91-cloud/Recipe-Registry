@@ -13,3 +13,7 @@ __pycache__/
 # "C:Tempdiff_core.txt" — a shell that interpreted "C:\Temp\…" as a
 # literal filename in the working directory).
 /C:*.txt
+# The cmangos world DB the trainer importer downloads: 300MB of somebody
+# else's reconstruction, and only an input to the fetch. What gets committed
+# is snapshots/*/trainers.json, which is a few hundred lines.
+tools/recipe-metadata/snapshots/*/.cmangos/

@@ -75,6 +75,21 @@ class RecipeRecord:
     # Set when several bosses drop it: the row says so and names the places,
     # rather than listing creatures a player would have to cross-reference.
     boss_drop: bool = False
+    # Which classes a trainer will teach this recipe to, as the client's own
+    # class bitmask, or None when every class can learn it. The gate is on the
+    # RECIPE (SkillLineAbility.ClassMask), not on what it makes: a warrior can
+    # learn to craft a druid-only helm, but no trainer will teach a warrior the
+    # Deathblow X11 Goggles. Twenty-two recipes carry one, all engineering.
+    class_mask: Optional[int] = None
+    # The content phase the recipe first becomes obtainable in, or None for
+    # base content -- see derive_phase for why absence means "from the start".
+    phase: Optional[int] = None
+    # The title every trainer of this recipe carries -- "Master Engineering
+    # Trainer" -- and the continents they stand on. Only set when they all
+    # share one title: a recipe several ranks of trainer teach has no single
+    # answer, and naming the highest would say the others refuse it.
+    trainer_title: Optional[str] = None
+    trainer_continents: Tuple[str, ...] = ()
     # In the client data but not in the game: never implemented, or taken out
     # and never returned. The record is kept whole rather than dropped, so
     # putting one back is an override and a regenerate rather than an
