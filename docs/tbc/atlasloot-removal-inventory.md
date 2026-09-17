@@ -3,7 +3,7 @@
 Phase: Recipe Metadata Roadmap Phase 5; staged for Phase 9
 Reviewed: 2026-05-23; Phase 8 category review 2026-05-24; Phase 9 staging review 2026-05-24
 
-This inventory follows `docs/recipe-metadata-roadmap.md` section 8.1. The runtime surface is currently AtlasLoot-free, and the committed Wago Tools DB2 snapshot now satisfies the strict release-candidate coverage gate for the supported Vanilla + TBC recipe scope.
+This inventory follows `docs/tbc/recipe-metadata-roadmap.md` section 8.1. The runtime surface is currently AtlasLoot-free, and the committed Wago Tools DB2 snapshot now satisfies the strict release-candidate coverage gate for the supported Vanilla + TBC recipe scope.
 
 | File | Function | Current AtlasLoot usage | Runtime path | Replacement source | Migration action | Test coverage | Status |
 |------|----------|--------------------------|--------------|--------------------|------------------|---------------|--------|

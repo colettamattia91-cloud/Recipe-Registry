@@ -218,7 +218,7 @@ The plugin needs **nothing** from RR beyond the load-order guarantee. It is a pu
 
 ### 4.3 Public API documentation
 
-The contract is documented in [`docs/recipe-registry-public-api.md`](recipe-registry-public-api.md), the same doc that hosts the RR_Orders public surface. Add a new `RecipeMetadata` section.
+The contract is documented in [`docs/tbc/recipe-registry-public-api.md`](recipe-registry-public-api.md), the same doc that hosts the RR_Orders public surface. Add a new `RecipeMetadata` section.
 
 ---
 
@@ -644,7 +644,7 @@ Increment `metadataVersion` when:
 
 ### 8.1 Inventory phase
 
-Before removing any AtlasLoot resolver call, produce `docs/atlasloot-removal-inventory.md` with a row per call-site:
+Before removing any AtlasLoot resolver call, produce `docs/tbc/atlasloot-removal-inventory.md` with a row per call-site:
 
 | File | Function | Current AtlasLoot usage | Runtime path | Replacement source | Migration action | Test coverage | Status |
 |------|----------|--------------------------|--------------|---------------------|------------------|---------------|--------|
@@ -855,7 +855,7 @@ Work items:
   - `generate` emits a hand-coded sample of 10-20 recipes covering: 1 Vanilla Alchemy, 1 TBC Alchemy, 1 Vanilla Engineering, 1 TBC Engineering, 1 ring enchant (outputless self-only), 1 BoP-output craft, 1 ambiguous created-item case.
   - Sample emitted to `RecipeRegistry_Metadata/Data/RecipeMetadata_Generated.lua`.
 - Add `Loader.LoadMetadata(opts)` to the test harness (analogous to `Loader.LoadOrders`).
-- Document the public API in `docs/recipe-registry-public-api.md` under a new `RecipeMetadata` section.
+- Document the public API in `docs/tbc/recipe-registry-public-api.md` under a new `RecipeMetadata` section.
 
 **Exit criteria:**
 
@@ -1007,7 +1007,7 @@ Work items:
 
 Work items:
 
-- Produce `docs/atlasloot-removal-inventory.md` per §8.1.
+- Produce `docs/tbc/atlasloot-removal-inventory.md` per §8.1.
 - For every call-site in the inventory:
   - Replace with `RecipeMetadata` lookup when behavior is in scope.
   - Replace with a direct WoW API call where appropriate.
@@ -1076,7 +1076,7 @@ Work items:
 
 - Category navigation with AtlasLoot absent is covered by `local-tests/spec/category_metadata_navigation_spec.lua`, which seeds every supported v1 profession and verifies metadata category filtering covers the same recipes as the All view.
 - The same spec installs throwing AtlasLoot category/ItemDB stubs while `RecipeRegistry_Metadata` is present; `Data:GetRecipeCategory`, `Data:GetRecipeCategories`, and category-filtered `Data:GetRecipeList` still succeed, proving the new category path performs zero AtlasLoot category lookups.
-- `docs/atlasloot-removal-inventory.md` was updated with the Phase 8 category review and records the `DataCatalog.lua` category call-site as metadata-backed, with the legacy AtlasLoot category provider restricted to plugin-absent fallback until Phase 9.
+- `docs/tbc/atlasloot-removal-inventory.md` was updated with the Phase 8 category review and records the `DataCatalog.lua` category call-site as metadata-backed, with the legacy AtlasLoot category provider restricted to plugin-absent fallback until Phase 9.
 - Remaining gap: the UI currently exposes category keys only. `Data:GetRecipeCategories` drops category labels/subcategory rows, and `MainFrame.lua` renders the raw key as the button label. Subcategory navigation and polished category labels are still required for the full §5.2 / §8 taxonomy contract.
 
 ### Phase 9 — AtlasLoot removal + release hardening
@@ -1090,7 +1090,7 @@ Work items:
 - Delete or archive [`Data/DataAtlasLoot.lua`](../Data/DataAtlasLoot.lua). If any historical diagnostic or non-projection path still references it, isolate behind an explicitly named `legacy/` folder excluded from the projection-path test gate.
 - Strict generator validation enabled in CI.
 - Update `CHANGELOG.md` with the new addon, new filter behavior, and the AtlasLoot removal announcement.
-- Update `docs/recipe-registry-public-api.md` with the final `RecipeMetadata` contract.
+- Update `docs/tbc/recipe-registry-public-api.md` with the final `RecipeMetadata` contract.
 - Polish diagnostics: `/rr filters`, `/rr filters unresolved`, `/rr filters explain`.
 
 **Exit criteria:**

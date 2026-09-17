@@ -1,0 +1,20 @@
+# Packaging for the TBC addon.
+#
+# This file sits in the addon folder, not in the repo root, because the packager
+# takes the project root as an argument: `release.sh -t RecipeRegistry` reads
+# this .pkgmeta and packages this folder alone. That is what lets the repo keep
+# one folder per game version without the two getting in each other's way.
+#
+# package-as is the folder name inside the zip, and therefore the addon's
+# identity in game: the TOC name, and the SavedVariables file that carries every
+# user's guild data. It stays "RecipeRegistry" whatever the repo folder is
+# called.
+package-as: RecipeRegistry
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+ignore:
+  - Sync/MockSync.lua
+  - local-tests
+  - tools
+  - artifacts

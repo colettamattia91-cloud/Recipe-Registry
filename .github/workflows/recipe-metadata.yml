@@ -1,9 +1,13 @@
 name: Recipe Metadata
 
 # The flavor is a property of the metadata being checked, not of the branch the
-# work sits on -- both flavors live on the same branches. So the flavors are
-# listed here and checked side by side, and teaching this workflow about a new
-# one is a single entry in the matrix.
+# work sits on. So the flavors are listed here and checked side by side, and
+# teaching this workflow about a new one is a single entry in the matrix.
+#
+# The generator lives inside the TBC addon folder, which is where its dataset
+# and its snapshots live too, hence the working-directory below. A Forever
+# dataset arrives from ../WowForeverMining and will be generated from its own
+# folder, with its own entry here.
 #
 # The generator accepts only 'tbc' today; `generate` and `validate` refuse
 # anything else outright. Forever joins the matrix when the generator learns
@@ -29,6 +33,7 @@ jobs:
       # Flavor-agnostic, and the thing that would catch a change to shared
       # pipeline code breaking a flavor that is not being checked below.
       - name: Run generator unit tests
+        working-directory: RecipeRegistry
         run: python -m unittest discover -s tools/recipe-metadata/tests
 
   metadata:
@@ -47,11 +52,13 @@ jobs:
           python-version: "3.11"
 
       - name: Check generated metadata is current
+        working-directory: RecipeRegistry
         run: >-
           python tools/recipe-metadata/generate_recipe_metadata.py generate
           --flavor ${{ matrix.flavor }} --offline --check
 
       - name: Validate metadata strictly
+        working-directory: RecipeRegistry
         run: >-
           python tools/recipe-metadata/generate_recipe_metadata.py validate
           --flavor ${{ matrix.flavor }} --strict

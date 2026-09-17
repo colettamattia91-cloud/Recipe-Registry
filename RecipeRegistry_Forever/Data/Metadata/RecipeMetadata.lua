@@ -1,0 +1,959 @@
+local Addon = _G.RecipeRegistry
+if not Addon then
+    return
+end
+
+local generated = _G.RecipeRegistryRecipeMetadata or {}
+local overrides = _G.RecipeRegistryRecipeMetadataOverrides or {}
+
+local RecipeMetadata = {
+    metadataVersion = generated.metadataVersion,
+    schemaVersion = generated.schemaVersion,
+    flavor = generated.flavor,
+    _generated = generated,
+    _overrides = overrides,
+    _recordsBySpellId = {},
+    _recipeItemToSpellId = {},
+    _createdItemToSpellIds = {},
+}
+
+local function countTable(tbl)
+    local count = 0
+    for _ in pairs(tbl or {}) do
+        count = count + 1
+    end
+    return count
+end
+
+local function countOverrideEntries()
+    local count = 0
+    for _, bucket in pairs(overrides or {}) do
+        count = count + countTable(bucket)
+    end
+    return count
+end
+
+local function cloneReagents(reagents)
+    if type(reagents) ~= "table" then
+        return nil
+    end
+    local out = {}
+    for index, reagent in ipairs(reagents) do
+        out[index] = {
+            itemId = reagent.itemId,
+            count = reagent.count,
+        }
+    end
+    return out
+end
+
+-- One entry per place: { name, zone, x, y, faction }, every field optional
+-- but the pair of them. The zone is still an interned id here; GetSource
+-- resolves it to a name.
+--
+-- The position and the faction are per NPC and not per recipe: a recipe sold
+-- by one vendor in Stormwind and another in Orgrimmar is available to both
+-- sides, and the recipe-level faction says exactly that -- which tells a Horde
+-- player nothing about which of the two they can walk up to.
+local function clonePlaces(list)
+    if type(list) ~= "table" then return nil end
+    local out = {}
+    for index, place in ipairs(list) do
+        out[index] = {
+            name = place.name,
+            zone = place.zone,
+            x = place.x,
+            y = place.y,
+            faction = place.faction,
+        }
+    end
+    return out
+end
+
+local function cloneStringList(list)
+    if type(list) ~= "table" then return nil end
+    local out = {}
+    for index, value in ipairs(list) do
+        out[index] = value
+    end
+    return out
+end
+
+local function cloneRecord(spellId, record)
+    if type(record) ~= "table" then
+        return nil
+    end
+    return {
+        spellId = tonumber(spellId),
+        profession = record.profession,
+        expansion = record.expansion,
+        recipeItemId = record.recipeItemId,
+        createdItemId = record.createdItemId,
+        createdCount = record.createdCount,
+        createdCountMax = record.createdCountMax,
+        specialization = record.specialization,
+        category = record.category,
+        subcategory = record.subcategory,
+        sortOrder = record.sortOrder,
+        requiredSkill = record.requiredSkill,
+        -- Which classes a trainer will teach this to, as the client's own
+        -- bitmask. Absent means every class.
+        classMask = record.classMask,
+        -- The content phase it first becomes obtainable in. Absent means base
+        -- content, which is most of the dataset.
+        phase = record.phase,
+        -- The title every trainer of this recipe carries, and the continents
+        -- they stand on. Absent means several ranks of trainer teach it, which
+        -- is the case where "from a trainer" is the right answer.
+        trainerTitle = record.trainerTitle,
+        trainerContinents = cloneStringList(record.trainerContinents),
+        selfOnlyOutputless = record.selfOnlyOutputless == true,
+        bopOutput = record.bopOutput,
+        -- Obtain-side fields. An absent faction means both: that is the
+        -- common case and the generator omits it rather than repeating it on
+        -- most of the dataset.
+        faction = record.faction,
+        sourceKind = record.sourceKind,
+        worldDrop = record.worldDrop == true,
+        bossDrop = record.bossDrop == true,
+        sourcePlaces = clonePlaces(record.sourcePlaces),
+        -- The four thresholds the game itself colours this recipe by. Four
+        -- numbers per recipe, stated by the source: orange up to the first,
+        -- then yellow, green, and grey from the last on.
+        skillLevels = cloneStringList(record.skillLevels),
+        -- In the client data but not in the game. Kept on the record rather
+        -- than left out of the payload, so a recipe flagged wrongly comes
+        -- back through the generator's override instead of an investigation.
+        removed = record.removed == true,
+        reagents = cloneReagents(record.reagents),
+    }
+end
+
+local function cloneSpellIdList(list)
+    local out = {}
+    for index, spellId in ipairs(list or {}) do
+        out[index] = spellId
+    end
+    return out
+end
+
+local function cloneSubcategoryList(list)
+    local out = {}
+    for index, subcategory in ipairs(list or {}) do
+        out[index] = {
+            key = subcategory.key,
+            label = subcategory.label,
+            order = subcategory.order,
+        }
+    end
+    return out
+end
+
+local function cloneCategoryList(list, subcategoriesByCategory)
+    local out = {}
+    for index, category in ipairs(list or {}) do
+        local key = category.key
+        out[index] = {
+            key = key,
+            label = category.label,
+            order = category.order,
+            subcategories = cloneSubcategoryList(subcategoriesByCategory and subcategoriesByCategory[key] or nil),
+        }
+    end
+    return out
+end
+
+local function sortedRecordIds(records)
+    local ids = {}
+    for spellId in pairs(records or {}) do
+        ids[#ids + 1] = spellId
+    end
+    table.sort(ids, function(left, right)
+        return tonumber(left) < tonumber(right)
+    end)
+    return ids
+end
+
+local function applyOverrides(record)
+    if type(record) ~= "table" then
+        return
+    end
+    local spellId = record.spellId
+
+    local expansion = overrides.expansionBySpellId and overrides.expansionBySpellId[spellId]
+    if expansion ~= nil then
+        record.expansion = expansion
+    end
+
+    local createdItemId = overrides.createdItemBySpellId and overrides.createdItemBySpellId[spellId]
+    if createdItemId ~= nil then
+        record.createdItemId = createdItemId
+    end
+
+    local recipeItemId = overrides.recipeItemBySpellId and overrides.recipeItemBySpellId[spellId]
+    if recipeItemId ~= nil then
+        record.recipeItemId = recipeItemId
+    end
+
+    local category = overrides.categoryBySpellId and overrides.categoryBySpellId[spellId]
+    if type(category) == "table" then
+        if category.category ~= nil then
+            record.category = category.category
+        end
+        if category.subcategory ~= nil then
+            record.subcategory = category.subcategory
+        end
+        if category.sortOrder ~= nil then
+            record.sortOrder = category.sortOrder
+        end
+    end
+
+    local selfOnly = overrides.selfOnlyOutputlessBySpellId and overrides.selfOnlyOutputlessBySpellId[spellId]
+    if selfOnly ~= nil then
+        record.selfOnlyOutputless = selfOnly == true
+    end
+
+    local bopOutput = overrides.bopOutputBySpellId and overrides.bopOutputBySpellId[spellId]
+    if bopOutput ~= nil then
+        record.bopOutput = bopOutput == true
+    elseif record.createdItemId and overrides.bindTypeByCreatedItemId then
+        local bindType = overrides.bindTypeByCreatedItemId[record.createdItemId]
+        if bindType ~= nil then
+            record.bopOutput = tonumber(bindType) == 1
+        end
+    end
+end
+
+local function addCreatedItemIndex(index, createdItemId, spellId)
+    if not createdItemId then
+        return
+    end
+    local bucket = index[createdItemId]
+    if not bucket then
+        bucket = {}
+        index[createdItemId] = bucket
+    end
+    bucket[#bucket + 1] = spellId
+end
+
+local function buildNavTreeFromRecords(recordsBySpellId)
+    -- Mirror the structure the Python generator emits: a nested map
+    -- expansion → profession → category → subcategory keyed by recipe IDs.
+    -- Each non-leaf node carries an `_all` array that unions every recipe
+    -- under it so the runtime can answer "all recipes for this expansion×
+    -- profession" or "all recipes in this category" with a single table get.
+    local tree = {}
+    for spellId, record in pairs(recordsBySpellId) do
+        local expansion = record.expansion
+        local profession = record.profession
+        if expansion and profession then
+            local expNode = tree[expansion]
+            if not expNode then
+                expNode = {}
+                tree[expansion] = expNode
+            end
+            local profNode = expNode[profession]
+            if not profNode then
+                profNode = { _all = {} }
+                expNode[profession] = profNode
+            end
+            profNode._all[#profNode._all + 1] = spellId
+
+            local categoryKey = record.category or "misc"
+            local catNode = profNode[categoryKey]
+            if not catNode then
+                catNode = { _all = {} }
+                profNode[categoryKey] = catNode
+            end
+            catNode._all[#catNode._all + 1] = spellId
+
+            local subKey = record.subcategory
+            if subKey ~= nil then
+                local subList = catNode[subKey]
+                if not subList then
+                    subList = {}
+                    catNode[subKey] = subList
+                end
+                subList[#subList + 1] = spellId
+            end
+        end
+    end
+    for _, expNode in pairs(tree) do
+        for _, profNode in pairs(expNode) do
+            table.sort(profNode._all)
+            for categoryKey, catNode in pairs(profNode) do
+                if categoryKey ~= "_all" then
+                    table.sort(catNode._all)
+                    for subKey, subList in pairs(catNode) do
+                        if subKey ~= "_all" then
+                            table.sort(subList)
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return tree
+end
+
+local function overridesAffectClassification(overrideTable)
+    if type(overrideTable) ~= "table" then return false end
+    -- Only expansion + category overrides change the navTree's shape;
+    -- other override buckets (createdItem, recipeItem, bopOutput, etc.) leave
+    -- the nav classification unchanged.
+    if type(overrideTable.expansionBySpellId) == "table"
+        and next(overrideTable.expansionBySpellId) ~= nil then
+        return true
+    end
+    if type(overrideTable.categoryBySpellId) == "table"
+        and next(overrideTable.categoryBySpellId) ~= nil then
+        return true
+    end
+    return false
+end
+
+function RecipeMetadata:_Rebuild()
+    generated = _G.RecipeRegistryRecipeMetadata or generated or {}
+    overrides = _G.RecipeRegistryRecipeMetadataOverrides or overrides or {}
+    self._generated = generated
+    self._overrides = overrides
+    self.metadataVersion = generated.metadataVersion
+    self.schemaVersion = generated.schemaVersion
+    self.flavor = generated.flavor
+    self._recordsBySpellId = {}
+    self._recipeItemToSpellId = {}
+    self._createdItemToSpellIds = {}
+    self._reagentItemIds = nil
+    -- Drop the resolution-status memo so the next predicate call rebuilds
+    -- it against the fresh record set.
+    self._unresolvedSpellIdSet = nil
+
+    for _, spellId in ipairs(sortedRecordIds(generated.recipesBySpellId)) do
+        local record = cloneRecord(spellId, generated.recipesBySpellId[spellId])
+        if record then
+            applyOverrides(record)
+            self._recordsBySpellId[record.spellId] = record
+            if record.recipeItemId then
+                self._recipeItemToSpellId[record.recipeItemId] = record.spellId
+            end
+            addCreatedItemIndex(self._createdItemToSpellIds, record.createdItemId, record.spellId)
+        end
+    end
+
+    for _, spellIds in pairs(self._createdItemToSpellIds) do
+        table.sort(spellIds)
+    end
+
+    -- Prefer the static nav-tree baked into Generated.lua (fast, no Lua
+    -- iteration at load) but fall back to a runtime build when it is absent
+    -- (sample fixture) or when runtime overrides change classification.
+    if generated.navTree and not overridesAffectClassification(overrides) then
+        self._navTree = generated.navTree
+    else
+        self._navTree = buildNavTreeFromRecords(self._recordsBySpellId)
+    end
+
+    return self
+end
+
+local function normalizeNumericRecipeKey(recipeKey)
+    local numeric = tonumber(recipeKey)
+    if not numeric then
+        return nil
+    end
+    return math.floor(numeric)
+end
+
+-- Ambiguous created-item keys (same item produced by more than one spell,
+-- e.g. Gold Bar via Smelt Gold and Transmute: Iron to Gold) can be broken
+-- when the caller knows which profession the recipe was scanned under.
+-- `professionHint` is a normalized profession key ("mining", "alchemy").
+-- Returns the single matching record, or nil when the hint is absent or
+-- still matches zero / more than one candidate (e.g. the two-alchemy
+-- elemental transmute pairs stay ambiguous by design).
+local function resolveAmbiguousByProfession(self, spellIds, professionHint)
+    if not professionHint then
+        return nil
+    end
+    local match
+    for _, spellId in ipairs(spellIds) do
+        local record = self._recordsBySpellId[spellId]
+        if record and record.profession == professionHint then
+            if match then
+                return nil
+            end
+            match = record
+        end
+    end
+    return match
+end
+
+function RecipeMetadata:NormalizeRecipeKey(recipeKey, professionHint)
+    local normalized = {
+        recipeKey = recipeKey,
+        source = "unknown",
+    }
+
+    local numeric = normalizeNumericRecipeKey(recipeKey)
+    if not numeric then
+        return normalized
+    end
+
+    if numeric < 0 then
+        local spellId = -numeric
+        local record = self._recordsBySpellId[spellId]
+        normalized.spellId = spellId
+        normalized.source = "spell"
+        if record then
+            normalized.recipeItemId = record.recipeItemId
+            normalized.createdItemId = record.createdItemId
+        end
+        return normalized
+    end
+
+    if numeric == 0 then
+        normalized.source = "invalidItem"
+        return normalized
+    end
+
+    local recipeSpellId = self._recipeItemToSpellId[numeric]
+    if recipeSpellId then
+        local record = self._recordsBySpellId[recipeSpellId]
+        normalized.spellId = recipeSpellId
+        normalized.recipeItemId = numeric
+        normalized.createdItemId = record and record.createdItemId or nil
+        normalized.source = "recipeItem"
+        return normalized
+    end
+
+    local createdSpellIds = self._createdItemToSpellIds[numeric]
+    if createdSpellIds then
+        normalized.createdItemId = numeric
+        normalized.source = "createdItem"
+        if #createdSpellIds == 1 then
+            local spellId = createdSpellIds[1]
+            local record = self._recordsBySpellId[spellId]
+            normalized.spellId = spellId
+            normalized.recipeItemId = record and record.recipeItemId or nil
+        else
+            local hinted = resolveAmbiguousByProfession(self, createdSpellIds, professionHint)
+            if hinted then
+                normalized.spellId = hinted.spellId
+                normalized.recipeItemId = hinted.recipeItemId
+            else
+                normalized.ambiguousSpellIds = cloneSpellIdList(createdSpellIds)
+            end
+        end
+        return normalized
+    end
+
+    normalized.source = "unknown"
+    return normalized
+end
+
+function RecipeMetadata:GetRecipeInfo(recipeKey, professionHint)
+    -- Hot path: skip the table allocation that NormalizeRecipeKey does when
+    -- we just want the record. Called once per candidate inside the list
+    -- build predicate cascade, so 300+ allocations per profession refresh
+    -- otherwise pile up against the Lua GC.
+    local numeric = tonumber(recipeKey)
+    if not numeric then return nil end
+    local floored = math.floor(numeric)
+    if floored == 0 then return nil end
+    if floored < 0 then
+        return self._recordsBySpellId[-floored]
+    end
+    local recipeSpellId = self._recipeItemToSpellId[floored]
+    if recipeSpellId then
+        return self._recordsBySpellId[recipeSpellId]
+    end
+    local createdSpellIds = self._createdItemToSpellIds[floored]
+    if type(createdSpellIds) == "table" then
+        if #createdSpellIds == 1 then
+            return self._recordsBySpellId[createdSpellIds[1]]
+        end
+        local hinted = resolveAmbiguousByProfession(self, createdSpellIds, professionHint)
+        if hinted then
+            return hinted
+        end
+    end
+    -- Ambiguous or unknown: fall back to the full normalize so the
+    -- caller still gets the ambiguity flag in GetMetadataResolutionStatus.
+    return nil
+end
+
+local function getInfo(self, recipeKey, info)
+    if type(info) == "table" then
+        return info
+    end
+    return self:GetRecipeInfo(recipeKey)
+end
+
+function RecipeMetadata:GetRecipeExpansion(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info and info.expansion or nil
+end
+
+function RecipeMetadata:GetProfession(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info and info.profession or nil
+end
+
+function RecipeMetadata:GetCategory(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    if not info or not info.category then
+        return nil
+    end
+    return {
+        category = info.category,
+        subcategory = info.subcategory,
+        sortOrder = info.sortOrder,
+    }
+end
+
+function RecipeMetadata:GetNavTree()
+    return self._navTree
+end
+
+-- O(1) presence map: which expansions hold at least one recipe for the
+-- given profession. Used by the sidebar to drop professions whose only
+-- expansions are filtered away (e.g. Jewelcrafting in a Vanilla-only view).
+function RecipeMetadata:GetProfessionExpansionsFromNav(professionKey)
+    local tree = self._navTree
+    if not tree then return nil end
+    return {
+        vanilla = tree.vanilla and tree.vanilla[professionKey] ~= nil or false,
+        tbc = tree.tbc and tree.tbc[professionKey] ~= nil or false,
+    }
+end
+
+-- True if `professionKey/categoryKey` holds at least one recipe under any of
+-- the visible expansions. `visibility = { vanilla = bool, tbc = bool }`.
+function RecipeMetadata:CategoryHasRecipeUnderVisibility(professionKey, categoryKey, visibility)
+    local tree = self._navTree
+    if not tree or not professionKey or not categoryKey then return false end
+    if visibility.vanilla ~= false then
+        local node = tree.vanilla and tree.vanilla[professionKey] and tree.vanilla[professionKey][categoryKey]
+        if node and node._all and #node._all > 0 then return true end
+    end
+    if visibility.tbc ~= false then
+        local node = tree.tbc and tree.tbc[professionKey] and tree.tbc[professionKey][categoryKey]
+        if node and node._all and #node._all > 0 then return true end
+    end
+    return false
+end
+
+-- True if `professionKey/categoryKey/subcategoryKey` holds at least one
+-- recipe under any of the visible expansions.
+function RecipeMetadata:SubcategoryHasRecipeUnderVisibility(professionKey, categoryKey, subcategoryKey, visibility)
+    local tree = self._navTree
+    if not tree or not professionKey or not categoryKey or not subcategoryKey then return false end
+    if visibility.vanilla ~= false then
+        local catNode = tree.vanilla and tree.vanilla[professionKey] and tree.vanilla[professionKey][categoryKey]
+        local subList = catNode and catNode[subcategoryKey]
+        if type(subList) == "table" and #subList > 0 then return true end
+    end
+    if visibility.tbc ~= false then
+        local catNode = tree.tbc and tree.tbc[professionKey] and tree.tbc[professionKey][categoryKey]
+        local subList = catNode and catNode[subcategoryKey]
+        if type(subList) == "table" and #subList > 0 then return true end
+    end
+    return false
+end
+
+-- Hash set of catalogued spell IDs that satisfy the active expansion
+-- visibility for the given profession (and optionally narrowed by category
+-- / subcategory). The list builder consults this hash to skip the per-
+-- recipe expansion check entirely on catalogued recipes — the only
+-- remaining runtime work is the BoP/ownership filter on a much smaller set.
+-- Returns nil if the nav-tree is unavailable (callers fall back to the
+-- per-recipe predicate).
+function RecipeMetadata:BuildVisibleSpellIdHash(professionKey, visibility, categoryKey, subcategoryKey)
+    local tree = self._navTree
+    if not tree or not professionKey or not visibility then return nil end
+
+    local function consumeArray(arr, hash)
+        if type(arr) ~= "table" then return end
+        for i = 1, #arr do hash[arr[i]] = true end
+    end
+
+    local function gatherForExpansion(expansion, hash)
+        local profNode = tree[expansion] and tree[expansion][professionKey]
+        if not profNode then return end
+        if subcategoryKey and categoryKey then
+            local catNode = profNode[categoryKey]
+            if catNode then consumeArray(catNode[subcategoryKey], hash) end
+        elseif categoryKey then
+            local catNode = profNode[categoryKey]
+            if catNode then consumeArray(catNode._all, hash) end
+        else
+            consumeArray(profNode._all, hash)
+        end
+    end
+
+    local hash = {}
+    -- Mining only has 18 smelting spells and the user prefers a shallow,
+    -- expansion-agnostic view rather than juggling vanilla vs TBC bars.
+    -- Always include both expansions for mining so e.g. Truesilver Bar
+    -- (vanilla) stays visible under a TBC filter view.
+    if professionKey == "mining" then
+        gatherForExpansion("vanilla", hash)
+        gatherForExpansion("tbc", hash)
+        return hash
+    end
+    if visibility.vanilla ~= false then gatherForExpansion("vanilla", hash) end
+    if visibility.tbc ~= false then gatherForExpansion("tbc", hash) end
+    return hash
+end
+
+-- Public count helper for callers that want "how many catalogued recipes
+-- does this profession have for this expansion?" without iterating the
+-- nav-tree themselves. Returns 0 when nothing matches; the underscore-
+-- prefixed _navTree should not be reached by consumers directly.
+function RecipeMetadata:GetExpansionRecipeCount(professionKey, expansion)
+    local tree = self._navTree
+    if not tree or not professionKey or not expansion then return 0 end
+    local profNode = tree[expansion] and tree[expansion][professionKey] or nil
+    local all = profNode and profNode._all
+    return all and #all or 0
+end
+
+function RecipeMetadata:GetCategoriesForProfession(professionKey)
+    local generatedCategories = self._generated and self._generated.categoriesByProfession
+    local generatedSubcategories = self._generated and self._generated.subcategoriesByProfession
+    return cloneCategoryList(
+        generatedCategories and generatedCategories[professionKey] or nil,
+        generatedSubcategories and generatedSubcategories[professionKey] or nil
+    )
+end
+
+function RecipeMetadata:GetSubcategoriesForProfession(professionKey, categoryKey)
+    local generatedSubcategories = self._generated and self._generated.subcategoriesByProfession
+    return cloneSubcategoryList(
+        generatedSubcategories
+            and generatedSubcategories[professionKey]
+            and generatedSubcategories[professionKey][categoryKey]
+            or nil
+    )
+end
+
+function RecipeMetadata:GetCreatedItemId(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info and info.createdItemId or nil
+end
+
+-- Spell ID of the profession specialization required to learn this recipe,
+-- or nil when any practitioner can learn it. The IDs match the ones
+-- Data.lua PROFESSION_SPECIALIZATIONS detects on the local character, so a
+-- caller can compare this directly against a scanned profession's
+-- specialization. Note this means "required to learn" — specializations that
+-- only improve yield (the TBC cloth cooldowns) are deliberately not flagged.
+function RecipeMetadata:GetSpecialization(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info and info.specialization or nil
+end
+
+-- Which classes a trainer will teach the recipe to, as the client's own class
+-- bitmask, or nil when every class can learn it. The gate is on the RECIPE,
+-- not on what it makes: a warrior can learn to craft a druid-only helm, but no
+-- trainer will teach a warrior the Deathblow X11 Goggles. Twenty-two recipes
+-- carry one and all of them are engineering goggles.
+function RecipeMetadata:GetClassMask(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info and info.classMask or nil
+end
+
+-- The content phase a recipe first becomes obtainable in, or nil for anything
+-- available from the start -- which is the whole of Vanilla and most of
+-- Burning Crusade. Absent means base content, never "unknown".
+function RecipeMetadata:GetPhase(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info and info.phase or nil
+end
+
+--- True for a recipe that is in the client data but not in the game: never
+--- implemented, or taken out and never returned. There is nowhere to go and
+--- learn one, so listing it among what a character could still learn is a
+--- wild goose chase. Absent data reads as false, not as unknown.
+function RecipeMetadata:IsRemoved(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info ~= nil and info.removed == true
+end
+
+-- Units produced per craft. The generated data omits the field for the
+-- common single-output case, so absence means 1 rather than "unknown".
+-- Returns min, max; the two differ only for the handful of recipes with a
+-- random yield.
+function RecipeMetadata:GetCreatedCount(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    if not info then
+        return nil
+    end
+    local minimum = tonumber(info.createdCount) or 1
+    return minimum, tonumber(info.createdCountMax) or minimum
+end
+
+-- Every item that appears as a reagent of some recipe, as a set. Consumers
+-- use it to bound their own per-item stores to things the addon will ever
+-- actually price. Memoized and dropped on rebuild; the returned table is
+-- freshly built, so callers may keep it.
+function RecipeMetadata:GetReagentItemIds()
+    if self._reagentItemIds then return self._reagentItemIds end
+    local ids = {}
+    for _, record in pairs(self._recordsBySpellId or {}) do
+        for _, reagent in ipairs(record.reagents or {}) do
+            if reagent.itemId then
+                ids[reagent.itemId] = true
+            end
+        end
+    end
+    self._reagentItemIds = ids
+    return ids
+end
+
+-- Where a recipe is obtained, for the ones taught by an item. Returns nil
+-- when nothing is known -- a trainer-taught recipe has no recipe item and so
+-- no entry, which is itself the answer.
+--
+-- `faction` is nil when both factions can get it, which is the common case;
+-- callers must not read nil as "unknown". Zone IDs are resolved to names
+-- here, from the table the generator emits once at the top level rather than
+-- repeating a popular vendor city on hundreds of records.
+function RecipeMetadata:GetSource(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    if not info then return nil end
+    if not (info.faction or info.sourceKind or info.worldDrop or info.bossDrop) then
+        return nil
+    end
+
+    -- Places come back as { name, zone } pairs with the zone resolved. Either
+    -- half can be missing: a quest names a zone and nobody, and a recipe every
+    -- trainer teaches names neither.
+    local zoneNames = self._generated and self._generated.zoneNamesById or nil
+    local places
+    for _, place in ipairs(info.sourcePlaces or {}) do
+        local zone = place.zone and zoneNames and zoneNames[place.zone] or nil
+        if place.name or zone then
+            places = places or {}
+            places[#places + 1] = {
+                name = place.name,
+                zone = zone,
+                x = place.x,
+                y = place.y,
+                faction = place.faction,
+            }
+        end
+    end
+
+    return {
+        faction = info.faction,
+        kind = info.sourceKind,
+        worldDrop = info.worldDrop == true,
+        bossDrop = info.bossDrop == true,
+        places = places,
+        -- Trainer-taught recipes have no places -- no source names the NPCs --
+        -- so the answer they do have is the title every one of their trainers
+        -- carries, which is the line the player reads under the NPC in game.
+        trainerTitle = info.trainerTitle,
+        trainerContinents = info.trainerContinents,
+    }
+end
+
+-- The four difficulty thresholds, when the source stated a usable ladder.
+-- 2092 of the 2151 records carry one; the rest have to be approximated from
+-- the skill requirement, which is the caller's problem and not this one's.
+function RecipeMetadata:GetSkillLevels(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    local levels = info and info.skillLevels or nil
+    if type(levels) ~= "table" or #levels ~= 4 then return nil end
+    return levels
+end
+
+function RecipeMetadata:GetRecipeItemId(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info and info.recipeItemId or nil
+end
+
+function RecipeMetadata:GetReagents(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info and cloneReagents(info.reagents) or nil
+end
+
+function RecipeMetadata:IsOutputlessSelfOnly(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    return info and info.selfOnlyOutputless == true or false
+end
+
+function RecipeMetadata:IsBopOutput(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    if not info then
+        return nil
+    end
+    return info.bopOutput
+end
+
+local function addUnresolved(out, spellId, field, severity, message)
+    out[#out + 1] = {
+        spellId = spellId,
+        field = field,
+        severity = severity,
+        message = message,
+    }
+end
+
+local function isExpectedOutputless(record)
+    return record.selfOnlyOutputless == true
+        or (record.profession == "enchanting" and record.createdItemId == nil)
+end
+
+function RecipeMetadata:_CollectUnresolvedRecords()
+    local out = {}
+    for _, spellId in ipairs(sortedRecordIds(self._recordsBySpellId)) do
+        local record = self._recordsBySpellId[spellId]
+        local expectedOutputless = isExpectedOutputless(record)
+        if not record.profession or record.profession == "" then
+            addUnresolved(out, spellId, "profession", "release-blocking", "missing profession")
+        end
+        if record.expansion ~= "vanilla" and record.expansion ~= "tbc" then
+            addUnresolved(out, spellId, "expansion", "release-blocking", "missing or unsupported expansion")
+        end
+        if not record.category or record.category == "" then
+            addUnresolved(out, spellId, "category", "release-blocking", "missing category")
+        end
+        if record.sortOrder == nil then
+            addUnresolved(out, spellId, "sortOrder", "release-blocking", "missing sort order")
+        end
+        if not expectedOutputless and record.createdItemId == nil then
+            addUnresolved(out, spellId, "createdItemId", "warning", "missing created item for normal craft")
+        end
+        if not record.selfOnlyOutputless and (type(record.reagents) ~= "table" or #record.reagents == 0) then
+            addUnresolved(out, spellId, "reagents", "warning", "missing reagents")
+        end
+    end
+    return out
+end
+
+-- Build a set { [spellId] = true } of records that have at least one
+-- unresolved field. The full _CollectUnresolvedRecords walk is O(N)
+-- over every catalogued record (~2150 in the current dataset); doing
+-- it inside RecipePasses meant 300+ × 2150 ops per profession list
+-- build, which produced visible CPU spikes when opening a profession.
+-- The set is built once per metadata rebuild and lookup is O(1).
+local function ensureUnresolvedSpellIdSet(self)
+    if self._unresolvedSpellIdSet ~= nil then
+        return self._unresolvedSpellIdSet
+    end
+    local set = {}
+    for _, unresolved in ipairs(self:_CollectUnresolvedRecords()) do
+        local spellId = unresolved and unresolved.spellId
+        if spellId then
+            set[spellId] = true
+        end
+    end
+    self._unresolvedSpellIdSet = set
+    return set
+end
+
+-- Drop the memoized unresolved set. Production code goes through
+-- _Rebuild which clears it automatically; tests and tools that poke
+-- _recordsBySpellId directly must call this to force a refresh.
+function RecipeMetadata:InvalidateResolutionCache()
+    self._unresolvedSpellIdSet = nil
+end
+
+function RecipeMetadata:GetMetadataResolutionStatus(recipeKey, info)
+    info = getInfo(self, recipeKey, info)
+    if info then
+        -- Resolved record. ambiguousSpellIds can only flag NULL info, so
+        -- skip the full NormalizeRecipeKey call (which allocates a fresh
+        -- table) when we already have a record.
+        return ensureUnresolvedSpellIdSet(self)[info.spellId]
+            and "unresolved" or "resolved"
+    end
+    -- info is nil: either ambiguous mapping or genuinely unknown.
+    local normalized = self:NormalizeRecipeKey(recipeKey)
+    if normalized.ambiguousSpellIds then
+        return "ambiguous"
+    end
+    return "unresolved"
+end
+
+-- Classification consensus for ambiguous created-item keys. An ambiguous
+-- key means we cannot know WHICH spell the entry maps to, but the fields
+-- shared by every candidate record are still certain knowledge: Essence
+-- of Water (7080) maps to two alchemy transmutes that are both vanilla,
+-- so its profession and expansion are known even though the spell is not.
+-- Returns nil for non-ambiguous keys or when a candidate record is
+-- missing; otherwise a table whose `profession` / `expansion` fields are
+-- set only where ALL candidates agree (nil where they diverge, e.g. Gold
+-- Bar's mining/alchemy split leaves profession nil but expansion
+-- "vanilla").
+function RecipeMetadata:GetAmbiguousRecipeConsensus(recipeKey)
+    local normalized = self:NormalizeRecipeKey(recipeKey)
+    local spellIds = normalized and normalized.ambiguousSpellIds
+    if type(spellIds) ~= "table" or #spellIds == 0 then
+        return nil
+    end
+    local profession, expansion
+    for index, spellId in ipairs(spellIds) do
+        local record = self._recordsBySpellId[spellId]
+        if not record then
+            return nil
+        end
+        if index == 1 then
+            profession = record.profession
+            expansion = record.expansion
+        else
+            if record.profession ~= profession then profession = nil end
+            if record.expansion ~= expansion then expansion = nil end
+        end
+    end
+    if profession == nil and expansion == nil then
+        return nil
+    end
+    return { profession = profession, expansion = expansion }
+end
+
+function RecipeMetadata:GetUnresolvedRecords(severity)
+    local out = {}
+    for _, unresolved in ipairs(self:_CollectUnresolvedRecords()) do
+        if severity == nil or unresolved.severity == severity then
+            out[#out + 1] = unresolved
+        end
+    end
+    return out
+end
+
+function RecipeMetadata:GetRecordCounts()
+    local counts = {
+        recipes = 0,
+        vanilla = 0,
+        tbc = 0,
+        unresolved = 0,
+        ambiguousCreatedItems = 0,
+        recipeItems = countTable(self._recipeItemToSpellId),
+        createdItems = countTable(self._createdItemToSpellIds),
+        overrides = countOverrideEntries(),
+    }
+
+    for _, record in pairs(self._recordsBySpellId or {}) do
+        counts.recipes = counts.recipes + 1
+        if record.expansion == "vanilla" then
+            counts.vanilla = counts.vanilla + 1
+        elseif record.expansion == "tbc" then
+            counts.tbc = counts.tbc + 1
+        end
+    end
+
+    for _, spellIds in pairs(self._createdItemToSpellIds or {}) do
+        if #spellIds > 1 then
+            counts.ambiguousCreatedItems = counts.ambiguousCreatedItems + 1
+        end
+    end
+
+    counts.unresolved = #self:GetUnresolvedRecords()
+    return counts
+end
+
+RecipeMetadata:_Rebuild()
+Addon.RecipeMetadata = RecipeMetadata

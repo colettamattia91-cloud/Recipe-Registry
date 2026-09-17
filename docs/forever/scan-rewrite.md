@@ -1,6 +1,6 @@
 # Forever: la scansione delle ricette
 
-Secondo passo dopo `forever-api-adaptation.md`, che ha inventariato le API. Qui
+Secondo passo dopo `api-adaptation.md`, che ha inventariato le API. Qui
 si guarda una cosa sola, la scansione, perché è il punto dove il client classic
 e un client retail non si assomigliano affatto.
 
@@ -125,24 +125,33 @@ Cosa dice ciascuna:
 3. **Cosa contiene `GetRecipeInfo`.** Serve `learned`, e serve un modo di
    arrivare all'oggetto prodotto. Se c'è `categoryID`, allora l'albero delle 216
    categorie trovate nei file del client è vivo e servibile alla UI.
-4. **Se le API classic sopravvivano in parallelo.** Forever è costruito su
-   vanilla: `GetNumTradeSkills` e compagnia potrebbero essere ancora lì. Se ci
-   sono e funzionano, al day one **non c'è niente da riscrivere**, e questa
-   riscrittura torna a essere una pulizia da fare con calma invece che un lavoro
-   sotto la beta. Questa riga vale da sola il costo del probe.
+4. **Se le API classic rispondano ancora.** Da non aspettarselo: quello che
+   Forever prende da vanilla è il *contenuto*, non l'interfaccia, e l'interfaccia
+   dichiarata è retail. La riga costa due secondi e serve solo a non scoprirlo
+   per caso dopo.
 
-## Il primo passo che non dipende da niente di tutto questo
+## Dove finisce il codice
 
-Oggi `Core.lua` chiama `ScanTradeSkill` e `ScanCraft` come due cose distinte e
-sceglie in base a quale frame è visibile. Due file alternativi per flavor
-(`DataScan_Classic.lua`, `DataScan_Forever.lua`) hanno bisogno di **una sola
-porta**: un `Data:ScanVisibleProfession()` che dentro sappia se esiste un
-percorso Craft o no.
+Deciso il 2026-09-18: **due addon separati, due cartelle**. TBC resta alla radice
+del repo, che è la cartella dell'addon spedito e non può spostarsi senza
+cambiargli nome; Forever vive in `RecipeRegistry_Forever/` con la sua copia di
+Core, Data, Sync, UI e Integrations.
 
-Quel raccordo si può fare subito su TBC, con le suite verdi a dimostrarlo, e non
-assume niente sul client Forever: riduce la superficie da duplicare prima di
-sapere cosa duplicare. È il posto giusto da cui partire mentre il probe aspetta.
+Questo cancella una domanda che questo documento si poneva un'ora prima. Non
+serve più una cucitura fra i due modelli di scansione, né una porta comune
+davanti a `ScanTradeSkill` e `ScanCraft`: nel suo albero, Forever riscrive
+`Data/DataScan.lua` al suo posto e cancella `ScanCraft`, senza che TBC lo sappia.
+Niente `if` per flavor, niente file con due nomi, e nessun rischio di rompere
+l'addon che è in produzione mentre si lavora su quello che non c'è ancora.
 
-Una conseguenza sui test, da mettere in conto: `local-tests/harness/wow.lua`
-mocka le API classic. Un percorso Forever ha bisogno di stub `C_TradeSkillUI`
-nell'harness, altrimenti non è testabile qui e si verifica solo in gioco.
+Il dataset è la stessa storia: `Data/Metadata/RecipeMetadata_Generated.lua` nella
+copia Forever è un segnaposto vuoto con `flavor = "forever"`, non il dataset TBC,
+che su questo client sarebbe sbagliato su reagenti e prodotti mentre sembra
+autorevole. Arriva da `../WowForeverMining` quando il generatore impara il
+flavor.
+
+Sui test: l'harness in `local-tests/` mocka le API classic, quindi è di TBC come
+il resto della radice. L'albero Forever ha per ora il suo solo cancello,
+`RecipeRegistry_Forever/local-tests/run-syntax.ps1`, e prende harness e spec
+propri quando ci sarà qualcosa da testare — cioè quando il probe avrà detto
+contro cosa si scrive.

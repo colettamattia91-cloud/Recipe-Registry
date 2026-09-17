@@ -1,0 +1,14 @@
+# Packaging for the Forever addon.
+#
+# Built with `release.sh -t RecipeRegistry_Forever`, which reads this file and
+# packages this folder alone. Separate from the TBC one on purpose: two addons,
+# two packages, two release histories.
+#
+# package-as must match the TOC filename inside, or the client has a folder
+# whose TOC it will not load.
+package-as: RecipeRegistry_Forever
+ignore:
+  - Sync/MockSync.lua
+  - local-tests
+# No manual-changelog yet: there is nothing to tell users about a build that has
+# never loaded on a client. It gets one when it ships, the way TBC has one.

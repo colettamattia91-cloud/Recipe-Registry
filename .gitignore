@@ -16,4 +16,4 @@ __pycache__/
 # The cmangos world DB the trainer importer downloads: 300MB of somebody
 # else's reconstruction, and only an input to the fetch. What gets committed
 # is snapshots/*/trainers.json, which is a few hundred lines.
-tools/recipe-metadata/snapshots/*/.cmangos/
+RecipeRegistry/tools/recipe-metadata/snapshots/*/.cmangos/

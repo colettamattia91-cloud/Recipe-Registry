@@ -10,25 +10,30 @@ Recipe Registry is a World of Warcraft: The Burning Crusade Classic Anniversary 
 
 **Run all active backend tests:**
 ```powershell
-.\local-tests\run-backend-tests.ps1
+.\RecipeRegistry\local-tests\run-backend-tests.ps1
 ```
 
 **Run a single spec:**
 ```powershell
-.\local-tests\run-backend-tests.ps1 -Spec sync_phase34_block_pull_spec.lua
+.\RecipeRegistry\local-tests\run-backend-tests.ps1 -Spec sync_phase34_block_pull_spec.lua
 ```
 
 **Run only the sync rewrite suite:**
 ```powershell
-.\local-tests\run-backend-tests.ps1 -Suite sync
+.\RecipeRegistry\local-tests\run-backend-tests.ps1 -Suite sync
 ```
 
-**Syntax check all Lua files:**
+**Syntax check all Lua files (TBC tree):**
 ```powershell
-.\local-tests\run-syntax.ps1
+.\RecipeRegistry\local-tests\run-syntax.ps1
 ```
 
-Tests require Lua 5.1 at `C:\Program Files (x86)\Lua\5.1\lua.exe`. Tests run from the repo root.
+**Syntax check the Forever tree:**
+```powershell
+.\RecipeRegistry_Forever\local-tests\run-syntax.ps1
+```
+
+Tests require Lua 5.1 at `C:\Program Files (x86)\Lua\5.1\lua.exe`. The runner enters the addon folder itself, so it can be called from anywhere. Every path in the harness and in the specs is relative to `RecipeRegistry/`.
 
 Suites: `all` (active baseline), `quick` (same as all), `sync` (HELLO/SUMMARY/INDEX_DIFF/BLOCK_PULL coverage), `soak` (no active specs).
 
@@ -36,7 +41,7 @@ Suites: `all` (active baseline), `quick` (same as all), `sync` (HELLO/SUMMARY/IN
 
 ### Addon structure
 
-The addon uses **AceAddon-3.0** with modules registered via `Addon:NewModule("Name")` and stored as `Addon.Name`. Load order is defined in `RecipeRegistry.toc`.
+The addon uses **AceAddon-3.0** with modules registered via `Addon:NewModule("Name")` and stored as `Addon.Name`. Load order is defined in `RecipeRegistry/RecipeRegistry.toc`.
 
 **Core bootstrap** (`Core.lua`): Creates the addon with `AceConsole-3.0`, `AceEvent-3.0`, `AceTimer-3.0`, `AceBucket-3.0`. Sets up debug log, slash commands (`/rr`), and SavedVariables initialization.
 
@@ -139,26 +144,71 @@ local addon, wow = Loader.Load()
 Test.it("description", function() Test.eq(actual, expected) end)
 ```
 
+## Two addon trees, one repo
+
+Since 2026-09-18 the repo carries two separate addons, and they share no Lua:
+
+| tree | what it is |
+|---|---|
+| `RecipeRegistry/` | the TBC Classic addon, in production on CurseForge, with its own tests and tooling |
+| `RecipeRegistry_Forever/` | the World of Warcraft: Forever addon, its own copy of all of the above |
+
+The repo root holds only what belongs to neither: `docs/`, `.github/`, `README.md`, `LICENSE`, `CLAUDE.md`.
+
+Why copies instead of shared files with a flavor switch: the two clients share
+content, not APIs — Forever is vanilla content behind a retail-shaped API. Code
+that is only correct on one of them is not inert on the other, it is a Lua
+error. Forever will also keep changing while TBC is effectively frozen. The
+price is accepted knowingly: a fix that matters to both is applied twice, and
+applied to TBC only if it still matters there.
+
+Rules that follow from it:
+
+- **Never edit both trees in one sweep** because a change "looks the same". They
+  are different addons; touch the one the task is about.
+- **Each addon folder carries its own `.pkgmeta`**, and the packager is pointed
+  at it: `release.sh -t RecipeRegistry`. That is what lets the repo keep a folder
+  per game version. Do not put a `.pkgmeta` back in the repo root.
+- **`package-as` is the addon's identity, not the repo folder's name.** It stays
+  `RecipeRegistry` for the TBC addon whatever its folder is called, because the
+  folder name in the zip is the TOC name and the SavedVariables file that holds
+  every user's guild data. Renaming it would give every existing user an empty
+  addon.
+- The TOC filename must match `package-as`, so `RecipeRegistry/` contains
+  `RecipeRegistry.toc`. To install that tree by hand, copy the folder into
+  `AddOns` — it already has the right name.
+- `.github/workflows/release.yml` builds one package per addon folder, from a
+  matrix. A tag builds the TBC addon alone; Forever joins the default when its
+  `## Interface` comes from the client instead of a formula.
+- Tests and tooling belong to their tree. `local-tests/` is TBC's, and its
+  harness mocks the classic APIs. Forever's gate today is
+  `RecipeRegistry_Forever/local-tests/run-syntax.ps1`; it gets a harness and
+  specs of its own when it has adapted code to test.
+- Docs are split the same way: `docs/tbc/`, `docs/forever/`.
+- The Forever dataset is a placeholder with `flavor = "forever"`. Never fill it
+  with the TBC dataset: Forever changes vanilla recipes as well as adding them,
+  so TBC rows would be wrong about reagents and outputs while looking
+  authoritative.
+
 ## Branch strategy
 
 - `develop` — the active development branch. All work happens here: code, tests, docs, tooling.
-- `feat/forever` — the World of Warcraft: Forever adaptation, forked from `develop` for the duration of the Forever beta (2026-09-17 to 2026-10-21). Retail-shaped API work goes here, not on `develop`, because the client churns weekly and most of the API mapping is still deduction; it merges back into `develop` once the unknowns in `docs/forever-api-adaptation.md` are closed on real data. Rebase it on `develop` rather than merging `develop` into it.
-- `main` — release-only. Its tree must contain ONLY the addon runtime files (`RecipeRegistry.toc`, `Core/`, `Data/`, `Integrations/`, `Libs/`, `Sync/` without `MockSync.lua`, `UI/`) plus `README.md`, `CHANGELOG.md`, `LICENSE`, `.pkgmeta`, `.gitignore`. Never commit or edit directly on `main`.
+- `feat/forever` — the World of Warcraft: Forever adaptation, forked from `develop` for the duration of the Forever beta (2026-09-17 to 2026-10-21). Retail-shaped API work goes here, not on `develop`, because the client churns weekly and most of the API mapping is still deduction; it merges back into `develop` once the unknowns in `docs/forever/api-adaptation.md` are closed on real data. Rebase it on `develop` rather than merging `develop` into it.
+- `main` — release-only. Its tree must contain ONLY the addon folders with their runtime files (`RecipeRegistry/` with `RecipeRegistry.toc`, `Core/`, `Data/`, `Integrations/`, `Libs/`, `Sync/` without `MockSync.lua`, `UI/`, plus `CHANGELOG.md`, `LICENSE`, `.pkgmeta`) plus `README.md`, `LICENSE`, `.gitignore` at the root. Never commit or edit directly on `main`.
 
-Flavors do not get a branch each. `main` carries every flavor at once and the
-TOC files decide what ships: `.github/workflows/release.yml` builds one zip per
-TOC in the tag and sends each where its `## Interface` belongs. A flavor whose
-TOC is absent publishes nothing, which is what keeps unverified work harmless.
-Adding a flavor means adding a TOC, not a branch and not a workflow job.
+Flavors do not get a branch each: `main` carries them all and
+`.github/workflows/release.yml` builds one zip per TOC in the tag, sending each
+where its `## Interface` belongs. What a flavor does get is **its own addon
+folder** — see below.
 
 ### Release procedure (version X.Y.Z)
 
 Never `git merge develop` into `main`: a true merge drags develop's commit history (tests, tooling, unrelated work) into main even when the final tree is clean. A release is exactly ONE squash commit:
 
-1. On `develop`: update `CHANGELOG.md`, bump `## Version:` in `RecipeRegistry.toc`, run the full test suite, commit.
+1. On `develop`: update `RecipeRegistry/CHANGELOG.md`, bump `## Version:` in `RecipeRegistry/RecipeRegistry.toc`, run the full test suite, commit.
 2. `git checkout main && git merge --squash develop` — resolve `CHANGELOG.md` with develop's version.
-3. `git rm -rf --ignore-unmatch local-tests docs CLAUDE.md .claude .vscode .github artifacts build tools RecipeRegistry_OrdersCore Sync/MockSync.lua`
-4. Verify before committing: `git status --short` must list only runtime files + `CHANGELOG.md` + `RecipeRegistry.toc`.
+3. `git rm -rf --ignore-unmatch docs CLAUDE.md .claude .vscode .github build RecipeRegistry_OrdersCore RecipeRegistry/local-tests RecipeRegistry/tools RecipeRegistry/artifacts RecipeRegistry/Sync/MockSync.lua RecipeRegistry_Forever/local-tests RecipeRegistry_Forever/Sync/MockSync.lua`
+4. Verify before committing: `git status --short` must list only runtime files under the addon folders, plus `RecipeRegistry/CHANGELOG.md` and `RecipeRegistry/RecipeRegistry.toc`.
 5. Commit as `Release X.Y.Z`, tag `vX.Y.Z`, check out `develop` again (and verify the checkout happened).
 6. Commit messages are plain text — no `Co-Authored-By` or any AI-attribution trailer, anywhere in this repo.
 7. Pushes are done by the maintainer (SSH key is passphrase-protected) — never attempt them.
@@ -167,7 +217,7 @@ Never `git merge develop` into `main`: a true merge drags develop's commit histo
 
 The `sync-rewrite` branch is mid-rewrite per `docs/sync-rewrite-roadmap.md`. Legacy modules `DataManifest.lua`, `SyncManifest.lua`, and `TrickleSync.lua` are no longer loaded. The roadmap is the canonical source of truth and must not be overwritten.
 
-**Current active test specs** are listed in `local-tests/run-backend-tests.ps1` under `$activeAllSpecs`. Historical manifest-era specs remain in-tree but are not part of any active suite.
+**Current active test specs** are listed in `RecipeRegistry/local-tests/run-backend-tests.ps1` under `$activeAllSpecs`. Historical manifest-era specs remain in-tree but are not part of any active suite.
 
 ## WoW API constraints
 

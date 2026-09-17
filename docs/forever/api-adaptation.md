@@ -33,6 +33,53 @@ Non ancora verificato, e va verificato prima di scrivere codice:
   `major*10000 + minor*100 + patch` la 1.60.1 darebbe `16001`, ma è derivato.
 - Se `ProfessionsFrame` esista, o se il frame si chiami ancora `TradeSkillFrame`.
 - Comportamento di AtlasLoot, TSM e Auctionator su questo client.
+- **Come si chiama un personaggio.** Su Forever i nomi sono nome piu' cognome, e
+  i realm in senso stretto non esistono piu'. Vedi la sezione qui sotto: non e'
+  un dettaglio cosmetico, e' la chiave con cui l'addon identifica un proprietario.
+
+## I nomi, che non sono un dettaglio
+
+Dichiarato: i personaggi hanno nome **e cognome**, e i realm in senso stretto
+sono stati eliminati. Se e' cosi', il nome del realm potrebbe non arrivare
+affatto. Va verificato, perche' l'identita' di un proprietario nel nostro
+modello e' una stringa `nome-realm` e ci passa tutto: le chiavi dei blocchi
+(`owner::professione`), le fingerprint, il routing dei messaggi diretti.
+
+Tre punti decidono, e sono tutti nostri:
+
+| dove | cosa fa oggi |
+|---|---|
+| `Data.lua:1046` `GetPlayerKey` | `UnitFullName("player")`, realm da `GetRealmName()`, e in mancanza la stringa letterale `UnknownRealm` |
+| `Data.lua:768-778` | normalizza un nome di roster: spezza su `-`, e se non c'e' realm ne appiccica uno |
+| `Data.lua:1053` `IsValidMemberKey` | pretende `^([^-]+)%-(.+)$`: **un** trattino obbligatorio, e un nome che non ne contenga |
+
+Da qui i due modi di rompersi, in ordine di gravita':
+
+1. **Un realm che non c'e' e viene inventato in modi diversi.** Se
+   `GetRealmName()` risponde `""` su un client e `"Beta"` su un altro, lo stesso
+   personaggio prende due chiavi diverse: due proprietari per uno, contenuto
+   diviso a meta' e fingerprint che non convergono mai. Il fallback
+   `UnknownRealm` va bene per un buco locale, non per un client dove il realm
+   non esiste per disegno: in quel caso la chiave deve essere deliberatamente
+   priva di realm, uguale per tutti.
+2. **Un cognome con il trattino.** `Jean-Luc Picard` finirebbe spezzato in nome
+   `Jean` e realm `Luc Picard`, e `IsValidMemberKey` accetterebbe la cosa senza
+   un lamento. Uno spazio invece passa: il pattern non lo esclude.
+
+Cosa serve dal client, prima di scrivere qualsiasi cosa:
+
+```
+/dump UnitName("player")
+/dump UnitFullName("player")
+/dump GetRealmName(), GetNormalizedRealmName()
+/dump GetGuildRosterInfo(1)
+/dump UnitName("target")   -- su un giocatore con cognome
+```
+
+La quarta riga e' la piu' importante delle cinque: il roster e' la fonte da cui
+nascono le chiavi di tutti gli altri, e se li elenca con un formato diverso da
+quello del personaggio locale, le due strade vanno riconciliate prima del sync,
+non dopo.
 
 ## Inventario: cosa usiamo oggi
 
@@ -97,19 +144,25 @@ nascosto dentro la lista.
 
 Quindi `DataScan.lua` non va tradotto: il suo modello di iterazione sparisce.
 
-Ed è il motivo per cui la separazione va fatta **per file** e non con le keyword
-del packager sparse nel codice. Un `if` per flavor dentro una funzione che deve
-iterare in due modi incompatibili diventa illeggibile in fretta; due file che
-espongono la stessa interfaccia, caricati da TOC diversi, restano leggibili
-entrambi:
+Ed è il motivo per cui un `if` per flavor non è una risposta: dentro una
+funzione che deve iterare in due modi incompatibili diventa illeggibile in
+fretta.
+
+**Deciso il 2026-09-18: la separazione è per cartella, non per file.** Forever è
+un addon suo, `RecipeRegistry_Forever/`, con la sua copia di Core, Data, Sync,
+UI e Integrations:
 
 ```
-RecipeRegistry_TBC.toc      -> Data/DataScan_Classic.lua
-RecipeRegistry_Forever.toc  -> Data/DataScan_Forever.lua
+RecipeRegistry.toc                              -> Core/ Data/ Sync/ UI/
+RecipeRegistry_Forever/RecipeRegistry_Forever.toc -> la sua copia di tutto
 ```
 
-Tutto il resto — Core, UI, Sync, Integrations, cioè il 89% del Lua — resta un
-file solo, caricato da entrambi.
+Il prezzo è che l'89% di Lua condiviso diventa 89% duplicato, e una fix
+condivisa va applicata due volte. La ragione per pagarlo: su un client con API
+retail, codice corretto solo su TBC non è codice inerte, sono errori Lua e
+instabilità — e Forever continuerà a evolvere mentre TBC è fermo, quindi il
+rischio che si corre volentieri è quello di dover replicare una fix su TBC, se
+mai servirà.
 
 ## L'indizio dai file del client
 
@@ -151,5 +204,5 @@ Fonte: `WowForeverMining`, bundle `forever-local-1.60.1.69893`, file
 ## Fonti
 
 - Datamining: `../WowForeverMining`, dataset `forever-local-1.60.1.69893`.
-- Analisi della scansione, secondo passo: `docs/forever-scan-rewrite.md`.
+- Analisi della scansione, secondo passo: `docs/forever/scan-rewrite.md`.
 - La fonte finale per gli Interface number resta il client via `GetBuildInfo()`.

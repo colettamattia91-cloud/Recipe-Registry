@@ -1,17 +1,22 @@
 name: Release
 
-# Releases come off main, and main carries every flavor at once. What ships is
-# decided by which TOC files exist, not by which branch the work sat on: the
-# packager builds one zip per TOC and sends each where its Interface number
-# belongs. Adding a flavor means adding a TOC, not a branch and not a job.
+# Releases come off main, and main carries one folder per game version. What
+# ships is decided by which addon folder is built, not by which branch the work
+# sat on: the packager takes the project root as an argument (`-t <folder>`),
+# reads that folder's own .pkgmeta, and packages it alone. Its package-as is the
+# folder name in game, so the TBC addon stays "RecipeRegistry" no matter what
+# the repo folder is called.
+#
+# Adding a game version means adding a folder with a .pkgmeta and a line in the
+# matrix below. It does not mean adding a branch or a workflow.
 #
 # Packaging used to happen on CurseForge's side, from a repository webhook,
 # which built whatever landed on the branch it watched. That cannot express
-# "this tag, these flavors" -- hence this.
+# "this tag, this addon" -- hence this.
 #
-# The CurseForge project id and API key never lived in the repository; they
-# were webhook configuration. Until they are set here a release still builds
-# and still reaches GitHub, and says what it could not do.
+# The CurseForge project ids and the API key never lived in the repository; they
+# were webhook configuration. Until they are set here a release still builds and
+# still reaches GitHub, and says what it could not do.
 
 on:
   push:
@@ -22,10 +27,15 @@ on:
       tag:
         description: "Existing tag to package"
         required: true
-      args:
+      addons:
         description: >-
-          Extra packager arguments, for releasing part of what main holds
-          (for example -g to pick a single game flavor, or -d for a dry run)
+          Which addon folders to build, comma separated. Defaults to the TBC
+          addon alone: the Forever one ships when its Interface number comes
+          from the client instead of a formula.
+        required: false
+        default: "RecipeRegistry"
+      args:
+        description: "Extra packager arguments (for example -d for a dry run)"
         required: false
         default: ""
 
@@ -33,8 +43,32 @@ permissions:
   contents: write
 
 jobs:
-  package:
+  plan:
     runs-on: ubuntu-latest
+    outputs:
+      addons: ${{ steps.pick.outputs.addons }}
+    steps:
+      - name: Decide which addons this release builds
+        id: pick
+        run: |
+          list="${{ github.event.inputs.addons }}"
+          if [ -z "$list" ]; then
+            list="RecipeRegistry"
+          fi
+          json=$(printf '%s' "$list" | tr ',' '\n' | sed 's/^ *//; s/ *$//' \
+                 | grep -v '^$' | jq -R . | jq -sc .)
+          echo "addons=$json" >> "$GITHUB_OUTPUT"
+          echo "Building: $json"
+
+  package:
+    needs: plan
+    runs-on: ubuntu-latest
+    strategy:
+      # One package per addon folder, and one failing addon does not cancel the
+      # other: a broken Forever build must not hold back a TBC release.
+      fail-fast: false
+      matrix:
+        addon: ${{ fromJson(needs.plan.outputs.addons) }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -56,22 +90,35 @@ jobs:
             exit 1
           fi
 
+      - name: Refuse an addon folder that cannot be packaged
+        run: |
+          if [ ! -f "${{ matrix.addon }}/.pkgmeta" ]; then
+            echo "::error::${{ matrix.addon }}/.pkgmeta does not exist. An" \
+                 "addon folder is packaged from its own .pkgmeta."
+            exit 1
+          fi
+          echo "TOC files in ${{ matrix.addon }}:"
+          ls -1 "${{ matrix.addon }}"/*.toc
+
       - name: Say where this build can go
         id: target
         run: |
-          if [ -z "${{ vars.CF_PROJECT_ID }}" ]; then
+          # One project id per addon, because they are separate projects on
+          # CurseForge. The variable name is the folder, uppercased, with the
+          # prefix below.
+          name=$(printf '%s' "${{ matrix.addon }}" | tr '[:lower:]' '[:upper:]')
+          case "${{ matrix.addon }}" in
+            RecipeRegistry)         id="${{ vars.CF_PROJECT_ID }}" ;;
+            RecipeRegistry_Forever) id="${{ vars.CF_PROJECT_ID_FOREVER }}" ;;
+            *)                      id="" ;;
+          esac
+          if [ -z "$id" ]; then
             echo "args=" >> "$GITHUB_OUTPUT"
-            echo "::warning::CF_PROJECT_ID is not set, so this release stops" \
-                 "at GitHub. The project id lived in the webhook" \
-                 "configuration, not in the repository."
+            echo "::warning::No CurseForge project id for $name, so this" \
+                 "release stops at GitHub."
           else
-            echo "args=-p ${{ vars.CF_PROJECT_ID }}" >> "$GITHUB_OUTPUT"
+            echo "args=-p $id" >> "$GITHUB_OUTPUT"
           fi
-
-      - name: List the flavors main is carrying
-        run: |
-          echo "TOC files in this tag, one zip each:"
-          ls -1 *.toc
 
       - name: Package and publish
         uses: BigWigsMods/packager@v2
@@ -79,4 +126,7 @@ jobs:
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
         with:
-          args: ${{ steps.target.outputs.args }} ${{ github.event.inputs.args }}
+          args: >-
+            -t ${{ matrix.addon }}
+            ${{ steps.target.outputs.args }}
+            ${{ github.event.inputs.args }}
