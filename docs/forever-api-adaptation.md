@@ -151,4 +151,5 @@ Fonte: `WowForeverMining`, bundle `forever-local-1.60.1.69893`, file
 ## Fonti
 
 - Datamining: `../WowForeverMining`, dataset `forever-local-1.60.1.69893`.
+- Analisi della scansione, secondo passo: `docs/forever-scan-rewrite.md`.
 - La fonte finale per gli Interface number resta il client via `GetBuildInfo()`.
