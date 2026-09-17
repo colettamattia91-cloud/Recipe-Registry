@@ -1,11 +1,21 @@
 name: Recipe Metadata
 
+# The flavor is a property of the metadata being checked, not of the branch the
+# work sits on -- both flavors live on the same branches. So the flavors are
+# listed here and checked side by side, and teaching this workflow about a new
+# one is a single entry in the matrix.
+#
+# The generator accepts only 'tbc' today; `generate` and `validate` refuse
+# anything else outright. Forever joins the matrix when the generator learns
+# it, and not before: a job that skips its own checks and reports green is
+# worse than no job.
+
 on:
   push:
   pull_request:
 
 jobs:
-  validate:
+  unit-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -16,11 +26,32 @@ jobs:
         with:
           python-version: "3.11"
 
+      # Flavor-agnostic, and the thing that would catch a change to shared
+      # pipeline code breaking a flavor that is not being checked below.
       - name: Run generator unit tests
         run: python -m unittest discover -s tools/recipe-metadata/tests
 
+  metadata:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        flavor: [tbc]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
       - name: Check generated metadata is current
-        run: python tools/recipe-metadata/generate_recipe_metadata.py generate --flavor tbc --offline --check
+        run: >-
+          python tools/recipe-metadata/generate_recipe_metadata.py generate
+          --flavor ${{ matrix.flavor }} --offline --check
 
       - name: Validate metadata strictly
-        run: python tools/recipe-metadata/generate_recipe_metadata.py validate --flavor tbc --strict
+        run: >-
+          python tools/recipe-metadata/generate_recipe_metadata.py validate
+          --flavor ${{ matrix.flavor }} --strict

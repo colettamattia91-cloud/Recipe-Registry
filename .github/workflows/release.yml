@@ -1,0 +1,82 @@
+name: Release
+
+# Releases come off main, and main carries every flavor at once. What ships is
+# decided by which TOC files exist, not by which branch the work sat on: the
+# packager builds one zip per TOC and sends each where its Interface number
+# belongs. Adding a flavor means adding a TOC, not a branch and not a job.
+#
+# Packaging used to happen on CurseForge's side, from a repository webhook,
+# which built whatever landed on the branch it watched. That cannot express
+# "this tag, these flavors" -- hence this.
+#
+# The CurseForge project id and API key never lived in the repository; they
+# were webhook configuration. Until they are set here a release still builds
+# and still reaches GitHub, and says what it could not do.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to package"
+        required: true
+      args:
+        description: >-
+          Extra packager arguments, for releasing part of what main holds
+          (for example -g to pick a single game flavor, or -d for a dry run)
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          # The packager reads tags and history to build the changelog; a
+          # shallow checkout gives it a release with nothing in it.
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - name: Refuse a tag that is not on main
+        run: |
+          tag="${{ github.event.inputs.tag || github.ref_name }}"
+          git fetch --quiet origin main
+          if git merge-base --is-ancestor HEAD origin/main; then
+            echo "Tag $tag is on main."
+          else
+            echo "::error::Tag $tag is not reachable from main. Releases come" \
+                 "off main; tag the merge, not the branch it came from."
+            exit 1
+          fi
+
+      - name: Say where this build can go
+        id: target
+        run: |
+          if [ -z "${{ vars.CF_PROJECT_ID }}" ]; then
+            echo "args=" >> "$GITHUB_OUTPUT"
+            echo "::warning::CF_PROJECT_ID is not set, so this release stops" \
+                 "at GitHub. The project id lived in the webhook" \
+                 "configuration, not in the repository."
+          else
+            echo "args=-p ${{ vars.CF_PROJECT_ID }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: List the flavors main is carrying
+        run: |
+          echo "TOC files in this tag, one zip each:"
+          ls -1 *.toc
+
+      - name: Package and publish
+        uses: BigWigsMods/packager@v2
+        env:
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+        with:
+          args: ${{ steps.target.outputs.args }} ${{ github.event.inputs.args }}
