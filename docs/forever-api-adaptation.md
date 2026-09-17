@@ -3,10 +3,15 @@
 Fase 0 per il supporto a World of Warcraft: Forever, che dalle dichiarazioni
 espone API in stile retail, senza toccare il comportamento su TBC.
 
-I due flavor non si separano per ramo. Convivono su `main`, lo sviluppo di
-entrambi avviene su `develop`, e a decidere cosa finisce in un pacchetto è il
-TOC: un TOC per flavor, uno zip per TOC. Quindi la domanda di questo documento
-non è "quale ramo", è **quali file** cambiano e quali no.
+A decidere cosa finisce in un pacchetto è il TOC: un TOC per flavor, uno zip
+per TOC, e `main` porta i flavor tutti insieme. Il ramo decide un'altra cosa,
+cioè dove sta il lavoro finché non è verificato: per la durata della beta
+(17/09 - 21/10) l'adeguamento Forever vive su `feat/forever`, forkato da
+`develop`, perché il client cambia di settimana in settimana e metà di quello
+che segue è ancora deduzione. Rientra in `develop` quando le incognite qui
+sotto sono chiuse su dati reali, e da lì la linea TBC resta rilasciabile senza
+portarsi dietro lavoro in corso. Quindi la domanda di questo documento non è
+"quale ramo", è **quali file** cambiano e quali no.
 
 Data: 2026-09-17. Client di riferimento: `wow_classic_beta` 1.60.1.69893.
 
@@ -139,10 +144,11 @@ Fonte: `WowForeverMining`, bundle `forever-local-1.60.1.69893`, file
    quel momento `forever` entra nella matrice di `recipe-metadata.yml`, che
    oggi contiene solo `tbc` proprio perché il generatore rifiuta il resto.
 5. Aggiungere `RecipeRegistry_Forever.toc` con l'Interface confermata al punto
-   1. È l'esistenza di quel file, non un ramo, a far uscire un secondo zip.
+   1, e portare il tutto su `develop`. È l'esistenza di quel file, non il ramo
+   su cui è stato scritto, a far uscire un secondo zip: finché il TOC non c'è,
+   un tag su `main` non pubblica niente per Forever.
 
 ## Fonti
 
 - Datamining: `../WowForeverMining`, dataset `forever-local-1.60.1.69893`.
-- Documento gemello per MoP ed Era: `docs/multi-client-compatibility-discovery.md`.
 - La fonte finale per gli Interface number resta il client via `GetBuildInfo()`.

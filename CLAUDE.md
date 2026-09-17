@@ -142,7 +142,14 @@ Test.it("description", function() Test.eq(actual, expected) end)
 ## Branch strategy
 
 - `develop` — the active development branch. All work happens here: code, tests, docs, tooling.
+- `feat/forever` — the World of Warcraft: Forever adaptation, forked from `develop` for the duration of the Forever beta (2026-09-17 to 2026-10-21). Retail-shaped API work goes here, not on `develop`, because the client churns weekly and most of the API mapping is still deduction; it merges back into `develop` once the unknowns in `docs/forever-api-adaptation.md` are closed on real data. Rebase it on `develop` rather than merging `develop` into it.
 - `main` — release-only. Its tree must contain ONLY the addon runtime files (`RecipeRegistry.toc`, `Core/`, `Data/`, `Integrations/`, `Libs/`, `Sync/` without `MockSync.lua`, `UI/`) plus `README.md`, `CHANGELOG.md`, `LICENSE`, `.pkgmeta`, `.gitignore`. Never commit or edit directly on `main`.
+
+Flavors do not get a branch each. `main` carries every flavor at once and the
+TOC files decide what ships: `.github/workflows/release.yml` builds one zip per
+TOC in the tag and sends each where its `## Interface` belongs. A flavor whose
+TOC is absent publishes nothing, which is what keeps unverified work harmless.
+Adding a flavor means adding a TOC, not a branch and not a workflow job.
 
 ### Release procedure (version X.Y.Z)
 
