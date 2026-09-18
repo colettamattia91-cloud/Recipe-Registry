@@ -124,5 +124,32 @@ t("una ricetta di alchemy che non conosce va via",
 t("una di cooking resta",
   Data:ShouldCleanRecipeFromProfession("Cooking", FOREVER_RECIPE, opts), false)
 
+print("\n== una ricetta puo' stare in due mestieri ==")
+-- la 461692 (Synthetic Gordok Ogre Suit) sta in Leatherworking e Tailoring;
+-- il dataset TBC ha lo stesso caso con Transmute Gold. Se la pulizia guardasse
+-- solo il mestiere primario, la toglierebbe dall'altro come 'fuori posto'.
+local shared = {
+  profession = "leatherworking",
+  professions = { "leatherworking", "tailoring" },
+}
+_G.RecipeRegistry.RecipeMetadata = {
+  metadataVersion = "forever-ingame-1.60.1.69913",
+  _recordsBySpellId = { [461692] = shared },
+  _generated = {
+    recipeItemToSpellId = {}, createdItemToSpellIds = { [227855] = { 461692 } },
+    recipesBySpellId = { [461692] = shared },
+  },
+  GetRecipeInfo = function() return nil end,
+  GetMetadataResolutionStatus = function() return "unresolved" end,
+}
+Data._metadataProfessions = nil
+local mismatchOpts = { checkMetadataCatalogued = true, checkProfessionMismatches = true }
+t("resta sotto leatherworking",
+  Data:ShouldCleanRecipeFromProfession("Leatherworking", 227855, mismatchOpts), false)
+t("e resta anche sotto tailoring",
+  Data:ShouldCleanRecipeFromProfession("Tailoring", 227855, mismatchOpts), false)
+t("ma non sotto un mestiere che non la fa",
+  Data:ShouldCleanRecipeFromProfession("Alchemy", 227855, mismatchOpts), true)
+
 print(fails == 0 and "\nTUTTO OK" or ("\n" .. fails .. " FALLITI"))
 os.exit(fails == 0 and 0 or 1)

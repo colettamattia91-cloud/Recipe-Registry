@@ -21,8 +21,11 @@ local PROFESSION_KEY_BY_DISPLAY = {
     -- emette gia' oggi (out/bundle/forever-local-*/recipes.json), e le due
     -- devono combaciare o il dataset non si aggancera' mai a questo mestiere
     ["First Aid"] = "first_aid",
+    Fishing = "fishing",
+    Herbalism = "herbalism",
     Leatherworking = "leatherworking",
     Mining = "mining",
+    Skinning = "skinning",
     Tailoring = "tailoring",
 }
 

@@ -77,6 +77,11 @@ _G.C_TradeSkillUI = {
   IsTradeSkillReady = function() return sessionReady end,
   -- la finestra aperta potrebbe essere quella di un compagno
   IsTradeSkillLinked = function() return linked end,
+  -- rispondono per un ID qualunque, anche di un mestiere non posseduto:
+  -- verificato in gioco il 2026-09-18
+  GetProfessionInfoByRecipeID = function()
+    return { professionName = "Alchemy", parentProfessionName = "Alchemy" }
+  end,
   IsTradeSkillGuild = function() return false end,
   IsNPCCrafting = function() return false end,
   GetBaseProfessionInfo = function() return { professionName = baseProfessionName } end,
@@ -198,6 +203,27 @@ local linkedOk, linkedReason = Data:CanScanTradeSkillData()
 t("cancello chiuso", linkedOk, false)
 t("motivo", linkedReason, "trade-linked")
 linked = false
+
+print("\n== una ricetta imparata si risolve senza finestra ==")
+-- e' il caso del dungeon: impari, e deve finire nel database da li', senza
+-- aprire il mestiere e senza aspettare un reload
+-- (la sezione precedente aveva cambiato mestiere: qui si torna ad Alchemy)
+_G.GetProfessionInfo = function() return "Alchemy", nil, 1, 75, nil, nil, 171 end
+Data:DetectProfessions()
+sessionReady = false
+local before = entry.professions["Alchemy"].count
+knownRecipes[1263078] = true   -- Alchemy Laboratory, prima non appresa
+local ok, why, prof, key = Data:LearnRecipeFromSignal(1263078, "test")
+t("risolta", ok, true)
+t("nel mestiere giusto", prof, "Alchemy")
+t("con la chiave dell'oggetto prodotto", key, 279990)
+t("e il conteggio cresce di uno", entry.professions["Alchemy"].count, before + 1)
+
+t("la seconda volta non ricresce", select(2, Data:LearnRecipeFromSignal(1263078, "test")), "already-known")
+-- l'oracolo e' la conferma: un evento su una ricetta che non sai non scrive
+knownRecipes[22430] = nil
+t("evento spurio rifiutato", select(2, Data:LearnRecipeFromSignal(22430, "test")), "not-known")
+sessionReady = true
 
 print(fails == 0 and "\nTUTTO OK" or ("\n" .. fails .. " FALLITI"))
 os.exit(fails == 0 and 0 or 1)

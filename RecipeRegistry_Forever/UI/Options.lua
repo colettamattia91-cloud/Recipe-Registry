@@ -55,7 +55,11 @@ local FILTER_PROFESSIONS = {
     { key = "enchanting",     label = "Enchanting" },
     { key = "engineering",    label = "Engineering" },
     { key = "first_aid",      label = "First Aid" },
+    { key = "fishing",        label = "Fishing" },
+    { key = "herbalism",      label = "Herbalism" },
     { key = "leatherworking", label = "Leatherworking" },
+    { key = "mining",         label = "Mining" },
+    { key = "skinning",       label = "Skinning" },
     { key = "tailoring",      label = "Tailoring" },
     { key = "cooking",        label = "Cooking" },
 }

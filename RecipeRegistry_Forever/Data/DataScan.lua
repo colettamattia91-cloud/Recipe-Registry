@@ -681,6 +681,115 @@ function Data:ScanKnownFromSpellBook(opts)
     })
 end
 
+-- Il dataset nomina i mestieri con la chiave minuscola ("first_aid"), TRACKED
+-- con l'etichetta ("First Aid"). Questa e' la traduzione, e serve solo quando
+-- il client non risponde e si ricade sul dataset.
+local PROFESSION_LABEL_BY_KEY = {}
+for label in pairs(TRACKED) do
+    PROFESSION_LABEL_BY_KEY[tostring(label):lower():gsub("[^%a%d]", "")] = label
+end
+PROFESSION_LABEL_BY_KEY["first_aid"] = "First Aid"
+
+-- Una ricetta appena imparata, risolta da sola.
+--
+-- NEW_RECIPE_LEARNED porta con se' il recipeID, e su questo client tanto basta:
+-- GetRecipeSchematic e GetRecipeItemLink rispondono per un ID qualunque, anche
+-- di un mestiere che il personaggio non ha -- verificato il 2026-09-18 chiedendo
+-- una ricetta di Alchemy dopo averla dimenticata, e il client ha risposto
+-- ugualmente con nome e oggetto prodotto. Non sono legate alla sessione aperta.
+--
+-- Quindi non serve ne' aprire il mestiere ne' consultare il dataset: impari una
+-- ricetta in un dungeon e finisce nel database e nel sync in pochi secondi,
+-- dove sei. Prima di oggi l'addon si limitava a segnarsi un promemoria e a
+-- chiedere all'utente di aprire il pannello -- era l'unica cosa possibile su un
+-- client classic, dove la lista viveva dentro la finestra.
+--
+-- IsSpellKnown fa da conferma: l'evento dice "e' successo qualcosa", l'oracolo
+-- dice "questa ricetta adesso la sai". Senza, un evento spurio scriverebbe nel
+-- database una ricetta che non hai, e il sync la pubblicherebbe.
+function Data:LearnRecipeFromSignal(recipeID, reason)
+    recipeID = tonumber(recipeID)
+    if not recipeID then return false, "no-recipe-id" end
+    local CT = _G.C_TradeSkillUI
+    if type(CT) ~= "table" then return false, "trade-api-missing" end
+
+    local CSB = _G.C_SpellBook
+    if type(CSB) == "table" and type(CSB.IsSpellKnown) == "function" then
+        local ok, known = pcall(CSB.IsSpellKnown, recipeID)
+        if ok and not known then return false, "not-known" end
+    end
+
+    -- Prima il client, poi il dataset.
+    --
+    -- Il client e' la fonte aggiornata: conosce anche le ricette che una patch
+    -- ha aggiunto dopo che il dataset e' stato generato, e su questo client
+    -- risponde per un ID qualunque. Il dataset e' la rete per quando non
+    -- risponde: le stesse due informazioni -- di che mestiere e' e cosa produce
+    -- -- le ha gia' dentro, quindi non serve nessuna scansione in nessuno dei
+    -- due casi.
+    local info = type(CT.GetProfessionInfoByRecipeID) == "function"
+        and CT.GetProfessionInfoByRecipeID(recipeID) or nil
+    local professionName = type(info) == "table"
+        and (info.parentProfessionName or info.professionName) or nil
+
+    local record
+    local metadata = Addon.RecipeMetadata
+    if type(metadata) == "table" and metadata.GetRecipeInfo then
+        local okRecord, found = pcall(metadata.GetRecipeInfo, metadata, -recipeID)
+        record = okRecord and found or nil
+    end
+    if (type(professionName) ~= "string" or professionName == "") and type(record) == "table" then
+        professionName = PROFESSION_LABEL_BY_KEY[record.profession] or record.profession
+    end
+
+    if type(professionName) ~= "string" or professionName == "" then
+        return false, "no-profession"
+    end
+    local canonical = self:GetCanonicalProfession(professionName)
+    if not TRACKED[canonical] then return false, "untracked" end
+
+    local recipeKey, variantSpellKey = buildScannedRecipeKey(
+        type(CT.GetRecipeItemLink) == "function" and CT.GetRecipeItemLink(recipeID) or nil,
+        type(CT.GetRecipeLink) == "function" and CT.GetRecipeLink(recipeID) or nil
+    )
+    if not isValidRecipeKey(recipeKey) and type(record) == "table" then
+        -- dal dataset: l'oggetto prodotto, o lo spell negativo se non ne produce
+        recipeKey = record.createdItemId or -recipeID
+        variantSpellKey = nil
+    end
+    if not isValidRecipeKey(recipeKey) then
+        self:RecordInvalidRecipeKey(recipeKey, "learned", self:GetPlayerKey(), canonical)
+        return false, "invalid-key"
+    end
+
+    local playerKey = self:GetPlayerKey()
+    local entry = self:GetOrCreateMember(playerKey)
+    local prof = entry.professions[canonical]
+    if not prof then
+        -- il mestiere non e' ancora nel blocco: lo crea DetectProfessions, che
+        -- gira su questo stesso segnale. Qui si evita di inventarne uno a meta'.
+        return false, "profession-not-detected"
+    end
+
+    prof.recipes = prof.recipes or {}
+    local added = false
+    if not prof.recipes[recipeKey] then prof.recipes[recipeKey] = true; added = true end
+    if variantSpellKey and isValidRecipeKey(variantSpellKey) and not prof.recipes[variantSpellKey] then
+        prof.recipes[variantSpellKey] = true
+        added = true
+    end
+    if not added then return false, "already-known" end
+
+    prof.count = countRecipeKeys(prof.recipes)
+    prof.lastUpdatedAt = time()
+    entry.updatedAt = prof.lastUpdatedAt
+    if self.MarkSyncIndexDirty then
+        self:MarkSyncIndexDirty(reason or "recipe-learned", self:BuildSyncBlockKey(playerKey, canonical))
+    end
+    Addon:Debug("Recipe learned and resolved:", canonical, recipeKey, "from", recipeID)
+    return true, nil, canonical, recipeKey
+end
+
 -- La scansione.
 --
 -- Su un client classic erano centocinquanta righe, e quasi tutte esistevano per

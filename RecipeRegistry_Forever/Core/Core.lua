@@ -773,6 +773,28 @@ function Addon:ProcessRecipeSignal(reason)
     if self.Data then
         local scanReason = tostring(reason or "recipe-learned")
         local metadataChanged = self.Data:DetectProfessions() == true
+
+        -- Prima di tutto il resto: la ricetta che ha scatenato l'evento si
+        -- risolve da sola. NEW_RECIPE_LEARNED ci da' il suo ID, e su questo
+        -- client tanto basta per sapere di che mestiere e' e cosa produce --
+        -- senza aprire niente e ovunque tu sia. Impari una ricetta in un
+        -- dungeon e finisce nel sync da li'.
+        --
+        -- Quello che viene dopo resta come rete: la scansione del mestiere
+        -- aperto, se una finestra c'e', e il promemoria se non abbiamo saputo
+        -- risolvere.
+        local learned = false
+        if self.Data.LearnRecipeFromSignal and self._lastRecipeLearnedSpellId then
+            local ok, why, profession = self.Data:LearnRecipeFromSignal(
+                self._lastRecipeLearnedSpellId, scanReason)
+            learned = ok == true
+            if learned then
+                markSyncIndexDirtyAndScheduleHello(self, scanReason, 0.5)
+                self:Debug("Recipe learned without a window:", tostring(profession))
+            else
+                self:Debug("Recipe signal not resolved:", tostring(why))
+            end
+        end
         if self.Data.MarkScanNeeded then
             self.Data:MarkScanNeeded(nil, scanReason)
         else
@@ -789,7 +811,10 @@ function Addon:ProcessRecipeSignal(reason)
         -- learns, never at /reload. Queue the post-warmup notice and
         -- resolve the profession label from metadata if we captured the
         -- recipe ID.
-        if not changed then
+        -- il promemoria serve solo se non abbiamo risolto: chiedere all'utente
+        -- di aprire un pannello per qualcosa che abbiamo gia' registrato e'
+        -- rumore, e lo farebbe dubitare di un dato corretto
+        if not changed and not learned then
             local visible = self.Data.GetVisibleTrackedProfessionContext
                 and self.Data:GetVisibleTrackedProfessionContext()
             if not visible then

@@ -60,14 +60,39 @@ local function runDump()
         return
     end
 
-    local base = safe(CT.GetBaseProfessionInfo)
-    local professionName = type(base) == "table" and base.professionName or nil
-    if (not professionName or professionName == "") and CT.GetProfessionInfoByRecipeID then
+    -- Di chi sono davvero queste ricette.
+    --
+    -- GetBaseProfessionInfo dice quale mestiere e' aperto; GetProfessionInfoByRecipeID
+    -- dice a chi appartengono gli ID che stiamo per archiviare. Di solito
+    -- coincidono, ma nel giro "impara, dumpa, dimentica, passa al successivo"
+    -- possono divergere per un istante: la finestra e' gia' del mestiere nuovo
+    -- mentre la lista e' ancora quella di prima. Fidarsi della finestra
+    -- archivierebbe il catalogo di Alchemy sotto Blacksmithing, e sarebbe
+    -- indistinguibile da un dato buono.
+    --
+    -- Quindi comanda la lista, e se la finestra non e' d'accordo non si sceglie:
+    -- si rifiuta e si riprova fra un secondo. Un dump mancato costa un comando,
+    -- uno etichettato male costa la fiducia in tutto il dataset.
+    local fromRecipes
+    if CT.GetProfessionInfoByRecipeID then
         local byRecipe = safe(CT.GetProfessionInfoByRecipeID, ids[1])
-        professionName = type(byRecipe) == "table"
+        fromRecipes = type(byRecipe) == "table"
             and (byRecipe.parentProfessionName or byRecipe.professionName) or nil
     end
+    if fromRecipes == "" then fromRecipes = nil end
 
+    local base = safe(CT.GetBaseProfessionInfo)
+    local fromWindow = type(base) == "table" and base.professionName or nil
+    if fromWindow == "" then fromWindow = nil end
+
+    if fromRecipes and fromWindow and fromRecipes ~= fromWindow then
+        print(string.format(
+            "|cffff5555rrdump|r: la finestra dice %s ma le ricette sono di %s -- la lista non ha ancora cambiato mestiere. Riprova fra un secondo.",
+            tostring(fromWindow), tostring(fromRecipes)))
+        return
+    end
+
+    local professionName = fromRecipes or fromWindow
     if type(professionName) ~= "string" or professionName == "" then
         print("rrdump: mestiere non identificato, riprova quando la lista e' pronta.")
         return

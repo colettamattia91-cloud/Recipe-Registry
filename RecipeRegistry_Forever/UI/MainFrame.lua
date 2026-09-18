@@ -138,7 +138,8 @@ local COLLECTION_PHASE_TEXT = {
 -- sbagliata: dice che qualcuno in gilda potrebbe saperlo fare.
 local PROF_ORDER = {
     FAVORITES_VIEW, "Alchemy", "Blacksmithing", "Cooking", "Enchanting", "Engineering",
-    "First Aid", "Leatherworking", "Mining", "Tailoring"
+    "First Aid", "Fishing", "Herbalism", "Leatherworking", "Mining", "Skinning",
+    "Tailoring"
 }
 
 local PROFESSION_SPELL_IDS = {
@@ -148,6 +149,7 @@ local PROFESSION_SPELL_IDS = {
     ["Enchanting"] = 7411,
     ["Engineering"] = 4036,
     ["First Aid"] = 3273,
+    ["Fishing"] = 7620,
     ["Herbalism"] = 2366,
     ["Leatherworking"] = 2108,
     ["Mining"] = 2575,

@@ -58,7 +58,11 @@ local PROFESSION_LABELS = {
     enchanting = "Enchanting",
     engineering = "Engineering",
     first_aid = "First Aid",
+    fishing = "Fishing",
+    herbalism = "Herbalism",
     leatherworking = "Leatherworking",
+    mining = "Mining",
+    skinning = "Skinning",
     tailoring = "Tailoring",
 }
 

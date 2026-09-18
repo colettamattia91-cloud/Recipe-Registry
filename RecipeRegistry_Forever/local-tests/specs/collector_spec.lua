@@ -13,10 +13,15 @@ GetBuildInfo = function() return "1.60.1", "69913" end
 RecipeRegistryDB = { global = { members = { sentinel = true } } }
 RecipeRegistryCharDB = { favorites = { [42] = true } }
 local broken, ready = false, true
+local windowProfession, recipeProfession = "Alchemy", "Alchemy"
 C_TradeSkillUI = {
     IsTradeSkillReady = function() return ready end,
     GetAllRecipeIDs = function() return { 7183, 22430 } end,
-    GetBaseProfessionInfo = function() return { professionName = "Alchemy" } end,
+    GetBaseProfessionInfo = function() return { professionName = windowProfession } end,
+    -- a chi appartengono davvero gli ID che stiamo per archiviare
+    GetProfessionInfoByRecipeID = function()
+        return { professionName = recipeProfession, parentProfessionName = recipeProfession }
+    end,
     GetRecipeInfo = function(id)
         if broken and id == 22430 then return nil end
         return { name = "Recipe", learned = id == 7183, categoryID = 2450 }
@@ -40,6 +45,19 @@ assert(RecipeRegistryDumpDB.dumps.Alchemy == saved, "partial captures must not r
 ready = false
 SlashCmdList.RRDUMP("")
 assert(RecipeRegistryDumpDB.dumps.Alchemy == saved, "closed sessions must not replace a valid dump")
+-- Nel giro "impara, dumpa, dimentica, passa al successivo" la finestra puo'
+-- essere gia' del mestiere nuovo mentre la lista e' ancora quella di prima.
+-- Archiviare allora vorrebbe dire mettere il catalogo di Alchemy sotto
+-- Blacksmithing, e da fuori sarebbe indistinguibile da un dato buono.
+ready = true
+windowProfession = "Blacksmithing"
+SlashCmdList.RRDUMP("")
+assert(RecipeRegistryDumpDB.dumps.Blacksmithing == nil,
+    "un disaccordo fra finestra e ricette non deve produrre un dump")
+assert(RecipeRegistryDumpDB.dumps.Alchemy == saved,
+    "e non deve nemmeno sostituire quello buono")
+windowProfession = "Alchemy"
+
 assert(RecipeRegistryDB.global.members.sentinel == true)
 assert(RecipeRegistryCharDB.favorites[42] == true)
 assert(next(RecipeRegistryDB.global.members, "sentinel") == nil, "ownership must remain untouched")

@@ -59,7 +59,31 @@ end
 -- Merge captures from separate sessions without depending on the beta's
 -- SavedVariables reader. Newest capture wins per profession; other professions
 -- remain. Input order breaks ties deterministically.
+-- Il datamining, se c'e'.
+--
+-- Porta i campi che il client non espone per ricetta: requiredSkill,
+-- skillLevels, l'espansione vera e classMask. Arriva gia' tradotto in Lua da
+-- import-dumps.ps1, perche' il bundle e' JSON e qui non lo leggeremmo.
+local mining = {}
+local miningPath
 for index = 3, #(arg or {}) do
+    local value = tostring(arg[index])
+    local path = value:match("^%-%-mining=(.+)$")
+    if path then
+        miningPath = path
+        local env = {}
+        local loader, loadErr = loadfile(path)
+        if not loader then error(loadErr) end
+        setfenv(loader, env)
+        loader()
+        mining = env.MiningRecipes or {}
+    end
+end
+
+for index = 3, #(arg or {}) do
+    if tostring(arg[index]):match("^%-%-mining=") then
+        -- gia' letto sopra
+    else
     local extra = {}
     local loader, loadErr = loadfile(arg[index])
     if not loader then error(loadErr) end
@@ -74,6 +98,7 @@ for index = 3, #(arg or {}) do
         if not previous or tostring(dump.at or "") >= tostring(previous.at or "") then
             dumps[name] = dump
         end
+    end
     end
 end
 
@@ -149,6 +174,7 @@ local function categoryChain(categories, categoryID)
 end
 
 local records = {}
+local placements = {}
 local categoriesByProfession = {}
 local subcategoriesByProfession = {}
 local stats = { professions = 0, recipes = 0, withReagents = 0, withoutOutput = 0 }
@@ -167,7 +193,19 @@ local function noteInto(bucketTable, key, entry)
     return bucket
 end
 
-for professionName, dump in pairs(dumps) do
+-- In ordine, non come capita.
+--
+-- Una ricetta puo' stare in due mestieri -- la 461692, Synthetic Gordok Ogre
+-- Suit, sta in Leatherworking e Tailoring -- e in quel caso uno dei due e' il
+-- primario nel record. Scorrere i dump con pairs lasciava decidere alla tabella
+-- hash: rigenerando senza toccare niente il primario poteva cambiare, e con lui
+-- il diff del file. Ordinati, la scelta e' sempre la stessa.
+local dumpNames = {}
+for professionName in pairs(dumps) do dumpNames[#dumpNames + 1] = professionName end
+table.sort(dumpNames)
+
+for _, professionName in ipairs(dumpNames) do
+    local dump = dumps[professionName]
     if type(dump) == "table" and type(dump.recipes) == "table" then
         stats.professions = stats.professions + 1
         local declared = dump.profession
@@ -199,9 +237,18 @@ for professionName, dump in pairs(dumps) do
                         end
                     end
                 end
+                -- L'espansione vera, quando il datamining la conosce: 1559
+                -- ricette vengono da vanilla e 990 sono aggiunte di Forever.
+                -- Senza, resta la costante -- l'albero di navigazione conosce
+                -- solo "vanilla" e "tbc", quindi questo campo oggi descrive e
+                -- non filtra.
+                local mined = mining[spellId]
                 local record = {
                     profession = professionKey,
-                    expansion = EXPANSION,
+                    expansion = (mined and mined.expansion) or EXPANSION,
+                    requiredSkill = mined and mined.requiredSkill or nil,
+                    skillLevels = mined and mined.skillLevels or nil,
+                    classMask = mined and mined.classMask or nil,
                     createdItemId = tonumber(row.outputItemID),
                     category = category,
                     subcategory = subcategory,
@@ -231,8 +278,41 @@ for professionName, dump in pairs(dumps) do
                         stats.withReagents = stats.withReagents + 1
                     end
                 end
-                records[spellId] = record
-                stats.recipes = stats.recipes + 1
+                -- Una ricetta in due mestieri non e' un errore da risolvere:
+                -- e' come il client la racconta, e il dataset TBC ha lo stesso
+                -- caso con Transmute Gold, che sta sotto Mining e Alchemy. Il
+                -- primo mestiere in ordine resta il primario del record, gli
+                -- altri si aggiungono in "professions"; le collocazioni restano
+                -- separate perche' la categoria e' diversa in ogni mestiere.
+                placements[spellId] = placements[spellId] or {}
+                placements[spellId][#placements[spellId] + 1] = {
+                    profession = professionKey,
+                    category = category,
+                    subcategory = subcategory,
+                }
+                local existing = records[spellId]
+                if existing then
+                    if existing.profession ~= professionKey then
+                        existing.professions = existing.professions or { existing.profession }
+                        local already = false
+                        for _, p in ipairs(existing.professions) do
+                            if p == professionKey then already = true end
+                        end
+                        if not already then
+                            existing.professions[#existing.professions + 1] = professionKey
+                            stats.multiProfession = (stats.multiProfession or 0) + 1
+                        end
+                    else
+                        -- lo stesso ID due volte nello stesso mestiere: il
+                        -- client lo fa (Obsidian Reaver in Blacksmithing) e le
+                        -- due righe sono identiche, quindi non c'e' niente da
+                        -- scegliere
+                        stats.duplicated = (stats.duplicated or 0) + 1
+                    end
+                else
+                    records[spellId] = record
+                    stats.recipes = stats.recipes + 1
+                end
             end
         end
     end
@@ -254,17 +334,28 @@ for _, spellId in ipairs(ids) do
         if not bucket then bucket = {}; createdItemToSpellIds[r.createdItemId] = bucket end
         bucket[#bucket + 1] = spellId
     end
-    local prof = navProfessions[r.profession]
-    if not prof then prof = { all = {}, categories = {} }; navProfessions[r.profession] = prof end
-    prof.all[#prof.all + 1] = spellId
-    if r.category then
-        local cat = prof.categories[r.category]
-        if not cat then cat = { all = {}, subs = {} }; prof.categories[r.category] = cat end
-        cat.all[#cat.all + 1] = spellId
-        if r.subcategory then
-            local sub = cat.subs[r.subcategory]
-            if not sub then sub = {}; cat.subs[r.subcategory] = sub end
-            sub[#sub + 1] = spellId
+    -- una riga per collocazione, non una per record: una ricetta di due
+    -- mestieri deve comparire nella barra laterale di entrambi, ognuno sotto
+    -- la sua categoria
+    for _, place in ipairs(placements[spellId] or {}) do
+        local prof = navProfessions[place.profession]
+        if not prof then prof = { all = {}, categories = {} }; navProfessions[place.profession] = prof end
+        local seenAll = false
+        for _, id in ipairs(prof.all) do if id == spellId then seenAll = true break end end
+        if not seenAll then prof.all[#prof.all + 1] = spellId end
+        if place.category then
+            local cat = prof.categories[place.category]
+            if not cat then cat = { all = {}, subs = {} }; prof.categories[place.category] = cat end
+            local seenCat = false
+            for _, id in ipairs(cat.all) do if id == spellId then seenCat = true break end end
+            if not seenCat then cat.all[#cat.all + 1] = spellId end
+            if place.subcategory then
+                local sub = cat.subs[place.subcategory]
+                if not sub then sub = {}; cat.subs[place.subcategory] = sub end
+                local seenSub = false
+                for _, id in ipairs(sub) do if id == spellId then seenSub = true break end end
+                if not seenSub then sub[#sub + 1] = spellId end
+            end
         end
     end
 end
@@ -293,17 +384,77 @@ local function emitIdList(indent, name, list)
     emit(string.format("%s%s = { %s },", indent, name, table.concat(parts, ", ")))
 end
 
+-- Il censimento della copertura.
+--
+-- Serve a sapere cosa c'e' e soprattutto cosa non c'e', senza doverlo dedurre
+-- leggendo i record. I campi assenti non sono dimenticanze: sono informazioni
+-- che ne' il client ne' il datamining espongono oggi, e finiscono in testa al
+-- file generato perche' e' il posto dove qualcuno le cerchera'.
+local COVERAGE_FIELDS = {
+    { "profession",     "client",     "di che mestiere e'" },
+    { "category",       "client",     "dove sta nella barra laterale" },
+    { "reagents",       "client",     "cosa serve per farla" },
+    { "createdItemId",  "client",     "cosa produce" },
+    { "createdCount",   "client",     "quante ne produce, se diverso da una" },
+    { "requiredSkill",  "datamining", "a che livello di mestiere si fa" },
+    { "skillLevels",    "datamining", "le soglie di difficolta'" },
+    { "expansion",      "datamining", "vanilla o aggiunta di Forever" },
+    { "classMask",      "datamining", "quali classi possono impararla" },
+}
+local MISSING_FIELDS = {
+    { "recipeItemId",     "l'oggetto che insegna la ricetta" },
+    { "sourceKind",       "da dove si ottiene: trainer, venditore, drop" },
+    { "sourcePlaces",     "dove si ottiene" },
+    { "trainerTitle",     "quale trainer la insegna" },
+    { "bopOutput",        "se il prodotto e' legato quando si raccoglie" },
+    { "specialization",   "se richiede una specializzazione" },
+    { "phase",            "in che fase di contenuto arriva" },
+}
+
+local coverage = {}
+for _, field in ipairs(COVERAGE_FIELDS) do coverage[field[1]] = 0 end
+for _, spellId in ipairs(ids) do
+    local r = records[spellId]
+    for _, field in ipairs(COVERAGE_FIELDS) do
+        local value = r[field[1]]
+        if value ~= nil and (type(value) ~= "table" or next(value) ~= nil) then
+            coverage[field[1]] = coverage[field[1]] + 1
+        end
+    end
+end
+
 emit("-- Generato da Tools/generate-from-dump.lua dal dump in gioco. Non modificare a mano.")
 emit("--")
-emit("-- Fonte: /rrdump su un client vivo, un mestiere per volta. Contiene la")
-emit("-- struttura -- ricette, oggetti prodotti, reagenti, categorie -- e non contiene")
-emit("-- requiredSkill, skillLevels, sourceKind, trainer, classi e fasi: il client non")
-emit("-- li espone per ricetta. Quelli arrivano dal datamining.")
+emit("-- Due fonti, ognuna per cio' che sa.")
 emit("--")
-emit("-- expansion vale \"vanilla\" per tutte: Forever non ha ancora una tassonomia sua,")
-emit("-- e l'albero di navigazione conosce solo vanilla e tbc.")
+emit("-- Il client, con /rrdump su una sessione viva: la struttura -- quali ricette")
+emit("-- esistono, cosa producono, con che reagenti, in che categoria. E' la fonte")
+emit("-- aggiornata, perche' conosce anche cio' che una patch ha aggiunto ieri.")
+emit("--")
+emit("-- Il datamining di ../WowForeverMining: i campi che il client non espone per")
+emit("-- ricetta -- requiredSkill, le soglie di difficolta', l'espansione di origine")
+emit("-- e classMask. Legge i file del gioco invece di interrogare l'API.")
+emit("--")
+emit("-- Dove si sovrappongono vince il client. Il censimento qui sotto dice riga per")
+emit("-- riga chi ha riempito cosa, e cosa non ha riempito nessuno dei due.")
 emit("--")
 emit(string.format("-- Mestieri coperti: %d. Ricette: %d.", stats.professions, #ids))
+emit("--")
+emit("-- Copertura dei campi, su " .. tostring(#ids) .. " ricette:")
+for _, field in ipairs(COVERAGE_FIELDS) do
+    local n = coverage[field[1]]
+    emit(string.format("--   %-16s %5d  (%s) %s", field[1], n, field[2], field[3]))
+end
+emit("--")
+emit("-- Quello che ancora manca, e da dove dovra' arrivare:")
+for _, field in ipairs(MISSING_FIELDS) do
+    emit(string.format("--   %-16s %s", field[1], field[2]))
+end
+emit("--")
+emit("-- Nessuno di questi e' esposto dal client per ricetta: GetRecipeSourceText")
+emit("-- tace su tutte e GetRecipeRequirements e' quasi sempre vuota. Vanno presi")
+emit("-- dal datamining quando imparera' a estrarli, o catturati in gioco dai")
+emit("-- trainer, che e' un lavoro di raccolta a se'.")
 emit("RecipeRegistryRecipeMetadata = {")
 emit("    schemaVersion = 1,")
 emit(string.format("    metadataVersion = %q,", "forever-ingame-" .. (buildList[1] or "sconosciuto")))
@@ -315,11 +466,23 @@ for _, spellId in ipairs(ids) do
     local r = records[spellId]
     emit(string.format("        [%d] = {", spellId))
     emit(string.format("            profession = %q,", r.profession))
+    if r.professions and #r.professions > 1 then
+        local parts = {}
+        for i, prof in ipairs(r.professions) do parts[i] = string.format("%q", prof) end
+        emit(string.format("            professions = { %s },", table.concat(parts, ", ")))
+    end
     emit(string.format("            expansion = %q,", r.expansion))
     if r.createdItemId then emit(string.format("            createdItemId = %d,", r.createdItemId)) end
     if r.category then emit(string.format("            category = %q,", r.category)) end
     if r.subcategory then emit(string.format("            subcategory = %q,", r.subcategory)) end
     if r.sortOrder then emit(string.format("            sortOrder = %d,", r.sortOrder)) end
+    if r.requiredSkill then emit(string.format("            requiredSkill = %d,", r.requiredSkill)) end
+    if r.skillLevels and #r.skillLevels > 0 then
+        local parts = {}
+        for i, level in ipairs(r.skillLevels) do parts[i] = tostring(level) end
+        emit(string.format("            skillLevels = { %s },", table.concat(parts, ", ")))
+    end
+    if r.classMask then emit(string.format("            classMask = %d,", r.classMask)) end
     if r.createdCount then
         emit(string.format("            createdCount = %d,", r.createdCount))
         emit(string.format("            createdCountMax = %d,", r.createdCountMax))
@@ -428,5 +591,13 @@ for _, bucket in pairs(categoriesByProfession) do categoryCount = categoryCount 
 print(string.format("scritto %s", output))
 print(string.format("  mestieri %d, ricette %d, con reagenti %d, senza oggetto prodotto %d",
     stats.professions, stats.recipes, stats.withReagents, stats.withoutOutput))
+print(string.format("  in piu' mestieri %d, righe doppie nel client %d",
+    stats.multiProfession or 0, stats.duplicated or 0))
+if miningPath then
+    local enriched = coverage.requiredSkill or 0
+    print(string.format("  arricchite dal datamining: %d su %d (%s)", enriched, #ids, miningPath))
+else
+    print("  nessun datamining: mancano requiredSkill, skillLevels, espansione, classMask")
+end
 print(string.format("  indici: %d oggetti prodotti, %d categorie",
     #sortedKeys(createdItemToSpellIds), categoryCount))

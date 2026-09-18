@@ -86,6 +86,13 @@ local function cloneRecord(spellId, record)
     return {
         spellId = tonumber(spellId),
         profession = record.profession,
+        -- Una ricetta puo' appartenere a piu' mestieri: la 461692, Synthetic
+        -- Gordok Ogre Suit, sta sia in Leatherworking sia in Tailoring, e il
+        -- dataset TBC ha lo stesso caso con Transmute Gold sotto Mining e
+        -- Alchemy. "profession" resta il primario, per tutto il codice che ne
+        -- vuole uno solo; qui c'e' l'elenco completo quando ce n'e' piu' d'uno.
+        -- Senza questa riga il clone lo perdeva e nessuno se ne accorgeva.
+        professions = cloneStringList(record.professions),
         expansion = record.expansion,
         recipeItemId = record.recipeItemId,
         createdItemId = record.createdItemId,

@@ -121,12 +121,35 @@ local DB_DEFAULTS = {
     },
 }
 
+-- Cosa entra in questa lista, e cosa no.
+--
+-- Il criterio non e' "il client lo tratta come un mestiere": e' "un compagno di
+-- gilda potrebbe chiedertelo". Questo addon e' un elenco di chi sa fare cosa
+-- PER GLI ALTRI, e una cosa che fai solo per te non ci appartiene, per quanto
+-- somigli a un mestiere nei dati.
+--
+-- Il caso che lo chiarisce: i veleni del Ladro. Nei dati di Forever hanno 26
+-- ricette, una progressione, categorie e una skill line tutta loro (la 40), e
+-- da fuori sono indistinguibili da un mestiere. Ma un Ladro i veleni se li fa
+-- per giocare, non li vende e non ha un trainer che insegni ricette nascoste:
+-- nessuno gli scrivera' mai per averne uno. Stessa storia dell'addestramento
+-- del pet del Cacciatore, che su TBC passava dal frame dei mestieri senza per
+-- questo essere un mestiere.
+--
+-- Se un giorno una di queste finisce comunque nel dataset -- basta che qualcuno
+-- apra quella finestra mentre il Collector gira -- non fa danno: l'addon guarda
+-- questa lista, e cio' che non c'e' lo ignora.
 local TRACKED = {
     ["Alchemy"] = true,
     ["Blacksmithing"] = true,
     ["Cooking"] = true,
     ["Enchanting"] = true,
     ["Engineering"] = true,
+    -- Le professioni di raccolta hanno ricette proprie su Forever -- il sistema
+    -- di campeggio ne da' a tutte e tre -- mentre su TBC non ne hanno nessuna,
+    -- ed e' il motivo per cui nell'albero TBC Fishing manca del tutto e
+    -- Herbalism e Skinning sono tracciate ma senza una scheda nella UI.
+    ["Fishing"] = true,
     -- First Aid non e' tracciata nell'albero TBC. Su Forever si': il client la
     -- restituisce da GetProfessions come gli altri mestieri, e qui ha ricette
     -- che vale la pena dichiarare alla gilda.
@@ -145,6 +168,10 @@ local PROFESSION_SPELL_IDS = {
     ["Enchanting"] = 7411,
     ["Engineering"] = 4036,
     ["First Aid"] = 3273,
+    -- l'unico ID di questa tabella non verificato su questo client: serve solo
+    -- a costruire la mappa dei nomi localizzati, quindi se fosse sbagliato il
+    -- mestiere resterebbe riconoscibile in inglese e muto nelle altre lingue
+    ["Fishing"] = 7620,
     ["Herbalism"] = 2366,
     ["Leatherworking"] = 2108,
     ["Mining"] = 2575,

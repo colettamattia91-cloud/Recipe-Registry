@@ -90,7 +90,20 @@ local function collectRecipeKeyProfessions(metadata, recipeKey)
         if not spellId then return end
         local records = metadata._recordsBySpellId
         local record = records and records[spellId]
-        local profession = record and record.profession
+        if not record then return end
+        -- ogni mestiere del record, non solo il primario: altrimenti una
+        -- ricetta di due mestieri risulterebbe "fuori posto" in uno dei due e
+        -- la pulizia la toglierebbe da li'
+        if type(record.professions) == "table" and #record.professions > 0 then
+            for _, profession in ipairs(record.professions) do
+                if profession and profession ~= "" then
+                    set = set or {}
+                    set[profession] = true
+                end
+            end
+            return
+        end
+        local profession = record.profession
         if profession and profession ~= "" then
             set = set or {}
             set[profession] = true

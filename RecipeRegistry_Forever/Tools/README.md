@@ -12,8 +12,16 @@ Dalla radice del repository:
 .\RecipeRegistry_Forever\local-tests\deploy-beta.ps1 -Collector
 ```
 
-Nel client abilita anche **Recipe Registry - Database Collector**. Il Collector
-e' un addon separato di sviluppo e non entra nel pacchetto di Recipe Registry.
+Nel client abilita **Recipe Registry - Database Collector**. Il Collector e' un
+addon separato di sviluppo, non usa Recipe Registry e non entra nel suo
+pacchetto.
+
+**Durante la raccolta conviene disabilitare Recipe Registry.** Il giro dai
+trainer prevede di imparare un mestiere, dumparlo e dimenticarlo: per Recipe
+Registry ogni "dimentica" e' un mestiere abbandonato, quindi cancella quel
+blocco e lo annuncia alla gilda. Sono decine di cambiamenti veri pubblicati a
+dei compagni per un lavoro che riguarda solo te, piu' la pulizia automatica che
+gira su dati che stanno cambiando sotto. Il Collector da solo basta.
 
 ## Giro delle professioni
 
@@ -41,6 +49,13 @@ solo la stessa professione; le altre restano. Con piu' account, specifica
 La beta scrive i dump ma non li ricarica: dopo il reload `/rrdump status` puo'
 essere vuoto anche se il file sul disco contiene i dati appena raccolti.
 L'archiviazione va fatta prima che il client riscriva quel file.
+
+Detto per il giro lungo, dove costa di piu': il Collector riparte vuoto a ogni
+sessione, quindi il reload successivo riscrive il file con i soli mestieri di
+quella sessione e i precedenti spariscono dal disco. **Si archivia dopo ogni
+sessione**, non alla fine del giro. Le sessioni archiviate si sommano fra loro:
+`import-dumps.ps1` le usa tutte, e la cattura piu' recente sostituisce solo lo
+stesso mestiere.
 
 Dopo l'importazione, ripeti il comando di deploy e fai reload per usare il nuovo
 database interno. I dati gia' disponibili coprono Alchemy, Cooking, First Aid e
