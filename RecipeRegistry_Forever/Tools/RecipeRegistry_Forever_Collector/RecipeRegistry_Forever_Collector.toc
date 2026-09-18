@@ -1,0 +1,7 @@
+## Interface: 16001
+## Title: Recipe Registry - Database Collector
+## Notes: Development tool: captures profession recipes and reagents with /rrdump.
+## Version: 0.1.0-dev
+## SavedVariables: RecipeRegistryDumpDB
+
+Collector.lua

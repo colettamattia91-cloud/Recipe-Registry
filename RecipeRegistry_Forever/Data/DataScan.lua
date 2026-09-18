@@ -2,28 +2,12 @@ local Addon = _G.RecipeRegistry
 local Data = Addon.Data
 local Private = Data._private
 
-local GetNumSkillLines = GetNumSkillLines
-local GetSkillLineInfo = GetSkillLineInfo
-local GetNumTradeSkills = GetNumTradeSkills
-local GetTradeSkillInfo = GetTradeSkillInfo
-local GetTradeSkillItemLink = GetTradeSkillItemLink
-local GetTradeSkillRecipeLink = GetTradeSkillRecipeLink
-local ExpandTradeSkillSubClass = ExpandTradeSkillSubClass
-local GetTradeSkillLine = GetTradeSkillLine
-local GetNumCrafts = GetNumCrafts
-local GetCraftInfo = GetCraftInfo
-local GetCraftItemLink = GetCraftItemLink
-local GetCraftRecipeLink = GetCraftRecipeLink
-local GetCraftSkillLine = GetCraftSkillLine
-local GetCraftDisplaySkillLine = GetCraftDisplaySkillLine
 local time = time
 local pairs = pairs
 local ipairs = ipairs
 local tostring = tostring
 
 local TRACKED = Private.TRACKED
-local clearCraftFilters = Private.clearCraftFilters
-local clearTradeSkillFilters = Private.clearTradeSkillFilters
 local countRecipeKeys = Private.countRecipeKeys
 local detectSpecialization = Private.detectSpecialization
 local extractItemID = Private.extractItemID
@@ -31,10 +15,6 @@ local extractSpellID = Private.extractSpellID
 local isSubsetOf = Private.isSubsetOf
 local isValidRecipeKey = Private.isValidRecipeKey
 local newScanTelemetry = Private.newScanTelemetry
-local restoreCraftFilters = Private.restoreCraftFilters
-local restoreTradeSkillFilters = Private.restoreTradeSkillFilters
-local snapshotCraftFilters = Private.snapshotCraftFilters
-local snapshotTradeSkillFilters = Private.snapshotTradeSkillFilters
 -- Set-difference compare on two recipe-key maps. Used by ApplyScanResult to
 -- decide whether a scan actually altered the local recipe set; the old code
 -- stored a pre-joined `prof.signature` in SavedVariables for the same
@@ -162,12 +142,37 @@ function Data:ApplyLocalProfessionMetadata(profession, metadata)
     return true, oldSpecialization, newSpecialization
 end
 
+-- I mestieri del personaggio, senza finestra.
+--
+-- Su un client classic questa lista si leggeva da GetNumSkillLines /
+-- GetSkillLineInfo, cioe' dalla finestra abilita': un array piatto in cui i
+-- mestieri stanno mescolati ad armi, lingue e intestazioni, da cui il filtro su
+-- isHeader e su TRACKED. Su questo client quelle due funzioni non esistono --
+-- confermato in gioco il 2026-09-18, "attempt to call a nil value" aprendo la
+-- scheda mestieri -- e al loro posto c'e' GetProfessions(), che restituisce
+-- direttamente gli indici dei mestieri appresi.
+--
+-- Il guadagno non e' la rinomina, e' che GetProfessionInfo risponde **a
+-- finestra chiusa**: nome, rank e maxRank arrivano da una chiamata invece che
+-- da una lista che esiste solo mentre un frame e' aperto. Quindi questa
+-- funzione puo' girare al login, e non deve piu' aspettare che l'utente apra
+-- qualcosa.
+--
+-- GetProfessions restituisce cinque valori posizionali -- i due mestieri
+-- principali, archeologia, pesca, cucina -- e i buchi sono nil. Per questo la
+-- tabella si attraversa con pairs e non con ipairs: ipairs si fermerebbe al
+-- primo buco, e chi ha un mestiere solo perderebbe cucina.
 function Data:DetectProfessions()
     self._currentProfs = {}
     local metadataChanged = false
-    for i = 1, GetNumSkillLines() do
-        local name, isHeader, _, skillRank, _, _, skillMaxRank = GetSkillLineInfo(i)
-        if not isHeader and name then
+    if type(GetProfessions) ~= "function" or type(GetProfessionInfo) ~= "function" then
+        Addon:Debug("DetectProfessions: GetProfessions/GetProfessionInfo non disponibili")
+        return false
+    end
+    local primary, secondary, archaeology, fishing, cooking = GetProfessions()
+    for _, professionIndex in pairs({ primary, secondary, archaeology, fishing, cooking }) do
+        local name, _, skillRank, skillMaxRank = GetProfessionInfo(professionIndex)
+        if name then
             local canonical = self:GetCanonicalProfession(name)
             if TRACKED[canonical] then
                 local specialization = detectSpecialization(canonical)
@@ -190,8 +195,58 @@ function Data:DetectProfessions()
             end
         end
     end
+    -- Chi cambia mestiere non deve restare due mestieri.
+    --
+    -- Prima di questa riga DetectProfessions sapeva solo aggiungere: chi
+    -- abbandonava Alchemy per Engineering restava in gilda come alchimista per
+    -- sempre, con le sue ricette, e nessuno se ne accorgeva. Quello che il
+    -- personaggio ha adesso e' _currentProfs, e basta: tutto il resto del suo
+    -- blocco se ne va, ricette e catalogo compresi.
+    metadataChanged = self:PruneDroppedProfessions() or metadataChanged
+
     Addon:RequestRefresh("detect-professions")
     return metadataChanged
+end
+
+-- I mestieri che il personaggio non ha piu', tolti dal suo blocco e dal catalogo
+-- salvato. Vale solo per il proprietario locale: di un compagno non sappiamo
+-- cosa abbia abbandonato finche' non ce lo racconta lui.
+function Data:PruneDroppedProfessions()
+    local current = self._currentProfs
+    if type(current) ~= "table" or not next(current) then
+        -- nessun mestiere rilevato: puo' voler dire "non ne ha" oppure "l'API
+        -- non ha ancora risposto", e non sono la stessa cosa. Nel dubbio non si
+        -- cancella niente.
+        return false
+    end
+    local playerKey = self:GetPlayerKey()
+    local entry = self:GetMembersDB()[playerKey]
+    if type(entry) ~= "table" or type(entry.professions) ~= "table" then
+        return false
+    end
+
+    local dropped = {}
+    for professionKey in pairs(entry.professions) do
+        if not current[professionKey] then
+            dropped[#dropped + 1] = professionKey
+        end
+    end
+    if #dropped == 0 then return false end
+
+    local catalog = Addon.charDB and Addon.charDB.recipeCatalog
+    for _, professionKey in ipairs(dropped) do
+        entry.professions[professionKey] = nil
+        if type(catalog) == "table" then
+            catalog[professionKey] = nil
+            self:InvalidateSchematicIndex()
+        end
+        if self._scanNeededByProfession then self._scanNeededByProfession[professionKey] = nil end
+        if self.MarkSyncIndexDirty then
+            self:MarkSyncIndexDirty("profession-dropped", self:BuildSyncBlockKey(playerKey, professionKey))
+        end
+        Addon:Debug("Profession dropped, block removed:", professionKey)
+    end
+    return true
 end
 
 function Data:EnsureScanState()
@@ -372,8 +427,48 @@ function Data:DumpScanStatus()
     end
 end
 
+-- Quale mestiere sta rispondendo adesso.
+--
+-- C_TradeSkillUI espone UNA sorgente dati alla volta: GetAllRecipeIDs elenca il
+-- mestiere "corrente", che cambia quando l'utente ne apre uno e sopravvive al
+-- /reload. Verificato in gioco il 2026-09-18: aperta Cooking, la lista passa da
+-- 197 righe (Alchemy) a 132, e resta Cooking anche dopo un reload in cui non si
+-- apre nulla.
+--
+-- Non esiste un modo pulito di sceglierlo da codice. Provati e scartati:
+-- SetProfessionChildSkillLineID accetta la chiamata e non sposta niente,
+-- GetProfessionSpells torna vuota, e OpenTradeSkill viene bloccata -- e comunque
+-- aprire finestre addosso all'utente non e' una cosa che facciamo.
+--
+-- GetBaseProfessionInfo e' la fonte ovvia ma non e' affidabile: a finestra
+-- chiusa risponde professionName = "" pur essendoci una lista valida. Per
+-- questo la seconda strada e' quella buona -- GetProfessionInfoByRecipeID su una
+-- ricetta qualunque della lista dice di chi e', e ha risposto correttamente
+-- "Cooking" proprio nei casi in cui GetBaseProfessionInfo taceva.
+local function activeProfessionName()
+    local CT = _G.C_TradeSkillUI
+    if not CT then return nil end
+    local base = type(CT.GetBaseProfessionInfo) == "function" and CT.GetBaseProfessionInfo()
+    if type(base) == "table" and type(base.professionName) == "string" and base.professionName ~= "" then
+        return base.professionName
+    end
+    if type(CT.GetAllRecipeIDs) ~= "function" or type(CT.GetProfessionInfoByRecipeID) ~= "function" then
+        return nil
+    end
+    local ids = CT.GetAllRecipeIDs()
+    if type(ids) ~= "table" or not ids[1] then return nil end
+    local info = CT.GetProfessionInfoByRecipeID(ids[1])
+    if type(info) ~= "table" then return nil end
+    -- il mestiere "padre" e' quello con il nome che conosciamo: la ricetta
+    -- risponde professionID 2939 / parentProfessionID 185, e 185 e' Cooking
+    local name = info.parentProfessionName
+    if type(name) ~= "string" or name == "" then name = info.professionName end
+    if type(name) ~= "string" or name == "" then return nil end
+    return name
+end
+
 function Data:GetActiveTradeSkillProfession()
-    local title = GetTradeSkillLine and GetTradeSkillLine()
+    local title = activeProfessionName()
     if not title or title == "" or title == "UNKNOWN" then
         return nil, "trade-no-title"
     end
@@ -392,75 +487,223 @@ function Data:CanScanTradeSkillData()
     if reason then
         return false, reason, canonical
     end
-    if type(GetNumTradeSkills) ~= "function" or type(GetTradeSkillInfo) ~= "function" then
+    local CT = _G.C_TradeSkillUI
+    if not CT or type(CT.GetAllRecipeIDs) ~= "function" or type(CT.GetRecipeInfo) ~= "function" then
         return false, "trade-api-missing", canonical
     end
-    local numSkills = GetNumTradeSkills()
-    if type(numSkills) ~= "number" or numSkills <= 0 then
+    -- Il cancello che conta, e che costa il guadagno piu' vistoso di questa
+    -- riscrittura.
+    --
+    -- A sessione chiusa GetAllRecipeIDs risponde comunque, e risponde bene: 197
+    -- righe, quelle giuste, quelle dell'ultimo mestiere aperto. Ma non e' una
+    -- sorgente viva, e' cio' che e' rimasto dell'ultima volta -- lo dicono tre
+    -- cose insieme: GetBaseProfessionInfo torna vuoto, IsTradeSkillReady torna
+    -- false, e il catalogo resta quello del mestiere aperto per ultimo anche
+    -- dopo un /reload.
+    --
+    -- Era allettante scansionare comunque, al login, senza chiedere niente
+    -- all'utente. Ma registrare uno snapshot vecchio come verita' e' il danno
+    -- peggiore che questo addon possa fare: dichiara alla gilda che sai fare
+    -- cose che magari non sai piu', o tace su quelle che hai imparato dopo, e
+    -- lo fa senza un errore da nessuna parte. Quindi si legge solo quando il
+    -- client conferma che la sessione e' viva.
+    if type(CT.IsTradeSkillReady) == "function" and not CT.IsTradeSkillReady() then
+        return false, "trade-session-closed", canonical
+    end
+    -- Non e' detto che la finestra aperta sia la tua.
+    --
+    -- Cliccando il mestiere che un compagno ha linkato in chat si apre la
+    -- finestra con le SUE ricette, e da fuori e' identica: stessa API, stessi
+    -- ID, TRADE_SKILL_SHOW che scatta regolarmente. Senza questa guardia la
+    -- scansione le registrerebbe come tue e il sync le pubblicherebbe alla
+    -- gilda a tuo nome -- dati sbagliati su di te, prodotti da un gesto
+    -- innocuo, e nessun modo di accorgersene dopo.
+    --
+    -- Stessa cosa per il mestiere di gilda e per la lavorazione presso un PNG:
+    -- in tutti e tre i casi la lista che il client espone non descrive questo
+    -- personaggio.
+    if type(CT.IsTradeSkillLinked) == "function" and CT.IsTradeSkillLinked() then
+        return false, "trade-linked", canonical
+    end
+    if type(CT.IsTradeSkillGuild) == "function" and CT.IsTradeSkillGuild() then
+        return false, "trade-guild", canonical
+    end
+    if type(CT.IsNPCCrafting) == "function" and CT.IsNPCCrafting() then
+        return false, "trade-npc", canonical
+    end
+    local ids = CT.GetAllRecipeIDs()
+    if type(ids) ~= "table" or #ids <= 0 then
         return false, "trade-data-not-ready", canonical
     end
-    return true, nil, canonical, numSkills
+    return true, nil, canonical, ids
 end
 
-function Data:GetActiveCraftProfession()
-    local title = GetCraftSkillLine and GetCraftSkillLine(1)
-    if not title or title == "" or title == "UNKNOWN" then
-        title = GetCraftDisplaySkillLine and GetCraftDisplaySkillLine()
-    end
-    if not title or title == "" or title == "UNKNOWN" then
-        return nil, "craft-no-title"
-    end
-    local canonical = self:GetCanonicalProfession(title)
-    if canonical ~= "Enchanting" then
-        return canonical, "craft-not-enchanting"
-    end
-    return canonical
-end
-
-function Data:CanScanCraftData()
-    local canonical, reason = self:GetActiveCraftProfession()
-    if not canonical then
-        return false, reason or "craft-no-title", canonical
-    end
-    if reason then
-        return false, reason, canonical
-    end
-    if type(GetNumCrafts) ~= "function" or type(GetCraftInfo) ~= "function" then
-        return false, "craft-api-missing", canonical
-    end
-    local numCrafts = GetNumCrafts()
-    if type(numCrafts) ~= "number" or numCrafts <= 0 then
-        return false, "craft-data-not-ready", canonical
-    end
-    return true, nil, canonical, numCrafts
-end
-
+-- Il contesto non e' piu' "quale frame e' visibile".
+--
+-- ProfessionsFrame viene creato solo la prima volta che l'utente apre un
+-- mestiere: a freddo e' nil, e testarne l'esistenza direbbe "nessun mestiere"
+-- mentre la lista risponde benissimo. Quello che conta e' se c'e' una sorgente
+-- dati leggibile, non se c'e' una finestra aperta.
 function Data:GetVisibleTrackedProfessionContext()
-    local tradeFrame = _G.TradeSkillFrame
-    if tradeFrame and type(tradeFrame.IsShown) == "function" and tradeFrame:IsShown() then
-        local canonical, reason = self:GetActiveTradeSkillProfession()
-        if canonical and not reason then
-            return canonical, "trade", nil
-        end
-        return nil, "trade", reason or "trade-no-title"
+    local canonical, reason = self:GetActiveTradeSkillProfession()
+    if canonical and not reason then
+        return canonical, "trade", nil
     end
-
-    local craftFrame = _G.CraftFrame
-    if craftFrame and type(craftFrame.IsShown) == "function" and craftFrame:IsShown() then
-        local canonical, reason = self:GetActiveCraftProfession()
-        if canonical and not reason then
-            return canonical, "craft", nil
-        end
-        return nil, "craft", reason or "craft-no-title"
+    if canonical then
+        return nil, "trade", reason
     end
-
-    return nil, nil, "no-visible-profession-frame"
+    return nil, nil, reason or "no-trade-skill-data"
 end
 
+-- Il catalogo di un mestiere: tutti i suoi recipeID, appresi o no.
+--
+-- Si puo' leggere solo con una sessione viva, ed e' l'unica cosa per cui quella
+-- sessione serva ancora. Salvato per personaggio in CharDB, fuori dal database
+-- di gilda: e' dato di gioco, non contenuto da condividere. In sovrascrittura,
+-- perche' l'elenco valido e' quello che il client dice adesso.
+-- Nel catalogo va la CHIAVE gia' calcolata, non solo l'ID.
+--
+-- La chiave si ricava da GetRecipeItemLink e GetRecipeLink, e quelle rispondono
+-- sulle ricette del mestiere corrente. Al login il mestiere corrente e' uno
+-- solo, quindi calcolarle allora funzionerebbe per uno e fallirebbe in silenzio
+-- per gli altri tre. Calcolate qui, mentre la sessione e' viva, la scansione dal
+-- libro non dipende piu' da quelle API: le basta sapere quali ID sono appresi.
+function Data:StoreRecipeCatalog(profession, entries)
+    if not profession or type(entries) ~= "table" or #entries == 0 then return false end
+    local charDB = Addon.charDB
+    if type(charDB) ~= "table" then return false end
+    if type(charDB.recipeCatalog) ~= "table" then charDB.recipeCatalog = {} end
+    charDB.recipeCatalog[profession] = entries
+    self:InvalidateSchematicIndex()
+    Addon:Debug("Recipe catalog stored:", profession, #entries, "recipes")
+    return true
+end
+
+-- Cosa il client ha detto di una ricetta, per chiave.
+--
+-- Il catalogo e' per mestiere e la UI ragiona per chiave di ricetta, quindi
+-- serve l'indice inverso. Costruito alla prima richiesta e buttato via quando
+-- il catalogo cambia: e' una comodita', non uno stato da mantenere.
+function Data:GetCachedRecipeSchematic(recipeKey)
+    if recipeKey == nil then return nil end
+    local charDB = Addon.charDB
+    local catalogs = type(charDB) == "table" and charDB.recipeCatalog or nil
+    if type(catalogs) ~= "table" then return nil end
+    if type(self._schematicIndex) ~= "table" then
+        local index = {}
+        for _, catalog in pairs(catalogs) do
+            for _, entry in ipairs(type(catalog) == "table" and catalog or {}) do
+                if type(entry) == "table" and entry.reagents then
+                    if entry.key ~= nil then index[entry.key] = entry end
+                    if entry.variant ~= nil then index[entry.variant] = entry end
+                end
+            end
+        end
+        self._schematicIndex = index
+    end
+    return self._schematicIndex[recipeKey] or self._schematicIndex[tonumber(recipeKey)]
+end
+
+function Data:InvalidateSchematicIndex()
+    self._schematicIndex = nil
+end
+
+function Data:GetRecipeCatalog(profession)
+    local charDB = Addon.charDB
+    local catalog = type(charDB) == "table" and charDB.recipeCatalog or nil
+    local stored = type(catalog) == "table" and catalog[profession] or nil
+    if type(stored) == "table" and #stored > 0 then return stored end
+    return nil
+end
+
+-- Cosa il personaggio sa fare, senza aprire niente.
+--
+-- Il libro degli incantesimi non ELENCA le ricette -- sotto la riga di un
+-- mestiere c'e' solo la sua abilita', verificato in gioco il 2026-09-18 -- ma
+-- C_SpellBook.IsSpellKnown sa rispondere su una ricetta: true sui tre elisir
+-- appresi del personaggio di prova, false sulle due che non conosceva. E'
+-- l'oracolo che mancava. Attenzione a non confonderlo con il globale
+-- IsSpellKnown, che su quegli stessi ID risponde false a tutti.
+--
+-- Quindi: il catalogo dice cosa chiedere, l'oracolo dice cosa sai. La coppia
+-- copre tutti i mestieri in una volta, al login, senza toccare la UI.
+--
+-- Il limite, e va detto invece che scoperto: una ricetta introdotta da una
+-- patch nuova non e' nel catalogo salvato, quindi resta invisibile finche' non
+-- si riapre quel mestiere una volta. Il buco si chiude da solo la prima volta
+-- che ci si lavora, ed e' il motivo per cui questa non sostituisce la scansione
+-- dalla sessione: la affianca.
+function Data:ScanKnownFromSpellBook(opts)
+    self:EnsureScanState()
+    local context = resolveScanContext(opts)
+    local CSB = _G.C_SpellBook
+    if type(CSB) ~= "table" or type(CSB.IsSpellKnown) ~= "function" then
+        return self:SkipScan(nil, "spellbook-api-missing", nil, context)
+    end
+    local current = self._currentProfs
+    if type(current) ~= "table" or not next(current) then
+        return self:SkipScan(nil, "no-professions", nil, context)
+    end
+
+    local scanned, changedAny = 0, false
+    for profession in pairs(current) do
+        local catalog = self:GetRecipeCatalog(profession)
+        if catalog then
+            local recipes = {}
+            for i = 1, #catalog do
+                local row = catalog[i]
+                local recipeID = type(row) == "table" and row.id or nil
+                if recipeID then
+                    local ok, known = pcall(CSB.IsSpellKnown, recipeID)
+                    if ok and known then
+                        if isValidRecipeKey(row.key) then recipes[row.key] = true end
+                        if isValidRecipeKey(row.variant) then recipes[row.variant] = true end
+                    end
+                end
+            end
+            if next(recipes) then
+                local result = self:ApplyScanResult(profession, recipes, context)
+                scanned = scanned + 1
+                if result and result.changed then changedAny = true end
+            end
+        end
+    end
+
+    if scanned == 0 then
+        return self:SkipScan(nil, "no-catalog", nil, context)
+    end
+    return self:MakeScanResult(nil, {
+        valid = true,
+        changed = changedAny,
+        count = scanned,
+        reason = context.reason,
+        notifyMode = context.notifyMode,
+    })
+end
+
+-- La scansione.
+--
+-- Su un client classic erano centocinquanta righe, e quasi tutte esistevano per
+-- aggirare il fatto che i dati vivessero dentro una lista di UI: spegnere i
+-- filtri dell'utente e rimetterli, espandere le intestazioni e ricollassarle,
+-- saltare le righe header dentro l'array piatto. Niente di tutto questo esiste
+-- qui. C_TradeSkillUI espone ID di ricetta, non righe di lista, e non c'e'
+-- niente da aprire perche' niente e' nascosto.
+--
+-- Quello che resta e' il mestiere vero: prendi gli ID, tieni quelli appresi,
+-- costruisci la chiave. GetAllRecipeIDs restituisce il CATALOGO del mestiere --
+-- tutte le sue ricette, apprese o no: su Alchemy a livello 1 sono 197 righe di
+-- cui 3 tue. Quindi il filtro su info.learned non e' un dettaglio, e' la
+-- scansione: senza, dichiareremmo alla gilda di saper fare tutto.
+--
+-- La chiave di ricetta non cambia rispetto a TBC, ed e' il motivo per cui wire,
+-- SavedVariables e fingerprint non si accorgono di questa riscrittura:
+-- GetRecipeItemLink da' un |Hitem:...| e GetRecipeLink un |Henchant:...|, che
+-- extractItemID ed extractSpellID leggono gia' entrambi.
 function Data:ScanTradeSkill(opts)
     self:EnsureScanState()
     local context = resolveScanContext(opts)
-    local canScan, reason, canonical, initialNumSkills = self:CanScanTradeSkillData()
+    local canScan, reason, canonical, recipeIDs = self:CanScanTradeSkillData()
     if not canScan then
         return self:SkipScan(canonical, reason or "trade-data-not-ready", nil, context)
     end
@@ -477,53 +720,75 @@ function Data:ScanTradeSkill(opts)
     self._scanTelemetry.lastSkipReason = nil
     self._scanTelemetry.lastScanReason = context.reason
     self._scanTelemetry.lastScanNotifyMode = context.notifyMode
-    local filterState = snapshotTradeSkillFilters()
-    clearTradeSkillFilters()
 
+    local CT = _G.C_TradeSkillUI
     local recipes = {}
-    local collapsedHeaders = {}
+    local catalog = {}
     local ok, err = pcall(function()
-        local numSkills = initialNumSkills or GetNumTradeSkills() or 0
-        for i = numSkills, 1, -1 do
-            local headerName, recipeType, _, isExpanded = GetTradeSkillInfo(i)
-            if recipeType == "header" and not isExpanded then
-                collapsedHeaders[headerName or i] = true
-                pcall(ExpandTradeSkillSubClass, i)
-            end
-        end
-
-        numSkills = GetNumTradeSkills() or 0
-        for i = 1, numSkills do
-            local recipeName, recipeType = GetTradeSkillInfo(i)
-            if recipeName and recipeType ~= "header" and recipeType ~= "subheader" then
-                local recipeKey, variantSpellKey = buildScannedRecipeKey(GetTradeSkillItemLink(i), GetTradeSkillRecipeLink(i))
+        for i = 1, #recipeIDs do
+            local recipeID = recipeIDs[i]
+            local info = CT.GetRecipeInfo(recipeID)
+            if type(info) == "table" then
+                -- la chiave si calcola per TUTTE, anche per le non apprese: e'
+                -- cio' che finisce nel catalogo, e serve a riconoscerle il
+                -- giorno che le imparerai, quando questa sessione non ci sara'
+                local recipeKey, variantSpellKey = buildScannedRecipeKey(
+                    CT.GetRecipeItemLink(recipeID),
+                    CT.GetRecipeLink(recipeID)
+                )
                 if isValidRecipeKey(recipeKey) then
-                    recipes[recipeKey] = true
-                    if variantSpellKey and isValidRecipeKey(variantSpellKey) then
-                        recipes[variantSpellKey] = true
+                    local entry = { id = recipeID, key = recipeKey, variant = variantSpellKey }
+                    -- I reagenti, dallo stesso giro. Il dataset dei metadati e'
+                    -- la fonte giusta e un giorno arrivera'; finche' e' il
+                    -- segnaposto vuoto, il pannello dettagli resterebbe senza
+                    -- reagenti, che su un addon di ricette e' mezzo addon.
+                    -- GetRecipeSchematic li da' qui e solo qui -- vuole la
+                    -- sessione viva, come il catalogo -- quindi si prendono
+                    -- adesso o non si prendono.
+                    local schematic = CT.GetRecipeSchematic and CT.GetRecipeSchematic(recipeID, false)
+                    if type(schematic) == "table" then
+                        local reagents = {}
+                        for _, slot in ipairs(schematic.reagentSlotSchematics or {}) do
+                            -- si tiene il primo item dello slot: gli slot a piu'
+                            -- scelte sono una cosa di retail moderno, qui i
+                            -- reagenti sono fissi e ne hanno uno
+                            local first = slot.reagents and slot.reagents[1]
+                            local itemID = first and first.itemID
+                            if itemID then
+                                reagents[#reagents + 1] = {
+                                    itemID = itemID,
+                                    count = slot.quantityRequired or 1,
+                                }
+                            end
+                        end
+                        if #reagents > 0 then entry.reagents = reagents end
+                        local yieldMin = tonumber(schematic.quantityMin) or 1
+                        local yieldMax = tonumber(schematic.quantityMax) or yieldMin
+                        -- 1 e' il caso normale: si salva solo quando non lo e'
+                        if yieldMin ~= 1 or yieldMax ~= 1 then
+                            entry.yieldMin, entry.yieldMax = yieldMin, yieldMax
+                        end
                     end
-                else
+                    catalog[#catalog + 1] = entry
+                    if info.learned then
+                        recipes[recipeKey] = true
+                        if variantSpellKey and isValidRecipeKey(variantSpellKey) then
+                            recipes[variantSpellKey] = true
+                        end
+                    end
+                elseif info.learned then
                     self:RecordInvalidRecipeKey(recipeKey, "scan", self:GetPlayerKey(), canonical)
                     Addon:Debug("Blocked invalid recipe from TradeSkill scan:", recipeKey, "profession:", canonical)
                 end
             end
         end
-
-        if next(collapsedHeaders) then
-            numSkills = GetNumTradeSkills() or 0
-            local CollapseTradeSkillSubClass = CollapseTradeSkillSubClass
-            if type(CollapseTradeSkillSubClass) == "function" then
-                for i = 1, numSkills do
-                    local headerName, recipeType, _, isExpanded = GetTradeSkillInfo(i)
-                    if recipeType == "header" and isExpanded and collapsedHeaders[headerName or i] then
-                        pcall(CollapseTradeSkillSubClass, i)
-                    end
-                end
-            end
-        end
     end)
 
-    restoreTradeSkillFilters(filterState)
+    -- Il catalogo si salva solo se il giro e' arrivato in fondo: uno a meta'
+    -- sarebbe peggio di nessuno, perche' al login sembrerebbe completo.
+    if ok then
+        self:StoreRecipeCatalog(canonical, catalog)
+    end
 
     if not ok then
         self:RecordScanTelemetry("scansFailed")
@@ -538,75 +803,6 @@ function Data:ScanTradeSkill(opts)
             valid = false,
             failed = true,
             skipReason = "trade-scan-failed",
-            previousCount = prof and prof.count or 0,
-            reason = context.reason,
-            notifyMode = context.notifyMode,
-        })
-    end
-
-    return self:ApplyScanResult(canonical, recipes, context)
-end
-
-function Data:ScanCraft(opts)
-    self:EnsureScanState()
-    local context = resolveScanContext(opts)
-    local canScan, reason, canonical, initialNumCrafts = self:CanScanCraftData()
-    if not canScan then
-        if reason == "craft-not-enchanting" then
-            Addon:Debug("ScanCraft skipped: CraftFrame shows", canonical or "nil")
-        end
-        return self:SkipScan(canonical, reason or "craft-data-not-ready", nil, context)
-    end
-
-    local entry = self:GetOrCreateMember(self:GetPlayerKey())
-    local prof = entry.professions[canonical]
-    local hasData = prof and prof.count and prof.count > 0
-    if hasData and not self:HasScanPending(canonical) then
-        return self:SkipScan(canonical, "cached", prof.count or 0, context)
-    end
-
-    self:RecordScanTelemetry("scansStarted")
-    self._scanTelemetry.lastProfession = canonical
-    self._scanTelemetry.lastSkipReason = nil
-    self._scanTelemetry.lastScanReason = context.reason
-    self._scanTelemetry.lastScanNotifyMode = context.notifyMode
-    local filterState = snapshotCraftFilters()
-    clearCraftFilters()
-
-    local recipes = {}
-    local ok, err = pcall(function()
-        for i = 1, (initialNumCrafts or GetNumCrafts() or 0) do
-            local recipeName, _craftSubSpellName, recipeType = GetCraftInfo(i)
-            if recipeName and recipeType ~= "header" and recipeType ~= "subheader" then
-                local recipeKey, variantSpellKey = buildScannedRecipeKey(GetCraftItemLink(i), GetCraftRecipeLink(i))
-                if isValidRecipeKey(recipeKey) then
-                    recipes[recipeKey] = true
-                    if variantSpellKey and isValidRecipeKey(variantSpellKey) then
-                        recipes[variantSpellKey] = true
-                    end
-                else
-                    self:RecordInvalidRecipeKey(recipeKey, "scan", self:GetPlayerKey(), canonical)
-                    Addon:Debug("Blocked invalid recipe from Craft scan:", recipeKey, "profession:", canonical)
-                end
-            end
-        end
-    end)
-
-    restoreCraftFilters(filterState)
-
-    if not ok then
-        self:RecordScanTelemetry("scansFailed")
-        self._scanTelemetry.lastScanReason = context.reason
-        self._scanTelemetry.lastScanNotifyMode = context.notifyMode
-        if context.notifyMode == "manual" then
-            Addon:Print("Craft scan failed: " .. tostring(err))
-        else
-            Addon:Debug("Craft scan failed:", tostring(err), "reason:", context.reason)
-        end
-        return self:MakeScanResult(canonical, {
-            valid = false,
-            failed = true,
-            skipReason = "craft-scan-failed",
             previousCount = prof and prof.count or 0,
             reason = context.reason,
             notifyMode = context.notifyMode,

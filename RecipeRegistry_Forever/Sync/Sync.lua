@@ -381,8 +381,7 @@ function Sync:GetWhisperTarget(memberKey)
     if not memberKey then
         return nil
     end
-    local name = memberKey:match("^([^%-]+)")
-    return name or memberKey
+    return Addon.Data:GetMemberKeyName(memberKey)
 end
 
 function Sync:IsRealTrafficSuppressed()

@@ -12,7 +12,7 @@ local MOCK_OWNER_PREFIX = "__RRMockOwner"
 
 local MOCK_PROFESSIONS = {
     "Alchemy", "Blacksmithing", "Cooking", "Enchanting",
-    "Engineering", "Jewelcrafting", "Leatherworking", "Tailoring",
+    "Engineering", "Leatherworking", "Tailoring",
 }
 
 local SCENARIOS = {

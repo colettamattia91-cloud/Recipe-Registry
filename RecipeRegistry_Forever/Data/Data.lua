@@ -5,34 +5,6 @@ Addon.Data = Data
 local Private = Data._private or {}
 Data._private = Private
 
-local GetNumSkillLines = GetNumSkillLines
-local GetSkillLineInfo = GetSkillLineInfo
-local GetNumTradeSkills = GetNumTradeSkills
-local GetTradeSkillInfo = GetTradeSkillInfo
-local GetTradeSkillItemLink = GetTradeSkillItemLink
-local GetTradeSkillRecipeLink = GetTradeSkillRecipeLink
-local ExpandTradeSkillSubClass = ExpandTradeSkillSubClass
-local GetTradeSkillLine = GetTradeSkillLine
-local GetTradeSkillSubClasses = GetTradeSkillSubClasses
-local GetTradeSkillSubClassFilter = GetTradeSkillSubClassFilter
-local SetTradeSkillSubClassFilter = SetTradeSkillSubClassFilter
-local GetTradeSkillInvSlots = GetTradeSkillInvSlots
-local GetTradeSkillInvSlotFilter = GetTradeSkillInvSlotFilter
-local SetTradeSkillInvSlotFilter = SetTradeSkillInvSlotFilter
-local GetTradeSkillItemNameFilter = GetTradeSkillItemNameFilter
-local SetTradeSkillItemNameFilter = SetTradeSkillItemNameFilter
-local GetTradeSkillItemLevelFilter = GetTradeSkillItemLevelFilter
-local SetTradeSkillItemLevelFilter = SetTradeSkillItemLevelFilter
-local TradeSkillOnlyShowMakeable = TradeSkillOnlyShowMakeable
-local TradeSkillOnlyShowSkillUps = TradeSkillOnlyShowSkillUps
-local GetNumCrafts = GetNumCrafts
-local GetCraftInfo = GetCraftInfo
-local GetCraftItemLink = GetCraftItemLink
-local GetCraftRecipeLink = GetCraftRecipeLink
-local GetCraftSkillLine = GetCraftSkillLine
-local GetCraftDisplaySkillLine = GetCraftDisplaySkillLine
-local GetCraftItemNameFilter = GetCraftItemNameFilter
-local SetCraftItemNameFilter = SetCraftItemNameFilter
 local GetNumGuildMembers = GetNumGuildMembers
 local GetGuildRosterInfo = GetGuildRosterInfo
 local GetGuildRosterLastOnline = GetGuildRosterLastOnline
@@ -104,14 +76,22 @@ local DB_DEFAULTS = {
             -- list rather than filter it.
             showOnlyProfitableRecipes = false,
             expansionDefaults = {
-                -- TBC-only by default. The vast majority of players land
-                -- on TBC content; surfacing 1248 vanilla recipes by
-                -- default in every profession list is noise for the
-                -- normal case. Users who actively level vanilla can flip
-                -- the toggle in /rr options. Existing users with an
-                -- explicit value keep theirs (AceDB only applies
-                -- defaults to keys not yet present in the profile).
-                vanilla = false,
+                -- Su Forever il default e' "mostra tutto".
+                --
+                -- L'albero TBC parte con vanilla spento, e li' ha senso: quasi
+                -- tutti giocano contenuto TBC, e 1248 ricette vanilla in ogni
+                -- lista sono rumore. Qui il ragionamento si capovolge --
+                -- contenuto TBC non ne esiste, e quello che c'e' e' vanilla piu'
+                -- le aggiunte di Forever -- quindi spegnere "vanilla"
+                -- nasconderebbe l'intero gioco.
+                --
+                -- Oggi non si vedrebbe: il dataset dei metadati e' il segnaposto
+                -- vuoto, nessuna ricetta risulta classificata, e il filtro
+                -- lascia passare tutto cio' che non sa collocare. Si vedrebbe il
+                -- giorno in cui arriva il dataset vero, e sarebbe un addon che
+                -- di colpo non mostra piu' niente per una decisione presa per un
+                -- altro gioco.
+                vanilla = true,
                 tbc = true,
             },
             professionExpansionOverrides = {},
@@ -147,8 +127,11 @@ local TRACKED = {
     ["Cooking"] = true,
     ["Enchanting"] = true,
     ["Engineering"] = true,
+    -- First Aid non e' tracciata nell'albero TBC. Su Forever si': il client la
+    -- restituisce da GetProfessions come gli altri mestieri, e qui ha ricette
+    -- che vale la pena dichiarare alla gilda.
+    ["First Aid"] = true,
     ["Herbalism"] = true,
-    ["Jewelcrafting"] = true,
     ["Leatherworking"] = true,
     ["Mining"] = true,
     ["Skinning"] = true,
@@ -161,8 +144,8 @@ local PROFESSION_SPELL_IDS = {
     ["Cooking"] = 2550,
     ["Enchanting"] = 7411,
     ["Engineering"] = 4036,
+    ["First Aid"] = 3273,
     ["Herbalism"] = 2366,
-    ["Jewelcrafting"] = 25229,
     ["Leatherworking"] = 2108,
     ["Mining"] = 2575,
     ["Skinning"] = 8613,
@@ -173,26 +156,31 @@ local TITLE_ALIAS_SPELL_IDS = {
     ["Mining"] = 2656,
 }
 
--- Professions that support specializations in TBC Classic.
--- Each entry maps a specialization display name to the spell ID the player
--- must know in order to have that spec.
+-- Le specializzazioni che questo client conosce.
+--
+-- Ogni voce lega un nome da mostrare allo spell ID che il personaggio deve
+-- sapere perche' quella specializzazione sia sua; detectSpecialization li
+-- interroga con IsSpellKnown.
+--
+-- Niente Alchemy e niente Tailoring. L'albero TBC ne elenca sei -- le maestrie
+-- Potion/Elixir/Transmutation e le vie Mooncloth/Shadoweave/Spellfire -- e sono
+-- roba di TBC: interrogando GetSpellInfo su tutti e sedici gli ID il
+-- 2026-09-18, quei sei sono gli unici a rispondere nil, mentre i dieci vanilla
+-- rispondono tutti. Tenerli non faceva danno, perche' IsSpellKnown su uno spell
+-- inesistente dice false e nessuno vedeva niente, ma erano peso morto che
+-- raccontava una cosa falsa su questo gioco.
+--
+-- Quello che manca, e che da qui non si puo' sapere: le specializzazioni che
+-- Forever abbia aggiunto di suo. Un ID che non conosciamo non si scopre
+-- interrogando il client, si scopre dal datamining -- stesso buco del dataset
+-- delle ricette, e si chiude dalla stessa parte.
 local PROFESSION_SPECIALIZATIONS = {
-    ["Alchemy"] = {
-        { name = "Potion Master",         spellID = 28675 },
-        { name = "Elixir Master",         spellID = 28677 },
-        { name = "Transmutation Master",  spellID = 28672 },
-    },
     ["Blacksmithing"] = {
         { name = "Armorsmith",            spellID = 9788  },
         { name = "Master Axesmith",       spellID = 17041 },
         { name = "Master Hammersmith",    spellID = 17040 },
         { name = "Master Swordsmith",     spellID = 17039 },
         { name = "Weaponsmith",           spellID = 9787  },
-    },
-    ["Tailoring"] = {
-        { name = "Mooncloth Tailoring",   spellID = 26798 },
-        { name = "Shadoweave Tailoring",  spellID = 26801 },
-        { name = "Spellfire Tailoring",   spellID = 26797 },
     },
     ["Leatherworking"] = {
         { name = "Dragonscale Leatherworking", spellID = 10656 },
@@ -373,193 +361,6 @@ local function extractSpellID(link)
     return spellID and tonumber(spellID) or nil
 end
 
-local function snapshotTradeSkillFilters()
-    local state = {
-        nameFilter = nil,
-        itemLevelMin = nil,
-        itemLevelMax = nil,
-        subclassIndex = 0,
-        invslotIndex = 0,
-        onlyMakeable = false,
-        onlySkillUps = false,
-    }
-
-    -- Name filter: prefer the EditBox widget text as authoritative source.
-    -- On reopen, Blizzard restores EditBox text from memory but may not yet have
-    -- called OnTextChanged, so GetTradeSkillItemNameFilter() can still return ""
-    -- even though the box visually shows the previous filter.
-    local filterBox = _G.TradeSkillFilterBox
-    local filterBoxText = (filterBox and type(filterBox.GetText) == "function")
-        and filterBox:GetText() or nil
-
-    if type(GetTradeSkillItemNameFilter) == "function" then
-        local ok, value = pcall(GetTradeSkillItemNameFilter)
-        if ok then state.nameFilter = value or "" end
-    end
-
-    -- If the EditBox has text but the API filter is empty, Blizzard hasn't applied
-    -- the EditBox value yet → take the EditBox text as the real filter.
-    if filterBoxText and filterBoxText ~= "" and (state.nameFilter == nil or state.nameFilter == "") then
-        state.nameFilter = filterBoxText
-    end
-
-    if type(GetTradeSkillItemLevelFilter) == "function" then
-        local ok, minLevel, maxLevel = pcall(GetTradeSkillItemLevelFilter)
-        if ok then
-            state.itemLevelMin = minLevel
-            state.itemLevelMax = maxLevel
-        end
-    end
-
-    -- In TBC Classic SetTradeSkillSubClassFilter takes a single index:
-    -- 0 = show all, i = show only subclass i.
-    -- Determine whether all are active (0) or a specific one.
-    if type(GetTradeSkillSubClasses) == "function" and type(GetTradeSkillSubClassFilter) == "function" then
-        local count = select("#", GetTradeSkillSubClasses())
-        local activeIndex = 0
-        local activeCount = 0
-        for i = 1, count do
-            if GetTradeSkillSubClassFilter(i) then
-                activeCount = activeCount + 1
-                activeIndex = i
-            end
-        end
-        state.subclassIndex = (activeCount == count or count == 0) and 0 or activeIndex
-    end
-
-    if type(GetTradeSkillInvSlots) == "function" and type(GetTradeSkillInvSlotFilter) == "function" then
-        local count = select("#", GetTradeSkillInvSlots())
-        local activeIndex = 0
-        local activeCount = 0
-        for i = 1, count do
-            if GetTradeSkillInvSlotFilter(i) then
-                activeCount = activeCount + 1
-                activeIndex = i
-            end
-        end
-        state.invslotIndex = (activeCount == count or count == 0) and 0 or activeIndex
-    end
-
-    -- Snapshot the "Have Materials" checkbox if the Blizzard frame is available.
-    local makeableBtn = _G.TradeSkillFrameAvailableFilterCheckButton
-    if makeableBtn and type(makeableBtn.GetChecked) == "function" then
-        state.onlyMakeable = makeableBtn:GetChecked() and true or false
-    end
-
-    -- Snapshot the "Has Skill Up" checkbox.
-    local skillUpBtn = _G.TradeSkillFrameFilterSkillUps
-    if skillUpBtn and type(skillUpBtn.GetChecked) == "function" then
-        state.onlySkillUps = skillUpBtn:GetChecked() and true or false
-    end
-
-    return state
-end
-
-local function clearTradeSkillFilters()
-    -- Clear the EditBox widget first: this triggers OnTextChanged which calls
-    -- SetTradeSkillItemNameFilter("") and TradeSkillFrame_Update internally,
-    -- keeping the API state and the visual in full sync during the scan.
-    local filterBox = _G.TradeSkillFilterBox
-    if filterBox and type(filterBox.SetText) == "function" then
-        filterBox:SetText("")
-    elseif type(SetTradeSkillItemNameFilter) == "function" then
-        pcall(SetTradeSkillItemNameFilter, "")
-    end
-    if type(SetTradeSkillItemLevelFilter) == "function" then
-        pcall(SetTradeSkillItemLevelFilter, 0, 0)
-    end
-    if type(TradeSkillOnlyShowMakeable) == "function" then
-        pcall(TradeSkillOnlyShowMakeable, false)
-    end
-    if type(TradeSkillOnlyShowSkillUps) == "function" then
-        pcall(TradeSkillOnlyShowSkillUps, false)
-    end
-    -- 0 = show all subclasses / inv slots in TBC Classic
-    if type(SetTradeSkillSubClassFilter) == "function" then
-        pcall(SetTradeSkillSubClassFilter, 0)
-    end
-    if type(SetTradeSkillInvSlotFilter) == "function" then
-        pcall(SetTradeSkillInvSlotFilter, 0)
-    end
-end
-
-local function restoreTradeSkillFilters(state)
-    if not state then return end
-
-    -- Single-index restore: 0 = all, i = specific subclass/slot
-    if type(SetTradeSkillSubClassFilter) == "function" then
-        pcall(SetTradeSkillSubClassFilter, state.subclassIndex or 0)
-    end
-
-    if type(SetTradeSkillInvSlotFilter) == "function" then
-        pcall(SetTradeSkillInvSlotFilter, state.invslotIndex or 0)
-    end
-
-    if type(SetTradeSkillItemNameFilter) == "function" and state.nameFilter ~= nil then
-        pcall(SetTradeSkillItemNameFilter, state.nameFilter)
-    end
-    -- Restore the EditBox widget and trigger Blizzard's OnTextChanged handler.
-    -- This is the authoritative path: the handler calls SetTradeSkillItemNameFilter
-    -- and TradeSkillFrame_Update on its own, ensuring the list is actually filtered.
-    local filterBox = _G.TradeSkillFilterBox
-    if filterBox and type(filterBox.SetText) == "function" then
-        filterBox:SetText(state.nameFilter or "")
-    end
-
-    if type(SetTradeSkillItemLevelFilter) == "function" and state.itemLevelMin ~= nil and state.itemLevelMax ~= nil then
-        pcall(SetTradeSkillItemLevelFilter, state.itemLevelMin, state.itemLevelMax)
-    end
-
-    -- Restore "Have Materials" / "Has Skill Up" toggles
-    if type(TradeSkillOnlyShowMakeable) == "function" then
-        pcall(TradeSkillOnlyShowMakeable, state.onlyMakeable or false)
-    end
-    if type(TradeSkillOnlyShowSkillUps) == "function" then
-        pcall(TradeSkillOnlyShowSkillUps, state.onlySkillUps or false)
-    end
-
-    -- Sync the Blizzard checkbox visuals to match the restored state
-    local makeableBtn = _G.TradeSkillFrameAvailableFilterCheckButton
-    if makeableBtn and type(makeableBtn.SetChecked) == "function" then
-        makeableBtn:SetChecked(state.onlyMakeable or false)
-    end
-    local skillUpBtn = _G.TradeSkillFrameFilterSkillUps
-    if skillUpBtn and type(skillUpBtn.SetChecked) == "function" then
-        skillUpBtn:SetChecked(state.onlySkillUps or false)
-    end
-
-    -- Force Blizzard frame to re-render with the restored filters
-    if TradeSkillFrame and TradeSkillFrame:IsShown() and type(TradeSkillFrame_Update) == "function" then
-        pcall(TradeSkillFrame_Update)
-    end
-end
-
-local function snapshotCraftFilters()
-    local state = { nameFilter = nil }
-    if type(GetCraftItemNameFilter) == "function" then
-        local ok, value = pcall(GetCraftItemNameFilter)
-        if ok then state.nameFilter = value or "" end
-    end
-    return state
-end
-
-local function clearCraftFilters()
-    if type(SetCraftItemNameFilter) == "function" then
-        pcall(SetCraftItemNameFilter, "")
-    end
-end
-
-local function restoreCraftFilters(state)
-    if not state then return end
-    if type(SetCraftItemNameFilter) == "function" and state.nameFilter ~= nil then
-        pcall(SetCraftItemNameFilter, state.nameFilter)
-    end
-    -- Force Blizzard CraftFrame to re-render with restored filters
-    if CraftFrame and CraftFrame:IsShown() and type(CraftFrame_Update) == "function" then
-        pcall(CraftFrame_Update)
-    end
-end
-
 local function isSubsetOf(smaller, bigger)
     for k in pairs(smaller or {}) do
         if not (bigger and bigger[k]) then
@@ -616,12 +417,6 @@ Private.buildLocaleMap = buildLocaleMap
 Private.lowerSafe = lowerSafe
 Private.extractItemID = extractItemID
 Private.extractSpellID = extractSpellID
-Private.snapshotTradeSkillFilters = snapshotTradeSkillFilters
-Private.clearTradeSkillFilters = clearTradeSkillFilters
-Private.restoreTradeSkillFilters = restoreTradeSkillFilters
-Private.snapshotCraftFilters = snapshotCraftFilters
-Private.clearCraftFilters = clearCraftFilters
-Private.restoreCraftFilters = restoreCraftFilters
 Private.isSubsetOf = isSubsetOf
 Private.newScanTelemetry = newScanTelemetry
 
@@ -633,6 +428,17 @@ function Data:OnInitialize()
     end
     if type(_G.RecipeRegistryCharDB.favorites) ~= "table" then
         _G.RecipeRegistryCharDB.favorites = {}
+    end
+    -- Il catalogo di ogni mestiere: tutti i suoi recipeID, appresi o no.
+    --
+    -- E' dato di gioco, non tuo: cambia con le patch, non con quello che impari.
+    -- Sta qui, per personaggio e fuori dal database di gilda, perche' non si
+    -- sincronizza -- ai compagni interessa cosa sai fare, non l'elenco di cosa
+    -- esiste. Si riempie quando apri un mestiere, ed e' cio' che permette poi di
+    -- sapere cosa sai fare al login senza aprire niente: si chiede
+    -- C_SpellBook.IsSpellKnown su ogni ID del catalogo.
+    if type(_G.RecipeRegistryCharDB.recipeCatalog) ~= "table" then
+        _G.RecipeRegistryCharDB.recipeCatalog = {}
     end
     Addon.charDB = _G.RecipeRegistryCharDB
     self._scanNeededByProfession = {}
@@ -764,17 +570,62 @@ function Data:OnInitialize()
     end
 end
 
+-- La chiave di proprietario su Forever e' il nome del personaggio. Basta quello.
+--
+-- Su un client classic la chiave e' "nome-realm", perche' il realm fa parte
+-- dell'identita'. Qui no, per due ragioni che si sommano:
+--
+-- 1. Forever e' dichiarato senza realm. Il client una stringa la risponde
+--    comunque (in beta "Classic Beta PvE 2"), ma sembra seguire l'istanza
+--    dinamica su cui si gira: lo stesso personaggio potrebbe presentarsi con
+--    realm diversi in momenti diversi, e ogni cambio creerebbe un secondo
+--    proprietario per la stessa persona. Contenuto diviso a meta', fingerprint
+--    che non convergono, e nessun errore da nessuna parte.
+-- 2. Il confine che conta e' la gilda, non il realm, ed e' gia' imposto dal
+--    trasporto: il sync va in "GUILD" e in "WHISPER" verso il roster, quindi da
+--    fuori non arriva niente. Dentro una gilda i nomi sono unici gia' di loro.
+--
+-- Il realm lo leggiamo ancora, ma per una cosa sola: se il roster elencasse un
+-- nome come "Kaedros Davian-ClassicBetaPvE2", riconoscere quella coda e
+-- scartarla, perche' altrimenti il personaggio locale e il roster darebbero due
+-- chiavi diverse per la stessa persona.
+--
+-- Il nome contiene uno spazio ("Nome Cognome") e potrebbe contenere un
+-- trattino: nessuna delle due cose e' un problema ora che nella chiave non
+-- c'e' piu' niente da spacchettare.
+local function normalizeRealmToken(realm)
+    local normalized = tostring(realm or ""):gsub("[%s%-]", "")
+    return normalized
+end
+
+-- Il realm che questo client dichiara adesso, normalizzato. Non finisce in
+-- nessuna chiave: serve solo a riconoscere un suffisso da buttare via.
+local function currentRealmToken()
+    local _, realm = UnitFullName("player")
+    local token = normalizeRealmToken(realm)
+    if token == "" then
+        token = normalizeRealmToken(GetRealmName())
+    end
+    return token
+end
+
+-- Un nome di roster e' ambiguo: "Jean-Luc Picard" senza realm ha la stessa
+-- forma di "Kaedros Davian-ClassicBetaPvE2" con realm. Lo si scioglie sapendo
+-- che un roster di gilda e' di un realm solo, il nostro: un suffisso e' un
+-- realm soltanto se coincide con quello che il client dichiara in questo
+-- momento. Tutto il resto fa parte del nome.
 local function normalizeGuildRosterMemberKey(fullName)
     if type(fullName) ~= "string" or fullName == "" then
         return nil
     end
-    local name, realm = fullName:match("^([^%-]+)%-(.+)$")
-    if not name then
-        name = fullName
-        realm = GetRealmName() or "UnknownRealm"
+    local name, suffix = fullName:match("^(.+)%-([^%-]+)$")
+    if name and name ~= "" and suffix then
+        local realmToken = currentRealmToken()
+        if realmToken ~= "" and normalizeRealmToken(suffix) == realmToken then
+            return name
+        end
     end
-    realm = (realm or "UnknownRealm"):gsub("[%s%-]", "")
-    return string.format("%s-%s", name, realm)
+    return fullName
 end
 
 local function computeOfflineDays(yearsOffline, monthsOffline, daysOffline, hoursOffline)
@@ -1044,17 +895,92 @@ function Data:GetCanonicalProfession(name)
 end
 
 function Data:GetPlayerKey()
-    local name, realm = UnitFullName("player")
-    realm = realm or GetRealmName() or "UnknownRealm"
-    realm = realm:gsub("[%s%-]", "")
-    return string.format("%s-%s", name or "Unknown", realm)
+    -- solo il primo valore: il realm che UnitFullName restituisce non e'
+    -- identita' su questo client, vedi normalizeGuildRosterMemberKey
+    local name = UnitFullName("player")
+    return name or "Unknown"
+end
+
+-- La chiave e' gia' il nome. Questa resta il posto unico da cui UI e sussurri
+-- ricavano come si chiama un proprietario, cosi' se la forma della chiave
+-- cambiera' di nuovo ci sara' una riga sola da cambiare.
+function Data:GetMemberKeyName(memberKey)
+    return memberKey
+end
+
+function Data:MemberKeyFromFullName(fullName)
+    return normalizeGuildRosterMemberKey(fullName)
+end
+
+-- Senza il segmento realm questo e' l'unico controllo di forma rimasto fra un
+-- peer e il nostro database, quindi deve fermare quello che faceva male:
+--   ":"  spezzerebbe le chiavi di blocco "proprietario::professione"
+--   "|"  e' l'escape di WoW, e un nome che lo contiene inietta colori e link
+--        dentro le stringhe che la UI compone
+--   caratteri di controllo, e spazi ai bordi, che darebbero due chiavi gemelle
+--   per lo stesso personaggio
+-- Il dataset dei metadati ha qualcosa da dire?
+--
+-- Due cancelli dell'addon cancellano o nascondono le ricette che il dataset non
+-- conosce: la pulizia automatica e il filtro hideUncataloguedRecipes della UI.
+-- Entrambi presuppongono un dataset che sappia le cose, e su TBC e' cosi'. Qui
+-- il dataset e' il segnaposto vuoto, e quei due cancelli hanno cancellato tutto
+-- e nascosto il resto -- visto in gioco il 2026-09-18, prima le tre ricette di
+-- Alchemy sparite otto secondi dopo il login, poi la lista vuota nell'addon.
+--
+-- Da qui in poi: un dataset che non conosce nessuna ricetta non ha opinioni, e
+-- chi lo interroga se ne accorge da questa funzione invece che dedurlo.
+--
+-- Vale anche quando il dataset vero arrivera'. Su un client che aggiunge
+-- ricette di continuo il dataset e' sempre indietro rispetto al gioco, e non
+-- sapere di una ricetta non e' un giudizio su quella ricetta.
+-- E di questo mestiere, ne sa qualcosa?
+--
+-- La domanda grossa non basta appena il dataset esiste ma e' parziale, ed e'
+-- lo stato normale di un dataset raccolto in gioco: si riempie un mestiere per
+-- volta, aprendo quel mestiere. Con la sola MetadataKnowsAnyRecipe, il primo
+-- dump di Alchemy accenderebbe i cancelli anche per Cooking -- e le ricette di
+-- Cooking, che il dataset non nomina, verrebbero cancellate dalla pulizia e
+-- nascoste dalla UI. Un dataset parziale sarebbe peggio di nessun dataset.
+--
+-- Quindi l'astensione e' per mestiere: si giudica solo cio' di cui si sa
+-- qualcosa. L'insieme si costruisce una volta e si butta se il dataset cambia
+-- sotto -- cosa che in gioco non succede, ma negli spec si'.
+function Data:MetadataKnowsProfession(professionKey)
+    if not professionKey then return false end
+    local metadata = Addon and Addon.RecipeMetadata
+    if type(metadata) ~= "table" then return false end
+    local generated = metadata._generated
+    local records = type(generated) == "table" and generated.recipesBySpellId or nil
+    if type(records) ~= "table" then return false end
+    if self._metadataProfessions == nil or self._metadataProfessionsSource ~= records then
+        local seen = {}
+        for _, record in pairs(records) do
+            if type(record) == "table" and record.profession then
+                seen[tostring(record.profession):lower()] = true
+            end
+        end
+        self._metadataProfessions = seen
+        self._metadataProfessionsSource = records
+    end
+    return self._metadataProfessions[tostring(professionKey):lower()] == true
+end
+
+function Data:MetadataKnowsAnyRecipe()
+    local metadata = Addon and Addon.RecipeMetadata
+    if type(metadata) ~= "table" then return false end
+    if next(metadata._recordsBySpellId or {}) ~= nil then return true end
+    local generated = metadata._generated
+    if type(generated) ~= "table" then return false end
+    return next(generated.recipeItemToSpellId or {}) ~= nil
+        or next(generated.createdItemToSpellIds or {}) ~= nil
 end
 
 function Data:IsValidMemberKey(memberKey)
     if type(memberKey) ~= "string" or memberKey == "" then return false end
-    if memberKey:find(":", 1, true) then return false end
-    local name, realm = memberKey:match("^([^-]+)%-(.+)$")
-    return name ~= nil and name ~= "" and realm ~= nil and realm ~= ""
+    if memberKey:find("[:|%c]") then return false end
+    if memberKey:match("^%s") or memberKey:match("%s$") then return false end
+    return true
 end
 
 function Data:GetMembersDB()
@@ -1884,14 +1810,8 @@ function Data:RebuildOnlineCache()
     }
     for i = 1, GetNumGuildMembers() do
         local fullName, rankName, rankIndex, level, classDisplayName, zone, publicNote, officerNote, online, status, classFileName = GetGuildRosterInfo(i)
-        if fullName then
-            local name, realm = fullName:match("^([^%-]+)%-(.+)$")
-            if not name then
-                name = fullName
-                realm = GetRealmName() or "UnknownRealm"
-            end
-            realm = (realm or "UnknownRealm"):gsub("[%s%-]", "")
-            local memberKey = name .. "-" .. realm
+        local memberKey = fullName and normalizeGuildRosterMemberKey(fullName)
+        if memberKey then
             if online then
                 nextOnline[memberKey] = true
                 delta.onlineCount = delta.onlineCount + 1

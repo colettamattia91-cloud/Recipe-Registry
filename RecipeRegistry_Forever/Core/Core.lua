@@ -251,17 +251,8 @@ local function scanActiveProfessionData(self, opts)
         end
         return changed
     end
-    if opts.source == "craft" then
-        if self.Data.ScanCraft then
-            changed = scanResultChanged(self.Data:ScanCraft(opts)) or changed
-        end
-        return changed
-    end
     if self.Data.ScanTradeSkill then
         changed = scanResultChanged(self.Data:ScanTradeSkill(opts)) or changed
-    end
-    if self.Data.ScanCraft then
-        changed = scanResultChanged(self.Data:ScanCraft(opts)) or changed
     end
     return changed
 end
@@ -279,6 +270,71 @@ local function markSyncIndexDirtyAndScheduleHello(self, reason, delay)
             self.Sync:RefreshSyncReadyState(reason)
         end
     end
+end
+
+-- Scansione con ritentativo.
+--
+-- La sorgente dati di C_TradeSkillUI non e' pronta quando lo siamo noi. Al
+-- login, due secondi dopo PLAYER_LOGIN, GetAllRecipeIDs tace ancora e la
+-- scansione salta con "trade-no-title"; una manciata di secondi dopo risponde
+-- 197 righe e registra correttamente. Stessa storia su TRADE_SKILL_SHOW, che
+-- arriva prima che il cambio di mestiere sia completo.
+--
+-- La domanda ovvia e' perche' non aspettare IsTradeSkillReady, che sembra
+-- fatta apposta. Perche' risponde a una domanda diversa: e' true solo mentre
+-- una sessione mestiere e' aperta, e torna false appena si chiude -- verificato
+-- in gioco il 2026-09-18. I dati invece restano leggibili anche dopo, ed e'
+-- proprio quel caso che ci interessa: catalogo di 197 ricette, scansione che ne
+-- registra 3, e IsTradeSkillReady a false. Aspettarla vorrebbe dire scansionare
+-- solo a finestra aperta, cioe' rinunciare a tutto il guadagno.
+--
+-- Quindi si prova, e se il motivo del rifiuto e' "non ancora pronto" si riprova
+-- piu' tardi. I motivi definitivi -- API assente, mestiere non tracciato, dati
+-- gia' a posto -- fermano la catena subito, perche' insistere non cambierebbe
+-- niente.
+local SCAN_RETRY_REASONS = {
+    ["trade-no-title"] = true,
+    ["trade-data-not-ready"] = true,
+    -- la sessione si sta aprendo proprio adesso: al primo tentativo
+    -- IsTradeSkillReady puo' ancora dire false
+    ["trade-session-closed"] = true,
+}
+
+-- Quando riprovare dopo TRADE_SKILL_SHOW. La prima e' quasi sempre quella
+-- buona; le altre coprono un client che ci mette piu' del previsto. Finite
+-- queste, si smette: se dopo otto secondi la sessione non e' viva, non lo
+-- diventera' per insistenza.
+local TRADE_SKILL_SHOW_RETRIES = { 0.3, 1, 2, 5 }
+
+-- Una catena alla volta per motivo. Aprire e chiudere la finestra dei mestieri
+-- un paio di volte fa arrivare TRADE_SKILL_SHOW altrettante, e senza questo ogni
+-- evento lascerebbe dietro di se' una catena di ritentativi che continua a
+-- girare. Il gettone e' il modo piu' semplice: chi parte lo incrementa, le
+-- catene vecchie se ne accorgono e si fermano da sole -- niente timer da
+-- inseguire e cancellare.
+local scheduleScanWithRetry
+scheduleScanWithRetry = function(self, reason, delays, attempt, token)
+    attempt = attempt or 1
+    if attempt == 1 then
+        self._scanRetryTokens = self._scanRetryTokens or {}
+        token = (self._scanRetryTokens[reason] or 0) + 1
+        self._scanRetryTokens[reason] = token
+    end
+    local delay = delays[attempt]
+    if not delay then return end
+    self:ScheduleTimer(function()
+        if not self.Data then return end
+        if self._scanRetryTokens and self._scanRetryTokens[reason] ~= token then
+            return
+        end
+        local result = self.Data:ScanTradeSkill({ reason = reason, notifyMode = "auto" })
+        if scanResultChanged(result) then
+            markSyncIndexDirtyAndScheduleHello(self, reason .. "-scan", 0.5)
+        end
+        if result and result.skipped and SCAN_RETRY_REASONS[result.skipReason] then
+            scheduleScanWithRetry(self, reason, delays, attempt + 1, token)
+        end
+    end, delay)
 end
 
 local function splitCommand(text)
@@ -496,7 +552,20 @@ function Addon:OnEnable()
     self:RegisterEvent("PLAYER_LOGIN", "OnPlayerLogin")
     self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnPlayerEnteringWorld")
     self:RegisterEvent("TRADE_SKILL_SHOW", "OnTradeSkillShow")
-    self:RegisterEvent("CRAFT_SHOW", "OnCraftShow")
+    -- Il segnale giusto, non solo il piu' ovvio. Registrando i candidati e
+    -- guardando cosa arriva davvero (2026-09-18, aprendo Alchemy):
+    --   TRADE_SKILL_SHOW                 catalogo 0    <- qui non c'e' ancora niente
+    --   TRADE_SKILL_DATA_SOURCE_CHANGING catalogo 0
+    --   TRADE_SKILL_DATA_SOURCE_CHANGED  catalogo 197  <- qui i dati ci sono
+    -- TRADE_SKILL_SHOW resta agganciato perche' e' il primo momento in cui si
+    -- sa che l'utente ha aperto qualcosa, e il ritentativo copre il vuoto; ma
+    -- questo e' l'evento che dice "adesso c'e' da leggere", e arriva anche
+    -- quando si passa da un mestiere all'altro senza riaprire la finestra.
+    self:RegisterEvent("TRADE_SKILL_DATA_SOURCE_CHANGED", "OnTradeSkillShow")
+    -- niente CRAFT_SHOW: su questo client l'evento non esiste, e registrarlo
+    -- fa fallire l'intero OnEnable ("Attempt to register unknown event").
+    -- Su TBC la famiglia Craft esisteva per un mestiere solo, Enchanting; qui
+    -- Enchanting e' un mestiere come gli altri e passa da TRADE_SKILL_SHOW.
     self:RegisterEvent("NEW_RECIPE_LEARNED", "OnRecipeSignal")
     self:RegisterEvent("SPELLS_CHANGED", "OnSkillSignal")
     self:RegisterEvent("SKILL_LINES_CHANGED", "OnSkillSignal")
@@ -536,6 +605,28 @@ function Addon:OnPlayerLogin()
     end
     if self.Data then
         self.Data:DetectProfessions()
+        -- La scansione al login, che non passa da C_TradeSkillUI.
+        --
+        -- La lista delle ricette del client serve una sessione viva e ne mostra
+        -- un mestiere alla volta, quindi al login non e' una fonte: a sessione
+        -- chiusa risponde con il residuo dell'ultimo mestiere aperto, e
+        -- registrarlo pubblicherebbe alla gilda uno stato vecchio.
+        --
+        -- Il libro degli incantesimi invece risponde sempre. Non elenca le
+        -- ricette, ma C_SpellBook.IsSpellKnown sa dire se ne conosci una --
+        -- verificato in gioco il 2026-09-18 -- e il catalogo salvato quando hai
+        -- aperto quel mestiere dice quali chiedere. Tutti i mestieri insieme,
+        -- senza toccare la UI.
+        self:ScheduleTimer(function()
+            if not self.Data or not self.Data.ScanKnownFromSpellBook then return end
+            local result = self.Data:ScanKnownFromSpellBook({
+                reason = "login",
+                notifyMode = "auto",
+            })
+            if scanResultChanged(result) then
+                markSyncIndexDirtyAndScheduleHello(self, "login-spellbook-scan", 1)
+            end
+        end, 3)
         if self.Data.ScheduleSyncIndexPrepare then
             self.Data:ScheduleSyncIndexPrepare("player-login", 0.2)
         end
@@ -648,42 +739,18 @@ local function countBucketEvents(events)
 end
 
 function Addon:OnTradeSkillShow()
-    -- Defer scan so the Blizzard TradeSkillFrame finishes initialising first.
-    if self._tradeSkillScanTimer then
-        self:CancelTimer(self._tradeSkillScanTimer, true)
-    end
-    self._tradeSkillScanTimer = self:ScheduleTimer(function()
-        self._tradeSkillScanTimer = nil
-        if self.Data then
-            local metadataChanged = self.Data:DetectProfessions() == true
-            local changed = scanResultChanged(self.Data:ScanTradeSkill({
-                reason = "profession-open",
-                notifyMode = "auto",
-            })) or metadataChanged
-            if changed then
-                markSyncIndexDirtyAndScheduleHello(self, "trade-scan", 0.5)
-            end
+    -- TRADE_SKILL_SHOW arriva mentre la sessione si sta ancora aprendo: al
+    -- primo tentativo IsTradeSkillReady puo' dire false e la sorgente dati puo'
+    -- non avere ancora finito di cambiare mestiere. Da qui il ritentativo,
+    -- invece di un unico colpo differito che o indovinava o perdeva la
+    -- scansione in silenzio.
+    if self.Data then
+        -- questa non aspetta niente: legge da GetProfessions, non dalla finestra
+        if self.Data:DetectProfessions() == true then
+            markSyncIndexDirtyAndScheduleHello(self, "profession-metadata", 0.5)
         end
-    end, 0.3)
-end
-
-function Addon:OnCraftShow()
-    if self._craftScanTimer then
-        self:CancelTimer(self._craftScanTimer, true)
     end
-    self._craftScanTimer = self:ScheduleTimer(function()
-        self._craftScanTimer = nil
-        if self.Data then
-            local metadataChanged = self.Data:DetectProfessions() == true
-            local changed = scanResultChanged(self.Data:ScanCraft({
-                reason = "profession-open",
-                notifyMode = "auto",
-            })) or metadataChanged
-            if changed then
-                markSyncIndexDirtyAndScheduleHello(self, "craft-scan", 0.5)
-            end
-        end
-    end, 0.3)
+    scheduleScanWithRetry(self, "profession-open", TRADE_SKILL_SHOW_RETRIES)
 end
 
 function Addon:OnRecipeSignal(_event, recipeID)
@@ -819,7 +886,7 @@ function Addon:ProcessSkillSignal(event)
     if not profession then
         -- No trade-skill window open right now. We can't read the recipe
         -- list without an open window, but we still flag a pending scan
-        -- so the next TRADE_SKILL_SHOW / CRAFT_SHOW picks up whatever
+        -- so the next TRADE_SKILL_SHOW picks up whatever
         -- changed. The chat notice is NOT armed from this path because
         -- SPELLS_CHANGED and SKILL_LINES_CHANGED also fire on /reload
         -- and login (with no actual learn happening); the notice is

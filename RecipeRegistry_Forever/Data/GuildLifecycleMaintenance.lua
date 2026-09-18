@@ -30,14 +30,10 @@ function GuildLifecycleMaintenance:BuildGuildRosterSnapshot()
     local total = GetNumGuildMembers and GetNumGuildMembers() or 0
     for i = 1, total do
         local fullName = GetGuildRosterInfo and GetGuildRosterInfo(i)
-        if fullName then
-            local name, realm = fullName:match("^([^%-]+)%-(.+)$")
-            if not name then
-                name = fullName
-                realm = GetRealmName() or "UnknownRealm"
-            end
-            realm = (realm or "UnknownRealm"):gsub("[%s%-]", "")
-            local memberKey = name .. "-" .. realm
+        -- una sola costruzione di chiave per tutto l'addon, in Data: tre copie
+        -- della stessa regola erano tre occasioni di divergere
+        local memberKey = fullName and Addon.Data:MemberKeyFromFullName(fullName)
+        if memberKey then
             if not snapshot[memberKey] then
                 snapshot[memberKey] = true
                 count = count + 1

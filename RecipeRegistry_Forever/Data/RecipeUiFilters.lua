@@ -17,7 +17,10 @@ local PROFESSION_KEY_BY_DISPLAY = {
     Cooking = "cooking",
     Enchanting = "enchanting",
     Engineering = "engineering",
-    Jewelcrafting = "jewelcrafting",
+    -- "first_aid" con l'underscore: e' la chiave che il bundle di datamining
+    -- emette gia' oggi (out/bundle/forever-local-*/recipes.json), e le due
+    -- devono combaciare o il dataset non si aggancera' mai a questo mestiere
+    ["First Aid"] = "first_aid",
     Leatherworking = "leatherworking",
     Mining = "mining",
     Tailoring = "tailoring",
@@ -48,10 +51,10 @@ local function getProfilePrefilters()
         filters.expansionDefaults = {}
     end
     if filters.expansionDefaults.vanilla == nil then
-        -- TBC-only default at first-touch — matches DB_DEFAULTS so legacy
-        -- saved data missing this field doesn't surprise the user with a
-        -- different visibility than a fresh install would give them.
-        filters.expansionDefaults.vanilla = false
+        -- Come DB_DEFAULTS in Data.lua: su questo client si mostra tutto,
+        -- perche' contenuto TBC non ne esiste e spegnere "vanilla"
+        -- nasconderebbe l'intero gioco.
+        filters.expansionDefaults.vanilla = true
     end
     if filters.expansionDefaults.tbc == nil then
         filters.expansionDefaults.tbc = true
@@ -339,7 +342,16 @@ function RecipeUiFilters:EvaluateVisibility(recipeKey, recipeInfo, filterContext
         -- no metadata to compare against — every recipe in those professions
         -- is "uncatalogued" by definition and dropping them hides real scan
         -- data, not garbage.
-        local skipUncataloguedGate = filterContext and filterContext.allowUncataloguedRecipes == true
+        -- Un dataset che non conosce nessuna ricetta non ha titolo per
+        -- nascondere qualcosa. Su Forever e' il segnaposto vuoto, e senza questa
+        -- riga il cancello nascondeva OGNI ricetta scansionata -- sono tutte
+        -- chiavi-oggetto positive -- lasciando l'addon con la lista vuota mentre
+        -- i dati erano regolarmente in SavedVariables. Visto in gioco il
+        -- 2026-09-18. Vedi Data:MetadataKnowsAnyRecipe.
+        local metadataHasOpinion = not (Addon.Data and Addon.Data.MetadataKnowsAnyRecipe)
+            or Addon.Data:MetadataKnowsAnyRecipe()
+        local skipUncataloguedGate = (filterContext and filterContext.allowUncataloguedRecipes == true)
+            or not metadataHasOpinion
         if not skipUncataloguedGate
             and profileFilters.hideUncataloguedRecipes ~= false
             and numericKey and numericKey > 0

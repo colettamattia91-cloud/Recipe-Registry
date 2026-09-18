@@ -57,6 +57,8 @@ end
 -- conservative because metadata may not be loaded yet at warmup.
 local function isRecipeKeyCatalogued(metadata, recipeKey)
     if not metadata then return true end
+    -- un dataset senza ricette non ha opinioni: vedi Data:MetadataKnowsAnyRecipe
+    if not Data:MetadataKnowsAnyRecipe() then return true end
     local numeric = tonumber(recipeKey)
     if not numeric or numeric == 0 then
         -- non-numeric or zero: not classifiable, default to "keep"
@@ -324,7 +326,14 @@ function Data:ShouldCleanRecipeFromProfession(profName, recipeKey, opts)
     -- because metadata might not be ready 8s after login.
     if opts.checkMetadataCatalogued then
         local metadata = Addon and Addon.RecipeMetadata
+        -- e solo per un mestiere di cui il dataset sa qualcosa: su uno che non
+        -- nomina mai, "non catalogata" non e' un giudizio, e' silenzio
+        local professionKey = type(profName) == "string"
+            and Addon.RecipeUiFilters and Addon.RecipeUiFilters.NormalizeProfessionKey
+            and Addon.RecipeUiFilters:NormalizeProfessionKey(profName)
+            or (type(profName) == "string" and profName:lower() or nil)
         if metadata and metadata.metadataVersion
+            and self:MetadataKnowsProfession(professionKey)
             and not isRecipeKeyCatalogued(metadata, recipeKey)
         then
             return true, "not-in-metadata"

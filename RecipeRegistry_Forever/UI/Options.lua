@@ -54,7 +54,7 @@ local FILTER_PROFESSIONS = {
     { key = "blacksmithing",  label = "Blacksmithing" },
     { key = "enchanting",     label = "Enchanting" },
     { key = "engineering",    label = "Engineering" },
-    { key = "jewelcrafting",  label = "Jewelcrafting" },
+    { key = "first_aid",      label = "First Aid" },
     { key = "leatherworking", label = "Leatherworking" },
     { key = "tailoring",      label = "Tailoring" },
     { key = "cooking",        label = "Cooking" },
@@ -89,7 +89,7 @@ local function ensureRecipePrefilters(profile)
         filters.expansionDefaults = {}
     end
     if filters.expansionDefaults.vanilla == nil then
-        filters.expansionDefaults.vanilla = false
+        filters.expansionDefaults.vanilla = true
     end
     if filters.expansionDefaults.tbc == nil then
         filters.expansionDefaults.tbc = true
@@ -106,9 +106,8 @@ local function resetRecipePrefilters(profile)
         showRemoteBopOutputRecipes = false,
         showOnlyProfitableRecipes = false,
         expansionDefaults = {
-            -- Match DB_DEFAULTS in Data.lua — TBC-only by default. Vanilla
-            -- recipes are an opt-in via the global Vanilla checkbox.
-            vanilla = false,
+            -- Come DB_DEFAULTS in Data.lua: qui si mostra tutto.
+            vanilla = true,
             tbc = true,
         },
         professionExpansionOverrides = {},

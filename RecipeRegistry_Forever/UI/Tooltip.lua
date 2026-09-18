@@ -486,7 +486,7 @@ function Tooltip:AddCraftLines(tooltip, rows, renderKey)
     for i = 1, maxRows do
         local row = displayRows[i]
         local r, g, b = row.online and 0.4 or 0.65, row.online and 1 or 0.65, row.online and 0.4 or 0.65
-        local nameText = string.format("%s (%s)", tostring(row.memberKey), tostring(row.profession))
+        local nameText = string.format("%s (%s)", Addon.Data:GetMemberKeyName(tostring(row.memberKey)), tostring(row.profession))
         if row.specialization then
             nameText = nameText .. string.format(" [%s]", row.specialization)
         end

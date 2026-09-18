@@ -7,12 +7,14 @@ e un client retail non si assomigliano affatto.
 La domanda di partenza era se la scansione serva ancora. La risposta corta è
 che la parola "scansione" sta tenendo insieme due cose diverse: un **rituale
 sulla UI di Blizzard**, che sparisce quasi tutto, e un'**enumerazione di quello
-che il personaggio sa**, che non sparisce ma si riduce a poche righe. E c'è una
-terza cosa, sotto, che nessuno ha ancora verificato e che decide quanto vale
-tutto il resto: se i dati arrivino anche a finestra chiusa.
+che il personaggio sa**, che non sparisce ma si riduce a poche righe.
 
-Data: 2026-09-17. Nessun dato in-game esiste ancora: il capture in
-`../WowForeverMining/out/ingame` è sintetico.
+Data: 2026-09-17, riscritto il 2026-09-18 con le risposte del client. Le
+sezioni fino a "Le due forme possibili" sono l'analisi fatta prima di aprire il
+gioco, tenuta perché dice da dove si partiva; **quello che il client ha davvero
+risposto sta in "Le risposte, dal client vivo"**, e dove le due si contraddicono
+vince la seconda. La riscrittura è fatta: vive in `Data/DataScan.lua`
+dell'albero Forever, con tre spec in `local-tests/specs/`.
 
 ## Cosa fa oggi la scansione
 
@@ -93,42 +95,73 @@ un buco silenzioso — il modo peggiore di sbagliare, per un addon il cui mestie
 Quindi B non può essere la fonte di verità. Ha senso solo come copertura fra due
 aperture di finestra, e soltanto se A si rivelasse vincolata alla finestra.
 
-## Le incognite che decidono, e i comandi che le chiudono
+## Le risposte, dal client vivo
 
-Da eseguire in ordine sul client, la prima volta **senza aprire niente**.
+Chiuse il 2026-09-18 sul client beta 1.60.1.69913, aprendo Alchemy, Cooking,
+First Aid e Herbalism su un personaggio vero.
 
-```
-/dump C_TradeSkillUI ~= nil, C_TradeSkillUI and C_TradeSkillUI.GetAllRecipeIDs ~= nil
-/dump GetProfessions()
-/dump GetProfessionInfo(1)
-/dump type(GetNumTradeSkills), type(GetCraftInfo), type(ExpandTradeSkillSubClass)
-/dump C_TradeSkillUI.GetAllRecipeIDs and #C_TradeSkillUI.GetAllRecipeIDs()
-```
+**`C_TradeSkillUI` esiste**, con tutto quello che serve: `GetAllRecipeIDs`,
+`GetRecipeInfo`, `GetRecipeItemLink`, `GetRecipeLink`, `GetBaseProfessionInfo`,
+`GetCategoryInfo`, `GetRecipeSchematic`. L'indizio di `TradeSkillCategory`
+popolata era buono.
 
-Poi, con la finestra del mestiere aperta:
+**Le API classic sono tutte `nil`** -- `GetNumTradeSkills`, `GetTradeSkillInfo`,
+`GetCraftInfo`, `GetNumCrafts`, `ExpandTradeSkillSubClass`, `GetNumSkillLines`.
+E `TradeSkillFrame` e `CraftFrame` non esistono: c'e' `ProfessionsFrame`, creato
+pigramente alla prima apertura, quindi testarne l'esistenza non dice niente.
 
-```
-/dump #C_TradeSkillUI.GetAllRecipeIDs()
-/dump C_TradeSkillUI.GetRecipeInfo(C_TradeSkillUI.GetAllRecipeIDs()[1])
-/dump C_TradeSkillUI.GetRecipeItemLink(C_TradeSkillUI.GetAllRecipeIDs()[1])
-/dump GetNumTradeSkills and GetNumTradeSkills()
-```
+**`GetAllRecipeIDs` risponde anche a sessione chiusa, ma non e' una sorgente.**
+Risponde con l'ultimo mestiere aperto, e quel catalogo sopravvive al `/reload`:
+e' un residuo, non un dato vivo. Lo dicono tre cose insieme --
+`GetBaseProfessionInfo` torna vuoto, `IsTradeSkillReady` torna false, e il
+contenuto resta quello di prima. Registrarlo pubblicherebbe alla gilda uno stato
+vecchio senza un errore da nessuna parte, quindi la scansione si fa solo a
+sessione viva. Il guadagno "scansione al login" non si incassa.
 
-Cosa dice ciascuna:
+**E l'API espone un mestiere alla volta**, quello aperto per ultimo. Non c'e'
+modo pulito di sceglierlo da codice: `SetProfessionChildSkillLineID` accetta la
+chiamata e non sposta niente, `GetProfessionSpells` torna vuota, `OpenTradeSkill`
+viene bloccata -- e comunque aprire finestre addosso all'utente non si fa.
 
-1. **Se `C_TradeSkillUI` esista.** Oggi è deduzione, appoggiata all'indizio di
-   `TradeSkillCategory` popolata nei file del client. Tutto il resto viene dopo.
-2. **Se la quinta riga risponde a finestra chiusa.** È l'unica domanda che fa
-   cadere davvero la scansione: senza finestra, `TRADE_SKILL_SHOW` non serve più
-   e l'addon si aggiorna al login. Se risponde `nil` o `0`, la finestra resta un
-   obbligo e cambia soltanto cosa facciamo dentro.
-3. **Cosa contiene `GetRecipeInfo`.** Serve `learned`, e serve un modo di
-   arrivare all'oggetto prodotto. Se c'è `categoryID`, allora l'albero delle 216
-   categorie trovate nei file del client è vivo e servibile alla UI.
-4. **Se le API classic rispondano ancora.** Da non aspettarselo: quello che
-   Forever prende da vanilla è il *contenuto*, non l'interfaccia, e l'interfaccia
-   dichiarata è retail. La riga costa due secondi e serve solo a non scoprirlo
-   per caso dopo.
+**Il catalogo non e' cio' che sai fare.** Alchemy a livello 1 restituisce 197
+ricette, di cui 3 apprese. Il filtro su `info.learned` non e' un dettaglio, e'
+la scansione: senza, l'addon dichiarerebbe alla gilda di saper fare tutto.
+
+**La chiave di ricetta sopravvive intatta.** `GetRecipeItemLink` da' un
+`|Hitem:...|`, `GetRecipeLink` un `|Henchant:...|`, e `extractItemID` ed
+`extractSpellID` li leggono gia' entrambi. Nessun cambio di formato sul wire, in
+SavedVariables o nelle fingerprint.
+
+**Il mestiere attivo non si chiede alla finestra.** `GetBaseProfessionInfo` tace
+proprio quando serve; `GetProfessionInfoByRecipeID` su una ricetta qualunque
+della lista risponde correttamente anche allora, ed e' la strada che usiamo.
+
+### Il libro degli incantesimi: una porta chiusa e un oracolo
+
+Le ricette **non** sono nel libro: sotto la riga di un mestiere c'e' solo la sua
+abilita' (Alchemy, Cooking, Find Herbs, Gardening). Quindi il libro non serve a
+elencare.
+
+Ma `C_SpellBook.IsSpellKnown(recipeID)` sa rispondere su una ricetta: true sui
+tre elisir appresi, false sulle due non apprese. Attenzione a non confonderlo con
+il globale `IsSpellKnown`, che su quegli stessi ID risponde false a tutti.
+L'oracolo c'e', quello che manca e' la lista di ID da interrogare -- ed e' il
+motivo per cui il dataset statico serve comunque.
+
+### Il bug del client che ha mangiato una serata
+
+**La beta scrive le SavedVariables ma non le rilegge.** Un dato salvato
+correttamente, con il file giusto sul disco e Lua valido, torna vuoto al
+caricamento successivo. Non e' un problema dell'addon e nessuna modifica al
+nostro codice lo aggira: e' segnalato pubblicamente da altri sulla beta.
+
+Va scritto qui perche' il sintomo e' perfido: sembra in tutto e per tutto un
+nostro bug di persistenza, e ci si puo' passare ore a strumentare il caricamento
+-- come e' successo il 2026-09-18. Prima di inseguire "i dati spariscono dopo il
+/reload", verificare che il client li stia rileggendo affatto.
+
+Conseguenza pratica: il dump del catalogo va **archiviato fuori dal client prima
+del reload successivo**, ed e' quello che fa `Tools/import-dumps.ps1`.
 
 ## Dove finisce il codice
 

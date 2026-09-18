@@ -517,7 +517,7 @@ end
 
 -- O(1) presence map: which expansions hold at least one recipe for the
 -- given profession. Used by the sidebar to drop professions whose only
--- expansions are filtered away (e.g. Jewelcrafting in a Vanilla-only view).
+-- expansions are filtered away.
 function RecipeMetadata:GetProfessionExpansionsFromNav(professionKey)
     local tree = self._navTree
     if not tree then return nil end

@@ -7,12 +7,14 @@
 #
 # The file list below is the TBC one, file for file, because this tree starts as
 # a copy and diverges from here. What is already known to diverge is in
-# docs/forever-scan-rewrite.md.
+# docs/forever/scan-rewrite.md.
 #
-# The Interface number is DERIVED, not read from the client: 1.60.1 under the
-# major*10000 + minor*100 + patch rule. Confirm it in game with
-#   /dump select(4, GetBuildInfo())
-# and until then tick "Load out of date AddOns".
+# The Interface number is READ FROM THE CLIENT, not derived: GetBuildInfo() on
+# 2026-09-18 answered 1.60.1 / 69913 / Sep 17 2026 / 16001. The
+# major*10000 + minor*100 + patch rule happened to predict it, but 16001 is now
+# the client's own answer and not an inference. Re-read it when the beta takes a
+# build that moves the version, because a stale number only costs an out-of-date
+# warning here, not a refusal to load.
 ## Interface: 16001
 ## Title: Recipe Registry |cff33ff99(Forever)|r
 ## Notes: Guild profession tracker for WoW: Forever. Adaptation in progress.

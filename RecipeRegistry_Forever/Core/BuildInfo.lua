@@ -1,3 +1,12 @@
+-- Il nome della cartella dell'addon, che WoW passa come primo vararg a ogni
+-- file. Era scritto a mano come "RecipeRegistry" e in questo albero la cartella
+-- si chiama RecipeRegistry_Forever, quindi ogni lettura dal TOC tornava nil e
+-- si cadeva sui default: in gioco l'addon si dichiarava versione 2.0.0 e canale
+-- "release" mentre il suo TOC dice 0.1.0-dev e dev, e di conseguenza parlava sul
+-- prefisso "RecipeRegistry" invece che su "RRDEV". Visto negli errori del
+-- 2026-09-18. Il vararg non puo' sbagliare cartella.
+local ADDON_FOLDER = ...
+
 local Addon = _G.RecipeRegistry
 local BuildInfo = Addon.BuildInfo or {}
 
@@ -12,13 +21,13 @@ Addon.BuildInfo = BuildInfo
 -- version-notice path. Try both APIs.
 local function getMetadata(field)
     if type(C_AddOns) == "table" and type(C_AddOns.GetAddOnMetadata) == "function" then
-        local ok, value = pcall(C_AddOns.GetAddOnMetadata, "RecipeRegistry", field)
+        local ok, value = pcall(C_AddOns.GetAddOnMetadata, ADDON_FOLDER, field)
         if ok and type(value) == "string" and value ~= "" then
             return value
         end
     end
     if type(GetAddOnMetadata) == "function" then
-        local ok, value = pcall(GetAddOnMetadata, "RecipeRegistry", field)
+        local ok, value = pcall(GetAddOnMetadata, ADDON_FOLDER, field)
         if ok and type(value) == "string" and value ~= "" then
             return value
         end

@@ -133,9 +133,12 @@ local COLLECTION_PHASE_TEXT = {
     [5] = "P5",
 }
 
+-- Niente Jewelcrafting: e' un mestiere di TBC, e Forever e' contenuto vanilla.
+-- Una scheda per un mestiere che nessuno puo' avere non resta vuota, resta
+-- sbagliata: dice che qualcuno in gilda potrebbe saperlo fare.
 local PROF_ORDER = {
     FAVORITES_VIEW, "Alchemy", "Blacksmithing", "Cooking", "Enchanting", "Engineering",
-    "Jewelcrafting", "Leatherworking", "Mining", "Tailoring"
+    "First Aid", "Leatherworking", "Mining", "Tailoring"
 }
 
 local PROFESSION_SPELL_IDS = {
@@ -144,8 +147,8 @@ local PROFESSION_SPELL_IDS = {
     ["Cooking"] = 2550,
     ["Enchanting"] = 7411,
     ["Engineering"] = 4036,
+    ["First Aid"] = 3273,
     ["Herbalism"] = 2366,
-    ["Jewelcrafting"] = 25229,
     ["Leatherworking"] = 2108,
     ["Mining"] = 2575,
     ["Skinning"] = 8613,
@@ -373,7 +376,9 @@ local function getClassColor(memberKey)
 end
 
 local function getClassColorizedName(memberKey)
-    return colorText(memberKey, getClassColor(memberKey))
+    -- dal nome che Data ricava dalla chiave, non dalla chiave: oggi su Forever
+    -- le due cose coincidono, e questo e' il punto in cui smetterebbero
+    return colorText(Addon.Data:GetMemberKeyName(memberKey), getClassColor(memberKey))
 end
 
 local function getRarityLabel(itemID)
@@ -782,8 +787,7 @@ end
 
 local function whisperTargetFromMemberKey(memberKey)
     if not memberKey then return nil end
-    local short = tostring(memberKey):match("^([^%-]+)")
-    return short or memberKey
+    return Addon.Data:GetMemberKeyName(tostring(memberKey))
 end
 
 local function openWhisperWindow(target)

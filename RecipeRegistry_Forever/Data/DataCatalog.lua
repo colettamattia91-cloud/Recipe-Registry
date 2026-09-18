@@ -57,7 +57,7 @@ local PROFESSION_LABELS = {
     cooking = "Cooking",
     enchanting = "Enchanting",
     engineering = "Engineering",
-    jewelcrafting = "Jewelcrafting",
+    first_aid = "First Aid",
     leatherworking = "Leatherworking",
     tailoring = "Tailoring",
 }
@@ -291,6 +291,30 @@ local function addMetadataReagents(info, metadata, recipeKey, metadataInfo)
             quality = reagentQuality,
         }
     end
+end
+
+-- I reagenti dal catalogo catturato dal client, quando il dataset non ne ha.
+--
+-- Non sostituisce addMetadataReagents: la interroga dopo, e solo se quella non
+-- ha prodotto niente. Il dataset resta la fonte giusta -- conosce le ricette di
+-- tutti, non solo dei mestieri che questo personaggio ha aperto -- e il giorno
+-- che arriva questa ricaduta smette da sola di servire.
+local function addCachedSchematicReagents(info, recipeKey)
+    if not Data.GetCachedRecipeSchematic then return false end
+    local cached = Data:GetCachedRecipeSchematic(recipeKey)
+    if type(cached) ~= "table" or type(cached.reagents) ~= "table" then return false end
+    for _, reagent in ipairs(cached.reagents) do
+        local itemID = reagent.itemID
+        local reagentName, reagentIcon, reagentQuality = getItemData(itemID)
+        info.reagents[#info.reagents + 1] = {
+            itemID = itemID,
+            count = reagent.count or 1,
+            name = reagentName or ("item:" .. tostring(itemID)),
+            icon = reagentIcon,
+            quality = reagentQuality,
+        }
+    end
+    return #info.reagents > 0
 end
 
 local function applyMetadataInfo(info, metadata, recipeKey, numericKey, metadataInfo)
@@ -700,8 +724,10 @@ end
 
 -- Which expansions hold at least one recipe for this profession in the
 -- generated metadata. Used by the sidebar to drop professions whose only
--- expansions are currently hidden (e.g. Jewelcrafting in a Vanilla-only
--- view). Backed by the pre-built nav-tree in the metadata module — O(1).
+-- expansions are currently hidden. Backed by the pre-built nav-tree in the
+-- metadata module — O(1). The TBC tree names Jewelcrafting as the example
+-- here; on this client that profession does not exist at all, so the case
+-- this guards is a profession whose recipes all sit in a hidden expansion.
 function Data:GetProfessionExpansions(profession)
     local metadata = getRecipeMetadata()
     if not metadata then return nil end
@@ -1398,6 +1424,28 @@ function Data:GetRecipeDisplayInfo(recipeKey, professionName)
     return info
 end
 
+-- Quando il cancello "nascondi le non catalogate" deve tacere.
+--
+-- Due casi, e sono lo stesso caso: il dataset non ha niente da dire su questo
+-- mestiere. Succede per le professioni fuori dallo scopo dei metadati (Mining,
+-- First Aid, Fishing), e succede per qualunque mestiere finche' il dataset non
+-- lo copre -- che su Forever, dove il dataset si raccoglie in gioco un mestiere
+-- per volta, e' la condizione normale e non l'eccezione. In entrambi i casi
+-- ogni ricetta e' "non catalogata" per definizione, e nasconderle nasconde dati
+-- di scansione veri invece che spazzatura.
+local function allowUncataloguedWhenUnknown(profName, filterContext)
+    if not profName or profName == "All" then return filterContext end
+    local filters = Addon.RecipeUiFilters
+    if not (filters and filters.NormalizeProfessionKey) then return filterContext end
+    local profKey = filters:NormalizeProfessionKey(profName)
+    local supported = filters.IsSupportedProfession and filters:IsSupportedProfession(profKey)
+    local covered = Data.MetadataKnowsProfession and Data:MetadataKnowsProfession(profKey)
+    if supported and covered then return filterContext end
+    filterContext = filterContext or {}
+    filterContext.allowUncataloguedRecipes = true
+    return filterContext
+end
+
 function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName, filterContext)
     sortMode = sortMode or "alpha"
     searchMode = searchMode == "materials" and "materials" or "recipe"
@@ -1406,13 +1454,7 @@ function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName,
     -- Out-of-scope professions (Mining, First Aid, Fishing) have no metadata
     -- to filter against; tell RecipePasses to bypass the hide-uncatalogued
     -- gate so their scanned recipes survive the predicate.
-    if profName and profName ~= "All" and Addon.RecipeUiFilters and Addon.RecipeUiFilters.IsSupportedProfession then
-        local profKey = Addon.RecipeUiFilters:NormalizeProfessionKey(profName)
-        if not Addon.RecipeUiFilters:IsSupportedProfession(profKey) then
-            filterContext = filterContext or {}
-            filterContext.allowUncataloguedRecipes = true
-        end
-    end
+    filterContext = allowUncataloguedWhenUnknown(profName, filterContext)
     local filterCacheKey = getFilterCacheKey(filterContext)
     local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode) .. "\t" .. searchMode .. "\t" .. tostring(categoryFilter or "") .. "\t" .. filterCacheKey
     self._recipeListCache = self._recipeListCache or {}
@@ -1597,13 +1639,7 @@ function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, catego
     searchMode = searchMode == "materials" and "materials" or "recipe"
     local categoryFilter = categoryFilterToken(categoryName)
     categoryFilter = categoryFilter and categoryFilter ~= "" and categoryFilter ~= "All" and categoryFilter or nil
-    if profName and profName ~= "All" and Addon.RecipeUiFilters and Addon.RecipeUiFilters.IsSupportedProfession then
-        local profKey = Addon.RecipeUiFilters:NormalizeProfessionKey(profName)
-        if not Addon.RecipeUiFilters:IsSupportedProfession(profKey) then
-            filterContext = filterContext or {}
-            filterContext.allowUncataloguedRecipes = true
-        end
-    end
+    filterContext = allowUncataloguedWhenUnknown(profName, filterContext)
     local filterCacheKey = getFilterCacheKey(filterContext)
     local cacheKey = tostring(profName or "") .. "\t" .. lowerSafe(query) .. "\t" .. tostring(sortMode) .. "\t" .. searchMode .. "\t" .. tostring(categoryFilter or "") .. "\t" .. filterCacheKey
     self._recipeListCache = self._recipeListCache or {}
@@ -2037,6 +2073,9 @@ function Data:EnsureRecipeReagents(info)
             and metadata:GetRecipeInfo(info.recipeKey, info._professionHintKey)
             or nil
         addMetadataReagents(info, metadata, info.recipeKey, metadataInfo)
+        if #info.reagents == 0 then
+            addCachedSchematicReagents(info, info.recipeKey)
+        end
         local parts = {
             info.label or "",
             info.spellName or "",
