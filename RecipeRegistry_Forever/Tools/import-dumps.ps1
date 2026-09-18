@@ -78,10 +78,10 @@ if (-not $NoMining) {
 
 # Freeze this file before generating: the client may save again while we work.
 Copy-Item -LiteralPath $SavedVariablesPath -Destination $pending
-$inputs = @()
-$legacy = Join-Path $PSScriptRoot 'dumps\20260918-1744-RecipeRegistry_Forever.lua'
-if (Test-Path -LiteralPath $legacy) { $inputs += $legacy }
-$inputs += @(Get-ChildItem -LiteralPath $archiveRoot -File -Filter '*.lua' | Sort-Object Name | ForEach-Object FullName)
+# Tutti gli archivi, piu' la cattura appena congelata. Si sommano per mestiere
+# e la piu' recente vince: e' quello che permette di raccogliere in piu'
+# sessioni, visto che il Collector riparte vuoto a ogni reload.
+$inputs = @(Get-ChildItem -LiteralPath $archiveRoot -File -Filter '*.lua' | Sort-Object Name | ForEach-Object FullName)
 $inputs += $pending
 try {
     $arguments = @((Join-Path $PSScriptRoot 'generate-from-dump.lua'), $inputs[0], $temporaryOutput)
