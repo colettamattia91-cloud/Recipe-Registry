@@ -11,5 +11,9 @@ ignore:
   - Sync/MockSync.lua
   - local-tests
   - Tools
-# No manual-changelog yet: there is nothing to tell users about a build that has
-# never loaded on a client. It gets one when it ships, the way TBC has one.
+# The changelog is written by hand, like the TBC one: the packager's generated
+# one lists commit subjects, which are written for whoever maintains this and
+# not for whoever installs it.
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown

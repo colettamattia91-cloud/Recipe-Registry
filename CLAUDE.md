@@ -240,11 +240,35 @@ Never `git merge develop` into `main`: a true merge drags develop's commit histo
 
 1. On `develop`: update `RecipeRegistry/CHANGELOG.md`, bump `## Version:` in `RecipeRegistry/RecipeRegistry.toc`, run the full test suite, commit.
 2. `git checkout main && git merge --squash develop` — resolve `CHANGELOG.md` with develop's version.
-3. `git rm -rf --ignore-unmatch docs CLAUDE.md .claude .vscode .github build RecipeRegistry_OrdersCore RecipeRegistry/local-tests RecipeRegistry/tools RecipeRegistry/artifacts RecipeRegistry/Sync/MockSync.lua RecipeRegistry_Forever/local-tests RecipeRegistry_Forever/Sync/MockSync.lua`
-4. Verify before committing: `git status --short` must list only runtime files under the addon folders, plus `RecipeRegistry/CHANGELOG.md` and `RecipeRegistry/RecipeRegistry.toc`.
+3. `git rm -rf --ignore-unmatch docs CLAUDE.md .claude .vscode .github build RecipeRegistry/local-tests RecipeRegistry/tools RecipeRegistry/artifacts RecipeRegistry/Sync/MockSync.lua RecipeRegistry_Forever/local-tests RecipeRegistry_Forever/Tools RecipeRegistry_Forever/Sync/MockSync.lua`
+4. Verify before committing: `git status --short` must list only runtime files under the addon folders, plus the `CHANGELOG.md` and `.toc` of the addon being released.
 5. Commit as `Release X.Y.Z`, tag `vX.Y.Z`, check out `develop` again (and verify the checkout happened).
 6. Commit messages are plain text — no `Co-Authored-By` or any AI-attribution trailer, anywhere in this repo.
 7. Pushes are done by the maintainer (SSH key is passphrase-protected) — never attempt them.
+
+### Releasing the Forever addon
+
+It has its own folder, its own `.pkgmeta` and its own `CHANGELOG.md`, so steps 1
+to 5 are the same against `RecipeRegistry_Forever/`. Three things are not.
+
+**The build channel.** `## X-Build-Channel: dev` puts the addon on the `RRDEV`
+comm prefix, and dev clients do not sync with release clients. That is right for
+a beta being handed around; it is wrong the moment it reaches CurseForge, where
+everyone who installs it would be talking on a prefix no released build uses.
+Flip it to `release` in the same commit as the version bump, or decide on
+purpose to ship a dev build and say so in the changelog.
+
+**Which addons a tag builds.** The workflow's default is the TBC addon alone.
+Forever is built by dispatching the workflow with `addons:
+RecipeRegistry_Forever`, which is also how it gets a version number of its own:
+the packager takes the version from the tag, so one tag driving both addons
+would give Forever whatever number TBC happens to be on. Two addons, two
+histories -- so two tags, and a dispatch per addon.
+
+**Where it can go.** The workflow reads the CurseForge project id from the
+`CF_PROJECT_ID_FOREVER` repository variable. Without it the build still runs and
+stops at GitHub with a warning rather than failing, which is the useful
+behaviour while the project page does not exist yet.
 
 ## Active rewrite context
 
