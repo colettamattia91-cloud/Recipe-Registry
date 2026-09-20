@@ -211,7 +211,7 @@ Rules that follow from it:
 
 - `develop` — the active development branch. All work happens here: code, tests, docs, tooling.
 - `feat/forever` — the World of Warcraft: Forever adaptation, forked from `develop` for the duration of the Forever beta (2026-09-17 to 2026-10-21). Retail-shaped API work goes here, not on `develop`, because the client churns weekly and most of the API mapping is still deduction; it merges back into `develop` once the unknowns in `docs/forever/api-adaptation.md` are closed on real data. Rebase it on `develop` rather than merging `develop` into it.
-- `main` — release-only. Its tree must contain ONLY the addon folders with their runtime files (`RecipeRegistry/` with `RecipeRegistry.toc`, `Core/`, `Data/`, `Integrations/`, `Libs/`, `Sync/` without `MockSync.lua`, `UI/`, plus `CHANGELOG.md`, `LICENSE`, `.pkgmeta`) plus `README.md`, `LICENSE`, `.gitignore` at the root. Never commit or edit directly on `main`.
+- `main` — release-only. Its tree must contain ONLY the addon folders with their runtime files (each with its own `.toc`, `Core/`, `Data/`, `Integrations/`, `Libs/`, `Sync/` without `MockSync.lua`, `UI/`, plus its own `CHANGELOG.md`, `LICENSE` and `.pkgmeta`) plus `README.md`, `LICENSE`, `.gitignore` at the root. **No `CHANGELOG.md` at the root**: there is one per addon, it lives beside the `.toc` it describes, and a root one would be a third copy nobody updates. Never commit or edit directly on `main`.
 
 **On `feat/forever` the TBC addon is not in the tree.** It was removed there on
 purpose: this branch is about Forever, and carrying 250 files of an addon it
@@ -229,6 +229,13 @@ sure `RecipeRegistry/` is present and intact before committing the merge --
 `git checkout develop -- RecipeRegistry` after a squash merge is enough, and
 `git ls-files RecipeRegistry | wc -l` should read 250, not 0.
 
+Check the changelogs in the same breath, because this merge is exactly where
+they go wrong: `develop` still keeps the TBC one at the repo root, and the
+restructure this branch carries moves it into `RecipeRegistry/`. After the merge
+`git ls-files | grep -i changelog` must list two paths, both inside an addon
+folder. Three means the old root copy survived the move and is now a stale file
+nothing will ever update; one means the TBC addon came across without its own.
+
 Flavors do not get a branch each: `main` carries them all and
 `.github/workflows/release.yml` builds one zip per TOC in the tag, sending each
 where its `## Interface` belongs. What a flavor does get is **its own addon
@@ -238,13 +245,30 @@ folder** — see below.
 
 Never `git merge develop` into `main`: a true merge drags develop's commit history (tests, tooling, unrelated work) into main even when the final tree is clean. A release is exactly ONE squash commit:
 
-1. On `develop`: update `RecipeRegistry/CHANGELOG.md`, bump `## Version:` in `RecipeRegistry/RecipeRegistry.toc`, run the full test suite, commit.
-2. `git checkout main && git merge --squash develop` — resolve `CHANGELOG.md` with develop's version.
+1. On `develop`: update the CHANGELOG of the addon you are releasing and bump `## Version:` in that addon's `.toc` — `RecipeRegistry/CHANGELOG.md` and `RecipeRegistry/RecipeRegistry.toc` for TBC, the `RecipeRegistry_Forever/` pair for Forever. Leave the other addon's two files alone: they are a different release. Run the full test suite, commit.
+2. `git checkout main && git merge --squash develop` — resolve conflicts in the CHANGELOG **of the addon being released** with develop's version, and leave the other addon's CHANGELOG at whatever main already had.
 3. `git rm -rf --ignore-unmatch docs CLAUDE.md .claude .vscode .github build RecipeRegistry/local-tests RecipeRegistry/tools RecipeRegistry/artifacts RecipeRegistry/Sync/MockSync.lua RecipeRegistry_Forever/local-tests RecipeRegistry_Forever/Tools RecipeRegistry_Forever/Sync/MockSync.lua`
 4. Verify before committing: `git status --short` must list only runtime files under the addon folders, plus the `CHANGELOG.md` and `.toc` of the addon being released.
 5. Commit as `Release X.Y.Z`, tag `vX.Y.Z`, check out `develop` again (and verify the checkout happened).
 6. Commit messages are plain text — no `Co-Authored-By` or any AI-attribution trailer, anywhere in this repo.
 7. Pushes are done by the maintainer (SSH key is passphrase-protected) — never attempt them.
+
+**One changelog per addon, none at the root.** This is easy to get wrong because
+of where the repo came from: before the folder-per-client restructure there was
+a single `CHANGELOG.md` at the root, and that restructure moves it into
+`RecipeRegistry/`. If a merge ever leaves the old root copy behind, the tree has
+three changelogs and the root one goes stale without anyone noticing, because
+nothing reads it and nothing fails.
+
+The check is one line, and it is worth running on `develop` and on `main` after
+any merge that touches the layout:
+
+```powershell
+git ls-files | Select-String -Pattern 'CHANGELOG'
+```
+
+It must list exactly two paths, both inside an addon folder. A root
+`CHANGELOG.md` in that output is the bug.
 
 ### Releasing the Forever addon
 
