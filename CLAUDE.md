@@ -289,20 +289,26 @@ the packager takes the version from the tag, so one tag driving both addons
 would give Forever whatever number TBC happens to be on. Two addons, two
 histories -- so two tags, and a dispatch per addon.
 
-**Two projects, not multi-TOC, and the reason is not taste.** CurseForge lets one
-project serve several flavors through Multi-TOC, and it is the model it
-recommends. It does not fit here. Multi-TOC requires every TOC to sit in ONE
-addon folder and be named after it (`Addon.toc`, `Addon_Camelot.toc`), and our
-two trees hold different files at the same paths -- `Core/Core.lua` exists in
-both with different content -- so one folder cannot hold them without moving one
-tree into a subfolder and shipping both codebases to everyone. The version
-settles it anyway: one project, one packager run, one version number, and these
-two addons are meant to have separate histories.
+**One CurseForge project, two files.** Both flavors live on project
+`recipe-registry`, the page the TBC addon has always been on. They are kept
+apart by the file, not by the page: each packager run produces its own zip, with
+its own version number and its own changelog, tagged for the game version its
+TOC declares. That is why the workflow reads one `CF_PROJECT_ID` for every addon
+folder, and why the changelogs are per addon folder rather than shared.
+
+**Two zips, though, and not Multi-TOC.** CurseForge's own recommendation for one
+project serving several flavors is Multi-TOC: one addon folder holding
+`Addon.toc`, `Addon_Camelot.toc` and so on. That does not fit here. Multi-TOC
+requires every TOC to sit in ONE folder and be named after it, and our two trees
+hold different files at the same paths -- `Core/Core.lua` exists in both with
+different content -- so one folder cannot hold them without moving a tree into a
+subfolder and shipping both codebases to everyone who installs either.
 
 So the TOC stays `RecipeRegistry_Forever.toc` in `RecipeRegistry_Forever/`,
 matching `package-as`. Do NOT rename it to `RecipeRegistry_Camelot.toc`: the
-`_Camelot` suffix is the Multi-TOC flavor marker, and it only means anything
-inside a folder named `RecipeRegistry`. Here it would just break `package-as`.
+`_Camelot` suffix is the Multi-TOC flavor marker, it only means anything inside
+a folder named `RecipeRegistry`, and here it would just break `package-as` --
+which is the folder name every existing user's SavedVariables sit in.
 
 **The flavor is detected, not declared.** The packager maps interface `16???` to
 the `forever` game type (`camelot` is its alias), so `## Interface: 16001` is
@@ -314,10 +320,9 @@ One caveat with a short fuse: Forever support landed in packager **v2.6.0, on
 which already carries it. Pinning an exact older version would silently lose the
 flavor, so if anyone pins, pin v2.6.1 or later.
 
-**Where it can go.** The workflow reads the CurseForge project id from the
-`CF_PROJECT_ID_FOREVER` repository variable. Without it the build still runs and
-stops at GitHub with a warning rather than failing, which is the useful
-behaviour while the project page does not exist yet.
+**The project description still says TBC only.** It was written when the page
+carried one addon. Worth a pass before the first Forever file lands on it, or
+the page will be describing half of what it offers.
 
 ## Active rewrite context
 

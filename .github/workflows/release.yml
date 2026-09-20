@@ -103,15 +103,12 @@ jobs:
       - name: Say where this build can go
         id: target
         run: |
-          # One project id per addon, because they are separate projects on
-          # CurseForge. The variable name is the folder, uppercased, with the
-          # prefix below.
+          # One CurseForge project carries both flavors, so every addon folder
+          # uploads to the same id. What keeps them apart is the file: each
+          # packager run produces its own zip, with its own version and its own
+          # changelog, tagged for the game version its TOC declares.
           name=$(printf '%s' "${{ matrix.addon }}" | tr '[:lower:]' '[:upper:]')
-          case "${{ matrix.addon }}" in
-            RecipeRegistry)         id="${{ vars.CF_PROJECT_ID }}" ;;
-            RecipeRegistry_Forever) id="${{ vars.CF_PROJECT_ID_FOREVER }}" ;;
-            *)                      id="" ;;
-          esac
+          id="${{ vars.CF_PROJECT_ID }}"
           if [ -z "$id" ]; then
             echo "args=" >> "$GITHUB_OUTPUT"
             echo "::warning::No CurseForge project id for $name, so this" \
