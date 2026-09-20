@@ -239,10 +239,6 @@ function GuildLifecycleMaintenance:StartCleanup(opts)
     return true
 end
 
-function GuildLifecycleMaintenance:StartWeeklyCleanup()
-    return self:StartCleanup({ force = false })
-end
-
 function GuildLifecycleMaintenance:StartManualCleanup()
     return self:StartCleanup({ force = true })
 end

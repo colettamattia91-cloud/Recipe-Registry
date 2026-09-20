@@ -650,37 +650,6 @@ function Data:ParseSyncBlockKey(blockKey)
     return ownerCharacter, professionKey
 end
 
-function Data:IsValidSyncBlockKey(blockKey)
-    local ownerCharacter, professionKey = self:ParseSyncBlockKey(blockKey)
-    if not self:IsValidMemberKey(ownerCharacter) then
-        return false
-    end
-    return type(professionKey) == "string" and professionKey ~= ""
-end
-
-function Data:GetSyncBlock(memberKey, professionKey)
-    local entry = self:GetMember(memberKey)
-    local profession = entry and entry.professions and entry.professions[professionKey] or nil
-    local block = profession and buildBlockRecord(self, memberKey, professionKey, profession) or nil
-    if not block then
-        return nil
-    end
-    return {
-        blockKey = block.blockKey,
-        ownerCharacter = block.ownerCharacter,
-        professionKey = block.professionKey,
-        contentKeys = cloneArray(block.sortedContentKeys),
-        count = block.contentCount,
-        fingerprint = block.blockFingerprint,
-        skillRank = profession.skillRank or 0,
-        skillMaxRank = profession.skillMaxRank or 0,
-        specialization = profession.specialization,
-        sourceType = profession.sourceType or entry.sourceType or self:GetMemberSourceType(memberKey),
-        guildStatus = profession.guildStatus or entry.guildStatus or "active",
-        lastSeenInGuildAt = profession.lastSeenInGuildAt or entry.lastSeenInGuildAt or 0,
-    }
-end
-
 function Data:MarkSyncIndexDirty(reason, blockKey, opts)
     local state, cache = ensureSyncIndexState(self)
     opts = type(opts) == "table" and opts or {}
@@ -856,87 +825,8 @@ function Data:GetRosterSyncUpdatePlan(opts)
     }
 end
 
-function Data:MaybeRunTrustedRosterCleanup(reason, opts)
-    opts = type(opts) == "table" and opts or {}
-    local lifecycle = Addon.GuildLifecycleMaintenance
-    if not lifecycle or not lifecycle.StartCleanup then
-        return false, "unavailable"
-    end
-    if opts.rosterState and opts.rosterState.trusted ~= true then
-        return false, "not-trusted"
-    end
-    if lifecycle.IsCleanupRunning and lifecycle:IsCleanupRunning() then
-        return false, "already-running"
-    end
-    local interval = Addon.Sync and Addon.Sync._private and Addon.Sync._private.constants and Addon.Sync._private.constants.TRUSTED_ROSTER_CLEANUP_INTERVAL_SECONDS or 86400
-    local meta = self:GetGlobalMeta()
-    local lastRun = tonumber(meta.lastTrustedRosterCleanupAt or 0) or 0
-    if lastRun > 0 and (time() - lastRun) < interval then
-        bumpSyncTelemetry("rosterCleanupSkippedThrottle")
-        return false, "throttled"
-    end
-    local memberKeys = opts.memberKeys or self:GetKnownSyncOwnerKeys()
-    local snapshot, snapshotCount = self:BuildCachedGuildRosterSnapshot()
-    local ok, cleanupReason = lifecycle:StartCleanup({
-        force = true,
-        updateLastRunAt = false,
-        snapshot = snapshot,
-        memberKeys = memberKeys,
-        label = tostring(reason or "trusted-roster-cleanup"),
-    })
-    if ok then
-        self:SetLastTrustedRosterCleanupAt(time())
-        bumpSyncTelemetry("rosterCleanupRuns")
-        bumpSyncTelemetry("rosterKnownOwnersChecked", #memberKeys)
-        return true, "started", {
-            snapshotCount = snapshotCount,
-            memberKeys = #memberKeys,
-        }
-    end
-    return false, cleanupReason or "cleanup-failed"
-end
-
-function Data:ClearSyncIndexDirty(reason)
-    local state, cache = ensureSyncIndexState(self)
-    cache.dirtyAll = false
-    cache.dirtyBlocks = {}
-    cache.dirtyBlockCount = 0
-    cache.globalFingerprintDirty = false
-    state.lastClearedReason = tostring(reason or "unspecified")
-    state.lastClearedAt = time()
-    syncTelemetryStats(cache)
-    return true
-end
-
 function Data:GetRosterTrustState()
     return cloneTable(buildRosterState(self, "sync-index-roster"))
-end
-
-function Data:EnsureTrustedRosterForSync(reason)
-    local rosterState = buildRosterState(self, reason or "sync-index")
-    if rosterState.trusted == true then
-        self:ScheduleSyncIndexPrepare(reason or "sync-index", 0.5)
-    end
-    return cloneTable(rosterState)
-end
-
-function Data:BuildSyntheticContentKeys(profession)
-    return buildContentKeysForProfession(self, profession)
-end
-
-function Data:BuildBlockContentKeys(blockKey)
-    local ownerCharacter, professionKey = self:ParseSyncBlockKey(blockKey)
-    if not ownerCharacter or not professionKey then
-        return {}
-    end
-    local entry = self:GetMember(ownerCharacter)
-    local profession = entry and entry.professions and entry.professions[professionKey] or nil
-    return buildContentKeysForProfession(self, profession)
-end
-
-function Data:BuildBlockFingerprint(blockKey)
-    local contentKeys = self:BuildBlockContentKeys(blockKey)
-    return string.format("bf3:%d:%s", #contentKeys, buildFingerprint("bf3", table.concat(contentKeys, "|")))
 end
 
 function Data:RefreshSyncBlockRecord(blockKey, reason)
@@ -964,24 +854,6 @@ function Data:RefreshSyncBlockRecord(blockKey, reason)
 
     local block = cache.blocks and cache.blocks[blockKey] or nil
     return block and block.blockFingerprint or nil
-end
-
-function Data:BuildGlobalFingerprint(index)
-    local blockKeys = cloneArray(index and index.blockKeys or {})
-    local blocks = index and index.blocks or {}
-    sortStrings(blockKeys)
-    local parts = {}
-    for _, blockKey in ipairs(blockKeys) do
-        local block = blocks[blockKey]
-        parts[#parts + 1] = string.format("%s=%s", tostring(blockKey), tostring(block and block.blockFingerprint or ""))
-    end
-    return string.format(
-        "gf3:%d:%d:%d:%s",
-        tonumber(index and index.activeOwnerCount or 0) or 0,
-        #blockKeys,
-        tonumber(index and index.activeContentCount or 0) or 0,
-        buildFingerprint("gf3", table.concat(parts, "|"))
-    )
 end
 
 function Data:BuildLocalSummary(opts)
@@ -1024,28 +896,6 @@ function Data:GetLocalSummary()
     return self:BuildLocalSummary({
         reason = "local-summary",
     })
-end
-
-function Data:GetLiveSyncIndex(opts)
-    local _, _, summary = ensureLiveIndex(self, opts and opts.reason or "live-index", {
-        allowDeferred = opts and opts.allowDeferred == true or false,
-        prepareDelay = opts and opts.prepareDelay or nil,
-        recomputeGlobalFingerprint = opts and opts.recomputeGlobalFingerprint == true or false,
-    })
-    return {
-        syncModel = summary.syncModel,
-        ready = summary.ready,
-        indexStatus = summary.indexStatus,
-        trustedRoster = summary.trustedRoster,
-        trustedRosterReason = summary.trustedRosterReason,
-        activeOwnerCount = summary.activeOwnerCount,
-        activeBlockCount = summary.activeBlockCount,
-        activeContentCount = summary.activeContentCount,
-        globalFingerprint = summary.globalFingerprint,
-        blocks = cloneTable(summary.blocks),
-        blockKeys = cloneArray(summary.blockKeys),
-        builtAt = summary.builtAt,
-    }
 end
 
 function Data:BuildRequesterIndexDigest(opts)

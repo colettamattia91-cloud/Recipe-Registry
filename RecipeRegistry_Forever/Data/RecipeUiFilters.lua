@@ -9,7 +9,6 @@ Addon.RecipeUiFilters = RecipeUiFilters
 local tostring = tostring
 local tonumber = tonumber
 local pairs = pairs
-local sort = table.sort
 
 local PROFESSION_KEY_BY_DISPLAY = {
     Alchemy = "alchemy",
@@ -50,21 +49,6 @@ local function getProfilePrefilters()
         filters = {}
         profile.recipePrefilters = filters
     end
-    if type(filters.expansionDefaults) ~= "table" then
-        filters.expansionDefaults = {}
-    end
-    if filters.expansionDefaults.vanilla == nil then
-        -- Come DB_DEFAULTS in Data.lua: su questo client si mostra tutto,
-        -- perche' contenuto TBC non ne esiste e spegnere "vanilla"
-        -- nasconderebbe l'intero gioco.
-        filters.expansionDefaults.vanilla = true
-    end
-    if filters.expansionDefaults.tbc == nil then
-        filters.expansionDefaults.tbc = true
-    end
-    if type(filters.professionExpansionOverrides) ~= "table" then
-        filters.professionExpansionOverrides = {}
-    end
     if filters.showRemoteBopOutputRecipes == nil then
         filters.showRemoteBopOutputRecipes = false
     end
@@ -83,15 +67,6 @@ end
 
 local function boolToken(value)
     return value and "1" or "0"
-end
-
-local function sortedKeys(tbl)
-    local keys = {}
-    for key in pairs(tbl or {}) do
-        keys[#keys + 1] = key
-    end
-    sort(keys, function(a, b) return tostring(a) < tostring(b) end)
-    return keys
 end
 
 function RecipeUiFilters:NormalizeProfessionKey(professionKey)
@@ -113,88 +88,10 @@ function RecipeUiFilters:IsSupportedProfession(professionKey)
     return false
 end
 
--- The expansion prefilter and the profit filter are settings, not options-panel
--- state. The collection strip and the recipe header drive the same two
--- switches the options panel does, so both the reading and the writing live
--- here, next to the code that consumes them: one setter, one invalidation
--- path, rather than one of each per surface.
---
--- Expansion is written as a pair rather than one flag at a time because the
--- pair has an illegal combination -- neither expansion visible is an empty
--- browser -- and a two-step write would pass through it.
-function RecipeUiFilters:GetExpansionDefaults()
-    local defaults = getProfilePrefilters().expansionDefaults or {}
-    return defaults.vanilla ~= false, defaults.tbc ~= false
-end
-
--- The reason is the caller's, not this function's: the options panel moves one
--- checkbox and names that checkbox, while the strip cycles the pair. Both
--- reach the same invalidation, and the scope string stays true to what the
--- player actually did.
-function RecipeUiFilters:SetExpansionDefaults(vanilla, tbc, reason)
-    if vanilla ~= true and tbc ~= true then return false end
-    local filters = getProfilePrefilters()
-    filters.expansionDefaults.vanilla = vanilla == true
-    filters.expansionDefaults.tbc = tbc == true
-    self:InvalidateProfessionProjection(nil, reason or "filters:expansion-defaults")
-    return true
-end
-
--- Which professions answer to their own expansion setting rather than the
--- global one. The in-tab control writes the global pair, so it has to be able
--- to say when a profession will not follow it.
-function RecipeUiFilters:GetProfessionsWithExpansionOverride()
-    local filters = getProfilePrefilters()
-    local out = {}
-    for professionKey, override in pairs(filters.professionExpansionOverrides or {}) do
-        if type(override) == "table" and override.inherit == false then
-            out[#out + 1] = professionKey
-        end
-    end
-    sort(out)
-    return out
-end
-
--- A profession override outranks the global default, which made the in-window
--- expansion control look broken: setting "TBC only" left every Vanilla recipe
--- of an overridden profession in the list, because that profession had been
--- told to answer for itself. A control that says "TBC only" has to mean it, so
--- choosing an expansion from the window clears the overrides it would
--- otherwise be silently losing to. The per-profession table in the options
--- panel is where they are set, and it is where they can be set again.
-function RecipeUiFilters:ClearProfessionExpansionOverrides()
-    local filters = getProfilePrefilters()
-    local cleared = false
-    for professionKey in pairs(filters.professionExpansionOverrides or {}) do
-        filters.professionExpansionOverrides[professionKey] = nil
-        cleared = true
-    end
-    if cleared then
-        self:InvalidateProfessionProjection(nil, "filters:overrides-cleared")
-    end
-    return cleared
-end
-
--- A profession override outranks the global default, which made the in-window
--- expansion control look broken: setting "TBC only" left every Vanilla recipe
--- of an overridden profession in the list, because that profession had been
--- told to answer for itself. A control that says "TBC only" has to mean it, so
--- choosing an expansion from the window clears the overrides it would
--- otherwise be silently losing to. The per-profession table in the options
--- panel is where they are set, and it is where they can be set again.
-function RecipeUiFilters:ClearProfessionExpansionOverrides()
-    local filters = getProfilePrefilters()
-    local cleared = false
-    for professionKey in pairs(filters.professionExpansionOverrides or {}) do
-        filters.professionExpansionOverrides[professionKey] = nil
-        cleared = true
-    end
-    if cleared then
-        self:InvalidateProfessionProjection(nil, "filters:overrides-cleared")
-    end
-    return cleared
-end
-
+-- The profit filter is a setting, not options-panel state. The collection
+-- strip and the recipe header drive the same switch the options panel does, so
+-- both the reading and the writing live here, next to the code that consumes
+-- them: one setter, one invalidation path, rather than one of each per surface.
 function RecipeUiFilters:IsProfitableOnly()
     return getProfilePrefilters().showOnlyProfitableRecipes == true
 end
@@ -202,54 +99,6 @@ end
 function RecipeUiFilters:SetProfitableOnly(enabled)
     getProfilePrefilters().showOnlyProfitableRecipes = enabled == true
     self:InvalidateProfessionProjection(nil, "filters:profitable-only")
-end
-
-function RecipeUiFilters:GetEffectiveExpansionVisibility(professionKey)
-    local filters = getProfilePrefilters()
-    local normalizedProfession = normalizeProfessionKey(professionKey)
-    local defaults = filters.expansionDefaults or {}
-    local out = {
-        professionKey = normalizedProfession,
-        vanilla = defaults.vanilla ~= false,
-        tbc = defaults.tbc ~= false,
-        inherited = true,
-    }
-
-    local override = normalizedProfession and filters.professionExpansionOverrides[normalizedProfession] or nil
-    if type(override) == "table" and override.inherit == false then
-        out.inherited = false
-        if override.vanilla ~= nil then
-            out.vanilla = override.vanilla == true
-        end
-        if override.tbc ~= nil then
-            out.tbc = override.tbc == true
-        end
-    end
-    return out
-end
-
--- An ambiguous created-item key still carries certain classification when
--- every candidate spell agrees (RecipeMetadata:GetAmbiguousRecipeConsensus):
--- Essence of Water maps to two alchemy transmutes that are both vanilla.
--- Apply the normal expansion gate to that consensus so the entry does not
--- slip through on the conservative-show path. Mining stays exempt
--- (expansion-agnostic in the UI, matching the resolved-record gate), and
--- any divergence in profession or expansion keeps the conservative show.
-local function ambiguousConsensusHiddenByExpansion(self, metadata, recipeKey, filterContext)
-    if not metadata.GetAmbiguousRecipeConsensus then
-        return false
-    end
-    local consensus = metadata:GetAmbiguousRecipeConsensus(recipeKey)
-    local professionKey = consensus and consensus.profession
-    local expansion = consensus and consensus.expansion
-    if not professionKey or not expansion or professionKey == "mining" then
-        return false
-    end
-    local visibility = filterContext and filterContext.precomputedVisibility
-        and filterContext.precomputedVisibility[professionKey]
-        or self:GetEffectiveExpansionVisibility(professionKey)
-    return (expansion == "vanilla" and visibility.vanilla == false)
-        or (expansion == "tbc" and visibility.tbc == false)
 end
 
 -- Profit gate for the "only profitable recipes" toggle. Deliberately the
@@ -306,7 +155,7 @@ function RecipeUiFilters:RecipePasses(recipeKey, recipeInfo, filterContext)
     return true, reason
 end
 
--- Everything except the profit gate: expansion, ownership, BoP/outputless
+-- Everything except the profit gate: ownership, BoP/outputless
 -- and the uncatalogued cleanup. Split out so the expensive gate can run
 -- once, last, on the survivors.
 function RecipeUiFilters:EvaluateVisibility(recipeKey, recipeInfo, filterContext)
@@ -323,12 +172,6 @@ function RecipeUiFilters:EvaluateVisibility(recipeKey, recipeInfo, filterContext
             -- Real recipe with mapping ambiguity (e.g. same created item from
             -- multiple spells): keep visible per roadmap §9 conservative show —
             -- the mapping is a remediation task, the recipe itself is legit.
-            -- Exception: when every candidate spell would be hidden by the
-            -- expansion prefilter anyway, honor the filter.
-            if ambiguousConsensusHiddenByExpansion(self, metadata, recipeKey, filterContext) then
-                Addon:Trace("filters", "ambiguous recipe hidden by expansion consensus", recipeKey)
-                return false, "hidden-expansion"
-            end
             Addon:Trace("filters", "metadata ambiguous for recipe", recipeKey)
             return true, "visible-unresolved-conservative"
         end
@@ -383,33 +226,6 @@ function RecipeUiFilters:EvaluateVisibility(recipeKey, recipeInfo, filterContext
         return true, "visible-unresolved-conservative"
     end
 
-    -- Mining is expansion-agnostic in the UI: 18 smelting spells total,
-    -- shallow sidebar, so vanilla and TBC bars share one view regardless
-    -- of the user's selected expansion. Skip the per-recipe expansion gate
-    -- for mining so e.g. Smelt Truesilver (vanilla) stays visible under
-    -- a TBC filter view. Matches BuildVisibleSpellIdHash's special-case.
-    if professionKey ~= "mining" then
-        -- Hot path: the list-build callsite passes the per-profession
-        -- visibility precomputed once. RecipePasses skips an O(profile +
-        -- override) lookup per candidate, which previously dominated the
-        -- predicate phase on Blacksmithing-sized lists (300+ candidates).
-        local visibility = filterContext and filterContext.precomputedVisibility
-            and filterContext.precomputedVisibility[professionKey]
-            or self:GetEffectiveExpansionVisibility(professionKey)
-        -- Skip the whole expansion gate when visibility is fully on; the
-        -- field reads here are cheap, but the resulting per-candidate
-        -- GetRecipeExpansion call also disappears.
-        if visibility.vanilla == false or visibility.tbc == false then
-            local expansion = info.expansion
-            if expansion == "vanilla" and visibility.vanilla == false then
-                return false, "hidden-expansion"
-            end
-            if expansion == "tbc" and visibility.tbc == false then
-                return false, "hidden-expansion"
-            end
-        end
-    end
-
     local ctx = filterContext or {}
     local ownership = ctx.ownership
     if not ownership and Addon.Data and Addon.Data.GetRecipeOwnershipSummary then
@@ -447,19 +263,6 @@ function RecipeUiFilters:EvaluateVisibility(recipeKey, recipeInfo, filterContext
     return true, "visible-normal"
 end
 
-local function appendOverride(parts, professionKey, override)
-    if type(override) ~= "table" then
-        return
-    end
-    parts[#parts + 1] = table.concat({
-        "override",
-        normalizeProfessionKey(professionKey) or tostring(professionKey),
-        boolToken(override.inherit ~= false),
-        boolToken(override.vanilla == true),
-        boolToken(override.tbc == true),
-    }, ":")
-end
-
 local function shouldUseBroadFilterKey(ctx)
     if not ctx then
         return true
@@ -493,23 +296,13 @@ function RecipeUiFilters:BuildFilterCacheKey(ctx)
         "ownership=" .. tostring(data._recipeOwnershipIndexGeneration or 0),
     }
 
-    local overrides = filters.professionExpansionOverrides or {}
     if shouldUseBroadFilterKey(ctx) then
         parts[#parts + 1] = "scope=broad"
-        parts[#parts + 1] = "defaultVanilla=" .. boolToken(filters.expansionDefaults and filters.expansionDefaults.vanilla ~= false)
-        parts[#parts + 1] = "defaultTbc=" .. boolToken(filters.expansionDefaults and filters.expansionDefaults.tbc ~= false)
         parts[#parts + 1] = "filterGen=" .. tostring(data._recipeFilterGenerationAll or 0)
-        for _, professionKey in ipairs(sortedKeys(overrides)) do
-            appendOverride(parts, professionKey, overrides[professionKey])
-        end
     else
         local professionKey = normalizeProfessionKey(ctx.effectiveProfession or ctx.selectedProfession)
-        local visibility = self:GetEffectiveExpansionVisibility(professionKey)
         local professionGenerations = data._recipeFilterGenerationByProfession or {}
         parts[#parts + 1] = "scope=profession:" .. tostring(professionKey)
-        parts[#parts + 1] = "vanilla=" .. boolToken(visibility.vanilla ~= false)
-        parts[#parts + 1] = "tbc=" .. boolToken(visibility.tbc ~= false)
-        parts[#parts + 1] = "inherited=" .. boolToken(visibility.inherited == true)
         parts[#parts + 1] = "filterGen=" .. tostring(professionGenerations[professionKey] or 0)
     end
 

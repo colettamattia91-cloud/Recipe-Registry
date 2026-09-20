@@ -6,7 +6,6 @@ local time = time
 local pairs = pairs
 local ipairs = ipairs
 local sort = table.sort
-local min = math.min
 local max = math.max
 local concat = table.concat
 
@@ -91,37 +90,6 @@ function Sync:RecordPauseCycle(paused)
     if paused then
         self.telemetry.pausedSyncCycles = (self.telemetry.pausedSyncCycles or 0) + 1
     end
-end
-
-function Sync:RecordMergeSkip(reason)
-    if reason == "equivalent" then
-        self.telemetry.skippedEquivalentMerges = (self.telemetry.skippedEquivalentMerges or 0) + 1
-    end
-end
-
-function Sync:GetPeerBackoffSummary(limit)
-    limit = limit or 3
-    local rows = {}
-    for peerKey, untilAt in pairs(self.peerBackoffUntil or {}) do
-        if untilAt and untilAt > time() then
-            rows[#rows + 1] = {
-                peerKey = peerKey,
-                remaining = untilAt - time(),
-            }
-        end
-    end
-    sort(rows, function(a, b)
-        if a.remaining ~= b.remaining then
-            return a.remaining > b.remaining
-        end
-        return tostring(a.peerKey) < tostring(b.peerKey)
-    end)
-
-    local parts = {}
-    for index = 1, min(limit, #rows) do
-        parts[#parts + 1] = string.format("%s(%ds)", tostring(rows[index].peerKey), max(0, math.floor(rows[index].remaining)))
-    end
-    return #rows, (#parts > 0 and table.concat(parts, ", ") or "none")
 end
 
 function Sync:GetRuntimeObservabilitySnapshot()

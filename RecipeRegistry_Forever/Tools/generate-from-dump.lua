@@ -77,28 +77,22 @@ for index = 3, #(arg or {}) do
         setfenv(loader, env)
         loader()
         mining = env.MiningRecipes or {}
-    end
-end
-
-for index = 3, #(arg or {}) do
-    if tostring(arg[index]):match("^%-%-mining=") then
-        -- gia' letto sopra
     else
-    local extra = {}
-    local loader, loadErr = loadfile(arg[index])
-    if not loader then error(loadErr) end
-    setfenv(loader, extra)
-    loader()
-    local incoming = (extra.RecipeRegistryDumpDB or extra.RecipeRegistryLogDB or {}).dumps
-    if type(incoming) ~= "table" or not next(incoming) then
-        error("nessun dump in " .. tostring(arg[index]))
-    end
-    for name, dump in pairs(incoming) do
-        local previous = dumps[name]
-        if not previous or tostring(dump.at or "") >= tostring(previous.at or "") then
-            dumps[name] = dump
+        local extra = {}
+        local loader, loadErr = loadfile(value)
+        if not loader then error(loadErr) end
+        setfenv(loader, extra)
+        loader()
+        local incoming = (extra.RecipeRegistryDumpDB or extra.RecipeRegistryLogDB or {}).dumps
+        if type(incoming) ~= "table" or not next(incoming) then
+            error("nessun dump in " .. value)
         end
-    end
+        for name, dump in pairs(incoming) do
+            local previous = dumps[name]
+            if not previous or tostring(dump.at or "") >= tostring(previous.at or "") then
+                dumps[name] = dump
+            end
+        end
     end
 end
 
@@ -109,12 +103,13 @@ for name, dump in pairs(dumps) do
     end
 end
 
--- L'albero di navigazione e il filtro per espansione conoscono due valori,
--- "vanilla" e "tbc", cablati in GetProfessionExpansionsFromNav. Forever e'
--- contenuto vanilla piu' aggiunte e non ha ancora una tassonomia sua: finche'
--- non ce l'ha, tutto sta sotto "vanilla". E' grossolano ma vero al livello che
--- conta, e soprattutto tiene le ricette visibili -- un valore che quel codice
--- non conosce le farebbe sparire dalla barra laterale.
+-- L'espansione di una ricetta la porta il datamining: 1557 vengono da vanilla,
+-- 962 sono aggiunte di Forever. EXPANSION e' il ripiego per quelle che il
+-- datamining non copre.
+--
+-- E' provenienza, non un asse di navigazione: l'addon non ci filtra e non ci
+-- ramifica sopra piu' niente, il campo resta nel record come requiredSkill e
+-- classMask, per chi un giorno lo vorra' mostrare.
 local EXPANSION = "vanilla"
 
 -- Le chiavi di mestiere devono combaciare con quelle del bundle di datamining
@@ -552,27 +547,25 @@ emit("    zoneNamesById = {},")
 emit("")
 
 emit("    navTree = {")
-emit(string.format("        [%q] = {", EXPANSION))
 for _, profession in ipairs(sortedKeys(navProfessions)) do
     local prof = navProfessions[profession]
-    emit(string.format("            [%q] = {", profession))
+    emit(string.format("        [%q] = {", profession))
     table.sort(prof.all)
-    emitIdList("                ", "_all", prof.all)
+    emitIdList("            ", "_all", prof.all)
     for _, categoryKey in ipairs(sortedKeys(prof.categories)) do
         local cat = prof.categories[categoryKey]
-        emit(string.format("                [%q] = {", categoryKey))
+        emit(string.format("            [%q] = {", categoryKey))
         table.sort(cat.all)
-        emitIdList("                    ", "_all", cat.all)
+        emitIdList("                ", "_all", cat.all)
         for _, subKey in ipairs(sortedKeys(cat.subs)) do
             local sub = cat.subs[subKey]
             table.sort(sub)
-            emitIdList("                    ", string.format("[%q]", subKey), sub)
+            emitIdList("                ", string.format("[%q]", subKey), sub)
         end
-        emit("                },")
+        emit("            },")
     end
-    emit("            },")
+    emit("        },")
 end
-emit("        },")
 emit("    },")
 emit("}")
 emit("")

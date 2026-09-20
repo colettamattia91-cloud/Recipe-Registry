@@ -5,7 +5,6 @@ local Private = Data._private
 local GetItemInfo = Addon.Compat.GetItemInfo
 local GetItemInfoInstant = Addon.Compat.GetItemInfoInstant
 local GetSpellInfo = Addon.Compat.GetSpellInfo
-local time = time
 local pairs = pairs
 local ipairs = ipairs
 local sort = table.sort

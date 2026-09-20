@@ -75,26 +75,6 @@ local DB_DEFAULTS = {
             -- prices, so with no TSM/Auctionator data it would empty the
             -- list rather than filter it.
             showOnlyProfitableRecipes = false,
-            expansionDefaults = {
-                -- Su Forever il default e' "mostra tutto".
-                --
-                -- L'albero TBC parte con vanilla spento, e li' ha senso: quasi
-                -- tutti giocano contenuto TBC, e 1248 ricette vanilla in ogni
-                -- lista sono rumore. Qui il ragionamento si capovolge --
-                -- contenuto TBC non ne esiste, e quello che c'e' e' vanilla piu'
-                -- le aggiunte di Forever -- quindi spegnere "vanilla"
-                -- nasconderebbe l'intero gioco.
-                --
-                -- Oggi non si vedrebbe: il dataset dei metadati e' il segnaposto
-                -- vuoto, nessuna ricetta risulta classificata, e il filtro
-                -- lascia passare tutto cio' che non sa collocare. Si vedrebbe il
-                -- giorno in cui arriva il dataset vero, e sarebbe un addon che
-                -- di colpo non mostra piu' niente per una decisione presa per un
-                -- altro gioco.
-                vanilla = true,
-                tbc = true,
-            },
-            professionExpansionOverrides = {},
         },
         mainFrame = {
             point = "CENTER",
@@ -348,6 +328,14 @@ local function detectSpecialization(professionName)
     return nil
 end
 
+-- L'ID dell'abilita' di un mestiere. Esiste perche' la UI ne ha bisogno per
+-- l'icona della scheda e la tabella sopra e' l'unica copia che ne teniamo: una
+-- seconda, in UI/MainFrame.lua, era identica e si sarebbe scordata il giorno
+-- che un mestiere entra o esce.
+function Data:GetProfessionSpellID(professionName)
+    return PROFESSION_SPELL_IDS[professionName]
+end
+
 local function buildLocaleMap()
     localeMap = {}
     for canonical, spellID in pairs(PROFESSION_SPELL_IDS) do
@@ -386,15 +374,6 @@ local function extractSpellID(link)
     if not link then return nil end
     local spellID = link:match("enchant:(%d+)") or link:match("spell:(%d+)")
     return spellID and tonumber(spellID) or nil
-end
-
-local function isSubsetOf(smaller, bigger)
-    for k in pairs(smaller or {}) do
-        if not (bigger and bigger[k]) then
-            return false
-        end
-    end
-    return true
 end
 
 local function newScanTelemetry()
@@ -444,7 +423,6 @@ Private.buildLocaleMap = buildLocaleMap
 Private.lowerSafe = lowerSafe
 Private.extractItemID = extractItemID
 Private.extractSpellID = extractSpellID
-Private.isSubsetOf = isSubsetOf
 Private.newScanTelemetry = newScanTelemetry
 
 function Data:OnInitialize()
@@ -543,8 +521,6 @@ function Data:OnInitialize()
             showRemoteBopOutputRecipes = false,
             hideUncataloguedRecipes = true,
             showOnlyProfitableRecipes = false,
-            expansionDefaults = { vanilla = true, tbc = true },
-            professionExpansionOverrides = {},
         }
     else
         local prefilters = self.db.profile.recipePrefilters
@@ -556,15 +532,6 @@ function Data:OnInitialize()
         end
         if prefilters.showOnlyProfitableRecipes == nil then
             prefilters.showOnlyProfitableRecipes = false
-        end
-        if type(prefilters.expansionDefaults) ~= "table" then
-            prefilters.expansionDefaults = { vanilla = true, tbc = true }
-        else
-            if prefilters.expansionDefaults.vanilla == nil then prefilters.expansionDefaults.vanilla = true end
-            if prefilters.expansionDefaults.tbc == nil then prefilters.expansionDefaults.tbc = true end
-        end
-        if type(prefilters.professionExpansionOverrides) ~= "table" then
-            prefilters.professionExpansionOverrides = {}
         end
     end
     self._onlineCache = {}
@@ -1111,11 +1078,6 @@ function Data:TouchAddonPeer(peerKey, version, seenAt)
     return peers[peerKey]
 end
 
-function Data:GetAddonPeer(peerKey)
-    local entry = self:GetAddonPeersDB()[peerKey]
-    return self:NormalizeAddonPeerEntry(entry, peerKey)
-end
-
 function Data:GetUpdateNoticeState()
     self.db.global.updateNotice = self.db.global.updateNotice or {}
     if self.db.global.updateNotice.latestRemoteVersionPeer ~= nil
@@ -1167,20 +1129,8 @@ function Data:GetGlobalMeta()
     return self.db.global.meta
 end
 
-function Data:GetSchemaVersion()
-    return self:GetGlobalMeta().schemaVersion or 1
-end
-
 function Data:SetLastWeeklyCleanupAt(ts)
     self:GetGlobalMeta().lastWeeklyCleanupAt = ts or time()
-end
-
-function Data:SetLastTrustedRosterCleanupAt(ts)
-    self:GetGlobalMeta().lastTrustedRosterCleanupAt = ts or time()
-end
-
-function Data:MarkBootstrapCompleted(ts)
-    self:GetGlobalMeta().bootstrapCompletedAt = ts or time()
 end
 
 function Data:GetMember(memberKey)
@@ -1320,18 +1270,6 @@ function Data:GetKnownSyncOwnerKeys()
     end
     sort(keys)
     return keys
-end
-
-function Data:BuildCachedGuildRosterSnapshot()
-    local snapshot = {}
-    local count = 0
-    for memberKey in pairs(self._guildMetaCache or {}) do
-        if not snapshot[memberKey] then
-            snapshot[memberKey] = true
-            count = count + 1
-        end
-    end
-    return snapshot, count
 end
 
 function Data:InvalidateRecipeCaches(scope)
@@ -1901,21 +1839,6 @@ end
 
 function Data:GetGuildMemberMeta(memberKey)
     return self._guildMetaCache and self._guildMetaCache[memberKey] or nil
-end
-
-function Data:GetGuildRosterAge()
-    local builtAt = self._guildRosterBuiltAt or 0
-    if builtAt <= 0 then
-        return math.huge
-    end
-    local age = time() - builtAt
-    if age < 0 then return 0 end
-    return age
-end
-
-function Data:NeedsGuildRosterRefresh(maxAge)
-    local threshold = tonumber(maxAge or 0) or 0
-    return self:GetGuildRosterAge() > threshold
 end
 
 function Data:RequestGuildRosterRefresh(_reason, opts)

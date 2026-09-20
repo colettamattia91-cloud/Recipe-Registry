@@ -144,16 +144,6 @@ function Performance:IsCategoryPaused(category)
     return category and self.pausedCategories[category] == true or false
 end
 
-function Performance:HasPendingJobs(category)
-    if category then
-        return self.jobQueues[category] and #self.jobQueues[category] > 0 or false
-    end
-    for _, queue in pairs(self.jobQueues) do
-        if #queue > 0 then return true end
-    end
-    return false
-end
-
 function Performance:GetNextRunnableCategory()
     local total = #self.jobOrder
     if total == 0 then return nil end

@@ -225,11 +225,6 @@ local function getMetadataCategoryInfoForRecipe(metadata, recipeKey, professionH
     return metadata:GetCategory(recipeKey, info)
 end
 
-local function getMetadataCategoryForRecipe(metadata, recipeKey, professionHint)
-    local category = getMetadataCategoryInfoForRecipe(metadata, recipeKey, professionHint)
-    return category and category.category or nil
-end
-
 local function categoryFilterToken(categoryName)
     if type(categoryName) == "table" then
         if categoryName.filterToken then
@@ -295,30 +290,6 @@ local function addMetadataReagents(info, metadata, recipeKey, metadataInfo)
             quality = reagentQuality,
         }
     end
-end
-
--- I reagenti dal catalogo catturato dal client, quando il dataset non ne ha.
---
--- Non sostituisce addMetadataReagents: la interroga dopo, e solo se quella non
--- ha prodotto niente. Il dataset resta la fonte giusta -- conosce le ricette di
--- tutti, non solo dei mestieri che questo personaggio ha aperto -- e il giorno
--- che arriva questa ricaduta smette da sola di servire.
-local function addCachedSchematicReagents(info, recipeKey)
-    if not Data.GetCachedRecipeSchematic then return false end
-    local cached = Data:GetCachedRecipeSchematic(recipeKey)
-    if type(cached) ~= "table" or type(cached.reagents) ~= "table" then return false end
-    for _, reagent in ipairs(cached.reagents) do
-        local itemID = reagent.itemID
-        local reagentName, reagentIcon, reagentQuality = getItemData(itemID)
-        info.reagents[#info.reagents + 1] = {
-            itemID = itemID,
-            count = reagent.count or 1,
-            name = reagentName or ("item:" .. tostring(itemID)),
-            icon = reagentIcon,
-            quality = reagentQuality,
-        }
-    end
-    return #info.reagents > 0
 end
 
 local function applyMetadataInfo(info, metadata, recipeKey, numericKey, metadataInfo)
@@ -407,7 +378,6 @@ local function newListBuildTelemetryRecord(profName, categoryFilter, searchMode)
         stepCount = 0,
         stepMsTotal = 0,
         predicateMs = 0,    -- recipePassesUiFilter (RecipePasses cascade)
-        visibleHashMs = 0,  -- visibleSpellIdsHash lookup (GetRecipeInfo+hash check)
         categoryMs = 0,     -- recipeMatchesCategoryFilter
         crafterLoopMs = 0,  -- crafterRows IsMemberOnline loop + professionList build
         status = "running",
@@ -593,22 +563,6 @@ function Data:ResetCatalogDiagnostics()
     self._catalogDiagnostics = nil
 end
 
-function Data:GetRecipeCategory(recipeKey, profession)
-    local metadata = getRecipeMetadata()
-    if metadata then
-        return getMetadataCategoryForRecipe(metadata, recipeKey, getMetadataProfessionKey(profession))
-    end
-    return nil
-end
-
-function Data:GetRecipeCategoryInfo(recipeKey, profession)
-    local metadata = getRecipeMetadata()
-    if metadata then
-        return getMetadataCategoryInfoForRecipe(metadata, recipeKey, getMetadataProfessionKey(profession))
-    end
-    return nil
-end
-
 function Data:GetRecipeCategories(profession, _includeEmpty)
     local metadata = getRecipeMetadata()
     if metadata then
@@ -623,14 +577,13 @@ end
 
 -- Like GetRecipeCategories, but pruned to the categories/subcategories that
 -- actually contain at least one recipe visible under the active UI filters.
--- The sidebar uses this so expansion/BoP filters that hide every recipe in a
+-- The sidebar uses this so BoP/ownership filters that hide every recipe in a
 -- category also hide that category's button: the filtered projection drives
 -- the tree, never the static taxonomy alone (UI-only filter contract).
 --
 -- Cached by profession + filter cache key. That key already folds in metadata
--- version, ownership generation, and the profession's effective expansion
--- visibility, so a filter change yields a new key and stale entries fall out
--- of the bounded cache without explicit invalidation.
+-- version and ownership generation, so a filter change yields a new key and
+-- stale entries fall out of the bounded cache without explicit invalidation.
 function Data:GetVisibleRecipeCategories(profession, filterContext)
     local metadata = getRecipeMetadata()
     if not metadata then
@@ -640,12 +593,6 @@ function Data:GetVisibleRecipeCategories(profession, filterContext)
     if not fullRows or #fullRows == 0 then
         return {}
     end
-
-    local filtersModule = Addon.RecipeUiFilters
-    local visibility = (filtersModule
-        and filtersModule.GetEffectiveExpansionVisibility
-        and filtersModule:GetEffectiveExpansionVisibility(profession))
-        or { vanilla = true, tbc = true }
 
     local professionKey = getMetadataProfessionKey(profession)
     if not professionKey then
@@ -677,10 +624,6 @@ function Data:GetVisibleRecipeCategories(profession, filterContext)
         end
     end
 
-    local visibleExpansions = {}
-    if visibility.vanilla ~= false then visibleExpansions[#visibleExpansions + 1] = "vanilla" end
-    if visibility.tbc ~= false then visibleExpansions[#visibleExpansions + 1] = "tbc" end
-
     local function arrayHasOwned(arr)
         if type(arr) ~= "table" then return false end
         for i = 1, #arr do
@@ -689,25 +632,19 @@ function Data:GetVisibleRecipeCategories(profession, filterContext)
         return false
     end
 
-    local function nodeForCategory(expansion, catKey)
-        local profNode = tree[expansion] and tree[expansion][professionKey]
+    local function nodeForCategory(catKey)
+        local profNode = tree[professionKey]
         return profNode and profNode[catKey] or nil
     end
 
     local function categoryHasOwnedVisible(catKey)
-        for _, expansion in ipairs(visibleExpansions) do
-            local catNode = nodeForCategory(expansion, catKey)
-            if catNode and arrayHasOwned(catNode._all) then return true end
-        end
-        return false
+        local catNode = nodeForCategory(catKey)
+        return catNode ~= nil and arrayHasOwned(catNode._all)
     end
 
     local function subcategoryHasOwnedVisible(catKey, subKey)
-        for _, expansion in ipairs(visibleExpansions) do
-            local catNode = nodeForCategory(expansion, catKey)
-            if catNode and arrayHasOwned(catNode[subKey]) then return true end
-        end
-        return false
+        local catNode = nodeForCategory(catKey)
+        return catNode ~= nil and arrayHasOwned(catNode[subKey])
     end
 
     local out = {}
@@ -724,23 +661,6 @@ function Data:GetVisibleRecipeCategories(profession, filterContext)
         end
     end
     return out
-end
-
--- Which expansions hold at least one recipe for this profession in the
--- generated metadata. Used by the sidebar to drop professions whose only
--- expansions are currently hidden. Backed by the pre-built nav-tree in the
--- metadata module — O(1). The TBC tree names Jewelcrafting as the example
--- here; on this client that profession does not exist at all, so the case
--- this guards is a profession whose recipes all sit in a hidden expansion.
-function Data:GetProfessionExpansions(profession)
-    local metadata = getRecipeMetadata()
-    if not metadata then return nil end
-    local key = getMetadataProfessionKey(profession)
-    if not key then return nil end
-    if metadata.GetProfessionExpansionsFromNav then
-        return metadata:GetProfessionExpansionsFromNav(key)
-    end
-    return { vanilla = false, tbc = false }
 end
 
 function Data:ResolveRecipeBopOutput(recipeKey, metadataInfo)
@@ -879,47 +799,6 @@ function Data:GetProfessionSummary()
     return result
 end
 
-function Data:GetMembersForProfession(profName)
-    local rows = {}
-    for memberKey, entry in pairs(self:GetMembersDB()) do
-        local prof = self:IsUserVisibleMember(memberKey, entry) and entry.professions and entry.professions[profName]
-        if prof then
-            rows[#rows + 1] = {
-                memberKey = memberKey,
-                online = self:IsMemberOnline(memberKey),
-                skillRank = prof.skillRank or 0,
-                skillMaxRank = prof.skillMaxRank or 0,
-                recipeCount = prof.count or 0,
-                updatedAt = entry.updatedAt or 0,
-            }
-        end
-    end
-    sort(rows, function(a, b)
-        if a.online ~= b.online then return a.online end
-        return a.memberKey < b.memberKey
-    end)
-    return rows
-end
-
-function Data:GetCraftersForItem(itemID)
-    local rows = {}
-    if not itemID then return rows end
-    for memberKey, entry in pairs(self:GetMembersDB()) do
-        if self:IsUserVisibleMember(memberKey, entry) then
-            for profName, prof in pairs(entry.professions or {}) do
-                if prof.recipes and prof.recipes[itemID] then
-                    rows[#rows + 1] = { memberKey = memberKey, profession = profName, online = self:IsMemberOnline(memberKey) }
-                end
-            end
-        end
-    end
-    sort(rows, function(a, b)
-        if a.online ~= b.online then return a.online end
-        return a.memberKey < b.memberKey
-    end)
-    return rows
-end
-
 -- The recipe index is purely a content aggregation: who knows what, at what
 -- skill rank, with what specialization. Live presence (`online`,
 -- `onlineCount`) is decided at query time against the online cache so the
@@ -1001,18 +880,6 @@ end
 
 function Data:GetRecipeIndex()
     return self._recipeIndex or self:BuildRecipeIndex()
-end
-
--- Public accessor for the per-profession recipe slice. Returns the live
--- array; callers must not mutate it. Returns nil when no member is known
--- for the profession (distinct from an empty result — empty would mean
--- "profession exists, no recipes match").
-function Data:GetRecipeKeysForProfession(profName)
-    if not profName then return nil end
-    if not self._recipeIndex then
-        self:BuildRecipeIndex()
-    end
-    return self._recipesByProfession and self._recipesByProfession[profName] or nil
 end
 
 -- Chunked counterpart to BuildRecipeIndex. The synchronous version walks
@@ -1328,9 +1195,8 @@ function Data:DumpListBuildTelemetry()
             run.ensureReagentsMs or 0
         ))
         print(string.format(
-            "      phases: predicate=%.1fms visibleHash=%.1fms category=%.1fms crafterLoop=%.1fms",
+            "      phases: predicate=%.1fms category=%.1fms crafterLoop=%.1fms",
             run.predicateMs or 0,
-            run.visibleHashMs or 0,
             run.categoryMs or 0,
             run.crafterLoopMs or 0
         ))
@@ -1472,47 +1338,6 @@ function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName,
     local recipeIndex = self:GetRecipeIndex()
     local candidates = getRecipeCandidates(self, recipeIndex, profName)
 
-    -- Static pre-filter: when an expansion is hidden for this profession,
-    -- build a hash of catalogued spell IDs that satisfy the active filter
-    -- (and optional category narrowing) directly from the metadata nav-tree.
-    -- Candidates whose normalized spell ID is catalogued but absent from
-    -- this hash are rejected without paying the per-recipe RecipePasses
-    -- expansion check. Uncatalogued candidates fall through to RecipePasses
-    -- so spell-keyed out-of-scope recipes (Mining smelting) keep showing
-    -- per the conservative policy.
-    local listMetadata = getRecipeMetadata()
-    local filtersModule = Addon.RecipeUiFilters
-    local visibleSpellIdsHash
-    if listMetadata and filtersModule
-        and profName and profName ~= "All"
-        and listMetadata.BuildVisibleSpellIdHash
-        and filtersModule.GetEffectiveExpansionVisibility
-    then
-        local visibility = filtersModule:GetEffectiveExpansionVisibility(profName)
-        if visibility and (visibility.vanilla == false or visibility.tbc == false) then
-            local catKey, subKey
-            if categoryFilter then
-                local filterText = tostring(categoryFilter)
-                local cat, sub = filterText:match("^subcategory:([^:]+):(.+)$")
-                if cat then
-                    catKey, subKey = cat, sub
-                else
-                    catKey = filterText:match("^category:(.+)$") or filterText
-                end
-            end
-            local profKey = filtersModule.NormalizeProfessionKey
-                and filtersModule:NormalizeProfessionKey(profName)
-                or profName
-            visibleSpellIdsHash = listMetadata:BuildVisibleSpellIdHash(profKey, visibility, catKey, subKey)
-            -- Empty hash means the profession isn't in metadata at all
-            -- (Mining/Fishing) or every expansion is hidden — fall back to the
-            -- per-recipe predicate so the conservative path stays correct.
-            if visibleSpellIdsHash and not next(visibleSpellIdsHash) then
-                visibleSpellIdsHash = nil
-            end
-        end
-    end
-
     -- Profession-scoped lists resolve ambiguous created-item keys against
     -- the list's own profession (Gold Bar under Mining → Smelt Gold).
     local listHintProfName = (profName and profName ~= "All") and profName or nil
@@ -1528,17 +1353,6 @@ function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName,
         end
         if include and categoryFilter and profName and profName ~= "All" then
             include = recipeMatchesCategoryFilter(getRecipeMetadata(), recipeKey, categoryFilter, listHintKey)
-        end
-        if include and visibleSpellIdsHash then
-            -- Use the record's canonical spellId, not just the normalized key.
-            -- Normalization sets spellId for any negative key even when no
-            -- record exists (e.g. the key was an item ID that happens to look
-            -- like a spell); only the actual record proves the recipe is
-            -- catalogued and thus subject to the hash filter.
-            recipeInfo = listMetadata:GetRecipeInfo(recipeKey, listHintKey)
-            if recipeInfo and recipeInfo.spellId and not visibleSpellIdsHash[recipeInfo.spellId] then
-                include = false
-            end
         end
         local visibilityReason
         if include then
@@ -1685,77 +1499,6 @@ function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, catego
 
         local candidates = getRecipeCandidates(self, recipeIndex, profName)
 
-        -- Pre-compute the visible-spell-ids hash once for the whole async
-        -- build so each step skips RecipePasses on catalogued recipes that
-        -- can't possibly pass the active expansion filter. See the matching
-        -- block in GetRecipeList for the rationale.
-        local listMetadata = getRecipeMetadata()
-        local filtersModule = Addon.RecipeUiFilters
-        -- Merge the per-session expansion reveal into the effective
-        -- visibility WITHOUT mutating the profile. If the user clicked
-        -- the "show hidden Vanilla" hint, this view treats Vanilla as
-        -- visible for the predicate cascade only.
-        local sessionReveal = filterContext and filterContext.sessionRevealedExpansions or nil
-        local function applySessionReveal(visibility)
-            if not sessionReveal then return visibility end
-            return {
-                professionKey = visibility.professionKey,
-                vanilla = visibility.vanilla ~= false or sessionReveal.vanilla == true,
-                tbc = visibility.tbc ~= false or sessionReveal.tbc == true,
-                inherited = visibility.inherited,
-            }
-        end
-        local visibleSpellIdsHash
-        if listMetadata and filtersModule
-            and profName and profName ~= "All"
-            and listMetadata.BuildVisibleSpellIdHash
-            and filtersModule.GetEffectiveExpansionVisibility
-        then
-            local visibility = applySessionReveal(filtersModule:GetEffectiveExpansionVisibility(profName))
-            if visibility and (visibility.vanilla == false or visibility.tbc == false) then
-                local catKey, subKey
-                if categoryFilter then
-                    local filterText = tostring(categoryFilter)
-                    local cat, sub = filterText:match("^subcategory:([^:]+):(.+)$")
-                    if cat then
-                        catKey, subKey = cat, sub
-                    else
-                        catKey = filterText:match("^category:(.+)$") or filterText
-                    end
-                end
-                local profKey = filtersModule.NormalizeProfessionKey
-                    and filtersModule:NormalizeProfessionKey(profName)
-                    or profName
-                visibleSpellIdsHash = listMetadata:BuildVisibleSpellIdHash(profKey, visibility, catKey, subKey)
-                if visibleSpellIdsHash and not next(visibleSpellIdsHash) then
-                    visibleSpellIdsHash = nil
-                end
-            end
-        end
-
-        -- Precompute the per-profession visibility once. RecipePasses
-        -- consults it via filterContext.precomputedVisibility so it
-        -- doesn't re-derive the same answer for every candidate (which
-        -- on Blacksmithing-sized lists meant 300+ profile-prefilter
-        -- lookups per build).
-        if filtersModule and filtersModule.GetEffectiveExpansionVisibility then
-            filterContext = filterContext or {}
-            local precomputed = filterContext.precomputedVisibility
-            if type(precomputed) ~= "table" then
-                precomputed = {}
-                filterContext.precomputedVisibility = precomputed
-            end
-            local profKey = profName
-            if profKey and profKey ~= "All" and filtersModule.NormalizeProfessionKey then
-                profKey = filtersModule:NormalizeProfessionKey(profName) or profName
-            end
-            if profKey and profKey ~= "All" and not precomputed[profKey] then
-                precomputed[profKey] = applySessionReveal(
-                    filtersModule:GetEffectiveExpansionVisibility(profKey)
-                )
-            end
-        end
-
         local telemetry = newListBuildTelemetryRecord(profName, categoryFilter, searchMode)
         telemetry.candidates = #candidates
         telemetry._statsAtStart = self:GetCatalogStatsSnapshot()
@@ -1765,7 +1508,6 @@ function Data:BuildRecipeListAsync(profName, query, sortMode, searchMode, catego
             recipeIndex = recipeIndex,
             cursor = 1,
             out = {},
-            visibleSpellIdsHash = visibleSpellIdsHash,
             listMetadata = listMetadata,
             professionHintName = (profName and profName ~= "All") and profName or nil,
             professionHintKey = getMetadataProfessionKey((profName and profName ~= "All") and profName or nil),
@@ -1812,7 +1554,6 @@ function Data:RunRecipeListBuildStep(state, ctx)
     local filterContext = state.filterContext
     local q = state.q
     local total = #candidates
-    local visibleSpellIdsHash = state.visibleSpellIdsHash
     local listMetadata = state.listMetadata
 
     while state.cursor <= total do
@@ -1832,14 +1573,6 @@ function Data:RunRecipeListBuildStep(state, ctx)
                 local phaseStart = nowMsLocal()
                 include = recipeMatchesCategoryFilter(getRecipeMetadata(), recipeKey, categoryFilter, state.professionHintKey)
                 if telemetry then telemetry.categoryMs = (telemetry.categoryMs or 0) + (nowMsLocal() - phaseStart) end
-            end
-            if include and visibleSpellIdsHash and listMetadata then
-                local phaseStart = nowMsLocal()
-                recipeInfo = listMetadata:GetRecipeInfo(recipeKey, state.professionHintKey)
-                if recipeInfo and recipeInfo.spellId and not visibleSpellIdsHash[recipeInfo.spellId] then
-                    include = false
-                end
-                if telemetry then telemetry.visibleHashMs = (telemetry.visibleHashMs or 0) + (nowMsLocal() - phaseStart) end
             end
             if include then
                 local phaseStart = nowMsLocal()
@@ -2077,9 +1810,6 @@ function Data:EnsureRecipeReagents(info)
             and metadata:GetRecipeInfo(info.recipeKey, info._professionHintKey)
             or nil
         addMetadataReagents(info, metadata, info.recipeKey, metadataInfo)
-        if #info.reagents == 0 then
-            addCachedSchematicReagents(info, info.recipeKey)
-        end
         local parts = {
             info.label or "",
             info.spellName or "",

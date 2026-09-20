@@ -40,14 +40,6 @@ function SyncPausePolicy:GetProtocolPauseReason(kind)
     return nil
 end
 
-function SyncPausePolicy:ShouldPauseOutbound(kind)
-    return self:GetProtocolPauseReason(kind) ~= nil
-end
-
-function SyncPausePolicy:ShouldPauseInboundApply()
-    return isInSensitiveInstance()
-end
-
 function SyncPausePolicy:ShouldPauseProtocolTraffic(kind)
     return self:GetProtocolPauseReason(kind) ~= nil
 end
@@ -58,10 +50,6 @@ end
 
 function SyncPausePolicy:ShouldPauseTooltipRebuild()
     return self:IsSensitiveSyncContext()
-end
-
-function SyncPausePolicy:AutoResumeWhenSafe()
-    self:RefreshPauseState()
 end
 
 function SyncPausePolicy:RefreshPauseState()

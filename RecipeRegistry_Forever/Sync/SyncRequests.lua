@@ -184,21 +184,6 @@ function Sync:BuildWantedBlockOrder(offeredBlocks, peerKey)
     return rows
 end
 
-function Sync:ClearSeedPendingState(_seedKey, reason)
-    local session = self.outboundSeedSession
-    if type(session) ~= "table" then
-        return false
-    end
-    session.offeredBlocks = {}
-    session.wantedBlocks = {}
-    session.nextWantedIndex = 1
-    session.activeBlockKey = nil
-    session.activeBlockRequestId = nil
-    session.activeBlockOfferedFingerprint = nil
-    session.lastCleanupReason = tostring(reason or "clear")
-    return true
-end
-
 function Sync:RequestIndexDiff(seedKey)
     local allowed = true
     if self.CanRunSyncProtocol then
@@ -312,11 +297,6 @@ function Sync:SendPreparedIndexDiffResponse(targetKey, requestPayload, response)
         )
     end
     return sent, response
-end
-
-function Sync:SendIndexDiffResponse(targetKey, requestPayload)
-    local response = self:BuildIndexDiffResponseForRequest(requestPayload)
-    return self:SendPreparedIndexDiffResponse(targetKey, requestPayload, response)
 end
 
 function Sync:SendIndexDiffBusy(targetKey, requestPayload, reason)

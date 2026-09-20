@@ -1,5 +1,4 @@
 RecipeRegistryRecipeMetadataOverrides = {
-    expansionBySpellId = {},
     createdItemBySpellId = {},
     recipeItemBySpellId = {},
     categoryBySpellId = {},

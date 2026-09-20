@@ -378,8 +378,6 @@ end
 local function getRecipePrefilters(self)
     local profile = self.db and self.db.profile or {}
     local filters = profile.recipePrefilters or {}
-    filters.expansionDefaults = filters.expansionDefaults or {}
-    filters.professionExpansionOverrides = filters.professionExpansionOverrides or {}
     return filters
 end
 
@@ -391,13 +389,10 @@ local function dumpFilterStatus(self)
         return
     end
     local counts = metadata:GetRecordCounts()
-    local defaults = filters.expansionDefaults or {}
     self:Print(string.format(
-        "Recipe filters: metadata=%s unresolved=%d vanilla=%s tbc=%s remoteBop=%s profitOnly=%s",
+        "Recipe filters: metadata=%s unresolved=%d remoteBop=%s profitOnly=%s",
         tostring(metadata.metadataVersion or "unknown"),
         counts.unresolved or 0,
-        defaults.vanilla ~= false and "on" or "off",
-        defaults.tbc ~= false and "on" or "off",
         filters.showRemoteBopOutputRecipes == true and "show" or "hide",
         filters.showOnlyProfitableRecipes == true and "on" or "off"
     ))
@@ -1081,10 +1076,6 @@ end
 
 function Addon:OnGuildRosterUpdate()
     self:OnGuildRosterBucket({ direct = 1 })
-end
-
-function Addon:OnItemInfoReceived()
-    self:OnItemInfoBucket({ direct = 1 })
 end
 
 function Addon:RequestRefresh(reason)

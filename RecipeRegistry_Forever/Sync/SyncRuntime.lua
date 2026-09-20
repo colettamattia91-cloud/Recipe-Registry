@@ -12,19 +12,14 @@ local remove = table.remove
 local random = math.random
 
 local countKeys = Private.countKeys
-local isMockKey = Private.isMockKey
 local newSyncTelemetry = Private.newSyncTelemetry
 local compareSemver = Addon.BuildInfo and Addon.BuildInfo.CompareSemver or nil
 
 local NODE_TIMEOUT = Constants.NODE_TIMEOUT
 local HELLO_INTERVAL = Constants.HELLO_INTERVAL
 local HELLO_INTERVAL_STABLE = Constants.HELLO_INTERVAL_STABLE or HELLO_INTERVAL
-local AUTO_SYNC_INTERVAL = Constants.AUTO_SYNC_INTERVAL
-local PEER_BACKOFF_SECONDS = Constants.PEER_BACKOFF_SECONDS or 45
 local SEED_SELECTION_TOP_BAND_RATIO = Constants.SEED_SELECTION_TOP_BAND_RATIO or 0.95
 local POST_WORLD_GRACE_SECONDS = Constants.POST_WORLD_GRACE_SECONDS or 12
-local POST_INSTANCE_GRACE_SECONDS = Constants.POST_INSTANCE_GRACE_SECONDS or 15
-local POST_RELOAD_IN_INSTANCE_GRACE_SECONDS = Constants.POST_RELOAD_IN_INSTANCE_GRACE_SECONDS or 30
 local RECENT_SYNC_EVENTS_LIMIT = Constants.RECENT_SYNC_EVENTS_LIMIT or 50
 
 local LIFECYCLE_DEBUG_LIMIT = 20
@@ -271,15 +266,6 @@ function Sync:GetRecentSyncEvents(limit)
     return rows
 end
 
-function Sync:PushOfflineDebugEvent(kind, detail)
-    local stamp = date and date("%H:%M:%S") or tostring(time())
-    local line = string.format("%s %s %s", tostring(stamp), tostring(kind or "event"), tostring(detail or ""))
-    self.offlineDebugLog[#self.offlineDebugLog + 1] = line
-    while #self.offlineDebugLog > 12 do
-        remove(self.offlineDebugLog, 1)
-    end
-end
-
 function Sync:ResetRuntimeStateForDatabaseWipe()
     self:ResetRuntimeQueues("database-wipe", {
         clearDiscovery = true,
@@ -493,10 +479,6 @@ function Sync:RefreshSyncReadyState(reason)
     self.telemetry.lastSyncReadyReason = self.syncReady == true and self.lastSyncReadyReason or self.lastSyncNotReadyReason
     self.telemetry.lastSyncNotReadyReason = self.lastSyncNotReadyReason
     return self.syncReady, self.syncReady and "ready" or self.lastSyncNotReadyReason
-end
-
-function Sync:IsSyncReady()
-    return self.syncReady == true
 end
 
 function Sync:CanAdvanceOutboundPullSession()
@@ -1187,41 +1169,8 @@ function Sync:OnGuildRosterUpdate(context)
     return true
 end
 
-function Sync:GetInFlightRequests()
-    self.inFlightRequests = self.inFlightRequests or {}
-    return self.inFlightRequests
-end
-
-function Sync:RefreshPrimaryInFlight()
-    self.inFlight = nil
-    return nil
-end
-
-function Sync:GetInFlightRequest(memberKey)
-    if not memberKey then
-        return nil
-    end
-    return self:GetInFlightRequests()[memberKey]
-end
-
 function Sync:GetActiveRequestCount()
     return 0
-end
-
-function Sync:GetMaxConcurrentRequests()
-    return Constants.MAX_CONCURRENT_REQUESTS or 1
-end
-
-function Sync:SetInFlightRequest(_request)
-    return nil
-end
-
-function Sync:ClearInFlightRequest(memberKey)
-    if memberKey then
-        self:GetInFlightRequests()[memberKey] = nil
-    end
-    self.inFlight = nil
-    return nil
 end
 
 function Sync:GetPendingHelloReason()

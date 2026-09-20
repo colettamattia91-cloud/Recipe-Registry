@@ -177,14 +177,6 @@ function Data:ApplyIncomingBlockAdditive(blockKey, snapshot, opts)
     }
 end
 
-function Data:RecomputeLocalBlockFingerprint(blockKey, opts)
-    opts = opts or {}
-    if self.RefreshSyncBlockRecord then
-        return self:RefreshSyncBlockRecord(blockKey, opts.reason or "block-fingerprint")
-    end
-    return self.BuildBlockFingerprint and self:BuildBlockFingerprint(blockKey) or nil
-end
-
 function Data:DumpLocalSyncStatus(professionFilter)
     local memberKey = self:GetPlayerKey()
     local entry = self:GetOrCreateMember(memberKey)

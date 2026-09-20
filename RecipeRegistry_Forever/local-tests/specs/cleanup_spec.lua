@@ -89,8 +89,7 @@ print("\n== e lo stesso vale per il filtro della UI ==")
 -- hideUncataloguedRecipes nasconde le chiavi-oggetto che il dataset non
 -- conosce. Con il segnaposto vuoto le nasconderebbe tutte, perche' ogni
 -- ricetta scansionata e' una chiave-oggetto positiva.
-Data.db.profile = { recipePrefilters = { hideUncataloguedRecipes = true,
-  expansionDefaults = { vanilla = true, tbc = true }, professionExpansionOverrides = {} } }
+Data.db.profile = { recipePrefilters = { hideUncataloguedRecipes = true } }
 _G.RecipeRegistry.RecipeMetadata = {
   metadataVersion = "forever-pending",
   _recordsBySpellId = {}, _generated = { recipeItemToSpellId = {}, createdItemToSpellIds = {} },

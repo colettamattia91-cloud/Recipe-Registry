@@ -7,7 +7,6 @@ Sync._private = Private
 local PREFIX = Addon.COMM_PREFIX or Addon.ADDON_PREFIX
 local time = time
 local pairs = pairs
-local ipairs = ipairs
 local min = math.min
 local GetTime = GetTime
 
@@ -404,9 +403,4 @@ function Sync:IsValidSyncMemberKey(memberKey)
         and memberKey ~= ""
         and not memberKey:find(":", 1, true)
         and memberKey:find("-", 1, true) ~= nil
-end
-
-function Sync:IsLocallyStaleOwner(ownerCharacter)
-    local entry = Addon.Data and Addon.Data.GetMember and Addon.Data:GetMember(ownerCharacter) or nil
-    return entry and (entry.guildStatus or "active") ~= "active" or false
 end

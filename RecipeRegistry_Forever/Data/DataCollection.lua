@@ -213,19 +213,6 @@ function Data:SetCollectionFilter(filter)
     profile.collectionFilter = filter
 end
 
-function Data:CycleCollectionFilter()
-    local current = self:GetCollectionFilter()
-    for index, filter in ipairs(COLLECTION_FILTER_ORDER) do
-        if filter == current then
-            local nextFilter = COLLECTION_FILTER_ORDER[index + 1] or COLLECTION_FILTER_ORDER[1]
-            self:SetCollectionFilter(nextFilter)
-            return nextFilter
-        end
-    end
-    self:SetCollectionFilter(COLLECTION_FILTER_ORDER[1])
-    return COLLECTION_FILTER_ORDER[1]
-end
-
 -- Whether a row survives the current filter. Lives here rather than in the
 -- view so the rule is testable, but it is applied at draw time: the rows the
 -- filter hides still have to be counted, or a profession header could not say
@@ -291,14 +278,10 @@ function Data:BuildCollectionRowsForProfession(professionName, prof)
         and filters:NormalizeProfessionKey(professionName) or nil
     if not professionKey then return {} end
 
-    -- Reuse the expansion visibility the rest of the UI is filtered by, so a
-    -- player who hides Vanilla is not shown a 1248-recipe vanilla book they
-    -- asked not to see.
-    local visibility = filters and filters.GetEffectiveExpansionVisibility
-        and filters:GetEffectiveExpansionVisibility(professionKey)
-        or { vanilla = true, tbc = true }
-    local candidates = meta.BuildVisibleSpellIdHash
-        and meta:BuildVisibleSpellIdHash(professionKey, visibility) or nil
+    -- Ogni ricetta catalogata del mestiere: il libro della collezione le
+    -- elenca tutte, e a scremare ci pensa il cancello di possesso piu' sotto.
+    local candidates = meta.BuildProfessionSpellIdHash
+        and meta:BuildProfessionSpellIdHash(professionKey) or nil
     if not candidates then return {} end
 
     local skillRank = tonumber(prof.skillRank) or 0
@@ -327,10 +310,9 @@ function Data:BuildCollectionRowsForProfession(professionName, prof)
         local known = self:IsRecipeKnownByCurrentPlayer(recipeKey)
             or (createdItemId ~= nil and self:IsRecipeKnownByCurrentPlayer(createdItemId))
             or false
-        -- Deliberately NOT run through RecipePasses. The expansion prefilter
-        -- is already applied above, via the candidate hash, and every
-        -- candidate is catalogued by construction. What is left in that
-        -- predicate is the ownership-driven filtering -- remote BoP,
+        -- Deliberately NOT run through RecipePasses. Every candidate is
+        -- catalogued by construction, so what is left in that predicate is
+        -- the ownership-driven filtering -- remote BoP,
         -- self-only outputless -- which exists because another player's
         -- soulbound craft is useless to you. A soulbound craft in your own
         -- book is the opposite: exactly what this view is for. The profit

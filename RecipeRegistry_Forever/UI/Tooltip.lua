@@ -224,7 +224,7 @@ function Tooltip:RunIndexBuildStep(state)
     local index = state.index or {}
     -- Partial alignment with the UI predicate: the tooltip is informational
     -- ("who knows this item / spell") and shouldn't follow user-preference
-    -- filters like expansion or BoP, because those answer a different
+    -- filters like the BoP gate, because those answer a different
     -- question. But it MUST honor the garbage gates — otherwise hovering an
     -- ordinary item like a Worn Axe surfaces ghost crafter rows from old
     -- mocks, and clearing those entries from one user's DB doesn't stop
@@ -310,15 +310,6 @@ function Tooltip:EnsureIndexBuildScheduled()
             generation = generation,
         },
     })
-end
-
-function Tooltip:OnSyncWarmupEnded()
-    if Addon.Sync and Addon.Sync.IsInWorldTransition and Addon.Sync:IsInWorldTransition() then
-        return
-    end
-    if self.indexDirty then
-        self:EnsureIndexBuildScheduled()
-    end
 end
 
 function Tooltip:ResolveBucketRows(bucket)

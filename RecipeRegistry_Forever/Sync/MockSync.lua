@@ -3,7 +3,6 @@ local MockSync = Addon:NewModule("MockSync")
 Addon.MockSync = MockSync
 
 local pairs = pairs
-local ipairs = ipairs
 local sort = table.sort
 local format = string.format
 

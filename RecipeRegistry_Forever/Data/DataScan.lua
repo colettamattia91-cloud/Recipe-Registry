@@ -12,7 +12,6 @@ local countRecipeKeys = Private.countRecipeKeys
 local detectSpecialization = Private.detectSpecialization
 local extractItemID = Private.extractItemID
 local extractSpellID = Private.extractSpellID
-local isSubsetOf = Private.isSubsetOf
 local isValidRecipeKey = Private.isValidRecipeKey
 local newScanTelemetry = Private.newScanTelemetry
 -- Set-difference compare on two recipe-key maps. Used by ApplyScanResult to
@@ -238,7 +237,6 @@ function Data:PruneDroppedProfessions()
         entry.professions[professionKey] = nil
         if type(catalog) == "table" then
             catalog[professionKey] = nil
-            self:InvalidateSchematicIndex()
         end
         if self._scanNeededByProfession then self._scanNeededByProfession[professionKey] = nil end
         if self.MarkSyncIndexDirty then
@@ -574,38 +572,8 @@ function Data:StoreRecipeCatalog(profession, entries)
     if type(charDB) ~= "table" then return false end
     if type(charDB.recipeCatalog) ~= "table" then charDB.recipeCatalog = {} end
     charDB.recipeCatalog[profession] = entries
-    self:InvalidateSchematicIndex()
     Addon:Debug("Recipe catalog stored:", profession, #entries, "recipes")
     return true
-end
-
--- Cosa il client ha detto di una ricetta, per chiave.
---
--- Il catalogo e' per mestiere e la UI ragiona per chiave di ricetta, quindi
--- serve l'indice inverso. Costruito alla prima richiesta e buttato via quando
--- il catalogo cambia: e' una comodita', non uno stato da mantenere.
-function Data:GetCachedRecipeSchematic(recipeKey)
-    if recipeKey == nil then return nil end
-    local charDB = Addon.charDB
-    local catalogs = type(charDB) == "table" and charDB.recipeCatalog or nil
-    if type(catalogs) ~= "table" then return nil end
-    if type(self._schematicIndex) ~= "table" then
-        local index = {}
-        for _, catalog in pairs(catalogs) do
-            for _, entry in ipairs(type(catalog) == "table" and catalog or {}) do
-                if type(entry) == "table" and entry.reagents then
-                    if entry.key ~= nil then index[entry.key] = entry end
-                    if entry.variant ~= nil then index[entry.variant] = entry end
-                end
-            end
-        end
-        self._schematicIndex = index
-    end
-    return self._schematicIndex[recipeKey] or self._schematicIndex[tonumber(recipeKey)]
-end
-
-function Data:InvalidateSchematicIndex()
-    self._schematicIndex = nil
 end
 
 function Data:GetRecipeCatalog(profession)
@@ -847,37 +815,6 @@ function Data:ScanTradeSkill(opts)
                 )
                 if isValidRecipeKey(recipeKey) then
                     local entry = { id = recipeID, key = recipeKey, variant = variantSpellKey }
-                    -- I reagenti, dallo stesso giro. Il dataset dei metadati e'
-                    -- la fonte giusta e un giorno arrivera'; finche' e' il
-                    -- segnaposto vuoto, il pannello dettagli resterebbe senza
-                    -- reagenti, che su un addon di ricette e' mezzo addon.
-                    -- GetRecipeSchematic li da' qui e solo qui -- vuole la
-                    -- sessione viva, come il catalogo -- quindi si prendono
-                    -- adesso o non si prendono.
-                    local schematic = CT.GetRecipeSchematic and CT.GetRecipeSchematic(recipeID, false)
-                    if type(schematic) == "table" then
-                        local reagents = {}
-                        for _, slot in ipairs(schematic.reagentSlotSchematics or {}) do
-                            -- si tiene il primo item dello slot: gli slot a piu'
-                            -- scelte sono una cosa di retail moderno, qui i
-                            -- reagenti sono fissi e ne hanno uno
-                            local first = slot.reagents and slot.reagents[1]
-                            local itemID = first and first.itemID
-                            if itemID then
-                                reagents[#reagents + 1] = {
-                                    itemID = itemID,
-                                    count = slot.quantityRequired or 1,
-                                }
-                            end
-                        end
-                        if #reagents > 0 then entry.reagents = reagents end
-                        local yieldMin = tonumber(schematic.quantityMin) or 1
-                        local yieldMax = tonumber(schematic.quantityMax) or yieldMin
-                        -- 1 e' il caso normale: si salva solo quando non lo e'
-                        if yieldMin ~= 1 or yieldMax ~= 1 then
-                            entry.yieldMin, entry.yieldMax = yieldMin, yieldMax
-                        end
-                    end
                     catalog[#catalog + 1] = entry
                     if info.learned then
                         recipes[recipeKey] = true

@@ -89,18 +89,6 @@ local function ensureRecipePrefilters(profile)
     if filters.showOnlyProfitableRecipes == nil then
         filters.showOnlyProfitableRecipes = false
     end
-    if type(filters.expansionDefaults) ~= "table" then
-        filters.expansionDefaults = {}
-    end
-    if filters.expansionDefaults.vanilla == nil then
-        filters.expansionDefaults.vanilla = true
-    end
-    if filters.expansionDefaults.tbc == nil then
-        filters.expansionDefaults.tbc = true
-    end
-    if type(filters.professionExpansionOverrides) ~= "table" then
-        filters.professionExpansionOverrides = {}
-    end
     return filters
 end
 
@@ -109,12 +97,6 @@ local function resetRecipePrefilters(profile)
     profile.recipePrefilters = {
         showRemoteBopOutputRecipes = false,
         showOnlyProfitableRecipes = false,
-        expansionDefaults = {
-            -- Come DB_DEFAULTS in Data.lua: qui si mostra tutto.
-            vanilla = true,
-            tbc = true,
-        },
-        professionExpansionOverrides = {},
     }
 end
 
@@ -444,51 +426,12 @@ local function invalidateRecipeFilters(professionKey, reason)
     refreshOpenDirectory()
 end
 
--- Both of these now go through RecipeUiFilters, which is where the collection
--- strip and the recipe header write the same two settings. The panel keeps its
--- own refresh of the open directory; the module handles the cache
--- invalidation that every writer needs.
-local function setFilterExpansionDefault(expansion, enabled)
-    local profile = getProfile()
-    if not profile then return end
-    local filters = ensureRecipePrefilters(profile)
-    local module = Addon.RecipeUiFilters
-    if module and module.SetExpansionDefaults then
-        local vanilla = filters.expansionDefaults.vanilla ~= false
-        local tbc = filters.expansionDefaults.tbc ~= false
-        if expansion == "vanilla" then vanilla = enabled == true else tbc = enabled == true end
-        -- The panel is allowed to switch both off: it shows a warning line for
-        -- exactly that state, and a checkbox that refuses to move is worse.
-        if not module:SetExpansionDefaults(vanilla, tbc, "filters:global-" .. tostring(expansion)) then
-            filters.expansionDefaults[expansion] = enabled == true
-        end
-        refreshOpenDirectory()
-        return
-    end
-    filters.expansionDefaults[expansion] = enabled == true
-    invalidateRecipeFilters(nil, "filters:global-" .. tostring(expansion))
-end
-
 local function setRemoteBopVisible(enabled)
     local profile = getProfile()
     if not profile then return end
     local filters = ensureRecipePrefilters(profile)
     filters.showRemoteBopOutputRecipes = enabled == true
     invalidateRecipeFilters(nil, "filters:remote-bop")
-end
-
-local function setProfitableOnly(enabled)
-    local profile = getProfile()
-    if not profile then return end
-    local filters = ensureRecipePrefilters(profile)
-    local module = Addon.RecipeUiFilters
-    if module and module.SetProfitableOnly then
-        module:SetProfitableOnly(enabled)
-        refreshOpenDirectory()
-        return
-    end
-    filters.showOnlyProfitableRecipes = enabled == true
-    invalidateRecipeFilters(nil, "filters:profitable-only")
 end
 
 -- The collection tab lists every profession this character has. Some
@@ -501,61 +444,6 @@ local function setCollectionEnabled(professionLabel, enabled)
     if Addon.UI and Addon.UI.RefreshRecipeList then
         Addon.UI:RefreshRecipeList()
     end
-end
-
-local function createProfessionOverride(filters, professionKey)
-    local overrides = filters.professionExpansionOverrides
-    local override = overrides[professionKey]
-    if type(override) ~= "table" then
-        override = {}
-        overrides[professionKey] = override
-    end
-    override.inherit = false
-    if override.vanilla == nil then
-        override.vanilla = filters.expansionDefaults.vanilla ~= false
-    end
-    if override.tbc == nil then
-        override.tbc = filters.expansionDefaults.tbc ~= false
-    end
-    return override
-end
-
-local function setProfessionCustom(professionKey, custom)
-    local profile = getProfile()
-    if not profile then return end
-    local filters = ensureRecipePrefilters(profile)
-    if custom == true then
-        createProfessionOverride(filters, professionKey)
-    else
-        filters.professionExpansionOverrides[professionKey] = nil
-    end
-    invalidateRecipeFilters(professionKey, "filters:" .. tostring(professionKey))
-end
-
-local function setProfessionExpansion(professionKey, expansion, enabled)
-    local profile = getProfile()
-    if not profile then return end
-    local filters = ensureRecipePrefilters(profile)
-    local override = createProfessionOverride(filters, professionKey)
-    override[expansion] = enabled == true
-    invalidateRecipeFilters(professionKey, "filters:" .. tostring(professionKey))
-end
-
-local function getFilterWarning(filters)
-    local defaults = filters and filters.expansionDefaults or {}
-    if defaults.vanilla == false and defaults.tbc == false then
-        return "Warning: global filters hide every Vanilla and TBC recipe."
-    end
-
-    local overrides = filters and filters.professionExpansionOverrides or {}
-    for _, profession in ipairs(FILTER_PROFESSIONS) do
-        local override = overrides[profession.key]
-        if type(override) == "table" and override.inherit == false
-            and override.vanilla == false and override.tbc == false then
-            return "Warning: one or more custom profession filters hide every Vanilla and TBC recipe."
-        end
-    end
-    return ""
 end
 
 local function setSearchMode(mode)
@@ -698,43 +586,20 @@ function Options:RefreshControls()
             self.filterPluginHint:SetText("Recipe metadata module not loaded. Recipe filters are unavailable.")
         end
     end
-    if self.globalVanillaCheck then
-        self.globalVanillaCheck:SetChecked(filters.expansionDefaults.vanilla ~= false)
-    end
-    if self.globalTbcCheck then
-        self.globalTbcCheck:SetChecked(filters.expansionDefaults.tbc ~= false)
-    end
     if self.remoteBopCheck then
         self.remoteBopCheck:SetChecked(filters.showRemoteBopOutputRecipes == true)
     end
     if self.professionFilterControls then
         for _, profession in ipairs(FILTER_PROFESSIONS) do
             local row = self.professionFilterControls[profession.key]
-            if row then
-                local override = filters.professionExpansionOverrides[profession.key]
-                local custom = type(override) == "table" and override.inherit == false
-                row.customCheck:SetChecked(custom)
-                if row.collectionCheck then
-                    local enabled = true
-                    if Addon.Data and Addon.Data.IsCollectionEnabledForProfession then
-                        enabled = Addon.Data:IsCollectionEnabledForProfession(row.professionLabel) ~= false
-                    end
-                    row.collectionCheck:SetChecked(enabled)
+            if row and row.collectionCheck then
+                local enabled = true
+                if Addon.Data and Addon.Data.IsCollectionEnabledForProfession then
+                    enabled = Addon.Data:IsCollectionEnabledForProfession(row.professionLabel) ~= false
                 end
-                if custom then
-                    row.vanillaCheck:SetChecked(override.vanilla ~= false)
-                    row.tbcCheck:SetChecked(override.tbc ~= false)
-                else
-                    row.vanillaCheck:SetChecked(filters.expansionDefaults.vanilla ~= false)
-                    row.tbcCheck:SetChecked(filters.expansionDefaults.tbc ~= false)
-                end
-                setCheckEnabled(row.vanillaCheck, custom)
-                setCheckEnabled(row.tbcCheck, custom)
+                row.collectionCheck:SetChecked(enabled)
             end
         end
-    end
-    if self.filterWarning then
-        self.filterWarning:SetText(getFilterWarning(filters))
     end
 end
 
@@ -856,25 +721,11 @@ function Options:EnsurePanel()
 
     local filterAnchor = filterPluginHint
     if hasMetadataPlugin() then
-        local globalVanillaCheck = createCheck(pageFilters, "Show Vanilla recipes by default", function(self)
-            setFilterExpansionDefault("vanilla", self:GetChecked() and true or false)
-            Options:RefreshControls()
-        end)
-        globalVanillaCheck:SetPoint("TOPLEFT", filterPluginHint, "BOTTOMLEFT", -2, -8)
-        self.globalVanillaCheck = globalVanillaCheck
-
-        local globalTbcCheck = createCheck(pageFilters, "Show TBC recipes by default", function(self)
-            setFilterExpansionDefault("tbc", self:GetChecked() and true or false)
-            Options:RefreshControls()
-        end)
-        globalTbcCheck:SetPoint("TOPLEFT", globalVanillaCheck, "BOTTOMLEFT", 0, -2)
-        self.globalTbcCheck = globalTbcCheck
-
         local remoteBopCheck = createCheck(pageFilters, "Show remote BoP and self-only recipes", function(self)
             setRemoteBopVisible(self:GetChecked() and true or false)
             Options:RefreshControls()
         end)
-        remoteBopCheck:SetPoint("TOPLEFT", globalTbcCheck, "BOTTOMLEFT", 0, -2)
+        remoteBopCheck:SetPoint("TOPLEFT", filterPluginHint, "BOTTOMLEFT", -2, -8)
         self.remoteBopCheck = remoteBopCheck
 
         -- "Show only profitable" is not here any more. It answers a passing
@@ -883,24 +734,15 @@ function Options:EnsurePanel()
         -- belongs next to the list it changes. It lives in the recipe
         -- browser's own filter control; see the Economy page.
 
-        local matrixHeader = createText(pageFilters, "Profession overrides", "GameFontNormalSmall")
+        local matrixHeader = createText(pageFilters, "Per profession", "GameFontNormalSmall")
         matrixHeader:SetPoint("TOPLEFT", remoteBopCheck, "BOTTOMLEFT", 28, -10)
 
         local headerProfession = createColumnHeader(pageFilters, "Profession", 132)
         headerProfession:SetJustifyH("LEFT")
         headerProfession:SetPoint("TOPLEFT", matrixHeader, "BOTTOMLEFT", 0, -8)
 
-        local headerCustom = createColumnHeader(pageFilters, "Custom")
-        headerCustom:SetPoint("CENTER", headerProfession, "LEFT", 190 + 12, 0)
-
-        local headerVanilla = createColumnHeader(pageFilters, "Vanilla")
-        headerVanilla:SetPoint("CENTER", headerProfession, "LEFT", 284 + 12, 0)
-
-        local headerTbc = createColumnHeader(pageFilters, "TBC")
-        headerTbc:SetPoint("CENTER", headerProfession, "LEFT", 372 + 12, 0)
-
         local headerCollection = createColumnHeader(pageFilters, "Collection")
-        headerCollection:SetPoint("CENTER", headerProfession, "LEFT", 460 + 12, 0)
+        headerCollection:SetPoint("CENTER", headerProfession, "LEFT", 190 + 12, 0)
 
         local separator = pageFilters:CreateTexture(nil, "ARTWORK")
         separator:SetColorTexture(0.4, 0.4, 0.4, 0.5)
@@ -916,53 +758,23 @@ function Options:EnsurePanel()
             label:SetWidth(132)
             label:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -6)
 
-            local customCheck = createCheck(pageFilters, "", function(self)
-                setProfessionCustom(professionKey, self:GetChecked() and true or false)
-                Options:RefreshControls()
-            end)
-            customCheck:SetPoint("CENTER", label, "LEFT", 190 + 12, 0)
-            setHoverTooltip(customCheck, "Custom override",
-                "When enabled, " .. profession.label .. " uses its own Vanilla/TBC visibility instead of the global defaults above.")
-
-            local vanillaCheck = createCheck(pageFilters, "", function(self)
-                setProfessionExpansion(professionKey, "vanilla", self:GetChecked() and true or false)
-                Options:RefreshControls()
-            end)
-            vanillaCheck:SetPoint("CENTER", label, "LEFT", 284 + 12, 0)
-            setHoverTooltip(vanillaCheck, "Show Vanilla recipes",
-                "Enable Custom on this row to change this value; otherwise it mirrors the global Vanilla default.")
-
-            local tbcCheck = createCheck(pageFilters, "", function(self)
-                setProfessionExpansion(professionKey, "tbc", self:GetChecked() and true or false)
-                Options:RefreshControls()
-            end)
-            tbcCheck:SetPoint("CENTER", label, "LEFT", 372 + 12, 0)
-            setHoverTooltip(tbcCheck, "Show TBC recipes",
-                "Enable Custom on this row to change this value; otherwise it mirrors the global TBC default.")
-
             local collectionCheck = createCheck(pageFilters, "", function(self)
                 setCollectionEnabled(profession.label, self:GetChecked() and true or false)
                 Options:RefreshControls()
             end)
-            collectionCheck:SetPoint("CENTER", label, "LEFT", 460 + 12, 0)
+            collectionCheck:SetPoint("CENTER", label, "LEFT", 190 + 12, 0)
             setHoverTooltip(collectionCheck, "List in Collection",
                 "When enabled, the Collection tab lists this character's " .. profession.label .. " recipe book -- learned and not. Only professions this character actually has are ever listed.")
 
             self.professionFilterControls[professionKey] = {
                 label = label,
-                customCheck = customCheck,
-                vanillaCheck = vanillaCheck,
-                tbcCheck = tbcCheck,
                 collectionCheck = collectionCheck,
                 professionLabel = profession.label,
             }
             previous = label
         end
 
-        local filterWarning = createText(pageFilters, "", "GameFontDisableSmall")
-        filterWarning:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -10)
-        self.filterWarning = filterWarning
-        filterAnchor = filterWarning
+        filterAnchor = previous
     end
 
     -- Driven off the UI module's tab registry, so a tab added there shows up

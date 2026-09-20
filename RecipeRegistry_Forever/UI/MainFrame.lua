@@ -133,28 +133,12 @@ local COLLECTION_PHASE_TEXT = {
     [5] = "P5",
 }
 
--- Niente Jewelcrafting: e' un mestiere di TBC, e Forever e' contenuto vanilla.
 -- Una scheda per un mestiere che nessuno puo' avere non resta vuota, resta
 -- sbagliata: dice che qualcuno in gilda potrebbe saperlo fare.
 local PROF_ORDER = {
     FAVORITES_VIEW, "Alchemy", "Blacksmithing", "Cooking", "Enchanting", "Engineering",
     "First Aid", "Fishing", "Herbalism", "Leatherworking", "Mining", "Skinning",
     "Tailoring"
-}
-
-local PROFESSION_SPELL_IDS = {
-    ["Alchemy"] = 2259,
-    ["Blacksmithing"] = 2018,
-    ["Cooking"] = 2550,
-    ["Enchanting"] = 7411,
-    ["Engineering"] = 4036,
-    ["First Aid"] = 3273,
-    ["Fishing"] = 7620,
-    ["Herbalism"] = 2366,
-    ["Leatherworking"] = 2108,
-    ["Mining"] = 2575,
-    ["Skinning"] = 8613,
-    ["Tailoring"] = 3908,
 }
 
 -- Top-level tabs, in nav order. Adding a tab is a row here plus its view
@@ -277,8 +261,6 @@ end
 -- Faction banners. Item icons rather than UI art: these two have shipped in
 -- every client since vanilla, so there is no build where they resolve to a
 -- green box.
-local ALLIANCE_TAG = textureTag("Interface\\Icons\\INV_BannerPVP_02", 14)
-local HORDE_TAG = textureTag("Interface\\Icons\\INV_BannerPVP_01", 14)
 
 -- The same two banners for use inside a line of text rather than beside one.
 -- At 14px with no offset they sat above the letters they follow and, on a
@@ -365,7 +347,9 @@ local function hasLocalProfessions()
 end
 
 local function getProfessionIcon(profName)
-    local spellID = PROFESSION_SPELL_IDS[profName]
+    -- l'elenco sta in Data: una copia qui sarebbe la stessa tabella due volte
+    local spellID = Addon.Data and Addon.Data.GetProfessionSpellID
+        and Addon.Data:GetProfessionSpellID(profName)
     return getSpellIcon(spellID)
 end
 
@@ -381,13 +365,6 @@ local function getClassColorizedName(memberKey)
     -- dal nome che Data ricava dalla chiave, non dalla chiave: oggi su Forever
     -- le due cose coincidono, e questo e' il punto in cui smetterebbero
     return colorText(Addon.Data:GetMemberKeyName(memberKey), getClassColor(memberKey))
-end
-
-local function getRarityLabel(itemID)
-    local quality = getItemQuality(itemID)
-    if quality == nil then return nil end
-    local label = _G["ITEM_QUALITY" .. quality .. "_DESC"] or _G["ITEM_QUALITY" .. tostring(quality) .. "_DESC"] or tostring(quality)
-    return colorText(label, getQualityColor(quality))
 end
 
 local function createBackdrop(frame, bgR, bgG, bgB, bgA, borderR, borderG, borderB, borderA)
@@ -498,12 +475,6 @@ local function ageText(ts)
     if delta < 3600 then return math.floor(delta / 60) .. "m ago" end
     if delta < 86400 then return math.floor(delta / 3600) .. "h ago" end
     return math.floor(delta / 86400) .. "d ago"
-end
-
-local function timestampText(ts)
-    if not ts or ts <= 0 then return "never" end
-    local formatted = date and date("%Y-%m-%d %H:%M", ts) or tostring(ts)
-    return string.format("%s (%s)", formatted, ageText(ts))
 end
 
 local function safeText(v)
@@ -1127,33 +1098,6 @@ function UI:GetCollectionColumnFilter(columnKey)
     return self.collectionFilters[columnKey] or "all"
 end
 
-function UI:CycleCollectionColumnFilter(columnKey)
-    local cycle = COLLECTION_FILTER_CYCLES[columnKey]
-    if not cycle then
-        self:SetCollectionSort(columnKey)
-        return
-    end
-    if columnKey == "status" then
-        local data = Addon.Data
-        if data and data.CycleCollectionFilter then data:CycleCollectionFilter() end
-    else
-        self.collectionFilters = self.collectionFilters or {}
-        local current = self.collectionFilters[columnKey] or "all"
-        local nextIndex = 1
-        for index, value in ipairs(cycle) do
-            if value == current then
-                nextIndex = index + 1
-                break
-            end
-        end
-        if nextIndex > #cycle then nextIndex = 1 end
-        self.collectionFilters[columnKey] = cycle[nextIndex]
-    end
-    self:ResetRecipeScroll()
-    self:RefreshCollectionControls()
-    self:RefreshRecipeList()
-end
-
 function UI:SetCollectionSort(columnKey)
     if not COLLECTION_SORT_KEYS[columnKey] then
         columnKey = COLLECTION_DEFAULT_SORT
@@ -1177,83 +1121,7 @@ function UI:SetCollectionSort(columnKey)
     self:RefreshRecipeList()
 end
 
--- The expansion prefilter and the profit filter used to be reachable only
--- through the options panel, two windows away from the list they change.
--- These drive the same profile settings the panel does, through the one
--- setter in RecipeUiFilters, so the panel and the strip cannot disagree.
---
--- Three states, not two switches: "neither expansion" is an empty browser, so
--- it is not one of the states you can cycle into.
-local EXPANSION_STATES = {
-    { key = "all",     vanilla = true,  tbc = true,  label = "Expansion: All" },
-    { key = "tbc",     vanilla = false, tbc = true,  label = "Expansion: TBC only" },
-    { key = "vanilla", vanilla = true,  tbc = false, label = "Expansion: Vanilla only" },
-}
-
-local EXPANSION_MIXED = { key = "mixed", label = "Expansion: Per profession" }
-
-function UI:GetExpansionFilterState()
-    local filters = Addon.RecipeUiFilters
-    if not (filters and filters.GetExpansionDefaults) then return EXPANSION_STATES[1] end
-    -- An override outranks the global pair, so a window that reported the
-    -- pair would be telling the reader something the list does not obey.
-    local overridden = filters.GetProfessionsWithExpansionOverride
-        and filters:GetProfessionsWithExpansionOverride() or {}
-    if #overridden > 0 then return EXPANSION_MIXED end
-    local vanilla, tbc = filters:GetExpansionDefaults()
-    for _, state in ipairs(EXPANSION_STATES) do
-        if state.vanilla == vanilla and state.tbc == tbc then return state end
-    end
-    return EXPANSION_STATES[1]
-end
-
--- Chosen from the window rather than cycled: the menu says what the three
--- states are, and picking one applies it to every profession.
-function UI:SetExpansionFilter(key)
-    local filters = Addon.RecipeUiFilters
-    if not (filters and filters.SetExpansionDefaults) then return end
-    for _, state in ipairs(EXPANSION_STATES) do
-        if state.key == key then
-            filters:SetExpansionDefaults(state.vanilla, state.tbc, "filters:expansion-" .. key)
-            if filters.ClearProfessionExpansionOverrides then
-                filters:ClearProfessionExpansionOverrides()
-            end
-            self:ResetRecipeScroll()
-            self:RefreshFilterControls()
-            self:RefreshRecipeList()
-            return
-        end
-    end
-end
-
--- The expansion choices, as menu items, for whichever control opened the menu.
-function UI:BuildExpansionMenuItems()
-    local current = self:GetExpansionFilterState()
-    local items = { { text = "Expansions", isTitle = true } }
-    for _, state in ipairs(EXPANSION_STATES) do
-        local key = state.key
-        items[#items + 1] = {
-            -- The label inside the menu drops the "Expansion:" prefix the
-            -- button carries: the title above it already said that.
-            text = state.label:gsub("^Expansion: ", ""),
-            checked = current.key == key,
-            func = function() UI:SetExpansionFilter(key) end,
-        }
-    end
-    if current.key == EXPANSION_MIXED.key then
-        items[#items + 1] = {
-            text = "Some professions are set on their own, in the options.",
-            isTitle = true,
-        }
-    end
-    return items
-end
-
--- The browser's only filter besides the search box. Which expansions to list
--- is asked in the collection, the tab whose whole subject is a profession's
--- book: here the banner over the list already says when an expansion is being
--- held back, and says it against the profession actually being looked at,
--- which a control in the sidebar cannot do.
+-- The browser's only filter besides the search box.
 function UI:OpenRecipeFilterMenu(anchor)
     local profitable = self:IsProfitableOnly()
     self:OpenDropdown(anchor, {
@@ -1285,10 +1153,6 @@ function UI:SetProfitableOnly(value)
     self:RefreshRecipeList()
 end
 
-function UI:ToggleProfitableOnly()
-    self:SetProfitableOnly(not self:IsProfitableOnly())
-end
-
 function UI:ShowRecipeFilterTooltip(owner)
     GameTooltip:SetOwner(owner, "ANCHOR_TOP")
     GameTooltip:AddLine("What this list is showing")
@@ -1297,23 +1161,11 @@ function UI:ShowRecipeFilterTooltip(owner)
     GameTooltip:Show()
 end
 
--- The expansion filter lives here alone now, so this is the only tooltip that
--- has to warn about a profession set on its own: a setting nobody can see is
--- a setting that reads as a broken window.
 function UI:ShowCollectionFilterTooltip(owner)
     GameTooltip:SetOwner(owner, "ANCHOR_TOP")
     GameTooltip:AddLine("What this table is showing")
-    GameTooltip:AddLine("How much of the collection to list, which expansions to include, and a way to drop every column filter at once. The expansions are the same setting as the options panel, and they apply to every tab.",
+    GameTooltip:AddLine("How much of the collection to list, and a way to drop every column filter at once.",
         0.75, 0.75, 0.75, true)
-    local filters = Addon.RecipeUiFilters
-    local overridden = filters and filters.GetProfessionsWithExpansionOverride
-        and filters:GetProfessionsWithExpansionOverride() or {}
-    if #overridden > 0 then
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine("These professions are set on their own and are not following it: "
-            .. table.concat(overridden, ", ") .. ". Choosing an expansion here puts them back in step.",
-            0.95, 0.75, 0.30, true)
-    end
     GameTooltip:Show()
 end
 
@@ -1408,11 +1260,6 @@ function UI:OpenCollectionFilterMenu(anchor)
                 UI:RefreshRecipeList()
             end,
         }
-    end
-
-    items[#items + 1] = { isSeparator = true }
-    for _, item in ipairs(self:BuildExpansionMenuItems()) do
-        items[#items + 1] = item
     end
 
     local narrowed = self:HasCollectionColumnFilter()
@@ -1978,10 +1825,6 @@ function UI:RefreshCollectionControls()
     local filter = (data and data.GetCollectionFilter and data:GetCollectionFilter()) or "all"
     if f.collectionFilterButton and f.collectionFilterButton.SetLabel then
         local label = (COLLECTION_FILTER_LABELS[filter] or COLLECTION_FILTER_LABELS.all)
-        local expansion = self:GetExpansionFilterState()
-        if expansion.key ~= "all" then
-            label = label .. ", " .. expansion.label:gsub("^Expansion: ", "")
-        end
         if self:HasCollectionColumnFilter() and filter == "all" then
             label = label .. " (filtered)"
         end
@@ -1990,7 +1833,7 @@ function UI:RefreshCollectionControls()
             -- Highlighted whenever the list is narrower than the collection,
             -- so a filtered view never looks like the whole book.
             f.collectionFilterButton:SetSelected(filter ~= "all"
-                or expansion.key ~= "all" or self:HasCollectionColumnFilter())
+                or self:HasCollectionColumnFilter())
         end
     end
     self:RefreshFilterControls()
@@ -2026,13 +1869,6 @@ function UI:ApplyMainLayout()
         f.center:SetPoint("TOPLEFT", 10, -94)
         f.center:SetPoint("BOTTOMRIGHT", -10, 34)
         setShownIfChanged(f.right, false)
-        -- The hidden-expansion hint is a button parented to the centre panel,
-        -- and the centre panel is exactly what these views take over. Nothing
-        -- else puts it away on the way in: both of its refresh calls sit in
-        -- the recipe-list build, which does not run for these views, so a hint
-        -- left showing in Recipes stayed painted over the guild members and
-        -- collection tables. Its own refresh knows to hide it here.
-        self:RefreshHiddenExpansionHint(self.selectedProfession)
         if f.recipeClip then
             f.recipeClip._rrAnchorMode = nil
             f.recipeClip:ClearAllPoints()
@@ -2057,8 +1893,7 @@ function UI:ApplyMainLayout()
             -- when mode already matches, but ApplyMainLayout's previous
             -- inline SetPoint had blown the anchor out from under it).
             f.recipeClip._rrAnchorMode = nil
-            local hint = f.hiddenExpansionHint
-            self:_SetRecipeScrollAnchor(hint and hint:IsShown() == true)
+            self:_SetRecipeScrollAnchor()
         end
     end
     self:RefreshAddonStatusControls()
@@ -2683,46 +2518,6 @@ function UI:CreateMainFrame()
         UI:RefreshRecipeList()
     end)
     f.collectionSearchClearButton = collectionSearchClearButton
-
-    -- Discoverability hint: when a profession's view is restricted by the
-    -- expansion filter, surface a one-click "N <expansion> recipes hidden"
-    -- button so the user doesn't have to dive into the options panel to
-    -- realise material is being filtered. Sits in the strip between the
-    -- header and the recipe list; hidden when not applicable.
-    local hiddenExpansionHint = CreateFrame("Button", nil, center)
-    -- y=-42 leaves ~12px of breathing room below the Sort button row
-    -- (sortSwitch bottoms out around y=-30); the scroll's hint-shown
-    -- anchor below puts another ~10px between the hint and the first
-    -- recipe row.
-    hiddenExpansionHint:SetPoint("TOPLEFT", 12, -42)
-    hiddenExpansionHint:SetPoint("TOPRIGHT", -28, -42)
-    hiddenExpansionHint:SetHeight(20)
-    -- The recipe list's clip container (created right after) inherits a
-    -- higher frame level by default, so its row children render in FRONT
-    -- of the hint when their y range overlaps. Bump the hint above the
-    -- centre frame so it stays on top within the same strata (changing
-    -- strata on a non-toplevel child can detach it from the parent).
-    hiddenExpansionHint:SetFrameLevel((center.GetFrameLevel and center:GetFrameLevel() or 1) + 10)
-    hiddenExpansionHint:Hide()
-    -- Faint background panel so the hint reads as an actionable strip
-    -- rather than blending into the centre frame backdrop.
-    local hintBg = hiddenExpansionHint:CreateTexture(nil, "BACKGROUND")
-    hintBg:SetAllPoints(true)
-    hintBg:SetColorTexture(0.95, 0.75, 0.20, 0.12)
-    hiddenExpansionHint.bg = hintBg
-    local hintHighlight = hiddenExpansionHint:CreateTexture(nil, "HIGHLIGHT")
-    hintHighlight:SetAllPoints(true)
-    hintHighlight:SetColorTexture(0.95, 0.75, 0.20, 0.22)
-    local hiddenExpansionHintText = hiddenExpansionHint:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    hiddenExpansionHintText:SetPoint("LEFT", 6, 0)
-    hiddenExpansionHintText:SetPoint("RIGHT", -6, 0)
-    hiddenExpansionHintText:SetJustifyH("LEFT")
-    hiddenExpansionHintText:SetTextColor(1.0, 0.82, 0.0)
-    hiddenExpansionHint.text = hiddenExpansionHintText
-    hiddenExpansionHint:SetScript("OnClick", function()
-        UI:UnhideCurrentProfessionExpansion()
-    end)
-    f.hiddenExpansionHint = hiddenExpansionHint
 
     -- WoW Classic's UIPanelScrollFrameTemplate doesn't clip children to
     -- the scroll's visible bounds. Without clipping, scrolling the list
@@ -3861,35 +3656,9 @@ function UI:RefreshProfessionButtons(opts)
         button:SetLabel(profName, profName ~= FAVORITES_VIEW and getProfessionIcon(profName) or nil)
         button:SetSelected(self.selectedProfession == profName)
 
-        -- Hide professions whose only expansions are currently filtered away.
-        -- Skipped when the filter is permissive (both Vanilla and TBC visible
-        -- for the profession): in that case every supported profession stays
-        -- in the sidebar. Only fires under a restrictive filter, e.g. JC has
-        -- no Vanilla recipes so it disappears in a Vanilla-only view.
-        local hideProfession = false
-        if profName ~= FAVORITES_VIEW and Addon.RecipeUiFilters and Addon.Data then
-            local visibility = Addon.RecipeUiFilters:GetEffectiveExpansionVisibility(profName)
-            if visibility and (visibility.vanilla == false or visibility.tbc == false) then
-                local expansions = Addon.Data.GetProfessionExpansions
-                    and Addon.Data:GetProfessionExpansions(profName)
-                    or nil
-                if expansions and (expansions.vanilla or expansions.tbc) then
-                    local vanillaMatch = visibility.vanilla and expansions.vanilla
-                    local tbcMatch = visibility.tbc and expansions.tbc
-                    if not vanillaMatch and not tbcMatch then
-                        hideProfession = true
-                    end
-                end
-            end
-        end
+        placeButton(button, 0, 24, 6)
 
-        if hideProfession then
-            setShownIfChanged(button, false)
-        else
-            placeButton(button, 0, 24, 6)
-        end
-
-        if not hideProfession and useCategories and self.selectedProfession == profName and profName ~= FAVORITES_VIEW then
+        if useCategories and self.selectedProfession == profName and profName ~= FAVORITES_VIEW then
             local viewMode = (Addon.db and Addon.db.profile and Addon.db.profile.recipeCategoryView) or "expanded"
             -- Sidebar categories follow the same projection as the recipe list:
             -- only categories with at least one recipe visible under the active
@@ -5298,35 +5067,12 @@ function UI:RefreshRecipeList()
         categoryFilter = categoryFilter,
         globalSearch = globalSearch,
     }
-    -- Thread the per-session expansion reveal so RecipePasses /
-    -- BuildVisibleSpellIdHash treat the hidden expansion as visible
-    -- for THIS view only. Profile prefilters stay untouched, so other
-    -- professions still respect the saved Vanilla=off preference.
-    if self._sessionRevealedExpansions and effectiveProfession then
-        local filtersModule = Addon.RecipeUiFilters
-        local profKey = effectiveProfession
-        if filtersModule and filtersModule.NormalizeProfessionKey then
-            profKey = filtersModule:NormalizeProfessionKey(effectiveProfession) or effectiveProfession
-        end
-        local reveal = profKey and self._sessionRevealedExpansions[profKey]
-        if reveal then
-            context.filterContext.sessionRevealedExpansions = reveal
-        end
-    end
     if Addon.RecipeUiFilters and Addon.RecipeUiFilters.BuildFilterCacheKey then
         context.filterCacheKey = Addon.RecipeUiFilters:BuildFilterCacheKey(context.filterContext)
     end
 
     self._recipeListGeneration = (self._recipeListGeneration or 0) + 1
     local generation = self._recipeListGeneration
-
-    -- Refresh the hint + scroll anchor before the build runs, so the
-    -- previously-rendered rows from the prior profession don't briefly
-    -- overlap the hint while the new build is in flight. _FinalizeRecipeList
-    -- re-runs the same refresh at the end (cheap no-op when nothing
-    -- changed) to catch edge cases where the hint state depends on
-    -- per-recipe data only available after the build.
-    self:RefreshHiddenExpansionHint(self.selectedProfession)
 
     if not (self.selectedProfession == "Favorites" or self.selectedProfession ~= nil or canRunGlobalSearch) then
         self:_FinalizeRecipeList({}, context, generation)
@@ -5534,141 +5280,24 @@ function UI:_FinalizeRecipeList(rows, context, generation)
     self:InvalidateRecipeWindowCache()
     self:RenderVisibleRecipeRows()
     self:RefreshSummaryCards()
-    self:RefreshHiddenExpansionHint(context.selectedProfession)
     -- Async path: the selection may have changed after the list arrived,
     -- so refresh the detail panel to keep it in sync with the new rows.
     self:RefreshDetailPanel()
 end
 
--- Discoverability hint shown between the recipe header and the list. When
--- the user has hidden an expansion globally (or via per-profession
--- override) and that expansion has catalogued recipes for the current
--- profession, expose a one-click affordance to surface them. Falls
--- through to hidden state for "All", Favorites, or fully-on visibility.
-function UI:RefreshHiddenExpansionHint(profession)
-    local hint = self.frame and self.frame.hiddenExpansionHint
-    if not hint then return end
-    -- The full-width views are not a profession browser, and the hint is
-    -- parented to the centre panel they take over: left showing, it painted
-    -- across the guild members and collection tables.
-    if self:IsFullWidthView() then
-        if hint.IsShown and hint:IsShown() then hint:Hide() end
-        return
-    end
-    if not profession or profession == "All" or profession == "Favorites" then
-        self:_SetRecipeScrollAnchor(false)
-        if hint.IsShown and hint:IsShown() then hint:Hide() end
-        return
-    end
-    local filters = Addon.RecipeUiFilters
-    local metadata = Addon.RecipeMetadata
-    if not (filters and metadata) then
-        if hint.IsShown and hint:IsShown() then hint:Hide() end
-        return
-    end
-    local profKey = filters.NormalizeProfessionKey and filters:NormalizeProfessionKey(profession) or profession
-    -- Mining is intentionally expansion-agnostic at the predicate level;
-    -- the hint would never fire usefully there.
-    if profKey == "mining" then
-        if hint.IsShown and hint:IsShown() then hint:Hide() end
-        return
-    end
-    local visibility = filters:GetEffectiveExpansionVisibility(profKey)
-    -- Honour the per-session reveal so the hint disappears after click
-    -- without forcing the user to refresh / re-navigate to clear it.
-    local sessionReveal = self._sessionRevealedExpansions
-        and self._sessionRevealedExpansions[profKey]
-        or nil
-    if sessionReveal then
-        visibility = {
-            vanilla = visibility.vanilla ~= false or sessionReveal.vanilla == true,
-            tbc = visibility.tbc ~= false or sessionReveal.tbc == true,
-        }
-    end
-    local hiddenExpansion, hiddenCount
-    local getCount = metadata.GetExpansionRecipeCount
-        and function(exp) return metadata:GetExpansionRecipeCount(profKey, exp) end
-        or function() return 0 end
-    if visibility.vanilla == false then
-        local n = getCount("vanilla")
-        if n > 0 then
-            hiddenExpansion = "vanilla"
-            hiddenCount = n
-        end
-    end
-    if not hiddenExpansion and visibility.tbc == false then
-        local n = getCount("tbc")
-        if n > 0 then
-            hiddenExpansion = "tbc"
-            hiddenCount = n
-        end
-    end
-    if not hiddenExpansion then
-        self:_SetRecipeScrollAnchor(false)
-        if hint.IsShown and hint:IsShown() then hint:Hide() end
-        return
-    end
-    hint._pendingProfession = profKey
-    hint._pendingExpansion = hiddenExpansion
-    local label = hiddenExpansion == "vanilla" and "Vanilla" or "TBC"
-    if hint.text then
-        hint.text:SetText(string.format(
-            "%d %s recipe%s hidden by filter -- click to show",
-            hiddenCount,
-            label,
-            hiddenCount == 1 and "" or "s"
-        ))
-    end
-    self:_SetRecipeScrollAnchor(true)
-    hint:Show()
-end
-
--- Toggle the recipe list's top anchor so the hint never overlaps the
--- first recipe row. Moves the clip container, which the scroll fills.
--- Uses absolute offsets relative to the centre frame
--- (not frame-to-frame anchors) — anchoring to the hint while it was
--- hidden produced a measurable mismatch (the hint's BOTTOMLEFT wasn't
--- being honoured) that put the scroll INSIDE the hint band by ~14px.
--- The hint sits at y=-34 with height 20, so y=-72 leaves an 18px gap
--- below the hint's bottom edge.
-function UI:_SetRecipeScrollAnchor(hintShown)
+-- Anchors the recipe list's clip container below the header. Absolute offsets
+-- relative to the centre frame rather than frame-to-frame anchors: those
+-- produced a measurable mismatch that put the scroll inside the band above it
+-- by ~14px.
+function UI:_SetRecipeScrollAnchor()
     local frame = self.frame
     local clip = frame and frame.recipeClip
     if not clip then return end
-    local mode = hintShown and "below-hint" or "below-header"
-    if clip._rrAnchorMode == mode then return end
-    clip._rrAnchorMode = mode
+    if clip._rrAnchorMode == "below-header" then return end
+    clip._rrAnchorMode = "below-header"
     clip:ClearAllPoints()
-    clip:SetPoint("TOPLEFT", 8, hintShown and -72 or -40)
+    clip:SetPoint("TOPLEFT", 8, -40)
     clip:SetPoint("BOTTOMRIGHT", -8, 10)
-end
-
--- Click handler: per-session reveal of the hidden expansion for the
--- currently-viewed profession. The user's saved profile is NOT
--- mutated, so navigating to another profession (or /reload) shows the
--- hint again at the original preference. Stored on the UI module so
--- subsequent navigations back to the same profession keep the reveal.
-function UI:UnhideCurrentProfessionExpansion()
-    local hint = self.frame and self.frame.hiddenExpansionHint
-    if not hint or not hint._pendingExpansion then return end
-    local profKey = hint._pendingProfession
-    if not profKey then return end
-    self._sessionRevealedExpansions = self._sessionRevealedExpansions or {}
-    local profReveal = self._sessionRevealedExpansions[profKey]
-    if type(profReveal) ~= "table" then
-        profReveal = {}
-        self._sessionRevealedExpansions[profKey] = profReveal
-    end
-    profReveal[hint._pendingExpansion] = true
-    -- Invalidate the list-cache slice for this profession only — the
-    -- session reveal changes the predicate outcome for the current view
-    -- but leaves every other cached list (other professions, profile-
-    -- side filters) intact.
-    if Addon.Data and Addon.Data.InvalidateRecipeCaches then
-        Addon.Data:InvalidateRecipeCaches("list")
-    end
-    hint:Hide()
-    Addon:RequestRefresh("unhide-expansion-session")
 end
 
 function UI:GetCrafterRequestability(recipeKey, crafter, selfKey)
@@ -6200,76 +5829,6 @@ function UI:RenderDetailLines(lines, lineLinks, lineMeta)
         self.frame.detailContent._rrHeight = detailHeight
         self.frame.detailContent:SetHeight(detailHeight)
     end
-end
-
-function UI:GetSelectedAddonStatusRow()
-    if not self.selectedAddonStatusKey then
-        return nil
-    end
-    for _, rowData in ipairs(self.currentRecipeRows or {}) do
-        if rowData.rowType == "addonStatus" and rowData.memberKey == self.selectedAddonStatusKey then
-            return rowData
-        end
-    end
-    return nil
-end
-
-function UI:RefreshAddonStatusDetailPanel()
-    if not self.frame then return end
-    self.currentDetail = nil
-    self._lastDetailSignature = nil
-    self.frame.detailFavoriteButton.recipeKey = nil
-    self.frame.detailFavoriteButton.isFavorite = false
-    setShownIfChanged(self.frame.detailFavoriteButton, false)
-
-    local lines = {}
-    local summary = self.currentAddonStatusSummary or {}
-    if summary.rosterReady ~= true then
-        setTextIfChanged(self.frame.detailTitle, ADDON_STATUS_VIEW)
-        setTextIfChanged(self.frame.detailSub, "Waiting for the guild roster refresh.")
-        lines[#lines + 1] = "Guild roster data is not loaded yet."
-        lines[#lines + 1] = "Recipe Registry has requested a roster refresh and will update this view automatically."
-        self:RenderDetailLines(lines, {}, {})
-        return
-    end
-
-    local row = self:GetSelectedAddonStatusRow()
-    if not row then
-        setTextIfChanged(self.frame.detailTitle, ADDON_STATUS_VIEW)
-        setTextIfChanged(self.frame.detailSub, "No guild member selected.")
-        if self.searchText and self.searchText ~= "" then
-            lines[#lines + 1] = "No guild roster rows match this search."
-        else
-            lines[#lines + 1] = "No guild roster rows are available."
-        end
-        self:RenderDetailLines(lines, {}, {})
-        return
-    end
-
-    local sr, sg, sb = addonStatusColor(row.addonStatusKey)
-    setTextIfChanged(self.frame.detailTitle, getClassColorizedName(row.memberKey))
-    setTextIfChanged(self.frame.detailSub, colorText(row.addonStatusLabel, sr, sg, sb))
-
-    lines[#lines + 1] = "|cffffd100Addon|r"
-    lines[#lines + 1] = "Status: " .. addonStatusLabelColor(row)
-    lines[#lines + 1] = "Version: " .. safeText(row.addonVersion)
-    lines[#lines + 1] = "Wire: " .. safeText(row.wireVersion)
-    lines[#lines + 1] = "Build channel: " .. safeText(row.buildChannel)
-    lines[#lines + 1] = "Build ID: " .. safeText(row.buildId)
-    lines[#lines + 1] = "First seen addon: " .. timestampText(row.firstSeenAt)
-    lines[#lines + 1] = "Last seen addon: " .. timestampText(row.lastSeenAt)
-
-    lines[#lines + 1] = " "
-    lines[#lines + 1] = "|cffffd100Roster|r"
-    lines[#lines + 1] = "Online status: " .. (row.online and colorText("Online", 0.35, 0.95, 0.45) or colorText("Offline", 0.85, 0.45, 0.45))
-    lines[#lines + 1] = "Rank: " .. safeText(row.rankName)
-    lines[#lines + 1] = "Level: " .. safeText(row.level)
-    lines[#lines + 1] = "Zone: " .. safeText(row.zone)
-    if row.status and row.status ~= "" then
-        lines[#lines + 1] = "Roster status: " .. safeText(row.status)
-    end
-
-    self:RenderDetailLines(lines, {}, {})
 end
 
 function UI:RefreshDetailPanel()
