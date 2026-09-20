@@ -2667,9 +2667,19 @@ function UI:CreateMainFrame()
     end)
     f.detailShareButton = detailShareButton
 
-    local shareMenuFrame = CreateFrame("Frame", "RecipeRegistryShareMenu", right, "UIDropDownMenuTemplate")
-    shareMenuFrame:Hide()
-    f.shareMenuFrame = shareMenuFrame
+    -- Il template puo' non esserci, e allora CreateFrame solleva un errore che
+    -- non si ferma al menu: si porta dietro tutto il resto della costruzione
+    -- del frame. Ogni altro uso di UIDropDownMenu in questo file e' gia' dietro
+    -- una guardia, e i due consumatori di shareMenuFrame reggono gia' il nil --
+    -- solo la creazione non lo faceva.
+    local shareMenuOk, shareMenuFrame = pcall(
+        CreateFrame, "Frame", "RecipeRegistryShareMenu", right, "UIDropDownMenuTemplate")
+    if shareMenuOk and shareMenuFrame then
+        shareMenuFrame:Hide()
+        f.shareMenuFrame = shareMenuFrame
+    else
+        Addon:Debug("UIDropDownMenuTemplate non disponibile: menu di condivisione assente")
+    end
 
     local detailTitleButton = CreateFrame("Button", nil, right)
     detailTitleButton:SetPoint("TOPLEFT", 10, -10)
