@@ -1,0 +1,64 @@
+# Recipe Registry for World of Warcraft: Forever.
+#
+# Its own addon folder, not a second TOC over the TBC files, because the two
+# clients share content and not APIs: Forever is vanilla content behind a
+# retail-shaped API. Code that is only correct on one of them has no business
+# loading on the other, where it is at best dead and at worst a Lua error.
+#
+# The file list below is the TBC one, file for file, because this tree starts as
+# a copy and diverges from here. What is already known to diverge is in
+# docs/forever/scan-rewrite.md.
+#
+# The Interface number is READ FROM THE CLIENT, not derived: GetBuildInfo() on
+# 2026-09-18 answered 1.60.1 / 69913 / Sep 17 2026 / 16001. The
+# major*10000 + minor*100 + patch rule happened to predict it, but 16001 is now
+# the client's own answer and not an inference. Re-read it when the beta takes a
+# build that moves the version, because a stale number only costs an out-of-date
+# warning here, not a refusal to load.
+## Interface: 16001
+## Title: Recipe Registry |cff33ff99(Forever)|r
+## Notes: Guild profession tracker for WoW: Forever. Adaptation in progress.
+## Author: OpenAI + User collaboration
+## Version: 0.1.0-dev
+## X-Build-Channel: dev
+## X-Build-ID: forever-dev
+## SavedVariables: RecipeRegistryDB,RecipeRegistryLogDB
+## SavedVariablesPerCharacter: RecipeRegistryCharDB
+## X-Category: Guild
+## OptionalDeps: TradeSkillMaster,Auctionator
+
+Libs\embeds.xml
+
+Core\Core.lua
+Core\Compat.lua
+Core\BuildInfo.lua
+Core\Performance.lua
+Data\Data.lua
+Data\DataScan.lua
+Data\DataSnapshot.lua
+Data\RecipeOwnershipIndex.lua
+Data\Metadata\RecipeMetadata_Generated.lua
+Data\Metadata\RecipeMetadata_Overrides.lua
+Data\Metadata\RecipeMetadata.lua
+Data\Metadata\RecipeMetadataDiagnostics.lua
+Data\RecipeUiFilters.lua
+Data\DataCatalog.lua
+Data\DataCollection.lua
+Data\DataIndex.lua
+Data\DataCleanup.lua
+Data\MergeEngine.lua
+Sync\BootstrapSync.lua
+Sync\SyncPausePolicy.lua
+Data\GuildLifecycleMaintenance.lua
+Integrations\Market.lua
+Sync\Sync.lua
+Sync\SyncRuntime.lua
+Sync\SyncProtocol.lua
+Sync\SyncCodec.lua
+Sync\SyncRequests.lua
+Sync\SyncTransfer.lua
+Sync\SyncDiagnostics.lua
+UI\Tooltip.lua
+UI\MinimapButton.lua
+UI\Options.lua
+UI\MainFrame.lua

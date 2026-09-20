@@ -1,0 +1,1566 @@
+local ADDON_NAME = "RecipeRegistry"
+
+local Addon = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME,
+    "AceConsole-3.0",
+    "AceEvent-3.0",
+    "AceTimer-3.0",
+    "AceBucket-3.0"
+)
+
+_G.RecipeRegistry = Addon
+Addon.debugMode = false
+Addon.perfDebugMode = false
+Addon._refreshReasons = {}
+
+local time = time
+local max = math.max
+local min = math.min
+
+local DEBUG_LOG_DEFAULTS = {
+    enabled = false,
+    maxEntries = 400,
+    chatEcho = false,
+    scopes = {
+        sync = true,
+        request = true,
+        transfer = true,
+        offline = true,
+        version = true,
+        filters = true,
+    },
+    entries = {},
+    nextSequence = 0,
+}
+
+local DEBUG_LOG_SCOPE_NAMES = {
+    sync = true,
+    request = true,
+    transfer = true,
+    offline = true,
+    version = true,
+    filters = true,
+}
+
+local function cloneShallow(src)
+    local out = {}
+    for key, value in pairs(src or {}) do
+        out[key] = value
+    end
+    return out
+end
+
+local function initDebugLogDB()
+    if type(_G.RecipeRegistryLogDB) ~= "table" then
+        _G.RecipeRegistryLogDB = {}
+    end
+    local db = _G.RecipeRegistryLogDB
+    if type(db.enabled) ~= "boolean" then
+        db.enabled = DEBUG_LOG_DEFAULTS.enabled
+    end
+    if type(db.maxEntries) ~= "number" or db.maxEntries < 50 then
+        db.maxEntries = DEBUG_LOG_DEFAULTS.maxEntries
+    end
+    if type(db.chatEcho) ~= "boolean" then
+        db.chatEcho = DEBUG_LOG_DEFAULTS.chatEcho
+    end
+    if type(db.scopes) ~= "table" then
+        db.scopes = cloneShallow(DEBUG_LOG_DEFAULTS.scopes)
+    else
+        for scopeName in pairs(DEBUG_LOG_SCOPE_NAMES) do
+            if type(db.scopes[scopeName]) ~= "boolean" then
+                db.scopes[scopeName] = DEBUG_LOG_DEFAULTS.scopes[scopeName]
+            end
+        end
+    end
+    if type(db.entries) ~= "table" then
+        db.entries = {}
+    end
+    if type(db.nextSequence) ~= "number" then
+        db.nextSequence = 0
+    end
+    return db
+end
+
+function Addon:GetDebugLogDB()
+    return initDebugLogDB()
+end
+
+function Addon:IsDebugLogEnabled(scope)
+    local db = self:GetDebugLogDB()
+    if db.enabled ~= true then
+        return false
+    end
+    local normalizedScope = tostring(scope or ""):lower()
+    if normalizedScope == "" then
+        return true
+    end
+    return db.scopes[normalizedScope] == true
+end
+
+function Addon:WriteDebugLog(scope, message, fields)
+    local normalizedScope = tostring(scope or "general"):lower()
+    if not self:IsDebugLogEnabled(normalizedScope) then
+        return false
+    end
+
+    local db = self:GetDebugLogDB()
+    db.nextSequence = (db.nextSequence or 0) + 1
+
+    local entry = {
+        seq = db.nextSequence,
+        at = time(),
+        scope = normalizedScope,
+        message = tostring(message or ""),
+    }
+    if type(fields) == "table" then
+        for key, value in pairs(fields) do
+            entry[key] = value
+        end
+    end
+    if self.Data and self.Data.GetPlayerKey then
+        entry.localPlayer = self.Data:GetPlayerKey()
+    end
+
+    local entries = db.entries
+    entries[#entries + 1] = entry
+    -- Batched trim: instead of paying O(N) on every append once the buffer is
+    -- full (table.remove(t, 1) shifts everything), let the buffer grow to ~2x
+    -- the cap, then compact in one walk. Amortized O(1) per append; trim
+    -- happens once every ~maxEntries traces.
+    local cap = max(50, db.maxEntries or DEBUG_LOG_DEFAULTS.maxEntries)
+    local count = #entries
+    if count > cap * 2 then
+        local startIndex = count - cap + 1
+        local kept = {}
+        for i = startIndex, count do
+            kept[#kept + 1] = entries[i]
+        end
+        db.entries = kept
+    end
+
+    if db.chatEcho == true and self.debugMode then
+        self:Print(string.format("|cff88ccff[trace:%s]|r %s", normalizedScope, entry.message))
+    end
+    return true
+end
+
+function Addon:Trace(scope, ...)
+    -- Early gate before tostring/concat — the formatted args still get
+    -- evaluated by the caller (Lua arg semantics), but at least we skip the
+    -- parts/tostring/concat work when the scope is disabled. Hot-path callers
+    -- should prefer Addon:Tracef which gates BEFORE the format string runs.
+    if not self:IsDebugLogEnabled(scope) then
+        return false
+    end
+    local parts = {}
+    for i = 1, select("#", ...) do
+        parts[#parts + 1] = tostring(select(i, ...))
+    end
+    return self:WriteDebugLog(scope, table.concat(parts, " "))
+end
+
+-- Lazy-formatting trace: skips string.format entirely when the scope is
+-- disabled. Use this in hot paths (protocol dispatch, block-pull handlers,
+-- merge, rebuild) where the trace arguments include tostring() calls or
+-- format strings that would otherwise run unconditionally.
+function Addon:Tracef(scope, fmt, ...)
+    if not self:IsDebugLogEnabled(scope) then
+        return false
+    end
+    local message
+    if select("#", ...) > 0 then
+        message = string.format(tostring(fmt or ""), ...)
+    else
+        message = tostring(fmt or "")
+    end
+    return self:WriteDebugLog(scope, message)
+end
+
+function Addon:GetDebugLogEntries(limit, scope)
+    local db = self:GetDebugLogDB()
+    local entries = db.entries or {}
+    local normalizedScope = tostring(scope or ""):lower()
+    local out = {}
+    for index = #entries, 1, -1 do
+        local entry = entries[index]
+        if normalizedScope == "" or tostring(entry.scope or "") == normalizedScope then
+            out[#out + 1] = entry
+            if limit and #out >= limit then
+                break
+            end
+        end
+    end
+    return out
+end
+
+function Addon:ClearDebugLog()
+    local db = self:GetDebugLogDB()
+    db.entries = {}
+    db.nextSequence = 0
+end
+
+local function safecall(fn, ...)
+    if type(fn) == "function" then
+        local ok, err = pcall(fn, ...)
+        if not ok then
+            DEFAULT_CHAT_FRAME:AddMessage("|cffff5555Recipe Registry error:|r " .. tostring(err))
+        end
+    end
+end
+
+function Addon:Debug(...)
+    if not self.debugMode then return end
+    local out = {}
+    for i = 1, select("#", ...) do
+        out[#out + 1] = tostring(select(i, ...))
+    end
+    self:Print("|cff8888ff[debug]|r " .. table.concat(out, " "))
+end
+
+function Addon:SystemPrint(...)
+    if not self.debugMode then return end
+    self:Print(...)
+end
+
+local function copySet(src)
+    local out = {}
+    for key, value in pairs(src or {}) do
+        out[key] = value
+    end
+    return out
+end
+
+local function trimInput(text)
+    return (text and text:match("^%s*(.-)%s*$")) or ""
+end
+
+local function scanResultChanged(result)
+    if type(result) == "table" then
+        return result.changed == true
+    end
+    return result == true
+end
+
+local function scanActiveProfessionData(self, opts)
+    if not self.Data then return false end
+    opts = opts or {}
+    local changed = false
+    if opts.source == "trade" then
+        if self.Data.ScanTradeSkill then
+            changed = scanResultChanged(self.Data:ScanTradeSkill(opts)) or changed
+        end
+        return changed
+    end
+    if self.Data.ScanTradeSkill then
+        changed = scanResultChanged(self.Data:ScanTradeSkill(opts)) or changed
+    end
+    return changed
+end
+
+local function markSyncIndexDirtyAndScheduleHello(self, reason, delay)
+    if self.Data and self.Data.MarkSyncIndexDirty then
+        self.Data:MarkSyncIndexDirty(reason)
+        if self.Data.ScheduleSyncIndexPrepare then
+            self.Data:ScheduleSyncIndexPrepare(reason, 0.2)
+        end
+    end
+    if self.Sync and self.Sync.ScheduleHello then
+        self.Sync:ScheduleHello(reason, delay or 0.5)
+        if self.Sync.RefreshSyncReadyState then
+            self.Sync:RefreshSyncReadyState(reason)
+        end
+    end
+end
+
+-- Scansione con ritentativo.
+--
+-- La sorgente dati di C_TradeSkillUI non e' pronta quando lo siamo noi. Al
+-- login, due secondi dopo PLAYER_LOGIN, GetAllRecipeIDs tace ancora e la
+-- scansione salta con "trade-no-title"; una manciata di secondi dopo risponde
+-- 197 righe e registra correttamente. Stessa storia su TRADE_SKILL_SHOW, che
+-- arriva prima che il cambio di mestiere sia completo.
+--
+-- La domanda ovvia e' perche' non aspettare IsTradeSkillReady, che sembra
+-- fatta apposta. Perche' risponde a una domanda diversa: e' true solo mentre
+-- una sessione mestiere e' aperta, e torna false appena si chiude -- verificato
+-- in gioco il 2026-09-18. I dati invece restano leggibili anche dopo, ed e'
+-- proprio quel caso che ci interessa: catalogo di 197 ricette, scansione che ne
+-- registra 3, e IsTradeSkillReady a false. Aspettarla vorrebbe dire scansionare
+-- solo a finestra aperta, cioe' rinunciare a tutto il guadagno.
+--
+-- Quindi si prova, e se il motivo del rifiuto e' "non ancora pronto" si riprova
+-- piu' tardi. I motivi definitivi -- API assente, mestiere non tracciato, dati
+-- gia' a posto -- fermano la catena subito, perche' insistere non cambierebbe
+-- niente.
+local SCAN_RETRY_REASONS = {
+    ["trade-no-title"] = true,
+    ["trade-data-not-ready"] = true,
+    -- la sessione si sta aprendo proprio adesso: al primo tentativo
+    -- IsTradeSkillReady puo' ancora dire false
+    ["trade-session-closed"] = true,
+}
+
+-- Quando riprovare dopo TRADE_SKILL_SHOW. La prima e' quasi sempre quella
+-- buona; le altre coprono un client che ci mette piu' del previsto. Finite
+-- queste, si smette: se dopo otto secondi la sessione non e' viva, non lo
+-- diventera' per insistenza.
+local TRADE_SKILL_SHOW_RETRIES = { 0.3, 1, 2, 5 }
+
+-- Una catena alla volta per motivo. Aprire e chiudere la finestra dei mestieri
+-- un paio di volte fa arrivare TRADE_SKILL_SHOW altrettante, e senza questo ogni
+-- evento lascerebbe dietro di se' una catena di ritentativi che continua a
+-- girare. Il gettone e' il modo piu' semplice: chi parte lo incrementa, le
+-- catene vecchie se ne accorgono e si fermano da sole -- niente timer da
+-- inseguire e cancellare.
+local scheduleScanWithRetry
+scheduleScanWithRetry = function(self, reason, delays, attempt, token)
+    attempt = attempt or 1
+    if attempt == 1 then
+        self._scanRetryTokens = self._scanRetryTokens or {}
+        token = (self._scanRetryTokens[reason] or 0) + 1
+        self._scanRetryTokens[reason] = token
+    end
+    local delay = delays[attempt]
+    if not delay then return end
+    self:ScheduleTimer(function()
+        if not self.Data then return end
+        if self._scanRetryTokens and self._scanRetryTokens[reason] ~= token then
+            return
+        end
+        local result = self.Data:ScanTradeSkill({ reason = reason, notifyMode = "auto" })
+        if scanResultChanged(result) then
+            markSyncIndexDirtyAndScheduleHello(self, reason .. "-scan", 0.5)
+        end
+        if result and result.skipped and SCAN_RETRY_REASONS[result.skipReason] then
+            scheduleScanWithRetry(self, reason, delays, attempt + 1, token)
+        end
+    end, delay)
+end
+
+local function splitCommand(text)
+    local trimmed = trimInput(text)
+    if trimmed == "" then
+        return "", ""
+    end
+
+    local cmd, rest = trimmed:match("^(%S+)%s*(.-)$")
+    return cmd or "", rest or ""
+end
+
+local function normalizeDebugLogScope(scope)
+    local normalized = trimInput(scope):lower()
+    if normalized == "" then
+        return nil
+    end
+    if DEBUG_LOG_SCOPE_NAMES[normalized] then
+        return normalized
+    end
+    return nil
+end
+
+local MOCK_SCENARIOS = "light, medium, heavy, burst, bootstrap, traffic, offline, offlinewipe, trafficburst, roster, rosterheavy, rosterbad, integrity"
+
+local function printMainHelp(self)
+    self:Print("Commands:")
+    self:Print("/rr - open or close the main window.")
+    self:Print("/rr options, /rr mini, /rr debug, /rr debug log")
+    self:Print("/rr rescan - queue a profession scan and scan active profession API data.")
+    self:Print("/rr version, /rr versions, /rr adoption, /rr dump, /rr self [profession], /rr sync [debug, diag, peers, sessions, log], /rr offline, /rr pull")
+    self:Print("/rr perf [toggle, dump, reset, help]")
+    self:Print("/rr filters [unresolved, explain <recipeKey>]")
+    if self.MockSync then
+        self:Print("/rr mock [status, start <" .. MOCK_SCENARIOS .. ">, stop, cleanup, reset, help]")
+    end
+    self:Print("/rr prices <item name or link>, /rr share [guild, party, raid, say, reply]")
+    self:Print("/rr clean [check], /rr wipe")
+end
+
+local function getRecipePrefilters(self)
+    local profile = self.db and self.db.profile or {}
+    local filters = profile.recipePrefilters or {}
+    return filters
+end
+
+local function dumpFilterStatus(self)
+    local filters = getRecipePrefilters(self)
+    local metadata = self.RecipeMetadata
+    if not metadata then
+        self:Print("Recipe filters: metadata module not ready; all recipes visible.")
+        return
+    end
+    local counts = metadata:GetRecordCounts()
+    self:Print(string.format(
+        "Recipe filters: metadata=%s unresolved=%d remoteBop=%s profitOnly=%s",
+        tostring(metadata.metadataVersion or "unknown"),
+        counts.unresolved or 0,
+        filters.showRemoteBopOutputRecipes == true and "show" or "hide",
+        filters.showOnlyProfitableRecipes == true and "on" or "off"
+    ))
+end
+
+local function dumpFilterUnresolved(self, severity)
+    local metadata = self.RecipeMetadata
+    if not metadata then
+        self:Print("Recipe filters: metadata module not ready.")
+        return
+    end
+    local unresolved = metadata:GetUnresolvedRecords(severity ~= "" and severity or nil)
+    if #unresolved == 0 then
+        self:Print("Recipe filters unresolved: none.")
+        return
+    end
+    self:Print(string.format("Recipe filters unresolved: %d record(s).", #unresolved))
+    local limit = math.min(#unresolved, 12)
+    for i = 1, limit do
+        local row = unresolved[i]
+        self:Print(string.format(
+            "%s spell=%s field=%s %s",
+            tostring(row.severity or "?"),
+            tostring(row.spellId or "?"),
+            tostring(row.field or "?"),
+            tostring(row.message or "")
+        ))
+    end
+    if #unresolved > limit then
+        self:Print(string.format("... %d more", #unresolved - limit))
+    end
+end
+
+local function explainFilterRecipe(self, input)
+    local recipeKey = tonumber(trimInput(input))
+    if not recipeKey then
+        self:Print("Usage: /rr filters explain <recipeKey>")
+        return
+    end
+    if not (self.RecipeUiFilters and self.RecipeUiFilters.Explain) then
+        self:Print("Recipe filters: diagnostics not available.")
+        return
+    end
+    local explanation = self.RecipeUiFilters:Explain(recipeKey, {})
+    self:Print(string.format(
+        "Recipe %s: %s reason=%s plugin=%s source=%s spell=%s",
+        tostring(recipeKey),
+        explanation.passed and "visible" or "hidden",
+        tostring(explanation.reason or "?"),
+        tostring(explanation.plugin or "?"),
+        tostring(explanation.source or "?"),
+        tostring(explanation.spellId or "?")
+    ))
+end
+
+local function handleFiltersCommand(self, rest)
+    local subcmd, subrest = splitCommand(rest)
+    subcmd = subcmd:lower()
+    if subcmd == "" or subcmd == "status" then
+        dumpFilterStatus(self)
+        return
+    end
+    if subcmd == "unresolved" then
+        dumpFilterUnresolved(self, trimInput(subrest))
+        return
+    end
+    if subcmd == "explain" then
+        explainFilterRecipe(self, subrest)
+        return
+    end
+    self:Print("Usage: /rr filters [unresolved|explain <recipeKey>]")
+end
+
+local function handleMetaCommand(self, rest)
+    local subcmd = splitCommand(rest):lower()
+    local diagnostics = self.RecipeMetadataDiagnostics
+    if subcmd == "" or subcmd == "diag" then
+        if diagnostics and diagnostics.PrintDiagnostics then
+            diagnostics:PrintDiagnostics()
+        else
+            self:Print("Recipe metadata diagnostics not ready.")
+        end
+        return
+    end
+    if subcmd == "version" then
+        if diagnostics and diagnostics.PrintVersion then
+            diagnostics:PrintVersion()
+        else
+            self:Print("Recipe metadata diagnostics not ready.")
+        end
+        return
+    end
+    self:Print("Usage: /rr meta [diag|version]")
+end
+
+local function printPerfHelp(self)
+    self:Print("/rr perf toggle - show or hide the performance/debug panel.")
+    self:Print("/rr perf dump - print scheduler, queues, sync and scan diagnostics.")
+    self:Print("/rr perf list - print recent recipe-list build telemetry (timing breakdown).")
+    self:Print("/rr perf reset - clear performance, sync and scan counters.")
+end
+
+local function printDebugLogHelp(self)
+    self:Print("/rr debug - enable or disable chat debug output.")
+    self:Print("/rr debug log on|off|status|show [count] [scope]|clear")
+    self:Print("/rr debug log scope <sync|request|transfer|offline|version> <on|off>")
+    self:Print("/rr debug log echo on|off - mirror persistent traces to the debug chat.")
+end
+
+local function printMockHelp(self)
+    self:Print("/rr mock status - current mock state and latest counters.")
+    self:Print("/rr mock start light, medium, heavy, burst - increasing direct-snapshot load.")
+    self:Print("/rr mock start bootstrap - heavy bootstrap-style transfer.")
+    self:Print("/rr mock start traffic - full HELLO/SUMMARY/INDEX_DIFF/BLOCK_PULL exercise.")
+    self:Print("/rr mock start offline - convergence of offline owners via a replica peer.")
+    self:Print("/rr mock start offlinewipe - simulate local wipe + unknown offline owners via replica.")
+    self:Print("/rr mock start trafficburst - replica traffic stress test.")
+    self:Print("/rr mock start roster - simulate roster cleanup with stale + prune.")
+    self:Print("/rr mock start rosterheavy - heavier variant of the roster test.")
+    self:Print("/rr mock start rosterbad - check the incomplete-roster-snapshot guardrail.")
+    self:Print("/rr mock start integrity - check partial-snapshot and merge protections.")
+    self:Print("/rr mock cleanup - remove local mock data/state from the client.")
+    self:Print("/rr mock reset - clear the mock counters.")
+    self:Print("/rr mock stop - stop the local mock worker and resume real traffic.")
+end
+
+function Addon:OnInitialize()
+    self:RegisterChatCommand("rr", "SlashHandler")
+    self:RegisterChatCommand("reciperegistry", "SlashHandler")
+    initDebugLogDB()
+    self.bucketTelemetry = {
+        rosterEventsAbsorbed = 0,
+        rosterBuckets = 0,
+        rosterDeferred = 0,
+        itemEventsAbsorbed = 0,
+        itemBuckets = 0,
+        lastRosterBucketAt = 0,
+        lastItemBucketAt = 0,
+    }
+end
+
+function Addon:MarkSavedVariablesReady(reason)
+    if self.Sync and self.Sync.SetSavedVariablesReady then
+        self.Sync._savedVariablesReadyBootstrap = true
+        self.Sync:SetSavedVariablesReady(reason or "addon-initialize")
+        return true
+    end
+    return false
+end
+
+function Addon:OnEnable()
+    self:RegisterEvent("PLAYER_LOGIN", "OnPlayerLogin")
+    self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnPlayerEnteringWorld")
+    self:RegisterEvent("TRADE_SKILL_SHOW", "OnTradeSkillShow")
+    -- Il segnale giusto, non solo il piu' ovvio. Registrando i candidati e
+    -- guardando cosa arriva davvero (2026-09-18, aprendo Alchemy):
+    --   TRADE_SKILL_SHOW                 catalogo 0    <- qui non c'e' ancora niente
+    --   TRADE_SKILL_DATA_SOURCE_CHANGING catalogo 0
+    --   TRADE_SKILL_DATA_SOURCE_CHANGED  catalogo 197  <- qui i dati ci sono
+    -- TRADE_SKILL_SHOW resta agganciato perche' e' il primo momento in cui si
+    -- sa che l'utente ha aperto qualcosa, e il ritentativo copre il vuoto; ma
+    -- questo e' l'evento che dice "adesso c'e' da leggere", e arriva anche
+    -- quando si passa da un mestiere all'altro senza riaprire la finestra.
+    self:RegisterEvent("TRADE_SKILL_DATA_SOURCE_CHANGED", "OnTradeSkillShow")
+    -- niente CRAFT_SHOW: su questo client l'evento non esiste, e registrarlo
+    -- fa fallire l'intero OnEnable ("Attempt to register unknown event").
+    -- Su TBC la famiglia Craft esisteva per un mestiere solo, Enchanting; qui
+    -- Enchanting e' un mestiere come gli altri e passa da TRADE_SKILL_SHOW.
+    self:RegisterEvent("NEW_RECIPE_LEARNED", "OnRecipeSignal")
+    self:RegisterEvent("SPELLS_CHANGED", "OnSkillSignal")
+    self:RegisterEvent("SKILL_LINES_CHANGED", "OnSkillSignal")
+    self:RegisterBucketEvent("GUILD_ROSTER_UPDATE", 1.5, "OnGuildRosterBucket")
+    self:RegisterBucketEvent("GET_ITEM_INFO_RECEIVED", 0.75, "OnItemInfoBucket")
+    -- ApplyIncomingBlockAdditive fires RR_BLOCK_MERGE_POST after each merge
+    -- and returns without recomputing the block fingerprint. The bucket
+    -- coalesces bursts (e.g. if BLOCK_PULL_DELAY_SECONDS is later reduced
+    -- or a peer is fed by multiple sessions) into a single dirty-block
+    -- rebuild per window. 0.5s matches the SUMMARY collection cadence:
+    -- short enough that the fingerprint is fresh before the next SUMMARY
+    -- needs it, long enough that several back-to-back merges share one
+    -- rebuild.
+    self:RegisterBucketMessage("RR_BLOCK_MERGE_POST", 0.5, "OnBlockMergePostBucket")
+    self:ScheduleTimer(function()
+        if self.MinimapButton then self.MinimapButton:Refresh() end
+        if self.UI then self.UI:CreateMainFrame() end
+    end, 0.2)
+
+    -- PLAYER_LOGIN is one-shot per session. If OnEnable runs after PLAYER_LOGIN
+    -- already fired (LoadOnDemand chains, late enable, addon loaded after login
+    -- complete) the handler registered above never gets invoked and
+    -- Sync.playerReady stays false forever, blocking HELLO with reason=player.
+    -- Replay OnPlayerLogin on the next tick. Sync:Startup is idempotent
+    -- (_startupInitialized guard) and SetPlayerReady just re-asserts the flag.
+    if IsLoggedIn and IsLoggedIn() then
+        self:ScheduleTimer("OnPlayerLogin", 0)
+    end
+end
+
+function Addon:OnPlayerLogin()
+    if self.Sync and self.Sync.Startup then
+        self.Sync:Startup()
+    end
+    if self.Sync and self.Sync.SetPlayerReady then
+        self.Sync:SetPlayerReady("player-login")
+    end
+    if self.Data then
+        self.Data:DetectProfessions()
+        -- La scansione al login, che non passa da C_TradeSkillUI.
+        --
+        -- La lista delle ricette del client serve una sessione viva e ne mostra
+        -- un mestiere alla volta, quindi al login non e' una fonte: a sessione
+        -- chiusa risponde con il residuo dell'ultimo mestiere aperto, e
+        -- registrarlo pubblicherebbe alla gilda uno stato vecchio.
+        --
+        -- Il libro degli incantesimi invece risponde sempre. Non elenca le
+        -- ricette, ma C_SpellBook.IsSpellKnown sa dire se ne conosci una --
+        -- verificato in gioco il 2026-09-18 -- e il catalogo salvato quando hai
+        -- aperto quel mestiere dice quali chiedere. Tutti i mestieri insieme,
+        -- senza toccare la UI.
+        self:ScheduleTimer(function()
+            if not self.Data or not self.Data.ScanKnownFromSpellBook then return end
+            local result = self.Data:ScanKnownFromSpellBook({
+                reason = "login",
+                notifyMode = "auto",
+            })
+            if scanResultChanged(result) then
+                markSyncIndexDirtyAndScheduleHello(self, "login-spellbook-scan", 1)
+            end
+        end, 3)
+        if self.Data.ScheduleSyncIndexPrepare then
+            self.Data:ScheduleSyncIndexPrepare("player-login", 0.2)
+        end
+    end
+    if self.Data and self.Data.ScheduleSafeAutoClean then
+        self:ScheduleTimer(function()
+            self.Data:ScheduleSafeAutoClean({ maxMembersPerStep = 8 })
+        end, 8)
+    end
+    -- Keep one watchdog for pathological reload/login paths, but readiness comes
+    -- from PLAYER_LOGIN / PLAYER_ENTERING_WORLD / GUILD_ROSTER_UPDATE + index prep.
+    self:ScheduleTimer("OnLoginReady", 10)
+    self:RequestRefresh("login")
+end
+
+function Addon:OnPlayerEnteringWorld(_event, isLogin, isReload)
+    if not IsInGuild() then
+        self:Debug("Not in guild, addon idle")
+        return
+    end
+
+    if self.Sync and self.Sync.EnterWorldTransition then
+        local syncConstants = self.Sync._private and self.Sync._private.constants or {}
+        local inInstance = IsInInstance and select(1, IsInInstance()) or false
+        -- Pick the longest applicable grace for the event we're handling.
+        -- Login and reload do a lot more work than a zone change (item
+        -- cache priming, full guild roster fetch, metadata warmup,
+        -- profession scan), so they get their own dedicated values.
+        local duration
+        if inInstance and (isLogin or isReload) then
+            duration = syncConstants.POST_RELOAD_IN_INSTANCE_GRACE_SECONDS or 30
+        elseif isLogin then
+            duration = syncConstants.POST_LOGIN_GRACE_SECONDS or 30
+        elseif isReload then
+            duration = syncConstants.POST_RELOAD_GRACE_SECONDS or 25
+        elseif inInstance then
+            duration = syncConstants.POST_INSTANCE_GRACE_SECONDS or 15
+        else
+            duration = syncConstants.POST_WORLD_GRACE_SECONDS or 12
+        end
+        self.Sync:EnterWorldTransition(
+            isLogin and "login"
+                or (isReload and "reload")
+                or (inInstance and "instance-enter")
+                or "zone-enter",
+            duration
+        )
+    end
+
+    if (isLogin or isReload) and self.Data and self.Data.RequestRosterSnapshot then
+        self.Data:RequestRosterSnapshot(isReload and "reload" or "login", {
+            cooldown = 0,
+            source = "player-entering-world",
+        })
+    end
+
+    if self.Data and self.Data.ScheduleSyncIndexPrepare then
+        self.Data:ScheduleSyncIndexPrepare("player-entering-world", 1)
+    end
+    if self.Sync and self.Sync.RefreshSyncReadyState then
+        self.Sync:RefreshSyncReadyState("player-entering-world")
+    end
+
+    -- Detect transitions out of an instance and re-probe profession state.
+    -- Recipes learned in-instance (trainer, scroll, drop) only fire
+    -- SKILL_LINES_CHANGED / SPELLS_CHANGED there, and without a profession
+    -- window open we can't read the new recipe list. The deferred-scan
+    -- flag set by ProcessSkillSignal in that situation needs the user to
+    -- open the relevant profession window after exit. Re-running
+    -- DetectProfessions here lets us notice skill-rank changes
+    -- immediately even if the window is never opened; an actual recipe
+    -- scan still requires the window, but the dirty fingerprint state is
+    -- at least updated.
+    local nowInInstance = IsInInstance and select(1, IsInInstance()) or false
+    if self._lastWorldInInstance == true and nowInInstance == false then
+        if self.Data and self.Data.DetectProfessions then
+            self.Data:DetectProfessions()
+        end
+        if self.Data and self.Data.MarkScanNeeded then
+            self.Data:MarkScanNeeded(nil, "instance-exit-rescan")
+        end
+        -- Kick the deferred-scan notice scheduler so the user gets the
+        -- "open profession to refresh" hint as soon as warmup + world
+        -- transition complete, instead of waiting for the next watchdog
+        -- tick that may already have been cancelled.
+        self:ScheduleDeferredScanNoticeCheck()
+    end
+    self._lastWorldInInstance = nowInInstance
+end
+
+function Addon:OnLoginReady()
+    if self.Sync and self.Sync.OnRosterPreflightWatchdog then
+        self.Sync:OnRosterPreflightWatchdog("login-watchdog")
+    end
+    if self.Sync and self.Sync.RefreshSyncReadyState then
+        self.Sync:RefreshSyncReadyState("login-watchdog")
+    end
+end
+
+local function countBucketEvents(events)
+    local total = 0
+    for _, count in pairs(events or {}) do
+        if type(count) == "number" then
+            total = total + count
+        else
+            total = total + 1
+        end
+    end
+    return total
+end
+
+function Addon:OnTradeSkillShow()
+    -- TRADE_SKILL_SHOW arriva mentre la sessione si sta ancora aprendo: al
+    -- primo tentativo IsTradeSkillReady puo' dire false e la sorgente dati puo'
+    -- non avere ancora finito di cambiare mestiere. Da qui il ritentativo,
+    -- invece di un unico colpo differito che o indovinava o perdeva la
+    -- scansione in silenzio.
+    if self.Data then
+        -- questa non aspetta niente: legge da GetProfessions, non dalla finestra
+        if self.Data:DetectProfessions() == true then
+            markSyncIndexDirtyAndScheduleHello(self, "profession-metadata", 0.5)
+        end
+    end
+    scheduleScanWithRetry(self, "profession-open", TRADE_SKILL_SHOW_RETRIES)
+end
+
+function Addon:OnRecipeSignal(_event, recipeID)
+    -- Capture the most recent recipeID from NEW_RECIPE_LEARNED so the
+    -- deferred-scan notice can name the affected profession ("You may
+    -- have learned an Alchemy recipe…") instead of a generic prompt.
+    if tonumber(recipeID) then
+        self._lastRecipeLearnedSpellId = tonumber(recipeID)
+    end
+    if self._recipeSignalTimer then
+        self:CancelTimer(self._recipeSignalTimer, true)
+    end
+    self._recipeSignalTimer = self:ScheduleTimer(function()
+        self:ProcessRecipeSignal("recipe-learned")
+    end, 1.0)
+end
+
+function Addon:ProcessRecipeSignal(reason)
+    self._recipeSignalTimer = nil
+    if self.Data then
+        local scanReason = tostring(reason or "recipe-learned")
+        local metadataChanged = self.Data:DetectProfessions() == true
+
+        -- Prima di tutto il resto: la ricetta che ha scatenato l'evento si
+        -- risolve da sola. NEW_RECIPE_LEARNED ci da' il suo ID, e su questo
+        -- client tanto basta per sapere di che mestiere e' e cosa produce --
+        -- senza aprire niente e ovunque tu sia. Impari una ricetta in un
+        -- dungeon e finisce nel sync da li'.
+        --
+        -- Quello che viene dopo resta come rete: la scansione del mestiere
+        -- aperto, se una finestra c'e', e il promemoria se non abbiamo saputo
+        -- risolvere.
+        local learned = false
+        if self.Data.LearnRecipeFromSignal and self._lastRecipeLearnedSpellId then
+            local ok, why, profession = self.Data:LearnRecipeFromSignal(
+                self._lastRecipeLearnedSpellId, scanReason)
+            learned = ok == true
+            if learned then
+                markSyncIndexDirtyAndScheduleHello(self, scanReason, 0.5)
+                self:Debug("Recipe learned without a window:", tostring(profession))
+            else
+                self:Debug("Recipe signal not resolved:", tostring(why))
+            end
+        end
+        if self.Data.MarkScanNeeded then
+            self.Data:MarkScanNeeded(nil, scanReason)
+        else
+            self.Data._scanNeeded = true
+        end
+        local changed = scanActiveProfessionData(self, {
+            reason = scanReason,
+            notifyMode = "auto",
+        }) or metadataChanged
+        if changed then
+            markSyncIndexDirtyAndScheduleHello(self, scanReason, 0.5)
+        end
+        -- NEW_RECIPE_LEARNED is the strong signal — fires only on actual
+        -- learns, never at /reload. Queue the post-warmup notice and
+        -- resolve the profession label from metadata if we captured the
+        -- recipe ID.
+        -- il promemoria serve solo se non abbiamo risolto: chiedere all'utente
+        -- di aprire un pannello per qualcosa che abbiamo gia' registrato e'
+        -- rumore, e lo farebbe dubitare di un dato corretto
+        if not changed and not learned then
+            local visible = self.Data.GetVisibleTrackedProfessionContext
+                and self.Data:GetVisibleTrackedProfessionContext()
+            if not visible then
+                self._pendingDeferredScanNotice = true
+                self._pendingDeferredScanProfession = self:_ResolveLearnedRecipeProfession()
+                self:ScheduleDeferredScanNoticeCheck()
+            end
+        end
+    end
+end
+
+function Addon:_ResolveLearnedRecipeProfession()
+    local spellId = self._lastRecipeLearnedSpellId
+    self._lastRecipeLearnedSpellId = nil
+    if not spellId then return nil end
+    local metadata = self.RecipeMetadata
+    if not (metadata and metadata.GetProfession) then return nil end
+    local professionKey = metadata:GetProfession(-spellId)
+    if not professionKey or professionKey == "" then return nil end
+    -- Title-case the key so the chat notice reads "Alchemy" not
+    -- "alchemy". The 8 supported professions are ASCII so a single
+    -- gsub is enough.
+    return (professionKey:sub(1, 1):upper() .. professionKey:sub(2))
+end
+
+function Addon:OnSkillSignal(event)
+    self._lastSkillSignalEvent = event or self._lastSkillSignalEvent or "SPELLS_CHANGED"
+    if self._skillSignalTimer then
+        self:CancelTimer(self._skillSignalTimer, true)
+    end
+    self._skillSignalTimer = self:ScheduleTimer(function()
+        self:ProcessSkillSignal(self._lastSkillSignalEvent)
+    end, 1.0)
+end
+
+-- Print a one-shot reminder that the user might have learned recipes
+-- while a profession window wasn't open (typical in raid/dungeon UIs or
+-- when training from a scroll). Suppressed until warmup + world
+-- transition have ended AND we're out of the instance, because firing
+-- mid-instance just adds chat noise the user can't act on anyway.
+function Addon:MaybeShowDeferredScanNotice()
+    if not self._pendingDeferredScanNotice then return false end
+    if self.Sync and self.Sync.IsInWarmup and self.Sync:IsInWarmup() then
+        return false
+    end
+    if self.Sync and self.Sync.IsInWorldTransition and self.Sync:IsInWorldTransition() then
+        return false
+    end
+    if type(IsInInstance) == "function" and select(1, IsInInstance()) then
+        return false
+    end
+    self._pendingDeferredScanNotice = false
+    self._deferredScanNoticeTimer = nil
+    local profession = self._pendingDeferredScanProfession
+    self._pendingDeferredScanProfession = nil
+    if profession and profession ~= "" then
+        self:Print(string.format(
+            "You may have learned a %s recipe -- open the profession panel to refresh the list.",
+            profession
+        ))
+    else
+        self:Print("You may have learned a recipe -- open the relevant profession panel to refresh the list.")
+    end
+    return true
+end
+
+function Addon:ScheduleDeferredScanNoticeCheck()
+    if not self._pendingDeferredScanNotice then return end
+    if self._deferredScanNoticeTimer then return end
+    -- Re-check every 5 seconds until conditions are met. The check is
+    -- cheap (three predicate evaluations) and self-cancels as soon as
+    -- the notice fires.
+    self._deferredScanNoticeTimer = self:ScheduleTimer(function()
+        self._deferredScanNoticeTimer = nil
+        if not self:MaybeShowDeferredScanNotice() then
+            self:ScheduleDeferredScanNoticeCheck()
+        end
+    end, 5)
+end
+
+function Addon:ProcessSkillSignal(event)
+    self._skillSignalTimer = nil
+    local signal = tostring(event or self._lastSkillSignalEvent or "SPELLS_CHANGED")
+    self._lastSkillSignalEvent = nil
+    if not self.Data then
+        return
+    end
+
+    local profession, source
+    if self.Data.GetVisibleTrackedProfessionContext then
+        profession, source = self.Data:GetVisibleTrackedProfessionContext()
+    end
+    local deferredReason = signal == "SPELLS_CHANGED" and "spell-update-deferred" or "skill-event-deferred"
+    if not profession then
+        -- No trade-skill window open right now. We can't read the recipe
+        -- list without an open window, but we still flag a pending scan
+        -- so the next TRADE_SKILL_SHOW picks up whatever
+        -- changed. The chat notice is NOT armed from this path because
+        -- SPELLS_CHANGED and SKILL_LINES_CHANGED also fire on /reload
+        -- and login (with no actual learn happening); the notice is
+        -- armed only by NEW_RECIPE_LEARNED (strong signal) and the
+        -- instance-exit transition (carries its own context).
+        if self.Data.MarkScanNeeded then
+            self.Data:MarkScanNeeded(nil, deferredReason)
+        end
+        self.Data:DetectProfessions()
+        if signal == "SKILL_LINES_CHANGED" then
+            self.Data:RecordScanTelemetry("scanSkippedWeaponSkill")
+        else
+            self.Data:RecordScanTelemetry("scanSkippedGenericSkill")
+        end
+        return
+    end
+
+    local reason = signal == "SPELLS_CHANGED" and "spell-update" or "skill-event"
+    local metadataChanged = self.Data:DetectProfessions() == true
+    self.Data:MarkScanNeeded(profession, reason)
+    local changed = scanActiveProfessionData(self, {
+        reason = reason,
+        notifyMode = "auto",
+        source = source,
+    }) or metadataChanged
+    if changed then
+        markSyncIndexDirtyAndScheduleHello(self, reason, 0.5)
+    end
+end
+
+function Addon:ResetBucketTelemetry()
+    self.bucketTelemetry = self.bucketTelemetry or {}
+    self.bucketTelemetry.rosterEventsAbsorbed = 0
+    self.bucketTelemetry.rosterBuckets = 0
+    self.bucketTelemetry.rosterDeferred = 0
+    self.bucketTelemetry.itemEventsAbsorbed = 0
+    self.bucketTelemetry.itemBuckets = 0
+    self.bucketTelemetry.lastRosterBucketAt = 0
+    self.bucketTelemetry.lastItemBucketAt = 0
+end
+
+function Addon:GetBucketTelemetrySnapshot()
+    self.bucketTelemetry = self.bucketTelemetry or {}
+    return {
+        rosterEventsAbsorbed = self.bucketTelemetry.rosterEventsAbsorbed or 0,
+        rosterBuckets = self.bucketTelemetry.rosterBuckets or 0,
+        rosterDeferred = self.bucketTelemetry.rosterDeferred or 0,
+        itemEventsAbsorbed = self.bucketTelemetry.itemEventsAbsorbed or 0,
+        itemBuckets = self.bucketTelemetry.itemBuckets or 0,
+        lastRosterBucketAt = self.bucketTelemetry.lastRosterBucketAt or 0,
+        lastItemBucketAt = self.bucketTelemetry.lastItemBucketAt or 0,
+    }
+end
+
+function Addon:DumpBucketStatus()
+    local snapshot = self:GetBucketTelemetrySnapshot()
+    self:SystemPrint(string.format(
+        "Buckets rosterEvents=%d rosterFlushes=%d rosterDeferred=%d lastRosterAt=%d itemEvents=%d itemFlushes=%d lastItemAt=%d",
+        snapshot.rosterEventsAbsorbed or 0,
+        snapshot.rosterBuckets or 0,
+        snapshot.rosterDeferred or 0,
+        snapshot.lastRosterBucketAt or 0,
+        snapshot.itemEventsAbsorbed or 0,
+        snapshot.itemBuckets or 0,
+        snapshot.lastItemBucketAt or 0
+    ))
+end
+
+function Addon:OnGuildRosterBucket(events)
+    local absorbed = countBucketEvents(events)
+    self.bucketTelemetry = self.bucketTelemetry or {}
+    self.bucketTelemetry.rosterBuckets = (self.bucketTelemetry.rosterBuckets or 0) + 1
+    self.bucketTelemetry.rosterEventsAbsorbed = (self.bucketTelemetry.rosterEventsAbsorbed or 0) + absorbed
+    self.bucketTelemetry.lastRosterBucketAt = time()
+    if self.Sync and self.Sync.telemetry then
+        self.Sync.telemetry.rosterEventsSeen = (self.Sync.telemetry.rosterEventsSeen or 0) + absorbed
+        self.Sync.telemetry.rosterEventsCoalesced = (self.Sync.telemetry.rosterEventsCoalesced or 0) + max(0, absorbed - 1)
+    end
+    if self.Sync and self.Sync.ShouldDeferHeavyLifecycleWork then
+        local shouldDefer = self.Sync:ShouldDeferHeavyLifecycleWork("roster-ui")
+        if shouldDefer then
+            self.bucketTelemetry.rosterDeferred = (self.bucketTelemetry.rosterDeferred or 0) + 1
+            self:ScheduleRosterUpdate("bucket")
+            return
+        end
+    end
+    self:ProcessCoalescedGuildRosterUpdate("bucket")
+end
+
+function Addon:OnItemInfoBucket(events)
+    local absorbed = countBucketEvents(events)
+    self.bucketTelemetry = self.bucketTelemetry or {}
+    self.bucketTelemetry.itemBuckets = (self.bucketTelemetry.itemBuckets or 0) + 1
+    self.bucketTelemetry.itemEventsAbsorbed = (self.bucketTelemetry.itemEventsAbsorbed or 0) + absorbed
+    self.bucketTelemetry.lastItemBucketAt = time()
+    local handledMetadataBop = false
+    if self.Data and self.Data.OnMetadataItemInfoReceived then
+        handledMetadataBop = self.Data:OnMetadataItemInfoReceived(events) == true
+    end
+    if self.Data and not handledMetadataBop then
+        self.Data:InvalidateRecipeCaches("list")
+    end
+    self:RequestRefresh("item-cache")
+end
+
+-- Deferred fingerprint recompute for blocks merged via
+-- Data:ApplyIncomingBlockAdditive. The blocks are already marked dirty
+-- inline by the merge; this handler walks the dirty set once per bucket
+-- window and rebuilds the affected fingerprints. A single call covers
+-- every key that came in during the window because RefreshSyncBlockRecord
+-- drains the dirty queue regardless of which blockKey is passed in.
+function Addon:OnBlockMergePostBucket(events)
+    local absorbed = countBucketEvents(events)
+    self.bucketTelemetry = self.bucketTelemetry or {}
+    self.bucketTelemetry.blockMergeBuckets = (self.bucketTelemetry.blockMergeBuckets or 0) + 1
+    self.bucketTelemetry.blockMergeEventsAbsorbed = (self.bucketTelemetry.blockMergeEventsAbsorbed or 0) + absorbed
+    self.bucketTelemetry.lastBlockMergeBucketAt = time()
+    if not (self.Data and self.Data.RefreshSyncBlockRecord) then
+        return
+    end
+    self.Data:RefreshSyncBlockRecord(nil, "block-merge-bucket")
+    if self.Sync and self.Sync.telemetry then
+        self.Sync.telemetry.blockFingerprintRecomputed = (self.Sync.telemetry.blockFingerprintRecomputed or 0) + absorbed
+    end
+end
+
+function Addon:ScheduleRosterUpdate(reason)
+    if self._rosterUpdateTimer then
+        return
+    end
+    self._rosterUpdateTimer = self:ScheduleTimer(function()
+        self._rosterUpdateTimer = nil
+        self:ProcessCoalescedGuildRosterUpdate(reason or "roster")
+    end, 3)
+end
+
+function Addon:ProcessCoalescedGuildRosterUpdate(reason)
+    local delta = self.Data and self.Data.RebuildOnlineCache and self.Data:RebuildOnlineCache() or nil
+    local heavyUpdate = not delta
+        or delta.membershipChanged
+        or delta.guildStatusChanged
+        or delta.knownMembersChanged
+    local presenceOnly = delta
+        and not heavyUpdate
+        and (delta.presenceChanged or delta.onlineCountChanged)
+
+    if self.Data and (heavyUpdate or presenceOnly) then
+        self.Data:InvalidateRecipeCaches("presence")
+    end
+    if self.Sync then
+        if presenceOnly and self.Sync.telemetry then
+            self.Sync.telemetry.rosterPresenceOnlyUpdates = (self.Sync.telemetry.rosterPresenceOnlyUpdates or 0) + 1
+        elseif heavyUpdate and self.Sync.telemetry then
+            self.Sync.telemetry.rosterHeavyUpdates = (self.Sync.telemetry.rosterHeavyUpdates or 0) + 1
+        end
+        self.Sync:OnGuildRosterUpdate({
+            reason = reason or "roster",
+            delta = delta,
+            heavyUpdate = heavyUpdate,
+            presenceOnly = presenceOnly,
+        })
+    end
+    if heavyUpdate or presenceOnly then
+        self:RequestRefresh(reason or "roster")
+    end
+end
+
+function Addon:OnGuildRosterUpdate()
+    self:OnGuildRosterBucket({ direct = 1 })
+end
+
+function Addon:RequestRefresh(reason)
+    if self.Performance and self.Performance.MarkUIRefreshNeeded then
+        self.Performance:MarkUIRefreshNeeded(reason)
+        return
+    end
+
+    if reason then self._refreshReasons[reason] = true end
+    if not (self.UI and self.UI.frame and self.UI.frame:IsShown()) then return end
+    if self._refreshTimer then return end
+
+    self._refreshTimer = self:ScheduleTimer(function()
+        self._refreshTimer = nil
+        local reasons = copySet(self._refreshReasons)
+        self._refreshReasons = {}
+        safecall(function()
+            if self.UI and self.UI.Refresh then
+                self.UI:Refresh(reasons)
+            end
+        end)
+    end, 0.25)
+end
+
+function Addon:SlashHandler(input)
+    local cmd, rest = splitCommand(input)
+    cmd = cmd:lower()
+
+    if cmd == "" or cmd == "show" then
+        if self.UI then self.UI:Toggle() end
+        return
+    end
+
+    if cmd == "debug" then
+        local debugCmd, debugRest = splitCommand(rest)
+        debugCmd = debugCmd:lower()
+        if debugCmd == "" or debugCmd == "toggle" then
+            self.debugMode = not self.debugMode
+            self:Print("Debug " .. (self.debugMode and "enabled" or "disabled"))
+            return
+        end
+        if debugCmd == "help" then
+            printDebugLogHelp(self)
+            return
+        end
+        if debugCmd == "log" then
+            local logCmd, logRest = splitCommand(debugRest)
+            logCmd = logCmd:lower()
+            local db = self:GetDebugLogDB()
+            if logCmd == "" or logCmd == "status" then
+                local enabledScopes = {}
+                for scopeName in pairs(DEBUG_LOG_SCOPE_NAMES) do
+                    if db.scopes[scopeName] == true then
+                        enabledScopes[#enabledScopes + 1] = scopeName
+                    end
+                end
+                table.sort(enabledScopes)
+                self:Print(string.format(
+                    "Debug log %s entries=%d max=%d echo=%s scopes=%s",
+                    db.enabled and "enabled" or "disabled",
+                    #(db.entries or {}),
+                    db.maxEntries or DEBUG_LOG_DEFAULTS.maxEntries,
+                    db.chatEcho and "on" or "off",
+                    #enabledScopes > 0 and table.concat(enabledScopes, ",") or "none"
+                ))
+                return
+            end
+            if logCmd == "on" then
+                db.enabled = true
+                self:Print("Debug log enabled.")
+                return
+            end
+            if logCmd == "off" then
+                db.enabled = false
+                self:Print("Debug log disabled.")
+                return
+            end
+            if logCmd == "clear" or logCmd == "reset" then
+                self:ClearDebugLog()
+                self:Print("Debug log cleared.")
+                return
+            end
+            if logCmd == "echo" then
+                local echoMode = trimInput(logRest):lower()
+                if echoMode == "on" or echoMode == "off" then
+                    db.chatEcho = echoMode == "on"
+                    self:Print("Debug log echo " .. (db.chatEcho and "enabled" or "disabled") .. ".")
+                else
+                    self:Print("Usage: /rr debug log echo on|off")
+                end
+                return
+            end
+            if logCmd == "scope" then
+                local scopeToken, scopeRest = splitCommand(logRest)
+                local scopeName = normalizeDebugLogScope(scopeToken)
+                local scopeMode = trimInput(scopeRest):lower()
+                if not scopeName then
+                    self:Print("Usage: /rr debug log scope <sync|request|transfer|offline|version> <on|off>")
+                    return
+                end
+                if scopeMode ~= "on" and scopeMode ~= "off" then
+                    self:Print("Usage: /rr debug log scope <sync|request|transfer|offline|version> <on|off>")
+                    return
+                end
+                db.scopes[scopeName] = scopeMode == "on"
+                self:Print(string.format("Debug log scope %s %s.", scopeName, db.scopes[scopeName] and "enabled" or "disabled"))
+                return
+            end
+            if logCmd == "show" then
+                local firstToken, secondToken = splitCommand(logRest)
+                local limit = 20
+                local scopeName = nil
+                if tonumber(firstToken) then
+                    limit = min(200, max(1, tonumber(firstToken) or 20))
+                    scopeName = normalizeDebugLogScope(secondToken)
+                else
+                    scopeName = normalizeDebugLogScope(firstToken)
+                end
+                local entries = self:GetDebugLogEntries(limit, scopeName)
+                if #entries == 0 then
+                    self:Print("Debug log entries: none")
+                    return
+                end
+                self:Print(string.format("Debug log entries: %d%s", #entries, scopeName and (" scope=" .. scopeName) or ""))
+                for index = #entries, 1, -1 do
+                    local entry = entries[index]
+                    self:Print(string.format(
+                        "#%d t=%d scope=%s %s",
+                        entry.seq or 0,
+                        entry.at or 0,
+                        tostring(entry.scope or "?"),
+                        tostring(entry.message or "")
+                    ))
+                end
+                return
+            end
+            printDebugLogHelp(self)
+            return
+        end
+        printDebugLogHelp(self)
+        return
+    end
+
+    if cmd == "perf" then
+        local perfCmd = trimInput(rest):lower()
+        if perfCmd == "help" then
+            printPerfHelp(self)
+            return
+        end
+        if perfCmd == "" or perfCmd == "show" or perfCmd == "toggle" then
+            self.perfDebugMode = not self.perfDebugMode
+            if self.UI and self.UI.RefreshDebugVisibility then
+                self.UI:RefreshDebugVisibility()
+            end
+            self:RequestRefresh("perf")
+            self:Print("Performance debug " .. (self.perfDebugMode and "enabled" or "disabled"))
+            return
+        end
+        if perfCmd == "dump" or perfCmd == "status" then
+            if not self.debugMode then
+                return
+            end
+            if self.Performance and self.Performance.DumpDebugStatus then
+                self.Performance:DumpDebugStatus()
+            end
+            if self.DumpBucketStatus then
+                self:DumpBucketStatus()
+            end
+            if self.Sync and self.Sync.DumpStatus then
+                self.Sync:DumpStatus()
+            end
+            if self.Data and self.Data.DumpScanStatus then
+                self.Data:DumpScanStatus()
+            end
+            if self.Data and self.Data.GetCatalogDiagnostics then
+                local diagnostics = self.Data:GetCatalogDiagnostics()
+                self:SystemPrint(string.format(
+                    "Catalog duplicateCrafterRows=%d collapsed=%d lastRecipe=%s lastMember=%s",
+                    diagnostics.duplicateCrafterRowsDetected or 0,
+                    diagnostics.duplicateCrafterRowsCollapsed or 0,
+                    tostring(diagnostics.lastDuplicateRecipeKey or "none"),
+                    tostring(diagnostics.lastDuplicateMemberKey or "none")
+                ))
+            end
+            if self.Data and self.Data.DumpSyncIndexStatus then
+                self.Data:DumpSyncIndexStatus()
+            end
+            return
+        end
+        if perfCmd == "reset" or perfCmd == "clear" then
+            if self.Performance and self.Performance.ResetTelemetry then
+                self.Performance:ResetTelemetry()
+            end
+            if self.ResetBucketTelemetry then
+                self:ResetBucketTelemetry()
+            end
+            if self.Sync and self.Sync.ResetTelemetry then
+                self.Sync:ResetTelemetry()
+            end
+            if self.Data and self.Data.ResetScanTelemetry then
+                self.Data:ResetScanTelemetry()
+            end
+            if self.Data and self.Data.ResetCatalogDiagnostics then
+                self.Data:ResetCatalogDiagnostics()
+            end
+            if self.Data and self.Data.ResetListBuildTelemetry then
+                self.Data:ResetListBuildTelemetry()
+            end
+            self:RequestRefresh("perf")
+            self:Print("Performance, sync, scan, and cache counters reset.")
+            return
+        end
+        if perfCmd == "list" or perfCmd == "builds" then
+            if self.Data and self.Data.DumpListBuildTelemetry then
+                self.Data:DumpListBuildTelemetry()
+            else
+                self:Print("List-build telemetry is not available.")
+            end
+            return
+        end
+        self:Print("Usage: /rr perf [toggle, dump, list, reset, help]")
+        return
+    end
+
+    if cmd == "filters" or cmd == "filter" then
+        handleFiltersCommand(self, rest)
+        return
+    end
+
+    if cmd == "meta" then
+        handleMetaCommand(self, rest)
+        return
+    end
+
+    if cmd == "mock" then
+        local mockCmd, mockRest = splitCommand(rest)
+        mockCmd = mockCmd:lower()
+        mockRest = trimInput(mockRest):lower()
+        if not self.MockSync then
+            self:Print("Mock sync module not available.")
+            return
+        end
+        if mockCmd == "help" then
+            printMockHelp(self)
+            return
+        end
+        if mockCmd == "" or mockCmd == "status" then
+            self.MockSync:DumpStatus()
+            return
+        end
+        if mockCmd == "start" then
+            local scenario = mockRest ~= "" and mockRest or "medium"
+            local ok, err = self.MockSync:StartScenario(scenario)
+            if ok then
+                if err then
+                    self:Print("Mock sync completed: " .. scenario .. " (" .. tostring(err) .. ")")
+                else
+                    self:Print("Mock sync started: " .. scenario)
+                end
+            else
+                self:Print("Mock sync start failed: " .. tostring(err))
+            end
+            return
+        end
+        if mockCmd == "stop" then
+            self.MockSync:Stop()
+            self:Print("Mock sync stopped.")
+            return
+        end
+        if mockCmd == "cleanup" or mockCmd == "clean" then
+            local removedMembers, removedRegistry, removedOnlineNodes, removedPending = self.MockSync:Cleanup()
+            self:Print(string.format(
+                "Mock cleanup complete. members=%d registry=%d nodes=%d pending=%d",
+                removedMembers or 0,
+                removedRegistry or 0,
+                removedOnlineNodes or 0,
+                removedPending or 0
+            ))
+            return
+        end
+        if mockCmd == "reset" then
+            self.MockSync:ResetTelemetry()
+            self:Print("Mock sync counters reset.")
+            self:RequestRefresh("mock")
+            return
+        end
+        self:Print("Usage: /rr mock [status, start <" .. MOCK_SCENARIOS .. ">, stop, cleanup, reset, help]")
+        return
+    end
+
+    if cmd == "dump" then
+        if not self.debugMode then
+            return
+        end
+        if self.Data then self.Data:DumpSummary() end
+        return
+    end
+
+    if cmd == "version" then
+        if self.Sync and self.Sync.DumpVersionStatus then
+            self.Sync:DumpVersionStatus()
+        else
+            self:Print(string.format(
+                "Recipe Registry: version=%s wire=%s channel=%s prefix=%s build=%s",
+                tostring(self.ADDON_VERSION or self.DISPLAY_VERSION or "?"),
+                tostring(self.WIRE_VERSION or "?"),
+                tostring(self.BUILD_CHANNEL or "release"),
+                tostring(self.COMM_PREFIX or self.ADDON_PREFIX or "?"),
+                tostring(self.BUILD_ID or "n/a")
+            ))
+        end
+        return
+    end
+
+    if cmd == "versions" then
+        if self.Sync and self.Sync.DumpPeerVersions then
+            self.Sync:DumpPeerVersions()
+        else
+            self:Print("Peer version diagnostics not available.")
+        end
+        return
+    end
+
+    if cmd == "adoption" or cmd == "addonstatus" then
+        if self.Data and self.Data.DumpAddonAdoptionStatus then
+            self.Data:DumpAddonAdoptionStatus({
+                searchText = rest,
+                staleAfterDays = 30,
+            })
+        else
+            self:Print("Addon status diagnostics not available.")
+        end
+        return
+    end
+
+    if cmd == "self" or cmd == "local" or cmd == "me" then
+        if self.Data and self.Data.DumpLocalSyncStatus then
+            self.Data:DumpLocalSyncStatus(rest)
+        end
+        return
+    end
+
+    if cmd == "wipe" or cmd == "reset" then
+        if self.Data then self.Data:WipeDatabase() end
+        return
+    end
+
+    if cmd == "syncreset" then
+        if not self.debugMode then
+            printMainHelp(self)
+            return
+        end
+        if self.Sync and self.Sync.ResetRuntimeQueues then
+            self.Sync:ResetRuntimeQueues("slash", {
+                clearDiscovery = false,
+                kickoffResync = true,
+                userVisible = true,
+            })
+        end
+        return
+    end
+
+    if cmd == "sync" or cmd == "comms" then
+        local syncCmd = trimInput(rest):lower()
+        if self.Sync then
+            if syncCmd == "" then
+                self.Sync:DumpStatus("summary")
+            elseif syncCmd == "debug" or syncCmd == "diag" or syncCmd == "peers" or syncCmd == "sessions" or syncCmd == "log" then
+                self.Sync:DumpStatus(syncCmd)
+            else
+                self:Print("Usage: /rr sync [debug, diag, peers, sessions, log]")
+            end
+        end
+        return
+    end
+
+    if cmd == "offline" or cmd == "replica" then
+        if not self.debugMode then
+            return
+        end
+        if self.Sync and self.Sync.DumpOfflineSyncStatus then
+            self.Sync:DumpOfflineSyncStatus()
+        end
+        return
+    end
+
+    if cmd == "prices" or cmd == "price" then
+        if self.Market then self.Market:DumpStatus(rest) end
+        return
+    end
+
+    if cmd == "share" then
+        if self.UI then self.UI:ShareSelectedRecipe(rest) end
+        return
+    end
+
+    if cmd == "options" or cmd == "opt" or cmd == "config" then
+        if self.Options and self.Options.Open and self.Options:Open() then
+            self:Print("Opening Recipe Registry options.")
+        else
+            self:Print("Options panel not available yet.")
+        end
+        return
+    end
+
+    if cmd == "rescan" then
+        if self.Data then
+            local metadataChanged = self.Data:DetectProfessions() == true
+            if self.Data.MarkScanNeeded then
+                self.Data:MarkScanNeeded(nil, "manual")
+            else
+                self.Data._scanNeeded = true
+            end
+            local changed = scanActiveProfessionData(self, {
+                reason = "manual",
+                notifyMode = "manual",
+            }) or metadataChanged
+            markSyncIndexDirtyAndScheduleHello(self, "manual-rescan", 0.5)
+            if self.Data.HasAnyScanPending and self.Data:HasAnyScanPending() then
+                self:Print("Profession rescan queued. Open or refresh a profession to complete pending scans.")
+            else
+                self:Print("Profession rescan completed for active profession data.")
+            end
+        end
+        return
+    end
+
+    if cmd == "pull" then
+        if self.Sync then self.Sync:StartManualSyncPull(rest, false) end
+        return
+    end
+
+    if cmd == "mini" or cmd == "minimap" then
+        if self.MinimapButton then self.MinimapButton:ToggleHidden() end
+        return
+    end
+
+    if cmd == "clean" or cmd == "repair" then
+        local mode = trimInput(rest):lower()
+        local dryRun = mode == "check" or mode == "dryrun" or mode == "dry-run" or mode == "preview"
+        -- Match the auto-clean's behavior: also drop keys that don't resolve
+        -- against the WoW client DB (mock leftovers, aborted scan rows). The
+        -- previous handler only ran the "invalid key shape" check, so users
+        -- running /rr clean manually saw zero removals and assumed the
+        -- command was broken even though the warmup pass would have cleaned
+        -- the same data.
+        local dataStats = self.Data and self.Data.CleanCorruptData
+            and self.Data:CleanCorruptData({
+                dryRun = dryRun,
+                checkClientResolvable = true,
+                checkMetadataCatalogued = true,
+            })
+            or {}
+        local syncStats = self.Sync and self.Sync.CleanCorruptState and self.Sync:CleanCorruptState({ dryRun = dryRun }) or {}
+        local repaired = (dataStats.repairedBlocks or 0) + (dataStats.repairedCounts or 0) + (dataStats.repairedSignatures or 0)
+        self:Print(string.format(
+            "%s members=%d professions=%d recipes=%d mismatches=%d repaired=%d sync=%d.",
+            dryRun and "Cleanup check:" or "Cleanup complete:",
+            dataStats.removedMembers or 0,
+            dataStats.removedProfessions or 0,
+            dataStats.removedRecipes or 0,
+            dataStats.mismatchedRecipes or 0,
+            repaired,
+            syncStats.removed or 0
+        ))
+        if dataStats.lastRecipeKey then
+            self:Print(string.format(
+                "Last recipe removed: %s from %s %s reason=%s%s",
+                tostring(dataStats.lastRecipeKey),
+                tostring(dataStats.lastMemberKey or "?"),
+                tostring(dataStats.lastProfession or "?"),
+                tostring(dataStats.lastReason or "?"),
+                dataStats.lastActualProfession and (" actual=" .. tostring(dataStats.lastActualProfession)) or ""
+            ))
+        end
+        if dryRun then
+            self:Print("Run /rr clean to apply these cleanup changes.")
+        end
+        return
+    end
+
+    if cmd == "help" then
+        printMainHelp(self)
+        return
+    end
+
+    printMainHelp(self)
+end

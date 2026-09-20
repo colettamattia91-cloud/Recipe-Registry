@@ -1,0 +1,385 @@
+local Addon = _G.RecipeRegistry
+local Performance = Addon:NewModule("Performance", "AceTimer-3.0")
+Addon.Performance = Performance
+
+local pairs = pairs
+local type = type
+local tremove = table.remove
+local min = math.min
+
+local TICK_INTERVAL = 0.05
+-- Budget the scheduler is allowed to spend per timer tick (~50ms). Sized to
+-- fit two heavy jobs (e.g. two 12ms list-build steps) without overrunning
+-- by more than a frame. Per-job step budgets remain governed by
+-- opts.budgetMs / DEFAULT_BUDGET_MS — the tick budget is a cap, not the
+-- per-step budget.
+local TICK_BUDGET_MS = 36
+local DEFAULT_BUDGET_MS = 3
+local DEFAULT_MAX_STEPS = 12
+
+local function nowMs()
+    if type(debugprofilestop) == "function" then
+        return debugprofilestop()
+    end
+    return GetTime() * 1000
+end
+
+local function countKeys(tbl)
+    local count = 0
+    for _ in pairs(tbl or {}) do
+        count = count + 1
+    end
+    return count
+end
+
+local function safeCall(fn, ...)
+    local ok, a, b, c = pcall(fn, ...)
+    if not ok then
+        DEFAULT_CHAT_FRAME:AddMessage("|cffff5555Recipe Registry error:|r " .. tostring(a))
+        return nil, nil, nil
+    end
+    return a, b, c
+end
+
+function Performance:OnInitialize()
+    self.jobQueues = {}
+    self.jobOrder = {}
+    self.pausedCategories = {}
+    self.pendingUIRefreshScopes = {}
+    self.telemetry = {
+        jobsScheduled = 0,
+        jobsCompleted = 0,
+        jobSteps = 0,
+        jobYields = 0,
+        pausedSkips = 0,
+        deferredUIRefreshCount = 0,
+        uiRefreshFlushes = 0,
+        uiRefreshMarks = 0,
+        uiRefreshTotalMs = 0,
+        uiRefreshLastMs = 0,
+        uiRefreshMaxMs = 0,
+        uiRefreshOverBudget = 0,
+        averageStepCostMs = 0,
+        maxStepCostMs = 0,
+        maxStepJobType = nil,
+        overBudgetSteps = 0,
+        lastOverBudgetJobType = nil,
+        lastOverBudgetMs = 0,
+    }
+    self._jobSequence = 0
+    self._queueCursor = 0
+    self._uiFlushQueued = false
+end
+
+function Performance:ResetTelemetry()
+    self.telemetry = {
+        jobsScheduled = 0,
+        jobsCompleted = 0,
+        jobSteps = 0,
+        jobYields = 0,
+        pausedSkips = 0,
+        deferredUIRefreshCount = 0,
+        uiRefreshFlushes = 0,
+        uiRefreshMarks = 0,
+        uiRefreshTotalMs = 0,
+        uiRefreshLastMs = 0,
+        uiRefreshMaxMs = 0,
+        uiRefreshOverBudget = 0,
+        averageStepCostMs = 0,
+        maxStepCostMs = 0,
+        maxStepJobType = nil,
+        overBudgetSteps = 0,
+        lastOverBudgetJobType = nil,
+        lastOverBudgetMs = 0,
+    }
+end
+
+function Performance:OnEnable()
+    if not self.ticker then
+        self.ticker = self:ScheduleRepeatingTimer("RunNextStep", TICK_INTERVAL)
+    end
+end
+
+function Performance:ScheduleJob(jobType, fn, opts)
+    if type(fn) ~= "function" then return nil end
+
+    opts = opts or {}
+    local category = opts.category or jobType or "general"
+    local queue = self.jobQueues[category]
+    if not queue then
+        queue = {}
+        self.jobQueues[category] = queue
+        self.jobOrder[#self.jobOrder + 1] = category
+    end
+
+    self._jobSequence = self._jobSequence + 1
+    local job = {
+        id = self._jobSequence,
+        type = jobType or "job",
+        category = category,
+        label = opts.label or jobType or "job",
+        fn = fn,
+        budgetMs = opts.budgetMs or DEFAULT_BUDGET_MS,
+        maxStepsPerRun = opts.maxStepsPerRun or 1,
+        enqueuedAt = time(),
+        state = opts.state or {},
+    }
+
+    queue[#queue + 1] = job
+    self.telemetry.jobsScheduled = self.telemetry.jobsScheduled + 1
+    return job.id
+end
+
+function Performance:PauseCategory(category)
+    if not category then return end
+    self.pausedCategories[category] = true
+end
+
+function Performance:ResumeCategory(category)
+    if not category then return end
+    self.pausedCategories[category] = nil
+end
+
+function Performance:IsCategoryPaused(category)
+    return category and self.pausedCategories[category] == true or false
+end
+
+function Performance:GetNextRunnableCategory()
+    local total = #self.jobOrder
+    if total == 0 then return nil end
+
+    for offset = 1, total do
+        local index = ((self._queueCursor + offset - 1) % total) + 1
+        local category = self.jobOrder[index]
+        local queue = self.jobQueues[category]
+        if queue and #queue > 0 then
+            if not self:IsCategoryPaused(category) then
+                self._queueCursor = index
+                return category, queue
+            end
+            self.telemetry.pausedSkips = self.telemetry.pausedSkips + 1
+        end
+    end
+
+    return nil
+end
+
+function Performance:RunJobStep(job, budgetMs)
+    local startedAt = nowMs()
+    local stepBudget = min(job.budgetMs or DEFAULT_BUDGET_MS, budgetMs or DEFAULT_BUDGET_MS)
+    local keepGoing, newState = safeCall(job.fn, job.state, {
+        budgetMs = stepBudget,
+        startedAtMs = startedAt,
+        jobId = job.id,
+        jobType = job.type,
+        category = job.category,
+    })
+    local elapsed = nowMs() - startedAt
+
+    self.telemetry.jobSteps = self.telemetry.jobSteps + 1
+    local n = self.telemetry.jobSteps
+    self.telemetry.averageStepCostMs = ((self.telemetry.averageStepCostMs * (n - 1)) + elapsed) / n
+    if elapsed > (self.telemetry.maxStepCostMs or 0) then
+        self.telemetry.maxStepCostMs = elapsed
+        self.telemetry.maxStepJobType = tostring(job.type or job.id or job.category or "unknown")
+    end
+    if elapsed > stepBudget then
+        self.telemetry.overBudgetSteps = (self.telemetry.overBudgetSteps or 0) + 1
+        self.telemetry.lastOverBudgetJobType = tostring(job.type or job.id or job.category or "unknown")
+        self.telemetry.lastOverBudgetMs = elapsed
+        if elapsed > 16 then
+            Addon:Tracef("perf",
+                "scheduler-step-slow job=%s category=%s elapsed=%.2fms budget=%.2fms",
+                tostring(job.type or job.id or "unknown"),
+                tostring(job.category or "unknown"),
+                elapsed,
+                stepBudget)
+        end
+    end
+
+    if newState ~= nil then
+        job.state = newState
+    end
+
+    if keepGoing then
+        self.telemetry.jobYields = self.telemetry.jobYields + 1
+        return true, elapsed
+    end
+
+    self.telemetry.jobsCompleted = self.telemetry.jobsCompleted + 1
+    return false, elapsed
+end
+
+function Performance:RunNextStep()
+    local startedAt = nowMs()
+    local budgetMs = TICK_BUDGET_MS
+    local remainingSteps = DEFAULT_MAX_STEPS
+
+    while remainingSteps > 0 and (nowMs() - startedAt) < budgetMs do
+        local category, queue = self:GetNextRunnableCategory()
+        if not category then break end
+
+        local job = queue[1]
+        if not job then break end
+
+        -- Honor per-job maxStepsPerRun: when the LIST build (or any other
+        -- job that opts into multi-step ticks) is selected, let it run up
+        -- to N consecutive steps before rotating the queue. This is how a
+        -- job declares "I want a fair share of the tick budget, not just
+        -- one slot." A 50ms scheduler tick used to give the list build a
+        -- single 3ms step before the next category round-robined in,
+        -- which dragged ~300-candidate professions out to 20s of wall
+        -- time despite only ~700ms of actual work.
+        local jobStepsLeft = job.maxStepsPerRun or 1
+        local completed = false
+        while jobStepsLeft > 0
+            and remainingSteps > 0
+            and (nowMs() - startedAt) < budgetMs
+        do
+            local keepGoing, elapsed = self:RunJobStep(job, budgetMs - (nowMs() - startedAt))
+            remainingSteps = remainingSteps - 1
+            jobStepsLeft = jobStepsLeft - 1
+            if not keepGoing then
+                tremove(queue, 1)
+                completed = true
+                break
+            end
+            if elapsed <= 0 then
+                break
+            end
+        end
+
+        if not completed then
+            tremove(queue, 1)
+            queue[#queue + 1] = job
+        end
+    end
+
+    if self._uiFlushQueued then
+        self:FlushDeferredUIRefresh()
+    end
+end
+
+function Performance:MarkUIRefreshNeeded(scope)
+    if scope then
+        self.pendingUIRefreshScopes[scope] = true
+    else
+        self.pendingUIRefreshScopes.general = true
+    end
+    self._uiFlushQueued = true
+    self.telemetry.uiRefreshMarks = self.telemetry.uiRefreshMarks + 1
+end
+
+function Performance:FlushDeferredUIRefresh(force)
+    if not next(self.pendingUIRefreshScopes) then
+        self._uiFlushQueued = false
+        return false
+    end
+
+    if not force and self:IsCategoryPaused("ui") then
+        return false
+    end
+
+    local ui = Addon.UI
+    if not (ui and ui.frame and ui.frame:IsShown() and ui.Refresh) then
+        return false
+    end
+
+    local scopes = self.pendingUIRefreshScopes
+    self.pendingUIRefreshScopes = {}
+    self._uiFlushQueued = false
+    self.telemetry.deferredUIRefreshCount = self.telemetry.deferredUIRefreshCount + countKeys(scopes)
+    self.telemetry.uiRefreshFlushes = self.telemetry.uiRefreshFlushes + 1
+    local startedAt = nowMs()
+    safeCall(ui.Refresh, ui, scopes)
+    local elapsed = nowMs() - startedAt
+    self.telemetry.uiRefreshLastMs = elapsed
+    self.telemetry.uiRefreshTotalMs = (self.telemetry.uiRefreshTotalMs or 0) + elapsed
+    if elapsed > (self.telemetry.uiRefreshMaxMs or 0) then
+        self.telemetry.uiRefreshMaxMs = elapsed
+    end
+    if elapsed > DEFAULT_BUDGET_MS then
+        self.telemetry.uiRefreshOverBudget = (self.telemetry.uiRefreshOverBudget or 0) + 1
+    end
+    return true
+end
+
+function Performance:GetTelemetry()
+    return self.telemetry
+end
+
+function Performance:GetQueueLengths()
+    local result = {}
+    for category, queue in pairs(self.jobQueues or {}) do
+        result[category] = #queue
+    end
+    return result
+end
+
+function Performance:GetUiState()
+    return {
+        pendingCategories = countKeys(self.jobQueues),
+        pausedCategories = countKeys(self.pausedCategories),
+        pendingUIRefresh = countKeys(self.pendingUIRefreshScopes),
+        averageStepCostMs = self.telemetry.averageStepCostMs,
+    }
+end
+
+function Performance:GetDebugSnapshot()
+    return {
+        telemetry = self:GetTelemetry(),
+        queueLengths = self:GetQueueLengths(),
+        pendingUIRefresh = countKeys(self.pendingUIRefreshScopes),
+        pausedCategories = self.pausedCategories,
+        tickInterval = TICK_INTERVAL,
+        tickBudgetMs = TICK_BUDGET_MS,
+        defaultBudgetMs = DEFAULT_BUDGET_MS,
+    }
+end
+
+function Performance:DumpDebugStatus()
+    local snapshot = self:GetDebugSnapshot()
+    local telemetry = snapshot.telemetry or {}
+    local queueLengths = snapshot.queueLengths or {}
+    local queueParts = {}
+    for category, size in pairs(queueLengths) do
+        queueParts[#queueParts + 1] = string.format("%s=%d", tostring(category), tonumber(size) or 0)
+    end
+    table.sort(queueParts)
+    Addon:SystemPrint(string.format(
+        "Perf steps=%d avg=%.2fms max=%.2fms(%s) overBudget=%d lastOver=%s(%.2fms) uiFlush=%d uiMarks=%d uiLast=%.2fms uiMax=%.2fms uiOverBudget=%d queues=%s",
+        telemetry.jobSteps or 0,
+        telemetry.averageStepCostMs or 0,
+        telemetry.maxStepCostMs or 0,
+        tostring(telemetry.maxStepJobType or "?"),
+        telemetry.overBudgetSteps or 0,
+        tostring(telemetry.lastOverBudgetJobType or "none"),
+        telemetry.lastOverBudgetMs or 0,
+        telemetry.uiRefreshFlushes or 0,
+        telemetry.uiRefreshMarks or 0,
+        telemetry.uiRefreshLastMs or 0,
+        telemetry.uiRefreshMaxMs or 0,
+        telemetry.uiRefreshOverBudget or 0,
+        #queueParts > 0 and table.concat(queueParts, ", ") or "none"
+    ))
+    local syncTel = Addon.Sync and Addon.Sync.telemetry or nil
+    if syncTel then
+        local mergeSamples = syncTel.mergeSamples or 0
+        local mergeAvg = mergeSamples > 0 and ((syncTel.mergeTotalMs or 0) / mergeSamples) or 0
+        local bucketSamples = syncTel.mergeBucketSamples or 0
+        local bucketAvg = bucketSamples > 0 and ((syncTel.mergeBucketTotalMs or 0) / bucketSamples) or 0
+        Addon:SystemPrint(string.format(
+            "Merge samples=%d avg=%.2fms last=%.2fms max=%.2fms overBudget=%d | bucket samples=%d avg=%.2fms last=%.2fms max=%.2fms overBudget=%d",
+            mergeSamples,
+            mergeAvg,
+            syncTel.mergeLastMs or 0,
+            syncTel.mergeMaxMs or 0,
+            syncTel.mergeOverBudget or 0,
+            bucketSamples,
+            bucketAvg,
+            syncTel.mergeBucketLastMs or 0,
+            syncTel.mergeBucketMaxMs or 0,
+            syncTel.mergeBucketOverBudget or 0
+        ))
+    end
+end

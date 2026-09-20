@@ -1,0 +1,19 @@
+# Packaging for the Forever addon.
+#
+# Built with `release.sh -t RecipeRegistry_Forever`, which reads this file and
+# packages this folder alone. Separate from the TBC one on purpose: two addons,
+# two packages, two release histories.
+#
+# package-as must match the TOC filename inside, or the client has a folder
+# whose TOC it will not load.
+package-as: RecipeRegistry_Forever
+ignore:
+  - Sync/MockSync.lua
+  - local-tests
+  - Tools
+# The changelog is written by hand, like the TBC one: the packager's generated
+# one lists commit subjects, which are written for whoever maintains this and
+# not for whoever installs it.
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
