@@ -265,6 +265,31 @@ the packager takes the version from the tag, so one tag driving both addons
 would give Forever whatever number TBC happens to be on. Two addons, two
 histories -- so two tags, and a dispatch per addon.
 
+**Two projects, not multi-TOC, and the reason is not taste.** CurseForge lets one
+project serve several flavors through Multi-TOC, and it is the model it
+recommends. It does not fit here. Multi-TOC requires every TOC to sit in ONE
+addon folder and be named after it (`Addon.toc`, `Addon_Camelot.toc`), and our
+two trees hold different files at the same paths -- `Core/Core.lua` exists in
+both with different content -- so one folder cannot hold them without moving one
+tree into a subfolder and shipping both codebases to everyone. The version
+settles it anyway: one project, one packager run, one version number, and these
+two addons are meant to have separate histories.
+
+So the TOC stays `RecipeRegistry_Forever.toc` in `RecipeRegistry_Forever/`,
+matching `package-as`. Do NOT rename it to `RecipeRegistry_Camelot.toc`: the
+`_Camelot` suffix is the Multi-TOC flavor marker, and it only means anything
+inside a folder named `RecipeRegistry`. Here it would just break `package-as`.
+
+**The flavor is detected, not declared.** The packager maps interface `16???` to
+the `forever` game type (`camelot` is its alias), so `## Interface: 16001` is
+enough and `-g forever` is not needed. CurseForge has the flavor --
+`gameVersionTypeId=88568` -- and addons already ship on it. Checked 2026-09-20.
+
+One caveat with a short fuse: Forever support landed in packager **v2.6.0, on
+2026-09-18**. The workflow uses `BigWigsMods/packager@v2`, the moving major tag,
+which already carries it. Pinning an exact older version would silently lose the
+flavor, so if anyone pins, pin v2.6.1 or later.
+
 **Where it can go.** The workflow reads the CurseForge project id from the
 `CF_PROJECT_ID_FOREVER` repository variable. Without it the build still runs and
 stops at GitHub with a warning rather than failing, which is the useful
