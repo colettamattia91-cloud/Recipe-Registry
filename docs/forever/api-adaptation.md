@@ -80,9 +80,29 @@ e' verosimilmente l'opposto, e allora `hookedAny` resta `false`, la funzione
 esce dal ramo "nessuno script: siamo nell'harness di test" e l'intera funzione
 "chi sa fare questa ricetta" sparisce senza dire niente.
 
-Sonda: passare il mouse su un oggetto craftabile noto a un compagno di gilda e
-vedere se compaiono le righe. Poi
-`/dump type(GameTooltip.GetItem), type(TooltipDataProcessor)`.
+**La sonda, che risponde in un colpo:**
+
+    /dump RecipeRegistry.Tooltip._tooltipHooksRegistered
+
+Quel flag si alza solo se almeno un tooltip e' stato agganciato davvero, quindi
+non serve dedurlo dal passare il mouse su qualcosa.
+
+- `true` -> ha agganciato. Il percorso legacy vive anche qui e non c'e' niente da
+  adattare. Se poi le righe dei crafter non compaiono lo stesso, il problema e'
+  altrove -- indice, dati, chiavi -- e non in questa sezione.
+- `nil` -> non ha agganciato, ed e' uscito dal ramo "siamo nell'harness di test"
+  senza dire niente. La diagnosi qui sopra e' confermata.
+
+Solo se risponde `nil`, la seconda sonda dice quale percorso scrivere:
+
+    /dump type(TooltipDataProcessor), type(GameTooltip.GetItem), type(TooltipUtil)
+
+Con `TooltipDataProcessor` a `table` si aggiunge il ramo retail
+(`AddTooltipPostCall` su `Enum.TooltipDataType.Item` e `.Spell`, con
+`TooltipUtil.GetDisplayedItem` per tirare fuori il link), lasciando il legacy
+dov'e' per l'albero TBC. Se invece `GetItem` e' `function` ma il flag era `nil`,
+allora a cadere e' stata un'altra delle tre condizioni di
+`supportsLegacyTooltipScripts` e va guardata quella.
 
 ### 2. Il menu di condivisione puo' far saltare la costruzione del frame
 
