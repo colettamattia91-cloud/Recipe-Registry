@@ -55,6 +55,130 @@ Verifiche ancora aperte:
 - Se `ProfessionsFrame` esista, o se il frame si chiami ancora `TradeSkillFrame`.
 - Comportamento di AtlasLoot, TSM e Auctionator su questo client.
 
+## Oltre TradeSkill: la superficie che nessuno ha ancora guardato
+
+Fatto il 2026-09-20, leggendo l'albero Forever invece del client. Le API di
+mestiere sono la parte che abbiamo verificato in gioco; tutto il resto
+dell'addon e' arrivato qui per copia dall'albero TBC, e almeno tre punti
+poggiano su assunzioni che su un client retail-shaped sono false.
+
+Il guaio comune e' che **falliscono in silenzio**: niente errore Lua, solo una
+funzione che non fa niente. Vanno sondati apposta.
+
+### 1. I tooltip non si agganciano (il piu' probabile)
+
+`UI/Tooltip.lua` ha un solo percorso: gli script legacy `OnTooltipSetItem` /
+`OnTooltipSetSpell` piu' gli accessori `GetItem()` / `GetSpell()`. La guardia
+`supportsLegacyTooltipScripts` pretende che `tooltip.GetItem` sia una funzione.
+Su retail `GameTooltip:GetItem()` e' stato rimosso nella 10.0 e la pipeline e'
+passata a `TooltipDataProcessor.AddTooltipPostCall`.
+
+`TooltipDataProcessor` **compare nel file una volta sola, dentro un commento**,
+che per giunta descrive il comportamento di TBC 2.5.6: li' la tabella retail
+esiste ma non viene mai invocata, quindi il legacy e' l'unica strada. Su Forever
+e' verosimilmente l'opposto, e allora `hookedAny` resta `false`, la funzione
+esce dal ramo "nessuno script: siamo nell'harness di test" e l'intera funzione
+"chi sa fare questa ricetta" sparisce senza dire niente.
+
+Sonda: passare il mouse su un oggetto craftabile noto a un compagno di gilda e
+vedere se compaiono le righe. Poi
+`/dump type(GameTooltip.GetItem), type(TooltipDataProcessor)`.
+
+### 2. Il menu di condivisione puo' far saltare la costruzione del frame
+
+`UI/MainFrame.lua` protegge ogni uso di UIDropDownMenu con
+`type(UIDropDownMenu_Initialize) == "function"` e ha `EasyMenu` come ripiego --
+tranne una riga:
+
+    local shareMenuFrame = CreateFrame("Frame", "RecipeRegistryShareMenu", right, "UIDropDownMenuTemplate")
+
+Non e' protetta. Se il template non esiste, `CreateFrame` solleva un errore e si
+porta dietro tutto il resto della costruzione del frame, non solo il menu.
+
+Sonda: aprire la finestra principale. Se non si apre, `/dump UIDropDownMenuTemplate`
+non serve (i template non sono globali): guardare l'errore Lua.
+`/dump type(UIDropDownMenu_Initialize)` dice se la famiglia c'e' ancora.
+
+### 3. Il pannello opzioni nasce senza genitore
+
+`Options:EnsurePanel` crea il pannello dentro `InterfaceOptionsFramePanelContainer`,
+che su retail dalla 10.0 non esiste piu': il genitore arriva `nil`. La
+registrazione invece e' gia' a tre vie
+(`Settings.RegisterCanvasLayoutCategory` -> `InterfaceOptions_AddCategory` ->
+`InterfaceOptionsFrame_AddCategory`), quindi il pannello probabilmente si
+registra lo stesso e viene riparentato da `Settings`. Da guardare, non da
+riscrivere a scatola chiusa.
+
+Sonda: `/dump InterfaceOptionsFramePanelContainer`, poi aprire le opzioni
+dell'addon e vedere se i controlli sono dove dovrebbero.
+
+### Quello che invece risulta gia' a posto
+
+- **Roster di gilda**: `C_GuildInfo.GuildRoster()` provata per prima, `GuildRoster()`
+  come ripiego. `GetNumGuildMembers` / `GetGuildRosterInfo` /
+  `GetGuildRosterLastOnline` esistono su entrambi.
+- **Comunicazioni**: AceComm usa `C_ChatInfo.RegisterAddonMessagePrefix` quando
+  la tabella c'e'. Il prefisso sta nei 16 caratteri.
+- **Oggetti e incantesimi**: `Core/Compat.lua` incapsula gia' `C_Item.*` e
+  `C_Spell.*` con i globali come ripiego.
+- **`BackdropTemplate`**: esiste su retail dalla 9.0.
+
+### Percorsi da provare in gioco, che non sono questioni di API
+
+- La ricetta che si registra da sola su `NEW_RECIPE_LEARNED`: scritta, mai vista
+  scattare.
+- La scansione dal libro degli incantesimi al login (vedi sopra: la beta non
+  rilegge le SavedVariables, quindi il percorso non e' verificabile finche'
+  quel bug non e' chiuso).
+- **Il sync, per intero.** Su questo client non e' mai girato un handshake:
+  servono due personaggi nella stessa gilda con l'addon. E' la ragione d'essere
+  dell'addon ed e' la parte meno verificata -- ma il rischio e' di
+  comportamento, non di API: vedi sotto.
+
+### Il sync, dal lato API, non ha niente da verificare
+
+Controllato il 2026-09-20 sull'albero Forever. L'intero cluster `Sync/` tocca
+cinque funzioni di gioco -- `IsInGuild`, `GetTime`, `IsInInstance`,
+`InCombatLockdown` e `GetRealmName` -- e nessuna e' cambiata fra classic e
+retail. Il trasporto e' AceComm, che usa `C_ChatInfo.RegisterAddonMessagePrefix`
+quando la tabella c'e', e spedisce su `GUILD` e `WHISPER`.
+
+`GetRealmName` merita una riga a parte, perche' su un client dichiarato
+realmless verrebbe da preoccuparsi: nel percorso wire non compare. Lo usa solo
+`normalizeRealmToken` per togliere il suffisso di reame dai nomi del roster, e
+solo quando coincide con quello che il client dichiara adesso. Le chiavi che
+viaggiano sono nomi nudi.
+
+Quindi il sync non ha adeguamenti da fare. Ha da essere provato.
+
+### Alla gilda si dichiara solo cio' che si sa fare
+
+La domanda vale la pena di fissarla, perche' su questo client la trappola c'e'
+davvero: `C_TradeSkillUI.GetAllRecipeIDs` restituisce il CATALOGO del mestiere,
+apprese e non -- su Alchemy a livello 1 sono 197 righe di cui 3 tue.
+
+Il catalogo completo esiste, ma vive in `RecipeRegistryCharDB`, per personaggio,
+e lo legge solo `DataScan` per sapere quali ID interrogare al login. Non tocca
+mai il database dei membri. Quello lo scrive `ApplyScanResult`, e i tre percorsi
+che lo chiamano filtrano tutti:
+
+- `ScanTradeSkill` tiene una riga solo `if info.learned`.
+- `ScanKnownFromSpellBook` interroga `C_SpellBook.IsSpellKnown` su ogni ID del
+  catalogo e tiene i `true`.
+- `LearnRecipeFromSignal` chiede conferma allo stesso oracolo prima di scrivere.
+
+Il blocco che il sync serve legge `prof.recipes` da li'. Quindi no: il catalogo
+non viaggia.
+
+Il terzo percorso pero' aveva due buchi, chiusi il 2026-09-20. La conferma era
+avvolta in `if type(CSB) == "table" and type(CSB.IsSpellKnown) == "function"`,
+quindi con l'API assente si scriveva senza chiedere; e il test era
+`if ok and not known`, che e' falso anche quando `ok` e' falso, quindi una pcall
+fallita passava allo stesso modo. In entrambi i casi un `NEW_RECIPE_LEARNED`
+spurio sarebbe bastato a pubblicare alla gilda una ricetta non posseduta. Adesso
+senza oracolo si rinuncia, come fa gia' `ScanKnownFromSpellBook`, e
+`scan_spec.lua` sorveglia i due casi.
+
 ## SavedVariables: scrittura riuscita, rilettura fallita nella beta
 
 Verificato il 2026-09-18 sulla build di riferimento con la sonda poi rimossa:

@@ -8,6 +8,28 @@ Recipe Registry is a World of Warcraft: The Burning Crusade Classic Anniversary 
 
 ## Commands
 
+> On `feat/forever` only the Forever commands below work. The TBC addon and its
+> `local-tests/` are not in this branch's tree (see **Branch strategy**); the
+> TBC commands are kept here because this file merges back, and they run on
+> `develop`.
+
+**Run the Forever specs:**
+```powershell
+.\RecipeRegistry_Forever\local-tests\run-tests.ps1
+```
+
+**Syntax check the Forever tree:**
+```powershell
+.\RecipeRegistry_Forever\local-tests\run-syntax.ps1
+```
+
+**Rebuild the Forever recipe database from the local dumps:**
+```powershell
+.\RecipeRegistry_Forever\Tools\import-dumps.ps1
+```
+
+### On `develop` (TBC addon)
+
 **Run all active backend tests:**
 ```powershell
 .\RecipeRegistry\local-tests\run-backend-tests.ps1
@@ -26,11 +48,6 @@ Recipe Registry is a World of Warcraft: The Burning Crusade Classic Anniversary 
 **Syntax check all Lua files (TBC tree):**
 ```powershell
 .\RecipeRegistry\local-tests\run-syntax.ps1
-```
-
-**Syntax check the Forever tree:**
-```powershell
-.\RecipeRegistry_Forever\local-tests\run-syntax.ps1
 ```
 
 Tests require Lua 5.1 at `C:\Program Files (x86)\Lua\5.1\lua.exe`. The runner enters the addon folder itself, so it can be called from anywhere. Every path in the harness and in the specs is relative to `RecipeRegistry/`.
@@ -195,6 +212,22 @@ Rules that follow from it:
 - `develop` — the active development branch. All work happens here: code, tests, docs, tooling.
 - `feat/forever` — the World of Warcraft: Forever adaptation, forked from `develop` for the duration of the Forever beta (2026-09-17 to 2026-10-21). Retail-shaped API work goes here, not on `develop`, because the client churns weekly and most of the API mapping is still deduction; it merges back into `develop` once the unknowns in `docs/forever/api-adaptation.md` are closed on real data. Rebase it on `develop` rather than merging `develop` into it.
 - `main` — release-only. Its tree must contain ONLY the addon folders with their runtime files (`RecipeRegistry/` with `RecipeRegistry.toc`, `Core/`, `Data/`, `Integrations/`, `Libs/`, `Sync/` without `MockSync.lua`, `UI/`, plus `CHANGELOG.md`, `LICENSE`, `.pkgmeta`) plus `README.md`, `LICENSE`, `.gitignore` at the root. Never commit or edit directly on `main`.
+
+**On `feat/forever` the TBC addon is not in the tree.** It was removed there on
+purpose: this branch is about Forever, and carrying 250 files of an addon it
+never touches only invites edits to the wrong copy. `develop` is the collector
+for every line of development and keeps the TBC addon; `main` ships it.
+
+That makes the merge back a selective one, and it has to be, because this branch
+carries BOTH the folder-per-client restructure (the addon moved from the repo
+root into `RecipeRegistry/`) AND the deletion of what that move produced. The
+restructure belongs on `develop`. The deletion does not. Merging the branch
+wholesale would replay move-then-delete and take the CurseForge addon with it.
+
+So: bring the Forever tree, the restructure and the tooling across, then make
+sure `RecipeRegistry/` is present and intact before committing the merge --
+`git checkout develop -- RecipeRegistry` after a squash merge is enough, and
+`git ls-files RecipeRegistry | wc -l` should read 250, not 0.
 
 Flavors do not get a branch each: `main` carries them all and
 `.github/workflows/release.yml` builds one zip per TOC in the tag, sending each
