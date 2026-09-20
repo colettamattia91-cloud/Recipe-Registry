@@ -1,0 +1,38 @@
+# Generator-time overrides for recipe metadata corrections.
+expansionBySpellId: {}
+createdItemBySpellId: {}
+recipeItemBySpellId: {}
+categoryBySpellId: {}
+selfOnlyOutputlessBySpellId: {}
+bopOutputBySpellId: {}
+bindTypeByCreatedItemId: {}
+classMaskBySpellId: {}
+trainerBySpellId: {}
+
+# The content phase a recipe first becomes obtainable in, 2 to 5. The pipeline
+# derives this from the ZONE a recipe comes from -- Serpentshrine Cavern opens
+# in phase 2, the Black Temple in phase 3 -- which answers "this content did
+# not exist yet" and nothing else. Two things it cannot see, and this is where
+# they go:
+#
+#   * A recipe from a launch zone that Blizzard held back anyway. Nothing in
+#     the client data or in any emulator database records a release schedule.
+#   * A recipe with no place at all. 340 of the 902 TBC recipes name nowhere
+#     -- 187 taught by a trainer, 106 world drops -- so there is no zone to
+#     read a phase off.
+#
+# One line per recipe, then regenerate.
+phaseBySpellId: {}
+
+# Recipes in the client data but not in the game. `false` puts one back that
+# the removed list flagged wrongly; `true` flags one it missed.
+#
+# These two were cut during the TBC beta and, in the wiki's words, "never made
+# available". The generated removed list misses them because it identifies a
+# removed recipe by the absence of difficulty data on Wowhead, and these two
+# have it. Everything else agrees they cannot be obtained: no vendor, no loot
+# table, no trainer and no quest in the emulator database, and no source
+# section on their item pages.
+removedBySpellId:
+  26918: true   # Design: Arcanite Sword Pendant
+  26920: true   # Design: Blood Crown

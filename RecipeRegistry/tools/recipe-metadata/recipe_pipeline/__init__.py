@@ -1,0 +1,1 @@
+"""Recipe metadata generation pipeline."""

@@ -1,0 +1,285 @@
+{
+  "parserVersion": 1,
+  "reason": "No Wowhead difficulty data available - indicates removed/placeholder content",
+  "removedBySpellId": {
+    "10550": {
+      "name": "Nightscape Cloak",
+      "notes": "No Wowhead data",
+      "profession": "Leatherworking"
+    },
+    "11447": {
+      "name": "Elixir of Waterwalking",
+      "notes": "No Wowhead data",
+      "profession": "Alchemy"
+    },
+    "11454": {
+      "name": "Inlaid Mithril Cylinder",
+      "notes": "Plans crafted by Gnomish Engineers, not a standard source",
+      "profession": "Blacksmithing"
+    },
+    "12062": {
+      "name": "Stormcloth Pants",
+      "notes": "No Wowhead data",
+      "profession": "Tailoring"
+    },
+    "12063": {
+      "name": "Stormcloth Gloves",
+      "notes": "No Wowhead data",
+      "profession": "Tailoring"
+    },
+    "12068": {
+      "name": "Stormcloth Vest",
+      "notes": "No Wowhead data",
+      "profession": "Tailoring"
+    },
+    "12083": {
+      "name": "Stormcloth Headband",
+      "notes": "No Wowhead data",
+      "profession": "Tailoring"
+    },
+    "12087": {
+      "name": "Stormcloth Shoulders",
+      "notes": "No Wowhead data",
+      "profession": "Tailoring"
+    },
+    "12090": {
+      "name": "Stormcloth Boots",
+      "notes": "No Wowhead data",
+      "profession": "Tailoring"
+    },
+    "12719": {
+      "name": "Explosive Arrow",
+      "notes": "Never implemented in TBC",
+      "profession": "Engineering"
+    },
+    "12720": {
+      "name": "Goblin \"Boom\" Box",
+      "notes": "Removed",
+      "profession": "Engineering"
+    },
+    "12722": {
+      "name": "Goblin Radio",
+      "notes": "Removed",
+      "profession": "Engineering"
+    },
+    "12900": {
+      "name": "Mobile Alarm",
+      "notes": "Removed",
+      "profession": "Engineering"
+    },
+    "12904": {
+      "name": "Gnomish Ham Radio",
+      "notes": "Removed",
+      "profession": "Engineering"
+    },
+    "16960": {
+      "name": "Thorium Greatsword",
+      "notes": "No Wowhead data",
+      "profession": "Blacksmithing"
+    },
+    "16965": {
+      "name": "Bleakwood Hew",
+      "notes": "No Wowhead data",
+      "profession": "Blacksmithing"
+    },
+    "16967": {
+      "name": "Inlaid Thorium Hammer",
+      "notes": "No Wowhead data",
+      "profession": "Blacksmithing"
+    },
+    "16980": {
+      "name": "Rune Edge",
+      "notes": "No Wowhead data",
+      "profession": "Blacksmithing"
+    },
+    "16986": {
+      "name": "Blood Talon",
+      "notes": "No Wowhead data",
+      "profession": "Blacksmithing"
+    },
+    "16987": {
+      "name": "Darkspear",
+      "notes": "No Wowhead data",
+      "profession": "Blacksmithing"
+    },
+    "17579": {
+      "name": "Greater Holy Protection Potion",
+      "notes": "No Wowhead data",
+      "profession": "Alchemy"
+    },
+    "19080": {
+      "name": "Warbear Woolies",
+      "notes": "No longer available, replaced by Meilosh (Timbermaw) vendor version",
+      "profession": "Leatherworking"
+    },
+    "19106": {
+      "name": "Onyxia Scale Breastplate",
+      "notes": "No Wowhead data",
+      "profession": "Leatherworking"
+    },
+    "2336": {
+      "name": "Elixir of Tongues",
+      "notes": "No Wowhead data",
+      "profession": "Alchemy"
+    },
+    "25614": {
+      "name": "Silver Rose Pendant",
+      "notes": "No Wowhead data",
+      "profession": "Jewelcrafting"
+    },
+    "2671": {
+      "name": "Rough Bronze Bracers",
+      "notes": "No Wowhead data",
+      "profession": "Blacksmithing"
+    },
+    "28021": {
+      "name": "Arcane Dust",
+      "notes": "Briefly in Beta, removed",
+      "profession": "Enchanting"
+    },
+    "28022": {
+      "name": "Large Prismatic Shard",
+      "notes": "Material conversion, always gray, never gives skill-ups",
+      "profession": "Enchanting"
+    },
+    "30021": {
+      "name": "Crystal Infused Bandage",
+      "notes": "Never implemented, placeholder reagent zzOLD[PH]",
+      "profession": "First Aid"
+    },
+    "30342": {
+      "name": "Red Smoke Flare",
+      "notes": "No Wowhead data",
+      "profession": "Engineering"
+    },
+    "30343": {
+      "name": "Blue Smoke Flare",
+      "notes": "No Wowhead data",
+      "profession": "Engineering"
+    },
+    "30349": {
+      "name": "Khorium Toolbox",
+      "notes": "Removed before live, never available to players",
+      "profession": "Engineering"
+    },
+    "30549": {
+      "name": "Critter Enlarger",
+      "notes": "No Wowhead data",
+      "profession": "Engineering"
+    },
+    "30561": {
+      "name": "Goblin Tonk Controller",
+      "notes": "Removed",
+      "profession": "Engineering"
+    },
+    "30573": {
+      "name": "Gnomish Tonk Controller",
+      "notes": "Removed",
+      "profession": "Engineering"
+    },
+    "31461": {
+      "name": "Heavy Netherweave Net",
+      "notes": "No Wowhead data",
+      "profession": "Tailoring"
+    },
+    "32810": {
+      "name": "Primal Stone Statue",
+      "notes": "No Wowhead data",
+      "profession": "Jewelcrafting"
+    },
+    "36665": {
+      "name": "Netherflame Robe",
+      "notes": "No Wowhead data",
+      "profession": "Tailoring"
+    },
+    "36667": {
+      "name": "Netherflame Belt",
+      "notes": "No Wowhead data",
+      "profession": "Tailoring"
+    },
+    "36668": {
+      "name": "Netherflame Boots",
+      "notes": "No Wowhead data",
+      "profession": "Tailoring"
+    },
+    "36669": {
+      "name": "Lifeblood Leggings",
+      "notes": "No Wowhead data",
+      "profession": "Tailoring"
+    },
+    "36670": {
+      "name": "Lifeblood Belt",
+      "notes": "No Wowhead data",
+      "profession": "Tailoring"
+    },
+    "36672": {
+      "name": "Lifeblood Bracers",
+      "notes": "No Wowhead data",
+      "profession": "Tailoring"
+    },
+    "42615": {
+      "name": "Small Prismatic Shard",
+      "notes": "Material conversion, always gray, never gives skill-ups",
+      "profession": "Enchanting"
+    },
+    "44612": {
+      "name": "Enchant Gloves - Greater Blasting",
+      "notes": "Unimplemented WotLK enchant - cat:0, no difficulty on Wowhead WotLK. Evidence: https://www.wowhead.com/wotlk/spell=44612",
+      "profession": "Enchanting"
+    },
+    "45765": {
+      "name": "Void Shatter",
+      "notes": "Material conversion, always gray, never gives skill-ups",
+      "profession": "Enchanting"
+    },
+    "46578": {
+      "name": "Enchant Weapon - Deathfrost",
+      "notes": "Seasonal event recipe (Midsummer), not reliably obtainable",
+      "profession": "Enchanting"
+    },
+    "57231": {
+      "name": "Death Knight Glyph 25",
+      "notes": "Placeholder/debug spell - learnedAt:9999, no Wowhead difficulty data, no source array. Never accessible to players. Evidence: https://www.wowhead.com/wotlk/spell=57231",
+      "profession": "Inscription"
+    },
+    "62257": {
+      "name": "Enchant Weapon - Titanguard",
+      "notes": "Unimplemented WotLK enchant - cat:0, no difficulty on Wowhead WotLK. Evidence: https://www.wowhead.com/wotlk/spell=62257",
+      "profession": "Enchanting"
+    },
+    "6619": {
+      "name": "Cowardly Flight Potion",
+      "notes": "No Wowhead data",
+      "profession": "Alchemy"
+    },
+    "7636": {
+      "name": "Green Woolen Robe",
+      "notes": "No Wowhead data",
+      "profession": "Tailoring"
+    },
+    "8366": {
+      "name": "Ironforge Chain",
+      "notes": "No Wowhead data",
+      "profession": "Blacksmithing"
+    },
+    "8368": {
+      "name": "Ironforge Gauntlets",
+      "notes": "No Wowhead data",
+      "profession": "Blacksmithing"
+    },
+    "8778": {
+      "name": "Boots of Darkness",
+      "notes": "No Wowhead data",
+      "profession": "Tailoring"
+    },
+    "9942": {
+      "name": "Mithril Scale Gloves",
+      "notes": "No Wowhead data",
+      "profession": "Blacksmithing"
+    }
+  },
+  "source": "craftlib-removed-recipes",
+  "sourceStats": {
+    "records": 55
+  }
+}

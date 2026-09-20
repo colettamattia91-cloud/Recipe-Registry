@@ -1,0 +1,612 @@
+#!/usr/bin/env python
+import argparse
+import json
+import shutil
+import sys
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parent.parent
+sys.path.insert(0, str(SCRIPT_DIR))
+
+from recipe_pipeline.derive_categories import categories_by_profession, load_taxonomies, subcategories_by_profession
+from recipe_pipeline.emit_lua import emit_lua
+from recipe_pipeline.emit_reports import build_reports, emit_reports
+from recipe_pipeline.normalize import normalize_records
+from recipe_pipeline.validate import validate_records
+from recipe_sources.db2_provider import DEFAULT_SNAPSHOT
+from recipe_sources.local_snapshot_provider import load_local_snapshot
+from recipe_sources.wowhead_specialization_provider import (
+    DEFAULT_FLAVOR as DEFAULT_WOWHEAD_FLAVOR,
+    DEFAULT_REQUEST_DELAY as DEFAULT_WOWHEAD_DELAY,
+    build_specialization_snapshot,
+    fetch_specializations,
+    write_specialization_snapshot,
+)
+from recipe_sources.arl_source_provider import (
+    build_snapshot as build_acquisition_snapshot,
+    fetch_acquisition,
+    write_snapshot as write_acquisition_snapshot,
+)
+from recipe_sources.wowhead_source_provider import (
+    build_snapshot as build_source_snapshot,
+    fetch_sources,
+    load_sources,
+    write_snapshot as write_source_snapshot,
+)
+from recipe_sources.wago_anniversary_provider import (
+    DEFAULT_BRANCH as DEFAULT_WAGO_BRANCH,
+    DEFAULT_LOCALE as DEFAULT_WAGO_LOCALE,
+    DEFAULT_METADATA_VERSION as DEFAULT_WAGO_METADATA_VERSION,
+    DEFAULT_PRODUCT as DEFAULT_WAGO_PRODUCT,
+    DEFAULT_VANILLA_BUILD,
+    build_normalized_snapshot,
+    fetch_wago_tables,
+    write_normalized_snapshot,
+)
+
+
+OUTPUT_PATH = REPO_ROOT / "Data" / "Metadata" / "RecipeMetadata_Generated.lua"
+SNAPSHOT_ROOT = SCRIPT_DIR / "snapshots"
+TAXONOMY_ROOT = SCRIPT_DIR / "remediation" / "taxonomy"
+OVERRIDES_PATH = SCRIPT_DIR / "remediation" / "manual_overrides.yaml"
+REPORT_DIR = REPO_ROOT / "artifacts" / "recipe-metadata"
+SCHEMA_VERSION = 1
+
+
+def _strip_comment(value):
+    """Drop a trailing `# ...` from a value.
+
+    This file is meant to be edited by hand, and a hand-written override is
+    worth an explanation beside it. Without this, `26918: true  # never
+    released` parsed as the string "true  # never released", which is not the
+    boolean the caller checks for -- so the override would be read, accepted,
+    and quietly do nothing.
+    """
+    value = value.strip()
+    if value.startswith('"'):
+        closing = value.find('"', 1)
+        if closing != -1:
+            return value[:closing + 1]
+    head, hash_mark, _ = value.partition("#")
+    return head.strip() if hash_mark else value
+
+
+def _coerce_scalar(value):
+    value = _strip_comment(value)
+    if value in ("true", "True"):
+        return True
+    if value in ("false", "False"):
+        return False
+    if value in ("{}", ""):
+        return {}
+    if value.startswith('"') and value.endswith('"'):
+        return value[1:-1]
+    try:
+        return int(value)
+    except ValueError:
+        return value
+
+
+def _load_overrides(path=OVERRIDES_PATH):
+    buckets = {
+        "expansionBySpellId": {},
+        "createdItemBySpellId": {},
+        "recipeItemBySpellId": {},
+        "categoryBySpellId": {},
+        "selfOnlyOutputlessBySpellId": {},
+        "bopOutputBySpellId": {},
+        "bindTypeByCreatedItemId": {},
+        "specializationBySpellId": {},
+        # Where a recipe is obtained, for one the bulk sources place wrongly.
+        # Read by normalize since the obtain-side work landed; the loader had
+        # never heard of it, so the override was a no-op that looked like one.
+        "acquisitionBySpellId": {},
+        # The content phase a recipe becomes obtainable in. derive_phase can
+        # only see the zone a recipe is obtained in, so a launch-zone recipe
+        # Blizzard held back for a later phase has to be stated here.
+        "phaseBySpellId": {},
+        # Which classes a trainer teaches a recipe to, as the client's own
+        # bitmask. The client states it; this is here for when it is wrong.
+        "classMaskBySpellId": {},
+        # The trainer title and where they stand, for a recipe cmangos places
+        # differently from the live 2.5.x client.
+        "trainerBySpellId": {},
+        # `removedBySpellId: {12345: false}` puts a recipe back that the
+        # removed list flagged wrongly -- one line, then regenerate.
+        "removedBySpellId": {},
+    }
+    if not Path(path).exists():
+        return buckets
+
+    current = None
+    for raw_line in Path(path).read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if not raw_line.startswith(" ") and ":" in line:
+            key, value = line.split(":", 1)
+            current = key.strip()
+            if current not in buckets:
+                continue
+            if value.strip() not in ("", "{}"):
+                parsed = _coerce_scalar(value)
+                if isinstance(parsed, dict):
+                    buckets[current] = parsed
+            continue
+        if current and ":" in line:
+            key, value = line.split(":", 1)
+            try:
+                numeric_key = int(key.strip())
+            except ValueError:
+                numeric_key = key.strip()
+            value = value.strip()
+            if value.startswith("{") and value.endswith("}"):
+                entry = {}
+                for part in value[1:-1].split(","):
+                    if ":" in part:
+                        entry_key, entry_value = part.split(":", 1)
+                        entry[entry_key.strip()] = _coerce_scalar(entry_value)
+                buckets[current][numeric_key] = entry
+            else:
+                buckets[current][numeric_key] = _coerce_scalar(value)
+    return buckets
+
+
+def _load_snapshot_json(path, expected_type, errors):
+    try:
+        value = json.loads(Path(path).read_text(encoding="utf-8"))
+    except Exception as exc:
+        errors.append("{0}: invalid JSON ({1})".format(Path(path).name, exc))
+        return None
+    if not isinstance(value, expected_type):
+        errors.append("{0}: expected {1}, got {2}".format(
+            Path(path).name,
+            expected_type.__name__,
+            type(value).__name__,
+        ))
+        return None
+    return value
+
+
+def _has_key(row, key):
+    return isinstance(row, dict) and key in row and row[key] is not None
+
+
+def validate_normalized_snapshot_dir(source_dir, expected_snapshot=None):
+    source_dir = Path(source_dir)
+    errors = []
+    required_shapes = {
+        "manifest.json": dict,
+        "recipes.json": list,
+        "spell_effects.json": list,
+        "item_sparse.json": list,
+    }
+    loaded = {}
+
+    for name, expected_type in required_shapes.items():
+        path = source_dir / name
+        if not path.exists():
+            errors.append("missing required snapshot file: " + str(path))
+            continue
+        loaded[name] = _load_snapshot_json(path, expected_type, errors)
+
+    secondary_path = source_dir / "secondary_static.json"
+    if secondary_path.exists():
+        loaded["secondary_static.json"] = _load_snapshot_json(secondary_path, dict, errors)
+
+    manifest = loaded.get("manifest.json")
+    if isinstance(manifest, dict):
+        snapshot = manifest.get("snapshot")
+        if expected_snapshot and snapshot != expected_snapshot:
+            errors.append("manifest snapshot {0} does not match requested snapshot {1}".format(
+                snapshot or "<missing>",
+                expected_snapshot,
+            ))
+        if manifest.get("flavor") != "tbc":
+            errors.append("manifest flavor must be tbc")
+        if manifest.get("datasetKind") not in ("fixture", "release-candidate"):
+            errors.append("manifest datasetKind must be fixture or release-candidate")
+
+    recipes = loaded.get("recipes.json") or []
+    seen_spell_ids = {}
+    for index, row in enumerate(recipes):
+        if not isinstance(row, dict):
+            errors.append("recipes.json[{0}]: expected object".format(index))
+            continue
+        for key in ("spellId", "profession", "firstSeenExpansion", "categoryHint"):
+            if not _has_key(row, key):
+                errors.append("recipes.json[{0}]: missing {1}".format(index, key))
+        spell_id = row.get("spellId")
+        if spell_id in seen_spell_ids:
+            errors.append("recipes.json[{0}]: duplicate spellId {1}".format(index, spell_id))
+        seen_spell_ids[spell_id] = True
+
+    spell_effects = loaded.get("spell_effects.json") or []
+    for index, row in enumerate(spell_effects):
+        if not isinstance(row, dict):
+            errors.append("spell_effects.json[{0}]: expected object".format(index))
+            continue
+        for key in ("spellId", "effectType"):
+            if not _has_key(row, key):
+                errors.append("spell_effects.json[{0}]: missing {1}".format(index, key))
+        if row.get("effectType") == "reagent":
+            for key in ("itemId", "count"):
+                if not _has_key(row, key):
+                    errors.append("spell_effects.json[{0}]: reagent missing {1}".format(index, key))
+
+    item_sparse = loaded.get("item_sparse.json") or []
+    for index, row in enumerate(item_sparse):
+        if not isinstance(row, dict):
+            errors.append("item_sparse.json[{0}]: expected object".format(index))
+            continue
+        if not _has_key(row, "itemId"):
+            errors.append("item_sparse.json[{0}]: missing itemId".format(index))
+
+    return errors
+
+
+def _build_pipeline(snapshot=DEFAULT_SNAPSHOT, flavor="tbc"):
+    primary, secondary = load_local_snapshot(SNAPSHOT_ROOT, snapshot)
+    taxonomies = load_taxonomies(TAXONOMY_ROOT)
+    overrides = _load_overrides()
+    records, diagnostics = normalize_records(primary, secondary, taxonomies, overrides, flavor)
+    metadata_version = primary.get("manifest", {}).get("metadataVersion", "0")
+    lua = emit_lua(
+        records,
+        categories_by_profession(taxonomies),
+        subcategories_by_profession(taxonomies),
+        metadata_version,
+        SCHEMA_VERSION,
+        flavor,
+    )
+    reports = build_reports(records, diagnostics, primary)
+    return primary, records, diagnostics, lua, reports
+
+
+def command_fetch(args):
+    if args.source == "removed-recipes":
+        # One curated file. Nothing here deletes anything: the list becomes a
+        # flag on the record, and an override puts any of them back.
+        from recipe_sources.removed_recipes import (
+            build_snapshot as build_removed_snapshot,
+            fetch_removed,
+            parse_removed,
+            write_snapshot as write_removed_snapshot,
+        )
+        snapshot_dir = SNAPSHOT_ROOT / args.snapshot
+        payload = fetch_removed(timeout=args.timeout)
+        by_spell_id = parse_removed(payload)
+        if not by_spell_id:
+            print("no removed rows parsed; refusing to overwrite the snapshot", file=sys.stderr)
+            return 2
+        path = write_removed_snapshot(
+            build_removed_snapshot(by_spell_id, payload.get("_reason")), snapshot_dir)
+        print("wrote {0} ({1} recipes flagged)".format(path, len(by_spell_id)))
+        return 0
+
+    if args.source == "arl-acquisition":
+        # A dozen small files, not a crawl: the whole dataset arrives in one
+        # pass, so there is no cache to resume from and no partial state.
+        snapshot_dir = SNAPSHOT_ROOT / args.snapshot
+        by_spell_id, per_profession, lookups = fetch_acquisition(
+            timeout=args.timeout,
+            delay=args.request_delay,
+        )
+        if not by_spell_id:
+            print("no acquisition rows parsed; refusing to overwrite the snapshot", file=sys.stderr)
+            return 2
+        payload = build_acquisition_snapshot(by_spell_id, per_profession, len(lookups))
+        path = write_acquisition_snapshot(payload, snapshot_dir)
+        print("wrote {0} ({1} recipes, {2} NPCs)".format(path, len(by_spell_id), len(lookups)))
+        return 0
+
+    if args.source == "wowhead-sources":
+        # One request per recipe item, and 1436 recipes have one, so the
+        # snapshot doubles as the cache: items already in it are skipped and
+        # the file is rewritten as the run goes, letting an interrupted fetch
+        # resume instead of starting over.
+        snapshot_dir = SNAPSHOT_ROOT / args.snapshot
+        recipes_path = snapshot_dir / "recipes.json"
+        if not recipes_path.exists():
+            print("no recipes.json in {0}; fetch the primary snapshot first".format(snapshot_dir), file=sys.stderr)
+            return 2
+        with recipes_path.open("r", encoding="utf-8") as handle:
+            recipes = json.load(handle)
+        recipe_item_ids = sorted({
+            record["recipeItemId"] for record in recipes if record.get("recipeItemId")
+        })
+
+        def progress(item_id, done, total, note):
+            print("  [{0}/{1}] item {2}: {3}".format(done, total, item_id, note), flush=True)
+
+        sources, zones, instance_zones, outcome = fetch_sources(
+            recipe_item_ids,
+            snapshot_dir,
+            flavor=args.wowhead_flavor,
+            timeout=args.timeout,
+            delay=args.request_delay,
+            limit=args.limit,
+            workers=args.workers,
+            progress=progress if args.verbose else None,
+        )
+        if not sources:
+            print("no source rows parsed; refusing to overwrite the snapshot", file=sys.stderr)
+            return 2
+
+        # Whatever did come back is still worth keeping -- the snapshot is the
+        # cache and a later run resumes from it -- but a run that was mostly
+        # refused must not report success.
+        payload = build_source_snapshot(sources, zones, instance_zones, flavor=args.wowhead_flavor)
+        path = write_source_snapshot(payload, snapshot_dir)
+        print("wrote {0} ({1} recipe items, {2} zones)".format(path, len(sources), len(zones)))
+        print("this run: {0}".format(outcome.describe()))
+        if outcome.mostly_failed():
+            print(
+                "most requests were refused; the snapshot is incomplete and the "
+                "payload should not be regenerated from it",
+                file=sys.stderr,
+            )
+            return 1
+        return 0
+
+    if args.source == "wowhead-specializations":
+        # Written straight into the snapshot dir rather than through the
+        # .incoming staging dance: this is one small standalone file with no
+        # cross-file invariants for validate_normalized_snapshot_dir to check.
+        by_spell_id, per_profession = fetch_specializations(
+            flavor=args.wowhead_flavor,
+            timeout=args.timeout,
+            delay=args.request_delay,
+        )
+        if not by_spell_id:
+            print("no specialization rows parsed; refusing to overwrite the snapshot", file=sys.stderr)
+            return 2
+        payload = build_specialization_snapshot(by_spell_id, per_profession, flavor=args.wowhead_flavor)
+        path = write_specialization_snapshot(payload, SNAPSHOT_ROOT / args.snapshot)
+        print("wrote {0} ({1} specialization records)".format(path, len(by_spell_id)))
+        return 0
+
+    if args.source == "atlasloot-phases":
+        from recipe_sources.atlasloot_phase_provider import (
+            SOURCE_FILES,
+            build_phases,
+            build_snapshot as build_phase_snapshot,
+            fetch_file as fetch_atlasloot_file,
+            write_snapshot as write_phase_snapshot,
+        )
+
+        snapshot_dir = SNAPSHOT_ROOT / args.snapshot
+        recipes_path = snapshot_dir / "recipes.json"
+        if not recipes_path.exists():
+            print("no recipes.json in {0}; fetch the primary snapshot first".format(snapshot_dir), file=sys.stderr)
+            return 2
+        with recipes_path.open("r", encoding="utf-8") as handle:
+            # Keyed by the RECIPE item -- the pattern that drops -- never by
+            # what the recipe creates.
+            by_recipe_item = {
+                int(record["recipeItemId"]): int(record["spellId"])
+                for record in json.load(handle) if record.get("recipeItemId")
+            }
+
+        texts = [fetch_atlasloot_file(name, timeout=args.timeout) for name in SOURCE_FILES]
+        by_spell_id, tables = build_phases(texts, by_recipe_item)
+        if not by_spell_id:
+            print("no phase rows parsed; refusing to overwrite the snapshot", file=sys.stderr)
+            return 2
+        path = write_phase_snapshot(build_phase_snapshot(by_spell_id, tables), snapshot_dir)
+        print("wrote {0} ({1} recipes placed by {2} tables)".format(
+            path, len(by_spell_id), len(tables)))
+        return 0
+
+    if args.source == "cmangos-trainers":
+        # One archive, not a crawl. The recipes it is asked about come from the
+        # committed snapshot, so the answer is scoped to what this addon ships
+        # rather than to every spell an emulator knows.
+        from recipe_sources.cmangos_trainer_provider import (
+            build_snapshot as build_trainer_snapshot,
+            build_trainers,
+            fetch_world_db,
+            write_snapshot as write_trainer_snapshot,
+        )
+
+        snapshot_dir = SNAPSHOT_ROOT / args.snapshot
+        recipes_path = snapshot_dir / "recipes.json"
+        if not recipes_path.exists():
+            print("no recipes.json in {0}; fetch the primary snapshot first".format(snapshot_dir), file=sys.stderr)
+            return 2
+        with recipes_path.open("r", encoding="utf-8") as handle:
+            professions = {
+                int(record["spellId"]): record.get("profession")
+                for record in json.load(handle)
+            }
+
+        world_db = fetch_world_db(args.work_dir or (snapshot_dir / ".cmangos"), timeout=args.timeout)
+        by_spell_id, stats = build_trainers(world_db, professions)
+        if not by_spell_id:
+            print("no trainer rows resolved; refusing to overwrite the snapshot", file=sys.stderr)
+            return 2
+        path = write_trainer_snapshot(build_trainer_snapshot(by_spell_id, stats), snapshot_dir)
+        print("wrote {0} ({1} titled, {2} resolved, {3} taught by several ranks, "
+              "{4} titled only by their profession, {5} unknown)".format(
+                  path, stats["titled"], stats["resolved"], stats["manyTitles"],
+                  stats["kindOnly"], stats["unresolved"]))
+        return 0
+
+    if args.source == "wago-anniversary":
+        snapshot_data = build_normalized_snapshot(
+            fetch_wago_tables(
+                product=args.wago_product,
+                branch=args.wago_branch,
+                vanilla_build=args.vanilla_build,
+                locale=args.locale,
+                timeout=args.timeout,
+            ),
+            args.snapshot,
+            product=args.wago_product,
+            branch=args.wago_branch,
+            vanilla_build=args.vanilla_build,
+            metadata_version=args.metadata_version,
+            dataset_kind=args.dataset_kind,
+        )
+        incoming_dir = SNAPSHOT_ROOT / (args.snapshot + ".incoming")
+        if incoming_dir.exists():
+            shutil.rmtree(incoming_dir)
+        write_normalized_snapshot(snapshot_data, incoming_dir)
+        validation_errors = validate_normalized_snapshot_dir(incoming_dir, args.snapshot)
+        if validation_errors:
+            for error in validation_errors:
+                print(error, file=sys.stderr)
+            return 2
+
+        target_dir = SNAPSHOT_ROOT / args.snapshot
+        target_dir.mkdir(parents=True, exist_ok=True)
+        for name in snapshot_data:
+            shutil.copyfile(incoming_dir / name, target_dir / name)
+        shutil.rmtree(incoming_dir)
+        print("fetched Wago Anniversary snapshot into " + str(target_dir))
+        return 0
+
+    if not args.source_dir:
+        print("fetch is maintainer-only; pass --source-dir with normalized snapshot JSON files", file=sys.stderr)
+        return 2
+
+    source_dir = Path(args.source_dir)
+    if not source_dir.exists():
+        print("missing source snapshot directory: " + str(source_dir), file=sys.stderr)
+        return 2
+
+    validation_errors = validate_normalized_snapshot_dir(source_dir, args.snapshot)
+    if validation_errors:
+        for error in validation_errors:
+            print(error, file=sys.stderr)
+        return 2
+
+    target_dir = SNAPSHOT_ROOT / args.snapshot
+    required = ("manifest.json", "recipes.json", "spell_effects.json", "item_sparse.json")
+    optional = ("secondary_static.json",)
+    target_dir.mkdir(parents=True, exist_ok=True)
+    for name in required:
+        src = source_dir / name
+        if not src.exists():
+            print("missing required snapshot file: " + str(src), file=sys.stderr)
+            return 2
+        shutil.copyfile(src, target_dir / name)
+    for name in optional:
+        src = source_dir / name
+        if src.exists():
+            shutil.copyfile(src, target_dir / name)
+
+    print("imported normalized snapshot into " + str(target_dir))
+    return 0
+
+
+def command_generate(args):
+    if args.flavor != "tbc":
+        print("unsupported flavor: " + args.flavor, file=sys.stderr)
+        return 2
+
+    primary, records, diagnostics, content, reports = _build_pipeline(args.snapshot, args.flavor)
+    if args.check:
+        existing = OUTPUT_PATH.read_text(encoding="utf-8") if OUTPUT_PATH.exists() else ""
+        if existing != content:
+            print(str(OUTPUT_PATH) + " is stale", file=sys.stderr)
+            return 1
+        for name, expected in sorted(reports.items()):
+            path = REPORT_DIR / name
+            existing_report = path.read_text(encoding="utf-8") if path.exists() else ""
+            if existing_report != expected:
+                print(str(path) + " is stale", file=sys.stderr)
+                return 1
+        print(str(OUTPUT_PATH) + " is current")
+        return 0
+
+    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT_PATH.write_text(content, encoding="utf-8")
+    emit_reports(records, diagnostics, primary, REPORT_DIR)
+    print("wrote " + str(OUTPUT_PATH))
+    return 0
+
+
+def command_validate(args):
+    primary, records, diagnostics, _content, _reports = _build_pipeline(args.snapshot, args.flavor)
+    failures, unresolved = validate_records(
+        records,
+        diagnostics,
+        strict=args.strict,
+        source_manifest=primary.get("manifest", {}),
+    )
+    emit_reports(records, diagnostics, primary, REPORT_DIR)
+    if failures:
+        for failure in failures:
+            print(json.dumps(failure, sort_keys=True), file=sys.stderr)
+        return 1
+
+    print("validated " + str(len(records)) + " metadata records; unresolved=" + str(len(unresolved)))
+    return 0
+
+
+def command_report(args):
+    primary, records, diagnostics, _content, _reports = _build_pipeline(args.snapshot, args.flavor)
+    emit_reports(records, diagnostics, primary, REPORT_DIR)
+    print("wrote reports to " + str(REPORT_DIR))
+    return 0
+
+
+def build_parser():
+    parser = argparse.ArgumentParser(description="Build Recipe Registry metadata")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    fetch = subparsers.add_parser("fetch")
+    fetch.add_argument("--flavor", default="tbc")
+    fetch.add_argument("--snapshot", default=DEFAULT_SNAPSHOT)
+    fetch.add_argument("--source", default="normalized-dir", choices=("normalized-dir", "wago-anniversary", "wowhead-specializations", "wowhead-sources", "arl-acquisition",
+                                       "cmangos-trainers", "atlasloot-phases", "removed-recipes"))
+    fetch.add_argument("--work-dir", default=None,
+                       help="cmangos-trainers: where to keep the downloaded world DB")
+    fetch.add_argument("--limit", type=int, default=None,
+                       help="wowhead-sources: stop after this many newly fetched items")
+    fetch.add_argument("--verbose", action="store_true",
+                       help="wowhead-sources: print progress per item")
+    fetch.add_argument("--workers", type=int, default=4,
+                       help="wowhead-sources: pages to fetch concurrently")
+    fetch.add_argument("--wowhead-flavor", default=DEFAULT_WOWHEAD_FLAVOR)
+    fetch.add_argument("--request-delay", type=float, default=DEFAULT_WOWHEAD_DELAY)
+    fetch.add_argument("--source-dir")
+    fetch.add_argument("--wago-product", default=DEFAULT_WAGO_PRODUCT)
+    fetch.add_argument("--wago-branch", default=DEFAULT_WAGO_BRANCH)
+    fetch.add_argument("--vanilla-build", default=DEFAULT_VANILLA_BUILD)
+    fetch.add_argument("--locale", default=DEFAULT_WAGO_LOCALE)
+    fetch.add_argument("--metadata-version", default=DEFAULT_WAGO_METADATA_VERSION)
+    fetch.add_argument("--dataset-kind", default="release-candidate", choices=("fixture", "release-candidate"))
+    fetch.add_argument("--timeout", type=int, default=90)
+    fetch.set_defaults(func=command_fetch)
+
+    generate = subparsers.add_parser("generate")
+    generate.add_argument("--flavor", default="tbc")
+    generate.add_argument("--snapshot", default=DEFAULT_SNAPSHOT)
+    generate.add_argument("--offline", action="store_true")
+    generate.add_argument("--check", action="store_true")
+    generate.set_defaults(func=command_generate)
+
+    validate = subparsers.add_parser("validate")
+    validate.add_argument("--flavor", default="tbc")
+    validate.add_argument("--snapshot", default=DEFAULT_SNAPSHOT)
+    validate.add_argument("--strict", action="store_true")
+    validate.set_defaults(func=command_validate)
+
+    report = subparsers.add_parser("report")
+    report.add_argument("--flavor", default="tbc")
+    report.add_argument("--snapshot", default=DEFAULT_SNAPSHOT)
+    report.set_defaults(func=command_report)
+    return parser
+
+
+def main(argv=None):
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    return args.func(args)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

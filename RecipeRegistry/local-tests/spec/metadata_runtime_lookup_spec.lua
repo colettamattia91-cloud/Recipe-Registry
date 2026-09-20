@@ -1,0 +1,119 @@
+local Loader = dofile("local-tests/harness/load-addon.lua")
+local Test = dofile("local-tests/harness/test.lua")
+
+local addon = Loader.LoadMetadata({ fixture = true })
+local metadata = addon.RecipeMetadata
+
+Test.it("exposes the Phase 1 public identity fields", function()
+    Test.eq(metadata.metadataVersion, "2026.05.23.2")
+    Test.eq(metadata.schemaVersion, 1)
+    Test.eq(metadata.flavor, "tbc")
+end)
+
+Test.it("resolves one recipe through spell, recipe item, and created item keys", function()
+    local bySpell = metadata:GetRecipeInfo(-28596)
+    local byRecipeItem = metadata:GetRecipeInfo(22900)
+    local byCreatedItem = metadata:GetRecipeInfo(22845)
+
+    Test.eq(bySpell.spellId, 28596)
+    Test.eq(byRecipeItem.spellId, 28596)
+    Test.eq(byCreatedItem.spellId, 28596)
+    Test.eq(metadata:GetRecipeExpansion(-28596, bySpell), "tbc")
+    Test.eq(metadata:GetProfession(-28596, bySpell), "alchemy")
+
+    local category = metadata:GetCategory(-28596, bySpell)
+    Test.eq(category.category, "flasks")
+    Test.eq(category.subcategory, "guardian_elixirs")
+    Test.eq(category.sortOrder, 120)
+    Test.eq(metadata:GetCreatedItemId(-28596, bySpell), 22845)
+    Test.eq(metadata:GetRecipeItemId(-28596, bySpell), 22900)
+    Test.eq(metadata:GetMetadataResolutionStatus(-28596, bySpell), "resolved")
+end)
+
+Test.it("returns cloned reagent data for normal crafts", function()
+    local reagents = metadata:GetReagents(-28596)
+    Test.eq(#reagents, 2)
+    Test.eq(reagents[1].itemId, 22790)
+    Test.eq(reagents[1].count, 7)
+
+    reagents[1].count = 99
+    local fresh = metadata:GetReagents(-28596)
+    Test.eq(fresh[1].count, 7)
+end)
+
+Test.it("reports crafted output quantity, defaulting to one when omitted", function()
+    -- The generated data omits createdCount for single-output crafts, so an
+    -- absent field must read as 1 rather than nil: cost-per-unit maths
+    -- divides by this.
+    local single, singleMax = metadata:GetCreatedCount(-28596)
+    Test.eq(single, 1)
+    Test.eq(singleMax, 1)
+
+    local stacked, stackedMax = metadata:GetCreatedCount(-30303)
+    Test.eq(stacked, 4)
+    Test.eq(stackedMax, 4)
+
+    Test.eq(metadata:GetCreatedCount(123456789), nil)
+end)
+
+Test.it("reports the required profession specialization, nil when unrestricted", function()
+    -- The spell ID is the specialization itself, so callers can compare it
+    -- straight against a scanned profession's specialization.
+    Test.eq(metadata:GetSpecialization(-30303), 20219)
+    Test.eq(metadata:GetSpecialization(-28596), nil)
+    Test.eq(metadata:GetSpecialization(123456789), nil)
+
+    local info = metadata:GetRecipeInfo(-30303)
+    Test.eq(info.specialization, 20219)
+    Test.eq(metadata:GetSpecialization(-30303, info), 20219)
+end)
+
+Test.it("returns category labels with cloned subcategory rows", function()
+    local categories = metadata:GetCategoriesForProfession("alchemy")
+    Test.eq(categories[1].key, "potions")
+    Test.eq(categories[1].label, "Potions")
+    Test.eq(categories[1].subcategories[1].key, "combat")
+
+    categories[1].subcategories[1].label = "Changed"
+    local fresh = metadata:GetSubcategoriesForProfession("alchemy", "potions")
+    Test.eq(fresh[1].label, "Combat")
+end)
+
+Test.it("reports where a recipe is obtained", function()
+    -- Sold by a vendor only the Horde can reach: a faction restriction in
+    -- TBC is a fact about the vendor, not a race lock on the item.
+    local source = metadata:GetSource(-28596)
+    Test.truthy(source ~= nil, "a vendor-sold recipe should carry a source")
+    Test.eq(source.faction, "horde")
+    Test.eq(source.kind, "vendor")
+    -- Name and zone arrive together, so a row can say which vendor stands
+    -- where rather than leaving the reader to pair two lists.
+    Test.eq(source.places[1].name, "Abigail Shiel")
+    Test.eq(source.places[1].zone, "Tirisfal Glades")
+    Test.eq(source.worldDrop, false)
+end)
+
+Test.it("leaves the faction unset when both sides can get the recipe", function()
+    -- Absent means both, which is the common case: stating it on most of the
+    -- dataset would be pure payload bloat.
+    local source = metadata:GetSource(-30303)
+    Test.eq(source.faction, nil)
+end)
+
+Test.it("points a world drop nowhere", function()
+    local source = metadata:GetSource(-30303)
+    Test.eq(source.worldDrop, true)
+    Test.eq(source.kind, "worldDrop")
+    Test.eq(source.places, nil)
+end)
+
+Test.it("reports outputless and BoP metadata without requiring Recipe Registry integration", function()
+    local outputless = metadata:GetRecipeInfo(-27924)
+    Test.eq(outputless.spellId, 27924)
+    Test.eq(metadata:GetCreatedItemId(-27924, outputless), nil)
+    Test.eq(metadata:IsOutputlessSelfOnly(-27924, outputless), true)
+    Test.eq(metadata:GetMetadataResolutionStatus(-27924, outputless), "resolved")
+
+    Test.eq(metadata:IsBopOutput(-35530), true)
+    Test.eq(metadata:IsBopOutput(-28596), false)
+end)

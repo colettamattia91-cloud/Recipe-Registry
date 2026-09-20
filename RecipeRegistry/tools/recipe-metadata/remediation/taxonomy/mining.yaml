@@ -1,0 +1,59 @@
+# Mining taxonomy.
+#
+# Mining is a gathering profession and its only "recipes" are Smelting
+# plus two shatter spells. Two buckets:
+#
+# - metals: ore-to-bar smelts and metal-to-metal alloys, vanilla + TBC.
+# - elementals: shatter spells that break a Primal into 10 Motes
+#   (Earth Shatter, Fire Sunder). Trainer-taught TBC mining utility spells.
+#
+# Note: the loader does not strip end-of-line comments, so each spell's
+# description sits on its own line above its binding.
+categories:
+  - key: metals, label: Metals, order: 10
+  - key: elementals, label: Elementals, order: 20
+  - key: misc, label: Miscellaneous, order: 999
+subcategories:
+spells:
+  # Smelt Copper (Vanilla)
+  2657: category: metals, sortOrder: 10
+  # Smelt Silver (Vanilla)
+  2658: category: metals, sortOrder: 20
+  # Smelt Bronze (Vanilla)
+  2659: category: metals, sortOrder: 30
+  # Smelt Tin (Vanilla)
+  3304: category: metals, sortOrder: 40
+  # Smelt Iron (Vanilla)
+  3307: category: metals, sortOrder: 50
+  # Smelt Gold (Vanilla)
+  3308: category: metals, sortOrder: 60
+  # Smelt Steel (Vanilla)
+  3569: category: metals, sortOrder: 70
+  # Smelt Mithril (Vanilla)
+  10097: category: metals, sortOrder: 80
+  # Smelt Truesilver (Vanilla)
+  10098: category: metals, sortOrder: 90
+  # Smelt Dark Iron (Vanilla)
+  14891: category: metals, sortOrder: 100
+  # Smelt Thorium (Vanilla)
+  16153: category: metals, sortOrder: 110
+  # Smelt Elementium (Vanilla — requires Elemental Flux)
+  22967: category: metals, sortOrder: 120
+  # Smelt Fel Iron (TBC)
+  29356: category: metals, sortOrder: 200
+  # Smelt Adamantite (TBC)
+  29358: category: metals, sortOrder: 210
+  # Smelt Eternium (TBC alloy: Fel Iron + Adamantite)
+  29359: category: metals, sortOrder: 220
+  # Smelt Felsteel (TBC — requires Primal Fire)
+  29360: category: metals, sortOrder: 230
+  # Smelt Khorium (TBC)
+  29361: category: metals, sortOrder: 240
+  # Smelt Hardened Adamantite (TBC — requires Primal Earth)
+  29686: category: metals, sortOrder: 250
+  # Earth Shatter (TBC — Primal Earth -> 10 Mote of Earth)
+  35750: category: elementals, sortOrder: 10
+  # Fire Sunder (TBC — Primal Fire -> 10 Mote of Fire)
+  35751: category: elementals, sortOrder: 20
+  # Smelt Hardened Khorium (TBC 2.4 — Study of Advanced Smelting drop)
+  46353: category: metals, sortOrder: 260
