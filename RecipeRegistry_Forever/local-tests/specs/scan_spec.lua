@@ -223,6 +223,21 @@ t("la seconda volta non ricresce", select(2, Data:LearnRecipeFromSignal(1263078,
 -- l'oracolo e' la conferma: un evento su una ricetta che non sai non scrive
 knownRecipes[22430] = nil
 t("evento spurio rifiutato", select(2, Data:LearnRecipeFromSignal(22430, "test")), "not-known")
+
+-- Senza oracolo non si scrive. Scritta com'era, la conferma saltava sia con
+-- l'API assente sia con la pcall fallita, e in entrambi i casi un evento
+-- bastava a pubblicare alla gilda una ricetta che non hai.
+local savedSpellBook = _G.C_SpellBook
+local countBefore = entry.professions["Alchemy"].count
+
+_G.C_SpellBook = nil
+t("senza C_SpellBook si rinuncia", select(2, Data:LearnRecipeFromSignal(1245246, "test")), "spellbook-api-missing")
+
+_G.C_SpellBook = { IsSpellKnown = function() error("boom") end }
+t("se l'oracolo esplode si rinuncia", select(2, Data:LearnRecipeFromSignal(1245246, "test")), "spellbook-error")
+
+t("e in nessuno dei due casi ha scritto", entry.professions["Alchemy"].count, countBefore)
+_G.C_SpellBook = savedSpellBook
 sessionReady = true
 
 print(fails == 0 and "\nTUTTO OK" or ("\n" .. fails .. " FALLITI"))

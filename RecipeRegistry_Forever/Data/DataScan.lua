@@ -681,11 +681,19 @@ function Data:LearnRecipeFromSignal(recipeID, reason)
     local CT = _G.C_TradeSkillUI
     if type(CT) ~= "table" then return false, "trade-api-missing" end
 
+    -- L'oracolo non e' facoltativo. Scritto com'era, la conferma saltava in due
+    -- casi -- API assente, e pcall fallita, perche' "ok and not known" e' falso
+    -- anche quando ok e' falso -- e in entrambi si finiva a scrivere nel
+    -- database su un evento e basta. Se l'oracolo non risponde si rinuncia: la
+    -- ricetta la prendera' la scansione dalla finestra, piu' tardi e sicura.
+    -- ScanKnownFromSpellBook si comporta gia' cosi'.
     local CSB = _G.C_SpellBook
-    if type(CSB) == "table" and type(CSB.IsSpellKnown) == "function" then
-        local ok, known = pcall(CSB.IsSpellKnown, recipeID)
-        if ok and not known then return false, "not-known" end
+    if type(CSB) ~= "table" or type(CSB.IsSpellKnown) ~= "function" then
+        return false, "spellbook-api-missing"
     end
+    local confirmed, known = pcall(CSB.IsSpellKnown, recipeID)
+    if not confirmed then return false, "spellbook-error" end
+    if not known then return false, "not-known" end
 
     -- Prima il client, poi il dataset.
     --
