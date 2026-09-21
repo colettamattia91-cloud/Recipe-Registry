@@ -136,19 +136,10 @@ end
 local function cloneCategoryRows(rows)
     local out = {}
     for index, row in ipairs(rows or {}) do
-        local subcategories = {}
-        for subIndex, subcategory in ipairs(row.subcategories or {}) do
-            subcategories[subIndex] = {
-                key = subcategory.key,
-                label = subcategory.label,
-                order = subcategory.order,
-            }
-        end
         out[index] = {
             key = row.key,
             label = row.label,
             order = row.order,
-            subcategories = subcategories,
         }
     end
     return out
@@ -210,12 +201,7 @@ local function getMetadataCategories(metadata, profession)
         return metadata:GetCategoriesForProfession(professionKey)
     end
     local generated = metadata._generated or {}
-    local rows = cloneCategoryRows(generated.categoriesByProfession and generated.categoriesByProfession[professionKey] or nil)
-    local subcategoriesByCategory = generated.subcategoriesByProfession and generated.subcategoriesByProfession[professionKey] or {}
-    for _, row in ipairs(rows) do
-        row.subcategories = cloneCategoryRows(subcategoriesByCategory[row.key] or nil)
-    end
-    return rows
+    return cloneCategoryRows(generated.categoriesByProfession and generated.categoriesByProfession[professionKey] or nil)
 end
 
 local function getMetadataCategoryInfoForRecipe(metadata, recipeKey, professionHint)
@@ -229,9 +215,6 @@ local function categoryFilterToken(categoryName)
     if type(categoryName) == "table" then
         if categoryName.filterToken then
             return categoryName.filterToken
-        end
-        if categoryName.subcategory then
-            return "subcategory:" .. tostring(categoryName.key or "") .. ":" .. tostring(categoryName.subcategory)
         end
         return categoryName.key
     end
@@ -247,12 +230,6 @@ local function recipeMatchesCategoryFilter(metadata, recipeKey, categoryFilter, 
     local category = getMetadataCategoryInfoForRecipe(metadata, recipeKey, professionHint)
     if not category then
         return false
-    end
-
-    local subCategory = tostring(token):match("^subcategory:([^:]+):(.+)$")
-    if subCategory then
-        local categoryKey, subcategoryKey = tostring(token):match("^subcategory:([^:]+):(.+)$")
-        return category.category == categoryKey and category.subcategory == subcategoryKey
     end
 
     local categoryKey = tostring(token):match("^category:(.+)$") or token
@@ -566,16 +543,15 @@ end
 function Data:GetRecipeCategories(profession, _includeEmpty)
     local metadata = getRecipeMetadata()
     if metadata then
-        -- getMetadataCategories already returns freshly-cloned rows
-        -- (cloneCategoryRows at the leaf level on every row + subcategory),
-        -- so wrapping it in another cloneCategoryRows here was paying for
-        -- a redundant deep copy on every sidebar refresh.
+        -- getMetadataCategories already returns freshly-cloned rows, so
+        -- wrapping it in another cloneCategoryRows here was paying for a
+        -- redundant copy on every sidebar refresh.
         return getMetadataCategories(metadata, profession)
     end
     return {}
 end
 
--- Like GetRecipeCategories, but pruned to the categories/subcategories that
+-- Like GetRecipeCategories, but pruned to the categories that
 -- actually contain at least one recipe visible under the active UI filters.
 -- The sidebar uses this so BoP/ownership filters that hide every recipe in a
 -- category also hide that category's button: the filtered projection drives
@@ -642,21 +618,9 @@ function Data:GetVisibleRecipeCategories(profession, filterContext)
         return catNode ~= nil and arrayHasOwned(catNode._all)
     end
 
-    local function subcategoryHasOwnedVisible(catKey, subKey)
-        local catNode = nodeForCategory(catKey)
-        return catNode ~= nil and arrayHasOwned(catNode[subKey])
-    end
-
     local out = {}
     for _, row in ipairs(fullRows) do
         if categoryHasOwnedVisible(row.key) then
-            local subs = {}
-            for _, sub in ipairs(row.subcategories or {}) do
-                if subcategoryHasOwnedVisible(row.key, sub.key) then
-                    subs[#subs + 1] = sub
-                end
-            end
-            row.subcategories = subs
             out[#out + 1] = row
         end
     end

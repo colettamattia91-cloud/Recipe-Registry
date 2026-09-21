@@ -56,7 +56,6 @@ local DB_DEFAULTS = {
         searchMode = "recipe",
         defaultSearchMode = "recipe",
         useRecipeCategories = true,
-        recipeCategoryView = "expanded",
         showTooltipCrafters = true,
         -- Which top-level tabs are shown. Absent or true means shown; the
         -- Recipes tab is not listed because it cannot be switched off.
@@ -481,10 +480,6 @@ function Data:OnInitialize()
     end
     if self.db.profile.useRecipeCategories == nil then
         self.db.profile.useRecipeCategories = true
-    end
-    local categoryView = self.db.profile.recipeCategoryView
-    if categoryView ~= "expanded" and categoryView ~= "accordion" and categoryView ~= "categoriesOnly" then
-        self.db.profile.recipeCategoryView = "expanded"
     end
     -- The collection tab was called "Missing recipes" until 2.3.0, and its
     -- three settings were stored under that name. Carried over rather than

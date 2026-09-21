@@ -100,7 +100,6 @@ local function cloneRecord(spellId, record)
         createdCountMax = record.createdCountMax,
         specialization = record.specialization,
         category = record.category,
-        subcategory = record.subcategory,
         sortOrder = record.sortOrder,
         requiredSkill = record.requiredSkill,
         -- Which classes a trainer will teach this to, as the client's own
@@ -144,27 +143,13 @@ local function cloneSpellIdList(list)
     return out
 end
 
-local function cloneSubcategoryList(list)
-    local out = {}
-    for index, subcategory in ipairs(list or {}) do
-        out[index] = {
-            key = subcategory.key,
-            label = subcategory.label,
-            order = subcategory.order,
-        }
-    end
-    return out
-end
-
-local function cloneCategoryList(list, subcategoriesByCategory)
+local function cloneCategoryList(list)
     local out = {}
     for index, category in ipairs(list or {}) do
-        local key = category.key
         out[index] = {
-            key = key,
+            key = category.key,
             label = category.label,
             order = category.order,
-            subcategories = cloneSubcategoryList(subcategoriesByCategory and subcategoriesByCategory[key] or nil),
         }
     end
     return out
@@ -202,9 +187,6 @@ local function applyOverrides(record)
         if category.category ~= nil then
             record.category = category.category
         end
-        if category.subcategory ~= nil then
-            record.subcategory = category.subcategory
-        end
         if category.sortOrder ~= nil then
             record.sortOrder = category.sortOrder
         end
@@ -240,7 +222,8 @@ end
 
 local function buildNavTreeFromRecords(recordsBySpellId)
     -- Mirror the structure the generator emits: a nested map
-    -- profession -> category -> subcategory keyed by recipe IDs.
+    -- profession -> category keyed by recipe IDs. One level of categories,
+    -- because that is all the Forever client has.
     -- Each non-leaf node carries an `_all` array that unions every recipe
     -- under it so the runtime can answer "all recipes for this profession"
     -- or "all recipes in this category" with a single table get.
@@ -262,16 +245,6 @@ local function buildNavTreeFromRecords(recordsBySpellId)
                 profNode[categoryKey] = catNode
             end
             catNode._all[#catNode._all + 1] = spellId
-
-            local subKey = record.subcategory
-            if subKey ~= nil then
-                local subList = catNode[subKey]
-                if not subList then
-                    subList = {}
-                    catNode[subKey] = subList
-                end
-                subList[#subList + 1] = spellId
-            end
         end
     end
     for _, profNode in pairs(tree) do
@@ -279,11 +252,6 @@ local function buildNavTreeFromRecords(recordsBySpellId)
         for categoryKey, catNode in pairs(profNode) do
             if categoryKey ~= "_all" then
                 table.sort(catNode._all)
-                for subKey, subList in pairs(catNode) do
-                    if subKey ~= "_all" then
-                        table.sort(subList)
-                    end
-                end
             end
         end
     end
@@ -491,17 +459,16 @@ function RecipeMetadata:GetCategory(recipeKey, info)
     end
     return {
         category = info.category,
-        subcategory = info.subcategory,
         sortOrder = info.sortOrder,
     }
 end
 
 -- Hash set of catalogued spell IDs for the given profession, optionally
--- narrowed by category / subcategory. The list builder consults this hash so
+-- narrowed to one category. The list builder consults this hash so
 -- the only remaining runtime work is the BoP/ownership filter on a much
 -- smaller set. Returns nil if the nav-tree is unavailable (callers fall back
 -- to the per-recipe predicate).
-function RecipeMetadata:BuildProfessionSpellIdHash(professionKey, categoryKey, subcategoryKey)
+function RecipeMetadata:BuildProfessionSpellIdHash(professionKey, categoryKey)
     local tree = self._navTree
     if not tree or not professionKey then return nil end
     local hash = {}
@@ -513,10 +480,7 @@ function RecipeMetadata:BuildProfessionSpellIdHash(professionKey, categoryKey, s
         for i = 1, #arr do hash[arr[i]] = true end
     end
 
-    if subcategoryKey and categoryKey then
-        local catNode = profNode[categoryKey]
-        if catNode then consumeArray(catNode[subcategoryKey]) end
-    elseif categoryKey then
+    if categoryKey then
         local catNode = profNode[categoryKey]
         if catNode then consumeArray(catNode._all) end
     else
@@ -527,11 +491,7 @@ end
 
 function RecipeMetadata:GetCategoriesForProfession(professionKey)
     local generatedCategories = self._generated and self._generated.categoriesByProfession
-    local generatedSubcategories = self._generated and self._generated.subcategoriesByProfession
-    return cloneCategoryList(
-        generatedCategories and generatedCategories[professionKey] or nil,
-        generatedSubcategories and generatedSubcategories[professionKey] or nil
-    )
+    return cloneCategoryList(generatedCategories and generatedCategories[professionKey] or nil)
 end
 
 function RecipeMetadata:GetCreatedItemId(recipeKey, info)
