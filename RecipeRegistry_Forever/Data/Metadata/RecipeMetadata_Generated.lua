@@ -38959,9 +38959,6 @@ RecipeRegistryRecipeMetadata = {
         },
     },
 
-    subcategoriesByProfession = {
-    },
-
     zoneNamesById = {},
 
     navTree = {

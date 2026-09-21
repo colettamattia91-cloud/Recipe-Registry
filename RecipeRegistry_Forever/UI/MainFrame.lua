@@ -917,7 +917,6 @@ function UI:OnInitialize()
     end
     self.selectedRecipeKey = nil
     self.selectedCategory = nil
-    self.expandedCategory = nil
     self.recipeSearchText = ""
     self.addonStatusSearchText = ""
     self.collectionSearchText = ""
@@ -972,7 +971,6 @@ function UI:SetMainView(view)
     self.selectedRecipeKey = nil
     self.selectedAddonStatusKey = nil
     self.selectedCategory = nil
-    self.expandedCategory = nil
     self:ApplyMainLayout()
     self:Refresh()
 end
@@ -2267,7 +2265,6 @@ function UI:CreateMainFrame()
             UI.selectedRecipeKey = nil
             UI.selectedAddonStatusKey = nil
             UI.selectedCategory = nil
-            UI.expandedCategory = nil
             UI:ResetRecipeScroll()
             UI:Refresh()
         end)
@@ -2861,16 +2858,6 @@ function UI:EnsureCategoryButton(index)
 
     button = createCardStyleButton(self.frame.profContent, 198, 20)
     button:SetScript("OnClick", function(self)
-        -- In accordion view a top-level category button also toggles its
-        -- subcategory group. `toggleExpandKey` is set per-render only for
-        -- those buttons; it's nil for "All", flat categories, and subcategories.
-        if self.toggleExpandKey then
-            if UI.expandedCategory == self.toggleExpandKey then
-                UI.expandedCategory = nil
-            else
-                UI.expandedCategory = self.toggleExpandKey
-            end
-        end
         UI.selectedCategory = self.categoryToken
         UI.selectedRecipeKey = nil
         UI:ResetRecipeScroll()
@@ -3669,7 +3656,11 @@ function UI:RefreshProfessionButtons(opts)
         placeButton(button, 0, 24, 6)
 
         if useCategories and self.selectedProfession == profName and profName ~= FAVORITES_VIEW then
-            local viewMode = (Addon.db and Addon.db.profile and Addon.db.profile.recipeCategoryView) or "expanded"
+            -- Un livello solo. L'albero delle categorie del client Forever, per
+            -- tutti e dodici i mestieri, e' mestiere -> categorie: nessuna ha un
+            -- genitore che non sia il mestiere. Quindi niente sottocategorie,
+            -- niente fisarmonica, niente modi di vista da scegliere.
+            --
             -- Sidebar categories follow the same projection as the recipe list:
             -- only categories with at least one recipe visible under the active
             -- filters are offered. The filter context here mirrors the list's
@@ -3686,101 +3677,44 @@ function UI:RefreshProfessionButtons(opts)
 
             local selectedCategoryExists = self.selectedCategory == nil
             for _, categoryRow in ipairs(categories) do
-                local categoryToken = categoryRow.key or categoryRow
-                if categoryToken == self.selectedCategory then
+                if (categoryRow.key or categoryRow) == self.selectedCategory then
                     selectedCategoryExists = true
                     break
                 end
-                for _, subcategoryRow in ipairs(categoryRow.subcategories or {}) do
-                    local subcategoryToken = "subcategory:" .. tostring(categoryToken) .. ":" .. tostring(subcategoryRow.key)
-                    if subcategoryToken == self.selectedCategory then
-                        selectedCategoryExists = true
-                        break
-                    end
-                end
-                if selectedCategoryExists then break end
             end
             if not selectedCategoryExists then
                 self.selectedCategory = nil
             end
 
-            -- Reconcile a subcategory selection with the active view mode so the
-            -- user never ends up filtered to a subcategory whose button isn't
-            -- rendered: categoriesOnly falls back to the parent category, while
-            -- accordion expands the parent so the selection stays visible.
-            local selectedSubParent = self.selectedCategory
-                and tostring(self.selectedCategory):match("^subcategory:([^:]+):")
-            if selectedSubParent then
-                if viewMode == "categoriesOnly" then
-                    self.selectedCategory = selectedSubParent
-                elseif viewMode == "accordion" then
-                    self.expandedCategory = selectedSubParent
-                end
-            end
-
             if #categories > 0 then
                 -- profContent is 196 wide (sized to clear the sidebar's
-                -- scrollbar); size each row to fit its indent so subcategory
-                -- rows at the deeper indent don't bleed past it.
-                local function widthFor(indent) return 196 - indent - 4 end
+                -- scrollbar); every row sits at the same indent.
+                local rowWidth = 196 - 14 - 4
                 categoryButtonIndex = categoryButtonIndex + 1
                 local allButton = self:EnsureCategoryButton(categoryButtonIndex)
                 allButton.categoryToken = nil
-                allButton.toggleExpandKey = nil
                 allButton.categoryLabel = "All"
                 allButton:SetLabel("All")
                 allButton:SetSelected(self.selectedCategory == nil)
-                allButton:SetWidth(widthFor(14))
+                allButton:SetWidth(rowWidth)
                 placeButton(allButton, 14, 20, 4)
 
                 for _, categoryRow in ipairs(categories) do
                     local categoryToken = categoryRow.key or categoryRow
                     local categoryLabel = categoryRow.label or categoryToken
-                    local hasSubcategories = categoryRow.subcategories and #categoryRow.subcategories > 0
-                    local expanded = viewMode == "accordion" and self.expandedCategory == categoryToken
-
                     categoryButtonIndex = categoryButtonIndex + 1
                     local categoryButton = self:EnsureCategoryButton(categoryButtonIndex)
                     categoryButton.categoryToken = categoryToken
                     categoryButton.categoryLabel = categoryLabel
-                    if viewMode == "accordion" and hasSubcategories then
-                        categoryButton.toggleExpandKey = categoryToken
-                        -- Same toggle art as every other collapsible header
-                        -- in the addon; see collapseTag.
-                        local arrow = collapseTag(not expanded) .. " "
-                        categoryButton:SetLabel(arrow .. categoryLabel)
-                    else
-                        categoryButton.toggleExpandKey = nil
-                        categoryButton:SetLabel(categoryLabel)
-                    end
+                    categoryButton:SetLabel(categoryLabel)
                     categoryButton:SetSelected(self.selectedCategory == categoryToken)
-                    categoryButton:SetWidth(widthFor(14))
+                    categoryButton:SetWidth(rowWidth)
                     placeButton(categoryButton, 14, 20, 4)
-
-                    -- expanded: always show subcategories; accordion: only for the
-                    -- expanded category; categoriesOnly: never.
-                    local renderSubcategories = hasSubcategories
-                        and (viewMode == "expanded" or (viewMode == "accordion" and expanded))
-                    if renderSubcategories then
-                        for _, subcategoryRow in ipairs(categoryRow.subcategories or {}) do
-                            local subcategoryToken = "subcategory:" .. tostring(categoryToken) .. ":" .. tostring(subcategoryRow.key)
-                            categoryButtonIndex = categoryButtonIndex + 1
-                            local subcategoryButton = self:EnsureCategoryButton(categoryButtonIndex)
-                            subcategoryButton.categoryToken = subcategoryToken
-                            subcategoryButton.toggleExpandKey = nil
-                            subcategoryButton.categoryLabel = subcategoryRow.label or subcategoryRow.key
-                            subcategoryButton:SetLabel(subcategoryButton.categoryLabel)
-                            subcategoryButton:SetSelected(self.selectedCategory == subcategoryToken)
-                            subcategoryButton:SetWidth(widthFor(28))
-                            placeButton(subcategoryButton, 28, 18, 3)
-                        end
-                    end
                 end
                 yOffset = yOffset + 2
             end
         elseif self.selectedProfession == profName then
             self.selectedCategory = nil
-            self.expandedCategory = nil
         end
     end
     for i = categoryButtonIndex + 1, #(self.frame.categoryButtons or {}) do
@@ -3801,16 +3735,9 @@ function UI:GetCategoryFilterLabel(profession, categoryToken)
     if not categoryToken or not (Addon.Data and Addon.Data.GetRecipeCategories) then
         return nil
     end
-    local subcategoryCategory, subcategoryKey = tostring(categoryToken):match("^subcategory:([^:]+):(.+)$")
     for _, categoryRow in ipairs(Addon.Data:GetRecipeCategories(profession, true) or {}) do
         local categoryKey = categoryRow.key or categoryRow
-        if subcategoryCategory and categoryKey == subcategoryCategory then
-            for _, subcategoryRow in ipairs(categoryRow.subcategories or {}) do
-                if subcategoryRow.key == subcategoryKey then
-                    return (categoryRow.label or categoryKey) .. " / " .. (subcategoryRow.label or subcategoryKey)
-                end
-            end
-        elseif categoryKey == categoryToken then
+        if categoryKey == categoryToken then
             return categoryRow.label or categoryKey
         end
     end

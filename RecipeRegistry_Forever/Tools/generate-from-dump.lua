@@ -149,7 +149,9 @@ end
 
 -- La catena di categorie di una ricetta, dalla piu' alta alla sua. Si risale
 -- fino alla radice, poi si scarta la radice: quella e' il mestiere, non una
--- categoria.
+-- categoria. Di quello che resta conta solo il primo anello: nel client Forever
+-- l'albero ha un livello solo sotto il mestiere, in tutti e dodici i mestieri,
+-- quindi di sottocategorie non ce ne sono e il dataset non le porta.
 local function categoryChain(categories, categoryID)
     if type(categories) ~= "table" then return nil end
     local chain, seen, cursor = {}, {}, categoryID
@@ -171,7 +173,6 @@ end
 local records = {}
 local placements = {}
 local categoriesByProfession = {}
-local subcategoriesByProfession = {}
 local stats = { professions = 0, recipes = 0, withReagents = 0, withoutOutput = 0 }
 local builds = {}
 
@@ -213,7 +214,7 @@ for _, professionName in ipairs(dumpNames) do
             local spellId = tonumber(row.recipeID)
             if spellId and professionKey then
                 local chain = categoryChain(dump.categories, row.categoryID)
-                local category, subcategory, sortOrder
+                local category, sortOrder
                 if chain then
                     category = categoryKey(chain[1])
                     sortOrder = tonumber(chain[1].uiOrder)
@@ -221,22 +222,11 @@ for _, professionName in ipairs(dumpNames) do
                         noteInto(categoriesByProfession, professionKey,
                             { key = category, label = tostring(chain[1].name or category), order = sortOrder or 999 })
                     end
-                    if chain[2] and category then
-                        subcategory = categoryKey(chain[2])
-                        local prof = subcategoriesByProfession[professionKey]
-                        if not prof then prof = {}; subcategoriesByProfession[professionKey] = prof end
-                        if subcategory then
-                            noteInto(prof, category,
-                                { key = subcategory, label = tostring(chain[2].name or subcategory),
-                                  order = tonumber(chain[2].uiOrder) or 999 })
-                        end
-                    end
                 end
                 -- L'espansione vera, quando il datamining la conosce: 1559
                 -- ricette vengono da vanilla e 990 sono aggiunte di Forever.
-                -- Senza, resta la costante -- l'albero di navigazione conosce
-                -- solo "vanilla" e "tbc", quindi questo campo oggi descrive e
-                -- non filtra.
+                -- Senza, resta la costante. E' provenienza e basta: l'addon non
+                -- ci filtra e non ci ramifica sopra.
                 local mined = mining[spellId]
                 local record = {
                     profession = professionKey,
@@ -246,7 +236,6 @@ for _, professionName in ipairs(dumpNames) do
                     classMask = mined and mined.classMask or nil,
                     createdItemId = tonumber(row.outputItemID),
                     category = category,
-                    subcategory = subcategory,
                     sortOrder = sortOrder,
                 }
                 local qMin = tonumber(row.quantityMin) or 1
@@ -283,7 +272,6 @@ for _, professionName in ipairs(dumpNames) do
                 placements[spellId][#placements[spellId] + 1] = {
                     profession = professionKey,
                     category = category,
-                    subcategory = subcategory,
                 }
                 local existing = records[spellId]
                 if existing then
@@ -340,17 +328,10 @@ for _, spellId in ipairs(ids) do
         if not seenAll then prof.all[#prof.all + 1] = spellId end
         if place.category then
             local cat = prof.categories[place.category]
-            if not cat then cat = { all = {}, subs = {} }; prof.categories[place.category] = cat end
+            if not cat then cat = { all = {} }; prof.categories[place.category] = cat end
             local seenCat = false
             for _, id in ipairs(cat.all) do if id == spellId then seenCat = true break end end
             if not seenCat then cat.all[#cat.all + 1] = spellId end
-            if place.subcategory then
-                local sub = cat.subs[place.subcategory]
-                if not sub then sub = {}; cat.subs[place.subcategory] = sub end
-                local seenSub = false
-                for _, id in ipairs(sub) do if id == spellId then seenSub = true break end end
-                if not seenSub then sub[#sub + 1] = spellId end
-            end
         end
     end
 end
@@ -469,7 +450,6 @@ for _, spellId in ipairs(ids) do
     emit(string.format("            expansion = %q,", r.expansion))
     if r.createdItemId then emit(string.format("            createdItemId = %d,", r.createdItemId)) end
     if r.category then emit(string.format("            category = %q,", r.category)) end
-    if r.subcategory then emit(string.format("            subcategory = %q,", r.subcategory)) end
     if r.sortOrder then emit(string.format("            sortOrder = %d,", r.sortOrder)) end
     if r.requiredSkill then emit(string.format("            requiredSkill = %d,", r.requiredSkill)) end
     if r.skillLevels and #r.skillLevels > 0 then
@@ -528,20 +508,6 @@ end
 emit("    },")
 emit("")
 
-emit("    subcategoriesByProfession = {")
-for _, profession in ipairs(sortedKeys(subcategoriesByProfession)) do
-    emit(string.format("        [%q] = {", profession))
-    local prof = subcategoriesByProfession[profession]
-    for _, categoryKey in ipairs(sortedKeys(prof)) do
-        emit(string.format("            [%q] = {", categoryKey))
-        emitLabelled(prof[categoryKey], "                ")
-        emit("            },")
-    end
-    emit("        },")
-end
-emit("    },")
-emit("")
-
 -- I nomi di zona servono alla libreria delle fonti, che qui non abbiamo.
 emit("    zoneNamesById = {},")
 emit("")
@@ -557,11 +523,6 @@ for _, profession in ipairs(sortedKeys(navProfessions)) do
         emit(string.format("            [%q] = {", categoryKey))
         table.sort(cat.all)
         emitIdList("                ", "_all", cat.all)
-        for _, subKey in ipairs(sortedKeys(cat.subs)) do
-            local sub = cat.subs[subKey]
-            table.sort(sub)
-            emitIdList("                ", string.format("[%q]", subKey), sub)
-        end
         emit("            },")
     end
     emit("        },")
