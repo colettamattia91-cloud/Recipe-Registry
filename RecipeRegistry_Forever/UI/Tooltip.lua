@@ -76,8 +76,8 @@ function Tooltip:OnEnable()
     self:InvalidateIndex()
 end
 
--- GetSpell historically returned (name, rank, spellID) and later
--- (name, spellID); the spell ID is always the last numeric return.
+-- TooltipUtil.GetDisplayedSpell risponde (nome, spellID); prendere l'ultimo
+-- valore numerico regge anche se un giorno ci aggiunge qualcosa davanti.
 local function lastNumericValue(...)
     for i = select("#", ...), 1, -1 do
         local value = tonumber((select(i, ...)))
@@ -86,46 +86,86 @@ local function lastNumericValue(...)
     return nil
 end
 
-local function supportsLegacyTooltipScripts(tooltip)
-    return tooltip.HookScript and tooltip.HasScript
-        and tooltip:HasScript("OnTooltipSetItem")
-        and type(tooltip.GetItem) == "function"
+-- La pipeline retail dei tooltip, se il client ce l'ha.
+--
+-- Su Forever e' l'unica che c'e'. Sondato in gioco il 2026-09-21:
+-- TooltipDataProcessor e TooltipUtil sono tabelle, GameTooltip:GetItem e' ancora
+-- una funzione -- ma lo SCRIPT OnTooltipSetItem non esiste piu'. Questo file
+-- arrivava da TBC con i soli script legacy, e qui non si agganciava a niente:
+-- _tooltipHooksRegistered restava nil e i crafter non comparivano mai, senza un
+-- errore. Il percorso legacy e' stato tolto invece che tenuto come ripiego,
+-- perche' su questo client non scatta mai.
+--
+-- Su retail non e' GetItem a sparire, come si poteva pensare: e' lo script. Gli
+-- accessori sono rimasti, gli eventi no.
+local function retailTooltipPipeline()
+    local processor = _G.TooltipDataProcessor
+    local dataTypes = _G.Enum and _G.Enum.TooltipDataType
+    if type(processor) ~= "table" or type(processor.AddTooltipPostCall) ~= "function" then
+        return nil
+    end
+    if type(dataTypes) ~= "table" or dataTypes.Item == nil then
+        return nil
+    end
+    return processor, dataTypes
 end
 
--- The TBC Anniversary 2.5.6 client runs the legacy tooltip pipeline:
--- OnTooltipSetItem/OnTooltipSetSpell scripts plus the GetItem()/GetSpell()
--- accessors. It also ships the retail TooltipDataProcessor table, but its
--- tooltip flow never invokes the post calls, so the legacy scripts are the
--- only path that actually fires.
+function Tooltip:RegisterRetailTooltipHooks(processor, dataTypes)
+    -- Le post-call arrivano per OGNI tooltip del gioco, confronti, tooltip
+    -- incorporati e protetti compresi. Scriviamo solo su quelli che guardiamo,
+    -- e mai su uno protetto, dove toccarlo e' un errore.
+    local function accept(tooltip)
+        if not self.watchedTooltips[tooltip] then return false end
+        if tooltip.IsForbidden and tooltip:IsForbidden() then return false end
+        -- Ogni post-call segue una ricostruzione del tooltip, che ha gia'
+        -- svuotato le righe. La chiave anti-doppione di AddCraftLines vale
+        -- dentro una costruzione; fra una e l'altra, se restasse, al primo
+        -- aggiornamento del tooltip le nostre righe sparirebbero e non
+        -- tornerebbero piu'.
+        tooltip._rrCraftRenderedKey = nil
+        return true
+    end
+
+    processor.AddTooltipPostCall(dataTypes.Item, function(tooltip, data)
+        if not accept(tooltip) then return end
+        local itemID = type(data) == "table" and tonumber(data.id) or nil
+        if not itemID then
+            local util = _G.TooltipUtil
+            if type(util) == "table" and type(util.GetDisplayedItem) == "function" then
+                local _, link, id = util.GetDisplayedItem(tooltip)
+                itemID = tonumber(id) or extractItemID(link)
+            end
+        end
+        self:OnTooltipSetItem(tooltip, itemID)
+    end)
+
+    if dataTypes.Spell ~= nil then
+        processor.AddTooltipPostCall(dataTypes.Spell, function(tooltip, data)
+            if not accept(tooltip) then return end
+            local spellID = type(data) == "table" and tonumber(data.id) or nil
+            if not spellID then
+                local util = _G.TooltipUtil
+                if type(util) == "table" and type(util.GetDisplayedSpell) == "function" then
+                    spellID = lastNumericValue(util.GetDisplayedSpell(tooltip))
+                end
+            end
+            self:OnTooltipSetSpell(tooltip, spellID)
+        end)
+    end
+end
+
+-- _tooltipHooksRegistered e' la sonda da usare in gioco:
+-- /dump RecipeRegistry.Tooltip._tooltipHooksRegistered
 function Tooltip:RegisterTooltipHooks()
     if self._tooltipHooksRegistered then return end
-
-    local hookedAny = false
-    for tooltip in pairs(self.watchedTooltips) do
-        if supportsLegacyTooltipScripts(tooltip) then
-            tooltip:HookScript("OnTooltipSetItem", function(tt)
-                local _, link = tt:GetItem()
-                self:OnTooltipSetItem(tt, extractItemID(link))
-            end)
-            if tooltip:HasScript("OnTooltipSetSpell") and type(tooltip.GetSpell) == "function" then
-                tooltip:HookScript("OnTooltipSetSpell", function(tt)
-                    self:OnTooltipSetSpell(tt, lastNumericValue(tt:GetSpell()))
-                end)
-            end
-            if tooltip:HasScript("OnTooltipCleared") then
-                tooltip:HookScript("OnTooltipCleared", function(tt)
-                    tt._rrCraftRenderedKey = nil
-                end)
-            end
-            hookedAny = true
-        end
-    end
-
-    if not hookedAny then
-        -- No tooltip scripts (offline test harness): crafter rows are
-        -- exercised directly via AddCraftLines in specs.
+    local processor, dataTypes = retailTooltipPipeline()
+    if not processor then
+        -- Senza pipeline (l'harness di test offline) non c'e' niente a cui
+        -- agganciarsi: le righe dei crafter si provano chiamando AddCraftLines
+        -- direttamente.
         return
     end
+    self:RegisterRetailTooltipHooks(processor, dataTypes)
     self._tooltipHooksRegistered = true
 end
 

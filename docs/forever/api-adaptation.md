@@ -52,7 +52,10 @@ Verifiche ancora aperte:
   TradeSkill possono esporre dati residui dell'ultima sessione; non basta che
   `GetAllRecipeIDs` risponda per considerarli dati aggiornati del personaggio.
   Il database statico di risoluzione non e' un fallback per questo percorso.
-- Se `ProfessionsFrame` esista, o se il frame si chiami ancora `TradeSkillFrame`.
+- ~~Se `ProfessionsFrame` esista, o se il frame si chiami ancora `TradeSkillFrame`.~~
+  Chiuso il 2026-09-21: `ProfessionsFrame` esiste, `TradeSkillFrame` e' nil. Non
+  serve niente, perche' la scansione riscritta non dipende da nessuno dei due
+  frame e nell'albero Forever `TradeSkillFrame` non compare piu'.
 - Comportamento di AtlasLoot, TSM e Auctionator su questo client.
 
 ## Oltre TradeSkill: la superficie che nessuno ha ancora guardato
@@ -65,44 +68,40 @@ poggiano su assunzioni che su un client retail-shaped sono false.
 Il guaio comune e' che **falliscono in silenzio**: niente errore Lua, solo una
 funzione che non fa niente. Vanno sondati apposta.
 
-### 1. I tooltip non si agganciano (il piu' probabile)
+### 1. I tooltip non si agganciavano -- chiuso il 2026-09-21
 
-`UI/Tooltip.lua` ha un solo percorso: gli script legacy `OnTooltipSetItem` /
-`OnTooltipSetSpell` piu' gli accessori `GetItem()` / `GetSpell()`. La guardia
-`supportsLegacyTooltipScripts` pretende che `tooltip.GetItem` sia una funzione.
-Su retail `GameTooltip:GetItem()` e' stato rimosso nella 10.0 e la pipeline e'
-passata a `TooltipDataProcessor.AddTooltipPostCall`.
+La diagnosi era giusta, la causa che le avevo attribuito no, e vale la pena
+lasciarlo scritto perche' e' l'errore naturale da fare.
 
-`TooltipDataProcessor` **compare nel file una volta sola, dentro un commento**,
-che per giunta descrive il comportamento di TBC 2.5.6: li' la tabella retail
-esiste ma non viene mai invocata, quindi il legacy e' l'unica strada. Su Forever
-e' verosimilmente l'opposto, e allora `hookedAny` resta `false`, la funzione
-esce dal ramo "nessuno script: siamo nell'harness di test" e l'intera funzione
-"chi sa fare questa ricetta" sparisce senza dire niente.
+Sondato in gioco:
 
-**La sonda, che risponde in un colpo:**
-
-    /dump RecipeRegistry.Tooltip._tooltipHooksRegistered
-
-Quel flag si alza solo se almeno un tooltip e' stato agganciato davvero, quindi
-non serve dedurlo dal passare il mouse su qualcosa.
-
-- `true` -> ha agganciato. Il percorso legacy vive anche qui e non c'e' niente da
-  adattare. Se poi le righe dei crafter non compaiono lo stesso, il problema e'
-  altrove -- indice, dati, chiavi -- e non in questa sezione.
-- `nil` -> non ha agganciato, ed e' uscito dal ramo "siamo nell'harness di test"
-  senza dire niente. La diagnosi qui sopra e' confermata.
-
-Solo se risponde `nil`, la seconda sonda dice quale percorso scrivere:
-
+    /dump RecipeRegistry.Tooltip._tooltipHooksRegistered   -> nil
     /dump type(TooltipDataProcessor), type(GameTooltip.GetItem), type(TooltipUtil)
+                                                            -> table, function, table
 
-Con `TooltipDataProcessor` a `table` si aggiunge il ramo retail
-(`AddTooltipPostCall` su `Enum.TooltipDataType.Item` e `.Spell`, con
-`TooltipUtil.GetDisplayedItem` per tirare fuori il link), lasciando il legacy
-dov'e' per l'albero TBC. Se invece `GetItem` e' `function` ma il flag era `nil`,
-allora a cadere e' stata un'altra delle tre condizioni di
-`supportsLegacyTooltipScripts` e va guardata quella.
+Quindi `GameTooltip:GetItem()` **c'e'**. Questo documento sosteneva che su retail
+fosse stato rimosso con la 10.0: falso. A mancare e' lo **script**
+`OnTooltipSetItem` -- gli accessori sono rimasti, gli eventi no. La guardia
+legacy di `UI/Tooltip.lua` pretendeva entrambi, cadeva sullo script, e la
+funzione usciva dal ramo "nessuno script: siamo nell'harness di test" senza un
+errore. I crafter non comparivano mai.
+
+Adesso il tooltip si aggancia con `TooltipDataProcessor.AddTooltipPostCall` su
+`Enum.TooltipDataType.Item` e `.Spell`, e prende l'ID dai dati della post-call,
+con `TooltipUtil.GetDisplayedItem` / `GetDisplayedSpell` come ripiego. Il
+percorso legacy e' stato **tolto**, non tenuto come ripiego: su questo client
+non scatta mai, e codice che non scatta mai e' codice morto.
+
+Un dettaglio che non era ovvio. Le post-call arrivano a ogni ricostruzione del
+tooltip, e `AddCraftLines` ha una chiave anti-doppione pensata per quando un
+evento scatta due volte sulla stessa costruzione. Con la nuova pipeline quella
+chiave restava appesa da una costruzione all'altra: al primo aggiornamento del
+tooltip le righe dei crafter sparivano e non tornavano piu'. Si azzera a ogni
+post-call. `local-tests/specs/tooltip_spec.lua` lo sorveglia, ed e' stato
+provato contro il codice senza l'azzeramento: fallisce con zero righe alla
+seconda costruzione.
+
+Verificato in gioco: dopo il deploy le righe dei crafter compaiono.
 
 ### 2. Il menu di condivisione puo' far saltare la costruzione del frame
 
