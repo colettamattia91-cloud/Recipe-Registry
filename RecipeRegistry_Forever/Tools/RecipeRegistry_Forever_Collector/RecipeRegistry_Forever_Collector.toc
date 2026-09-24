@@ -1,6 +1,6 @@
 ## Interface: 16001
 ## Title: Recipe Registry - Database Collector
-## Notes: Development tool: captures profession recipes and reagents with /rrdump.
+## Notes: Development tool: captures profession recipes with /rrdump, vendor stock with /rrdump vendor.
 ## Version: 0.1.0-dev
 ## SavedVariables: RecipeRegistryDumpDB
 
