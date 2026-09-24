@@ -1,0 +1,330 @@
+recipeItemId	itemName	sourceKind	npcName	zone	x	y	faction
+159	Refreshing Spring Water	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+2678	Mild Spices	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+2692	Hot Spices	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+3713	Soothing Spices	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+4470	Simple Wood	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+4471	Flint and Tinder	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+4536	Shiny Red Apple	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+10284	Simple Flour	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+11291	Star Wood	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+21099	Recipe: Smoked Sagefish	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+21219	Recipe: Sagefish Delight	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+249476	Formula: Mystic Mushroom	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249477	Formula: Tenets of the Silver Hand	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249478	Formula: Polished Driftwood Icon	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249479	Formula: Enchant Weapon - Insight	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249480	Formula: Enchant Weapon - Recovery	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249481	Formula: Enchant Weapon - Revelation	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249482	Formula: Glimmering Staff	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249483	Formula: Soulstaff	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249484	Formula: Orb of Mystic Insight	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249485	Formula: Orb of Souls	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249493	Formula: Talons of Wrath	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249494	Formula: Libram of Invocation	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249495	Formula: Totem of Ancestral Protection	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249496	Formula: Enchant Necklace - Strength	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249502	Formula: Enchant Necklace - Spell Power	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249503	Formula: Enchant Necklace - Healing Power	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249504	Formula: Enchant Necklace - Agility	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249505	Formula: Enchant Necklace - Deflection	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249506	Formula: Radiant Staff	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249507	Formula: Dreamstaff	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249508	Formula: Truesilver Conduit	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249509	Formula: Twisting Essence Jar	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249510	Formula: Enchant Chest - Absorption	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249525	Formula: Enchant 2H Weapon - Mighty Spell Power	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249526	Formula: Enchant 2H Weapon - Mighty Healing Power	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249529	Formula: Idol of the Dream	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249530	Formula: Libram of Holy Alacrity	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249532	Formula: Totem of Thunder	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249534	Formula: Enchant Gloves - Arcane Power	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249535	Formula: Enchant Gloves - Natural Power	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249536	Formula: Enchant Gloves - Holy Power	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249537	Formula: Brilliant Wand	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249538	Formula: Enchant Bracer - Superior Intellect	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249539	Formula: Enchant Bracer - Superior Deflection	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+249885	Recipe: Venomous Smoothie	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+249886	Recipe: Slimy Smoothie	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+249887	Recipe: Mrrggl Smrrthle	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+249888	Recipe: Calcified Smoothie	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+249889	Recipe: Spicy Smoothie	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+249890	Recipe: Wicked Smoothie	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+250364	Recipe: Elixir of Cunning	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250365	Recipe: Elixir of the Phalanx	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250367	Recipe: Lesser Cleric's Elixir	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250369	Recipe: Greater Cleric's Elixir	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250371	Recipe: Elixir of Greater Fortitude	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250372	Recipe: Elixir of Wicked Regeneration	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250373	Recipe: Elixir of the Owl	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250374	Recipe: Elixir of Sages	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250376	Recipe: Lesser Mageblood Elixir	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250377	Recipe: Greater Mageblood Elixir	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250378	Recipe: Lesser Arcane Elixir	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250379	Recipe: Elixir of Nature Power	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250381	Recipe: Elixir of Lesser Spirit	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250383	Recipe: Elixir of Greater Spirit	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250384	Recipe: Elixir of the Whale	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250386	Recipe: Elixir of Ferocity	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250387	Recipe: Elixir of the Grizzly	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250388	Recipe: Elixir of Lesser Intellect	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250978	Recipe: Spellblasting Potion	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250981	Recipe: Major Spellblasting Potion	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250984	Recipe: Frenzy Potion	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250987	Recipe: Major Frenzy Potion	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250990	Recipe: Mender's Potion	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250993	Recipe: Major Mender's Potion	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250994	Recipe: Potion of Venomous Blood	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250995	Recipe: Caustic Smog Potion	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250996	Recipe: Disorienting Smog Potion	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250997	Recipe: Dragonfire Potion	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+250998	Recipe: Potion of Elemental Siphoning	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+251355	Plans: Veteran's Boots	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251356	Plans: Guard's Boots	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251357	Plans: Protector's Boots	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251358	Plans: Acolyte's Boots	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251359	Plans: Crusader's Boots	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251360	Plans: Veteran's Gloves	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251361	Plans: Guard's Gloves	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251362	Plans: Protector's Gloves	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251363	Plans: Acolyte's Gloves	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251364	Plans: Crusader's Gloves	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251365	Plans: Veteran's Chain Belt	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251366	Plans: Guard's Chain Belt	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251367	Plans: Protector's Chain Belt	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251368	Plans: Acolyte's Chain Belt	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251369	Plans: Crusader's Chain Belt	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251370	Plans: Veteran's Silvered Chain Shirt	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251371	Plans: Guard's Silvered Chain Shirt	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251372	Plans: Protector's Silvered Chain Shirt	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251373	Plans: Acolyte's Silvered Chain Shirt	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251374	Plans: Crusader's Silvered Chain Shirt	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251375	Plans: Veteran's Silvered Chain Leggings	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251376	Plans: Guard's Silvered Chain Leggings	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251377	Plans: Protector's Silvered Chain Leggings	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251378	Plans: Acolyte's Silvered Chain Leggings	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251379	Plans: Crusader's Silvered Chain Leggings	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251380	Plans: Veteran's Silvered Chain Helm	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251381	Plans: Guard's Silvered Chain Helm	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251382	Plans: Protector's Silvered Chain Helm	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251383	Plans: Acolyte's Silvered Chain Helm	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251384	Plans: Crusader's Silvered Chain Helm	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251413	Plans: Officer's Sabatons	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251414	Plans: Sentinel's Sabatons	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251415	Plans: Warder's Sabatons	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251416	Plans: Prefect's Sabatons	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251417	Plans: Justicar's Sabatons	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251418	Plans: Officer's Gauntlet	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251419	Plans: Sentinel's Gauntlet	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251420	Plans: Warder's Gauntlet	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251421	Plans: Prefect's Gauntlet	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251422	Plans: Justicar's Gauntlet	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251423	Plans: Officer's Waistguard	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251424	Plans: Sentinel's Waistguard	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251425	Plans: Warder's Waistguard	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251426	Plans: Prefect's Waistguard	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251427	Plans: Justicar's Waistguard	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251428	Plans: Officer's Pauldrons	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251429	Plans: Sentinel's Pauldrons	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251430	Plans: Warder's Pauldrons	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251431	Plans: Prefect's Pauldrons	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251432	Plans: Justicar's Pauldrons	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251433	Plans: Officer's Wristguard	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251434	Plans: Sentinel's Wristguard	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251435	Plans: Warder's Wristguard	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251436	Plans: Prefect's Wristguard	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251437	Plans: Justicar's Wristguards	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251447	Plans: Enriched Thorium Breastplate	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251448	Plans: Enriched Thorium Leggings	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251449	Plans: Enriched Thorium Helm	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251465	Plans: Thorium Greatmace	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251466	Plans: Thorium Cestus	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+251471	Plans: Legionite Glaive	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+252765	Pattern: Brawler's Leather Belt	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252766	Pattern: Trapper's Leather Belt	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252767	Pattern: Defender's Leather Belt	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252768	Pattern: Totemic Leather Belt	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252769	Pattern: Stormrider's Leather Belt	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252770	Pattern: Wisdom's Leather Belt	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252777	Pattern: Brawler's Leather Gloves	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252778	Pattern: Trapper's Leather Gloves	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252779	Pattern: Defender's Leather Gloves	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252780	Pattern: Totemic Leather Gloves	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252781	Pattern: Stormrider's Leather Gloves	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252782	Pattern: Wisdom's Leather Gloves	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252786	Pattern: Brawler's Leather Boots	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252787	Pattern: Trapper's Leather Boots	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252788	Pattern: Defender's Leather Boots	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252789	Pattern: Totemic Leather Boots	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252790	Pattern: Stormrider's Leather Boots	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252791	Pattern: Wisdom's Leather Boots	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252798	Pattern: Brawler's Leather Hood	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252799	Pattern: Trapper's Leather Hood	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252800	Pattern: Defender's Leather Hood	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252801	Pattern: Totemic Leather Hood	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252802	Pattern: Stormrider's Leather Hood	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252803	Pattern: Wisdom's Leather Hood	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252805	Pattern: Brawler's Leather Tunic	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252806	Pattern: Trapper's Leather Tunic	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252807	Pattern: Defender's Leather Tunic	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252808	Pattern: Totemic Leather Tunic	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252809	Pattern: Stormrider's Leather Tunic	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252810	Pattern: Wisdom's Leather Tunic	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252820	Pattern: Brawler's Leather Legguards	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252821	Pattern: Trapper's Leather Legguards	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252822	Pattern: Defender's Leather Kilt	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252823	Pattern: Totemic Leather Leggings	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252824	Pattern: Stormrider's Leather Kilt	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252825	Pattern: Wisdom's Leather Leggings	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252834	Pattern: Forceful Thick Armor Kit	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252836	Pattern: Prowler's Leather Gloves	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252837	Pattern: Skulker's Leather Gloves	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252838	Pattern: Stalker's Leather Gloves	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252839	Pattern: Warden's Leather Gloves	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252840	Pattern: Skirmisher's Leather Gloves	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252841	Pattern: Skycaller's Leather Gloves	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252842	Pattern: Mender's Leather Gloves	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252848	Pattern: Prowler's Leather Shoulder	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252849	Pattern: Skulker's Leather Shoulder	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252850	Pattern: Warden's Leather Shoulder	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252851	Pattern: Skycaller's Leather Shoulder	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252852	Pattern: Mender's Leather Shoulder	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252853	Pattern: Prowler's Leather Bracers	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252854	Pattern: Skulker's Leather Bracers	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252855	Pattern: Warden's Leather Bracers	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252856	Pattern: Skycaller's Leather Bracers	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252857	Pattern: Mender's Leather Bracers	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252860	Pattern: Prowler's Leather Boots	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252861	Pattern: Skulker's Leather Boots	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252862	Pattern: Warden's Leather Boots	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252863	Pattern: Skycaller's Leather Boots	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252864	Pattern: Mender's Leather Boots	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252872	Pattern: Prowler's Leather Waistguard	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252873	Pattern: Skulker's Leather Waistguard	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252874	Pattern: Warden's Leather Waistguard	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252875	Pattern: Skycaller's Leather Waistguard	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252876	Pattern: Mender's Leather Waistguard	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252900	Pattern: Stalker's Mail Shoulder	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252901	Pattern: Skycaller's Mail Shoulder	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252902	Pattern: Skirmisher's Mail Shoulder	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252903	Pattern: Mender's Mail Shoulder	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252904	Pattern: Stalker's Mail Bracers	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252905	Pattern: Skycaller's Mail Bracers	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252906	Pattern: Skirmisher's Mail Bracers	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252907	Pattern: Mender's Mail Bracers	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252910	Pattern: Stalker's Mail Sabatons	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252911	Pattern: Skycaller's Mail Sabatons	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252912	Pattern: Skirmisher's Mail Sabatons	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252913	Pattern: Mender's Mail Sabatons	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252922	Pattern: Stalker's Mail Belt	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252923	Pattern: Skycaller's Mail Belt	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252924	Pattern: Skirmisher's Mail Belt	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252925	Pattern: Mender's Mail Belt	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+252941	Pattern: Mystic Rugged Armor Kit	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+253890	Pattern: Pristine Boots	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253892	Pattern: Silky Boots	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253894	Pattern: Flame Boots	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253896	Pattern: Shadow Boots	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253898	Pattern: Pearly Boots	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253900	Pattern: Shining Boots	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253914	Pattern: Pristine Gloves	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253916	Pattern: Silky Gloves	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253918	Pattern: Flame Gloves	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253920	Pattern: Shadow Gloves	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253922	Pattern: Pearly Gloves	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253924	Pattern: Shining Gloves	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253926	Pattern: Pristine Sash	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253928	Pattern: Silky Sash	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253930	Pattern: Flame Sash	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253932	Pattern: Shadow Sash	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253934	Pattern: Pearly Sash	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253936	Pattern: Shining Sash	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253950	Pattern: Pristine Circlet	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253952	Pattern: Silky Circlet	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253954	Pattern: Flame Circlet	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253956	Pattern: Shadow Circlet	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253958	Pattern: Pearly Circlet	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253960	Pattern: Shining Circlet	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253962	Pattern: Pristine Gown	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253964	Pattern: Silky Gown	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253966	Pattern: Flame Gown	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253968	Pattern: Shadow Gown	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253970	Pattern: Pearly Gown	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253972	Pattern: Shining Gown	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253988	Pattern: Pristine Leggings	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253990	Pattern: Silky Leggings	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253992	Pattern: Flame Leggings	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253994	Pattern: Shadow Leggings	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253996	Pattern: Pearly Leggings	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+253998	Pattern: Shining Leggings	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254024	Pattern: Frothing Handwraps	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254026	Pattern: Fiery Handwraps	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254028	Pattern: Black Handwraps	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254030	Pattern: Golden Handwraps	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254032	Pattern: Radiant Handwraps	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254036	Pattern: Mageweave Reagent Bag	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254050	Pattern: Nethergeld Shoulders	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254052	Pattern: Netherfroth Shoulders	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254054	Pattern: Netherflame Shoulders	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254056	Pattern: Netherpearl Shoulders	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254058	Pattern: Nethershine Shoulders	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254060	Pattern: Netherlight Shoulders	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254062	Pattern: Nethergeld Cuffs	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254064	Pattern: Netherfroth Cuffs	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254066	Pattern: Netherflame Cuffs	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254068	Pattern: Netherpearl Cuffs	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254070	Pattern: Nethershine Cuffs	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254072	Pattern: Netherlight Cuffs	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254080	Pattern: Runecloth Reagent Bag	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254082	Pattern: Gilded Waistcord	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254084	Pattern: Frothing Waistcord	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254086	Pattern: Fiery Waistcord	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254088	Pattern: Black Waistcord	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254090	Pattern: Golden Waistcord	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254092	Pattern: Radiant Waistcord	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254108	Pattern: Gilded Sandals	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254110	Pattern: Frothing Sandals	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254112	Pattern: Fiery Sandals	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254114	Pattern: Black Sandals	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254116	Pattern: Golden Sandals	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+254118	Pattern: Radiant Sandals	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+264201	Schematic: SAF-T Tabs	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+264202	Schematic: SAF-T Dynamite	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+264203	Schematic: SAF-T Copper Bomb	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+264204	Schematic: EZ-Thro Wrap	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+264205	Schematic: EZ-Thro Copper Bomb XL	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+264206	Schematic: No Slip SAF-T Padding	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+264209	Schematic: SAF-T Bell	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+264211	Schematic: EZ-Thro Fireproof Fuse	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+264216	Schematic: Emergency Field Cloak	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+264217	Schematic: Compact Critter Carrier	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+264220	Schematic: SAF-T Disposable Parachute	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+264221	Schematic: Gnomish Army Knife	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+264222	Schematic: Loot-A-Rang	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+264232	Schematic: Ultrasafe Rechargeable Battery	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+264234	Schematic: Gnomish Poultryizer	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+264235	Schematic: Ultralight Goblin Glider	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+264237	Schematic: Stealthman 52	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+271621	Alchemy Certification	vendor	Nina Surefire	Three Corners, Redridge Mountains	10.9	72.5	alliance
+271622	Blacksmithing Certification	vendor	Stondry Darkhammer	Three Corners, Redridge Mountains	10.4	74.8	alliance
+271624	Enchanting Certification	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+271625	Engineering Certification	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+271626	Leatherworking Certification	vendor	Daniel Stitchsong	Three Corners, Redridge Mountains	10.0	72.8	alliance
+271627	Tailoring Certification	vendor	Mivin Shadowweave	Three Corners, Redridge Mountains	10.0	72.9	alliance
+272941	Thick Logs	vendor	Kalsey Sanden	Three Corners, Redridge Mountains	10.8	72.8	alliance
+274393	Formula: Enchant Off-Hand - Wisdom	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+274394	Formula: Enchant 2H Weapon - Spellblasting	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+274398	Formula: Enchant Gloves - Superior Strength	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+274399	Formula: Enchant Cloak - Agility	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+274401	Formula: Enchant Bracer - Greater Spellpower	vendor	Alynsia	Three Corners, Redridge Mountains	11.2	71.5	alliance
+280321	Schematic: Whimsical Waistwrap	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+280322	Schematic: Gizmo Girdle	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+280323	Schematic: Clanking Cord	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+280325	Schematic: Floppy Goggles	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+280326	Schematic: Bent Goggles	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+280327	Schematic: Stuckbutton Goggles	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+280328	Schematic: Dented Goggles	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+285285	Schematic: Satchel of Copper Bombs	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+285286	Schematic: Satchel of Bronze Bombs	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+285287	Schematic: Satchel of Iron Bombs	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance
+285288	Schematic: Satchel of Dark Iron Bombs	vendor	Fritz Fizzle	Three Corners, Redridge Mountains	10.5	74.3	alliance

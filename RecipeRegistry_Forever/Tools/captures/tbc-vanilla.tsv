@@ -1,0 +1,2105 @@
+spellId	sourceKind	npcName	zone	faction	bossDrop	worldDrop	trainerTitle
+2149	trainer						
+2152	trainer						
+2153	trainer						
+2158	worldDrop					true	
+2159	trainer						
+2160	trainer						
+2161	trainer						
+2162	trainer						
+2163	worldDrop					true	
+2164	worldDrop					true	
+2165	trainer						
+2166	trainer						
+2167	trainer						
+2168	trainer						
+2169	worldDrop					true	
+2329	trainer						
+2330	trainer						
+2331	trainer						
+2332	trainer						
+2333	worldDrop					true	
+2334	trainer						
+2335	worldDrop					true	
+2337	trainer						
+2385	trainer						
+2386	trainer						
+2387	trainer						
+2389	worldDrop					true	
+2392	trainer						
+2393	trainer						
+2394	trainer						
+2395	trainer						
+2396	trainer						
+2397	trainer						
+2399	trainer						
+2401	trainer						
+2402	trainer						
+2403	worldDrop					true	
+2406	trainer						
+2538	trainer						
+2539	trainer						
+2540	trainer						
+2541	trainer						
+2542	vendor	Kendor Kabonka	Stormwind City	alliance			
+2543	vendor	Kendor Kabonka	Stormwind City	alliance			
+2544	trainer						
+2545	vendor	Kendor Kabonka	Stormwind City	alliance			
+2546	trainer						
+2547	vendor	Kendor Kabonka	Stormwind City	alliance			
+2548	vendor	Kendor Kabonka	Stormwind City	alliance			
+2549	vendor	Kendor Kabonka	Stormwind City	alliance			
+2657	trainer						
+2658	trainer						
+2659	trainer						
+2660	trainer						
+2661	trainer						
+2662	trainer						
+2663	trainer						
+2664	trainer						
+2665	trainer						
+2666	trainer						
+2667	worldDrop					true	
+2668	trainer						
+2670	trainer						
+2672	trainer						
+2673	worldDrop					true	
+2674	trainer						
+2675	trainer						
+2737	trainer						
+2738	trainer						
+2739	trainer						
+2740	trainer						
+2741	trainer						
+2742	trainer						
+2795	vendor	Kendor Kabonka	Stormwind City	alliance			
+2881	trainer						
+2963	trainer						
+2964	trainer						
+3115	trainer						
+3116	trainer						
+3117	trainer						
+3170	trainer						
+3171	trainer						
+3172	worldDrop					true	
+3173	trainer						
+3174	worldDrop					true	
+3175	worldDrop					true	
+3176	trainer						
+3177	trainer						
+3188	worldDrop					true	
+3230	worldDrop					true	
+3292	trainer						
+3293	trainer						
+3294	trainer						
+3295	worldDrop					true	
+3296	trainer						
+3297	worldDrop					true	
+3304	trainer						
+3307	trainer						
+3308	trainer						
+3319	trainer						
+3320	trainer						
+3321	worldDrop					true	
+3323	trainer						
+3324	trainer						
+3325	worldDrop					true	
+3326	trainer						
+3328	trainer						
+3330	worldDrop					true	
+3331	trainer						
+3333	trainer						
+3334	worldDrop					true	
+3336	worldDrop					true	
+3337	trainer						
+3370	vendor	Kendor Kabonka	Stormwind City	alliance			
+3371	vendor	Kendor Kabonka	Stormwind City	alliance			
+3372	vendor	Kendor Kabonka	Stormwind City	alliance			
+3373	vendor	Kendor Kabonka	Stormwind City	alliance			
+3376	vendor	Nerrist | Keena | Kendor Kabonka	Stranglethorn Vale | Arathi Highlands | Stormwind City	horde | horde | alliance			
+3377	vendor	Kendor Kabonka	Stormwind City	alliance			
+3397	vendor	Ulthaan | Super-Seller 680	Ashenvale | Desolace	alliance | 			
+3398	vendor	Zargh | Vendor-Tron 1000	The Barrens | Desolace	horde | 			
+3399	quest		Hillsbrad Foothills	alliance			
+3400	quest		Hillsbrad Foothills	alliance			
+3447	trainer						
+3448	trainer						
+3449	vendor	Bliztik | Montarr	Duskwood | Thousand Needles	 | horde			
+3450	trainer						
+3451	worldDrop					true	
+3452	trainer						
+3453	worldDrop					true	
+3454	vendor	Bro'kin	Alterac Mountains				
+3491	trainer						
+3492	vendor	Jutak | Kaita Deepforge	Stranglethorn Vale | Stormwind City	 | alliance			
+3493	worldDrop					true	
+3494	vendor	Jazzrik | Muuran | Jannos Ironwill | High Admiral \"Shelly\" Jorrik	Badlands | Desolace | Arathi Highlands | Dun Morogh	horde | horde | alliance | 			
+3495	worldDrop					true	
+3496	vendor	Zarena Cromwind	Stranglethorn Vale				
+3497	worldDrop					true	
+3498	vendor	Jaquilina Dramet | Vharr	Stranglethorn Vale | Stranglethorn Vale	 | horde			
+3500	worldDrop					true	
+3501	trainer						
+3502	trainer						
+3503	vendor	Krinkle Goodsteel	Tanaris				
+3504	worldDrop					true	
+3505	worldDrop					true	
+3506	trainer						
+3507	worldDrop					true	
+3508	trainer						
+3511	worldDrop					true	
+3513	worldDrop					true	
+3515	worldDrop					true	
+3569	trainer						
+3753	trainer						
+3755	trainer						
+3756	trainer						
+3757	trainer						
+3758	worldDrop					true	
+3759	trainer						
+3760	trainer						
+3761	trainer						
+3762	worldDrop					true	
+3763	trainer						
+3764	trainer						
+3765	worldDrop					true	
+3766	trainer						
+3767	worldDrop					true	
+3768	trainer						
+3769	worldDrop					true	
+3770	trainer						
+3771	worldDrop					true	
+3772	vendor	Wenna Silkbeard | George Candarte	Wetlands | Hillsbrad Foothills	alliance | horde			
+3773	worldDrop					true	
+3774	trainer						
+3775	worldDrop					true	
+3776	trainer						
+3777	worldDrop					true	
+3778	vendor	Rikqiz	Stranglethorn Vale				
+3779	worldDrop					true	
+3780	trainer						
+3813	trainer						
+3816	trainer						
+3817	trainer						
+3818	trainer						
+3839	trainer						
+3840	trainer						
+3841	trainer						
+3842	trainer						
+3843	trainer						
+3844	worldDrop					true	
+3845	trainer						
+3847	worldDrop					true	
+3848	trainer						
+3849	worldDrop					true	
+3850	trainer						
+3851	worldDrop					true	
+3852	trainer						
+3854	vendor	Wenna Silkbeard | Kireena	Wetlands | Desolace	alliance | horde			
+3855	trainer						
+3856	worldDrop					true	
+3857	vendor	Xizk Goodstitch	Stranglethorn Vale				
+3858	worldDrop					true	
+3859	trainer						
+3860	worldDrop					true	
+3861	trainer						
+3862	vendor	Micha Yance | Ghok'kah	Hillsbrad Foothills | Dustwallow Marsh	alliance | horde			
+3863	worldDrop					true	
+3864	worldDrop					true	
+3865	trainer						
+3866	trainer						
+3868	worldDrop					true	
+3869	vendor	Danielle Zipstitch	Duskwood	alliance			
+3870	vendor	Mallen Swain | Sheri Zipstitch	Hillsbrad Foothills | Duskwood	horde | alliance			
+3871	trainer						
+3872	worldDrop					true	
+3873	vendor	Narkk	Stranglethorn Vale				
+3914	trainer						
+3915	trainer						
+3918	trainer						
+3919	trainer						
+3920	trainer						
+3922	trainer						
+3923	trainer						
+3924	trainer						
+3925	trainer						
+3926	trainer						
+3928	worldDrop					true	
+3929	trainer						
+3930	trainer						
+3931	trainer						
+3932	trainer						
+3933	worldDrop					true	
+3934	trainer						
+3936	trainer						
+3937	trainer						
+3938	trainer						
+3939	vendor	Fradd Swiftgear | Jinky Twizzlefixxit	Wetlands | Thousand Needles	alliance | 			
+3940	worldDrop					true	
+3941	trainer						
+3942	trainer						
+3944	drop	Mekgineer Thermaplugg	Gnomeregan				
+3945	trainer						
+3946	trainer						
+3947	trainer						
+3949	trainer						
+3950	trainer						
+3952	vendor	Gagsprocket | Namdo Bizzfizzle | Fradd Swiftgear	The Barrens | Gnomeregan | Wetlands	 | alliance | alliance			
+3953	trainer						
+3954	worldDrop					true	
+3955	trainer						
+3956	trainer						
+3957	vendor	Rizz Loosebolt	Alterac Mountains				
+3958	trainer						
+3959	drop	Mekgineer Thermaplugg	Gnomeregan				
+3960	worldDrop					true	
+3961	trainer						
+3962	trainer						
+3963	trainer						
+3965	trainer						
+3966	worldDrop					true	
+3967	trainer						
+3968	worldDrop					true	
+3969	vendor	Gnaz Blunderflame	Stranglethorn Vale				
+3971	vendor	Zan Shivsproket	Alterac Mountains				
+3972	worldDrop					true	
+3973	trainer						
+3977	trainer						
+3978	trainer						
+3979	vendor	Mazk Snipeshot	Stranglethorn Vale				
+4094	vendor	Narj Deepslice | Super-Seller 680	Arathi Highlands | Desolace	alliance | 			
+4096	vendor	Tunkk	Arathi Highlands	horde			
+4097	vendor	Androd Fadran	Arathi Highlands	alliance			
+4508	quest		Silverpine Forest	horde			
+4942	quest		Badlands				
+5244	quest		Thunder Bluff	horde			
+6412	quest		Teldrassil	alliance			
+6413	vendor	Grimtak	Durotar	horde			
+6414	vendor	Wunna Darkmane	Mulgore	horde			
+6415	vendor	Laird	Darkshore	alliance			
+6416	vendor	Tari'qa	The Barrens	horde			
+6417	vendor	Prospector Khazgorm	The Barrens	alliance			
+6418	vendor	Tari'qa	The Barrens	horde			
+6419	vendor	Ulthaan | Vendor-Tron 1000	Ashenvale | Desolace	alliance | 			
+6458	trainer						
+6499	trainer						
+6500	trainer						
+6501	vendor	Kriggon Talsone | Heldan Galesong	Westfall | Darkshore	alliance | alliance			
+6517	trainer						
+6518	worldDrop					true	
+6521	trainer						
+6617	vendor	Xandar Goodbeard | Hagrus | Defias Profiteer | Ranik	Loch Modan | Orgrimmar | Westfall | The Barrens	alliance | horde |  | 			
+6618	vendor	Hagrus | Ulthir	Orgrimmar | Darnassus	horde | alliance			
+6624	vendor	Soolie Berryfizz | Ulthir | Kor'geld	Ironforge | Darnassus | Orgrimmar	alliance | alliance | horde			
+6661	trainer						
+6686	vendor	Rathis Tomber | Gina MacGregor | Mahu | Valdaron	Ghostlands | Westfall | Thunder Bluff | Darkshore	horde | alliance | horde | alliance			
+6688	vendor	Amy Davenport | Jennabink Powerseam | Rann Flamespinner | Mahu	Redridge Mountains | Wetlands | Loch Modan | Thunder Bluff	alliance | alliance | alliance | horde			
+6690	trainer						
+6692	drop		Thousand Needles | Duskwood | Darkshore				
+6693	worldDrop					true	
+6695	drop		Dustwallow Marsh | Hillsbrad Foothills | Alterac Mountains				
+6702	vendor	Gina MacGregor | Andrew Hilbert | Mavralyn	Westfall | Silverpine Forest | Darkshore	alliance | horde | alliance			
+6703	vendor	Gina MacGregor | Andrew Hilbert | Mavralyn	Westfall | Silverpine Forest | Darkshore	alliance | horde | alliance			
+6704	vendor	Micha Yance | Christoph Jeffcoat | Blixrez Goodstitch	Hillsbrad Foothills | Hillsbrad Foothills | Stranglethorn Vale	alliance | horde | 			
+6705	vendor	Helenia Olden	Dustwallow Marsh	alliance			
+7126	trainer						
+7133	worldDrop					true	
+7135	trainer						
+7147	trainer						
+7149	vendor	Lardan | Hammon Karwn | Jandia | Keena	Ashenvale | Arathi Highlands | Thousand Needles | Arathi Highlands	alliance | alliance | horde | horde			
+7151	trainer						
+7153	worldDrop					true	
+7156	trainer						
+7179	trainer						
+7181	trainer						
+7183	trainer						
+7213	vendor	Kelsey Yance	Stranglethorn Vale				
+7221	worldDrop					true	
+7222	worldDrop					true	
+7223	trainer						
+7224	worldDrop					true	
+7255	vendor	Xandar Goodbeard | Kzixx | Hula'mahi	Loch Modan | Duskwood | The Barrens	alliance |  | horde			
+7256	vendor	Christoph Jeffcoat | Harklan Moongrove	Hillsbrad Foothills | Ashenvale	horde | alliance			
+7257	vendor	Jeeda | Nandar Branson	Stonetalon Mountains | Hillsbrad Foothills	horde | alliance			
+7258	vendor	Drovnar Strongbrew | Glyx Brewright	Arathi Highlands | Stranglethorn Vale	alliance | 			
+7259	vendor	Logannas | Bronk | Glyx Brewright | Alchemist Pestlezugg	Feralas | Feralas | Stranglethorn Vale | Tanaris	alliance | horde |  | 			
+7408	trainer						
+7418	trainer						
+7420	trainer						
+7421	trainer						
+7426	trainer						
+7428	trainer						
+7430	trainer						
+7443	worldDrop					true	
+7454	trainer						
+7457	trainer						
+7623	trainer						
+7624	trainer						
+7629	worldDrop					true	
+7630	vendor	Tharynn Bouden | Borya | Valdaron | Wrahk	Elwynn Forest | Orgrimmar | Darkshore | The Barrens	alliance | horde | alliance | horde			
+7633	vendor	Elynna | Ranik | Andrew Hilbert | Wrahk	Darnassus | The Barrens | Silverpine Forest | The Barrens	alliance |  | horde | horde			
+7639	vendor	Gina MacGregor | Alexandra Bolero | Mallen Swain | Borya	Westfall | Stormwind City | Hillsbrad Foothills | Orgrimmar	alliance | alliance | horde | horde			
+7643	vendor	Rann Flamespinner | Ranik | Jennabink Powerseam | Sheri Zipstitch	Loch Modan | The Barrens | Wetlands | Duskwood	alliance |  | alliance | alliance			
+7745	trainer						
+7748	trainer						
+7751	vendor	Harn Longcast | Gretta Ganter | Catherine Leland | Martine Tramblay	Mulgore | Dun Morogh | Stormwind City | Tirisfal Glades	horde | alliance | alliance | horde			
+7752	vendor	Tansy Puddlefizz | Kriggon Talsone | Martine Tramblay | Zansoa	Ironforge | Westfall | Tirisfal Glades | Durotar	alliance | alliance | horde | horde			
+7753	vendor	Killian Sanatha | Khara Deepwater | Lizbeth Cromwell | Tharynn Bouden	Silverpine Forest | Loch Modan | Undercity | Elwynn Forest	horde | alliance | horde | alliance			
+7754	vendor	Khara Deepwater	Loch Modan	alliance			
+7755	vendor	Kilxx | Ronald Burch | Lindea Rabonne | Naal Mistrunner	The Barrens | Undercity | Hillsbrad Foothills | Thunder Bluff	 | horde | alliance | horde			
+7766	worldDrop					true	
+7771	trainer						
+7776	vendor	Kithas | Lilly	Orgrimmar | Silverpine Forest	horde | horde			
+7779	trainer						
+7782	worldDrop					true	
+7786	worldDrop					true	
+7788	trainer						
+7793	vendor	Nata Dawnstrider | Tilli Thistlefuzz | Kithas | Leo Sarn	Thunder Bluff | Ironforge | Orgrimmar | Silverpine Forest	horde | alliance | horde | horde			
+7795	trainer						
+7817	trainer						
+7818	trainer						
+7827	vendor	Kriggon Talsone | Heldan Galesong | Killian Sanatha | Catherine Leland	Westfall | Darkshore | Silverpine Forest | Stormwind City	alliance | alliance | horde | alliance			
+7828	vendor	Heldan Galesong | Kelsey Yance | Shankys | Wik'Tar	Darkshore | Stranglethorn Vale | Orgrimmar | Ashenvale	alliance |  | horde | horde			
+7836	trainer						
+7837	trainer						
+7841	trainer						
+7845	trainer						
+7857	trainer						
+7859	worldDrop					true	
+7861	trainer						
+7863	trainer						
+7867	vendor	Nata Dawnstrider | Zixil	Thunder Bluff | Hillsbrad Foothills	horde | 			
+7892	worldDrop					true	
+7893	worldDrop					true	
+7953	vendor	Kalldan Felmoon	The Barrens				
+7954	vendor	Kalldan Felmoon	The Barrens				
+7955	quest		The Barrens				
+8238	worldDrop					true	
+8240	worldDrop					true	
+8243	quest		Badlands				
+8322	quest		Darnassus	alliance			
+8334	trainer						
+8339	worldDrop					true	
+8367	quest		Ironforge	alliance			
+8465	trainer						
+8467	trainer						
+8483	trainer						
+8489	trainer						
+8604	trainer						
+8607	vendor	Drac Roughcut | Andrew Hilbert	Loch Modan | Silverpine Forest	alliance | horde			
+8758	trainer						
+8760	trainer						
+8762	trainer						
+8764	trainer						
+8766	trainer						
+8768	trainer						
+8770	trainer						
+8772	trainer						
+8774	trainer						
+8776	trainer						
+8780	worldDrop					true	
+8782	worldDrop					true	
+8784	worldDrop					true	
+8786	vendor	Jun'ha | Brienna Starglow	Arathi Highlands | Feralas	horde | alliance			
+8789	vendor	Xizk Goodstitch	Stranglethorn Vale				
+8791	trainer						
+8793	worldDrop					true	
+8795	worldDrop					true	
+8797	worldDrop					true	
+8799	trainer						
+8802	vendor	Vizzklick	Tanaris				
+8804	trainer						
+8880	trainer						
+8895	trainer	Nixx Sprocketspring	Tanaris				Goblin Engineering Trainer
+9058	trainer						
+9059	trainer						
+9060	trainer						
+9062	trainer						
+9064	worldDrop					true	
+9065	trainer						
+9068	trainer						
+9070	vendor	Clyde Ranthal	Redridge Mountains	alliance			
+9072	vendor	Wenna Silkbeard	Wetlands	alliance			
+9074	trainer						
+9145	trainer						
+9146	vendor	Harlown Darkweave	Ashenvale	alliance			
+9147	vendor	Zixil	Hillsbrad Foothills				
+9148	worldDrop					true	
+9149	worldDrop					true	
+9193	trainer						
+9194	trainer						
+9195	worldDrop					true	
+9196	trainer						
+9197	worldDrop					true	
+9198	trainer						
+9201	trainer						
+9202	vendor	Jangdor Swiftstrider | Pratt McGrubben | Joseph Moore | Saenorion	Feralas | Feralas | Undercity | Darnassus	horde | alliance | horde | alliance			
+9206	trainer						
+9207	worldDrop					true	
+9208	worldDrop					true	
+9269	vendor	Gearcutter Cogspinner | Jinky Twizzlefixxit	Ironforge | Thousand Needles	alliance | 			
+9271	trainer						
+9273	vendor	Veenix | Kzixx | Zixil	Stonetalon Mountains | Duskwood | Hillsbrad Foothills				
+9513	vendor	Smudge Thunderwood	Alterac Mountains				
+9811	quest		Orgrimmar	horde			
+9813	quest		Orgrimmar	horde			
+9814	quest		Orgrimmar	horde			
+9818	quest		Orgrimmar	horde			
+9820	quest		Orgrimmar	horde			
+9916	trainer						
+9918	trainer						
+9920	trainer						
+9921	trainer						
+9926	trainer						
+9928	trainer						
+9931	trainer						
+9933	worldDrop					true	
+9935	trainer						
+9937	vendor	Harggan | Gharash	The Hinterlands | Swamp of Sorrows	alliance | horde			
+9939	worldDrop					true	
+9945	quest		Stranglethorn Vale				
+9950	quest		Stranglethorn Vale				
+9952	quest		Stranglethorn Vale				
+9954	trainer						
+9957	quest		Orgrimmar	horde			
+9959	trainer						
+9961	trainer						
+9964	worldDrop					true	
+9966	worldDrop					true	
+9968	trainer						
+9970	worldDrop					true	
+9972	quest		Tanaris				
+9974	trainer						
+9979	quest		Tanaris				
+9980	quest		Tanaris				
+9983	trainer						
+9985	trainer						
+9986	trainer						
+9987	trainer						
+9993	trainer						
+9995	worldDrop					true	
+9997	worldDrop					true	
+10001	trainer						
+10003	trainer						
+10005	worldDrop					true	
+10007	trainer						
+10009	worldDrop					true	
+10011	trainer						
+10013	vendor	Magnus Frostwake	Western Plaguelands				
+10015	trainer						
+10097	trainer						
+10098	trainer						
+10482	trainer						
+10487	trainer						
+10490	worldDrop					true	
+10499	trainer						
+10507	trainer						
+10509	vendor	Pratt McGrubben | Jangdor Swiftstrider	Feralas | Feralas	alliance | horde			
+10511	trainer						
+10516	vendor	Jangdor Swiftstrider | Nioma	Feralas | The Hinterlands	horde | alliance			
+10518	trainer						
+10520	worldDrop					true	
+10525	drop		Tanaris				
+10529	quest		Feralas	alliance			
+10531	worldDrop					true	
+10533	drop		Tanaris				
+10542	drop		Tanaris				
+10544	quest		Feralas	alliance			
+10546	quest		Feralas	alliance			
+10548	trainer						
+10552	trainer						
+10554	drop		Tanaris				
+10556	trainer						
+10558	trainer						
+10560	worldDrop					true	
+10562	worldDrop					true	
+10564	drop		Tanaris				
+10566	quest		Feralas	alliance			
+10568	drop		Tanaris				
+10570	drop		Tanaris				
+10572	quest		Feralas	alliance			
+10574	quest		Feralas	alliance			
+10619	trainer	Peter Galen | Thorkaf Dragoneye	Azshara | Badlands	alliance | horde			
+10621	trainer	Caryssia Moonhunter | Se'Jib	Feralas | Stranglethorn Vale	alliance | horde			
+10630	trainer	Brumn Winterhoof | Sarah Tanner	Arathi Highlands | Searing Gorge	horde | alliance			
+10632	trainer	Brumn Winterhoof | Sarah Tanner	Arathi Highlands | Searing Gorge	horde | alliance			
+10647	trainer	Caryssia Moonhunter | Se'Jib	Feralas | Stranglethorn Vale	alliance | horde			
+10650	trainer	Peter Galen | Thorkaf Dragoneye	Azshara | Badlands	alliance | horde			
+11448	trainer						
+11449	trainer						
+11450	trainer						
+11451	trainer						
+11452	quest		Badlands | Loch Modan	horde | alliance			
+11453	worldDrop					true	
+11454	trainer						
+11456	trainer						
+11457	trainer						
+11458	worldDrop					true	
+11459	vendor	Alchemist Pestlezugg	Tanaris				
+11460	trainer						
+11461	trainer						
+11464	worldDrop					true	
+11465	trainer						
+11466	drop		Western Plaguelands				
+11467	trainer						
+11468	worldDrop					true	
+11472	worldDrop					true	
+11473	vendor	Logannas | Bronk	Feralas | Feralas	alliance | horde			
+11476	vendor	Maria Lumere | Algernon	Stormwind City | Undercity	alliance | horde			
+11477	vendor	Rartar | Nina Lightbrew	Swamp of Sorrows | Blasted Lands	horde | alliance			
+11478	trainer						
+11479	vendor	Alchemist Pestlezugg	Tanaris				
+11480	vendor	Alchemist Pestlezugg	Tanaris				
+11643	quest		Stormwind City	alliance			
+12044	trainer						
+12045	trainer						
+12046	trainer						
+12047	worldDrop					true	
+12048	trainer						
+12049	trainer						
+12050	trainer						
+12052	trainer	Josephine Lister | Jalane Ayrole	Undercity | Stormwind City	horde | alliance			Master Shadoweave Tailor
+12053	trainer						
+12055	trainer	Josephine Lister | Jalane Ayrole	Undercity | Stormwind City	horde | alliance			Master Shadoweave Tailor
+12056	worldDrop					true	
+12059	worldDrop					true	
+12060	worldDrop					true	
+12061	trainer						
+12064	vendor	Mahu | Elynna	Thunder Bluff | Darnassus	horde | alliance			
+12065	trainer						
+12066	worldDrop					true	
+12067	trainer						
+12069	trainer						
+12070	trainer						
+12071	trainer	Josephine Lister | Jalane Ayrole	Undercity | Stormwind City	horde | alliance			Master Shadoweave Tailor
+12072	trainer						
+12073	trainer						
+12074	trainer						
+12075	vendor	Borya | Outfitter Eric	Orgrimmar | Ironforge	horde | alliance			
+12076	trainer	Josephine Lister | Jalane Ayrole	Undercity | Stormwind City	horde | alliance			Master Shadoweave Tailor
+12077	trainer						
+12078	worldDrop					true	
+12079	trainer						
+12080	vendor	Borya | Outfitter Eric	Orgrimmar | Ironforge	horde | alliance			
+12081	vendor	Cowardly Crosby	Stranglethorn Vale				
+12082	trainer	Josephine Lister | Jalane Ayrole	Undercity | Stormwind City	horde | alliance			Master Shadoweave Tailor
+12084	worldDrop					true	
+12085	vendor	Millie Gregorian | Outfitter Eric	Undercity | Ironforge	horde | alliance			
+12086	quest		Searing Gorge				
+12088	trainer						
+12089	vendor	Millie Gregorian | Outfitter Eric	Undercity | Ironforge	horde | alliance			
+12091	vendor	Alexandra Bolero | Mahu	Stormwind City | Thunder Bluff	alliance | horde			
+12092	trainer						
+12093	vendor	Millie Gregorian | Outfitter Eric	Undercity | Ironforge	horde | alliance			
+12259	worldDrop					true	
+12260	trainer						
+12584	trainer						
+12585	trainer						
+12586	trainer						
+12587	worldDrop					true	
+12589	trainer						
+12590	trainer						
+12591	trainer						
+12594	trainer						
+12595	trainer						
+12596	trainer						
+12597	vendor	Knaz Blunderflame | Yuka Screwspigot	Stranglethorn Vale | Burning Steppes				
+12599	trainer						
+12603	trainer						
+12607	worldDrop					true	
+12609	trainer						
+12614	worldDrop					true	
+12615	trainer						
+12616	worldDrop					true	
+12617	vendor	Jubie Gadgetspring	Azshara				
+12618	trainer						
+12619	trainer						
+12620	worldDrop					true	
+12621	trainer						
+12622	trainer						
+12624	vendor	Ruppo Zipcoil	The Hinterlands				
+12715	trainer	Nixx Sprocketspring	Tanaris				Goblin Engineering Trainer
+12716	trainer	Vazario Linkgrease | Nixx Sprocketspring	The Barrens | Tanaris				Goblin Engineering Trainer
+12717	trainer	Vazario Linkgrease | Nixx Sprocketspring	The Barrens | Tanaris				Goblin Engineering Trainer
+12718	trainer	Vazario Linkgrease | Nixx Sprocketspring	The Barrens | Tanaris				Goblin Engineering Trainer
+12754	trainer	Vazario Linkgrease | Nixx Sprocketspring	The Barrens | Tanaris				Goblin Engineering Trainer
+12755	trainer	Vazario Linkgrease | Nixx Sprocketspring	The Barrens | Tanaris				Goblin Engineering Trainer
+12758	trainer	Vazario Linkgrease | Nixx Sprocketspring	The Barrens | Tanaris				Goblin Engineering Trainer
+12759	trainer	Tinkmaster Overspark | Oglethorpe Obnoticus	Ironforge | Stranglethorn Vale	alliance | 			Gnomish Engineering Trainer
+12760	trainer	Nixx Sprocketspring	Tanaris				Goblin Engineering Trainer
+12895	trainer	Tinkmaster Overspark | Oglethorpe Obnoticus	Ironforge | Stranglethorn Vale	alliance | 			Gnomish Engineering Trainer
+12897	trainer	Tinkmaster Overspark | Oglethorpe Obnoticus	Ironforge | Stranglethorn Vale	alliance | 			Gnomish Engineering Trainer
+12899	trainer	Tinkmaster Overspark | Oglethorpe Obnoticus	Ironforge | Stranglethorn Vale	alliance | 			Gnomish Engineering Trainer
+12902	trainer	Tinkmaster Overspark | Oglethorpe Obnoticus	Ironforge | Stranglethorn Vale	alliance | 			Gnomish Engineering Trainer
+12903	trainer	Tinkmaster Overspark | Oglethorpe Obnoticus	Ironforge | Stranglethorn Vale	alliance | 			Gnomish Engineering Trainer
+12905	trainer	Tinkmaster Overspark | Oglethorpe Obnoticus	Ironforge | Stranglethorn Vale	alliance | 			Gnomish Engineering Trainer
+12906	trainer	Tinkmaster Overspark | Oglethorpe Obnoticus	Ironforge | Stranglethorn Vale	alliance | 			Gnomish Engineering Trainer
+12907	trainer	Tinkmaster Overspark | Oglethorpe Obnoticus	Ironforge | Stranglethorn Vale	alliance | 			Gnomish Engineering Trainer
+12908	trainer	Vazario Linkgrease | Nixx Sprocketspring	The Barrens | Tanaris				Goblin Engineering Trainer
+13028	trainer		Razorfen Downs				
+13240	trainer	Nixx Sprocketspring | Vazario Linkgrease	Tanaris | The Barrens				
+13378	trainer						
+13380	worldDrop					true	
+13419	vendor	Dalria | Kulwia	Ashenvale | Stonetalon Mountains	alliance | horde			
+13421	trainer						
+13464	worldDrop					true	
+13485	trainer						
+13501	trainer						
+13503	trainer						
+13522	worldDrop					true	
+13529	trainer						
+13536	vendor	Dalria | Kulwia	Ashenvale | Stonetalon Mountains	alliance | horde			
+13538	trainer						
+13607	trainer						
+13612	drop		Wetlands				
+13617	drop		Stonetalon Mountains | Ashenvale				
+13620	drop		Hillsbrad Foothills				
+13622	trainer						
+13626	trainer						
+13628	trainer						
+13631	trainer						
+13635	trainer						
+13637	trainer						
+13640	trainer						
+13642	trainer						
+13644	trainer						
+13646	vendor	Micha Yance | Keena	Hillsbrad Foothills | Arathi Highlands	alliance | horde			
+13648	trainer						
+13653	worldDrop					true	
+13655	worldDrop					true	
+13657	trainer						
+13659	trainer						
+13661	trainer						
+13663	trainer						
+13687	worldDrop					true	
+13689	worldDrop					true	
+13693	trainer						
+13695	trainer						
+13698	drop		Arathi Highlands				
+13700	trainer						
+13702	trainer						
+13746	trainer						
+13794	trainer						
+13815	trainer						
+13817	worldDrop					true	
+13822	trainer						
+13836	trainer						
+13841	drop		Stranglethorn Vale				
+13846	worldDrop					true	
+13858	trainer						
+13868	drop		Swamp of Sorrows				
+13882	drop		Tanaris | Alterac Mountains				
+13887	trainer						
+13890	trainer						
+13898	drop	Pyromancer Loregrain	Blackrock Depths				
+13905	trainer						
+13915	worldDrop					true	
+13917	trainer						
+13931	vendor	Banalash | Mythrin'dir	Swamp of Sorrows | Darnassus	horde | alliance			
+13933	worldDrop					true	
+13935	trainer						
+13937	trainer						
+13939	trainer						
+13941	trainer						
+13943	trainer						
+13945	worldDrop					true	
+13947	worldDrop					true	
+13948	trainer						
+14293	trainer						
+14379	trainer						
+14380	trainer						
+14807	trainer						
+14809	trainer						
+14810	trainer						
+14891	quest		Blackrock Depths				
+14930	trainer						
+14932	trainer						
+15255	trainer						
+15292	drop	Grizzle	Blackrock Depths				
+15293	container		Blackrock Depths				
+15294	drop		Blackrock Depths				
+15295	container		Blackrock Depths				
+15296	drop	Ribbly Screwspigot	Blackrock Depths				
+15596	drop	Lord Roccor	Blackrock Depths				
+15628	container		Gnomeregan				
+15633	container		Gnomeregan				
+15833	trainer						
+15853	vendor	Super-Seller 680	Desolace				
+15855	vendor	Nerrist | Corporal Bluth | Vendor-Tron 1000 | Keena	Stranglethorn Vale | Stranglethorn Vale | Desolace | Arathi Highlands	horde | alliance |  | horde			
+15856	vendor	Sheendra Tallgrass | Vivianna | Super-Seller 680	Feralas | Feralas | Desolace	horde | alliance | 			
+15861	vendor	Nerrist | Corporal Bluth | Vendor-Tron 1000	Stranglethorn Vale | Stranglethorn Vale | Desolace	horde | alliance | 			
+15863	vendor	Vendor-Tron 1000 | Ogg'marr | Banalash | Kireena	Desolace | Dustwallow Marsh | Swamp of Sorrows | Desolace	 | horde | horde | horde			
+15865	vendor	Helenia Olden | Janet Hommers | Super-Seller 680	Dustwallow Marsh | Desolace | Desolace	alliance | alliance | 			
+15906	vendor	Helenia Olden | Ogg'marr | Super-Seller 680	Dustwallow Marsh | Dustwallow Marsh | Desolace	alliance | horde | 			
+15910	vendor	Vendor-Tron 1000 | Kireena | Janet Hommers	Desolace | Desolace | Desolace	 | horde | alliance			
+15915	vendor	Kriggon Talsone | Uthok | Banalash	Westfall | Stranglethorn Vale | Swamp of Sorrows	alliance | horde | horde			
+15933	vendor	Malygen | Bale | Himmik	Felwood | Felwood | Winterspring	alliance | horde | 			
+15935	vendor	Abigail Shiel	Tirisfal Glades	horde			
+15972	trainer						
+15973	worldDrop					true	
+16153	trainer						
+16639	trainer						
+16640	trainer						
+16641	trainer						
+16642	trainer						
+16643	trainer						
+16644	trainer						
+16645	worldDrop					true	
+16646	quest		Tanaris				
+16647	quest		Tanaris				
+16648	worldDrop					true	
+16649	quest		Tanaris				
+16650	worldDrop					true	
+16651	worldDrop					true	
+16652	trainer						
+16653	trainer						
+16654	worldDrop					true	
+16655	quest		Winterspring				
+16656	worldDrop					true	
+16657	quest		Tanaris				
+16658	quest		Tanaris				
+16659	worldDrop					true	
+16660	worldDrop					true	
+16661	vendor	Magnus Frostwake	Western Plaguelands				
+16662	trainer						
+16663	quest		Tanaris				
+16664	drop		Dustwallow Marsh				
+16665	drop		Western Plaguelands				
+16667	quest		Winterspring				
+16724	worldDrop					true	
+16725	worldDrop					true	
+16726	drop		Dustwallow Marsh				
+16728	worldDrop					true	
+16729	worldDrop					true	
+16730	quest		Tanaris				
+16731	drop		Dustwallow Marsh				
+16732	drop		Western Plaguelands				
+16741	worldDrop					true	
+16742	quest		Dire Maul				
+16744	quest		Dire Maul				
+16745	quest		Dire Maul				
+16746	worldDrop					true	
+16969	vendor	Magnus Frostwake	Western Plaguelands				
+16970	quest		Winterspring				
+16971	vendor	Magnus Frostwake	Western Plaguelands				
+16973	quest		Winterspring				
+16978	quest		Winterspring				
+16983	container		Stratholme				
+16984	drop		Burning Steppes				
+16985	container		Stratholme				
+16988	drop	Maleki the Pallid	Stratholme				
+16990	drop	Goraluk Anvilcrack	Blackrock Spire				
+16991	drop	Quartermaster Zigris	Blackrock Spire				
+16992	drop		Western Plaguelands				
+16993	drop	Goraluk Anvilcrack	Blackrock Spire				
+16994	drop	Bannok Grimaxe	Blackrock Spire				
+16995	drop	Cannon Master Willey	Stratholme				
+17180	trainer						
+17181	trainer						
+17187	vendor	Alchemist Pestlezugg	Tanaris				
+17551	trainer						
+17552	trainer						
+17553	trainer						
+17554	vendor	Soolie Berryfizz | Kor'geld	Ironforge | Orgrimmar	alliance | horde			
+17555	trainer						
+17556	trainer						
+17557	trainer						
+17559	vendor	Argent Quartermaster Hasana | Quartermaster Miranda Breechlock | Argent Quartermaster Lightspark	Tirisfal Glades | Eastern Plaguelands | Western Plaguelands				
+17560	vendor	Plugger Spazzring	Blackrock Depths				
+17561	vendor	Meilosh	Felwood	horde			
+17562	vendor	Magnus Frostwake	Western Plaguelands				
+17563	worldDrop					true	
+17564	worldDrop					true	
+17565	worldDrop					true	
+17566	worldDrop					true	
+17570	worldDrop					true	
+17571	drop		Azshara | Felwood				
+17572	trainer						
+17573	trainer						
+17574	drop		Blackrock Spire				
+17575	drop		Winterspring				
+17576	drop		Western Plaguelands				
+17577	drop		Winterspring				
+17578	drop		Eastern Plaguelands				
+17580	vendor	Magnus Frostwake	Western Plaguelands				
+17632	vendor	Almaador	Shattrath City				
+17634	worldDrop					true	
+17635	vendor	Almaador	Shattrath City				
+17636	vendor	Fedryen Swiftspear	Zangarmarsh				
+17637	vendor	Alurmi	Tanaris				
+17638	vendor	Nakodu	Shattrath City				
+18238	vendor	Gikkix	Tanaris				
+18239	vendor	Kelsey Yance	Stranglethorn Vale				
+18240	vendor	Gikkix	Tanaris				
+18241	vendor	Kelsey Yance	Stranglethorn Vale				
+18242	vendor	Kelsey Yance	Stranglethorn Vale				
+18243	vendor	Gikkix	Tanaris				
+18244	vendor	Gikkix	Tanaris				
+18245	vendor	Vivianna | Sheendra Tallgrass	Feralas | Feralas	alliance | horde			
+18246	vendor	Vivianna | Sheendra Tallgrass	Feralas | Feralas	alliance | horde			
+18247	vendor	Vivianna | Sheendra Tallgrass	Feralas | Feralas	alliance | horde			
+18401	trainer						
+18402	trainer						
+18403	trainer						
+18404	worldDrop					true	
+18405	vendor	Qia	Winterspring				
+18406	vendor	Darnall	Moonglade				
+18407	trainer						
+18408	drop		Searing Gorge				
+18409	vendor	Darnall	Moonglade				
+18410	trainer						
+18411	trainer						
+18412	drop		Searing Gorge				
+18413	trainer						
+18414	trainer						
+18415	trainer						
+18416	trainer						
+18417	trainer						
+18418	drop		Burning Steppes				
+18419	vendor	Lorelae Wintersong	Moonglade				
+18420	trainer						
+18421	trainer						
+18422	drop	Overmaster Pyron	Searing Gorge				
+18423	trainer						
+18424	trainer						
+18434	drop		Burning Steppes				
+18436	drop		Winterspring				
+18437	trainer						
+18438	trainer						
+18439	worldDrop					true	
+18440	worldDrop					true	
+18441	trainer						
+18442	trainer						
+18444	trainer						
+18445	worldDrop					true	
+18446	trainer						
+18447	worldDrop					true	
+18448	worldDrop					true	
+18449	trainer						
+18450	trainer						
+18451	trainer						
+18452	worldDrop					true	
+18453	trainer						
+18454	worldDrop					true	
+18455	worldDrop					true	
+18456	drop	Balnazzar	Stratholme				
+18457	drop		Blackrock Spire				
+18458	drop	Darkmaster Gandling	Scholomance				
+18560	vendor	Qia	Winterspring				
+19047	trainer						
+19048	vendor	Zannok Hidepiercer	Silithus				
+19049	vendor	Leonard Porter | Werg Thickblade	Western Plaguelands | Tirisfal Glades	alliance | horde			
+19050	vendor	Masat T'andr	Swamp of Sorrows				
+19051	drop		Blasted Lands				
+19052	trainer						
+19053	vendor	Blimo Gadgetspring	Azshara				
+19054	drop	General Drakkisath	Blackrock Spire				
+19055	trainer						
+19058	trainer						
+19059	drop		Burning Steppes				
+19060	drop		The Temple of Atal'Hakkar				
+19061	vendor	Pratt McGrubben | Jangdor Swiftstrider	Feralas | Feralas	alliance | horde			
+19062	vendor	Gigget Zipcoil	The Hinterlands				
+19063	worldDrop					true	
+19064	drop		Burning Steppes				
+19065	trainer						
+19066	vendor	Qia	Winterspring				
+19067	vendor	Leonard Porter | Werg Thickblade	Western Plaguelands | Tirisfal Glades	alliance | horde			
+19068	vendor	Meilosh	Felwood	horde			
+19070	worldDrop					true	
+19071	trainer						
+19072	trainer						
+19073	worldDrop					true	
+19074	drop		Winterspring				
+19075	drop		Burning Steppes				
+19076	drop		Blackrock Spire				
+19077	vendor	Blimo Gadgetspring	Azshara				
+19078	drop		Felwood				
+19079	drop		Azshara				
+19080	vendor	Meilosh	Felwood	horde			
+19081	worldDrop					true	
+19082	trainer						
+19083	trainer						
+19084	vendor	Nergal	Un'Goro Crater				
+19085	vendor	Plugger Spazzring	Blackrock Depths				
+19086	drop		The Hinterlands				
+19087	drop		Felwood				
+19088	vendor	Zannok Hidepiercer	Silithus				
+19089	drop		Azshara				
+19090	drop		Azshara				
+19091	trainer						
+19092	trainer						
+19093	quest		Orgrimmar | Stormwind City	horde | alliance			
+19094	drop		Blackrock Depths				
+19095	drop		Western Plaguelands				
+19097	drop		Un'Goro Crater				
+19098	trainer						
+19100	drop		Burning Steppes				
+19101	drop		Blackrock Spire				
+19102	trainer						
+19103	trainer						
+19104	drop		Winterspring				
+19107	drop		Blackrock Depths				
+19435	quest		Felwood				
+19567	trainer						
+19666	trainer						
+19667	trainer						
+19668	trainer						
+19669	trainer						
+19788	trainer						
+19790	trainer						
+19791	trainer						
+19792	trainer						
+19793	worldDrop					true	
+19794	trainer						
+19795	trainer						
+19796	drop		Blackrock Depths				
+19799	drop		Blackrock Depths				
+19800	trainer						
+19814	vendor	Xizzer Fizzbolt	Winterspring				
+19815	vendor	Xizzer Fizzbolt	Winterspring				
+19819	drop		Stratholme				
+19825	trainer						
+19830	drop		Winterspring				
+19831	worldDrop					true	
+19833	drop		Eastern Plaguelands				
+20008	trainer						
+20009	worldDrop					true	
+20010	drop		Deadwind Pass				
+20011	worldDrop					true	
+20012	trainer						
+20013	trainer						
+20014	trainer						
+20015	vendor	Lorelae Wintersong	Moonglade				
+20016	trainer						
+20017	vendor	Mythrin'dir | Daniel Bartlett	Darnassus | Undercity	alliance | horde			
+20020	worldDrop					true	
+20023	trainer						
+20024	worldDrop					true	
+20025	worldDrop					true	
+20026	vendor	Qia	Winterspring				
+20028	trainer						
+20029	drop		Winterspring				
+20030	drop		Blackrock Spire				
+20031	drop		Blackrock Spire				
+20032	drop		Scholomance				
+20033	drop		Stratholme | Terokkar Forest				
+20034	drop		Western Plaguelands | Eastern Plaguelands				
+20035	drop		Scholomance				
+20036	drop		Stratholme				
+20051	vendor	Lorelae Wintersong	Moonglade				
+20201	trainer						
+20626	vendor	Jabbey	Tanaris				
+20648	trainer						
+20649	trainer						
+20650	trainer						
+20848	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+20849	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+20853	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+20854	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+20855	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+20872	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+20873	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+20874	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+20876	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+20890	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+20897	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+20916	vendor	Heldan Galesong | Kelsey Yance | Shankys | Wik'Tar	Darkshore | Stranglethorn Vale | Orgrimmar | Ashenvale	alliance |  | horde | horde			
+21143	vendor	Eebee Jinglepocket | Wolgren Jinglepocket | Khole Jinglepocket | Seersa Copperpinch	Shattrath City | The Exodar | Stormwind City | Thunder Bluff	 | alliance | alliance | horde			
+21144	vendor	Eebee Jinglepocket | Wolgren Jinglepocket | Khole Jinglepocket | Seersa Copperpinch	Shattrath City | The Exodar | Stormwind City | Thunder Bluff	 | alliance | alliance | horde			
+21161	quest		Blackrock Depths				
+21175	trainer						
+21913	worldEvent						
+21923	worldEvent						
+21931	worldEvent						
+21940	worldEvent						
+21943	worldEvent						
+21945	worldEvent						
+22331	trainer						
+22480	vendor	Truk Wildbeard | Dirge Quikcleave | Innkeeper Fizzgrimble	The Hinterlands | Tanaris | Tanaris	alliance |  | 			
+22704	container		Blackrock Depths				
+22711	vendor	Rikqiz	Stranglethorn Vale				
+22727	drop		Molten Core				
+22732	drop		Molten Core				
+22749	drop		Molten Core				
+22750	drop		Molten Core				
+22757	drop		Molten Core				
+22759	drop		Molten Core				
+22761	drop	Pusillin	Dire Maul				
+22793	drop		Molten Core				
+22795	drop		Molten Core				
+22797	drop		Molten Core				
+22808	trainer						
+22813	quest		Dire Maul				
+22815	quest		Dire Maul				
+22866	container		Dire Maul				
+22867	container		Dire Maul				
+22868	container		Dire Maul				
+22869	container		Dire Maul				
+22870	container		Dire Maul				
+22902	vendor	Shen'dralar Provisioner	Dire Maul				
+22921	container		Dire Maul				
+22922	container		Dire Maul				
+22923	container		Dire Maul				
+22926	container		Dire Maul				
+22927	container		Dire Maul				
+22928	container		Dire Maul				
+22967	trainer	Master Elemental Shaper Krixix	Blackwing Lair				
+23066	vendor	Sovik	Orgrimmar	horde			
+23067	vendor	Gearcutter Cogspinner	Ironforge	alliance			
+23068	vendor	Crazk Sparks | Gagsprocket	Stranglethorn Vale | The Barrens				
+23069	vendor	Blizrik Buckshot	Tanaris				
+23070	trainer						
+23071	trainer						
+23077	vendor	Xizzer Fizzbolt	Winterspring				
+23078	drop	Plugger Spazzring	Blackrock Depths				
+23079	container		Dire Maul				
+23080	vendor	Xizzer Fizzbolt	Winterspring				
+23081	drop	Solakar Flamewreath	Blackrock Spire				
+23082	drop		Stratholme				
+23096	drop		Blackrock Depths				
+23129	drop		Blackrock Depths				
+23190	vendor	Bombus Finespindle | Tamar	Ironforge | Orgrimmar	alliance | horde			
+23399	vendor	Saenorion | Joseph Moore	Darnassus | Undercity	alliance | horde			
+23486	trainer	Zap Farflinger	Winterspring				
+23489	trainer	Jhordy Lapforge	Tanaris				
+23507	vendor	Zorbin Fandazzle	Feralas				
+23628	vendor	Meilosh	Felwood	horde			
+23629	vendor	Meilosh	Felwood	horde			
+23632	vendor	Argent Quartermaster Hasana | Quartermaster Miranda Breechlock | Argent Quartermaster Lightspark	Tirisfal Glades | Eastern Plaguelands | Western Plaguelands				
+23633	vendor	Argent Quartermaster Hasana | Quartermaster Miranda Breechlock | Argent Quartermaster Lightspark	Tirisfal Glades | Eastern Plaguelands | Western Plaguelands				
+23636	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+23637	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+23638	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+23639	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+23650	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+23652	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+23653	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+23662	vendor	Meilosh	Felwood	horde			
+23663	vendor	Meilosh	Felwood	horde			
+23664	vendor	Argent Quartermaster Hasana | Quartermaster Miranda Breechlock | Argent Quartermaster Lightspark	Tirisfal Glades | Eastern Plaguelands | Western Plaguelands				
+23665	vendor	Argent Quartermaster Hasana | Quartermaster Miranda Breechlock | Argent Quartermaster Lightspark	Tirisfal Glades | Eastern Plaguelands | Western Plaguelands				
+23666	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+23667	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+23703	vendor	Meilosh	Felwood	horde			
+23704	vendor	Meilosh	Felwood	horde			
+23705	vendor	Argent Quartermaster Hasana | Quartermaster Miranda Breechlock | Argent Quartermaster Lightspark	Tirisfal Glades | Eastern Plaguelands | Western Plaguelands				
+23706	vendor	Argent Quartermaster Hasana | Quartermaster Miranda Breechlock | Argent Quartermaster Lightspark	Tirisfal Glades | Eastern Plaguelands | Western Plaguelands				
+23707	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+23708	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+23709	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+23710	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+23799	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+23800	vendor	Meilosh	Felwood	horde			
+23801	vendor	Argent Quartermaster Hasana | Quartermaster Miranda Breechlock | Argent Quartermaster Lightspark	Tirisfal Glades | Eastern Plaguelands | Western Plaguelands				
+23802	vendor	Argent Quartermaster Hasana | Quartermaster Miranda Breechlock | Argent Quartermaster Lightspark	Tirisfal Glades | Eastern Plaguelands | Western Plaguelands				
+23803	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+23804	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+24091	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24092	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24093	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24121	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24122	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24123	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24124	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24125	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24136	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24137	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24138	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24139	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24140	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24141	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24266	drop		Zul'Gurub				
+24356	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24357	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24365	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24366	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24367	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24368	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+24399	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+24418	vendor	Ogg'marr	Dustwallow Marsh	horde			
+24654	trainer	Peter Galen | Thorkaf Dragoneye	Azshara | Badlands	alliance | horde			Dragonscale Leatherworking Trainer
+24655	trainer	Peter Galen | Thorkaf Dragoneye	Azshara | Badlands	alliance | horde			Dragonscale Leatherworking Trainer
+24703	vendor	Aendel Windspear	Silithus				
+24801	quest		Silithus				
+24846	vendor	Aendel Windspear	Silithus				
+24847	vendor	Aendel Windspear	Silithus				
+24848	vendor	Aendel Windspear	Silithus				
+24849	vendor	Aendel Windspear	Silithus				
+24850	vendor	Aendel Windspear	Silithus				
+24851	vendor	Aendel Windspear	Silithus				
+24901	quest		Silithus				
+24902	quest		Silithus				
+24903	quest		Silithus				
+24912	quest		Silithus				
+24913	quest		Silithus				
+24914	quest		Silithus				
+24940	vendor	Amy Davenport	Redridge Mountains	alliance			
+25072	vendor	Almaador	Shattrath City				
+25073	drop		Temple of Ahn'Qiraj				
+25074	drop		Temple of Ahn'Qiraj				
+25078	drop		Temple of Ahn'Qiraj				
+25079	drop		Temple of Ahn'Qiraj				
+25080	vendor	Alurmi	Tanaris				
+25081	vendor	Kania	Silithus				
+25082	vendor	Kania	Silithus				
+25083	vendor	Fedryen Swiftspear	Zangarmarsh				
+25084	vendor	Logistics Officer Ulrike | Quartermaster Urgronn	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+25086	vendor	Nakodu	Shattrath City				
+25124	vendor	Kania | Thaddeus Webb | Erilia | Lilly	Silithus | Undercity | Eversong Woods | Silverpine Forest	 | horde | horde | horde			
+25125	vendor	Kania | Thaddeus Webb | Erilia | Lilly	Silithus | Undercity | Eversong Woods | Silverpine Forest	 | horde | horde | horde			
+25126	vendor	Kania | Thaddeus Webb | Erilia | Lilly	Silithus | Undercity | Eversong Woods | Silverpine Forest	 | horde | horde | horde			
+25127	vendor	Kania	Silithus				
+25128	vendor	Kania	Silithus				
+25129	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+25130	vendor	Rin'wosho the Trader	Stranglethorn Vale				
+25146	vendor	Lokhtos Darkbargainer	Blackrock Depths				
+25255	trainer						
+25278	trainer						
+25280	trainer						
+25283	trainer						
+25284	trainer						
+25287	trainer						
+25305	trainer						
+25317	trainer						
+25318	trainer						
+25320	vendor	Arred | Gelanthis | Felika | Edna Mullby	The Exodar | Silvermoon City | Orgrimmar | Stormwind City	alliance | horde | horde | alliance			
+25321	trainer						
+25323	vendor	Ranik | Dalria	The Barrens | Ashenvale	 | alliance			
+25339	vendor	Gelanthis | Daniel Bartlett | Mythrin'dir | Arred	Silvermoon City | Undercity | Darnassus | The Exodar	horde | horde | alliance | alliance			
+25490	trainer						
+25493	trainer						
+25498	trainer						
+25610	vendor	Neal Allen | Jandia	Wetlands | Thousand Needles	alliance | horde			
+25612	vendor	Micha Yance | Christoph Jeffcoat	Hillsbrad Foothills | Hillsbrad Foothills	alliance | horde			
+25613	trainer						
+25615	trainer						
+25617	vendor	Micha Yance | Kireena	Hillsbrad Foothills | Desolace	alliance | horde			
+25618	worldDrop					true	
+25619	vendor	Arred | Gelanthis | Felicia Doan | Burbik Gearspanner	The Exodar | Silvermoon City | Undercity | Ironforge	alliance | horde | horde | alliance			
+25620	trainer						
+25621	trainer						
+25622	worldDrop					true	
+25659	quest		Tanaris				
+25704	vendor	Derak Nightfall | Phea | Gloria Femmel | \"Cookie\" McWeaksauce	Hillsbrad Foothills | The Exodar | Redridge Mountains | Azuremyst Isle	horde | alliance | alliance | alliance			
+25954	vendor	Derak Nightfall | Phea | Gloria Femmel | \"Cookie\" McWeaksauce	Hillsbrad Foothills | The Exodar | Redridge Mountains | Azuremyst Isle	horde | alliance | alliance | alliance			
+26011	quest		Winterspring				
+26085	vendor	Vizzklick	Tanaris				
+26086	drop	Jandice Barov	Scholomance				
+26087	drop		Molten Core				
+26277	drop		Searing Gorge				
+26279	drop		Silithus | Winterspring		true		
+26403	vendor	Fariel Starsong	Moonglade				
+26407	vendor	Fariel Starsong	Moonglade				
+26416	vendor	Fariel Starsong	Moonglade				
+26417	vendor	Fariel Starsong	Moonglade				
+26418	vendor	Fariel Starsong	Moonglade				
+26420	vendor	Fariel Starsong	Moonglade				
+26421	vendor	Fariel Starsong	Moonglade				
+26422	vendor	Fariel Starsong	Moonglade				
+26423	vendor	Fariel Starsong	Moonglade				
+26424	vendor	Fariel Starsong	Moonglade				
+26425	vendor	Fariel Starsong	Moonglade				
+26426	vendor	Fariel Starsong	Moonglade				
+26427	vendor	Fariel Starsong	Moonglade				
+26428	vendor	Fariel Starsong	Moonglade				
+26442	vendor	Fariel Starsong	Moonglade				
+26443	vendor	Fariel Starsong	Moonglade				
+26745	trainer	Dalinna | Hama	Hellfire Peninsula | Hellfire Peninsula	horde | alliance			
+26746	trainer	Dalinna | Hama	Hellfire Peninsula | Hellfire Peninsula	horde | alliance			
+26747	vendor	Eiin | Neii | Deynna	Shattrath City | The Exodar | Silvermoon City	 | alliance | horde			
+26749	vendor	Mathar G'ochar | Eiin	Nagrand | Shattrath City	horde | 			
+26750	vendor	Mathar G'ochar | Deynna | Borto | Neii	Nagrand | Silvermoon City | Nagrand | The Exodar	horde | horde | alliance | alliance			
+26751	vendor	Nasmara Moonsong	Shattrath City				
+26752	vendor	Gidge Spellweaver	Shattrath City				
+26753	vendor	Gidge Spellweaver	Shattrath City				
+26754	vendor	Gidge Spellweaver	Shattrath City				
+26755	vendor	Gidge Spellweaver	Shattrath City				
+26756	vendor	Andrion Darkspinner	Shattrath City				
+26757	vendor	Andrion Darkspinner	Shattrath City				
+26758	vendor	Andrion Darkspinner	Shattrath City				
+26759	vendor	Andrion Darkspinner	Shattrath City				
+26760	vendor	Nasmara Moonsong	Shattrath City				
+26761	vendor	Nasmara Moonsong	Shattrath City				
+26762	vendor	Nasmara Moonsong	Shattrath City				
+26763	vendor	Nasmara Moonsong	Shattrath City				
+26764	trainer	Dalinna | Hama	Hellfire Peninsula | Hellfire Peninsula	horde | alliance			
+26765	trainer	Dalinna | Hama	Hellfire Peninsula | Hellfire Peninsula	horde | alliance			
+26770	trainer	Dalinna | Hama	Hellfire Peninsula | Hellfire Peninsula	horde | alliance			
+26771	trainer	Dalinna | Hama	Hellfire Peninsula | Hellfire Peninsula	horde | alliance			
+26772	trainer	Dalinna | Hama	Hellfire Peninsula | Hellfire Peninsula	horde | alliance			
+26773	vendor	Eiin | Neii | Deynna	Shattrath City | The Exodar | Silvermoon City	 | alliance | horde			
+26774	vendor	Eiin | Neii | Deynna	Shattrath City | The Exodar | Silvermoon City	 | alliance | horde			
+26775	vendor	Zurai | Muheru the Weaver	Zangarmarsh | Zangarmarsh	horde | alliance			
+26776	vendor	Zurai | Muheru the Weaver	Zangarmarsh | Zangarmarsh	horde | alliance			
+26777	vendor	Arrond	Shadowmoon Valley				
+26778	vendor	Arrond	Shadowmoon Valley				
+26779	vendor	Mathar G'ochar | Borto	Nagrand | Nagrand	horde | alliance			
+26780	drop		Karazhan				
+26781	drop		Karazhan				
+26782	drop		The Arcatraz				
+26783	drop		The Mechanar				
+26784	drop	Pathaleon the Calculator	The Mechanar				
+26872	trainer						
+26873	worldDrop					true	
+26874	trainer						
+26875	vendor	Banalash | Helenia Olden	Swamp of Sorrows | Dustwallow Marsh	horde | alliance			
+26876	trainer						
+26878	vendor	Hammon Karwn | Keena	Arathi Highlands | Arathi Highlands	alliance | horde			
+26880	trainer						
+26881	vendor	Nerrist | Helenia Olden	Stranglethorn Vale | Dustwallow Marsh	horde | alliance			
+26882	worldDrop					true	
+26883	trainer						
+26885	trainer						
+26887	worldDrop					true	
+26896	worldDrop					true	
+26897	vendor	Arred | Burbik Gearspanner | Gelanthis | Shadi Mistrunner	The Exodar | Ironforge | Silvermoon City | Thunder Bluff	alliance | alliance | horde | horde			
+26900	worldDrop					true	
+26902	trainer						
+26903	trainer						
+26906	vendor	Mishta	Silithus				
+26907	trainer						
+26908	trainer						
+26909	worldDrop					true	
+26910	vendor	Jase Farlane	Eastern Plaguelands				
+26911	trainer						
+26912	drop	Quartermaster Zigris	Blackrock Spire				
+26914	drop	Golem Lord Argelmach	Blackrock Depths				
+26915	vendor	Qia	Winterspring				
+26916	trainer						
+26925	trainer						
+26926	trainer						
+26927	trainer						
+26928	trainer						
+27585	vendor	Vargus	Silithus				
+27586	vendor	Lieutenant General Andorov	Ruins of Ahn'Qiraj				
+27587	drop	The Prophet Skeram	Temple of Ahn'Qiraj				
+27588	vendor	Vargus	Silithus				
+27589	drop	Moam	Ruins of Ahn'Qiraj				
+27590	vendor	Lieutenant General Andorov	Ruins of Ahn'Qiraj				
+27658	vendor	Kania | Thaddeus Webb | Erilia | Lilly	Silithus | Undercity | Eversong Woods | Silverpine Forest	 | horde | horde | horde			
+27659	vendor	Kania	Silithus				
+27660	drop	Magister Kalendris	Dire Maul				
+27724	vendor	Mishta	Silithus				
+27725	vendor	Mishta	Silithus				
+27829	worldDrop					true	
+27830	worldDrop					true	
+27832	worldDrop					true	
+27837	vendor	Meilosh	Felwood	horde			
+27899	trainer						
+27905	trainer						
+27906	drop		Netherstorm				
+27911	vendor	Logistics Officer Ulrike | Quartermaster Urgronn	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+27913	worldDrop					true	
+27914	drop		The Steamvault				
+27917	drop		Blade's Edge Mountains				
+27920	vendor	Ythyar	Karazhan				
+27924	vendor	Alurmi	Tanaris				
+27926	vendor	Almaador	Shattrath City				
+27927	vendor	Nakodu	Shattrath City				
+27944	trainer						
+27945	vendor	Aged Dalaran Wizard	Old Hillsbrad Foothills				
+27946	worldDrop					true	
+27947	worldDrop					true	
+27948	drop	Kael'thas Sunstrider	Magisters' Terrace				
+27950	drop		Mana-Tombs				
+27951	drop		Auchenai Crypts				
+27954	drop		Karazhan				
+27957	trainer						
+27958	trainer						
+27960	vendor	Logistics Officer Ulrike | Quartermaster Urgronn	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+27961	trainer						
+27962	worldDrop					true	
+27967	vendor	Karaaz | Paulsta'ats	Netherstorm | Nagrand				
+27968	drop		Netherstorm				
+27971	drop		The Shattered Halls				
+27972	worldDrop					true	
+27975	drop		Blade's Edge Mountains				
+27977	drop		The Arcatraz				
+27981	drop	Shade of Aran	Karazhan				
+27982	drop	Terestian Illhoof	Karazhan				
+27984	drop	Moroes	Karazhan				
+28003	worldDrop					true	
+28004	worldDrop					true	
+28016	vendor	Madame Ruby | Egomis | Lyna	Shattrath City | The Exodar | Silvermoon City	 | alliance | horde			
+28019	vendor	Madame Ruby | Egomis | Lyna	Shattrath City | The Exodar | Silvermoon City	 | alliance | horde			
+28022	vendor	Madame Ruby | Egomis | Lyna	Shattrath City | The Exodar | Silvermoon City	 | alliance | horde			
+28027	trainer						
+28028	trainer						
+28205	vendor	Master Craftsman Omarion	Naxxramas				
+28207	vendor	Master Craftsman Omarion	Naxxramas				
+28208	vendor	Master Craftsman Omarion	Naxxramas				
+28209	vendor	Master Craftsman Omarion	Naxxramas				
+28210	vendor	Mishta	Silithus				
+28219	vendor	Master Craftsman Omarion	Naxxramas				
+28220	vendor	Master Craftsman Omarion	Naxxramas				
+28221	vendor	Master Craftsman Omarion	Naxxramas				
+28222	vendor	Master Craftsman Omarion	Naxxramas				
+28223	vendor	Master Craftsman Omarion	Naxxramas				
+28224	vendor	Master Craftsman Omarion	Naxxramas				
+28242	vendor	Master Craftsman Omarion	Naxxramas				
+28243	vendor	Master Craftsman Omarion	Naxxramas				
+28244	vendor	Master Craftsman Omarion	Naxxramas				
+28267	vendor	Master Chef Mouldier | Fazu	Ghostlands | Bloodmyst Isle	horde | alliance			
+28327	vendor	Sovik | Gearcutter Cogspinner	Orgrimmar | Ironforge	horde | alliance			
+28461	vendor	Vargus	Silithus				
+28462	vendor	Vargus	Silithus				
+28463	vendor	Vargus	Silithus				
+28472	vendor	Aendel Windspear	Silithus				
+28473	vendor	Aendel Windspear	Silithus				
+28474	vendor	Aendel Windspear	Silithus				
+28480	vendor	Mishta	Silithus				
+28481	vendor	Mishta	Silithus				
+28482	vendor	Mishta	Silithus				
+28543	vendor	Alchemist Gribble | Altaa | Melaris | Apothecary Antonivich	Hellfire Peninsula | The Exodar | Silvermoon City | Hellfire Peninsula	alliance | alliance | horde | horde			
+28544	trainer	Alchemist Gribble | Lorokeem | Apothecary Antonivich	Hellfire Peninsula | Shattrath City | Hellfire Peninsula	alliance |  | horde			Master Alchemy Trainer
+28545	trainer	Alchemist Gribble | Lorokeem | Apothecary Antonivich	Hellfire Peninsula | Shattrath City | Hellfire Peninsula	alliance |  | horde			Master Alchemy Trainer
+28546	vendor	Seer Janidi | Leeli Longhaggle	Zangarmarsh | Terokkar Forest	horde | alliance			
+28549	vendor	Haalrun | Seer Janidi	Zangarmarsh | Zangarmarsh	alliance | horde			
+28550	worldDrop					true	
+28551	trainer	Alchemist Gribble | Lorokeem | Apothecary Antonivich	Hellfire Peninsula | Shattrath City | Hellfire Peninsula	alliance |  | horde			Master Alchemy Trainer
+28552	worldDrop					true	
+28553	vendor	Logistics Officer Ulrike | Quartermaster Urgronn	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+28554	vendor	Mycah	Zangarmarsh				
+28555	vendor	Haalrun | Daga Ramba	Zangarmarsh | Blade's Edge Mountains	alliance | horde			
+28556	vendor	Quartermaster Enuril	Shattrath City				
+28557	vendor	Haalrun | Daga Ramba	Zangarmarsh | Blade's Edge Mountains	alliance | horde			
+28558	vendor	Nakodu	Shattrath City				
+28562	vendor	Leeli Longhaggle | Daga Ramba	Terokkar Forest | Blade's Edge Mountains	alliance | horde			
+28563	worldDrop					true	
+28564	drop	Kael'thas Sunstrider	Magisters' Terrace				
+28565	worldDrop					true	
+28566	vendor	Almaador	Shattrath City				
+28567	vendor	Mycah	Zangarmarsh				
+28568	vendor	Trader Narasu	Nagrand	alliance			
+28569	vendor	Fedryen Swiftspear	Zangarmarsh				
+28570	worldDrop					true	
+28571	drop		The Mechanar				
+28572	drop	Nexus-Prince Shaffar	Mana-Tombs				
+28573	vendor	Fedryen Swiftspear	Zangarmarsh				
+28575	drop		Nagrand				
+28576	drop		Shadowmoon Valley				
+28577	drop		Blade's Edge Mountains				
+28578	drop	Kael'thas Sunstrider	Magisters' Terrace				
+28579	drop	Captain Skarloc	Old Hillsbrad Foothills				
+28580	discovery						
+28581	discovery						
+28582	discovery						
+28583	discovery						
+28584	discovery						
+28585	discovery						
+28586	discovery						
+28587	discovery						
+28588	discovery						
+28589	discovery						
+28590	discovery						
+28591	discovery						
+28903	trainer						
+28905	trainer						
+28906	vendor	Quartermaster Enuril	Shattrath City				
+28907	vendor	Karaaz | Paulsta'ats	Netherstorm | Nagrand				
+28910	trainer						
+28912	vendor	Karaaz | Paulsta'ats	Netherstorm | Nagrand				
+28914	trainer						
+28915	vendor	Nakodu	Shattrath City				
+28916	trainer						
+28917	trainer						
+28918	vendor	Logistics Officer Ulrike | Quartermaster Urgronn	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+28924	vendor	Quartermaster Enuril	Shattrath City				
+28925	trainer						
+28927	vendor	Quartermaster Endarin	Shattrath City				
+28933	vendor	Karaaz | Paulsta'ats	Netherstorm | Nagrand				
+28936	trainer						
+28938	trainer						
+28944	vendor	Quartermaster Endarin	Shattrath City				
+28947	vendor	Karaaz | Paulsta'ats	Netherstorm | Nagrand				
+28948	trainer						
+28950	trainer						
+28953	trainer						
+28955	worldDrop					true	
+28957	vendor	Karaaz | Paulsta'ats	Netherstorm | Nagrand				
+29356	trainer	Hurnak Grimmord | Krugosh	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+29358	trainer	Hurnak Grimmord | Krugosh	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+29359	trainer	Hurnak Grimmord | Krugosh	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+29360	trainer	Hurnak Grimmord | Krugosh	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+29361	trainer	Hurnak Grimmord | Krugosh	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+29545	trainer	Humphry | Rohok | Grutah	Hellfire Peninsula | Hellfire Peninsula | Shadowmoon Valley	alliance | horde | horde			Master Blacksmithing Trainer
+29547	trainer	Humphry | Rohok | Grutah	Hellfire Peninsula | Hellfire Peninsula | Shadowmoon Valley	alliance | horde | horde			Master Blacksmithing Trainer
+29548	trainer	Humphry | Rohok | Grutah	Hellfire Peninsula | Hellfire Peninsula | Shadowmoon Valley	alliance | horde | horde			Master Blacksmithing Trainer
+29549	trainer	Humphry | Rohok | Grutah	Hellfire Peninsula | Hellfire Peninsula | Shadowmoon Valley	alliance | horde | horde			Master Blacksmithing Trainer
+29550	trainer	Humphry | Rohok | Grutah	Hellfire Peninsula | Hellfire Peninsula | Shadowmoon Valley	alliance | horde | horde			Master Blacksmithing Trainer
+29551	trainer	Humphry | Rohok | Grutah	Hellfire Peninsula | Hellfire Peninsula | Shadowmoon Valley	alliance | horde | horde			Master Blacksmithing Trainer
+29552	trainer	Humphry | Rohok | Grutah	Hellfire Peninsula | Hellfire Peninsula | Shadowmoon Valley	alliance | horde | horde			Master Blacksmithing Trainer
+29553	trainer	Humphry | Rohok | Grutah	Hellfire Peninsula | Hellfire Peninsula | Shadowmoon Valley	alliance | horde | horde			Master Blacksmithing Trainer
+29556	trainer	Humphry | Rohok | Grutah	Hellfire Peninsula | Hellfire Peninsula | Shadowmoon Valley	alliance | horde | horde			Master Blacksmithing Trainer
+29557	trainer	Humphry | Rohok | Grutah	Hellfire Peninsula | Hellfire Peninsula | Shadowmoon Valley	alliance | horde | horde			Master Blacksmithing Trainer
+29558	trainer	Humphry | Rohok | Grutah	Hellfire Peninsula | Hellfire Peninsula | Shadowmoon Valley	alliance | horde | horde			Master Blacksmithing Trainer
+29565	trainer	Humphry | Rohok | Grutah	Hellfire Peninsula | Hellfire Peninsula | Shadowmoon Valley	alliance | horde | horde			Master Blacksmithing Trainer
+29566	vendor	Eriden | Arras | Aaron Hollman	Silvermoon City | The Exodar | Shattrath City	horde | alliance | 			
+29568	vendor	Eriden | Arras | Aaron Hollman	Silvermoon City | The Exodar | Shattrath City	horde | alliance | 			
+29569	vendor	Eriden | Arras | Aaron Hollman	Silvermoon City | The Exodar | Shattrath City	horde | alliance | 			
+29571	vendor	Eriden | Arras | Aaron Hollman	Silvermoon City | The Exodar | Shattrath City	horde | alliance | 			
+29603	vendor	Krek Cragcrush | Loolruna	Shadowmoon Valley | Zangarmarsh	horde | alliance			
+29605	vendor	Krek Cragcrush | Loolruna	Shadowmoon Valley | Zangarmarsh	horde | alliance			
+29606	vendor	Krek Cragcrush | Loolruna	Shadowmoon Valley | Zangarmarsh	horde | alliance			
+29608	vendor	Quartermaster Enuril	Shattrath City				
+29610	vendor	Quartermaster Enuril	Shattrath City				
+29611	vendor	Quartermaster Enuril	Shattrath City				
+29613	vendor	Quartermaster Enuril	Shattrath City				
+29614	vendor	Quartermaster Endarin	Shattrath City				
+29615	vendor	Quartermaster Endarin	Shattrath City				
+29616	vendor	Quartermaster Endarin	Shattrath City				
+29617	vendor	Quartermaster Endarin	Shattrath City				
+29619	drop		Auchenai Crypts				
+29620	drop		The Arcatraz				
+29621	drop		Shadow Labyrinth				
+29622	worldDrop					true	
+29628	drop		Nagrand				
+29629	drop		Shadowmoon Valley				
+29630	drop		Netherstorm				
+29642	drop		Nagrand				
+29643	drop		Blade's Edge Mountains				
+29645	drop		Shadowmoon Valley				
+29648	drop		Mana-Tombs				
+29649	drop	High Botanist Freywinn	The Botanica				
+29654	trainer	Humphry | Rohok | Grutah	Hellfire Peninsula | Hellfire Peninsula | Shadowmoon Valley	alliance | horde | horde			Master Blacksmithing Trainer
+29656	vendor	Fedryen Swiftspear	Zangarmarsh				
+29657	vendor	Logistics Officer Ulrike | Quartermaster Urgronn	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+29658	worldDrop					true	
+29662	worldDrop					true	
+29663	worldDrop					true	
+29664	worldDrop					true	
+29668	worldDrop					true	
+29669	worldDrop					true	
+29671	worldDrop					true	
+29672	worldDrop					true	
+29686	trainer	Hurnak Grimmord | Krugosh	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+29688	vendor	Altaa | Melaris | Skreah	The Exodar | Silvermoon City | Shattrath City	alliance | horde | 			
+29692	worldDrop					true	
+29693	worldDrop					true	
+29694	worldDrop					true	
+29695	worldDrop					true	
+29696	worldDrop					true	
+29697	worldDrop					true	
+29698	worldDrop					true	
+29699	worldDrop					true	
+29700	worldDrop					true	
+29728	vendor	Rohok | Mari Stonehand	Hellfire Peninsula | Shadowmoon Valley	horde | alliance			
+29729	drop		Netherstorm				
+30303	trainer						Master Engineering Trainer
+30304	trainer						Master Engineering Trainer
+30305	trainer						Master Engineering Trainer
+30306	trainer						Master Engineering Trainer
+30307	trainer						Master Engineering Trainer
+30308	trainer						Master Engineering Trainer
+30309	trainer						Master Engineering Trainer
+30310	trainer						Master Engineering Trainer
+30311	trainer						Master Engineering Trainer
+30312	trainer						Master Engineering Trainer
+30313	vendor	Feera | Viggz Shinesparked | Yatheon	The Exodar | Shattrath City | Silvermoon City	alliance |  | horde			
+30314	drop		Blade's Edge Mountains				
+30315	worldDrop					true	
+30316	vendor	Lebowski | Mixie Farshot	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+30317	worldDrop					true	
+30318	vendor	Lebowski | Captured Gnome	Hellfire Peninsula | Zangarmarsh	alliance | horde			
+30325	drop		Shadowmoon Valley				
+30329	vendor	Daggle Ironshaper | Mixie Farshot	Shadowmoon Valley | Hellfire Peninsula	alliance | horde			
+30332	drop		Netherstorm				
+30334	drop	Attumen the Huntsman	Karazhan				
+30337	worldDrop					true	
+30341	vendor	Feera | Wind Trader Lathrai | Captured Gnome | Yatheon	The Exodar | Shattrath City | Zangarmarsh | Silvermoon City	alliance |  | horde | horde			
+30344	vendor	Fedryen Swiftspear	Zangarmarsh				
+30346	trainer						Master Engineering Trainer
+30347	vendor	Feera | Yatheon | Wind Trader Lathrai	The Exodar | Silvermoon City | Shattrath City	alliance | horde | 			
+30348	vendor	Feera | Yatheon | Wind Trader Lathrai	The Exodar | Silvermoon City | Shattrath City	alliance | horde | 			
+30349	vendor						
+30547	vendor	Karaaz | Paulsta'ats	Netherstorm | Nagrand				
+30548	quest		Zangarmarsh	horde			
+30551	drop	Kael'thas Sunstrider	Magisters' Terrace				
+30552	drop	Kael'thas Sunstrider	Magisters' Terrace				
+30556	drop	Mekgineer Steamrigger	The Steamvault				
+30558	trainer	Vazario Linkgrease | Nixx Sprocketspring	The Barrens | Tanaris				Goblin Engineering Trainer
+30560	trainer	Vazario Linkgrease | Nixx Sprocketspring	The Barrens | Tanaris				Goblin Engineering Trainer
+30563	trainer	Vazario Linkgrease | Nixx Sprocketspring	The Barrens | Tanaris				Goblin Engineering Trainer
+30565	trainer	Vazario Linkgrease | Nixx Sprocketspring	The Barrens | Tanaris				Goblin Engineering Trainer
+30566	trainer	Vazario Linkgrease | Nixx Sprocketspring	The Barrens | Tanaris				Goblin Engineering Trainer
+30568	trainer	Tinkmaster Overspark | Oglethorpe Obnoticus	Ironforge | Stranglethorn Vale	alliance | 			Gnomish Engineering Trainer
+30569	trainer	Tinkmaster Overspark | Oglethorpe Obnoticus	Ironforge | Stranglethorn Vale	alliance | 			Gnomish Engineering Trainer
+30570	trainer	Tinkmaster Overspark | Oglethorpe Obnoticus	Ironforge | Stranglethorn Vale	alliance | 			Gnomish Engineering Trainer
+30574	trainer	Tinkmaster Overspark | Oglethorpe Obnoticus	Ironforge | Stranglethorn Vale	alliance | 			Gnomish Engineering Trainer
+30575	trainer	Tinkmaster Overspark | Oglethorpe Obnoticus	Ironforge | Stranglethorn Vale	alliance | 			Gnomish Engineering Trainer
+31048	trainer						
+31049	trainer						
+31050	trainer						
+31051	trainer						
+31052	trainer						
+31053	drop		Shadowmoon Valley				
+31054	drop		The Steamvault				
+31055	drop	Darkweaver Syth	Sethekk Halls				
+31056	drop		Blade's Edge Mountains				
+31057	drop		Netherstorm				
+31058	worldDrop					true	
+31060	worldDrop					true	
+31061	worldDrop					true	
+31062	vendor	Alurmi	Tanaris				
+31063	vendor	Nakodu	Shattrath City				
+31064	vendor	Quartermaster Enuril	Shattrath City				
+31065	vendor	Quartermaster Endarin	Shattrath City				
+31066	vendor	Karaaz | Paulsta'ats	Netherstorm | Nagrand				
+31067	worldDrop					true	
+31068	worldDrop					true	
+31070	worldDrop					true	
+31071	worldDrop					true	
+31072	worldDrop					true	
+31076	worldDrop					true	
+31077	drop		The Botanica				
+31078	drop	Epoch Hunter	Old Hillsbrad Foothills				
+31079	vendor	Nakodu	Shattrath City				
+31080	vendor	Logistics Officer Ulrike | Quartermaster Urgronn	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+31081	vendor	Alurmi	Tanaris				
+31082	vendor	Almaador	Shattrath City				
+31083	vendor	Fedryen Swiftspear	Zangarmarsh				
+31084	worldDrop					true	
+31085	worldDrop					true	
+31087	worldDrop					true	
+31088	drop	Kael'thas Sunstrider	Magisters' Terrace				
+31089	drop	Kael'thas Sunstrider	Magisters' Terrace				
+31090	worldDrop					true	
+31091	worldDrop					true	
+31092	drop	Kael'thas Sunstrider	Magisters' Terrace				
+31094	worldDrop					true	
+31095	worldDrop					true	
+31096	worldDrop					true	
+31097	worldDrop					true	
+31098	drop	Kael'thas Sunstrider	Magisters' Terrace				
+31099	worldDrop					true	
+31100	worldDrop					true	
+31101	vendor	Coreiel | Aldraan	Nagrand | Nagrand	horde | alliance			
+31102	worldDrop					true	
+31103	worldDrop					true	
+31104	worldDrop					true	
+31105	worldDrop					true	
+31106	worldDrop					true	
+31107	worldDrop					true	
+31108	worldDrop					true	
+31109	worldDrop					true	
+31110	worldDrop					true	
+31111	worldDrop					true	
+31112	worldDrop					true	
+31113	worldDrop					true	
+31149	worldDrop					true	
+31373	vendor	Gidge Spellweaver	Shattrath City				
+31430	vendor	Quartermaster Enuril	Shattrath City				
+31431	vendor	Quartermaster Endarin	Shattrath City				
+31432	vendor	Quartermaster Enuril	Shattrath City				
+31433	vendor	Quartermaster Endarin	Shattrath City				
+31434	drop	Kael'thas Sunstrider	Magisters' Terrace				
+31435	worldDrop					true	
+31437	worldDrop					true	
+31438	worldDrop					true	
+31440	worldDrop					true	
+31441	worldDrop					true	
+31442	drop	Kael'thas Sunstrider	Magisters' Terrace				
+31443	worldDrop					true	
+31444	worldDrop					true	
+31448	worldDrop					true	
+31449	worldDrop					true	
+31450	worldDrop					true	
+31451	drop	Dalliah the Doomsayer	The Arcatraz				
+31452	drop	Murmur	Shadow Labyrinth				
+31453	drop	Thorngrin the Tender	The Botanica				
+31454	drop	Warp Splinter	The Botanica				
+31455	drop	Grand Warlock Nethekurse	The Shattered Halls				
+31456	drop	Warlord Kalithresh	The Steamvault				
+31459	vendor	Karaaz | Paulsta'ats	Netherstorm | Nagrand				
+31460	trainer	Dalinna | Hama	Hellfire Peninsula | Hellfire Peninsula	horde | alliance			
+32178	trainer						
+32179	trainer						
+32259	trainer						
+32284	trainer	Humphry | Rohok | Grutah	Hellfire Peninsula | Hellfire Peninsula | Shadowmoon Valley	alliance | horde | horde			Master Blacksmithing Trainer
+32285	vendor	Fedryen Swiftspear	Zangarmarsh				
+32454	trainer						Master Leatherworking Trainer
+32455	vendor	Haferet | Zaralda | Cro Threadstrong	The Exodar | Silvermoon City | Shattrath City	alliance | horde | 			
+32456	trainer						Master Leatherworking Trainer
+32457	vendor	Quartermaster Endarin	Shattrath City				
+32458	vendor	Quartermaster Enuril	Shattrath City				
+32461	vendor	Thomas Yance	Old Hillsbrad Foothills				
+32462	trainer						Master Leatherworking Trainer
+32463	trainer						Master Leatherworking Trainer
+32464	trainer						Master Leatherworking Trainer
+32465	trainer						Master Leatherworking Trainer
+32466	trainer						Master Leatherworking Trainer
+32467	trainer						Master Leatherworking Trainer
+32468	trainer						Master Leatherworking Trainer
+32469	trainer						Master Leatherworking Trainer
+32470	trainer						Master Leatherworking Trainer
+32471	trainer						Master Leatherworking Trainer
+32472	trainer						Master Leatherworking Trainer
+32473	trainer						Master Leatherworking Trainer
+32478	trainer						Master Leatherworking Trainer
+32479	trainer						Master Leatherworking Trainer
+32480	trainer						Master Leatherworking Trainer
+32481	trainer						Master Leatherworking Trainer
+32482	vendor	Zaralda | Haferet	Silvermoon City | The Exodar	horde | alliance			
+32485	drop	Blackheart the Inciter	Shadow Labyrinth				
+32487	drop		Old Hillsbrad Foothills				
+32488	drop		Sethekk Halls				
+32489	drop		The Black Morass				
+32490	vendor	Karaaz | Paulsta'ats	Netherstorm | Nagrand				
+32493	vendor	Karaaz | Paulsta'ats	Netherstorm | Nagrand				
+32494	vendor	Karaaz | Paulsta'ats	Netherstorm | Nagrand				
+32495	vendor	Fedryen Swiftspear	Zangarmarsh				
+32496	vendor	Fedryen Swiftspear	Zangarmarsh				
+32497	vendor	Fedryen Swiftspear	Zangarmarsh				
+32498	vendor	Logistics Officer Ulrike | Quartermaster Urgronn	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+32499	vendor	Logistics Officer Ulrike | Quartermaster Urgronn	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+32500	vendor	Logistics Officer Ulrike | Quartermaster Urgronn	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+32501	vendor	Trader Narasu	Nagrand	alliance			
+32502	vendor	Trader Narasu	Nagrand	alliance			
+32503	vendor	Trader Narasu	Nagrand	alliance			
+32655	trainer	Humphry | Rohok | Grutah	Hellfire Peninsula | Hellfire Peninsula | Shadowmoon Valley	alliance | horde | horde			Master Blacksmithing Trainer
+32656	vendor	Aaron Hollman	Shattrath City				
+32657	vendor	Rohok | Mari Stonehand	Hellfire Peninsula | Shadowmoon Valley	horde | alliance			
+32664	trainer						
+32665	vendor	Rungor | Vodesiin	Terokkar Forest | Hellfire Peninsula	horde | alliance			
+32667	vendor	Madame Ruby	Shattrath City				
+32765	vendor	Fedryen Swiftspear	Zangarmarsh				
+32766	vendor	Logistics Officer Ulrike | Quartermaster Urgronn	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+32801	trainer						
+32807	trainer						
+32808	trainer						
+32809	trainer						
+32814	worldDrop					true	
+32866	vendor	Ythyar	Karazhan				
+32867	vendor	Ythyar	Karazhan				
+32868	worldDrop					true	
+32869	worldDrop					true	
+32870	vendor	Almaador	Shattrath City				
+32871	worldDrop					true	
+32872	worldDrop					true	
+32873	vendor	Karaaz | Paulsta'ats	Netherstorm | Nagrand				
+32874	vendor	Alurmi	Tanaris				
+33276	vendor	Landraelanis	Eversong Woods	horde			
+33277	quest		Azuremyst Isle	alliance			
+33278	vendor	Master Chef Mouldier	Ghostlands	horde			
+33279	quest		Hellfire Peninsula				
+33284	vendor	Cookie One-Eye | Sid Limbardi	Hellfire Peninsula | Hellfire Peninsula	horde | alliance			
+33285	vendor	Mycah	Zangarmarsh				
+33286	vendor	Innkeeper Grilka | Supply Officer Mills	Terokkar Forest | Terokkar Forest	horde | alliance			
+33287	vendor	Uriku | Nula the Butcher	Nagrand | Nagrand	alliance | horde			
+33288	vendor	Innkeeper Grilka | Supply Officer Mills	Terokkar Forest | Terokkar Forest	horde | alliance			
+33289	vendor	Uriku | Nula the Butcher	Nagrand | Nagrand	alliance | horde			
+33290	vendor	Gambarinka | Doba	Zangarmarsh | Zangarmarsh	horde | alliance			
+33291	vendor	Zurai | Doba	Zangarmarsh | Zangarmarsh	horde | alliance			
+33292	vendor	Juno Dufrain	Zangarmarsh				
+33293	vendor	Uriku | Nula the Butcher	Nagrand | Nagrand	alliance | horde			
+33294	vendor	Uriku | Nula the Butcher	Nagrand | Nagrand	alliance | horde			
+33295	vendor	Rungor | Innkeeper Biribi	Terokkar Forest | Terokkar Forest	horde | alliance			
+33296	vendor	Rungor | Innkeeper Biribi	Terokkar Forest | Terokkar Forest	horde | alliance			
+33732	trainer	Alchemist Gribble | Lorokeem | Apothecary Antonivich	Hellfire Peninsula | Shattrath City | Hellfire Peninsula	alliance |  | horde			Master Alchemy Trainer
+33733	trainer	Alchemist Gribble | Lorokeem | Apothecary Antonivich	Hellfire Peninsula | Shattrath City | Hellfire Peninsula	alliance |  | horde			Master Alchemy Trainer
+33738	trainer	Alchemist Gribble | Lorokeem | Apothecary Antonivich	Hellfire Peninsula | Shattrath City | Hellfire Peninsula	alliance |  | horde			Master Alchemy Trainer
+33740	trainer	Alchemist Gribble | Lorokeem | Apothecary Antonivich	Hellfire Peninsula | Shattrath City | Hellfire Peninsula	alliance |  | horde			Master Alchemy Trainer
+33741	trainer	Alchemist Gribble | Lorokeem | Apothecary Antonivich	Hellfire Peninsula | Shattrath City | Hellfire Peninsula	alliance |  | horde			Master Alchemy Trainer
+33990	trainer						
+33991	trainer						
+33992	worldDrop					true	
+33993	trainer						
+33994	vendor	Fedryen Swiftspear	Zangarmarsh				
+33995	trainer						
+33996	trainer						
+33997	vendor	Alurmi	Tanaris				
+33999	vendor	Almaador	Shattrath City				
+34001	trainer						
+34002	trainer						
+34003	vendor	Karaaz | Paulsta'ats	Netherstorm | Nagrand				
+34004	trainer						
+34005	drop		Shadowmoon Valley				
+34006	drop		Netherstorm				
+34007	drop	Kael'thas Sunstrider	Magisters' Terrace				
+34008	drop	Kael'thas Sunstrider	Magisters' Terrace				
+34009	vendor	Madame Ruby	Shattrath City				
+34010	vendor	Almaador	Shattrath City				
+34069	trainer						
+34529	trainer						
+34530	trainer						
+34533	trainer						
+34534	trainer						
+34535	trainer						
+34537	trainer						
+34538	trainer						
+34540	trainer						
+34541	trainer						
+34542	trainer						
+34543	trainer						
+34544	trainer						
+34545	trainer						
+34546	trainer						
+34547	trainer						
+34548	trainer						
+34590	trainer						
+34607	trainer	Humphry | Rohok | Grutah	Hellfire Peninsula | Hellfire Peninsula | Shadowmoon Valley	alliance | horde | horde			Master Blacksmithing Trainer
+34608	vendor	Fedryen Swiftspear	Zangarmarsh				
+34955	trainer						
+34959	trainer						
+34960	trainer						
+34961	trainer						
+34979	trainer						
+34981	trainer						
+34982	trainer						
+34983	trainer	Humphry | Rohok | Grutah	Hellfire Peninsula | Hellfire Peninsula | Shadowmoon Valley	alliance | horde | horde			Master Blacksmithing Trainer
+35520	drop		Sethekk Halls				
+35521	drop		The Arcatraz				
+35522	drop	Hydromancer Thespia	The Steamvault				
+35523	drop	Mennu the Betrayer	The Slave Pens				
+35524	drop	Chrono Lord Deja	The Black Morass				
+35525	vendor	Quartermaster Enuril	Shattrath City				
+35526	vendor	Quartermaster Enuril	Shattrath City				
+35527	vendor	Quartermaster Enuril	Shattrath City				
+35528	vendor	Quartermaster Endarin	Shattrath City				
+35529	vendor	Quartermaster Endarin	Shattrath City				
+35530	vendor	Trader Narasu	Nagrand	alliance			
+35531	vendor	Quartermaster Endarin	Shattrath City				
+35532	vendor	Quartermaster Enuril	Shattrath City				
+35533	vendor	Quartermaster Enuril	Shattrath City				
+35534	vendor	Quartermaster Enuril	Shattrath City				
+35535	vendor	Quartermaster Endarin	Shattrath City				
+35536	vendor	Quartermaster Endarin	Shattrath City				
+35537	vendor	Quartermaster Endarin	Shattrath City				
+35538	vendor	Alurmi	Tanaris				
+35539	vendor	Trader Narasu	Nagrand	alliance			
+35540	trainer						Master Leatherworking Trainer
+35543	vendor	Almaador	Shattrath City				
+35544	vendor	Provisioner Nasela | Trader Narasu	Nagrand | Nagrand	horde | alliance			
+35549	vendor	Logistics Officer Ulrike | Quartermaster Urgronn	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+35554	vendor	Logistics Officer Ulrike | Quartermaster Urgronn	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+35555	vendor	Fedryen Swiftspear	Zangarmarsh				
+35557	vendor	Fedryen Swiftspear	Zangarmarsh				
+35558	worldDrop					true	
+35559	drop	Kael'thas Sunstrider	Magisters' Terrace				
+35560	worldDrop					true	
+35561	worldDrop					true	
+35562	drop	Kael'thas Sunstrider	Magisters' Terrace				
+35563	worldDrop					true	
+35564	worldDrop					true	
+35567	worldDrop					true	
+35568	drop	Kael'thas Sunstrider	Magisters' Terrace				
+35572	worldDrop					true	
+35573	drop	Kael'thas Sunstrider	Magisters' Terrace				
+35574	worldDrop					true	
+35575	trainer	Peter Galen | Thorkaf Dragoneye	Azshara | Badlands	alliance | horde			Dragonscale Leatherworking Trainer
+35576	trainer	Peter Galen | Thorkaf Dragoneye	Azshara | Badlands	alliance | horde			Dragonscale Leatherworking Trainer
+35577	trainer	Peter Galen | Thorkaf Dragoneye	Azshara | Badlands	alliance | horde			Dragonscale Leatherworking Trainer
+35580	trainer	Peter Galen | Thorkaf Dragoneye	Azshara | Badlands	alliance | horde			Dragonscale Leatherworking Trainer
+35582	trainer	Peter Galen | Thorkaf Dragoneye	Azshara | Badlands	alliance | horde			Dragonscale Leatherworking Trainer
+35584	trainer	Peter Galen | Thorkaf Dragoneye	Azshara | Badlands	alliance | horde			Dragonscale Leatherworking Trainer
+35585	trainer	Caryssia Moonhunter | Se'Jib	Feralas | Stranglethorn Vale	alliance | horde			Tribal Leatherworking Trainer
+35587	trainer	Caryssia Moonhunter | Se'Jib	Feralas | Stranglethorn Vale	alliance | horde			Tribal Leatherworking Trainer
+35588	trainer	Caryssia Moonhunter | Se'Jib	Feralas | Stranglethorn Vale	alliance | horde			Tribal Leatherworking Trainer
+35589	trainer	Brumn Winterhoof | Sarah Tanner	Arathi Highlands | Searing Gorge	horde | alliance			Elemental Leatherworking Trainer
+35590	trainer	Brumn Winterhoof | Sarah Tanner	Arathi Highlands | Searing Gorge	horde | alliance			Elemental Leatherworking Trainer
+35591	trainer	Brumn Winterhoof | Sarah Tanner	Arathi Highlands | Searing Gorge	horde | alliance			Elemental Leatherworking Trainer
+35750	trainer	Hurnak Grimmord | Krugosh	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+35751	trainer	Hurnak Grimmord | Krugosh	Hellfire Peninsula | Hellfire Peninsula	alliance | horde			
+36074	trainer	Brumn Winterhoof | Sarah Tanner	Arathi Highlands | Searing Gorge	horde | alliance			Elemental Leatherworking Trainer
+36075	trainer	Caryssia Moonhunter | Se'Jib	Feralas | Stranglethorn Vale	alliance | horde			Tribal Leatherworking Trainer
+36076	trainer	Peter Galen | Thorkaf Dragoneye	Azshara | Badlands	alliance | horde			Dragonscale Leatherworking Trainer
+36077	trainer	Brumn Winterhoof | Sarah Tanner	Arathi Highlands | Searing Gorge	horde | alliance			Elemental Leatherworking Trainer
+36078	trainer	Caryssia Moonhunter | Se'Jib	Feralas | Stranglethorn Vale	alliance | horde			Tribal Leatherworking Trainer
+36079	trainer	Peter Galen | Thorkaf Dragoneye	Azshara | Badlands	alliance | horde			Dragonscale Leatherworking Trainer
+36122	trainer						
+36124	trainer						
+36125	trainer						
+36126	trainer						
+36128	trainer						
+36129	trainer						
+36130	trainer						
+36131	trainer						
+36133	trainer						
+36134	trainer						
+36135	trainer						
+36136	trainer						
+36137	trainer						
+36210	vendor	Mycah	Zangarmarsh				
+36256	trainer						
+36257	trainer						
+36258	trainer						
+36259	trainer						
+36260	trainer						
+36261	trainer						
+36262	trainer						
+36263	trainer						
+36315	drop		Serpentshrine Cavern | The Eye				
+36316	drop		Serpentshrine Cavern | The Eye				
+36317	drop		Serpentshrine Cavern | The Eye				
+36318	drop		Serpentshrine Cavern | The Eye				
+36349	drop		Serpentshrine Cavern | The Eye				
+36351	drop		Serpentshrine Cavern | The Eye				
+36352	drop		Serpentshrine Cavern | The Eye				
+36353	drop		Serpentshrine Cavern | The Eye				
+36355	drop		Serpentshrine Cavern | The Eye				
+36357	drop		Serpentshrine Cavern | The Eye				
+36358	drop		Serpentshrine Cavern | The Eye				
+36359	drop		Serpentshrine Cavern | The Eye				
+36389	drop		Serpentshrine Cavern | The Eye				
+36390	drop		Serpentshrine Cavern | The Eye				
+36391	drop		Serpentshrine Cavern | The Eye				
+36392	drop		Serpentshrine Cavern | The Eye				
+36523	trainer						
+36524	trainer						
+36525	trainer						
+36526	trainer						
+36686	vendor	Andrion Darkspinner	Shattrath City				
+36954	trainer	Kablamm Farflinger	Netherstorm				
+36955	trainer	Smiles O'Byron	Blade's Edge Mountains				
+37818	trainer						
+37836	trainer						
+37855	vendor	Almaador	Shattrath City				
+37873	vendor	Nakodu	Shattrath City				
+37882	vendor	Quartermaster Endarin	Shattrath City				
+37883	vendor	Quartermaster Endarin	Shattrath City				
+37884	vendor	Quartermaster Endarin	Shattrath City				
+38068	trainer						
+38070	trainer	Alchemist Gribble | Lorokeem | Apothecary Antonivich	Hellfire Peninsula | Shattrath City | Hellfire Peninsula	alliance |  | horde			Master Alchemy Trainer
+38175	trainer						
+38473	vendor	Fedryen Swiftspear	Zangarmarsh				
+38475	vendor	Fedryen Swiftspear	Zangarmarsh				
+38476	vendor	Fedryen Swiftspear	Zangarmarsh				
+38477	vendor	Koren	Karazhan				
+38478	vendor	Koren	Karazhan				
+38479	vendor	Koren	Karazhan				
+38503	vendor	Apprentice Darius	Deadwind Pass				
+38504	vendor	Fedryen Swiftspear	Zangarmarsh				
+38867	vendor	Xerintha Ravenoak | Sassa Weldwell	Blade's Edge Mountains | Blade's Edge Mountains	 | alliance			
+38868	vendor	Xerintha Ravenoak | Sassa Weldwell	Blade's Edge Mountains | Blade's Edge Mountains	 | alliance			
+38960	drop		Shadowmoon Valley				
+38961	drop		Shadowmoon Valley				
+38962	drop		Shadowmoon Valley				
+39451	drop		Blade's Edge Mountains				
+39452	worldDrop					true	
+39455	drop		Blade's Edge Mountains				
+39458	drop		Blade's Edge Mountains				
+39462	worldDrop					true	
+39463	worldDrop					true	
+39466	drop		Blade's Edge Mountains				
+39467	drop		Blade's Edge Mountains				
+39470	worldDrop					true	
+39471	worldDrop					true	
+39636	trainer	Alchemist Gribble | Lorokeem | Apothecary Antonivich	Hellfire Peninsula | Shattrath City | Hellfire Peninsula	alliance |  | horde			Master Alchemy Trainer
+39637	vendor	Fedryen Swiftspear	Zangarmarsh				
+39638	trainer	Alchemist Gribble | Lorokeem | Apothecary Antonivich	Hellfire Peninsula | Shattrath City | Hellfire Peninsula	alliance |  | horde			Master Alchemy Trainer
+39639	vendor	Quartermaster Jaffrey Noreliqe | Quartermaster Davian Vaclav	Nagrand | Nagrand	horde | alliance			
+39705	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39706	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39710	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39711	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39712	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39713	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39714	vendor	Ontuvo | Shaani	Shattrath City | Isle of Quel'Danas				
+39715	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39716	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39717	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39718	vendor	Ontuvo | Shaani	Shattrath City | Isle of Quel'Danas				
+39719	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39720	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39721	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39722	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39723	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39724	vendor	Ontuvo | Shaani	Shattrath City | Isle of Quel'Danas				
+39725	vendor	Ontuvo | Shaani	Shattrath City | Isle of Quel'Danas				
+39727	vendor	Ontuvo | Shaani	Shattrath City | Isle of Quel'Danas				
+39728	vendor	Ontuvo | Shaani	Shattrath City | Isle of Quel'Danas				
+39729	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39730	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39731	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39732	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39733	vendor	Ontuvo | Shaani	Shattrath City | Isle of Quel'Danas				
+39734	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39735	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39736	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39737	vendor	Ontuvo | Shaani	Shattrath City | Isle of Quel'Danas				
+39738	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39739	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39740	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39741	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39742	vendor	Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+39895	vendor	Xizzer Fizzbolt | Viggz Shinesparked	Winterspring | Shattrath City				
+39961	vendor	Karaaz | Paulsta'ats	Netherstorm | Nagrand				
+39963	worldDrop					true	
+39971	trainer						Master Engineering Trainer
+39973	trainer						Master Engineering Trainer
+39997	vendor	Okuno	Black Temple				
+40000	vendor	Okuno	Black Temple				
+40001	vendor	Okuno	Black Temple				
+40002	vendor	Okuno	Black Temple				
+40003	vendor	Okuno	Black Temple				
+40004	vendor	Okuno	Black Temple				
+40005	vendor	Okuno	Black Temple				
+40006	vendor	Okuno	Black Temple				
+40020	vendor	Okuno	Black Temple				
+40021	vendor	Okuno	Black Temple				
+40023	vendor	Okuno	Black Temple				
+40024	vendor	Okuno	Black Temple				
+40033	vendor	Okuno	Black Temple				
+40034	vendor	Okuno	Black Temple				
+40035	vendor	Okuno	Black Temple				
+40036	vendor	Okuno	Black Temple				
+40060	vendor	Okuno	Black Temple				
+40274	trainer						Master Engineering Trainer
+40514	trainer						Master Jewelcrafting Trainer
+41132	drop		Hyjal Summit | Black Temple				
+41133	drop		Black Temple				
+41134	drop		Black Temple				
+41135	drop		Hyjal Summit | Black Temple				
+41156	drop		Black Temple				
+41157	drop		Hyjal Summit | Black Temple				
+41158	drop		Hyjal Summit | Black Temple				
+41160	drop		Black Temple				
+41161	drop		Hyjal Summit | Black Temple				
+41162	drop		Black Temple				
+41163	drop		Black Temple				
+41164	drop		Hyjal Summit | Black Temple				
+41205	drop		Black Temple				
+41206	drop		Hyjal Summit | Black Temple				
+41207	drop		Hyjal Summit | Black Temple				
+41208	drop		Black Temple				
+41307	trainer						Master Engineering Trainer
+41311	trainer						Master Engineering Trainer
+41312	trainer						Master Engineering Trainer
+41314	trainer						Master Engineering Trainer
+41315	trainer						Master Engineering Trainer
+41316	trainer						Master Engineering Trainer
+41317	trainer						Master Engineering Trainer
+41318	trainer						Master Engineering Trainer
+41319	trainer						Master Engineering Trainer
+41320	trainer						Master Engineering Trainer
+41321	trainer						Master Engineering Trainer
+41414	trainer						Master Jewelcrafting Trainer
+41415	trainer						Master Jewelcrafting Trainer
+41418	trainer						Master Jewelcrafting Trainer
+41420	trainer						Master Jewelcrafting Trainer
+41429	trainer						Master Jewelcrafting Trainer
+41458	discovery						
+41500	discovery						
+41501	discovery						
+41502	discovery						
+41503	discovery						
+42296	trainer	Kylene	Shattrath City				Barmaid
+42302	trainer	Kylene	Shattrath City				Barmaid
+42305	trainer	Kylene	Shattrath City				Barmaid
+42546	vendor	Apprentice Darius	Deadwind Pass				
+42558	vendor	Karaaz | Paulsta'ats	Netherstorm | Nagrand				
+42588	vendor	Almaador	Shattrath City				
+42589	vendor	Karaaz | Paulsta'ats	Netherstorm | Nagrand				
+42590	vendor	Nakodu	Shattrath City				
+42591	vendor	Alurmi	Tanaris				
+42592	vendor	Almaador	Shattrath City				
+42593	vendor	Alurmi	Tanaris				
+42613	trainer						
+42615	trainer						
+42620	vendor	Apprentice Darius	Deadwind Pass				
+42662	drop		Shadowmoon Valley				
+42688	drop	Kael'thas Sunstrider	Magisters' Terrace				
+42731	vendor	Apprentice Darius	Deadwind Pass				
+42736	vendor	Apprentice Darius	Deadwind Pass				
+42974	drop		Zul'Aman				
+43493	vendor	Quartermaster Jaffrey Noreliqe | Quartermaster Davian Vaclav	Nagrand | Nagrand	horde | alliance			
+43549	quest		Ironforge	alliance			
+43676	drop		Netherstorm				
+43707	quest		Shattrath City				
+43758	quest		Shattrath City				
+43761	quest		Shattrath City				
+43765	quest		Shattrath City				
+43772	quest		Shattrath City				
+43779	quest		Shattrath City				
+43846	worldDrop					true	
+44155	trainer	Jonathan Garrett | Niobe Whizzlespark	Shadowmoon Valley | Shadowmoon Valley	horde | alliance			Master Engineering Trainer
+44157	trainer	Niobe Whizzlespark | Jonathan Garrett	Shadowmoon Valley | Shadowmoon Valley	alliance | horde			Master Engineering Trainer
+44343	trainer						Master Leatherworking Trainer
+44344	trainer						Master Leatherworking Trainer
+44359	vendor	Nakodu	Shattrath City				
+44383	trainer						
+44391	drop		Blade's Edge Mountains				
+44768	vendor	Quartermaster Urgronn | Logistics Officer Ulrike	Hellfire Peninsula | Hellfire Peninsula	horde | alliance			
+44770	trainer						Master Leatherworking Trainer
+44794	drop		Shadowmoon Valley				
+44950	vendor	Penney Copperpinch	Orgrimmar				
+44953	vendor	Penney Copperpinch | Wulmort Jinglepocket	Orgrimmar | Ironforge				
+44958	vendor	Wulmort Jinglepocket	Ironforge				
+44970	trainer						Master Leatherworking Trainer
+45022	vendor	Penney Copperpinch | Wulmort Jinglepocket	Orgrimmar | Ironforge				
+45061	trainer	Alchemist Gribble | Lorokeem | Apothecary Antonivich	Hellfire Peninsula | Shattrath City | Hellfire Peninsula	alliance |  | horde			Master Alchemy Trainer
+45100	trainer						Master Leatherworking Trainer
+45117	drop		Terokkar Forest				
+45695	quest		Terokkar Forest				
+45765	vendor	Eldara Dawnrunner	Isle of Quel'Danas				
+46106	drop		Sunwell Plateau				
+46107	drop		Sunwell Plateau				
+46108	drop		Sunwell Plateau				
+46109	drop		Sunwell Plateau				
+46110	drop		Sunwell Plateau				
+46111	drop		Sunwell Plateau				
+46112	drop		Sunwell Plateau				
+46113	drop		Sunwell Plateau				
+46114	drop		Sunwell Plateau				
+46115	drop		Sunwell Plateau				
+46116	drop		Sunwell Plateau				
+46122	drop		Sunwell Plateau				
+46123	drop		Sunwell Plateau				
+46124	drop		Sunwell Plateau				
+46125	drop		Sunwell Plateau				
+46126	drop		Sunwell Plateau				
+46127	drop		Sunwell Plateau				
+46128	drop		Sunwell Plateau				
+46129	drop		Sunwell Plateau				
+46130	drop		Sunwell Plateau				
+46131	drop		Sunwell Plateau				
+46132	drop		Sunwell Plateau				
+46133	drop		Sunwell Plateau				
+46134	drop		Sunwell Plateau				
+46135	drop		Sunwell Plateau				
+46136	drop		Sunwell Plateau				
+46137	drop		Sunwell Plateau				
+46138	drop		Sunwell Plateau				
+46139	drop		Sunwell Plateau				
+46140	drop		Sunwell Plateau				
+46141	drop		Sunwell Plateau				
+46142	drop		Sunwell Plateau				
+46144	drop		Sunwell Plateau				
+46353	drop		Sunwell Plateau				
+46403	vendor	Shaani | Ontuvo	Isle of Quel'Danas | Shattrath City				
+46404	vendor	Shaani | Ontuvo	Isle of Quel'Danas | Shattrath City				
+46405	vendor	Shaani | Ontuvo	Isle of Quel'Danas | Shattrath City				
+46578	worldEvent						
+46594	vendor	Eldara Dawnrunner	Isle of Quel'Danas				
+46597	vendor	Eldara Dawnrunner	Isle of Quel'Danas				
+46601	vendor	Eldara Dawnrunner	Isle of Quel'Danas				
+46684	vendor	Malygen | Bale	Felwood | Felwood	alliance | horde			
+46688	vendor	Malygen | Bale	Felwood | Felwood	alliance | horde			
+46697	drop	Mechano-Lord Capacitus	The Mechanar				
+46775	vendor	Eldara Dawnrunner	Isle of Quel'Danas				
+46776	vendor	Eldara Dawnrunner	Isle of Quel'Danas				
+46777	vendor	Eldara Dawnrunner	Isle of Quel'Danas				
+46778	vendor	Eldara Dawnrunner	Isle of Quel'Danas				
+46779	vendor	Eldara Dawnrunner	Isle of Quel'Danas				
+46803	vendor	Eldara Dawnrunner	Isle of Quel'Danas				
+47046	vendor	Eldara Dawnrunner	Isle of Quel'Danas				
+47048	vendor	Eldara Dawnrunner	Isle of Quel'Danas				
+47049	vendor	Eldara Dawnrunner	Isle of Quel'Danas				
+47050	vendor	Eldara Dawnrunner	Isle of Quel'Danas				
+47051	drop	Priestess Delrissa	Magisters' Terrace				
+47053	vendor	Eldara Dawnrunner | Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+47054	vendor	Indormi | Eldara Dawnrunner | Shaani | Ontuvo	Hyjal Summit | Isle of Quel'Danas | Isle of Quel'Danas | Shattrath City				
+47055	vendor	Eldara Dawnrunner | Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+47056	vendor	Eldara Dawnrunner | Shaani | Ontuvo | Indormi	Isle of Quel'Danas | Isle of Quel'Danas | Shattrath City | Hyjal Summit				
+47280	trainer						Master Jewelcrafting Trainer
+48789	vendor	Shaani | Ontuvo	Isle of Quel'Danas | Shattrath City				
+49677	vendor	Haughty Modiste	Tanaris				
+50194	vendor	Mycah	Zangarmarsh				
+50644	vendor	Haughty Modiste	Tanaris				
+50647	vendor	Haughty Modiste	Tanaris				
+351766	trainer						
+351768	vendor	Provisioner Nasela	Nagrand				
+351769	vendor	Provisioner Nasela	Nagrand				
+351770	vendor	Alurmi	Tanaris				
+351771	vendor	Almaador	Shattrath City				
