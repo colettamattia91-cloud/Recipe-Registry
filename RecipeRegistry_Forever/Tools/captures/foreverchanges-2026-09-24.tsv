@@ -1,0 +1,151 @@
+profession	name	skill	source
+leatherworking	Comfortable Leather Hat	175	Pattern drops in Sunken Temple, Scarlet Monastery and Tanaris and 15 more
+leatherworking	Big Voodoo Mask	195	Pattern drops in Feralas, Stranglethorn Vale and The Hinterlands and 26 more
+leatherworking	Wild Leather Helmet	200	Pattern: reward of the quest Wild Leather Helmet (level 45, Alliance) or 1 other
+leatherworking	Tough Scorpid Helm	225	Pattern drops from Wastewander Assassin, Tanaris; Andre Firebeard, Tanaris
+leatherworking	Charged Scorpid Helm	240	Pattern: nobody has found it in the beta yet
+leatherworking	Wicked Leather Headband	255	Pattern drops from Jadefire Trickster, Felwood
+leatherworking	Supple Scorpid Helm	260	Pattern: nobody has found it in the beta yet
+leatherworking	Runic Leather Headband	265	Pattern sold by Jase Farlane, Eastern Plaguelands
+leatherworking	Tooled Leather Crown	265	Pattern: nobody has found it in the beta yet
+leatherworking	Heavy Scorpid Helm	270	Pattern sold by Zannok Hidepiercer, Silithus
+leatherworking	Blue Suede Hat	280	Pattern: nobody has found it in the beta yet
+leatherworking	Helm of the Great Chief	290	Pattern drops in Ruins of Ahn'Qiraj, Molten Core and Stratholme and 4 more
+leatherworking	Black Dragonscale Helm	300	Pattern: nobody has found it in the beta yet
+leatherworking	Blue Dragonscale Helm	300	Pattern: nobody has found it in the beta yet
+leatherworking	Living Crown	300	Pattern: nobody has found it in the beta yet
+leatherworking	Molten Helm	300	Pattern sold by Lokhtos Darkbargainer, Blackrock Depths
+leatherworking	Outlaw's Collar	300	Pattern: nobody has found it in the beta yet
+leatherworking	Warbear Helm	300	Pattern: nobody has found it in the beta yet
+leatherworking	Azure Gustwoven Hood	175	Pattern sold by Archmage Alvareaux, Alterac Mountains
+leatherworking	Azure Windraveled Cover	175	Pattern sold by Archmage Alvareaux, Alterac Mountains
+leatherworking	Cloudy Gustwoven Hood	175	Pattern sold by Sutara Plainstalker, Mulgore (Horde)
+leatherworking	Cloudy Windraveled Cover	175	Pattern sold by Sutara Plainstalker, Mulgore (Horde)
+leatherworking	Tanning Rack	140	Blueprint
+leatherworking	Sewing Machine	300	Blueprint
+blacksmithing	Edge of Winter	165	Plans drops in Redridge Mountains
+blacksmithing	Iron Morningstar	165	Plans sold by Gorhak, Desolace
+blacksmithing	Mithril Shortsword	180	Plans: nobody has found it in the beta yet
+blacksmithing	Mithril Claws	195	Plans: nobody has found it in the beta yet
+blacksmithing	Mithril Stiletto	210	Plans: nobody has found it in the beta yet
+blacksmithing	Ebon Shiv	230	Plans sold by Magnus Frostwake, Western Plaguelands
+blacksmithing	Dawn's Edge	250	Plans: reward of the quest Snakestone of the Shadow Huntress (level 60)
+blacksmithing	Ornate Thorium Handaxe	250	Plans sold by Magnus Frostwake, Western Plaguelands
+blacksmithing	Thorium Cestus	250	Plans sold by Pexmit, Mount Hyjal
+blacksmithing	Blazing Rapier	255	Plans: reward of the quest Corruption (level 60)
+blacksmithing	Serenity	260	Plans found in Blacksmithing Plans, Stratholme
+blacksmithing	Volcanic Hammer	265	Plans drops from Volchan, Burning Steppes
+blacksmithing	Bold Dirk	270	Plans sold by Pexmit, Mount Hyjal
+blacksmithing	Bagh Nakh	300	Plans: nobody has found it in the beta yet
+tailoring	Earthen Silk Hood	150	Pattern: nobody has found it in the beta yet
+tailoring	Azure Stormsewn Cowl	175	Pattern sold by Archmage Alvareaux, Alterac Mountains
+tailoring	Cloudy Stormsewn Cowl	175	Pattern sold by Sutara Plainstalker, Mulgore (Horde)
+tailoring	Stormcloth Headband	200	Pattern: nobody has found it in the beta yet
+tailoring	Earthenweave Crown	260	Pattern: nobody has found it in the beta yet
+tailoring	Ghostweave Hood	260	Pattern: nobody has found it in the beta yet
+tailoring	Sylvan Crown	300	Pattern sold by Mishta, Silithus
+tailoring	Filigreed Flame Circlet	125	Pattern: nobody has found it in the beta yet
+tailoring	Filigreed Pearly Circlet	125	Pattern: nobody has found it in the beta yet
+tailoring	Filigreed Pristine Circlet	125	Pattern: nobody has found it in the beta yet
+tailoring	Filigreed Shadow Circlet	125	Pattern: nobody has found it in the beta yet
+tailoring	Filigreed Shining Circlet	125	Pattern: nobody has found it in the beta yet
+tailoring	Filigreed Silky Circlet	125	Pattern: nobody has found it in the beta yet
+engineering	SAF-T Bronze Bomb	145	nobody has found it in the beta yet
+engineering	SAF-T Jumbo Dynamite	150	nobody has found it in the beta yet
+engineering	Shafety Sheep	175	nobody has found it in the beta yet
+engineering	EZ-Thro Grenade	200	nobody has found it in the beta yet
+engineering	SAF-T Bomb	215	nobody has found it in the beta yet
+engineering	Tru-Trigger Frag Bomb	240	nobody has found it in the beta yet
+engineering	Unsanctified Grenade	260	nobody has found it in the beta yet
+engineering	SAF-T Clever Dynamite	275	nobody has found it in the beta yet
+engineering	EZ-Thro Thorium Grenade	285	nobody has found it in the beta yet
+engineering	EZ-Thro Dark Bomb	300	nobody has found it in the beta yet
+engineering	EZ-Thro Mana Bomb	300	nobody has found it in the beta yet
+engineering	Anarchist's Workbench	300	Blueprint
+alchemy	Minor Mender's Potion	30	Recipe drops from Gnarlpine Mystic, Teldrassil
+alchemy	Minor Spellblasting Potion	35	Recipe drops from Kobold Geomancer, Elwynn Forest
+alchemy	Minor Frenzy Potion	40	Recipe drops from Windfury Wind Witch, Mulgore; Bloodfeather Harpy, Teldrassil
+alchemy	Lesser Mender's Potion	80	Recipe drops from Theramore Preserver, The Barrens; Stormscale Siren, Darkshore
+alchemy	Lesser Spellblasting Potion	85	Recipe drops from Witchwing Windcaller, The Barrens
+alchemy	Lesser Frenzy Potion	90	Recipe drops from Raging Rot Hide, Silverpine Forest
+alchemy	Greater Spellblasting Potion	185	Recipe sold by Gorhak, Desolace
+alchemy	Greater Frenzy Potion	190	Recipe sold by Gorhak, Desolace
+alchemy	Superior Mender's Potion	230	nobody has found it in the beta yet
+alchemy	Superior Spellblasting Potion	235	nobody has found it in the beta yet
+alchemy	Superior Frenzy Potion	240	nobody has found it in the beta yet
+alchemy	Potion of Beast Culling	280	nobody has found it in the beta yet
+alchemy	Fermenter	140	Blueprint
+alchemy	Alchemy Laboratory	300	Blueprint
+cooking	Skywall Souffle	25	reward of the quest Restocking the Larders
+cooking	Breakfast Omelette	75	drops from Dire Condor, Redridge Mountains
+cooking	Giant Scrambled Eggs	175	nobody has found it in the beta yet
+cooking	Savory Turtle Stew	275	nobody has found it in the beta yet
+cooking	Cookie's Feast	140	Blueprint
+cooking	Iron Oven	300	Blueprint
+first_aid	Toxin Study	140	Blueprint
+first_aid	Plague Doctor's Laboratory	300	Blueprint
+enchanting	Arcane Salvager	140	Blueprint
+enchanting	Arcane Forge	300	Blueprint
+alchemy	Mana Well	11	Blueprint
+alchemy	Minor Discolored Healing Potion	50	Recipe: reward of the quest Wild Hearts (level 11, Horde)
+alchemy	Swiftness Potion	60	Recipe: a world drop, from creatures level 5 to 25
+alchemy	Restorative Potion	210	Not from a trainer: a quest or a teacher of its own in Classic
+alchemy	Lesser Stoneshield Potion	215	Recipe: reward of the quest Liquid Stone (level 37)
+enchanting	Mystic Mushroom	130	Blueprint
+enchanting	Polished Driftwood Icon	130	Blueprint
+enchanting	Tenets of the Silver Hand	130	Blueprint
+enchanting	Libram of Invocation	210	Blueprint
+enchanting	Talons of Wrath	210	Blueprint
+enchanting	Totem of Ancestral Protection	210	Blueprint
+enchanting	Idol of Swiftness	300	Blueprint
+enchanting	Idol of the Ursine Twins	300	Blueprint
+enchanting	Libram of Infusion	300	Blueprint
+enchanting	Steadfast Libram	300	Blueprint
+enchanting	Totem of Urgency	300	Blueprint
+enchanting	Winter's Might	190	nobody has found it in the beta yet
+tailoring	Flame Gown	110	Pattern sold by Cowardly Crosby, Stranglethorn Vale
+tailoring	Pearly Gown	110	Pattern sold by Cowardly Crosby, Stranglethorn Vale
+tailoring	Pristine Boots	100	nobody has found it in the beta yet
+engineering	Repair Bot	140	Blueprint
+alchemy	Greater Holy Protection Potion	290	Recipe drops from Scarlet Alchemist, Scarlet Enclave
+enchanting	Enchant Weapon - Healing Power	300	Formula drops in Molten Core
+enchanting	Enchant Weapon - Spell Power	300	Formula drops in Molten Core
+enchanting	Enchant Bracer - Strength	100	Formula sold by Dalria (Alliance) or Kulwia (Horde)
+cooking	Venomous Smoothie	25	Merchant's Favor skill 25 to 125
+cooking	Slimy Smoothie	100	Merchant's Favor skill 25 to 125
+cooking	Mrrggl Smrrthle	100	Merchant's Favor skill 25 to 125
+cooking	Calcified Smoothie	180	Merchant's Favor skill 180 to 200
+cooking	Spicy Smoothie	180	Merchant's Favor skill 180 to 200
+cooking	Wicked Smoothie	250	Merchant's Favor skill 250
+first_aid	Simple Poultice	1	Learned from the trainer
+alchemy	Elixir of the Phalanx	250	180 Merchant's Favor skill 250 to 285
+alchemy	Caustic Smog Potion	265	180 Merchant's Favor skill 250 to 285
+alchemy	Elixir of Cunning	250	180 Merchant's Favor skill 250 to 285
+alchemy	Elixir of Ferocity	250	180 Merchant's Favor skill 250 to 285
+alchemy	Elixir of Sages	250	180 Merchant's Favor skill 250 to 285
+alchemy	Elixir of the Whale	250	180 Merchant's Favor skill 250 to 285
+alchemy	Potion of Venomous Blood	275	180 Merchant's Favor skill 250 to 285
+alchemy	Elixir of the Owl	250	180 Merchant's Favor skill 250 to 285
+alchemy	Major Mender's Potion	280	180 Merchant's Favor skill 250 to 285
+alchemy	Potion of Elemental Siphoning	280	180 Merchant's Favor skill 250 to 285
+alchemy	Elixir of Nature Power	250	180 Merchant's Favor skill 250 to 285
+alchemy	Elixir of Wicked Regeneration	250	180 Merchant's Favor skill 250 to 285
+alchemy	Major Spellblasting Potion	285	180 Merchant's Favor skill 250 to 285
+alchemy	Major Frenzy Potion	290	240 Merchant's Favor skill 290 to 300
+alchemy	Elixir of the Grizzly	300	240 Merchant's Favor skill 290 to 300
+alchemy	Minor Arcane Elixir	65	45 Merchant's Favor skill 65 to 140
+alchemy	Discolored Healing Potion	120	Trainer
+alchemy	Elixir of Lesser Spirit	65	45 Merchant's Favor skill 65 to 140
+alchemy	Lesser Mageblood Elixir	65	45 Merchant's Favor skill 65 to 140
+alchemy	Elixir of Lesser Intellect	65	45 Merchant's Favor skill 65 to 140
+alchemy	Lesser Cleric's Elixir	65	45 Merchant's Favor skill 65 to 140
+alchemy	Lesser Arcane Elixir	65	45 Merchant's Favor skill 65 to 140
+alchemy	Mender's Potion	130	45 Merchant's Favor skill 65 to 140
+alchemy	Spellblasting Potion	135	45 Merchant's Favor skill 65 to 140
+alchemy	Frenzy Potion	140	45 Merchant's Favor skill 65 to 140
+alchemy	Elixir of Greater Spirit	165	120 Merchant's Favor skill 165 to 245
+alchemy	Greater Mageblood Elixir	165	120 Merchant's Favor skill 165 to 245
+alchemy	Greater Cleric's Elixir	165	120 Merchant's Favor skill 165 to 245
+alchemy	Elixir of Greater Fortitude	165	120 Merchant's Favor skill 165 to 245
+alchemy	Disorienting Smog Potion	180	120 Merchant's Favor skill 165 to 245
+alchemy	Dragonfire Potion	245	120 Merchant's Favor skill 165 to 245

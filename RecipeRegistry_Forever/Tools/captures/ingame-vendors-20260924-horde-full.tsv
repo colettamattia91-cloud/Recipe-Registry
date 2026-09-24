@@ -1,0 +1,330 @@
+recipeItemId	itemName	sourceKind	npcName	zone	x	y	faction
+159	Refreshing Spring Water	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+2678	Mild Spices	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+2692	Hot Spices	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+3713	Soothing Spices	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+4470	Simple Wood	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+4471	Flint and Tinder	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+4536	Shiny Red Apple	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+10284	Simple Flour	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+11291	Star Wood	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+21099	Recipe: Smoked Sagefish	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+21219	Recipe: Sagefish Delight	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+249476	Formula: Mystic Mushroom	vendor	Beneris	The Barrens	49.7	29.8	horde
+249477	Formula: Tenets of the Silver Hand	vendor	Beneris	The Barrens	49.7	29.8	horde
+249478	Formula: Polished Driftwood Icon	vendor	Beneris	The Barrens	49.7	29.8	horde
+249479	Formula: Enchant Weapon - Insight	vendor	Beneris	The Barrens	49.7	29.8	horde
+249480	Formula: Enchant Weapon - Recovery	vendor	Beneris	The Barrens	49.7	29.8	horde
+249481	Formula: Enchant Weapon - Revelation	vendor	Beneris	The Barrens	49.7	29.8	horde
+249482	Formula: Glimmering Staff	vendor	Beneris	The Barrens	49.7	29.8	horde
+249483	Formula: Soulstaff	vendor	Beneris	The Barrens	49.7	29.8	horde
+249484	Formula: Orb of Mystic Insight	vendor	Beneris	The Barrens	49.7	29.8	horde
+249485	Formula: Orb of Souls	vendor	Beneris	The Barrens	49.7	29.8	horde
+249493	Formula: Talons of Wrath	vendor	Beneris	The Barrens	49.7	29.8	horde
+249494	Formula: Libram of Invocation	vendor	Beneris	The Barrens	49.7	29.8	horde
+249495	Formula: Totem of Ancestral Protection	vendor	Beneris	The Barrens	49.7	29.8	horde
+249496	Formula: Enchant Necklace - Strength	vendor	Beneris	The Barrens	49.7	29.8	horde
+249502	Formula: Enchant Necklace - Spell Power	vendor	Beneris	The Barrens	49.7	29.8	horde
+249503	Formula: Enchant Necklace - Healing Power	vendor	Beneris	The Barrens	49.7	29.8	horde
+249504	Formula: Enchant Necklace - Agility	vendor	Beneris	The Barrens	49.7	29.8	horde
+249505	Formula: Enchant Necklace - Deflection	vendor	Beneris	The Barrens	49.7	29.8	horde
+249506	Formula: Radiant Staff	vendor	Beneris	The Barrens	49.7	29.8	horde
+249507	Formula: Dreamstaff	vendor	Beneris	The Barrens	49.7	29.8	horde
+249508	Formula: Truesilver Conduit	vendor	Beneris	The Barrens	49.7	29.8	horde
+249509	Formula: Twisting Essence Jar	vendor	Beneris	The Barrens	49.7	29.8	horde
+249510	Formula: Enchant Chest - Absorption	vendor	Beneris	The Barrens	49.7	29.8	horde
+249525	Formula: Enchant 2H Weapon - Mighty Spell Power	vendor	Beneris	The Barrens	49.7	29.8	horde
+249526	Formula: Enchant 2H Weapon - Mighty Healing Power	vendor	Beneris	The Barrens	49.7	29.8	horde
+249529	Formula: Idol of the Dream	vendor	Beneris	The Barrens	49.7	29.8	horde
+249530	Formula: Libram of Holy Alacrity	vendor	Beneris	The Barrens	49.7	29.8	horde
+249532	Formula: Totem of Thunder	vendor	Beneris	The Barrens	49.7	29.8	horde
+249534	Formula: Enchant Gloves - Arcane Power	vendor	Beneris	The Barrens	49.7	29.8	horde
+249535	Formula: Enchant Gloves - Natural Power	vendor	Beneris	The Barrens	49.7	29.8	horde
+249536	Formula: Enchant Gloves - Holy Power	vendor	Beneris	The Barrens	49.7	29.8	horde
+249537	Formula: Brilliant Wand	vendor	Beneris	The Barrens	49.7	29.8	horde
+249538	Formula: Enchant Bracer - Superior Intellect	vendor	Beneris	The Barrens	49.7	29.8	horde
+249539	Formula: Enchant Bracer - Superior Deflection	vendor	Beneris	The Barrens	49.7	29.8	horde
+249885	Recipe: Venomous Smoothie	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+249886	Recipe: Slimy Smoothie	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+249887	Recipe: Mrrggl Smrrthle	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+249888	Recipe: Calcified Smoothie	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+249889	Recipe: Spicy Smoothie	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+249890	Recipe: Wicked Smoothie	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+250364	Recipe: Elixir of Cunning	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250365	Recipe: Elixir of the Phalanx	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250367	Recipe: Lesser Cleric's Elixir	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250369	Recipe: Greater Cleric's Elixir	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250371	Recipe: Elixir of Greater Fortitude	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250372	Recipe: Elixir of Wicked Regeneration	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250373	Recipe: Elixir of the Owl	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250374	Recipe: Elixir of Sages	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250376	Recipe: Lesser Mageblood Elixir	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250377	Recipe: Greater Mageblood Elixir	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250378	Recipe: Lesser Arcane Elixir	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250379	Recipe: Elixir of Nature Power	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250381	Recipe: Elixir of Lesser Spirit	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250383	Recipe: Elixir of Greater Spirit	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250384	Recipe: Elixir of the Whale	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250386	Recipe: Elixir of Ferocity	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250387	Recipe: Elixir of the Grizzly	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250388	Recipe: Elixir of Lesser Intellect	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250978	Recipe: Spellblasting Potion	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250981	Recipe: Major Spellblasting Potion	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250984	Recipe: Frenzy Potion	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250987	Recipe: Major Frenzy Potion	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250990	Recipe: Mender's Potion	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250993	Recipe: Major Mender's Potion	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250994	Recipe: Potion of Venomous Blood	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250995	Recipe: Caustic Smog Potion	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250996	Recipe: Disorienting Smog Potion	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250997	Recipe: Dragonfire Potion	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+250998	Recipe: Potion of Elemental Siphoning	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+251355	Plans: Veteran's Boots	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251356	Plans: Guard's Boots	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251357	Plans: Protector's Boots	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251358	Plans: Acolyte's Boots	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251359	Plans: Crusader's Boots	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251360	Plans: Veteran's Gloves	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251361	Plans: Guard's Gloves	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251362	Plans: Protector's Gloves	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251363	Plans: Acolyte's Gloves	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251364	Plans: Crusader's Gloves	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251365	Plans: Veteran's Chain Belt	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251366	Plans: Guard's Chain Belt	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251367	Plans: Protector's Chain Belt	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251368	Plans: Acolyte's Chain Belt	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251369	Plans: Crusader's Chain Belt	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251370	Plans: Veteran's Silvered Chain Shirt	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251371	Plans: Guard's Silvered Chain Shirt	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251372	Plans: Protector's Silvered Chain Shirt	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251373	Plans: Acolyte's Silvered Chain Shirt	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251374	Plans: Crusader's Silvered Chain Shirt	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251375	Plans: Veteran's Silvered Chain Leggings	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251376	Plans: Guard's Silvered Chain Leggings	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251377	Plans: Protector's Silvered Chain Leggings	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251378	Plans: Acolyte's Silvered Chain Leggings	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251379	Plans: Crusader's Silvered Chain Leggings	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251380	Plans: Veteran's Silvered Chain Helm	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251381	Plans: Guard's Silvered Chain Helm	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251382	Plans: Protector's Silvered Chain Helm	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251383	Plans: Acolyte's Silvered Chain Helm	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251384	Plans: Crusader's Silvered Chain Helm	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251413	Plans: Officer's Sabatons	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251414	Plans: Sentinel's Sabatons	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251415	Plans: Warder's Sabatons	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251416	Plans: Prefect's Sabatons	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251417	Plans: Justicar's Sabatons	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251418	Plans: Officer's Gauntlet	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251419	Plans: Sentinel's Gauntlet	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251420	Plans: Warder's Gauntlet	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251421	Plans: Prefect's Gauntlet	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251422	Plans: Justicar's Gauntlet	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251423	Plans: Officer's Waistguard	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251424	Plans: Sentinel's Waistguard	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251425	Plans: Warder's Waistguard	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251426	Plans: Prefect's Waistguard	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251427	Plans: Justicar's Waistguard	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251428	Plans: Officer's Pauldrons	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251429	Plans: Sentinel's Pauldrons	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251430	Plans: Warder's Pauldrons	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251431	Plans: Prefect's Pauldrons	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251432	Plans: Justicar's Pauldrons	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251433	Plans: Officer's Wristguard	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251434	Plans: Sentinel's Wristguard	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251435	Plans: Warder's Wristguard	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251436	Plans: Prefect's Wristguard	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251437	Plans: Justicar's Wristguards	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251447	Plans: Enriched Thorium Breastplate	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251448	Plans: Enriched Thorium Leggings	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251449	Plans: Enriched Thorium Helm	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251465	Plans: Thorium Greatmace	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251466	Plans: Thorium Cestus	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+251471	Plans: Legionite Glaive	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+252765	Pattern: Brawler's Leather Belt	vendor	Pawani	The Barrens	49.6	29.7	horde
+252766	Pattern: Trapper's Leather Belt	vendor	Pawani	The Barrens	49.6	29.7	horde
+252767	Pattern: Defender's Leather Belt	vendor	Pawani	The Barrens	49.6	29.7	horde
+252768	Pattern: Totemic Leather Belt	vendor	Pawani	The Barrens	49.6	29.7	horde
+252769	Pattern: Stormrider's Leather Belt	vendor	Pawani	The Barrens	49.6	29.7	horde
+252770	Pattern: Wisdom's Leather Belt	vendor	Pawani	The Barrens	49.6	29.7	horde
+252777	Pattern: Brawler's Leather Gloves	vendor	Pawani	The Barrens	49.6	29.7	horde
+252778	Pattern: Trapper's Leather Gloves	vendor	Pawani	The Barrens	49.6	29.7	horde
+252779	Pattern: Defender's Leather Gloves	vendor	Pawani	The Barrens	49.6	29.7	horde
+252780	Pattern: Totemic Leather Gloves	vendor	Pawani	The Barrens	49.6	29.7	horde
+252781	Pattern: Stormrider's Leather Gloves	vendor	Pawani	The Barrens	49.6	29.7	horde
+252782	Pattern: Wisdom's Leather Gloves	vendor	Pawani	The Barrens	49.6	29.7	horde
+252786	Pattern: Brawler's Leather Boots	vendor	Pawani	The Barrens	49.6	29.7	horde
+252787	Pattern: Trapper's Leather Boots	vendor	Pawani	The Barrens	49.6	29.7	horde
+252788	Pattern: Defender's Leather Boots	vendor	Pawani	The Barrens	49.6	29.7	horde
+252789	Pattern: Totemic Leather Boots	vendor	Pawani	The Barrens	49.6	29.7	horde
+252790	Pattern: Stormrider's Leather Boots	vendor	Pawani	The Barrens	49.6	29.7	horde
+252791	Pattern: Wisdom's Leather Boots	vendor	Pawani	The Barrens	49.6	29.7	horde
+252798	Pattern: Brawler's Leather Hood	vendor	Pawani	The Barrens	49.6	29.7	horde
+252799	Pattern: Trapper's Leather Hood	vendor	Pawani	The Barrens	49.6	29.7	horde
+252800	Pattern: Defender's Leather Hood	vendor	Pawani	The Barrens	49.6	29.7	horde
+252801	Pattern: Totemic Leather Hood	vendor	Pawani	The Barrens	49.6	29.7	horde
+252802	Pattern: Stormrider's Leather Hood	vendor	Pawani	The Barrens	49.6	29.7	horde
+252803	Pattern: Wisdom's Leather Hood	vendor	Pawani	The Barrens	49.6	29.7	horde
+252805	Pattern: Brawler's Leather Tunic	vendor	Pawani	The Barrens	49.6	29.7	horde
+252806	Pattern: Trapper's Leather Tunic	vendor	Pawani	The Barrens	49.6	29.7	horde
+252807	Pattern: Defender's Leather Tunic	vendor	Pawani	The Barrens	49.6	29.7	horde
+252808	Pattern: Totemic Leather Tunic	vendor	Pawani	The Barrens	49.6	29.7	horde
+252809	Pattern: Stormrider's Leather Tunic	vendor	Pawani	The Barrens	49.6	29.7	horde
+252810	Pattern: Wisdom's Leather Tunic	vendor	Pawani	The Barrens	49.6	29.7	horde
+252820	Pattern: Brawler's Leather Legguards	vendor	Pawani	The Barrens	49.6	29.7	horde
+252821	Pattern: Trapper's Leather Legguards	vendor	Pawani	The Barrens	49.6	29.7	horde
+252822	Pattern: Defender's Leather Kilt	vendor	Pawani	The Barrens	49.6	29.7	horde
+252823	Pattern: Totemic Leather Leggings	vendor	Pawani	The Barrens	49.6	29.7	horde
+252824	Pattern: Stormrider's Leather Kilt	vendor	Pawani	The Barrens	49.6	29.7	horde
+252825	Pattern: Wisdom's Leather Leggings	vendor	Pawani	The Barrens	49.6	29.7	horde
+252834	Pattern: Forceful Thick Armor Kit	vendor	Pawani	The Barrens	49.6	29.7	horde
+252836	Pattern: Prowler's Leather Gloves	vendor	Pawani	The Barrens	49.6	29.7	horde
+252837	Pattern: Skulker's Leather Gloves	vendor	Pawani	The Barrens	49.6	29.7	horde
+252838	Pattern: Stalker's Leather Gloves	vendor	Pawani	The Barrens	49.6	29.7	horde
+252839	Pattern: Warden's Leather Gloves	vendor	Pawani	The Barrens	49.6	29.7	horde
+252840	Pattern: Skirmisher's Leather Gloves	vendor	Pawani	The Barrens	49.6	29.7	horde
+252841	Pattern: Skycaller's Leather Gloves	vendor	Pawani	The Barrens	49.6	29.7	horde
+252842	Pattern: Mender's Leather Gloves	vendor	Pawani	The Barrens	49.6	29.7	horde
+252848	Pattern: Prowler's Leather Shoulder	vendor	Pawani	The Barrens	49.6	29.7	horde
+252849	Pattern: Skulker's Leather Shoulder	vendor	Pawani	The Barrens	49.6	29.7	horde
+252850	Pattern: Warden's Leather Shoulder	vendor	Pawani	The Barrens	49.6	29.7	horde
+252851	Pattern: Skycaller's Leather Shoulder	vendor	Pawani	The Barrens	49.6	29.7	horde
+252852	Pattern: Mender's Leather Shoulder	vendor	Pawani	The Barrens	49.6	29.7	horde
+252853	Pattern: Prowler's Leather Bracers	vendor	Pawani	The Barrens	49.6	29.7	horde
+252854	Pattern: Skulker's Leather Bracers	vendor	Pawani	The Barrens	49.6	29.7	horde
+252855	Pattern: Warden's Leather Bracers	vendor	Pawani	The Barrens	49.6	29.7	horde
+252856	Pattern: Skycaller's Leather Bracers	vendor	Pawani	The Barrens	49.6	29.7	horde
+252857	Pattern: Mender's Leather Bracers	vendor	Pawani	The Barrens	49.6	29.7	horde
+252860	Pattern: Prowler's Leather Boots	vendor	Pawani	The Barrens	49.6	29.7	horde
+252861	Pattern: Skulker's Leather Boots	vendor	Pawani	The Barrens	49.6	29.7	horde
+252862	Pattern: Warden's Leather Boots	vendor	Pawani	The Barrens	49.6	29.7	horde
+252863	Pattern: Skycaller's Leather Boots	vendor	Pawani	The Barrens	49.6	29.7	horde
+252864	Pattern: Mender's Leather Boots	vendor	Pawani	The Barrens	49.6	29.7	horde
+252872	Pattern: Prowler's Leather Waistguard	vendor	Pawani	The Barrens	49.6	29.7	horde
+252873	Pattern: Skulker's Leather Waistguard	vendor	Pawani	The Barrens	49.6	29.7	horde
+252874	Pattern: Warden's Leather Waistguard	vendor	Pawani	The Barrens	49.6	29.7	horde
+252875	Pattern: Skycaller's Leather Waistguard	vendor	Pawani	The Barrens	49.6	29.7	horde
+252876	Pattern: Mender's Leather Waistguard	vendor	Pawani	The Barrens	49.6	29.7	horde
+252900	Pattern: Stalker's Mail Shoulder	vendor	Pawani	The Barrens	49.6	29.7	horde
+252901	Pattern: Skycaller's Mail Shoulder	vendor	Pawani	The Barrens	49.6	29.7	horde
+252902	Pattern: Skirmisher's Mail Shoulder	vendor	Pawani	The Barrens	49.6	29.7	horde
+252903	Pattern: Mender's Mail Shoulder	vendor	Pawani	The Barrens	49.6	29.7	horde
+252904	Pattern: Stalker's Mail Bracers	vendor	Pawani	The Barrens	49.6	29.7	horde
+252905	Pattern: Skycaller's Mail Bracers	vendor	Pawani	The Barrens	49.6	29.7	horde
+252906	Pattern: Skirmisher's Mail Bracers	vendor	Pawani	The Barrens	49.6	29.7	horde
+252907	Pattern: Mender's Mail Bracers	vendor	Pawani	The Barrens	49.6	29.7	horde
+252910	Pattern: Stalker's Mail Sabatons	vendor	Pawani	The Barrens	49.6	29.7	horde
+252911	Pattern: Skycaller's Mail Sabatons	vendor	Pawani	The Barrens	49.6	29.7	horde
+252912	Pattern: Skirmisher's Mail Sabatons	vendor	Pawani	The Barrens	49.6	29.7	horde
+252913	Pattern: Mender's Mail Sabatons	vendor	Pawani	The Barrens	49.6	29.7	horde
+252922	Pattern: Stalker's Mail Belt	vendor	Pawani	The Barrens	49.6	29.7	horde
+252923	Pattern: Skycaller's Mail Belt	vendor	Pawani	The Barrens	49.6	29.7	horde
+252924	Pattern: Skirmisher's Mail Belt	vendor	Pawani	The Barrens	49.6	29.7	horde
+252925	Pattern: Mender's Mail Belt	vendor	Pawani	The Barrens	49.6	29.7	horde
+252941	Pattern: Mystic Rugged Armor Kit	vendor	Pawani	The Barrens	49.6	29.7	horde
+253890	Pattern: Pristine Boots	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253892	Pattern: Silky Boots	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253894	Pattern: Flame Boots	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253896	Pattern: Shadow Boots	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253898	Pattern: Pearly Boots	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253900	Pattern: Shining Boots	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253914	Pattern: Pristine Gloves	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253916	Pattern: Silky Gloves	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253918	Pattern: Flame Gloves	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253920	Pattern: Shadow Gloves	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253922	Pattern: Pearly Gloves	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253924	Pattern: Shining Gloves	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253926	Pattern: Pristine Sash	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253928	Pattern: Silky Sash	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253930	Pattern: Flame Sash	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253932	Pattern: Shadow Sash	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253934	Pattern: Pearly Sash	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253936	Pattern: Shining Sash	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253950	Pattern: Pristine Circlet	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253952	Pattern: Silky Circlet	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253954	Pattern: Flame Circlet	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253956	Pattern: Shadow Circlet	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253958	Pattern: Pearly Circlet	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253960	Pattern: Shining Circlet	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253962	Pattern: Pristine Gown	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253964	Pattern: Silky Gown	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253966	Pattern: Flame Gown	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253968	Pattern: Shadow Gown	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253970	Pattern: Pearly Gown	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253972	Pattern: Shining Gown	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253988	Pattern: Pristine Leggings	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253990	Pattern: Silky Leggings	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253992	Pattern: Flame Leggings	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253994	Pattern: Shadow Leggings	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253996	Pattern: Pearly Leggings	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+253998	Pattern: Shining Leggings	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254024	Pattern: Frothing Handwraps	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254026	Pattern: Fiery Handwraps	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254028	Pattern: Black Handwraps	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254030	Pattern: Golden Handwraps	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254032	Pattern: Radiant Handwraps	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254036	Pattern: Mageweave Reagent Bag	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254050	Pattern: Nethergeld Shoulders	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254052	Pattern: Netherfroth Shoulders	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254054	Pattern: Netherflame Shoulders	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254056	Pattern: Netherpearl Shoulders	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254058	Pattern: Nethershine Shoulders	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254060	Pattern: Netherlight Shoulders	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254062	Pattern: Nethergeld Cuffs	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254064	Pattern: Netherfroth Cuffs	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254066	Pattern: Netherflame Cuffs	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254068	Pattern: Netherpearl Cuffs	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254070	Pattern: Nethershine Cuffs	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254072	Pattern: Netherlight Cuffs	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254080	Pattern: Runecloth Reagent Bag	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254082	Pattern: Gilded Waistcord	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254084	Pattern: Frothing Waistcord	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254086	Pattern: Fiery Waistcord	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254088	Pattern: Black Waistcord	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254090	Pattern: Golden Waistcord	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254092	Pattern: Radiant Waistcord	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254108	Pattern: Gilded Sandals	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254110	Pattern: Frothing Sandals	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254112	Pattern: Fiery Sandals	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254114	Pattern: Black Sandals	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254116	Pattern: Golden Sandals	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+254118	Pattern: Radiant Sandals	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+264201	Schematic: SAF-T Tabs	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+264202	Schematic: SAF-T Dynamite	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+264203	Schematic: SAF-T Copper Bomb	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+264204	Schematic: EZ-Thro Wrap	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+264205	Schematic: EZ-Thro Copper Bomb XL	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+264206	Schematic: No Slip SAF-T Padding	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+264209	Schematic: SAF-T Bell	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+264211	Schematic: EZ-Thro Fireproof Fuse	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+264216	Schematic: Emergency Field Cloak	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+264217	Schematic: Compact Critter Carrier	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+264220	Schematic: SAF-T Disposable Parachute	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+264221	Schematic: Gnomish Army Knife	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+264222	Schematic: Loot-A-Rang	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+264232	Schematic: Ultrasafe Rechargeable Battery	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+264234	Schematic: Gnomish Poultryizer	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+264235	Schematic: Ultralight Goblin Glider	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+264237	Schematic: Stealthman 52	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+271621	Alchemy Certification	vendor	Apothecary Durelle	The Barrens	49.9	29.6	horde
+271622	Blacksmithing Certification	vendor	Gor'mak	The Barrens	49.8	29.7	horde
+271624	Enchanting Certification	vendor	Beneris	The Barrens	49.7	29.8	horde
+271625	Engineering Certification	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+271626	Leatherworking Certification	vendor	Pawani	The Barrens	49.6	29.7	horde
+271627	Tailoring Certification	vendor	Jim'bek	The Barrens	49.6	29.5	horde
+272941	Thick Logs	vendor	Aza'bek	The Barrens	49.7	29.4	horde
+274393	Formula: Enchant Off-Hand - Wisdom	vendor	Beneris	The Barrens	49.7	29.8	horde
+274394	Formula: Enchant 2H Weapon - Spellblasting	vendor	Beneris	The Barrens	49.7	29.8	horde
+274398	Formula: Enchant Gloves - Superior Strength	vendor	Beneris	The Barrens	49.7	29.8	horde
+274399	Formula: Enchant Cloak - Agility	vendor	Beneris	The Barrens	49.7	29.8	horde
+274401	Formula: Enchant Bracer - Greater Spellpower	vendor	Beneris	The Barrens	49.7	29.8	horde
+280321	Schematic: Whimsical Waistwrap	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+280322	Schematic: Gizmo Girdle	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+280323	Schematic: Clanking Cord	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+280325	Schematic: Floppy Goggles	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+280326	Schematic: Bent Goggles	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+280327	Schematic: Stuckbutton Goggles	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+280328	Schematic: Dented Goggles	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+285285	Schematic: Satchel of Copper Bombs	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+285286	Schematic: Satchel of Bronze Bombs	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+285287	Schematic: Satchel of Iron Bombs	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde
+285288	Schematic: Satchel of Dark Iron Bombs	vendor	Fizzlefuse	The Barrens	49.8	29.7	horde

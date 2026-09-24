@@ -62,14 +62,113 @@ end
 -- Il datamining, se c'e'.
 --
 -- Porta i campi che il client non espone per ricetta: requiredSkill,
--- skillLevels, l'espansione vera e classMask. Arriva gia' tradotto in Lua da
--- import-dumps.ps1, perche' il bundle e' JSON e qui non lo leggeremmo.
+-- skillLevels, l'espansione vera e classMask -- e, per oggetto, il legame:
+-- MiningItems[itemId] e' il bindType di ItemSparse, 1 = legato quando si
+-- raccoglie. Arriva gia' tradotto in Lua da convert-mining.ps1, perche' il
+-- bundle e' JSON e qui non lo leggeremmo.
+-- La provenienza raccolta a mano, da Tools/acquisition-worksheet.tsv.
+--
+-- Non viene dal client e non viene dal datamining: chi vende una ricetta, chi
+-- la droppa e chi la insegna lo decide il server, e finche' non esiste un
+-- database di Forever quella colonna si riempie a mano -- in gioco aprendo il
+-- venditore, o leggendo una fonte e citandola. Il TSV e' il foglio dove si
+-- scrive; questo lo legge e basta.
+local acquisition = {}
+local acquisitionBySpell = {}
+local acquisitionRows = 0
+
+local function loadAcquisition(path)
+    local file = io.open(path, "r")
+    if not file then error("worksheet non leggibile: " .. tostring(path)) end
+    local header
+    for line in file:lines() do
+        line = line:gsub("\r$", "")
+        local fields = {}
+        for value in (line .. "\t"):gmatch("([^\t]*)\t") do fields[#fields + 1] = value end
+        if not header then
+            header = {}
+            for index, name in ipairs(fields) do header[name] = index end
+            if not header.recipeItemId then error("worksheet senza colonna recipeItemId") end
+        else
+            local function get(name)
+                local index = header[name]
+                local value = index and fields[index] or nil
+                if value == nil or value == "" then return nil end
+                return value
+            end
+            local itemId = tonumber(get("recipeItemId"))
+            local spellId = tonumber(get("spellId"))
+            local kind = get("sourceKind")
+            -- Una riga senza provenienza e' una riga ancora da riempire, non
+            -- un dato: si salta, cosi' il conteggio dice la verita'.
+            if kind and (itemId or spellId) then
+                -- Nome, zona e fazione possono portare piu' valori separati da
+                -- " | ": una ricetta venduta da due NPC, uno per fazione, e'
+                -- la forma normale dei quartermaster a Merchant's Favor. Si
+                -- srotolano in piu' sourcePlaces, che e' la verita': sono due
+                -- persone in due posti, non una con due nomi.
+                local function split(value)
+                    if not value then return {} end
+                    local parts = {}
+                    for piece in (value .. " | "):gmatch("%s*(.-)%s*| ") do
+                        if piece ~= "" then parts[#parts + 1] = piece end
+                    end
+                    if #parts == 0 then parts[1] = value end
+                    return parts
+                end
+                local names, zones, factions = split(get("npcName")), split(get("zone")), split(get("faction"))
+                local xs, ys = split(get("x")), split(get("y"))
+                local places = {}
+                for i = 1, math.max(#names, #zones, 1) do
+                    local place = {
+                        name = names[i] or names[1],
+                        zone = zones[i] or zones[1],
+                        -- Le coordinate seguono il loro NPC: due venditori
+                        -- stanno in due punti, e riusare le prime per il
+                        -- secondo e' un numero preciso e sbagliato.
+                        x = tonumber(xs[i] or (#xs == 1 and xs[1] or nil)),
+                        y = tonumber(ys[i] or (#ys == 1 and ys[1] or nil)),
+                        faction = factions[i] or (#factions == 1 and factions[1] or nil),
+                    }
+                    if place.name or place.zone then places[#places + 1] = place end
+                end
+                local entry = {
+                    kind = kind,
+                    places = places,
+                    bossDrop = get("bossDrop") == "true",
+                    worldDrop = get("worldDrop") == "true",
+                    trainerTitle = get("trainerTitle"),
+                }
+                -- Due indici perche' due forme di ricetta. Quella insegnata da
+                -- un oggetto si riconosce dall'oggetto, che e' cio' che si
+                -- vede in gioco. Quella che un oggetto non ce l'ha -- le
+                -- ricette da trainer -- si riconosce solo dallo spell, e senza
+                -- questo secondo indice non si potrebbe correggere: e' il caso
+                -- di Enchant Bracer - Strength, che la deduzione dava per
+                -- trainer e che invece vende Dalria.
+                if itemId then acquisition[itemId] = entry end
+                if spellId then acquisitionBySpell[spellId] = entry end
+                acquisitionRows = acquisitionRows + 1
+            end
+        end
+    end
+    file:close()
+end
+
 local mining = {}
+local miningItems = {}
+-- Gli oggetti che questa build del client non descrive: nessuna riga in
+-- ItemSparse, quindi nemmeno un nome. Una ricetta che produce uno di questi
+-- esiste nei dati e non nel gioco.
+local miningUnshipped = {}
 local miningPath
 for index = 3, #(arg or {}) do
     local value = tostring(arg[index])
+    local acquisitionPath = value:match("^%-%-acquisition=(.+)$")
     local path = value:match("^%-%-mining=(.+)$")
-    if path then
+    if acquisitionPath then
+        loadAcquisition(acquisitionPath)
+    elseif path then
         miningPath = path
         local env = {}
         local loader, loadErr = loadfile(path)
@@ -77,6 +176,8 @@ for index = 3, #(arg or {}) do
         setfenv(loader, env)
         loader()
         mining = env.MiningRecipes or {}
+        miningItems = env.MiningItems or {}
+        miningUnshipped = env.MiningUnshippedItems or {}
     else
         local extra = {}
         local loader, loadErr = loadfile(value)
@@ -234,6 +335,11 @@ for _, professionName in ipairs(dumpNames) do
                     requiredSkill = mined and mined.requiredSkill or nil,
                     skillLevels = mined and mined.skillLevels or nil,
                     classMask = mined and mined.classMask or nil,
+                    -- L'oggetto che insegna la ricetta -- un Pattern, dei Plans --
+                    -- dal datamining: il client non lo dice per ricetta. Su
+                    -- Forever il datamining lo trova solo passando da
+                    -- ItemXItemEffect, come retail; senza, era vuoto per tutte.
+                    recipeItemId = mined and mined.recipeItemId or nil,
                     createdItemId = tonumber(row.outputItemID),
                     category = category,
                     sortOrder = sortOrder,
@@ -244,11 +350,69 @@ for _, professionName in ipairs(dumpNames) do
                     record.createdCount = qMin
                     record.createdCountMax = qMax
                 end
+                -- Una ricetta che non produce un oggetto NON e' per questo "solo
+                -- per se'". Questa riga lo deduceva, ed era sbagliato: gli
+                -- incantamenti non producono niente e si mettono sugli oggetti
+                -- di chiunque. Marcarli self-only nascondeva al filtro tutti gli
+                -- incantamenti dei compagni di gilda -- 179 su 179 -- che e'
+                -- proprio "chi mi incanta i bracciali?", la domanda per cui
+                -- l'addon esiste. Visto in gioco il 2026-09-21, col primo sync.
+                --
+                -- Su TBC il flag e' stretto e viene da conoscenza esplicita: 4
+                -- ricette, gli incantamenti agli anelli, che l'incantatore mette
+                -- solo sui propri. Su Forever non esistono. Se un giorno si
+                -- sapra' di una ricetta davvero self-only, la si dichiara in
+                -- RecipeMetadata_Overrides.lua, selfOnlyOutputlessBySpellId.
                 if not record.createdItemId then
-                    -- una ricetta senza oggetto prodotto e' un effetto su di se'
-                    record.selfOnlyOutputless = true
                     stats.withoutOutput = stats.withoutOutput + 1
                 end
+                -- Il BoP e' un fatto dell'oggetto prodotto, non della ricetta: si
+                -- legge dal legame che il datamining da' per quell'oggetto, e
+                -- l'oggetto e' quello che dice il client. Cosi' era anche su TBC,
+                -- dove il bopOutput statico veniva da ItemSparse. Senza oggetto
+                -- (gli incantamenti) non c'e' niente da legare, e il campo resta
+                -- assente. Senza legame noto resta assente anche lui, e decide a
+                -- runtime il client, come prima.
+                local bind = record.createdItemId and miningItems[record.createdItemId]
+                if bind ~= nil then
+                    record.bopOutput = tonumber(bind) == 1
+                end
+                -- Una ricetta il cui prodotto il client non sa nemmeno
+                -- nominare non e' una ricetta che ti manca: e' contenuto che
+                -- questa build non spedisce -- avanzi di Season of Discovery,
+                -- roba di Forever non ancora attiva, i rimossi storici di
+                -- vanilla. Listarla fra "quelle che ti mancano" manda il
+                -- giocatore a cercare una ricetta che non esiste, quindi si
+                -- marca `removed` e il tab Collection la esclude da solo.
+                -- Stesso taglio che fa ForeverChanges, che su alchemy ne
+                -- scarta 18 delle sue 197.
+                if record.createdItemId and miningUnshipped[record.createdItemId] then
+                    record.removed = true
+                end
+                -- La provenienza raccolta a mano, se per questa ricetta c'e'.
+                -- Si indicizza sull'oggetto-ricetta perche' e' quello che si
+                -- vede in gioco: la riga del venditore, l'oggetto che cade.
+                local got = (record.recipeItemId and acquisition[record.recipeItemId])
+                    or acquisitionBySpell[spellId]
+                if got then
+                    record.sourceKind = got.kind
+                    record.bossDrop = got.bossDrop or nil
+                    record.worldDrop = got.worldDrop or nil
+                    record.trainerTitle = got.trainerTitle
+                    if got.places and #got.places > 0 then
+                        record.sourcePlaces = got.places
+                    end
+                end
+                -- Niente deduzione per esclusione: l'assenza di un
+                -- oggetto-ricetta dice che non la insegna un OGGETTO, non che
+                -- la insegni un trainer. Poteva essere una discovery, un
+                -- premio di quest o un sottoprodotto -- Fire Oil si impara
+                -- lavorando e non la insegna nessuno. Qui c'era quella
+                -- deduzione, misurata al 90%, e il 10% restante erano righe
+                -- inventate indistinguibili da quelle lette. La provenienza
+                -- delle ricette vanilla arriva dal dataset TBC, che quel dato
+                -- ce l'ha per davvero; quella di Forever resta vuota finche'
+                -- non la si raccoglie.
                 if type(row.reagents) == "table" and #row.reagents > 0 then
                     local reagents = {}
                     for _, r in ipairs(row.reagents) do
@@ -309,9 +473,13 @@ table.sort(ids)
 
 -- Gli indici che il modulo si aspetta gia' costruiti nel file.
 local createdItemToSpellIds = {}
+local recipeItemToSpellId = {}
 local navProfessions = {}
 for _, spellId in ipairs(ids) do
     local r = records[spellId]
+    if r.recipeItemId and not recipeItemToSpellId[r.recipeItemId] then
+        recipeItemToSpellId[r.recipeItemId] = spellId
+    end
     if r.createdItemId then
         local bucket = createdItemToSpellIds[r.createdItemId]
         if not bucket then bucket = {}; createdItemToSpellIds[r.createdItemId] = bucket end
@@ -342,6 +510,19 @@ table.sort(buildList)
 
 local out = {}
 local function emit(line) out[#out + 1] = line end
+
+-- I nomi di zona si internano: una citta' che compare su cento righe si
+-- scrive una volta sola e le righe portano il numero. E' la stessa forma del
+-- dataset TBC, che RecipeMetadata:GetSource risolve da zoneNamesById.
+local zoneNames, zoneIds, zoneCount = {}, {}, 0
+local function zoneId(name)
+    if not zoneIds[name] then
+        zoneCount = zoneCount + 1
+        zoneIds[name] = zoneCount
+        zoneNames[zoneCount] = name
+    end
+    return zoneIds[name]
+end
 
 local function sortedKeys(tbl)
     local keys = {}
@@ -376,13 +557,14 @@ local COVERAGE_FIELDS = {
     { "skillLevels",    "datamining", "le soglie di difficolta'" },
     { "expansion",      "datamining", "vanilla o aggiunta di Forever" },
     { "classMask",      "datamining", "quali classi possono impararla" },
+    { "bopOutput",      "datamining", "se il prodotto e' legato quando si raccoglie" },
+    { "recipeItemId",   "datamining", "l'oggetto che insegna la ricetta" },
+    { "removed",        "datamining", "nei dati del client ma non nel gioco" },
+    { "sourceKind",     "a mano",     "da dove si ottiene" },
+    { "sourcePlaces",   "a mano",     "chi la vende o la droppa, e dove" },
 }
 local MISSING_FIELDS = {
-    { "recipeItemId",     "l'oggetto che insegna la ricetta" },
-    { "sourceKind",       "da dove si ottiene: trainer, venditore, drop" },
-    { "sourcePlaces",     "dove si ottiene" },
     { "trainerTitle",     "quale trainer la insegna" },
-    { "bopOutput",        "se il prodotto e' legato quando si raccoglie" },
     { "specialization",   "se richiede una specializzazione" },
     { "phase",            "in che fase di contenuto arriva" },
 }
@@ -449,6 +631,33 @@ for _, spellId in ipairs(ids) do
     end
     emit(string.format("            expansion = %q,", r.expansion))
     if r.createdItemId then emit(string.format("            createdItemId = %d,", r.createdItemId)) end
+    if r.recipeItemId then emit(string.format("            recipeItemId = %d,", r.recipeItemId)) end
+    if r.bopOutput ~= nil then emit(string.format("            bopOutput = %s,", tostring(r.bopOutput))) end
+    -- Solo quando e' vero: `removed = false` su 2167 record sarebbe rumore, e
+    -- RecipeMetadata:IsRemoved legge l'assenza come "non rimossa".
+    if r.removed then emit("            removed = true,") end
+    if r.sourceKind then
+        emit(string.format("            sourceKind = %q,", r.sourceKind))
+        if r.bossDrop then emit("            bossDrop = true,") end
+        if r.worldDrop then emit("            worldDrop = true,") end
+        if r.trainerTitle then emit(string.format("            trainerTitle = %q,", r.trainerTitle)) end
+        if r.sourcePlaces then
+            local parts = {}
+            for _, place in ipairs(r.sourcePlaces) do
+                local fields = {}
+                if place.name then fields[#fields + 1] = string.format("name = %q", place.name) end
+                -- La zona e' un id internato, non una stringa: RecipeMetadata
+                -- la risolve da zoneNamesById, e una citta' che compare su
+                -- cento righe si scrive una volta sola.
+                if place.zone then fields[#fields + 1] = string.format("zone = %d", zoneId(place.zone)) end
+                if place.x then fields[#fields + 1] = string.format("x = %s", tostring(place.x)) end
+                if place.y then fields[#fields + 1] = string.format("y = %s", tostring(place.y)) end
+                if place.faction then fields[#fields + 1] = string.format("faction = %q", place.faction) end
+                parts[#parts + 1] = "{ " .. table.concat(fields, ", ") .. " }"
+            end
+            emit(string.format("            sourcePlaces = { %s },", table.concat(parts, ", ")))
+        end
+    end
     if r.category then emit(string.format("            category = %q,", r.category)) end
     if r.sortOrder then emit(string.format("            sortOrder = %d,", r.sortOrder)) end
     if r.requiredSkill then emit(string.format("            requiredSkill = %d,", r.requiredSkill)) end
@@ -475,9 +684,13 @@ end
 emit("    },")
 emit("")
 
--- Nessuna ricetta del client dichiara l'oggetto che la insegna: il campo esiste
--- perche' il modulo lo cerca, e resta vuoto finche' non arriva dal datamining.
-emit("    recipeItemToSpellId = {},")
+-- L'oggetto che insegna una ricetta, all'indietro: e' cio' che permette al
+-- tooltip di un Pattern di dire chi sa gia' fare la ricetta che insegna.
+emit("    recipeItemToSpellId = {")
+for _, itemId in ipairs(sortedKeys(recipeItemToSpellId)) do
+    emit(string.format("        [%d] = %d,", itemId, recipeItemToSpellId[itemId]))
+end
+emit("    },")
 emit("")
 
 emit("    createdItemToSpellIds = {")
@@ -509,7 +722,15 @@ emit("    },")
 emit("")
 
 -- I nomi di zona servono alla libreria delle fonti, che qui non abbiamo.
-emit("    zoneNamesById = {},")
+if zoneCount == 0 then
+    emit("    zoneNamesById = {},")
+else
+    emit("    zoneNamesById = {")
+    for id = 1, zoneCount do
+        emit(string.format("        [%d] = %q,", id, zoneNames[id]))
+    end
+    emit("    },")
+end
 emit("")
 
 emit("    navTree = {")
