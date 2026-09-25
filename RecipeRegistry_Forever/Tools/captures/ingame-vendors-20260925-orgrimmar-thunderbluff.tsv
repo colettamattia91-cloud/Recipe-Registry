@@ -1,0 +1,135 @@
+recipeItemId	itemName	sourceKind	npcName	zone	x	y	faction
+159	Refreshing Spring Water	vendor	Naal Mistrunner	Thunder Bluff	51.1	52.5	horde
+159	Refreshing Spring Water	vendor	Xen'to	The Drag, Orgrimmar	57.6	53.3	horde
+2320	Coarse Thread	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+2320	Coarse Thread	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+2321	Fine Thread	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+2321	Fine Thread	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+2324	Bleach	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+2324	Bleach	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+2325	Black Dye	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+2325	Black Dye	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+2604	Red Dye	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+2604	Red Dye	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+2605	Green Dye	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+2605	Green Dye	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+2678	Mild Spices	vendor	Naal Mistrunner	Thunder Bluff	51.1	52.5	horde
+2678	Mild Spices	vendor	Xen'to	The Drag, Orgrimmar	57.6	53.3	horde
+2692	Hot Spices	vendor	Naal Mistrunner	Thunder Bluff	51.1	52.5	horde
+2692	Hot Spices	vendor	Xen'to	The Drag, Orgrimmar	57.6	53.3	horde
+2880	Weak Flux	vendor	Sovik	Valley of Honor, Orgrimmar	75.6	25.3	horde
+2880	Weak Flux	vendor	Sumi	Valley of Honor, Orgrimmar	82.6	24.0	horde
+2901	Mining Pick	vendor	Sovik	Valley of Honor, Orgrimmar	75.6	25.3	horde
+2901	Mining Pick	vendor	Sumi	Valley of Honor, Orgrimmar	82.6	24.0	horde
+3371	Empty Vial	vendor	Kor'geld	The Drag, Orgrimmar	56.1	34.1	horde
+3372	Leaded Vial	vendor	Kor'geld	The Drag, Orgrimmar	56.1	34.1	horde
+3466	Strong Flux	vendor	Sovik	Valley of Honor, Orgrimmar	75.6	25.3	horde
+3466	Strong Flux	vendor	Sumi	Valley of Honor, Orgrimmar	82.6	24.0	horde
+3713	Soothing Spices	vendor	Naal Mistrunner	Thunder Bluff	51.1	52.5	horde
+3713	Soothing Spices	vendor	Xen'to	The Drag, Orgrimmar	57.6	53.3	horde
+3857	Coal	vendor	Sumi	Valley of Honor, Orgrimmar	82.6	24.0	horde
+4289	Salt	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+4291	Silken Thread	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+4291	Silken Thread	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+4340	Gray Dye	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+4340	Gray Dye	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+4341	Yellow Dye	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+4341	Yellow Dye	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+4342	Purple Dye	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+4342	Purple Dye	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+4357	Rough Blasting Powder	vendor	Sovik	Valley of Honor, Orgrimmar	75.6	25.3	horde
+4399	Wooden Stock	vendor	Sovik	Valley of Honor, Orgrimmar	75.6	25.3	horde
+4400	Heavy Stock	vendor	Sovik	Valley of Honor, Orgrimmar	75.6	25.3	horde
+4470	Simple Wood	vendor	Kithas	The Drag, Orgrimmar	53.8	38.1	horde
+4470	Simple Wood	vendor	Naal Mistrunner	Thunder Bluff	51.1	52.5	horde
+4470	Simple Wood	vendor	Nata Dawnstrider	Thunder Bluff	44.8	38.8	horde
+4470	Simple Wood	vendor	Xen'to	The Drag, Orgrimmar	57.6	53.3	horde
+4471	Flint and Tinder	vendor	Naal Mistrunner	Thunder Bluff	51.1	52.5	horde
+4471	Flint and Tinder	vendor	Xen'to	The Drag, Orgrimmar	57.6	53.3	horde
+4536	Shiny Red Apple	vendor	Naal Mistrunner	Thunder Bluff	51.1	52.5	horde
+4536	Shiny Red Apple	vendor	Xen'to	The Drag, Orgrimmar	57.6	53.3	horde
+5642	Recipe: Free Action Potion	vendor	Kor'geld	The Drag, Orgrimmar	56.1	34.1	horde
+5771	Pattern: Red Linen Bag	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+5772	Pattern: Red Woolen Bag	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+5772	Pattern: Red Woolen Bag	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+5956	Blacksmith Hammer	vendor	Sovik	Valley of Honor, Orgrimmar	75.6	25.3	horde
+5956	Blacksmith Hammer	vendor	Sumi	Valley of Honor, Orgrimmar	82.6	24.0	horde
+6217	Copper Rod	vendor	Kithas	The Drag, Orgrimmar	53.8	38.1	horde
+6217	Copper Rod	vendor	Nata Dawnstrider	Thunder Bluff	44.8	38.8	horde
+6256	Fishing Pole	vendor	Sewa Mistrunner	Thunder Bluff	55.8	47.2	horde
+6260	Blue Dye	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+6260	Blue Dye	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+6261	Orange Dye	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+6261	Orange Dye	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+6270	Pattern: Blue Linen Vest	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+6274	Pattern: Blue Overalls	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+6325	Recipe: Brilliant Smallfish	vendor	Sewa Mistrunner	Thunder Bluff	55.8	47.2	horde
+6328	Recipe: Longjaw Mud Snapper	vendor	Naal Mistrunner	Thunder Bluff	51.1	52.5	horde
+6330	Recipe: Bristle Whisker Catfish	vendor	Naal Mistrunner	Thunder Bluff	51.1	52.5	horde
+6330	Recipe: Bristle Whisker Catfish	vendor	Sewa Mistrunner	Thunder Bluff	55.8	47.2	horde
+6342	Formula: Enchant Chest - Minor Intellect	vendor	Kithas	The Drag, Orgrimmar	53.8	38.1	horde
+6342	Formula: Enchant Chest - Minor Intellect	vendor	Nata Dawnstrider	Thunder Bluff	44.8	38.8	horde
+6349	Formula: Enchant 2H Weapon - Lesser Intellect	vendor	Kithas	The Drag, Orgrimmar	53.8	38.1	horde
+6349	Formula: Enchant 2H Weapon - Lesser Intellect	vendor	Nata Dawnstrider	Thunder Bluff	44.8	38.8	horde
+6377	Formula: Enchant Boots - Minor Agility	vendor	Nata Dawnstrider	Thunder Bluff	44.8	38.8	horde
+6529	Shiny Bauble	vendor	Sewa Mistrunner	Thunder Bluff	55.8	47.2	horde
+6530	Nightcrawlers	vendor	Sewa Mistrunner	Thunder Bluff	55.8	47.2	horde
+6532	Bright Baubles	vendor	Sewa Mistrunner	Thunder Bluff	55.8	47.2	horde
+7005	Skinning Knife	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+8343	Heavy Silken Thread	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+8343	Heavy Silken Thread	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+8925	Crystal Vial	vendor	Kor'geld	The Drag, Orgrimmar	56.1	34.1	horde
+10284	Simple Flour	vendor	Naal Mistrunner	Thunder Bluff	51.1	52.5	horde
+10284	Simple Flour	vendor	Xen'to	The Drag, Orgrimmar	57.6	53.3	horde
+10290	Pink Dye	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+10290	Pink Dye	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+10311	Pattern: Orange Martial Shirt	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+10314	Pattern: Lavender Mageweave Shirt	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+10317	Pattern: Pink Mageweave Shirt	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+10325	Pattern: White Wedding Dress	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+10647	Engineer's Ink	vendor	Sovik	Valley of Honor, Orgrimmar	75.6	25.3	horde
+10648	Blank Parchment	vendor	Sovik	Valley of Honor, Orgrimmar	75.6	25.3	horde
+10938	Lesser Magic Essence	vendor	Nata Dawnstrider	Thunder Bluff	44.8	38.8	horde
+10940	Strange Dust	vendor	Nata Dawnstrider	Thunder Bluff	44.8	38.8	horde
+11291	Star Wood	vendor	Kithas	The Drag, Orgrimmar	53.8	38.1	horde
+11291	Star Wood	vendor	Naal Mistrunner	Thunder Bluff	51.1	52.5	horde
+11291	Star Wood	vendor	Nata Dawnstrider	Thunder Bluff	44.8	38.8	horde
+11291	Star Wood	vendor	Xen'to	The Drag, Orgrimmar	57.6	53.3	horde
+12162	Plans: Hardened Iron Shortsword	vendor	Sumi	Valley of Honor, Orgrimmar	82.6	24.0	horde
+13478	Recipe: Elixir of Superior Defense	vendor	Kor'geld	The Drag, Orgrimmar	56.1	34.1	horde
+14341	Rune Thread	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+14341	Rune Thread	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+16041	Schematic: Thorium Grenade	vendor	Sovik	Valley of Honor, Orgrimmar	75.6	25.3	horde
+16042	Schematic: Thorium Widget	vendor	Sovik	Valley of Honor, Orgrimmar	75.6	25.3	horde
+18256	Imbued Vial	vendor	Kor'geld	The Drag, Orgrimmar	56.1	34.1	horde
+18567	Elemental Flux	vendor	Sumi	Valley of Honor, Orgrimmar	82.6	24.0	horde
+18647	Schematic: Red Firework	vendor	Sovik	Valley of Honor, Orgrimmar	75.6	25.3	horde
+20752	Formula: Minor Mana Oil	vendor	Kithas	The Drag, Orgrimmar	53.8	38.1	horde
+20752	Formula: Minor Mana Oil	vendor	Nata Dawnstrider	Thunder Bluff	44.8	38.8	horde
+20753	Formula: Lesser Wizard Oil	vendor	Kithas	The Drag, Orgrimmar	53.8	38.1	horde
+20753	Formula: Lesser Wizard Oil	vendor	Nata Dawnstrider	Thunder Bluff	44.8	38.8	horde
+20758	Formula: Minor Wizard Oil	vendor	Kithas	The Drag, Orgrimmar	53.8	38.1	horde
+20758	Formula: Minor Wizard Oil	vendor	Nata Dawnstrider	Thunder Bluff	44.8	38.8	horde
+21099	Recipe: Smoked Sagefish	vendor	Naal Mistrunner	Thunder Bluff	51.1	52.5	horde
+21099	Recipe: Smoked Sagefish	vendor	Xen'to	The Drag, Orgrimmar	57.6	53.3	horde
+21219	Recipe: Sagefish Delight	vendor	Naal Mistrunner	Thunder Bluff	51.1	52.5	horde
+21219	Recipe: Sagefish Delight	vendor	Xen'to	The Drag, Orgrimmar	57.6	53.3	horde
+22307	Pattern: Enchanted Mageweave Pouch	vendor	Kithas	The Drag, Orgrimmar	53.8	38.1	horde
+22307	Pattern: Enchanted Mageweave Pouch	vendor	Nata Dawnstrider	Thunder Bluff	44.8	38.8	horde
+247786	Mote of Magic	vendor	Kithas	The Drag, Orgrimmar	53.8	38.1	horde
+247786	Mote of Magic	vendor	Nata Dawnstrider	Thunder Bluff	44.8	38.8	horde
+252783	Pattern: Mystic Medium Armor Kit	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+252784	Pattern: Forceful Medium Armor Kit	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+252811	Pattern: Mystic Heavy Armor Kit	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+252812	Pattern: Forceful Heavy Armor Kit	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+253665	Pattern: Linen Reagent Bag	vendor	Boramu	Thunder Bluff	44.1	45.4	horde
+253665	Pattern: Linen Reagent Bag	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+253665	Pattern: Linen Reagent Bag	vendor	Darah	The Drag, Orgrimmar	63.7	50.6	horde
+253665	Pattern: Linen Reagent Bag	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+253668	Pattern: Woolen Reagent Bag	vendor	Boramu	Thunder Bluff	44.1	45.4	horde
+253668	Pattern: Woolen Reagent Bag	vendor	Borya	The Drag, Orgrimmar	63.2	51.2	horde
+253668	Pattern: Woolen Reagent Bag	vendor	Darah	The Drag, Orgrimmar	63.7	50.6	horde
+253668	Pattern: Woolen Reagent Bag	vendor	Mahu	Thunder Bluff	43.8	44.9	horde
+272941	Thick Logs	vendor	Naal Mistrunner	Thunder Bluff	51.1	52.5	horde
+272941	Thick Logs	vendor	Xen'to	The Drag, Orgrimmar	57.6	53.3	horde
+273636	Chef's Knife	vendor	Sewa Mistrunner	Thunder Bluff	55.8	47.2	horde

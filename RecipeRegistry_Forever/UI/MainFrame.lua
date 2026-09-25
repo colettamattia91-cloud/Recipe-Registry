@@ -86,7 +86,7 @@ local COLLECTION_SORT_KEYS = {
 local COLLECTION_FILTER_CYCLES = {
     status = { "all", "unlearned", "ready" },
     skill  = { "all", "inreach", "outofreach", "noskill" },
-    source = { "all", "trainer", "vendor", "drop", "quest", "worldDrop", "discovery", "worldEvent" },
+    source = { "all", "item", "trainer", "vendor", "drop", "quest", "worldDrop", "blueprint", "discovery", "worldEvent" },
     spec   = { "all", "none", "required", "have" },
     phase  = { "all", "base", "later", "p2", "p3", "p4", "p5" },
 }
@@ -104,11 +104,13 @@ local COLLECTION_COLUMN_FILTER_LABELS = {
     inreach    = "In reach",
     outofreach = "Out of reach",
     noskill    = "Not listed",
+    item       = "Recipe item",
     trainer    = "Trainer",
     vendor     = "Vendor",
     drop       = "Drop",
     quest      = "Quest",
     worldDrop  = "World drop",
+    blueprint  = "Blueprint",
     discovery  = "Discovery",
     worldEvent = "World event",
     none       = "None",
@@ -135,11 +137,24 @@ local COLLECTION_PHASE_TEXT = {
 
 -- Una scheda per un mestiere che nessuno puo' avere non resta vuota, resta
 -- sbagliata: dice che qualcuno in gilda potrebbe saperlo fare.
-local PROF_ORDER = {
-    FAVORITES_VIEW, "Alchemy", "Blacksmithing", "Cooking", "Enchanting", "Engineering",
-    "First Aid", "Fishing", "Herbalism", "Leatherworking", "Mining", "Skinning",
-    "Tailoring"
+-- L'ordine dei mestieri, lo stesso nella barra laterale e nelle sezioni della
+-- Collezione. Prima quelli che producono cio' che si va a chiedere a un
+-- compagno, poi i secondari, in fondo la raccolta: Herbalism ha tre ricette, e
+-- chi apre l'addon cerca un fabbro prima di un erborista. Dentro ogni gruppo
+-- resta l'ordine alfabetico.
+local PROFESSION_GROUPS = {
+    { "Alchemy", "Blacksmithing", "Enchanting", "Engineering", "Leatherworking", "Tailoring" },
+    { "Cooking", "First Aid", "Fishing" },
+    { "Herbalism", "Mining", "Skinning" },
 }
+local PROF_ORDER = { FAVORITES_VIEW }
+local PROFESSION_RANK = {}
+for _, group in ipairs(PROFESSION_GROUPS) do
+    for _, profName in ipairs(group) do
+        PROF_ORDER[#PROF_ORDER + 1] = profName
+        PROFESSION_RANK[profName] = #PROF_ORDER
+    end
+end
 
 -- Top-level tabs, in nav order. Adding a tab is a row here plus its view
 -- code: the nav layout, the enable/disable options and the fallback when a
@@ -295,12 +310,17 @@ end
 -- Everything else -- a discovery at your own anvil, a world event, a pattern
 -- the data cannot place -- asks for none of those and stays grey.
 local COLLECTION_SOURCE_COLORS = {
+    item      = "|cffc9a8ff",
     trainer   = "|cff8fc6ff",
     vendor    = "|cffffd100",
     drop      = "|cffff9d5a",
     worldDrop = "|cffff9d5a",
     container = "|cffff9d5a",
     quest     = "|cffffe066",
+    -- I Blueprint non sono un posto dove andare: sono le postazioni del
+    -- sistema di perk di Forever, e si sbloccano progredendo nel mestiere.
+    -- Verde perche' e' l'unica provenienza che non chiede un viaggio.
+    blueprint = "|cff7fd97f",
 }
 
 local function collectionSourceColor(sourceKind)
@@ -4435,13 +4455,20 @@ function UI:ShowCollectionRowTooltip(row)
     end
 
     local known = collection.known == true
+    -- Senza provenienza nota il blocco non c'e': un titolo "Where to learn"
+    -- sopra una riga vuota direbbe che la risposta esiste e si e' persa.
+    local sourceLines = collection.sourceLines
+    if (not sourceLines or #sourceLines == 0) and collection.sourceLabel then
+        sourceLines = { collection.sourceLabel }
+    end
+    if sourceLines and #sourceLines > 0 then
     GameTooltip:AddLine(" ")
     -- A recipe already in the book is not somewhere to go, it is somewhere it
     -- came from -- worth keeping, because "where did I get this" is a real
     -- question when a guildmate asks.
     GameTooltip:AddLine(known and "Where it comes from" or "Where to learn", 1, 0.82, 0)
     local lineInfo = collection.sourceLineInfo
-    for index, line in ipairs(collection.sourceLines or { collection.sourceLabel or "" }) do
+    for index, line in ipairs(sourceLines) do
         local text = safeText(line)
         local info = lineInfo and lineInfo[index]
         -- The map position, where the source knew one. The table column has no
@@ -4457,10 +4484,10 @@ function UI:ShowCollectionRowTooltip(row)
         end
         GameTooltip:AddLine(text, 0.85, 0.85, 0.85, true)
     end
-    -- The source line says "from a trainer" because that is all the data
-    -- records. When the trainer only teaches it to some classes, that is the
-    -- rest of the answer, and without it the row reads as a recipe any
-    -- engineer could walk up and buy.
+    end
+    -- Quali classi possono impararla e' un fatto della ricetta, noto anche
+    -- quando la provenienza non lo e': senza, la riga si legge come una
+    -- ricetta che qualunque ingegnere puo' imparare.
     if collection.classNames then
         GameTooltip:AddLine("Taught only to " .. collection.classNames, 0.95, 0.75, 0.30, true)
     end
@@ -5432,7 +5459,13 @@ function UI:BuildCollectionDisplayRows(rows)
             knownCount = knownCount + 1
         end
     end
-    table.sort(order)
+    -- Stesso ordine della barra laterale; un mestiere che non conosce finisce in
+    -- fondo, in ordine alfabetico.
+    table.sort(order, function(a, b)
+        local ra, rb = PROFESSION_RANK[a] or math.huge, PROFESSION_RANK[b] or math.huge
+        if ra ~= rb then return ra < rb end
+        return a < b
+    end)
 
     local out = {}
     if #rows > 0 then

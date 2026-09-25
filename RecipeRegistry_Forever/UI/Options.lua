@@ -49,19 +49,21 @@ local TUNING_BOUNDS = {
     blockPullResponseTimeoutSeconds = { default = 60,  min = 30,  max = 120 },
 }
 
+-- Nello stesso ordine della barra laterale: prima i mestieri che producono,
+-- poi i secondari, in fondo la raccolta.
 local FILTER_PROFESSIONS = {
     { key = "alchemy",        label = "Alchemy" },
     { key = "blacksmithing",  label = "Blacksmithing" },
     { key = "enchanting",     label = "Enchanting" },
     { key = "engineering",    label = "Engineering" },
+    { key = "leatherworking", label = "Leatherworking" },
+    { key = "tailoring",      label = "Tailoring" },
+    { key = "cooking",        label = "Cooking" },
     { key = "first_aid",      label = "First Aid" },
     { key = "fishing",        label = "Fishing" },
     { key = "herbalism",      label = "Herbalism" },
-    { key = "leatherworking", label = "Leatherworking" },
     { key = "mining",         label = "Mining" },
     { key = "skinning",       label = "Skinning" },
-    { key = "tailoring",      label = "Tailoring" },
-    { key = "cooking",        label = "Cooking" },
 }
 
 local function clampTuning(field, value)

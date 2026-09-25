@@ -658,16 +658,10 @@ local function addUnresolved(out, spellId, field, severity, message)
     }
 end
 
-local function isExpectedOutputless(record)
-    return record.selfOnlyOutputless == true
-        or (record.profession == "enchanting" and record.createdItemId == nil)
-end
-
 function RecipeMetadata:_CollectUnresolvedRecords()
     local out = {}
     for _, spellId in ipairs(sortedRecordIds(self._recordsBySpellId)) do
         local record = self._recordsBySpellId[spellId]
-        local expectedOutputless = isExpectedOutputless(record)
         if not record.profession or record.profession == "" then
             addUnresolved(out, spellId, "profession", "release-blocking", "missing profession")
         end
@@ -677,9 +671,9 @@ function RecipeMetadata:_CollectUnresolvedRecords()
         if record.sortOrder == nil then
             addUnresolved(out, spellId, "sortOrder", "release-blocking", "missing sort order")
         end
-        if not expectedOutputless and record.createdItemId == nil then
-            addUnresolved(out, spellId, "createdItemId", "warning", "missing created item for normal craft")
-        end
+        -- Niente controllo "manca l'oggetto prodotto". Su Forever ogni record
+        -- viene dal client, e un createdItemId assente e' la risposta del
+        -- client, non un buco: incantamenti e Tinker non producono un oggetto.
         if not record.selfOnlyOutputless and (type(record.reagents) ~= "table" or #record.reagents == 0) then
             addUnresolved(out, spellId, "reagents", "warning", "missing reagents")
         end

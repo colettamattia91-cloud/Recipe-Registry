@@ -2,10 +2,16 @@ param(
     [string]$ClientPath = 'C:\Program Files (x86)\World of Warcraft\_classic_beta_',
     [string]$SavedVariablesPath,
     # Il bundle del datamining, che porta i campi che il client non espone per
-    # ricetta: requiredSkill, skillLevels, espansione, classMask. Si cerca da
-    # solo accanto al repo; con -NoMining si genera senza.
+    # ricetta: requiredSkill, skillLevels, espansione, classMask, e il legame
+    # degli oggetti prodotti. Si cerca da solo accanto al repo; con -NoMining si
+    # genera senza.
     [string]$MiningBundle,
-    [switch]$NoMining
+    [switch]$NoMining,
+    # Dove si archiviano le catture del Collector. Di norma e' il repo privato
+    # accanto a questo, ../WowForeverMining/data/collector: le catture sono dati,
+    # si rifanno solo giocando, e questo repo e' pubblico. Chi quel repo non ce
+    # l'ha ricade sulla cartella locale Tools/dumps/catalog.
+    [string]$ArchiveRoot
 )
 $ErrorActionPreference = 'Stop'
 $addonRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
@@ -19,58 +25,45 @@ if (-not $SavedVariablesPath) {
     $SavedVariablesPath = $candidates[0].FullName
 }
 $SavedVariablesPath = (Resolve-Path -LiteralPath $SavedVariablesPath).Path
-$archiveRoot = Join-Path $PSScriptRoot 'dumps\catalog'
+$miningRepo = Join-Path (Split-Path -Parent (Split-Path -Parent $addonRoot)) 'WowForeverMining'
+if (-not $ArchiveRoot) {
+    $privateArchive = Join-Path $miningRepo 'data\collector'
+    $ArchiveRoot = if (Test-Path -LiteralPath $privateArchive) { $privateArchive } else { Join-Path $PSScriptRoot 'dumps\catalog' }
+}
+$archiveRoot = $ArchiveRoot
 New-Item -ItemType Directory -Force -Path $archiveRoot | Out-Null
+# I file di lavoro restano qui, nella cartella locale: nell'archivio -- che puo'
+# essere un altro repo -- arriva solo la cattura finita.
+$workRoot = Join-Path $PSScriptRoot 'dumps'
+New-Item -ItemType Directory -Force -Path $workRoot | Out-Null
+Write-Host "Archivio delle catture: $archiveRoot"
 $id = (Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [guid]::NewGuid().ToString('N')
-$pending = Join-Path $archiveRoot "$id.pending"
-$temporaryOutput = Join-Path $archiveRoot "$id.output"
+$pending = Join-Path $workRoot "$id.pending"
+$temporaryOutput = Join-Path $workRoot "$id.output"
 $output = Join-Path $addonRoot 'Data\Metadata\RecipeMetadata_Generated.lua'
 
-# Il datamining, tradotto in Lua una volta sola.
+# Il datamining, tradotto in Lua da convert-mining.ps1.
 #
-# Il bundle e' JSON e il generatore e' Lua 5.1, che non lo legge. PowerShell si':
-# quindi la conversione sta qui e il generatore riceve una tabella gia' pronta.
-# Il file convertito si rigenera solo se il bundle e' piu' recente.
+# Il bundle e' JSON e il generatore e' Lua 5.1, che non lo legge. La conversione
+# sta in uno script suo, che si puo' lanciare da solo: questo invece congela le
+# SavedVariables del Collector in un archivio ogni volta che gira, e non va usato
+# per aggiornare solo il datamining. Con -IfStale si riconverte solo se il bundle
+# o il formato di mining.lua sono cambiati.
 $miningLua = $null
 if (-not $NoMining) {
     if (-not $MiningBundle) {
-        $guess = Join-Path (Split-Path -Parent (Split-Path -Parent $addonRoot)) 'WowForeverMining\out\bundle'
-        if (Test-Path -LiteralPath $guess) {
+        # Prima i bundle archiviati nel repo privato, che sono quelli da cui il
+        # database e' stato generato; poi l'uscita di un emit appena fatto.
+        foreach ($guess in @((Join-Path $miningRepo 'data\bundles'), (Join-Path $miningRepo 'out\bundle'))) {
+            if ($MiningBundle -or -not (Test-Path -LiteralPath $guess)) { continue }
             $found = Get-ChildItem -LiteralPath $guess -Recurse -File -Filter 'recipes.json' |
-                Sort-Object LastWriteTime | Select-Object -Last 1
+                Sort-Object FullName | Select-Object -Last 1
             if ($found) { $MiningBundle = $found.FullName }
         }
     }
     if ($MiningBundle -and (Test-Path -LiteralPath $MiningBundle)) {
-        $MiningBundle = (Resolve-Path -LiteralPath $MiningBundle).Path
         $miningLua = Join-Path $PSScriptRoot 'dumps\mining.lua'
-        $bundleStamp = (Get-Item -LiteralPath $MiningBundle).LastWriteTimeUtc
-        $needsConversion = -not (Test-Path -LiteralPath $miningLua) -or
-            (Get-Item -LiteralPath $miningLua).LastWriteTimeUtc -lt $bundleStamp
-        if ($needsConversion) {
-            $rows = Get-Content -LiteralPath $MiningBundle -Raw | ConvertFrom-Json
-            $writer = New-Object System.Text.StringBuilder
-            [void]$writer.AppendLine('-- Generato da Tools/import-dumps.ps1 dal bundle di ../WowForeverMining.')
-            [void]$writer.AppendLine('-- Non modificare a mano: si rigenera quando il bundle cambia.')
-            [void]$writer.AppendLine("-- Fonte: $MiningBundle")
-            [void]$writer.AppendLine('MiningRecipes = {')
-            foreach ($row in $rows) {
-                if ($null -eq $row.spellId) { continue }
-                $parts = New-Object System.Collections.Generic.List[string]
-                if ($null -ne $row.requiredSkill) { $parts.Add("requiredSkill = $($row.requiredSkill)") }
-                if ($null -ne $row.classMask) { $parts.Add("classMask = $($row.classMask)") }
-                if ($row.firstSeenExpansion) { $parts.Add("expansion = '$($row.firstSeenExpansion)'") }
-                if ($row.skillLevels -and $row.skillLevels.Count -gt 0) {
-                    $parts.Add("skillLevels = { $($row.skillLevels -join ', ') }")
-                }
-                if ($parts.Count -gt 0) {
-                    [void]$writer.AppendLine("    [$($row.spellId)] = { $($parts -join ', ') },")
-                }
-            }
-            [void]$writer.AppendLine('}')
-            Set-Content -LiteralPath $miningLua -Value $writer.ToString() -NoNewline
-            Write-Host "Datamining convertito: $miningLua ($($rows.Count) righe lette)"
-        }
+        & (Join-Path $PSScriptRoot 'convert-mining.ps1') -MiningBundle $MiningBundle -Output $miningLua -IfStale
     } else {
         Write-Host "Datamining non trovato: il database conterra' solo cio' che il client espone."
     }
