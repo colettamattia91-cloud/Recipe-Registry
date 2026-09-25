@@ -99,7 +99,7 @@ local Data = _G.RecipeRegistry.Data or modules["Data"]
 -- ne' OnInitialize
 Data.db = { global = { members = {}, options = {} } }
 Data._currentProfs = {}
-_G.RecipeRegistry.charDB = { favorites = {}, recipeCatalog = {} }
+_G.RecipeRegistry.charDB = { favorites = {} }
 
 local fails = 0
 local function t(label, got, want)
@@ -158,40 +158,11 @@ local ctxProf, ctxKind = Data:GetVisibleTrackedProfessionContext()
 t("mestiere dal contesto", ctxProf, "Alchemy")
 t("tipo di contesto", ctxKind, "trade")
 
-print("\n== il catalogo si salva durante la sessione ==")
--- e' l'unico momento in cui il client lo dice: da qui in poi bastera' il libro
-local catalog = Data:GetRecipeCatalog("Alchemy")
-t("catalogo salvato", catalog and #catalog, 6)
-local withKeys = 0
-for _, row in ipairs(catalog or {}) do
-  if row.id and row.key then withKeys = withKeys + 1 end
-end
-t("ogni voce porta id e chiave", withKeys, 6)
-
-print("\n== la scansione dal libro, senza sessione ==")
--- al login DetectProfessions gira per prima: senza mestieri rilevati la
--- scansione dal libro non saprebbe quali cataloghi guardare
-Data:DetectProfessions()
--- si azzera il registrato per vedere che sia il libro a riempirlo
-sessionReady = false
-entry.professions["Alchemy"].recipes = {}
-entry.professions["Alchemy"].count = 0
-Data:MarkScanNeeded("Alchemy", "test")
-local bookResult = Data:ScanKnownFromSpellBook({ reason = "login", notifyMode = "auto" })
-t("scansione valida", bookResult and bookResult.valid, true)
-t("ricette ritrovate", entry.professions["Alchemy"].count, 3)
-local bookKeys = {}
-for k in pairs(entry.professions["Alchemy"].recipes) do bookKeys[#bookKeys + 1] = k end
-table.sort(bookKeys)
-t("le stesse chiavi della sessione", table.concat(bookKeys, ","), "5997,247754,247755")
-sessionReady = true
-
 print("\n== chi cambia mestiere non resta due mestieri ==")
 -- il personaggio aveva Alchemy; adesso GetProfessions dice Engineering
 _G.GetProfessionInfo = function() return "Engineering", nil, 1, 75, nil, nil, 202 end
 Data:DetectProfessions()
 t("Alchemy rimossa dal blocco", entry.professions["Alchemy"], nil)
-t("e il suo catalogo con lei", Data:GetRecipeCatalog("Alchemy"), nil)
 t("Engineering al suo posto", entry.professions["Engineering"] ~= nil, true)
 
 print("\n== la finestra di un altro non e' la tua ==")

@@ -44,14 +44,18 @@ Stabilito su dati reali:
 
 Verifiche ancora aperte:
 
-- **Scansione delle ricette conosciute al login.** Il percorso esiste:
-  `OnPlayerLogin` chiama `ScanKnownFromSpellBook`, che interroga
-  `C_SpellBook.IsSpellKnown` sugli ID della cache raccolta aprendo il mestiere.
-  La beta non ricarica quella cache dalle SavedVariables: il percorso non e'
-  quindi verificato come soluzione autonoma al login. A finestra chiusa le API
-  TradeSkill possono esporre dati residui dell'ultima sessione; non basta che
-  `GetAllRecipeIDs` risponda per considerarli dati aggiornati del personaggio.
-  Il database statico di risoluzione non e' un fallback per questo percorso.
+- ~~Scansione delle ricette conosciute al login.~~ Abbandonata il 2026-09-25.
+  Riverificato in gioco a finestra chiusa, dopo un `/reload`: `IsTradeSkillReady`
+  false, `GetBaseProfessionInfo` vuoto, `GetAllRecipeIDs` restituisce 471 ID di
+  Tailoring, l'ultimo mestiere aperto. Su quelli `learned` e
+  `C_SpellBook.IsSpellKnown` concordano 471 su 471; su una ricetta di un altro
+  mestiere `learned` risponde false dove `IsSpellKnown` risponde true. Nessuna
+  delle 74 funzioni di `C_TradeSkillUI` su ricette e mestieri elenca le ricette
+  di un mestiere scelto. Quindi al login un mestiere solo e' leggibile, e gli
+  altri richiederebbero una lista di ID presa altrove (un catalogo salvato o il
+  dataset) e centinaia di chiamate per mestiere, per un risultato comunque
+  parziale. Le ricette si registrano aprendo il mestiere e da
+  `NEW_RECIPE_LEARNED`.
 - ~~Se `ProfessionsFrame` esista, o se il frame si chiami ancora `TradeSkillFrame`.~~
   Chiuso il 2026-09-21: `ProfessionsFrame` esiste, `TradeSkillFrame` e' nil. Non
   serve niente, perche' la scansione riscritta non dipende da nessuno dei due
@@ -146,9 +150,6 @@ dell'addon e vedere se i controlli sono dove dovrebbero.
 
 - La ricetta che si registra da sola su `NEW_RECIPE_LEARNED`: scritta, mai vista
   scattare.
-- La scansione dal libro degli incantesimi al login (vedi sopra: la beta non
-  rilegge le SavedVariables, quindi il percorso non e' verificabile finche'
-  quel bug non e' chiuso).
 - **Il sync, per intero.** Su questo client non e' mai girato un handshake:
   servono due personaggi nella stessa gilda con l'addon. E' la ragione d'essere
   dell'addon ed e' la parte meno verificata -- ma il rischio e' di
@@ -176,27 +177,24 @@ La domanda vale la pena di fissarla, perche' su questo client la trappola c'e'
 davvero: `C_TradeSkillUI.GetAllRecipeIDs` restituisce il CATALOGO del mestiere,
 apprese e non -- su Alchemy a livello 1 sono 197 righe di cui 3 tue.
 
-Il catalogo completo esiste, ma vive in `RecipeRegistryCharDB`, per personaggio,
-e lo legge solo `DataScan` per sapere quali ID interrogare al login. Non tocca
-mai il database dei membri. Quello lo scrive `ApplyScanResult`, e i tre percorsi
-che lo chiamano filtrano tutti:
+Il catalogo non viene salvato. Il database dei membri lo scrive
+`ApplyScanResult`, e i due percorsi che lo chiamano filtrano entrambi:
 
-- `ScanTradeSkill` tiene una riga solo `if info.learned`.
-- `ScanKnownFromSpellBook` interroga `C_SpellBook.IsSpellKnown` su ogni ID del
-  catalogo e tiene i `true`.
-- `LearnRecipeFromSignal` chiede conferma allo stesso oracolo prima di scrivere.
+- `ScanTradeSkill` tiene una riga solo `if info.learned`, e solo per quelle
+  chiede i link da cui si ricava la chiave.
+- `LearnRecipeFromSignal` chiede conferma a `C_SpellBook.IsSpellKnown` prima di
+  scrivere.
 
 Il blocco che il sync serve legge `prof.recipes` da li'. Quindi no: il catalogo
 non viaggia.
 
-Il terzo percorso pero' aveva due buchi, chiusi il 2026-09-20. La conferma era
+Il secondo percorso pero' aveva due buchi, chiusi il 2026-09-20. La conferma era
 avvolta in `if type(CSB) == "table" and type(CSB.IsSpellKnown) == "function"`,
 quindi con l'API assente si scriveva senza chiedere; e il test era
 `if ok and not known`, che e' falso anche quando `ok` e' falso, quindi una pcall
 fallita passava allo stesso modo. In entrambi i casi un `NEW_RECIPE_LEARNED`
 spurio sarebbe bastato a pubblicare alla gilda una ricetta non posseduta. Adesso
-senza oracolo si rinuncia, come fa gia' `ScanKnownFromSpellBook`, e
-`scan_spec.lua` sorveglia i due casi.
+senza oracolo si rinuncia, e `scan_spec.lua` sorveglia i due casi.
 
 ## SavedVariables: scrittura riuscita, rilettura fallita nella beta
 
@@ -300,6 +298,8 @@ diventerebbe "una stringa non vuota", quindi e' stato riscritto su cio' che fa
 male davvero: `:` (spezzerebbe le chiavi di blocco `proprietario::professione`),
 `|` (l'escape di WoW: un nome che lo contiene inietta colori e link nelle
 stringhe che la UI compone), i caratteri di controllo, e gli spazi ai bordi, che
+darebbero due chiavi gemelle per lo stesso personaggio.
+
 ### Il 25 settembre il cognome ha cambiato posto
 
 Letto in gioco il 2026-09-25: `UnitFullName("player")` risponde
@@ -314,8 +314,6 @@ conosce, sempre offline. Adesso il secondo valore si attacca come cognome, trann
 quando e' il realm della forma vecchia (coincide con `GetRealmName` e il primo
 valore ha gia' lo spazio). E il realm si legge solo da `GetRealmName`: letto dal
 secondo valore di `UnitFullName`, oggi sarebbe stato il cognome.
-
-darebbero due chiavi gemelle per lo stesso personaggio.
 
 ### Il trattino, che resta il caso da sorvegliare
 

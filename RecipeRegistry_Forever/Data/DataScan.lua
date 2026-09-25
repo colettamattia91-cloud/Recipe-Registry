@@ -200,16 +200,16 @@ function Data:DetectProfessions()
     -- abbandonava Alchemy per Engineering restava in gilda come alchimista per
     -- sempre, con le sue ricette, e nessuno se ne accorgeva. Quello che il
     -- personaggio ha adesso e' _currentProfs, e basta: tutto il resto del suo
-    -- blocco se ne va, ricette e catalogo compresi.
+    -- blocco se ne va, ricette comprese.
     metadataChanged = self:PruneDroppedProfessions() or metadataChanged
 
     Addon:RequestRefresh("detect-professions")
     return metadataChanged
 end
 
--- I mestieri che il personaggio non ha piu', tolti dal suo blocco e dal catalogo
--- salvato. Vale solo per il proprietario locale: di un compagno non sappiamo
--- cosa abbia abbandonato finche' non ce lo racconta lui.
+-- I mestieri che il personaggio non ha piu', tolti dal suo blocco. Vale solo
+-- per il proprietario locale: di un compagno non sappiamo cosa abbia
+-- abbandonato finche' non ce lo racconta lui.
 function Data:PruneDroppedProfessions()
     local current = self._currentProfs
     if type(current) ~= "table" or not next(current) then
@@ -232,12 +232,8 @@ function Data:PruneDroppedProfessions()
     end
     if #dropped == 0 then return false end
 
-    local catalog = Addon.charDB and Addon.charDB.recipeCatalog
     for _, professionKey in ipairs(dropped) do
         entry.professions[professionKey] = nil
-        if type(catalog) == "table" then
-            catalog[professionKey] = nil
-        end
         if self._scanNeededByProfession then self._scanNeededByProfession[professionKey] = nil end
         if self.MarkSyncIndexDirty then
             self:MarkSyncIndexDirty("profession-dropped", self:BuildSyncBlockKey(playerKey, professionKey))
@@ -553,102 +549,6 @@ function Data:GetVisibleTrackedProfessionContext()
     return nil, nil, reason or "no-trade-skill-data"
 end
 
--- Il catalogo di un mestiere: tutti i suoi recipeID, appresi o no.
---
--- Si puo' leggere solo con una sessione viva, ed e' l'unica cosa per cui quella
--- sessione serva ancora. Salvato per personaggio in CharDB, fuori dal database
--- di gilda: e' dato di gioco, non contenuto da condividere. In sovrascrittura,
--- perche' l'elenco valido e' quello che il client dice adesso.
--- Nel catalogo va la CHIAVE gia' calcolata, non solo l'ID.
---
--- La chiave si ricava da GetRecipeItemLink e GetRecipeLink, e quelle rispondono
--- sulle ricette del mestiere corrente. Al login il mestiere corrente e' uno
--- solo, quindi calcolarle allora funzionerebbe per uno e fallirebbe in silenzio
--- per gli altri tre. Calcolate qui, mentre la sessione e' viva, la scansione dal
--- libro non dipende piu' da quelle API: le basta sapere quali ID sono appresi.
-function Data:StoreRecipeCatalog(profession, entries)
-    if not profession or type(entries) ~= "table" or #entries == 0 then return false end
-    local charDB = Addon.charDB
-    if type(charDB) ~= "table" then return false end
-    if type(charDB.recipeCatalog) ~= "table" then charDB.recipeCatalog = {} end
-    charDB.recipeCatalog[profession] = entries
-    Addon:Debug("Recipe catalog stored:", profession, #entries, "recipes")
-    return true
-end
-
-function Data:GetRecipeCatalog(profession)
-    local charDB = Addon.charDB
-    local catalog = type(charDB) == "table" and charDB.recipeCatalog or nil
-    local stored = type(catalog) == "table" and catalog[profession] or nil
-    if type(stored) == "table" and #stored > 0 then return stored end
-    return nil
-end
-
--- Cosa il personaggio sa fare, senza aprire niente.
---
--- Il libro degli incantesimi non ELENCA le ricette -- sotto la riga di un
--- mestiere c'e' solo la sua abilita', verificato in gioco il 2026-09-18 -- ma
--- C_SpellBook.IsSpellKnown sa rispondere su una ricetta: true sui tre elisir
--- appresi del personaggio di prova, false sulle due che non conosceva. E'
--- l'oracolo che mancava. Attenzione a non confonderlo con il globale
--- IsSpellKnown, che su quegli stessi ID risponde false a tutti.
---
--- Quindi: il catalogo dice cosa chiedere, l'oracolo dice cosa sai. La coppia
--- copre tutti i mestieri in una volta, al login, senza toccare la UI.
---
--- Il limite, e va detto invece che scoperto: una ricetta introdotta da una
--- patch nuova non e' nel catalogo salvato, quindi resta invisibile finche' non
--- si riapre quel mestiere una volta. Il buco si chiude da solo la prima volta
--- che ci si lavora, ed e' il motivo per cui questa non sostituisce la scansione
--- dalla sessione: la affianca.
-function Data:ScanKnownFromSpellBook(opts)
-    self:EnsureScanState()
-    local context = resolveScanContext(opts)
-    local CSB = _G.C_SpellBook
-    if type(CSB) ~= "table" or type(CSB.IsSpellKnown) ~= "function" then
-        return self:SkipScan(nil, "spellbook-api-missing", nil, context)
-    end
-    local current = self._currentProfs
-    if type(current) ~= "table" or not next(current) then
-        return self:SkipScan(nil, "no-professions", nil, context)
-    end
-
-    local scanned, changedAny = 0, false
-    for profession in pairs(current) do
-        local catalog = self:GetRecipeCatalog(profession)
-        if catalog then
-            local recipes = {}
-            for i = 1, #catalog do
-                local row = catalog[i]
-                local recipeID = type(row) == "table" and row.id or nil
-                if recipeID then
-                    local ok, known = pcall(CSB.IsSpellKnown, recipeID)
-                    if ok and known then
-                        if isValidRecipeKey(row.key) then recipes[row.key] = true end
-                        if isValidRecipeKey(row.variant) then recipes[row.variant] = true end
-                    end
-                end
-            end
-            if next(recipes) then
-                local result = self:ApplyScanResult(profession, recipes, context)
-                scanned = scanned + 1
-                if result and result.changed then changedAny = true end
-            end
-        end
-    end
-
-    if scanned == 0 then
-        return self:SkipScan(nil, "no-catalog", nil, context)
-    end
-    return self:MakeScanResult(nil, {
-        valid = true,
-        changed = changedAny,
-        count = scanned,
-        reason = context.reason,
-        notifyMode = context.notifyMode,
-    })
-end
-
 -- Il dataset nomina i mestieri con la chiave minuscola ("first_aid"), TRACKED
 -- con l'etichetta ("First Aid"). Questa e' la traduzione, e serve solo quando
 -- il client non risponde e si ricade sul dataset.
@@ -686,7 +586,6 @@ function Data:LearnRecipeFromSignal(recipeID, reason)
     -- anche quando ok e' falso -- e in entrambi si finiva a scrivere nel
     -- database su un evento e basta. Se l'oracolo non risponde si rinuncia: la
     -- ricetta la prendera' la scansione dalla finestra, piu' tardi e sicura.
-    -- ScanKnownFromSpellBook si comporta gia' cosi'.
     local CSB = _G.C_SpellBook
     if type(CSB) ~= "table" or type(CSB.IsSpellKnown) ~= "function" then
         return false, "spellbook-api-missing"
@@ -808,41 +707,29 @@ function Data:ScanTradeSkill(opts)
 
     local CT = _G.C_TradeSkillUI
     local recipes = {}
-    local catalog = {}
     local ok, err = pcall(function()
         for i = 1, #recipeIDs do
             local recipeID = recipeIDs[i]
             local info = CT.GetRecipeInfo(recipeID)
-            if type(info) == "table" then
-                -- la chiave si calcola per TUTTE, anche per le non apprese: e'
-                -- cio' che finisce nel catalogo, e serve a riconoscerle il
-                -- giorno che le imparerai, quando questa sessione non ci sara'
+            -- la lista e' il catalogo del mestiere, apprese e no: le chiavi, e i
+            -- due link che costano, servono solo per le apprese
+            if type(info) == "table" and info.learned then
                 local recipeKey, variantSpellKey = buildScannedRecipeKey(
                     CT.GetRecipeItemLink(recipeID),
                     CT.GetRecipeLink(recipeID)
                 )
                 if isValidRecipeKey(recipeKey) then
-                    local entry = { id = recipeID, key = recipeKey, variant = variantSpellKey }
-                    catalog[#catalog + 1] = entry
-                    if info.learned then
-                        recipes[recipeKey] = true
-                        if variantSpellKey and isValidRecipeKey(variantSpellKey) then
-                            recipes[variantSpellKey] = true
-                        end
+                    recipes[recipeKey] = true
+                    if variantSpellKey and isValidRecipeKey(variantSpellKey) then
+                        recipes[variantSpellKey] = true
                     end
-                elseif info.learned then
+                else
                     self:RecordInvalidRecipeKey(recipeKey, "scan", self:GetPlayerKey(), canonical)
                     Addon:Debug("Blocked invalid recipe from TradeSkill scan:", recipeKey, "profession:", canonical)
                 end
             end
         end
     end)
-
-    -- Il catalogo si salva solo se il giro e' arrivato in fondo: uno a meta'
-    -- sarebbe peggio di nessuno, perche' al login sembrerebbe completo.
-    if ok then
-        self:StoreRecipeCatalog(canonical, catalog)
-    end
 
     if not ok then
         self:RecordScanTelemetry("scansFailed")
