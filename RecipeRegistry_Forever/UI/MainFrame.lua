@@ -200,11 +200,12 @@ local function colorText(text, r, g, b)
 end
 
 -- Il pulsante del sort gira sulle tre modalita' in quest'ordine.
-local NEXT_SORT_MODE = { alpha = "rarity", rarity = "skill", skill = "alpha" }
+local NEXT_SORT_MODE = { alpha = "rarity", rarity = "skill", skill = "skilldesc", skilldesc = "alpha" }
 local SORT_LABELS = {
     alpha = "Sort: Alphabetical",
     rarity = "Sort: Rarity",
-    skill = "Sort: Skill",
+    skill = "Sort: Skill (low)",
+    skilldesc = "Sort: Skill (high)",
 }
 
 local function lowerSafe(v)

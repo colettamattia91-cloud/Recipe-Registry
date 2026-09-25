@@ -54,5 +54,9 @@ print("\n== skill ==")
 t("livello crescente, i senza livello in fondo", sorted("skill"),
   "Brown Linen Vest, Bolt of Silk Cloth, Azure Silk Hood, Admiral's Hat, Ninja Rope")
 
+print("\n== skill, dal piu' alto ==")
+t("livello decrescente, i senza livello sempre in fondo", sorted("skilldesc"),
+  "Azure Silk Hood, Bolt of Silk Cloth, Brown Linen Vest, Admiral's Hat, Ninja Rope")
+
 print(fails == 0 and "\nTUTTO OK" or ("\n" .. fails .. " FALLITI"))
 os.exit(fails == 0 and 0 or 1)
