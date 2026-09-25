@@ -80,6 +80,12 @@ try {
     $arguments = @((Join-Path $PSScriptRoot 'generate-from-dump.lua'), $inputs[0], $temporaryOutput)
     if ($inputs.Count -gt 1) { $arguments += $inputs[1..($inputs.Count - 1)] }
     if ($miningLua -and (Test-Path -LiteralPath $miningLua)) { $arguments += "--mining=$miningLua" }
+    # La provenienza e il livello vanilla. Senza la prima il database esce senza
+    # "chi la vende"; senza il secondo le ricette dei trainer tornano a livello 1.
+    $worksheet = Join-Path $PSScriptRoot 'acquisition-worksheet.tsv'
+    if (Test-Path -LiteralPath $worksheet) { $arguments += "--acquisition=$worksheet" }
+    $vanillaSkill = Join-Path $PSScriptRoot 'captures\tbc-vanilla-skill.tsv'
+    if (Test-Path -LiteralPath $vanillaSkill) { $arguments += "--vanilla-skill=$vanillaSkill" }
     & $lua @arguments
     if ($LASTEXITCODE -ne 0) { throw 'Importazione fallita: database interno invariato.' }
     $archive = Join-Path $archiveRoot "$id.lua"

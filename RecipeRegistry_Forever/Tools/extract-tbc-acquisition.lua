@@ -10,10 +10,20 @@
 -- non esistono in TBC, e restano senza provenienza finche' non la si
 -- raccoglie.
 --
---   lua Tools/extract-tbc-acquisition.lua ../RecipeRegistry/Data/Metadata/RecipeMetadata_Generated.lua Tools/captures/tbc-vanilla.tsv
+-- Scrive anche, a parte, il livello a cui la ricetta si impara. Il client di
+-- Forever non lo porta per le ricette dei trainer: SkillLineAbility dice 1 su
+-- quasi tutte, perche' il livello che il trainer chiede e' dato del server. Il
+-- dataset TBC lo ha, verificato. Forever potrebbe aver spostato qualche
+-- requisito, ma e' improbabile, e un valore vanilla e' meglio di un 1 che
+-- dice il falso. File separato perche' non e' provenienza, e perche'
+-- build-acquisition-worksheet.py prende ogni riga di tbc-vanilla.tsv come una
+-- provenienza trovata.
+--
+--   lua Tools/extract-tbc-acquisition.lua ../RecipeRegistry/Data/Metadata/RecipeMetadata_Generated.lua Tools/captures/tbc-vanilla.tsv Tools/captures/tbc-vanilla-skill.tsv
 
 local tbcPath = arg and arg[1]
 local outPath = (arg and arg[2]) or "Tools/captures/tbc-vanilla.tsv"
+local skillPath = (arg and arg[3]) or "Tools/captures/tbc-vanilla-skill.tsv"
 if not tbcPath then
     io.stderr:write("uso: lua Tools/extract-tbc-acquisition.lua <RecipeMetadata_Generated.lua del TBC> [output.tsv]\n")
     os.exit(2)
@@ -79,6 +89,22 @@ end
 file:close()
 
 print(string.format("scritte %d righe -> %s", #rows, outPath))
+
+local skills = {}
+for spellId, record in pairs(tbc.recipesBySpellId) do
+    local skill = tonumber(record.requiredSkill)
+    if skill and skill > 0 then
+        skills[#skills + 1] = { spellId = math.abs(tonumber(spellId) or 0), requiredSkill = skill }
+    end
+end
+table.sort(skills, function(a, b) return a.spellId < b.spellId end)
+local skillFile = assert(io.open(skillPath, "w"))
+skillFile:write("spellId\trequiredSkill\n")
+for _, row in ipairs(skills) do
+    skillFile:write(string.format("%d\t%d\n", row.spellId, row.requiredSkill))
+end
+skillFile:close()
+print(string.format("scritti %d livelli -> %s", #skills, skillPath))
 local kinds = {}
 for kind in pairs(counts) do kinds[#kinds + 1] = kind end
 table.sort(kinds)

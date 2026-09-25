@@ -1,12 +1,13 @@
 -- Multiple saved sessions must accumulate professions; the latest capture of
 -- one profession replaces only that profession, regardless of input order.
 local base = "local-tests/specs/.dump-generator-"
-local paths = { base .. "old.lua", base .. "new.lua", base .. "output.lua", base .. "mining.lua" }
+local paths = { base .. "old.lua", base .. "new.lua", base .. "output.lua", base .. "mining.lua",
+    base .. "vanilla-skill.tsv" }
 local function write(path, content)
     local file = assert(io.open(path, "w")); file:write(content); file:close()
 end
-local function generate(first, second, extra)
-    local env = setmetatable({ arg = { first, paths[3], second, extra } }, { __index = _G })
+local function generate(first, second, ...)
+    local env = setmetatable({ arg = { first, paths[3], second, ... } }, { __index = _G })
     local generator = assert(loadfile("Tools/generate-from-dump.lua"))
     setfenv(generator, env)
     generator()
@@ -50,9 +51,23 @@ MiningItems = { [22] = 1, [33] = 2 }]])
     assert(mined.recipesBySpellId[3].recipeItemId == 5003, "recipe item must reach the record")
     assert(mined.recipeItemToSpellId[5003] == 3, "recipe item must reach the reverse index")
     assert(mined.recipesBySpellId[2].recipeItemId == nil, "no recipe item is not a recipe item")
+    -- Il livello a cui si impara. Il client dice 1 su quasi tutto -- e' il
+    -- valore di SkillLineAbility, il vero requisito del trainer e' dato del
+    -- server -- quindi prima l'oggetto-ricetta, poi il vanilla, e un 1 del
+    -- client non passa per un livello.
+    write(paths[4], [[MiningRecipes = {
+    [2] = { requiredSkill = 1 },
+    [3] = { recipeItemId = 5003, recipeItemSkill = 140, requiredSkill = 1 },
+    [7443] = { requiredSkill = 1 },
+}]])
+    write(paths[5], "spellId\trequiredSkill\n2\t75\n3\t999\n")
+    local skilled = generate(paths[1], paths[2], "--mining=" .. paths[4], "--vanilla-skill=" .. paths[5])
+    assert(skilled.recipesBySpellId[3].requiredSkill == 140, "the recipe item's rank comes first")
+    assert(skilled.recipesBySpellId[2].requiredSkill == 75, "then the vanilla rank")
+    assert(skilled.recipesBySpellId[7443].requiredSkill == nil, "a client 1 is not a requirement")
     local reverse = generate(paths[2], paths[1])
     assert(reverse.recipesBySpellId[3] and not reverse.recipesBySpellId[1], "older captures cannot replace newer ones")
 end)
 for _, path in ipairs(paths) do os.remove(path) end
 assert(ok, err)
-print("PASS generator: multiple sessions, legacy format, newest capture, reagents, indices, outputless is not self-only, static BoP from item binding, recipe items")
+print("PASS generator: multiple sessions, legacy format, newest capture, reagents, indices, outputless is not self-only, static BoP from item binding, recipe items, required skill")
