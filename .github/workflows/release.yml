@@ -111,7 +111,7 @@ jobs:
           # The id is written here rather than read from a repository variable:
           # it is not a secret -- it is in the project's public URL,
           # authors.curseforge.com/#/projects/1501457 -- and there is one
-          # project. The upload key is the secret, CF_API_KEY.
+          # project. The upload key is the secret, CURSEFORGETOKEN.
           echo "args=-p 1501457" >> "$GITHUB_OUTPUT"
 
       - name: Give the addon folder a checkout of its own
@@ -140,7 +140,7 @@ jobs:
         uses: BigWigsMods/packager@v2
         env:
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
-          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          CF_API_KEY: ${{ secrets.CURSEFORGETOKEN }}
         with:
           args: >-
             -t ${{ steps.tree.outputs.dir }}
