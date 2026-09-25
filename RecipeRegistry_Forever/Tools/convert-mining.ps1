@@ -25,7 +25,8 @@ $ErrorActionPreference = 'Stop'
 #   2  + MiningItems: il legame di ogni oggetto, da item_sparse.json
 #   3  + recipeItemId: l'oggetto che insegna la ricetta (Pattern, Plans...)
 #   4  + MiningUnshippedItems: gli oggetti che il client non descrive
-$format = 4
+#   5  + recipeItemSkill: il livello che l'oggetto-ricetta chiede per insegnarla
+$format = 5
 $marker = "-- formato: $format"
 
 $MiningBundle = (Resolve-Path -LiteralPath $MiningBundle).Path
@@ -58,6 +59,7 @@ foreach ($row in $rows) {
         $parts.Add("skillLevels = { $($row.skillLevels -join ', ') }")
     }
     if ($row.recipeItemId) { $parts.Add("recipeItemId = $($row.recipeItemId)") }
+    if ($row.recipeItemRequiredSkillRank) { $parts.Add("recipeItemSkill = $($row.recipeItemRequiredSkillRank)") }
     if ($parts.Count -gt 0) {
         [void]$writer.AppendLine("    [$($row.spellId)] = { $($parts -join ', ') },")
     }

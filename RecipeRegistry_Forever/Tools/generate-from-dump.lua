@@ -162,12 +162,57 @@ local miningItems = {}
 -- esiste nei dati e non nel gioco.
 local miningUnshipped = {}
 local miningPath
+
+-- Il livello a cui si impara una ricetta vanilla, dal dataset TBC
+-- (Tools/captures/tbc-vanilla-skill.tsv, scritto da extract-tbc-acquisition.lua).
+-- Serve per le ricette dei trainer: il client di Forever per quelle dice 1.
+local vanillaSkill = {}
+local function loadVanillaSkill(path)
+    local file = assert(io.open(path, "r"))
+    local header = true
+    for line in file:lines() do
+        if header then
+            header = false
+        else
+            local spellId, skill = line:match("^(%d+)\t(%d+)")
+            if spellId then vanillaSkill[tonumber(spellId)] = tonumber(skill) end
+        end
+    end
+    file:close()
+end
+
+-- A che livello di mestiere si impara la ricetta, e da dove lo sappiamo.
+--
+-- Il campo del client, SkillLineAbility.MinSkillLineRank, vale 1 su 2503
+-- ricette su 2519: il livello che un trainer chiede e' dato del server. Messo
+-- nel record cosi' com'era, l'addon mostrava "1" su ogni riga. Quindi:
+--   1. il livello che chiede l'oggetto-ricetta (ItemSparse.RequiredSkillRank),
+--      dato del client di Forever, per le ricette che un oggetto insegna;
+--   2. il livello vanilla dal dataset TBC, per le ricette dei trainer;
+--   3. MinSkillLineRank, solo quando dice qualcosa (sopra 1);
+--   4. niente: meglio nessun livello che uno falso.
+local function resolveRequiredSkill(spellId, mined)
+    if mined and tonumber(mined.recipeItemSkill) and mined.recipeItemSkill > 0 then
+        return mined.recipeItemSkill, "recipeItem"
+    end
+    if vanillaSkill[spellId] then
+        return vanillaSkill[spellId], "vanilla"
+    end
+    if mined and tonumber(mined.requiredSkill) and mined.requiredSkill > 1 then
+        return mined.requiredSkill, "client"
+    end
+    return nil, nil
+end
+local requiredSkillSources = {}
 for index = 3, #(arg or {}) do
     local value = tostring(arg[index])
     local acquisitionPath = value:match("^%-%-acquisition=(.+)$")
     local path = value:match("^%-%-mining=(.+)$")
+    local vanillaSkillPath = value:match("^%-%-vanilla%-skill=(.+)$")
     if acquisitionPath then
         loadAcquisition(acquisitionPath)
+    elseif vanillaSkillPath then
+        loadVanillaSkill(vanillaSkillPath)
     elseif path then
         miningPath = path
         local env = {}
@@ -329,10 +374,13 @@ for _, professionName in ipairs(dumpNames) do
                 -- Senza, resta la costante. E' provenienza e basta: l'addon non
                 -- ci filtra e non ci ramifica sopra.
                 local mined = mining[spellId]
+                local requiredSkill, requiredSkillSource = resolveRequiredSkill(spellId, mined)
+                requiredSkillSources[requiredSkillSource or "none"] =
+                    (requiredSkillSources[requiredSkillSource or "none"] or 0) + 1
                 local record = {
                     profession = professionKey,
                     expansion = (mined and mined.expansion) or EXPANSION,
-                    requiredSkill = mined and mined.requiredSkill or nil,
+                    requiredSkill = requiredSkill,
                     skillLevels = mined and mined.skillLevels or nil,
                     classMask = mined and mined.classMask or nil,
                     -- L'oggetto che insegna la ricetta -- un Pattern, dei Plans --
@@ -553,7 +601,7 @@ local COVERAGE_FIELDS = {
     { "reagents",       "client",     "cosa serve per farla" },
     { "createdItemId",  "client",     "cosa produce" },
     { "createdCount",   "client",     "quante ne produce, se diverso da una" },
-    { "requiredSkill",  "datamining", "a che livello di mestiere si fa" },
+    { "requiredSkill",  "datamining + TBC", "a che livello si impara: oggetto-ricetta, poi vanilla" },
     { "skillLevels",    "datamining", "le soglie di difficolta'" },
     { "expansion",      "datamining", "vanilla o aggiunta di Forever" },
     { "classMask",      "datamining", "quali classi possono impararla" },
@@ -771,6 +819,9 @@ print(string.format("  in piu' mestieri %d, righe doppie nel client %d",
 if miningPath then
     local enriched = coverage.requiredSkill or 0
     print(string.format("  arricchite dal datamining: %d su %d (%s)", enriched, #ids, miningPath))
+    print(string.format("  livello richiesto: oggetto-ricetta %d, vanilla %d, client %d, ignoto %d",
+        requiredSkillSources.recipeItem or 0, requiredSkillSources.vanilla or 0,
+        requiredSkillSources.client or 0, requiredSkillSources.none or 0))
 else
     print("  nessun datamining: mancano requiredSkill, skillLevels, espansione, classMask")
 end
