@@ -117,6 +117,28 @@ jobs:
             echo "args=-p $id" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Give the addon folder a checkout of its own
+        id: tree
+        run: |
+          # The packager refuses a -t folder with no .git directory of its
+          # own ("No Git, SVN, or Hg checkout found"), and an addon folder in
+          # this repo is a subfolder. So the folder becomes the root of a
+          # checkout: subtree split gives a history where it is the top level,
+          # and the checkout gets the tag and the origin the packager reads --
+          # the tag for the version, origin for the GitHub release.
+          tag="${{ github.event.inputs.tag || github.ref_name }}"
+          addon="${{ matrix.addon }}"
+          dir="$RUNNER_TEMP/$addon"
+          who=(-c user.name=github-actions -c user.email=github-actions@users.noreply.github.com)
+          split=$(git "${who[@]}" subtree split -q --prefix="$addon" HEAD)
+          git init -q "$dir"
+          git -C "$dir" fetch -q "$GITHUB_WORKSPACE" "$split"
+          git -C "$dir" checkout -q FETCH_HEAD
+          git -C "$dir" "${who[@]}" tag -a "$tag" -m "$tag"
+          git -C "$dir" remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          echo "dir=$dir" >> "$GITHUB_OUTPUT"
+          echo "Packaging $addon from $dir at $split, tagged $tag"
+
       - name: Package and publish
         uses: BigWigsMods/packager@v2
         env:
@@ -124,6 +146,6 @@ jobs:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
         with:
           args: >-
-            -t ${{ matrix.addon }}
+            -t ${{ steps.tree.outputs.dir }}
             ${{ steps.target.outputs.args }}
             ${{ github.event.inputs.args }}
