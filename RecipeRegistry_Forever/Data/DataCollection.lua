@@ -378,10 +378,6 @@ function Data:BuildCollectionRowsForProfession(professionName, prof)
                         and self:GetSpecializationName(professionName, specializationId) or nil,
                     specializationMet = specializationId == nil
                         or specializationId == ownedSpecializationId,
-                    -- The content phase this one arrives in. nil is the answer
-                    -- for everything obtainable from the start, which is most
-                    -- of the book, and the column stays blank for those.
-                    phase = meta.GetPhase and meta:GetPhase(recipeKey, info) or nil,
                     -- Kept on the row even though the gate has already let it
                     -- through: "who else can have this" is the question the
                     -- tooltip answers, and a trainer that teaches a recipe to
