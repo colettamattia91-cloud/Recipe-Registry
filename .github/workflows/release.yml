@@ -107,15 +107,12 @@ jobs:
           # uploads to the same id. What keeps them apart is the file: each
           # packager run produces its own zip, with its own version and its own
           # changelog, tagged for the game version its TOC declares.
-          name=$(printf '%s' "${{ matrix.addon }}" | tr '[:lower:]' '[:upper:]')
-          id="${{ vars.CF_PROJECT_ID }}"
-          if [ -z "$id" ]; then
-            echo "args=" >> "$GITHUB_OUTPUT"
-            echo "::warning::No CurseForge project id for $name, so this" \
-                 "release stops at GitHub."
-          else
-            echo "args=-p $id" >> "$GITHUB_OUTPUT"
-          fi
+          #
+          # The id is written here rather than read from a repository variable:
+          # it is not a secret -- it is in the project's public URL,
+          # authors.curseforge.com/#/projects/1501457 -- and there is one
+          # project. The upload key is the secret, CF_API_KEY.
+          echo "args=-p 1501457" >> "$GITHUB_OUTPUT"
 
       - name: Give the addon folder a checkout of its own
         id: tree
