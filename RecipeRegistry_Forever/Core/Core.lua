@@ -500,7 +500,6 @@ local function printDebugLogHelp(self)
     self:Print("/rr debug log on|off|status|show [count] [scope]|clear")
     self:Print("/rr debug log scope <sync|request|transfer|offline|version> <on|off>")
     self:Print("/rr debug log echo on|off - mirror persistent traces to the debug chat.")
-    self:Print("/rr debug textures - list the game textures this client does not have.")
 end
 
 local function printMockHelp(self)
@@ -1101,12 +1100,6 @@ function Addon:SlashHandler(input)
         end
         if debugCmd == "help" then
             printDebugLogHelp(self)
-            return
-        end
-        if debugCmd == "textures" then
-            if self.UI and self.UI.ReportMissingTextures then
-                self.UI:ReportMissingTextures()
-            end
             return
         end
         if debugCmd == "log" then

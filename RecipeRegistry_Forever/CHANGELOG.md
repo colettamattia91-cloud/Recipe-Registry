@@ -9,11 +9,6 @@ All notable changes to this addon are documented in this file.
 - **The favourites star is back.** It was looked up in the folder of the TBC
   addon, which a Forever install does not have, so it showed nowhere.
 
-### Added
-
-- **`/rr debug textures`** lists any game texture the addon uses that this
-  client does not have -- a check worth running after a new beta build.
-
 ### Changed
 
 - **Sorting by skill level goes both ways.** The sort button now cycles through
