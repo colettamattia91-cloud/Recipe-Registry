@@ -184,11 +184,15 @@ Data:DetectProfessions()
 sessionReady = false
 local before = entry.professions["Alchemy"].count
 knownRecipes[1263078] = true   -- Alchemy Laboratory, prima non appresa
+-- una lista gia' costruita, come quella che la UI ha in mano
+Data._recipeListCache = { stale = true }
 local ok, why, prof, key = Data:LearnRecipeFromSignal(1263078, "test")
 t("risolta", ok, true)
 t("nel mestiere giusto", prof, "Alchemy")
 t("con la chiave dell'oggetto prodotto", key, 279990)
 t("e il conteggio cresce di uno", entry.professions["Alchemy"].count, before + 1)
+-- visto in gioco il 25/09: ricetta scritta, addon fermo alla lista di prima
+t("e la lista in cache se ne va", Data._recipeListCache, nil)
 
 t("la seconda volta non ricresce", select(2, Data:LearnRecipeFromSignal(1263078, "test")), "already-known")
 -- l'oracolo e' la conferma: un evento su una ricetta che non sai non scrive
