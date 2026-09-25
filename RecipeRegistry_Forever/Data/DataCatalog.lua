@@ -136,19 +136,10 @@ end
 local function cloneCategoryRows(rows)
     local out = {}
     for index, row in ipairs(rows or {}) do
-        local subcategories = {}
-        for subIndex, subcategory in ipairs(row.subcategories or {}) do
-            subcategories[subIndex] = {
-                key = subcategory.key,
-                label = subcategory.label,
-                order = subcategory.order,
-            }
-        end
         out[index] = {
             key = row.key,
             label = row.label,
             order = row.order,
-            subcategories = subcategories,
         }
     end
     return out
@@ -210,12 +201,7 @@ local function getMetadataCategories(metadata, profession)
         return metadata:GetCategoriesForProfession(professionKey)
     end
     local generated = metadata._generated or {}
-    local rows = cloneCategoryRows(generated.categoriesByProfession and generated.categoriesByProfession[professionKey] or nil)
-    local subcategoriesByCategory = generated.subcategoriesByProfession and generated.subcategoriesByProfession[professionKey] or {}
-    for _, row in ipairs(rows) do
-        row.subcategories = cloneCategoryRows(subcategoriesByCategory[row.key] or nil)
-    end
-    return rows
+    return cloneCategoryRows(generated.categoriesByProfession and generated.categoriesByProfession[professionKey] or nil)
 end
 
 local function getMetadataCategoryInfoForRecipe(metadata, recipeKey, professionHint)
@@ -229,9 +215,6 @@ local function categoryFilterToken(categoryName)
     if type(categoryName) == "table" then
         if categoryName.filterToken then
             return categoryName.filterToken
-        end
-        if categoryName.subcategory then
-            return "subcategory:" .. tostring(categoryName.key or "") .. ":" .. tostring(categoryName.subcategory)
         end
         return categoryName.key
     end
@@ -247,12 +230,6 @@ local function recipeMatchesCategoryFilter(metadata, recipeKey, categoryFilter, 
     local category = getMetadataCategoryInfoForRecipe(metadata, recipeKey, professionHint)
     if not category then
         return false
-    end
-
-    local subCategory = tostring(token):match("^subcategory:([^:]+):(.+)$")
-    if subCategory then
-        local categoryKey, subcategoryKey = tostring(token):match("^subcategory:([^:]+):(.+)$")
-        return category.category == categoryKey and category.subcategory == subcategoryKey
     end
 
     local categoryKey = tostring(token):match("^category:(.+)$") or token
@@ -566,16 +543,15 @@ end
 function Data:GetRecipeCategories(profession, _includeEmpty)
     local metadata = getRecipeMetadata()
     if metadata then
-        -- getMetadataCategories already returns freshly-cloned rows
-        -- (cloneCategoryRows at the leaf level on every row + subcategory),
-        -- so wrapping it in another cloneCategoryRows here was paying for
-        -- a redundant deep copy on every sidebar refresh.
+        -- getMetadataCategories already returns freshly-cloned rows, so
+        -- wrapping it in another cloneCategoryRows here was paying for a
+        -- redundant copy on every sidebar refresh.
         return getMetadataCategories(metadata, profession)
     end
     return {}
 end
 
--- Like GetRecipeCategories, but pruned to the categories/subcategories that
+-- Like GetRecipeCategories, but pruned to the categories that
 -- actually contain at least one recipe visible under the active UI filters.
 -- The sidebar uses this so BoP/ownership filters that hide every recipe in a
 -- category also hide that category's button: the filtered projection drives
@@ -642,21 +618,9 @@ function Data:GetVisibleRecipeCategories(profession, filterContext)
         return catNode ~= nil and arrayHasOwned(catNode._all)
     end
 
-    local function subcategoryHasOwnedVisible(catKey, subKey)
-        local catNode = nodeForCategory(catKey)
-        return catNode ~= nil and arrayHasOwned(catNode[subKey])
-    end
-
     local out = {}
     for _, row in ipairs(fullRows) do
         if categoryHasOwnedVisible(row.key) then
-            local subs = {}
-            for _, sub in ipairs(row.subcategories or {}) do
-                if subcategoryHasOwnedVisible(row.key, sub.key) then
-                    subs[#subs + 1] = sub
-                end
-            end
-            row.subcategories = subs
             out[#out + 1] = row
         end
     end
@@ -1841,15 +1805,12 @@ end
 -- Callers with vertical room read `lines` instead: the same rule applied once
 -- per place, so a recipe sold in four cities reads as four errands.
 
--- The proxy this started with, for a recipe the metadata cannot place: a
--- recipe taught by an item has one, and one taught by a trainer does not.
--- It is a guess, so it runs last -- see DescribeRecipeSource.
-local function guessSourceFromRecipeItem(metadataInfo)
-    if metadataInfo and metadataInfo.recipeItemId then
-        return "item", "Recipe item"
-    end
-    return "trainer", "From a trainer"
-end
+-- Quando la provenienza non si conosce, non si indovina: si risponde nil e chi
+-- la mostra lascia vuoto. Qui c'era una stima -- "Recipe item" se la ricetta
+-- ha un oggetto-ricetta, altrimenti "From a trainer" -- e su Forever era falsa
+-- per costruzione: il dataset non ha nessun oggetto-ricetta, quindi ogni
+-- ricetta risultava insegnata da un trainer, pattern, venditori e drop
+-- compresi. Meglio un dato assente che uno sbagliato.
 
 -- The one-line form for a single set of who/where strings. Every caller of
 -- the describer -- the joined label and the per-place lines alike -- goes
@@ -1897,6 +1858,14 @@ local function sourceLabelFor(source, who, where)
     if source.kind == "worldEvent" then
         return "worldEvent", "World event"
     end
+    -- Le postazioni di Forever -- fermentatore, forno, forgia arcana, banco da
+    -- lavoro. Non le insegna nessuno e non stanno da nessuna parte: arrivano
+    -- col sistema di perk del mestiere, quindi la risposta e' "progredisci",
+    -- non "vai". Nessun luogo, nessun NPC, e per questo il nome del mestiere
+    -- non aggiunge niente alla riga.
+    if source.kind == "blueprint" then
+        return "blueprint", "Blueprint"
+    end
     if source.kind == "quest" then
         if who then return "quest", named("Quest") end
         return "quest", where and placed("Quest", "at") or "Quest"
@@ -1936,7 +1905,7 @@ end
 function Data:DescribeRecipeSource(recipeKey, professionHint, metadataInfo)
     local metadata = getRecipeMetadata()
     if not metadata then
-        return { kind = "trainer", label = "From a trainer", lines = { "From a trainer" }, known = false }
+        return nil
     end
     if metadataInfo == nil then
         metadataInfo = metadata.GetRecipeInfo and metadata:GetRecipeInfo(recipeKey, professionHint) or nil
@@ -1944,19 +1913,23 @@ function Data:DescribeRecipeSource(recipeKey, professionHint, metadataInfo)
 
     local source = metadata.GetSource and metadata:GetSource(recipeKey, metadataInfo) or nil
     if not (source and source.kind) then
-        -- Nothing recorded: fall back to guessing from whether a pattern
-        -- exists. Checking that first, as this used to, meant the guess beat
-        -- the data for every recipe with no pattern -- and an alchemy
-        -- discovery has none, so all seventeen of them were reported as
-        -- taught by a trainer who does not teach them.
-        local kind, label = guessSourceFromRecipeItem(metadataInfo)
-        return {
-            kind = kind,
-            label = label,
-            lines = { label },
-            known = false,
-            faction = source and source.faction or nil,
-        }
+        -- Nessuna provenienza nota, ma a volte si sa quale oggetto insegna la
+        -- ricetta -- "Pattern: Mooncloth" -- e quello e' un fatto, dal
+        -- datamining. Si mostra lui e basta: dove si trovi l'oggetto non si sa,
+        -- e non lo si indovina. Il nome viene dal client, localizzato; finche'
+        -- non l'ha in cache resta "Recipe item", che e' comunque vero.
+        local recipeItemId = metadataInfo and metadataInfo.recipeItemId
+        if recipeItemId then
+            local label = getItemData(recipeItemId) or "Recipe item"
+            return {
+                kind = "item",
+                label = label,
+                lines = { label },
+                known = true,
+                recipeItemId = recipeItemId,
+            }
+        end
+        return nil
     end
 
     -- Each place carries its own zone, so a row can say which vendor stands
@@ -2000,12 +1973,9 @@ function Data:DescribeRecipeSource(recipeKey, professionHint, metadataInfo)
         #zonesOnly > 0 and table.concat(zonesOnly, ", ") or nil)
 
     if not label then
-        -- A kind nothing above handles, or a known kind whose places came
-        -- back empty. Better to guess than to say nothing, but reaching here
-        -- means the metadata grew a shape this describer does not render.
-        kind, label = guessSourceFromRecipeItem(metadataInfo)
-        lines = nil
-        lineInfo = nil
+        -- A kind nothing above renders: the metadata grew a shape this
+        -- describer does not know. Unknown, then, not guessed.
+        return nil
     end
     if not lines or #lines == 0 then
         lines = { label }

@@ -600,28 +600,9 @@ function Addon:OnPlayerLogin()
     end
     if self.Data then
         self.Data:DetectProfessions()
-        -- La scansione al login, che non passa da C_TradeSkillUI.
-        --
-        -- La lista delle ricette del client serve una sessione viva e ne mostra
-        -- un mestiere alla volta, quindi al login non e' una fonte: a sessione
-        -- chiusa risponde con il residuo dell'ultimo mestiere aperto, e
-        -- registrarlo pubblicherebbe alla gilda uno stato vecchio.
-        --
-        -- Il libro degli incantesimi invece risponde sempre. Non elenca le
-        -- ricette, ma C_SpellBook.IsSpellKnown sa dire se ne conosci una --
-        -- verificato in gioco il 2026-09-18 -- e il catalogo salvato quando hai
-        -- aperto quel mestiere dice quali chiedere. Tutti i mestieri insieme,
-        -- senza toccare la UI.
-        self:ScheduleTimer(function()
-            if not self.Data or not self.Data.ScanKnownFromSpellBook then return end
-            local result = self.Data:ScanKnownFromSpellBook({
-                reason = "login",
-                notifyMode = "auto",
-            })
-            if scanResultChanged(result) then
-                markSyncIndexDirtyAndScheduleHello(self, "login-spellbook-scan", 1)
-            end
-        end, 3)
+        -- Niente scansione delle ricette al login: il client ne espone un
+        -- mestiere alla volta, e solo a finestra aperta. Si registrano aprendo
+        -- il mestiere, o da NEW_RECIPE_LEARNED.
         if self.Data.ScheduleSyncIndexPrepare then
             self.Data:ScheduleSyncIndexPrepare("player-login", 0.2)
         end

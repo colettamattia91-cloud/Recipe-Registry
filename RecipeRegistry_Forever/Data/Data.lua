@@ -56,7 +56,6 @@ local DB_DEFAULTS = {
         searchMode = "recipe",
         defaultSearchMode = "recipe",
         useRecipeCategories = true,
-        recipeCategoryView = "expanded",
         showTooltipCrafters = true,
         -- Which top-level tabs are shown. Absent or true means shown; the
         -- Recipes tab is not listed because it cannot be switched off.
@@ -434,17 +433,9 @@ function Data:OnInitialize()
     if type(_G.RecipeRegistryCharDB.favorites) ~= "table" then
         _G.RecipeRegistryCharDB.favorites = {}
     end
-    -- Il catalogo di ogni mestiere: tutti i suoi recipeID, appresi o no.
-    --
-    -- E' dato di gioco, non tuo: cambia con le patch, non con quello che impari.
-    -- Sta qui, per personaggio e fuori dal database di gilda, perche' non si
-    -- sincronizza -- ai compagni interessa cosa sai fare, non l'elenco di cosa
-    -- esiste. Si riempie quando apri un mestiere, ed e' cio' che permette poi di
-    -- sapere cosa sai fare al login senza aprire niente: si chiede
-    -- C_SpellBook.IsSpellKnown su ogni ID del catalogo.
-    if type(_G.RecipeRegistryCharDB.recipeCatalog) ~= "table" then
-        _G.RecipeRegistryCharDB.recipeCatalog = {}
-    end
+    -- Il catalogo dei mestieri serviva solo alla scansione al login, che non
+    -- c'e' piu': chi l'ha nel file lo perde qui, invece di portarselo dietro.
+    _G.RecipeRegistryCharDB.recipeCatalog = nil
     Addon.charDB = _G.RecipeRegistryCharDB
     self._scanNeededByProfession = {}
     self._genericScanAttempts = {}
@@ -481,10 +472,6 @@ function Data:OnInitialize()
     end
     if self.db.profile.useRecipeCategories == nil then
         self.db.profile.useRecipeCategories = true
-    end
-    local categoryView = self.db.profile.recipeCategoryView
-    if categoryView ~= "expanded" and categoryView ~= "accordion" and categoryView ~= "categoriesOnly" then
-        self.db.profile.recipeCategoryView = "expanded"
     end
     -- The collection tab was called "Missing recipes" until 2.3.0, and its
     -- three settings were stored under that name. Carried over rather than
@@ -594,13 +581,12 @@ end
 
 -- Il realm che questo client dichiara adesso, normalizzato. Non finisce in
 -- nessuna chiave: serve solo a riconoscere un suffisso da buttare via.
+--
+-- Solo GetRealmName. Il secondo valore di UnitFullName era il realm fino al
+-- 18/09 ("ClassicBetaPvE2"), ma dal 25/09 e' il cognome: "Kaedros", "Davian".
+-- Letto da li', un roster con "Qualcuno-Davian" avrebbe perso il cognome.
 local function currentRealmToken()
-    local _, realm = UnitFullName("player")
-    local token = normalizeRealmToken(realm)
-    if token == "" then
-        token = normalizeRealmToken(GetRealmName())
-    end
-    return token
+    return normalizeRealmToken(GetRealmName())
 end
 
 -- Un nome di roster e' ambiguo: "Jean-Luc Picard" senza realm ha la stessa
@@ -888,11 +874,26 @@ function Data:GetCanonicalProfession(name)
     return localeMap[name] or name
 end
 
+-- Il nome del personaggio come lo scrive il roster, che e' "Nome Cognome".
+--
+-- UnitFullName ha cambiato forma sotto i piedi. Il 18/09 rispondeva
+-- "Kaedros Davian", "ClassicBetaPvE2": nome intero, poi il realm. Il 25/09
+-- risponde "Kaedros", "Davian": il cognome e' passato nel secondo valore. Il
+-- roster invece e' rimasto "Kaedros Davian". Leggere solo il primo valore
+-- dava la chiave "Kaedros", che il roster non conosce: un secondo proprietario
+-- per la stessa persona, sempre offline.
+--
+-- Quindi il secondo valore si attacca, a meno che non sia il realm -- la forma
+-- vecchia, riconoscibile perche' coincide con GetRealmName e perche' il primo
+-- valore ha gia' lo spazio.
 function Data:GetPlayerKey()
-    -- solo il primo valore: il realm che UnitFullName restituisce non e'
-    -- identita' su questo client, vedi normalizeGuildRosterMemberKey
-    local name = UnitFullName("player")
-    return name or "Unknown"
+    local name, second = UnitFullName("player")
+    if type(name) ~= "string" or name == "" then return "Unknown" end
+    if type(second) == "string" and second ~= "" and not name:find(" ", 1, true)
+        and normalizeRealmToken(second) ~= currentRealmToken() then
+        return name .. " " .. second
+    end
+    return name
 end
 
 -- La chiave e' gia' il nome. Questa resta il posto unico da cui UI e sussurri
@@ -906,13 +907,6 @@ function Data:MemberKeyFromFullName(fullName)
     return normalizeGuildRosterMemberKey(fullName)
 end
 
--- Senza il segmento realm questo e' l'unico controllo di forma rimasto fra un
--- peer e il nostro database, quindi deve fermare quello che faceva male:
---   ":"  spezzerebbe le chiavi di blocco "proprietario::professione"
---   "|"  e' l'escape di WoW, e un nome che lo contiene inietta colori e link
---        dentro le stringhe che la UI compone
---   caratteri di controllo, e spazi ai bordi, che darebbero due chiavi gemelle
---   per lo stesso personaggio
 -- Il dataset dei metadati ha qualcosa da dire?
 --
 -- Due cancelli dell'addon cancellano o nascondono le ricette che il dataset non
@@ -970,6 +964,14 @@ function Data:MetadataKnowsAnyRecipe()
         or next(generated.createdItemToSpellIds or {}) ~= nil
 end
 
+-- Senza il segmento realm questo e' l'unico controllo di forma rimasto fra un
+-- peer e il nostro database -- anche per il sync, che lo usa invece di averne
+-- uno suo -- quindi deve fermare quello che faceva male:
+--   ":"  spezzerebbe le chiavi di blocco "proprietario::professione"
+--   "|"  e' l'escape di WoW, e un nome che lo contiene inietta colori e link
+--        dentro le stringhe che la UI compone
+--   caratteri di controllo, e spazi ai bordi, che darebbero due chiavi gemelle
+--   per lo stesso personaggio
 function Data:IsValidMemberKey(memberKey)
     if type(memberKey) ~= "string" or memberKey == "" then return false end
     if memberKey:find("[:|%c]") then return false end

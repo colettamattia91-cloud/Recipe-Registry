@@ -86,7 +86,7 @@ local COLLECTION_SORT_KEYS = {
 local COLLECTION_FILTER_CYCLES = {
     status = { "all", "unlearned", "ready" },
     skill  = { "all", "inreach", "outofreach", "noskill" },
-    source = { "all", "trainer", "vendor", "drop", "quest", "worldDrop", "discovery", "worldEvent" },
+    source = { "all", "item", "trainer", "vendor", "drop", "quest", "worldDrop", "blueprint", "discovery", "worldEvent" },
     spec   = { "all", "none", "required", "have" },
     phase  = { "all", "base", "later", "p2", "p3", "p4", "p5" },
 }
@@ -104,11 +104,13 @@ local COLLECTION_COLUMN_FILTER_LABELS = {
     inreach    = "In reach",
     outofreach = "Out of reach",
     noskill    = "Not listed",
+    item       = "Recipe item",
     trainer    = "Trainer",
     vendor     = "Vendor",
     drop       = "Drop",
     quest      = "Quest",
     worldDrop  = "World drop",
+    blueprint  = "Blueprint",
     discovery  = "Discovery",
     worldEvent = "World event",
     none       = "None",
@@ -135,11 +137,24 @@ local COLLECTION_PHASE_TEXT = {
 
 -- Una scheda per un mestiere che nessuno puo' avere non resta vuota, resta
 -- sbagliata: dice che qualcuno in gilda potrebbe saperlo fare.
-local PROF_ORDER = {
-    FAVORITES_VIEW, "Alchemy", "Blacksmithing", "Cooking", "Enchanting", "Engineering",
-    "First Aid", "Fishing", "Herbalism", "Leatherworking", "Mining", "Skinning",
-    "Tailoring"
+-- L'ordine dei mestieri, lo stesso nella barra laterale e nelle sezioni della
+-- Collezione. Prima quelli che producono cio' che si va a chiedere a un
+-- compagno, poi i secondari, in fondo la raccolta: Herbalism ha tre ricette, e
+-- chi apre l'addon cerca un fabbro prima di un erborista. Dentro ogni gruppo
+-- resta l'ordine alfabetico.
+local PROFESSION_GROUPS = {
+    { "Alchemy", "Blacksmithing", "Enchanting", "Engineering", "Leatherworking", "Tailoring" },
+    { "Cooking", "First Aid", "Fishing" },
+    { "Herbalism", "Mining", "Skinning" },
 }
+local PROF_ORDER = { FAVORITES_VIEW }
+local PROFESSION_RANK = {}
+for _, group in ipairs(PROFESSION_GROUPS) do
+    for _, profName in ipairs(group) do
+        PROF_ORDER[#PROF_ORDER + 1] = profName
+        PROFESSION_RANK[profName] = #PROF_ORDER
+    end
+end
 
 -- Top-level tabs, in nav order. Adding a tab is a row here plus its view
 -- code: the nav layout, the enable/disable options and the fallback when a
@@ -295,12 +310,17 @@ end
 -- Everything else -- a discovery at your own anvil, a world event, a pattern
 -- the data cannot place -- asks for none of those and stays grey.
 local COLLECTION_SOURCE_COLORS = {
+    item      = "|cffc9a8ff",
     trainer   = "|cff8fc6ff",
     vendor    = "|cffffd100",
     drop      = "|cffff9d5a",
     worldDrop = "|cffff9d5a",
     container = "|cffff9d5a",
     quest     = "|cffffe066",
+    -- I Blueprint non sono un posto dove andare: sono le postazioni del
+    -- sistema di perk di Forever, e si sbloccano progredendo nel mestiere.
+    -- Verde perche' e' l'unica provenienza che non chiede un viaggio.
+    blueprint = "|cff7fd97f",
 }
 
 local function collectionSourceColor(sourceKind)
@@ -917,7 +937,6 @@ function UI:OnInitialize()
     end
     self.selectedRecipeKey = nil
     self.selectedCategory = nil
-    self.expandedCategory = nil
     self.recipeSearchText = ""
     self.addonStatusSearchText = ""
     self.collectionSearchText = ""
@@ -972,7 +991,6 @@ function UI:SetMainView(view)
     self.selectedRecipeKey = nil
     self.selectedAddonStatusKey = nil
     self.selectedCategory = nil
-    self.expandedCategory = nil
     self:ApplyMainLayout()
     self:Refresh()
 end
@@ -2267,7 +2285,6 @@ function UI:CreateMainFrame()
             UI.selectedRecipeKey = nil
             UI.selectedAddonStatusKey = nil
             UI.selectedCategory = nil
-            UI.expandedCategory = nil
             UI:ResetRecipeScroll()
             UI:Refresh()
         end)
@@ -2861,16 +2878,6 @@ function UI:EnsureCategoryButton(index)
 
     button = createCardStyleButton(self.frame.profContent, 198, 20)
     button:SetScript("OnClick", function(self)
-        -- In accordion view a top-level category button also toggles its
-        -- subcategory group. `toggleExpandKey` is set per-render only for
-        -- those buttons; it's nil for "All", flat categories, and subcategories.
-        if self.toggleExpandKey then
-            if UI.expandedCategory == self.toggleExpandKey then
-                UI.expandedCategory = nil
-            else
-                UI.expandedCategory = self.toggleExpandKey
-            end
-        end
         UI.selectedCategory = self.categoryToken
         UI.selectedRecipeKey = nil
         UI:ResetRecipeScroll()
@@ -3669,7 +3676,11 @@ function UI:RefreshProfessionButtons(opts)
         placeButton(button, 0, 24, 6)
 
         if useCategories and self.selectedProfession == profName and profName ~= FAVORITES_VIEW then
-            local viewMode = (Addon.db and Addon.db.profile and Addon.db.profile.recipeCategoryView) or "expanded"
+            -- Un livello solo. L'albero delle categorie del client Forever, per
+            -- tutti e dodici i mestieri, e' mestiere -> categorie: nessuna ha un
+            -- genitore che non sia il mestiere. Quindi niente sottocategorie,
+            -- niente fisarmonica, niente modi di vista da scegliere.
+            --
             -- Sidebar categories follow the same projection as the recipe list:
             -- only categories with at least one recipe visible under the active
             -- filters are offered. The filter context here mirrors the list's
@@ -3686,101 +3697,44 @@ function UI:RefreshProfessionButtons(opts)
 
             local selectedCategoryExists = self.selectedCategory == nil
             for _, categoryRow in ipairs(categories) do
-                local categoryToken = categoryRow.key or categoryRow
-                if categoryToken == self.selectedCategory then
+                if (categoryRow.key or categoryRow) == self.selectedCategory then
                     selectedCategoryExists = true
                     break
                 end
-                for _, subcategoryRow in ipairs(categoryRow.subcategories or {}) do
-                    local subcategoryToken = "subcategory:" .. tostring(categoryToken) .. ":" .. tostring(subcategoryRow.key)
-                    if subcategoryToken == self.selectedCategory then
-                        selectedCategoryExists = true
-                        break
-                    end
-                end
-                if selectedCategoryExists then break end
             end
             if not selectedCategoryExists then
                 self.selectedCategory = nil
             end
 
-            -- Reconcile a subcategory selection with the active view mode so the
-            -- user never ends up filtered to a subcategory whose button isn't
-            -- rendered: categoriesOnly falls back to the parent category, while
-            -- accordion expands the parent so the selection stays visible.
-            local selectedSubParent = self.selectedCategory
-                and tostring(self.selectedCategory):match("^subcategory:([^:]+):")
-            if selectedSubParent then
-                if viewMode == "categoriesOnly" then
-                    self.selectedCategory = selectedSubParent
-                elseif viewMode == "accordion" then
-                    self.expandedCategory = selectedSubParent
-                end
-            end
-
             if #categories > 0 then
                 -- profContent is 196 wide (sized to clear the sidebar's
-                -- scrollbar); size each row to fit its indent so subcategory
-                -- rows at the deeper indent don't bleed past it.
-                local function widthFor(indent) return 196 - indent - 4 end
+                -- scrollbar); every row sits at the same indent.
+                local rowWidth = 196 - 14 - 4
                 categoryButtonIndex = categoryButtonIndex + 1
                 local allButton = self:EnsureCategoryButton(categoryButtonIndex)
                 allButton.categoryToken = nil
-                allButton.toggleExpandKey = nil
                 allButton.categoryLabel = "All"
                 allButton:SetLabel("All")
                 allButton:SetSelected(self.selectedCategory == nil)
-                allButton:SetWidth(widthFor(14))
+                allButton:SetWidth(rowWidth)
                 placeButton(allButton, 14, 20, 4)
 
                 for _, categoryRow in ipairs(categories) do
                     local categoryToken = categoryRow.key or categoryRow
                     local categoryLabel = categoryRow.label or categoryToken
-                    local hasSubcategories = categoryRow.subcategories and #categoryRow.subcategories > 0
-                    local expanded = viewMode == "accordion" and self.expandedCategory == categoryToken
-
                     categoryButtonIndex = categoryButtonIndex + 1
                     local categoryButton = self:EnsureCategoryButton(categoryButtonIndex)
                     categoryButton.categoryToken = categoryToken
                     categoryButton.categoryLabel = categoryLabel
-                    if viewMode == "accordion" and hasSubcategories then
-                        categoryButton.toggleExpandKey = categoryToken
-                        -- Same toggle art as every other collapsible header
-                        -- in the addon; see collapseTag.
-                        local arrow = collapseTag(not expanded) .. " "
-                        categoryButton:SetLabel(arrow .. categoryLabel)
-                    else
-                        categoryButton.toggleExpandKey = nil
-                        categoryButton:SetLabel(categoryLabel)
-                    end
+                    categoryButton:SetLabel(categoryLabel)
                     categoryButton:SetSelected(self.selectedCategory == categoryToken)
-                    categoryButton:SetWidth(widthFor(14))
+                    categoryButton:SetWidth(rowWidth)
                     placeButton(categoryButton, 14, 20, 4)
-
-                    -- expanded: always show subcategories; accordion: only for the
-                    -- expanded category; categoriesOnly: never.
-                    local renderSubcategories = hasSubcategories
-                        and (viewMode == "expanded" or (viewMode == "accordion" and expanded))
-                    if renderSubcategories then
-                        for _, subcategoryRow in ipairs(categoryRow.subcategories or {}) do
-                            local subcategoryToken = "subcategory:" .. tostring(categoryToken) .. ":" .. tostring(subcategoryRow.key)
-                            categoryButtonIndex = categoryButtonIndex + 1
-                            local subcategoryButton = self:EnsureCategoryButton(categoryButtonIndex)
-                            subcategoryButton.categoryToken = subcategoryToken
-                            subcategoryButton.toggleExpandKey = nil
-                            subcategoryButton.categoryLabel = subcategoryRow.label or subcategoryRow.key
-                            subcategoryButton:SetLabel(subcategoryButton.categoryLabel)
-                            subcategoryButton:SetSelected(self.selectedCategory == subcategoryToken)
-                            subcategoryButton:SetWidth(widthFor(28))
-                            placeButton(subcategoryButton, 28, 18, 3)
-                        end
-                    end
                 end
                 yOffset = yOffset + 2
             end
         elseif self.selectedProfession == profName then
             self.selectedCategory = nil
-            self.expandedCategory = nil
         end
     end
     for i = categoryButtonIndex + 1, #(self.frame.categoryButtons or {}) do
@@ -3801,16 +3755,9 @@ function UI:GetCategoryFilterLabel(profession, categoryToken)
     if not categoryToken or not (Addon.Data and Addon.Data.GetRecipeCategories) then
         return nil
     end
-    local subcategoryCategory, subcategoryKey = tostring(categoryToken):match("^subcategory:([^:]+):(.+)$")
     for _, categoryRow in ipairs(Addon.Data:GetRecipeCategories(profession, true) or {}) do
         local categoryKey = categoryRow.key or categoryRow
-        if subcategoryCategory and categoryKey == subcategoryCategory then
-            for _, subcategoryRow in ipairs(categoryRow.subcategories or {}) do
-                if subcategoryRow.key == subcategoryKey then
-                    return (categoryRow.label or categoryKey) .. " / " .. (subcategoryRow.label or subcategoryKey)
-                end
-            end
-        elseif categoryKey == categoryToken then
+        if categoryKey == categoryToken then
             return categoryRow.label or categoryKey
         end
     end
@@ -4508,13 +4455,20 @@ function UI:ShowCollectionRowTooltip(row)
     end
 
     local known = collection.known == true
+    -- Senza provenienza nota il blocco non c'e': un titolo "Where to learn"
+    -- sopra una riga vuota direbbe che la risposta esiste e si e' persa.
+    local sourceLines = collection.sourceLines
+    if (not sourceLines or #sourceLines == 0) and collection.sourceLabel then
+        sourceLines = { collection.sourceLabel }
+    end
+    if sourceLines and #sourceLines > 0 then
     GameTooltip:AddLine(" ")
     -- A recipe already in the book is not somewhere to go, it is somewhere it
     -- came from -- worth keeping, because "where did I get this" is a real
     -- question when a guildmate asks.
     GameTooltip:AddLine(known and "Where it comes from" or "Where to learn", 1, 0.82, 0)
     local lineInfo = collection.sourceLineInfo
-    for index, line in ipairs(collection.sourceLines or { collection.sourceLabel or "" }) do
+    for index, line in ipairs(sourceLines) do
         local text = safeText(line)
         local info = lineInfo and lineInfo[index]
         -- The map position, where the source knew one. The table column has no
@@ -4530,10 +4484,10 @@ function UI:ShowCollectionRowTooltip(row)
         end
         GameTooltip:AddLine(text, 0.85, 0.85, 0.85, true)
     end
-    -- The source line says "from a trainer" because that is all the data
-    -- records. When the trainer only teaches it to some classes, that is the
-    -- rest of the answer, and without it the row reads as a recipe any
-    -- engineer could walk up and buy.
+    end
+    -- Quali classi possono impararla e' un fatto della ricetta, noto anche
+    -- quando la provenienza non lo e': senza, la riga si legge come una
+    -- ricetta che qualunque ingegnere puo' imparare.
     if collection.classNames then
         GameTooltip:AddLine("Taught only to " .. collection.classNames, 0.95, 0.75, 0.30, true)
     end
@@ -5505,7 +5459,13 @@ function UI:BuildCollectionDisplayRows(rows)
             knownCount = knownCount + 1
         end
     end
-    table.sort(order)
+    -- Stesso ordine della barra laterale; un mestiere che non conosce finisce in
+    -- fondo, in ordine alfabetico.
+    table.sort(order, function(a, b)
+        local ra, rb = PROFESSION_RANK[a] or math.huge, PROFESSION_RANK[b] or math.huge
+        if ra ~= rb then return ra < rb end
+        return a < b
+    end)
 
     local out = {}
     if #rows > 0 then

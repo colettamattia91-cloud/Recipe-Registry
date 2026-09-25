@@ -25,9 +25,6 @@
     <Include file="AceComm-3.0\AceComm-3.0.xml"/>
     <Include file="AceSerializer-3.0\AceSerializer-3.0.xml"/>
 
-    <!-- ChatThrottleLib -->
-    <Include file="ChatThrottleLib\ChatThrottleLib.xml"/>
-
     <!-- LibDeflate -->
     <Include file="LibDeflate\lib.xml"/>
 
