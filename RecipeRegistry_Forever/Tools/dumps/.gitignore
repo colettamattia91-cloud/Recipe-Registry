@@ -1,10 +1,13 @@
-# Gli ingressi del database restano locali.
+# Gli ingressi del database restano fuori da questo repo, che e' pubblico.
 #
-# Qui dentro stanno il dump del Collector e il datamining convertito: sono cio'
-# da cui Data/Metadata/RecipeMetadata_Generated.lua nasce, non cio' che l'addon
-# usa. Il file che conta e' quello generato, ed e' versionato lui.
+# Il file che conta e' Data/Metadata/RecipeMetadata_Generated.lua, ed e'
+# versionato lui. Cio' da cui nasce -- le catture del Collector e il bundle del
+# datamining -- si archivia nel repo privato accanto a questo,
+# ../WowForeverMining/data: una cattura si rifa' solo giocando, un giro dai
+# trainer un mestiere per volta, e va conservata, ma non qui.
 #
-# Il dump completo si rifa' solo giocando -- un giro dai trainer, un mestiere
-# per volta -- quindi conservalo, ma conservalo qui e non in cronologia.
+# Questa cartella resta come spazio di lavoro: mining.lua convertito da
+# convert-mining.ps1, i file temporanei di import-dumps.ps1, e l'archivio locale
+# per chi il repo privato non ce l'ha.
 *
 !.gitignore

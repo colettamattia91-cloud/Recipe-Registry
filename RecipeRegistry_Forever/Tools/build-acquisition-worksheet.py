@@ -161,25 +161,7 @@ def main():
             for field in ("npcName", "zone", "x", "y", "faction"):
                 got[field].append(c[field])
 
-    from_ingame = 0
-    for row in rows:
-        if not row["recipeItemId"]:
-            continue
-        got = ingame.get(int(row["recipeItemId"]))
-        if not got:
-            continue
-        # Anche x e y vanno per posto: due NPC sono in due punti della mappa,
-        # e dare a entrambi le coordinate del primo manda meta' della gilda
-        # nel posto sbagliato con un numero che sembra preciso.
-        row.update(sourceKind="vendor",
-                   npcName=" | ".join(got["npcName"]),
-                   zone=" | ".join(got["zone"]),
-                   x=" | ".join(got["x"]), y=" | ".join(got["y"]),
-                   faction=" | ".join(got["faction"]),
-                   notes="catturato in gioco")
-        from_ingame += 1
-
-    # Poi il dataset TBC, che e' il dato curato e verificato da anni.
+    # Prima il dataset TBC, che e' il dato curato e verificato da anni.
     from_tbc = 0
     for row in rows:
         if row["sourceKind"]:
@@ -230,6 +212,48 @@ def main():
         row.update(parse_source(h["source"]))
         row["notes"] = (row.get("notes") or h["source"]) + " [foreverchanges 2026-09-24]"
         filled += 1
+
+    # ULTIMA la cattura in gioco, e FONDE invece di sostituire.
+    #
+    # Un venditore visto non e' l'unico venditore: Brilliant Smallfish la
+    # vendono Harn Longcast, Gretta Ganter e altri, e aver visto Sewa
+    # Mistrunner a Thunder Bluff aggiunge lei, non cancella loro. Quindi si
+    # fonde per nome: l'NPC che c'era resta, e se e' lo stesso che abbiamo
+    # visto vince la versione in gioco -- quella porta zona e coordinate
+    # verificate, ed e' cosi' che Archmage Alvareaux e' passato da "Alterac
+    # Mountains", dov'era Dalaran in vanilla, a The Silver Enclave.
+    from_ingame = 0
+    for row in rows:
+        if not row["recipeItemId"]:
+            continue
+        got = ingame.get(int(row["recipeItemId"]))
+        if not got:
+            continue
+
+        def split(value):
+            return [p.strip() for p in (value or "").split("|")] if value else []
+
+        places, order = {}, []
+        old = (split(row["npcName"]), split(row["zone"]), split(row["x"]),
+               split(row["y"]), split(row["faction"]))
+        for i, name in enumerate(old[0]):
+            if not name:
+                continue
+            order.append(name)
+            places[name] = [name] + [old[j][i] if i < len(old[j]) else "" for j in (1, 2, 3, 4)]
+        for i, name in enumerate(got["npcName"]):
+            if name not in places:
+                order.append(name)
+            places[name] = [name, got["zone"][i], got["x"][i], got["y"][i], got["faction"][i]]
+
+        row.update(sourceKind=row["sourceKind"] or "vendor",
+                   npcName=" | ".join(places[n][0] for n in order),
+                   zone=" | ".join(places[n][1] for n in order),
+                   x=" | ".join(places[n][2] for n in order),
+                   y=" | ".join(places[n][3] for n in order),
+                   faction=" | ".join(places[n][4] for n in order),
+                   notes=(row["notes"] + " + " if row["notes"] else "") + "catturato in gioco")
+        from_ingame += 1
 
     # La fazione quando il sito la mette fra parentesi nella zona.
     for row in rows:

@@ -335,7 +335,9 @@ function Data:BuildCollectionRowsForProfession(professionName, prof)
             local requiredSkill = tonumber(info and info.requiredSkill) or nil
             local specializationId = meta.GetSpecialization
                 and meta:GetSpecialization(recipeKey, info) or nil
-            local source = self:DescribeRecipeSource(recipeKey, professionKey, info)
+            -- nil quando la provenienza non si conosce: i campi restano nil e
+            -- la colonna vuota, invece di indovinare
+            local source = self:DescribeRecipeSource(recipeKey, professionKey, info) or {}
             rows[#rows + 1] = {
                 recipeKey = recipeKey,
                 -- detail and label are filled in by ResolveCollectionRow,
