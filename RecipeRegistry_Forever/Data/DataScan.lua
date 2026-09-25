@@ -661,6 +661,10 @@ function Data:LearnRecipeFromSignal(recipeID, reason)
     if self.MarkSyncIndexDirty then
         self:MarkSyncIndexDirty(reason or "recipe-learned", self:BuildSyncBlockKey(playerKey, canonical))
     end
+    -- come ApplyScanResult: senza, il dato e' scritto ma la lista e i tooltip
+    -- restano quelli in cache fino alla prossima scansione
+    self:InvalidateRecipeCaches()
+    Addon:RequestRefresh("scan")
     Addon:Debug("Recipe learned and resolved:", canonical, recipeKey, "from", recipeID)
     return true, nil, canonical, recipeKey
 end
