@@ -1,0 +1,129 @@
+name: Release
+
+# Releases come off main, and main carries one folder per game version. What
+# ships is decided by which addon folder is built, not by which branch the work
+# sat on: the packager takes the project root as an argument (`-t <folder>`),
+# reads that folder's own .pkgmeta, and packages it alone. Its package-as is the
+# folder name in game, so the TBC addon stays "RecipeRegistry" no matter what
+# the repo folder is called.
+#
+# Adding a game version means adding a folder with a .pkgmeta and a line in the
+# matrix below. It does not mean adding a branch or a workflow.
+#
+# Packaging used to happen on CurseForge's side, from a repository webhook,
+# which built whatever landed on the branch it watched. That cannot express
+# "this tag, this addon" -- hence this.
+#
+# The CurseForge project ids and the API key never lived in the repository; they
+# were webhook configuration. Until they are set here a release still builds and
+# still reaches GitHub, and says what it could not do.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to package"
+        required: true
+      addons:
+        description: >-
+          Which addon folders to build, comma separated. Defaults to the TBC
+          addon alone: the Forever one ships when its Interface number comes
+          from the client instead of a formula.
+        required: false
+        default: "RecipeRegistry"
+      args:
+        description: "Extra packager arguments (for example -d for a dry run)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      addons: ${{ steps.pick.outputs.addons }}
+    steps:
+      - name: Decide which addons this release builds
+        id: pick
+        run: |
+          list="${{ github.event.inputs.addons }}"
+          if [ -z "$list" ]; then
+            list="RecipeRegistry"
+          fi
+          json=$(printf '%s' "$list" | tr ',' '\n' | sed 's/^ *//; s/ *$//' \
+                 | grep -v '^$' | jq -R . | jq -sc .)
+          echo "addons=$json" >> "$GITHUB_OUTPUT"
+          echo "Building: $json"
+
+  package:
+    needs: plan
+    runs-on: ubuntu-latest
+    strategy:
+      # One package per addon folder, and one failing addon does not cancel the
+      # other: a broken Forever build must not hold back a TBC release.
+      fail-fast: false
+      matrix:
+        addon: ${{ fromJson(needs.plan.outputs.addons) }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          # The packager reads tags and history to build the changelog; a
+          # shallow checkout gives it a release with nothing in it.
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - name: Refuse a tag that is not on main
+        run: |
+          tag="${{ github.event.inputs.tag || github.ref_name }}"
+          git fetch --quiet origin main
+          if git merge-base --is-ancestor HEAD origin/main; then
+            echo "Tag $tag is on main."
+          else
+            echo "::error::Tag $tag is not reachable from main. Releases come" \
+                 "off main; tag the merge, not the branch it came from."
+            exit 1
+          fi
+
+      - name: Refuse an addon folder that cannot be packaged
+        run: |
+          if [ ! -f "${{ matrix.addon }}/.pkgmeta" ]; then
+            echo "::error::${{ matrix.addon }}/.pkgmeta does not exist. An" \
+                 "addon folder is packaged from its own .pkgmeta."
+            exit 1
+          fi
+          echo "TOC files in ${{ matrix.addon }}:"
+          ls -1 "${{ matrix.addon }}"/*.toc
+
+      - name: Say where this build can go
+        id: target
+        run: |
+          # One CurseForge project carries both flavors, so every addon folder
+          # uploads to the same id. What keeps them apart is the file: each
+          # packager run produces its own zip, with its own version and its own
+          # changelog, tagged for the game version its TOC declares.
+          name=$(printf '%s' "${{ matrix.addon }}" | tr '[:lower:]' '[:upper:]')
+          id="${{ vars.CF_PROJECT_ID }}"
+          if [ -z "$id" ]; then
+            echo "args=" >> "$GITHUB_OUTPUT"
+            echo "::warning::No CurseForge project id for $name, so this" \
+                 "release stops at GitHub."
+          else
+            echo "args=-p $id" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Package and publish
+        uses: BigWigsMods/packager@v2
+        env:
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+        with:
+          args: >-
+            -t ${{ matrix.addon }}
+            ${{ steps.target.outputs.args }}
+            ${{ github.event.inputs.args }}
