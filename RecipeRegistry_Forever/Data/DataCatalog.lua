@@ -1280,6 +1280,40 @@ local function allowUncataloguedWhenUnknown(profName, filterContext)
     return filterContext
 end
 
+-- L'ordine delle righe della scheda Recipes, uguale per la lista, la sua
+-- versione a passi e i preferiti.
+--   alpha   per nome
+--   rarity  prima la qualita' dell'oggetto prodotto, poi per nome
+--   skill   il livello a cui si impara, dal piu' basso; chi non ce l'ha va in
+--           fondo invece di passare per una ricetta di livello 0
+function Data:CompareRecipeRows(a, b, sortMode)
+    if sortMode == "rarity" then
+        local aq = (a.detail and (a.detail.createdItemQuality or a.detail.recipeItemQuality))
+        local bq = (b.detail and (b.detail.createdItemQuality or b.detail.recipeItemQuality))
+        aq = aq == nil and -1 or aq
+        bq = bq == nil and -1 or bq
+        if aq ~= bq then return aq > bq end
+    elseif sortMode == "skill" then
+        local ar = a.detail and tonumber(a.detail.minRank) or nil
+        local br = b.detail and tonumber(b.detail.minRank) or nil
+        if ar ~= br then
+            if ar == nil then return false end
+            if br == nil then return true end
+            return ar < br
+        end
+    end
+    local al = lowerSafe(a.label)
+    local bl = lowerSafe(b.label)
+    if al ~= bl then return al < bl end
+    local ao = a.onlineCount or 0
+    local bo = b.onlineCount or 0
+    if ao ~= bo then return ao > bo end
+    local ac = a.crafterCount or 0
+    local bc = b.crafterCount or 0
+    if ac ~= bc then return ac > bc end
+    return tostring(a.recipeKey) < tostring(b.recipeKey)
+end
+
 function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName, filterContext)
     sortMode = sortMode or "alpha"
     searchMode = searchMode == "materials" and "materials" or "recipe"
@@ -1371,25 +1405,7 @@ function Data:GetRecipeList(profName, query, sortMode, searchMode, categoryName,
         end
     end
 
-    sort(out, function(a, b)
-        if sortMode == "rarity" then
-            local aq = (a.detail and (a.detail.createdItemQuality or a.detail.recipeItemQuality))
-            local bq = (b.detail and (b.detail.createdItemQuality or b.detail.recipeItemQuality))
-            aq = aq == nil and -1 or aq
-            bq = bq == nil and -1 or bq
-            if aq ~= bq then return aq > bq end
-        end
-        local al = lowerSafe(a.label)
-        local bl = lowerSafe(b.label)
-        if al ~= bl then return al < bl end
-        local ao = a.onlineCount or 0
-        local bo = b.onlineCount or 0
-        if ao ~= bo then return ao > bo end
-        local ac = a.crafterCount or 0
-        local bc = b.crafterCount or 0
-        if ac ~= bc then return ac > bc end
-        return tostring(a.recipeKey) < tostring(b.recipeKey)
-    end)
+    sort(out, function(a, b) return self:CompareRecipeRows(a, b, sortMode) end)
 
     rememberBoundedCache(
         self._recipeListCache,
@@ -1601,25 +1617,7 @@ function Data:RunRecipeListBuildStep(state, ctx)
     end
 
     local sortMode = state.sortMode
-    sort(out, function(a, b)
-        if sortMode == "rarity" then
-            local aq = (a.detail and (a.detail.createdItemQuality or a.detail.recipeItemQuality))
-            local bq = (b.detail and (b.detail.createdItemQuality or b.detail.recipeItemQuality))
-            aq = aq == nil and -1 or aq
-            bq = bq == nil and -1 or bq
-            if aq ~= bq then return aq > bq end
-        end
-        local al = lowerSafe(a.label)
-        local bl = lowerSafe(b.label)
-        if al ~= bl then return al < bl end
-        local ao = a.onlineCount or 0
-        local bo = b.onlineCount or 0
-        if ao ~= bo then return ao > bo end
-        local ac = a.crafterCount or 0
-        local bc = b.crafterCount or 0
-        if ac ~= bc then return ac > bc end
-        return tostring(a.recipeKey) < tostring(b.recipeKey)
-    end)
+    sort(out, function(a, b) return self:CompareRecipeRows(a, b, sortMode) end)
 
     -- If the underlying caches were invalidated mid-build (roster presence
     -- flip, scan completion, etc.) the rows we just assembled may already be
