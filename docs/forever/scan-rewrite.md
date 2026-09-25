@@ -145,8 +145,12 @@ elencare.
 Ma `C_SpellBook.IsSpellKnown(recipeID)` sa rispondere su una ricetta: true sui
 tre elisir appresi, false sulle due non apprese. Attenzione a non confonderlo con
 il globale `IsSpellKnown`, che su quegli stessi ID risponde false a tutti.
-L'oracolo c'e', quello che manca e' la lista di ID da interrogare -- ed e' il
-motivo per cui il dataset statico serve comunque.
+L'oracolo c'e', quello che manca e' la lista di ID da interrogare.
+
+Per un po' la scansione al login l'ha presa da un catalogo salvato aprendo ogni
+mestiere. Tolta il 2026-09-25: copriva solo i mestieri gia' aperti una volta, e
+coprirli tutti voleva dire interrogare centinaia di ID per mestiere a ogni
+login. `IsSpellKnown` resta come conferma di `NEW_RECIPE_LEARNED`.
 
 ### Il bug del client che ha mangiato una serata
 
