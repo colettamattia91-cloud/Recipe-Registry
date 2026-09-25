@@ -81,14 +81,13 @@ local ADDON_STATUS_COLUMN_TITLES = {
 -- whole book; source and specialization ask about the recipe, not about you.
 local COLLECTION_DEFAULT_SORT = "default"
 local COLLECTION_SORT_KEYS = {
-    name = true, status = true, skill = true, source = true, spec = true, phase = true,
+    name = true, status = true, skill = true, source = true, spec = true,
 }
 local COLLECTION_FILTER_CYCLES = {
     status = { "all", "unlearned", "ready" },
     skill  = { "all", "inreach", "outofreach", "noskill" },
     source = { "all", "item", "trainer", "vendor", "drop", "quest", "worldDrop", "blueprint", "discovery", "worldEvent" },
     spec   = { "all", "none", "required", "have" },
-    phase  = { "all", "base", "later", "p2", "p3", "p4", "p5" },
 }
 local COLLECTION_COLUMN_TITLES = {
     name = "Recipe",
@@ -96,7 +95,7 @@ local COLLECTION_COLUMN_TITLES = {
     skill = "Skill needed",
     source = "Learned from",
     spec = "Specialization",
-    phase = "Content phase",
+    coords = "Coordinates",
 }
 local COLLECTION_COLUMN_FILTER_LABELS = {
     unlearned  = "Not learned",
@@ -116,23 +115,6 @@ local COLLECTION_COLUMN_FILTER_LABELS = {
     none       = "None",
     required   = "Required",
     have       = "Mine",
-    base       = "From the start",
-    later      = "Any later phase",
-    p2         = "Phase 2",
-    p3         = "Phase 3",
-    p4         = "Phase 4",
-    p5         = "Phase 5",
-}
-
--- What the Phase column writes. A recipe obtainable from the start says
--- nothing at all: that is most of the book, and a column that repeats "1" four
--- hundred times is a column that has stopped being read. The number appears
--- only when the answer is "not yet", which is the whole reason to have it.
-local COLLECTION_PHASE_TEXT = {
-    [2] = "P2",
-    [3] = "P3",
-    [4] = "P4",
-    [5] = "P5",
 }
 
 -- Una scheda per un mestiere che nessuno puo' avere non resta vuota, resta
@@ -1230,18 +1212,6 @@ function UI:CollectionRowPassesColumns(row)
         return false
     end
 
-    local phase = self:GetCollectionColumnFilter("phase")
-    if phase ~= "all" then
-        local value = collection.phase
-        if phase == "base" then
-            if value ~= nil then return false end
-        elseif phase == "later" then
-            if value == nil then return false end
-        elseif tostring(value or "") ~= phase:sub(2) then
-            return false
-        end
-    end
-
     local spec = self:GetCollectionColumnFilter("spec")
     if spec ~= "all" then
         local required = collection.specializationSpellId ~= nil
@@ -1351,7 +1321,7 @@ function UI:HasCollectionColumnFilter()
 end
 
 function UI:ClearCollectionColumnFilters()
-    self.collectionFilters = { skill = "all", source = "all", spec = "all", phase = "all" }
+    self.collectionFilters = { skill = "all", source = "all", spec = "all" }
     local data = Addon.Data
     if data and data.SetCollectionFilter then data:SetCollectionFilter("all") end
     self:ResetRecipeScroll()
@@ -1683,6 +1653,24 @@ function UI:MarkFullRefreshPending(reason)
     if Addon.Sync and Addon.Sync.telemetry then
         Addon.Sync.telemetry.transitionDeferredUI = (Addon.Sync.telemetry.transitionDeferredUI or 0) + 1
     end
+    self:EnsureResumeWatcher()
+end
+
+-- La ripresa dalla modalita' "status only" non dipende piu' solo dai timer di
+-- fine warmup e fine transizione. Erano gli unici a chiamare
+-- TryResumeFullRefresh, per ultimi nel loro callback: un errore prima di
+-- quella riga, o i due timer in un ordine sfortunato, e la finestra aperta
+-- durante il login restava vuota finche' non si cliccava un mestiere. Visto in
+-- gioco il 25/09. Finche' la finestra e' aperta e aspetta, riprova da sola.
+function UI:EnsureResumeWatcher()
+    if self._resumeWatcher or not Addon.ScheduleRepeatingTimer then return end
+    self._resumeWatcher = Addon:ScheduleRepeatingTimer(function()
+        local shown = self.frame and self.frame:IsShown()
+        if not self.fullRefreshPending or not shown or self:TryResumeFullRefresh() then
+            Addon:CancelTimer(self._resumeWatcher)
+            self._resumeWatcher = nil
+        end
+    end, 1)
 end
 
 function UI:RefreshDegradedStatus(reason)
@@ -1790,6 +1778,7 @@ function UI:RefreshAddonStatusControls()
     setShownIfChanged(f.addonStatusHelp, addonStatusView)
     setShownIfChanged(f.collectionControls, collectionView)
     setShownIfChanged(f.collectionHelp, collectionView)
+    setShownIfChanged(f.collectionNotice, collectionView)
     if collectionView then
         self:RefreshCollectionControls()
     end
@@ -1899,8 +1888,9 @@ function UI:ApplyMainLayout()
             f.recipeClip._rrAnchorMode = nil
             f.recipeClip:ClearAllPoints()
             -- The collection view needs an extra band for its own header and
-            -- search strip, the same way the addon status view does.
-            f.recipeClip:SetPoint("TOPLEFT", 8, self:IsCollectionView() and -70 or -58)
+            -- search strip, the same way the addon status view does, plus one
+            -- line for the notice that its data is partial.
+            f.recipeClip:SetPoint("TOPLEFT", 8, self:IsCollectionView() and -84 or -58)
             f.recipeClip:SetPoint("BOTTOMRIGHT", -8, 10)
         end
     else
@@ -2469,6 +2459,18 @@ function UI:CreateMainFrame()
         .. " Left-click a column header to sort by it, right-click one to filter by it.")
     collectionHelp:SetTextColor(0.70, 0.70, 0.70)
     f.collectionHelp = collectionHelp
+
+    -- I dati di provenienza su Forever sono raccolti a mano, un venditore e un
+    -- trainer per volta, e il gioco cambia sotto. Chi legge la tabella deve
+    -- saperlo prima di attraversare un continente per una riga sbagliata.
+    local collectionNotice = center:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    collectionNotice:SetPoint("TOPLEFT", collectionHelp, "BOTTOMLEFT", 0, -3)
+    collectionNotice:SetPoint("TOPRIGHT", collectionHelp, "BOTTOMRIGHT", 0, -3)
+    collectionNotice:SetJustifyH("LEFT")
+    collectionNotice:SetText("Forever beta: where a recipe is learned, its coordinates and its skill"
+        .. " level are still being collected. Expect gaps and some wrong entries.")
+    collectionNotice:SetTextColor(0.90, 0.66, 0.30)
+    f.collectionNotice = collectionNotice
 
     local collectionSearchBox = CreateFrame("EditBox", nil, collectionControls, "InputBoxTemplate")
     collectionSearchBox:SetPoint("LEFT", 54, 0)
@@ -4177,6 +4179,30 @@ function UI:CollectionSkillText(collection, known)
         required)
 end
 
+-- Le coordinate di ogni luogo, sulla stessa riga del suo "Learned from". Una
+-- riga senza coordinate -- un trainer qualunque, un drop in una zona intera --
+-- ha un trattino, cosi' le righe sotto non salgono di posto.
+function UI:CollectionCoordsText(collection, known)
+    local lineInfo = collection.sourceLineInfo
+    local lines = collection.sourceLines
+    local count = (lines and #lines > 0) and #lines or 1
+    if count > COLLECTION_MAX_SOURCE_LINES then count = COLLECTION_MAX_SOURCE_LINES end
+    local colour = known and COLLECTION_KNOWN_DIM or "|cffc8c8c8"
+    local out, any = {}, false
+    for index = 1, count do
+        local info = lineInfo and lineInfo[index]
+        local x, y = info and tonumber(info.x), info and tonumber(info.y)
+        if x and y then
+            out[index] = string.format("%s%.1f, %.1f|r", colour, x, y)
+            any = true
+        else
+            out[index] = "|cff8f949c-|r"
+        end
+    end
+    if not any then return "|cff8f949c-|r" end
+    return table.concat(out, "\n")
+end
+
 -- The source as a stacked list, one place per line, with the faction
 -- restriction hung on the first line rather than given a column of its own:
 -- 74 recipes out of 2150 carry one, and a column that is 96% dashes is a
@@ -4232,22 +4258,21 @@ local COLLECTION_NAME_INSET = 40 + COLLECTION_GROUP_INDENT
 local COLLECTION_STATUS_WIDTH = 92
 local COLLECTION_SKILL_WIDTH = 62
 local COLLECTION_SPEC_WIDTH = 148
--- Wide enough for "P5" and its header arrow and no wider: the column is blank
--- on everything obtainable from the start, so it earns its place by being the
--- flag for what is not, not by being readable at a distance.
-local COLLECTION_PHASE_WIDTH = 46
+-- Le coordinate, una riga per luogo accanto a "Learned from": "83.2, 68.1".
+-- Al posto della colonna Phase, che su Forever non aveva niente da dire.
+local COLLECTION_COORDS_WIDTH = 72
 local COLLECTION_NAME_MIN_WIDTH = 190
 local COLLECTION_SOURCE_MIN_WIDTH = 150
 
 function UI:GetCollectionColumnWidths()
     local fixed = COLLECTION_STATUS_WIDTH + COLLECTION_SKILL_WIDTH + COLLECTION_SPEC_WIDTH
-        + COLLECTION_PHASE_WIDTH
+        + COLLECTION_COORDS_WIDTH
     local flexible = self:GetListRowWidth()
         - COLLECTION_NAME_INSET - 10 - (COLLECTION_COLUMN_GAP * 5) - fixed
     local nameWidth = math.max(COLLECTION_NAME_MIN_WIDTH, math.floor(flexible * 0.45))
     local sourceWidth = math.max(COLLECTION_SOURCE_MIN_WIDTH, flexible - nameWidth)
     return nameWidth, COLLECTION_STATUS_WIDTH, COLLECTION_SKILL_WIDTH, sourceWidth,
-        COLLECTION_SPEC_WIDTH, COLLECTION_PHASE_WIDTH
+        COLLECTION_SPEC_WIDTH, COLLECTION_COORDS_WIDTH
 end
 
 -- Columns hang from the TOP of the row, not its middle: a row is as tall as
@@ -4285,19 +4310,20 @@ function UI:EnsureCollectionRowParts(row)
     row.collectionSectionTitle:SetPoint("RIGHT", -10, 0)
     row.collectionSectionTitle:SetJustifyH("LEFT")
 
-    local nameWidth, statusWidth, skillWidth, sourceWidth, specWidth, phaseWidth =
+    local nameWidth, statusWidth, skillWidth, sourceWidth, specWidth, coordsWidth =
         self:GetCollectionColumnWidths()
     row.collectionName = makeCollectionColumn(row, nil, nameWidth)
     row.collectionStatus = makeCollectionColumn(row, row.collectionName, statusWidth)
     row.collectionSkill = makeCollectionColumn(row, row.collectionStatus, skillWidth)
     row.collectionSource = makeCollectionColumn(row, row.collectionSkill, sourceWidth, true)
     row.collectionSpec = makeCollectionColumn(row, row.collectionSource, specWidth)
-    row.collectionPhase = makeCollectionColumn(row, row.collectionSpec, phaseWidth)
-    -- The source is the one column allowed to be several lines tall.
-    if row.collectionSource.SetMaxLines then
-        row.collectionSource:SetMaxLines(COLLECTION_MAX_SOURCE_LINES)
+    row.collectionCoords = makeCollectionColumn(row, row.collectionSpec, coordsWidth, true)
+    -- The source is the one column allowed to be several lines tall -- and the
+    -- coordinates with it, one line per place, so they have to keep its pace.
+    for _, column in ipairs({ row.collectionSource, row.collectionCoords }) do
+        if column.SetMaxLines then column:SetMaxLines(COLLECTION_MAX_SOURCE_LINES) end
+        column:SetSpacing(2)
     end
-    row.collectionSource:SetSpacing(2)
 
     -- The tooltip belongs to the NAME, not to the whole row: sweeping the
     -- cursor down a dense table popped a tooltip over every row it crossed.
@@ -4330,7 +4356,6 @@ function UI:EnsureCollectionRowParts(row)
         { key = "skill",  region = row.collectionSkill },
         { key = "source", region = row.collectionSource },
         { key = "spec",   region = row.collectionSpec },
-        { key = "phase",  region = row.collectionPhase },
     }) do
         local button = CreateFrame("Button", nil, row)
         button.collectionColumnKey = column.key
@@ -4371,7 +4396,7 @@ end
 -- Re-applied on bind rather than at build time: the window is resizable, and
 -- the two flexible columns follow its width.
 function UI:ApplyCollectionColumnWidths(row)
-    local nameWidth, statusWidth, skillWidth, sourceWidth, specWidth, phaseWidth =
+    local nameWidth, statusWidth, skillWidth, sourceWidth, specWidth, coordsWidth =
         self:GetCollectionColumnWidths()
     if row._rrCollectionNameWidth == nameWidth and row._rrCollectionSourceWidth == sourceWidth then
         return
@@ -4383,7 +4408,7 @@ function UI:ApplyCollectionColumnWidths(row)
     row.collectionSkill:SetWidth(skillWidth)
     row.collectionSource:SetWidth(sourceWidth)
     row.collectionSpec:SetWidth(specWidth)
-    row.collectionPhase:SetWidth(phaseWidth)
+    row.collectionCoords:SetWidth(coordsWidth)
 end
 
 function UI:SetCollectionHeaderButtonsVisible(row, visible)
@@ -4401,7 +4426,7 @@ function UI:SetCollectionPartsVisible(row, visible)
     setShownIfChanged(row.collectionSkill, visible)
     setShownIfChanged(row.collectionSource, visible)
     setShownIfChanged(row.collectionSpec, visible)
-    setShownIfChanged(row.collectionPhase, visible)
+    setShownIfChanged(row.collectionCoords, visible)
     setShownIfChanged(row.collectionNameHit, visible)
 end
 
@@ -4414,7 +4439,7 @@ function UI:HideCollectionRowParts(row)
     setShownIfChanged(row.collectionSkill, false)
     setShownIfChanged(row.collectionSource, false)
     setShownIfChanged(row.collectionSpec, false)
-    setShownIfChanged(row.collectionPhase, false)
+    setShownIfChanged(row.collectionCoords, false)
     setShownIfChanged(row.collectionNameHit, false)
 end
 
@@ -4533,7 +4558,7 @@ function UI:BindCollectionGroupRow(row, rowData)
     setShownIfChanged(row.collectionSkill, false)
     setShownIfChanged(row.collectionSource, false)
     setShownIfChanged(row.collectionSpec, false)
-    setShownIfChanged(row.collectionPhase, false)
+    setShownIfChanged(row.collectionCoords, false)
     setShownIfChanged(row.collectionNameHit, false)
     row.collectionGroupKey = rowData.groupKey
 
@@ -4563,14 +4588,16 @@ function UI:BindCollectionHeaderRow(row, rowData)
     if row.collectionSource.SetMaxLines then row.collectionSource:SetMaxLines(1) end
     setTextIfChanged(row.collectionSource, self:GetCollectionHeaderText("source", "Learned from"))
     setTextIfChanged(row.collectionSpec, self:GetCollectionHeaderText("spec", "Specialization"))
-    setTextIfChanged(row.collectionPhase, self:GetCollectionHeaderText("phase", "Phase"))
+    -- Niente sort ne' filtro: ordinare per coordinate non risponde a nessuna domanda.
+    if row.collectionCoords.SetMaxLines then row.collectionCoords:SetMaxLines(1) end
+    setTextIfChanged(row.collectionCoords, "Coords")
     self:SetCollectionHeaderButtonsVisible(row, true)
     row.collectionName:SetTextColor(0.72, 0.72, 0.72)
     row.collectionStatus:SetTextColor(0.72, 0.72, 0.72)
     row.collectionSkill:SetTextColor(0.72, 0.72, 0.72)
     row.collectionSource:SetTextColor(0.72, 0.72, 0.72)
     row.collectionSpec:SetTextColor(0.72, 0.72, 0.72)
-    row.collectionPhase:SetTextColor(0.72, 0.72, 0.72)
+    row.collectionCoords:SetTextColor(0.72, 0.72, 0.72)
     setVertexColorIfChanged(row.stripe, 0.35, 0.35, 0.35, 1)
     setBackdropColorsIfChanged(row, 0.06, 0.06, 0.06, 0.98, 0.20, 0.20, 0.20, 0.95)
     setShownIfChanged(row, true)
@@ -4667,16 +4694,13 @@ function UI:BindCollectionRow(row, rowIdx, rowData)
         setTextIfChanged(row.collectionSpec, "|cff8f949c-|r")
     end
 
-    -- Amber rather than the row's own colour: a phase is not a property of the
-    -- recipe the way its skill is, it is a date, and the one thing worth
-    -- saying about it is that the date has not arrived on every realm.
-    local phaseText = COLLECTION_PHASE_TEXT[collection.phase or 0]
-    if phaseText then
-        setTextIfChanged(row.collectionPhase,
-            string.format("%s%s|r", known and COLLECTION_KNOWN_DIM or "|cffe6a94d", phaseText))
-    else
-        setTextIfChanged(row.collectionPhase, "")
+    if row.collectionCoords.SetMaxLines then
+        local lineCount = collection.sourceLines and #collection.sourceLines or 1
+        if lineCount > COLLECTION_MAX_SOURCE_LINES then lineCount = COLLECTION_MAX_SOURCE_LINES end
+        if lineCount < 1 then lineCount = 1 end
+        row.collectionCoords:SetMaxLines(lineCount)
     end
+    setTextIfChanged(row.collectionCoords, self:CollectionCoordsText(collection, known))
 
     row.collectionInfo = collection
     row.collectionLabel = rowData.label
@@ -5405,9 +5429,6 @@ local COLLECTION_SORT_VALUES = {
     skill = function(collection) return collection.requiredSkill or -1 end,
     source = function(collection) return collection.sourceLabel or "" end,
     spec = function(collection) return collection.specializationName or "" end,
-    -- Base content sorts first because it is the phase that has already
-    -- arrived, and 1 is the number it would carry if the field were written.
-    phase = function(collection) return collection.phase or 1 end,
     name = function(_, row) return lowerSafe(row.label) end,
 }
 
