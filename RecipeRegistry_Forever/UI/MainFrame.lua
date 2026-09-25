@@ -1,3 +1,4 @@
+local ADDON_FOLDER = ...
 local Addon = _G.RecipeRegistry
 local UI = Addon:NewModule("UI")
 Addon.UI = UI
@@ -169,7 +170,11 @@ local COLOR_BUTTON_ACTIVE = {0.13, 0.11, 0.08, 0.98}
 local SCROLLBAR_LANE = 20
 local COLOR_PROFIT_TEXT = "|cff3fbf6f"
 local COLOR_LOSS_TEXT = "|cffe05561"
-local FAVORITE_ICON = "Interface\\AddOns\\RecipeRegistry\\UI\\Assets\\favorite-star"
+-- Dalla cartella in cui l'addon e' installato, non da un nome scritto a mano:
+-- il percorso fisso era quello dell'addon TBC, "RecipeRegistry", che sul client
+-- Forever non c'e', e la stellina dei preferiti non compariva da nessuna parte.
+local FAVORITE_ICON = "Interface\\AddOns\\" .. (ADDON_FOLDER or "RecipeRegistry_Forever")
+    .. "\\UI\\Assets\\favorite-star"
 local VALID_FRAME_POINTS = {
     TOPLEFT = true,
     TOP = true,
@@ -3145,6 +3150,69 @@ function UI:EnsureDetailLine(index)
     end)
     self.frame.detailLines[index] = line
     return line
+end
+
+-- Ogni texture che l'addon chiede al client, per /rr debug textures.
+--
+-- Forever e' un client con l'interfaccia retail e il contenuto vanilla: una
+-- texture classic puo' non esserci piu', e il sintomo e' un quadrato vuoto o
+-- niente del tutto, senza un errore da nessuna parte. La stellina dei
+-- preferiti e' sparita cosi' -- il percorso puntava alla cartella dell'addon
+-- TBC. Un percorso nuovo nel codice va aggiunto anche qui.
+local TEXTURE_CHECKS = {
+    "Interface\\Buttons\\WHITE8x8",
+    "Interface\\Buttons\\UI-StopButton",
+    "Interface\\Buttons\\UI-SliderBar-Background",
+    "Interface\\Buttons\\UI-SliderBar-Border",
+    "Interface\\Icons\\INV_Misc_QuestionMark",
+    "Interface\\Icons\\INV_Misc_Book_11",
+    "Interface\\Icons\\INV_BannerPVP_01",
+    "Interface\\Icons\\INV_BannerPVP_02",
+    "Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up",
+    "Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up",
+    "Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down",
+    "Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight",
+    -- LibDBIcon, per il pulsante della minimappa
+    "Interface\\Minimap\\UI-Minimap-Background",
+    "Interface\\Minimap\\MiniMap-TrackingBorder",
+    "Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight",
+}
+
+-- Una texture del gioco esiste se il client le da' un file id. Un file
+-- dell'addon un id non ce l'ha -- non sta negli archivi del client -- quindi
+-- per quelli la risposta e' "guarda se si vede", e si dice cosi'.
+function UI:ReportMissingTextures()
+    self._textureProbe = self._textureProbe or UIParent:CreateTexture(nil, "BACKGROUND")
+    local probe = self._textureProbe
+    local missing, checked = {}, 0
+    for _, path in ipairs(TEXTURE_CHECKS) do
+        probe:SetTexture(nil)
+        probe:SetTexture(path)
+        checked = checked + 1
+        local fileID = probe.GetTextureFileID and probe:GetTextureFileID() or nil
+        if not fileID then missing[#missing + 1] = path end
+    end
+    local professions = {}
+    for profName in pairs(PROFESSION_RANK) do professions[#professions + 1] = profName end
+    table.sort(professions)
+    for _, profName in ipairs(professions) do
+        checked = checked + 1
+        if not getProfessionIcon(profName) then
+            missing[#missing + 1] = string.format("%s (icona del mestiere, spell %s)", profName,
+                tostring(Addon.Data and Addon.Data.GetProfessionSpellID
+                    and Addon.Data:GetProfessionSpellID(profName) or "?"))
+        end
+    end
+    if #missing == 0 then
+        Addon:Print(string.format("Textures: tutte e %d presenti.", checked))
+    else
+        Addon:Print(string.format("Textures: %d mancanti su %d.", #missing, checked))
+        for _, entry in ipairs(missing) do
+            Addon:Print("  |cffff5555manca|r " .. entry)
+        end
+    end
+    Addon:Print("Stellina dei preferiti (file dell'addon, nessun id nel client): "
+        .. FAVORITE_ICON .. " -- controlla che si veda nella lista.")
 end
 
 function UI:IsFavorite(recipeKey)
