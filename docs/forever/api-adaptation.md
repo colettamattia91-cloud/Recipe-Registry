@@ -300,6 +300,21 @@ diventerebbe "una stringa non vuota", quindi e' stato riscritto su cio' che fa
 male davvero: `:` (spezzerebbe le chiavi di blocco `proprietario::professione`),
 `|` (l'escape di WoW: un nome che lo contiene inietta colori e link nelle
 stringhe che la UI compone), i caratteri di controllo, e gli spazi ai bordi, che
+### Il 25 settembre il cognome ha cambiato posto
+
+Letto in gioco il 2026-09-25: `UnitFullName("player")` risponde
+`"Kaedros", "Davian"`, non piu' `"Kaedros Davian", "ClassicBetaPvE2"`. Il
+cognome e' passato nel secondo valore, dove prima c'era il realm; anche
+`UnitName` risponde col solo nome (AceDB ha creato il profilo `"Kaedros - PvE"`).
+Il roster invece e' rimasto `"Kaedros Davian"`.
+
+`GetPlayerKey` leggeva solo il primo valore, quindi per qualche sessione ha
+scritto le scansioni sotto `"Kaedros"`: un proprietario che il roster non
+conosce, sempre offline. Adesso il secondo valore si attacca come cognome, tranne
+quando e' il realm della forma vecchia (coincide con `GetRealmName` e il primo
+valore ha gia' lo spazio). E il realm si legge solo da `GetRealmName`: letto dal
+secondo valore di `UnitFullName`, oggi sarebbe stato il cognome.
+
 darebbero due chiavi gemelle per lo stesso personaggio.
 
 ### Il trattino, che resta il caso da sorvegliare

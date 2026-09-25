@@ -52,6 +52,16 @@ t("nome col realm del client", Data:MemberKeyFromFullName("Kaedros Davian-Classi
 t("cognome col trattino", Data:MemberKeyFromFullName("Jean-Luc Picard"), "Jean-Luc Picard")
 t("cognome col trattino + realm", Data:MemberKeyFromFullName("Jean-Luc Picard-ClassicBetaPvE2"), "Jean-Luc Picard")
 t("nome singolo", Data:MemberKeyFromFullName("Kaedros"), "Kaedros")
+
+-- Un suffisso che NON e' il nostro realm resta nella chiave. Serve se un giorno
+-- il roster elencasse qualcuno di un altro shard -- un altro ruleset, visto che
+-- il realm di questo client si chiama "ClassicBetaPvE2": ruleset piu' numero.
+-- In WoW una gilda e' di un realm solo, quindi non dovrebbe succedere; se
+-- succedesse, due persone diverse con lo stesso nome avrebbero due chiavi
+-- diverse invece di fondersi in una, e la chiave resta un bersaglio valido per
+-- un sussurro.
+t("suffisso di un altro ruleset: resta", Data:MemberKeyFromFullName("Kaedros Davian-ClassicBetaPvP1"), "Kaedros Davian-ClassicBetaPvP1")
+t("e non collide con il nostro", Data:MemberKeyFromFullName("Kaedros Davian-ClassicBetaPvE2") ~= Data:MemberKeyFromFullName("Kaedros Davian-ClassicBetaPvP1"), true)
 t("stringa vuota", Data:MemberKeyFromFullName(""), nil)
 
 print("\n== il realm cambia sotto i piedi: la chiave no ==")
@@ -59,6 +69,21 @@ PLAYER_REALM = "ForeverShard7"
 _G.GetRealmName = function() return "Forever Shard 7" end
 t("GetPlayerKey dopo il cambio", Data:GetPlayerKey(), "Kaedros Davian")
 t("roster dopo il cambio", Data:MemberKeyFromFullName("Kaedros Davian-ForeverShard7"), "Kaedros Davian")
+
+print("\n== il 25/09 il cognome e' passato nel secondo valore ==")
+-- UnitFullName risponde "Kaedros", "Davian"; il roster resta "Kaedros Davian".
+-- Leggere solo il primo valore dava "Kaedros": un proprietario che il roster
+-- non conosce, quindi sempre offline, e le scansioni finivano li'.
+PLAYER_NAME, PLAYER_REALM = "Kaedros", "Davian"
+_G.GetRealmName = function() return "Classic Beta PvE 2" end
+t("GetPlayerKey col cognome a parte", Data:GetPlayerKey(), "Kaedros Davian")
+t("coincide col roster", Data:MemberKeyFromFullName("Kaedros Davian"), Data:GetPlayerKey())
+-- il cognome non e' un realm: prima il token del realm si leggeva da li'
+t("il cognome non e' scambiato per realm", Data:MemberKeyFromFullName("Anna-Davian"), "Anna-Davian")
+t("il realm vero si scarta ancora", Data:MemberKeyFromFullName("Anna Rossi-ClassicBetaPvE2"), "Anna Rossi")
+PLAYER_REALM = nil
+t("senza secondo valore", Data:GetPlayerKey(), "Kaedros")
+PLAYER_NAME, PLAYER_REALM = "Kaedros Davian", "ClassicBetaPvE2"
 
 print("\n== IsValidMemberKey: cosa deve passare ==")
 t("nome e cognome", Data:IsValidMemberKey("Kaedros Davian"), true)
@@ -78,6 +103,23 @@ t("con un a capo", Data:IsValidMemberKey("Kaedros\nDavian"), false)
 -- spazi ai bordi: due chiavi gemelle per lo stesso personaggio
 t("spazio in testa", Data:IsValidMemberKey(" Kaedros Davian"), false)
 t("spazio in coda", Data:IsValidMemberKey("Kaedros Davian "), false)
+
+print("\n== il sync usa la stessa regola ==")
+-- Il sync aveva un validatore suo, arrivato da TBC, che pretendeva il trattino
+-- di "Nome-Reame". Su Forever scartava ogni peer come identita' non valida, e
+-- due client nella stessa gilda non si vedevano. Adesso chiede a Data: se
+-- qualcuno gli ridesse una regola propria, il primo caso qui sotto fallirebbe.
+rawset(_G.RecipeRegistry, "Data", Data)
+dofile("Sync/Sync.lua")
+local Sync = modules["Sync"]
+t("un peer Forever e' un peer", Sync:IsValidSyncMemberKey("Kaedros Davian"), true)
+t("anche col trattino nel cognome", Sync:IsValidSyncMemberKey("Jean-Luc Picard"), true)
+t("nome singolo", Sync:IsValidSyncMemberKey("Kaedros"), true)
+t("la propria identita' e' valida", Sync:IsValidSyncMemberKey(Data:GetPlayerKey()), true)
+t("chiave di un altro shard", Sync:IsValidSyncMemberKey("Kaedros Davian-ClassicBetaPvP1"), true)
+t("i due punti restano fuori", Sync:IsValidSyncMemberKey("Kaedros::alchemy"), false)
+t("il pipe resta fuori", Sync:IsValidSyncMemberKey("Kaedros|cff"), false)
+t("vuota", Sync:IsValidSyncMemberKey(""), false)
 
 print(fails == 0 and "\nTUTTO OK" or ("\n" .. fails .. " FALLITI"))
 os.exit(fails == 0 and 0 or 1)

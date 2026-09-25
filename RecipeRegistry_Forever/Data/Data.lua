@@ -581,6 +581,10 @@ end
 --
 -- Il nome contiene uno spazio ("Nome Cognome") e potrebbe contenere un
 -- trattino: nessuna delle due cose e' un problema ora che nella chiave non
+--
+-- Solo GetRealmName. Il secondo valore di UnitFullName era il realm fino al
+-- 18/09 ("ClassicBetaPvE2"), ma dal 25/09 e' il cognome: "Kaedros", "Davian".
+-- Letto da li', un roster con "Qualcuno-Davian" avrebbe perso il cognome.
 -- c'e' piu' niente da spacchettare.
 local function normalizeRealmToken(realm)
     local normalized = tostring(realm or ""):gsub("[%s%-]", "")
@@ -590,12 +594,7 @@ end
 -- Il realm che questo client dichiara adesso, normalizzato. Non finisce in
 -- nessuna chiave: serve solo a riconoscere un suffisso da buttare via.
 local function currentRealmToken()
-    local _, realm = UnitFullName("player")
-    local token = normalizeRealmToken(realm)
-    if token == "" then
-        token = normalizeRealmToken(GetRealmName())
-    end
-    return token
+    return normalizeRealmToken(GetRealmName())
 end
 
 -- Un nome di roster e' ambiguo: "Jean-Luc Picard" senza realm ha la stessa
@@ -875,6 +874,18 @@ function Data:ProcessPendingRosterSnapshot(reason, opts)
         unknownMembersIgnored = math.max(0, snapshotCount - #knownOwnerKeys),
         membershipFallbackUsed = membershipFallbackUsed,
         usableSnapshot = usable,
+-- Il nome del personaggio come lo scrive il roster, che e' "Nome Cognome".
+--
+-- UnitFullName ha cambiato forma sotto i piedi. Il 18/09 rispondeva
+-- "Kaedros Davian", "ClassicBetaPvE2": nome intero, poi il realm. Il 25/09
+-- risponde "Kaedros", "Davian": il cognome e' passato nel secondo valore. Il
+-- roster invece e' rimasto "Kaedros Davian". Leggere solo il primo valore
+-- dava la chiave "Kaedros", che il roster non conosce: un secondo proprietario
+-- per la stessa persona, sempre offline.
+--
+-- Quindi il secondo valore si attacca, a meno che non sia il realm -- la forma
+-- vecchia, riconoscibile perche' coincide con GetRealmName e perche' il primo
+-- valore ha gia' lo spazio.
     }
 end
 
@@ -884,10 +895,13 @@ function Data:GetCanonicalProfession(name)
 end
 
 function Data:GetPlayerKey()
-    -- solo il primo valore: il realm che UnitFullName restituisce non e'
-    -- identita' su questo client, vedi normalizeGuildRosterMemberKey
-    local name = UnitFullName("player")
-    return name or "Unknown"
+    local name, second = UnitFullName("player")
+    if type(name) ~= "string" or name == "" then return "Unknown" end
+    if type(second) == "string" and second ~= "" and not name:find(" ", 1, true)
+        and normalizeRealmToken(second) ~= currentRealmToken() then
+        return name .. " " .. second
+    end
+    return name
 end
 
 -- La chiave e' gia' il nome. Questa resta il posto unico da cui UI e sussurri
@@ -901,13 +915,6 @@ function Data:MemberKeyFromFullName(fullName)
     return normalizeGuildRosterMemberKey(fullName)
 end
 
--- Senza il segmento realm questo e' l'unico controllo di forma rimasto fra un
--- peer e il nostro database, quindi deve fermare quello che faceva male:
---   ":"  spezzerebbe le chiavi di blocco "proprietario::professione"
---   "|"  e' l'escape di WoW, e un nome che lo contiene inietta colori e link
---        dentro le stringhe che la UI compone
---   caratteri di controllo, e spazi ai bordi, che darebbero due chiavi gemelle
---   per lo stesso personaggio
 -- Il dataset dei metadati ha qualcosa da dire?
 --
 -- Due cancelli dell'addon cancellano o nascondono le ricette che il dataset non
@@ -957,6 +964,14 @@ end
 
 function Data:MetadataKnowsAnyRecipe()
     local metadata = Addon and Addon.RecipeMetadata
+-- Senza il segmento realm questo e' l'unico controllo di forma rimasto fra un
+-- peer e il nostro database -- anche per il sync, che lo usa invece di averne
+-- uno suo -- quindi deve fermare quello che faceva male:
+--   ":"  spezzerebbe le chiavi di blocco "proprietario::professione"
+--   "|"  e' l'escape di WoW, e un nome che lo contiene inietta colori e link
+--        dentro le stringhe che la UI compone
+--   caratteri di controllo, e spazi ai bordi, che darebbero due chiavi gemelle
+--   per lo stesso personaggio
     if type(metadata) ~= "table" then return false end
     if next(metadata._recordsBySpellId or {}) ~= nil then return true end
     local generated = metadata._generated
