@@ -398,9 +398,14 @@ function Sync:IsMockKey(memberKey)
     return row and row.isMock == true or false
 end
 
+-- La forma di una chiave la decide Data, e una volta sola.
+--
+-- Questa funzione aveva la sua regola, arrivata da TBC: pretendeva un trattino,
+-- cioe' il formato "Nome-Reame". Su Forever le chiavi sono nomi nudi --
+-- "Kaedros Davian", con lo spazio e senza reame -- e lo strato Data era gia'
+-- stato adattato, ma il sync controllava per conto suo. Risultato: ogni peer
+-- Forever scartato come identita' non valida, e due client nella stessa gilda
+-- che non si vedevano. Trovato il 2026-09-21 cercando perche'.
 function Sync:IsValidSyncMemberKey(memberKey)
-    return type(memberKey) == "string"
-        and memberKey ~= ""
-        and not memberKey:find(":", 1, true)
-        and memberKey:find("-", 1, true) ~= nil
+    return Addon.Data:IsValidMemberKey(memberKey)
 end
