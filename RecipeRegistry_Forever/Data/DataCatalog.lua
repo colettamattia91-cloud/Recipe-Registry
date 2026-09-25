@@ -1284,8 +1284,11 @@ end
 -- versione a passi e i preferiti.
 --   alpha   per nome
 --   rarity  prima la qualita' dell'oggetto prodotto, poi per nome
---   skill   il livello a cui si impara, dal piu' basso; chi non ce l'ha va in
---           fondo invece di passare per una ricetta di livello 0
+--   skill      il livello a cui si impara, dal piu' basso
+--   skilldesc  lo stesso, dal piu' alto: quello che serve quando cerchi cosa
+--              craftare adesso
+-- In entrambe chi non ha un livello va in fondo, invece di passare per una
+-- ricetta di livello 0 o di livello infinito.
 function Data:CompareRecipeRows(a, b, sortMode)
     if sortMode == "rarity" then
         local aq = (a.detail and (a.detail.createdItemQuality or a.detail.recipeItemQuality))
@@ -1293,12 +1296,13 @@ function Data:CompareRecipeRows(a, b, sortMode)
         aq = aq == nil and -1 or aq
         bq = bq == nil and -1 or bq
         if aq ~= bq then return aq > bq end
-    elseif sortMode == "skill" then
+    elseif sortMode == "skill" or sortMode == "skilldesc" then
         local ar = a.detail and tonumber(a.detail.minRank) or nil
         local br = b.detail and tonumber(b.detail.minRank) or nil
         if ar ~= br then
             if ar == nil then return false end
             if br == nil then return true end
+            if sortMode == "skilldesc" then return ar > br end
             return ar < br
         end
     end
