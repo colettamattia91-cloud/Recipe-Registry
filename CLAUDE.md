@@ -306,8 +306,11 @@ histories -- so two tags, and a dispatch per addon.
 `recipe-registry`, the page the TBC addon has always been on. They are kept
 apart by the file, not by the page: each packager run produces its own zip, with
 its own version number and its own changelog, tagged for the game version its
-TOC declares. That is why the workflow reads one `CF_PROJECT_ID` for every addon
-folder, and why the changelogs are per addon folder rather than shared.
+TOC declares. That is why the workflow uploads every addon folder to the same
+project id, 1501457, written in `release.yml` because it is public and there is
+only one -- and why the changelogs are per addon folder rather than shared. The
+one thing the workflow needs from the repository settings is the secret
+`CF_API_KEY`, a token from legacy.curseforge.com/account/api-tokens.
 
 **Two zips, though, and not Multi-TOC.** CurseForge's own recommendation for one
 project serving several flavors is Multi-TOC: one addon folder holding
