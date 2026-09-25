@@ -212,6 +212,14 @@ local function colorText(text, r, g, b)
     return string.format("|cff%02x%02x%02x%s|r", r * 255, g * 255, b * 255, tostring(text))
 end
 
+-- Il pulsante del sort gira sulle tre modalita' in quest'ordine.
+local NEXT_SORT_MODE = { alpha = "rarity", rarity = "skill", skill = "alpha" }
+local SORT_LABELS = {
+    alpha = "Sort: Alphabetical",
+    rarity = "Sort: Rarity",
+    skill = "Sort: Skill",
+}
+
 local function lowerSafe(v)
     if v == nil then return "" end
     return tostring(v):lower()
@@ -2317,7 +2325,7 @@ function UI:CreateMainFrame()
     sortSwitch:SetPoint("TOPRIGHT", -8, -8)
     sortSwitch:SetLabel("Sort: Alphabetical")
     sortSwitch:SetScript("OnClick", function()
-        UI.sortMode = (UI.sortMode == "alpha") and "rarity" or "alpha"
+        UI.sortMode = NEXT_SORT_MODE[UI.sortMode] or "alpha"
         if Addon.db and Addon.db.profile then Addon.db.profile.sortMode = UI.sortMode end
         UI:Refresh()
     end)
@@ -5124,7 +5132,7 @@ function UI:_ShowRecipeListLoadingState(context, generation)
         if self.frame.sortSwitch.Enable then
             self.frame.sortSwitch:Enable()
         end
-        local sortLabel = context.sortMode == "rarity" and "Sort: Rarity" or "Sort: Alphabetical"
+        local sortLabel = SORT_LABELS[context.sortMode] or SORT_LABELS.alpha
         self.frame.sortSwitch:SetLabel(sortLabel)
     end
 end
@@ -5216,7 +5224,7 @@ function UI:_FinalizeRecipeList(rows, context, generation)
         if self.frame.sortSwitch.Enable then
             self.frame.sortSwitch:Enable()
         end
-        local sortLabel = context.sortMode == "rarity" and "Sort: Rarity" or "Sort: Alphabetical"
+        local sortLabel = SORT_LABELS[context.sortMode] or SORT_LABELS.alpha
         self.frame.sortSwitch:SetLabel(sortLabel)
     end
 
@@ -5645,21 +5653,8 @@ function UI:BuildFavoriteRecipeRows(filterContext)
         end
     end
 
-    table.sort(out, function(a, b)
-        if self.sortMode == "rarity" then
-            local aq = a.detail and (a.detail.createdItemQuality or a.detail.recipeItemQuality)
-            local bq = b.detail and (b.detail.createdItemQuality or b.detail.recipeItemQuality)
-            aq = aq == nil and -1 or aq
-            bq = bq == nil and -1 or bq
-            if aq ~= bq then return aq > bq end
-        end
-        local al = lowerSafe(a.label)
-        local bl = lowerSafe(b.label)
-        if al ~= bl then return al < bl end
-        if (a.onlineCount or 0) ~= (b.onlineCount or 0) then return (a.onlineCount or 0) > (b.onlineCount or 0) end
-        if (a.crafterCount or 0) ~= (b.crafterCount or 0) then return (a.crafterCount or 0) > (b.crafterCount or 0) end
-        return tostring(a.recipeKey) < tostring(b.recipeKey)
-    end)
+    local sortMode = self.sortMode
+    table.sort(out, function(a, b) return Addon.Data:CompareRecipeRows(a, b, sortMode) end)
 
     return out
 end
