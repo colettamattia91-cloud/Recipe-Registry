@@ -4,6 +4,18 @@ All notable changes to this addon are documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- **The favourites star is back.** It was looked up in the folder of the TBC
+  addon, which a Forever install does not have, so it showed nowhere.
+
+### Added
+
+- **`/rr debug textures`** lists any game texture the addon uses that this
+  client does not have -- a check worth running after a new beta build.
+
+## [0.1.0] - 2026-09-25
+
 The first release of Recipe Registry for WoW: Forever.
 
 ### Added
