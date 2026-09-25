@@ -211,7 +211,7 @@ Rules that follow from it:
 
 - `develop` — the active development branch. All work happens here: code, tests, docs, tooling.
 - `feat/forever` — the World of Warcraft: Forever adaptation, forked from `develop` for the duration of the Forever beta (2026-09-17 to 2026-10-21). Retail-shaped API work goes here, not on `develop`, because the client churns weekly and most of the API mapping is still deduction; it merges back into `develop` once the unknowns in `docs/forever/api-adaptation.md` are closed on real data. Rebase it on `develop` rather than merging `develop` into it.
-- `main` — release-only. Its tree must contain ONLY the addon folders with their runtime files (each with its own `.toc`, `Core/`, `Data/`, `Integrations/`, `Libs/`, `Sync/` without `MockSync.lua`, `UI/`, plus its own `CHANGELOG.md`, `LICENSE` and `.pkgmeta`) plus `README.md`, `LICENSE`, `.gitignore` at the root. **No `CHANGELOG.md` at the root**: there is one per addon, it lives beside the `.toc` it describes, and a root one would be a third copy nobody updates. Never commit or edit directly on `main`.
+- `main` — release-only. Its tree must contain ONLY the addon folders with their runtime files (each with its own `.toc`, `Core/`, `Data/`, `Integrations/`, `Libs/`, `Sync/` without `MockSync.lua`, `UI/`, plus its own `CHANGELOG.md`, `LICENSE` and `.pkgmeta`) plus `README.md`, `LICENSE`, `.gitignore` and `.github/workflows/release.yml` at the root. The release workflow lives on `main` because `main` is what publishes: a dispatched workflow runs from the branch that carries its file, and the one that packages a release has to be the release branch. It is the only workflow there -- `recipe-metadata.yml` tests the tooling on every push and has nothing to test on `main`. **No `CHANGELOG.md` at the root**: there is one per addon, it lives beside the `.toc` it describes, and a root one would be a third copy nobody updates. Never commit or edit directly on `main`.
 
 **On `feat/forever` the TBC addon is not in the tree.** It was removed there on
 purpose: this branch is about Forever, and carrying 250 files of an addon it
@@ -247,8 +247,8 @@ Never `git merge develop` into `main`: a true merge drags develop's commit histo
 
 1. On `develop`: update the CHANGELOG of the addon you are releasing and bump `## Version:` in that addon's `.toc` — `RecipeRegistry/CHANGELOG.md` and `RecipeRegistry/RecipeRegistry.toc` for TBC, the `RecipeRegistry_Forever/` pair for Forever. Leave the other addon's two files alone: they are a different release. Run the full test suite, commit.
 2. `git checkout main && git merge --squash develop` — resolve conflicts in the CHANGELOG **of the addon being released** with develop's version, and leave the other addon's CHANGELOG at whatever main already had.
-3. `git rm -rf --ignore-unmatch docs CLAUDE.md .claude .vscode .github build RecipeRegistry/local-tests RecipeRegistry/tools RecipeRegistry/artifacts RecipeRegistry/Sync/MockSync.lua RecipeRegistry_Forever/local-tests RecipeRegistry_Forever/Tools RecipeRegistry_Forever/Sync/MockSync.lua`
-4. Verify before committing: `git status --short` must list only runtime files under the addon folders, plus the `CHANGELOG.md` and `.toc` of the addon being released.
+3. `git rm -rf --ignore-unmatch docs CLAUDE.md .claude .vscode .github/workflows/recipe-metadata.yml build RecipeRegistry/local-tests RecipeRegistry/tools RecipeRegistry/artifacts RecipeRegistry/Sync/MockSync.lua RecipeRegistry_Forever/local-tests RecipeRegistry_Forever/Tools RecipeRegistry_Forever/Sync/MockSync.lua`
+4. Verify before committing: `git status --short` must list only runtime files under the addon folders, plus the `CHANGELOG.md` and `.toc` of the addon being released, and `.github/workflows/release.yml` if it changed.
 5. Commit as `Release X.Y.Z`, tag `vX.Y.Z`, check out `develop` again (and verify the checkout happened).
 6. Commit messages are plain text — no `Co-Authored-By` or any AI-attribution trailer, anywhere in this repo.
 7. Pushes are done by the maintainer (SSH key is passphrase-protected) — never attempt them.
@@ -272,8 +272,21 @@ It must list exactly two paths, both inside an addon folder. A root
 
 ### Releasing the Forever addon
 
-It has its own folder, its own `.pkgmeta` and its own `CHANGELOG.md`, so steps 1
-to 5 are the same against `RecipeRegistry_Forever/`. Three things are not.
+It has its own folder, its own `.pkgmeta` and its own `CHANGELOG.md`, so steps 2
+to 4 are the same against `RecipeRegistry_Forever/`. Four things are not.
+
+**The release metadata goes on `main` only.** `## Version:`, the build channel
+flipped to `release`, `## X-Build-ID: release` and the dated heading in the
+changelog are written in the release commit on `main`, not on `develop`.
+`develop` and `feat/forever` keep `0.1.0-dev`, `dev` and `[Unreleased]`,
+because the builds made from them are the ones installed by hand for testing,
+and those must stay on the dev comm prefix. Decided for 0.1.0, 2026-09-25.
+
+**The tag is `forever-vX.Y.Z`, not `vX.Y.Z`.** TBC owns the `v` tags, and a
+pushed `v*` tag fires the workflow for the TBC addon on its own. A Forever tag
+with its own prefix can never start a TBC build by accident. Tag the release
+commit on `main`, then dispatch the workflow from `main` with that tag and
+`addons: RecipeRegistry_Forever`.
 
 **The build channel.** `## X-Build-Channel: dev` puts the addon on the `RRDEV`
 comm prefix, and dev clients do not sync with release clients. That is right for
