@@ -10,13 +10,27 @@ who can help when they log back in.
 Available for **WoW: The Burning Crusade Classic Anniversary** and **WoW:
 Forever**.
 
+### At a glance
+
+- **Find a crafter in seconds** — search a recipe, or a material you are
+  holding, and see who in the guild can make it, online ones first.
+- **Zero upkeep** — open your professions once; the directory fills and syncs
+  itself between everyone running the addon.
+- **Your whole book in one table** — every recipe your professions can learn,
+  what you already know, and where to go for the rest.
+- **Tooltips that answer the question** — hover almost any craftable item and
+  see who can make it.
+- **Know the margin** — material cost, sale price and profit, with
+  TradeSkillMaster or Auctionator.
+
 ---
 
 ## Search it like you think about it
 
 Type the name of what you want. Or type a material you are sitting on and see
-what it turns into. Filter to one profession, sort by rarity, star the crafts
-you ask about most and keep them on top. Categories and subcategories drill
+what it turns into. Filter to one profession, sort by rarity — or, on Forever,
+by the skill level a recipe is learned at — star the crafts you ask about most
+and keep them on top. Categories and subcategories drill
 down through big professions without scrolling through hundreds of rows.
 
 ## Know who to ask, and when
@@ -33,6 +47,9 @@ they can learn, the ones you already know ticked off, and the rest showing the
 skill they ask against the skill you have. Each profession is headed with how
 far along you are — "Blacksmithing (185/385)" — so you can see the holes at a
 glance, and narrow the list to what you could go and learn today.
+
+For the ones you are missing it tells you where to go: the trainer, the vendor,
+the drop or the quest, the zone, and on Forever the map coordinates too.
 
 ## Know what a craft is worth before you make it
 
@@ -88,8 +105,10 @@ Spellfire Tailor, Dragonscale Leatherworker and the rest.
 **WoW: Forever.** Its own recipe database, built from that game's content rather
 than carried over from TBC: 2519 recipes across all twelve professions, with
 Fishing, Herbalism and Skinning included because on Forever they have recipes of
-their own. The "where to learn" guidance and phase information are still
-TBC-only, and will follow.
+their own. Where to learn each recipe, with map coordinates, is there and
+growing: Forever does not ship that information in its game files, so it is
+being collected in game, and the Collection tab says plainly that some of it is
+still missing. Content phases and specializations are TBC-only for now.
 
 Pick it up from CurseForge and the right build installs itself. Installing by
 hand, extract the zip into `Interface/AddOns/` and keep the folder name the zip

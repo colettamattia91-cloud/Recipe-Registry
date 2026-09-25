@@ -17,11 +17,11 @@
 # warning here, not a refusal to load.
 ## Interface: 16001
 ## Title: Recipe Registry |cff33ff99(Forever)|r
-## Notes: Guild profession tracker for WoW: Forever. Adaptation in progress.
+## Notes: Guild profession tracker for WoW: Forever.
 ## Author: OpenAI + User collaboration
-## Version: 0.1.0-dev
-## X-Build-Channel: dev
-## X-Build-ID: forever-dev
+## Version: 0.1.0
+## X-Build-Channel: release
+## X-Build-ID: release
 ## SavedVariables: RecipeRegistryDB,RecipeRegistryLogDB
 ## SavedVariablesPerCharacter: RecipeRegistryCharDB
 ## X-Category: Guild
