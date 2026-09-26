@@ -876,38 +876,19 @@ end
 
 -- Il nome del personaggio come lo scrive il roster, che e' "Nome Cognome".
 --
--- UnitFullName ha cambiato forma sotto i piedi. Il 18/09 rispondeva
--- "Kaedros Davian", "ClassicBetaPvE2": nome intero, poi il realm. Il 25/09
--- risponde "Kaedros", "Davian": il cognome e' passato nel secondo valore. Il
--- roster invece e' rimasto "Kaedros Davian". Leggere solo il primo valore
--- dava la chiave "Kaedros", che il roster non conosce: un secondo proprietario
--- per la stessa persona, sempre offline.
+-- Su Forever UnitNameUnmodified da' nome e cognome separati -- verificato in
+-- gioco il 26/09: "Kaedros", "Davian". Il secondo valore non puo' essere un
+-- realm: Forever non ne ha, e i nomi sono unici anche fra ruleset diversi.
 --
--- Il client ha un'API per questo, e la usiamo prima di tutto: con i nomi unici
--- per regione (RegionalUniqueNamesEnabled, true su Forever) UnitNameUnmodified
--- da' nome e cognome separati. E' la stessa strada di AceDB-3.0 dalla minor 39,
--- e verificata in gioco il 26/09: true, "Kaedros", "Davian".
---
--- Senza quell'API resta la deduzione di prima: il secondo valore di
--- UnitFullName si attacca, a meno che non sia il realm -- la forma vecchia,
--- riconoscibile perche' coincide con GetRealmName e perche' il primo valore ha
--- gia' lo spazio.
+-- Fino al 25/09 la chiave si leggeva dal solo primo valore di UnitFullName,
+-- che quel giorno ha smesso di essere "Kaedros Davian" ed e' diventato
+-- "Kaedros": un secondo proprietario per la stessa persona, che il roster non
+-- conosce, sempre offline.
 function Data:GetPlayerKey()
-    if type(RegionalUniqueNamesEnabled) == "function" and RegionalUniqueNamesEnabled()
-        and type(UnitNameUnmodified) == "function" then
-        local first, surname = UnitNameUnmodified("player")
-        if type(first) == "string" and first ~= "" then
-            if type(surname) == "string" and surname ~= "" then
-                return first .. " " .. surname
-            end
-            return first
-        end
-    end
-    local name, second = UnitFullName("player")
+    local name, surname = UnitNameUnmodified("player")
     if type(name) ~= "string" or name == "" then return "Unknown" end
-    if type(second) == "string" and second ~= "" and not name:find(" ", 1, true)
-        and normalizeRealmToken(second) ~= currentRealmToken() then
-        return name .. " " .. second
+    if type(surname) == "string" and surname ~= "" then
+        return name .. " " .. surname
     end
     return name
 end

@@ -11,8 +11,9 @@
 -- trasporto (sync in "GUILD" e "WHISPER" verso il roster), e dentro una gilda
 -- i nomi sono unici: il realm non ha niente da aggiungere.
 --
--- I valori qui sotto non sono inventati: sono quelli che il client beta
--- 1.60.1.69913 ha risposto il 2026-09-18 a UnitFullName e GetRealmName.
+-- I valori qui sotto non sono inventati: sono quelli che il client beta ha
+-- risposto in gioco, a GetRealmName il 2026-09-18 e a
+-- RegionalUniqueNamesEnabled e UnitNameUnmodified il 2026-09-26.
 --
 -- Niente harness condiviso: Forever non ne ha ancora uno, e per interrogare le
 -- funzioni di chiave basta uno stub che regga il caricamento di Data.lua.
@@ -26,9 +27,10 @@ _G.RecipeRegistry = setmetatable({
   Compat = setmetatable({}, {__index = function() return function() end end}),
 }, {__index = function() return function() end end})
 
--- quello che il client ha risposto davvero il 2026-09-18
-local PLAYER_NAME, PLAYER_REALM = "Kaedros Davian", "ClassicBetaPvE2"
-_G.UnitFullName = function() return PLAYER_NAME, PLAYER_REALM end
+-- quello che il client ha risposto davvero: GetRealmName il 2026-09-18,
+-- UnitNameUnmodified il 2026-09-26
+local PLAYER_FIRST, PLAYER_SURNAME = "Kaedros", "Davian"
+_G.UnitNameUnmodified = function() return PLAYER_FIRST, PLAYER_SURNAME end
 _G.GetRealmName = function() return "Classic Beta PvE 2" end
 _G.GetNumGuildMembers = function() return 0 end
 
@@ -65,43 +67,24 @@ t("e non collide con il nostro", Data:MemberKeyFromFullName("Kaedros Davian-Clas
 t("stringa vuota", Data:MemberKeyFromFullName(""), nil)
 
 print("\n== il realm cambia sotto i piedi: la chiave no ==")
-PLAYER_REALM = "ForeverShard7"
 _G.GetRealmName = function() return "Forever Shard 7" end
 t("GetPlayerKey dopo il cambio", Data:GetPlayerKey(), "Kaedros Davian")
 t("roster dopo il cambio", Data:MemberKeyFromFullName("Kaedros Davian-ForeverShard7"), "Kaedros Davian")
-
-print("\n== il 25/09 il cognome e' passato nel secondo valore ==")
--- UnitFullName risponde "Kaedros", "Davian"; il roster resta "Kaedros Davian".
--- Leggere solo il primo valore dava "Kaedros": un proprietario che il roster
--- non conosce, quindi sempre offline, e le scansioni finivano li'.
-PLAYER_NAME, PLAYER_REALM = "Kaedros", "Davian"
 _G.GetRealmName = function() return "Classic Beta PvE 2" end
-t("GetPlayerKey col cognome a parte", Data:GetPlayerKey(), "Kaedros Davian")
+
+print("\n== il nome del giocatore: nome e cognome ==")
+-- UnitNameUnmodified da' nome e cognome separati. Leggere solo il primo --
+-- come si faceva fino al 25/09 con UnitFullName -- dava "Kaedros", un
+-- proprietario che il roster non conosce, sempre offline.
+t("nome e cognome", Data:GetPlayerKey(), "Kaedros Davian")
 t("coincide col roster", Data:MemberKeyFromFullName("Kaedros Davian"), Data:GetPlayerKey())
--- il cognome non e' un realm: prima il token del realm si leggeva da li'
+PLAYER_SURNAME = nil
+t("senza cognome, il nome", Data:GetPlayerKey(), "Kaedros")
+PLAYER_SURNAME = "Davian"
+-- il cognome non e' un realm: fino al 25/09 il token del realm si leggeva dal
+-- secondo valore di UnitFullName, che nel frattempo era diventato il cognome
 t("il cognome non e' scambiato per realm", Data:MemberKeyFromFullName("Anna-Davian"), "Anna-Davian")
 t("il realm vero si scarta ancora", Data:MemberKeyFromFullName("Anna Rossi-ClassicBetaPvE2"), "Anna Rossi")
-PLAYER_REALM = nil
-t("senza secondo valore", Data:GetPlayerKey(), "Kaedros")
-PLAYER_NAME, PLAYER_REALM = "Kaedros Davian", "ClassicBetaPvE2"
-
-print("\n== l'API del client per i nomi unici per regione ==")
--- Verificato in gioco il 26/09: RegionalUniqueNamesEnabled() true,
--- UnitNameUnmodified("player") -> "Kaedros", "Davian". Quando c'e', decide lei,
--- qualunque cosa risponda UnitFullName.
-_G.RegionalUniqueNamesEnabled = function() return true end
-_G.UnitNameUnmodified = function() return "Kaedros", "Davian" end
-PLAYER_NAME, PLAYER_REALM = "Qualcosa", "DiStrano"
-t("nome e cognome dall'API", Data:GetPlayerKey(), "Kaedros Davian")
-_G.UnitNameUnmodified = function() return "Kaedros", nil end
-t("senza cognome, il nome", Data:GetPlayerKey(), "Kaedros")
--- se il client dice che i nomi NON sono unici per regione, si torna alla
--- deduzione su UnitFullName
-_G.RegionalUniqueNamesEnabled = function() return false end
-PLAYER_NAME, PLAYER_REALM = "Kaedros", "Davian"
-t("API spenta: la deduzione di prima", Data:GetPlayerKey(), "Kaedros Davian")
-_G.RegionalUniqueNamesEnabled, _G.UnitNameUnmodified = nil, nil
-PLAYER_NAME, PLAYER_REALM = "Kaedros Davian", "ClassicBetaPvE2"
 
 print("\n== IsValidMemberKey: cosa deve passare ==")
 t("nome e cognome", Data:IsValidMemberKey("Kaedros Davian"), true)
