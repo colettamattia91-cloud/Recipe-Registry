@@ -883,10 +883,26 @@ end
 -- dava la chiave "Kaedros", che il roster non conosce: un secondo proprietario
 -- per la stessa persona, sempre offline.
 --
--- Quindi il secondo valore si attacca, a meno che non sia il realm -- la forma
--- vecchia, riconoscibile perche' coincide con GetRealmName e perche' il primo
--- valore ha gia' lo spazio.
+-- Il client ha un'API per questo, e la usiamo prima di tutto: con i nomi unici
+-- per regione (RegionalUniqueNamesEnabled, true su Forever) UnitNameUnmodified
+-- da' nome e cognome separati. E' la stessa strada di AceDB-3.0 dalla minor 39,
+-- e verificata in gioco il 26/09: true, "Kaedros", "Davian".
+--
+-- Senza quell'API resta la deduzione di prima: il secondo valore di
+-- UnitFullName si attacca, a meno che non sia il realm -- la forma vecchia,
+-- riconoscibile perche' coincide con GetRealmName e perche' il primo valore ha
+-- gia' lo spazio.
 function Data:GetPlayerKey()
+    if type(RegionalUniqueNamesEnabled) == "function" and RegionalUniqueNamesEnabled()
+        and type(UnitNameUnmodified) == "function" then
+        local first, surname = UnitNameUnmodified("player")
+        if type(first) == "string" and first ~= "" then
+            if type(surname) == "string" and surname ~= "" then
+                return first .. " " .. surname
+            end
+            return first
+        end
+    end
     local name, second = UnitFullName("player")
     if type(name) ~= "string" or name == "" then return "Unknown" end
     if type(second) == "string" and second ~= "" and not name:find(" ", 1, true)

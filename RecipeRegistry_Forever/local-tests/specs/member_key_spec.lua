@@ -85,6 +85,24 @@ PLAYER_REALM = nil
 t("senza secondo valore", Data:GetPlayerKey(), "Kaedros")
 PLAYER_NAME, PLAYER_REALM = "Kaedros Davian", "ClassicBetaPvE2"
 
+print("\n== l'API del client per i nomi unici per regione ==")
+-- Verificato in gioco il 26/09: RegionalUniqueNamesEnabled() true,
+-- UnitNameUnmodified("player") -> "Kaedros", "Davian". Quando c'e', decide lei,
+-- qualunque cosa risponda UnitFullName.
+_G.RegionalUniqueNamesEnabled = function() return true end
+_G.UnitNameUnmodified = function() return "Kaedros", "Davian" end
+PLAYER_NAME, PLAYER_REALM = "Qualcosa", "DiStrano"
+t("nome e cognome dall'API", Data:GetPlayerKey(), "Kaedros Davian")
+_G.UnitNameUnmodified = function() return "Kaedros", nil end
+t("senza cognome, il nome", Data:GetPlayerKey(), "Kaedros")
+-- se il client dice che i nomi NON sono unici per regione, si torna alla
+-- deduzione su UnitFullName
+_G.RegionalUniqueNamesEnabled = function() return false end
+PLAYER_NAME, PLAYER_REALM = "Kaedros", "Davian"
+t("API spenta: la deduzione di prima", Data:GetPlayerKey(), "Kaedros Davian")
+_G.RegionalUniqueNamesEnabled, _G.UnitNameUnmodified = nil, nil
+PLAYER_NAME, PLAYER_REALM = "Kaedros Davian", "ClassicBetaPvE2"
+
 print("\n== IsValidMemberKey: cosa deve passare ==")
 t("nome e cognome", Data:IsValidMemberKey("Kaedros Davian"), true)
 t("cognome col trattino", Data:IsValidMemberKey("Jean-Luc Picard"), true)
