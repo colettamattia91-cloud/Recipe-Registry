@@ -2,7 +2,7 @@
 
 All notable changes to this addon are documented in this file.
 
-## [Unreleased]
+## [0.1.1] - 2026-09-26
 
 ### Fixed
 
