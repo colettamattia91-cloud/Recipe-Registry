@@ -25,7 +25,7 @@ _G.RecipeRegistry = {
   }, { __index = function() return function() end end }),
 }
 
-_G.UnitFullName = function() return "Kaedros Davian", "ClassicBetaPvE2" end
+_G.UnitNameUnmodified = function() return "Kaedros", "Davian" end
 _G.GetRealmName = function() return "Classic Beta PvE 2" end
 _G.GetNumGuildMembers = function() return 0 end
 _G.time = os.time
