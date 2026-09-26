@@ -18,8 +18,8 @@
 ## Interface: 16001
 ## Title: Recipe Registry |cff33ff99(Forever)|r
 ## Notes: Guild profession tracker for WoW: Forever.
-## Author: OpenAI + User collaboration
-## Version: 0.1.0
+## Author: Kaedros
+## Version: 0.1.1
 ## X-Build-Channel: release
 ## X-Build-ID: release
 ## SavedVariables: RecipeRegistryDB,RecipeRegistryLogDB

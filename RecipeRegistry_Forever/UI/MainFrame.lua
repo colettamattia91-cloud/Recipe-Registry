@@ -1,3 +1,4 @@
+local ADDON_FOLDER = ...
 local Addon = _G.RecipeRegistry
 local UI = Addon:NewModule("UI")
 Addon.UI = UI
@@ -169,7 +170,11 @@ local COLOR_BUTTON_ACTIVE = {0.13, 0.11, 0.08, 0.98}
 local SCROLLBAR_LANE = 20
 local COLOR_PROFIT_TEXT = "|cff3fbf6f"
 local COLOR_LOSS_TEXT = "|cffe05561"
-local FAVORITE_ICON = "Interface\\AddOns\\RecipeRegistry\\UI\\Assets\\favorite-star"
+-- Dalla cartella in cui l'addon e' installato, non da un nome scritto a mano:
+-- il percorso fisso era quello dell'addon TBC, "RecipeRegistry", che sul client
+-- Forever non c'e', e la stellina dei preferiti non compariva da nessuna parte.
+local FAVORITE_ICON = "Interface\\AddOns\\" .. (ADDON_FOLDER or "RecipeRegistry_Forever")
+    .. "\\UI\\Assets\\favorite-star"
 local VALID_FRAME_POINTS = {
     TOPLEFT = true,
     TOP = true,
@@ -195,11 +200,12 @@ local function colorText(text, r, g, b)
 end
 
 -- Il pulsante del sort gira sulle tre modalita' in quest'ordine.
-local NEXT_SORT_MODE = { alpha = "rarity", rarity = "skill", skill = "alpha" }
+local NEXT_SORT_MODE = { alpha = "rarity", rarity = "skill", skill = "skilldesc", skilldesc = "alpha" }
 local SORT_LABELS = {
     alpha = "Sort: Alphabetical",
     rarity = "Sort: Rarity",
-    skill = "Sort: Skill",
+    skill = "Sort: Skill (low)",
+    skilldesc = "Sort: Skill (high)",
 }
 
 local function lowerSafe(v)
