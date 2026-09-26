@@ -163,11 +163,11 @@ cinque funzioni di gioco -- `IsInGuild`, `GetTime`, `IsInInstance`,
 retail. Il trasporto e' AceComm, che usa `C_ChatInfo.RegisterAddonMessagePrefix`
 quando la tabella c'e', e spedisce su `GUILD` e `WHISPER`.
 
-`GetRealmName` merita una riga a parte, perche' su un client dichiarato
-realmless verrebbe da preoccuparsi: nel percorso wire non compare. Lo usa solo
-`normalizeRealmToken` per togliere il suffisso di reame dai nomi del roster, e
-solo quando coincide con quello che il client dichiara adesso. Le chiavi che
-viaggiano sono nomi nudi.
+`GetRealmName` non lo usa piu' nessuno, dal 2026-09-26. Serviva a riconoscere un
+suffisso di reame sui nomi del roster, e in gioco quel suffisso non si presenta
+mai: il mittente dei messaggi addon arriva nudo, `Kaedros Davian`, sia in
+`GUILD` sia in `WHISPER`, e un sussurro al nome completo arriva. Le chiavi che
+viaggiano sono nomi nudi, e sono gia' indirizzi validi.
 
 Quindi il sync non ha adeguamenti da fare. Ha da essere provato.
 
@@ -315,6 +315,15 @@ quando e' il realm della forma vecchia (coincide con `GetRealmName` e il primo
 valore ha gia' lo spazio). E il realm si legge solo da `GetRealmName`: letto dal
 secondo valore di `UnitFullName`, oggi sarebbe stato il cognome.
 
+Il giorno dopo, 2026-09-26, tutto questo e' stato semplificato su dati letti in
+gioco. `UnitFullName("player")` risponde ormai solo `"Kaedros"`, mentre
+`UnitNameUnmodified("player")` risponde `"Kaedros", "Davian"` -- ed e' la strada
+che ha preso anche AceDB-3.0 dalla minor 39. `GetPlayerKey` usa solo quella: il
+secondo valore e' sempre il cognome, perche' Forever non ha realm e i nomi sono
+unici anche fra ruleset. Il roster (120 membri) elenca nomi nudi, nessuno con un
+trattino, e il mittente dei messaggi addon arriva nudo: il codice che
+riconosceva e toglieva un suffisso `-Realm` non scattava mai, e non c'e' piu'.
+
 ### Il trattino, che resta il caso da sorvegliare
 
 Il pericolo vero non era lo spazio, era un cognome col trattino. Con i sei
@@ -323,11 +332,9 @@ pattern che spaccavano sul **primo** trattino, `Jean-Luc Picard` dava
 due chiavi, una persona. E `IsValidMemberKey` rispondeva `true` a entrambe.
 
 Nella chiave non c'e' piu' niente da spacchettare, quindi quel modo di rompersi
-e' sparito insieme al segmento realm. Sul roster la stringa resta
-ambigua di suo -- `Jean-Luc Picard` senza realm ha la stessa forma di
-`Kaedros Davian-ClassicBetaPvE2` con realm -- e la si scioglie sapendo che un
-roster di gilda e' di un realm solo: un suffisso e' un realm soltanto se
-coincide con quello che il client dichiara in quel momento.
+e' sparito insieme al segmento realm. Sul roster non c'e' piu' nemmeno
+l'ambiguita' fra `Jean-Luc Picard` e un nome col suffisso di realm: i suffissi
+non arrivano, e un nome del roster si usa com'e'.
 
 Se su Forever i cognomi col trattino esistano davvero non lo sappiamo: i tre
 nomi visti finora (`Kaedros Davian`, `Lyndaric Mojo`, `Bernes Jored`) sono tutti
@@ -338,8 +345,8 @@ e' corretta comunque, e perche' il caso che copre e' silenzioso.
 
 | dove | cosa fa ora |
 |---|---|
-| `Data/Data.lua` `GetPlayerKey` | nome da `UnitFullName`, primo valore soltanto: il realm non lo guarda nessuno |
-| `Data/Data.lua` `MemberKeyFromFullName` | l'unica costruzione di chiave da un nome di roster, e l'unico punto che legge il realm -- per scartarlo. Era la stessa regola copiata in tre punti |
+| `Data/Data.lua` `GetPlayerKey` | nome e cognome da `UnitNameUnmodified`, dal 26/09 |
+| `Data/Data.lua` `MemberKeyFromFullName` | l'unica costruzione di chiave da un nome di roster: il nome com'e', dal 26/09. Era la stessa regola copiata in tre punti |
 | `Data/Data.lua` `IsValidMemberKey` | controllo di forma riscritto su cosa fa male, vedi sopra |
 | `Data/Data.lua` `GetMemberKeyName` | come si ricava un nome da una chiave: oggi e' l'identita', e resta il punto unico in cui smetterebbe di esserlo |
 | `Data/GuildLifecycleMaintenance.lua` | non costruisce piu' chiavi per conto suo |
@@ -348,9 +355,9 @@ e' corretta comunque, e perche' il caso che copre e' silenzioso.
 Il gate: `RecipeRegistry_Forever/local-tests/run-tests.ps1`, che e' nato qui --
 era il primo pezzo di codice adattato che valesse la pena sorvegliare.
 
-Resta da vedere `GetGuildRosterInfo`, cioe' se il roster elenchi i nomi col
-suffisso di realm o nudi. In entrambi i casi la chiave e' la stessa, ed e' il
-motivo per cui questa decisione non aspettava quella risposta.
+~~Resta da vedere `GetGuildRosterInfo`~~: chiuso. Il 21/09 i nomi del roster sono
+risultati nudi, e il 26/09 lo ha confermato un roster di 120 membri senza un
+solo trattino.
 
 ## Inventario: cosa usiamo oggi
 

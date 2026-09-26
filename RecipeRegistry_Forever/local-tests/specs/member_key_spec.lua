@@ -12,8 +12,8 @@
 -- i nomi sono unici: il realm non ha niente da aggiungere.
 --
 -- I valori qui sotto non sono inventati: sono quelli che il client beta ha
--- risposto in gioco, a GetRealmName il 2026-09-18 e a
--- RegionalUniqueNamesEnabled e UnitNameUnmodified il 2026-09-26.
+-- risposto in gioco il 2026-09-26: UnitNameUnmodified, il roster e il
+-- mittente dei messaggi addon.
 --
 -- Niente harness condiviso: Forever non ne ha ancora uno, e per interrogare le
 -- funzioni di chiave basta uno stub che regga il caricamento di Data.lua.
@@ -27,11 +27,9 @@ _G.RecipeRegistry = setmetatable({
   Compat = setmetatable({}, {__index = function() return function() end end}),
 }, {__index = function() return function() end end})
 
--- quello che il client ha risposto davvero: GetRealmName il 2026-09-18,
--- UnitNameUnmodified il 2026-09-26
+-- quello che il client ha risposto davvero il 2026-09-26
 local PLAYER_FIRST, PLAYER_SURNAME = "Kaedros", "Davian"
 _G.UnitNameUnmodified = function() return PLAYER_FIRST, PLAYER_SURNAME end
-_G.GetRealmName = function() return "Classic Beta PvE 2" end
 _G.GetNumGuildMembers = function() return 0 end
 
 dofile("Data/Data.lua")
@@ -48,29 +46,16 @@ print("== la chiave e' il nome ==")
 t("GetPlayerKey", Data:GetPlayerKey(), "Kaedros Davian")
 t("GetMemberKeyName", Data:GetMemberKeyName("Kaedros Davian"), "Kaedros Davian")
 
-print("\n== roster -> chiave: deve coincidere col personaggio locale ==")
-t("nome nudo", Data:MemberKeyFromFullName("Kaedros Davian"), "Kaedros Davian")
-t("nome col realm del client", Data:MemberKeyFromFullName("Kaedros Davian-ClassicBetaPvE2"), "Kaedros Davian")
+print("\n== roster -> chiave: il nome passa com'e' ==")
+-- Verificato in gioco il 26/09: 120 membri, tutti "Nome Cognome", nessuno con
+-- un trattino; il mittente dei messaggi addon arriva nudo in GUILD e WHISPER.
+-- Non c'e' un suffisso di realm da togliere, e il nome non si tocca: un
+-- trattino, se c'e', fa parte del nome.
+t("nome e cognome", Data:MemberKeyFromFullName("Kaedros Davian"), "Kaedros Davian")
 t("cognome col trattino", Data:MemberKeyFromFullName("Jean-Luc Picard"), "Jean-Luc Picard")
-t("cognome col trattino + realm", Data:MemberKeyFromFullName("Jean-Luc Picard-ClassicBetaPvE2"), "Jean-Luc Picard")
 t("nome singolo", Data:MemberKeyFromFullName("Kaedros"), "Kaedros")
-
--- Un suffisso che NON e' il nostro realm resta nella chiave. Serve se un giorno
--- il roster elencasse qualcuno di un altro shard -- un altro ruleset, visto che
--- il realm di questo client si chiama "ClassicBetaPvE2": ruleset piu' numero.
--- In WoW una gilda e' di un realm solo, quindi non dovrebbe succedere; se
--- succedesse, due persone diverse con lo stesso nome avrebbero due chiavi
--- diverse invece di fondersi in una, e la chiave resta un bersaglio valido per
--- un sussurro.
-t("suffisso di un altro ruleset: resta", Data:MemberKeyFromFullName("Kaedros Davian-ClassicBetaPvP1"), "Kaedros Davian-ClassicBetaPvP1")
-t("e non collide con il nostro", Data:MemberKeyFromFullName("Kaedros Davian-ClassicBetaPvE2") ~= Data:MemberKeyFromFullName("Kaedros Davian-ClassicBetaPvP1"), true)
 t("stringa vuota", Data:MemberKeyFromFullName(""), nil)
-
-print("\n== il realm cambia sotto i piedi: la chiave no ==")
-_G.GetRealmName = function() return "Forever Shard 7" end
-t("GetPlayerKey dopo il cambio", Data:GetPlayerKey(), "Kaedros Davian")
-t("roster dopo il cambio", Data:MemberKeyFromFullName("Kaedros Davian-ForeverShard7"), "Kaedros Davian")
-_G.GetRealmName = function() return "Classic Beta PvE 2" end
+t("non stringa", Data:MemberKeyFromFullName(nil), nil)
 
 print("\n== il nome del giocatore: nome e cognome ==")
 -- UnitNameUnmodified da' nome e cognome separati. Leggere solo il primo --
@@ -81,10 +66,6 @@ t("coincide col roster", Data:MemberKeyFromFullName("Kaedros Davian"), Data:GetP
 PLAYER_SURNAME = nil
 t("senza cognome, il nome", Data:GetPlayerKey(), "Kaedros")
 PLAYER_SURNAME = "Davian"
--- il cognome non e' un realm: fino al 25/09 il token del realm si leggeva dal
--- secondo valore di UnitFullName, che nel frattempo era diventato il cognome
-t("il cognome non e' scambiato per realm", Data:MemberKeyFromFullName("Anna-Davian"), "Anna-Davian")
-t("il realm vero si scarta ancora", Data:MemberKeyFromFullName("Anna Rossi-ClassicBetaPvE2"), "Anna Rossi")
 
 print("\n== IsValidMemberKey: cosa deve passare ==")
 t("nome e cognome", Data:IsValidMemberKey("Kaedros Davian"), true)

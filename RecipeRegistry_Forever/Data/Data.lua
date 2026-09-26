@@ -566,44 +566,19 @@ end
 --    trasporto: il sync va in "GUILD" e in "WHISPER" verso il roster, quindi da
 --    fuori non arriva niente. Dentro una gilda i nomi sono unici gia' di loro.
 --
--- Il realm lo leggiamo ancora, ma per una cosa sola: se il roster elencasse un
--- nome come "Kaedros Davian-ClassicBetaPvE2", riconoscere quella coda e
--- scartarla, perche' altrimenti il personaggio locale e il roster darebbero due
--- chiavi diverse per la stessa persona.
+-- Il realm non lo leggiamo piu', nemmeno per scartarlo. Verificato in gioco il
+-- 26/09: il roster (120 membri) elenca nomi nudi, "Kaedros Davian", nessuno con
+-- un trattino; il mittente dei messaggi addon arriva nudo sia in GUILD sia in
+-- WHISPER; un sussurro al nome completo arriva. Il suffisso "-Realm" che qui si
+-- riconosceva e si toglieva non si presenta mai, e il codice che lo faceva era
+-- morto.
 --
 -- Il nome contiene uno spazio ("Nome Cognome") e potrebbe contenere un
--- trattino: nessuna delle due cose e' un problema ora che nella chiave non
--- c'e' piu' niente da spacchettare.
-local function normalizeRealmToken(realm)
-    local normalized = tostring(realm or ""):gsub("[%s%-]", "")
-    return normalized
-end
-
--- Il realm che questo client dichiara adesso, normalizzato. Non finisce in
--- nessuna chiave: serve solo a riconoscere un suffisso da buttare via.
---
--- Solo GetRealmName. Il secondo valore di UnitFullName era il realm fino al
--- 18/09 ("ClassicBetaPvE2"), ma dal 25/09 e' il cognome: "Kaedros", "Davian".
--- Letto da li', un roster con "Qualcuno-Davian" avrebbe perso il cognome.
-local function currentRealmToken()
-    return normalizeRealmToken(GetRealmName())
-end
-
--- Un nome di roster e' ambiguo: "Jean-Luc Picard" senza realm ha la stessa
--- forma di "Kaedros Davian-ClassicBetaPvE2" con realm. Lo si scioglie sapendo
--- che un roster di gilda e' di un realm solo, il nostro: un suffisso e' un
--- realm soltanto se coincide con quello che il client dichiara in questo
--- momento. Tutto il resto fa parte del nome.
+-- trattino: nessuna delle due cose e' un problema, nella chiave non c'e' niente
+-- da spacchettare.
 local function normalizeGuildRosterMemberKey(fullName)
     if type(fullName) ~= "string" or fullName == "" then
         return nil
-    end
-    local name, suffix = fullName:match("^(.+)%-([^%-]+)$")
-    if name and name ~= "" and suffix then
-        local realmToken = currentRealmToken()
-        if realmToken ~= "" and normalizeRealmToken(suffix) == realmToken then
-            return name
-        end
     end
     return fullName
 end
