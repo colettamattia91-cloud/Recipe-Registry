@@ -15,6 +15,13 @@ All notable changes to this addon are documented in this file.
   alphabetical, rarity, skill from lowest and skill from highest -- the last one
   being what you want when you are looking for something worth crafting now.
   Recipes with no known level stay at the bottom either way.
+- **Your character is read the way the game names it.** First name and surname
+  now come from the game's own name API instead of being pieced together, so a
+  client update that changes how names are reported can no longer split you
+  into two crafters.
+- **Settings stay with your character.** The bundled AceDB library is updated to
+  its WoW: Forever release, which files your settings under your full name
+  rather than under the ruleset.
 
 ## [0.1.0] - 2026-09-25
 
