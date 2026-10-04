@@ -12,8 +12,15 @@
 #
 # Con -IfStale non riconverte se mining.lua e' gia' aggiornato rispetto al bundle
 # e al formato: e' il modo in cui lo chiama import-dumps.ps1.
+#
+# -FallbackBundle e' il bundle di una build precedente, per le ricette che quello
+# corrente non legge piu'. Sulla 70205 le 27 "Adaptive" sono finite in sezioni
+# cifrate: il client le elenca ancora, il datamining non le vede, e senza i loro
+# dati il generatore le scriverebbe come ricette vanilla vive senza livello.
+# Dal ripiego si prende solo cio' che manca nel bundle corrente, mai il resto.
 param(
     [Parameter(Mandatory = $true)][string]$MiningBundle,
+    [string]$FallbackBundle,
     [string]$Output = (Join-Path $PSScriptRoot 'dumps\mining.lua'),
     [switch]$IfStale
 )
@@ -32,7 +39,9 @@ $marker = "-- formato: $format"
 $MiningBundle = (Resolve-Path -LiteralPath $MiningBundle).Path
 $itemsPath = Join-Path (Split-Path -Parent $MiningBundle) 'item_sparse.json'
 
-if ($IfStale -and (Test-Path -LiteralPath $Output)) {
+# Con un ripiego si riconverte sempre: lo stampo dei file non dice se il ripiego
+# e' lo stesso dell'ultima volta, e convertire costa un secondo.
+if ($IfStale -and -not $FallbackBundle -and (Test-Path -LiteralPath $Output)) {
     $outputStamp = (Get-Item -LiteralPath $Output).LastWriteTimeUtc
     $sources = @($MiningBundle)
     if (Test-Path -LiteralPath $itemsPath) { $sources += $itemsPath }
@@ -45,9 +54,44 @@ $writer = New-Object System.Text.StringBuilder
 [void]$writer.AppendLine('-- Generato da Tools/convert-mining.ps1 dal bundle di ../WowForeverMining.')
 [void]$writer.AppendLine('-- Non modificare a mano: si rigenera quando il bundle o il formato cambiano.')
 [void]$writer.AppendLine("-- Fonte: $MiningBundle")
+
+$rows = @(foreach ($entry in (Get-Content -LiteralPath $MiningBundle -Raw | ConvertFrom-Json)) { $entry })
+$items = $null
+if (Test-Path -LiteralPath $itemsPath) {
+    $items = @(foreach ($entry in (Get-Content -LiteralPath $itemsPath -Raw | ConvertFrom-Json)) { $entry })
+} else {
+    Write-Warning "item_sparse.json assente accanto al bundle: niente legame degli oggetti, niente bopOutput statico."
+}
+
+$carried = New-Object System.Collections.Generic.List[string]
+if ($FallbackBundle) {
+    $FallbackBundle = (Resolve-Path -LiteralPath $FallbackBundle).Path
+    $fallbackRows = @(foreach ($entry in (Get-Content -LiteralPath $FallbackBundle -Raw | ConvertFrom-Json)) { $entry })
+    $known = @{}
+    foreach ($row in $rows) { if ($null -ne $row.spellId) { $known[[string]$row.spellId] = $true } }
+    $neededItems = @{}
+    foreach ($row in $fallbackRows) {
+        if ($null -eq $row.spellId -or $known.ContainsKey([string]$row.spellId)) { continue }
+        $rows += $row
+        $carried.Add("$($row.spellId) $($row.name)")
+        foreach ($id in @($row.createdItemId, $row.recipeItemId)) { if ($id) { $neededItems[[string]$id] = $true } }
+    }
+    # Gli oggetti di quelle ricette, se il bundle corrente non li ha: e' da qui
+    # che il generatore sa che il prodotto non e' descritto dal client, e quindi
+    # che la ricetta e' `removed`.
+    $fallbackItemsPath = Join-Path (Split-Path -Parent $FallbackBundle) 'item_sparse.json'
+    if ($neededItems.Count -gt 0 -and (Test-Path -LiteralPath $fallbackItemsPath)) {
+        $haveItems = @{}
+        foreach ($item in $items) { if ($null -ne $item.itemId) { $haveItems[[string]$item.itemId] = $true } }
+        foreach ($item in (Get-Content -LiteralPath $fallbackItemsPath -Raw | ConvertFrom-Json)) {
+            $key = [string]$item.itemId
+            if ($neededItems.ContainsKey($key) -and -not $haveItems.ContainsKey($key)) { $items += $item }
+        }
+    }
+    [void]$writer.AppendLine("-- Ripiego: $FallbackBundle ($($carried.Count) ricette che la fonte non legge piu')")
+}
 [void]$writer.AppendLine($marker)
 
-$rows = Get-Content -LiteralPath $MiningBundle -Raw | ConvertFrom-Json
 [void]$writer.AppendLine('MiningRecipes = {')
 foreach ($row in $rows) {
     if ($null -eq $row.spellId) { continue }
@@ -72,12 +116,6 @@ foreach ($row in $rows) {
 # scrive il valore intero, perche' la domanda potrebbe cambiare e il dato no.
 $itemCount = 0
 $unshipped = New-Object System.Collections.Generic.List[string]
-$items = $null
-if (Test-Path -LiteralPath $itemsPath) {
-    $items = Get-Content -LiteralPath $itemsPath -Raw | ConvertFrom-Json
-} else {
-    Write-Warning "item_sparse.json assente accanto al bundle: niente legame degli oggetti, niente bopOutput statico."
-}
 [void]$writer.AppendLine('MiningItems = {')
 foreach ($item in $items) {
     if ($null -eq $item.itemId) { continue }
@@ -106,3 +144,7 @@ foreach ($line in $unshipped) { [void]$writer.AppendLine($line) }
 
 Set-Content -LiteralPath $Output -Value $writer.ToString() -NoNewline
 Write-Host "Datamining convertito: $Output ($($rows.Count) ricette, $itemCount oggetti, $($unshipped.Count) non spediti)"
+if ($carried.Count -gt 0) {
+    Write-Host "Dal ripiego, perche' la fonte non le legge piu': $($carried.Count) ricette"
+    foreach ($line in $carried) { Write-Host "  $line" }
+}
