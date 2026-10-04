@@ -4,6 +4,13 @@ All notable changes to this addon are documented in this file.
 
 ## [0.1.2] - 2026-10-04
 
+### Added
+
+- **The window tells you when you are out of date.** When a guildmate runs a
+  newer Recipe Registry, a yellow "Update available" appears next to the Sync
+  light, and stays there until you update. Before, the only hint was one line
+  in chat that was easy to miss. Thanks to Juliette for the idea.
+
 ### Changed
 
 - **Recipe data from the latest beta build (1.60.1.70205).** Ten more recipes
