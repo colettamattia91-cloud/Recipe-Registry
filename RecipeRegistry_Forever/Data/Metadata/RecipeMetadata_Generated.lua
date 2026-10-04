@@ -22,14 +22,14 @@
 --   createdItemId     2337  (client) cosa produce
 --   createdCount       115  (client) quante ne produce, se diverso da una
 --   requiredSkill     2276  (datamining + TBC) a che livello si impara: oggetto-ricetta, poi vanilla
---   skillLevels       2490  (datamining) le soglie di difficolta'
+--   skillLevels       2475  (datamining) le soglie di difficolta'
 --   expansion         2519  (datamining) vanilla o aggiunta di Forever
 --   classMask            0  (datamining) quali classi possono impararla
 --   bopOutput         1985  (datamining) se il prodotto e' legato quando si raccoglie
 --   recipeItemId      1998  (datamining) l'oggetto che insegna la ricetta
 --   removed            352  (datamining) nei dati del client ma non nel gioco
---   sourceKind        1621  (a mano) da dove si ottiene
---   sourcePlaces       952  (a mano) chi la vende o la droppa, e dove
+--   sourceKind        1631  (a mano) da dove si ottiene
+--   sourcePlaces       962  (a mano) chi la vende o la droppa, e dove
 --
 -- Quello che ancora manca, e da dove dovra' arrivare:
 --   trainerTitle     quale trainer la insegna
@@ -2891,7 +2891,7 @@ RecipeRegistryRecipeMetadata = {
             expansion = "vanilla",
             createdItemId = 4255,
             recipeItemId = 7613,
-            bopOutput = true,
+            bopOutput = false,
             sourceKind = "vendor",
             sourcePlaces = { { name = "Wenna Silkbeard", zone = 15, faction = "alliance" }, { name = "George Candarte", zone = 7, faction = "horde" } },
             category = "c2555",
@@ -21658,7 +21658,6 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 285,
-            skillLevels = { 1, 285, 290 },
             reagents = {
                 { itemId = 2840, count = 1 },
                 { itemId = 2997, count = 1 },
@@ -26484,7 +26483,6 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2718",
             sortOrder = 1,
-            skillLevels = { 1, 20, 25 },
             reagents = {
                 { itemId = 2318, count = 3 },
                 { itemId = 4470, count = 2 },
@@ -26497,7 +26495,6 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2716",
             sortOrder = 1,
-            skillLevels = { 1, 20, 25 },
             reagents = {
                 { itemId = 2447, count = 1 },
                 { itemId = 765, count = 1 },
@@ -26522,7 +26519,6 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2715",
             sortOrder = 1,
-            skillLevels = { 1, 20, 25 },
             reagents = {
                 { itemId = 6291, count = 1 },
                 { itemId = 3371, count = 1 },
@@ -26535,7 +26531,6 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2535",
             sortOrder = 1,
-            skillLevels = { 1, 20, 25 },
             reagents = {
                 { itemId = 1251, count = 3 },
                 { itemId = 159, count = 1 },
@@ -26548,7 +26543,6 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2717",
             sortOrder = 1,
-            skillLevels = { 1, 20, 25 },
             reagents = {
                 { itemId = 2835, count = 1 },
                 { itemId = 2840, count = 1 },
@@ -27914,6 +27908,8 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 249866,
             recipeItemId = 249880,
             bopOutput = false,
+            sourceKind = "drop",
+            sourcePlaces = { { name = "Windshear Geomancer", zone = 32 } },
             category = "c2646",
             sortOrder = 100,
             requiredSkill = 100,
@@ -28232,6 +28228,8 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 250074,
             recipeItemId = 250182,
             bopOutput = false,
+            sourceKind = "drop",
+            sourcePlaces = { { name = "Ashenvale Bear", zone = 4 } },
             category = "c2633",
             sortOrder = 20,
             requiredSkill = 175,
@@ -29308,6 +29306,8 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 250483,
             recipeItemId = 251335,
             bopOutput = false,
+            sourceKind = "drop",
+            sourcePlaces = { { name = "Syndicate Watchman", zone = 7 } },
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 100,
@@ -29711,7 +29711,7 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 251360,
             bopOutput = true,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Gor'mak", zone = 6, x = 49.8, y = 29.7, faction = "horde" }, { name = "Stondry Darkhammer", zone = 70, x = 10.4, y = 74.8, faction = "alliance" } },
+            sourcePlaces = { { name = "Stondry Darkhammer", zone = 70, x = 10.4, y = 74.8, faction = "alliance" }, { name = "Gor'mak", zone = 6, x = 49.8, y = 29.7, faction = "horde" } },
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 80,
@@ -35491,7 +35491,7 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 253665,
             bopOutput = false,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alexandra Bolero", zone = 1, x = 43.8, y = 44.9, faction = "alliance" }, { name = "Jennabink Powerseam", zone = 15, x = 63.2, y = 51.2, faction = "alliance" }, { name = "Rann Flamespinner", zone = 25, x = 63.7, y = 50.6, faction = "alliance" }, { name = "Lohgan Eva", zone = 8, x = 44.1, y = 45.4, faction = "alliance" }, { name = "Mallen Swain", zone = 7, faction = "horde" }, { name = "Danielle Zipstitch", zone = 8, faction = "alliance" }, { name = "Xizk Goodstitch", zone = 2, faction = "horde" }, { name = "Mahu", zone = 19, faction = "alliance" }, { name = "Franklin Hamar", zone = 31, faction = "horde" }, { name = "Borya", zone = 29, faction = "horde" }, { name = "Wrahk", zone = 6, faction = "alliance" }, { name = "Elynna", zone = 27, faction = "alliance" }, { name = "Valdaron", zone = 23, faction = "horde" }, { name = "Millie Gregorian", zone = 36, faction = "alliance" }, { name = "Poranna Snowbraid", zone = 28, faction = "horde" }, { name = "Yonada", zone = 6, faction = "alliance" }, { name = "Vizzklick", zone = 14, faction = "alliance" }, { name = "Brienna Starglow", zone = 33, faction = "alliance" }, { name = "Darnall", zone = 55, faction = "alliance" }, { name = "Outfitter Eric", zone = 28, faction = "horde" }, { name = "Dominique Stefano", zone = 10, faction = "horde" }, { name = "Taleen Shimmerthread", zone = 75, faction = "horde" }, { name = "Othesia Evengale", zone = 75, faction = "alliance" }, { name = "Angela Ward", zone = 36, faction = "alliance" }, { name = "Darah", zone = 29, faction = "alliance" }, { name = "Boramu", zone = 19 }, { name = "Ellie Stonebrow", zone = 28 }, { name = "Antonio Bolero", zone = 1 }, { name = "Dani'ill", zone = 27 }, { name = "Stitch Pinwizzle", zone = 74 } },
+            sourcePlaces = { { name = "Dani'ill", zone = 27, x = 63.2, y = 51.2, faction = "alliance" }, { name = "Borya", zone = 29, x = 63.7, y = 50.6, faction = "horde" }, { name = "Elynna", zone = 27, x = 44.1, y = 45.4, faction = "alliance" }, { name = "Ellie Stonebrow", zone = 28, x = 43.8, y = 44.9, faction = "alliance" }, { name = "Outfitter Eric", zone = 28, faction = "alliance" }, { name = "Poranna Snowbraid", zone = 28, faction = "alliance" }, { name = "Darah", zone = 29, faction = "horde" }, { name = "Alexandra Bolero", zone = 1, faction = "alliance" }, { name = "Antonio Bolero", zone = 1, faction = "alliance" }, { name = "Boramu", zone = 19, faction = "horde" }, { name = "Mahu", zone = 19, faction = "horde" }, { name = "Angela Ward", zone = 36, faction = "horde" }, { name = "Millie Gregorian", zone = 36, faction = "horde" }, { name = "Dominique Stefano", zone = 10, faction = "alliance" }, { name = "Valdaron", zone = 23, faction = "alliance" }, { name = "Danielle Zipstitch", zone = 8, faction = "alliance" }, { name = "Lohgan Eva", zone = 8, faction = "alliance" }, { name = "Brienna Starglow", zone = 33, faction = "alliance" }, { name = "Mallen Swain", zone = 7, faction = "horde" }, { name = "Rann Flamespinner", zone = 25, faction = "alliance" }, { name = "Franklin Hamar", zone = 31, faction = "alliance" }, { name = "Wrahk", zone = 6, faction = "horde" }, { name = "Yonada", zone = 6, faction = "horde" }, { name = "Jennabink Powerseam", zone = 15, faction = "alliance" }, { name = "Othesia Evengale", zone = 75, faction = "alliance" }, { name = "Darnall", zone = 55 }, { name = "Stitch Pinwizzle", zone = 74 }, { name = "Xizk Goodstitch", zone = 2 }, { name = "Vizzklick", zone = 14 }, { name = "Taleen Shimmerthread", zone = 75 } },
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 5,
@@ -35508,7 +35508,7 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 253668,
             bopOutput = false,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Alexandra Bolero", zone = 1, x = 43.8, y = 44.9, faction = "alliance" }, { name = "Jennabink Powerseam", zone = 15, x = 63.2, y = 51.2, faction = "alliance" }, { name = "Rann Flamespinner", zone = 25, x = 63.7, y = 50.6, faction = "alliance" }, { name = "Lohgan Eva", zone = 8, x = 44.1, y = 45.4, faction = "alliance" }, { name = "Mallen Swain", zone = 7, faction = "horde" }, { name = "Danielle Zipstitch", zone = 8, faction = "alliance" }, { name = "Xizk Goodstitch", zone = 2, faction = "horde" }, { name = "Mahu", zone = 19, faction = "alliance" }, { name = "Franklin Hamar", zone = 31, faction = "horde" }, { name = "Borya", zone = 29, faction = "horde" }, { name = "Wrahk", zone = 6, faction = "alliance" }, { name = "Elynna", zone = 27, faction = "alliance" }, { name = "Valdaron", zone = 23, faction = "horde" }, { name = "Millie Gregorian", zone = 36, faction = "alliance" }, { name = "Poranna Snowbraid", zone = 28, faction = "horde" }, { name = "Yonada", zone = 6, faction = "alliance" }, { name = "Vizzklick", zone = 14, faction = "alliance" }, { name = "Brienna Starglow", zone = 33, faction = "alliance" }, { name = "Darnall", zone = 55, faction = "alliance" }, { name = "Outfitter Eric", zone = 28, faction = "horde" }, { name = "Dominique Stefano", zone = 10, faction = "horde" }, { name = "Taleen Shimmerthread", zone = 75, faction = "horde" }, { name = "Othesia Evengale", zone = 75, faction = "alliance" }, { name = "Angela Ward", zone = 36, faction = "alliance" }, { name = "Darah", zone = 29, faction = "alliance" }, { name = "Boramu", zone = 19 }, { name = "Ellie Stonebrow", zone = 28 }, { name = "Antonio Bolero", zone = 1 }, { name = "Dani'ill", zone = 27 }, { name = "Stitch Pinwizzle", zone = 74 } },
+            sourcePlaces = { { name = "Dani'ill", zone = 27, x = 63.2, y = 51.2, faction = "alliance" }, { name = "Borya", zone = 29, x = 63.7, y = 50.6, faction = "horde" }, { name = "Elynna", zone = 27, x = 44.1, y = 45.4, faction = "alliance" }, { name = "Ellie Stonebrow", zone = 28, x = 43.8, y = 44.9, faction = "alliance" }, { name = "Outfitter Eric", zone = 28, faction = "alliance" }, { name = "Poranna Snowbraid", zone = 28, faction = "alliance" }, { name = "Darah", zone = 29, faction = "horde" }, { name = "Alexandra Bolero", zone = 1, faction = "alliance" }, { name = "Antonio Bolero", zone = 1, faction = "alliance" }, { name = "Boramu", zone = 19, faction = "horde" }, { name = "Mahu", zone = 19, faction = "horde" }, { name = "Angela Ward", zone = 36, faction = "horde" }, { name = "Millie Gregorian", zone = 36, faction = "horde" }, { name = "Dominique Stefano", zone = 10, faction = "alliance" }, { name = "Valdaron", zone = 23, faction = "alliance" }, { name = "Danielle Zipstitch", zone = 8, faction = "alliance" }, { name = "Lohgan Eva", zone = 8, faction = "alliance" }, { name = "Brienna Starglow", zone = 33, faction = "alliance" }, { name = "Mallen Swain", zone = 7, faction = "horde" }, { name = "Rann Flamespinner", zone = 25, faction = "alliance" }, { name = "Franklin Hamar", zone = 31, faction = "alliance" }, { name = "Wrahk", zone = 6, faction = "horde" }, { name = "Yonada", zone = 6, faction = "horde" }, { name = "Jennabink Powerseam", zone = 15, faction = "alliance" }, { name = "Othesia Evengale", zone = 75, faction = "alliance" }, { name = "Darnall", zone = 55 }, { name = "Stitch Pinwizzle", zone = 74 }, { name = "Xizk Goodstitch", zone = 2 }, { name = "Vizzklick", zone = 14 }, { name = "Taleen Shimmerthread", zone = 75 } },
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 70,
@@ -35688,6 +35688,8 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 253903,
             recipeItemId = 253904,
             bopOutput = true,
+            sourceKind = "drop",
+            sourcePlaces = { { name = "Lady Anacondra", zone = 76 }, { name = "Rhahk'Zor", zone = 77 } },
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 75,
@@ -35705,6 +35707,8 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 253905,
             recipeItemId = 253906,
             bopOutput = true,
+            sourceKind = "drop",
+            sourcePlaces = { { name = "Captain Greenskin", zone = 77 } },
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 75,
@@ -35722,6 +35726,8 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 253907,
             recipeItemId = 253908,
             bopOutput = true,
+            sourceKind = "drop",
+            sourcePlaces = { { name = "Lord Cobrahn", zone = 76 } },
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 75,
@@ -36001,6 +36007,8 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 253937,
             recipeItemId = 253938,
             bopOutput = true,
+            sourceKind = "drop",
+            sourcePlaces = { { name = "Verdan the Everliving", zone = 76 }, { name = "Lord Pythas", zone = 76 } },
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 100,
@@ -36018,6 +36026,8 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 253939,
             recipeItemId = 253940,
             bopOutput = true,
+            sourceKind = "drop",
+            sourcePlaces = { { name = "Edwin VanCleef", zone = 77 } },
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 100,
@@ -36052,6 +36062,8 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 253943,
             recipeItemId = 253944,
             bopOutput = true,
+            sourceKind = "drop",
+            sourcePlaces = { { name = "Skum", zone = 76 } },
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 100,
@@ -36069,6 +36081,8 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 253945,
             recipeItemId = 253946,
             bopOutput = true,
+            sourceKind = "drop",
+            sourcePlaces = { { name = "Ghamoo-ra", zone = 78 } },
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 100,
@@ -38065,7 +38079,6 @@ RecipeRegistryRecipeMetadata = {
             category = "c2717",
             sortOrder = 1,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 145 },
             reagents = {
                 { itemId = 2838, count = 2 },
                 { itemId = 2772, count = 1 },
@@ -38098,7 +38111,6 @@ RecipeRegistryRecipeMetadata = {
             category = "c2716",
             sortOrder = 1,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 145 },
             reagents = {
                 { itemId = 4470, count = 2 },
                 { itemId = 8836, count = 1 },
@@ -38130,7 +38142,6 @@ RecipeRegistryRecipeMetadata = {
             category = "c2718",
             sortOrder = 1,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 145 },
             reagents = {
                 { itemId = 2319, count = 3 },
                 { itemId = 5784, count = 2 },
@@ -38146,7 +38157,6 @@ RecipeRegistryRecipeMetadata = {
             category = "c2715",
             sortOrder = 1,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 145 },
             reagents = {
                 { itemId = 4470, count = 2 },
                 { itemId = 8925, count = 1 },
@@ -38163,7 +38173,6 @@ RecipeRegistryRecipeMetadata = {
             category = "c2535",
             sortOrder = 1,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 145 },
             reagents = {
                 { itemId = 6452, count = 1 },
                 { itemId = 8544, count = 2 },
@@ -38179,7 +38188,6 @@ RecipeRegistryRecipeMetadata = {
             category = "c2715",
             sortOrder = 1,
             requiredSkill = 300,
-            skillLevels = { 1, 300, 300 },
             reagents = {
                 { itemId = 4470, count = 5 },
                 { itemId = 14048, count = 2 },
@@ -38196,7 +38204,6 @@ RecipeRegistryRecipeMetadata = {
             category = "c2535",
             sortOrder = 1,
             requiredSkill = 300,
-            skillLevels = { 1, 300, 300 },
             reagents = {
                 { itemId = 4470, count = 2 },
                 { itemId = 6453, count = 2 },
@@ -38328,7 +38335,6 @@ RecipeRegistryRecipeMetadata = {
             category = "c2716",
             sortOrder = 1,
             requiredSkill = 300,
-            skillLevels = { 1, 300, 300 },
             reagents = {
                 { itemId = 13465, count = 4 },
                 { itemId = 8925, count = 1 },
@@ -38344,7 +38350,6 @@ RecipeRegistryRecipeMetadata = {
             category = "c2717",
             sortOrder = 1,
             requiredSkill = 300,
-            skillLevels = { 1, 300, 300 },
             reagents = {
                 { itemId = 12359, count = 5 },
                 { itemId = 12365, count = 2 },
@@ -41963,7 +41968,7 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 276984,
             bopOutput = false,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Archmage Alvareaux", zone = 76, x = 14, y = 63.1, faction = "alliance" } },
+            sourcePlaces = { { name = "Archmage Alvareaux", zone = 79, x = 14, y = 63.1, faction = "alliance" } },
             category = "c2461",
             sortOrder = 110,
             requiredSkill = 175,
@@ -41981,7 +41986,7 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 276985,
             bopOutput = false,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Archmage Alvareaux", zone = 76, x = 14, y = 63.1, faction = "alliance" } },
+            sourcePlaces = { { name = "Archmage Alvareaux", zone = 79, x = 14, y = 63.1, faction = "alliance" } },
             category = "c2462",
             sortOrder = 120,
             requiredSkill = 175,
@@ -41999,7 +42004,7 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 276986,
             bopOutput = false,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Archmage Alvareaux", zone = 76, x = 14, y = 63.1, faction = "alliance" } },
+            sourcePlaces = { { name = "Archmage Alvareaux", zone = 79, x = 14, y = 63.1, faction = "alliance" } },
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 175,
@@ -42018,7 +42023,7 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 276987,
             bopOutput = false,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Archmage Alvareaux", zone = 76, x = 14, y = 63.1, faction = "alliance" } },
+            sourcePlaces = { { name = "Archmage Alvareaux", zone = 79, x = 14, y = 63.1, faction = "alliance" } },
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 175,
@@ -42037,7 +42042,7 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 276988,
             bopOutput = false,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Archmage Alvareaux", zone = 76, x = 14, y = 63.1, faction = "alliance" } },
+            sourcePlaces = { { name = "Archmage Alvareaux", zone = 79, x = 14, y = 63.1, faction = "alliance" } },
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 175,
@@ -42056,7 +42061,7 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 276989,
             bopOutput = false,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Archmage Alvareaux", zone = 76, x = 14, y = 63.1, faction = "alliance" } },
+            sourcePlaces = { { name = "Archmage Alvareaux", zone = 79, x = 14, y = 63.1, faction = "alliance" } },
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 175,
@@ -42075,7 +42080,7 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 276990,
             bopOutput = false,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Archmage Alvareaux", zone = 76, x = 14, y = 63.1, faction = "alliance" } },
+            sourcePlaces = { { name = "Archmage Alvareaux", zone = 79, x = 14, y = 63.1, faction = "alliance" } },
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 175,
@@ -42094,7 +42099,7 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 276991,
             bopOutput = false,
             sourceKind = "vendor",
-            sourcePlaces = { { name = "Archmage Alvareaux", zone = 76, x = 14, y = 63.1, faction = "alliance" } },
+            sourcePlaces = { { name = "Archmage Alvareaux", zone = 79, x = 14, y = 63.1, faction = "alliance" } },
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 175,
@@ -47728,7 +47733,10 @@ RecipeRegistryRecipeMetadata = {
         [73] = "Mount Hyjal",
         [74] = "Riverglades",
         [75] = "Zephras Isle",
-        [76] = "The Silver Enclave, City of Dalaran",
+        [76] = "Wailing Caverns",
+        [77] = "The Deadmines",
+        [78] = "Blackfathom Deeps",
+        [79] = "The Silver Enclave, City of Dalaran",
     },
 
     navTree = {

@@ -1183,6 +1183,42 @@ function UI:ShowCollectionFilterTooltip(owner)
     GameTooltip:Show()
 end
 
+-- La versione piu' nuova vista in gilda, se e' piu' nuova di questa.
+--
+-- Il dato lo scrive il sync (RecordLatestRemoteVersion) e sta nello scope
+-- globale, quindi sopravvive al logout e sparisce da solo appena si aggiorna:
+-- il confronto e' sempre con la versione che gira adesso.
+--
+-- Su una build dev non si mostra mai. Le build dev restano a 0.1.0-dev per
+-- scelta, e il dato salvato puo' venire da una release installata prima: la
+-- scritta direbbe "aggiorna" a chi gira la versione del repo.
+function UI:GetAvailableUpdate()
+    if Addon.BUILD_CHANNEL == "dev" then return nil end
+    local data, buildInfo = Addon.Data, Addon.BuildInfo
+    if not (data and data.GetUpdateNoticeState and buildInfo and buildInfo.IsRemoteNewer) then
+        return nil
+    end
+    local notice = data:GetUpdateNoticeState()
+    local latest = notice and notice.latestRemoteVersionSeen
+    if latest and buildInfo.IsRemoteNewer(tostring(latest), Addon.ADDON_VERSION) then
+        return tostring(latest), notice.latestRemoteVersionPeer
+    end
+    return nil
+end
+
+function UI:ShowUpdateNoticeTooltip(owner)
+    local latest, peer = self:GetAvailableUpdate()
+    if not latest then return end
+    GameTooltip:SetOwner(owner, "ANCHOR_BOTTOM")
+    GameTooltip:AddLine("A newer Recipe Registry is out")
+    GameTooltip:AddLine(string.format("Seen: %s%s. You are running %s.",
+        latest, peer and (" on " .. tostring(peer)) or "", tostring(Addon.ADDON_VERSION or "?")),
+        0.75, 0.75, 0.75, true)
+    GameTooltip:AddLine("Update from CurseForge or your addon manager, then restart the game.",
+        0.75, 0.75, 0.75, true)
+    GameTooltip:Show()
+end
+
 function UI:HandleCollectionHeaderClick(columnKey, mouseButton, anchor)
     if mouseButton == "RightButton" then
         self:OpenCollectionColumnMenu(columnKey, anchor)
@@ -2071,6 +2107,25 @@ function UI:CreateMainFrame()
     autoLabel:SetText("Sync")
     autoLabel:SetTextColor(0.7, 0.9, 0.7)
     f.autoLabel = autoLabel
+
+    -- Una versione piu' nuova vista in gilda. Il sync la segnala gia' in chat,
+    -- ma una volta sola e con un cooldown: chi apre la finestra dopo non lo
+    -- sa. E' un Button e non un FontString solo per avere il tooltip.
+    local updateNotice = CreateFrame("Button", nil, titleBar)
+    updateNotice:SetPoint("RIGHT", autoLabel, "LEFT", -14, 0)
+    updateNotice:SetHeight(16)
+    local updateText = updateNotice:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    updateText:SetPoint("RIGHT", 0, 0)
+    updateText:SetTextColor(1.0, 0.82, 0.0)
+    updateNotice.text = updateText
+    updateNotice:SetScript("OnEnter", function(self)
+        UI:ShowUpdateNoticeTooltip(self)
+    end)
+    updateNotice:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    updateNotice:Hide()
+    f.updateNotice = updateNotice
 
     local mainNav = CreateFrame("Frame", nil, f)
     mainNav:SetPoint("TOPLEFT", 10, -58)
@@ -3535,6 +3590,16 @@ function UI:RefreshStatusBar()
     if paused then
         setVertexColorIfChanged(self.frame.syncDot, 0.75, 0.2, 0.2, 1)
         self.frame.autoLabel:SetTextColor(1.0, 0.75, 0.75)
+    end
+
+    local updateNotice = self.frame.updateNotice
+    if updateNotice then
+        local latest = self:GetAvailableUpdate()
+        if latest then
+            setTextIfChanged(updateNotice.text, "Update available: " .. latest)
+            updateNotice:SetWidth(math.ceil(updateNotice.text:GetStringWidth()) + 2)
+        end
+        setShownIfChanged(updateNotice, latest ~= nil)
     end
 
     setTextIfChanged(self.frame.cards.members.value, tostring(members))
