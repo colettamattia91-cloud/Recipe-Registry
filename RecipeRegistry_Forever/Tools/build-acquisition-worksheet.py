@@ -11,6 +11,9 @@ MINING = r"C:\Progetti\Public\WowForeverMining"
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "acquisition-worksheet.tsv")
 HARVEST = os.path.join(HERE, "captures", "foreverchanges-2026-09-24.tsv")
+# Il dataset del datamining da cui si prendono le ricette e gli oggetti del
+# client. Va tenuto uguale al bundle con cui si genera il database.
+MINING_REF = "forever-local-1.60.1.70205"
 
 COLS = ["profession", "learnSkill", "name", "spellId", "recipeItemId", "band",
         "sourceKind", "npcName", "zone", "x", "y", "faction",
@@ -25,9 +28,9 @@ def norm(s):
 
 def load_client():
     recipes = json.load(open(os.path.join(
-        MINING, "out", "bundle", "forever-local-1.60.1.69913", "recipes.json"), encoding="utf-8"))
+        MINING, "out", "bundle", MINING_REF, "recipes.json"), encoding="utf-8"))
     rank, sparse = {}, set()
-    path = os.path.join(MINING, "cache", "datasets", "forever-local-1.60.1.69913", "ItemSparse.csv")
+    path = os.path.join(MINING, "cache", "datasets", MINING_REF, "ItemSparse.csv")
     with open(path, encoding="utf-8") as f:
         reader = csv.reader(f)
         header = next(reader)

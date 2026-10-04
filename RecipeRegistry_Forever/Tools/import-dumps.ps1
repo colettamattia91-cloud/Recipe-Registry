@@ -6,6 +6,9 @@ param(
     # degli oggetti prodotti. Si cerca da solo accanto al repo; con -NoMining si
     # genera senza.
     [string]$MiningBundle,
+    # Il bundle di una build precedente, per le ricette che $MiningBundle non
+    # legge piu'. Quando il bundle si cerca da solo, e' il penultimo archiviato.
+    [string]$FallbackBundle,
     [switch]$NoMining,
     # Dove si archiviano le catture del Collector. Di norma e' il repo privato
     # accanto a questo, ../WowForeverMining/data/collector: le catture sono dati,
@@ -56,14 +59,19 @@ if (-not $NoMining) {
         # database e' stato generato; poi l'uscita di un emit appena fatto.
         foreach ($guess in @((Join-Path $miningRepo 'data\bundles'), (Join-Path $miningRepo 'out\bundle'))) {
             if ($MiningBundle -or -not (Test-Path -LiteralPath $guess)) { continue }
-            $found = Get-ChildItem -LiteralPath $guess -Recurse -File -Filter 'recipes.json' |
-                Sort-Object FullName | Select-Object -Last 1
-            if ($found) { $MiningBundle = $found.FullName }
+            $found = @(Get-ChildItem -LiteralPath $guess -Recurse -File -Filter 'recipes.json' |
+                Sort-Object FullName | Select-Object -Last 2)
+            if ($found.Count -gt 0) { $MiningBundle = $found[-1].FullName }
+            # Il bundle precedente fa da ripiego per le ricette che l'ultimo non
+            # legge piu' (vedi convert-mining.ps1).
+            if ($found.Count -gt 1 -and -not $FallbackBundle) { $FallbackBundle = $found[0].FullName }
         }
     }
     if ($MiningBundle -and (Test-Path -LiteralPath $MiningBundle)) {
         $miningLua = Join-Path $PSScriptRoot 'dumps\mining.lua'
-        & (Join-Path $PSScriptRoot 'convert-mining.ps1') -MiningBundle $MiningBundle -Output $miningLua -IfStale
+        $convertArguments = @{ MiningBundle = $MiningBundle; Output = $miningLua; IfStale = $true }
+        if ($FallbackBundle) { $convertArguments.FallbackBundle = $FallbackBundle }
+        & (Join-Path $PSScriptRoot 'convert-mining.ps1') @convertArguments
     } else {
         Write-Host "Datamining non trovato: il database conterra' solo cio' che il client espone."
     }
