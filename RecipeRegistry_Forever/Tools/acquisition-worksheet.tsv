@@ -45,8 +45,8 @@ alchemy	275	Potion of Venomous Blood	1251748	250994	forever	vendor	Nina Surefire
 alchemy	275	Transmute: Legionite	1317279	284871	forever											
 alchemy	280	Elixir of the Owl	1250786	250373	forever	vendor	Nina Surefire | Apothecary Durelle	Three Corners, Redridge Mountains | The Barrens	10.9 | 49.9	72.5 | 29.6	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 alchemy	280	Major Mender's Potion	1251747	250993	forever	vendor	Nina Surefire | Apothecary Durelle	Three Corners, Redridge Mountains | The Barrens	10.9 | 49.9	72.5 | 29.6	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
-alchemy	280	Potion of Beast Culling	1251753	250999	forever											ignota anche alla community [foreverchanges 2026-09-24]
-alchemy	280	Potion of Elemental Siphoning	1251752	250998	forever	vendor	Nina Surefire | Apothecary Durelle	Three Corners, Redridge Mountains | The Barrens	10.9 | 49.9	72.5 | 29.6	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
+alchemy	280	Potion of Beast Slaying	1251753	250999	forever											
+alchemy	280	Potion of Elemental Purging	1251752	250998	forever	vendor	Nina Surefire | Apothecary Durelle	Three Corners, Redridge Mountains | The Barrens	10.9 | 49.9	72.5 | 29.6	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 alchemy	285	Elixir of Nature Power	1250792	250379	forever	vendor	Nina Surefire | Apothecary Durelle	Three Corners, Redridge Mountains | The Barrens	10.9 | 49.9	72.5 | 29.6	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 alchemy	285	Elixir of Wicked Regeneration	1250785	250372	forever	vendor	Nina Surefire | Apothecary Durelle	Three Corners, Redridge Mountains | The Barrens	10.9 | 49.9	72.5 | 29.6	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 alchemy	285	Major Spellblasting Potion	1251734	250981	forever	vendor	Nina Surefire | Apothecary Durelle	Three Corners, Redridge Mountains | The Barrens	10.9 | 49.9	72.5 | 29.6	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
@@ -95,7 +95,7 @@ blacksmithing	80	Crusader's Gloves	1252261	251364	forever	vendor	Stondry Darkham
 blacksmithing	80	Guard's Chain Shirt	1252238	251341	forever											
 blacksmithing	80	Guard's Gloves	1252258	251361	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 blacksmithing	80	Protector's Gloves	1252259	251362	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
-blacksmithing	80	Veteran's Gloves	1252257	251360	forever	vendor	Gor'mak | Stondry Darkhammer	The Barrens | Three Corners, Redridge Mountains	49.8 | 10.4	29.7 | 74.8	horde | alliance					foreverchanges, letto da wowhead + catturato in gioco
+blacksmithing	80	Veteran's Gloves	1252257	251360	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 blacksmithing	85	Acolyte's Boots	1252255	251358	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 blacksmithing	85	Crusader's Boots	1252256	251359	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 blacksmithing	85	Guard's Boots	1252253	251356	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
@@ -107,7 +107,7 @@ blacksmithing	95	Crusader's Silvered Chain Helm	1252281	251384	forever	vendor	St
 blacksmithing	95	Guard's Silvered Chain Helm	1252278	251381	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 blacksmithing	95	Protector's Silvered Chain Helm	1252279	251382	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 blacksmithing	95	Veteran's Silvered Chain Helm	1252277	251380	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
-blacksmithing	100	Sterling Silver Boots	1252232	251335	forever											
+blacksmithing	100	Sterling Silver Boots	1252232	251335	forever	drop	Syndicate Watchman	Hillsbrad Foothills							20-21	foreverchanges, letto da wowhead
 blacksmithing	105	Sterling Silver Gauntlet	1252234	251337	forever											
 blacksmithing	105	Sterling Silver Leggings	1252233	251336	forever											
 blacksmithing	110	Acolyte's Silvered Chain Shirt	1252270	251373	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
@@ -253,12 +253,12 @@ cooking	75	Breakfast Omelette	1250157	250188	forever	drop	Dire Condor	Redridge M
 cooking	75	Twice-Spiced Raptor Slice	1250154	250185	forever											
 cooking	85	Savory Whimsyfin Delight	1252566	251526	forever											
 cooking	90	Journeyman Campfire	1283400	273087	forever											
-cooking	100	Royal Tea	1249958	249880	forever											
+cooking	100	Royal Tea	1249958	249880	forever	drop	Windshear Geomancer	Stonetalon Mountains							20-21	foreverchanges, letto da wowhead
 cooking	100	Slimy Smoothie	1249964	249886	forever	vendor	Kalsey Sanden | Aza'bek	Three Corners, Redridge Mountains | The Barrens	10.8 | 49.7	72.8 | 29.4	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 cooking	125	Mrrggl Smrrthle	1249965	249887	forever	vendor	Kalsey Sanden | Aza'bek	Three Corners, Redridge Mountains | The Barrens	10.8 | 49.7	72.8 | 29.4	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 cooking	125	Root Tea	1249959	249881	forever											
 cooking	140	Cookie's Feast	1262978	273102	forever	blueprint										Blueprint [foreverchanges 2026-09-24]
-cooking	175	Bear Brisket	1250151	250182	forever											
+cooking	175	Bear Brisket	1250151	250182	forever	drop	Ashenvale Bear	Ashenvale							21-22	foreverchanges, letto da wowhead
 cooking	175	Giant Scrambled Eggs	1250155	250186	forever											ignota anche alla community [foreverchanges 2026-09-24]
 cooking	180	Calcified Smoothie	1249966	249888	forever	vendor	Kalsey Sanden | Aza'bek	Three Corners, Redridge Mountains | The Barrens	10.8 | 49.7	72.8 | 29.4	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 cooking	180	Triage Tea	1249960	249882	forever											
@@ -341,7 +341,7 @@ enchanting	300	Steadfast Libram	1306521	279296	forever	blueprint										Bluepr
 enchanting	300	Torch of Light	1306520	279295	forever											
 enchanting	300	Totem of Thunder	1249154	249532	forever	vendor	Alynsia | Beneris	Three Corners, Redridge Mountains | The Barrens	11.2 | 49.7	71.5 | 29.8	alliance | horde					catturato in gioco
 enchanting	300	Totem of Urgency	1306523	279298	forever	blueprint										Blueprint [foreverchanges 2026-09-24]
-enchanting		Dormant  Heart of the Mountain	1249114	249521	forever											
+enchanting		Dormant Heart of the Mountain	1249114	249521	forever											
 enchanting		Dust to Motes	1245320		forever											
 enchanting		Enchant Gloves - Superior Strength	1248640	249533	forever											
 enchanting		Frozen Heart of the Mountain	1249107	249519	forever											
@@ -652,10 +652,10 @@ leatherworking	300	Outlaw's Collar	1306527	279302	forever											ignota anche
 leatherworking	300	Pristine Scorpid Leggings	1254967	252940	forever											
 leatherworking	300	Red Dragonscale Leggings	1254970	252937	forever											
 leatherworking	300	Sewing Machine	1263079	273121	forever	blueprint										Blueprint [foreverchanges 2026-09-24]
-leatherworking	300	Spiritcaller Grips	1299915	276543	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
-leatherworking	300	Spiritcaller Leggings	1299914	276542	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
-leatherworking	300	Spiritcaller Spaulders	1299916	276544	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
-leatherworking	300	Spiritcaller Treads	1299917	276545	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Spiritcaller Boots	1299917	276545	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Spiritcaller Gloves	1299915	276543	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Spiritcaller Kilt	1299914	276542	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Spiritcaller Mantle	1299916	276544	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
 leatherworking	300	Timbermaw Tunic	1255014	252893	forever											
 leatherworking	300	Tranquil Wristguards	1306530	279305	forever											
 leatherworking	300	Warbear Helm	1255013	252894	forever											ignota anche alla community [foreverchanges 2026-09-24]
@@ -686,7 +686,7 @@ skill:2933		Smelt Copper (Test)	1240345		forever
 skill:3012		Study	1302508		forever											
 skinning	140	Field Guide	1262985	273098	forever											
 skinning	300	Trapper's Workbench	1262982	273109	forever											
-tailoring	5	Linen Reagent Bag	1257013	253665	forever	vendor	Alexandra Bolero | Jennabink Powerseam | Rann Flamespinner | Lohgan Eva | Mallen Swain | Danielle Zipstitch | Xizk Goodstitch | Mahu | Franklin Hamar | Borya | Wrahk | Elynna | Valdaron | Millie Gregorian | Poranna Snowbraid | Yonada | Vizzklick | Brienna Starglow | Darnall | Outfitter Eric | Dominique Stefano | Taleen Shimmerthread | Othesia Evengale | Angela Ward | Darah | Boramu | Ellie Stonebrow | Antonio Bolero | Dani'ill | Stitch Pinwizzle	Stormwind City | Wetlands | Loch Modan | Duskwood | Hillsbrad Foothills | Duskwood | Stranglethorn Vale | Thunder Bluff | Redridge Mountains | The Drag, Orgrimmar | The Barrens | Darnassus | Darkshore | Undercity | Ironforge | The Barrens | Tanaris | Feralas | Moonglade | Ironforge | Alterac Mountains | Zephras Isle | Zephras Isle | Undercity | The Drag, Orgrimmar | Thunder Bluff | Ironforge | Stormwind City | Darnassus | Riverglades	 |  |  |  |  |  |  | 43.8 |  | 63.2 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 63.7 | 44.1 |  |  |  | 	 |  |  |  |  |  |  | 44.9 |  | 51.2 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 50.6 | 45.4 |  |  |  | 	alliance | alliance | alliance | alliance | horde | alliance |  | horde | alliance | horde | horde | alliance | alliance | horde | alliance | horde |  | alliance |  | alliance | alliance |  | alliance | horde | horde | horde | alliance | alliance | alliance | 					foreverchanges, letto da wowhead + catturato in gioco
+tailoring	5	Linen Reagent Bag	1257013	253665	forever	vendor	Dani'ill | Borya | Elynna | Ellie Stonebrow | Outfitter Eric | Poranna Snowbraid | Darah | Alexandra Bolero | Antonio Bolero | Boramu | Mahu | Angela Ward | Millie Gregorian | Dominique Stefano | Valdaron | Danielle Zipstitch | Lohgan Eva | Brienna Starglow | Mallen Swain | Rann Flamespinner | Franklin Hamar | Wrahk | Yonada | Jennabink Powerseam | Othesia Evengale | Darnall | Stitch Pinwizzle | Xizk Goodstitch | Vizzklick | Taleen Shimmerthread	Darnassus | The Drag, Orgrimmar | Darnassus | Ironforge | Ironforge | Ironforge | The Drag, Orgrimmar | Stormwind City | Stormwind City | Thunder Bluff | Thunder Bluff | Undercity | Undercity | Alterac Mountains | Darkshore | Duskwood | Duskwood | Feralas | Hillsbrad Foothills | Loch Modan | Redridge Mountains | The Barrens | The Barrens | Wetlands | Zephras Isle | Moonglade | Riverglades | Stranglethorn Vale | Tanaris | Zephras Isle	 | 63.2 |  |  |  |  | 63.7 |  |  | 44.1 | 43.8 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 	 | 51.2 |  |  |  |  | 50.6 |  |  | 45.4 | 44.9 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 	alliance | horde | alliance | alliance | alliance | alliance | horde | alliance | alliance | horde | horde | horde | horde | alliance | alliance | alliance | alliance | alliance | horde | alliance | alliance | horde | horde | alliance | alliance |  |  |  |  | 					foreverchanges, letto da wowhead + catturato in gioco
 tailoring	50	Azure Stormsewn Cord	1301466	276973	forever											
 tailoring	50	Azure Stormsewn Cuffs	1301464	276971	forever											
 tailoring	50	Cloudy Stormsewn Cord	1301442	276949	forever											
@@ -707,13 +707,13 @@ tailoring	60	Pristine Boots	1257370	253890	forever	vendor	Mivin Shadowweave | Ji
 tailoring	60	Shadow Boots	1257373	253896	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 tailoring	60	Shining Boots	1257375	253900	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 tailoring	60	Silky Boots	1257371	253892	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
-tailoring	70	Woolen Reagent Bag	1257017	253668	forever	vendor	Alexandra Bolero | Jennabink Powerseam | Rann Flamespinner | Lohgan Eva | Mallen Swain | Danielle Zipstitch | Xizk Goodstitch | Mahu | Franklin Hamar | Borya | Wrahk | Elynna | Valdaron | Millie Gregorian | Poranna Snowbraid | Yonada | Vizzklick | Brienna Starglow | Darnall | Outfitter Eric | Dominique Stefano | Taleen Shimmerthread | Othesia Evengale | Angela Ward | Darah | Boramu | Ellie Stonebrow | Antonio Bolero | Dani'ill | Stitch Pinwizzle	Stormwind City | Wetlands | Loch Modan | Duskwood | Hillsbrad Foothills | Duskwood | Stranglethorn Vale | Thunder Bluff | Redridge Mountains | The Drag, Orgrimmar | The Barrens | Darnassus | Darkshore | Undercity | Ironforge | The Barrens | Tanaris | Feralas | Moonglade | Ironforge | Alterac Mountains | Zephras Isle | Zephras Isle | Undercity | The Drag, Orgrimmar | Thunder Bluff | Ironforge | Stormwind City | Darnassus | Riverglades	 |  |  |  |  |  |  | 43.8 |  | 63.2 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 63.7 | 44.1 |  |  |  | 	 |  |  |  |  |  |  | 44.9 |  | 51.2 |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 50.6 | 45.4 |  |  |  | 	alliance | alliance | alliance | alliance | horde | alliance |  | horde | alliance | horde | horde | alliance | alliance | horde | alliance | horde |  | alliance |  | alliance | alliance |  | alliance | horde | horde | horde | alliance | alliance | alliance | 					foreverchanges, letto da wowhead + catturato in gioco
-tailoring	75	Filigreed Flame Gown	1257378	253906	forever											
+tailoring	70	Woolen Reagent Bag	1257017	253668	forever	vendor	Dani'ill | Borya | Elynna | Ellie Stonebrow | Outfitter Eric | Poranna Snowbraid | Darah | Alexandra Bolero | Antonio Bolero | Boramu | Mahu | Angela Ward | Millie Gregorian | Dominique Stefano | Valdaron | Danielle Zipstitch | Lohgan Eva | Brienna Starglow | Mallen Swain | Rann Flamespinner | Franklin Hamar | Wrahk | Yonada | Jennabink Powerseam | Othesia Evengale | Darnall | Stitch Pinwizzle | Xizk Goodstitch | Vizzklick | Taleen Shimmerthread	Darnassus | The Drag, Orgrimmar | Darnassus | Ironforge | Ironforge | Ironforge | The Drag, Orgrimmar | Stormwind City | Stormwind City | Thunder Bluff | Thunder Bluff | Undercity | Undercity | Alterac Mountains | Darkshore | Duskwood | Duskwood | Feralas | Hillsbrad Foothills | Loch Modan | Redridge Mountains | The Barrens | The Barrens | Wetlands | Zephras Isle | Moonglade | Riverglades | Stranglethorn Vale | Tanaris | Zephras Isle	 | 63.2 |  |  |  |  | 63.7 |  |  | 44.1 | 43.8 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 	 | 51.2 |  |  |  |  | 50.6 |  |  | 45.4 | 44.9 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 	alliance | horde | alliance | alliance | alliance | alliance | horde | alliance | alliance | horde | horde | horde | horde | alliance | alliance | alliance | alliance | alliance | horde | alliance | alliance | horde | horde | alliance | alliance |  |  |  |  | 					foreverchanges, letto da wowhead + catturato in gioco
+tailoring	75	Filigreed Flame Gown	1257378	253906	forever	drop	Captain Greenskin	The Deadmines							20-20	foreverchanges, letto da wowhead
 tailoring	75	Filigreed Pearly Gown	1257380	253910	forever											
 tailoring	75	Filigreed Pristine Gown	1257376	253902	forever											
-tailoring	75	Filigreed Shadow Gown	1257379	253908	forever											
+tailoring	75	Filigreed Shadow Gown	1257379	253908	forever	drop	Lord Cobrahn	Wailing Caverns							20-20	foreverchanges, letto da wowhead
 tailoring	75	Filigreed Shining Gown	1257381	253912	forever											
-tailoring	75	Filigreed Silky Gown	1257377	253904	forever											
+tailoring	75	Filigreed Silky Gown	1257377	253904	forever	drop	Lady Anacondra | Rhahk'Zor	Wailing Caverns | The Deadmines								foreverchanges, letto da wowhead
 tailoring	75	Flame Gloves	1257384	253918	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 tailoring	75	Pearly Gloves	1257386	253922	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 tailoring	75	Pristine Gloves	1257382	253914	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
@@ -727,11 +727,11 @@ tailoring	85	Shadow Sash	1257391	253932	forever	vendor	Mivin Shadowweave | Jim'b
 tailoring	85	Shining Sash	1257393	253936	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 tailoring	85	Silky Sash	1257389	253928	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 tailoring	100	Filigreed Flame Leggings	1257396	253942	forever											
-tailoring	100	Filigreed Pearly Leggings	1257398	253946	forever											
-tailoring	100	Filigreed Pristine Leggings	1257394	253938	forever											
-tailoring	100	Filigreed Shadow Leggings	1257397	253944	forever											
+tailoring	100	Filigreed Pearly Leggings	1257398	253946	forever	drop	Ghamoo-ra	Blackfathom Deeps							23-23	foreverchanges, letto da wowhead
+tailoring	100	Filigreed Pristine Leggings	1257394	253938	forever	drop	Verdan the Everliving | Lord Pythas	Wailing Caverns | Wailing Caverns								foreverchanges, letto da wowhead
+tailoring	100	Filigreed Shadow Leggings	1257397	253944	forever	drop	Skum	Wailing Caverns							20-20	foreverchanges, letto da wowhead
 tailoring	100	Filigreed Shining Leggings	1257399	253948	forever											
-tailoring	100	Filigreed Silky Leggings	1257395	253940	forever											
+tailoring	100	Filigreed Silky Leggings	1257395	253940	forever	drop	Edwin VanCleef	The Deadmines							20-20	foreverchanges, letto da wowhead
 tailoring	100	Flame Circlet	1257402	253954	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 tailoring	100	Pearly Circlet	1257404	253958	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 tailoring	100	Pristine Circlet	1257400	253950	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
@@ -888,7 +888,7 @@ alchemy	250	Elixir of Holy Power	26277	21547	vanilla	drop		Searing Gorge								
 alchemy	250	Elixir of Shadow Power	11476	9301	vanilla	vendor	Maria Lumere | Algernon	Stormwind City | Undercity			alliance | horde					da vanilla, dataset TBC
 alchemy	250	Limited Invulnerability Potion	3175	3395	vanilla	worldDrop							true			da vanilla, dataset TBC
 alchemy	250	Major Discolored Healing Potion	1231583	241651	sod											
-alchemy	250	Potion of Demonslaying	11477	9300	vanilla	vendor	Rartar | Nina Lightbrew	Swamp of Sorrows | Blasted Lands			horde | alliance					da vanilla, dataset TBC
+alchemy	250	Potion of Demon Slaying	11477	9300	vanilla	vendor	Rartar | Nina Lightbrew	Swamp of Sorrows | Blasted Lands			horde | alliance					da vanilla, dataset TBC
 alchemy	255	Mighty Rage Potion	17552	13476	vanilla	trainer										da vanilla, dataset TBC
 alchemy	260	Superior Mana Potion	17553	13477	vanilla	trainer										da vanilla, dataset TBC
 alchemy	265	Elixir of Greater Defense	17554	13478	vanilla	vendor	Soolie Berryfizz | Kor'geld	Ironforge | The Drag, Orgrimmar	 | 56.1	 | 34.1	alliance | horde					da vanilla, dataset TBC + catturato in gioco
