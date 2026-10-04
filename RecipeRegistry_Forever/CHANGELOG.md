@@ -2,6 +2,16 @@
 
 All notable changes to this addon are documented in this file.
 
+## [Unreleased]
+
+### Changed
+
+- **Recipe data from the latest beta build (1.60.1.70205).** Ten more recipes
+  now tell you where they drop, among them the Filigreed tailoring patterns
+  from Deadmines, Wailing Caverns and Blackfathom Deeps, Royal Tea, Bear
+  Brisket and Sterling Silver Boots. Fifteen camp crafts no longer show a
+  difficulty range, because this build no longer gives them one.
+
 ## [0.1.1] - 2026-09-26
 
 ### Fixed
