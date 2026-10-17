@@ -2,6 +2,17 @@
 
 All notable changes to this addon are documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- **Each guild sees its own crafters.** Characters on the same account shared
+  one list, so an alt outside your guild, or in another guild, showed your
+  guildmates' recipes as if they were its own. Now every guild keeps its own
+  list, and a character with no guild sees only itself. Your existing data
+  stays with the guild it came from: it moves there the first time one of your
+  characters logs in to that guild.
+
 ## [0.1.2] - 2026-10-04
 
 ### Added

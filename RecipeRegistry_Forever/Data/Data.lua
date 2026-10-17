@@ -24,6 +24,10 @@ local SECONDS_PER_DAY = 86400
 local DB_DEFAULTS = {
     global = {
         meta = {
+            -- resta 3 anche se lo schema corrente e' il 4: AceDB toglie dal
+            -- file i valori uguali al default, quindi un file salvato al 3
+            -- puo' non averlo scritto, e un default a 4 lo farebbe passare per
+            -- migrato. Il 4 lo scrive DataGuildScope, a migrazione fatta.
             schemaVersion = 3,
             lastWeeklyCleanupAt = 0,
             lastTrustedRosterCleanupAt = 0,
@@ -38,7 +42,10 @@ local DB_DEFAULTS = {
             lastNoticedPeer = nil,
             lastNoticedWireVersion = nil,
         },
-        members = {},
+        -- niente members: dallo schema 4 i membri stanno in un cassetto per
+        -- gilda, db.global.guilds e db.global.unguilded (DataGuildScope.lua).
+        -- Un default qui ricreerebbe a ogni caricamento la tabella dello
+        -- schema 3, che la migrazione deve poter togliere.
         addonPeers = {},
         -- itemID -> copper, learned from merchant windows. Account-wide on
         -- purpose: what a vendor charges is a fact about the item, not about
@@ -951,10 +958,6 @@ function Data:IsValidMemberKey(memberKey)
     return true
 end
 
-function Data:GetMembersDB()
-    return self.db.global.members
-end
-
 function Data:GetAddonPeersDB()
     if type(self.db.global.addonPeers) ~= "table" then
         self.db.global.addonPeers = {}
@@ -1108,7 +1111,7 @@ function Data:SetLastWeeklyCleanupAt(ts)
 end
 
 function Data:GetMember(memberKey)
-    return self.db.global.members[memberKey]
+    return self:GetMembersDB()[memberKey]
 end
 
 function Data:GetMemberSourceType(memberKey)
@@ -1180,8 +1183,17 @@ function Data:MigrateDatabase()
         end
     end
 
-    for memberKey, entry in pairs(self:GetMembersDB()) do
-        self:NormalizeMemberEntry(entry, memberKey)
+    -- Al caricamento la gilda non si sa ancora, quindi niente GetMembersDB: si
+    -- normalizzano tutte le tabelle del file. Lo schema 2 riguarda solo quella
+    -- dello schema 3, l'unica che puo' venire da un file cosi' vecchio.
+    self:ForEachStoredMembersTable(function(members)
+        for memberKey, entry in pairs(members) do
+            self:NormalizeMemberEntry(entry, memberKey)
+        end
+    end)
+
+    local legacyMembers = type(self.db.global.members) == "table" and self.db.global.members or {}
+    for _, entry in pairs(legacyMembers) do
         if schemaVersion < 2 then
             if entry.owner == self:GetPlayerKey() then
                 entry.sourceType = "owner"
@@ -1202,7 +1214,9 @@ function Data:MigrateDatabase()
         end
     end
 
-    meta.schemaVersion = 3
+    -- Il 4 lo scrive DataGuildScope, quando la tabella dello schema 3 trova la
+    -- sua gilda: fino ad allora il file e' ancora un 3.
+    meta.schemaVersion = math.max(schemaVersion, 3)
 end
 
 function Data:GetMemberProfessionBlockKeys(memberKey)
@@ -1302,6 +1316,24 @@ function Data:InvalidateRecipeCaches(scope)
         return
     end
     self._recipeListCacheGeneration = (self._recipeListCacheGeneration or 0) + 1
+    if scope == "members" then
+        -- Cambio di cassetto di gilda: chi sa fare cosa e' un altro elenco,
+        -- quindi via l'indice e tutto cio' che ne deriva. Non la cache dei
+        -- dettagli: descrive le ricette, non chi le conosce, e sta su disco
+        -- per risparmiare a ogni login la raffica di GetItemInfo.
+        if self.InvalidateRecipeOwnershipIndex then
+            self:InvalidateRecipeOwnershipIndex(scope)
+        end
+        self._recipeListCache = nil
+        self._recipeListCacheOrder = nil
+        self._recipeIndexGeneration = (self._recipeIndexGeneration or 0) + 1
+        self._recipeIndex = nil
+        self._recipesByProfession = nil
+        if Addon.Tooltip and Addon.Tooltip.InvalidateIndex then
+            Addon.Tooltip:InvalidateIndex(scope)
+        end
+        return
+    end
     if scope == "list" then
         -- Content changed (new recipes / new owner / status flip): the
         -- ownership index "who knows recipe X" depends on those facts,
@@ -1680,7 +1712,7 @@ end
 function Data:DeleteMember(memberKey)
     if not memberKey then return false end
     local blockKeys = self:GetMemberProfessionBlockKeys(memberKey)
-    self.db.global.members[memberKey] = nil
+    self:GetMembersDB()[memberKey] = nil
     if self.MarkSyncIndexDirty then
         if #blockKeys > 0 then
             for index = 1, #blockKeys do
@@ -1708,10 +1740,11 @@ end
 
 function Data:DeleteMockMembers()
     local removed = 0
-    for memberKey, entry in pairs(self:GetMembersDB()) do
+    local members = self:GetMembersDB()
+    for memberKey, entry in pairs(members) do
         if self:IsMockMember(memberKey, entry) then
             local blockKeys = self:GetMemberProfessionBlockKeys(memberKey)
-            self.db.global.members[memberKey] = nil
+            members[memberKey] = nil
             removed = removed + 1
             if self.MarkSyncIndexDirty then
                 if #blockKeys > 0 then

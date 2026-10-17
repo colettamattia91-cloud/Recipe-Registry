@@ -92,12 +92,13 @@ _G.C_TradeSkillUI = {
 }
 
 dofile("Data/Data.lua")
+dofile("Data/DataGuildScope.lua")
 dofile("Data/DataScan.lua")
 local Data = _G.RecipeRegistry.Data or modules["Data"]
 
 -- il minimo che ApplyScanResult si aspetta di trovare: qui non girano ne' AceDB
 -- ne' OnInitialize
-Data.db = { global = { members = {}, options = {} } }
+Data.db = { global = { options = {} } }
 Data._currentProfs = {}
 _G.RecipeRegistry.charDB = { favorites = {} }
 

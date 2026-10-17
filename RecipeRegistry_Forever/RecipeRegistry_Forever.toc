@@ -34,6 +34,7 @@ Core\Compat.lua
 Core\BuildInfo.lua
 Core\Performance.lua
 Data\Data.lua
+Data\DataGuildScope.lua
 Data\DataScan.lua
 Data\DataSnapshot.lua
 Data\RecipeOwnershipIndex.lua

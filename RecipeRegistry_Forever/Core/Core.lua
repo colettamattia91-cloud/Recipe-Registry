@@ -565,6 +565,11 @@ function Addon:OnEnable()
     self:RegisterEvent("SPELLS_CHANGED", "OnSkillSignal")
     self:RegisterEvent("SKILL_LINES_CHANGED", "OnSkillSignal")
     self:RegisterBucketEvent("GUILD_ROSTER_UPDATE", 1.5, "OnGuildRosterBucket")
+    -- Entrare, uscire o cambiare gilda cambia il cassetto dei membri. L'evento
+    -- c'e' da vanilla a retail, ma su questo client non e' stato visto in
+    -- gioco: se il client lo rifiutasse, un errore qui farebbe fallire tutto
+    -- OnEnable, come CRAFT_SHOW. Il roster qui sopra copre comunque il caso.
+    pcall(self.RegisterEvent, self, "PLAYER_GUILD_UPDATE", "OnPlayerGuildUpdate")
     self:RegisterBucketEvent("GET_ITEM_INFO_RECEIVED", 0.75, "OnItemInfoBucket")
     -- ApplyIncomingBlockAdditive fires RR_BLOCK_MERGE_POST after each merge
     -- and returns without recomputing the block fingerprint. The bucket
@@ -592,6 +597,11 @@ function Addon:OnEnable()
 end
 
 function Addon:OnPlayerLogin()
+    -- Prima di tutto il resto: DetectProfessions qui sotto scrive la voce del
+    -- giocatore, e deve trovare gia' aperto il cassetto giusto.
+    if self.Data and self.Data.RefreshGuildScope then
+        self.Data:RefreshGuildScope("player-login")
+    end
     if self.Sync and self.Sync.Startup then
         self.Sync:Startup()
     end
@@ -956,7 +966,20 @@ function Addon:DumpBucketStatus()
     ))
 end
 
+function Addon:OnPlayerGuildUpdate()
+    if self.Data and self.Data.RefreshGuildScope then
+        self.Data:RefreshGuildScope("player-guild-update")
+    end
+end
+
 function Addon:OnGuildRosterBucket(events)
+    -- Il nome della gilda arriva col roster: e' qui che al login il cassetto
+    -- provvisorio diventa quello vero, e che la tabella dello schema 3 trova
+    -- il roster per provare a chi appartiene. Prima del rinvio qui sotto, che
+    -- riguarda il lavoro pesante e non il cassetto.
+    if self.Data and self.Data.RefreshGuildScope then
+        self.Data:RefreshGuildScope("guild-roster-update")
+    end
     local absorbed = countBucketEvents(events)
     self.bucketTelemetry = self.bucketTelemetry or {}
     self.bucketTelemetry.rosterBuckets = (self.bucketTelemetry.rosterBuckets or 0) + 1
