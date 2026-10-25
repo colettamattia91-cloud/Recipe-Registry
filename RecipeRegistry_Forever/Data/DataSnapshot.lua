@@ -123,7 +123,7 @@ function Data:ApplyIncomingBlockAdditive(blockKey, snapshot, opts)
 
     entry.professions = entry.professions or {}
     entry.professions[professionKey] = self:NormalizeProfessionBlock(entry, professionKey, profession)
-    self.db.global.members[ownerCharacter] = self:NormalizeMemberEntry(entry, ownerCharacter)
+    self:GetMembersDB()[ownerCharacter] = self:NormalizeMemberEntry(entry, ownerCharacter)
 
     -- If the merge flipped the owner from stale to active, the entry's
     -- OTHER professions were previously excluded from the sync index by

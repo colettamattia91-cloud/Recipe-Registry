@@ -19,7 +19,7 @@
 ## Title: Recipe Registry |cff33ff99(Forever)|r
 ## Notes: Guild profession tracker for WoW: Forever.
 ## Author: Kaedros
-## Version: 0.1.2
+## Version: 0.1.3
 ## X-Build-Channel: release
 ## X-Build-ID: release
 ## SavedVariables: RecipeRegistryDB,RecipeRegistryLogDB
@@ -34,6 +34,7 @@ Core\Compat.lua
 Core\BuildInfo.lua
 Core\Performance.lua
 Data\Data.lua
+Data\DataGuildScope.lua
 Data\DataScan.lua
 Data\DataSnapshot.lua
 Data\RecipeOwnershipIndex.lua

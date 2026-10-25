@@ -180,7 +180,7 @@ local function cleanCorruptMember(data, memberKey, entry, opts, stats, dirtyBloc
         stats.removedMembers = stats.removedMembers + 1
         dirtyAll = true
         if not dryRun then
-            data.db.global.members[memberKey] = nil
+            data:GetMembersDB()[memberKey] = nil
         end
         return dirtyAll
     end
