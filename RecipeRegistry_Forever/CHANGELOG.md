@@ -4,36 +4,17 @@ All notable changes to this addon are documented in this file.
 
 ## [0.1.3] - 2026-10-25
 
+### Added
+
+- **141 more recipes show where to get them.**
+
 ### Changed
 
-- **About 140 more recipes tell you where to get them.** Most of them are new
-  to Forever, and the sources now come straight from Wowhead as well: the
-  Skyforged plans, for one, are sold by Vayn Moongaze on Zephras Isle. A
-  recipe that drops names the creature or the zone, and says nothing rather
-  than guess when Wowhead has neither.
-- **More recipes tell you where they drop.** Eleven more Filigreed tailoring
-  patterns now name the dungeon bosses that drop them, from Shadowfang Keep,
-  Ragefire Chasm, The Stockade and Razorfen Kraul as well as Deadmines,
-  Wailing Caverns and Blackfathom Deeps, and seven that already had a source
-  now list every boss that drops them. Plans: Hard Gold Boots and Recipe:
-  Giant Scrambled Eggs show where they drop too.
-- **The first camp blueprints show who sells them.** Fermenter, Anvil,
-  Tanning Rack, Spinning Wheel, Repair Bot, Toxin Study, Rock Garden, Cookie's
-  Feast and Journeyman Campfire are sold by the Happy Camper in Dun Morogh.
-  Before, they said only "Blueprint", or nothing at all.
-
-### Fixed
-
-- **Vanilla recipes that drop no longer send you to a trainer.** Fifty-three
-  of them, among them Thorium Armor, Mighty Rage Potion and Elixir of the
-  Sages, said a trainer teaches them. That is true in The Burning Crusade, not
-  in vanilla, and Forever follows vanilla: they drop, and now say where.
-- **Each guild sees its own crafters.** Characters on the same account shared
-  one list, so an alt outside your guild, or in another guild, showed your
-  guildmates' recipes as if they were its own. Now every guild keeps its own
-  list, and a character with no guild sees only itself. Your existing data
-  stays with the guild it came from: it moves there the first time one of your
-  characters logs in to that guild.
+- **65 recipes show updated information on where to get them.**
+- **Each guild keeps its own crafters.** An alt outside your guild, or in
+  another guild, no longer sees your guildmates' recipes, and a character with
+  no guild sees only itself. Existing data moves to its guild the first time
+  one of your characters logs in there.
 
 ## [0.1.2] - 2026-10-04
 
