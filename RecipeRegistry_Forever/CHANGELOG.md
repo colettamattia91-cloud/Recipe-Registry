@@ -4,6 +4,19 @@ All notable changes to this addon are documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- **More recipes tell you where they drop.** Eleven more Filigreed tailoring
+  patterns now name the dungeon bosses that drop them, from Shadowfang Keep,
+  Ragefire Chasm, The Stockade and Razorfen Kraul as well as Deadmines,
+  Wailing Caverns and Blackfathom Deeps, and seven that already had a source
+  now list every boss that drops them. Plans: Hard Gold Boots and Recipe:
+  Giant Scrambled Eggs show where they drop too.
+- **The first camp blueprints show who sells them.** Fermenter, Anvil,
+  Tanning Rack, Spinning Wheel, Repair Bot, Toxin Study, Rock Garden, Cookie's
+  Feast and Journeyman Campfire are sold by the Happy Camper in Dun Morogh.
+  Before, they said only "Blueprint", or nothing at all.
+
 ### Fixed
 
 - **Each guild sees its own crafters.** Characters on the same account shared

@@ -67,7 +67,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 	249536	Formula: Enchant Gloves - Holy Power	vendor	Alynsia | Beneris	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 	249538	Formula: Enchant Bracer - Superior Intellect	vendor	Alynsia | Beneris	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 	249539	Formula: Enchant Bracer - Superior Deflection	vendor	Alynsia | Beneris	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
-	274393	Formula: Enchant Off-Hand - Wisdom	vendor	Alynsia | Beneris	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
+	274393	Formula: Enchant Off Hand - Wisdom	vendor	Alynsia | Beneris	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 	274394	Formula: Enchant 2H Weapon - Spellblasting	vendor	Alynsia | Beneris	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 	274398	Formula: Enchant Gloves - Superior Strength	vendor	Alynsia | Beneris	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 	274399	Formula: Enchant Cloak - Agility	vendor	Alynsia | Beneris	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
@@ -145,6 +145,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1249967	249889	Recipe: Spicy Smoothie	vendor	Kalsey Sanden | Aza'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1249968	249890	Recipe: Wicked Smoothie	vendor	Kalsey Sanden | Aza'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1250151	250182	Recipe: Bear Brisket	drop	Ashenvale Bear	Ashenvale			foreverchanges, letto da wowhead
+1250155	250186	Recipe: Giant Scrambled Eggs	drop	Lost One Cook	Swamp of Sorrows			foreverchanges, letto da wowhead
 1250156	250187	Recipe: Tasty Raptor Bites	drop	Sunscale Screecher	The Barrens			foreverchanges, letto da wowhead
 1250157	250188	Recipe: Breakfast Omelette	drop	Dire Condor	Redridge Mountains			foreverchanges, letto da wowhead
 1250777	250364	Recipe: Elixir of Cunning	vendor	Nina Surefire | Apothecary Durelle	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
@@ -184,7 +185,6 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1251747	250993	Recipe: Major Mender's Potion	vendor	Nina Surefire | Apothecary Durelle	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1251748	250994	Recipe: Potion of Venomous Blood	vendor	Nina Surefire | Apothecary Durelle	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1251749	250995	Recipe: Caustic Smog Potion	vendor	Nina Surefire | Apothecary Durelle	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
-1251750	250996	Recipe: Disorienting Smog Potion	vendor	Nina Surefire | Apothecary Durelle	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1251751	250997	Recipe: Dragonfire Potion	vendor	Nina Surefire | Apothecary Durelle	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1251752	250998	Recipe: Potion of Elemental Purging	vendor	Nina Surefire | Apothecary Durelle	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1252232	251335	Plans: Sterling Silver Boots	drop	Syndicate Watchman	Hillsbrad Foothills			foreverchanges, letto da wowhead
@@ -218,6 +218,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1252279	251382	Plans: Protector's Silvered Chain Helm	vendor	Stondry Darkhammer | Gor'mak	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1252280	251383	Plans: Acolyte's Silvered Chain Helm	vendor	Stondry Darkhammer | Gor'mak	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1252281	251384	Plans: Crusader's Silvered Chain Helm	vendor	Stondry Darkhammer | Gor'mak	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
+1252283	251386	Plans: Hard Gold Boots	drop	Syndicate Highwayman	Arathi Highlands			foreverchanges, letto da wowhead
 1252287	251390	Plans: Hard Gold Gauntlet	vendor	Gorhak	Desolace			foreverchanges, letto da wowhead
 1252310	251413	Plans: Officer's Sabatons	vendor	Stondry Darkhammer | Gor'mak	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1252311	251414	Plans: Sentinel's Sabatons	vendor	Stondry Darkhammer | Gor'mak	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
@@ -266,10 +267,10 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1255001	252906	Pattern: Skirmisher's Mail Bracers	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1255002	252905	Pattern: Skycaller's Mail Bracers	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1255003	252904	Pattern: Stalker's Mail Bracers	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
-1255004	252903	Pattern: Mender's Mail Shoulder	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
-1255005	252902	Pattern: Skirmisher's Mail Shoulder	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
-1255006	252901	Pattern: Skycaller's Mail Shoulder	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
-1255007	252900	Pattern: Stalker's Mail Shoulder	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
+1255004	252903	Pattern: Mender's Mail Shoulders	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
+1255005	252902	Pattern: Skirmisher's Mail Shoulders	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
+1255006	252901	Pattern: Skycaller's Mail Shoulders	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
+1255007	252900	Pattern: Stalker's Mail Shoulders	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1255030	252877	Pattern: Tooled Leather Armor	vendor	Pexmit	Mount Hyjal			foreverchanges, letto da wowhead
 1255031	252876	Pattern: Mender's Leather Waistguard	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1255032	252875	Pattern: Skycaller's Leather Waistguard	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
@@ -286,11 +287,11 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1255052	252855	Pattern: Warden's Leather Bracers	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1255053	252854	Pattern: Skulker's Leather Bracers	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1255054	252853	Pattern: Prowler's Leather Bracers	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
-1255055	252852	Pattern: Mender's Leather Shoulder	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
-1255056	252851	Pattern: Skycaller's Leather Shoulder	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
-1255057	252850	Pattern: Warden's Leather Shoulder	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
+1255055	252852	Pattern: Mender's Leather Shoulders	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
+1255056	252851	Pattern: Skycaller's Leather Shoulders	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
+1255057	252850	Pattern: Warden's Leather Shoulders	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1255058	252849	Pattern: Skulker's Leather Shoulder	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
-1255059	252848	Pattern: Prowler's Leather Shoulder	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
+1255059	252848	Pattern: Prowler's Leather Shoulders	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1255065	252842	Pattern: Mender's Leather Gloves	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1255066	252841	Pattern: Skycaller's Leather Gloves	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1255067	252840	Pattern: Skirmisher's Leather Gloves	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
@@ -357,9 +358,12 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1257373	253896	Pattern: Shadow Boots	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1257374	253898	Pattern: Pearly Boots	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1257375	253900	Pattern: Shining Boots	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
-1257377	253904	Pattern: Filigreed Silky Gown	drop	Lady Anacondra | Rhahk'Zor	Wailing Caverns | The Deadmines			foreverchanges, letto da wowhead
-1257378	253906	Pattern: Filigreed Flame Gown	drop	Captain Greenskin	The Deadmines			foreverchanges, letto da wowhead
-1257379	253908	Pattern: Filigreed Shadow Gown	drop	Lord Cobrahn	Wailing Caverns			foreverchanges, letto da wowhead
+1257376	253902	Pattern: Filigreed Pristine Gown	drop	Fel Steed | Sneed	Shadowfang Keep | The Deadmines			foreverchanges, letto da wowhead
+1257377	253904	Pattern: Filigreed Silky Gown	drop	Fel Steed | Gilnid | Sneed | Lady Anacondra | Rhahk'Zor	Shadowfang Keep | The Deadmines | The Deadmines | Wailing Caverns | The Deadmines			foreverchanges, letto da wowhead
+1257378	253906	Pattern: Filigreed Flame Gown	drop	Fel Steed | Rhahk'Zor | Shadow Charger | Gilnid | Jergosh the Invoker | Captain Greenskin	Shadowfang Keep | The Deadmines | Shadowfang Keep | The Deadmines | Ragefire Chasm | The Deadmines			foreverchanges, letto da wowhead
+1257379	253908	Pattern: Filigreed Shadow Gown	drop	Fel Steed | Bazzalan | Cookie | Lord Cobrahn	Shadowfang Keep | Ragefire Chasm | The Deadmines | Wailing Caverns			foreverchanges, letto da wowhead
+1257380	253910	Pattern: Filigreed Pearly Gown	drop	Fel Steed | Bazzalan | Cookie	Shadowfang Keep | Ragefire Chasm | The Deadmines			foreverchanges, letto da wowhead
+1257381	253912	Pattern: Filigreed Shining Gown	drop	Bazzalan | Fel Steed | Captain Greenskin | Cookie	Ragefire Chasm | Shadowfang Keep | The Deadmines | The Deadmines			foreverchanges, letto da wowhead
 1257382	253914	Pattern: Pristine Gloves	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1257383	253916	Pattern: Silky Gloves	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1257384	253918	Pattern: Flame Gloves	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
@@ -372,10 +376,12 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1257391	253932	Pattern: Shadow Sash	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1257392	253934	Pattern: Pearly Sash	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1257393	253936	Pattern: Shining Sash	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
-1257394	253938	Pattern: Filigreed Pristine Leggings	drop	Verdan the Everliving | Lord Pythas	Wailing Caverns | Wailing Caverns			foreverchanges, letto da wowhead
-1257395	253940	Pattern: Filigreed Silky Leggings	drop	Edwin VanCleef	The Deadmines			foreverchanges, letto da wowhead
-1257397	253944	Pattern: Filigreed Shadow Leggings	drop	Skum	Wailing Caverns			foreverchanges, letto da wowhead
-1257398	253946	Pattern: Filigreed Pearly Leggings	drop	Ghamoo-ra	Blackfathom Deeps			foreverchanges, letto da wowhead
+1257394	253938	Pattern: Filigreed Pristine Leggings	drop	Ghamoo-ra | Edwin VanCleef | Verdan the Everliving | Lord Pythas	Blackfathom Deeps | The Deadmines | Wailing Caverns | Wailing Caverns			foreverchanges, letto da wowhead
+1257395	253940	Pattern: Filigreed Silky Leggings	drop	Ghamoo-ra | Shadow Charger | Edwin VanCleef	Blackfathom Deeps | Shadowfang Keep | The Deadmines			foreverchanges, letto da wowhead
+1257396	253942	Pattern: Filigreed Flame Leggings	drop	Lady Sarevess | Ghamoo-ra | Targorr the Dread	Blackfathom Deeps | Blackfathom Deeps | The Stockade			foreverchanges, letto da wowhead
+1257397	253944	Pattern: Filigreed Shadow Leggings	drop	Lady Sarevess | Ghamoo-ra | Targorr the Dread | Skum	Blackfathom Deeps | Blackfathom Deeps | The Stockade | Wailing Caverns			foreverchanges, letto da wowhead
+1257398	253946	Pattern: Filigreed Pearly Leggings	drop	Shadow Charger | Ghamoo-ra	Shadowfang Keep | Blackfathom Deeps			foreverchanges, letto da wowhead
+1257399	253948	Pattern: Filigreed Shining Leggings	drop	Shadow Charger | Lady Sarevess | Edwin VanCleef	Shadowfang Keep | Blackfathom Deeps | The Deadmines			foreverchanges, letto da wowhead
 1257400	253950	Pattern: Pristine Circlet	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1257401	253952	Pattern: Silky Circlet	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1257402	253954	Pattern: Flame Circlet	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
@@ -389,6 +395,12 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1257410	253970	Pattern: Pearly Gown	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1257411	253972	Pattern: Shining Gown	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1257412	253974	Pattern: Silk Reagent Bag	vendor	Gorhak	Desolace			foreverchanges, letto da wowhead
+1257413	253976	Pattern: Filigreed Pristine Circlet	drop	Blind Hunter | Charlga Razorflank | Overlord Ramtusk | Bazil Thredd | Twilight Lord Kelris	Razorfen Kraul | Razorfen Kraul | Razorfen Kraul | The Stockade | Blackfathom Deeps			foreverchanges, letto da wowhead
+1257414	253978	Pattern: Filigreed Silky Circlet	worldDrop				true	foreverchanges, letto da wowhead
+1257415	253980	Pattern: Filigreed Flame Circlet	drop	Lorgus Jett | Baron Aquanis | Gelihast | Aku'mai | Dextren Ward | Hamhock | Kam Deepfury | Twilight Lord Kelris	Blackfathom Deeps | Blackfathom Deeps | Blackfathom Deeps | Blackfathom Deeps | The Stockade | The Stockade | The Stockade | Blackfathom Deeps			foreverchanges, letto da wowhead
+1257416	253982	Pattern: Filigreed Shadow Circlet	worldDrop				true	foreverchanges, letto da wowhead
+1257417	253984	Pattern: Filigreed Pearly Circlet	drop	Lorgus Jett | Aku'mai | Hamhock | Twilight Lord Kelris | Interrogator Vishas	Blackfathom Deeps | Blackfathom Deeps | The Stockade | Blackfathom Deeps | Scarlet Monastery			foreverchanges, letto da wowhead
+1257418	253986	Pattern: Filigreed Shining Circlet	drop	Death Speaker Jargba | Overlord Ramtusk | Bazil Thredd | Dextren Ward | Twilight Lord Kelris	Razorfen Kraul | Razorfen Kraul | The Stockade | The Stockade | Blackfathom Deeps			foreverchanges, letto da wowhead
 1257419	253988	Pattern: Pristine Leggings	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1257420	253990	Pattern: Silky Leggings	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1257421	253992	Pattern: Flame Leggings	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
@@ -436,6 +448,14 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 12617	10607	Schematic: Deepdive Helmet	vendor	Jubie Gadgetspring	Azshara			foreverchanges, letto da classic
 12620	10608	Schematic: Sniper Scope	drop	Thunderstomp Stegodon | Dreadmaul Ogre Mage | Black Drake	Un'Goro Crater | Blasted Lands | Burning Steppes			foreverchanges, letto da classic
 12624	10609	Schematic: Mithril Mechanical Dragonling	vendor	Ruppo Zipcoil	The Hinterlands			foreverchanges, letto da classic
+1262975	273097	Blueprint: Rock Garden	vendor	Happy Camper	Dun Morogh			foreverchanges, letto da wowhead
+1262978	273102	Blueprint: Cookie's Feast	vendor	Happy Camper	Dun Morogh			foreverchanges, letto da wowhead
+1262996	273105	Blueprint: Toxin Study	vendor	Happy Camper	Dun Morogh			foreverchanges, letto da wowhead
+1263005	273085	Blueprint: Fermenter	vendor	Happy Camper	Dun Morogh			foreverchanges, letto da wowhead
+1263031	273096	Blueprint: Tanning Rack	vendor	Happy Camper	Dun Morogh			foreverchanges, letto da wowhead
+1263032	273099	Blueprint: Spinning Wheel	vendor	Happy Camper	Dun Morogh			foreverchanges, letto da wowhead
+1263034	273092	Blueprint: Repair Bot	vendor	Happy Camper	Dun Morogh			foreverchanges, letto da wowhead
+1263041	273086	Blueprint: Anvil	vendor	Happy Camper	Dun Morogh			foreverchanges, letto da wowhead
 1266893	264201	Schematic: SAF-T Tabs	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1266905	264202	Schematic: SAF-T Dynamite	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1266906	264203	Schematic: SAF-T Copper Bomb	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
@@ -456,6 +476,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1266940	264237	Schematic: Stealthman 52	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da wowhead
 1270633	263511	Recipe: Skywall Souffle	quest		Zephras Isle			foreverchanges, letto da wowhead
 1270635	263513	Recipe: Pincer Bites	quest		Zephras Isle			foreverchanges, letto da wowhead
+1283400	273087	Blueprint: Journeyman Campfire	vendor	Happy Camper	Dun Morogh			foreverchanges, letto da wowhead
 1286792	269901	Schematic: Centaur Banner Deployment Device	vendor	Gorhak	Desolace			foreverchanges, letto da wowhead
 1286796	269903	Schematic: Hoof-Shaped Foot Pedal	vendor	Gorhak	Desolace			foreverchanges, letto da wowhead
 1292920	273952	Pattern: Grovekeeper Trousers	vendor	Aisarra Nightmeadow	Mount Hyjal			foreverchanges, letto da wowhead
@@ -539,14 +560,14 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1301531	276981	Pattern: Cloudy Windraveled Drapes	vendor	Sutara Plainstalker	Mulgore	horde		foreverchanges, letto da wowhead
 1301532	276982	Pattern: Cloudy Stormsewn Cowl	vendor	Sutara Plainstalker	Mulgore	horde		foreverchanges, letto da wowhead
 1301533	276983	Pattern: Cloudy Stormsewn Epaulets	vendor	Sutara Plainstalker	Mulgore	horde		foreverchanges, letto da wowhead
-1301534	276984	Plans: Azure Skyforged Helm	vendor	Archmage Alvareaux	Alterac Mountains			foreverchanges, letto da wowhead
-1301535	276985	Plans: Azure Skyforged Pauldrons	vendor	Archmage Alvareaux	Alterac Mountains			foreverchanges, letto da wowhead
-1301536	276986	Pattern: Azure Gustwoven Hood	vendor	Archmage Alvareaux	Alterac Mountains			foreverchanges, letto da wowhead
-1301537	276987	Pattern: Azure Gustwoven Spaulders	vendor	Archmage Alvareaux	Alterac Mountains			foreverchanges, letto da wowhead
-1301538	276988	Pattern: Azure Windraveled Cover	vendor	Archmage Alvareaux	Alterac Mountains			foreverchanges, letto da wowhead
-1301539	276989	Pattern: Azure Windraveled Drapes	vendor	Archmage Alvareaux	Alterac Mountains			foreverchanges, letto da wowhead
-1301540	276990	Pattern: Azure Stormsewn Cowl	vendor	Archmage Alvareaux	Alterac Mountains			foreverchanges, letto da wowhead
-1301541	276991	Pattern: Azure Stormsewn Epaulets	vendor	Archmage Alvareaux	Alterac Mountains			foreverchanges, letto da wowhead
+1301534	276984	Plans: Azure Skyforged Helm	vendor	Archmage Alvareaux	Alterac Mountains	alliance		foreverchanges, letto da wowhead
+1301535	276985	Plans: Azure Skyforged Pauldrons	vendor	Archmage Alvareaux	Alterac Mountains	alliance		foreverchanges, letto da wowhead
+1301536	276986	Pattern: Azure Gustwoven Hood	vendor	Archmage Alvareaux	Alterac Mountains	alliance		foreverchanges, letto da wowhead
+1301537	276987	Pattern: Azure Gustwoven Spaulders	vendor	Archmage Alvareaux	Alterac Mountains	alliance		foreverchanges, letto da wowhead
+1301538	276988	Pattern: Azure Windraveled Cover	vendor	Archmage Alvareaux	Alterac Mountains	alliance		foreverchanges, letto da wowhead
+1301539	276989	Pattern: Azure Windraveled Drapes	vendor	Archmage Alvareaux	Alterac Mountains	alliance		foreverchanges, letto da wowhead
+1301540	276990	Pattern: Azure Stormsewn Cowl	vendor	Archmage Alvareaux	Alterac Mountains	alliance		foreverchanges, letto da wowhead
+1301541	276991	Pattern: Azure Stormsewn Epaulets	vendor	Archmage Alvareaux	Alterac Mountains	alliance		foreverchanges, letto da wowhead
 1302161	277470	Schematic: Harvester Override Signalcaster	quest		Westfall			foreverchanges, letto da wowhead
 1302598	277673	Plans: Rough Copper Chain Boots	quest					foreverchanges, letto da wowhead
 1302604	277716	Pattern: Light Leather Reagent Bag	vendor	Saenorion	Darnassus	alliance		foreverchanges, letto da wowhead
