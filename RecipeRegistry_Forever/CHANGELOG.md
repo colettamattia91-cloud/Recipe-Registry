@@ -11,6 +11,8 @@ All notable changes to this addon are documented in this file.
 ### Changed
 
 - **65 recipes show updated information on where to get them.**
+- **Recipe data from game build 1.60.1.70532.** 43 recipes changed, and 5
+  that are no longer in the game are no longer listed as missing.
 - **Each guild keeps its own crafters.** An alt outside your guild, or in
   another guild, no longer sees your guildmates' recipes, and a character with
   no guild sees only itself. Existing data moves to its guild the first time

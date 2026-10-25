@@ -6,9 +6,10 @@ param(
     # degli oggetti prodotti. Si cerca da solo accanto al repo; con -NoMining si
     # genera senza.
     [string]$MiningBundle,
-    # Il bundle di una build precedente, per le ricette che $MiningBundle non
-    # legge piu'. Quando il bundle si cerca da solo, e' il penultimo archiviato.
-    [string]$FallbackBundle,
+    # I bundle delle build precedenti, dal piu' recente, per le ricette che
+    # $MiningBundle non legge piu'. Quando il bundle si cerca da solo, sono
+    # tutti gli altri archiviati.
+    [string[]]$FallbackBundle,
     [switch]$NoMining,
     # Dove si archiviano le catture del Collector. Di norma e' il repo privato
     # accanto a questo, ../WowForeverMining/data/collector: le catture sono dati,
@@ -59,12 +60,17 @@ if (-not $NoMining) {
         # database e' stato generato; poi l'uscita di un emit appena fatto.
         foreach ($guess in @((Join-Path $miningRepo 'data\bundles'), (Join-Path $miningRepo 'out\bundle'))) {
             if ($MiningBundle -or -not (Test-Path -LiteralPath $guess)) { continue }
+            # In ordine di build, non di nome: forever-local-* e forever-wago-*
+            # sono due estrazioni, e per nome ogni wago verrebbe dopo ogni local.
             $found = @(Get-ChildItem -LiteralPath $guess -Recurse -File -Filter 'recipes.json' |
-                Sort-Object FullName | Select-Object -Last 2)
+                Sort-Object { if ($_.Directory.Name -match '(\d+\.\d+\.\d+\.\d+)$') { [version]$Matches[1] } else { [version]'0.0' } })
             if ($found.Count -gt 0) { $MiningBundle = $found[-1].FullName }
-            # Il bundle precedente fa da ripiego per le ricette che l'ultimo non
-            # legge piu' (vedi convert-mining.ps1).
-            if ($found.Count -gt 1 -and -not $FallbackBundle) { $FallbackBundle = $found[0].FullName }
+            # Tutti i bundle precedenti, dal piu' recente, fanno da ripiego per
+            # le ricette che l'ultimo non legge piu' (vedi convert-mining.ps1).
+            if ($found.Count -gt 1 -and -not $FallbackBundle) {
+                $FallbackBundle = @($found[0..($found.Count - 2)] | ForEach-Object FullName)
+                [array]::Reverse($FallbackBundle)
+            }
         }
     }
     if ($MiningBundle -and (Test-Path -LiteralPath $MiningBundle)) {

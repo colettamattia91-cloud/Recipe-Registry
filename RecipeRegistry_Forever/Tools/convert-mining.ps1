@@ -13,14 +13,25 @@
 # Con -IfStale non riconverte se mining.lua e' gia' aggiornato rispetto al bundle
 # e al formato: e' il modo in cui lo chiama import-dumps.ps1.
 #
-# -FallbackBundle e' il bundle di una build precedente, per le ricette che quello
-# corrente non legge piu'. Sulla 70205 le 27 "Adaptive" sono finite in sezioni
-# cifrate: il client le elenca ancora, il datamining non le vede, e senza i loro
-# dati il generatore le scriverebbe come ricette vanilla vive senza livello.
-# Dal ripiego si prende solo cio' che manca nel bundle corrente, mai il resto.
+# -FallbackBundle sono i bundle delle build precedenti, dal piu' recente, per le
+# ricette che quello corrente non legge piu'. Sulla 70205 le 27 "Adaptive" sono
+# finite in sezioni cifrate: il client le elenca ancora, il datamining non le
+# vede, e senza i loro dati il generatore le scriverebbe come ricette vanilla
+# vive senza livello. Dal ripiego si prende solo cio' che manca nel bundle
+# corrente, mai il resto, e ogni ricetta dal primo ripiego che la conosce: una
+# catena e non un bundle solo, perche' dalla 70532 il penultimo bundle e' la
+# 70205, dove le Adaptive sono gia' cifrate.
+#
+# Mancare dal bundle pero' vuol dire due cose. Le Adaptive la build corrente le
+# elenca ancora in SkillLineAbility: e' il nome a essere cifrato. Disorienting
+# Smog Potion, con la 70532, da li' e' sparita: e' uscita dal gioco, e il
+# ripiego la riporterebbe in vita. Per distinguerle serve il SkillLineAbility
+# del dataset da cui il bundle e' nato (-Dataset): di norma si trova da solo
+# nella cache del datamining, dal nome scritto nel manifest del bundle.
 param(
     [Parameter(Mandatory = $true)][string]$MiningBundle,
-    [string]$FallbackBundle,
+    [string[]]$FallbackBundle,
+    [string]$Dataset,
     [string]$Output = (Join-Path $PSScriptRoot 'dumps\mining.lua'),
     [switch]$IfStale
 )
@@ -33,7 +44,8 @@ $ErrorActionPreference = 'Stop'
 #   3  + recipeItemId: l'oggetto che insegna la ricetta (Pattern, Plans...)
 #   4  + MiningUnshippedItems: gli oggetti che il client non descrive
 #   5  + recipeItemSkill: il livello che l'oggetto-ricetta chiede per insegnarla
-$format = 5
+#   6  + MiningRemovedSpells: le ricette che la build corrente non elenca piu'
+$format = 6
 $marker = "-- formato: $format"
 
 $MiningBundle = (Resolve-Path -LiteralPath $MiningBundle).Path
@@ -64,31 +76,73 @@ if (Test-Path -LiteralPath $itemsPath) {
 }
 
 $carried = New-Object System.Collections.Generic.List[string]
+$removedSpells = New-Object System.Collections.Generic.List[string]
 if ($FallbackBundle) {
-    $FallbackBundle = (Resolve-Path -LiteralPath $FallbackBundle).Path
-    $fallbackRows = @(foreach ($entry in (Get-Content -LiteralPath $FallbackBundle -Raw | ConvertFrom-Json)) { $entry })
+    # Gli spell che la build corrente elenca ancora. Senza, il ripiego porta
+    # tutto, come prima, e lo si dice: una ricetta tolta resterebbe viva.
+    if (-not $Dataset) {
+        $manifestPath = Join-Path (Split-Path -Parent $MiningBundle) 'manifest.json'
+        if (Test-Path -LiteralPath $manifestPath) {
+            $datasetName = (Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json).source.dataset
+            # <repo>\out\bundle\<ref>\recipes.json oppure <repo>\data\bundles\<ref>\recipes.json
+            $miningRepo = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $MiningBundle)))
+            $guess = Join-Path $miningRepo "cache\datasets\$datasetName"
+            if ($datasetName -and (Test-Path -LiteralPath (Join-Path $guess 'SkillLineAbility.csv'))) { $Dataset = $guess }
+        }
+    }
+    $listed = $null
+    if ($Dataset) {
+        $listed = @{}
+        foreach ($row in (Import-Csv -LiteralPath (Join-Path $Dataset 'SkillLineAbility.csv'))) { $listed[[string]$row.Spell] = $true }
+    } else {
+        Write-Warning "SkillLineAbility della build corrente non trovato: il ripiego porta anche le ricette uscite dal gioco."
+    }
+
     $known = @{}
     foreach ($row in $rows) { if ($null -ne $row.spellId) { $known[[string]$row.spellId] = $true } }
     $neededItems = @{}
-    foreach ($row in $fallbackRows) {
-        if ($null -eq $row.spellId -or $known.ContainsKey([string]$row.spellId)) { continue }
-        $rows += $row
-        $carried.Add("$($row.spellId) $($row.name)")
-        foreach ($id in @($row.createdItemId, $row.recipeItemId)) { if ($id) { $neededItems[[string]$id] = $true } }
+    $fallbackItemPaths = New-Object System.Collections.Generic.List[string]
+    $fallbackNames = New-Object System.Collections.Generic.List[string]
+    foreach ($fallback in $FallbackBundle) {
+        $fallback = (Resolve-Path -LiteralPath $fallback).Path
+        $fallbackNames.Add((Split-Path -Leaf (Split-Path -Parent $fallback)))
+        $fallbackItemPaths.Add((Join-Path (Split-Path -Parent $fallback) 'item_sparse.json'))
+        foreach ($row in (Get-Content -LiteralPath $fallback -Raw | ConvertFrom-Json)) {
+            if ($null -eq $row.spellId) { continue }
+            $key = [string]$row.spellId
+            if ($known.ContainsKey($key)) { continue }
+            $known[$key] = $true
+            # Uscita dal gioco: si porta lo stesso, perche' un record rimosso si
+            # marca e resta intero -- mestiere, espansione, oggetto-ricetta --
+            # cosi' rimetterlo e' togliere una riga, non ricostruirlo.
+            if ($listed -and -not $listed.ContainsKey($key)) {
+                $removedSpells.Add("$key $($row.name)")
+            } else {
+                $carried.Add("$key $($row.name)")
+            }
+            $rows += $row
+            foreach ($id in @($row.createdItemId, $row.recipeItemId)) { if ($id) { $neededItems[[string]$id] = $true } }
+        }
     }
     # Gli oggetti di quelle ricette, se il bundle corrente non li ha: e' da qui
     # che il generatore sa che il prodotto non e' descritto dal client, e quindi
-    # che la ricetta e' `removed`.
-    $fallbackItemsPath = Join-Path (Split-Path -Parent $FallbackBundle) 'item_sparse.json'
-    if ($neededItems.Count -gt 0 -and (Test-Path -LiteralPath $fallbackItemsPath)) {
+    # che la ricetta e' `removed`. Anche questi dal primo ripiego che li ha.
+    if ($neededItems.Count -gt 0) {
         $haveItems = @{}
         foreach ($item in $items) { if ($null -ne $item.itemId) { $haveItems[[string]$item.itemId] = $true } }
-        foreach ($item in (Get-Content -LiteralPath $fallbackItemsPath -Raw | ConvertFrom-Json)) {
-            $key = [string]$item.itemId
-            if ($neededItems.ContainsKey($key) -and -not $haveItems.ContainsKey($key)) { $items += $item }
+        foreach ($fallbackItemsPath in $fallbackItemPaths) {
+            if (-not (Test-Path -LiteralPath $fallbackItemsPath)) { continue }
+            foreach ($item in (Get-Content -LiteralPath $fallbackItemsPath -Raw | ConvertFrom-Json)) {
+                $key = [string]$item.itemId
+                if ($neededItems.ContainsKey($key) -and -not $haveItems.ContainsKey($key)) {
+                    $items += $item
+                    $haveItems[$key] = $true
+                }
+            }
         }
     }
-    [void]$writer.AppendLine("-- Ripiego: $FallbackBundle ($($carried.Count) ricette che la fonte non legge piu')")
+    [void]$writer.AppendLine("-- Ripiego: $($fallbackNames -join ', ') ($($carried.Count) ricette che la fonte non legge piu')")
+    [void]$writer.AppendLine("-- Uscite dal gioco, secondo SkillLineAbility di ${Dataset}: $($removedSpells.Count)")
 }
 [void]$writer.AppendLine($marker)
 
@@ -142,9 +196,20 @@ foreach ($item in $items) {
 foreach ($line in $unshipped) { [void]$writer.AppendLine($line) }
 [void]$writer.AppendLine('}')
 
+# Le ricette che un ripiego conosceva e che la build corrente non elenca piu':
+# stanno anche in MiningRecipes, coi dati del ripiego, e il generatore le marca
+# `removed`, come quelle il cui prodotto non c'e'.
+[void]$writer.AppendLine('MiningRemovedSpells = {')
+foreach ($line in $removedSpells) { [void]$writer.AppendLine("    [$($line.Split(' ')[0])] = true, -- $($line.Substring($line.IndexOf(' ') + 1))") }
+[void]$writer.AppendLine('}')
+
 Set-Content -LiteralPath $Output -Value $writer.ToString() -NoNewline
 Write-Host "Datamining convertito: $Output ($($rows.Count) ricette, $itemCount oggetti, $($unshipped.Count) non spediti)"
 if ($carried.Count -gt 0) {
     Write-Host "Dal ripiego, perche' la fonte non le legge piu': $($carried.Count) ricette"
     foreach ($line in $carried) { Write-Host "  $line" }
+}
+if ($removedSpells.Count -gt 0) {
+    Write-Host "Uscite dal gioco, la build corrente non le elenca piu': $($removedSpells.Count) ricette"
+    foreach ($line in $removedSpells) { Write-Host "  $line" }
 }

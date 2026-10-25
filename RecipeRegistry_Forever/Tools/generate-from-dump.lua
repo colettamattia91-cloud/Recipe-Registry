@@ -161,6 +161,10 @@ local miningItems = {}
 -- ItemSparse, quindi nemmeno un nome. Una ricetta che produce uno di questi
 -- esiste nei dati e non nel gioco.
 local miningUnshipped = {}
+-- Le ricette che la build corrente non elenca piu' nemmeno in SkillLineAbility:
+-- uscite dal gioco, come Disorienting Smog Potion con la 70532. La cattura del
+-- client le ha ancora perche' e' di una build precedente.
+local miningRemoved = {}
 local miningPath
 
 -- Il livello a cui si impara una ricetta vanilla, dal dataset TBC
@@ -223,6 +227,7 @@ for index = 3, #(arg or {}) do
         mining = env.MiningRecipes or {}
         miningItems = env.MiningItems or {}
         miningUnshipped = env.MiningUnshippedItems or {}
+        miningRemoved = env.MiningRemovedSpells or {}
     else
         local extra = {}
         local loader, loadErr = loadfile(value)
@@ -435,6 +440,9 @@ for _, professionName in ipairs(dumpNames) do
                 -- Stesso taglio che fa ForeverChanges, che su alchemy ne
                 -- scarta 18 delle sue 197.
                 if record.createdItemId and miningUnshipped[record.createdItemId] then
+                    record.removed = true
+                end
+                if miningRemoved[spellId] then
                     record.removed = true
                 end
                 -- La provenienza raccolta a mano, se per questa ricetta c'e'.

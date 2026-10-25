@@ -24,11 +24,11 @@ alchemy	150	Elixir of Fortitude	1250783	250370	forever
 alchemy	150	Elixir of Strength	1250798	250385	forever											
 alchemy	165	Elixir of Greater Spirit	1250796	250383	forever	vendor	Nina Surefire | Apothecary Durelle	Three Corners, Redridge Mountains | The Barrens	10.9 | 49.9	72.5 | 29.6	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 alchemy	175	Greater Mageblood Elixir	1250790	250377	forever	vendor	Nina Surefire | Apothecary Durelle	Three Corners, Redridge Mountains | The Barrens	10.9 | 49.9	72.5 | 29.6	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
-alchemy	180	Disorienting Smog Potion	1251750	250996	forever	vendor	Nina Surefire | Apothecary Durelle	Three Corners, Redridge Mountains | The Barrens	10.9 | 49.9	72.5 | 29.6	alliance | horde					quartermaster a Merchant's Favor -- 120 Merchant's Favor skill 165 to 245 [foreverchanges 2026-09-24] + catturato in gioco
+alchemy	180	Greater Mender's Potion	1251744	250991	forever											
 alchemy	185	Greater Spellblasting Potion	1251732	250979	forever	vendor	Gorhak	Desolace								foreverchanges, letto da wowhead
 alchemy	190	Greater Frenzy Potion	1251738	250985	forever	vendor	Gorhak	Desolace								foreverchanges, letto da wowhead
-alchemy	195	Draught of Predatory Senses	1250776	250363	forever											
 alchemy	195	Greater Cleric's Elixir	1250782	250369	forever	vendor	Nina Surefire | Apothecary Durelle	Three Corners, Redridge Mountains | The Barrens	10.9 | 49.9	72.5 | 29.6	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
+alchemy	195	Potion of Predatory Senses	1250776	250363	forever											
 alchemy	200	Elixir of Greater Fortitude	1250784	250371	forever	vendor	Nina Surefire | Apothecary Durelle	Three Corners, Redridge Mountains | The Barrens	10.9 | 49.9	72.5 | 29.6	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 alchemy	230	Superior Mender's Potion	1251745	250992	forever											ignota anche alla community [foreverchanges 2026-09-24]
 alchemy	235	Superior Spellblasting Potion	1251733	250980	forever											ignota anche alla community [foreverchanges 2026-09-24]
@@ -61,7 +61,6 @@ alchemy		Cerulean Dye	1249630		forever
 alchemy		Discolored Healing Potion	1244646		forever											Trainer [foreverchanges 2026-09-24]
 alchemy		Elixir of Minor Force	1245250		forever											
 alchemy		Greater Discolored Healing Potion	1244647		forever											
-alchemy		Greater Mender's Potion	1251744	250991	forever											
 alchemy		Lesser Discolored Healing Potion	1244645		forever											
 alchemy		Magenta Dye	1249631		forever											
 alchemy		Minor Arcane Elixir	1245246		forever	vendor										quartermaster a Merchant's Favor -- 45 Merchant's Favor skill 65 to 140 [foreverchanges 2026-09-24]
@@ -261,6 +260,7 @@ cooking	140	Cookie's Feast	1262978	273102	forever	vendor	Happy Camper	Dun Morogh
 cooking	175	Bear Brisket	1250151	250182	forever	drop	Ashenvale Bear	Ashenvale							21-22	foreverchanges, letto da wowhead
 cooking	175	Giant Scrambled Eggs	1250155	250186	forever	drop	Lost One Cook	Swamp of Sorrows							37-37	foreverchanges, letto da wowhead
 cooking	180	Calcified Smoothie	1249966	249888	forever	vendor	Kalsey Sanden | Aza'bek	Three Corners, Redridge Mountains | The Barrens	10.8 | 49.7	72.8 | 29.4	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
+cooking	180	Raging Raptor Ribs	1250150	250181	forever											
 cooking	180	Triage Tea	1249960	249882	forever											
 cooking	185	Plain Ol' Paletusk	1295834	274977	forever	vendor	Martha Wellsworth	Riverglades								foreverchanges, letto da wowhead
 cooking	200	Briny Seafood Stew	1295805	274972	forever											
@@ -277,7 +277,6 @@ cooking	275	Bear Bruscitti	1250147	250178	forever
 cooking	275	Clam Linguine	1250158	250189	forever											
 cooking	275	Flank au Poivre	1250146	250177	forever											
 cooking	275	Prehistoric Pulled Raptor	1250152	250183	forever											
-cooking	275	Raging Raptor Ribs	1250150	250181	forever											
 cooking	275	Savory Turtle Stew	1250145	250176	forever											ignota anche alla community [foreverchanges 2026-09-24]
 cooking	275	Soaring Pamplona	1250143	250174	forever											
 cooking	275	Steaming Stag Steak	1250148	250179	forever											
@@ -545,15 +544,15 @@ leatherworking	200	Skycaller's Leather Shoes	1255061	252846	forever	drop	Arcanis
 leatherworking	200	Skycaller's Mail Boots	1255010	252897	forever											
 leatherworking	200	Stalker's Mail Boots	1255011	252896	forever											
 leatherworking	200	Warden's Leather Shoes	1255062	252845	forever	drop	Arcanist Doan	Scarlet Monastery							35-35	wowhead, elenco
-leatherworking	210	Mender's Leather Shoulder	1255055	252852	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
-leatherworking	210	Mender's Mail Shoulder	1255004	252903	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
-leatherworking	210	Prowler's Leather Shoulder	1255059	252848	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
-leatherworking	210	Skirmisher's Mail Shoulder	1255005	252902	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
-leatherworking	210	Skulker's Leather Shoulder	1255058	252849	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
-leatherworking	210	Skycaller's Leather Shoulder	1255056	252851	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
-leatherworking	210	Skycaller's Mail Shoulder	1255006	252901	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
-leatherworking	210	Stalker's Mail Shoulder	1255007	252900	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
-leatherworking	210	Warden's Leather Shoulder	1255057	252850	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
+leatherworking	210	Mender's Leather Shoulders	1255055	252852	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
+leatherworking	210	Mender's Mail Shoulders	1255004	252903	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
+leatherworking	210	Prowler's Leather Shoulders	1255059	252848	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
+leatherworking	210	Skirmisher's Mail Shoulders	1255005	252902	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
+leatherworking	210	Skulker's Leather Shoulders	1255058	252849	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
+leatherworking	210	Skycaller's Leather Shoulders	1255056	252851	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
+leatherworking	210	Skycaller's Mail Shoulders	1255006	252901	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
+leatherworking	210	Stalker's Mail Shoulders	1255007	252900	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
+leatherworking	210	Warden's Leather Shoulders	1255057	252850	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 leatherworking	225	Mender's Leather Bracers	1255050	252857	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 leatherworking	225	Mender's Mail Bracers	1255000	252907	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 leatherworking	225	Prowler's Leather Bracers	1255054	252853	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
@@ -582,7 +581,7 @@ leatherworking	240	Blue Suede Gloves	1255041	252866	forever
 leatherworking	240	Charged Scorpid Helm	1254992	252915	forever											ignota anche alla community [foreverchanges 2026-09-24]
 leatherworking	240	Supple Scorpid Leggings	1254993	252914	forever											
 leatherworking	240	Tooled Leather Boots	1255042	252865	forever											
-leatherworking	250	Charged Scorpid Shoulder	1254990	252917	forever											
+leatherworking	250	Charged Scorpid Shoulders	1254990	252917	forever											
 leatherworking	250	Mender's Leather Gauntlets	1255036	252871	forever											
 leatherworking	250	Mender's Leather Waistguard	1255031	252876	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 leatherworking	250	Mender's Mail Belt	1254982	252925	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
@@ -607,9 +606,9 @@ leatherworking	255	Charged Scorpid Bracers	1254980	252927	forever
 leatherworking	255	Charged Scorpid Gauntlets	1254977	252930	forever											
 leatherworking	255	Heavy Scorpid Boots	1254979	252928	forever											
 leatherworking	255	Supple Scorpid Belt	1254978	252929	forever											
-leatherworking	255	Supple Scorpid Shoulder	1254981	252926	forever											
+leatherworking	255	Supple Scorpid Shoulders	1254981	252926	forever											
 leatherworking	255	Tooled Leather Armor	1255030	252877	forever	vendor	Pexmit	Mount Hyjal								foreverchanges, letto da wowhead
-leatherworking	260	Blue Suede Shoulder	1255026	252881	forever											
+leatherworking	260	Blue Suede Shoulders	1255026	252881	forever											
 leatherworking	260	Charged Scorpid Vest	1254975	252932	forever											
 leatherworking	260	Supple Scorpid Helm	1254976	252931	forever											ignota anche alla community [foreverchanges 2026-09-24]
 leatherworking	260	Tooled Leather Gauntlets	1255027	252880	forever											
@@ -620,7 +619,7 @@ leatherworking	270	Blue Suede Belt	1255021	252886	forever
 leatherworking	270	Charged Scorpid Leggings	1254973	252934	forever											
 leatherworking	270	Supple Scorpid Vest	1254974	252933	forever	vendor	Pexmit	Mount Hyjal								foreverchanges, letto da wowhead
 leatherworking	270	Tooled Leather Bracers	1255022	252885	forever											
-leatherworking	270	Wicked Leather Shoulder	1255023	252884	forever											
+leatherworking	270	Wicked Leather Shoulders	1255023	252884	forever											
 leatherworking	275	Blue Suede Bracers	1255019	252888	forever											
 leatherworking	275	Tooled Leather Epaulets	1255020	252887	forever											
 leatherworking	280	Blue Suede Hat	1255017	252890	forever											ignota anche alla community [foreverchanges 2026-09-24]
@@ -933,7 +932,7 @@ alchemy		Draught of Detect Demon	11478		vanilla	trainer										da vanilla, dat
 alchemy		Draught of Detect Undead	11460		vanilla	trainer										da vanilla, dataset TBC
 alchemy		Draught of Greater Water Breathing	22808		vanilla	trainer										da vanilla, dataset TBC
 alchemy		Draught of Water Breathing	7179		vanilla	trainer										da vanilla, dataset TBC
-alchemy		Draught of Water Walking	11447		vanilla											
+alchemy		Draught of Water Walking	11447	288206	vanilla											
 alchemy		Dreamless Sleep Potion	15833		vanilla	trainer										da vanilla, dataset TBC
 alchemy		Elixir of Agility	11449		vanilla	trainer										da vanilla, dataset TBC
 alchemy		Elixir of Defense	11450		vanilla	trainer										da vanilla, dataset TBC
@@ -1523,14 +1522,10 @@ engineering	240	Sniper Scope	12620	10608	vanilla	worldDrop							true			da vanil
 engineering	250	Mithril Mechanical Dragonling	12624	10609	vanilla	vendor	Ruppo Zipcoil	The Hinterlands								da vanilla, dataset TBC
 engineering	250	Pop-Up Shrub	1228088	239222	sod											
 engineering	250	Snake Burst Firework	23507	19027	vanilla	vendor	Zorbin Fandazzle	Feralas								da vanilla, dataset TBC
-engineering	250	Tinkerbox	1226206	238782	sod											
 engineering	260	Gyrofreeze Ice Reflector	23077	18652	vanilla	vendor	Xizzer Fizzbolt	Winterspring								da vanilla, dataset TBC
 engineering	260	Thorium Grenade	19790	16041	vanilla	trainer	Sovik	Valley of Honor, Orgrimmar	75.6	25.3	horde					da vanilla, dataset TBC + catturato in gioco
 engineering	260	Thorium Rifle	19792	16043	vanilla	worldDrop							true			wowhead, elenco (era trainer per il dataset TBC)
 engineering	260	Thorium Widget	19791	16042	vanilla	trainer	Sovik	Valley of Honor, Orgrimmar	75.6	25.3	horde					da vanilla, dataset TBC + catturato in gioco
-engineering	260	Tinkerbox: Magnetic Displacement	1226209	238785	sod											
-engineering	260	Tinkerbox: Nitro Boosts	1226208	238784	sod											
-engineering	260	Tinkerbox: Teleport	1226207	238783	sod											
 engineering	260	Truesilver Transformer	23071	18651	vanilla	trainer										da vanilla, dataset TBC
 engineering	260	World Enlarger	23129	18661	vanilla	drop		Blackrock Depths								da vanilla, dataset TBC
 engineering	265	Alarm-O-Bot	23096	18654	vanilla	drop		Blackrock Depths								da vanilla, dataset TBC
@@ -1547,9 +1542,6 @@ engineering	275	Masterwork Target Dummy	19814	16046	vanilla	vendor	Xizzer Fizzbo
 engineering	275	Powerful Seaforium Charge	23080	18656	vanilla	vendor	Xizzer Fizzbolt	Winterspring								da vanilla, dataset TBC
 engineering	275	Steam Tonk Controller	28327	22729	vanilla	vendor	Sovik | Gearcutter Cogspinner	Orgrimmar | Ironforge			horde | alliance					da vanilla, dataset TBC
 engineering	275	Thorium Tube	19795	16047	vanilla	trainer										da vanilla, dataset TBC
-engineering	280	Tinker: Magnetic Displacement	1226212	238788	sod											
-engineering	280	Tinker: Nitro Boosts	1226211	238787	sod											
-engineering	280	Tinker: Teleport	1226210	238786	sod											
 engineering	285	Dark Iron Bomb	19799	16049	vanilla	drop		Blackrock Depths								da vanilla, dataset TBC
 engineering	285	Delicate Arcanite Converter	19815	16050	vanilla	vendor	Xizzer Fizzbolt	Winterspring								da vanilla, dataset TBC
 engineering	285	Thorium Shells	19800	16051	vanilla	worldDrop							true			wowhead, elenco (era trainer per il dataset TBC)
@@ -1644,6 +1636,9 @@ engineering		Standard Scope	3978		vanilla	trainer										da vanilla, dataset T
 engineering		Target Dummy	3932		vanilla	trainer										da vanilla, dataset TBC
 engineering		The Big One	12754	221341	vanilla	trainer	Vazario Linkgrease | Nixx Sprocketspring	The Barrens | Tanaris						Goblin Engineering Trainer		da vanilla, dataset TBC
 engineering		The Mortar: Reloaded	13240		vanilla	trainer	Nixx Sprocketspring | Vazario Linkgrease	Tanaris | The Barrens								da vanilla, dataset TBC
+engineering		Tinker: Magnetic Displacement	1226212	238788	sod											
+engineering		Tinker: Nitro Boosts	1226211	238787	sod											
+engineering		Tinker: Teleport	1226210	238786	sod											
 engineering		Tranquil Mechanical Yeti	26011		vanilla	quest		Winterspring								da vanilla, dataset TBC
 engineering		Ultrasafe Transporter - Gadgetzan	23489		vanilla	trainer	Jhordy Lapforge	Tanaris								da vanilla, dataset TBC
 engineering		Unstable Trigger	12591		vanilla	trainer										da vanilla, dataset TBC
@@ -1830,7 +1825,6 @@ leatherworking		Cured Medium Hide	3817		vanilla	trainer										da vanilla, dat
 leatherworking		Cured Rugged Hide	19047		vanilla	trainer										da vanilla, dataset TBC
 leatherworking		Cured Thick Hide	10482		vanilla	trainer										da vanilla, dataset TBC
 leatherworking		Dark Leather Belt	3766		vanilla	trainer										da vanilla, dataset TBC
-leatherworking		Dark Leather Boots	2167		vanilla	trainer										da vanilla, dataset TBC
 leatherworking		Dark Leather Cloak	2168		vanilla	trainer										da vanilla, dataset TBC
 leatherworking		Dark Leather Pants	7135		vanilla	trainer										da vanilla, dataset TBC
 leatherworking		Dragonscale Breastplate	10650		vanilla	trainer	Peter Galen | Thorkaf Dragoneye	Azshara | Badlands			alliance | horde					da vanilla, dataset TBC
@@ -1852,6 +1846,7 @@ leatherworking		Fletcher's Gloves	9145		vanilla	trainer										da vanilla, dat
 leatherworking		Frost Leather Cloak	9198		vanilla	trainer										da vanilla, dataset TBC
 leatherworking		Gauntlets of the Sea	10630		vanilla	trainer	Brumn Winterhoof | Sarah Tanner	Arathi Highlands | Searing Gorge			horde | alliance					da vanilla, dataset TBC
 leatherworking		Gordok Ogre Suit	22815		vanilla	quest		Dire Maul								da vanilla, dataset TBC
+leatherworking		Gray Leather Boots	2167		vanilla	trainer										da vanilla, dataset TBC
 leatherworking		Green Dragonscale Gauntlets	24655		vanilla	trainer	Peter Galen | Thorkaf Dragoneye	Azshara | Badlands			alliance | horde			Dragonscale Leatherworking Trainer		da vanilla, dataset TBC
 leatherworking		Green Leather Belt	3774		vanilla	trainer										da vanilla, dataset TBC
 leatherworking		Green Leather Bracers	3776		vanilla	trainer										da vanilla, dataset TBC

@@ -65,9 +65,18 @@ MiningItems = { [22] = 1, [33] = 2 }]])
     assert(skilled.recipesBySpellId[3].requiredSkill == 140, "the recipe item's rank comes first")
     assert(skilled.recipesBySpellId[2].requiredSkill == 75, "then the vanilla rank")
     assert(skilled.recipesBySpellId[7443].requiredSkill == nil, "a client 1 is not a requirement")
+    -- Una ricetta che la build corrente non elenca piu' (Disorienting Smog
+    -- Potion con la 70532) la cattura del client ce l'ha ancora: si marca
+    -- `removed` e resta intera, coi dati che il ripiego le ha dato.
+    write(paths[4], [[MiningRecipes = { [3] = { recipeItemId = 5003, expansion = 'forever' } }
+MiningRemovedSpells = { [3] = true }]])
+    local gone = generate(paths[1], paths[2], "--mining=" .. paths[4])
+    assert(gone.recipesBySpellId[3].removed == true, "a recipe the build no longer lists is removed")
+    assert(gone.recipesBySpellId[3].recipeItemId == 5003, "a removed recipe keeps its data")
+    assert(gone.recipesBySpellId[2].removed == nil, "the others stay in the game")
     local reverse = generate(paths[2], paths[1])
     assert(reverse.recipesBySpellId[3] and not reverse.recipesBySpellId[1], "older captures cannot replace newer ones")
 end)
 for _, path in ipairs(paths) do os.remove(path) end
 assert(ok, err)
-print("PASS generator: multiple sessions, legacy format, newest capture, reagents, indices, outputless is not self-only, static BoP from item binding, recipe items, required skill")
+print("PASS generator: multiple sessions, legacy format, newest capture, reagents, indices, outputless is not self-only, static BoP from item binding, recipe items, required skill, recipes the build no longer lists")
