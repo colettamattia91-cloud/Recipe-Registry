@@ -203,6 +203,44 @@ def main():
                    faction=w["faction"], worldDrop=w["worldDrop"], notes=w["notes"])
         from_web += 1
 
+    # Wowhead direttamente, dalle sue pagine-oggetto (Tools/scrape-wowhead.py).
+    # Dopo foreverchanges, che in parte lo legge gia', e solo dove la riga e'
+    # ancora vuota. Dove le fonti si sovrappongono le discordanze si contano
+    # in fondo invece di decidere qui chi vince: quale fonte abbia ragione si
+    # guarda caso per caso.
+    wowhead = {}
+    wowhead_path = os.path.join(HERE, "captures", "wowhead-recipes.tsv")
+    if os.path.exists(wowhead_path):
+        for w in csv.DictReader(open(wowhead_path, encoding="utf-8"), delimiter="\t"):
+            wowhead[int(w["recipeItemId"])] = w
+
+    # Un'eccezione, misurata il 25/10: il "trainer" che il dataset TBC da' a
+    # ricette vanilla che su Forever droppano. TBC ha messo dal trainer molte
+    # ricette che in vanilla si trovavano solo in giro -- 47 delle 54 hanno in
+    # cmangos TBC sia il trainer sia la loot -- e il dataset ha scelto il
+    # trainer. Forever e' vanilla, e Wowhead Forever le vede droppare: li'
+    # vince Wowhead.
+    from_wowhead, tbc_trainer_fixed, disagree = 0, 0, []
+    for row in rows:
+        w = wowhead.get(int(row["recipeItemId"])) if row["recipeItemId"] else None
+        if not w:
+            continue
+        if (row["sourceKind"] == "trainer" and row["notes"] == "da vanilla, dataset TBC"
+                and w["sourceKind"] in ("drop", "worldDrop")):
+            row.update(sourceKind=w["sourceKind"], npcName=w["npcName"], zone=w["zone"],
+                       faction=w["faction"], bossDrop=w["bossDrop"], worldDrop=w["worldDrop"],
+                       trainerTitle="", notes=w["notes"] + " (era trainer per il dataset TBC)")
+            tbc_trainer_fixed += 1
+            continue
+        if row["sourceKind"]:
+            if row["sourceKind"] != w["sourceKind"]:
+                disagree.append((row["sourceKind"], w["sourceKind"], row["name"]))
+            continue
+        row.update(sourceKind=w["sourceKind"], npcName=w["npcName"], zone=w["zone"],
+                   faction=w["faction"], bossDrop=w["bossDrop"],
+                   worldDrop=w["worldDrop"], notes=w["notes"])
+        from_wowhead += 1
+
     # Infine il raccolto a mano dalle pagine, per cio' che lo scraping non ha:
     # i Blueprint, che sul sito non stanno nel dato strutturato.
     filled = 0
@@ -284,9 +322,16 @@ def main():
         writer.writerows(rows)
     os.replace(tmp, OUT)
 
-    print("righe: %d | in gioco: %d | TBC: %d | scraping: %d | a mano: %d | vuote: %d"
-          % (len(rows), from_ingame, from_tbc, from_web, filled,
+    print("righe: %d | in gioco: %d | TBC: %d | scraping: %d | wowhead: %d (+%d trainer TBC corretti)"
+          " | a mano: %d | vuote: %d"
+          % (len(rows), from_ingame, from_tbc, from_web, from_wowhead, tbc_trainer_fixed, filled,
              sum(1 for r in rows if not r["sourceKind"])))
+    if disagree:
+        from collections import Counter
+        print("\n=== WOWHEAD DICE ALTRO SU %d RIGHE GIA' PIENE (prima -> wowhead) ===" % len(disagree))
+        for (before, after), n in Counter((d[0], d[1]) for d in disagree).most_common():
+            print("  %-10s -> %-10s %4d   es. %s" % (before, after, n,
+                  ", ".join(d[2] for d in disagree if (d[0], d[1]) == (before, after))[:90]))
     low = [r for r in rows if r["sourceKind"] == "drop" and r["mobLevel"]
            and int(r["mobLevel"].split("-")[1]) <= 20]
     print("\n=== DROP DA MOB <= LIVELLO 20 CHE CI MANCANO ===")

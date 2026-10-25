@@ -6,6 +6,11 @@ All notable changes to this addon are documented in this file.
 
 ### Changed
 
+- **About 140 more recipes tell you where to get them.** Most of them are new
+  to Forever, and the sources now come straight from Wowhead as well: the
+  Skyforged plans, for one, are sold by Vayn Moongaze on Zephras Isle. A
+  recipe that drops names the creature or the zone, and says nothing rather
+  than guess when Wowhead has neither.
 - **More recipes tell you where they drop.** Eleven more Filigreed tailoring
   patterns now name the dungeon bosses that drop them, from Shadowfang Keep,
   Ragefire Chasm, The Stockade and Razorfen Kraul as well as Deadmines,
@@ -19,6 +24,10 @@ All notable changes to this addon are documented in this file.
 
 ### Fixed
 
+- **Vanilla recipes that drop no longer send you to a trainer.** Fifty-three
+  of them, among them Thorium Armor, Mighty Rage Potion and Elixir of the
+  Sages, said a trainer teaches them. That is true in The Burning Crusade, not
+  in vanilla, and Forever follows vanilla: they drop, and now say where.
 - **Each guild sees its own crafters.** Characters on the same account shared
   one list, so an alt outside your guild, or in another guild, showed your
   guildmates' recipes as if they were its own. Now every guild keeps its own

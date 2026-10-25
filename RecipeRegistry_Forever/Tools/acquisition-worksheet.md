@@ -33,10 +33,14 @@ pubbliche che sembrano averla sono tutte lo stesso dato di seconda mano:
   stagionali e quartermaster reputazione. Zero righe sul contenuto Forever.
 - **Wowhead** ce l'ha perche' migliaia di client dei giocatori glielo
   caricano. E' la sola fonte del contenuto nuovo, e non e' replicabile da
-  soli.
+  soli. Dal 25/10 si legge direttamente, una pagina-oggetto per ricetta, con
+  `Tools/scrape-wowhead.py` (in `captures/wowhead-recipes.tsv`): riempie le
+  righe che foreverchanges lascia vuote, e conta dove i due non concordano.
 
-Quindi le 994 righe qui sono il residuo dopo aver spremuto tutto il
-replicabile.
+Quindi le righe vuote qui sono il residuo dopo aver spremuto tutto il
+replicabile: 994 il 24/09, 424 il 25/10 dopo Wowhead. Di queste, 265
+Wowhead le conosce senza sapere da dove vengano, e 62 su Forever non le ha:
+resta la cattura in gioco.
 
 ## Vocabolario
 
