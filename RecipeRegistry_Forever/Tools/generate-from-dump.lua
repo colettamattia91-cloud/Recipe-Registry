@@ -27,6 +27,17 @@
 -- e vanno presi dal datamining, che legge i file invece di interrogare l'API.
 -- Quello che esce di qui e' la struttura: cosa esiste, cosa produce, con che
 -- reagenti, in che categoria.
+--
+-- Ma il dump la struttura la da' solo per la build su cui e' stato fatto, e non
+-- si rifa' a ogni patch: e' un giro dai trainer. Quando il datamining la porta
+-- (MiningStructure, scritta da convert-mining.ps1) oggetto prodotto, reagenti e
+-- categoria vengono da li', che si rifa' a ogni build in pochi minuti, e cosi'
+-- le ricette arrivate dopo il dump. Al dump restano quali ricette il gioco
+-- mostra, l'ordine dei reagenti e le quantita', e il ruolo di controllo: dove
+-- le due fonti non concordano, lo si stampa. Misurato sulla 69913, la build
+-- del dump: reagenti e oggetti prodotti identici su 2519 ricette, categorie
+-- diverse in 2. Alla 70755 le categorie diverse erano 21, e quattro pantaloni
+-- di tailoring chiedevano ancora un reagente tolto con la 70205.
 
 local input = arg and arg[1]
 local output = (arg and arg[2]) or "Data/Metadata/RecipeMetadata_Generated.lua"
@@ -165,6 +176,13 @@ local miningUnshipped = {}
 -- uscite dal gioco, come Disorienting Smog Potion con la 70532. La cattura del
 -- client le ha ancora perche' e' di una build precedente.
 local miningRemoved = {}
+-- La struttura, quando il datamining la porta: in MiningRecipes, per ricetta,
+-- profession, createdItemId, category, reagents e `since`, la build piu'
+-- vecchia fra quelle lette che la elenca. MiningCategories e' l'albero delle
+-- categorie del client, MiningBuilds le build lette, dalla piu' recente.
+local miningStructure = false
+local miningCategories = {}
+local miningBuilds = {}
 local miningPath
 
 -- Il livello a cui si impara una ricetta vanilla, dal dataset TBC
@@ -228,6 +246,9 @@ for index = 3, #(arg or {}) do
         miningItems = env.MiningItems or {}
         miningUnshipped = env.MiningUnshippedItems or {}
         miningRemoved = env.MiningRemovedSpells or {}
+        miningStructure = env.MiningStructure == true
+        miningCategories = env.MiningCategories or {}
+        miningBuilds = env.MiningBuilds or {}
     else
         local extra = {}
         local loader, loadErr = loadfile(value)
@@ -321,11 +342,180 @@ local function categoryChain(categories, categoryID)
     return chain
 end
 
+-- La stessa risalita sull'albero del datamining, che e' la tabella
+-- TradeSkillCategory del client: chiave, nome e ordine della categoria in cima,
+-- sotto la radice del mestiere. Nomi e ordini sono gli stessi del dump su
+-- tutte le 148 categorie che il dump usa.
+local function miningCategory(categoryId)
+    local chain, seen, cursor = {}, {}, tonumber(categoryId)
+    while cursor do
+        if seen[cursor] then break end
+        seen[cursor] = true
+        local info = miningCategories[cursor]
+        if type(info) ~= "table" then break end
+        table.insert(chain, 1, { id = cursor, info = info })
+        cursor = tonumber(info.parent)
+    end
+    if #chain == 0 then return nil end
+    if #chain > 1 then table.remove(chain, 1) end
+    local top = chain[1]
+    return "c" .. tostring(top.id), tostring(top.info.name or ("c" .. tostring(top.id))), tonumber(top.info.order)
+end
+
+-- "1.60.1.70755" contro "1.60.1.69913", parte per parte.
+local function compareBuilds(a, b)
+    local left, right = {}, {}
+    for part in tostring(a):gmatch("%d+") do left[#left + 1] = tonumber(part) end
+    for part in tostring(b):gmatch("%d+") do right[#right + 1] = tonumber(part) end
+    for i = 1, math.max(#left, #right) do
+        local x, y = left[i] or 0, right[i] or 0
+        if x ~= y then return x < y and -1 or 1 end
+    end
+    return 0
+end
+
+-- Quali reagenti e quanti li dice il datamining; l'ordine no, perche' il
+-- bundle li ordina per ID dell'oggetto, e quello che vede il giocatore e'
+-- l'ordine del dump. Quindi prima i reagenti del dump che il datamining
+-- conferma, coi suoi numeri, poi quelli che solo il datamining conosce.
+local function mergeReagents(captured, mined)
+    local counts = {}
+    for _, reagent in ipairs(mined) do counts[reagent.itemId] = reagent.count end
+    local out, used = {}, {}
+    for _, reagent in ipairs(captured or {}) do
+        local count = counts[reagent.itemId]
+        if count and not used[reagent.itemId] then
+            out[#out + 1] = { itemId = reagent.itemId, count = count }
+            used[reagent.itemId] = true
+        end
+    end
+    for _, reagent in ipairs(mined) do
+        if not used[reagent.itemId] then
+            out[#out + 1] = { itemId = reagent.itemId, count = reagent.count }
+            used[reagent.itemId] = true
+        end
+    end
+    return out
+end
+
+local function sameReagents(a, b)
+    if #a ~= #b then return false end
+    local counts = {}
+    for _, reagent in ipairs(a) do counts[reagent.itemId] = reagent.count end
+    for _, reagent in ipairs(b) do
+        if counts[reagent.itemId] ~= reagent.count then return false end
+    end
+    return true
+end
+
 local records = {}
 local placements = {}
 local categoriesByProfession = {}
 local stats = { professions = 0, recipes = 0, withReagents = 0, withoutOutput = 0 }
 local builds = {}
+-- La build del dump di ogni mestiere; false se il dump non la dice.
+local captureBuildByProfession = {}
+-- Dove il datamining e il dump non concordano, per campo: { spellId, nome }.
+local drift = { createdItem = {}, category = {}, reagents = {}, reagentsOnlyInCapture = {} }
+local function noteDrift(kind, spellId, name)
+    drift[kind][#drift[kind] + 1] = { spellId = spellId, name = name }
+end
+
+local function newRecord(spellId, professionKey, mined, createdItemId, category, sortOrder)
+    -- L'espansione vera, quando il datamining la conosce: 1559
+    -- ricette vengono da vanilla e 990 sono aggiunte di Forever.
+    -- Senza, resta la costante. E' provenienza e basta: l'addon non
+    -- ci filtra e non ci ramifica sopra.
+    local requiredSkill, requiredSkillSource = resolveRequiredSkill(spellId, mined)
+    requiredSkillSources[requiredSkillSource or "none"] =
+        (requiredSkillSources[requiredSkillSource or "none"] or 0) + 1
+    return {
+        profession = professionKey,
+        expansion = (mined and mined.expansion) or EXPANSION,
+        requiredSkill = requiredSkill,
+        skillLevels = mined and mined.skillLevels or nil,
+        classMask = mined and mined.classMask or nil,
+        -- L'oggetto che insegna la ricetta -- un Pattern, dei Plans --
+        -- dal datamining: il client non lo dice per ricetta. Su
+        -- Forever il datamining lo trova solo passando da
+        -- ItemXItemEffect, come retail; senza, era vuoto per tutte.
+        recipeItemId = mined and mined.recipeItemId or nil,
+        createdItemId = createdItemId,
+        category = category,
+        sortOrder = sortOrder,
+    }
+end
+
+-- Cio' che segue dall'oggetto prodotto e dalla provenienza, uguale per una
+-- ricetta del dump e per una che arriva solo dal datamining.
+local function completeRecord(record, spellId)
+    -- Una ricetta che non produce un oggetto NON e' per questo "solo
+    -- per se'". Questa riga lo deduceva, ed era sbagliato: gli
+    -- incantamenti non producono niente e si mettono sugli oggetti
+    -- di chiunque. Marcarli self-only nascondeva al filtro tutti gli
+    -- incantamenti dei compagni di gilda -- 179 su 179 -- che e'
+    -- proprio "chi mi incanta i bracciali?", la domanda per cui
+    -- l'addon esiste. Visto in gioco il 2026-09-21, col primo sync.
+    --
+    -- Su TBC il flag e' stretto e viene da conoscenza esplicita: 4
+    -- ricette, gli incantamenti agli anelli, che l'incantatore mette
+    -- solo sui propri. Su Forever non esistono. Se un giorno si
+    -- sapra' di una ricetta davvero self-only, la si dichiara in
+    -- RecipeMetadata_Overrides.lua, selfOnlyOutputlessBySpellId.
+    if not record.createdItemId then
+        stats.withoutOutput = stats.withoutOutput + 1
+    end
+    -- Il BoP e' un fatto dell'oggetto prodotto, non della ricetta: si
+    -- legge dal legame che il datamining da' per quell'oggetto, e
+    -- l'oggetto e' quello che dice il client. Cosi' era anche su TBC,
+    -- dove il bopOutput statico veniva da ItemSparse. Senza oggetto
+    -- (gli incantamenti) non c'e' niente da legare, e il campo resta
+    -- assente. Senza legame noto resta assente anche lui, e decide a
+    -- runtime il client, come prima.
+    local bind = record.createdItemId and miningItems[record.createdItemId]
+    if bind ~= nil then
+        record.bopOutput = tonumber(bind) == 1
+    end
+    -- Una ricetta il cui prodotto il client non sa nemmeno
+    -- nominare non e' una ricetta che ti manca: e' contenuto che
+    -- questa build non spedisce -- avanzi di Season of Discovery,
+    -- roba di Forever non ancora attiva, i rimossi storici di
+    -- vanilla. Listarla fra "quelle che ti mancano" manda il
+    -- giocatore a cercare una ricetta che non esiste, quindi si
+    -- marca `removed` e il tab Collection la esclude da solo.
+    -- Stesso taglio che fa ForeverChanges, che su alchemy ne
+    -- scarta 18 delle sue 197.
+    if record.createdItemId and miningUnshipped[record.createdItemId] then
+        record.removed = true
+    end
+    if miningRemoved[spellId] then
+        record.removed = true
+    end
+    -- La provenienza raccolta a mano, se per questa ricetta c'e'.
+    -- Si indicizza sull'oggetto-ricetta perche' e' quello che si
+    -- vede in gioco: la riga del venditore, l'oggetto che cade.
+    local got = (record.recipeItemId and acquisition[record.recipeItemId])
+        or acquisitionBySpell[spellId]
+    if got then
+        record.sourceKind = got.kind
+        record.bossDrop = got.bossDrop or nil
+        record.worldDrop = got.worldDrop or nil
+        record.trainerTitle = got.trainerTitle
+        if got.places and #got.places > 0 then
+            record.sourcePlaces = got.places
+        end
+    end
+    -- Niente deduzione per esclusione: l'assenza di un
+    -- oggetto-ricetta dice che non la insegna un OGGETTO, non che
+    -- la insegni un trainer. Poteva essere una discovery, un
+    -- premio di quest o un sottoprodotto -- Fire Oil si impara
+    -- lavorando e non la insegna nessuno. Qui c'era quella
+    -- deduzione, misurata al 90%, e il 10% restante erano righe
+    -- inventate indistinguibili da quelle lette. La provenienza
+    -- delle ricette vanilla arriva dal dataset TBC, che quel dato
+    -- ce l'ha per davvero; quella di Forever resta vuota finche'
+    -- non la si raccoglie.
+end
 
 local function noteInto(bucketTable, key, entry)
     local bucket = bucketTable[key]
@@ -358,129 +548,77 @@ for _, professionName in ipairs(dumpNames) do
         local declared = dump.profession
         if declared == "nil" then declared = nil end
         local professionKey = slug(declared or professionName)
+        local captureBuild = false
         if type(dump.build) == "table" and dump.build[1] then
-            builds[tostring(dump.build[1]) .. "." .. tostring(dump.build[2])] = true
+            captureBuild = tostring(dump.build[1]) .. "." .. tostring(dump.build[2])
+            builds[captureBuild] = true
         end
+        if professionKey then captureBuildByProfession[professionKey] = captureBuild end
         for _, row in ipairs(dump.recipes) do
             local spellId = tonumber(row.recipeID)
             if spellId and professionKey then
                 local chain = categoryChain(dump.categories, row.categoryID)
-                local category, sortOrder
+                local category, sortOrder, label
                 if chain then
                     category = categoryKey(chain[1])
                     sortOrder = tonumber(chain[1].uiOrder)
-                    if category then
-                        noteInto(categoriesByProfession, professionKey,
-                            { key = category, label = tostring(chain[1].name or category), order = sortOrder or 999 })
-                    end
+                    label = tostring(chain[1].name or category)
                 end
-                -- L'espansione vera, quando il datamining la conosce: 1559
-                -- ricette vengono da vanilla e 990 sono aggiunte di Forever.
-                -- Senza, resta la costante. E' provenienza e basta: l'addon non
-                -- ci filtra e non ci ramifica sopra.
-                local mined = mining[spellId]
-                local requiredSkill, requiredSkillSource = resolveRequiredSkill(spellId, mined)
-                requiredSkillSources[requiredSkillSource or "none"] =
-                    (requiredSkillSources[requiredSkillSource or "none"] or 0) + 1
-                local record = {
-                    profession = professionKey,
-                    expansion = (mined and mined.expansion) or EXPANSION,
-                    requiredSkill = requiredSkill,
-                    skillLevels = mined and mined.skillLevels or nil,
-                    classMask = mined and mined.classMask or nil,
-                    -- L'oggetto che insegna la ricetta -- un Pattern, dei Plans --
-                    -- dal datamining: il client non lo dice per ricetta. Su
-                    -- Forever il datamining lo trova solo passando da
-                    -- ItemXItemEffect, come retail; senza, era vuoto per tutte.
-                    recipeItemId = mined and mined.recipeItemId or nil,
-                    createdItemId = tonumber(row.outputItemID),
-                    category = category,
-                    sortOrder = sortOrder,
-                }
-                local qMin = tonumber(row.quantityMin) or 1
-                local qMax = tonumber(row.quantityMax) or qMin
-                if qMin ~= 1 or qMax ~= 1 then
-                    record.createdCount = qMin
-                    record.createdCountMax = qMax
-                end
-                -- Una ricetta che non produce un oggetto NON e' per questo "solo
-                -- per se'". Questa riga lo deduceva, ed era sbagliato: gli
-                -- incantamenti non producono niente e si mettono sugli oggetti
-                -- di chiunque. Marcarli self-only nascondeva al filtro tutti gli
-                -- incantamenti dei compagni di gilda -- 179 su 179 -- che e'
-                -- proprio "chi mi incanta i bracciali?", la domanda per cui
-                -- l'addon esiste. Visto in gioco il 2026-09-21, col primo sync.
-                --
-                -- Su TBC il flag e' stretto e viene da conoscenza esplicita: 4
-                -- ricette, gli incantamenti agli anelli, che l'incantatore mette
-                -- solo sui propri. Su Forever non esistono. Se un giorno si
-                -- sapra' di una ricetta davvero self-only, la si dichiara in
-                -- RecipeMetadata_Overrides.lua, selfOnlyOutputlessBySpellId.
-                if not record.createdItemId then
-                    stats.withoutOutput = stats.withoutOutput + 1
-                end
-                -- Il BoP e' un fatto dell'oggetto prodotto, non della ricetta: si
-                -- legge dal legame che il datamining da' per quell'oggetto, e
-                -- l'oggetto e' quello che dice il client. Cosi' era anche su TBC,
-                -- dove il bopOutput statico veniva da ItemSparse. Senza oggetto
-                -- (gli incantamenti) non c'e' niente da legare, e il campo resta
-                -- assente. Senza legame noto resta assente anche lui, e decide a
-                -- runtime il client, come prima.
-                local bind = record.createdItemId and miningItems[record.createdItemId]
-                if bind ~= nil then
-                    record.bopOutput = tonumber(bind) == 1
-                end
-                -- Una ricetta il cui prodotto il client non sa nemmeno
-                -- nominare non e' una ricetta che ti manca: e' contenuto che
-                -- questa build non spedisce -- avanzi di Season of Discovery,
-                -- roba di Forever non ancora attiva, i rimossi storici di
-                -- vanilla. Listarla fra "quelle che ti mancano" manda il
-                -- giocatore a cercare una ricetta che non esiste, quindi si
-                -- marca `removed` e il tab Collection la esclude da solo.
-                -- Stesso taglio che fa ForeverChanges, che su alchemy ne
-                -- scarta 18 delle sue 197.
-                if record.createdItemId and miningUnshipped[record.createdItemId] then
-                    record.removed = true
-                end
-                if miningRemoved[spellId] then
-                    record.removed = true
-                end
-                -- La provenienza raccolta a mano, se per questa ricetta c'e'.
-                -- Si indicizza sull'oggetto-ricetta perche' e' quello che si
-                -- vede in gioco: la riga del venditore, l'oggetto che cade.
-                local got = (record.recipeItemId and acquisition[record.recipeItemId])
-                    or acquisitionBySpell[spellId]
-                if got then
-                    record.sourceKind = got.kind
-                    record.bossDrop = got.bossDrop or nil
-                    record.worldDrop = got.worldDrop or nil
-                    record.trainerTitle = got.trainerTitle
-                    if got.places and #got.places > 0 then
-                        record.sourcePlaces = got.places
-                    end
-                end
-                -- Niente deduzione per esclusione: l'assenza di un
-                -- oggetto-ricetta dice che non la insegna un OGGETTO, non che
-                -- la insegni un trainer. Poteva essere una discovery, un
-                -- premio di quest o un sottoprodotto -- Fire Oil si impara
-                -- lavorando e non la insegna nessuno. Qui c'era quella
-                -- deduzione, misurata al 90%, e il 10% restante erano righe
-                -- inventate indistinguibili da quelle lette. La provenienza
-                -- delle ricette vanilla arriva dal dataset TBC, che quel dato
-                -- ce l'ha per davvero; quella di Forever resta vuota finche'
-                -- non la si raccoglie.
-                if type(row.reagents) == "table" and #row.reagents > 0 then
-                    local reagents = {}
+                local reagents = {}
+                if type(row.reagents) == "table" then
                     for _, r in ipairs(row.reagents) do
                         local itemId = tonumber(r.itemID)
                         if itemId then
                             reagents[#reagents + 1] = { itemId = itemId, count = tonumber(r.count) or 1 }
                         end
                     end
-                    if #reagents > 0 then
-                        record.reagents = reagents
-                        stats.withReagents = stats.withReagents + 1
+                end
+                local createdItemId = tonumber(row.outputItemID)
+                local mined = mining[spellId]
+                -- La struttura dal datamining, dove c'e', e il dump come
+                -- controllo. La categoria solo nel mestiere in cui il
+                -- datamining mette la ricetta: la 461692 per lui e' di
+                -- Tailoring, e in Leatherworking resta quella del dump.
+                if miningStructure and mined then
+                    if mined.createdItemId ~= createdItemId then
+                        noteDrift("createdItem", spellId, row.name)
                     end
+                    createdItemId = mined.createdItemId
+                    if mined.profession == professionKey and mined.category then
+                        local minedKey, minedLabel, minedOrder = miningCategory(mined.category)
+                        if minedKey then
+                            if minedKey ~= category then noteDrift("category", spellId, row.name) end
+                            category, label, sortOrder = minedKey, minedLabel, minedOrder
+                        end
+                    end
+                    -- Niente reagenti nel datamining e qualcuno nel dump: si
+                    -- tengono quelli del dump. Un reagente fuori da
+                    -- SpellReagents -- uno slot del crafting retail -- il bundle
+                    -- non lo vede, e "nessun reagente" sarebbe un dato inventato.
+                    if mined.reagents and #mined.reagents > 0 then
+                        if not sameReagents(reagents, mined.reagents) then
+                            noteDrift("reagents", spellId, row.name)
+                        end
+                        reagents = mergeReagents(reagents, mined.reagents)
+                    elseif #reagents > 0 then
+                        noteDrift("reagentsOnlyInCapture", spellId, row.name)
+                    end
+                end
+                if category then
+                    noteInto(categoriesByProfession, professionKey,
+                        { key = category, label = label, order = sortOrder or 999 })
+                end
+                local record = newRecord(spellId, professionKey, mined, createdItemId, category, sortOrder)
+                local qMin = tonumber(row.quantityMin) or 1
+                local qMax = tonumber(row.quantityMax) or qMin
+                if qMin ~= 1 or qMax ~= 1 then
+                    record.createdCount = qMin
+                    record.createdCountMax = qMax
+                end
+                completeRecord(record, spellId)
+                if #reagents > 0 then
+                    record.reagents = reagents
+                    stats.withReagents = stats.withReagents + 1
                 end
                 -- Una ricetta in due mestieri non e' un errore da risolvere:
                 -- e' come il client la racconta, e il dataset TBC ha lo stesso
@@ -517,6 +655,61 @@ for _, professionName in ipairs(dumpNames) do
                     stats.recipes = stats.recipes + 1
                 end
             end
+        end
+    end
+end
+
+-- Le ricette arrivate dopo il dump.
+--
+-- Il datamining elenca anche cio' che il gioco non mostra come ricetta di un
+-- mestiere: i veleni dei rogue, i fuochi da campo, spell di test, e Basic
+-- Campfire, che in SkillLineAbility sta ancora sotto Cooking e che il client
+-- non lista. Il confine lo traccia il dump, che e' la risposta del gioco a
+-- "cosa c'e' in questo mestiere": una ricetta che il datamining aveva gia' alla
+-- build del dump, e che il dump non elenca, il gioco la nasconde e resta fuori.
+-- Entra solo cio' che il datamining vede comparire DOPO quella build (`since`),
+-- e solo nei mestieri di cui c'e' un dump. Se le build lette non arrivano
+-- indietro fino a quella del dump, il nuovo non si distingue dal nascosto, e
+-- non entra niente.
+local added = { list = {}, hidden = 0, otherSkillLine = 0, undecided = 0 }
+if miningStructure then
+    local oldest = miningBuilds[#miningBuilds]
+    local minedIds = {}
+    for spellId in pairs(mining) do minedIds[#minedIds + 1] = spellId end
+    table.sort(minedIds)
+    for _, spellId in ipairs(minedIds) do
+        local mined = mining[spellId]
+        local captureBuild = mined.profession and captureBuildByProfession[mined.profession]
+        if records[spellId] then
+            -- gia' nel dump
+        elseif captureBuild == nil then
+            added.otherSkillLine = added.otherSkillLine + 1
+        elseif not captureBuild or not oldest or not mined.since
+            or compareBuilds(oldest, captureBuild) > 0 then
+            added.undecided = added.undecided + 1
+        elseif compareBuilds(mined.since, captureBuild) <= 0 then
+            added.hidden = added.hidden + 1
+        else
+            local category, label, sortOrder
+            if mined.category then category, label, sortOrder = miningCategory(mined.category) end
+            if category then
+                noteInto(categoriesByProfession, mined.profession,
+                    { key = category, label = label, order = sortOrder or 999 })
+            end
+            -- La quantita' no. Il bundle la conta uno in piu' su questo client:
+            -- EffectBasePointsF e' gia' il numero, e il datamining ci aggiunge
+            -- uno come si fa in vanilla. Finche' non si corregge li', una
+            -- ricetta nuova resta a uno, che e' il caso di quasi tutte.
+            local record = newRecord(spellId, mined.profession, mined, mined.createdItemId, category, sortOrder)
+            completeRecord(record, spellId)
+            if mined.reagents and #mined.reagents > 0 then
+                record.reagents = mergeReagents(nil, mined.reagents)
+                stats.withReagents = stats.withReagents + 1
+            end
+            placements[spellId] = { { profession = mined.profession, category = category } }
+            records[spellId] = record
+            stats.recipes = stats.recipes + 1
+            added.list[#added.list + 1] = { spellId = spellId, name = mined.name }
         end
     end
 end
@@ -603,11 +796,12 @@ end
 -- leggendo i record. I campi assenti non sono dimenticanze: sono informazioni
 -- che ne' il client ne' il datamining espongono oggi, e finiscono in testa al
 -- file generato perche' e' il posto dove qualcuno le cerchera'.
+local STRUCTURE_SOURCE = miningStructure and "datamining" or "client"
 local COVERAGE_FIELDS = {
     { "profession",     "client",     "di che mestiere e'" },
-    { "category",       "client",     "dove sta nella barra laterale" },
-    { "reagents",       "client",     "cosa serve per farla" },
-    { "createdItemId",  "client",     "cosa produce" },
+    { "category",       STRUCTURE_SOURCE, "dove sta nella barra laterale" },
+    { "reagents",       STRUCTURE_SOURCE, "cosa serve per farla" },
+    { "createdItemId",  STRUCTURE_SOURCE, "cosa produce" },
     { "createdCount",   "client",     "quante ne produce, se diverso da una" },
     { "requiredSkill",  "datamining + TBC", "a che livello si impara: oggetto-ricetta, poi vanilla" },
     { "skillLevels",    "datamining", "le soglie di difficolta'" },
@@ -641,16 +835,30 @@ emit("-- Generato da Tools/generate-from-dump.lua dal dump in gioco. Non modific
 emit("--")
 emit("-- Due fonti, ognuna per cio' che sa.")
 emit("--")
-emit("-- Il client, con /rrdump su una sessione viva: la struttura -- quali ricette")
-emit("-- esistono, cosa producono, con che reagenti, in che categoria. E' la fonte")
-emit("-- aggiornata, perche' conosce anche cio' che una patch ha aggiunto ieri.")
+if miningStructure then
+    emit("-- Il datamining di ../WowForeverMining, build " .. tostring(miningBuilds[1]) .. ", che legge i file")
+    emit("-- del gioco e si rifa' a ogni build: la struttura -- cosa produce ogni")
+    emit("-- ricetta, con che reagenti, in che categoria, e le ricette arrivate dopo il")
+    emit("-- dump -- e i campi che il client non espone per ricetta: requiredSkill, le")
+    emit("-- soglie di difficolta', l'espansione di origine e classMask.")
+    emit("--")
+    emit("-- Il client, con /rrdump su una sessione viva della " .. (buildList[1] or "build sconosciuta") .. ": quali ricette")
+    emit("-- il gioco mostra in ogni mestiere, l'ordine dei reagenti, le quantita'. Dove")
+    emit("-- la struttura non concorda col datamining vince il datamining, che e' la")
+    emit("-- build piu' recente; il generatore stampa le differenze.")
+else
+    emit("-- Il client, con /rrdump su una sessione viva: la struttura -- quali ricette")
+    emit("-- esistono, cosa producono, con che reagenti, in che categoria.")
+    emit("--")
+    emit("-- Il datamining di ../WowForeverMining: i campi che il client non espone per")
+    emit("-- ricetta -- requiredSkill, le soglie di difficolta', l'espansione di origine")
+    emit("-- e classMask. Legge i file del gioco invece di interrogare l'API.")
+    emit("--")
+    emit("-- Dove si sovrappongono vince il client.")
+end
 emit("--")
-emit("-- Il datamining di ../WowForeverMining: i campi che il client non espone per")
-emit("-- ricetta -- requiredSkill, le soglie di difficolta', l'espansione di origine")
-emit("-- e classMask. Legge i file del gioco invece di interrogare l'API.")
-emit("--")
-emit("-- Dove si sovrappongono vince il client. Il censimento qui sotto dice riga per")
-emit("-- riga chi ha riempito cosa, e cosa non ha riempito nessuno dei due.")
+emit("-- Il censimento qui sotto dice riga per riga chi ha riempito cosa, e cosa non")
+emit("-- ha riempito nessuno dei due.")
 emit("--")
 emit(string.format("-- Mestieri coperti: %d. Ricette: %d.", stats.professions, #ids))
 emit("--")
@@ -669,9 +877,17 @@ emit("-- Nessuno di questi e' esposto dal client per ricetta: GetRecipeSourceTex
 emit("-- tace su tutte e GetRecipeRequirements e' quasi sempre vuota. Vanno presi")
 emit("-- dal datamining quando imparera' a estrarli, o catturati in gioco dai")
 emit("-- trainer, che e' un lavoro di raccolta a se'.")
+-- La versione nomina i dati, e la cache dei dettagli che l'addon tiene nelle
+-- SavedVariables si svuota quando cambia. Legata alla build del dump e' rimasta
+-- la stessa mentre i dati cambiavano a ogni release; con la struttura dal
+-- datamining segue la sua build.
+local metadataVersion = "forever-ingame-" .. (buildList[1] or "sconosciuto")
+if miningStructure and miningBuilds[1] then
+    metadataVersion = "forever-" .. miningBuilds[1]
+end
 emit("RecipeRegistryRecipeMetadata = {")
 emit("    schemaVersion = 1,")
-emit(string.format("    metadataVersion = %q,", "forever-ingame-" .. (buildList[1] or "sconosciuto")))
+emit(string.format("    metadataVersion = %q,", metadataVersion))
 emit('    flavor = "forever",')
 emit("")
 emit("    recipesBySpellId = {")
@@ -832,6 +1048,20 @@ if miningPath then
         requiredSkillSources.client or 0, requiredSkillSources.none or 0))
 else
     print("  nessun datamining: mancano requiredSkill, skillLevels, espansione, classMask")
+end
+if miningStructure then
+    print(string.format("  struttura dal datamining %s; dal dump diversi: oggetto %d, categoria %d, reagenti %d, reagenti solo nel dump %d",
+        tostring(miningBuilds[1]), #drift.createdItem, #drift.category, #drift.reagents, #drift.reagentsOnlyInCapture))
+    for _, kind in ipairs({ "createdItem", "category", "reagents", "reagentsOnlyInCapture" }) do
+        for _, entry in ipairs(drift[kind]) do
+            print(string.format("    %-21s %8d %s", kind, entry.spellId, tostring(entry.name or "")))
+        end
+    end
+    print(string.format("  aggiunte dal datamining: %d; nascoste dal gioco alla build del dump: %d; di altre skill line: %d; senza build per decidere: %d",
+        #added.list, added.hidden, added.otherSkillLine, added.undecided))
+    for _, entry in ipairs(added.list) do
+        print(string.format("    %8d %s", entry.spellId, tostring(entry.name or "")))
+    end
 end
 print(string.format("  indici: %d oggetti prodotti, %d categorie",
     #sortedKeys(createdItemToSpellIds), categoryCount))

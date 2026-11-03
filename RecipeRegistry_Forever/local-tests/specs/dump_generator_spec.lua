@@ -2,7 +2,7 @@
 -- one profession replaces only that profession, regardless of input order.
 local base = "local-tests/specs/.dump-generator-"
 local paths = { base .. "old.lua", base .. "new.lua", base .. "output.lua", base .. "mining.lua",
-    base .. "vanilla-skill.tsv" }
+    base .. "vanilla-skill.tsv", base .. "capture.lua", base .. "structure.lua" }
 local function write(path, content)
     local file = assert(io.open(path, "w")); file:write(content); file:close()
 end
@@ -74,9 +74,62 @@ MiningRemovedSpells = { [3] = true }]])
     assert(gone.recipesBySpellId[3].removed == true, "a recipe the build no longer lists is removed")
     assert(gone.recipesBySpellId[3].recipeItemId == 5003, "a removed recipe keeps its data")
     assert(gone.recipesBySpellId[2].removed == nil, "the others stay in the game")
+    -- La struttura dal datamining. Il dump e' della build 100 e il datamining
+    -- della 300: nel frattempo la ricetta 3 ha cambiato prodotto, categoria e
+    -- reagenti, e la 4 e' nata. La 5 c'era gia' alla 100 e il dump non la
+    -- elenca, quindi il gioco la nasconde (Basic Campfire); la 6 sta su una
+    -- skill line di cui non c'e' un dump (i veleni dei rogue).
+    write(paths[6], [[RecipeRegistryDumpDB = { dumps = {
+        Alchemy = { at = "2026-09-18 10:00:00", build = { "1.60.1", "100" },
+            categories = { ["1"] = { categoryID = 1, name = "Alchemy", parentCategoryID = 0 },
+                ["50"] = { categoryID = 50, name = "Potions", uiOrder = 5, parentCategoryID = 1 } },
+            recipes = { { recipeID = 3, outputItemID = 33, categoryID = 50,
+                reagents = { { itemID = 765, count = 2 }, { itemID = 766, count = 1 } } } } },
+        Cooking = { at = "2026-09-18 10:00:00", build = { "1.60.1", "100" },
+            categories = { ["2"] = { categoryID = 2, name = "Cooking", parentCategoryID = 0 },
+                ["70"] = { categoryID = 70, name = "Meals", uiOrder = 1, parentCategoryID = 2 } },
+            recipes = { { recipeID = 3, outputItemID = 33, categoryID = 70 } } },
+    } }]])
+    local structure = [[MiningRecipes = {
+    [3] = { profession = 'alchemy', createdItemId = 34, category = 60, since = '1.60.1.100',
+        reagents = { { itemId = 766, count = 1 }, { itemId = 765, count = 3 }, { itemId = 767, count = 1 } } },
+    [4] = { profession = 'alchemy', category = 60, since = '1.60.1.300', reagents = { { itemId = 900, count = 1 } } },
+    [5] = { profession = 'alchemy', since = '1.60.1.100' },
+    [6] = { profession = 'skill:40', since = '1.60.1.300' },
+}
+MiningStructure = true
+MiningCategories = { [1] = { name = "Alchemy", order = 0 }, [60] = { name = "Elixirs", order = 7, parent = 1 } }
+]]
+    write(paths[7], structure .. "MiningBuilds = { '1.60.1.300', '1.60.1.100' }\n")
+    local built = generate(paths[6], "--mining=" .. paths[7])
+    local three = built.recipesBySpellId[3]
+    assert(three.createdItemId == 34 and built.createdItemToSpellIds[34][1] == 3, "the created item comes from the datamining")
+    assert(three.category == "c60" and three.sortOrder == 7, "so does the category")
+    assert(three.reagents[1].itemId == 765 and three.reagents[1].count == 3, "the counts are the datamining's")
+    assert(three.reagents[2].itemId == 766, "the order is the game's, from the dump")
+    assert(three.reagents[3].itemId == 767, "a reagent only the datamining knows goes last")
+    assert(built.navTree.alchemy.c60 and not built.navTree.alchemy.c50, "the recipe moves to its new category")
+    assert(built.navTree.cooking.c70, "in a profession the datamining does not give it, the dump's category stays")
+    assert(built.recipesBySpellId[4] and built.recipesBySpellId[4].profession == "alchemy", "a recipe born after the dump comes in")
+    assert(built.recipesBySpellId[4].category == "c60", "with its category")
+    assert(built.recipesBySpellId[5] == nil, "one the game already hid at the dump's build stays out")
+    assert(built.recipesBySpellId[6] == nil, "so does one from a skill line with no dump")
+    assert(built.metadataVersion == "forever-1.60.1.300", "the version follows the datamining's build")
+    -- Se le build lette non arrivano alla build del dump, il nuovo non si
+    -- distingue dal nascosto: non entra niente.
+    write(paths[7], structure .. "MiningBuilds = { '1.60.1.300' }\n")
+    local unsure = generate(paths[6], "--mining=" .. paths[7])
+    assert(unsure.recipesBySpellId[4] == nil, "without the dump's build to compare with, nothing new comes in")
+    assert(unsure.recipesBySpellId[3].category == "c60", "the structure still comes from the datamining")
+    -- Un datamining di formato vecchio non porta la struttura: resta il dump.
+    write(paths[7], "MiningRecipes = { [3] = { createdItemId = 34, category = 60 } }\n")
+    local plain = generate(paths[6], "--mining=" .. paths[7])
+    assert(plain.recipesBySpellId[3].createdItemId == 33 and plain.recipesBySpellId[3].reagents[1].count == 2,
+        "without MiningStructure the dump's structure stays")
+    assert(plain.metadataVersion == "forever-ingame-1.60.1.100", "and the version follows the dump")
     local reverse = generate(paths[2], paths[1])
     assert(reverse.recipesBySpellId[3] and not reverse.recipesBySpellId[1], "older captures cannot replace newer ones")
 end)
 for _, path in ipairs(paths) do os.remove(path) end
 assert(ok, err)
-print("PASS generator: multiple sessions, legacy format, newest capture, reagents, indices, outputless is not self-only, static BoP from item binding, recipe items, required skill, recipes the build no longer lists")
+print("PASS generator: multiple sessions, legacy format, newest capture, reagents, indices, outputless is not self-only, static BoP from item binding, recipe items, required skill, recipes the build no longer lists, structure from the datamining")

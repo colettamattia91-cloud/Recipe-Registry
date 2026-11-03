@@ -45,18 +45,63 @@ $ErrorActionPreference = 'Stop'
 #   4  + MiningUnshippedItems: gli oggetti che il client non descrive
 #   5  + recipeItemSkill: il livello che l'oggetto-ricetta chiede per insegnarla
 #   6  + MiningRemovedSpells: le ricette che la build corrente non elenca piu'
-$format = 6
+#   7  + la struttura: per ricetta mestiere, oggetto prodotto, categoria,
+#        reagenti, nome e `since`; MiningCategories, MiningBuilds e
+#        MiningStructure, che dice al generatore che quei campi ci sono
+$format = 7
 $marker = "-- formato: $format"
 
 $MiningBundle = (Resolve-Path -LiteralPath $MiningBundle).Path
-$itemsPath = Join-Path (Split-Path -Parent $MiningBundle) 'item_sparse.json'
+$bundleDir = Split-Path -Parent $MiningBundle
+$itemsPath = Join-Path $bundleDir 'item_sparse.json'
+$effectsPath = Join-Path $bundleDir 'spell_effects.json'
+$categoriesPath = Join-Path $bundleDir 'trade_skill_categories.json'
+
+# La build di un bundle: dal manifest, o dal nome della cartella.
+function Get-BundleBuild([string]$recipesPath) {
+    $directory = Split-Path -Parent $recipesPath
+    $manifestPath = Join-Path $directory 'manifest.json'
+    if (Test-Path -LiteralPath $manifestPath) {
+        $build = (Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json).source.datasetMeta.build
+        if ($build) { return [string]$build }
+    }
+    if ((Split-Path -Leaf $directory) -match '(\d+\.\d+\.\d+\.\d+)$') { return $Matches[1] }
+    return $null
+}
+
+# I reagenti di un bundle per spell, gia' scritti in Lua. Il bundle li ordina
+# per ID dell'oggetto; l'ordine del gioco lo rimette il generatore dal dump.
+function Get-BundleReagents([string]$recipesPath) {
+    $path = Join-Path (Split-Path -Parent $recipesPath) 'spell_effects.json'
+    if (-not (Test-Path -LiteralPath $path)) { return $null }
+    $bySpell = @{}
+    foreach ($effect in (Get-Content -LiteralPath $path -Raw | ConvertFrom-Json)) {
+        if ($effect.effectType -ne 'reagent') { continue }
+        $key = [string]$effect.spellId
+        if (-not $bySpell.ContainsKey($key)) { $bySpell[$key] = New-Object System.Collections.Generic.List[string] }
+        $bySpell[$key].Add("{ itemId = $($effect.itemId), count = $($effect.count) }")
+    }
+    return $bySpell
+}
+
+function Get-BundleCategories([string]$recipesPath) {
+    $path = Join-Path (Split-Path -Parent $recipesPath) 'trade_skill_categories.json'
+    if (-not (Test-Path -LiteralPath $path)) { return @() }
+    return @(foreach ($category in (Get-Content -LiteralPath $path -Raw | ConvertFrom-Json)) { $category })
+}
+
+function ConvertTo-LuaString([string]$text) {
+    return '"' + ($text -replace '\\', '\\' -replace '"', '\"') + '"'
+}
 
 # Con un ripiego si riconverte sempre: lo stampo dei file non dice se il ripiego
 # e' lo stesso dell'ultima volta, e convertire costa un secondo.
 if ($IfStale -and -not $FallbackBundle -and (Test-Path -LiteralPath $Output)) {
     $outputStamp = (Get-Item -LiteralPath $Output).LastWriteTimeUtc
     $sources = @($MiningBundle)
-    if (Test-Path -LiteralPath $itemsPath) { $sources += $itemsPath }
+    foreach ($companion in @($itemsPath, $effectsPath, $categoriesPath)) {
+        if (Test-Path -LiteralPath $companion) { $sources += $companion }
+    }
     $newerSource = $sources | Where-Object { (Get-Item -LiteralPath $_).LastWriteTimeUtc -gt $outputStamp }
     $sameFormat = Select-String -LiteralPath $Output -SimpleMatch $marker -Quiet
     if (-not $newerSource -and $sameFormat) { return }
@@ -74,6 +119,28 @@ if (Test-Path -LiteralPath $itemsPath) {
 } else {
     Write-Warning "item_sparse.json assente accanto al bundle: niente legame degli oggetti, niente bopOutput statico."
 }
+
+# La struttura. Senza reagenti o senza categorie non la si scrive affatto: un
+# generatore che la crede presente leggerebbe "nessun reagente" dove il dato
+# manca, e toglierebbe i reagenti del dump.
+$currentBuild = Get-BundleBuild $MiningBundle
+$reagents = Get-BundleReagents $MiningBundle
+$categories = Get-BundleCategories $MiningBundle
+$structure = ($null -ne $reagents) -and ($categories.Count -gt 0)
+if (-not $structure) {
+    Write-Warning "spell_effects.json o trade_skill_categories.json assenti accanto al bundle: reagenti, prodotti e categorie restano quelli del dump."
+}
+if (-not $currentBuild) {
+    Write-Warning "Build del bundle sconosciuta: il generatore non potra' riconoscere le ricette arrivate dopo il dump."
+}
+$builds = New-Object System.Collections.Generic.List[string]
+if ($currentBuild) { $builds.Add($currentBuild) }
+$knownCategories = @{}
+foreach ($category in $categories) { $knownCategories[[string]$category.id] = $true }
+# Per ogni spell, la build piu' vecchia fra quelle lette che lo elenca. Il
+# generatore la confronta con la build del dump: cio' che c'era gia' allora e il
+# dump non mostra, il gioco lo nasconde; cio' che e' arrivato dopo e' nuovo.
+$since = @{}
 
 $carried = New-Object System.Collections.Generic.List[string]
 $removedSpells = New-Object System.Collections.Generic.List[string]
@@ -107,10 +174,26 @@ if ($FallbackBundle) {
         $fallback = (Resolve-Path -LiteralPath $fallback).Path
         $fallbackNames.Add((Split-Path -Leaf (Split-Path -Parent $fallback)))
         $fallbackItemPaths.Add((Join-Path (Split-Path -Parent $fallback) 'item_sparse.json'))
+        $fallbackBuild = Get-BundleBuild $fallback
+        if ($fallbackBuild) { $builds.Add($fallbackBuild) }
+        # Le categorie che il bundle corrente non ha piu', per le ricette che
+        # arrivano da qui. I reagenti solo se servono: e' il file piu' grosso.
+        foreach ($category in (Get-BundleCategories $fallback)) {
+            $id = [string]$category.id
+            if (-not $knownCategories.ContainsKey($id)) { $categories += $category; $knownCategories[$id] = $true }
+        }
+        $fallbackReagents = $null
         foreach ($row in (Get-Content -LiteralPath $fallback -Raw | ConvertFrom-Json)) {
             if ($null -eq $row.spellId) { continue }
             $key = [string]$row.spellId
+            # I ripieghi vanno dal piu' recente al piu' vecchio: l'ultimo che
+            # scrive e' il piu' vecchio che la elenca.
+            if ($fallbackBuild) { $since[$key] = $fallbackBuild }
             if ($known.ContainsKey($key)) { continue }
+            if ($structure -and -not $reagents.ContainsKey($key)) {
+                if ($null -eq $fallbackReagents) { $fallbackReagents = Get-BundleReagents $fallback }
+                if ($fallbackReagents -and $fallbackReagents.ContainsKey($key)) { $reagents[$key] = $fallbackReagents[$key] }
+            }
             $known[$key] = $true
             # Uscita dal gioco: si porta lo stesso, perche' un record rimosso si
             # marca e resta intero -- mestiere, espansione, oggetto-ricetta --
@@ -158,11 +241,39 @@ foreach ($row in $rows) {
     }
     if ($row.recipeItemId) { $parts.Add("recipeItemId = $($row.recipeItemId)") }
     if ($row.recipeItemRequiredSkillRank) { $parts.Add("recipeItemSkill = $($row.recipeItemRequiredSkillRank)") }
+    if ($structure) {
+        $key = [string]$row.spellId
+        if ($row.profession) { $parts.Add("profession = '$($row.profession)'") }
+        if ($row.createdItemId) { $parts.Add("createdItemId = $($row.createdItemId)") }
+        if ($row.tradeSkillCategoryId) { $parts.Add("category = $($row.tradeSkillCategoryId)") }
+        $first = if ($since.ContainsKey($key)) { $since[$key] } else { $currentBuild }
+        if ($first) { $parts.Add("since = '$first'") }
+        if ($reagents.ContainsKey($key)) { $parts.Add("reagents = { $($reagents[$key] -join ', ') }") }
+        # Solo per il rapporto del generatore, che senza nome stamperebbe numeri.
+        if ($row.name) { $parts.Add("name = $(ConvertTo-LuaString $row.name)") }
+    }
     if ($parts.Count -gt 0) {
         [void]$writer.AppendLine("    [$($row.spellId)] = { $($parts -join ', ') },")
     }
 }
 [void]$writer.AppendLine('}')
+
+if ($structure) {
+    [void]$writer.AppendLine('MiningStructure = true')
+    # Dalla piu' recente: la prima e' quella del bundle, che da' il nome ai dati.
+    [void]$writer.AppendLine("MiningBuilds = { $(($builds | ForEach-Object { "'$_'" }) -join ', ') }")
+    # L'albero delle categorie del client. La radice di ogni mestiere non ha
+    # padre; il generatore risale fino a li', come fa sul dump.
+    [void]$writer.AppendLine('MiningCategories = {')
+    foreach ($category in ($categories | Sort-Object { [int]$_.id })) {
+        $fields = New-Object System.Collections.Generic.List[string]
+        if ($category.name) { $fields.Add("name = $(ConvertTo-LuaString $category.name)") }
+        if ($null -ne $category.orderIndex) { $fields.Add("order = $($category.orderIndex)") }
+        if ($null -ne $category.parentId) { $fields.Add("parent = $($category.parentId)") }
+        [void]$writer.AppendLine("    [$($category.id)] = { $($fields -join ', ') },")
+    }
+    [void]$writer.AppendLine('}')
+}
 
 # Il legame di ogni oggetto, cosi' com'e' in ItemSparse: 0 nessuno, 1 quando si
 # raccoglie, 2 quando si equipaggia, 3 quando si usa, 4 oggetto di missione. Il
@@ -205,6 +316,9 @@ foreach ($line in $removedSpells) { [void]$writer.AppendLine("    [$($line.Split
 
 Set-Content -LiteralPath $Output -Value $writer.ToString() -NoNewline
 Write-Host "Datamining convertito: $Output ($($rows.Count) ricette, $itemCount oggetti, $($unshipped.Count) non spediti)"
+if ($structure) {
+    Write-Host "Struttura dal datamining: build $($builds -join ', '); $($reagents.Count) ricette con reagenti, $($categories.Count) categorie"
+}
 if ($carried.Count -gt 0) {
     Write-Host "Dal ripiego, perche' la fonte non le legge piu': $($carried.Count) ricette"
     foreach ($line in $carried) { Write-Host "  $line" }

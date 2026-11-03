@@ -2,34 +2,37 @@
 --
 -- Due fonti, ognuna per cio' che sa.
 --
--- Il client, con /rrdump su una sessione viva: la struttura -- quali ricette
--- esistono, cosa producono, con che reagenti, in che categoria. E' la fonte
--- aggiornata, perche' conosce anche cio' che una patch ha aggiunto ieri.
+-- Il datamining di ../WowForeverMining, build 1.60.1.70755, che legge i file
+-- del gioco e si rifa' a ogni build: la struttura -- cosa produce ogni
+-- ricetta, con che reagenti, in che categoria, e le ricette arrivate dopo il
+-- dump -- e i campi che il client non espone per ricetta: requiredSkill, le
+-- soglie di difficolta', l'espansione di origine e classMask.
 --
--- Il datamining di ../WowForeverMining: i campi che il client non espone per
--- ricetta -- requiredSkill, le soglie di difficolta', l'espansione di origine
--- e classMask. Legge i file del gioco invece di interrogare l'API.
+-- Il client, con /rrdump su una sessione viva della 1.60.1.69913: quali ricette
+-- il gioco mostra in ogni mestiere, l'ordine dei reagenti, le quantita'. Dove
+-- la struttura non concorda col datamining vince il datamining, che e' la
+-- build piu' recente; il generatore stampa le differenze.
 --
--- Dove si sovrappongono vince il client. Il censimento qui sotto dice riga per
--- riga chi ha riempito cosa, e cosa non ha riempito nessuno dei due.
+-- Il censimento qui sotto dice riga per riga chi ha riempito cosa, e cosa non
+-- ha riempito nessuno dei due.
 --
--- Mestieri coperti: 12. Ricette: 2519.
+-- Mestieri coperti: 12. Ricette: 2520.
 --
--- Copertura dei campi, su 2519 ricette:
---   profession        2519  (client) di che mestiere e'
---   category          2518  (client) dove sta nella barra laterale
---   reagents          2519  (client) cosa serve per farla
---   createdItemId     2337  (client) cosa produce
+-- Copertura dei campi, su 2520 ricette:
+--   profession        2520  (client) di che mestiere e'
+--   category          2519  (datamining) dove sta nella barra laterale
+--   reagents          2520  (datamining) cosa serve per farla
+--   createdItemId     2337  (datamining) cosa produce
 --   createdCount       115  (client) quante ne produce, se diverso da una
---   requiredSkill     2270  (datamining + TBC) a che livello si impara: oggetto-ricetta, poi vanilla
---   skillLevels       2489  (datamining) le soglie di difficolta'
---   expansion         2519  (datamining) vanilla o aggiunta di Forever
+--   requiredSkill     2308  (datamining + TBC) a che livello si impara: oggetto-ricetta, poi vanilla
+--   skillLevels       2490  (datamining) le soglie di difficolta'
+--   expansion         2520  (datamining) vanilla o aggiunta di Forever
 --   classMask            0  (datamining) quali classi possono impararla
 --   bopOutput         1981  (datamining) se il prodotto e' legato quando si raccoglie
---   recipeItemId      1999  (datamining) l'oggetto che insegna la ricetta
+--   recipeItemId      2001  (datamining) l'oggetto che insegna la ricetta
 --   removed            357  (datamining) nei dati del client ma non nel gioco
---   sourceKind        1771  (a mano) da dove si ottiene
---   sourcePlaces      1128  (a mano) chi la vende o la droppa, e dove
+--   sourceKind        1772  (a mano) da dove si ottiene
+--   sourcePlaces      1129  (a mano) chi la vende o la droppa, e dove
 --
 -- Quello che ancora manca, e da dove dovra' arrivare:
 --   trainerTitle     quale trainer la insegna
@@ -42,7 +45,7 @@
 -- trainer, che e' un lavoro di raccolta a se'.
 RecipeRegistryRecipeMetadata = {
     schemaVersion = 1,
-    metadataVersion = "forever-ingame-1.60.1.69913",
+    metadataVersion = "forever-1.60.1.70755",
     flavor = "forever",
 
     recipesBySpellId = {
@@ -1996,8 +1999,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             sourceKind = "vendor",
             sourcePlaces = { { name = "Kendor Kabonka", zone = 1, faction = "alliance" } },
-            category = "c2632",
-            sortOrder = 10,
+            category = "c2640",
+            sortOrder = 15,
             requiredSkill = 110,
             skillLevels = { 1, 150, 190 },
             reagents = {
@@ -20223,8 +20226,8 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 20731,
             sourceKind = "vendor",
             sourcePlaces = { { name = "Alurmi", zone = 14 } },
-            category = "c2506",
-            sortOrder = 170,
+            category = "c2497",
+            sortOrder = 80,
             requiredSkill = 300,
             skillLevels = { 1, 320, 360 },
             reagents = {
@@ -21707,8 +21710,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             sourceKind = "vendor",
             sourcePlaces = { { name = "Penney Copperpinch", zone = 26 }, { name = "Wulmort Jinglepocket", zone = 28 } },
-            category = "c2557",
-            sortOrder = 800,
+            category = "c2560",
+            sortOrder = 1100,
             requiredSkill = 285,
             reagents = {
                 { itemId = 2840, count = 1 },
@@ -24584,8 +24587,8 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 249536,
             sourceKind = "vendor",
             sourcePlaces = { { name = "Alynsia", zone = 70, x = 11.2, y = 71.5, faction = "alliance" }, { name = "Beneris", zone = 6, x = 49.7, y = 29.8, faction = "horde" } },
-            category = "c2595",
-            sortOrder = 9999,
+            category = "c2497",
+            sortOrder = 80,
             requiredSkill = 300,
             skillLevels = { 1, 320, 360 },
             reagents = {
@@ -24601,8 +24604,8 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 249534,
             sourceKind = "vendor",
             sourcePlaces = { { name = "Alynsia", zone = 70, x = 11.2, y = 71.5, faction = "alliance" }, { name = "Beneris", zone = 6, x = 49.7, y = 29.8, faction = "horde" } },
-            category = "c2595",
-            sortOrder = 9999,
+            category = "c2497",
+            sortOrder = 80,
             requiredSkill = 300,
             skillLevels = { 1, 320, 360 },
             reagents = {
@@ -27800,6 +27803,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2510",
             sortOrder = 210,
+            requiredSkill = 265,
             skillLevels = { 1, 285, 325 },
             reagents = {
                 { itemId = 11382, count = 1 },
@@ -27815,6 +27819,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2510",
             sortOrder = 210,
+            requiredSkill = 265,
             skillLevels = { 1, 285, 325 },
             reagents = {
                 { itemId = 11382, count = 1 },
@@ -27830,6 +27835,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2510",
             sortOrder = 210,
+            requiredSkill = 265,
             skillLevels = { 1, 285, 325 },
             reagents = {
                 { itemId = 11382, count = 1 },
@@ -29507,6 +29513,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2463",
             sortOrder = 130,
+            requiredSkill = 80,
             skillLevels = { 1, 85, 85 },
             reagents = {
                 { itemId = 2841, count = 4 },
@@ -29540,6 +29547,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2463",
             sortOrder = 130,
+            requiredSkill = 80,
             skillLevels = { 1, 85, 85 },
             reagents = {
                 { itemId = 2841, count = 4 },
@@ -29555,6 +29563,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2463",
             sortOrder = 130,
+            requiredSkill = 80,
             skillLevels = { 1, 85, 85 },
             reagents = {
                 { itemId = 2841, count = 4 },
@@ -29570,6 +29579,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2463",
             sortOrder = 130,
+            requiredSkill = 80,
             skillLevels = { 1, 85, 85 },
             reagents = {
                 { itemId = 2841, count = 4 },
@@ -29585,6 +29595,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2467",
             sortOrder = 170,
+            requiredSkill = 95,
             skillLevels = { 1, 100, 100 },
             reagents = {
                 { itemId = 2841, count = 6 },
@@ -29600,6 +29611,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2467",
             sortOrder = 170,
+            requiredSkill = 95,
             skillLevels = { 1, 100, 100 },
             reagents = {
                 { itemId = 2841, count = 6 },
@@ -29615,6 +29627,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2467",
             sortOrder = 170,
+            requiredSkill = 95,
             skillLevels = { 1, 100, 100 },
             reagents = {
                 { itemId = 2841, count = 6 },
@@ -29630,6 +29643,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2467",
             sortOrder = 170,
+            requiredSkill = 95,
             skillLevels = { 1, 100, 100 },
             reagents = {
                 { itemId = 2841, count = 6 },
@@ -29645,6 +29659,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2467",
             sortOrder = 170,
+            requiredSkill = 95,
             skillLevels = { 1, 100, 100 },
             reagents = {
                 { itemId = 2841, count = 6 },
@@ -29660,6 +29675,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2461",
             sortOrder = 110,
+            requiredSkill = 125,
             skillLevels = { 1, 130, 130 },
             reagents = {
                 { itemId = 2841, count = 8 },
@@ -29675,6 +29691,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2461",
             sortOrder = 110,
+            requiredSkill = 125,
             skillLevels = { 1, 130, 130 },
             reagents = {
                 { itemId = 2841, count = 8 },
@@ -29690,6 +29707,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2461",
             sortOrder = 110,
+            requiredSkill = 125,
             skillLevels = { 1, 130, 130 },
             reagents = {
                 { itemId = 2841, count = 8 },
@@ -29705,6 +29723,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2461",
             sortOrder = 110,
+            requiredSkill = 125,
             skillLevels = { 1, 130, 130 },
             reagents = {
                 { itemId = 2841, count = 8 },
@@ -29720,6 +29739,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2461",
             sortOrder = 110,
+            requiredSkill = 125,
             skillLevels = { 1, 130, 130 },
             reagents = {
                 { itemId = 2841, count = 8 },
@@ -30320,8 +30340,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             sourceKind = "drop",
             sourcePlaces = { { name = "Screeching Roguefeather", zone = 9 } },
-            category = "c2461",
-            sortOrder = 110,
+            category = "c2463",
+            sortOrder = 130,
             requiredSkill = 145,
             skillLevels = { 1, 170, 195 },
             reagents = {
@@ -30496,6 +30516,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2469",
             sortOrder = 30,
+            requiredSkill = 215,
             skillLevels = { 1, 235, 255 },
             reagents = {
                 { itemId = 3860, count = 8 },
@@ -30704,8 +30725,8 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 250556,
             recipeItemId = 251408,
             bopOutput = true,
-            category = "c2474",
-            sortOrder = 80,
+            category = "c2466",
+            sortOrder = 160,
             requiredSkill = 150,
             skillLevels = { 1, 155, 155 },
             reagents = {
@@ -30720,8 +30741,8 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 250557,
             recipeItemId = 251409,
             bopOutput = true,
-            category = "c2474",
-            sortOrder = 80,
+            category = "c2466",
+            sortOrder = 160,
             requiredSkill = 150,
             skillLevels = { 1, 155, 155 },
             reagents = {
@@ -30736,8 +30757,8 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 250558,
             recipeItemId = 251410,
             bopOutput = true,
-            category = "c2474",
-            sortOrder = 80,
+            category = "c2466",
+            sortOrder = 160,
             requiredSkill = 150,
             skillLevels = { 1, 155, 155 },
             reagents = {
@@ -30752,8 +30773,8 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 250559,
             recipeItemId = 251411,
             bopOutput = true,
-            category = "c2474",
-            sortOrder = 80,
+            category = "c2466",
+            sortOrder = 160,
             requiredSkill = 150,
             skillLevels = { 1, 155, 155 },
             reagents = {
@@ -30768,8 +30789,8 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 250560,
             recipeItemId = 251412,
             bopOutput = true,
-            category = "c2474",
-            sortOrder = 80,
+            category = "c2466",
+            sortOrder = 160,
             requiredSkill = 150,
             skillLevels = { 1, 155, 155 },
             reagents = {
@@ -30891,8 +30912,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             sourceKind = "vendor",
             sourcePlaces = { { name = "Stondry Darkhammer", zone = 70, x = 10.4, y = 74.8, faction = "alliance" }, { name = "Gor'mak", zone = 6, x = 49.8, y = 29.7, faction = "horde" } },
-            category = "c2473",
-            sortOrder = 70,
+            category = "c2465",
+            sortOrder = 150,
             requiredSkill = 175,
             skillLevels = { 1, 200, 225 },
             reagents = {
@@ -30911,8 +30932,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             sourceKind = "vendor",
             sourcePlaces = { { name = "Stondry Darkhammer", zone = 70, x = 10.4, y = 74.8, faction = "alliance" }, { name = "Gor'mak", zone = 6, x = 49.8, y = 29.7, faction = "horde" } },
-            category = "c2473",
-            sortOrder = 70,
+            category = "c2465",
+            sortOrder = 150,
             requiredSkill = 175,
             skillLevels = { 1, 200, 225 },
             reagents = {
@@ -30931,8 +30952,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             sourceKind = "vendor",
             sourcePlaces = { { name = "Stondry Darkhammer", zone = 70, x = 10.4, y = 74.8, faction = "alliance" }, { name = "Gor'mak", zone = 6, x = 49.8, y = 29.7, faction = "horde" } },
-            category = "c2473",
-            sortOrder = 70,
+            category = "c2465",
+            sortOrder = 150,
             requiredSkill = 175,
             skillLevels = { 1, 200, 225 },
             reagents = {
@@ -30951,8 +30972,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             sourceKind = "vendor",
             sourcePlaces = { { name = "Stondry Darkhammer", zone = 70, x = 10.4, y = 74.8, faction = "alliance" }, { name = "Gor'mak", zone = 6, x = 49.8, y = 29.7, faction = "horde" } },
-            category = "c2473",
-            sortOrder = 70,
+            category = "c2465",
+            sortOrder = 150,
             requiredSkill = 175,
             skillLevels = { 1, 200, 225 },
             reagents = {
@@ -30971,8 +30992,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             sourceKind = "vendor",
             sourcePlaces = { { name = "Stondry Darkhammer", zone = 70, x = 10.4, y = 74.8, faction = "alliance" }, { name = "Gor'mak", zone = 6, x = 49.8, y = 29.7, faction = "horde" } },
-            category = "c2473",
-            sortOrder = 70,
+            category = "c2465",
+            sortOrder = 150,
             requiredSkill = 175,
             skillLevels = { 1, 200, 225 },
             reagents = {
@@ -31047,9 +31068,13 @@ RecipeRegistryRecipeMetadata = {
             profession = "blacksmithing",
             expansion = "forever",
             createdItemId = 250574,
+            recipeItemId = 251426,
             bopOutput = true,
+            sourceKind = "vendor",
+            sourcePlaces = { { name = "Stondry Darkhammer", zone = 70, x = 10.4, y = 74.8, faction = "alliance" }, { name = "Gor'mak", zone = 6, x = 49.8, y = 29.7, faction = "horde" } },
             category = "c2474",
             sortOrder = 80,
+            requiredSkill = 250,
             skillLevels = { 1, 270, 290 },
             reagents = {
                 { itemId = 12359, count = 24 },
@@ -31456,8 +31481,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             sourceKind = "vendor",
             sourcePlaces = { { name = "Stondry Darkhammer", zone = 70, x = 10.4, y = 74.8, faction = "alliance" }, { name = "Gor'mak", zone = 6, x = 49.8, y = 29.7, faction = "horde" } },
-            category = "c2467",
-            sortOrder = 170,
+            category = "c2475",
+            sortOrder = 90,
             requiredSkill = 300,
             skillLevels = { 1, 320, 340 },
             reagents = {
@@ -32772,8 +32797,8 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 252583,
             recipeItemId = 252917,
             bopOutput = false,
-            category = "c2554",
-            sortOrder = 500,
+            category = "c2562",
+            sortOrder = 1300,
             requiredSkill = 250,
             skillLevels = { 1, 270, 290 },
             reagents = {
@@ -34604,6 +34629,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2553",
             sortOrder = 400,
+            requiredSkill = 125,
             skillLevels = { 1, 130, 130 },
             reagents = {
                 { itemId = 2319, count = 12 },
@@ -34619,6 +34645,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2553",
             sortOrder = 400,
+            requiredSkill = 125,
             skillLevels = { 1, 130, 130 },
             reagents = {
                 { itemId = 2319, count = 12 },
@@ -34634,6 +34661,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2553",
             sortOrder = 400,
+            requiredSkill = 125,
             skillLevels = { 1, 130, 130 },
             reagents = {
                 { itemId = 2319, count = 12 },
@@ -34649,6 +34677,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2553",
             sortOrder = 400,
+            requiredSkill = 125,
             skillLevels = { 1, 130, 130 },
             reagents = {
                 { itemId = 2319, count = 12 },
@@ -34664,6 +34693,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2553",
             sortOrder = 400,
+            requiredSkill = 125,
             skillLevels = { 1, 130, 130 },
             reagents = {
                 { itemId = 2319, count = 12 },
@@ -34679,6 +34709,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2553",
             sortOrder = 400,
+            requiredSkill = 125,
             skillLevels = { 1, 130, 130 },
             reagents = {
                 { itemId = 2319, count = 12 },
@@ -34988,6 +35019,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2559",
             sortOrder = 1000,
+            requiredSkill = 100,
             skillLevels = { 1, 105, 105 },
             reagents = {
                 { itemId = 2319, count = 8 },
@@ -35003,6 +35035,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2559",
             sortOrder = 1000,
+            requiredSkill = 100,
             skillLevels = { 1, 105, 105 },
             reagents = {
                 { itemId = 2319, count = 8 },
@@ -35018,6 +35051,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2559",
             sortOrder = 1000,
+            requiredSkill = 100,
             skillLevels = { 1, 105, 105 },
             reagents = {
                 { itemId = 2319, count = 8 },
@@ -35033,6 +35067,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2559",
             sortOrder = 1000,
+            requiredSkill = 100,
             skillLevels = { 1, 105, 105 },
             reagents = {
                 { itemId = 2319, count = 8 },
@@ -35048,6 +35083,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2559",
             sortOrder = 1000,
+            requiredSkill = 100,
             skillLevels = { 1, 105, 105 },
             reagents = {
                 { itemId = 2319, count = 8 },
@@ -35063,6 +35099,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2559",
             sortOrder = 1000,
+            requiredSkill = 100,
             skillLevels = { 1, 105, 105 },
             reagents = {
                 { itemId = 2319, count = 8 },
@@ -35354,6 +35391,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2555",
             sortOrder = 600,
+            requiredSkill = 75,
             skillLevels = { 1, 80, 80 },
             reagents = {
                 { itemId = 2318, count = 16 },
@@ -35369,6 +35407,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2555",
             sortOrder = 600,
+            requiredSkill = 75,
             skillLevels = { 1, 80, 80 },
             reagents = {
                 { itemId = 2318, count = 16 },
@@ -35384,6 +35423,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2555",
             sortOrder = 600,
+            requiredSkill = 75,
             skillLevels = { 1, 80, 80 },
             reagents = {
                 { itemId = 2318, count = 16 },
@@ -35399,6 +35439,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2555",
             sortOrder = 600,
+            requiredSkill = 75,
             skillLevels = { 1, 80, 80 },
             reagents = {
                 { itemId = 2318, count = 16 },
@@ -35414,6 +35455,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2555",
             sortOrder = 600,
+            requiredSkill = 75,
             skillLevels = { 1, 80, 80 },
             reagents = {
                 { itemId = 2318, count = 16 },
@@ -35429,6 +35471,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             category = "c2555",
             sortOrder = 600,
+            requiredSkill = 75,
             skillLevels = { 1, 80, 80 },
             reagents = {
                 { itemId = 2318, count = 16 },
@@ -35945,8 +35988,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = true,
             sourceKind = "vendor",
             sourcePlaces = { { name = "Mivin Shadowweave", zone = 70, x = 10, y = 72.9, faction = "alliance" }, { name = "Jim'bek", zone = 6, x = 49.6, y = 29.5, faction = "horde" } },
-            category = "c2583",
-            sortOrder = 800,
+            category = "c2585",
+            sortOrder = 1000,
             requiredSkill = 75,
             skillLevels = { 1, 100, 135 },
             reagents = {
@@ -41522,7 +41565,6 @@ RecipeRegistryRecipeMetadata = {
             skillLevels = { 1, 65, 70 },
             reagents = {
                 { itemId = 2318, count = 7 },
-                { itemId = 4321, count = 1 },
                 { itemId = 2320, count = 2 },
             },
         },
@@ -41626,7 +41668,6 @@ RecipeRegistryRecipeMetadata = {
             skillLevels = { 1, 65, 70 },
             reagents = {
                 { itemId = 2318, count = 7 },
-                { itemId = 4321, count = 1 },
                 { itemId = 2320, count = 2 },
             },
         },
@@ -41930,7 +41971,6 @@ RecipeRegistryRecipeMetadata = {
             skillLevels = { 1, 65, 70 },
             reagents = {
                 { itemId = 2318, count = 7 },
-                { itemId = 4321, count = 1 },
                 { itemId = 2320, count = 2 },
             },
         },
@@ -42034,7 +42074,6 @@ RecipeRegistryRecipeMetadata = {
             skillLevels = { 1, 65, 70 },
             reagents = {
                 { itemId = 2318, count = 7 },
-                { itemId = 4321, count = 1 },
                 { itemId = 2320, count = 2 },
             },
         },
@@ -43492,6 +43531,21 @@ RecipeRegistryRecipeMetadata = {
                 { itemId = 3713, count = 1 },
             },
         },
+        [1328948] = {
+            profession = "enchanting",
+            expansion = "forever",
+            recipeItemId = 289560,
+            category = "c2500",
+            sortOrder = 110,
+            requiredSkill = 280,
+            skillLevels = { 1, 280, 300 },
+            reagents = {
+                { itemId = 11175, count = 2 },
+                { itemId = 11176, count = 8 },
+                { itemId = 11178, count = 2 },
+                { itemId = 12361, count = 1 },
+            },
+        },
     },
 
     recipeItemToSpellId = {
@@ -44790,6 +44844,7 @@ RecipeRegistryRecipeMetadata = {
         [251423] = 1252320,
         [251424] = 1252321,
         [251425] = 1252322,
+        [251426] = 1252323,
         [251427] = 1252324,
         [251428] = 1252325,
         [251429] = 1252326,
@@ -45494,6 +45549,7 @@ RecipeRegistryRecipeMetadata = {
         [286087] = 1319165,
         [286153] = 1319313,
         [288206] = 11447,
+        [289560] = 1328948,
     },
 
     createdItemToSpellIds = {
@@ -48140,25 +48196,25 @@ RecipeRegistryRecipeMetadata = {
                 _all = { 2660, 2665, 2674, 3115, 3116, 3117, 9918, 9921, 16640, 16641, 22757 },
             },
             ["c2461"] = {
-                _all = { 3502, 3503, 9814, 9961, 16659, 1252247, 1252248, 1252249, 1252250, 1252251, 1252277, 1252278, 1252279, 1252280, 1252281, 1252282, 1252286, 1301526, 1301534 },
+                _all = { 3502, 3503, 9814, 9961, 16659, 1252247, 1252248, 1252249, 1252250, 1252251, 1252277, 1252278, 1252279, 1252280, 1252281, 1252286, 1301526, 1301534 },
             },
             ["c2462"] = {
                 _all = { 3328, 3330, 3504, 3505, 9811, 9966, 20873, 24137, 1252235, 1252288, 1301527, 1301535 },
             },
             ["c2463"] = {
-                _all = { 2667, 2670, 2673, 2675, 3321, 3508, 3511, 8366, 8367, 9813, 9916, 12260, 15293, 16648, 24136, 27590, 1252236, 1252237, 1252238, 1252239, 1252240, 1252241, 1252267, 1252268, 1252269, 1252270, 1252271, 1301421, 1301445 },
+                _all = { 2667, 2670, 2673, 2675, 3321, 3508, 3511, 8366, 8367, 9813, 9916, 12260, 15293, 16648, 24136, 27590, 1252236, 1252237, 1252238, 1252239, 1252240, 1252241, 1252267, 1252268, 1252269, 1252270, 1252271, 1252282, 1301421, 1301445 },
             },
             ["c2464"] = {
                 _all = { 2663, 2664, 2671, 2672, 3501, 7223, 9937, 1252284, 1301422, 1301446 },
             },
             ["c2465"] = {
-                _all = { 3323, 3325, 3333, 3336, 8368, 9820, 9942, 11643, 16654, 24138, 27589, 1252234, 1252257, 1252258, 1252259, 1252260, 1252261, 1252287, 1301423, 1301447 },
+                _all = { 3323, 3325, 3333, 3336, 8368, 9820, 9942, 11643, 16654, 24138, 27589, 1252234, 1252257, 1252258, 1252259, 1252260, 1252261, 1252287, 1252315, 1252316, 1252317, 1252318, 1252319, 1301423, 1301447 },
             },
             ["c2466"] = {
-                _all = { 2661, 2666, 16645, 20872, 27588, 1252262, 1252263, 1252264, 1252265, 1252266, 1301424, 1301448 },
+                _all = { 2661, 2666, 16645, 20872, 27588, 1252262, 1252263, 1252264, 1252265, 1252266, 1252305, 1252306, 1252307, 1252308, 1252309, 1301424, 1301448 },
             },
             ["c2467"] = {
-                _all = { 2662, 2668, 3324, 3506, 3507, 9931, 9957, 12259, 16725, 1252233, 1252242, 1252243, 1252244, 1252245, 1252246, 1252272, 1252273, 1252274, 1252275, 1252276, 1252285, 1252345, 1301425, 1301449 },
+                _all = { 2662, 2668, 3324, 3506, 3507, 9931, 9957, 12259, 16725, 1252233, 1252242, 1252243, 1252244, 1252245, 1252246, 1252272, 1252273, 1252274, 1252275, 1252276, 1252285, 1301425, 1301449 },
             },
             ["c2468"] = {
                 _all = { 3319, 3331, 3334, 3513, 3515, 7817, 9818, 1252229, 1252230, 1252231, 1252232, 1252252, 1252253, 1252254, 1252255, 1252256, 1252283, 1301426, 1301450, 1302598 },
@@ -48176,13 +48232,13 @@ RecipeRegistryRecipeMetadata = {
                 _all = { 16644, 16649, 20874, 28244, 1252330, 1252331, 1252332, 1252333, 1252334, 1252339, 1252989, 1253002 },
             },
             ["c2473"] = {
-                _all = { 9928, 9950, 9954, 16655, 16741, 23633, 23637, 24912, 28243, 28462, 1252294, 1252300, 1252301, 1252302, 1252303, 1252304, 1252315, 1252316, 1252317, 1252318, 1252319, 1252337, 1252338, 1292946, 1292950, 1292954, 1292982, 1292986, 1297138, 1297141, 1306538 },
+                _all = { 9928, 9950, 9954, 16655, 16741, 23633, 23637, 24912, 28243, 28462, 1252294, 1252300, 1252301, 1252302, 1252303, 1252304, 1252337, 1252338, 1292946, 1292950, 1292954, 1292982, 1292986, 1297138, 1297141, 1306538 },
             },
             ["c2474"] = {
-                _all = { 16643, 16647, 23632, 27585, 28463, 1252305, 1252306, 1252307, 1252308, 1252309, 1252320, 1252321, 1252322, 1252323, 1252324, 1252341, 1252990, 1253003, 1297139, 1297142 },
+                _all = { 16643, 16647, 23632, 27585, 28463, 1252320, 1252321, 1252322, 1252323, 1252324, 1252341, 1252990, 1253003, 1297139, 1297142 },
             },
             ["c2475"] = {
-                _all = { 9933, 9945, 16662, 16730, 16732, 16744, 20876, 24140, 27829, 1252293, 1252340, 1252347, 1252349, 1292945, 1292949, 1292953, 1292981, 1292985, 1306539 },
+                _all = { 9933, 9945, 16662, 16730, 16732, 16744, 20876, 24140, 27829, 1252293, 1252340, 1252345, 1252347, 1252349, 1292945, 1292949, 1292953, 1292981, 1292985, 1306539 },
             },
             ["c2476"] = {
                 _all = { 9968, 9979, 16652, 16656, 16657, 16665, 24399, 1252291, 1252295, 1252296, 1252297, 1252298, 1252299, 1252310, 1252311, 1252312, 1252313, 1252314, 1252336, 1292948, 1292952, 1292956, 1292984, 1292988, 1297140, 1297143, 1306537 },
@@ -48239,7 +48295,7 @@ RecipeRegistryRecipeMetadata = {
                 _all = { 470359, 470370, 1225758, 1225759, 1225760, 1225762, 1225763 },
             },
             ["c2632"] = {
-                _all = { 2538, 3377, 3400, 6412, 6417, 6499, 6500, 6501, 7213, 15863, 15865, 15906, 20626, 21175, 1250158, 1255241 },
+                _all = { 2538, 3400, 6412, 6417, 6499, 6500, 6501, 7213, 15863, 15865, 15906, 20626, 21175, 1250158, 1255241 },
             },
             ["c2633"] = {
                 _all = { 2540, 2542, 2546, 2548, 2795, 3371, 3397, 6419, 8607, 24801, 1250142, 1250147, 1250148, 1250151, 1295834 },
@@ -48257,7 +48313,7 @@ RecipeRegistryRecipeMetadata = {
                 _all = { 21143, 21144 },
             },
             ["c2640"] = {
-                _all = { 3372, 3376, 6414, 6418, 8604, 15910, 15933, 1250145, 1250155, 1250157, 1270633 },
+                _all = { 3372, 3376, 3377, 6414, 6418, 8604, 15910, 15933, 1250145, 1250155, 1250157, 1270633 },
             },
             ["c2641"] = {
                 _all = { 7827, 18238, 18243, 18245, 18247, 25704, 25954, 1295805 },
@@ -48285,7 +48341,7 @@ RecipeRegistryRecipeMetadata = {
             },
         },
         ["enchanting"] = {
-            _all = { 7418, 7420, 7421, 7426, 7428, 7443, 7454, 7457, 7745, 7748, 7766, 7771, 7776, 7779, 7782, 7786, 7788, 7793, 7795, 7857, 7859, 7861, 7863, 7867, 13378, 13380, 13419, 13421, 13464, 13485, 13501, 13503, 13522, 13529, 13536, 13538, 13607, 13612, 13617, 13620, 13622, 13626, 13628, 13631, 13635, 13637, 13640, 13642, 13644, 13646, 13648, 13653, 13655, 13657, 13659, 13661, 13663, 13687, 13689, 13693, 13695, 13698, 13700, 13702, 13746, 13794, 13815, 13817, 13822, 13836, 13841, 13846, 13858, 13868, 13882, 13887, 13890, 13898, 13905, 13915, 13917, 13931, 13933, 13935, 13937, 13939, 13941, 13943, 13945, 13947, 13948, 14293, 14807, 14809, 14810, 15596, 17180, 17181, 20008, 20009, 20010, 20011, 20012, 20013, 20014, 20015, 20016, 20017, 20020, 20023, 20024, 20025, 20026, 20028, 20029, 20030, 20031, 20032, 20033, 20034, 20035, 20036, 20051, 21931, 22749, 22750, 23799, 23800, 23801, 23802, 23803, 23804, 25072, 25073, 25074, 25078, 25079, 25080, 25081, 25082, 25083, 25084, 25086, 25124, 25125, 25126, 25127, 25128, 25129, 25130, 27837, 430409, 435481, 435903, 439134, 439156, 446243, 448624, 463866, 463869, 463871, 471400, 1213593, 1213595, 1213598, 1213600, 1213603, 1213607, 1213610, 1213616, 1213622, 1213626, 1213628, 1213633, 1213635, 1216005, 1216007, 1216010, 1216014, 1216016, 1216018, 1216020, 1216022, 1216024, 1217189, 1217203, 1219577, 1219578, 1219579, 1219580, 1219581, 1219587, 1220623, 1220624, 1230643, 1231128, 1231139, 1231164, 1232172, 1245320, 1245321, 1248458, 1248459, 1248460, 1248461, 1248497, 1248498, 1248500, 1248505, 1248509, 1248510, 1248511, 1248515, 1248528, 1248599, 1248607, 1248636, 1248640, 1248645, 1248650, 1248661, 1248665, 1248668, 1248703, 1248739, 1248745, 1248748, 1248752, 1248754, 1248755, 1248757, 1248760, 1248805, 1248974, 1249006, 1249015, 1249019, 1249057, 1249058, 1249059, 1249060, 1249061, 1249064, 1249069, 1249070, 1249071, 1249107, 1249112, 1249114, 1249128, 1249152, 1249154, 1263056, 1263082, 1294054, 1306520, 1306521, 1306522, 1306523, 1306524, 1306525 },
+            _all = { 7418, 7420, 7421, 7426, 7428, 7443, 7454, 7457, 7745, 7748, 7766, 7771, 7776, 7779, 7782, 7786, 7788, 7793, 7795, 7857, 7859, 7861, 7863, 7867, 13378, 13380, 13419, 13421, 13464, 13485, 13501, 13503, 13522, 13529, 13536, 13538, 13607, 13612, 13617, 13620, 13622, 13626, 13628, 13631, 13635, 13637, 13640, 13642, 13644, 13646, 13648, 13653, 13655, 13657, 13659, 13661, 13663, 13687, 13689, 13693, 13695, 13698, 13700, 13702, 13746, 13794, 13815, 13817, 13822, 13836, 13841, 13846, 13858, 13868, 13882, 13887, 13890, 13898, 13905, 13915, 13917, 13931, 13933, 13935, 13937, 13939, 13941, 13943, 13945, 13947, 13948, 14293, 14807, 14809, 14810, 15596, 17180, 17181, 20008, 20009, 20010, 20011, 20012, 20013, 20014, 20015, 20016, 20017, 20020, 20023, 20024, 20025, 20026, 20028, 20029, 20030, 20031, 20032, 20033, 20034, 20035, 20036, 20051, 21931, 22749, 22750, 23799, 23800, 23801, 23802, 23803, 23804, 25072, 25073, 25074, 25078, 25079, 25080, 25081, 25082, 25083, 25084, 25086, 25124, 25125, 25126, 25127, 25128, 25129, 25130, 27837, 430409, 435481, 435903, 439134, 439156, 446243, 448624, 463866, 463869, 463871, 471400, 1213593, 1213595, 1213598, 1213600, 1213603, 1213607, 1213610, 1213616, 1213622, 1213626, 1213628, 1213633, 1213635, 1216005, 1216007, 1216010, 1216014, 1216016, 1216018, 1216020, 1216022, 1216024, 1217189, 1217203, 1219577, 1219578, 1219579, 1219580, 1219581, 1219587, 1220623, 1220624, 1230643, 1231128, 1231139, 1231164, 1232172, 1245320, 1245321, 1248458, 1248459, 1248460, 1248461, 1248497, 1248498, 1248500, 1248505, 1248509, 1248510, 1248511, 1248515, 1248528, 1248599, 1248607, 1248636, 1248640, 1248645, 1248650, 1248661, 1248665, 1248668, 1248703, 1248739, 1248745, 1248748, 1248752, 1248754, 1248755, 1248757, 1248760, 1248805, 1248974, 1249006, 1249015, 1249019, 1249057, 1249058, 1249059, 1249060, 1249061, 1249064, 1249069, 1249070, 1249071, 1249107, 1249112, 1249114, 1249128, 1249152, 1249154, 1263056, 1263082, 1294054, 1306520, 1306521, 1306522, 1306523, 1306524, 1306525, 1328948 },
             ["c2490"] = {
                 _all = { 17180, 17181, 1245320 },
             },
@@ -48302,10 +48358,10 @@ RecipeRegistryRecipeMetadata = {
                 _all = { 7418, 7428, 7457, 7766, 7779, 7782, 7859, 13501, 13536, 13622, 13642, 13646, 13648, 13661, 13822, 13846, 13931, 13939, 13945, 20008, 20009, 20010, 20011, 23801, 23802, 1220624, 1248458, 1248459, 1248460, 1248497, 1248498, 1248500, 1248599, 1248661, 1248665 },
             },
             ["c2497"] = {
-                _all = { 13612, 13617, 13620, 13698, 13815, 13841, 13868, 13887, 13947, 13948, 20012, 20013, 25072, 25073, 25074, 25078, 25079, 1248528, 1248640, 1248645, 1294054 },
+                _all = { 13612, 13617, 13620, 13698, 13815, 13841, 13868, 13887, 13947, 13948, 20012, 20013, 25072, 25073, 25074, 25078, 25079, 25080, 1213622, 1213626, 1248528, 1248640, 1248645, 1294054 },
             },
             ["c2500"] = {
-                _all = { 7863, 7867, 13637, 13644, 13687, 13836, 13890, 13935, 20020, 20023, 20024 },
+                _all = { 7863, 7867, 13637, 13644, 13687, 13836, 13890, 13935, 20020, 20023, 20024, 1328948 },
             },
             ["c2501"] = {
                 _all = { 7745, 7793, 13380, 13529, 13695, 13937, 20030, 20035, 20036, 27837, 1219580, 1248510, 1248511, 1248607, 1248636, 1248668 },
@@ -48323,7 +48379,7 @@ RecipeRegistryRecipeMetadata = {
                 _all = { 1249019, 1249057, 1249058, 1249059, 1249060 },
             },
             ["c2506"] = {
-                _all = { 7454, 7771, 7861, 13419, 13421, 13522, 13635, 13657, 13746, 13794, 13882, 20014, 20015, 25080, 25081, 25082, 25083, 25084, 25086, 1219587 },
+                _all = { 7454, 7771, 7861, 13419, 13421, 13522, 13635, 13657, 13746, 13794, 13882, 20014, 20015, 25081, 25082, 25083, 25084, 25086, 1219587 },
             },
             ["c2509"] = {
                 _all = { 1248752, 1248754, 1248755, 1248974, 1249006, 1249015, 1249128, 1249152, 1249154, 1306521, 1306522, 1306523, 1306524, 1306525 },
@@ -48344,7 +48400,7 @@ RecipeRegistryRecipeMetadata = {
                 _all = { 1230643, 1263056, 1263082 },
             },
             ["c2595"] = {
-                _all = { 430409, 435481, 435903, 439134, 439156, 446243, 448624, 463866, 463869, 463871, 471400, 1213593, 1213595, 1213598, 1213600, 1213603, 1213607, 1213610, 1213616, 1213622, 1213626, 1213628, 1213633, 1213635, 1216005, 1216007, 1216010, 1216014, 1216016, 1216018, 1216020, 1216022, 1216024, 1217189, 1217203, 1231128, 1231139, 1231164, 1232172 },
+                _all = { 430409, 435481, 435903, 439134, 439156, 446243, 448624, 463866, 463869, 463871, 471400, 1213593, 1213595, 1213598, 1213600, 1213603, 1213607, 1213610, 1213616, 1213628, 1213633, 1213635, 1216005, 1216007, 1216010, 1216014, 1216016, 1216018, 1216020, 1216022, 1216024, 1217189, 1217203, 1231128, 1231139, 1231164, 1232172 },
             },
         },
         ["engineering"] = {
@@ -48440,7 +48496,7 @@ RecipeRegistryRecipeMetadata = {
                 _all = { 10490, 10507, 10531, 10546, 10621, 10632, 19071, 19082, 20854, 28472, 1255013, 1255016, 1255017, 1255025, 1255088, 1255089, 1255090, 1255091, 1255092, 1255093, 1255104, 1255105, 1255106, 1255107, 1255108, 1255109, 1301528, 1301530, 1301536, 1301538, 1306527 },
             },
             ["c2554"] = {
-                _all = { 3768, 3769, 7151, 9147, 10516, 10529, 19061, 19062, 19090, 19101, 19103, 23706, 24125, 1254990, 1255020, 1255023, 1255026, 1255055, 1255056, 1255057, 1255058, 1255059, 1292923, 1292927, 1292931, 1292935, 1292967, 1301529, 1301531, 1301537, 1301539 },
+                _all = { 3768, 3769, 7151, 9147, 10516, 10529, 19061, 19062, 19090, 19101, 19103, 23706, 24125, 1255020, 1255023, 1255026, 1255055, 1255056, 1255057, 1255058, 1255059, 1292923, 1292927, 1292931, 1292935, 1292967, 1301529, 1301531, 1301537, 1301539 },
             },
             ["c2555"] = {
                 _all = { 2160, 2163, 2166, 2169, 3761, 3762, 3772, 3773, 4096, 6661, 6703, 6704, 7126, 8322, 9196, 9197, 10499, 10520, 10544, 10647, 19068, 19076, 19079, 19081, 19086, 19095, 19098, 19102, 19104, 23703, 24121, 24124, 24940, 28219, 1252982, 1252985, 1255014, 1255015, 1255024, 1255030, 1255097, 1255098, 1255099, 1255100, 1255101, 1255102, 1255131, 1255132, 1255133, 1255134, 1255135, 1255136, 1301427, 1301433, 1301451, 1301457 },
@@ -48449,7 +48505,7 @@ RecipeRegistryRecipeMetadata = {
                 _all = { 3776, 3777, 6705, 9059, 9065, 9201, 9202, 19052, 19065, 23399, 24123, 28221, 1252983, 1252986, 1255019, 1255022, 1255050, 1255051, 1255052, 1255053, 1255054, 1301428, 1301434, 1301452, 1301458 },
             },
             ["c2557"] = {
-                _all = { 2164, 3756, 3764, 3765, 3770, 3771, 7156, 7954, 9072, 9074, 9145, 9146, 9148, 9149, 10630, 19049, 19053, 19055, 19084, 19087, 21943, 22711, 23704, 24122, 26279, 28220, 44953, 1255027, 1255036, 1255037, 1255038, 1255039, 1255040, 1255041, 1255065, 1255066, 1255067, 1255068, 1255069, 1255070, 1255071, 1255125, 1255126, 1255127, 1255128, 1255129, 1255130, 1292921, 1292926, 1292930, 1292934, 1292966, 1297126, 1297129, 1301429, 1301435, 1301453, 1301459 },
+                _all = { 2164, 3756, 3764, 3765, 3770, 3771, 7156, 7954, 9072, 9074, 9145, 9146, 9148, 9149, 10630, 19049, 19053, 19055, 19084, 19087, 21943, 22711, 23704, 24122, 26279, 28220, 1255027, 1255036, 1255037, 1255038, 1255039, 1255040, 1255041, 1255065, 1255066, 1255067, 1255068, 1255069, 1255070, 1255071, 1255125, 1255126, 1255127, 1255128, 1255129, 1255130, 1292921, 1292926, 1292930, 1292934, 1292966, 1297126, 1297129, 1301429, 1301435, 1301453, 1301459 },
             },
             ["c2558"] = {
                 _all = { 3753, 3763, 3766, 3767, 3774, 3775, 3778, 3779, 4097, 6702, 7955, 9206, 19072, 19092, 22921, 23707, 23709, 23710, 28474, 1252984, 1252987, 1255021, 1255031, 1255032, 1255033, 1255034, 1255035, 1255049, 1255075, 1255076, 1255077, 1255078, 1255079, 1255080, 1255081, 1255137, 1255138, 1255139, 1255140, 1255141, 1255142, 1297127, 1297130, 1301430, 1301436, 1301454, 1301460, 1306526 },
@@ -48458,13 +48514,13 @@ RecipeRegistryRecipeMetadata = {
                 _all = { 2153, 3759, 7133, 7135, 7147, 7149, 9064, 9068, 9195, 10548, 10560, 10572, 19059, 19067, 19073, 19074, 19078, 19080, 19083, 19091, 19097, 1255012, 1255018, 1255029, 1255082, 1255083, 1255084, 1255085, 1255086, 1255087, 1255110, 1255111, 1255112, 1255113, 1255114, 1255115, 1292920, 1292925, 1292929, 1292933, 1292965, 1301431, 1301437, 1301455, 1301461, 1306528 },
             },
             ["c2560"] = {
-                _all = { 2149, 2158, 2161, 2167, 9207, 9208, 10558, 10566, 19063, 19066, 20853, 22922, 23705, 28473, 1255028, 1255042, 1255043, 1255044, 1255045, 1255046, 1255047, 1255048, 1255060, 1255061, 1255062, 1255063, 1255064, 1255103, 1255116, 1255117, 1255118, 1255119, 1255120, 1255121, 1255143, 1255144, 1255145, 1255146, 1292924, 1292928, 1292932, 1292936, 1292968, 1297128, 1297131, 1301432, 1301438, 1301456, 1301462 },
+                _all = { 2149, 2158, 2161, 2167, 9207, 9208, 10558, 10566, 19063, 19066, 20853, 22922, 23705, 28473, 44953, 1255028, 1255042, 1255043, 1255044, 1255045, 1255046, 1255047, 1255048, 1255060, 1255061, 1255062, 1255063, 1255064, 1255103, 1255116, 1255117, 1255118, 1255119, 1255120, 1255121, 1255143, 1255144, 1255145, 1255146, 1292924, 1292928, 1292932, 1292936, 1292968, 1297128, 1297131, 1301432, 1301438, 1301456, 1301462 },
             },
             ["c2561"] = {
                 _all = { 10552, 10570, 16728, 19088, 1254968, 1254969, 1254976, 1254992 },
             },
             ["c2562"] = {
-                _all = { 10564, 19089, 19094, 19100, 1254981, 1255004, 1255005, 1255006, 1255007, 1292939, 1292971, 1292975, 1299916, 1306529 },
+                _all = { 10564, 19089, 19094, 19100, 1254981, 1254990, 1255004, 1255005, 1255006, 1255007, 1292939, 1292971, 1292975, 1299916, 1306529 },
             },
             ["c2563"] = {
                 _all = { 10511, 10525, 10650, 16650, 16746, 19050, 19051, 19054, 19077, 19085, 19106, 24703, 24848, 24851, 28222, 1252995, 1252998, 1254974, 1254975 },
@@ -48539,13 +48595,13 @@ RecipeRegistryRecipeMetadata = {
                 _all = { 3848, 3849, 8774, 8793, 8795, 12074, 12076, 12078, 12087, 18448, 18449, 18453, 20848, 23663, 23665, 28482, 435848, 1257442, 1257450, 1257451, 1257452, 1257453, 1257454, 1257455, 1257485, 1257489, 1292943, 1292959, 1292963, 1292979, 1301533, 1301541 },
             },
             ["c2583"] = {
-                _all = { 2385, 2389, 2395, 2399, 2403, 3859, 6690, 6692, 7623, 7624, 7629, 7630, 7633, 7636, 7639, 7643, 8764, 8770, 8784, 8791, 8802, 12048, 12050, 12055, 12056, 12068, 12069, 12070, 18403, 18404, 18406, 18407, 18408, 18414, 18416, 18436, 18446, 18447, 18451, 18456, 18457, 18458, 22902, 23666, 24091, 28207, 28480, 44950, 44958, 1252979, 1252991, 1257376, 1257377, 1257378, 1257379, 1257380, 1257381, 1257382, 1257406, 1257407, 1257408, 1257409, 1257410, 1257411, 1257486, 1301439, 1301463, 1306540 },
+                _all = { 2385, 2389, 2395, 2399, 2403, 3859, 6690, 6692, 7623, 7624, 7629, 7630, 7633, 7636, 7639, 7643, 8764, 8770, 8784, 8791, 8802, 12048, 12050, 12055, 12056, 12068, 12069, 12070, 18403, 18404, 18406, 18407, 18408, 18414, 18416, 18436, 18446, 18447, 18451, 18456, 18457, 18458, 22902, 23666, 24091, 28207, 28480, 44950, 44958, 1252979, 1252991, 1257376, 1257377, 1257378, 1257379, 1257380, 1257381, 1257406, 1257407, 1257408, 1257409, 1257410, 1257411, 1257486, 1301439, 1301463, 1306540 },
             },
             ["c2584"] = {
                 _all = { 3841, 22759, 28209, 428424, 1252980, 1252992, 1257435, 1257456, 1257457, 1257458, 1257459, 1257460, 1257461, 1257487, 1257491, 1301440, 1301464 },
             },
             ["c2585"] = {
-                _all = { 3840, 3843, 3852, 3854, 3868, 8780, 8782, 8804, 12053, 12063, 12066, 12067, 12071, 18411, 18412, 18413, 18415, 18417, 18454, 20849, 22867, 22868, 22869, 28205, 1257383, 1257384, 1257385, 1257386, 1257387, 1257434, 1257436, 1257437, 1257438, 1257439, 1257440, 1257441, 1257463, 1257473, 1257474, 1257475, 1257476, 1257477, 1257478, 1292942, 1292958, 1292962, 1292978, 1297120, 1297123, 1301441, 1301465 },
+                _all = { 3840, 3843, 3852, 3854, 3868, 8780, 8782, 8804, 12053, 12063, 12066, 12067, 12071, 18411, 18412, 18413, 18415, 18417, 18454, 20849, 22867, 22868, 22869, 28205, 1257382, 1257383, 1257384, 1257385, 1257386, 1257387, 1257434, 1257436, 1257437, 1257438, 1257439, 1257440, 1257441, 1257463, 1257473, 1257474, 1257475, 1257476, 1257477, 1257478, 1292942, 1292958, 1292962, 1292978, 1297120, 1297123, 1301441, 1301465 },
             },
             ["c2586"] = {
                 _all = { 3863, 3864, 8766, 8772, 8776, 8797, 18402, 18410, 22866, 23662, 24902, 435841, 1252981, 1252993, 1257368, 1257369, 1257388, 1257389, 1257390, 1257391, 1257392, 1257393, 1257444, 1257445, 1257446, 1257447, 1257448, 1257449, 1257462, 1257464, 1257466, 1257467, 1257468, 1257469, 1257470, 1257471, 1297121, 1297124, 1301442, 1301466, 1306541 },
