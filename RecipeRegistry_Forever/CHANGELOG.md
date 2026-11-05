@@ -12,9 +12,10 @@ All notable changes to this addon are documented in this file.
 
 ### Changed
 
-- **Recipe data from game build 1.60.1.70755.** 60 recipes changed: 37 now
+- **Recipe data from game build 1.60.1.70790.** 60 recipes changed: 37 now
   show the skill needed to learn them, 19 moved to another category and 4 have
   updated reagents.
+- **73 recipes are no longer hidden from Collection.**
 
 ## [0.1.3] - 2026-10-25
 
