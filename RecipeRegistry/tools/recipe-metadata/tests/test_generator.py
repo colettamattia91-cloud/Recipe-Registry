@@ -931,6 +931,19 @@ class ArlProviderTests(unittest.TestCase):
         self.assertTrue(summary["worldDrop"])
         self.assertEqual(names_of(summary), [])
 
+    def test_a_name_with_quotes_is_read_as_lua_reads_it(self):
+        # ARL escapes the quotes inside a name. Kept verbatim, the backslashes
+        # reached the database and the addon showed them.
+        lookups = parse_lookup(r'''
+            AddVendor(2663, L["High Admiral \"Shelly\" Jorrik"], BZ["Dun Morogh"], 10.9, 76.1)
+            AddVendor(1465, L["\"Cookie\" McWeaksauce"], BZ["Redridge Mountains"], 46.7, 70.5, ALLIANCE)
+        ''')
+        self.assertEqual(lookups[2663]["name"], 'High Admiral "Shelly" Jorrik')
+        self.assertEqual(lookups[1465]["name"], '"Cookie" McWeaksauce')
+        self.assertEqual(lookups[1465]["zone"], "Redridge Mountains")
+        places = parse_custom_places(r'self:addLookupList(DB, 7, L["A \"quoted\" key"], BZ["Dire Maul"], 0, 0)')
+        self.assertEqual(places[7]["key"], 'A "quoted" key')
+
 
 class PostTbcNpcTests(unittest.TestCase):
     """ARL covers later expansions than this project targets."""

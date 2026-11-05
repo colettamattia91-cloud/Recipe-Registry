@@ -2319,7 +2319,7 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 155,
             sourceKind = "vendor",
             skillLevels = { 155, 180, 192, 205 },
-            sourcePlaces = { { name = "Jazzrik", zone = 11, x = 42.5, y = 52.6, faction = "horde" }, { name = "Muuran", zone = 5, x = 55.6, y = 56.5, faction = "horde" }, { name = "Jannos Ironwill", zone = 3, x = 46, y = 47.7, faction = "alliance" }, { name = "High Admiral \\\"Shelly\\\" Jorrik", zone = 12, x = 10.9, y = 76.1 } },
+            sourcePlaces = { { name = "Jazzrik", zone = 11, x = 42.5, y = 52.6, faction = "horde" }, { name = "Muuran", zone = 5, x = 55.6, y = 56.5, faction = "horde" }, { name = "Jannos Ironwill", zone = 3, x = 46, y = 47.7, faction = "alliance" }, { name = "High Admiral \"Shelly\" Jorrik", zone = 12, x = 10.9, y = 76.1 } },
             bopOutput = false,
             reagents = {
                 { itemId = 2842, count = 4 },
@@ -21712,7 +21712,7 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 80,
             sourceKind = "vendor",
             skillLevels = { 80, 120, 140, 160 },
-            sourcePlaces = { { name = "Derak Nightfall", zone = 7, x = 63, y = 18.5, faction = "horde" }, { name = "Phea", zone = 59, x = 54.7, y = 26.5, faction = "alliance" }, { name = "Gloria Femmel", zone = 29, x = 26.7, y = 43.5, faction = "alliance" }, { name = "\\\"Cookie\\\" McWeaksauce", zone = 67, x = 46.7, y = 70.5, faction = "alliance" } },
+            sourcePlaces = { { name = "Derak Nightfall", zone = 7, x = 63, y = 18.5, faction = "horde" }, { name = "Phea", zone = 59, x = 54.7, y = 26.5, faction = "alliance" }, { name = "Gloria Femmel", zone = 29, x = 26.7, y = 43.5, faction = "alliance" }, { name = "\"Cookie\" McWeaksauce", zone = 67, x = 46.7, y = 70.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2678, count = 1 },
@@ -21729,7 +21729,7 @@ RecipeRegistryRecipeMetadata = {
             requiredSkill = 175,
             sourceKind = "vendor",
             skillLevels = { 175, 215, 235, 255 },
-            sourcePlaces = { { name = "Derak Nightfall", zone = 7, x = 63, y = 18.5, faction = "horde" }, { name = "Phea", zone = 59, x = 54.7, y = 26.5, faction = "alliance" }, { name = "Gloria Femmel", zone = 29, x = 26.7, y = 43.5, faction = "alliance" }, { name = "\\\"Cookie\\\" McWeaksauce", zone = 67, x = 46.7, y = 70.5, faction = "alliance" } },
+            sourcePlaces = { { name = "Derak Nightfall", zone = 7, x = 63, y = 18.5, faction = "horde" }, { name = "Phea", zone = 59, x = 54.7, y = 26.5, faction = "alliance" }, { name = "Gloria Femmel", zone = 29, x = 26.7, y = 43.5, faction = "alliance" }, { name = "\"Cookie\" McWeaksauce", zone = 67, x = 46.7, y = 70.5, faction = "alliance" } },
             bopOutput = false,
             reagents = {
                 { itemId = 2692, count = 1 },

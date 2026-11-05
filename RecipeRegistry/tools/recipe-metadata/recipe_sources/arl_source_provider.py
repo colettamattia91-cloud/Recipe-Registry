@@ -44,7 +44,8 @@ ARL_RAW_BASE = "https://raw.githubusercontent.com/Xurkon/AckisRecipeList/HEAD/"
 DEFAULT_USER_AGENT = "RecipeRegistry metadata importer"
 DEFAULT_REQUEST_DELAY = 0.5
 SNAPSHOT_FILENAME = "acquisition.json"
-PARSER_VERSION = 2
+# 3: the strings read from ARL's Lua are unescaped (see lua_unescape).
+PARSER_VERSION = 3
 
 # Professions this project supports. ARL also ships Inscription, Runeforging
 # and First Aid, which are out of scope here.
@@ -279,6 +280,29 @@ _LOOKUP_FACTION_BY_TOKEN = {
     "NEUTRAL": None, "0": None,
 }
 
+# The patterns above take what sits between the quotes as the source writes
+# it, escapes included. ARL writes L["High Admiral \"Shelly\" Jorrik"], which
+# in Lua is a name with plain quotes in it; kept verbatim, the backslashes went
+# into the snapshot, the emitter escaped them a second time, and the addon
+# showed High Admiral \"Shelly\" Jorrik. Every string read from ARL goes
+# through here before it is stored.
+_LUA_ESCAPES = {"a": "\a", "b": "\b", "f": "\f", "n": "\n", "r": "\r", "t": "\t", "v": "\v"}
+_LUA_ESCAPE_RE = re.compile(r"\\(\d{1,3}|.)", re.DOTALL)
+
+
+def lua_unescape(text):
+    """The value of a Lua string literal, from the text between its quotes."""
+    if not text or "\\" not in text:
+        return text
+
+    def replace(match):
+        token = match.group(1)
+        if token.isdigit():
+            return chr(int(token))
+        return _LUA_ESCAPES.get(token, token)
+
+    return _LUA_ESCAPE_RE.sub(replace, text)
+
 
 def parse_place_faction(arguments):
     match = _LOOKUP_FACTION_RE.search(arguments)
@@ -335,7 +359,7 @@ def parse_custom_places(text):
     """
     out = {}
     for match in _CUSTOM_LOOKUP_RE.finditer(text or ""):
-        key, zone = match.group(2), match.group(3)
+        key, zone = lua_unescape(match.group(2)), lua_unescape(match.group(3))
         if zone or key in CONTAINER_PLACE_KEYS:
             out[int(match.group(1))] = {"key": key, "zone": zone}
     return out
@@ -365,8 +389,8 @@ def parse_lookup(text):
             continue
         x, y = parse_place_coords(arguments)
         out[int(match.group(1))] = {
-            "name": name.group(2) if name else None,
-            "zone": zone.group(1) if zone else None,
+            "name": lua_unescape(name.group(2)) if name else None,
+            "zone": lua_unescape(zone.group(1)) if zone else None,
             # Where in the zone, and whose side of the war they are on. Both
             # are per NPC: a recipe sold by one vendor in Stormwind and another
             # in Orgrimmar is available to everyone, and saying so at the

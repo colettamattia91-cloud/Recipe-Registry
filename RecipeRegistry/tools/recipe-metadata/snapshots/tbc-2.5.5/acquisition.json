@@ -14005,7 +14005,7 @@
         },
         {
           "faction": "alliance",
-          "name": "\\\"Cookie\\\" McWeaksauce",
+          "name": "\"Cookie\" McWeaksauce",
           "x": 46.7,
           "y": 70.5,
           "zone": "Azuremyst Isle"
@@ -14048,7 +14048,7 @@
         },
         {
           "faction": "alliance",
-          "name": "\\\"Cookie\\\" McWeaksauce",
+          "name": "\"Cookie\" McWeaksauce",
           "x": 46.7,
           "y": 70.5,
           "zone": "Azuremyst Isle"
@@ -26758,7 +26758,7 @@
           "zone": "Arathi Highlands"
         },
         {
-          "name": "High Admiral \\\"Shelly\\\" Jorrik",
+          "name": "High Admiral \"Shelly\" Jorrik",
           "x": 10.9,
           "y": 76.1,
           "zone": "Dun Morogh"
@@ -54539,7 +54539,7 @@
       "worldDrop": true
     }
   },
-  "parserVersion": 2,
+  "parserVersion": 3,
   "source": "ackis-recipe-list",
   "sourceStats": {
     "byFaction": {
