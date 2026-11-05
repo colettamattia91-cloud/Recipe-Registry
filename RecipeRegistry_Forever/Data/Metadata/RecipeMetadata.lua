@@ -617,7 +617,8 @@ function RecipeMetadata:GetSource(recipeKey, info)
 end
 
 -- The four difficulty thresholds, when the source stated a usable ladder.
--- 2092 of the 2151 records carry one; the rest have to be approximated from
+-- 2490 of the 2520 records carry one, built by the generator from the
+-- client's three (learn, yellow, grey); the rest have to be approximated from
 -- the skill requirement, which is the caller's problem and not this one's.
 function RecipeMetadata:GetSkillLevels(recipeKey, info)
     info = getInfo(self, recipeKey, info)

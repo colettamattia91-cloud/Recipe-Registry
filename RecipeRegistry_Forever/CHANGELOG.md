@@ -2,6 +2,28 @@
 
 All notable changes to this addon are documented in this file.
 
+## [0.1.4] - 2026-11-05
+
+### Added
+
+- **1 new recipe.**
+- **74 more recipes show where to get them.**
+- **An icon in the AddOns list.**
+
+### Changed
+
+- **Recipe data from game build 1.60.1.70790.** 60 recipes changed: 37 now
+  show the skill needed to learn them, 19 moved to another category and 4 have
+  updated reagents.
+- **73 recipes are no longer hidden from Collection.**
+
+### Fixed
+
+- **Vendor names with quotation marks show correctly.**
+- **Recipe difficulty colours follow the game's thresholds** on 2490 recipes.
+- **190 recipes show the skill level Forever teaches them at**, and 36 show
+  one for the first time.
+
 ## [0.1.3] - 2026-10-25
 
 ### Added
