@@ -8,6 +8,7 @@ All notable changes to this addon are documented in this file.
 
 - **1 new recipe.**
 - **1 more recipe shows where to get it.**
+- **An icon in the AddOns list.**
 
 ### Changed
 

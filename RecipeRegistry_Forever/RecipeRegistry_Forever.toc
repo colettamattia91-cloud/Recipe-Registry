@@ -19,6 +19,7 @@
 ## Title: Recipe Registry |cff33ff99(Forever)|r
 ## Notes: Guild profession tracker for WoW: Forever. Adaptation in progress.
 ## Author: Kaedros
+## IconTexture: Interface\Icons\INV_Misc_Book_11
 ## Version: 0.1.0-dev
 ## X-Build-Channel: dev
 ## X-Build-ID: forever-dev
