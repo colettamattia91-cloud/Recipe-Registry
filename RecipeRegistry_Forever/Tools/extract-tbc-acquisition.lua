@@ -51,7 +51,11 @@ for spellId, record in pairs(tbc.recipesBySpellId) do
         local id = math.abs(tonumber(spellId) or 0)
         local names, zoneNames, factions = {}, {}, {}
         for _, place in ipairs(record.sourcePlaces or {}) do
-            names[#names + 1] = place.name or ""
+            -- Il generatore del TBC scrive le virgolette di un nome due volte
+            -- escapate: `"High Admiral \\\"Shelly\\\" Jorrik"`, che caricato
+            -- da' un backslash vero davanti a ogni virgoletta. Qui si toglie,
+            -- cosi' il nome arriva a Forever come lo scrive il gioco.
+            names[#names + 1] = (place.name or ""):gsub('\\"', '"')
             zoneNames[#zoneNames + 1] = (place.zone and zones[place.zone]) or ""
             factions[#factions + 1] = place.faction or ""
         end

@@ -95,7 +95,16 @@ local function loadAcquisition(path)
     for line in file:lines() do
         line = line:gsub("\r$", "")
         local fields = {}
-        for value in (line .. "\t"):gmatch("([^\t]*)\t") do fields[#fields + 1] = value end
+        for value in (line .. "\t"):gmatch("([^\t]*)\t") do
+            -- Il worksheet lo scrive il modulo csv di Python, che racchiude fra
+            -- virgolette un campo che ne contiene e le raddoppia dentro:
+            -- Ziri "The Wrench" Littlesprocket esce come
+            -- "Ziri ""The Wrench"" Littlesprocket". Letto cosi' com'era, quel
+            -- nome arrivava in gioco con tutte le virgolette in piu'.
+            local quoted = value:match('^"(.*)"$')
+            if quoted then value = quoted:gsub('""', '"') end
+            fields[#fields + 1] = value
+        end
         if not header then
             header = {}
             for index, name in ipairs(fields) do header[name] = index end

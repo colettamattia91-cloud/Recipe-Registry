@@ -2,7 +2,7 @@
 -- one profession replaces only that profession, regardless of input order.
 local base = "local-tests/specs/.dump-generator-"
 local paths = { base .. "old.lua", base .. "new.lua", base .. "output.lua", base .. "mining.lua",
-    base .. "vanilla-skill.tsv", base .. "capture.lua", base .. "structure.lua" }
+    base .. "vanilla-skill.tsv", base .. "capture.lua", base .. "structure.lua", base .. "worksheet.tsv" }
 local function write(path, content)
     local file = assert(io.open(path, "w")); file:write(content); file:close()
 end
@@ -65,6 +65,20 @@ MiningItems = { [22] = 1, [33] = 2 }]])
     assert(skilled.recipesBySpellId[3].requiredSkill == 140, "the recipe item's rank comes first")
     assert(skilled.recipesBySpellId[2].requiredSkill == 75, "then the vanilla rank")
     assert(skilled.recipesBySpellId[7443].requiredSkill == nil, "a client 1 is not a requirement")
+    -- I nomi con le virgolette. Il worksheet lo scrive il modulo csv di
+    -- Python, che racchiude fra virgolette il campo che ne contiene e le
+    -- raddoppia dentro. Letto com'era, "Ziri ""The Wrench"" Littlesprocket"
+    -- arrivava in gioco cosi', e in una lista il primo NPC prendeva la
+    -- virgoletta d'apertura.
+    write(paths[8], 'profession\tspellId\trecipeItemId\tsourceKind\tnpcName\tzone\n'
+        .. 'cooking\t2\t\tvendor\t"Jazzrik | ""Cookie"" McWeaksauce"\tBadlands | Redridge Mountains\n'
+        .. 'alchemy\t3\t\tvendor\t"Ziri ""The Wrench"" Littlesprocket"\tGnomeregan\n')
+    local sold = generate(paths[1], paths[2], "--acquisition=" .. paths[8])
+    local listed = sold.recipesBySpellId[2].sourcePlaces
+    assert(listed[1].name == "Jazzrik", "the opening quote of the field is not part of the first name")
+    assert(listed[2].name == '"Cookie" McWeaksauce', "a doubled quote inside the field is one quote")
+    assert(sold.recipesBySpellId[3].sourcePlaces[1].name == 'Ziri "The Wrench" Littlesprocket',
+        "a quoted name comes back as the game writes it")
     -- Una ricetta che la build corrente non elenca piu' (Disorienting Smog
     -- Potion con la 70532) la cattura del client ce l'ha ancora: si marca
     -- `removed` e resta intera, coi dati che il ripiego le ha dato.
@@ -132,4 +146,4 @@ MiningCategories = { [1] = { name = "Alchemy", order = 0 }, [60] = { name = "Eli
 end)
 for _, path in ipairs(paths) do os.remove(path) end
 assert(ok, err)
-print("PASS generator: multiple sessions, legacy format, newest capture, reagents, indices, outputless is not self-only, static BoP from item binding, recipe items, required skill, recipes the build no longer lists, structure from the datamining")
+print("PASS generator: multiple sessions, legacy format, newest capture, reagents, indices, outputless is not self-only, static BoP from item binding, recipe items, required skill, quoted names from the worksheet, recipes the build no longer lists, structure from the datamining")

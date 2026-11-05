@@ -133,7 +133,7 @@ spellId	sourceKind	npcName	zone	faction	bossDrop	worldDrop	trainerTitle
 3491	trainer						
 3492	vendor	Jutak | Kaita Deepforge	Stranglethorn Vale | Stormwind City	 | alliance			
 3493	worldDrop					true	
-3494	vendor	Jazzrik | Muuran | Jannos Ironwill | High Admiral \"Shelly\" Jorrik	Badlands | Desolace | Arathi Highlands | Dun Morogh	horde | horde | alliance | 			
+3494	vendor	Jazzrik | Muuran | Jannos Ironwill | High Admiral "Shelly" Jorrik	Badlands | Desolace | Arathi Highlands | Dun Morogh	horde | horde | alliance | 			
 3495	worldDrop					true	
 3496	vendor	Zarena Cromwind	Stranglethorn Vale				
 3497	worldDrop					true	
@@ -1181,8 +1181,8 @@ spellId	sourceKind	npcName	zone	faction	bossDrop	worldDrop	trainerTitle
 25621	trainer						
 25622	worldDrop					true	
 25659	quest		Tanaris				
-25704	vendor	Derak Nightfall | Phea | Gloria Femmel | \"Cookie\" McWeaksauce	Hillsbrad Foothills | The Exodar | Redridge Mountains | Azuremyst Isle	horde | alliance | alliance | alliance			
-25954	vendor	Derak Nightfall | Phea | Gloria Femmel | \"Cookie\" McWeaksauce	Hillsbrad Foothills | The Exodar | Redridge Mountains | Azuremyst Isle	horde | alliance | alliance | alliance			
+25704	vendor	Derak Nightfall | Phea | Gloria Femmel | "Cookie" McWeaksauce	Hillsbrad Foothills | The Exodar | Redridge Mountains | Azuremyst Isle	horde | alliance | alliance | alliance			
+25954	vendor	Derak Nightfall | Phea | Gloria Femmel | "Cookie" McWeaksauce	Hillsbrad Foothills | The Exodar | Redridge Mountains | Azuremyst Isle	horde | alliance | alliance | alliance			
 26011	quest		Winterspring				
 26085	vendor	Vizzklick	Tanaris				
 26086	drop	Jandice Barov	Scholomance				
