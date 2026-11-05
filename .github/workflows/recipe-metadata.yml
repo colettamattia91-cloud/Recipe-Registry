@@ -14,9 +14,20 @@ name: Recipe Metadata
 # it, and not before: a job that skips its own checks and reports green is
 # worse than no job.
 
+#
+# It runs only when RecipeRegistry/ changes, because that folder is all it
+# checks. feat/forever does not carry the TBC tree at all (see CLAUDE.md), and
+# without the filter every push there failed before running a single test --
+# working-directory pointing at a folder that is not there -- 19 times from
+# 2026-09-20 on, which turned a red mark into noise.
+
 on:
   push:
+    paths:
+      - "RecipeRegistry/**"
   pull_request:
+    paths:
+      - "RecipeRegistry/**"
 
 jobs:
   unit-tests:
