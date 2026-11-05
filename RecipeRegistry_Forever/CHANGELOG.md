@@ -7,7 +7,7 @@ All notable changes to this addon are documented in this file.
 ### Added
 
 - **1 new recipe.**
-- **1 more recipe shows where to get it.**
+- **74 more recipes show where to get them.**
 - **An icon in the AddOns list.**
 
 ### Changed
@@ -16,6 +16,10 @@ All notable changes to this addon are documented in this file.
   show the skill needed to learn them, 19 moved to another category and 4 have
   updated reagents.
 - **73 recipes are no longer hidden from Collection.**
+
+### Fixed
+
+- **Vendor names with quotation marks show correctly.**
 
 ## [0.1.3] - 2026-10-25
 

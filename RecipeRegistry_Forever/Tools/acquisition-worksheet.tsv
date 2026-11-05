@@ -234,12 +234,32 @@ blacksmithing	300	Enriched Thorium Helm	1252346	251449	forever	vendor	Stondry Da
 blacksmithing	300	Enriched Thorium Leggings	1252345	251448	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 blacksmithing	300	Evergreen Shield	1306536	279311	forever											
 blacksmithing	300	Forest Defender's Axe	1306534	279309	forever											
+blacksmithing	300	Gauntlets of Glory	1292982	274013	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+blacksmithing	300	Greaves of Glory	1292984	274015	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
 blacksmithing	300	Greenhammer	1306535	279310	forever											
+blacksmithing	300	Handguards of Glory	1292986	274017	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
 blacksmithing	300	Heavy Thorium Gauntlets	1306538	279313	forever											
 blacksmithing	300	Ironwood Blade	1306533	279308	forever											
+blacksmithing	300	Justice Epaulets	1292951	273982	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+blacksmithing	300	Justice Gauntlets	1292946	273977	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+blacksmithing	300	Justice Gloves	1292950	273981	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+blacksmithing	300	Justice Greaves	1292948	273979	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+blacksmithing	300	Justice Handguards	1292954	273985	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+blacksmithing	300	Justice Leggings	1292945	273976	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+blacksmithing	300	Justice Legguards	1292953	273984	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+blacksmithing	300	Justice Legplates	1292949	273980	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+blacksmithing	300	Justice Pauldrons	1292955	273986	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+blacksmithing	300	Justice Sabatons	1292956	273987	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+blacksmithing	300	Justice Spaulders	1292947	273978	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+blacksmithing	300	Justice Treads	1292952	273983	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+blacksmithing	300	Legguards of Glory	1292985	274016	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
 blacksmithing	300	Legionite Glaive	1252368	251471	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
+blacksmithing	300	Legplates of Glory	1292981	274012	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
 blacksmithing	300	Martyr's Legplates	1252349	251452	forever											
 blacksmithing	300	Master Forge	1263073	273113	forever											
+blacksmithing	300	Pauldrons of Glory	1292987	274018	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+blacksmithing	300	Sabatons of Glory	1292988	274019	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+blacksmithing	300	Shoulders of Glory	1292983	274014	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
 blacksmithing	300	Stalwart Helm	1252348	251451	forever											
 blacksmithing	300	Stormcarver	1252366	251469	forever											
 blacksmithing		Copper Rod	1245287		forever											
@@ -420,6 +440,7 @@ engineering	300	Swiftfeather Arrow	1293849	274389	forever
 engineering	300	Swiftstrike Shot	1293850	274390	forever											
 engineering	300	Ultralight Goblin Glider	1266938	264235	forever	vendor	Fritz Fizzle | Fizzlefuse	Three Corners, Redridge Mountains | The Barrens	10.5 | 49.8	74.3 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 engineering	300	Ultrasafe Rechargeable Battery	1266935	264232	forever	vendor	Fritz Fizzle | Fizzlefuse	Three Corners, Redridge Mountains | The Barrens	10.5 | 49.8	74.3 | 29.7	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
+engineering		9-60 Battery Pack	1293088	274049	forever	drop	Crowd Pummeler 9-60	Gnomeregan							28-28	wowhead, elenco
 engineering		Sandpaper	1249634		forever											
 first_aid	140	Clever Poultice	1259343	255724	forever	drop	Defias Enchanter	Duskwood							26-27	wowhead, elenco
 first_aid	140	Toxin Study	1262996	273105	forever	vendor	Happy Camper	Dun Morogh								foreverchanges, letto da wowhead
@@ -663,6 +684,26 @@ leatherworking	300	Dawn Armor	1255015	252892	forever
 leatherworking	300	Elderwild Pants	1306528	279303	forever											
 leatherworking	300	Elderwild Waistcord	1306526	279301	forever											
 leatherworking	300	Eternity Pauldrons	1306529	279304	forever											
+leatherworking	300	Grimstitch Boots	1292968	273999	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grimstitch Gloves	1292966	273997	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grimstitch Pants	1292965	273996	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grimstitch Spaulders	1292967	273998	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grovekeeper Boots	1292932	273963	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grovekeeper Gauntlets	1292934	273965	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grovekeeper Grips	1292921	273953	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grovekeeper Handguards	1292930	273961	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grovekeeper Kilt	1292925	273956	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grovekeeper Leggings	1292933	273964	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grovekeeper Legguards	1292929	273960	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grovekeeper Mantle	1292927	273958	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grovekeeper Mitts	1292926	273957	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grovekeeper Pauldrons	1292931	273962	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grovekeeper Sandals	1292928	273959	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grovekeeper Shoulderpads	1292923	273954	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grovekeeper Spaulders	1292935	273966	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grovekeeper Stompers	1292924	273955	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grovekeeper Treads	1292936	273967	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Grovekeeper Trousers	1292920	273952	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
 leatherworking	300	Ironfeather Leggings	1255012	252895	forever											
 leatherworking	300	Living Crown	1255016	252891	forever											ignota anche alla community [foreverchanges 2026-09-24]
 leatherworking	300	Mourning Handguards	1306531	279306	forever											
@@ -671,13 +712,25 @@ leatherworking	300	Pristine Scorpid Leggings	1254967	252940	forever
 leatherworking	300	Red Dragonscale Leggings	1254970	252937	forever											
 leatherworking	300	Sewing Machine	1263079	273121	forever	blueprint										Blueprint [foreverchanges 2026-09-24]
 leatherworking	300	Spiritcaller Boots	1299917	276545	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Spiritcaller Epaulets	1292975	274006	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Spiritcaller Gauntlets	1292974	274005	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
 leatherworking	300	Spiritcaller Gloves	1299915	276543	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Spiritcaller Greaves	1292976	274007	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Spiritcaller Grips	1292970	274001	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
 leatherworking	300	Spiritcaller Kilt	1299914	276542	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Spiritcaller Leggings	1292969	274000	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
 leatherworking	300	Spiritcaller Mantle	1299916	276544	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Spiritcaller Pants	1292973	274004	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Spiritcaller Spaulders	1292971	274002	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Spiritcaller Treads	1292972	274003	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
 leatherworking	300	Timbermaw Tunic	1255014	252893	forever											
 leatherworking	300	Tranquil Wristguards	1306530	279305	forever											
 leatherworking	300	Warbear Helm	1255013	252894	forever											ignota anche alla community [foreverchanges 2026-09-24]
 leatherworking	300	Wild Leather Armor Kit	1306532	279307	forever											
+leatherworking	300	Wildstalker's Gauntlets	1292938	273969	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Wildstalker's Greaves	1292940	273971	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Wildstalker's Legguards	1292937	273968	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+leatherworking	300	Wildstalker's Spaulders	1292939	273970	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
 mining	140	Rock Garden	1262975	273097	forever	vendor	Happy Camper	Dun Morogh								foreverchanges, letto da wowhead
 mining	300	Molten Foundry	1263071	273122	forever											
 mining		Smelt Azerothium	1249637		forever											
@@ -838,14 +891,30 @@ tailoring	290	Swarmtender's Cord	1297124	275584	forever	vendor	Mishta	Silithus		
 tailoring	290	Venomspew Cord	1297121	275581	forever	vendor	Mishta	Silithus								wowhead, elenco
 tailoring	295	Swarmtender's Footpads	1297125	275585	forever	vendor	Mishta	Silithus								wowhead, elenco
 tailoring	295	Venomspew Footpads	1297122	275582	forever	vendor	Mishta	Silithus								wowhead, elenco
+tailoring	300	Boots of Conviction	1292964	273995	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
 tailoring	300	Bottomless Reagent Bag	1257495	254140	forever											
 tailoring	300	Cloak of Earth and Sky	1306544	279319	forever											
+tailoring	300	Demonheart Boots	1292980	274011	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+tailoring	300	Demonheart Gloves	1292978	274009	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+tailoring	300	Demonheart Leggings	1292977	274008	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+tailoring	300	Demonheart Spaulders	1292979	274010	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
 tailoring	300	Fel Cape	1306543	279318	forever											
 tailoring	300	Felblood Soul Bag	1306545	279320	forever											
+tailoring	300	Gloves of Conviction	1292958	273989	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+tailoring	300	Handguards of Conviction	1292962	273993	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+tailoring	300	Leggings of Conviction	1292961	273992	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
 tailoring	300	Loom	1263080	273124	forever											
 tailoring	300	Mana-infused Cord	1306541	279316	forever											
+tailoring	300	Manaflare Boots	1292944	273975	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+tailoring	300	Manaflare Gloves	1292942	273973	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+tailoring	300	Manaflare Mantle	1292943	273974	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+tailoring	300	Manaflare Pants	1292941	273972	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+tailoring	300	Mantle of Conviction	1292959	273990	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+tailoring	300	Pants of Conviction	1292957	273988	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
+tailoring	300	Pauldrons of Conviction	1292963	273994	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
 tailoring	300	Rime-encrusted Boots	1306542	279317	forever											
 tailoring	300	Robes of Fiery Devastation	1306540	279315	forever											
+tailoring	300	Treads of Conviction	1292960	273991	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da wowhead
 tailoring		Faction Banner	1263425		forever											
 alchemy	50	Elixir of Minor Agility	3230	2553	vanilla	worldDrop							true			da vanilla, dataset TBC
 alchemy	50	Elixir of Minor Fortitude	2334	2554	vanilla	trainer										da vanilla, dataset TBC
@@ -973,7 +1042,7 @@ blacksmithing	120	Mighty Iron Hammer	3297	3608	vanilla	worldDrop							true			da
 blacksmithing	125	Green Iron Gauntlets	3336	3612	vanilla	worldDrop							true			da vanilla, dataset TBC
 blacksmithing	125	Iron Shield Spike	7221	6044	vanilla	worldDrop							true			da vanilla, dataset TBC
 blacksmithing	130	Silvered Bronze Leggings	12259	10424	vanilla	worldDrop							true			da vanilla, dataset TBC
-blacksmithing	130	Solid Iron Maul	3494	10858	vanilla	vendor	"Jazzrik | Muuran | Jannos Ironwill | High Admiral \""Shelly\"" Jorrik"	Badlands | Desolace | Arathi Highlands | Dun Morogh			horde | horde | alliance | 					da vanilla, dataset TBC
+blacksmithing	130	Solid Iron Maul	3494	10858	vanilla	vendor	"Jazzrik | Muuran | Jannos Ironwill | High Admiral ""Shelly"" Jorrik"	Badlands | Desolace | Arathi Highlands | Dun Morogh			horde | horde | alliance | 					da vanilla, dataset TBC
 blacksmithing	135	Barbaric Iron Breastplate	9813	7979	vanilla	quest		Orgrimmar			horde					da vanilla, dataset TBC
 blacksmithing	135	Barbaric Iron Shoulders	9811	7978	vanilla	quest		Orgrimmar			horde					da vanilla, dataset TBC
 blacksmithing	135	Green Iron Shoulders	3504	3870	vanilla	worldDrop							true			da vanilla, dataset TBC
@@ -1036,6 +1105,7 @@ blacksmithing	255	Huge Thorium Battleaxe	16971	12823	vanilla	vendor	Magnus Frost
 blacksmithing	255	Thorium Boots	16652	12693	vanilla	worldDrop							true			wowhead, elenco (era trainer per il dataset TBC)
 blacksmithing	255	Thorium Helm	16653	12694	vanilla	worldDrop							true			wowhead, elenco (era trainer per il dataset TBC)
 blacksmithing	260	Dark Iron Plate	15296	11612	vanilla	drop	Ribbly Screwspigot	Blackrock Depths							53-53	da vanilla, dataset TBC
+blacksmithing	260	Demon Forged Breastplate	16667	12696	vanilla	quest		Winterspring								da vanilla, dataset TBC
 blacksmithing	260	Radiant Gloves	16654	12695	vanilla	worldDrop							true			da vanilla, dataset TBC
 blacksmithing	260	Serenity	16983	12827	vanilla	container		Stratholme								da vanilla, dataset TBC
 blacksmithing	265	Corruption	16985	12830	vanilla	container		Stratholme								da vanilla, dataset TBC
@@ -1223,7 +1293,7 @@ cooking	60	Blood Sausage	3371	3679	vanilla	vendor	Kendor Kabonka	Stormwind City	
 cooking	60	Thistle Tea	9513	7678	vanilla	vendor	Smudge Thunderwood	Alterac Mountains								da vanilla, dataset TBC
 cooking	75	Westfall Stew	2543	728	vanilla	vendor	Kendor Kabonka	Stormwind City			alliance					da vanilla, dataset TBC
 cooking	80	Crocolisk Steak	3370	3678	vanilla	vendor	Kendor Kabonka	Stormwind City			alliance					da vanilla, dataset TBC
-cooking	80	Smoked Sagefish	25704	21099	vanilla	vendor	"Derak Nightfall | Phea | Gloria Femmel | \""Cookie\"" McWeaksauce | Kalsey Sanden | Aza'bek | Naal Mistrunner | Xen'to"	Hillsbrad Foothills | The Exodar | Redridge Mountains | Azuremyst Isle | Three Corners, Redridge Mountains | The Barrens | Thunder Bluff | The Drag, Orgrimmar	 |  |  |  | 10.8 | 49.7 | 51.1 | 57.6	 |  |  |  | 72.8 | 29.4 | 52.5 | 53.3	horde | alliance | alliance | alliance | alliance | horde | horde | horde					da vanilla, dataset TBC + catturato in gioco
+cooking	80	Smoked Sagefish	25704	21099	vanilla	vendor	"Derak Nightfall | Phea | Gloria Femmel | ""Cookie"" McWeaksauce | Kalsey Sanden | Aza'bek | Naal Mistrunner | Xen'to"	Hillsbrad Foothills | The Exodar | Redridge Mountains | Azuremyst Isle | Three Corners, Redridge Mountains | The Barrens | Thunder Bluff | The Drag, Orgrimmar	 |  |  |  | 10.8 | 49.7 | 51.1 | 57.6	 |  |  |  | 72.8 | 29.4 | 52.5 | 53.3	horde | alliance | alliance | alliance | alliance | horde | horde | horde					da vanilla, dataset TBC + catturato in gioco
 cooking	85	Cooked Crab Claw	2545	2698	vanilla	vendor	Kendor Kabonka	Stormwind City			alliance					da vanilla, dataset TBC
 cooking	85	Savory Deviate Delight	8238	6661	vanilla	worldDrop							true			da vanilla, dataset TBC
 cooking	90	Clam Chowder	6501	5528	vanilla	vendor	Kriggon Talsone | Heldan Galesong	Westfall | Darkshore			alliance | alliance					da vanilla, dataset TBC
@@ -1252,7 +1322,7 @@ cooking	175	Mithril Headed Trout	20916	17062	vanilla	vendor	Heldan Galesong | Ke
 cooking	175	Mystery Stew	15865	12233	vanilla	vendor	Helenia Olden | Janet Hommers | Super-Seller 680	Dustwallow Marsh | Desolace | Desolace			alliance | alliance | 					da vanilla, dataset TBC
 cooking	175	Roast Raptor	15855	12228	vanilla	vendor	Nerrist | Corporal Bluth | Vendor-Tron 1000 | Keena	Stranglethorn Vale | Stranglethorn Vale | Desolace | Arathi Highlands			horde | alliance |  | horde					da vanilla, dataset TBC
 cooking	175	Rockscale Cod	7828	6369	vanilla	vendor	Heldan Galesong | Kelsey Yance | Shankys | Wik'Tar	Darkshore | Stranglethorn Vale | Orgrimmar | Ashenvale			alliance |  | horde | horde					da vanilla, dataset TBC
-cooking	175	Sagefish Delight	25954	21219	vanilla	vendor	"Derak Nightfall | Phea | Gloria Femmel | \""Cookie\"" McWeaksauce | Kalsey Sanden | Aza'bek | Naal Mistrunner | Xen'to"	Hillsbrad Foothills | The Exodar | Redridge Mountains | Azuremyst Isle | Three Corners, Redridge Mountains | The Barrens | Thunder Bluff | The Drag, Orgrimmar	 |  |  |  | 10.8 | 49.7 | 51.1 | 57.6	 |  |  |  | 72.8 | 29.4 | 52.5 | 53.3	horde | alliance | alliance | alliance | alliance | horde | horde | horde					da vanilla, dataset TBC + catturato in gioco
+cooking	175	Sagefish Delight	25954	21219	vanilla	vendor	"Derak Nightfall | Phea | Gloria Femmel | ""Cookie"" McWeaksauce | Kalsey Sanden | Aza'bek | Naal Mistrunner | Xen'to"	Hillsbrad Foothills | The Exodar | Redridge Mountains | Azuremyst Isle | Three Corners, Redridge Mountains | The Barrens | Thunder Bluff | The Drag, Orgrimmar	 |  |  |  | 10.8 | 49.7 | 51.1 | 57.6	 |  |  |  | 72.8 | 29.4 | 52.5 | 53.3	horde | alliance | alliance | alliance | alliance | horde | horde | horde					da vanilla, dataset TBC + catturato in gioco
 cooking	175	Soothing Turtle Bisque	3400	3737	vanilla	quest		Hillsbrad Foothills			alliance					da vanilla, dataset TBC
 cooking	200	Dragonbreath Chili	15906	12239	vanilla	vendor	Helenia Olden | Ogg'marr | Super-Seller 680	Dustwallow Marsh | Dustwallow Marsh | Desolace			alliance | horde | 					da vanilla, dataset TBC
 cooking	200	Heavy Kodo Stew	15910	12240	vanilla	vendor	Vendor-Tron 1000 | Kireena | Janet Hommers	Desolace | Desolace | Desolace			 | horde | alliance					da vanilla, dataset TBC
@@ -1340,6 +1410,7 @@ enchanting	260	Enchant Boots - Greater Stamina	20020	16215	vanilla	worldDrop				
 enchanting	265	Enchant Cloak - Greater Resistance	20014	16216	vanilla	drop		The Temple of Atal'Hakkar								wowhead, elenco (era trainer per il dataset TBC)
 enchanting	265	Enchant Shield - Greater Stamina	20017	16217	vanilla	vendor	Mythrin'dir | Daniel Bartlett	Darnassus | Undercity			alliance | horde					da vanilla, dataset TBC
 enchanting	265	Enchant Weapon - Fiery Weapon	13898	11207	vanilla	drop	Pyromancer Loregrain	Blackrock Depths							52-52	da vanilla, dataset TBC
+enchanting	265	Smoking Heart of the Mountain	15596	11813	vanilla	drop	Lord Roccor	Blackrock Depths							51-51	da vanilla, dataset TBC
 enchanting	270	Enchant Bracer - Superior Spirit	20009	16218	vanilla	worldDrop							true			da vanilla, dataset TBC
 enchanting	270	Enchant Gloves - Greater Agility	20012	16219	vanilla	drop	Legashi Rogue	Azshara							51-53	wowhead, elenco (era trainer per il dataset TBC)
 enchanting	275	Conductive Shield Coating	463869	228981	sod	vendor	Lokhtos Darkbargainer	Blackrock Depths								wowhead
@@ -1513,8 +1584,10 @@ engineering	210	Deadly Scope	12597	10602	vanilla	vendor	Knaz Blunderflame | Yuka
 engineering	220	Catseye Ultra Goggles	12607	10603	vanilla	worldDrop							true			da vanilla, dataset TBC
 engineering	220	Mithril Heavy-bore Rifle	12614	10604	vanilla	worldDrop							true			da vanilla, dataset TBC
 engineering	225	Blue Rocket Cluster	26423	21730	vanilla	vendor	Fariel Starsong	Moonglade								da vanilla, dataset TBC
+engineering	225	Ez-Thro Radiation Bomb	435966	215432	sod	vendor	"Ziri ""The Wrench"" Littlesprocket"	Gnomeregan								wowhead, elenco
 engineering	225	Firework Launcher	26442	21738	vanilla	vendor	Fariel Starsong	Moonglade								da vanilla, dataset TBC
 engineering	225	Green Rocket Cluster	26424	21731	vanilla	vendor	Fariel Starsong	Moonglade								da vanilla, dataset TBC
+engineering	225	High-Yield Radiation Bomb	435964	215431	sod	vendor	"Ziri ""The Wrench"" Littlesprocket"	Gnomeregan								wowhead, elenco
 engineering	225	Parachute Cloak	12616	10606	vanilla	worldDrop							true			da vanilla, dataset TBC
 engineering	225	Red Rocket Cluster	26425	21732	vanilla	vendor	Fariel Starsong	Moonglade								da vanilla, dataset TBC
 engineering	225	Spellpower Goggles Xtreme	12615	10605	vanilla	trainer										da vanilla, dataset TBC
