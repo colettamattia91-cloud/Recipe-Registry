@@ -1,0 +1,430 @@
+spellId	requiredSkill	name
+2153	15	Handstitched Leather Pants
+2159	50	Fine Leather Cloak
+2160	35	Embossed Leather Vest
+2161	50	Embossed Leather Boots
+2162	40	Embossed Leather Cloak
+2165	75	Medium Armor Kit
+2166	95	Toughened Leather Armor
+2167	75	Gray Leather Boots
+2168	85	Dark Leather Cloak
+2329	15	Elixir of Minor Strength
+2331	25	Minor Mana Potion
+2332	40	Minor Rejuvenation Potion
+2334	50	Elixir of Minor Fortitude
+2385	10	Brown Linen Vest
+2386	40	Linen Boots
+2392	25	Red Linen Shirt
+2393	1	White Linen Shirt
+2394	25	Blue Linen Shirt
+2395	40	Barbaric Linen Vest
+2396	40	Green Linen Shirt
+2397	35	Reinforced Linen Cape
+2399	60	Green Woolen Vest
+2401	70	Woolen Boots
+2402	55	Woolen Cape
+2406	80	Gray Woolen Shirt
+2539	10	Spiced Wolf Meat
+2541	50	Coyote Steak
+2544	75	Crab Cake
+2546	80	Dry Pork Ribs
+2658	75	Smelt Silver
+2659	65	Smelt Bronze
+2661	30	Copper Chain Belt
+2662	15	Copper Chain Pants
+2664	65	Runed Copper Bracers
+2665	40	Coarse Sharpening Stone
+2666	45	Runed Copper Belt
+2668	80	Rough Bronze Leggings
+2670	80	Rough Bronze Cuirass
+2672	95	Patterned Bronze Bracers
+2674	100	Heavy Sharpening Stone
+2675	120	Shining Silver Breastplate
+2737	15	Copper Mace
+2738	20	Copper Axe
+2739	25	Copper Shortsword
+2740	85	Bronze Mace
+2741	90	Bronze Axe
+2742	95	Bronze Shortsword
+2964	55	Bolt of Woolen Cloth
+3116	40	Coarse Weightstone
+3117	100	Heavy Weightstone
+3170	15	Minor Troll's Blood Elixir
+3171	90	Elixir of Wisdom
+3173	120	Lesser Mana Potion
+3176	125	Lesser Troll's Blood Elixir
+3177	130	Elixir of Lesser Defense
+3276	40	Heavy Linen Bandage
+3277	80	Wool Bandage
+3278	115	Heavy Wool Bandage
+3292	70	Heavy Copper Broadsword
+3293	30	Copper Battle Axe
+3294	45	Thick War Axe
+3296	105	Heavy Bronze Mace
+3307	125	Smelt Iron
+3308	155	Smelt Gold
+3319	20	Copper Chain Boots
+3320	25	Rough Grinding Stone
+3323	35	Runed Copper Gauntlets
+3324	35	Runed Copper Pants
+3326	50	Coarse Grinding Stone
+3328	85	Rough Bronze Shoulders
+3331	105	Silvered Bronze Boots
+3333	110	Silvered Bronze Gauntlets
+3337	100	Heavy Grinding Stone
+3448	165	Lesser Invisibility Potion
+3450	175	Elixir of Lesser Fortitude
+3452	160	Mana Potion
+3491	80	Big Bronze Knife
+3501	140	Green Iron Bracers
+3502	145	Green Iron Helm
+3506	130	Green Iron Leggings
+3508	155	Green Iron Hauberk
+3569	165	Smelt Steel
+3753	25	Handstitched Leather Belt
+3755	5	Linen Bag
+3756	40	Embossed Leather Gloves
+3757	50	Woolen Bag
+3759	50	Embossed Leather Pants
+3760	125	Hillman's Cloak
+3761	60	Fine Leather Tunic
+3763	55	Fine Leather Belt
+3764	120	Hillman's Leather Gloves
+3766	100	Dark Leather Belt
+3768	105	Hillman's Shoulders
+3770	110	Toughened Leather Gloves
+3774	135	Green Leather Belt
+3776	155	Green Leather Bracers
+3780	125	Heavy Armor Kit
+3813	125	Small Silk Pack
+3816	30	Cured Light Hide
+3817	75	Cured Medium Hide
+3818	125	Cured Heavy Hide
+3839	100	Bolt of Silk Cloth
+3840	25	Heavy Linen Gloves
+3841	35	Green Linen Bracers
+3842	45	Handstitched Linen Britches
+3843	60	Heavy Woolen Gloves
+3845	55	Soft-soled Linen Boots
+3848	85	Double-stitched Woolen Shoulders
+3850	85	Heavy Woolen Pants
+3852	105	Gloves of Meditation
+3855	100	Spidersilk Boots
+3859	125	Azure Silk Vest
+3861	150	Long Silken Cloak
+3865	140	Bolt of Mageweave
+3866	85	Stylish Red Shirt
+3871	135	Formal White Shirt
+3914	25	Brown Linen Pants
+3922	30	Handful of Copper Bolts
+3923	30	Rough Copper Bomb
+3924	50	Copper Tube
+3925	50	Rough Boomstick
+3926	65	Copper Modulator
+3929	75	Coarse Blasting Powder
+3930	75	Crafted Heavy Shot
+3931	75	Coarse Dynamite
+3932	85	Target Dummy
+3934	100	Flying Tiger Goggles
+3936	105	Deadly Blunderbuss
+3937	105	Large Copper Bomb
+3938	105	Bronze Tube
+3941	120	Small Bronze Bomb
+3942	125	Whirring Bronze Gizmo
+3945	125	Heavy Blasting Powder
+3946	125	Heavy Dynamite
+3947	125	Crafted Solid Shot
+3949	130	Silver-plated Shotgun
+3950	140	Big Bronze Bomb
+3953	145	Bronze Framework
+3955	150	Explosive Sheep
+3956	150	Green Tinted Goggles
+3958	160	Iron Strut
+3961	170	Gyrochronatom
+3962	175	Iron Grenade
+3963	175	Compact Harvest Reaper Kit
+3965	185	Advanced Target Dummy
+3967	190	Big Iron Bomb
+3973	90	Silver Contact
+3977	60	Crude Scope
+3978	110	Standard Scope
+4094	175	Barbecued Buzzard Wing
+4508	50	Minor Discolored Healing Potion
+6458	135	Ornate Spyglass
+6499	50	Boiled Clams
+6500	125	Goblin Deviled Clams
+6517	85	Pearl-handled Dagger
+6521	70	Pearl-clasped Cloak
+6661	165	Barbaric Harness
+6690	110	Lesser Wizard's Robe
+7135	90	Dark Leather Pants
+7147	135	Guardian Pants
+7151	150	Barbaric Shoulders
+7156	165	Guardian Gloves
+7179	90	Draught of Water Breathing
+7223	160	Golden Scale Bracers
+7408	40	Heavy Copper Maul
+7420	15	Enchant Chest - Inferior Stamina
+7426	40	Enchant Chest - Minor Absorption
+7430	50	Arclight Spanner
+7454	45	Enchant Cloak - Minor Resistance
+7457	50	Enchant Bracer - Minor Stamina
+7623	25	Brown Linen Robe
+7624	25	White Linen Robe
+7745	100	Enchant 2H Weapon - Minor Impact
+7748	60	Enchant Chest - Lesser Stamina
+7771	70	Enchant Cloak - Minor Protection
+7779	80	Enchant Bracer - Minor Agility
+7788	90	Enchant Weapon - Minor Striking
+7795	100	Runed Silver Rod
+7817	70	Rough Bronze Boots
+7818	75	Silver Rod
+7836	80	Blackmouth Oil
+7837	130	Fire Oil
+7841	100	Swim Speed Potion
+7845	140	Elixir of Fire Power
+7857	120	Enchant Chest - Stamina
+7861	125	Enchant Cloak - Lesser Fire Resistance
+7863	125	Enchant Boots - Minor Stamina
+7928	150	Silk Bandage
+7934	80	Anti-Venom
+8334	100	Practice Lock
+8465	25	Simple Dress
+8467	85	White Woolen Dress
+8483	125	White Swashbuckler's Shirt
+8489	140	Red Swashbuckler's Shirt
+8758	115	Azure Silk Pants
+8760	120	Azure Silk Hood
+8762	125	Silk Headband
+8764	135	Earthen Vest
+8766	140	Azure Silk Belt
+8768	125	Iron Buckle
+8770	155	Robe of Power
+8772	140	Crimson Silk Belt
+8774	145	Green Silken Shoulders
+8776	15	Linen Belt
+8791	150	Crimson Silk Vest
+8799	160	Crimson Silk Pantaloons
+8804	175	Crimson Silk Gloves
+8880	25	Copper Dagger
+8895	225	Goblin Rocket Boots
+9060	25	Light Leather Quiver
+9062	25	Small Leather Ammo Pouch
+9065	45	Light Leather Bracers
+9068	70	Light Leather Pants
+9074	95	Nimble Leather Gloves
+9145	100	Fletcher's Gloves
+9193	125	Heavy Quiver
+9194	125	Heavy Leather Ammo Pouch
+9196	150	Dusky Leather Armor
+9198	155	Frost Leather Cloak
+9201	160	Dusky Bracers
+9206	170	Dusky Belt
+9271	150	Aquadynamic Fish Attractor
+9916	175	Steel Breastplate
+9918	175	Solid Sharpening Stone
+9920	175	Solid Grinding Stone
+9921	175	Solid Weightstone
+9926	180	Heavy Mithril Shoulder
+9928	180	Heavy Mithril Gauntlet
+9931	185	Mithril Plate Pants
+9935	190	Steel Plate Helm
+9959	205	Heavy Mithril Breastplate
+9961	205	Mithril Coif
+9968	210	Heavy Mithril Boots
+9983	25	Copper Claymore
+9985	100	Bronze Warhammer
+9986	105	Bronze Greatsword
+9987	110	Bronze Battle Axe
+9993	185	Heavy Mithril Axe
+10001	205	Big Black Mace
+10097	175	Smelt Mithril
+10098	230	Smelt Truesilver
+10482	175	Cured Thick Hide
+10487	175	Thick Armor Kit
+10499	180	Nightscape Tunic
+10507	180	Nightscape Headband
+10511	185	Turtle Scale Breastplate
+10518	185	Turtle Scale Bracers
+10548	205	Nightscape Pants
+10552	205	Turtle Scale Helm
+10556	210	Turtle Scale Leggings
+10558	210	Nightscape Boots
+11448	205	Greater Mana Potion
+11449	185	Elixir of Agility
+11450	195	Elixir of Defense
+11451	205	Oil of Immolation
+11460	230	Draught of Detect Undead
+11461	235	Arcane Elixir
+11465	235	Elixir of Greater Intellect
+11467	240	Elixir of Greater Agility
+11478	250	Draught of Detect Demon
+11479	225	Transmute: Iron to Gold
+11480	225	Transmute: Mithril to Truesilver
+12045	20	Simple Linen Boots
+12046	50	Simple Kilt
+12048	170	Black Mageweave Vest
+12049	170	Black Mageweave Leggings
+12050	175	Black Mageweave Robe
+12053	180	Black Mageweave Gloves
+12061	180	Orange Mageweave Shirt
+12065	190	Mageweave Bag
+12067	190	Dreamweave Gloves
+12069	190	Cindercloth Robe
+12070	190	Dreamweave Vest
+12584	150	Gold Power Core
+12585	175	Solid Blasting Powder
+12586	175	Solid Dynamite
+12589	195	Mithril Tube
+12590	175	Gyromatic Micro-Adjustor
+12591	200	Unstable Trigger
+12594	205	Fire Goggles
+12595	205	Mithril Blunderbuss
+12596	210	Hi-Impact Mithril Slugs
+12599	215	Mithril Casing
+12603	215	Mithril Frag Bomb
+12609	200	Catseye Draught
+12618	230	Rose Colored Goggles
+12619	235	Hi-Explosive Bomb
+12621	245	Mithril Gyro-Shot
+12622	245	Green Lens
+12715	205	Goblin Rocket Fuel Recipe
+12717	205	Goblin Mining Helmet
+12718	205	Goblin Construction Helmet
+12754	235	The Big One
+12755	230	Goblin Bomb Dispenser
+12758	245	Goblin Rocket Helmet
+12759	240	Gnomish Death Ray
+12760	205	Goblin Sapper Charge
+12895	205	Inlaid Mithril Cylinder Plans
+12897	210	Gnomish Goggles
+12899	205	Gnomish Shrink Ray
+12902	210	Gnomish Net-o-Matic Projector
+12903	215	Gnomish Harm Prevention Belt
+12905	225	Gnomish Rocket Boots
+12906	230	Gnomish Battle Chicken
+12907	235	Gnomish Mind Control Cap
+12908	240	Goblin Dragon Gun
+13378	105	Enchant Shield - Minor Stamina
+13421	115	Enchant Cloak - Lesser Protection
+13485	130	Enchant Shield - Lesser Spirit
+13501	130	Enchant Bracer - Lesser Stamina
+13503	140	Enchant Weapon - Lesser Striking
+13529	145	Enchant 2H Weapon - Lesser Impact
+13538	140	Enchant Chest - Lesser Absorption
+13607	145	Enchant Chest - Intellect
+13622	150	Enchant Bracer - Lesser Intellect
+13626	150	Enchant Chest - Minor Stats
+13628	150	Runed Golden Rod
+13631	155	Enchant Shield - Lesser Stamina
+13635	155	Enchant Cloak - Defense
+13637	160	Enchant Boots - Lesser Agility
+13640	160	Enchant Chest - Greater Stamina
+13642	165	Enchant Bracer - Spirit
+13644	170	Enchant Boots - Lesser Stamina
+13648	170	Enchant Bracer - Stamina
+13657	175	Enchant Cloak - Fire Resistance
+13659	180	Enchant Shield - Spirit
+13661	180	Enchant Bracer - Strength
+13663	185	Enchant Chest - Greater Intellect
+13693	195	Enchant Weapon - Striking
+13695	200	Enchant 2H Weapon - Impact
+13700	200	Enchant Chest - Lesser Stats
+13702	200	Runed Truesilver Rod
+13746	205	Enchant Cloak - Greater Defense
+13794	205	Enchant Cloak - Resistance
+13815	210	Enchant Gloves - Agility
+13822	210	Enchant Bracer - Intellect
+13836	215	Enchant Boots - Stamina
+13858	220	Enchant Chest - Superior Stamina
+13887	225	Enchant Gloves - Strength
+13890	225	Enchant Boots - Minor Speed
+13905	230	Enchant Shield - Greater Spirit
+13917	230	Enchant Chest - Superior Intellect
+13935	235	Enchant Boots - Agility
+13937	240	Enchant 2H Weapon - Greater Impact
+13939	240	Enchant Bracer - Greater Strength
+13941	245	Enchant Chest - Stats
+13943	245	Enchant Weapon - Greater Striking
+13948	250	Enchant Gloves - Minor Haste
+14293	10	Lesser Magic Wand
+14379	125	Golden Rod
+14380	175	Truesilver Rod
+14807	70	Greater Magic Wand
+14809	155	Lesser Mystic Wand
+14810	175	Greater Mystic Wand
+14930	200	Quickdraw Quiver
+14932	200	Thick Leather Ammo Pouch
+15255	200	Mechanical Repair Kit
+15833	230	Dreamless Sleep Potion
+15972	155	Glinting Steel Dagger
+16153	250	Smelt Thorium
+16639	225	Dense Grinding Stone
+16640	225	Dense Weightstone
+16641	225	Dense Sharpening Stone
+17180	250	Enchanted Thorium
+17181	250	Enchanted Leather
+17551	250	Stonescale Oil
+19047	225	Cured Rugged Hide
+19058	225	Rugged Armor Kit
+19567	250	Salt Shaker
+19666	75	Silver Skeleton Key
+19667	125	Golden Skeleton Key
+19668	175	Truesilver Skeleton Key
+19669	250	Arcanite Skeleton Key
+19788	250	Dense Blasting Powder
+20201	250	Arcanite Rod
+20648	75	Medium Leather
+20649	125	Heavy Leather
+20650	175	Thick Leather
+21175	200	Spider Sausage
+22331	225	Rugged Leather
+22808	215	Draught of Greater Water Breathing
+23070	250	Dense Dynamite
+24654	300	Blue Dragonscale Leggings
+1229432	20	Camp Tent
+1229504	20	Faction Banner
+1229517	20	Camp Chair
+1229705	20	Incense Candle
+1229745	20	Fish Bowl
+1230117	20	First Aid Kit
+1230161	20	Lodestone
+1230171	20	Sharpening Wheel
+1230564	20	Mana Well
+1230643	20	Enchanted Lute
+1230656	20	Reagent Bot
+1231583	250	Major Discolored Healing Potion
+1244431	1	Minor Healing Potion
+1244432	55	Lesser Healing Potion
+1244433	110	Healing Potion
+1249630	40	Cerulean Dye
+1249631	120	Magenta Dye
+1249632	215	Viridian Dye
+1249633	40	Sulfuric Acid
+1249634	120	Sandpaper
+1249637	275	Smelt Azerothium
+1252229	35	Gemmed Copper Boots
+1252230	35	Strange Copper Boots
+1252231	35	Glowing Copper Boots
+1252305	150	Officer's Belt
+1252306	150	Sentinel's Belt
+1252307	150	Warder's Belt
+1252308	150	Prefect's Belt
+1252309	150	Justicar's Belt
+1255075	150	Mender's Leather Belt
+1255076	150	Skycaller's Leather Belt
+1255077	150	Skirmisher's Leather Belt
+1255078	150	Warden's Leather Belt
+1255079	150	Stalker's Leather Belt
+1255080	150	Skulker's Leather Belt
+1255081	150	Prowler's Leather Belt
+1255143	35	Moonglow Boots
+1255144	35	Murloc Scale Shoes
+1255145	35	Dark Leather Boots
+1255146	35	Black Whelp Slippers
+1257368	35	Novice Arcanist's Sash
+1257369	35	Novice Ardent's Sash
+1259342	90	Simple Poultice
+1259347	120	Woolen Tourniquet
+1263425	20	Faction Banner
+1306126	300	Smelt Heavy Thorium

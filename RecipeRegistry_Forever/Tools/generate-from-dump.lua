@@ -198,7 +198,12 @@ local miningPath
 -- (Tools/captures/tbc-vanilla-skill.tsv, scritto da extract-tbc-acquisition.lua).
 -- Serve per le ricette dei trainer: il client di Forever per quelle dice 1.
 local vanillaSkill = {}
-local function loadVanillaSkill(path)
+-- Il livello a cui un trainer di Forever insegna la ricetta, da Wowhead
+-- (Tools/captures/wowhead-trainer-skill.tsv, scritto da scrape-wowhead.py
+-- --spells). Forever ha abbassato molte ricette dei trainer: Coarse
+-- Weightstone il vanilla la insegnava a 65, su Forever e' gialla da 40.
+local trainerSkill = {}
+local function loadSkillTable(path, into)
     local file = assert(io.open(path, "r"))
     local header = true
     for line in file:lines() do
@@ -206,7 +211,7 @@ local function loadVanillaSkill(path)
             header = false
         else
             local spellId, skill = line:match("^(%d+)\t(%d+)")
-            if spellId then vanillaSkill[tonumber(spellId)] = tonumber(skill) end
+            if spellId then into[tonumber(spellId)] = tonumber(skill) end
         end
     end
     file:close()
@@ -217,14 +222,29 @@ end
 -- Il campo del client, SkillLineAbility.MinSkillLineRank, vale 1 su 2503
 -- ricette su 2519: il livello che un trainer chiede e' dato del server. Messo
 -- nel record cosi' com'era, l'addon mostrava "1" su ogni riga. Quindi:
+--   0. le ricette che il client dice apprese da sole (AcquireMethod 1): il
+--      gioco le da' appena il mestiere arriva a MinSkillLineRank, e quello e'
+--      il livello. Linen Bag su Forever e' fra queste, a 1, mentre il vanilla
+--      la vendeva dal trainer a 45: col solo passo 2 l'addon diceva 45;
 --   1. il livello che chiede l'oggetto-ricetta (ItemSparse.RequiredSkillRank),
 --      dato del client di Forever, per le ricette che un oggetto insegna;
---   2. il livello vanilla dal dataset TBC, per le ricette dei trainer;
---   3. MinSkillLineRank, solo quando dice qualcosa (sopra 1);
---   4. niente: meglio nessun livello che uno falso.
+--   2. il livello del trainer di Forever, da Wowhead. Dopo l'oggetto-ricetta,
+--      perche' quello e' il client; prima del vanilla, perche' Forever ha
+--      rifatto i livelli: dove le soglie non sono cambiate Wowhead ripete il
+--      vanilla (178 ricette su 178), dove sono scese scende anche lui;
+--   3. il livello vanilla dal dataset TBC, per le ricette dei trainer;
+--   4. MinSkillLineRank, solo quando dice qualcosa (sopra 1);
+--   5. niente: meglio nessun livello che uno falso.
+local ACQUIRE_ON_SKILL_RANK = 1
 local function resolveRequiredSkill(spellId, mined)
+    if mined and mined.acquireMethod == ACQUIRE_ON_SKILL_RANK and tonumber(mined.requiredSkill) then
+        return mined.requiredSkill, "auto"
+    end
     if mined and tonumber(mined.recipeItemSkill) and mined.recipeItemSkill > 0 then
         return mined.recipeItemSkill, "recipeItem"
+    end
+    if trainerSkill[spellId] then
+        return trainerSkill[spellId], "trainer"
     end
     if vanillaSkill[spellId] then
         return vanillaSkill[spellId], "vanilla"
@@ -234,16 +254,41 @@ local function resolveRequiredSkill(spellId, mined)
     end
     return nil, nil
 end
+
+-- Le quattro soglie di difficolta' -- arancione, giallo, verde, grigio -- nella
+-- forma che l'addon legge (RecipeMetadata:GetSkillLevels vuole quattro numeri,
+-- come sull'albero TBC).
+--
+-- Il client ne porta tre, { MinSkillLineRank, TrivialSkillLineRankLow,
+-- TrivialSkillLineRankHigh }: dove si impara, dove diventa gialla, dove
+-- diventa grigia. Passate cosi' com'erano, GetSkillLevels le scartava tutte e
+-- l'addon colorava ogni ricetta con fasce fisse a +10/+20/+30 dal livello
+-- richiesto. Il verde il client non lo scrive: e' la meta' fra giallo e grigio,
+-- arrotondata in basso -- misurato contro le scale di Ackis sull'albero TBC,
+-- 1921 su 1921 sul client Anniversary e 1141 su 1141 sul vanilla.
+--
+-- L'arancione e' il livello a cui si impara, quello del record: sulle ricette
+-- dei trainer MinSkillLineRank dice 1 e non e' un livello (vedi sopra).
+local function difficultyLadder(mined, requiredSkill)
+    local levels = mined and mined.skillLevels
+    if type(levels) ~= "table" or #levels ~= 3 then return nil end
+    local minimum, yellow, grey = tonumber(levels[1]), tonumber(levels[2]), tonumber(levels[3])
+    if not (minimum and yellow and grey) or yellow <= 0 or grey < yellow then return nil end
+    return { requiredSkill or minimum, yellow, math.floor((yellow + grey) / 2), grey }
+end
 local requiredSkillSources = {}
 for index = 3, #(arg or {}) do
     local value = tostring(arg[index])
     local acquisitionPath = value:match("^%-%-acquisition=(.+)$")
     local path = value:match("^%-%-mining=(.+)$")
     local vanillaSkillPath = value:match("^%-%-vanilla%-skill=(.+)$")
+    local trainerSkillPath = value:match("^%-%-trainer%-skill=(.+)$")
     if acquisitionPath then
         loadAcquisition(acquisitionPath)
     elseif vanillaSkillPath then
-        loadVanillaSkill(vanillaSkillPath)
+        loadSkillTable(vanillaSkillPath, vanillaSkill)
+    elseif trainerSkillPath then
+        loadSkillTable(trainerSkillPath, trainerSkill)
     elseif path then
         miningPath = path
         local env = {}
@@ -442,7 +487,7 @@ local function newRecord(spellId, professionKey, mined, createdItemId, category,
         profession = professionKey,
         expansion = (mined and mined.expansion) or EXPANSION,
         requiredSkill = requiredSkill,
-        skillLevels = mined and mined.skillLevels or nil,
+        skillLevels = difficultyLadder(mined, requiredSkill),
         classMask = mined and mined.classMask or nil,
         -- L'oggetto che insegna la ricetta -- un Pattern, dei Plans --
         -- dal datamining: il client non lo dice per ricetta. Su
@@ -812,8 +857,8 @@ local COVERAGE_FIELDS = {
     { "reagents",       STRUCTURE_SOURCE, "cosa serve per farla" },
     { "createdItemId",  STRUCTURE_SOURCE, "cosa produce" },
     { "createdCount",   "client",     "quante ne produce, se diverso da una" },
-    { "requiredSkill",  "datamining + TBC", "a che livello si impara: oggetto-ricetta, poi vanilla" },
-    { "skillLevels",    "datamining", "le soglie di difficolta'" },
+    { "requiredSkill",  "datamining + Wowhead + TBC", "a che livello si impara: da sola, oggetto-ricetta, trainer, poi vanilla" },
+    { "skillLevels",    "datamining", "le soglie di difficolta', il verde a meta' fra giallo e grigio" },
     { "expansion",      "datamining", "vanilla o aggiunta di Forever" },
     { "classMask",      "datamining", "quali classi possono impararla" },
     { "bopOutput",      "datamining", "se il prodotto e' legato quando si raccoglie" },
@@ -1052,8 +1097,9 @@ print(string.format("  in piu' mestieri %d, righe doppie nel client %d",
 if miningPath then
     local enriched = coverage.requiredSkill or 0
     print(string.format("  arricchite dal datamining: %d su %d (%s)", enriched, #ids, miningPath))
-    print(string.format("  livello richiesto: oggetto-ricetta %d, vanilla %d, client %d, ignoto %d",
-        requiredSkillSources.recipeItem or 0, requiredSkillSources.vanilla or 0,
+    print(string.format("  livello richiesto: appresa da sola %d, oggetto-ricetta %d, trainer %d, vanilla %d, client %d, ignoto %d",
+        requiredSkillSources.auto or 0, requiredSkillSources.recipeItem or 0, requiredSkillSources.trainer or 0,
+        requiredSkillSources.vanilla or 0,
         requiredSkillSources.client or 0, requiredSkillSources.none or 0))
 else
     print("  nessun datamining: mancano requiredSkill, skillLevels, espansione, classMask")

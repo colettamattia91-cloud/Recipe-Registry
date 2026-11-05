@@ -20,6 +20,9 @@ All notable changes to this addon are documented in this file.
 ### Fixed
 
 - **Vendor names with quotation marks show correctly.**
+- **Recipe difficulty colours follow the game's thresholds** on 2490 recipes.
+- **190 recipes show the skill level Forever teaches them at**, and 36 show
+  one for the first time.
 
 ## [0.1.3] - 2026-10-25
 

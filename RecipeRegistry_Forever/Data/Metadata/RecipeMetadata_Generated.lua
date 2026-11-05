@@ -24,8 +24,8 @@
 --   reagents          2520  (datamining) cosa serve per farla
 --   createdItemId     2337  (datamining) cosa produce
 --   createdCount       115  (client) quante ne produce, se diverso da una
---   requiredSkill     2308  (datamining + TBC) a che livello si impara: oggetto-ricetta, poi vanilla
---   skillLevels       2490  (datamining) le soglie di difficolta'
+--   requiredSkill     2344  (datamining + Wowhead + TBC) a che livello si impara: da sola, oggetto-ricetta, trainer, poi vanilla
+--   skillLevels       2490  (datamining) le soglie di difficolta', il verde a meta' fra giallo e grigio
 --   expansion         2520  (datamining) vanilla o aggiunta di Forever
 --   classMask            0  (datamining) quali classi possono impararla
 --   bopOutput         2054  (datamining) se il prodotto e' legato quando si raccoglie
@@ -58,7 +58,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 1,
-            skillLevels = { 1, 40, 70 },
+            skillLevels = { 1, 40, 55, 70 },
             reagents = {
                 { itemId = 2318, count = 2 },
                 { itemId = 2320, count = 1 },
@@ -73,7 +73,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2569",
             sortOrder = 2000,
             requiredSkill = 1,
-            skillLevels = { 1, 30, 60 },
+            skillLevels = { 1, 30, 45, 60 },
             reagents = {
                 { itemId = 2318, count = 1 },
             },
@@ -86,8 +86,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2559",
             sortOrder = 1000,
-            requiredSkill = 30,
-            skillLevels = { 1, 45, 75 },
+            requiredSkill = 15,
+            skillLevels = { 15, 45, 60, 75 },
             reagents = {
                 { itemId = 2318, count = 4 },
                 { itemId = 2320, count = 1 },
@@ -104,7 +104,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 65,
-            skillLevels = { 1, 95, 125 },
+            skillLevels = { 65, 95, 110, 125 },
             reagents = {
                 { itemId = 2318, count = 7 },
                 { itemId = 2320, count = 2 },
@@ -118,8 +118,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2552",
             sortOrder = 300,
-            requiredSkill = 85,
-            skillLevels = { 1, 70, 100 },
+            requiredSkill = 50,
+            skillLevels = { 50, 70, 85, 100 },
             reagents = {
                 { itemId = 2318, count = 10 },
                 { itemId = 2321, count = 2 },
@@ -133,8 +133,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2555",
             sortOrder = 600,
-            requiredSkill = 50,
-            skillLevels = { 1, 65, 95 },
+            requiredSkill = 35,
+            skillLevels = { 35, 65, 80, 95 },
             reagents = {
                 { itemId = 2318, count = 8 },
                 { itemId = 2320, count = 4 },
@@ -148,8 +148,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2560",
             sortOrder = 1100,
-            requiredSkill = 65,
-            skillLevels = { 1, 80, 110 },
+            requiredSkill = 50,
+            skillLevels = { 50, 80, 95, 110 },
             reagents = {
                 { itemId = 2318, count = 8 },
                 { itemId = 2320, count = 5 },
@@ -163,8 +163,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2552",
             sortOrder = 300,
-            requiredSkill = 65,
-            skillLevels = { 1, 70, 100 },
+            requiredSkill = 40,
+            skillLevels = { 40, 70, 85, 100 },
             reagents = {
                 { itemId = 2318, count = 5 },
                 { itemId = 2320, count = 2 },
@@ -181,7 +181,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 40,
-            skillLevels = { 1, 70, 100 },
+            skillLevels = { 40, 70, 85, 100 },
             reagents = {
                 { itemId = 2318, count = 8 },
                 { itemId = 2320, count = 2 },
@@ -199,7 +199,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 50,
-            skillLevels = { 1, 80, 110 },
+            skillLevels = { 50, 80, 95, 110 },
             reagents = {
                 { itemId = 4231, count = 1 },
                 { itemId = 2318, count = 4 },
@@ -215,7 +215,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2569",
             sortOrder = 2000,
             requiredSkill = 75,
-            skillLevels = { 1, 90, 105 },
+            skillLevels = { 75, 90, 97, 105 },
             reagents = {
                 { itemId = 2319, count = 4 },
                 { itemId = 2320, count = 1 },
@@ -229,8 +229,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2555",
             sortOrder = 600,
-            requiredSkill = 125,
-            skillLevels = { 1, 120, 145 },
+            requiredSkill = 95,
+            skillLevels = { 95, 120, 132, 145 },
             reagents = {
                 { itemId = 2319, count = 10 },
                 { itemId = 4231, count = 2 },
@@ -245,8 +245,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2560",
             sortOrder = 1100,
-            requiredSkill = 100,
-            skillLevels = { 1, 100, 125 },
+            requiredSkill = 75,
+            skillLevels = { 75, 100, 112, 125 },
             reagents = {
                 { itemId = 2319, count = 4 },
                 { itemId = 2321, count = 2 },
@@ -261,8 +261,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2552",
             sortOrder = 300,
-            requiredSkill = 110,
-            skillLevels = { 1, 110, 135 },
+            requiredSkill = 85,
+            skillLevels = { 85, 110, 122, 135 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 2321, count = 1 },
@@ -280,7 +280,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 125 },
+            skillLevels = { 75, 100, 112, 125 },
             reagents = {
                 { itemId = 2319, count = 6 },
                 { itemId = 2321, count = 1 },
@@ -295,8 +295,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2450",
             sortOrder = 30,
-            requiredSkill = 1,
-            skillLevels = { 1, 55, 95 },
+            requiredSkill = 15,
+            skillLevels = { 15, 55, 75, 95 },
             reagents = {
                 { itemId = 2449, count = 1 },
                 { itemId = 765, count = 1 },
@@ -311,8 +311,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2621",
             sortOrder = 20,
-            requiredSkill = 30,
-            skillLevels = { 1, 65, 105 },
+            requiredSkill = 25,
+            skillLevels = { 25, 65, 85, 105 },
             reagents = {
                 { itemId = 785, count = 1 },
                 { itemId = 2447, count = 1 },
@@ -328,7 +328,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2621",
             sortOrder = 20,
             requiredSkill = 40,
-            skillLevels = { 40, 70, 110 },
+            skillLevels = { 40, 70, 90, 110 },
             reagents = {
                 { itemId = 785, count = 2 },
                 { itemId = 2447, count = 1 },
@@ -346,7 +346,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 140,
-            skillLevels = { 1, 165, 205 },
+            skillLevels = { 140, 165, 185, 205 },
             reagents = {
                 { itemId = 3355, count = 1 },
                 { itemId = 2452, count = 1 },
@@ -363,7 +363,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 50,
-            skillLevels = { 50, 80, 120 },
+            skillLevels = { 50, 80, 100, 120 },
             reagents = {
                 { itemId = 2449, count = 2 },
                 { itemId = 2447, count = 1 },
@@ -381,7 +381,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 60,
-            skillLevels = { 60, 90, 130 },
+            skillLevels = { 60, 90, 110, 130 },
             reagents = {
                 { itemId = 2452, count = 1 },
                 { itemId = 2450, count = 1 },
@@ -396,7 +396,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2651",
             sortOrder = 55,
-            skillLevels = { 1, 100, 140 },
+            skillLevels = { 1, 100, 120, 140 },
             reagents = {
                 { itemId = 2449, count = 2 },
                 { itemId = 785, count = 2 },
@@ -412,7 +412,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 10,
-            skillLevels = { 1, 45, 70 },
+            skillLevels = { 10, 45, 57, 70 },
             reagents = {
                 { itemId = 2996, count = 1 },
                 { itemId = 2320, count = 1 },
@@ -426,8 +426,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2588",
             sortOrder = 1300,
-            requiredSkill = 65,
-            skillLevels = { 1, 65, 100 },
+            requiredSkill = 40,
+            skillLevels = { 40, 65, 82, 100 },
             reagents = {
                 { itemId = 2996, count = 3 },
                 { itemId = 2320, count = 1 },
@@ -443,7 +443,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2580",
             sortOrder = 500,
             requiredSkill = 1,
-            skillLevels = { 1, 35, 60 },
+            skillLevels = { 1, 35, 47, 60 },
             reagents = {
                 { itemId = 2996, count = 1 },
                 { itemId = 2320, count = 1 },
@@ -460,7 +460,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 25,
-            skillLevels = { 1, 50, 85 },
+            skillLevels = { 25, 50, 67, 85 },
             reagents = {
                 { itemId = 2996, count = 3 },
                 { itemId = 2320, count = 2 },
@@ -475,8 +475,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2589",
             sortOrder = 1400,
-            requiredSkill = 40,
-            skillLevels = { 1, 50, 85 },
+            requiredSkill = 25,
+            skillLevels = { 25, 50, 67, 85 },
             reagents = {
                 { itemId = 2996, count = 2 },
                 { itemId = 2320, count = 1 },
@@ -492,7 +492,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2589",
             sortOrder = 1400,
             requiredSkill = 1,
-            skillLevels = { 1, 35, 60 },
+            skillLevels = { 1, 35, 47, 60 },
             reagents = {
                 { itemId = 2996, count = 1 },
                 { itemId = 2320, count = 1 },
@@ -507,8 +507,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2589",
             sortOrder = 1400,
-            requiredSkill = 40,
-            skillLevels = { 1, 50, 85 },
+            requiredSkill = 25,
+            skillLevels = { 25, 50, 67, 85 },
             reagents = {
                 { itemId = 2996, count = 2 },
                 { itemId = 2320, count = 1 },
@@ -523,8 +523,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2583",
             sortOrder = 800,
-            requiredSkill = 70,
-            skillLevels = { 1, 65, 100 },
+            requiredSkill = 40,
+            skillLevels = { 40, 65, 82, 100 },
             reagents = {
                 { itemId = 2996, count = 4 },
                 { itemId = 2318, count = 1 },
@@ -539,8 +539,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2589",
             sortOrder = 1400,
-            requiredSkill = 70,
-            skillLevels = { 1, 65, 100 },
+            requiredSkill = 40,
+            skillLevels = { 40, 65, 82, 100 },
             reagents = {
                 { itemId = 2996, count = 3 },
                 { itemId = 2321, count = 1 },
@@ -555,8 +555,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2580",
             sortOrder = 500,
-            requiredSkill = 60,
-            skillLevels = { 1, 60, 95 },
+            requiredSkill = 35,
+            skillLevels = { 35, 60, 77, 95 },
             reagents = {
                 { itemId = 2996, count = 2 },
                 { itemId = 2320, count = 3 },
@@ -570,8 +570,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2583",
             sortOrder = 800,
-            requiredSkill = 85,
-            skillLevels = { 1, 85, 120 },
+            requiredSkill = 60,
+            skillLevels = { 60, 85, 102, 120 },
             reagents = {
                 { itemId = 2997, count = 2 },
                 { itemId = 2321, count = 2 },
@@ -586,8 +586,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2588",
             sortOrder = 1300,
-            requiredSkill = 95,
-            skillLevels = { 1, 95, 130 },
+            requiredSkill = 70,
+            skillLevels = { 70, 95, 112, 130 },
             reagents = {
                 { itemId = 2997, count = 4 },
                 { itemId = 2321, count = 2 },
@@ -602,8 +602,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2580",
             sortOrder = 500,
-            requiredSkill = 75,
-            skillLevels = { 1, 80, 115 },
+            requiredSkill = 55,
+            skillLevels = { 55, 80, 97, 115 },
             reagents = {
                 { itemId = 2997, count = 1 },
                 { itemId = 2321, count = 1 },
@@ -620,7 +620,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 80,
-            skillLevels = { 1, 105, 140 },
+            skillLevels = { 80, 105, 122, 140 },
             reagents = {
                 { itemId = 2997, count = 4 },
                 { itemId = 2321, count = 3 },
@@ -635,8 +635,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2589",
             sortOrder = 1400,
-            requiredSkill = 100,
-            skillLevels = { 1, 90, 110 },
+            requiredSkill = 80,
+            skillLevels = { 80, 90, 100, 110 },
             reagents = {
                 { itemId = 2997, count = 2 },
                 { itemId = 2321, count = 1 },
@@ -652,7 +652,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2632",
             sortOrder = 10,
             requiredSkill = 1,
-            skillLevels = { 1, 45, 85 },
+            skillLevels = { 1, 45, 65, 85 },
             reagents = {
                 { itemId = 2672, count = 1 },
             },
@@ -665,8 +665,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2634",
             sortOrder = 30,
-            requiredSkill = 30,
-            skillLevels = { 1, 50, 90 },
+            requiredSkill = 10,
+            skillLevels = { 10, 50, 70, 90 },
             reagents = {
                 { itemId = 2672, count = 1 },
                 { itemId = 2678, count = 1 },
@@ -681,7 +681,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2633",
             sortOrder = 20,
             requiredSkill = 1,
-            skillLevels = { 1, 45, 85 },
+            skillLevels = { 1, 45, 65, 85 },
             reagents = {
                 { itemId = 769, count = 1 },
             },
@@ -694,8 +694,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2634",
             sortOrder = 30,
-            requiredSkill = 65,
-            skillLevels = { 1, 90, 130 },
+            requiredSkill = 50,
+            skillLevels = { 50, 90, 110, 130 },
             reagents = {
                 { itemId = 2673, count = 1 },
             },
@@ -711,7 +711,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2633",
             sortOrder = 20,
             requiredSkill = 50,
-            skillLevels = { 1, 90, 130 },
+            skillLevels = { 50, 90, 110, 130 },
             reagents = {
                 { itemId = 723, count = 1 },
                 { itemId = 2678, count = 1 },
@@ -728,7 +728,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2636",
             sortOrder = 200,
             requiredSkill = 75,
-            skillLevels = { 1, 115, 155 },
+            skillLevels = { 75, 115, 135, 155 },
             reagents = {
                 { itemId = 729, count = 1 },
                 { itemId = 730, count = 1 },
@@ -744,7 +744,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2635",
             sortOrder = 40,
             requiredSkill = 75,
-            skillLevels = { 1, 115, 155 },
+            skillLevels = { 75, 115, 135, 155 },
             reagents = {
                 { itemId = 2674, count = 1 },
                 { itemId = 2678, count = 1 },
@@ -761,7 +761,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2635",
             sortOrder = 40,
             requiredSkill = 85,
-            skillLevels = { 1, 125, 165 },
+            skillLevels = { 85, 125, 145, 165 },
             reagents = {
                 { itemId = 2675, count = 1 },
                 { itemId = 2678, count = 1 },
@@ -775,8 +775,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2633",
             sortOrder = 20,
-            requiredSkill = 110,
-            skillLevels = { 1, 120, 160 },
+            requiredSkill = 80,
+            skillLevels = { 80, 120, 140, 160 },
             reagents = {
                 { itemId = 2677, count = 1 },
                 { itemId = 2678, count = 1 },
@@ -793,7 +793,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2635",
             sortOrder = 40,
             requiredSkill = 100,
-            skillLevels = { 1, 135, 175 },
+            skillLevels = { 100, 135, 155, 175 },
             reagents = {
                 { itemId = 1081, count = 1 },
                 { itemId = 1080, count = 1 },
@@ -810,7 +810,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2633",
             sortOrder = 20,
             requiredSkill = 110,
-            skillLevels = { 1, 130, 170 },
+            skillLevels = { 110, 130, 150, 170 },
             reagents = {
                 { itemId = 2677, count = 2 },
                 { itemId = 2692, count = 1 },
@@ -827,7 +827,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2634",
             sortOrder = 30,
             requiredSkill = 100,
-            skillLevels = { 1, 140, 180 },
+            skillLevels = { 100, 140, 160, 180 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -844,7 +844,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2575",
             sortOrder = 100,
             requiredSkill = 1,
-            skillLevels = { 1, 25, 70 },
+            skillLevels = { 1, 25, 47, 70 },
             reagents = {
                 { itemId = 2770, count = 1 },
             },
@@ -858,7 +858,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2575",
             sortOrder = 100,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 125 },
+            skillLevels = { 75, 100, 112, 125 },
             reagents = {
                 { itemId = 2775, count = 1 },
             },
@@ -872,7 +872,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2575",
             sortOrder = 100,
             requiredSkill = 65,
-            skillLevels = { 1, 65, 115 },
+            skillLevels = { 65, 65, 90, 115 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -889,7 +889,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2460",
             sortOrder = 20,
             requiredSkill = 1,
-            skillLevels = { 1, 15, 55 },
+            skillLevels = { 1, 15, 35, 55 },
             reagents = {
                 { itemId = 2835, count = 1 },
             },
@@ -902,8 +902,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2466",
             sortOrder = 160,
-            requiredSkill = 55,
-            skillLevels = { 1, 70, 110 },
+            requiredSkill = 30,
+            skillLevels = { 30, 70, 90, 110 },
             reagents = {
                 { itemId = 2840, count = 6 },
             },
@@ -916,8 +916,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2467",
             sortOrder = 170,
-            requiredSkill = 40,
-            skillLevels = { 40, 50, 90 },
+            requiredSkill = 15,
+            skillLevels = { 15, 50, 70, 90 },
             reagents = {
                 { itemId = 2840, count = 4 },
             },
@@ -931,7 +931,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2464",
             sortOrder = 140,
             requiredSkill = 1,
-            skillLevels = { 1, 20, 60 },
+            skillLevels = { 1, 20, 40, 60 },
             reagents = {
                 { itemId = 2840, count = 2 },
             },
@@ -945,7 +945,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2464",
             sortOrder = 140,
             requiredSkill = 65,
-            skillLevels = { 1, 90, 115 },
+            skillLevels = { 65, 90, 102, 115 },
             reagents = {
                 { itemId = 2840, count = 10 },
                 { itemId = 3470, count = 3 },
@@ -959,8 +959,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2460",
             sortOrder = 20,
-            requiredSkill = 75,
-            skillLevels = { 75, 40, 55 },
+            requiredSkill = 40,
+            skillLevels = { 40, 40, 47, 55 },
             reagents = {
                 { itemId = 2836, count = 1 },
             },
@@ -973,8 +973,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2466",
             sortOrder = 160,
-            requiredSkill = 80,
-            skillLevels = { 80, 85, 125 },
+            requiredSkill = 45,
+            skillLevels = { 45, 85, 105, 125 },
             reagents = {
                 { itemId = 2840, count = 10 },
             },
@@ -990,7 +990,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 55,
-            skillLevels = { 90, 95, 135 },
+            skillLevels = { 55, 95, 115, 135 },
             reagents = {
                 { itemId = 2840, count = 12 },
                 { itemId = 1210, count = 1 },
@@ -1005,8 +1005,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2467",
             sortOrder = 170,
-            requiredSkill = 95,
-            skillLevels = { 95, 120, 150 },
+            requiredSkill = 80,
+            skillLevels = { 80, 120, 135, 150 },
             reagents = {
                 { itemId = 2841, count = 6 },
             },
@@ -1019,8 +1019,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2463",
             sortOrder = 130,
-            requiredSkill = 105,
-            skillLevels = { 105, 120, 150 },
+            requiredSkill = 80,
+            skillLevels = { 80, 120, 135, 150 },
             reagents = {
                 { itemId = 2841, count = 7 },
             },
@@ -1034,7 +1034,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2464",
             sortOrder = 140,
             requiredSkill = 100,
-            skillLevels = { 1, 115, 145 },
+            skillLevels = { 100, 115, 130, 145 },
             reagents = {
                 { itemId = 2841, count = 4 },
             },
@@ -1047,8 +1047,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2464",
             sortOrder = 140,
-            requiredSkill = 120,
-            skillLevels = { 120, 125, 155 },
+            requiredSkill = 95,
+            skillLevels = { 95, 125, 140, 155 },
             reagents = {
                 { itemId = 2841, count = 5 },
                 { itemId = 3478, count = 2 },
@@ -1065,7 +1065,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 105,
-            skillLevels = { 1, 135, 165 },
+            skillLevels = { 105, 135, 150, 165 },
             reagents = {
                 { itemId = 2841, count = 10 },
                 { itemId = 2842, count = 2 },
@@ -1081,8 +1081,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2460",
             sortOrder = 20,
-            requiredSkill = 125,
-            skillLevels = { 125, 100, 115 },
+            requiredSkill = 100,
+            skillLevels = { 100, 100, 107, 115 },
             reagents = {
                 { itemId = 2838, count = 1 },
             },
@@ -1095,8 +1095,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2463",
             sortOrder = 130,
-            requiredSkill = 135,
-            skillLevels = { 135, 150, 180 },
+            requiredSkill = 120,
+            skillLevels = { 120, 150, 165, 180 },
             reagents = {
                 { itemId = 2841, count = 20 },
                 { itemId = 1206, count = 2 },
@@ -1113,8 +1113,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2484",
             sortOrder = 260,
-            requiredSkill = 30,
-            skillLevels = { 1, 55, 95 },
+            requiredSkill = 15,
+            skillLevels = { 15, 55, 75, 95 },
             reagents = {
                 { itemId = 2840, count = 6 },
                 { itemId = 2880, count = 1 },
@@ -1129,8 +1129,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2481",
             sortOrder = 230,
-            requiredSkill = 35,
-            skillLevels = { 1, 60, 100 },
+            requiredSkill = 20,
+            skillLevels = { 20, 60, 80, 100 },
             reagents = {
                 { itemId = 2840, count = 6 },
                 { itemId = 2880, count = 1 },
@@ -1145,8 +1145,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2485",
             sortOrder = 270,
-            requiredSkill = 40,
-            skillLevels = { 40, 65, 105 },
+            requiredSkill = 25,
+            skillLevels = { 25, 65, 85, 105 },
             reagents = {
                 { itemId = 2840, count = 6 },
                 { itemId = 2880, count = 1 },
@@ -1161,8 +1161,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2484",
             sortOrder = 260,
-            requiredSkill = 75,
-            skillLevels = { 75, 115, 145 },
+            requiredSkill = 85,
+            skillLevels = { 85, 115, 130, 145 },
             reagents = {
                 { itemId = 2841, count = 6 },
                 { itemId = 2880, count = 4 },
@@ -1177,8 +1177,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2481",
             sortOrder = 230,
-            requiredSkill = 85,
-            skillLevels = { 85, 120, 150 },
+            requiredSkill = 90,
+            skillLevels = { 90, 120, 135, 150 },
             reagents = {
                 { itemId = 2841, count = 7 },
                 { itemId = 2880, count = 4 },
@@ -1194,7 +1194,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2485",
             sortOrder = 270,
             requiredSkill = 95,
-            skillLevels = { 95, 125, 155 },
+            skillLevels = { 95, 125, 140, 155 },
             reagents = {
                 { itemId = 2841, count = 5 },
                 { itemId = 2880, count = 4 },
@@ -1212,7 +1212,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2633",
             sortOrder = 20,
             requiredSkill = 25,
-            skillLevels = { 1, 60, 100 },
+            skillLevels = { 25, 60, 80, 100 },
             reagents = {
                 { itemId = 2886, count = 1 },
                 { itemId = 2894, count = 1 },
@@ -1227,7 +1227,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2550",
             sortOrder = 100,
             requiredSkill = 1,
-            skillLevels = { 1, 20, 40 },
+            skillLevels = { 1, 20, 30, 40 },
             reagents = {
                 { itemId = 2934, count = 3 },
             },
@@ -1241,7 +1241,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2576",
             sortOrder = 100,
             requiredSkill = 1,
-            skillLevels = { 1, 25, 50 },
+            skillLevels = { 1, 25, 37, 50 },
             reagents = {
                 { itemId = 2589, count = 2 },
             },
@@ -1254,8 +1254,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2576",
             sortOrder = 100,
-            requiredSkill = 75,
-            skillLevels = { 1, 70, 85 },
+            requiredSkill = 55,
+            skillLevels = { 55, 70, 77, 85 },
             reagents = {
                 { itemId = 2592, count = 3 },
             },
@@ -1269,7 +1269,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2460",
             sortOrder = 20,
             requiredSkill = 1,
-            skillLevels = { 1, 15, 55 },
+            skillLevels = { 1, 15, 35, 55 },
             reagents = {
                 { itemId = 2835, count = 1 },
             },
@@ -1282,8 +1282,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2460",
             sortOrder = 20,
-            requiredSkill = 65,
-            skillLevels = { 1, 40, 55 },
+            requiredSkill = 40,
+            skillLevels = { 40, 40, 47, 55 },
             reagents = {
                 { itemId = 2836, count = 1 },
             },
@@ -1296,8 +1296,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2460",
             sortOrder = 20,
-            requiredSkill = 125,
-            skillLevels = { 1, 100, 115 },
+            requiredSkill = 100,
+            skillLevels = { 100, 100, 107, 115 },
             reagents = {
                 { itemId = 2838, count = 1 },
             },
@@ -1311,7 +1311,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 15,
-            skillLevels = { 1, 60, 100 },
+            skillLevels = { 15, 60, 80, 100 },
             reagents = {
                 { itemId = 2447, count = 1 },
                 { itemId = 2449, count = 2 },
@@ -1327,7 +1327,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 90,
-            skillLevels = { 1, 120, 160 },
+            skillLevels = { 90, 120, 140, 160 },
             reagents = {
                 { itemId = 785, count = 1 },
                 { itemId = 2450, count = 2 },
@@ -1345,7 +1345,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 110,
-            skillLevels = { 1, 135, 175 },
+            skillLevels = { 110, 135, 155, 175 },
             reagents = {
                 { itemId = 785, count = 3 },
                 { itemId = 3355, count = 1 },
@@ -1361,7 +1361,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2621",
             sortOrder = 20,
             requiredSkill = 120,
-            skillLevels = { 1, 145, 185 },
+            skillLevels = { 120, 145, 165, 185 },
             reagents = {
                 { itemId = 785, count = 1 },
                 { itemId = 3820, count = 1 },
@@ -1379,7 +1379,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 120,
-            skillLevels = { 1, 145, 185 },
+            skillLevels = { 120, 145, 165, 185 },
             reagents = {
                 { itemId = 1288, count = 1 },
                 { itemId = 2453, count = 1 },
@@ -1397,7 +1397,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 250,
-            skillLevels = { 1, 275, 315 },
+            skillLevels = { 250, 275, 295, 315 },
             reagents = {
                 { itemId = 8839, count = 2 },
                 { itemId = 8845, count = 1 },
@@ -1413,7 +1413,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 125,
-            skillLevels = { 1, 150, 190 },
+            skillLevels = { 125, 150, 170, 190 },
             reagents = {
                 { itemId = 2453, count = 2 },
                 { itemId = 2450, count = 2 },
@@ -1429,7 +1429,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 130,
-            skillLevels = { 1, 155, 195 },
+            skillLevels = { 130, 155, 175, 195 },
             reagents = {
                 { itemId = 3355, count = 1 },
                 { itemId = 3820, count = 1 },
@@ -1447,7 +1447,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 150,
-            skillLevels = { 1, 175, 215 },
+            skillLevels = { 150, 175, 195, 215 },
             reagents = {
                 { itemId = 2449, count = 1 },
                 { itemId = 3356, count = 1 },
@@ -1465,7 +1465,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 50,
-            skillLevels = { 1, 80, 120 },
+            skillLevels = { 50, 80, 100, 120 },
             reagents = {
                 { itemId = 2452, count = 1 },
                 { itemId = 765, count = 1 },
@@ -1479,7 +1479,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2530",
             sortOrder = 10,
-            skillLevels = { 1, 30, 60 },
+            requiredSkill = 1,
+            skillLevels = { 1, 30, 45, 60 },
             reagents = {
                 { itemId = 2589, count = 1 },
             },
@@ -1491,7 +1492,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2530",
             sortOrder = 10,
-            skillLevels = { 1, 50, 100 },
+            requiredSkill = 40,
+            skillLevels = { 40, 50, 75, 100 },
             reagents = {
                 { itemId = 2589, count = 2 },
             },
@@ -1503,7 +1505,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2530",
             sortOrder = 10,
-            skillLevels = { 1, 80, 150 },
+            requiredSkill = 80,
+            skillLevels = { 80, 80, 115, 150 },
             reagents = {
                 { itemId = 2592, count = 1 },
             },
@@ -1515,7 +1518,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2530",
             sortOrder = 10,
-            skillLevels = { 1, 115, 185 },
+            requiredSkill = 115,
+            skillLevels = { 115, 115, 150, 185 },
             reagents = {
                 { itemId = 2592, count = 2 },
             },
@@ -1528,8 +1532,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2480",
             sortOrder = 220,
-            requiredSkill = 95,
-            skillLevels = { 1, 110, 150 },
+            requiredSkill = 70,
+            skillLevels = { 70, 110, 130, 150 },
             reagents = {
                 { itemId = 2840, count = 14 },
                 { itemId = 2880, count = 2 },
@@ -1545,8 +1549,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2477",
             sortOrder = 190,
-            requiredSkill = 35,
-            skillLevels = { 1, 70, 110 },
+            requiredSkill = 30,
+            skillLevels = { 30, 70, 90, 110 },
             reagents = {
                 { itemId = 2840, count = 12 },
                 { itemId = 2880, count = 2 },
@@ -1563,8 +1567,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2481",
             sortOrder = 230,
-            requiredSkill = 70,
-            skillLevels = { 1, 85, 125 },
+            requiredSkill = 45,
+            skillLevels = { 45, 85, 105, 125 },
             reagents = {
                 { itemId = 2840, count = 10 },
                 { itemId = 2880, count = 2 },
@@ -1584,7 +1588,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2482",
             sortOrder = 240,
             requiredSkill = 100,
-            skillLevels = { 1, 130, 160 },
+            skillLevels = { 100, 130, 145, 160 },
             reagents = {
                 { itemId = 2841, count = 4 },
                 { itemId = 3466, count = 1 },
@@ -1602,8 +1606,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2484",
             sortOrder = 260,
-            requiredSkill = 130,
-            skillLevels = { 1, 135, 165 },
+            requiredSkill = 105,
+            skillLevels = { 105, 135, 150, 165 },
             reagents = {
                 { itemId = 2841, count = 8 },
                 { itemId = 3466, count = 1 },
@@ -1624,7 +1628,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2484",
             sortOrder = 260,
             requiredSkill = 120,
-            skillLevels = { 1, 150, 180 },
+            skillLevels = { 120, 150, 165, 180 },
             reagents = {
                 { itemId = 3575, count = 6 },
                 { itemId = 3466, count = 2 },
@@ -1643,7 +1647,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2575",
             sortOrder = 100,
             requiredSkill = 65,
-            skillLevels = { 1, 50, 75 },
+            skillLevels = { 65, 50, 62, 75 },
             reagents = {
                 { itemId = 2771, count = 1 },
             },
@@ -1657,7 +1661,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2575",
             sortOrder = 100,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 140 },
+            skillLevels = { 125, 130, 135, 140 },
             reagents = {
                 { itemId = 2772, count = 1 },
             },
@@ -1671,7 +1675,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2575",
             sortOrder = 100,
             requiredSkill = 155,
-            skillLevels = { 1, 170, 185 },
+            skillLevels = { 155, 170, 177, 185 },
             reagents = {
                 { itemId = 2776, count = 1 },
             },
@@ -1685,7 +1689,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 20,
-            skillLevels = { 1, 60, 100 },
+            skillLevels = { 20, 60, 80, 100 },
             reagents = {
                 { itemId = 2840, count = 8 },
             },
@@ -1699,7 +1703,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2459",
             sortOrder = 10,
             requiredSkill = 25,
-            skillLevels = { 1, 45, 85 },
+            skillLevels = { 25, 45, 65, 85 },
             reagents = {
                 { itemId = 2835, count = 2 },
             },
@@ -1715,7 +1719,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 30,
-            skillLevels = { 1, 70, 110 },
+            skillLevels = { 30, 70, 90, 110 },
             reagents = {
                 { itemId = 2840, count = 8 },
                 { itemId = 774, count = 1 },
@@ -1730,8 +1734,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2465",
             sortOrder = 150,
-            requiredSkill = 40,
-            skillLevels = { 1, 75, 115 },
+            requiredSkill = 35,
+            skillLevels = { 35, 75, 95, 115 },
             reagents = {
                 { itemId = 2840, count = 8 },
                 { itemId = 3470, count = 2 },
@@ -1745,8 +1749,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2467",
             sortOrder = 170,
-            requiredSkill = 45,
-            skillLevels = { 1, 75, 115 },
+            requiredSkill = 35,
+            skillLevels = { 35, 75, 95, 115 },
             reagents = {
                 { itemId = 2840, count = 8 },
                 { itemId = 2320, count = 3 },
@@ -1764,7 +1768,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 35,
-            skillLevels = { 1, 75, 115 },
+            skillLevels = { 35, 75, 95, 115 },
             reagents = {
                 { itemId = 2840, count = 8 },
                 { itemId = 818, count = 1 },
@@ -1779,8 +1783,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2459",
             sortOrder = 10,
-            requiredSkill = 75,
-            skillLevels = { 1, 50, 75 },
+            requiredSkill = 50,
+            skillLevels = { 50, 50, 62, 75 },
             reagents = {
                 { itemId = 2836, count = 2 },
             },
@@ -1793,8 +1797,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2462",
             sortOrder = 120,
-            requiredSkill = 110,
-            skillLevels = { 1, 115, 145 },
+            requiredSkill = 85,
+            skillLevels = { 85, 115, 130, 145 },
             reagents = {
                 { itemId = 2841, count = 5 },
                 { itemId = 1210, count = 1 },
@@ -1812,7 +1816,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2462",
             sortOrder = 120,
             requiredSkill = 100,
-            skillLevels = { 1, 130, 160 },
+            skillLevels = { 100, 130, 145, 160 },
             reagents = {
                 { itemId = 2841, count = 8 },
                 { itemId = 2842, count = 2 },
@@ -1827,8 +1831,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2468",
             sortOrder = 180,
-            requiredSkill = 130,
-            skillLevels = { 1, 135, 165 },
+            requiredSkill = 105,
+            skillLevels = { 105, 135, 150, 165 },
             reagents = {
                 { itemId = 2841, count = 6 },
                 { itemId = 2842, count = 1 },
@@ -1843,8 +1847,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2465",
             sortOrder = 150,
-            requiredSkill = 135,
-            skillLevels = { 1, 140, 170 },
+            requiredSkill = 110,
+            skillLevels = { 110, 140, 155, 170 },
             reagents = {
                 { itemId = 2841, count = 8 },
                 { itemId = 2842, count = 1 },
@@ -1862,7 +1866,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 120,
-            skillLevels = { 1, 150, 180 },
+            skillLevels = { 120, 150, 165, 180 },
             reagents = {
                 { itemId = 3575, count = 4 },
                 { itemId = 1705, count = 2 },
@@ -1881,7 +1885,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 125,
-            skillLevels = { 1, 155, 185 },
+            skillLevels = { 125, 155, 170, 185 },
             reagents = {
                 { itemId = 3575, count = 4 },
                 { itemId = 5498, count = 2 },
@@ -1897,8 +1901,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2459",
             sortOrder = 10,
-            requiredSkill = 125,
-            skillLevels = { 1, 100, 125 },
+            requiredSkill = 100,
+            skillLevels = { 100, 100, 112, 125 },
             reagents = {
                 { itemId = 2838, count = 3 },
             },
@@ -1914,7 +1918,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2634",
             sortOrder = 30,
             requiredSkill = 80,
-            skillLevels = { 1, 120, 160 },
+            skillLevels = { 80, 120, 140, 160 },
             reagents = {
                 { itemId = 2924, count = 1 },
                 { itemId = 2678, count = 1 },
@@ -1931,7 +1935,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2633",
             sortOrder = 20,
             requiredSkill = 60,
-            skillLevels = { 1, 100, 140 },
+            skillLevels = { 60, 100, 120, 140 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -1951,7 +1955,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2640",
             sortOrder = 15,
             requiredSkill = 90,
-            skillLevels = { 1, 130, 170 },
+            skillLevels = { 90, 130, 150, 170 },
             reagents = {
                 { itemId = 1468, count = 2 },
                 { itemId = 2692, count = 1 },
@@ -1968,7 +1972,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2634",
             sortOrder = 30,
             requiredSkill = 120,
-            skillLevels = { 1, 160, 200 },
+            skillLevels = { 120, 160, 180, 200 },
             reagents = {
                 { itemId = 3667, count = 1 },
                 { itemId = 2692, count = 1 },
@@ -1985,7 +1989,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2640",
             sortOrder = 15,
             requiredSkill = 130,
-            skillLevels = { 1, 170, 210 },
+            skillLevels = { 130, 170, 190, 210 },
             reagents = {
                 { itemId = 3685, count = 1 },
                 { itemId = 2692, count = 1 },
@@ -2002,7 +2006,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2640",
             sortOrder = 15,
             requiredSkill = 110,
-            skillLevels = { 1, 150, 190 },
+            skillLevels = { 110, 150, 170, 190 },
             reagents = {
                 { itemId = 2251, count = 2 },
                 { itemId = 2692, count = 1 },
@@ -2019,7 +2023,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2633",
             sortOrder = 20,
             requiredSkill = 110,
-            skillLevels = { 1, 150, 190 },
+            skillLevels = { 110, 150, 170, 190 },
             reagents = {
                 { itemId = 3730, count = 1 },
                 { itemId = 2692, count = 1 },
@@ -2036,7 +2040,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2634",
             sortOrder = 30,
             requiredSkill = 125,
-            skillLevels = { 1, 175, 215 },
+            skillLevels = { 125, 175, 195, 215 },
             reagents = {
                 { itemId = 3731, count = 1 },
                 { itemId = 2692, count = 1 },
@@ -2053,7 +2057,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2634",
             sortOrder = 30,
             requiredSkill = 150,
-            skillLevels = { 1, 190, 230 },
+            skillLevels = { 150, 190, 210, 230 },
             reagents = {
                 { itemId = 3731, count = 2 },
                 { itemId = 3713, count = 1 },
@@ -2070,7 +2074,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2632",
             sortOrder = 10,
             requiredSkill = 175,
-            skillLevels = { 1, 215, 255 },
+            skillLevels = { 175, 215, 235, 255 },
             reagents = {
                 { itemId = 3712, count = 1 },
                 { itemId = 3713, count = 1 },
@@ -2085,7 +2089,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 165,
-            skillLevels = { 1, 185, 225 },
+            skillLevels = { 165, 185, 205, 225 },
             reagents = {
                 { itemId = 3818, count = 1 },
                 { itemId = 3355, count = 1 },
@@ -2103,7 +2107,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2455",
             sortOrder = 50,
             requiredSkill = 165,
-            skillLevels = { 1, 190, 230 },
+            skillLevels = { 165, 190, 210, 230 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -2123,7 +2127,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 235 },
+            skillLevels = { 175, 195, 215, 235 },
             reagents = {
                 { itemId = 3355, count = 1 },
                 { itemId = 3821, count = 1 },
@@ -2141,7 +2145,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 180,
-            skillLevels = { 1, 200, 240 },
+            skillLevels = { 180, 200, 220, 240 },
             reagents = {
                 { itemId = 3357, count = 1 },
                 { itemId = 2453, count = 1 },
@@ -2157,7 +2161,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2621",
             sortOrder = 20,
             requiredSkill = 160,
-            skillLevels = { 1, 180, 220 },
+            skillLevels = { 160, 180, 200, 220 },
             reagents = {
                 { itemId = 3820, count = 1 },
                 { itemId = 3356, count = 1 },
@@ -2175,7 +2179,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2651",
             sortOrder = 55,
             requiredSkill = 195,
-            skillLevels = { 1, 215, 255 },
+            skillLevels = { 195, 215, 235, 255 },
             reagents = {
                 { itemId = 3358, count = 1 },
                 { itemId = 3818, count = 1 },
@@ -2193,7 +2197,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2455",
             sortOrder = 50,
             requiredSkill = 200,
-            skillLevels = { 1, 220, 260 },
+            skillLevels = { 200, 220, 240, 260 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -2210,8 +2214,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2482",
             sortOrder = 240,
-            requiredSkill = 105,
-            skillLevels = { 1, 110, 140 },
+            requiredSkill = 80,
+            skillLevels = { 80, 110, 125, 140 },
             reagents = {
                 { itemId = 2841, count = 6 },
                 { itemId = 2880, count = 4 },
@@ -2231,7 +2235,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2485",
             sortOrder = 270,
             requiredSkill = 135,
-            skillLevels = { 1, 160, 185 },
+            skillLevels = { 135, 160, 172, 185 },
             reagents = {
                 { itemId = 3575, count = 6 },
                 { itemId = 3466, count = 2 },
@@ -2251,7 +2255,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2485",
             sortOrder = 270,
             requiredSkill = 150,
-            skillLevels = { 1, 175, 200 },
+            skillLevels = { 150, 175, 187, 200 },
             reagents = {
                 { itemId = 3575, count = 8 },
                 { itemId = 3466, count = 2 },
@@ -2271,7 +2275,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2478",
             sortOrder = 200,
             requiredSkill = 130,
-            skillLevels = { 1, 155, 180 },
+            skillLevels = { 130, 155, 167, 180 },
             reagents = {
                 { itemId = 3575, count = 8 },
                 { itemId = 3466, count = 2 },
@@ -2291,7 +2295,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2478",
             sortOrder = 200,
             requiredSkill = 145,
-            skillLevels = { 1, 170, 195 },
+            skillLevels = { 145, 170, 182, 195 },
             reagents = {
                 { itemId = 3575, count = 10 },
                 { itemId = 3577, count = 4 },
@@ -2312,7 +2316,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2480",
             sortOrder = 220,
             requiredSkill = 155,
-            skillLevels = { 1, 180, 205 },
+            skillLevels = { 155, 180, 192, 205 },
             reagents = {
                 { itemId = 3859, count = 8 },
                 { itemId = 3466, count = 2 },
@@ -2332,7 +2336,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2480",
             sortOrder = 220,
             requiredSkill = 175,
-            skillLevels = { 1, 200, 225 },
+            skillLevels = { 175, 200, 212, 225 },
             reagents = {
                 { itemId = 3859, count = 8 },
                 { itemId = 3466, count = 2 },
@@ -2353,7 +2357,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2477",
             sortOrder = 190,
             requiredSkill = 160,
-            skillLevels = { 1, 185, 210 },
+            skillLevels = { 160, 185, 197, 210 },
             reagents = {
                 { itemId = 3575, count = 14 },
                 { itemId = 3466, count = 2 },
@@ -2373,7 +2377,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2477",
             sortOrder = 190,
             requiredSkill = 175,
-            skillLevels = { 1, 200, 225 },
+            skillLevels = { 175, 200, 212, 225 },
             reagents = {
                 { itemId = 3859, count = 10 },
                 { itemId = 3466, count = 2 },
@@ -2391,8 +2395,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2464",
             sortOrder = 140,
-            requiredSkill = 165,
-            skillLevels = { 1, 165, 190 },
+            requiredSkill = 140,
+            skillLevels = { 140, 165, 177, 190 },
             reagents = {
                 { itemId = 3575, count = 6 },
                 { itemId = 2605, count = 1 },
@@ -2406,8 +2410,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2461",
             sortOrder = 110,
-            requiredSkill = 170,
-            skillLevels = { 1, 170, 195 },
+            requiredSkill = 145,
+            skillLevels = { 145, 170, 182, 195 },
             reagents = {
                 { itemId = 3575, count = 12 },
                 { itemId = 3864, count = 1 },
@@ -2425,7 +2429,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2461",
             sortOrder = 110,
             requiredSkill = 165,
-            skillLevels = { 1, 190, 215 },
+            skillLevels = { 165, 190, 202, 215 },
             reagents = {
                 { itemId = 3859, count = 8 },
                 { itemId = 3577, count = 2 },
@@ -2443,7 +2447,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2462",
             sortOrder = 120,
             requiredSkill = 135,
-            skillLevels = { 1, 160, 185 },
+            skillLevels = { 135, 160, 172, 185 },
             reagents = {
                 { itemId = 3575, count = 7 },
                 { itemId = 3486, count = 1 },
@@ -2461,7 +2465,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2462",
             sortOrder = 120,
             requiredSkill = 150,
-            skillLevels = { 1, 175, 200 },
+            skillLevels = { 150, 175, 187, 200 },
             reagents = {
                 { itemId = 3859, count = 6 },
                 { itemId = 3577, count = 2 },
@@ -2476,8 +2480,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2467",
             sortOrder = 170,
-            requiredSkill = 155,
-            skillLevels = { 1, 155, 180 },
+            requiredSkill = 130,
+            skillLevels = { 130, 155, 167, 180 },
             reagents = {
                 { itemId = 3575, count = 8 },
                 { itemId = 3486, count = 1 },
@@ -2495,7 +2499,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 145,
-            skillLevels = { 1, 170, 195 },
+            skillLevels = { 145, 170, 182, 195 },
             reagents = {
                 { itemId = 3575, count = 10 },
                 { itemId = 3577, count = 2 },
@@ -2510,8 +2514,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2463",
             sortOrder = 130,
-            requiredSkill = 180,
-            skillLevels = { 1, 180, 205 },
+            requiredSkill = 155,
+            skillLevels = { 155, 180, 192, 205 },
             reagents = {
                 { itemId = 3575, count = 20 },
                 { itemId = 3486, count = 4 },
@@ -2531,7 +2535,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 170,
-            skillLevels = { 1, 195, 220 },
+            skillLevels = { 170, 195, 207, 220 },
             reagents = {
                 { itemId = 3859, count = 12 },
                 { itemId = 3577, count = 2 },
@@ -2550,7 +2554,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 160,
-            skillLevels = { 1, 185, 210 },
+            skillLevels = { 160, 185, 197, 210 },
             reagents = {
                 { itemId = 3859, count = 8 },
                 { itemId = 3864, count = 1 },
@@ -2569,7 +2573,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 175,
-            skillLevels = { 1, 200, 225 },
+            skillLevels = { 175, 200, 212, 225 },
             reagents = {
                 { itemId = 3859, count = 10 },
                 { itemId = 3577, count = 4 },
@@ -2586,7 +2590,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2575",
             sortOrder = 100,
             requiredSkill = 165,
-            skillLevels = { 1, 165, 165 },
+            skillLevels = { 165, 165, 165, 165 },
             reagents = {
                 { itemId = 3575, count = 1 },
                 { itemId = 3857, count = 1 },
@@ -2601,7 +2605,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 25,
-            skillLevels = { 1, 55, 85 },
+            skillLevels = { 25, 55, 70, 85 },
             reagents = {
                 { itemId = 2318, count = 6 },
                 { itemId = 2320, count = 1 },
@@ -2615,8 +2619,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2578",
             sortOrder = 300,
-            requiredSkill = 45,
-            skillLevels = { 1, 30, 65 },
+            requiredSkill = 1,
+            skillLevels = { 1, 30, 47, 65 },
             reagents = {
                 { itemId = 2996, count = 3 },
                 { itemId = 2320, count = 3 },
@@ -2630,8 +2634,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2557",
             sortOrder = 800,
-            requiredSkill = 55,
-            skillLevels = { 1, 70, 100 },
+            requiredSkill = 40,
+            skillLevels = { 40, 70, 85, 100 },
             reagents = {
                 { itemId = 2318, count = 3 },
                 { itemId = 2320, count = 2 },
@@ -2645,8 +2649,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2578",
             sortOrder = 300,
-            requiredSkill = 80,
-            skillLevels = { 1, 75, 110 },
+            requiredSkill = 50,
+            skillLevels = { 50, 75, 92, 110 },
             reagents = {
                 { itemId = 2997, count = 3 },
                 { itemId = 2321, count = 1 },
@@ -2663,7 +2667,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2578",
             sortOrder = 300,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 135 },
+            skillLevels = { 75, 100, 117, 135 },
             reagents = {
                 { itemId = 2997, count = 4 },
                 { itemId = 2605, count = 1 },
@@ -2678,8 +2682,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2559",
             sortOrder = 1000,
-            requiredSkill = 75,
-            skillLevels = { 1, 80, 110 },
+            requiredSkill = 50,
+            skillLevels = { 50, 80, 95, 110 },
             reagents = {
                 { itemId = 4231, count = 1 },
                 { itemId = 2318, count = 6 },
@@ -2694,8 +2698,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2552",
             sortOrder = 300,
-            requiredSkill = 150,
-            skillLevels = { 1, 145, 165 },
+            requiredSkill = 125,
+            skillLevels = { 125, 145, 155, 165 },
             reagents = {
                 { itemId = 4234, count = 5 },
                 { itemId = 2321, count = 2 },
@@ -2709,8 +2713,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2555",
             sortOrder = 600,
-            requiredSkill = 85,
-            skillLevels = { 1, 90, 120 },
+            requiredSkill = 60,
+            skillLevels = { 60, 90, 105, 120 },
             reagents = {
                 { itemId = 4231, count = 3 },
                 { itemId = 2318, count = 6 },
@@ -2728,7 +2732,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 125 },
+            skillLevels = { 75, 100, 112, 125 },
             reagents = {
                 { itemId = 4243, count = 1 },
                 { itemId = 4231, count = 2 },
@@ -2743,8 +2747,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2558",
             sortOrder = 900,
-            requiredSkill = 80,
-            skillLevels = { 1, 85, 115 },
+            requiredSkill = 55,
+            skillLevels = { 55, 85, 100, 115 },
             reagents = {
                 { itemId = 2318, count = 6 },
                 { itemId = 2320, count = 2 },
@@ -2758,8 +2762,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2557",
             sortOrder = 800,
-            requiredSkill = 145,
-            skillLevels = { 1, 145, 170 },
+            requiredSkill = 120,
+            skillLevels = { 120, 145, 157, 170 },
             reagents = {
                 { itemId = 2319, count = 14 },
                 { itemId = 2321, count = 4 },
@@ -2776,7 +2780,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 95,
-            skillLevels = { 1, 140, 165 },
+            skillLevels = { 95, 140, 152, 165 },
             reagents = {
                 { itemId = 2312, count = 1 },
                 { itemId = 4233, count = 1 },
@@ -2792,8 +2796,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2558",
             sortOrder = 900,
-            requiredSkill = 125,
-            skillLevels = { 1, 125, 150 },
+            requiredSkill = 100,
+            skillLevels = { 100, 125, 137, 150 },
             reagents = {
                 { itemId = 4246, count = 1 },
                 { itemId = 4233, count = 1 },
@@ -2812,7 +2816,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 95,
-            skillLevels = { 1, 125, 150 },
+            skillLevels = { 95, 125, 137, 150 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 3383, count = 1 },
@@ -2827,8 +2831,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2554",
             sortOrder = 500,
-            requiredSkill = 130,
-            skillLevels = { 1, 130, 155 },
+            requiredSkill = 105,
+            skillLevels = { 105, 130, 142, 155 },
             reagents = {
                 { itemId = 4233, count = 1 },
                 { itemId = 2319, count = 4 },
@@ -2846,7 +2850,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 115,
-            skillLevels = { 1, 140, 165 },
+            skillLevels = { 115, 140, 152, 165 },
             reagents = {
                 { itemId = 2319, count = 12 },
                 { itemId = 3390, count = 1 },
@@ -2862,8 +2866,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2557",
             sortOrder = 800,
-            requiredSkill = 135,
-            skillLevels = { 1, 135, 160 },
+            requiredSkill = 110,
+            skillLevels = { 110, 135, 147, 160 },
             reagents = {
                 { itemId = 2319, count = 4 },
                 { itemId = 4233, count = 2 },
@@ -2883,7 +2887,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 125,
-            skillLevels = { 1, 150, 170 },
+            skillLevels = { 125, 150, 160, 170 },
             reagents = {
                 { itemId = 4234, count = 6 },
                 { itemId = 5637, count = 2 },
@@ -2901,7 +2905,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 130,
-            skillLevels = { 1, 150, 170 },
+            skillLevels = { 130, 150, 160, 170 },
             reagents = {
                 { itemId = 4234, count = 9 },
                 { itemId = 2605, count = 2 },
@@ -2919,7 +2923,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 150,
-            skillLevels = { 1, 170, 190 },
+            skillLevels = { 150, 170, 180, 190 },
             reagents = {
                 { itemId = 4236, count = 2 },
                 { itemId = 4234, count = 12 },
@@ -2935,8 +2939,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2558",
             sortOrder = 900,
-            requiredSkill = 160,
-            skillLevels = { 1, 155, 175 },
+            requiredSkill = 135,
+            skillLevels = { 135, 155, 165, 175 },
             reagents = {
                 { itemId = 4236, count = 1 },
                 { itemId = 4234, count = 5 },
@@ -2956,7 +2960,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 145,
-            skillLevels = { 1, 165, 185 },
+            skillLevels = { 145, 165, 175, 185 },
             reagents = {
                 { itemId = 4236, count = 2 },
                 { itemId = 4234, count = 4 },
@@ -2972,8 +2976,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2556",
             sortOrder = 700,
-            requiredSkill = 180,
-            skillLevels = { 1, 175, 195 },
+            requiredSkill = 155,
+            skillLevels = { 155, 175, 185, 195 },
             reagents = {
                 { itemId = 4236, count = 2 },
                 { itemId = 4234, count = 6 },
@@ -2992,7 +2996,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 170,
-            skillLevels = { 1, 190, 210 },
+            skillLevels = { 170, 190, 200, 210 },
             reagents = {
                 { itemId = 4234, count = 6 },
                 { itemId = 4236, count = 2 },
@@ -3010,7 +3014,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 160,
-            skillLevels = { 1, 180, 200 },
+            skillLevels = { 160, 180, 190, 200 },
             reagents = {
                 { itemId = 4236, count = 4 },
                 { itemId = 5500, count = 2 },
@@ -3030,7 +3034,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 215 },
+            skillLevels = { 175, 195, 205, 215 },
             reagents = {
                 { itemId = 4234, count = 6 },
                 { itemId = 4236, count = 2 },
@@ -3048,8 +3052,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2569",
             sortOrder = 2000,
-            requiredSkill = 150,
-            skillLevels = { 1, 145, 165 },
+            requiredSkill = 125,
+            skillLevels = { 125, 145, 155, 165 },
             reagents = {
                 { itemId = 4234, count = 5 },
                 { itemId = 2321, count = 1 },
@@ -3063,8 +3067,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2578",
             sortOrder = 300,
-            requiredSkill = 150,
-            skillLevels = { 1, 145, 175 },
+            requiredSkill = 125,
+            skillLevels = { 125, 145, 160, 175 },
             reagents = {
                 { itemId = 4305, count = 3 },
                 { itemId = 4234, count = 2 },
@@ -3079,8 +3083,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2550",
             sortOrder = 100,
-            requiredSkill = 35,
-            skillLevels = { 1, 50, 70 },
+            requiredSkill = 30,
+            skillLevels = { 30, 50, 60, 70 },
             reagents = {
                 { itemId = 783, count = 1 },
                 { itemId = 4289, count = 1 },
@@ -3094,8 +3098,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2550",
             sortOrder = 100,
-            requiredSkill = 100,
-            skillLevels = { 1, 90, 105 },
+            requiredSkill = 75,
+            skillLevels = { 75, 90, 97, 105 },
             reagents = {
                 { itemId = 4232, count = 1 },
                 { itemId = 4289, count = 1 },
@@ -3109,8 +3113,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2550",
             sortOrder = 100,
-            requiredSkill = 150,
-            skillLevels = { 1, 135, 145 },
+            requiredSkill = 125,
+            skillLevels = { 125, 135, 140, 145 },
             reagents = {
                 { itemId = 4235, count = 1 },
                 { itemId = 4289, count = 3 },
@@ -3124,8 +3128,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2576",
             sortOrder = 100,
-            requiredSkill = 125,
-            skillLevels = { 1, 110, 120 },
+            requiredSkill = 100,
+            skillLevels = { 100, 110, 115, 120 },
             reagents = {
                 { itemId = 4306, count = 4 },
             },
@@ -3138,8 +3142,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2585",
             sortOrder = 1000,
-            requiredSkill = 35,
-            skillLevels = { 1, 50, 85 },
+            requiredSkill = 25,
+            skillLevels = { 25, 50, 67, 85 },
             reagents = {
                 { itemId = 2996, count = 2 },
                 { itemId = 2320, count = 1 },
@@ -3153,8 +3157,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2584",
             sortOrder = 900,
-            requiredSkill = 60,
-            skillLevels = { 1, 60, 95 },
+            requiredSkill = 35,
+            skillLevels = { 35, 60, 77, 95 },
             reagents = {
                 { itemId = 2996, count = 3 },
                 { itemId = 2320, count = 2 },
@@ -3169,8 +3173,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2587",
             sortOrder = 1200,
-            requiredSkill = 70,
-            skillLevels = { 1, 70, 105 },
+            requiredSkill = 45,
+            skillLevels = { 45, 70, 87, 105 },
             reagents = {
                 { itemId = 2996, count = 4 },
                 { itemId = 2321, count = 2 },
@@ -3184,8 +3188,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2585",
             sortOrder = 1000,
-            requiredSkill = 85,
-            skillLevels = { 1, 85, 120 },
+            requiredSkill = 60,
+            skillLevels = { 60, 85, 102, 120 },
             reagents = {
                 { itemId = 2997, count = 3 },
                 { itemId = 2321, count = 1 },
@@ -3202,7 +3206,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2580",
             sortOrder = 500,
             requiredSkill = 80,
-            skillLevels = { 1, 105, 140 },
+            skillLevels = { 80, 105, 122, 140 },
             reagents = {
                 { itemId = 2997, count = 3 },
                 { itemId = 2321, count = 2 },
@@ -3217,8 +3221,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2588",
             sortOrder = 1300,
-            requiredSkill = 80,
-            skillLevels = { 1, 80, 115 },
+            requiredSkill = 55,
+            skillLevels = { 55, 80, 97, 115 },
             reagents = {
                 { itemId = 2996, count = 5 },
                 { itemId = 2318, count = 2 },
@@ -3236,7 +3240,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 75,
-            skillLevels = { 1, 80, 115 },
+            skillLevels = { 75, 80, 97, 115 },
             reagents = {
                 { itemId = 2997, count = 4 },
                 { itemId = 2318, count = 2 },
@@ -3252,8 +3256,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2582",
             sortOrder = 700,
-            requiredSkill = 110,
-            skillLevels = { 1, 110, 145 },
+            requiredSkill = 85,
+            skillLevels = { 85, 110, 127, 145 },
             reagents = {
                 { itemId = 2997, count = 3 },
                 { itemId = 2321, count = 2 },
@@ -3270,7 +3274,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 95,
-            skillLevels = { 1, 120, 155 },
+            skillLevels = { 95, 120, 137, 155 },
             reagents = {
                 { itemId = 2997, count = 6 },
                 { itemId = 2319, count = 2 },
@@ -3285,8 +3289,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2587",
             sortOrder = 1200,
-            requiredSkill = 110,
-            skillLevels = { 1, 110, 145 },
+            requiredSkill = 85,
+            skillLevels = { 85, 110, 127, 145 },
             reagents = {
                 { itemId = 2997, count = 5 },
                 { itemId = 2321, count = 4 },
@@ -3303,7 +3307,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 100,
-            skillLevels = { 1, 125, 160 },
+            skillLevels = { 100, 125, 142, 160 },
             reagents = {
                 { itemId = 2997, count = 6 },
                 { itemId = 5500, count = 1 },
@@ -3318,8 +3322,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2585",
             sortOrder = 1000,
-            requiredSkill = 130,
-            skillLevels = { 1, 125, 155 },
+            requiredSkill = 105,
+            skillLevels = { 105, 125, 140, 155 },
             reagents = {
                 { itemId = 2997, count = 4 },
                 { itemId = 2321, count = 3 },
@@ -3337,7 +3341,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 120,
-            skillLevels = { 1, 140, 170 },
+            skillLevels = { 120, 140, 155, 170 },
             reagents = {
                 { itemId = 4305, count = 3 },
                 { itemId = 4234, count = 2 },
@@ -3353,8 +3357,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2588",
             sortOrder = 1300,
-            requiredSkill = 125,
-            skillLevels = { 1, 125, 160 },
+            requiredSkill = 100,
+            skillLevels = { 100, 125, 142, 160 },
             reagents = {
                 { itemId = 4305, count = 2 },
                 { itemId = 2319, count = 4 },
@@ -3373,7 +3377,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 115,
-            skillLevels = { 1, 135, 160 },
+            skillLevels = { 115, 135, 147, 160 },
             reagents = {
                 { itemId = 4305, count = 3 },
                 { itemId = 3182, count = 1 },
@@ -3391,7 +3395,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 130,
-            skillLevels = { 1, 150, 180 },
+            skillLevels = { 130, 150, 165, 180 },
             reagents = {
                 { itemId = 4305, count = 3 },
                 { itemId = 2321, count = 2 },
@@ -3409,7 +3413,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 135,
-            skillLevels = { 1, 155, 185 },
+            skillLevels = { 135, 155, 170, 185 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 4291, count = 1 },
@@ -3424,8 +3428,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2583",
             sortOrder = 800,
-            requiredSkill = 150,
-            skillLevels = { 1, 145, 175 },
+            requiredSkill = 125,
+            skillLevels = { 125, 145, 160, 175 },
             reagents = {
                 { itemId = 4305, count = 5 },
                 { itemId = 6260, count = 4 },
@@ -3442,7 +3446,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 140,
-            skillLevels = { 1, 160, 190 },
+            skillLevels = { 140, 160, 175, 190 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 4291, count = 1 },
@@ -3457,8 +3461,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2580",
             sortOrder = 500,
-            requiredSkill = 185,
-            skillLevels = { 1, 170, 200 },
+            requiredSkill = 150,
+            skillLevels = { 150, 170, 185, 200 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 3827, count = 1 },
@@ -3476,7 +3480,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2580",
             sortOrder = 500,
             requiredSkill = 165,
-            skillLevels = { 1, 185, 215 },
+            skillLevels = { 165, 185, 200, 215 },
             reagents = {
                 { itemId = 4339, count = 3 },
                 { itemId = 4291, count = 2 },
@@ -3495,7 +3499,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 145,
-            skillLevels = { 1, 165, 195 },
+            skillLevels = { 145, 165, 180, 195 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 4337, count = 2 },
@@ -3513,7 +3517,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 165,
-            skillLevels = { 1, 185, 215 },
+            skillLevels = { 165, 185, 200, 215 },
             reagents = {
                 { itemId = 4339, count = 4 },
                 { itemId = 4234, count = 4 },
@@ -3530,8 +3534,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2576",
             sortOrder = 100,
-            requiredSkill = 175,
-            skillLevels = { 1, 145, 150 },
+            requiredSkill = 140,
+            skillLevels = { 140, 145, 147, 150 },
             reagents = {
                 { itemId = 4338, count = 5 },
             },
@@ -3544,8 +3548,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2589",
             sortOrder = 1400,
-            requiredSkill = 110,
-            skillLevels = { 1, 110, 145 },
+            requiredSkill = 85,
+            skillLevels = { 85, 110, 127, 145 },
             reagents = {
                 { itemId = 2997, count = 3 },
                 { itemId = 2604, count = 2 },
@@ -3563,7 +3567,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 100,
-            skillLevels = { 1, 125, 160 },
+            skillLevels = { 100, 125, 142, 160 },
             reagents = {
                 { itemId = 2997, count = 4 },
                 { itemId = 5500, count = 1 },
@@ -3582,7 +3586,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2589",
             sortOrder = 1400,
             requiredSkill = 110,
-            skillLevels = { 1, 120, 130 },
+            skillLevels = { 110, 120, 125, 130 },
             reagents = {
                 { itemId = 4305, count = 1 },
                 { itemId = 4341, count = 1 },
@@ -3600,7 +3604,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2589",
             sortOrder = 1400,
             requiredSkill = 120,
-            skillLevels = { 1, 130, 140 },
+            skillLevels = { 120, 130, 135, 140 },
             reagents = {
                 { itemId = 4305, count = 2 },
                 { itemId = 4340, count = 2 },
@@ -3615,8 +3619,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2589",
             sortOrder = 1400,
-            requiredSkill = 170,
-            skillLevels = { 1, 145, 155 },
+            requiredSkill = 135,
+            skillLevels = { 135, 145, 150, 155 },
             reagents = {
                 { itemId = 4305, count = 3 },
                 { itemId = 2324, count = 2 },
@@ -3634,7 +3638,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2589",
             sortOrder = 1400,
             requiredSkill = 150,
-            skillLevels = { 1, 160, 170 },
+            skillLevels = { 150, 160, 165, 170 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 4342, count = 1 },
@@ -3652,7 +3656,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2589",
             sortOrder = 1400,
             requiredSkill = 165,
-            skillLevels = { 1, 175, 185 },
+            skillLevels = { 165, 175, 180, 185 },
             reagents = {
                 { itemId = 4305, count = 5 },
                 { itemId = 2325, count = 1 },
@@ -3667,8 +3671,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2587",
             sortOrder = 1200,
-            requiredSkill = 30,
-            skillLevels = { 1, 50, 85 },
+            requiredSkill = 25,
+            skillLevels = { 25, 50, 67, 85 },
             reagents = {
                 { itemId = 2996, count = 2 },
                 { itemId = 2320, count = 1 },
@@ -3683,7 +3687,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2589",
             sortOrder = 1400,
             requiredSkill = 1,
-            skillLevels = { 1, 35, 60 },
+            skillLevels = { 1, 35, 47, 60 },
             reagents = {
                 { itemId = 2996, count = 1 },
                 { itemId = 2320, count = 1 },
@@ -3698,7 +3702,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 1,
-            skillLevels = { 1, 20, 40 },
+            skillLevels = { 1, 20, 30, 40 },
             reagents = {
                 { itemId = 2835, count = 1 },
             },
@@ -3712,7 +3716,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 1,
-            skillLevels = { 1, 30, 60 },
+            skillLevels = { 1, 30, 45, 60 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -3729,7 +3733,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2528",
             sortOrder = 140,
             requiredSkill = 1,
-            skillLevels = { 1, 30, 60 },
+            skillLevels = { 1, 30, 45, 60 },
             createdCount = 200,
             createdCountMax = 200,
             reagents = {
@@ -3746,7 +3750,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 30,
-            skillLevels = { 1, 45, 60 },
+            skillLevels = { 30, 45, 52, 60 },
             reagents = {
                 { itemId = 2840, count = 1 },
             },
@@ -3760,7 +3764,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 30,
-            skillLevels = { 1, 60, 90 },
+            skillLevels = { 30, 60, 75, 90 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -3779,7 +3783,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 50,
-            skillLevels = { 1, 80, 110 },
+            skillLevels = { 50, 80, 95, 110 },
             reagents = {
                 { itemId = 2840, count = 2 },
                 { itemId = 2880, count = 1 },
@@ -3794,7 +3798,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2526",
             sortOrder = 120,
             requiredSkill = 50,
-            skillLevels = { 1, 80, 110 },
+            skillLevels = { 50, 80, 95, 110 },
             reagents = {
                 { itemId = 4361, count = 1 },
                 { itemId = 4359, count = 1 },
@@ -3810,7 +3814,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 65,
-            skillLevels = { 1, 95, 125 },
+            skillLevels = { 65, 95, 110, 125 },
             reagents = {
                 { itemId = 4359, count = 2 },
                 { itemId = 2840, count = 1 },
@@ -3828,7 +3832,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2521",
             sortOrder = 70,
             requiredSkill = 75,
-            skillLevels = { 1, 105, 135 },
+            skillLevels = { 75, 105, 120, 135 },
             reagents = {
                 { itemId = 4363, count = 1 },
                 { itemId = 4359, count = 1 },
@@ -3845,7 +3849,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 75,
-            skillLevels = { 1, 85, 95 },
+            skillLevels = { 75, 85, 90, 95 },
             reagents = {
                 { itemId = 2836, count = 1 },
             },
@@ -3859,7 +3863,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2528",
             sortOrder = 140,
             requiredSkill = 75,
-            skillLevels = { 1, 85, 95 },
+            skillLevels = { 75, 85, 90, 95 },
             createdCount = 200,
             createdCountMax = 200,
             reagents = {
@@ -3876,7 +3880,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 75,
-            skillLevels = { 1, 90, 105 },
+            skillLevels = { 75, 90, 97, 105 },
             createdCount = 1,
             createdCountMax = 3,
             reagents = {
@@ -3893,7 +3897,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2521",
             sortOrder = 70,
             requiredSkill = 85,
-            skillLevels = { 1, 115, 145 },
+            skillLevels = { 85, 115, 130, 145 },
             reagents = {
                 { itemId = 4363, count = 1 },
                 { itemId = 4359, count = 2 },
@@ -3912,7 +3916,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 100,
-            skillLevels = { 1, 130, 160 },
+            skillLevels = { 100, 130, 145, 160 },
             reagents = {
                 { itemId = 4364, count = 2 },
                 { itemId = 4363, count = 1 },
@@ -3929,7 +3933,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 100,
-            skillLevels = { 1, 130, 160 },
+            skillLevels = { 100, 130, 145, 160 },
             reagents = {
                 { itemId = 2318, count = 6 },
                 { itemId = 818, count = 2 },
@@ -3944,7 +3948,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2526",
             sortOrder = 120,
             requiredSkill = 105,
-            skillLevels = { 1, 130, 155 },
+            skillLevels = { 105, 130, 142, 155 },
             reagents = {
                 { itemId = 4361, count = 2 },
                 { itemId = 4359, count = 4 },
@@ -3961,7 +3965,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 105,
-            skillLevels = { 1, 105, 155 },
+            skillLevels = { 105, 105, 130, 155 },
             createdCount = 2,
             createdCountMax = 4,
             reagents = {
@@ -3979,7 +3983,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 105,
-            skillLevels = { 1, 105, 155 },
+            skillLevels = { 105, 105, 130, 155 },
             reagents = {
                 { itemId = 2841, count = 2 },
                 { itemId = 2880, count = 1 },
@@ -3996,7 +4000,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2526",
             sortOrder = 120,
             requiredSkill = 120,
-            skillLevels = { 1, 145, 170 },
+            skillLevels = { 120, 145, 157, 170 },
             reagents = {
                 { itemId = 4371, count = 2 },
                 { itemId = 4359, count = 2 },
@@ -4015,7 +4019,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 120,
-            skillLevels = { 1, 145, 170 },
+            skillLevels = { 120, 145, 157, 170 },
             reagents = {
                 { itemId = 2319, count = 4 },
                 { itemId = 1210, count = 2 },
@@ -4030,7 +4034,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 120,
-            skillLevels = { 1, 120, 170 },
+            skillLevels = { 120, 120, 145, 170 },
             createdCount = 1,
             createdCountMax = 3,
             reagents = {
@@ -4049,7 +4053,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 125,
-            skillLevels = { 1, 125, 175 },
+            skillLevels = { 125, 125, 150, 175 },
             reagents = {
                 { itemId = 2841, count = 2 },
                 { itemId = 2592, count = 1 },
@@ -4066,7 +4070,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 125,
-            skillLevels = { 1, 125, 175 },
+            skillLevels = { 125, 125, 150, 175 },
             reagents = {
                 { itemId = 4375, count = 1 },
                 { itemId = 4402, count = 1 },
@@ -4081,7 +4085,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 125,
-            skillLevels = { 1, 125, 145 },
+            skillLevels = { 125, 125, 135, 145 },
             reagents = {
                 { itemId = 2838, count = 1 },
             },
@@ -4095,7 +4099,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 125,
-            skillLevels = { 1, 125, 145 },
+            skillLevels = { 125, 125, 135, 145 },
             createdCount = 1,
             createdCountMax = 5,
             reagents = {
@@ -4112,7 +4116,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2528",
             sortOrder = 140,
             requiredSkill = 125,
-            skillLevels = { 1, 125, 145 },
+            skillLevels = { 125, 125, 135, 145 },
             createdCount = 200,
             createdCountMax = 200,
             reagents = {
@@ -4129,7 +4133,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2526",
             sortOrder = 120,
             requiredSkill = 130,
-            skillLevels = { 1, 155, 180 },
+            skillLevels = { 130, 155, 167, 180 },
             reagents = {
                 { itemId = 4371, count = 2 },
                 { itemId = 4375, count = 2 },
@@ -4146,7 +4150,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 190 },
+            skillLevels = { 140, 140, 165, 190 },
             createdCount = 2,
             createdCountMax = 4,
             reagents = {
@@ -4166,7 +4170,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 140,
-            skillLevels = { 1, 165, 190 },
+            skillLevels = { 140, 165, 177, 190 },
             reagents = {
                 { itemId = 4371, count = 1 },
                 { itemId = 4375, count = 2 },
@@ -4183,7 +4187,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 145,
-            skillLevels = { 1, 145, 195 },
+            skillLevels = { 145, 145, 170, 195 },
             reagents = {
                 { itemId = 2841, count = 2 },
                 { itemId = 2319, count = 1 },
@@ -4201,7 +4205,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2526",
             sortOrder = 120,
             requiredSkill = 145,
-            skillLevels = { 1, 170, 195 },
+            skillLevels = { 145, 170, 182, 195 },
             reagents = {
                 { itemId = 4371, count = 3 },
                 { itemId = 4375, count = 3 },
@@ -4218,7 +4222,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 150,
-            skillLevels = { 1, 175, 200 },
+            skillLevels = { 150, 175, 187, 200 },
             reagents = {
                 { itemId = 4382, count = 1 },
                 { itemId = 4375, count = 1 },
@@ -4235,7 +4239,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 150,
-            skillLevels = { 1, 175, 200 },
+            skillLevels = { 150, 175, 187, 200 },
             reagents = {
                 { itemId = 2319, count = 4 },
                 { itemId = 1206, count = 2 },
@@ -4253,7 +4257,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 155,
-            skillLevels = { 1, 175, 195 },
+            skillLevels = { 155, 175, 185, 195 },
             reagents = {
                 { itemId = 4375, count = 1 },
                 { itemId = 3829, count = 1 },
@@ -4268,7 +4272,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 160,
-            skillLevels = { 1, 160, 180 },
+            skillLevels = { 160, 160, 170, 180 },
             reagents = {
                 { itemId = 3575, count = 2 },
             },
@@ -4284,7 +4288,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 160,
-            skillLevels = { 1, 180, 200 },
+            skillLevels = { 160, 180, 190, 200 },
             reagents = {
                 { itemId = 4375, count = 3 },
                 { itemId = 4306, count = 2 },
@@ -4303,7 +4307,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 165,
-            skillLevels = { 1, 185, 205 },
+            skillLevels = { 165, 185, 195, 205 },
             reagents = {
                 { itemId = 4371, count = 4 },
                 { itemId = 4387, count = 1 },
@@ -4320,7 +4324,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 170,
-            skillLevels = { 1, 170, 210 },
+            skillLevels = { 170, 170, 190, 210 },
             reagents = {
                 { itemId = 3575, count = 1 },
                 { itemId = 10558, count = 1 },
@@ -4335,7 +4339,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 175,
-            skillLevels = { 1, 175, 215 },
+            skillLevels = { 175, 175, 195, 215 },
             createdCount = 2,
             createdCountMax = 4,
             reagents = {
@@ -4353,7 +4357,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2518",
             sortOrder = 40,
             requiredSkill = 175,
-            skillLevels = { 1, 175, 215 },
+            skillLevels = { 175, 175, 195, 215 },
             reagents = {
                 { itemId = 4387, count = 2 },
                 { itemId = 4382, count = 1 },
@@ -4370,7 +4374,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2521",
             sortOrder = 70,
             requiredSkill = 185,
-            skillLevels = { 1, 185, 225 },
+            skillLevels = { 185, 185, 205, 225 },
             reagents = {
                 { itemId = 4387, count = 1 },
                 { itemId = 4382, count = 1 },
@@ -4389,7 +4393,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 185,
-            skillLevels = { 1, 205, 225 },
+            skillLevels = { 185, 205, 215, 225 },
             reagents = {
                 { itemId = 4234, count = 6 },
                 { itemId = 3864, count = 2 },
@@ -4404,7 +4408,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 190,
-            skillLevels = { 1, 190, 230 },
+            skillLevels = { 190, 190, 210, 230 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -4424,7 +4428,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 195,
-            skillLevels = { 1, 215, 235 },
+            skillLevels = { 195, 215, 225, 235 },
             reagents = {
                 { itemId = 4377, count = 3 },
                 { itemId = 3575, count = 2 },
@@ -4442,7 +4446,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2521",
             sortOrder = 70,
             requiredSkill = 200,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 200, 220, 230, 240 },
             reagents = {
                 { itemId = 4382, count = 1 },
                 { itemId = 4387, count = 4 },
@@ -4462,7 +4466,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 200,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 200, 220, 230, 240 },
             reagents = {
                 { itemId = 4389, count = 4 },
                 { itemId = 1529, count = 2 },
@@ -4482,7 +4486,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 200,
-            skillLevels = { 1, 200, 240 },
+            skillLevels = { 200, 200, 220, 240 },
             reagents = {
                 { itemId = 10505, count = 2 },
                 { itemId = 4234, count = 2 },
@@ -4498,7 +4502,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 90,
-            skillLevels = { 1, 110, 140 },
+            skillLevels = { 90, 110, 125, 140 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -4514,7 +4518,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2527",
             sortOrder = 130,
             requiredSkill = 60,
-            skillLevels = { 1, 90, 120 },
+            skillLevels = { 60, 90, 105, 120 },
             reagents = {
                 { itemId = 4361, count = 1 },
                 { itemId = 774, count = 1 },
@@ -4530,7 +4534,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2527",
             sortOrder = 130,
             requiredSkill = 110,
-            skillLevels = { 1, 135, 160 },
+            skillLevels = { 110, 135, 147, 160 },
             reagents = {
                 { itemId = 4371, count = 1 },
                 { itemId = 1206, count = 1 },
@@ -4547,7 +4551,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2527",
             sortOrder = 130,
             requiredSkill = 180,
-            skillLevels = { 1, 200, 220 },
+            skillLevels = { 180, 200, 210, 220 },
             reagents = {
                 { itemId = 4371, count = 1 },
                 { itemId = 1529, count = 1 },
@@ -4565,7 +4569,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2635",
             sortOrder = 40,
             requiredSkill = 175,
-            skillLevels = { 1, 215, 255 },
+            skillLevels = { 175, 215, 235, 255 },
             reagents = {
                 { itemId = 3404, count = 1 },
                 { itemId = 2692, count = 1 },
@@ -4582,7 +4586,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 140,
-            skillLevels = { 1, 160, 180 },
+            skillLevels = { 140, 160, 170, 180 },
             reagents = {
                 { itemId = 4461, count = 6 },
                 { itemId = 4234, count = 4 },
@@ -4600,7 +4604,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 140,
-            skillLevels = { 1, 160, 180 },
+            skillLevels = { 140, 160, 170, 180 },
             reagents = {
                 { itemId = 4461, count = 4 },
                 { itemId = 4234, count = 4 },
@@ -4618,7 +4622,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2621",
             sortOrder = 20,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 95 },
+            skillLevels = { 50, 55, 75, 95 },
             reagents = {
                 { itemId = 3371, count = 1 },
                 { itemId = 2447, count = 1 },
@@ -4636,7 +4640,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 270 },
+            skillLevels = { 215, 230, 250, 270 },
             reagents = {
                 { itemId = 3858, count = 1 },
                 { itemId = 3821, count = 1 },
@@ -4654,7 +4658,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2551",
             sortOrder = 200,
             requiredSkill = 35,
-            skillLevels = { 1, 65, 95 },
+            skillLevels = { 35, 65, 80, 95 },
             reagents = {
                 { itemId = 5082, count = 3 },
                 { itemId = 2318, count = 4 },
@@ -4672,7 +4676,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2632",
             sortOrder = 10,
             requiredSkill = 10,
-            skillLevels = { 1, 50, 90 },
+            skillLevels = { 10, 50, 70, 90 },
             reagents = {
                 { itemId = 5465, count = 1 },
             },
@@ -4688,7 +4692,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2636",
             sortOrder = 200,
             requiredSkill = 20,
-            skillLevels = { 1, 60, 100 },
+            skillLevels = { 20, 60, 80, 100 },
             reagents = {
                 { itemId = 5466, count = 1 },
             },
@@ -4704,7 +4708,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2640",
             sortOrder = 15,
             requiredSkill = 35,
-            skillLevels = { 1, 75, 115 },
+            skillLevels = { 35, 75, 95, 115 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -4723,7 +4727,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2644",
             sortOrder = 88,
             requiredSkill = 50,
-            skillLevels = { 1, 90, 130 },
+            skillLevels = { 50, 90, 110, 130 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -4742,7 +4746,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2635",
             sortOrder = 40,
             requiredSkill = 50,
-            skillLevels = { 1, 90, 130 },
+            skillLevels = { 50, 90, 110, 130 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -4761,7 +4765,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2632",
             sortOrder = 10,
             requiredSkill = 90,
-            skillLevels = { 1, 130, 170 },
+            skillLevels = { 90, 130, 150, 170 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -4779,7 +4783,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2640",
             sortOrder = 15,
             requiredSkill = 100,
-            skillLevels = { 1, 140, 180 },
+            skillLevels = { 100, 140, 160, 180 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -4798,7 +4802,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2633",
             sortOrder = 20,
             requiredSkill = 110,
-            skillLevels = { 1, 150, 190 },
+            skillLevels = { 110, 150, 170, 190 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -4815,7 +4819,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2527",
             sortOrder = 130,
             requiredSkill = 135,
-            skillLevels = { 1, 160, 185 },
+            skillLevels = { 135, 160, 172, 185 },
             reagents = {
                 { itemId = 4371, count = 2 },
                 { itemId = 4375, count = 2 },
@@ -4832,7 +4836,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2632",
             sortOrder = 10,
             requiredSkill = 50,
-            skillLevels = { 1, 90, 130 },
+            skillLevels = { 50, 90, 110, 130 },
             reagents = {
                 { itemId = 5503, count = 1 },
                 { itemId = 159, count = 1 },
@@ -4847,7 +4851,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2632",
             sortOrder = 10,
             requiredSkill = 125,
-            skillLevels = { 1, 165, 205 },
+            skillLevels = { 125, 165, 185, 205 },
             reagents = {
                 { itemId = 5504, count = 1 },
                 { itemId = 2692, count = 1 },
@@ -4864,7 +4868,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2632",
             sortOrder = 10,
             requiredSkill = 90,
-            skillLevels = { 1, 130, 170 },
+            skillLevels = { 90, 130, 150, 170 },
             reagents = {
                 { itemId = 5503, count = 1 },
                 { itemId = 1179, count = 1 },
@@ -4879,8 +4883,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2482",
             sortOrder = 240,
-            requiredSkill = 110,
-            skillLevels = { 1, 115, 145 },
+            requiredSkill = 85,
+            skillLevels = { 85, 115, 130, 145 },
             reagents = {
                 { itemId = 2841, count = 6 },
                 { itemId = 3466, count = 1 },
@@ -4899,7 +4903,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2484",
             sortOrder = 260,
             requiredSkill = 115,
-            skillLevels = { 1, 145, 175 },
+            skillLevels = { 115, 145, 160, 175 },
             reagents = {
                 { itemId = 2841, count = 10 },
                 { itemId = 3466, count = 1 },
@@ -4916,8 +4920,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2580",
             sortOrder = 500,
-            requiredSkill = 90,
-            skillLevels = { 1, 95, 130 },
+            requiredSkill = 70,
+            skillLevels = { 70, 95, 112, 130 },
             reagents = {
                 { itemId = 2997, count = 3 },
                 { itemId = 2321, count = 2 },
@@ -4935,7 +4939,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 60,
-            skillLevels = { 1, 90, 130 },
+            skillLevels = { 60, 90, 110, 130 },
             reagents = {
                 { itemId = 5635, count = 1 },
                 { itemId = 2450, count = 1 },
@@ -4953,7 +4957,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 235 },
+            skillLevels = { 175, 195, 215, 235 },
             reagents = {
                 { itemId = 5637, count = 1 },
                 { itemId = 3356, count = 1 },
@@ -4971,7 +4975,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 150,
-            skillLevels = { 1, 175, 215 },
+            skillLevels = { 150, 175, 195, 215 },
             reagents = {
                 { itemId = 6370, count = 2 },
                 { itemId = 3820, count = 1 },
@@ -4986,8 +4990,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2555",
             sortOrder = 600,
-            requiredSkill = 190,
-            skillLevels = { 1, 185, 205 },
+            requiredSkill = 165,
+            skillLevels = { 165, 185, 195, 205 },
             reagents = {
                 { itemId = 4234, count = 14 },
                 { itemId = 2321, count = 2 },
@@ -5005,7 +5009,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2578",
             sortOrder = 300,
             requiredSkill = 50,
-            skillLevels = { 1, 75, 110 },
+            skillLevels = { 50, 75, 92, 110 },
             reagents = {
                 { itemId = 2996, count = 4 },
                 { itemId = 2321, count = 1 },
@@ -5023,7 +5027,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2578",
             sortOrder = 300,
             requiredSkill = 90,
-            skillLevels = { 1, 115, 150 },
+            skillLevels = { 90, 115, 132, 150 },
             reagents = {
                 { itemId = 2997, count = 4 },
                 { itemId = 2604, count = 1 },
@@ -5038,8 +5042,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2583",
             sortOrder = 800,
-            requiredSkill = 135,
-            skillLevels = { 1, 130, 160 },
+            requiredSkill = 110,
+            skillLevels = { 110, 130, 145, 160 },
             reagents = {
                 { itemId = 4305, count = 2 },
                 { itemId = 2321, count = 2 },
@@ -5057,7 +5061,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 125,
-            skillLevels = { 1, 145, 175 },
+            skillLevels = { 125, 145, 160, 175 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 2321, count = 2 },
@@ -5075,7 +5079,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2578",
             sortOrder = 300,
             requiredSkill = 140,
-            skillLevels = { 1, 160, 190 },
+            skillLevels = { 140, 160, 175, 190 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 4234, count = 3 },
@@ -5094,7 +5098,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2578",
             sortOrder = 300,
             requiredSkill = 150,
-            skillLevels = { 1, 170, 200 },
+            skillLevels = { 150, 170, 185, 200 },
             reagents = {
                 { itemId = 4305, count = 5 },
                 { itemId = 2325, count = 1 },
@@ -5112,7 +5116,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 65,
-            skillLevels = { 1, 95, 125 },
+            skillLevels = { 65, 95, 110, 125 },
             reagents = {
                 { itemId = 5784, count = 8 },
                 { itemId = 2318, count = 6 },
@@ -5130,7 +5134,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 70,
-            skillLevels = { 1, 100, 130 },
+            skillLevels = { 70, 100, 115, 130 },
             reagents = {
                 { itemId = 5784, count = 12 },
                 { itemId = 4231, count = 1 },
@@ -5149,7 +5153,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 145,
-            skillLevels = { 1, 165, 185 },
+            skillLevels = { 145, 165, 175, 185 },
             reagents = {
                 { itemId = 5785, count = 12 },
                 { itemId = 4236, count = 1 },
@@ -5168,7 +5172,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 165,
-            skillLevels = { 1, 185, 205 },
+            skillLevels = { 165, 185, 195, 205 },
             reagents = {
                 { itemId = 5785, count = 16 },
                 { itemId = 4236, count = 1 },
@@ -5185,7 +5189,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 1,
-            skillLevels = { 1, 40, 70 },
+            skillLevels = { 1, 40, 55, 70 },
             reagents = {
                 { itemId = 2318, count = 3 },
                 { itemId = 2320, count = 1 },
@@ -5202,7 +5206,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 80,
-            skillLevels = { 1, 105, 130 },
+            skillLevels = { 80, 105, 117, 130 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 2997, count = 1 },
@@ -5217,8 +5221,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2559",
             sortOrder = 1000,
-            requiredSkill = 115,
-            skillLevels = { 1, 115, 140 },
+            requiredSkill = 90,
+            skillLevels = { 90, 115, 127, 140 },
             reagents = {
                 { itemId = 2319, count = 12 },
                 { itemId = 4340, count = 1 },
@@ -5233,8 +5237,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2559",
             sortOrder = 1000,
-            requiredSkill = 160,
-            skillLevels = { 1, 155, 175 },
+            requiredSkill = 135,
+            skillLevels = { 135, 155, 165, 175 },
             reagents = {
                 { itemId = 4234, count = 12 },
                 { itemId = 4305, count = 2 },
@@ -5252,7 +5256,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 145,
-            skillLevels = { 1, 165, 185 },
+            skillLevels = { 145, 165, 175, 185 },
             reagents = {
                 { itemId = 4234, count = 10 },
                 { itemId = 2321, count = 2 },
@@ -5267,8 +5271,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2554",
             sortOrder = 500,
-            requiredSkill = 175,
-            skillLevels = { 1, 170, 190 },
+            requiredSkill = 150,
+            skillLevels = { 150, 170, 180, 190 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4236, count = 1 },
@@ -5286,7 +5290,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2552",
             sortOrder = 300,
             requiredSkill = 125,
-            skillLevels = { 1, 180, 200 },
+            skillLevels = { 125, 180, 190, 200 },
             reagents = {
                 { itemId = 4234, count = 14 },
                 { itemId = 4305, count = 2 },
@@ -5301,8 +5305,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2557",
             sortOrder = 800,
-            requiredSkill = 190,
-            skillLevels = { 1, 185, 205 },
+            requiredSkill = 165,
+            skillLevels = { 165, 185, 195, 205 },
             reagents = {
                 { itemId = 4234, count = 4 },
                 { itemId = 4236, count = 1 },
@@ -5318,7 +5322,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2651",
             sortOrder = 55,
             requiredSkill = 90,
-            skillLevels = { 1, 120, 160 },
+            skillLevels = { 90, 120, 140, 160 },
             reagents = {
                 { itemId = 3820, count = 1 },
                 { itemId = 6370, count = 2 },
@@ -5334,7 +5338,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 1,
-            skillLevels = { 1, 55, 95 },
+            skillLevels = { 1, 55, 75, 95 },
             reagents = {
                 { itemId = 765, count = 1 },
                 { itemId = 2447, count = 1 },
@@ -5352,7 +5356,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2632",
             sortOrder = 10,
             requiredSkill = 175,
-            skillLevels = { 1, 215, 255 },
+            skillLevels = { 175, 215, 235, 255 },
             reagents = {
                 { itemId = 4655, count = 1 },
                 { itemId = 2692, count = 1 },
@@ -5369,7 +5373,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2487",
             sortOrder = 290,
             requiredSkill = 125,
-            skillLevels = { 1, 155, 185 },
+            skillLevels = { 125, 155, 170, 185 },
             reagents = {
                 { itemId = 3575, count = 6 },
                 { itemId = 3478, count = 4 },
@@ -5386,7 +5390,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2487",
             sortOrder = 290,
             requiredSkill = 140,
-            skillLevels = { 1, 165, 190 },
+            skillLevels = { 140, 165, 177, 190 },
             reagents = {
                 { itemId = 3575, count = 4 },
                 { itemId = 3478, count = 2 },
@@ -5401,8 +5405,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2464",
             sortOrder = 140,
-            requiredSkill = 185,
-            skillLevels = { 1, 185, 210 },
+            requiredSkill = 160,
+            skillLevels = { 160, 185, 197, 210 },
             reagents = {
                 { itemId = 3859, count = 5 },
                 { itemId = 3486, count = 2 },
@@ -5419,7 +5423,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2487",
             sortOrder = 290,
             requiredSkill = 165,
-            skillLevels = { 1, 190, 215 },
+            skillLevels = { 165, 190, 202, 215 },
             reagents = {
                 { itemId = 3859, count = 8 },
                 { itemId = 3486, count = 2 },
@@ -5437,7 +5441,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 100,
-            skillLevels = { 1, 130, 170 },
+            skillLevels = { 100, 130, 150, 170 },
             reagents = {
                 { itemId = 2453, count = 1 },
                 { itemId = 2452, count = 1 },
@@ -5455,7 +5459,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 135,
-            skillLevels = { 1, 160, 200 },
+            skillLevels = { 135, 160, 180, 200 },
             reagents = {
                 { itemId = 3369, count = 1 },
                 { itemId = 3356, count = 1 },
@@ -5473,7 +5477,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 165,
-            skillLevels = { 1, 210, 250 },
+            skillLevels = { 165, 210, 230, 250 },
             reagents = {
                 { itemId = 4402, count = 1 },
                 { itemId = 6371, count = 1 },
@@ -5491,7 +5495,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 190,
-            skillLevels = { 1, 205, 245 },
+            skillLevels = { 190, 205, 225, 245 },
             reagents = {
                 { itemId = 3819, count = 1 },
                 { itemId = 3821, count = 1 },
@@ -5509,7 +5513,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 190,
-            skillLevels = { 1, 210, 250 },
+            skillLevels = { 190, 210, 230, 250 },
             reagents = {
                 { itemId = 3357, count = 1 },
                 { itemId = 3820, count = 1 },
@@ -5524,8 +5528,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2478",
             sortOrder = 200,
-            requiredSkill = 65,
-            skillLevels = { 1, 80, 120 },
+            requiredSkill = 40,
+            skillLevels = { 40, 80, 100, 120 },
             reagents = {
                 { itemId = 2840, count = 12 },
                 { itemId = 2880, count = 2 },
@@ -5539,7 +5543,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 1,
-            skillLevels = { 1, 20, 25 },
+            skillLevels = { 1, 20, 22, 25 },
             reagents = {
                 { itemId = 247786, count = 1 },
             },
@@ -5551,7 +5555,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 15,
-            skillLevels = { 1, 70, 110 },
+            skillLevels = { 15, 70, 90, 110 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -5567,7 +5571,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2491",
             sortOrder = 20,
             requiredSkill = 1,
-            skillLevels = { 1, 5, 10 },
+            skillLevels = { 1, 5, 7, 10 },
             reagents = {
                 { itemId = 6217, count = 1 },
                 { itemId = 247786, count = 1 },
@@ -5580,7 +5584,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 40,
-            skillLevels = { 1, 90, 130 },
+            skillLevels = { 40, 90, 110, 130 },
             reagents = {
                 { itemId = 10938, count = 1 },
             },
@@ -5592,7 +5596,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 1,
-            skillLevels = { 1, 80, 120 },
+            skillLevels = { 1, 80, 100, 120 },
             reagents = {
                 { itemId = 10938, count = 1 },
             },
@@ -5606,7 +5610,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 50,
-            skillLevels = { 1, 70, 90 },
+            skillLevels = { 50, 70, 80, 90 },
             reagents = {
                 { itemId = 2840, count = 6 },
             },
@@ -5621,7 +5625,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 20,
-            skillLevels = { 1, 80, 120 },
+            skillLevels = { 20, 80, 100, 120 },
             reagents = {
                 { itemId = 10938, count = 1 },
             },
@@ -5633,7 +5637,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 45,
-            skillLevels = { 1, 95, 135 },
+            skillLevels = { 45, 95, 115, 135 },
             reagents = {
                 { itemId = 10940, count = 1 },
                 { itemId = 10938, count = 1 },
@@ -5646,7 +5650,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 50,
-            skillLevels = { 1, 100, 140 },
+            skillLevels = { 50, 100, 120, 140 },
             reagents = {
                 { itemId = 10940, count = 2 },
             },
@@ -5659,8 +5663,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2583",
             sortOrder = 800,
-            requiredSkill = 30,
-            skillLevels = { 1, 50, 85 },
+            requiredSkill = 25,
+            skillLevels = { 25, 50, 67, 85 },
             reagents = {
                 { itemId = 2996, count = 3 },
                 { itemId = 2320, count = 1 },
@@ -5674,8 +5678,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2583",
             sortOrder = 800,
-            requiredSkill = 30,
-            skillLevels = { 1, 50, 85 },
+            requiredSkill = 25,
+            skillLevels = { 25, 50, 67, 85 },
             reagents = {
                 { itemId = 2996, count = 3 },
                 { itemId = 2320, count = 1 },
@@ -5693,7 +5697,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 35,
-            skillLevels = { 1, 60, 95 },
+            skillLevels = { 35, 60, 77, 95 },
             reagents = {
                 { itemId = 2996, count = 3 },
                 { itemId = 2320, count = 1 },
@@ -5711,7 +5715,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 35,
-            skillLevels = { 1, 60, 95 },
+            skillLevels = { 35, 60, 77, 95 },
             reagents = {
                 { itemId = 2996, count = 3 },
                 { itemId = 2320, count = 1 },
@@ -5729,7 +5733,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 45,
-            skillLevels = { 1, 70, 105 },
+            skillLevels = { 45, 70, 87, 105 },
             reagents = {
                 { itemId = 2996, count = 4 },
                 { itemId = 2320, count = 2 },
@@ -5745,7 +5749,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 90,
-            skillLevels = { 1, 90, 125 },
+            skillLevels = { 90, 90, 107, 125 },
             reagents = {
                 { itemId = 2997, count = 3 },
                 { itemId = 2321, count = 2 },
@@ -5763,7 +5767,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 135 },
+            skillLevels = { 75, 100, 117, 135 },
             reagents = {
                 { itemId = 2997, count = 4 },
                 { itemId = 2321, count = 2 },
@@ -5781,7 +5785,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 90,
-            skillLevels = { 1, 115, 150 },
+            skillLevels = { 90, 115, 132, 150 },
             reagents = {
                 { itemId = 2997, count = 5 },
                 { itemId = 2321, count = 3 },
@@ -5795,7 +5799,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2501",
             sortOrder = 120,
             requiredSkill = 100,
-            skillLevels = { 1, 130, 170 },
+            skillLevels = { 100, 130, 150, 170 },
             reagents = {
                 { itemId = 10940, count = 1 },
                 { itemId = 10978, count = 1 },
@@ -5808,7 +5812,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 60,
-            skillLevels = { 1, 105, 145 },
+            skillLevels = { 60, 105, 125, 145 },
             reagents = {
                 { itemId = 10940, count = 1 },
                 { itemId = 10938, count = 1 },
@@ -5825,7 +5829,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2643",
             sortOrder = 60,
             requiredSkill = 1,
-            skillLevels = { 1, 45, 85 },
+            skillLevels = { 1, 45, 65, 85 },
             reagents = {
                 { itemId = 6291, count = 1 },
             },
@@ -5841,7 +5845,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2643",
             sortOrder = 60,
             requiredSkill = 1,
-            skillLevels = { 1, 45, 85 },
+            skillLevels = { 1, 45, 65, 85 },
             reagents = {
                 { itemId = 6303, count = 1 },
             },
@@ -5857,7 +5861,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2643",
             sortOrder = 60,
             requiredSkill = 50,
-            skillLevels = { 1, 90, 130 },
+            skillLevels = { 50, 90, 110, 130 },
             reagents = {
                 { itemId = 6289, count = 1 },
             },
@@ -5873,7 +5877,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2644",
             sortOrder = 88,
             requiredSkill = 50,
-            skillLevels = { 1, 90, 130 },
+            skillLevels = { 50, 90, 110, 130 },
             reagents = {
                 { itemId = 6317, count = 1 },
                 { itemId = 2678, count = 1 },
@@ -5890,7 +5894,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2644",
             sortOrder = 88,
             requiredSkill = 100,
-            skillLevels = { 1, 140, 180 },
+            skillLevels = { 100, 140, 160, 180 },
             reagents = {
                 { itemId = 6308, count = 1 },
             },
@@ -5904,7 +5908,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 60,
-            skillLevels = { 1, 105, 145 },
+            skillLevels = { 60, 105, 125, 145 },
             reagents = {
                 { itemId = 10938, count = 1 },
             },
@@ -5917,7 +5921,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 90,
-            skillLevels = { 1, 110, 150 },
+            skillLevels = { 90, 110, 130, 150 },
             reagents = {
                 { itemId = 10940, count = 2 },
             },
@@ -5931,7 +5935,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 80,
-            skillLevels = { 1, 115, 155 },
+            skillLevels = { 80, 115, 135, 155 },
             reagents = {
                 { itemId = 10938, count = 2 },
             },
@@ -5943,7 +5947,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 80,
-            skillLevels = { 1, 115, 155 },
+            skillLevels = { 80, 115, 135, 155 },
             reagents = {
                 { itemId = 10940, count = 1 },
                 { itemId = 10938, count = 2 },
@@ -5958,7 +5962,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 80,
-            skillLevels = { 1, 115, 155 },
+            skillLevels = { 80, 115, 135, 155 },
             reagents = {
                 { itemId = 10940, count = 3 },
             },
@@ -5972,7 +5976,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 90,
-            skillLevels = { 1, 120, 160 },
+            skillLevels = { 90, 120, 140, 160 },
             reagents = {
                 { itemId = 10940, count = 2 },
                 { itemId = 10939, count = 1 },
@@ -5985,7 +5989,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 90,
-            skillLevels = { 1, 120, 160 },
+            skillLevels = { 90, 120, 140, 160 },
             reagents = {
                 { itemId = 10940, count = 1 },
                 { itemId = 10938, count = 1 },
@@ -6001,7 +6005,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2501",
             sortOrder = 120,
             requiredSkill = 100,
-            skillLevels = { 1, 130, 170 },
+            skillLevels = { 100, 130, 150, 170 },
             reagents = {
                 { itemId = 10938, count = 4 },
             },
@@ -6015,7 +6019,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2491",
             sortOrder = 20,
             requiredSkill = 100,
-            skillLevels = { 1, 130, 170 },
+            skillLevels = { 100, 130, 150, 170 },
             reagents = {
                 { itemId = 6338, count = 1 },
                 { itemId = 10940, count = 3 },
@@ -6031,8 +6035,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2468",
             sortOrder = 180,
-            requiredSkill = 95,
-            skillLevels = { 1, 100, 130 },
+            requiredSkill = 70,
+            skillLevels = { 70, 100, 115, 130 },
             reagents = {
                 { itemId = 2841, count = 6 },
                 { itemId = 3470, count = 6 },
@@ -6046,8 +6050,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2488",
             sortOrder = 300,
-            requiredSkill = 100,
-            skillLevels = { 1, 80, 85 },
+            requiredSkill = 75,
+            skillLevels = { 75, 80, 82, 85 },
             reagents = {
                 { itemId = 2842, count = 1 },
                 { itemId = 3470, count = 2 },
@@ -6064,7 +6068,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2641",
             sortOrder = 50,
             requiredSkill = 50,
-            skillLevels = { 1, 90, 130 },
+            skillLevels = { 50, 90, 110, 130 },
             reagents = {
                 { itemId = 6361, count = 1 },
             },
@@ -6080,7 +6084,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2644",
             sortOrder = 88,
             requiredSkill = 175,
-            skillLevels = { 1, 190, 230 },
+            skillLevels = { 175, 190, 210, 230 },
             reagents = {
                 { itemId = 6362, count = 1 },
             },
@@ -6094,7 +6098,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2448",
             sortOrder = 10,
             requiredSkill = 80,
-            skillLevels = { 1, 80, 100 },
+            skillLevels = { 80, 80, 90, 100 },
             reagents = {
                 { itemId = 6358, count = 2 },
                 { itemId = 3371, count = 1 },
@@ -6109,7 +6113,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2448",
             sortOrder = 10,
             requiredSkill = 130,
-            skillLevels = { 1, 150, 170 },
+            skillLevels = { 130, 150, 160, 170 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -6126,7 +6130,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 100,
-            skillLevels = { 1, 130, 170 },
+            skillLevels = { 100, 130, 150, 170 },
             reagents = {
                 { itemId = 2452, count = 1 },
                 { itemId = 6370, count = 1 },
@@ -6142,7 +6146,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 140,
-            skillLevels = { 1, 165, 205 },
+            skillLevels = { 140, 165, 185, 205 },
             reagents = {
                 { itemId = 6371, count = 2 },
                 { itemId = 3356, count = 1 },
@@ -6156,7 +6160,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 120,
-            skillLevels = { 1, 145, 185 },
+            skillLevels = { 120, 145, 165, 185 },
             reagents = {
                 { itemId = 10940, count = 2 },
                 { itemId = 10998, count = 1 },
@@ -6171,7 +6175,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 120,
-            skillLevels = { 1, 145, 185 },
+            skillLevels = { 120, 145, 165, 185 },
             reagents = {
                 { itemId = 10998, count = 1 },
             },
@@ -6183,7 +6187,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 125,
-            skillLevels = { 1, 150, 190 },
+            skillLevels = { 125, 150, 170, 190 },
             reagents = {
                 { itemId = 6371, count = 1 },
                 { itemId = 10998, count = 1 },
@@ -6197,7 +6201,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2500",
             sortOrder = 110,
             requiredSkill = 125,
-            skillLevels = { 1, 150, 190 },
+            skillLevels = { 125, 150, 170, 190 },
             reagents = {
                 { itemId = 10940, count = 4 },
             },
@@ -6211,7 +6215,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2500",
             sortOrder = 110,
             requiredSkill = 125,
-            skillLevels = { 1, 150, 190 },
+            skillLevels = { 125, 150, 170, 190 },
             reagents = {
                 { itemId = 10940, count = 3 },
                 { itemId = 10998, count = 1 },
@@ -6228,7 +6232,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2589",
             sortOrder = 1400,
             requiredSkill = 95,
-            skillLevels = { 1, 120, 155 },
+            skillLevels = { 95, 120, 137, 155 },
             reagents = {
                 { itemId = 2997, count = 4 },
                 { itemId = 6260, count = 2 },
@@ -6247,7 +6251,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2589",
             sortOrder = 1400,
             requiredSkill = 95,
-            skillLevels = { 1, 120, 155 },
+            skillLevels = { 95, 120, 137, 155 },
             reagents = {
                 { itemId = 2997, count = 4 },
                 { itemId = 2605, count = 2 },
@@ -6262,7 +6266,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2530",
             sortOrder = 10,
-            skillLevels = { 1, 150, 210 },
+            requiredSkill = 150,
+            skillLevels = { 150, 150, 180, 210 },
             reagents = {
                 { itemId = 4306, count = 1 },
             },
@@ -6278,7 +6283,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2530",
             sortOrder = 10,
             requiredSkill = 180,
-            skillLevels = { 1, 180, 240 },
+            skillLevels = { 180, 180, 210, 240 },
             reagents = {
                 { itemId = 4306, count = 2 },
             },
@@ -6290,7 +6295,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2533",
             sortOrder = 10,
-            skillLevels = { 1, 80, 150 },
+            requiredSkill = 80,
+            skillLevels = { 80, 80, 115, 150 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -6308,7 +6314,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2533",
             sortOrder = 10,
             requiredSkill = 130,
-            skillLevels = { 1, 130, 200 },
+            skillLevels = { 130, 130, 165, 200 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -6326,7 +6332,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2552",
             sortOrder = 300,
             requiredSkill = 65,
-            skillLevels = { 1, 95, 125 },
+            skillLevels = { 65, 95, 110, 125 },
             reagents = {
                 { itemId = 6470, count = 8 },
                 { itemId = 4231, count = 1 },
@@ -6344,7 +6350,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 80,
-            skillLevels = { 1, 105, 130 },
+            skillLevels = { 80, 105, 117, 130 },
             reagents = {
                 { itemId = 6471, count = 2 },
                 { itemId = 6470, count = 6 },
@@ -6362,7 +6368,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 90,
-            skillLevels = { 1, 115, 140 },
+            skillLevels = { 90, 115, 127, 140 },
             reagents = {
                 { itemId = 6471, count = 10 },
                 { itemId = 6470, count = 10 },
@@ -6380,7 +6386,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2636",
             sortOrder = 200,
             requiredSkill = 85,
-            skillLevels = { 1, 125, 165 },
+            skillLevels = { 85, 125, 145, 165 },
             reagents = {
                 { itemId = 6522, count = 1 },
                 { itemId = 2678, count = 1 },
@@ -6397,7 +6403,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 90,
-            skillLevels = { 1, 120, 160 },
+            skillLevels = { 90, 120, 140, 160 },
             reagents = {
                 { itemId = 6522, count = 1 },
                 { itemId = 2449, count = 1 },
@@ -6415,7 +6421,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 185,
-            skillLevels = { 1, 185, 225 },
+            skillLevels = { 185, 185, 205, 225 },
             reagents = {
                 { itemId = 4611, count = 1 },
                 { itemId = 4377, count = 1 },
@@ -6433,7 +6439,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 65,
-            skillLevels = { 1, 90, 120 },
+            skillLevels = { 65, 90, 105, 120 },
             reagents = {
                 { itemId = 2318, count = 6 },
                 { itemId = 4231, count = 1 },
@@ -6450,7 +6456,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2518",
             sortOrder = 40,
             requiredSkill = 100,
-            skillLevels = { 1, 115, 130 },
+            skillLevels = { 100, 115, 122, 130 },
             reagents = {
                 { itemId = 2841, count = 1 },
                 { itemId = 4359, count = 2 },
@@ -6468,7 +6474,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 100,
-            skillLevels = { 1, 115, 130 },
+            skillLevels = { 100, 115, 122, 130 },
             createdCount = 1,
             createdCountMax = 3,
             reagents = {
@@ -6486,7 +6492,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 70,
-            skillLevels = { 1, 80, 120 },
+            skillLevels = { 70, 80, 100, 120 },
             reagents = {
                 { itemId = 2840, count = 12 },
                 { itemId = 774, count = 2 },
@@ -6504,7 +6510,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 100,
-            skillLevels = { 1, 115, 155 },
+            skillLevels = { 100, 115, 135, 155 },
             reagents = {
                 { itemId = 2840, count = 16 },
                 { itemId = 818, count = 2 },
@@ -6520,7 +6526,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 170 },
+            skillLevels = { 140, 140, 155, 170 },
             reagents = {
                 { itemId = 2841, count = 8 },
                 { itemId = 1210, count = 3 },
@@ -6535,8 +6541,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2590",
             sortOrder = 1500,
-            requiredSkill = 40,
-            skillLevels = { 1, 50, 85 },
+            requiredSkill = 25,
+            skillLevels = { 25, 50, 67, 85 },
             reagents = {
                 { itemId = 2996, count = 2 },
                 { itemId = 2320, count = 1 },
@@ -6552,8 +6558,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2590",
             sortOrder = 1500,
-            requiredSkill = 110,
-            skillLevels = { 1, 110, 145 },
+            requiredSkill = 85,
+            skillLevels = { 85, 110, 127, 145 },
             reagents = {
                 { itemId = 2997, count = 3 },
                 { itemId = 2324, count = 4 },
@@ -6568,8 +6574,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2589",
             sortOrder = 1400,
-            requiredSkill = 160,
-            skillLevels = { 1, 135, 145 },
+            requiredSkill = 125,
+            skillLevels = { 125, 135, 140, 145 },
             reagents = {
                 { itemId = 4305, count = 3 },
                 { itemId = 2324, count = 2 },
@@ -6584,8 +6590,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2589",
             sortOrder = 1400,
-            requiredSkill = 175,
-            skillLevels = { 1, 150, 160 },
+            requiredSkill = 140,
+            skillLevels = { 140, 150, 155, 160 },
             reagents = {
                 { itemId = 4305, count = 3 },
                 { itemId = 2604, count = 2 },
@@ -6602,7 +6608,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2640",
             sortOrder = 15,
             requiredSkill = 1,
-            skillLevels = { 1, 45, 85 },
+            skillLevels = { 1, 45, 65, 85 },
             reagents = {
                 { itemId = 6889, count = 1 },
                 { itemId = 2678, count = 1 },
@@ -6619,7 +6625,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2633",
             sortOrder = 20,
             requiredSkill = 40,
-            skillLevels = { 1, 80, 120 },
+            skillLevels = { 40, 80, 100, 120 },
             reagents = {
                 { itemId = 3173, count = 1 },
             },
@@ -6632,8 +6638,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2587",
             sortOrder = 1200,
-            requiredSkill = 140,
-            skillLevels = { 1, 135, 165 },
+            requiredSkill = 115,
+            skillLevels = { 115, 135, 150, 165 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 6260, count = 2 },
@@ -6648,8 +6654,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2581",
             sortOrder = 600,
-            requiredSkill = 145,
-            skillLevels = { 1, 130, 140 },
+            requiredSkill = 120,
+            skillLevels = { 120, 130, 135, 140 },
             reagents = {
                 { itemId = 4305, count = 2 },
                 { itemId = 6260, count = 2 },
@@ -6664,8 +6670,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2581",
             sortOrder = 600,
-            requiredSkill = 160,
-            skillLevels = { 1, 135, 145 },
+            requiredSkill = 125,
+            skillLevels = { 125, 135, 140, 145 },
             reagents = {
                 { itemId = 4305, count = 3 },
                 { itemId = 2321, count = 2 },
@@ -6679,8 +6685,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2583",
             sortOrder = 800,
-            requiredSkill = 170,
-            skillLevels = { 1, 155, 185 },
+            requiredSkill = 135,
+            skillLevels = { 135, 155, 170, 185 },
             reagents = {
                 { itemId = 4305, count = 3 },
                 { itemId = 7067, count = 1 },
@@ -6695,8 +6701,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2586",
             sortOrder = 1100,
-            requiredSkill = 175,
-            skillLevels = { 1, 160, 190 },
+            requiredSkill = 140,
+            skillLevels = { 140, 160, 175, 190 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 7070, count = 1 },
@@ -6713,8 +6719,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2459",
             sortOrder = 10,
-            requiredSkill = 150,
-            skillLevels = { 1, 125, 130 },
+            requiredSkill = 125,
+            skillLevels = { 125, 125, 127, 130 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -6729,8 +6735,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2583",
             sortOrder = 800,
-            requiredSkill = 190,
-            skillLevels = { 1, 175, 205 },
+            requiredSkill = 155,
+            skillLevels = { 155, 175, 190, 205 },
             reagents = {
                 { itemId = 4339, count = 2 },
                 { itemId = 7067, count = 2 },
@@ -6748,8 +6754,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2586",
             sortOrder = 1100,
-            requiredSkill = 175,
-            skillLevels = { 1, 160, 190 },
+            requiredSkill = 140,
+            skillLevels = { 140, 160, 175, 190 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 7071, count = 1 },
@@ -6765,8 +6771,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2582",
             sortOrder = 700,
-            requiredSkill = 180,
-            skillLevels = { 1, 165, 195 },
+            requiredSkill = 145,
+            skillLevels = { 145, 165, 180, 195 },
             reagents = {
                 { itemId = 4305, count = 5 },
                 { itemId = 4291, count = 2 },
@@ -6781,7 +6787,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 15,
-            skillLevels = { 1, 50, 85 },
+            skillLevels = { 15, 50, 67, 85 },
             reagents = {
                 { itemId = 2996, count = 1 },
                 { itemId = 2320, count = 1 },
@@ -6796,7 +6802,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 140,
-            skillLevels = { 1, 135, 165 },
+            skillLevels = { 140, 135, 150, 165 },
             reagents = {
                 { itemId = 4305, count = 3 },
                 { itemId = 2319, count = 2 },
@@ -6815,7 +6821,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 120,
-            skillLevels = { 1, 140, 170 },
+            skillLevels = { 120, 140, 155, 170 },
             reagents = {
                 { itemId = 4305, count = 3 },
                 { itemId = 4234, count = 2 },
@@ -6834,7 +6840,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 125,
-            skillLevels = { 1, 145, 175 },
+            skillLevels = { 125, 145, 160, 175 },
             reagents = {
                 { itemId = 4305, count = 3 },
                 { itemId = 4234, count = 2 },
@@ -6853,7 +6859,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 130,
-            skillLevels = { 1, 150, 180 },
+            skillLevels = { 130, 150, 165, 180 },
             reagents = {
                 { itemId = 4305, count = 5 },
                 { itemId = 2605, count = 2 },
@@ -6871,7 +6877,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2580",
             sortOrder = 500,
             requiredSkill = 140,
-            skillLevels = { 1, 160, 190 },
+            skillLevels = { 140, 160, 175, 190 },
             reagents = {
                 { itemId = 4305, count = 3 },
                 { itemId = 6260, count = 2 },
@@ -6889,7 +6895,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2580",
             sortOrder = 500,
             requiredSkill = 145,
-            skillLevels = { 1, 165, 195 },
+            skillLevels = { 145, 165, 180, 195 },
             reagents = {
                 { itemId = 4305, count = 5 },
                 { itemId = 2604, count = 2 },
@@ -6905,8 +6911,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2583",
             sortOrder = 800,
-            requiredSkill = 185,
-            skillLevels = { 1, 170, 190 },
+            requiredSkill = 150,
+            skillLevels = { 150, 170, 180, 190 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 2604, count = 2 },
@@ -6924,7 +6930,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 155,
-            skillLevels = { 1, 175, 205 },
+            skillLevels = { 155, 175, 190, 205 },
             reagents = {
                 { itemId = 4305, count = 5 },
                 { itemId = 6371, count = 2 },
@@ -6943,7 +6949,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 155,
-            skillLevels = { 1, 175, 205 },
+            skillLevels = { 155, 175, 190, 205 },
             reagents = {
                 { itemId = 4305, count = 6 },
                 { itemId = 7072, count = 2 },
@@ -6962,7 +6968,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 160,
-            skillLevels = { 1, 180, 210 },
+            skillLevels = { 160, 180, 195, 210 },
             reagents = {
                 { itemId = 4305, count = 5 },
                 { itemId = 7067, count = 4 },
@@ -6979,8 +6985,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2587",
             sortOrder = 1200,
-            requiredSkill = 195,
-            skillLevels = { 1, 180, 200 },
+            requiredSkill = 160,
+            skillLevels = { 160, 180, 190, 200 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 2604, count = 2 },
@@ -6998,7 +7004,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 170,
-            skillLevels = { 1, 185, 215 },
+            skillLevels = { 170, 185, 200, 215 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 7068, count = 4 },
@@ -7015,8 +7021,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2585",
             sortOrder = 1000,
-            requiredSkill = 210,
-            skillLevels = { 1, 190, 220 },
+            requiredSkill = 175,
+            skillLevels = { 175, 190, 205, 220 },
             reagents = {
                 { itemId = 4305, count = 6 },
                 { itemId = 7068, count = 2 },
@@ -7034,8 +7040,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2482",
             sortOrder = 240,
-            requiredSkill = 30,
-            skillLevels = { 1, 65, 105 },
+            requiredSkill = 25,
+            skillLevels = { 25, 65, 85, 105 },
             reagents = {
                 { itemId = 2840, count = 6 },
                 { itemId = 2880, count = 1 },
@@ -7054,7 +7060,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 130,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 130, 245, 255, 265 },
             reagents = {
                 { itemId = 10026, count = 1 },
                 { itemId = 10559, count = 2 },
@@ -7072,7 +7078,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2552",
             sortOrder = 300,
             requiredSkill = 1,
-            skillLevels = { 1, 40, 70 },
+            skillLevels = { 1, 40, 55, 70 },
             reagents = {
                 { itemId = 2318, count = 2 },
                 { itemId = 2320, count = 1 },
@@ -7087,7 +7093,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 1,
-            skillLevels = { 1, 40, 70 },
+            skillLevels = { 1, 40, 55, 70 },
             reagents = {
                 { itemId = 2318, count = 2 },
                 { itemId = 2320, count = 3 },
@@ -7101,8 +7107,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2570",
             sortOrder = 2100,
-            requiredSkill = 30,
-            skillLevels = { 1, 55, 85 },
+            requiredSkill = 25,
+            skillLevels = { 25, 55, 70, 85 },
             reagents = {
                 { itemId = 2318, count = 4 },
                 { itemId = 2320, count = 2 },
@@ -7116,8 +7122,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2571",
             sortOrder = 2200,
-            requiredSkill = 30,
-            skillLevels = { 1, 55, 85 },
+            requiredSkill = 25,
+            skillLevels = { 25, 55, 70, 85 },
             reagents = {
                 { itemId = 2318, count = 3 },
                 { itemId = 2320, count = 4 },
@@ -7134,7 +7140,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 30,
-            skillLevels = { 1, 60, 90 },
+            skillLevels = { 30, 60, 75, 90 },
             reagents = {
                 { itemId = 2318, count = 5 },
                 { itemId = 2320, count = 5 },
@@ -7148,8 +7154,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2556",
             sortOrder = 700,
-            requiredSkill = 70,
-            skillLevels = { 1, 75, 105 },
+            requiredSkill = 45,
+            skillLevels = { 45, 75, 90, 105 },
             reagents = {
                 { itemId = 2318, count = 6 },
                 { itemId = 2320, count = 4 },
@@ -7163,8 +7169,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2559",
             sortOrder = 1000,
-            requiredSkill = 95,
-            skillLevels = { 1, 100, 130 },
+            requiredSkill = 70,
+            skillLevels = { 70, 100, 115, 130 },
             reagents = {
                 { itemId = 2318, count = 10 },
                 { itemId = 4231, count = 1 },
@@ -7182,7 +7188,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2552",
             sortOrder = 300,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 125 },
+            skillLevels = { 75, 100, 112, 125 },
             reagents = {
                 { itemId = 7286, count = 12 },
                 { itemId = 2319, count = 4 },
@@ -7200,7 +7206,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 95,
-            skillLevels = { 1, 120, 145 },
+            skillLevels = { 95, 120, 132, 145 },
             reagents = {
                 { itemId = 7287, count = 6 },
                 { itemId = 2319, count = 4 },
@@ -7215,8 +7221,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2557",
             sortOrder = 800,
-            requiredSkill = 120,
-            skillLevels = { 1, 120, 145 },
+            requiredSkill = 95,
+            skillLevels = { 95, 120, 132, 145 },
             reagents = {
                 { itemId = 2457, count = 1 },
                 { itemId = 2319, count = 6 },
@@ -7231,8 +7237,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2557",
             sortOrder = 800,
-            requiredSkill = 125,
-            skillLevels = { 1, 125, 150 },
+            requiredSkill = 100,
+            skillLevels = { 100, 125, 137, 150 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 5116, count = 4 },
@@ -7250,7 +7256,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 110,
-            skillLevels = { 1, 135, 160 },
+            skillLevels = { 110, 135, 147, 160 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 3356, count = 4 },
@@ -7268,7 +7274,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 110,
-            skillLevels = { 1, 135, 160 },
+            skillLevels = { 110, 135, 147, 160 },
             reagents = {
                 { itemId = 2319, count = 6 },
                 { itemId = 7067, count = 1 },
@@ -7286,7 +7292,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 115,
-            skillLevels = { 1, 140, 165 },
+            skillLevels = { 115, 140, 152, 165 },
             reagents = {
                 { itemId = 2319, count = 10 },
                 { itemId = 5373, count = 2 },
@@ -7304,7 +7310,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 120,
-            skillLevels = { 1, 145, 170 },
+            skillLevels = { 120, 145, 157, 170 },
             reagents = {
                 { itemId = 2319, count = 12 },
                 { itemId = 7067, count = 2 },
@@ -7320,8 +7326,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2570",
             sortOrder = 2100,
-            requiredSkill = 150,
-            skillLevels = { 1, 145, 165 },
+            requiredSkill = 125,
+            skillLevels = { 125, 145, 155, 165 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 2321, count = 2 },
@@ -7335,8 +7341,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2571",
             sortOrder = 2200,
-            requiredSkill = 150,
-            skillLevels = { 1, 145, 165 },
+            requiredSkill = 125,
+            skillLevels = { 125, 145, 155, 165 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 2321, count = 2 },
@@ -7353,7 +7359,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 140,
-            skillLevels = { 1, 160, 180 },
+            skillLevels = { 140, 160, 170, 180 },
             reagents = {
                 { itemId = 4234, count = 10 },
                 { itemId = 2325, count = 1 },
@@ -7368,8 +7374,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2555",
             sortOrder = 600,
-            requiredSkill = 175,
-            skillLevels = { 1, 170, 190 },
+            requiredSkill = 150,
+            skillLevels = { 150, 170, 180, 190 },
             reagents = {
                 { itemId = 4234, count = 10 },
                 { itemId = 3824, count = 1 },
@@ -7387,7 +7393,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 150,
-            skillLevels = { 1, 170, 190 },
+            skillLevels = { 150, 170, 180, 190 },
             reagents = {
                 { itemId = 7392, count = 4 },
                 { itemId = 4234, count = 10 },
@@ -7402,8 +7408,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2552",
             sortOrder = 300,
-            requiredSkill = 180,
-            skillLevels = { 1, 175, 195 },
+            requiredSkill = 155,
+            skillLevels = { 155, 175, 185, 195 },
             reagents = {
                 { itemId = 4234, count = 6 },
                 { itemId = 7067, count = 2 },
@@ -7419,8 +7425,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2556",
             sortOrder = 700,
-            requiredSkill = 185,
-            skillLevels = { 1, 180, 200 },
+            requiredSkill = 160,
+            skillLevels = { 160, 180, 190, 200 },
             reagents = {
                 { itemId = 4234, count = 16 },
                 { itemId = 2325, count = 1 },
@@ -7438,7 +7444,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 165,
-            skillLevels = { 1, 185, 205 },
+            skillLevels = { 165, 185, 195, 205 },
             reagents = {
                 { itemId = 7392, count = 6 },
                 { itemId = 4234, count = 8 },
@@ -7453,8 +7459,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2558",
             sortOrder = 900,
-            requiredSkill = 195,
-            skillLevels = { 1, 190, 210 },
+            requiredSkill = 170,
+            skillLevels = { 170, 190, 200, 210 },
             reagents = {
                 { itemId = 4234, count = 10 },
                 { itemId = 4305, count = 2 },
@@ -7473,7 +7479,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 215 },
+            skillLevels = { 175, 195, 205, 215 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 7428, count = 2 },
@@ -7492,7 +7498,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 215 },
+            skillLevels = { 175, 195, 205, 215 },
             reagents = {
                 { itemId = 4234, count = 10 },
                 { itemId = 2459, count = 2 },
@@ -7511,7 +7517,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 125,
-            skillLevels = { 1, 150, 175 },
+            skillLevels = { 125, 150, 162, 175 },
             reagents = {
                 { itemId = 2841, count = 6 },
                 { itemId = 4375, count = 1 },
@@ -7529,7 +7535,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2518",
             sortOrder = 40,
             requiredSkill = 150,
-            skillLevels = { 1, 150, 170 },
+            skillLevels = { 150, 150, 160, 170 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -7549,7 +7555,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 165,
-            skillLevels = { 1, 160, 200 },
+            skillLevels = { 165, 160, 180, 200 },
             reagents = {
                 { itemId = 3575, count = 6 },
                 { itemId = 4375, count = 2 },
@@ -7570,7 +7576,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2636",
             sortOrder = 200,
             requiredSkill = 60,
-            skillLevels = { 1, 100, 140 },
+            skillLevels = { 60, 100, 120, 140 },
             reagents = {
                 { itemId = 2452, count = 1 },
                 { itemId = 159, count = 1 },
@@ -7587,7 +7593,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2462",
             sortOrder = 120,
             requiredSkill = 135,
-            skillLevels = { 1, 160, 185 },
+            skillLevels = { 135, 160, 172, 185 },
             reagents = {
                 { itemId = 3575, count = 8 },
                 { itemId = 5635, count = 4 },
@@ -7606,7 +7612,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 135,
-            skillLevels = { 1, 160, 185 },
+            skillLevels = { 135, 160, 172, 185 },
             reagents = {
                 { itemId = 3575, count = 20 },
                 { itemId = 3486, count = 4 },
@@ -7623,7 +7629,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2461",
             sortOrder = 110,
             requiredSkill = 150,
-            skillLevels = { 1, 175, 200 },
+            skillLevels = { 150, 175, 187, 200 },
             reagents = {
                 { itemId = 3575, count = 10 },
                 { itemId = 5637, count = 2 },
@@ -7641,7 +7647,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 155,
-            skillLevels = { 1, 180, 205 },
+            skillLevels = { 155, 180, 192, 205 },
             reagents = {
                 { itemId = 3575, count = 12 },
                 { itemId = 5637, count = 4 },
@@ -7660,7 +7666,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 160,
-            skillLevels = { 1, 185, 210 },
+            skillLevels = { 160, 185, 197, 210 },
             reagents = {
                 { itemId = 3575, count = 14 },
                 { itemId = 3486, count = 3 },
@@ -7675,8 +7681,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2463",
             sortOrder = 130,
-            requiredSkill = 200,
-            skillLevels = { 1, 200, 225 },
+            requiredSkill = 175,
+            skillLevels = { 175, 200, 212, 225 },
             reagents = {
                 { itemId = 3859, count = 16 },
                 { itemId = 3486, count = 3 },
@@ -7690,8 +7696,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2460",
             sortOrder = 20,
-            requiredSkill = 200,
-            skillLevels = { 1, 175, 185 },
+            requiredSkill = 175,
+            skillLevels = { 175, 175, 180, 185 },
             reagents = {
                 { itemId = 7912, count = 1 },
             },
@@ -7704,8 +7710,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2459",
             sortOrder = 10,
-            requiredSkill = 200,
-            skillLevels = { 1, 175, 185 },
+            requiredSkill = 175,
+            skillLevels = { 175, 175, 180, 185 },
             reagents = {
                 { itemId = 7912, count = 4 },
             },
@@ -7718,8 +7724,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2460",
             sortOrder = 20,
-            requiredSkill = 200,
-            skillLevels = { 1, 175, 185 },
+            requiredSkill = 175,
+            skillLevels = { 175, 175, 180, 185 },
             reagents = {
                 { itemId = 7912, count = 1 },
             },
@@ -7732,8 +7738,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2470",
             sortOrder = 40,
-            requiredSkill = 205,
-            skillLevels = { 1, 200, 220 },
+            requiredSkill = 180,
+            skillLevels = { 180, 200, 210, 220 },
             reagents = {
                 { itemId = 3860, count = 8 },
                 { itemId = 4234, count = 6 },
@@ -7747,8 +7753,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2473",
             sortOrder = 70,
-            requiredSkill = 205,
-            skillLevels = { 1, 200, 220 },
+            requiredSkill = 180,
+            skillLevels = { 180, 200, 210, 220 },
             reagents = {
                 { itemId = 3860, count = 6 },
                 { itemId = 4338, count = 4 },
@@ -7762,8 +7768,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2467",
             sortOrder = 170,
-            requiredSkill = 210,
-            skillLevels = { 1, 205, 225 },
+            requiredSkill = 185,
+            skillLevels = { 185, 205, 215, 225 },
             reagents = {
                 { itemId = 3860, count = 12 },
             },
@@ -7779,7 +7785,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 185,
-            skillLevels = { 1, 205, 225 },
+            skillLevels = { 185, 205, 215, 225 },
             reagents = {
                 { itemId = 3860, count = 10 },
                 { itemId = 1705, count = 2 },
@@ -7793,8 +7799,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2469",
             sortOrder = 30,
-            requiredSkill = 215,
-            skillLevels = { 1, 210, 230 },
+            requiredSkill = 190,
+            skillLevels = { 190, 210, 220, 230 },
             reagents = {
                 { itemId = 3859, count = 14 },
                 { itemId = 7966, count = 1 },
@@ -7811,7 +7817,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2464",
             sortOrder = 140,
             requiredSkill = 190,
-            skillLevels = { 1, 210, 230 },
+            skillLevels = { 190, 210, 220, 230 },
             reagents = {
                 { itemId = 3860, count = 8 },
                 { itemId = 3864, count = 2 },
@@ -7828,7 +7834,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2487",
             sortOrder = 290,
             requiredSkill = 190,
-            skillLevels = { 1, 210, 230 },
+            skillLevels = { 190, 210, 220, 230 },
             reagents = {
                 { itemId = 3860, count = 4 },
                 { itemId = 6037, count = 2 },
@@ -7844,7 +7850,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 220,
-            skillLevels = { 1, 215, 235 },
+            skillLevels = { 220, 215, 225, 235 },
             reagents = {
                 { itemId = 3860, count = 8 },
                 { itemId = 4234, count = 6 },
@@ -7862,7 +7868,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 195,
-            skillLevels = { 1, 215, 235 },
+            skillLevels = { 195, 215, 225, 235 },
             reagents = {
                 { itemId = 3860, count = 12 },
                 { itemId = 6037, count = 1 },
@@ -7881,7 +7887,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 195,
-            skillLevels = { 1, 215, 235 },
+            skillLevels = { 195, 215, 225, 235 },
             reagents = {
                 { itemId = 3860, count = 10 },
                 { itemId = 4338, count = 6 },
@@ -7900,7 +7906,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 200,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 200, 220, 230, 240 },
             reagents = {
                 { itemId = 3860, count = 12 },
                 { itemId = 6037, count = 1 },
@@ -7916,7 +7922,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 225,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 225, 220, 230, 240 },
             reagents = {
                 { itemId = 3860, count = 10 },
                 { itemId = 6037, count = 8 },
@@ -7937,7 +7943,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 230,
-            skillLevels = { 1, 225, 245 },
+            skillLevels = { 230, 225, 235, 245 },
             reagents = {
                 { itemId = 3860, count = 12 },
                 { itemId = 7067, count = 1 },
@@ -7951,8 +7957,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2471",
             sortOrder = 50,
-            requiredSkill = 230,
-            skillLevels = { 1, 225, 245 },
+            requiredSkill = 205,
+            skillLevels = { 205, 225, 235, 245 },
             reagents = {
                 { itemId = 3860, count = 16 },
             },
@@ -7965,8 +7971,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2461",
             sortOrder = 110,
-            requiredSkill = 230,
-            skillLevels = { 1, 225, 245 },
+            requiredSkill = 205,
+            skillLevels = { 205, 225, 235, 245 },
             reagents = {
                 { itemId = 3860, count = 10 },
                 { itemId = 4338, count = 6 },
@@ -7983,7 +7989,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2487",
             sortOrder = 290,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 3860, count = 4 },
                 { itemId = 7966, count = 3 },
@@ -8000,7 +8006,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2462",
             sortOrder = 120,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 3860, count = 14 },
                 { itemId = 4304, count = 4 },
@@ -8015,8 +8021,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2476",
             sortOrder = 100,
-            requiredSkill = 235,
-            skillLevels = { 1, 230, 250 },
+            requiredSkill = 210,
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 3860, count = 14 },
                 { itemId = 4304, count = 4 },
@@ -8033,7 +8039,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2469",
             sortOrder = 30,
             requiredSkill = 220,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 220, 230, 240, 250 },
             reagents = {
                 { itemId = 3860, count = 14 },
                 { itemId = 7909, count = 1 },
@@ -8050,7 +8056,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2471",
             sortOrder = 50,
             requiredSkill = 240,
-            skillLevels = { 1, 235, 255 },
+            skillLevels = { 240, 235, 245, 255 },
             reagents = {
                 { itemId = 3860, count = 16 },
                 { itemId = 6037, count = 6 },
@@ -8067,7 +8073,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2471",
             sortOrder = 50,
             requiredSkill = 245,
-            skillLevels = { 1, 240, 260 },
+            skillLevels = { 245, 240, 250, 260 },
             reagents = {
                 { itemId = 3860, count = 12 },
                 { itemId = 6037, count = 24 },
@@ -8087,7 +8093,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 245,
-            skillLevels = { 1, 240, 260 },
+            skillLevels = { 245, 240, 250, 260 },
             reagents = {
                 { itemId = 3860, count = 14 },
                 { itemId = 6037, count = 2 },
@@ -8107,7 +8113,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2469",
             sortOrder = 30,
             requiredSkill = 245,
-            skillLevels = { 1, 240, 260 },
+            skillLevels = { 245, 240, 250, 260 },
             reagents = {
                 { itemId = 3860, count = 16 },
                 { itemId = 6037, count = 2 },
@@ -8123,8 +8129,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2480",
             sortOrder = 220,
-            requiredSkill = 30,
-            skillLevels = { 1, 65, 105 },
+            requiredSkill = 25,
+            skillLevels = { 25, 65, 85, 105 },
             reagents = {
                 { itemId = 2840, count = 10 },
                 { itemId = 2880, count = 2 },
@@ -8140,8 +8146,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2478",
             sortOrder = 200,
-            requiredSkill = 125,
-            skillLevels = { 1, 155, 185 },
+            requiredSkill = 100,
+            skillLevels = { 100, 155, 170, 185 },
             reagents = {
                 { itemId = 2841, count = 8 },
                 { itemId = 3466, count = 1 },
@@ -8156,8 +8162,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2480",
             sortOrder = 220,
-            requiredSkill = 130,
-            skillLevels = { 1, 135, 165 },
+            requiredSkill = 105,
+            skillLevels = { 105, 135, 150, 165 },
             reagents = {
                 { itemId = 2841, count = 12 },
                 { itemId = 3466, count = 2 },
@@ -8172,8 +8178,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2477",
             sortOrder = 190,
-            requiredSkill = 135,
-            skillLevels = { 1, 140, 170 },
+            requiredSkill = 110,
+            skillLevels = { 110, 140, 155, 170 },
             reagents = {
                 { itemId = 2841, count = 14 },
                 { itemId = 3466, count = 1 },
@@ -8188,8 +8194,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2481",
             sortOrder = 230,
-            requiredSkill = 210,
-            skillLevels = { 1, 210, 235 },
+            requiredSkill = 185,
+            skillLevels = { 185, 210, 222, 235 },
             reagents = {
                 { itemId = 3860, count = 12 },
                 { itemId = 3864, count = 2 },
@@ -8208,7 +8214,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2481",
             sortOrder = 230,
             requiredSkill = 195,
-            skillLevels = { 1, 220, 245 },
+            skillLevels = { 195, 220, 232, 245 },
             reagents = {
                 { itemId = 3860, count = 16 },
                 { itemId = 7909, count = 2 },
@@ -8227,7 +8233,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2485",
             sortOrder = 270,
             requiredSkill = 200,
-            skillLevels = { 1, 225, 250 },
+            skillLevels = { 200, 225, 237, 250 },
             reagents = {
                 { itemId = 3860, count = 14 },
                 { itemId = 6037, count = 4 },
@@ -8243,8 +8249,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2484",
             sortOrder = 260,
-            requiredSkill = 230,
-            skillLevels = { 1, 230, 255 },
+            requiredSkill = 205,
+            skillLevels = { 205, 230, 242, 255 },
             reagents = {
                 { itemId = 3860, count = 16 },
                 { itemId = 7971, count = 1 },
@@ -8262,7 +8268,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2484",
             sortOrder = 260,
             requiredSkill = 235,
-            skillLevels = { 1, 235, 260 },
+            skillLevels = { 235, 235, 247, 260 },
             reagents = {
                 { itemId = 3860, count = 24 },
                 { itemId = 7075, count = 4 },
@@ -8284,7 +8290,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2485",
             sortOrder = 270,
             requiredSkill = 215,
-            skillLevels = { 1, 240, 265 },
+            skillLevels = { 215, 240, 252, 265 },
             reagents = {
                 { itemId = 3860, count = 14 },
                 { itemId = 7909, count = 1 },
@@ -8303,7 +8309,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2485",
             sortOrder = 270,
             requiredSkill = 245,
-            skillLevels = { 1, 245, 270 },
+            skillLevels = { 245, 245, 257, 270 },
             reagents = {
                 { itemId = 3860, count = 28 },
                 { itemId = 7081, count = 6 },
@@ -8325,7 +8331,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2484",
             sortOrder = 260,
             requiredSkill = 220,
-            skillLevels = { 1, 245, 270 },
+            skillLevels = { 220, 245, 257, 270 },
             reagents = {
                 { itemId = 3860, count = 18 },
                 { itemId = 7075, count = 2 },
@@ -8342,7 +8348,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2479",
             sortOrder = 210,
             requiredSkill = 250,
-            skillLevels = { 1, 250, 275 },
+            skillLevels = { 250, 250, 262, 275 },
             reagents = {
                 { itemId = 3860, count = 28 },
                 { itemId = 7972, count = 10 },
@@ -8362,7 +8368,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2482",
             sortOrder = 240,
             requiredSkill = 230,
-            skillLevels = { 1, 255, 280 },
+            skillLevels = { 230, 255, 267, 280 },
             reagents = {
                 { itemId = 3860, count = 12 },
                 { itemId = 6037, count = 6 },
@@ -8380,7 +8386,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2480",
             sortOrder = 220,
             requiredSkill = 260,
-            skillLevels = { 1, 260, 285 },
+            skillLevels = { 260, 260, 272, 285 },
             reagents = {
                 { itemId = 3860, count = 30 },
                 { itemId = 6037, count = 16 },
@@ -8399,7 +8405,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2575",
             sortOrder = 100,
             requiredSkill = 175,
-            skillLevels = { 1, 175, 175 },
+            skillLevels = { 175, 175, 175, 175 },
             reagents = {
                 { itemId = 3858, count = 1 },
             },
@@ -8413,7 +8419,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2575",
             sortOrder = 100,
             requiredSkill = 230,
-            skillLevels = { 1, 230, 230 },
+            skillLevels = { 230, 230, 230, 230 },
             reagents = {
                 { itemId = 7911, count = 1 },
             },
@@ -8426,8 +8432,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2550",
             sortOrder = 100,
-            requiredSkill = 200,
-            skillLevels = { 1, 175, 175 },
+            requiredSkill = 175,
+            skillLevels = { 175, 175, 175, 175 },
             reagents = {
                 { itemId = 8169, count = 1 },
                 { itemId = 8150, count = 1 },
@@ -8441,8 +8447,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2569",
             sortOrder = 2000,
-            requiredSkill = 200,
-            skillLevels = { 1, 195, 215 },
+            requiredSkill = 175,
+            skillLevels = { 175, 195, 205, 215 },
             reagents = {
                 { itemId = 4304, count = 5 },
                 { itemId = 4291, count = 1 },
@@ -8459,7 +8465,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 215 },
+            skillLevels = { 175, 195, 205, 215 },
             reagents = {
                 { itemId = 4234, count = 12 },
                 { itemId = 4236, count = 2 },
@@ -8474,8 +8480,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2555",
             sortOrder = 600,
-            requiredSkill = 205,
-            skillLevels = { 1, 200, 220 },
+            requiredSkill = 180,
+            skillLevels = { 180, 200, 210, 220 },
             reagents = {
                 { itemId = 4304, count = 7 },
                 { itemId = 4291, count = 2 },
@@ -8489,8 +8495,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2553",
             sortOrder = 400,
-            requiredSkill = 205,
-            skillLevels = { 1, 200, 220 },
+            requiredSkill = 180,
+            skillLevels = { 180, 200, 210, 220 },
             reagents = {
                 { itemId = 4304, count = 5 },
                 { itemId = 4291, count = 2 },
@@ -8507,7 +8513,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 180,
-            skillLevels = { 1, 200, 220 },
+            skillLevels = { 180, 200, 210, 220 },
             reagents = {
                 { itemId = 4304, count = 6 },
                 { itemId = 8167, count = 8 },
@@ -8522,8 +8528,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2563",
             sortOrder = 1400,
-            requiredSkill = 210,
-            skillLevels = { 1, 205, 225 },
+            requiredSkill = 185,
+            skillLevels = { 185, 205, 215, 225 },
             reagents = {
                 { itemId = 4304, count = 6 },
                 { itemId = 8167, count = 12 },
@@ -8541,7 +8547,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 185,
-            skillLevels = { 1, 205, 225 },
+            skillLevels = { 185, 205, 215, 225 },
             reagents = {
                 { itemId = 4304, count = 8 },
                 { itemId = 4338, count = 6 },
@@ -8556,8 +8562,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2564",
             sortOrder = 1500,
-            requiredSkill = 210,
-            skillLevels = { 1, 205, 225 },
+            requiredSkill = 185,
+            skillLevels = { 185, 205, 215, 225 },
             reagents = {
                 { itemId = 4304, count = 8 },
                 { itemId = 8167, count = 12 },
@@ -8575,7 +8581,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 190,
-            skillLevels = { 1, 210, 230 },
+            skillLevels = { 190, 210, 220, 230 },
             reagents = {
                 { itemId = 4304, count = 10 },
                 { itemId = 8151, count = 4 },
@@ -8593,7 +8599,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2563",
             sortOrder = 1400,
             requiredSkill = 195,
-            skillLevels = { 1, 215, 235 },
+            skillLevels = { 195, 215, 225, 235 },
             reagents = {
                 { itemId = 4304, count = 12 },
                 { itemId = 8154, count = 12 },
@@ -8611,7 +8617,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 195,
-            skillLevels = { 1, 215, 235 },
+            skillLevels = { 195, 215, 225, 235 },
             reagents = {
                 { itemId = 4304, count = 10 },
                 { itemId = 8153, count = 1 },
@@ -8629,7 +8635,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 195,
-            skillLevels = { 1, 215, 235 },
+            skillLevels = { 195, 215, 225, 235 },
             reagents = {
                 { itemId = 4304, count = 8 },
                 { itemId = 8151, count = 6 },
@@ -8647,7 +8653,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2564",
             sortOrder = 1500,
             requiredSkill = 195,
-            skillLevels = { 1, 215, 235 },
+            skillLevels = { 195, 215, 225, 235 },
             reagents = {
                 { itemId = 4304, count = 10 },
                 { itemId = 8154, count = 4 },
@@ -8665,7 +8671,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 200,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 200, 220, 230, 240 },
             reagents = {
                 { itemId = 4304, count = 6 },
                 { itemId = 8154, count = 8 },
@@ -8683,7 +8689,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 200,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 200, 220, 230, 240 },
             reagents = {
                 { itemId = 4304, count = 12 },
                 { itemId = 8153, count = 2 },
@@ -8701,7 +8707,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 200,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 200, 220, 230, 240 },
             reagents = {
                 { itemId = 4304, count = 10 },
                 { itemId = 8153, count = 2 },
@@ -8716,8 +8722,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2559",
             sortOrder = 1000,
-            requiredSkill = 230,
-            skillLevels = { 1, 225, 245 },
+            requiredSkill = 205,
+            skillLevels = { 205, 225, 235, 245 },
             reagents = {
                 { itemId = 4304, count = 14 },
                 { itemId = 4291, count = 4 },
@@ -8732,7 +8738,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2552",
             sortOrder = 300,
             requiredSkill = 205,
-            skillLevels = { 1, 225, 245 },
+            skillLevels = { 205, 225, 235, 245 },
             reagents = {
                 { itemId = 4304, count = 12 },
                 { itemId = 4291, count = 4 },
@@ -8746,8 +8752,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2561",
             sortOrder = 1200,
-            requiredSkill = 230,
-            skillLevels = { 1, 225, 245 },
+            requiredSkill = 205,
+            skillLevels = { 205, 225, 235, 245 },
             reagents = {
                 { itemId = 4304, count = 14 },
                 { itemId = 8167, count = 24 },
@@ -8765,7 +8771,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 4304, count = 12 },
                 { itemId = 8154, count = 12 },
@@ -8780,8 +8786,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2567",
             sortOrder = 1800,
-            requiredSkill = 235,
-            skillLevels = { 1, 230, 250 },
+            requiredSkill = 210,
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 4304, count = 14 },
                 { itemId = 8167, count = 28 },
@@ -8796,8 +8802,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2560",
             sortOrder = 1100,
-            requiredSkill = 235,
-            skillLevels = { 1, 230, 250 },
+            requiredSkill = 210,
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8343, count = 2 },
@@ -8814,7 +8820,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 215, 230, 240, 250 },
             reagents = {
                 { itemId = 4304, count = 10 },
                 { itemId = 8152, count = 6 },
@@ -8832,7 +8838,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2552",
             sortOrder = 300,
             requiredSkill = 215,
-            skillLevels = { 1, 235, 255 },
+            skillLevels = { 215, 235, 245, 255 },
             reagents = {
                 { itemId = 4304, count = 14 },
                 { itemId = 8152, count = 4 },
@@ -8850,7 +8856,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2562",
             sortOrder = 1300,
             requiredSkill = 215,
-            skillLevels = { 1, 235, 255 },
+            skillLevels = { 215, 235, 245, 255 },
             reagents = {
                 { itemId = 4304, count = 12 },
                 { itemId = 8154, count = 16 },
@@ -8868,7 +8874,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 220,
-            skillLevels = { 1, 240, 260 },
+            skillLevels = { 220, 240, 250, 260 },
             reagents = {
                 { itemId = 4304, count = 14 },
                 { itemId = 8153, count = 4 },
@@ -8886,7 +8892,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2567",
             sortOrder = 1800,
             requiredSkill = 220,
-            skillLevels = { 1, 240, 260 },
+            skillLevels = { 220, 240, 250, 260 },
             reagents = {
                 { itemId = 4304, count = 14 },
                 { itemId = 8154, count = 8 },
@@ -8904,7 +8910,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2561",
             sortOrder = 1200,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 225, 245, 255, 265 },
             reagents = {
                 { itemId = 4304, count = 10 },
                 { itemId = 8154, count = 20 },
@@ -8922,7 +8928,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 225, 245, 255, 265 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8153, count = 2 },
@@ -8940,7 +8946,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2552",
             sortOrder = 300,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 225, 245, 255, 265 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8153, count = 2 },
@@ -8957,7 +8963,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 225,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 225, 220, 230, 240 },
             reagents = {
                 { itemId = 4304, count = 24 },
                 { itemId = 8165, count = 12 },
@@ -8975,7 +8981,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 225,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 225, 220, 230, 240 },
             reagents = {
                 { itemId = 4304, count = 18 },
                 { itemId = 8368, count = 2 },
@@ -8994,7 +9000,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 230,
-            skillLevels = { 1, 225, 245 },
+            skillLevels = { 230, 225, 235, 245 },
             reagents = {
                 { itemId = 4304, count = 20 },
                 { itemId = 7079, count = 8 },
@@ -9013,7 +9019,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 250,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 250, 245, 255, 265 },
             reagents = {
                 { itemId = 4304, count = 40 },
                 { itemId = 7077, count = 8 },
@@ -9032,7 +9038,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 250,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 250, 245, 255, 265 },
             reagents = {
                 { itemId = 4304, count = 40 },
                 { itemId = 8168, count = 40 },
@@ -9051,7 +9057,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2563",
             sortOrder = 1400,
             requiredSkill = 255,
-            skillLevels = { 1, 250, 270 },
+            skillLevels = { 255, 250, 260, 270 },
             reagents = {
                 { itemId = 4304, count = 40 },
                 { itemId = 8165, count = 30 },
@@ -9070,7 +9076,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2530",
             sortOrder = 10,
             requiredSkill = 210,
-            skillLevels = { 1, 210, 270 },
+            skillLevels = { 210, 210, 240, 270 },
             reagents = {
                 { itemId = 4338, count = 1 },
             },
@@ -9082,7 +9088,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2530",
             sortOrder = 10,
-            skillLevels = { 1, 240, 300 },
+            skillLevels = { 1, 240, 270, 300 },
             reagents = {
                 { itemId = 4338, count = 2 },
             },
@@ -9095,7 +9101,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2651",
             sortOrder = 55,
-            skillLevels = { 1, 190, 230 },
+            skillLevels = { 1, 190, 210, 230 },
             reagents = {
                 { itemId = 6370, count = 1 },
                 { itemId = 3357, count = 1 },
@@ -9111,7 +9117,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2621",
             sortOrder = 20,
             requiredSkill = 205,
-            skillLevels = { 1, 220, 260 },
+            skillLevels = { 205, 220, 240, 260 },
             reagents = {
                 { itemId = 3358, count = 1 },
                 { itemId = 3821, count = 1 },
@@ -9127,7 +9133,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 185,
-            skillLevels = { 1, 205, 245 },
+            skillLevels = { 185, 205, 225, 245 },
             reagents = {
                 { itemId = 3820, count = 1 },
                 { itemId = 3821, count = 1 },
@@ -9143,7 +9149,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 195,
-            skillLevels = { 1, 215, 255 },
+            skillLevels = { 195, 215, 235, 255 },
             reagents = {
                 { itemId = 3355, count = 1 },
                 { itemId = 3821, count = 1 },
@@ -9159,7 +9165,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 205,
-            skillLevels = { 1, 220, 260 },
+            skillLevels = { 205, 220, 240, 260 },
             reagents = {
                 { itemId = 4625, count = 1 },
                 { itemId = 3821, count = 1 },
@@ -9176,7 +9182,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 210,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 210, 225, 245, 265 },
             reagents = {
                 { itemId = 7067, count = 1 },
                 { itemId = 3821, count = 1 },
@@ -9194,7 +9200,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 210,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 210, 225, 245, 265 },
             reagents = {
                 { itemId = 3358, count = 1 },
                 { itemId = 8831, count = 1 },
@@ -9211,7 +9217,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2459",
             sortOrder = 10,
             requiredSkill = 200,
-            skillLevels = { 1, 200, 225 },
+            skillLevels = { 200, 200, 212, 225 },
             reagents = {
                 { itemId = 3860, count = 5 },
                 { itemId = 3577, count = 1 },
@@ -9228,7 +9234,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2448",
             sortOrder = 10,
             requiredSkill = 210,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 210, 225, 245, 265 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -9248,7 +9254,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2621",
             sortOrder = 20,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 250 },
+            skillLevels = { 225, 225, 237, 250 },
             reagents = {
                 { itemId = 8153, count = 1 },
                 { itemId = 8831, count = 1 },
@@ -9266,7 +9272,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2453",
             sortOrder = 70,
             requiredSkill = 225,
-            skillLevels = { 1, 240, 280 },
+            skillLevels = { 225, 240, 260, 280 },
             reagents = {
                 { itemId = 3575, count = 4 },
                 { itemId = 9262, count = 1 },
@@ -9283,7 +9289,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2651",
             sortOrder = 55,
             requiredSkill = 230,
-            skillLevels = { 1, 245, 285 },
+            skillLevels = { 230, 245, 265, 285 },
             reagents = {
                 { itemId = 8836, count = 1 },
                 { itemId = 8925, count = 1 },
@@ -9298,7 +9304,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 235,
-            skillLevels = { 1, 250, 290 },
+            skillLevels = { 235, 250, 270, 290 },
             reagents = {
                 { itemId = 8839, count = 1 },
                 { itemId = 3821, count = 1 },
@@ -9316,7 +9322,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 235,
-            skillLevels = { 1, 250, 290 },
+            skillLevels = { 235, 250, 270, 290 },
             reagents = {
                 { itemId = 8845, count = 1 },
                 { itemId = 8838, count = 1 },
@@ -9332,7 +9338,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 235,
-            skillLevels = { 1, 250, 290 },
+            skillLevels = { 235, 250, 270, 290 },
             reagents = {
                 { itemId = 8839, count = 1 },
                 { itemId = 3358, count = 1 },
@@ -9350,7 +9356,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 240,
-            skillLevels = { 1, 255, 295 },
+            skillLevels = { 240, 255, 275, 295 },
             reagents = {
                 { itemId = 8836, count = 1 },
                 { itemId = 8839, count = 1 },
@@ -9366,7 +9372,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 240,
-            skillLevels = { 1, 255, 295 },
+            skillLevels = { 240, 255, 275, 295 },
             reagents = {
                 { itemId = 8838, count = 1 },
                 { itemId = 3821, count = 1 },
@@ -9384,7 +9390,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2651",
             sortOrder = 55,
             requiredSkill = 240,
-            skillLevels = { 1, 255, 295 },
+            skillLevels = { 240, 255, 275, 295 },
             reagents = {
                 { itemId = 8831, count = 3 },
                 { itemId = 8925, count = 1 },
@@ -9401,7 +9407,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 245,
-            skillLevels = { 1, 260, 300 },
+            skillLevels = { 245, 260, 280, 300 },
             reagents = {
                 { itemId = 8838, count = 1 },
                 { itemId = 8846, count = 1 },
@@ -9419,7 +9425,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2448",
             sortOrder = 10,
             requiredSkill = 245,
-            skillLevels = { 1, 260, 300 },
+            skillLevels = { 245, 260, 280, 300 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -9439,7 +9445,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 250,
-            skillLevels = { 1, 265, 305 },
+            skillLevels = { 250, 265, 285, 305 },
             reagents = {
                 { itemId = 8845, count = 3 },
                 { itemId = 8925, count = 1 },
@@ -9456,7 +9462,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 250,
-            skillLevels = { 1, 265, 305 },
+            skillLevels = { 250, 265, 285, 305 },
             reagents = {
                 { itemId = 8846, count = 1 },
                 { itemId = 8845, count = 1 },
@@ -9472,7 +9478,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2651",
             sortOrder = 55,
             requiredSkill = 250,
-            skillLevels = { 1, 265, 305 },
+            skillLevels = { 250, 265, 285, 305 },
             reagents = {
                 { itemId = 8846, count = 2 },
                 { itemId = 8925, count = 1 },
@@ -9489,7 +9495,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2452",
             sortOrder = 60,
             requiredSkill = 225,
-            skillLevels = { 1, 240, 280 },
+            skillLevels = { 225, 240, 260, 280 },
             reagents = {
                 { itemId = 3575, count = 1 },
             },
@@ -9505,7 +9511,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2452",
             sortOrder = 60,
             requiredSkill = 225,
-            skillLevels = { 1, 240, 280 },
+            skillLevels = { 225, 240, 260, 280 },
             reagents = {
                 { itemId = 3860, count = 1 },
             },
@@ -9521,7 +9527,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 180,
-            skillLevels = { 1, 200, 220 },
+            skillLevels = { 180, 200, 210, 220 },
             reagents = {
                 { itemId = 3859, count = 10 },
                 { itemId = 3577, count = 4 },
@@ -9538,7 +9544,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 1,
-            skillLevels = { 1, 40, 60 },
+            skillLevels = { 1, 40, 50, 60 },
             reagents = {
                 { itemId = 2996, count = 1 },
                 { itemId = 2320, count = 1 },
@@ -9553,7 +9559,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 20,
-            skillLevels = { 1, 50, 85 },
+            skillLevels = { 20, 50, 67, 85 },
             reagents = {
                 { itemId = 2996, count = 2 },
                 { itemId = 2318, count = 1 },
@@ -9568,8 +9574,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2587",
             sortOrder = 1200,
-            requiredSkill = 75,
-            skillLevels = { 1, 75, 110 },
+            requiredSkill = 50,
+            skillLevels = { 50, 75, 92, 110 },
             reagents = {
                 { itemId = 2996, count = 4 },
                 { itemId = 2321, count = 1 },
@@ -9586,7 +9592,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 70,
-            skillLevels = { 1, 95, 130 },
+            skillLevels = { 70, 95, 112, 130 },
             reagents = {
                 { itemId = 2997, count = 5 },
                 { itemId = 2604, count = 3 },
@@ -9601,8 +9607,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2583",
             sortOrder = 800,
-            requiredSkill = 205,
-            skillLevels = { 1, 185, 215 },
+            requiredSkill = 170,
+            skillLevels = { 170, 185, 200, 215 },
             reagents = {
                 { itemId = 4339, count = 2 },
                 { itemId = 4291, count = 3 },
@@ -9616,8 +9622,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2587",
             sortOrder = 1200,
-            requiredSkill = 205,
-            skillLevels = { 1, 185, 215 },
+            requiredSkill = 170,
+            skillLevels = { 170, 185, 200, 215 },
             reagents = {
                 { itemId = 4339, count = 2 },
                 { itemId = 4291, count = 3 },
@@ -9631,8 +9637,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2583",
             sortOrder = 800,
-            requiredSkill = 210,
-            skillLevels = { 1, 190, 220 },
+            requiredSkill = 175,
+            skillLevels = { 175, 190, 205, 220 },
             reagents = {
                 { itemId = 4339, count = 3 },
                 { itemId = 8343, count = 1 },
@@ -9649,7 +9655,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 210,
-            skillLevels = { 1, 190, 220 },
+            skillLevels = { 210, 190, 205, 220 },
             reagents = {
                 { itemId = 4339, count = 3 },
                 { itemId = 10285, count = 2 },
@@ -9664,8 +9670,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2585",
             sortOrder = 1000,
-            requiredSkill = 215,
-            skillLevels = { 1, 195, 225 },
+            requiredSkill = 180,
+            skillLevels = { 180, 195, 210, 225 },
             reagents = {
                 { itemId = 4339, count = 2 },
                 { itemId = 8343, count = 2 },
@@ -9682,7 +9688,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 215,
-            skillLevels = { 1, 195, 225 },
+            skillLevels = { 215, 195, 210, 225 },
             reagents = {
                 { itemId = 4339, count = 3 },
                 { itemId = 10285, count = 2 },
@@ -9700,7 +9706,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 180,
-            skillLevels = { 1, 195, 225 },
+            skillLevels = { 180, 195, 210, 225 },
             reagents = {
                 { itemId = 4339, count = 3 },
                 { itemId = 2604, count = 2 },
@@ -9718,7 +9724,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 180,
-            skillLevels = { 1, 185, 195 },
+            skillLevels = { 180, 185, 190, 195 },
             reagents = {
                 { itemId = 4339, count = 1 },
                 { itemId = 2324, count = 1 },
@@ -9736,7 +9742,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 180,
-            skillLevels = { 1, 195, 225 },
+            skillLevels = { 180, 195, 210, 225 },
             reagents = {
                 { itemId = 4339, count = 3 },
                 { itemId = 2604, count = 2 },
@@ -9751,8 +9757,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2589",
             sortOrder = 1400,
-            requiredSkill = 215,
-            skillLevels = { 1, 185, 195 },
+            requiredSkill = 180,
+            skillLevels = { 180, 185, 190, 195 },
             reagents = {
                 { itemId = 4339, count = 1 },
                 { itemId = 6261, count = 1 },
@@ -9768,7 +9774,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 220,
-            skillLevels = { 1, 200, 230 },
+            skillLevels = { 220, 200, 215, 230 },
             reagents = {
                 { itemId = 4339, count = 4 },
                 { itemId = 7079, count = 2 },
@@ -9786,7 +9792,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 220,
-            skillLevels = { 1, 200, 230 },
+            skillLevels = { 220, 200, 215, 230 },
             reagents = {
                 { itemId = 4339, count = 3 },
                 { itemId = 7079, count = 2 },
@@ -9804,7 +9810,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2589",
             sortOrder = 1400,
             requiredSkill = 185,
-            skillLevels = { 1, 190, 200 },
+            skillLevels = { 185, 190, 195, 200 },
             reagents = {
                 { itemId = 4339, count = 2 },
                 { itemId = 6261, count = 2 },
@@ -9819,8 +9825,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2578",
             sortOrder = 300,
-            requiredSkill = 225,
-            skillLevels = { 1, 205, 235 },
+            requiredSkill = 190,
+            skillLevels = { 190, 205, 220, 235 },
             reagents = {
                 { itemId = 4339, count = 4 },
                 { itemId = 4291, count = 2 },
@@ -9837,7 +9843,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 190,
-            skillLevels = { 1, 205, 235 },
+            skillLevels = { 190, 205, 220, 235 },
             reagents = {
                 { itemId = 4339, count = 3 },
                 { itemId = 2604, count = 2 },
@@ -9852,8 +9858,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2585",
             sortOrder = 1000,
-            requiredSkill = 225,
-            skillLevels = { 1, 205, 235 },
+            requiredSkill = 190,
+            skillLevels = { 190, 205, 220, 235 },
             reagents = {
                 { itemId = 4339, count = 4 },
                 { itemId = 8153, count = 4 },
@@ -9870,7 +9876,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 225,
-            skillLevels = { 1, 205, 235 },
+            skillLevels = { 225, 205, 220, 235 },
             reagents = {
                 { itemId = 4339, count = 5 },
                 { itemId = 7079, count = 3 },
@@ -9885,8 +9891,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2583",
             sortOrder = 800,
-            requiredSkill = 225,
-            skillLevels = { 1, 205, 235 },
+            requiredSkill = 190,
+            skillLevels = { 190, 205, 220, 235 },
             reagents = {
                 { itemId = 4339, count = 5 },
                 { itemId = 7077, count = 2 },
@@ -9901,8 +9907,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2583",
             sortOrder = 800,
-            requiredSkill = 225,
-            skillLevels = { 1, 205, 235 },
+            requiredSkill = 190,
+            skillLevels = { 190, 205, 220, 235 },
             reagents = {
                 { itemId = 4339, count = 6 },
                 { itemId = 8153, count = 6 },
@@ -9921,7 +9927,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 225,
-            skillLevels = { 1, 205, 235 },
+            skillLevels = { 225, 205, 220, 235 },
             reagents = {
                 { itemId = 4339, count = 5 },
                 { itemId = 10285, count = 5 },
@@ -9937,7 +9943,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 230,
-            skillLevels = { 1, 205, 235 },
+            skillLevels = { 230, 205, 220, 235 },
             reagents = {
                 { itemId = 4339, count = 3 },
                 { itemId = 8343, count = 2 },
@@ -9952,7 +9958,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 230,
-            skillLevels = { 1, 205, 235 },
+            skillLevels = { 230, 205, 220, 235 },
             reagents = {
                 { itemId = 4339, count = 3 },
                 { itemId = 8343, count = 2 },
@@ -9968,7 +9974,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 230,
-            skillLevels = { 1, 205, 235 },
+            skillLevels = { 230, 205, 220, 235 },
             reagents = {
                 { itemId = 4339, count = 3 },
                 { itemId = 8343, count = 2 },
@@ -9985,7 +9991,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2589",
             sortOrder = 1400,
             requiredSkill = 190,
-            skillLevels = { 1, 195, 205 },
+            skillLevels = { 190, 195, 200, 205 },
             reagents = {
                 { itemId = 4339, count = 2 },
                 { itemId = 4342, count = 2 },
@@ -10003,7 +10009,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 235,
-            skillLevels = { 1, 210, 240 },
+            skillLevels = { 235, 210, 225, 240 },
             reagents = {
                 { itemId = 4339, count = 5 },
                 { itemId = 10285, count = 4 },
@@ -10019,7 +10025,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2590",
             sortOrder = 1500,
             requiredSkill = 235,
-            skillLevels = { 1, 200, 210 },
+            skillLevels = { 235, 200, 205, 210 },
             reagents = {
                 { itemId = 4339, count = 3 },
                 { itemId = 2325, count = 1 },
@@ -10038,7 +10044,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 195,
-            skillLevels = { 1, 210, 240 },
+            skillLevels = { 195, 210, 225, 240 },
             reagents = {
                 { itemId = 4339, count = 4 },
                 { itemId = 2604, count = 2 },
@@ -10054,7 +10060,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2578",
             sortOrder = 300,
             requiredSkill = 235,
-            skillLevels = { 1, 210, 240 },
+            skillLevels = { 235, 210, 225, 240 },
             reagents = {
                 { itemId = 4339, count = 4 },
                 { itemId = 2604, count = 2 },
@@ -10072,7 +10078,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2589",
             sortOrder = 1400,
             requiredSkill = 195,
-            skillLevels = { 1, 200, 210 },
+            skillLevels = { 195, 200, 205, 210 },
             reagents = {
                 { itemId = 4339, count = 3 },
                 { itemId = 10290, count = 1 },
@@ -10090,7 +10096,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 200,
-            skillLevels = { 1, 215, 245 },
+            skillLevels = { 200, 215, 230, 245 },
             reagents = {
                 { itemId = 4339, count = 3 },
                 { itemId = 4589, count = 6 },
@@ -10108,7 +10114,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 240,
-            skillLevels = { 1, 215, 245 },
+            skillLevels = { 240, 215, 230, 245 },
             reagents = {
                 { itemId = 4339, count = 6 },
                 { itemId = 10285, count = 6 },
@@ -10125,7 +10131,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 240,
-            skillLevels = { 1, 215, 245 },
+            skillLevels = { 240, 215, 230, 245 },
             reagents = {
                 { itemId = 4339, count = 4 },
                 { itemId = 7079, count = 4 },
@@ -10143,7 +10149,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 200,
-            skillLevels = { 1, 215, 245 },
+            skillLevels = { 200, 215, 230, 245 },
             reagents = {
                 { itemId = 4339, count = 4 },
                 { itemId = 2604, count = 2 },
@@ -10161,7 +10167,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2590",
             sortOrder = 1500,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 215 },
+            skillLevels = { 200, 205, 210, 215 },
             reagents = {
                 { itemId = 4339, count = 4 },
                 { itemId = 8343, count = 2 },
@@ -10178,7 +10184,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 200,
-            skillLevels = { 1, 215, 245 },
+            skillLevels = { 200, 215, 230, 245 },
             reagents = {
                 { itemId = 4339, count = 2 },
                 { itemId = 10285, count = 8 },
@@ -10194,7 +10200,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 245,
-            skillLevels = { 1, 215, 245 },
+            skillLevels = { 245, 215, 230, 245 },
             reagents = {
                 { itemId = 4339, count = 5 },
                 { itemId = 7079, count = 6 },
@@ -10210,7 +10216,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 245,
-            skillLevels = { 1, 215, 245 },
+            skillLevels = { 245, 215, 230, 245 },
             reagents = {
                 { itemId = 4339, count = 5 },
                 { itemId = 7077, count = 1 },
@@ -10229,7 +10235,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2590",
             sortOrder = 1500,
             requiredSkill = 140,
-            skillLevels = { 1, 205, 215 },
+            skillLevels = { 140, 205, 210, 215 },
             reagents = {
                 { itemId = 4339, count = 4 },
                 { itemId = 8343, count = 3 },
@@ -10244,7 +10250,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 250,
-            skillLevels = { 1, 220, 250 },
+            skillLevels = { 250, 220, 235, 250 },
             reagents = {
                 { itemId = 4339, count = 6 },
                 { itemId = 7079, count = 6 },
@@ -10263,7 +10269,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2590",
             sortOrder = 1500,
             requiredSkill = 140,
-            skillLevels = { 1, 145, 155 },
+            skillLevels = { 140, 145, 150, 155 },
             reagents = {
                 { itemId = 4339, count = 5 },
                 { itemId = 8343, count = 3 },
@@ -10279,7 +10285,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 250,
-            skillLevels = { 1, 220, 250 },
+            skillLevels = { 250, 220, 235, 250 },
             reagents = {
                 { itemId = 4339, count = 8 },
                 { itemId = 8153, count = 4 },
@@ -10300,7 +10306,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2590",
             sortOrder = 1500,
             requiredSkill = 140,
-            skillLevels = { 1, 155, 185 },
+            skillLevels = { 140, 155, 170, 185 },
             reagents = {
                 { itemId = 4339, count = 5 },
                 { itemId = 8343, count = 3 },
@@ -10317,7 +10323,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 130,
-            skillLevels = { 1, 155, 180 },
+            skillLevels = { 130, 155, 167, 180 },
             reagents = {
                 { itemId = 2841, count = 12 },
                 { itemId = 2842, count = 4 },
@@ -10333,7 +10339,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 1,
-            skillLevels = { 1, 15, 55 },
+            skillLevels = { 1, 15, 35, 55 },
             reagents = {
                 { itemId = 2840, count = 4 },
             },
@@ -10347,7 +10353,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 150,
-            skillLevels = { 1, 150, 190 },
+            skillLevels = { 150, 150, 170, 190 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -10363,7 +10369,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 175,
-            skillLevels = { 1, 175, 195 },
+            skillLevels = { 175, 175, 185, 195 },
             reagents = {
                 { itemId = 7912, count = 2 },
             },
@@ -10377,7 +10383,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 175,
-            skillLevels = { 1, 175, 195 },
+            skillLevels = { 175, 175, 185, 195 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -10396,7 +10402,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 215 },
+            skillLevels = { 175, 195, 205, 215 },
             reagents = {
                 { itemId = 4234, count = 6 },
                 { itemId = 3864, count = 2 },
@@ -10411,7 +10417,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 195,
-            skillLevels = { 1, 195, 235 },
+            skillLevels = { 195, 195, 215, 235 },
             reagents = {
                 { itemId = 3860, count = 3 },
             },
@@ -10425,7 +10431,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 175,
-            skillLevels = { 1, 175, 215 },
+            skillLevels = { 175, 175, 195, 215 },
             reagents = {
                 { itemId = 3859, count = 4 },
             },
@@ -10439,7 +10445,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 200,
-            skillLevels = { 1, 200, 240 },
+            skillLevels = { 200, 200, 220, 240 },
             reagents = {
                 { itemId = 3860, count = 1 },
                 { itemId = 4338, count = 1 },
@@ -10455,7 +10461,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 205,
-            skillLevels = { 1, 225, 245 },
+            skillLevels = { 205, 225, 235, 245 },
             reagents = {
                 { itemId = 4385, count = 1 },
                 { itemId = 3864, count = 2 },
@@ -10472,7 +10478,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2526",
             sortOrder = 120,
             requiredSkill = 205,
-            skillLevels = { 1, 225, 245 },
+            skillLevels = { 205, 225, 235, 245 },
             reagents = {
                 { itemId = 10559, count = 1 },
                 { itemId = 10560, count = 1 },
@@ -10490,7 +10496,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2528",
             sortOrder = 140,
             requiredSkill = 210,
-            skillLevels = { 1, 210, 250 },
+            skillLevels = { 210, 210, 230, 250 },
             createdCount = 200,
             createdCountMax = 200,
             reagents = {
@@ -10509,7 +10515,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2527",
             sortOrder = 130,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 10559, count = 1 },
                 { itemId = 7909, count = 2 },
@@ -10525,7 +10531,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 215,
-            skillLevels = { 1, 215, 255 },
+            skillLevels = { 215, 215, 235, 255 },
             reagents = {
                 { itemId = 3860, count = 3 },
             },
@@ -10539,7 +10545,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 215,
-            skillLevels = { 1, 215, 255 },
+            skillLevels = { 215, 215, 235, 255 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -10559,7 +10565,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 220,
-            skillLevels = { 1, 240, 260 },
+            skillLevels = { 220, 240, 250, 260 },
             reagents = {
                 { itemId = 4304, count = 4 },
                 { itemId = 7909, count = 2 },
@@ -10575,7 +10581,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2651",
             sortOrder = 55,
             requiredSkill = 200,
-            skillLevels = { 1, 220, 260 },
+            skillLevels = { 200, 220, 240, 260 },
             reagents = {
                 { itemId = 3821, count = 1 },
                 { itemId = 3818, count = 1 },
@@ -10593,7 +10599,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2526",
             sortOrder = 120,
             requiredSkill = 220,
-            skillLevels = { 1, 240, 260 },
+            skillLevels = { 220, 240, 250, 260 },
             reagents = {
                 { itemId = 10559, count = 2 },
                 { itemId = 10560, count = 1 },
@@ -10612,7 +10618,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 225, 245, 255, 265 },
             reagents = {
                 { itemId = 4304, count = 4 },
                 { itemId = 7910, count = 2 },
@@ -10629,7 +10635,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 225, 245, 255, 265 },
             reagents = {
                 { itemId = 4339, count = 4 },
                 { itemId = 10285, count = 2 },
@@ -10648,7 +10654,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 230,
-            skillLevels = { 1, 250, 270 },
+            skillLevels = { 230, 250, 260, 270 },
             reagents = {
                 { itemId = 3860, count = 8 },
                 { itemId = 10561, count = 1 },
@@ -10666,7 +10672,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 230,
-            skillLevels = { 1, 250, 270 },
+            skillLevels = { 230, 250, 260, 270 },
             reagents = {
                 { itemId = 4304, count = 6 },
                 { itemId = 7910, count = 2 },
@@ -10681,7 +10687,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 235,
-            skillLevels = { 1, 235, 275 },
+            skillLevels = { 235, 235, 255, 275 },
             createdCount = 4,
             createdCountMax = 4,
             reagents = {
@@ -10701,7 +10707,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2527",
             sortOrder = 130,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 10559, count = 1 },
                 { itemId = 7910, count = 1 },
@@ -10717,7 +10723,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2528",
             sortOrder = 140,
             requiredSkill = 245,
-            skillLevels = { 1, 245, 285 },
+            skillLevels = { 245, 245, 265, 285 },
             createdCount = 200,
             createdCountMax = 200,
             reagents = {
@@ -10734,7 +10740,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 245,
-            skillLevels = { 1, 265, 285 },
+            skillLevels = { 245, 265, 275, 285 },
             reagents = {
                 { itemId = 4304, count = 8 },
                 { itemId = 1529, count = 3 },
@@ -10754,7 +10760,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2521",
             sortOrder = 70,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 3860, count = 14 },
                 { itemId = 7077, count = 4 },
@@ -10775,7 +10781,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 205,
-            skillLevels = { 1, 205, 205 },
+            skillLevels = { 205, 205, 205, 205 },
             reagents = {
                 { itemId = 10648, count = 1 },
                 { itemId = 10647, count = 1 },
@@ -10792,7 +10798,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 205,
-            skillLevels = { 1, 225, 245 },
+            skillLevels = { 205, 225, 235, 245 },
             reagents = {
                 { itemId = 10559, count = 2 },
                 { itemId = 3860, count = 4 },
@@ -10813,7 +10819,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 205,
-            skillLevels = { 1, 225, 245 },
+            skillLevels = { 205, 225, 235, 245 },
             reagents = {
                 { itemId = 3860, count = 8 },
                 { itemId = 3864, count = 1 },
@@ -10832,7 +10838,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 205,
-            skillLevels = { 1, 225, 245 },
+            skillLevels = { 205, 225, 235, 245 },
             reagents = {
                 { itemId = 3860, count = 8 },
                 { itemId = 3864, count = 1 },
@@ -10846,7 +10852,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2528",
             sortOrder = 140,
-            skillLevels = { 1, 210, 250 },
+            skillLevels = { 1, 210, 230, 250 },
             createdCount = 100,
             createdCountMax = 100,
             reagents = {
@@ -10862,7 +10868,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2519",
             sortOrder = 50,
-            skillLevels = { 1, 235, 255 },
+            skillLevels = { 1, 235, 245, 255 },
             reagents = {
                 { itemId = 10561, count = 1 },
                 { itemId = 10505, count = 2 },
@@ -10877,7 +10883,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2519",
             sortOrder = 50,
-            skillLevels = { 1, 240, 260 },
+            skillLevels = { 1, 240, 250, 260 },
             reagents = {
                 { itemId = 10561, count = 1 },
                 { itemId = 3860, count = 2 },
@@ -10897,7 +10903,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 235,
-            skillLevels = { 1, 235, 275 },
+            skillLevels = { 235, 235, 255, 275 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -10919,7 +10925,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 230,
-            skillLevels = { 1, 230, 270 },
+            skillLevels = { 230, 230, 250, 270 },
             reagents = {
                 { itemId = 10561, count = 2 },
                 { itemId = 10505, count = 4 },
@@ -10940,7 +10946,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 245,
-            skillLevels = { 1, 265, 285 },
+            skillLevels = { 245, 265, 275, 285 },
             reagents = {
                 { itemId = 10543, count = 1 },
                 { itemId = 9061, count = 4 },
@@ -10960,7 +10966,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 10559, count = 2 },
                 { itemId = 10560, count = 1 },
@@ -10981,7 +10987,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 205,
-            skillLevels = { 1, 205, 245 },
+            skillLevels = { 205, 205, 225, 245 },
             reagents = {
                 { itemId = 4338, count = 1 },
                 { itemId = 10505, count = 3 },
@@ -10999,7 +11005,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 205,
-            skillLevels = { 1, 205, 205 },
+            skillLevels = { 205, 205, 205, 205 },
             reagents = {
                 { itemId = 10648, count = 1 },
                 { itemId = 10647, count = 1 },
@@ -11017,7 +11023,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 10500, count = 1 },
                 { itemId = 10559, count = 1 },
@@ -11038,7 +11044,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 205,
-            skillLevels = { 1, 225, 245 },
+            skillLevels = { 205, 225, 235, 245 },
             reagents = {
                 { itemId = 10559, count = 1 },
                 { itemId = 10560, count = 1 },
@@ -11054,7 +11060,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2521",
             sortOrder = 70,
-            skillLevels = { 1, 205, 245 },
+            skillLevels = { 1, 205, 225, 245 },
             reagents = {
                 { itemId = 10559, count = 1 },
                 { itemId = 10560, count = 1 },
@@ -11073,7 +11079,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 10559, count = 1 },
                 { itemId = 10285, count = 2 },
@@ -11094,7 +11100,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 215,
-            skillLevels = { 1, 235, 255 },
+            skillLevels = { 215, 235, 245, 255 },
             reagents = {
                 { itemId = 7387, count = 1 },
                 { itemId = 3860, count = 4 },
@@ -11110,7 +11116,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2520",
             sortOrder = 60,
-            skillLevels = { 1, 240, 260 },
+            skillLevels = { 1, 240, 250, 260 },
             reagents = {
                 { itemId = 10561, count = 1 },
                 { itemId = 3860, count = 2 },
@@ -11130,7 +11136,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 225, 245, 255, 265 },
             reagents = {
                 { itemId = 10026, count = 1 },
                 { itemId = 10559, count = 2 },
@@ -11151,7 +11157,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 230,
-            skillLevels = { 1, 250, 270 },
+            skillLevels = { 230, 250, 260, 270 },
             reagents = {
                 { itemId = 10561, count = 1 },
                 { itemId = 6037, count = 6 },
@@ -11173,7 +11179,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 275 },
+            skillLevels = { 235, 255, 265, 275 },
             reagents = {
                 { itemId = 3860, count = 10 },
                 { itemId = 6037, count = 4 },
@@ -11194,7 +11200,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 10559, count = 2 },
                 { itemId = 9061, count = 4 },
@@ -11213,7 +11219,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2636",
             sortOrder = 200,
             requiredSkill = 175,
-            skillLevels = { 1, 215, 255 },
+            skillLevels = { 175, 215, 235, 255 },
             createdCount = 4,
             createdCountMax = 4,
             reagents = {
@@ -11244,7 +11250,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2503",
             sortOrder = 140,
             requiredSkill = 105,
-            skillLevels = { 1, 130, 170 },
+            skillLevels = { 105, 130, 150, 170 },
             reagents = {
                 { itemId = 10998, count = 1 },
                 { itemId = 10940, count = 1 },
@@ -11259,7 +11265,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2501",
             sortOrder = 120,
             requiredSkill = 110,
-            skillLevels = { 1, 135, 175 },
+            skillLevels = { 110, 135, 155, 175 },
             reagents = {
                 { itemId = 10998, count = 1 },
                 { itemId = 10940, count = 3 },
@@ -11274,7 +11280,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 110,
-            skillLevels = { 1, 135, 175 },
+            skillLevels = { 110, 135, 155, 175 },
             reagents = {
                 { itemId = 10998, count = 1 },
             },
@@ -11286,7 +11292,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 115,
-            skillLevels = { 1, 140, 180 },
+            skillLevels = { 115, 140, 160, 180 },
             reagents = {
                 { itemId = 10940, count = 3 },
                 { itemId = 10978, count = 1 },
@@ -11301,7 +11307,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2503",
             sortOrder = 140,
             requiredSkill = 115,
-            skillLevels = { 1, 140, 180 },
+            skillLevels = { 115, 140, 160, 180 },
             reagents = {
                 { itemId = 10940, count = 1 },
                 { itemId = 10978, count = 1 },
@@ -11314,7 +11320,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2503",
             sortOrder = 140,
             requiredSkill = 130,
-            skillLevels = { 1, 155, 195 },
+            skillLevels = { 130, 155, 175, 195 },
             reagents = {
                 { itemId = 10998, count = 1 },
                 { itemId = 10940, count = 2 },
@@ -11327,7 +11333,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 130,
-            skillLevels = { 1, 155, 195 },
+            skillLevels = { 130, 155, 175, 195 },
             reagents = {
                 { itemId = 11083, count = 1 },
             },
@@ -11339,7 +11345,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 140,
-            skillLevels = { 1, 165, 205 },
+            skillLevels = { 140, 165, 185, 205 },
             reagents = {
                 { itemId = 11083, count = 1 },
                 { itemId = 11084, count = 1 },
@@ -11354,7 +11360,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 135,
-            skillLevels = { 1, 160, 200 },
+            skillLevels = { 135, 160, 180, 200 },
             reagents = {
                 { itemId = 10998, count = 1 },
                 { itemId = 6048, count = 1 },
@@ -11367,7 +11373,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2501",
             sortOrder = 120,
             requiredSkill = 145,
-            skillLevels = { 1, 170, 210 },
+            skillLevels = { 145, 170, 190, 210 },
             reagents = {
                 { itemId = 11083, count = 1 },
                 { itemId = 11084, count = 1 },
@@ -11382,7 +11388,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 140,
-            skillLevels = { 1, 165, 205 },
+            skillLevels = { 140, 165, 185, 205 },
             reagents = {
                 { itemId = 11083, count = 1 },
             },
@@ -11394,7 +11400,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 140,
-            skillLevels = { 1, 165, 205 },
+            skillLevels = { 140, 165, 185, 205 },
             reagents = {
                 { itemId = 10940, count = 1 },
                 { itemId = 10998, count = 1 },
@@ -11408,7 +11414,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 145,
-            skillLevels = { 1, 170, 210 },
+            skillLevels = { 145, 170, 190, 210 },
             reagents = {
                 { itemId = 11082, count = 1 },
             },
@@ -11422,7 +11428,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 145,
-            skillLevels = { 1, 170, 210 },
+            skillLevels = { 145, 170, 190, 210 },
             reagents = {
                 { itemId = 11083, count = 1 },
                 { itemId = 2772, count = 1 },
@@ -11437,7 +11443,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 145,
-            skillLevels = { 1, 170, 210 },
+            skillLevels = { 145, 170, 190, 210 },
             reagents = {
                 { itemId = 11083, count = 1 },
                 { itemId = 3356, count = 1 },
@@ -11452,7 +11458,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 145,
-            skillLevels = { 1, 170, 210 },
+            skillLevels = { 145, 170, 190, 210 },
             reagents = {
                 { itemId = 11083, count = 1 },
                 { itemId = 6370, count = 1 },
@@ -11465,7 +11471,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 150,
-            skillLevels = { 1, 175, 215 },
+            skillLevels = { 150, 175, 195, 215 },
             reagents = {
                 { itemId = 11082, count = 1 },
             },
@@ -11477,7 +11483,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 150,
-            skillLevels = { 1, 175, 215 },
+            skillLevels = { 150, 175, 195, 215 },
             reagents = {
                 { itemId = 10998, count = 1 },
                 { itemId = 11083, count = 1 },
@@ -11493,7 +11499,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2491",
             sortOrder = 20,
             requiredSkill = 150,
-            skillLevels = { 1, 175, 215 },
+            skillLevels = { 150, 175, 195, 215 },
             reagents = {
                 { itemId = 11128, count = 1 },
                 { itemId = 5500, count = 1 },
@@ -11508,7 +11514,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2503",
             sortOrder = 140,
             requiredSkill = 155,
-            skillLevels = { 1, 175, 215 },
+            skillLevels = { 155, 175, 195, 215 },
             reagents = {
                 { itemId = 11134, count = 1 },
             },
@@ -11520,7 +11526,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 155,
-            skillLevels = { 1, 175, 215 },
+            skillLevels = { 155, 175, 195, 215 },
             reagents = {
                 { itemId = 11138, count = 1 },
                 { itemId = 11083, count = 1 },
@@ -11533,7 +11539,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2500",
             sortOrder = 110,
             requiredSkill = 160,
-            skillLevels = { 1, 180, 220 },
+            skillLevels = { 160, 180, 200, 220 },
             reagents = {
                 { itemId = 11083, count = 1 },
             },
@@ -11545,7 +11551,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 160,
-            skillLevels = { 1, 180, 220 },
+            skillLevels = { 160, 180, 200, 220 },
             reagents = {
                 { itemId = 11083, count = 2 },
             },
@@ -11557,7 +11563,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 165,
-            skillLevels = { 1, 185, 225 },
+            skillLevels = { 165, 185, 205, 225 },
             reagents = {
                 { itemId = 11134, count = 1 },
             },
@@ -11569,7 +11575,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2500",
             sortOrder = 110,
             requiredSkill = 170,
-            skillLevels = { 1, 190, 230 },
+            skillLevels = { 170, 190, 210, 230 },
             reagents = {
                 { itemId = 11083, count = 2 },
             },
@@ -11583,7 +11589,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 170,
-            skillLevels = { 1, 190, 230 },
+            skillLevels = { 170, 190, 210, 230 },
             reagents = {
                 { itemId = 11134, count = 1 },
                 { itemId = 11083, count = 1 },
@@ -11596,7 +11602,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 170,
-            skillLevels = { 1, 190, 230 },
+            skillLevels = { 170, 190, 210, 230 },
             reagents = {
                 { itemId = 11083, count = 3 },
             },
@@ -11610,7 +11616,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 235 },
+            skillLevels = { 175, 195, 215, 235 },
             reagents = {
                 { itemId = 5637, count = 1 },
                 { itemId = 11138, count = 1 },
@@ -11625,7 +11631,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 235 },
+            skillLevels = { 175, 195, 215, 235 },
             reagents = {
                 { itemId = 7067, count = 1 },
                 { itemId = 11138, count = 1 },
@@ -11638,7 +11644,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 235 },
+            skillLevels = { 175, 195, 215, 235 },
             reagents = {
                 { itemId = 11134, count = 1 },
                 { itemId = 7068, count = 1 },
@@ -11651,7 +11657,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2503",
             sortOrder = 140,
             requiredSkill = 180,
-            skillLevels = { 1, 200, 240 },
+            skillLevels = { 180, 200, 220, 240 },
             reagents = {
                 { itemId = 11134, count = 1 },
                 { itemId = 11137, count = 1 },
@@ -11664,7 +11670,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 180,
-            skillLevels = { 1, 200, 240 },
+            skillLevels = { 180, 200, 220, 240 },
             reagents = {
                 { itemId = 11137, count = 1 },
             },
@@ -11676,7 +11682,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 185,
-            skillLevels = { 1, 205, 245 },
+            skillLevels = { 185, 205, 225, 245 },
             reagents = {
                 { itemId = 11134, count = 1 },
             },
@@ -11690,7 +11696,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2500",
             sortOrder = 110,
             requiredSkill = 190,
-            skillLevels = { 1, 210, 250 },
+            skillLevels = { 190, 210, 230, 250 },
             reagents = {
                 { itemId = 11134, count = 2 },
             },
@@ -11704,7 +11710,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2503",
             sortOrder = 140,
             requiredSkill = 195,
-            skillLevels = { 1, 215, 255 },
+            skillLevels = { 195, 215, 235, 255 },
             reagents = {
                 { itemId = 11135, count = 1 },
                 { itemId = 11137, count = 1 },
@@ -11718,7 +11724,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 195,
-            skillLevels = { 1, 215, 255 },
+            skillLevels = { 195, 215, 235, 255 },
             reagents = {
                 { itemId = 11135, count = 1 },
                 { itemId = 11139, count = 1 },
@@ -11731,7 +11737,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2501",
             sortOrder = 120,
             requiredSkill = 200,
-            skillLevels = { 1, 220, 260 },
+            skillLevels = { 200, 220, 240, 260 },
             reagents = {
                 { itemId = 11137, count = 2 },
                 { itemId = 11139, count = 1 },
@@ -11746,7 +11752,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 200,
-            skillLevels = { 1, 220, 260 },
+            skillLevels = { 200, 220, 240, 260 },
             reagents = {
                 { itemId = 11137, count = 1 },
                 { itemId = 7392, count = 1 },
@@ -11759,7 +11765,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 200,
-            skillLevels = { 1, 220, 260 },
+            skillLevels = { 200, 220, 240, 260 },
             reagents = {
                 { itemId = 11135, count = 1 },
                 { itemId = 11137, count = 1 },
@@ -11775,7 +11781,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2491",
             sortOrder = 20,
             requiredSkill = 200,
-            skillLevels = { 1, 220, 260 },
+            skillLevels = { 200, 220, 240, 260 },
             reagents = {
                 { itemId = 11144, count = 1 },
                 { itemId = 7971, count = 1 },
@@ -11790,7 +11796,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 205,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 205, 225, 245, 265 },
             reagents = {
                 { itemId = 11137, count = 1 },
             },
@@ -11802,7 +11808,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 205,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 205, 225, 245, 265 },
             reagents = {
                 { itemId = 11174, count = 1 },
             },
@@ -11814,7 +11820,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 270 },
+            skillLevels = { 210, 230, 250, 270 },
             reagents = {
                 { itemId = 11137, count = 1 },
             },
@@ -11828,7 +11834,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2503",
             sortOrder = 140,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 270 },
+            skillLevels = { 210, 230, 250, 270 },
             reagents = {
                 { itemId = 11137, count = 2 },
             },
@@ -11840,7 +11846,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 270 },
+            skillLevels = { 210, 230, 250, 270 },
             reagents = {
                 { itemId = 11174, count = 1 },
             },
@@ -11852,7 +11858,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2500",
             sortOrder = 110,
             requiredSkill = 215,
-            skillLevels = { 1, 235, 275 },
+            skillLevels = { 215, 235, 255, 275 },
             reagents = {
                 { itemId = 11137, count = 2 },
             },
@@ -11866,7 +11872,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 215,
-            skillLevels = { 1, 235, 275 },
+            skillLevels = { 215, 235, 255, 275 },
             reagents = {
                 { itemId = 11137, count = 2 },
                 { itemId = 6037, count = 1 },
@@ -11881,7 +11887,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 220,
-            skillLevels = { 1, 240, 280 },
+            skillLevels = { 220, 240, 260, 280 },
             reagents = {
                 { itemId = 11174, count = 1 },
                 { itemId = 11137, count = 1 },
@@ -11894,7 +11900,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 220,
-            skillLevels = { 1, 240, 280 },
+            skillLevels = { 220, 240, 260, 280 },
             reagents = {
                 { itemId = 11137, count = 3 },
             },
@@ -11908,7 +11914,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 285 },
+            skillLevels = { 225, 245, 265, 285 },
             reagents = {
                 { itemId = 11137, count = 2 },
                 { itemId = 8838, count = 1 },
@@ -11923,7 +11929,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 285 },
+            skillLevels = { 225, 245, 265, 285 },
             reagents = {
                 { itemId = 11174, count = 1 },
             },
@@ -11935,7 +11941,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 285 },
+            skillLevels = { 225, 245, 265, 285 },
             reagents = {
                 { itemId = 11174, count = 1 },
                 { itemId = 11137, count = 2 },
@@ -11948,7 +11954,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2500",
             sortOrder = 110,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 285 },
+            skillLevels = { 225, 245, 265, 285 },
             reagents = {
                 { itemId = 11177, count = 1 },
                 { itemId = 7909, count = 1 },
@@ -11964,7 +11970,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 325 },
+            skillLevels = { 265, 285, 305, 325 },
             reagents = {
                 { itemId = 11177, count = 2 },
                 { itemId = 7078, count = 1 },
@@ -11977,7 +11983,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2503",
             sortOrder = 140,
             requiredSkill = 230,
-            skillLevels = { 1, 250, 290 },
+            skillLevels = { 230, 250, 270, 290 },
             reagents = {
                 { itemId = 11174, count = 2 },
                 { itemId = 11176, count = 1 },
@@ -11992,7 +11998,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 230,
-            skillLevels = { 1, 250, 290 },
+            skillLevels = { 230, 250, 270, 290 },
             reagents = {
                 { itemId = 11177, count = 1 },
                 { itemId = 11176, count = 1 },
@@ -12006,7 +12012,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 230,
-            skillLevels = { 1, 250, 290 },
+            skillLevels = { 230, 250, 270, 290 },
             reagents = {
                 { itemId = 11175, count = 1 },
             },
@@ -12020,7 +12026,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 295 },
+            skillLevels = { 235, 255, 275, 295 },
             reagents = {
                 { itemId = 11174, count = 2 },
                 { itemId = 11176, count = 1 },
@@ -12035,7 +12041,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2503",
             sortOrder = 140,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 295 },
+            skillLevels = { 235, 255, 275, 295 },
             reagents = {
                 { itemId = 11178, count = 1 },
                 { itemId = 3829, count = 1 },
@@ -12048,7 +12054,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2500",
             sortOrder = 110,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 295 },
+            skillLevels = { 235, 255, 275, 295 },
             reagents = {
                 { itemId = 11175, count = 1 },
             },
@@ -12060,7 +12066,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2501",
             sortOrder = 120,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 300 },
+            skillLevels = { 240, 260, 280, 300 },
             reagents = {
                 { itemId = 11178, count = 1 },
                 { itemId = 11176, count = 1 },
@@ -12073,7 +12079,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 300 },
+            skillLevels = { 240, 260, 280, 300 },
             reagents = {
                 { itemId = 11176, count = 1 },
                 { itemId = 11174, count = 2 },
@@ -12086,7 +12092,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 245,
-            skillLevels = { 1, 265, 305 },
+            skillLevels = { 245, 265, 285, 305 },
             reagents = {
                 { itemId = 11178, count = 1 },
                 { itemId = 11176, count = 1 },
@@ -12100,7 +12106,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 245,
-            skillLevels = { 1, 265, 305 },
+            skillLevels = { 245, 265, 285, 305 },
             reagents = {
                 { itemId = 11178, count = 1 },
                 { itemId = 11175, count = 1 },
@@ -12115,7 +12121,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 245,
-            skillLevels = { 1, 265, 305 },
+            skillLevels = { 245, 265, 285, 305 },
             reagents = {
                 { itemId = 11176, count = 3 },
             },
@@ -12129,7 +12135,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 310 },
+            skillLevels = { 250, 270, 290, 310 },
             reagents = {
                 { itemId = 11178, count = 1 },
                 { itemId = 11176, count = 2 },
@@ -12142,7 +12148,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 310 },
+            skillLevels = { 250, 270, 290, 310 },
             reagents = {
                 { itemId = 11178, count = 1 },
                 { itemId = 8153, count = 1 },
@@ -12157,7 +12163,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2512",
             sortOrder = 230,
             requiredSkill = 10,
-            skillLevels = { 1, 75, 115 },
+            skillLevels = { 10, 75, 95, 115 },
             reagents = {
                 { itemId = 4470, count = 1 },
                 { itemId = 10938, count = 1 },
@@ -12171,8 +12177,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2488",
             sortOrder = 300,
-            requiredSkill = 150,
-            skillLevels = { 1, 130, 135 },
+            requiredSkill = 125,
+            skillLevels = { 125, 130, 132, 135 },
             reagents = {
                 { itemId = 3577, count = 1 },
                 { itemId = 3478, count = 2 },
@@ -12186,8 +12192,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2488",
             sortOrder = 300,
-            requiredSkill = 200,
-            skillLevels = { 1, 180, 185 },
+            requiredSkill = 175,
+            skillLevels = { 175, 180, 182, 185 },
             reagents = {
                 { itemId = 6037, count = 1 },
                 { itemId = 3486, count = 1 },
@@ -12202,7 +12208,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2512",
             sortOrder = 230,
             requiredSkill = 70,
-            skillLevels = { 1, 110, 150 },
+            skillLevels = { 70, 110, 130, 150 },
             reagents = {
                 { itemId = 4470, count = 1 },
                 { itemId = 10938, count = 2 },
@@ -12217,7 +12223,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2512",
             sortOrder = 230,
             requiredSkill = 155,
-            skillLevels = { 1, 175, 215 },
+            skillLevels = { 155, 175, 195, 215 },
             reagents = {
                 { itemId = 11291, count = 1 },
                 { itemId = 11134, count = 1 },
@@ -12232,7 +12238,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2512",
             sortOrder = 230,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 235 },
+            skillLevels = { 175, 195, 215, 235 },
             reagents = {
                 { itemId = 11291, count = 1 },
                 { itemId = 11134, count = 1 },
@@ -12249,7 +12255,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2575",
             sortOrder = 100,
             requiredSkill = 230,
-            skillLevels = { 1, 230, 230 },
+            skillLevels = { 230, 230, 230, 230 },
             reagents = {
                 { itemId = 11370, count = 8 },
             },
@@ -12262,8 +12268,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2570",
             sortOrder = 2100,
-            requiredSkill = 225,
-            skillLevels = { 1, 220, 240 },
+            requiredSkill = 200,
+            skillLevels = { 200, 220, 230, 240 },
             reagents = {
                 { itemId = 4304, count = 12 },
                 { itemId = 8172, count = 1 },
@@ -12279,8 +12285,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2571",
             sortOrder = 2200,
-            requiredSkill = 225,
-            skillLevels = { 1, 220, 240 },
+            requiredSkill = 200,
+            skillLevels = { 200, 220, 230, 240 },
             reagents = {
                 { itemId = 4304, count = 10 },
                 { itemId = 8172, count = 1 },
@@ -12297,7 +12303,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2518",
             sortOrder = 40,
             requiredSkill = 200,
-            skillLevels = { 1, 200, 240 },
+            skillLevels = { 200, 200, 220, 240 },
             reagents = {
                 { itemId = 3860, count = 1 },
                 { itemId = 4338, count = 1 },
@@ -12315,7 +12321,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2478",
             sortOrder = 200,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 11371, count = 18 },
                 { itemId = 7077, count = 4 },
@@ -12332,7 +12338,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 245,
-            skillLevels = { 1, 265, 285 },
+            skillLevels = { 245, 265, 275, 285 },
             reagents = {
                 { itemId = 11371, count = 10 },
                 { itemId = 7077, count = 2 },
@@ -12349,7 +12355,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2477",
             sortOrder = 190,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 11371, count = 26 },
                 { itemId = 7077, count = 4 },
@@ -12366,7 +12372,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 255,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 255, 275, 285, 295 },
             reagents = {
                 { itemId = 11371, count = 6 },
                 { itemId = 7077, count = 1 },
@@ -12383,7 +12389,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2471",
             sortOrder = 50,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 11371, count = 20 },
                 { itemId = 7077, count = 8 },
@@ -12400,7 +12406,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2510",
             sortOrder = 210,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 325 },
+            skillLevels = { 265, 285, 305, 325 },
             reagents = {
                 { itemId = 11382, count = 1 },
                 { itemId = 7078, count = 1 },
@@ -12418,7 +12424,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2521",
             sortOrder = 70,
             requiredSkill = 205,
-            skillLevels = { 1, 205, 210 },
+            skillLevels = { 205, 205, 207, 210 },
             reagents = {
                 { itemId = 4394, count = 1 },
                 { itemId = 7077, count = 1 },
@@ -12437,7 +12443,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2521",
             sortOrder = 70,
             requiredSkill = 205,
-            skillLevels = { 1, 205, 205 },
+            skillLevels = { 205, 205, 205, 205 },
             reagents = {
                 { itemId = 7075, count = 1 },
                 { itemId = 4389, count = 2 },
@@ -12455,7 +12461,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2621",
             sortOrder = 20,
             requiredSkill = 230,
-            skillLevels = { 1, 245, 285 },
+            skillLevels = { 230, 245, 265, 285 },
             reagents = {
                 { itemId = 8831, count = 3 },
                 { itemId = 8925, count = 1 },
@@ -12472,7 +12478,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2634",
             sortOrder = 30,
             requiredSkill = 125,
-            skillLevels = { 1, 165, 205 },
+            skillLevels = { 125, 165, 185, 205 },
             reagents = {
                 { itemId = 1015, count = 1 },
                 { itemId = 2678, count = 1 },
@@ -12489,7 +12495,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2635",
             sortOrder = 40,
             requiredSkill = 175,
-            skillLevels = { 1, 215, 255 },
+            skillLevels = { 175, 215, 235, 255 },
             reagents = {
                 { itemId = 12184, count = 1 },
                 { itemId = 2692, count = 1 },
@@ -12506,7 +12512,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2634",
             sortOrder = 30,
             requiredSkill = 175,
-            skillLevels = { 1, 215, 255 },
+            skillLevels = { 175, 215, 235, 255 },
             reagents = {
                 { itemId = 12203, count = 1 },
                 { itemId = 2692, count = 1 },
@@ -12523,7 +12529,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2634",
             sortOrder = 30,
             requiredSkill = 175,
-            skillLevels = { 1, 215, 255 },
+            skillLevels = { 175, 215, 235, 255 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -12543,7 +12549,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2632",
             sortOrder = 10,
             requiredSkill = 175,
-            skillLevels = { 1, 215, 255 },
+            skillLevels = { 175, 215, 235, 255 },
             reagents = {
                 { itemId = 12037, count = 1 },
                 { itemId = 2692, count = 1 },
@@ -12560,7 +12566,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2632",
             sortOrder = 10,
             requiredSkill = 175,
-            skillLevels = { 1, 215, 255 },
+            skillLevels = { 175, 215, 235, 255 },
             reagents = {
                 { itemId = 12037, count = 1 },
                 { itemId = 2596, count = 1 },
@@ -12577,7 +12583,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2632",
             sortOrder = 10,
             requiredSkill = 200,
-            skillLevels = { 1, 240, 280 },
+            skillLevels = { 200, 240, 260, 280 },
             reagents = {
                 { itemId = 12037, count = 1 },
                 { itemId = 4402, count = 1 },
@@ -12595,7 +12601,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2640",
             sortOrder = 15,
             requiredSkill = 200,
-            skillLevels = { 1, 240, 280 },
+            skillLevels = { 200, 240, 260, 280 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -12615,7 +12621,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2635",
             sortOrder = 40,
             requiredSkill = 225,
-            skillLevels = { 1, 265, 305 },
+            skillLevels = { 225, 265, 285, 305 },
             reagents = {
                 { itemId = 12206, count = 1 },
                 { itemId = 2692, count = 2 },
@@ -12632,7 +12638,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2640",
             sortOrder = 15,
             requiredSkill = 225,
-            skillLevels = { 1, 265, 305 },
+            skillLevels = { 225, 265, 285, 305 },
             reagents = {
                 { itemId = 12207, count = 1 },
                 { itemId = 3713, count = 2 },
@@ -12649,7 +12655,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2635",
             sortOrder = 40,
             requiredSkill = 1,
-            skillLevels = { 1, 45, 85 },
+            skillLevels = { 1, 45, 65, 85 },
             reagents = {
                 { itemId = 12223, count = 1 },
                 { itemId = 2678, count = 1 },
@@ -12663,8 +12669,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2482",
             sortOrder = 240,
-            requiredSkill = 180,
-            skillLevels = { 1, 180, 205 },
+            requiredSkill = 155,
+            skillLevels = { 155, 180, 192, 205 },
             reagents = {
                 { itemId = 3859, count = 10 },
                 { itemId = 3466, count = 2 },
@@ -12684,7 +12690,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2482",
             sortOrder = 240,
             requiredSkill = 165,
-            skillLevels = { 1, 190, 215 },
+            skillLevels = { 165, 190, 202, 215 },
             reagents = {
                 { itemId = 3859, count = 10 },
                 { itemId = 3577, count = 4 },
@@ -12700,8 +12706,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2575",
             sortOrder = 100,
-            requiredSkill = 230,
-            skillLevels = { 1, 250, 250 },
+            requiredSkill = 250,
+            skillLevels = { 250, 250, 250, 250 },
             reagents = {
                 { itemId = 10620, count = 1 },
             },
@@ -12714,8 +12720,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2459",
             sortOrder = 10,
-            requiredSkill = 250,
-            skillLevels = { 1, 230, 235 },
+            requiredSkill = 225,
+            skillLevels = { 225, 230, 232, 235 },
             reagents = {
                 { itemId = 12365, count = 4 },
             },
@@ -12728,8 +12734,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2460",
             sortOrder = 20,
-            requiredSkill = 250,
-            skillLevels = { 1, 230, 235 },
+            requiredSkill = 225,
+            skillLevels = { 225, 230, 232, 235 },
             reagents = {
                 { itemId = 12365, count = 1 },
             },
@@ -12742,8 +12748,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2460",
             sortOrder = 20,
-            requiredSkill = 250,
-            skillLevels = { 1, 230, 235 },
+            requiredSkill = 225,
+            skillLevels = { 225, 230, 232, 235 },
             reagents = {
                 { itemId = 12365, count = 1 },
             },
@@ -12759,7 +12765,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2471",
             sortOrder = 50,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 225, 245, 255, 265 },
             reagents = {
                 { itemId = 12359, count = 16 },
                 { itemId = 12361, count = 1 },
@@ -12777,7 +12783,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2474",
             sortOrder = 80,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 225, 245, 255, 265 },
             reagents = {
                 { itemId = 12359, count = 12 },
                 { itemId = 11186, count = 4 },
@@ -12794,7 +12800,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2472",
             sortOrder = 60,
             requiredSkill = 230,
-            skillLevels = { 1, 250, 270 },
+            skillLevels = { 230, 250, 260, 270 },
             reagents = {
                 { itemId = 12359, count = 12 },
                 { itemId = 11184, count = 4 },
@@ -12811,7 +12817,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2466",
             sortOrder = 160,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 275 },
+            skillLevels = { 235, 255, 265, 275 },
             reagents = {
                 { itemId = 12359, count = 10 },
                 { itemId = 7077, count = 2 },
@@ -12828,7 +12834,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 12359, count = 24 },
                 { itemId = 8170, count = 6 },
@@ -12846,7 +12852,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2474",
             sortOrder = 80,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 12359, count = 22 },
                 { itemId = 8170, count = 6 },
@@ -12864,7 +12870,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 245,
-            skillLevels = { 1, 265, 285 },
+            skillLevels = { 245, 265, 275, 285 },
             reagents = {
                 { itemId = 12359, count = 18 },
                 { itemId = 7077, count = 2 },
@@ -12882,7 +12888,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2472",
             sortOrder = 60,
             requiredSkill = 245,
-            skillLevels = { 1, 265, 285 },
+            skillLevels = { 245, 265, 275, 285 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 7910, count = 1 },
@@ -12899,7 +12905,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2563",
             sortOrder = 1400,
             requiredSkill = 245,
-            skillLevels = { 1, 265, 285 },
+            skillLevels = { 245, 265, 275, 285 },
             reagents = {
                 { itemId = 8170, count = 40 },
                 { itemId = 12810, count = 2 },
@@ -12920,7 +12926,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2487",
             sortOrder = 290,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 12359, count = 4 },
                 { itemId = 12644, count = 4 },
@@ -12938,7 +12944,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 255,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 255, 275, 285, 295 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 8170, count = 8 },
@@ -12956,7 +12962,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2469",
             sortOrder = 30,
             requiredSkill = 255,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 255, 275, 285, 295 },
             reagents = {
                 { itemId = 12359, count = 24 },
                 { itemId = 7910, count = 1 },
@@ -12974,7 +12980,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 12359, count = 18 },
                 { itemId = 7077, count = 4 },
@@ -12991,7 +12997,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 265, 285, 295, 305 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 12655, count = 6 },
@@ -13010,7 +13016,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 265, 285, 295, 305 },
             reagents = {
                 { itemId = 12359, count = 14 },
                 { itemId = 7077, count = 4 },
@@ -13027,7 +13033,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 12359, count = 34 },
                 { itemId = 7910, count = 1 },
@@ -13045,7 +13051,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2469",
             sortOrder = 30,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 12359, count = 34 },
                 { itemId = 7910, count = 2 },
@@ -13062,7 +13068,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2461",
             sortOrder = 110,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 12359, count = 18 },
                 { itemId = 7077, count = 4 },
@@ -13079,7 +13085,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 265, 285, 295, 305 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 12360, count = 4 },
@@ -13098,7 +13104,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 12810, count = 4 },
@@ -13118,7 +13124,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 275,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 275, 295, 305, 315 },
             reagents = {
                 { itemId = 12359, count = 26 },
                 { itemId = 11186, count = 4 },
@@ -13135,7 +13141,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2471",
             sortOrder = 50,
             requiredSkill = 275,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 275, 295, 305, 315 },
             reagents = {
                 { itemId = 12359, count = 40 },
                 { itemId = 7910, count = 2 },
@@ -13152,7 +13158,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 275,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 275, 295, 305, 315 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 12360, count = 2 },
@@ -13170,7 +13176,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 275,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 275, 295, 305, 315 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 12360, count = 2 },
@@ -13188,7 +13194,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2471",
             sortOrder = 50,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 12359, count = 40 },
                 { itemId = 12662, count = 10 },
@@ -13207,7 +13213,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2469",
             sortOrder = 30,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 290, 310, 320, 330 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 12655, count = 4 },
@@ -13227,7 +13233,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 280,
-            skillLevels = { 1, 300, 320 },
+            skillLevels = { 280, 300, 310, 320 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 7077, count = 4 },
@@ -13244,7 +13250,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2469",
             sortOrder = 30,
             requiredSkill = 280,
-            skillLevels = { 1, 300, 320 },
+            skillLevels = { 280, 300, 310, 320 },
             reagents = {
                 { itemId = 12359, count = 30 },
                 { itemId = 12360, count = 2 },
@@ -13263,7 +13269,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2561",
             sortOrder = 1200,
             requiredSkill = 290,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 290, 290, 300, 310 },
             reagents = {
                 { itemId = 8170, count = 40 },
                 { itemId = 12810, count = 4 },
@@ -13284,7 +13290,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2469",
             sortOrder = 30,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12359, count = 80 },
                 { itemId = 12360, count = 12 },
@@ -13304,7 +13310,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 280,
-            skillLevels = { 1, 300, 320 },
+            skillLevels = { 280, 300, 310, 320 },
             reagents = {
                 { itemId = 12359, count = 44 },
                 { itemId = 7910, count = 2 },
@@ -13321,7 +13327,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2471",
             sortOrder = 50,
             requiredSkill = 285,
-            skillLevels = { 1, 305, 325 },
+            skillLevels = { 285, 305, 315, 325 },
             reagents = {
                 { itemId = 12359, count = 40 },
                 { itemId = 12360, count = 2 },
@@ -13339,7 +13345,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 285,
-            skillLevels = { 1, 305, 325 },
+            skillLevels = { 285, 305, 315, 325 },
             reagents = {
                 { itemId = 12359, count = 40 },
                 { itemId = 12360, count = 2 },
@@ -13357,7 +13363,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 15 },
                 { itemId = 12655, count = 20 },
@@ -13377,7 +13383,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2469",
             sortOrder = 30,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 6 },
                 { itemId = 12655, count = 16 },
@@ -13397,7 +13403,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 10 },
                 { itemId = 12655, count = 20 },
@@ -13417,7 +13423,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2471",
             sortOrder = 50,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 8 },
                 { itemId = 12655, count = 24 },
@@ -13438,7 +13444,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2563",
             sortOrder = 1400,
             requiredSkill = 295,
-            skillLevels = { 1, 295, 310 },
+            skillLevels = { 295, 295, 302, 310 },
             reagents = {
                 { itemId = 249427, count = 20 },
                 { itemId = 12810, count = 30 },
@@ -13457,7 +13463,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2480",
             sortOrder = 220,
             requiredSkill = 260,
-            skillLevels = { 1, 260, 285 },
+            skillLevels = { 260, 260, 272, 285 },
             reagents = {
                 { itemId = 12359, count = 16 },
                 { itemId = 12644, count = 2 },
@@ -13473,7 +13479,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2477",
             sortOrder = 190,
             requiredSkill = 270,
-            skillLevels = { 1, 270, 295 },
+            skillLevels = { 270, 270, 282, 295 },
             reagents = {
                 { itemId = 12359, count = 30 },
                 { itemId = 12803, count = 6 },
@@ -13492,7 +13498,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2478",
             sortOrder = 200,
             requiredSkill = 270,
-            skillLevels = { 1, 270, 295 },
+            skillLevels = { 270, 270, 282, 295 },
             reagents = {
                 { itemId = 12359, count = 30 },
                 { itemId = 3577, count = 4 },
@@ -13512,7 +13518,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2481",
             sortOrder = 230,
             requiredSkill = 250,
-            skillLevels = { 1, 275, 300 },
+            skillLevels = { 250, 275, 287, 300 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 12799, count = 2 },
@@ -13531,7 +13537,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2481",
             sortOrder = 230,
             requiredSkill = 250,
-            skillLevels = { 1, 275, 300 },
+            skillLevels = { 250, 275, 287, 300 },
             reagents = {
                 { itemId = 12359, count = 30 },
                 { itemId = 12655, count = 4 },
@@ -13552,7 +13558,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2477",
             sortOrder = 190,
             requiredSkill = 255,
-            skillLevels = { 1, 280, 305 },
+            skillLevels = { 255, 280, 292, 305 },
             reagents = {
                 { itemId = 12359, count = 40 },
                 { itemId = 12644, count = 6 },
@@ -13570,7 +13576,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2478",
             sortOrder = 200,
             requiredSkill = 255,
-            skillLevels = { 1, 280, 305 },
+            skillLevels = { 255, 280, 292, 305 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 12655, count = 6 },
@@ -13590,7 +13596,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2485",
             sortOrder = 270,
             requiredSkill = 255,
-            skillLevels = { 1, 280, 305 },
+            skillLevels = { 255, 280, 292, 305 },
             reagents = {
                 { itemId = 12655, count = 10 },
                 { itemId = 7078, count = 4 },
@@ -13608,7 +13614,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2481",
             sortOrder = 230,
             requiredSkill = 285,
-            skillLevels = { 1, 285, 310 },
+            skillLevels = { 285, 285, 297, 310 },
             reagents = {
                 { itemId = 12359, count = 30 },
                 { itemId = 12799, count = 2 },
@@ -13627,7 +13633,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2484",
             sortOrder = 260,
             requiredSkill = 260,
-            skillLevels = { 1, 285, 310 },
+            skillLevels = { 260, 285, 297, 310 },
             reagents = {
                 { itemId = 12655, count = 6 },
                 { itemId = 12360, count = 2 },
@@ -13648,7 +13654,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2484",
             sortOrder = 260,
             requiredSkill = 265,
-            skillLevels = { 1, 290, 315 },
+            skillLevels = { 265, 290, 302, 315 },
             reagents = {
                 { itemId = 12359, count = 30 },
                 { itemId = 7077, count = 4 },
@@ -13667,7 +13673,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2480",
             sortOrder = 220,
             requiredSkill = 265,
-            skillLevels = { 1, 290, 315 },
+            skillLevels = { 265, 290, 302, 315 },
             reagents = {
                 { itemId = 12359, count = 40 },
                 { itemId = 12360, count = 2 },
@@ -13687,7 +13693,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2483",
             sortOrder = 250,
             requiredSkill = 300,
-            skillLevels = { 1, 325, 350 },
+            skillLevels = { 300, 325, 337, 350 },
             reagents = {
                 { itemId = 12655, count = 10 },
                 { itemId = 12360, count = 10 },
@@ -13705,7 +13711,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2479",
             sortOrder = 210,
             requiredSkill = 300,
-            skillLevels = { 1, 325, 350 },
+            skillLevels = { 300, 325, 337, 350 },
             reagents = {
                 { itemId = 12655, count = 20 },
                 { itemId = 12804, count = 20 },
@@ -13725,7 +13731,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2478",
             sortOrder = 200,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12359, count = 50 },
                 { itemId = 12360, count = 15 },
@@ -13745,7 +13751,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2480",
             sortOrder = 220,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 15 },
                 { itemId = 12800, count = 8 },
@@ -13766,7 +13772,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2481",
             sortOrder = 230,
             requiredSkill = 300,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 300, 295, 305, 315 },
             reagents = {
                 { itemId = 12359, count = 40 },
                 { itemId = 12360, count = 12 },
@@ -13787,7 +13793,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2485",
             sortOrder = 270,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 18 },
                 { itemId = 12361, count = 8 },
@@ -13808,7 +13814,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2484",
             sortOrder = 260,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12655, count = 20 },
                 { itemId = 12364, count = 8 },
@@ -13828,7 +13834,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2477",
             sortOrder = 190,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 20 },
                 { itemId = 12810, count = 6 },
@@ -13846,7 +13852,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2482",
             sortOrder = 240,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 10 },
                 { itemId = 12655, count = 10 },
@@ -13866,7 +13872,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2490",
             sortOrder = 10,
             requiredSkill = 250,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 250, 250, 255, 260 },
             reagents = {
                 { itemId = 12359, count = 1 },
                 { itemId = 11176, count = 3 },
@@ -13881,7 +13887,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2490",
             sortOrder = 10,
             requiredSkill = 250,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 250, 250, 255, 260 },
             reagents = {
                 { itemId = 8170, count = 1 },
                 { itemId = 16202, count = 1 },
@@ -13898,7 +13904,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2620",
             sortOrder = 65,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 290 },
+            skillLevels = { 275, 275, 282, 290 },
             reagents = {
                 { itemId = 12359, count = 1 },
                 { itemId = 12363, count = 1 },
@@ -13913,7 +13919,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2448",
             sortOrder = 10,
             requiredSkill = 250,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 250, 250, 255, 260 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -13932,7 +13938,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 255,
-            skillLevels = { 1, 270, 310 },
+            skillLevels = { 255, 270, 290, 310 },
             reagents = {
                 { itemId = 8846, count = 3 },
                 { itemId = 8925, count = 1 },
@@ -13948,7 +13954,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2621",
             sortOrder = 20,
             requiredSkill = 260,
-            skillLevels = { 1, 275, 315 },
+            skillLevels = { 260, 275, 295, 315 },
             reagents = {
                 { itemId = 8838, count = 2 },
                 { itemId = 8839, count = 2 },
@@ -13966,7 +13972,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 265,
-            skillLevels = { 1, 280, 320 },
+            skillLevels = { 265, 280, 300, 320 },
             reagents = {
                 { itemId = 13423, count = 2 },
                 { itemId = 8838, count = 1 },
@@ -13984,7 +13990,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 270,
-            skillLevels = { 1, 285, 325 },
+            skillLevels = { 270, 285, 305, 325 },
             reagents = {
                 { itemId = 13463, count = 1 },
                 { itemId = 13466, count = 2 },
@@ -14001,7 +14007,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 275,
-            skillLevels = { 1, 290, 330 },
+            skillLevels = { 275, 290, 310, 330 },
             reagents = {
                 { itemId = 8846, count = 2 },
                 { itemId = 13466, count = 2 },
@@ -14019,7 +14025,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2452",
             sortOrder = 60,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 290 },
+            skillLevels = { 275, 275, 282, 290 },
             reagents = {
                 { itemId = 7082, count = 1 },
             },
@@ -14035,7 +14041,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2452",
             sortOrder = 60,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 290 },
+            skillLevels = { 275, 275, 282, 290 },
             reagents = {
                 { itemId = 7078, count = 1 },
             },
@@ -14051,7 +14057,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2452",
             sortOrder = 60,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 290 },
+            skillLevels = { 275, 275, 282, 290 },
             reagents = {
                 { itemId = 7076, count = 1 },
             },
@@ -14067,7 +14073,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2452",
             sortOrder = 60,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 290 },
+            skillLevels = { 275, 275, 282, 290 },
             reagents = {
                 { itemId = 7080, count = 1 },
             },
@@ -14083,7 +14089,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2452",
             sortOrder = 60,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 290 },
+            skillLevels = { 275, 275, 282, 290 },
             reagents = {
                 { itemId = 12808, count = 1 },
             },
@@ -14099,7 +14105,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2452",
             sortOrder = 60,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 290 },
+            skillLevels = { 275, 275, 282, 290 },
             reagents = {
                 { itemId = 7080, count = 1 },
             },
@@ -14115,7 +14121,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2452",
             sortOrder = 60,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 290 },
+            skillLevels = { 275, 275, 282, 290 },
             reagents = {
                 { itemId = 12803, count = 1 },
             },
@@ -14131,7 +14137,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2452",
             sortOrder = 60,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 290 },
+            skillLevels = { 275, 275, 282, 290 },
             reagents = {
                 { itemId = 7076, count = 1 },
             },
@@ -14147,7 +14153,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 280,
-            skillLevels = { 1, 295, 335 },
+            skillLevels = { 280, 295, 315, 335 },
             reagents = {
                 { itemId = 13423, count = 3 },
                 { itemId = 10620, count = 1 },
@@ -14165,7 +14171,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 280,
-            skillLevels = { 1, 295, 335 },
+            skillLevels = { 280, 295, 315, 335 },
             reagents = {
                 { itemId = 13465, count = 2 },
                 { itemId = 13466, count = 2 },
@@ -14183,7 +14189,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 285,
-            skillLevels = { 1, 300, 340 },
+            skillLevels = { 285, 300, 320, 340 },
             reagents = {
                 { itemId = 13467, count = 2 },
                 { itemId = 13466, count = 2 },
@@ -14200,7 +14206,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 285,
-            skillLevels = { 1, 300, 340 },
+            skillLevels = { 285, 300, 320, 340 },
             reagents = {
                 { itemId = 13463, count = 3 },
                 { itemId = 13465, count = 1 },
@@ -14218,7 +14224,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 290,
-            skillLevels = { 1, 305, 345 },
+            skillLevels = { 290, 305, 325, 345 },
             reagents = {
                 { itemId = 7068, count = 1 },
                 { itemId = 13463, count = 1 },
@@ -14236,7 +14242,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 290,
-            skillLevels = { 1, 305, 345 },
+            skillLevels = { 290, 305, 325, 345 },
             reagents = {
                 { itemId = 7070, count = 1 },
                 { itemId = 13463, count = 1 },
@@ -14254,7 +14260,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 290,
-            skillLevels = { 1, 305, 345 },
+            skillLevels = { 290, 305, 325, 345 },
             reagents = {
                 { itemId = 7067, count = 1 },
                 { itemId = 13463, count = 1 },
@@ -14272,7 +14278,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 290,
-            skillLevels = { 1, 305, 345 },
+            skillLevels = { 290, 305, 325, 345 },
             reagents = {
                 { itemId = 11176, count = 1 },
                 { itemId = 13463, count = 1 },
@@ -14290,7 +14296,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 290,
-            skillLevels = { 1, 305, 345 },
+            skillLevels = { 290, 305, 325, 345 },
             reagents = {
                 { itemId = 3824, count = 1 },
                 { itemId = 13463, count = 1 },
@@ -14308,7 +14314,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 290,
-            skillLevels = { 1, 305, 345 },
+            skillLevels = { 290, 305, 325, 345 },
             reagents = {
                 { itemId = 7069, count = 1 },
                 { itemId = 13463, count = 1 },
@@ -14326,7 +14332,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2621",
             sortOrder = 20,
             requiredSkill = 295,
-            skillLevels = { 1, 310, 350 },
+            skillLevels = { 295, 310, 330, 350 },
             reagents = {
                 { itemId = 13463, count = 3 },
                 { itemId = 13467, count = 2 },
@@ -14344,7 +14350,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2453",
             sortOrder = 70,
             requiredSkill = 275,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 275, 315, 322, 330 },
             reagents = {
                 { itemId = 7078, count = 8 },
                 { itemId = 7076, count = 8 },
@@ -14366,7 +14372,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2451",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 300, 315, 322, 330 },
             reagents = {
                 { itemId = 13423, count = 30 },
                 { itemId = 13465, count = 10 },
@@ -14385,7 +14391,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2451",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 300, 315, 322, 330 },
             reagents = {
                 { itemId = 8846, count = 30 },
                 { itemId = 13423, count = 10 },
@@ -14404,7 +14410,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2451",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 300, 315, 322, 330 },
             reagents = {
                 { itemId = 13463, count = 30 },
                 { itemId = 13467, count = 10 },
@@ -14423,7 +14429,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2451",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 300, 315, 322, 330 },
             reagents = {
                 { itemId = 13463, count = 30 },
                 { itemId = 13465, count = 10 },
@@ -14442,7 +14448,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2451",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 300, 315, 322, 330 },
             reagents = {
                 { itemId = 13467, count = 30 },
                 { itemId = 13465, count = 10 },
@@ -14461,7 +14467,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2641",
             sortOrder = 50,
             requiredSkill = 225,
-            skillLevels = { 1, 265, 305 },
+            skillLevels = { 225, 265, 285, 305 },
             reagents = {
                 { itemId = 4603, count = 1 },
             },
@@ -14477,7 +14483,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2643",
             sortOrder = 60,
             requiredSkill = 225,
-            skillLevels = { 1, 265, 305 },
+            skillLevels = { 225, 265, 285, 305 },
             reagents = {
                 { itemId = 13754, count = 1 },
                 { itemId = 3713, count = 1 },
@@ -14494,7 +14500,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2642",
             sortOrder = 70,
             requiredSkill = 240,
-            skillLevels = { 1, 280, 320 },
+            skillLevels = { 240, 280, 300, 320 },
             reagents = {
                 { itemId = 13755, count = 1 },
                 { itemId = 3713, count = 1 },
@@ -14511,7 +14517,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2644",
             sortOrder = 88,
             requiredSkill = 225,
-            skillLevels = { 1, 265, 305 },
+            skillLevels = { 225, 265, 285, 305 },
             reagents = {
                 { itemId = 13758, count = 1 },
             },
@@ -14527,7 +14533,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2642",
             sortOrder = 70,
             requiredSkill = 240,
-            skillLevels = { 1, 280, 320 },
+            skillLevels = { 240, 280, 300, 320 },
             reagents = {
                 { itemId = 13756, count = 1 },
                 { itemId = 2692, count = 2 },
@@ -14544,7 +14550,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2641",
             sortOrder = 50,
             requiredSkill = 250,
-            skillLevels = { 1, 290, 330 },
+            skillLevels = { 250, 290, 310, 330 },
             reagents = {
                 { itemId = 13759, count = 1 },
                 { itemId = 159, count = 1 },
@@ -14561,7 +14567,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2643",
             sortOrder = 60,
             requiredSkill = 250,
-            skillLevels = { 1, 290, 330 },
+            skillLevels = { 250, 290, 310, 330 },
             reagents = {
                 { itemId = 13760, count = 1 },
             },
@@ -14577,7 +14583,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2641",
             sortOrder = 50,
             requiredSkill = 275,
-            skillLevels = { 1, 315, 355 },
+            skillLevels = { 275, 315, 335, 355 },
             reagents = {
                 { itemId = 13888, count = 1 },
                 { itemId = 159, count = 1 },
@@ -14594,7 +14600,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2643",
             sortOrder = 60,
             requiredSkill = 275,
-            skillLevels = { 1, 315, 355 },
+            skillLevels = { 275, 315, 335, 355 },
             reagents = {
                 { itemId = 13893, count = 1 },
                 { itemId = 2692, count = 1 },
@@ -14612,7 +14618,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2641",
             sortOrder = 50,
             requiredSkill = 275,
-            skillLevels = { 1, 315, 355 },
+            skillLevels = { 275, 315, 335, 355 },
             reagents = {
                 { itemId = 13889, count = 1 },
                 { itemId = 3713, count = 1 },
@@ -14627,7 +14633,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2576",
             sortOrder = 100,
             requiredSkill = 250,
-            skillLevels = { 1, 210, 215 },
+            skillLevels = { 250, 210, 212, 215 },
             reagents = {
                 { itemId = 14047, count = 5 },
             },
@@ -14641,7 +14647,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 255,
-            skillLevels = { 1, 225, 255 },
+            skillLevels = { 255, 225, 240, 255 },
             reagents = {
                 { itemId = 14048, count = 3 },
                 { itemId = 14341, count = 1 },
@@ -14658,7 +14664,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 210,
-            skillLevels = { 1, 225, 255 },
+            skillLevels = { 210, 225, 240, 255 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 7079, count = 2 },
@@ -14676,7 +14682,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 210,
-            skillLevels = { 1, 225, 255 },
+            skillLevels = { 210, 225, 240, 255 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 7079, count = 2 },
@@ -14694,7 +14700,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2578",
             sortOrder = 300,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 260 },
+            skillLevels = { 215, 230, 245, 260 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 8170, count = 2 },
@@ -14714,7 +14720,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 260 },
+            skillLevels = { 215, 230, 245, 260 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 14227, count = 1 },
@@ -14732,7 +14738,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 260 },
+            skillLevels = { 215, 230, 245, 260 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 14227, count = 1 },
@@ -14750,7 +14756,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 260 },
+            skillLevels = { 215, 230, 245, 260 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 7077, count = 3 },
@@ -14768,7 +14774,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2580",
             sortOrder = 500,
             requiredSkill = 220,
-            skillLevels = { 1, 240, 270 },
+            skillLevels = { 220, 240, 255, 270 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 14227, count = 1 },
@@ -14786,7 +14792,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 220,
-            skillLevels = { 1, 235, 265 },
+            skillLevels = { 220, 235, 250, 265 },
             reagents = {
                 { itemId = 14048, count = 3 },
                 { itemId = 9210, count = 2 },
@@ -14805,7 +14811,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 260 },
+            skillLevels = { 215, 230, 245, 260 },
             reagents = {
                 { itemId = 14048, count = 3 },
                 { itemId = 7080, count = 1 },
@@ -14823,7 +14829,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 225,
-            skillLevels = { 1, 240, 270 },
+            skillLevels = { 225, 240, 255, 270 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 7077, count = 3 },
@@ -14840,7 +14846,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 225,
-            skillLevels = { 1, 240, 270 },
+            skillLevels = { 225, 240, 255, 270 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 9210, count = 2 },
@@ -14859,7 +14865,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 225,
-            skillLevels = { 1, 240, 270 },
+            skillLevels = { 225, 240, 255, 270 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 3577, count = 2 },
@@ -14877,7 +14883,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 225,
-            skillLevels = { 1, 240, 270 },
+            skillLevels = { 225, 240, 255, 270 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 3577, count = 2 },
@@ -14895,7 +14901,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 225,
-            skillLevels = { 1, 240, 270 },
+            skillLevels = { 225, 240, 255, 270 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 9210, count = 4 },
@@ -14913,7 +14919,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 230,
-            skillLevels = { 1, 245, 275 },
+            skillLevels = { 230, 245, 260, 275 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 8170, count = 4 },
@@ -14931,7 +14937,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2580",
             sortOrder = 500,
             requiredSkill = 230,
-            skillLevels = { 1, 245, 275 },
+            skillLevels = { 230, 245, 260, 275 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 7078, count = 1 },
@@ -14949,7 +14955,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 230,
-            skillLevels = { 1, 245, 275 },
+            skillLevels = { 230, 245, 260, 275 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 14256, count = 4 },
@@ -14967,7 +14973,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2580",
             sortOrder = 500,
             requiredSkill = 230,
-            skillLevels = { 1, 245, 275 },
+            skillLevels = { 230, 245, 260, 275 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 3577, count = 2 },
@@ -14985,7 +14991,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 230,
-            skillLevels = { 1, 245, 275 },
+            skillLevels = { 230, 245, 260, 275 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 11176, count = 1 },
@@ -15003,7 +15009,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2580",
             sortOrder = 500,
             requiredSkill = 235,
-            skillLevels = { 1, 250, 280 },
+            skillLevels = { 235, 250, 265, 280 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 7078, count = 4 },
@@ -15022,7 +15028,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 235,
-            skillLevels = { 1, 250, 280 },
+            skillLevels = { 235, 250, 265, 280 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 14227, count = 2 },
@@ -15041,7 +15047,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 235,
-            skillLevels = { 1, 250, 280 },
+            skillLevels = { 235, 250, 265, 280 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 7080, count = 1 },
@@ -15059,7 +15065,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 235,
-            skillLevels = { 1, 250, 280 },
+            skillLevels = { 235, 250, 265, 280 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 7078, count = 1 },
@@ -15077,7 +15083,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 245,
-            skillLevels = { 1, 260, 290 },
+            skillLevels = { 245, 260, 275, 290 },
             reagents = {
                 { itemId = 14048, count = 10 },
                 { itemId = 14256, count = 12 },
@@ -15097,7 +15103,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 240,
-            skillLevels = { 1, 255, 285 },
+            skillLevels = { 240, 255, 270, 285 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 14256, count = 4 },
@@ -15116,7 +15122,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 240,
-            skillLevels = { 1, 255, 285 },
+            skillLevels = { 240, 255, 270, 285 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 14227, count = 2 },
@@ -15134,7 +15140,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 245,
-            skillLevels = { 1, 260, 290 },
+            skillLevels = { 245, 260, 275, 290 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 3577, count = 4 },
@@ -15153,7 +15159,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 245,
-            skillLevels = { 1, 270, 300 },
+            skillLevels = { 245, 270, 285, 300 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 14342, count = 4 },
@@ -15171,7 +15177,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 245,
-            skillLevels = { 1, 260, 290 },
+            skillLevels = { 245, 260, 275, 290 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 9210, count = 4 },
@@ -15189,7 +15195,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 245,
-            skillLevels = { 1, 260, 290 },
+            skillLevels = { 245, 260, 275, 290 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 14256, count = 4 },
@@ -15207,7 +15213,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 250,
-            skillLevels = { 1, 265, 295 },
+            skillLevels = { 250, 265, 280, 295 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 14227, count = 2 },
@@ -15225,7 +15231,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2578",
             sortOrder = 300,
             requiredSkill = 255,
-            skillLevels = { 1, 270, 300 },
+            skillLevels = { 255, 270, 285, 300 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 14342, count = 1 },
@@ -15246,7 +15252,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 255,
-            skillLevels = { 1, 270, 300 },
+            skillLevels = { 255, 270, 285, 300 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 11176, count = 2 },
@@ -15264,7 +15270,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 270,
-            skillLevels = { 1, 285, 315 },
+            skillLevels = { 270, 285, 300, 315 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 14342, count = 4 },
@@ -15282,7 +15288,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 275,
-            skillLevels = { 1, 290, 320 },
+            skillLevels = { 275, 290, 305, 320 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 14342, count = 5 },
@@ -15300,7 +15306,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 260,
-            skillLevels = { 1, 275, 305 },
+            skillLevels = { 260, 275, 290, 305 },
             reagents = {
                 { itemId = 14048, count = 7 },
                 { itemId = 14227, count = 2 },
@@ -15319,7 +15325,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 260,
-            skillLevels = { 1, 275, 305 },
+            skillLevels = { 260, 275, 290, 305 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 11176, count = 4 },
@@ -15338,7 +15344,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 260,
-            skillLevels = { 1, 275, 305 },
+            skillLevels = { 260, 275, 290, 305 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 14256, count = 8 },
@@ -15357,7 +15363,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 280,
-            skillLevels = { 1, 295, 325 },
+            skillLevels = { 280, 295, 310, 325 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 14342, count = 6 },
@@ -15377,7 +15383,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 265,
-            skillLevels = { 1, 280, 310 },
+            skillLevels = { 265, 280, 295, 310 },
             reagents = {
                 { itemId = 14048, count = 7 },
                 { itemId = 14256, count = 6 },
@@ -15397,7 +15403,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 295,
-            skillLevels = { 1, 310, 340 },
+            skillLevels = { 295, 310, 325, 340 },
             reagents = {
                 { itemId = 14048, count = 10 },
                 { itemId = 14342, count = 8 },
@@ -15420,7 +15426,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2578",
             sortOrder = 300,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 14342, count = 12 },
@@ -15442,7 +15448,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 295,
-            skillLevels = { 1, 310, 340 },
+            skillLevels = { 295, 310, 325, 340 },
             reagents = {
                 { itemId = 14048, count = 12 },
                 { itemId = 14342, count = 8 },
@@ -15464,7 +15470,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 295,
-            skillLevels = { 1, 310, 340 },
+            skillLevels = { 295, 310, 325, 340 },
             reagents = {
                 { itemId = 14048, count = 12 },
                 { itemId = 7078, count = 8 },
@@ -15486,7 +15492,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 295,
-            skillLevels = { 1, 310, 340 },
+            skillLevels = { 295, 310, 325, 340 },
             reagents = {
                 { itemId = 14048, count = 12 },
                 { itemId = 12662, count = 20 },
@@ -15508,7 +15514,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2576",
             sortOrder = 100,
             requiredSkill = 230,
-            skillLevels = { 1, 270, 300 },
+            skillLevels = { 230, 270, 285, 300 },
             reagents = {
                 { itemId = 14256, count = 2 },
             },
@@ -15520,7 +15526,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2530",
             sortOrder = 10,
-            skillLevels = { 1, 260, 320 },
+            skillLevels = { 1, 260, 290, 320 },
             reagents = {
                 { itemId = 14047, count = 1 },
             },
@@ -15532,7 +15538,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2530",
             sortOrder = 10,
-            skillLevels = { 1, 290, 350 },
+            skillLevels = { 1, 290, 320, 350 },
             reagents = {
                 { itemId = 14047, count = 2 },
             },
@@ -15545,8 +15551,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2550",
             sortOrder = 100,
-            requiredSkill = 250,
-            skillLevels = { 1, 225, 235 },
+            requiredSkill = 225,
+            skillLevels = { 225, 225, 230, 235 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -15565,7 +15571,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2564",
             sortOrder = 1500,
             requiredSkill = 255,
-            skillLevels = { 1, 250, 270 },
+            skillLevels = { 255, 250, 260, 270 },
             reagents = {
                 { itemId = 8170, count = 4 },
                 { itemId = 15408, count = 4 },
@@ -15583,7 +15589,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 275 },
+            skillLevels = { 235, 255, 265, 275 },
             reagents = {
                 { itemId = 8170, count = 8 },
                 { itemId = 2325, count = 1 },
@@ -15601,7 +15607,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2563",
             sortOrder = 1400,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 275 },
+            skillLevels = { 235, 255, 265, 275 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 15412, count = 25 },
@@ -15619,7 +15625,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2563",
             sortOrder = 1400,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 8170, count = 6 },
                 { itemId = 15408, count = 6 },
@@ -15637,7 +15643,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 8170, count = 8 },
                 { itemId = 2325, count = 1 },
@@ -15655,7 +15661,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 8170, count = 6 },
                 { itemId = 15423, count = 6 },
@@ -15673,7 +15679,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2563",
             sortOrder = 1400,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 290, 310, 320, 330 },
             reagents = {
                 { itemId = 8170, count = 40 },
                 { itemId = 15414, count = 30 },
@@ -15691,7 +15697,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 245,
-            skillLevels = { 1, 265, 285 },
+            skillLevels = { 245, 265, 275, 285 },
             reagents = {
                 { itemId = 8170, count = 10 },
                 { itemId = 14047, count = 6 },
@@ -15706,8 +15712,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2569",
             sortOrder = 2000,
-            requiredSkill = 250,
-            skillLevels = { 1, 225, 245 },
+            requiredSkill = 225,
+            skillLevels = { 225, 225, 235, 245 },
             reagents = {
                 { itemId = 8170, count = 5 },
             },
@@ -15723,7 +15729,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 245,
-            skillLevels = { 1, 265, 285 },
+            skillLevels = { 245, 265, 275, 285 },
             reagents = {
                 { itemId = 8170, count = 6 },
                 { itemId = 7078, count = 1 },
@@ -15742,7 +15748,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2567",
             sortOrder = 1800,
             requiredSkill = 245,
-            skillLevels = { 1, 265, 285 },
+            skillLevels = { 245, 265, 275, 285 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 15412, count = 25 },
@@ -15760,7 +15766,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 245,
-            skillLevels = { 1, 265, 285 },
+            skillLevels = { 245, 265, 275, 285 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 12803, count = 4 },
@@ -15778,7 +15784,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 245,
-            skillLevels = { 1, 265, 285 },
+            skillLevels = { 245, 265, 275, 285 },
             reagents = {
                 { itemId = 8170, count = 24 },
                 { itemId = 15420, count = 80 },
@@ -15797,7 +15803,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 8170, count = 4 },
                 { itemId = 15423, count = 8 },
@@ -15815,7 +15821,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 8170, count = 6 },
                 { itemId = 15408, count = 8 },
@@ -15833,7 +15839,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 8170, count = 6 },
                 { itemId = 7971, count = 1 },
@@ -15852,7 +15858,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 8170, count = 4 },
                 { itemId = 15422, count = 6 },
@@ -15870,7 +15876,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 8170, count = 16 },
                 { itemId = 7080, count = 2 },
@@ -15889,7 +15895,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 8170, count = 28 },
                 { itemId = 15419, count = 12 },
@@ -15907,7 +15913,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2566",
             sortOrder = 1700,
             requiredSkill = 255,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 255, 275, 285, 295 },
             reagents = {
                 { itemId = 8170, count = 6 },
                 { itemId = 15408, count = 8 },
@@ -15925,7 +15931,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 255,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 255, 275, 285, 295 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 2325, count = 1 },
@@ -15943,7 +15949,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 255,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 255, 275, 285, 295 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 14047, count = 10 },
@@ -15961,7 +15967,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 255,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 255, 275, 285, 295 },
             reagents = {
                 { itemId = 8170, count = 8 },
                 { itemId = 15423, count = 8 },
@@ -15979,7 +15985,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 8170, count = 6 },
                 { itemId = 15422, count = 8 },
@@ -15997,7 +16003,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2567",
             sortOrder = 1800,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 8170, count = 8 },
                 { itemId = 15408, count = 12 },
@@ -16015,7 +16021,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 8170, count = 8 },
                 { itemId = 7078, count = 1 },
@@ -16034,7 +16040,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2563",
             sortOrder = 1400,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 8170, count = 28 },
                 { itemId = 15415, count = 30 },
@@ -16053,7 +16059,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 8170, count = 16 },
                 { itemId = 12803, count = 6 },
@@ -16072,7 +16078,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 8170, count = 16 },
                 { itemId = 7080, count = 3 },
@@ -16092,7 +16098,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 8170, count = 24 },
                 { itemId = 15419, count = 14 },
@@ -16110,7 +16116,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 265, 285, 295, 305 },
             reagents = {
                 { itemId = 8170, count = 10 },
                 { itemId = 15423, count = 10 },
@@ -16127,7 +16133,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 265, 285, 295, 305 },
             reagents = {
                 { itemId = 8170, count = 14 },
                 { itemId = 14047, count = 10 },
@@ -16145,7 +16151,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 265, 285, 295, 305 },
             reagents = {
                 { itemId = 8170, count = 16 },
                 { itemId = 15407, count = 1 },
@@ -16164,7 +16170,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 265, 285, 295, 305 },
             reagents = {
                 { itemId = 8170, count = 30 },
                 { itemId = 15417, count = 8 },
@@ -16182,7 +16188,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2563",
             sortOrder = 1400,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 265, 285, 295, 305 },
             reagents = {
                 { itemId = 8170, count = 40 },
                 { itemId = 15416, count = 60 },
@@ -16201,7 +16207,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 265, 285, 295, 305 },
             reagents = {
                 { itemId = 8170, count = 40 },
                 { itemId = 15420, count = 120 },
@@ -16221,7 +16227,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 8170, count = 6 },
                 { itemId = 15422, count = 10 },
@@ -16239,7 +16245,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2561",
             sortOrder = 1200,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 8170, count = 8 },
                 { itemId = 15408, count = 12 },
@@ -16258,7 +16264,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2562",
             sortOrder = 1300,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 8170, count = 28 },
                 { itemId = 15415, count = 30 },
@@ -16278,7 +16284,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 7080, count = 3 },
@@ -16298,7 +16304,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 275,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 275, 295, 305, 315 },
             reagents = {
                 { itemId = 8170, count = 18 },
                 { itemId = 14047, count = 12 },
@@ -16317,7 +16323,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 275,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 275, 295, 305, 315 },
             reagents = {
                 { itemId = 8170, count = 14 },
                 { itemId = 2325, count = 2 },
@@ -16335,7 +16341,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2552",
             sortOrder = 300,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 15410, count = 1 },
                 { itemId = 14044, count = 1 },
@@ -16353,7 +16359,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2562",
             sortOrder = 1300,
             requiredSkill = 270,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 270, 310, 320, 330 },
             reagents = {
                 { itemId = 8170, count = 44 },
                 { itemId = 15416, count = 45 },
@@ -16373,7 +16379,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 290, 310, 320, 330 },
             reagents = {
                 { itemId = 8170, count = 16 },
                 { itemId = 12803, count = 8 },
@@ -16393,7 +16399,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 290, 310, 320, 330 },
             reagents = {
                 { itemId = 8170, count = 30 },
                 { itemId = 15417, count = 14 },
@@ -16412,7 +16418,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 280,
-            skillLevels = { 1, 300, 320 },
+            skillLevels = { 280, 300, 310, 320 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 15407, count = 2 },
@@ -16432,7 +16438,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2562",
             sortOrder = 1300,
             requiredSkill = 280,
-            skillLevels = { 1, 300, 320 },
+            skillLevels = { 280, 300, 310, 320 },
             reagents = {
                 { itemId = 8170, count = 14 },
                 { itemId = 15408, count = 14 },
@@ -16451,7 +16457,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 280,
-            skillLevels = { 1, 300, 320 },
+            skillLevels = { 280, 300, 310, 320 },
             reagents = {
                 { itemId = 8170, count = 10 },
                 { itemId = 7078, count = 1 },
@@ -16470,7 +16476,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 285,
-            skillLevels = { 1, 305, 325 },
+            skillLevels = { 285, 305, 315, 325 },
             reagents = {
                 { itemId = 8170, count = 22 },
                 { itemId = 12810, count = 4 },
@@ -16490,7 +16496,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 285,
-            skillLevels = { 1, 305, 325 },
+            skillLevels = { 285, 305, 315, 325 },
             reagents = {
                 { itemId = 8170, count = 16 },
                 { itemId = 12810, count = 4 },
@@ -16510,7 +16516,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 290, 310, 320, 330 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 15422, count = 12 },
@@ -16527,7 +16533,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2563",
             sortOrder = 1400,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 40 },
                 { itemId = 15410, count = 12 },
@@ -16546,7 +16552,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2567",
             sortOrder = 1800,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 290, 310, 320, 330 },
             reagents = {
                 { itemId = 8170, count = 40 },
                 { itemId = 15416, count = 60 },
@@ -16565,7 +16571,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 290,
-            skillLevels = { 1, 285, 315 },
+            skillLevels = { 290, 285, 300, 315 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 14342, count = 4 },
@@ -16582,7 +16588,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 10561, count = 1 },
                 { itemId = 12359, count = 6 },
@@ -16598,8 +16604,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2487",
             sortOrder = 290,
-            requiredSkill = 100,
-            skillLevels = { 1, 75, 95 },
+            requiredSkill = 75,
+            skillLevels = { 75, 75, 85, 95 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -16615,8 +16621,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2487",
             sortOrder = 290,
-            requiredSkill = 150,
-            skillLevels = { 1, 125, 145 },
+            requiredSkill = 125,
+            skillLevels = { 125, 125, 135, 145 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -16632,8 +16638,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2487",
             sortOrder = 290,
-            requiredSkill = 200,
-            skillLevels = { 1, 175, 195 },
+            requiredSkill = 175,
+            skillLevels = { 175, 175, 185, 195 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -16649,8 +16655,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2487",
             sortOrder = 290,
-            requiredSkill = 275,
-            skillLevels = { 1, 250, 260 },
+            requiredSkill = 250,
+            skillLevels = { 250, 250, 255, 260 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -16667,7 +16673,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 250,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 250, 250, 255, 260 },
             reagents = {
                 { itemId = 12365, count = 2 },
             },
@@ -16683,7 +16689,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -16704,7 +16710,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 12359, count = 3 },
                 { itemId = 14047, count = 1 },
@@ -16721,7 +16727,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2526",
             sortOrder = 120,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 10559, count = 2 },
                 { itemId = 10561, count = 2 },
@@ -16741,7 +16747,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2521",
             sortOrder = 70,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 265, 285, 295, 305 },
             reagents = {
                 { itemId = 12803, count = 1 },
                 { itemId = 15994, count = 4 },
@@ -16760,7 +16766,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 10502, count = 1 },
                 { itemId = 7910, count = 4 },
@@ -16778,7 +16784,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 275,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 275, 295, 305, 315 },
             reagents = {
                 { itemId = 12359, count = 6 },
             },
@@ -16794,7 +16800,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2526",
             sortOrder = 120,
             requiredSkill = 275,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 275, 295, 305, 315 },
             reagents = {
                 { itemId = 16000, count = 2 },
                 { itemId = 11371, count = 6 },
@@ -16815,7 +16821,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 285,
-            skillLevels = { 1, 305, 325 },
+            skillLevels = { 285, 305, 315, 325 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -16836,7 +16842,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2528",
             sortOrder = 140,
             requiredSkill = 285,
-            skillLevels = { 1, 305, 325 },
+            skillLevels = { 285, 305, 315, 325 },
             createdCount = 200,
             createdCountMax = 200,
             reagents = {
@@ -16855,7 +16861,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2521",
             sortOrder = 70,
             requiredSkill = 275,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 275, 295, 305, 315 },
             reagents = {
                 { itemId = 10561, count = 1 },
                 { itemId = 16000, count = 1 },
@@ -16876,7 +16882,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 285,
-            skillLevels = { 1, 305, 325 },
+            skillLevels = { 285, 305, 315, 325 },
             reagents = {
                 { itemId = 12360, count = 1 },
                 { itemId = 14227, count = 1 },
@@ -16893,7 +16899,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 290, 310, 320, 330 },
             reagents = {
                 { itemId = 16006, count = 2 },
                 { itemId = 10558, count = 1 },
@@ -16912,7 +16918,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 290, 310, 320, 330 },
             reagents = {
                 { itemId = 10500, count = 1 },
                 { itemId = 12364, count = 2 },
@@ -16930,7 +16936,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2521",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 10576, count = 1 },
                 { itemId = 16006, count = 8 },
@@ -16951,7 +16957,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -16971,7 +16977,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2526",
             sortOrder = 120,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 10 },
                 { itemId = 16000, count = 2 },
@@ -16990,7 +16996,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 255,
-            skillLevels = { 1, 275, 315 },
+            skillLevels = { 255, 275, 295, 315 },
             reagents = {
                 { itemId = 16202, count = 2 },
             },
@@ -17004,7 +17010,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 330 },
+            skillLevels = { 270, 290, 310, 330 },
             reagents = {
                 { itemId = 16202, count = 2 },
                 { itemId = 11176, count = 7 },
@@ -17019,7 +17025,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 295,
-            skillLevels = { 1, 315, 355 },
+            skillLevels = { 295, 315, 335, 355 },
             reagents = {
                 { itemId = 16204, count = 6 },
                 { itemId = 16203, count = 6 },
@@ -17034,7 +17040,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 16204, count = 15 },
             },
@@ -17048,7 +17054,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 330 },
+            skillLevels = { 270, 290, 310, 330 },
             reagents = {
                 { itemId = 16202, count = 2 },
                 { itemId = 16204, count = 2 },
@@ -17063,7 +17069,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 295,
-            skillLevels = { 1, 315, 355 },
+            skillLevels = { 295, 315, 335, 355 },
             reagents = {
                 { itemId = 16203, count = 4 },
                 { itemId = 16204, count = 4 },
@@ -17078,7 +17084,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 325 },
+            skillLevels = { 265, 285, 305, 325 },
             reagents = {
                 { itemId = 16202, count = 1 },
                 { itemId = 7077, count = 1 },
@@ -17097,7 +17103,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 285,
-            skillLevels = { 1, 305, 345 },
+            skillLevels = { 285, 305, 325, 345 },
             reagents = {
                 { itemId = 16204, count = 8 },
             },
@@ -17111,7 +17117,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2503",
             sortOrder = 140,
             requiredSkill = 280,
-            skillLevels = { 1, 300, 340 },
+            skillLevels = { 280, 300, 320, 340 },
             reagents = {
                 { itemId = 16203, count = 2 },
                 { itemId = 16204, count = 4 },
@@ -17126,7 +17132,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2503",
             sortOrder = 140,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 325 },
+            skillLevels = { 265, 285, 305, 325 },
             reagents = {
                 { itemId = 11176, count = 6 },
             },
@@ -17140,7 +17146,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2500",
             sortOrder = 110,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 320 },
+            skillLevels = { 260, 280, 300, 320 },
             reagents = {
                 { itemId = 11176, count = 6 },
             },
@@ -17154,7 +17160,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2500",
             sortOrder = 110,
             requiredSkill = 295,
-            skillLevels = { 1, 315, 355 },
+            skillLevels = { 295, 315, 335, 355 },
             reagents = {
                 { itemId = 16203, count = 8 },
             },
@@ -17168,7 +17174,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2500",
             sortOrder = 110,
             requiredSkill = 275,
-            skillLevels = { 1, 295, 335 },
+            skillLevels = { 275, 295, 315, 335 },
             reagents = {
                 { itemId = 16203, count = 2 },
                 { itemId = 16202, count = 1 },
@@ -17183,7 +17189,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 14344, count = 4 },
                 { itemId = 16204, count = 15 },
@@ -17199,7 +17205,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 275,
-            skillLevels = { 1, 295, 335 },
+            skillLevels = { 275, 295, 315, 335 },
             reagents = {
                 { itemId = 16204, count = 6 },
                 { itemId = 14343, count = 1 },
@@ -17214,7 +17220,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 350 },
+            skillLevels = { 290, 310, 330, 350 },
             reagents = {
                 { itemId = 16203, count = 3 },
                 { itemId = 14343, count = 1 },
@@ -17229,7 +17235,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 285,
-            skillLevels = { 1, 305, 345 },
+            skillLevels = { 285, 305, 325, 345 },
             reagents = {
                 { itemId = 14343, count = 4 },
                 { itemId = 7080, count = 1 },
@@ -17246,7 +17252,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2501",
             sortOrder = 120,
             requiredSkill = 295,
-            skillLevels = { 1, 315, 355 },
+            skillLevels = { 295, 315, 335, 355 },
             reagents = {
                 { itemId = 14344, count = 4 },
                 { itemId = 16204, count = 10 },
@@ -17261,7 +17267,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 14344, count = 2 },
                 { itemId = 16203, count = 10 },
@@ -17276,7 +17282,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 14344, count = 6 },
                 { itemId = 12808, count = 6 },
@@ -17292,7 +17298,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 295,
-            skillLevels = { 1, 315, 355 },
+            skillLevels = { 295, 315, 335, 355 },
             reagents = {
                 { itemId = 14344, count = 4 },
                 { itemId = 12808, count = 4 },
@@ -17307,7 +17313,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 14344, count = 4 },
                 { itemId = 12811, count = 2 },
@@ -17322,7 +17328,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2501",
             sortOrder = 120,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 16203, count = 12 },
                 { itemId = 14344, count = 2 },
@@ -17337,7 +17343,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2501",
             sortOrder = 120,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 16203, count = 12 },
                 { itemId = 14344, count = 2 },
@@ -17354,7 +17360,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2491",
             sortOrder = 20,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 350 },
+            skillLevels = { 290, 310, 330, 350 },
             reagents = {
                 { itemId = 16206, count = 1 },
                 { itemId = 13926, count = 1 },
@@ -17372,8 +17378,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2488",
             sortOrder = 300,
-            requiredSkill = 275,
-            skillLevels = { 1, 250, 260 },
+            requiredSkill = 250,
+            skillLevels = { 250, 250, 255, 260 },
             reagents = {
                 { itemId = 12360, count = 3 },
                 { itemId = 12644, count = 1 },
@@ -17390,7 +17396,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2632",
             sortOrder = 10,
             requiredSkill = 225,
-            skillLevels = { 1, 265, 305 },
+            skillLevels = { 225, 265, 285, 305 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -17407,8 +17413,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2550",
             sortOrder = 100,
-            requiredSkill = 100,
-            skillLevels = { 1, 75, 85 },
+            requiredSkill = 75,
+            skillLevels = { 75, 75, 80, 85 },
             reagents = {
                 { itemId = 2318, count = 4 },
             },
@@ -17421,8 +17427,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2550",
             sortOrder = 100,
-            requiredSkill = 150,
-            skillLevels = { 1, 125, 135 },
+            requiredSkill = 125,
+            skillLevels = { 125, 125, 130, 135 },
             reagents = {
                 { itemId = 2319, count = 5 },
             },
@@ -17435,8 +17441,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2550",
             sortOrder = 100,
-            requiredSkill = 200,
-            skillLevels = { 1, 175, 180 },
+            requiredSkill = 175,
+            skillLevels = { 175, 175, 177, 180 },
             reagents = {
                 { itemId = 4234, count = 6 },
             },
@@ -17452,7 +17458,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14048, count = 12 },
                 { itemId = 17010, count = 4 },
@@ -17472,7 +17478,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 17010, count = 6 },
@@ -17492,7 +17498,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 295,
-            skillLevels = { 1, 315, 335 },
+            skillLevels = { 295, 315, 325, 335 },
             reagents = {
                 { itemId = 17012, count = 20 },
                 { itemId = 17010, count = 6 },
@@ -17511,7 +17517,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 17012, count = 15 },
                 { itemId = 17010, count = 3 },
@@ -17530,7 +17536,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12810, count = 6 },
                 { itemId = 15416, count = 30 },
@@ -17550,7 +17556,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2466",
             sortOrder = 160,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 11371, count = 6 },
                 { itemId = 17010, count = 3 },
@@ -17568,7 +17574,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2462",
             sortOrder = 120,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 11371, count = 16 },
                 { itemId = 17010, count = 4 },
@@ -17586,7 +17592,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2472",
             sortOrder = 60,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 11371, count = 4 },
                 { itemId = 17010, count = 2 },
@@ -17604,7 +17610,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 11371, count = 16 },
                 { itemId = 17010, count = 4 },
@@ -17622,7 +17628,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2485",
             sortOrder = 270,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 11371, count = 16 },
                 { itemId = 17010, count = 12 },
@@ -17641,7 +17647,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2481",
             sortOrder = 230,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 11371, count = 18 },
                 { itemId = 17011, count = 12 },
@@ -17660,7 +17666,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2643",
             sortOrder = 60,
             requiredSkill = 175,
-            skillLevels = { 1, 215, 255 },
+            skillLevels = { 175, 215, 235, 255 },
             reagents = {
                 { itemId = 8365, count = 1 },
             },
@@ -17676,7 +17682,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2638",
             sortOrder = 300,
             requiredSkill = 1,
-            skillLevels = { 1, 45, 85 },
+            skillLevels = { 1, 45, 65, 85 },
             reagents = {
                 { itemId = 6889, count = 1 },
                 { itemId = 17194, count = 1 },
@@ -17693,7 +17699,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2638",
             sortOrder = 300,
             requiredSkill = 35,
-            skillLevels = { 1, 75, 115 },
+            skillLevels = { 35, 75, 95, 115 },
             reagents = {
                 { itemId = 6889, count = 1 },
                 { itemId = 1179, count = 1 },
@@ -17712,7 +17718,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2478",
             sortOrder = 200,
             requiredSkill = 300,
-            skillLevels = { 1, 325, 350 },
+            skillLevels = { 300, 325, 337, 350 },
             reagents = {
                 { itemId = 17203, count = 8 },
                 { itemId = 11371, count = 20 },
@@ -17732,7 +17738,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2632",
             sortOrder = 10,
             requiredSkill = 200,
-            skillLevels = { 1, 240, 280 },
+            skillLevels = { 200, 240, 260, 280 },
             reagents = {
                 { itemId = 12205, count = 2 },
             },
@@ -17747,7 +17753,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2481",
             sortOrder = 230,
             requiredSkill = 165,
-            skillLevels = { 1, 190, 215 },
+            skillLevels = { 165, 190, 202, 215 },
             reagents = {
                 { itemId = 3859, count = 10 },
                 { itemId = 3829, count = 1 },
@@ -17766,7 +17772,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 190,
-            skillLevels = { 1, 210, 250 },
+            skillLevels = { 190, 210, 230, 250 },
             reagents = {
                 { itemId = 3819, count = 2 },
                 { itemId = 3358, count = 1 },
@@ -17781,7 +17787,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 190,
-            skillLevels = { 1, 210, 250 },
+            skillLevels = { 190, 210, 230, 250 },
             reagents = {
                 { itemId = 11135, count = 1 },
                 { itemId = 11137, count = 1 },
@@ -17799,7 +17805,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 190,
-            skillLevels = { 1, 190, 230 },
+            skillLevels = { 190, 190, 210, 230 },
             reagents = {
                 { itemId = 3860, count = 8 },
                 { itemId = 4389, count = 4 },
@@ -17817,7 +17823,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 165,
-            skillLevels = { 1, 185, 205 },
+            skillLevels = { 165, 185, 195, 205 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 7067, count = 4 },
@@ -17834,7 +17840,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2589",
             sortOrder = 1400,
             requiredSkill = 155,
-            skillLevels = { 1, 165, 175 },
+            skillLevels = { 155, 165, 170, 175 },
             reagents = {
                 { itemId = 4305, count = 5 },
                 { itemId = 2605, count = 4 },
@@ -17849,8 +17855,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "trainer",
             category = "c2550",
             sortOrder = 100,
-            requiredSkill = 250,
-            skillLevels = { 1, 225, 225 },
+            requiredSkill = 225,
+            skillLevels = { 225, 225, 225, 225 },
             reagents = {
                 { itemId = 4304, count = 6 },
             },
@@ -17862,7 +17868,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2448",
             sortOrder = 10,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             reagents = {
                 { itemId = 15410, count = 1 },
             },
@@ -17878,7 +17884,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2634",
             sortOrder = 30,
             requiredSkill = 225,
-            skillLevels = { 1, 265, 305 },
+            skillLevels = { 225, 265, 285, 305 },
             reagents = {
                 { itemId = 12208, count = 1 },
                 { itemId = 3713, count = 1 },
@@ -17895,7 +17901,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2518",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12359, count = 12 },
                 { itemId = 8170, count = 4 },
@@ -17915,7 +17921,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 175,
-            skillLevels = { 1, 185, 205 },
+            skillLevels = { 175, 185, 195, 205 },
             reagents = {
                 { itemId = 4304, count = 6 },
                 { itemId = 7428, count = 8 },
@@ -17936,7 +17942,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2569",
             sortOrder = 2000,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 17012, count = 3 },
                 { itemId = 14341, count = 2 },
@@ -17953,7 +17959,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2621",
             sortOrder = 20,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 300, 310, 320, 330 },
             reagents = {
                 { itemId = 10286, count = 1 },
                 { itemId = 13464, count = 4 },
@@ -17970,7 +17976,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 14344, count = 4 },
                 { itemId = 16203, count = 12 },
@@ -17989,7 +17995,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 14344, count = 4 },
                 { itemId = 16203, count = 8 },
@@ -18009,7 +18015,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2460",
             sortOrder = 20,
             requiredSkill = 300,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 300, 275, 285, 295 },
             reagents = {
                 { itemId = 7067, count = 2 },
                 { itemId = 12365, count = 3 },
@@ -18026,7 +18032,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2584",
             sortOrder = 900,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 350 },
+            skillLevels = { 300, 320, 335, 350 },
             reagents = {
                 { itemId = 14342, count = 6 },
                 { itemId = 17010, count = 8 },
@@ -18046,7 +18052,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2635",
             sortOrder = 40,
             requiredSkill = 275,
-            skillLevels = { 1, 315, 355 },
+            skillLevels = { 275, 315, 335, 355 },
             reagents = {
                 { itemId = 18255, count = 1 },
                 { itemId = 3713, count = 1 },
@@ -18063,7 +18069,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2527",
             sortOrder = 130,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 17011, count = 2 },
                 { itemId = 7076, count = 2 },
@@ -18083,7 +18089,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2526",
             sortOrder = 120,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 17010, count = 4 },
                 { itemId = 17011, count = 2 },
@@ -18103,7 +18109,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 6 },
                 { itemId = 16006, count = 2 },
@@ -18121,7 +18127,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2651",
             sortOrder = 55,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 270 },
+            skillLevels = { 215, 230, 250, 270 },
             reagents = {
                 { itemId = 7972, count = 1 },
                 { itemId = 8831, count = 2 },
@@ -18138,7 +18144,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2600",
             sortOrder = 1550,
             requiredSkill = 275,
-            skillLevels = { 1, 285, 295 },
+            skillLevels = { 275, 285, 290, 295 },
             reagents = {
                 { itemId = 14048, count = 2 },
                 { itemId = 8170, count = 4 },
@@ -18156,7 +18162,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2599",
             sortOrder = 2450,
             requiredSkill = 275,
-            skillLevels = { 1, 285, 295 },
+            skillLevels = { 275, 285, 290, 295 },
             reagents = {
                 { itemId = 8170, count = 4 },
                 { itemId = 14048, count = 2 },
@@ -18175,7 +18181,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 295,
-            skillLevels = { 1, 310, 340 },
+            skillLevels = { 295, 310, 325, 340 },
             reagents = {
                 { itemId = 14048, count = 16 },
                 { itemId = 9210, count = 8 },
@@ -18198,7 +18204,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 280,
-            skillLevels = { 1, 295, 325 },
+            skillLevels = { 280, 295, 310, 325 },
             reagents = {
                 { itemId = 14048, count = 12 },
                 { itemId = 14256, count = 20 },
@@ -18218,7 +18224,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 280,
-            skillLevels = { 1, 295, 325 },
+            skillLevels = { 280, 295, 310, 325 },
             reagents = {
                 { itemId = 14048, count = 12 },
                 { itemId = 7078, count = 10 },
@@ -18237,7 +18243,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 280,
-            skillLevels = { 1, 295, 325 },
+            skillLevels = { 280, 295, 310, 325 },
             reagents = {
                 { itemId = 14048, count = 12 },
                 { itemId = 14342, count = 6 },
@@ -18256,7 +18262,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2580",
             sortOrder = 500,
             requiredSkill = 280,
-            skillLevels = { 1, 295, 325 },
+            skillLevels = { 280, 295, 310, 325 },
             reagents = {
                 { itemId = 14048, count = 12 },
                 { itemId = 12809, count = 4 },
@@ -18275,7 +18281,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 275,
-            skillLevels = { 1, 290, 320 },
+            skillLevels = { 275, 290, 305, 320 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 14342, count = 4 },
@@ -18294,7 +18300,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 290, 310, 320, 330 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 12804, count = 12 },
@@ -18313,7 +18319,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 290, 310, 320, 330 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 7082, count = 6 },
@@ -18333,7 +18339,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2564",
             sortOrder = 1500,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 290, 310, 320, 330 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 18512, count = 8 },
@@ -18353,7 +18359,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2552",
             sortOrder = 300,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 30 },
                 { itemId = 12607, count = 12 },
@@ -18374,7 +18380,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2552",
             sortOrder = 300,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 30 },
                 { itemId = 12803, count = 12 },
@@ -18395,7 +18401,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2552",
             sortOrder = 300,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 30 },
                 { itemId = 7082, count = 12 },
@@ -18414,7 +18420,7 @@ RecipeRegistryRecipeMetadata = {
             sourcePlaces = { { name = "Master Elemental Shaper Krixix", zone = 64 } },
             category = "c2575",
             sortOrder = 100,
-            skillLevels = { 1, 310, 320 },
+            skillLevels = { 1, 310, 315, 320 },
             reagents = {
                 { itemId = 18562, count = 1 },
                 { itemId = 12360, count = 10 },
@@ -18433,7 +18439,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 150,
-            skillLevels = { 1, 150, 175 },
+            skillLevels = { 150, 150, 162, 175 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -18452,7 +18458,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 150,
-            skillLevels = { 1, 150, 175 },
+            skillLevels = { 150, 150, 162, 175 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -18471,7 +18477,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 150,
-            skillLevels = { 1, 150, 175 },
+            skillLevels = { 150, 150, 162, 175 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -18490,7 +18496,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 200,
-            skillLevels = { 1, 200, 220 },
+            skillLevels = { 200, 200, 210, 220 },
             reagents = {
                 { itemId = 10505, count = 1 },
                 { itemId = 4306, count = 1 },
@@ -18506,7 +18512,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 250,
-            skillLevels = { 1, 250, 270 },
+            skillLevels = { 250, 250, 260, 270 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -18524,7 +18530,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 260,
-            skillLevels = { 1, 270, 280 },
+            skillLevels = { 260, 270, 275, 280 },
             reagents = {
                 { itemId = 6037, count = 2 },
                 { itemId = 7067, count = 2 },
@@ -18542,7 +18548,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 15994, count = 6 },
                 { itemId = 18631, count = 2 },
@@ -18563,7 +18569,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 265, 285, 295, 305 },
             reagents = {
                 { itemId = 15994, count = 2 },
                 { itemId = 18631, count = 2 },
@@ -18583,7 +18589,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 275,
-            skillLevels = { 1, 285, 295 },
+            skillLevels = { 275, 285, 290, 295 },
             reagents = {
                 { itemId = 16000, count = 2 },
                 { itemId = 18631, count = 1 },
@@ -18601,7 +18607,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 275, 275, 285, 295 },
             reagents = {
                 { itemId = 15994, count = 2 },
                 { itemId = 15992, count = 3 },
@@ -18620,7 +18626,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 290, 310, 320, 330 },
             reagents = {
                 { itemId = 11371, count = 4 },
                 { itemId = 18631, count = 3 },
@@ -18640,7 +18646,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 11371, count = 8 },
                 { itemId = 18631, count = 4 },
@@ -18661,7 +18667,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2521",
             sortOrder = 70,
             requiredSkill = 265,
-            skillLevels = { 1, 275, 285 },
+            skillLevels = { 265, 275, 280, 285 },
             reagents = {
                 { itemId = 12359, count = 4 },
                 { itemId = 15994, count = 2 },
@@ -18681,7 +18687,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 260,
-            skillLevels = { 1, 260, 270 },
+            skillLevels = { 260, 260, 265, 270 },
             reagents = {
                 { itemId = 10561, count = 1 },
                 { itemId = 15994, count = 2 },
@@ -18701,7 +18707,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2599",
             sortOrder = 2450,
             requiredSkill = 125,
-            skillLevels = { 1, 125, 135 },
+            skillLevels = { 125, 125, 130, 135 },
             reagents = {
                 { itemId = 4234, count = 2 },
                 { itemId = 2321, count = 1 },
@@ -18718,7 +18724,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 130,
-            skillLevels = { 1, 155, 175 },
+            skillLevels = { 130, 155, 165, 175 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4236, count = 2 },
@@ -18737,7 +18743,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 260,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 260, 285, 295, 305 },
             reagents = {
                 { itemId = 3860, count = 10 },
                 { itemId = 18631, count = 1 },
@@ -18756,7 +18762,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 260,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 260, 285, 295, 305 },
             reagents = {
                 { itemId = 3860, count = 12 },
                 { itemId = 18631, count = 2 },
@@ -18777,7 +18783,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 250,
-            skillLevels = { 1, 250, 270 },
+            skillLevels = { 250, 250, 260, 270 },
             createdCount = 4,
             createdCountMax = 4,
             reagents = {
@@ -18797,7 +18803,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2566",
             sortOrder = 1700,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 265, 285, 295, 305 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 7076, count = 3 },
@@ -18816,7 +18822,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 295,
-            skillLevels = { 1, 300, 320 },
+            skillLevels = { 295, 300, 310, 320 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 7076, count = 6 },
@@ -18835,7 +18841,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2474",
             sortOrder = 80,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 265, 285, 295, 305 },
             reagents = {
                 { itemId = 12359, count = 8 },
                 { itemId = 6037, count = 6 },
@@ -18853,7 +18859,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 2 },
                 { itemId = 6037, count = 10 },
@@ -18871,7 +18877,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2469",
             sortOrder = 30,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 17011, count = 4 },
                 { itemId = 17010, count = 2 },
@@ -18889,7 +18895,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 17011, count = 3 },
                 { itemId = 17010, count = 5 },
@@ -18909,7 +18915,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2482",
             sortOrder = 240,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 17011, count = 3 },
                 { itemId = 17010, count = 6 },
@@ -18929,7 +18935,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2479",
             sortOrder = 210,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 17011, count = 5 },
                 { itemId = 17010, count = 2 },
@@ -18948,7 +18954,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2484",
             sortOrder = 260,
             requiredSkill = 300,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 300, 295, 305, 315 },
             reagents = {
                 { itemId = 17011, count = 4 },
                 { itemId = 17010, count = 7 },
@@ -18968,7 +18974,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2485",
             sortOrder = 270,
             requiredSkill = 300,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 300, 295, 305, 315 },
             reagents = {
                 { itemId = 17011, count = 6 },
                 { itemId = 17010, count = 6 },
@@ -18988,7 +18994,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2477",
             sortOrder = 190,
             requiredSkill = 300,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 300, 295, 305, 315 },
             reagents = {
                 { itemId = 17011, count = 8 },
                 { itemId = 17010, count = 5 },
@@ -19008,7 +19014,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 255,
-            skillLevels = { 1, 270, 300 },
+            skillLevels = { 255, 270, 285, 300 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 7076, count = 3 },
@@ -19027,7 +19033,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 290,
-            skillLevels = { 1, 305, 334 },
+            skillLevels = { 290, 305, 319, 334 },
             reagents = {
                 { itemId = 14342, count = 5 },
                 { itemId = 7076, count = 5 },
@@ -19046,7 +19052,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 255,
-            skillLevels = { 1, 270, 300 },
+            skillLevels = { 255, 270, 285, 300 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 12810, count = 4 },
@@ -19066,7 +19072,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 290,
-            skillLevels = { 1, 305, 335 },
+            skillLevels = { 290, 305, 320, 335 },
             reagents = {
                 { itemId = 14342, count = 5 },
                 { itemId = 12809, count = 2 },
@@ -19084,7 +19090,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14342, count = 10 },
                 { itemId = 17010, count = 2 },
@@ -19104,7 +19110,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14342, count = 8 },
                 { itemId = 17010, count = 5 },
@@ -19124,7 +19130,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 265, 285, 295, 305 },
             reagents = {
                 { itemId = 8170, count = 30 },
                 { itemId = 12804, count = 2 },
@@ -19144,7 +19150,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 295,
-            skillLevels = { 1, 315, 335 },
+            skillLevels = { 295, 315, 325, 335 },
             reagents = {
                 { itemId = 12810, count = 8 },
                 { itemId = 12804, count = 6 },
@@ -19164,7 +19170,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 265, 285, 295, 305 },
             reagents = {
                 { itemId = 8170, count = 30 },
                 { itemId = 12809, count = 2 },
@@ -19184,7 +19190,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 295,
-            skillLevels = { 1, 315, 335 },
+            skillLevels = { 295, 315, 325, 335 },
             reagents = {
                 { itemId = 12810, count = 8 },
                 { itemId = 12803, count = 4 },
@@ -19204,7 +19210,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 17011, count = 5 },
                 { itemId = 15407, count = 4 },
@@ -19222,7 +19228,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 17010, count = 5 },
                 { itemId = 17011, count = 2 },
@@ -19243,7 +19249,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 17010, count = 8 },
                 { itemId = 17012, count = 12 },
@@ -19263,7 +19269,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 17010, count = 2 },
                 { itemId = 17011, count = 7 },
@@ -19283,7 +19289,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2533",
             sortOrder = 10,
             requiredSkill = 300,
-            skillLevels = { 1, 300, 360 },
+            skillLevels = { 300, 300, 330, 360 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -19299,7 +19305,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 350 },
+            skillLevels = { 290, 310, 330, 350 },
             reagents = {
                 { itemId = 14344, count = 6 },
                 { itemId = 16203, count = 6 },
@@ -19316,7 +19322,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 350 },
+            skillLevels = { 290, 310, 330, 350 },
             reagents = {
                 { itemId = 14344, count = 6 },
                 { itemId = 16203, count = 6 },
@@ -19333,7 +19339,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 350 },
+            skillLevels = { 290, 310, 330, 350 },
             reagents = {
                 { itemId = 16204, count = 16 },
                 { itemId = 16203, count = 4 },
@@ -19349,7 +19355,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 14344, count = 2 },
                 { itemId = 16204, count = 20 },
@@ -19366,7 +19372,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 14344, count = 10 },
                 { itemId = 16203, count = 8 },
@@ -19382,7 +19388,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 14344, count = 15 },
                 { itemId = 16203, count = 12 },
@@ -19400,7 +19406,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14342, count = 3 },
                 { itemId = 19726, count = 5 },
@@ -19420,7 +19426,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14342, count = 4 },
                 { itemId = 19726, count = 4 },
@@ -19440,7 +19446,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14342, count = 3 },
                 { itemId = 19726, count = 3 },
@@ -19460,7 +19466,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 19767, count = 14 },
                 { itemId = 15407, count = 5 },
@@ -19479,7 +19485,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 19767, count = 10 },
                 { itemId = 15407, count = 4 },
@@ -19498,7 +19504,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 19767, count = 8 },
                 { itemId = 15407, count = 3 },
@@ -19517,7 +19523,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 19768, count = 35 },
                 { itemId = 19726, count = 2 },
@@ -19536,7 +19542,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 19768, count = 25 },
                 { itemId = 19726, count = 2 },
@@ -19555,7 +19561,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 19774, count = 10 },
@@ -19574,7 +19580,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2462",
             sortOrder = 120,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12359, count = 16 },
                 { itemId = 19774, count = 8 },
@@ -19593,7 +19599,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12359, count = 12 },
                 { itemId = 19774, count = 6 },
@@ -19612,7 +19618,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2471",
             sortOrder = 50,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 19774, count = 14 },
@@ -19630,7 +19636,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12359, count = 18 },
                 { itemId = 19774, count = 12 },
@@ -19648,7 +19654,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12359, count = 16 },
                 { itemId = 19774, count = 10 },
@@ -19665,7 +19671,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2453",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 300, 315, 322, 330 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -19686,7 +19692,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 19726, count = 4 },
                 { itemId = 19774, count = 5 },
@@ -19706,7 +19712,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 19726, count = 5 },
                 { itemId = 19774, count = 5 },
@@ -19726,7 +19732,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 275,
-            skillLevels = { 1, 290, 330 },
+            skillLevels = { 275, 290, 310, 330 },
             reagents = {
                 { itemId = 13463, count = 1 },
                 { itemId = 13466, count = 2 },
@@ -19744,7 +19750,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2621",
             sortOrder = 20,
             requiredSkill = 275,
-            skillLevels = { 1, 290, 330 },
+            skillLevels = { 275, 290, 310, 330 },
             reagents = {
                 { itemId = 13463, count = 2 },
                 { itemId = 13464, count = 1 },
@@ -19762,7 +19768,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 285,
-            skillLevels = { 1, 300, 340 },
+            skillLevels = { 285, 300, 320, 340 },
             reagents = {
                 { itemId = 13467, count = 2 },
                 { itemId = 13465, count = 2 },
@@ -19781,7 +19787,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 290,
-            skillLevels = { 1, 305, 345 },
+            skillLevels = { 290, 305, 325, 345 },
             reagents = {
                 { itemId = 8846, count = 1 },
                 { itemId = 13466, count = 2 },
@@ -19799,7 +19805,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 17011, count = 3 },
                 { itemId = 17010, count = 3 },
@@ -19818,7 +19824,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2634",
             sortOrder = 30,
             requiredSkill = 150,
-            skillLevels = { 1, 160, 200 },
+            skillLevels = { 150, 160, 180, 200 },
             reagents = {
                 { itemId = 3667, count = 2 },
                 { itemId = 3713, count = 1 },
@@ -19835,7 +19841,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2567",
             sortOrder = 1800,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 300, 310, 320, 330 },
             reagents = {
                 { itemId = 8170, count = 28 },
                 { itemId = 15415, count = 36 },
@@ -19854,7 +19860,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 260,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 260, 275, 285, 295 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 15412, count = 30 },
@@ -19873,7 +19879,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2563",
             sortOrder = 1400,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12810, count = 12 },
                 { itemId = 20381, count = 6 },
@@ -19892,7 +19898,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2633",
             sortOrder = 20,
             requiredSkill = 285,
-            skillLevels = { 1, 325, 365 },
+            skillLevels = { 285, 325, 345, 365 },
             reagents = {
                 { itemId = 20424, count = 1 },
                 { itemId = 3713, count = 1 },
@@ -19909,7 +19915,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2564",
             sortOrder = 1500,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 300, 310, 320, 330 },
             reagents = {
                 { itemId = 20500, count = 1 },
                 { itemId = 20498, count = 20 },
@@ -19927,7 +19933,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 300,
-            skillLevels = { 1, 305, 325 },
+            skillLevels = { 300, 305, 315, 325 },
             reagents = {
                 { itemId = 20500, count = 2 },
                 { itemId = 20498, count = 30 },
@@ -19946,7 +19952,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2563",
             sortOrder = 1400,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 300, 310, 320, 330 },
             reagents = {
                 { itemId = 20500, count = 3 },
                 { itemId = 20498, count = 40 },
@@ -19965,7 +19971,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2564",
             sortOrder = 1500,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 300, 310, 320, 330 },
             reagents = {
                 { itemId = 20501, count = 1 },
                 { itemId = 20498, count = 20 },
@@ -19983,7 +19989,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 300, 310, 320, 330 },
             reagents = {
                 { itemId = 20501, count = 2 },
                 { itemId = 20498, count = 30 },
@@ -20002,7 +20008,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2563",
             sortOrder = 1400,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 300, 310, 320, 330 },
             reagents = {
                 { itemId = 20501, count = 3 },
                 { itemId = 20498, count = 40 },
@@ -20021,7 +20027,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 285,
-            skillLevels = { 1, 300, 330 },
+            skillLevels = { 285, 300, 315, 330 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 20520, count = 8 },
@@ -20040,7 +20046,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 285,
-            skillLevels = { 1, 300, 330 },
+            skillLevels = { 285, 300, 315, 330 },
             reagents = {
                 { itemId = 14048, count = 2 },
                 { itemId = 20520, count = 6 },
@@ -20060,7 +20066,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 285,
-            skillLevels = { 1, 300, 330 },
+            skillLevels = { 285, 300, 315, 330 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 20520, count = 6 },
@@ -20080,7 +20086,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12359, count = 12 },
                 { itemId = 20520, count = 6 },
@@ -20099,7 +20105,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2469",
             sortOrder = 30,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12359, count = 16 },
                 { itemId = 20520, count = 8 },
@@ -20118,7 +20124,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2471",
             sortOrder = 50,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 20520, count = 10 },
@@ -20136,7 +20142,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 125 },
+            skillLevels = { 75, 100, 112, 125 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 7286, count = 8 },
@@ -20153,7 +20159,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 4 },
                 { itemId = 14344, count = 6 },
@@ -20169,7 +20175,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 3 },
                 { itemId = 14344, count = 10 },
@@ -20185,7 +20191,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 3 },
                 { itemId = 14344, count = 10 },
@@ -20201,7 +20207,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 2 },
                 { itemId = 14344, count = 10 },
@@ -20217,7 +20223,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 3 },
                 { itemId = 14344, count = 8 },
@@ -20233,7 +20239,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 3 },
                 { itemId = 14344, count = 8 },
@@ -20249,7 +20255,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 3 },
                 { itemId = 14344, count = 8 },
@@ -20265,7 +20271,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 2 },
                 { itemId = 14344, count = 8 },
@@ -20281,7 +20287,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 3 },
                 { itemId = 14344, count = 8 },
@@ -20297,7 +20303,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 4 },
                 { itemId = 14344, count = 6 },
@@ -20313,7 +20319,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 3 },
                 { itemId = 14344, count = 8 },
@@ -20331,7 +20337,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2492",
             sortOrder = 30,
             requiredSkill = 45,
-            skillLevels = { 1, 30, 65 },
+            skillLevels = { 45, 30, 47, 65 },
             reagents = {
                 { itemId = 10940, count = 1 },
                 { itemId = 17034, count = 1 },
@@ -20349,7 +20355,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2492",
             sortOrder = 30,
             requiredSkill = 150,
-            skillLevels = { 1, 160, 180 },
+            skillLevels = { 150, 160, 170, 180 },
             reagents = {
                 { itemId = 11083, count = 1 },
                 { itemId = 17034, count = 2 },
@@ -20367,7 +20373,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2492",
             sortOrder = 30,
             requiredSkill = 200,
-            skillLevels = { 1, 210, 230 },
+            skillLevels = { 200, 210, 220, 230 },
             reagents = {
                 { itemId = 11137, count = 1 },
                 { itemId = 17035, count = 2 },
@@ -20385,7 +20391,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2492",
             sortOrder = 30,
             requiredSkill = 250,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 250, 260, 270, 280 },
             reagents = {
                 { itemId = 11176, count = 1 },
                 { itemId = 8831, count = 1 },
@@ -20403,7 +20409,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2492",
             sortOrder = 30,
             requiredSkill = 275,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 275, 285, 295, 305 },
             reagents = {
                 { itemId = 16204, count = 3 },
                 { itemId = 4625, count = 2 },
@@ -20421,7 +20427,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2492",
             sortOrder = 30,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 300, 310, 320, 330 },
             reagents = {
                 { itemId = 14344, count = 2 },
                 { itemId = 4625, count = 3 },
@@ -20439,7 +20445,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2492",
             sortOrder = 30,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 300, 310, 320, 330 },
             reagents = {
                 { itemId = 14344, count = 2 },
                 { itemId = 8831, count = 3 },
@@ -20457,7 +20463,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2452",
             sortOrder = 60,
             requiredSkill = 300,
-            skillLevels = { 1, 301, 310 },
+            skillLevels = { 300, 301, 305, 310 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -20475,7 +20481,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2636",
             sortOrder = 200,
             requiredSkill = 300,
-            skillLevels = { 1, 325, 365 },
+            skillLevels = { 300, 325, 345, 365 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -20496,7 +20502,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2641",
             sortOrder = 50,
             requiredSkill = 80,
-            skillLevels = { 1, 120, 160 },
+            skillLevels = { 80, 120, 140, 160 },
             reagents = {
                 { itemId = 21071, count = 1 },
                 { itemId = 2678, count = 1 },
@@ -20513,7 +20519,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2641",
             sortOrder = 50,
             requiredSkill = 175,
-            skillLevels = { 1, 215, 255 },
+            skillLevels = { 175, 215, 235, 255 },
             reagents = {
                 { itemId = 21153, count = 1 },
                 { itemId = 2692, count = 1 },
@@ -20529,7 +20535,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2521",
             sortOrder = 70,
             requiredSkill = 250,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 250, 320, 330, 340 },
             reagents = {
                 { itemId = 15407, count = 1 },
                 { itemId = 15994, count = 4 },
@@ -20549,7 +20555,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 260 },
+            skillLevels = { 215, 230, 245, 260 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 8170, count = 4 },
@@ -20568,7 +20574,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 285,
-            skillLevels = { 1, 260, 290 },
+            skillLevels = { 285, 260, 275, 290 },
             reagents = {
                 { itemId = 14256, count = 12 },
                 { itemId = 12810, count = 6 },
@@ -20587,7 +20593,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14256, count = 20 },
                 { itemId = 17012, count = 16 },
@@ -20607,7 +20613,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 250,
-            skillLevels = { 1, 265, 305 },
+            skillLevels = { 250, 265, 285, 305 },
             reagents = {
                 { itemId = 6371, count = 3 },
                 { itemId = 4625, count = 3 },
@@ -20626,7 +20632,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 290, 310, 320, 330 },
             reagents = {
                 { itemId = 12810, count = 6 },
                 { itemId = 7080, count = 4 },
@@ -20646,7 +20652,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2590",
             sortOrder = 1500,
             requiredSkill = 205,
-            skillLevels = { 1, 220, 250 },
+            skillLevels = { 205, 220, 235, 250 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 4625, count = 2 },
@@ -20665,7 +20671,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2590",
             sortOrder = 1500,
             requiredSkill = 205,
-            skillLevels = { 1, 220, 250 },
+            skillLevels = { 205, 220, 235, 250 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 4625, count = 2 },
@@ -20684,7 +20690,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 125,
-            skillLevels = { 1, 125, 150 },
+            skillLevels = { 125, 125, 137, 150 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -20703,7 +20709,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 125,
-            skillLevels = { 1, 125, 150 },
+            skillLevels = { 125, 125, 137, 150 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -20722,7 +20728,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 125,
-            skillLevels = { 1, 125, 150 },
+            skillLevels = { 125, 125, 137, 150 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -20741,7 +20747,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 175,
-            skillLevels = { 1, 175, 200 },
+            skillLevels = { 175, 175, 187, 200 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -20760,7 +20766,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 175,
-            skillLevels = { 1, 175, 200 },
+            skillLevels = { 175, 175, 187, 200 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -20779,7 +20785,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 175,
-            skillLevels = { 1, 175, 200 },
+            skillLevels = { 175, 175, 187, 200 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -20798,7 +20804,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 250 },
+            skillLevels = { 225, 225, 237, 250 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -20817,7 +20823,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 250 },
+            skillLevels = { 225, 225, 237, 250 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -20836,7 +20842,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 250 },
+            skillLevels = { 225, 225, 237, 250 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -20855,7 +20861,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 285 },
+            skillLevels = { 275, 275, 280, 285 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -20874,7 +20880,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 285 },
+            skillLevels = { 275, 275, 280, 285 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -20893,7 +20899,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 285 },
+            skillLevels = { 275, 275, 280, 285 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -20912,7 +20918,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 225, 245, 255, 265 },
             reagents = {
                 { itemId = 9060, count = 2 },
                 { itemId = 9061, count = 2 },
@@ -20931,7 +20937,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 275,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 275, 295, 305, 315 },
             reagents = {
                 { itemId = 9060, count = 3 },
                 { itemId = 9061, count = 3 },
@@ -20950,7 +20956,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2474",
             sortOrder = 80,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 22202, count = 14 },
                 { itemId = 12655, count = 4 },
@@ -20968,7 +20974,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2486",
             sortOrder = 280,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 22203, count = 8 },
                 { itemId = 22202, count = 24 },
@@ -20987,7 +20993,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2471",
             sortOrder = 50,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 22203, count = 18 },
                 { itemId = 22202, count = 40 },
@@ -21007,7 +21013,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2466",
             sortOrder = 160,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 22202, count = 14 },
                 { itemId = 12810, count = 4 },
@@ -21024,7 +21030,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 22203, count = 8 },
                 { itemId = 22202, count = 24 },
@@ -21043,7 +21049,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 22203, count = 15 },
                 { itemId = 22202, count = 36 },
@@ -21063,7 +21069,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 190,
-            skillLevels = { 1, 205, 235 },
+            skillLevels = { 190, 205, 220, 235 },
             reagents = {
                 { itemId = 4339, count = 4 },
                 { itemId = 11137, count = 4 },
@@ -21081,7 +21087,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 230,
-            skillLevels = { 1, 245, 275 },
+            skillLevels = { 230, 245, 260, 275 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 16203, count = 2 },
@@ -21099,7 +21105,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 255,
-            skillLevels = { 1, 270, 300 },
+            skillLevels = { 255, 270, 285, 300 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 14344, count = 4 },
@@ -21118,7 +21124,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 230,
-            skillLevels = { 1, 245, 275 },
+            skillLevels = { 230, 245, 260, 275 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 8831, count = 10 },
@@ -21137,7 +21143,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 255,
-            skillLevels = { 1, 270, 300 },
+            skillLevels = { 255, 270, 285, 300 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 14342, count = 2 },
@@ -21156,7 +21162,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 12 },
                 { itemId = 12655, count = 20 },
@@ -21175,7 +21181,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2484",
             sortOrder = 260,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 15 },
                 { itemId = 11371, count = 10 },
@@ -21196,7 +21202,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2485",
             sortOrder = 270,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 12 },
                 { itemId = 20725, count = 2 },
@@ -21213,7 +21219,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2501",
             sortOrder = 120,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 350 },
+            skillLevels = { 290, 310, 330, 350 },
             reagents = {
                 { itemId = 14344, count = 10 },
                 { itemId = 16203, count = 6 },
@@ -21232,7 +21238,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 22682, count = 5 },
                 { itemId = 14048, count = 4 },
@@ -21251,7 +21257,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 22682, count = 7 },
                 { itemId = 14048, count = 8 },
@@ -21270,7 +21276,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2580",
             sortOrder = 500,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 22682, count = 5 },
                 { itemId = 14048, count = 4 },
@@ -21289,7 +21295,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2584",
             sortOrder = 900,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 22682, count = 4 },
                 { itemId = 14048, count = 2 },
@@ -21308,7 +21314,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2580",
             sortOrder = 500,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 19726, count = 1 },
                 { itemId = 14342, count = 2 },
@@ -21327,7 +21333,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 22682, count = 7 },
                 { itemId = 12810, count = 16 },
@@ -21347,7 +21353,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 22682, count = 5 },
                 { itemId = 12810, count = 12 },
@@ -21367,7 +21373,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 22682, count = 4 },
                 { itemId = 12810, count = 12 },
@@ -21387,7 +21393,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2563",
             sortOrder = 1400,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 22682, count = 7 },
                 { itemId = 15408, count = 24 },
@@ -21407,7 +21413,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 22682, count = 5 },
                 { itemId = 15408, count = 16 },
@@ -21427,7 +21433,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2564",
             sortOrder = 1500,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 22682, count = 4 },
                 { itemId = 15408, count = 16 },
@@ -21447,7 +21453,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2471",
             sortOrder = 50,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 22682, count = 7 },
                 { itemId = 12359, count = 16 },
@@ -21466,7 +21472,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 22682, count = 5 },
                 { itemId = 12359, count = 12 },
@@ -21485,7 +21491,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2472",
             sortOrder = 60,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 22682, count = 4 },
                 { itemId = 12359, count = 12 },
@@ -21504,7 +21510,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 275,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 275, 295, 305, 315 },
             reagents = {
                 { itemId = 15994, count = 2 },
                 { itemId = 10561, count = 1 },
@@ -21520,7 +21526,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2471",
             sortOrder = 50,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12655, count = 12 },
                 { itemId = 19726, count = 2 },
@@ -21537,7 +21543,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12655, count = 8 },
                 { itemId = 19726, count = 1 },
@@ -21553,7 +21559,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2474",
             sortOrder = 80,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12655, count = 6 },
                 { itemId = 12803, count = 2 },
@@ -21570,7 +21576,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12810, count = 12 },
                 { itemId = 19726, count = 2 },
@@ -21589,7 +21595,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12810, count = 6 },
                 { itemId = 18512, count = 2 },
@@ -21608,7 +21614,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12810, count = 4 },
                 { itemId = 12803, count = 2 },
@@ -21626,7 +21632,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 19726, count = 2 },
@@ -21645,7 +21651,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 14342, count = 2 },
@@ -21664,7 +21670,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14048, count = 2 },
                 { itemId = 12803, count = 4 },
@@ -21679,7 +21685,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2530",
             sortOrder = 10,
-            skillLevels = { 1, 300, 360 },
+            skillLevels = { 1, 300, 330, 360 },
             createdCount = 4,
             createdCountMax = 4,
             reagents = {
@@ -21698,7 +21704,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 250,
-            skillLevels = { 1, 250, 255 },
+            skillLevels = { 250, 250, 252, 255 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 2997, count = 1 },
@@ -21735,7 +21741,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 250,
-            skillLevels = { 1, 250, 255 },
+            skillLevels = { 250, 250, 252, 255 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 2997, count = 1 },
@@ -21754,7 +21760,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 135,
-            skillLevels = { 1, 135, 145 },
+            skillLevels = { 135, 135, 140, 145 },
             reagents = {
                 { itemId = 4382, count = 1 },
                 { itemId = 4375, count = 2 },
@@ -21772,7 +21778,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2592",
             sortOrder = 9999,
             requiredSkill = 90,
-            skillLevels = { 1, 90, 110 },
+            skillLevels = { 90, 90, 100, 110 },
             reagents = {
                 { itemId = 3820, count = 5 },
                 { itemId = 3372, count = 1 },
@@ -21789,7 +21795,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 150,
-            skillLevels = { 1, 140, 160 },
+            skillLevels = { 150, 140, 150, 160 },
             reagents = {
                 { itemId = 2841, count = 20 },
                 { itemId = 1206, count = 2 },
@@ -21809,7 +21815,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2584",
             sortOrder = 900,
             requiredSkill = 125,
-            skillLevels = { 1, 125, 150 },
+            skillLevels = { 125, 125, 137, 150 },
             reagents = {
                 { itemId = 2997, count = 6 },
                 { itemId = 814, count = 2 },
@@ -21823,7 +21829,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 175, 205 },
+            skillLevels = { 1, 175, 190, 205 },
             reagents = {
                 { itemId = 2870, count = 1 },
                 { itemId = 211422, count = 1 },
@@ -21836,7 +21842,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 150, 185 },
+            skillLevels = { 1, 150, 167, 185 },
             reagents = {
                 { itemId = 211422, count = 1 },
                 { itemId = 4320, count = 1 },
@@ -21849,7 +21855,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 160, 185 },
+            skillLevels = { 1, 160, 172, 185 },
             reagents = {
                 { itemId = 211422, count = 1 },
                 { itemId = 4253, count = 1 },
@@ -21862,7 +21868,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 160, 185 },
+            skillLevels = { 1, 160, 172, 185 },
             reagents = {
                 { itemId = 211422, count = 1 },
                 { itemId = 4253, count = 1 },
@@ -21876,7 +21882,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 100, 120 },
+            skillLevels = { 1, 100, 110, 120 },
             reagents = {
                 { itemId = 2863, count = 1 },
                 { itemId = 10938, count = 1 },
@@ -21890,7 +21896,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 100, 120 },
+            skillLevels = { 1, 100, 110, 120 },
             reagents = {
                 { itemId = 3372, count = 1 },
                 { itemId = 10939, count = 1 },
@@ -21908,7 +21914,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2596",
             sortOrder = 9999,
             requiredSkill = 205,
-            skillLevels = { 1, 205, 215 },
+            skillLevels = { 205, 205, 210, 215 },
             reagents = {
                 { itemId = 1210, count = 4 },
                 { itemId = 9262, count = 1 },
@@ -21924,7 +21930,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2595",
             sortOrder = 9999,
             requiredSkill = 225,
-            skillLevels = { 1, 200, 235 },
+            skillLevels = { 225, 200, 217, 235 },
             reagents = {
                 { itemId = 11174, count = 4 },
                 { itemId = 5637, count = 2 },
@@ -21940,7 +21946,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 235 },
+            skillLevels = { 225, 225, 230, 235 },
             reagents = {
                 { itemId = 213379, count = 5 },
                 { itemId = 213369, count = 1 },
@@ -21960,7 +21966,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 200,
-            skillLevels = { 1, 200, 220 },
+            skillLevels = { 200, 200, 210, 220 },
             reagents = {
                 { itemId = 8172, count = 1 },
                 { itemId = 213370, count = 5 },
@@ -21977,7 +21983,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 200,
-            skillLevels = { 1, 200, 220 },
+            skillLevels = { 200, 200, 210, 220 },
             reagents = {
                 { itemId = 4339, count = 2 },
                 { itemId = 213378, count = 5 },
@@ -21995,7 +22001,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 150,
-            skillLevels = { 1, 170, 200 },
+            skillLevels = { 150, 170, 185, 200 },
             reagents = {
                 { itemId = 4305, count = 3 },
                 { itemId = 1210, count = 1 },
@@ -22014,7 +22020,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 150,
-            skillLevels = { 1, 170, 200 },
+            skillLevels = { 150, 170, 185, 200 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 4340, count = 4 },
@@ -22031,7 +22037,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2595",
             sortOrder = 9999,
             requiredSkill = 225,
-            skillLevels = { 1, 200, 240 },
+            skillLevels = { 225, 200, 220, 240 },
             reagents = {
                 { itemId = 11177, count = 1 },
                 { itemId = 11176, count = 2 },
@@ -22046,7 +22052,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 235 },
+            skillLevels = { 225, 225, 230, 235 },
             reagents = {
                 { itemId = 213379, count = 1 },
                 { itemId = 8172, count = 5 },
@@ -22063,7 +22069,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 235 },
+            skillLevels = { 225, 225, 230, 235 },
             reagents = {
                 { itemId = 3860, count = 25 },
                 { itemId = 213376, count = 4 },
@@ -22080,7 +22086,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 235 },
+            skillLevels = { 225, 225, 230, 235 },
             reagents = {
                 { itemId = 3860, count = 25 },
                 { itemId = 213376, count = 4 },
@@ -22099,7 +22105,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 200,
-            skillLevels = { 1, 200, 220 },
+            skillLevels = { 200, 200, 210, 220 },
             reagents = {
                 { itemId = 6037, count = 1 },
                 { itemId = 213373, count = 5 },
@@ -22114,7 +22120,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 235 },
+            skillLevels = { 225, 225, 230, 235 },
             reagents = {
                 { itemId = 213376, count = 1 },
                 { itemId = 5785, count = 10 },
@@ -22131,7 +22137,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 235 },
+            skillLevels = { 225, 225, 230, 235 },
             reagents = {
                 { itemId = 213372, count = 1 },
                 { itemId = 8172, count = 5 },
@@ -22148,7 +22154,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 235 },
+            skillLevels = { 225, 225, 230, 235 },
             reagents = {
                 { itemId = 213376, count = 1 },
                 { itemId = 8172, count = 5 },
@@ -22167,7 +22173,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2596",
             sortOrder = 9999,
             requiredSkill = 200,
-            skillLevels = { 1, 200, 220 },
+            skillLevels = { 200, 200, 210, 220 },
             reagents = {
                 { itemId = 6037, count = 1 },
                 { itemId = 213381, count = 5 },
@@ -22182,7 +22188,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2596",
             sortOrder = 9999,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 240 },
+            skillLevels = { 225, 225, 232, 240 },
             reagents = {
                 { itemId = 213376, count = 3 },
                 { itemId = 213383, count = 5 },
@@ -22201,7 +22207,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2596",
             sortOrder = 9999,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 235 },
+            skillLevels = { 225, 225, 230, 235 },
             reagents = {
                 { itemId = 213383, count = 3 },
                 { itemId = 213379, count = 3 },
@@ -22220,7 +22226,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2596",
             sortOrder = 9999,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 235 },
+            skillLevels = { 225, 225, 230, 235 },
             createdCount = 2,
             createdCountMax = 4,
             reagents = {
@@ -22240,7 +22246,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2596",
             sortOrder = 9999,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 235 },
+            skillLevels = { 225, 225, 230, 235 },
             createdCount = 2,
             createdCountMax = 4,
             reagents = {
@@ -22258,7 +22264,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2592",
             sortOrder = 9999,
             requiredSkill = 200,
-            skillLevels = { 1, 200, 220 },
+            skillLevels = { 200, 200, 210, 220 },
             reagents = {
                 { itemId = 3372, count = 1 },
                 { itemId = 213371, count = 5 },
@@ -22273,7 +22279,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2592",
             sortOrder = 9999,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 235 },
+            skillLevels = { 225, 225, 230, 235 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -22292,7 +22298,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 205,
-            skillLevels = { 1, 220, 250 },
+            skillLevels = { 205, 220, 235, 250 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 7068, count = 4 },
@@ -22308,7 +22314,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 220, 250 },
+            skillLevels = { 1, 220, 235, 250 },
             reagents = {
                 { itemId = 4339, count = 2 },
                 { itemId = 4291, count = 3 },
@@ -22321,7 +22327,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 220, 250 },
+            skillLevels = { 1, 220, 235, 250 },
             reagents = {
                 { itemId = 4339, count = 2 },
                 { itemId = 4291, count = 3 },
@@ -22336,7 +22342,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 195,
-            skillLevels = { 1, 215, 245 },
+            skillLevels = { 195, 215, 230, 245 },
             reagents = {
                 { itemId = 4305, count = 5 },
                 { itemId = 7067, count = 4 },
@@ -22354,7 +22360,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 190,
-            skillLevels = { 1, 210, 240 },
+            skillLevels = { 190, 210, 225, 240 },
             reagents = {
                 { itemId = 4305, count = 5 },
                 { itemId = 6371, count = 2 },
@@ -22369,7 +22375,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 205, 235 },
+            skillLevels = { 1, 205, 220, 235 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 3827, count = 1 },
@@ -22385,7 +22391,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 225 },
+            skillLevels = { 175, 195, 210, 225 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 4291, count = 1 },
@@ -22399,7 +22405,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 195, 225 },
+            skillLevels = { 1, 195, 210, 225 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 7071, count = 1 },
@@ -22414,7 +22420,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 190, 220 },
+            skillLevels = { 1, 190, 205, 220 },
             reagents = {
                 { itemId = 4305, count = 3 },
                 { itemId = 7067, count = 1 },
@@ -22430,7 +22436,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 165,
-            skillLevels = { 1, 185, 215 },
+            skillLevels = { 165, 185, 200, 215 },
             reagents = {
                 { itemId = 4305, count = 3 },
                 { itemId = 2321, count = 2 },
@@ -22446,7 +22452,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 220,
-            skillLevels = { 1, 240, 260 },
+            skillLevels = { 220, 240, 250, 260 },
             reagents = {
                 { itemId = 4304, count = 8 },
                 { itemId = 8151, count = 6 },
@@ -22462,7 +22468,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 215,
-            skillLevels = { 1, 235, 255 },
+            skillLevels = { 215, 235, 245, 255 },
             reagents = {
                 { itemId = 4304, count = 10 },
                 { itemId = 8151, count = 4 },
@@ -22478,7 +22484,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 195,
-            skillLevels = { 1, 215, 235 },
+            skillLevels = { 195, 215, 225, 235 },
             reagents = {
                 { itemId = 4234, count = 6 },
                 { itemId = 4236, count = 2 },
@@ -22494,7 +22500,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 170,
-            skillLevels = { 1, 190, 210 },
+            skillLevels = { 170, 190, 200, 210 },
             reagents = {
                 { itemId = 4236, count = 2 },
                 { itemId = 4234, count = 4 },
@@ -22509,7 +22515,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 180, 200 },
+            skillLevels = { 1, 180, 190, 200 },
             reagents = {
                 { itemId = 4234, count = 12 },
                 { itemId = 4305, count = 2 },
@@ -22523,7 +22529,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 1, 230, 240, 250 },
             reagents = {
                 { itemId = 4304, count = 6 },
                 { itemId = 8167, count = 12 },
@@ -22541,7 +22547,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 205,
-            skillLevels = { 1, 225, 245 },
+            skillLevels = { 205, 225, 235, 245 },
             reagents = {
                 { itemId = 4304, count = 6 },
                 { itemId = 8167, count = 8 },
@@ -22557,7 +22563,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 205,
-            skillLevels = { 1, 225, 245 },
+            skillLevels = { 205, 225, 235, 245 },
             reagents = {
                 { itemId = 3859, count = 10 },
                 { itemId = 3577, count = 4 },
@@ -22574,7 +22580,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 200,
-            skillLevels = { 1, 225, 250 },
+            skillLevels = { 200, 225, 237, 250 },
             reagents = {
                 { itemId = 3859, count = 10 },
                 { itemId = 3577, count = 4 },
@@ -22591,7 +22597,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 195,
-            skillLevels = { 1, 220, 245 },
+            skillLevels = { 195, 220, 232, 245 },
             reagents = {
                 { itemId = 3859, count = 12 },
                 { itemId = 3577, count = 2 },
@@ -22608,7 +22614,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 190,
-            skillLevels = { 1, 215, 240 },
+            skillLevels = { 190, 215, 227, 240 },
             reagents = {
                 { itemId = 3859, count = 8 },
                 { itemId = 3577, count = 2 },
@@ -22624,7 +22630,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 180,
-            skillLevels = { 1, 205, 230 },
+            skillLevels = { 180, 205, 217, 230 },
             reagents = {
                 { itemId = 3859, count = 8 },
                 { itemId = 3466, count = 2 },
@@ -22642,7 +22648,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 175,
-            skillLevels = { 1, 200, 225 },
+            skillLevels = { 175, 200, 212, 225 },
             reagents = {
                 { itemId = 3859, count = 6 },
                 { itemId = 3577, count = 2 },
@@ -22658,7 +22664,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 170,
-            skillLevels = { 1, 195, 220 },
+            skillLevels = { 170, 195, 207, 220 },
             reagents = {
                 { itemId = 3575, count = 10 },
                 { itemId = 3577, count = 2 },
@@ -22672,7 +22678,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 195, 235 },
+            skillLevels = { 1, 195, 215, 235 },
             reagents = {
                 { itemId = 11291, count = 1 },
                 { itemId = 11135, count = 1 },
@@ -22690,7 +22696,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2595",
             sortOrder = 9999,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 230 },
+            skillLevels = { 225, 225, 227, 230 },
             reagents = {
                 { itemId = 11137, count = 5 },
             },
@@ -22705,7 +22711,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2592",
             sortOrder = 9999,
             requiredSkill = 190,
-            skillLevels = { 1, 210, 215 },
+            skillLevels = { 190, 210, 212, 215 },
             reagents = {
                 { itemId = 3356, count = 1 },
                 { itemId = 3821, count = 1 },
@@ -22719,7 +22725,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -22732,7 +22738,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -22747,7 +22753,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -22762,7 +22768,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -22777,7 +22783,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -22790,7 +22796,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -22805,7 +22811,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -22820,7 +22826,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -22833,7 +22839,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -22848,7 +22854,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -22863,7 +22869,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -22878,7 +22884,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -22894,7 +22900,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2592",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -22908,7 +22914,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -22924,7 +22930,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -22940,7 +22946,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -22956,7 +22962,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 11176, count = 5 },
             },
@@ -22968,7 +22974,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2592",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 5 },
                 { itemId = 8925, count = 1 },
@@ -22982,7 +22988,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2592",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -23000,7 +23006,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2595",
             sortOrder = 9999,
             requiredSkill = 120,
-            skillLevels = { 1, 120, 160 },
+            skillLevels = { 120, 120, 140, 160 },
             reagents = {
                 { itemId = 4470, count = 1 },
                 { itemId = 10940, count = 4 },
@@ -23013,7 +23019,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 250, 260 },
+            skillLevels = { 1, 250, 255, 260 },
             reagents = {
                 { itemId = 221021, count = 10 },
                 { itemId = 220688, count = 1 },
@@ -23030,7 +23036,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 325, 350 },
+            skillLevels = { 300, 325, 337, 350 },
             reagents = {
                 { itemId = 17203, count = 8 },
                 { itemId = 11371, count = 20 },
@@ -23050,7 +23056,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 295,
-            skillLevels = { 1, 315, 335 },
+            skillLevels = { 295, 315, 325, 335 },
             reagents = {
                 { itemId = 8170, count = 28 },
                 { itemId = 15415, count = 30 },
@@ -23068,7 +23074,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12794, count = 1 },
                 { itemId = 18262, count = 10 },
@@ -23084,7 +23090,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 15412, count = 25 },
@@ -23100,7 +23106,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 290, 310, 320, 330 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 12655, count = 6 },
@@ -23117,7 +23123,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 30 },
                 { itemId = 12607, count = 12 },
@@ -23136,7 +23142,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 290, 310, 320, 330 },
             reagents = {
                 { itemId = 8170, count = 40 },
                 { itemId = 15416, count = 60 },
@@ -23153,7 +23159,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 40 },
                 { itemId = 15416, count = 60 },
@@ -23171,7 +23177,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 44 },
                 { itemId = 15416, count = 45 },
@@ -23189,7 +23195,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 285,
-            skillLevels = { 1, 305, 325 },
+            skillLevels = { 285, 305, 315, 325 },
             reagents = {
                 { itemId = 8170, count = 8 },
                 { itemId = 7078, count = 1 },
@@ -23206,7 +23212,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 10 },
                 { itemId = 7078, count = 1 },
@@ -23223,7 +23229,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 8170, count = 6 },
                 { itemId = 7078, count = 1 },
@@ -23240,7 +23246,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 285,
-            skillLevels = { 1, 305, 325 },
+            skillLevels = { 285, 305, 315, 325 },
             reagents = {
                 { itemId = 11371, count = 20 },
                 { itemId = 7077, count = 8 },
@@ -23255,7 +23261,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12790, count = 1 },
                 { itemId = 18262, count = 10 },
@@ -23270,7 +23276,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 15 },
                 { itemId = 12655, count = 20 },
@@ -23288,7 +23294,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 285,
-            skillLevels = { 1, 305, 325 },
+            skillLevels = { 285, 305, 315, 325 },
             reagents = {
                 { itemId = 8170, count = 28 },
                 { itemId = 15415, count = 30 },
@@ -23305,7 +23311,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12784, count = 1 },
                 { itemId = 18262, count = 10 },
@@ -23320,7 +23326,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 270,
-            skillLevels = { 1, 300, 320 },
+            skillLevels = { 270, 300, 310, 320 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 15412, count = 25 },
@@ -23336,7 +23342,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 30 },
                 { itemId = 7082, count = 12 },
@@ -23355,7 +23361,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 285, 295 },
+            skillLevels = { 1, 285, 290, 295 },
             reagents = {
                 { itemId = 8170, count = 4 },
                 { itemId = 14048, count = 2 },
@@ -23372,7 +23378,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 18512, count = 8 },
@@ -23390,7 +23396,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 14342, count = 4 },
@@ -23406,7 +23412,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 17010, count = 4 },
                 { itemId = 17011, count = 2 },
@@ -23423,7 +23429,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12796, count = 1 },
                 { itemId = 18262, count = 10 },
@@ -23437,7 +23443,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 340 },
+            skillLevels = { 1, 315, 327, 340 },
             reagents = {
                 { itemId = 12359, count = 40 },
                 { itemId = 12360, count = 2 },
@@ -23456,7 +23462,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 10 },
                 { itemId = 12655, count = 10 },
@@ -23475,7 +23481,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 310, 335 },
+            skillLevels = { 1, 310, 322, 335 },
             reagents = {
                 { itemId = 12655, count = 6 },
                 { itemId = 12360, count = 2 },
@@ -23494,7 +23500,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 15412, count = 25 },
@@ -23510,7 +23516,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 290,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 290, 310, 320, 330 },
             reagents = {
                 { itemId = 8170, count = 30 },
                 { itemId = 15417, count = 8 },
@@ -23527,7 +23533,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 30 },
                 { itemId = 15417, count = 20 },
@@ -23547,7 +23553,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 8170, count = 2 },
@@ -23564,7 +23570,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12797, count = 1 },
                 { itemId = 18262, count = 10 },
@@ -23579,7 +23585,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 305, 330 },
+            skillLevels = { 280, 305, 317, 330 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 12655, count = 6 },
@@ -23597,7 +23603,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 30 },
                 { itemId = 12655, count = 30 },
@@ -23614,7 +23620,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 295,
-            skillLevels = { 1, 315, 335 },
+            skillLevels = { 295, 315, 325, 335 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 12655, count = 4 },
@@ -23631,7 +23637,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12359, count = 40 },
                 { itemId = 12655, count = 4 },
@@ -23649,7 +23655,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 12 },
                 { itemId = 20725, count = 2 },
@@ -23666,7 +23672,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 14342, count = 4 },
@@ -23682,7 +23688,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 14342, count = 6 },
@@ -23700,7 +23706,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 290,
-            skillLevels = { 1, 305, 335 },
+            skillLevels = { 290, 305, 320, 335 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 14342, count = 4 },
@@ -23716,7 +23722,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 12804, count = 12 },
@@ -23731,7 +23737,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 28 },
                 { itemId = 15415, count = 36 },
@@ -23748,7 +23754,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14048, count = 16 },
                 { itemId = 9210, count = 10 },
@@ -23770,7 +23776,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2595",
             sortOrder = 9999,
             requiredSkill = 290,
-            skillLevels = { 1, 305, 320 },
+            skillLevels = { 290, 305, 312, 320 },
             reagents = {
                 { itemId = 16204, count = 1 },
             },
@@ -23786,7 +23792,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2595",
             sortOrder = 9999,
             requiredSkill = 275,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 275, 285, 295, 305 },
             reagents = {
                 { itemId = 16204, count = 2 },
                 { itemId = 4625, count = 1 },
@@ -23802,7 +23808,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2595",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 14344, count = 4 },
                 { itemId = 16203, count = 12 },
@@ -23821,7 +23827,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 14342, count = 12 },
@@ -23839,7 +23845,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2530",
             sortOrder = 10,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 340 },
+            skillLevels = { 300, 315, 327, 340 },
             reagents = {
                 { itemId = 14530, count = 2 },
             },
@@ -23855,7 +23861,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2594",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 325, 365 },
+            skillLevels = { 300, 325, 345, 365 },
             reagents = {
                 { itemId = 13888, count = 1 },
                 { itemId = 227813, count = 1 },
@@ -23870,7 +23876,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2594",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 325, 365 },
+            skillLevels = { 300, 325, 345, 365 },
             reagents = {
                 { itemId = 13758, count = 1 },
             },
@@ -23886,7 +23892,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2595",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 330 },
+            skillLevels = { 300, 310, 320, 330 },
             reagents = {
                 { itemId = 8151, count = 3 },
                 { itemId = 8152, count = 3 },
@@ -23902,7 +23908,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 15 },
                 { itemId = 234003, count = 3 },
@@ -23919,7 +23925,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 15 },
                 { itemId = 234003, count = 3 },
@@ -23936,7 +23942,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 20 },
                 { itemId = 234003, count = 4 },
@@ -23953,7 +23959,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 40 },
                 { itemId = 234003, count = 10 },
@@ -23971,7 +23977,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 40 },
                 { itemId = 234003, count = 10 },
@@ -23989,7 +23995,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 40 },
                 { itemId = 234003, count = 10 },
@@ -24007,7 +24013,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 30 },
                 { itemId = 234003, count = 8 },
@@ -24025,7 +24031,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 30 },
                 { itemId = 234003, count = 8 },
@@ -24043,7 +24049,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 30 },
                 { itemId = 234003, count = 8 },
@@ -24061,7 +24067,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 234007, count = 5 },
                 { itemId = 14342, count = 3 },
@@ -24076,7 +24082,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 234007, count = 5 },
                 { itemId = 15407, count = 3 },
@@ -24091,7 +24097,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 234007, count = 15 },
                 { itemId = 12810, count = 8 },
@@ -24107,7 +24113,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 234007, count = 15 },
                 { itemId = 12810, count = 8 },
@@ -24123,7 +24129,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 234007, count = 22 },
                 { itemId = 12810, count = 12 },
@@ -24139,7 +24145,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 1, 315, 330, 345 },
             reagents = {
                 { itemId = 234009, count = 15 },
                 { itemId = 14342, count = 8 },
@@ -24155,7 +24161,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 1, 315, 330, 345 },
             reagents = {
                 { itemId = 234009, count = 15 },
                 { itemId = 14342, count = 8 },
@@ -24171,7 +24177,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 1, 315, 330, 345 },
             reagents = {
                 { itemId = 234009, count = 25 },
                 { itemId = 14342, count = 12 },
@@ -24187,7 +24193,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 234009, count = 9 },
                 { itemId = 234007, count = 8 },
@@ -24204,7 +24210,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 234009, count = 9 },
                 { itemId = 234007, count = 8 },
@@ -24221,7 +24227,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 234009, count = 9 },
                 { itemId = 234007, count = 8 },
@@ -24238,7 +24244,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 234009, count = 9 },
                 { itemId = 234007, count = 8 },
@@ -24255,7 +24261,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2592",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             reagents = {
                 { itemId = 16203, count = 1 },
                 { itemId = 234012, count = 1 },
@@ -24271,7 +24277,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2592",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             reagents = {
                 { itemId = 16203, count = 1 },
                 { itemId = 234011, count = 1 },
@@ -24287,7 +24293,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2592",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             reagents = {
                 { itemId = 16203, count = 1 },
                 { itemId = 234006, count = 1 },
@@ -24303,7 +24309,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2592",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             reagents = {
                 { itemId = 16203, count = 1 },
                 { itemId = 234010, count = 1 },
@@ -24319,7 +24325,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2592",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             reagents = {
                 { itemId = 13465, count = 2 },
                 { itemId = 234012, count = 2 },
@@ -24335,7 +24341,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2592",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             reagents = {
                 { itemId = 13466, count = 2 },
                 { itemId = 234012, count = 2 },
@@ -24351,7 +24357,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2592",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             reagents = {
                 { itemId = 13467, count = 2 },
                 { itemId = 234012, count = 2 },
@@ -24367,7 +24373,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2592",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             reagents = {
                 { itemId = 13463, count = 2 },
                 { itemId = 234012, count = 2 },
@@ -24383,7 +24389,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -24400,7 +24406,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             reagents = {
                 { itemId = 234011, count = 1 },
                 { itemId = 234005, count = 2 },
@@ -24415,7 +24421,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -24433,7 +24439,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             reagents = {
                 { itemId = 234005, count = 20 },
                 { itemId = 234012, count = 30 },
@@ -24451,7 +24457,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             reagents = {
                 { itemId = 18168, count = 1 },
                 { itemId = 234007, count = 4 },
@@ -24467,7 +24473,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 234006, count = 10 },
                 { itemId = 234010, count = 10 },
@@ -24484,7 +24490,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 234006, count = 10 },
                 { itemId = 234010, count = 10 },
@@ -24501,7 +24507,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 234007, count = 10 },
                 { itemId = 234010, count = 5 },
@@ -24518,7 +24524,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 234003, count = 3 },
                 { itemId = 234005, count = 6 },
@@ -24534,7 +24540,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 234007, count = 10 },
                 { itemId = 234010, count = 5 },
@@ -24552,7 +24558,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 16203, count = 1 },
                 { itemId = 14047, count = 1 },
@@ -24566,7 +24572,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 234011, count = 3 },
                 { itemId = 234012, count = 3 },
@@ -24579,7 +24585,7 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 233997,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 2 },
                 { itemId = 16204, count = 8 },
@@ -24598,7 +24604,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 2 },
                 { itemId = 14344, count = 5 },
@@ -24615,7 +24621,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 2 },
                 { itemId = 14344, count = 5 },
@@ -24630,7 +24636,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 3 },
                 { itemId = 234008, count = 10 },
@@ -24646,7 +24652,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 3 },
                 { itemId = 234012, count = 10 },
@@ -24662,7 +24668,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 2 },
                 { itemId = 234012, count = 20 },
@@ -24677,7 +24683,7 @@ RecipeRegistryRecipeMetadata = {
             createdItemId = 234003,
             recipeItemId = 234278,
             removed = true,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             reagents = {
                 { itemId = 12655, count = 2 },
                 { itemId = 22203, count = 2 },
@@ -24691,7 +24697,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             reagents = {
                 { itemId = 22202, count = 5 },
             },
@@ -24704,7 +24710,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             reagents = {
                 { itemId = 22202, count = 2 },
             },
@@ -24717,7 +24723,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12655, count = 8 },
                 { itemId = 12803, count = 4 },
@@ -24732,7 +24738,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12655, count = 12 },
                 { itemId = 19726, count = 4 },
@@ -24747,7 +24753,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12655, count = 14 },
                 { itemId = 19726, count = 8 },
@@ -24763,7 +24769,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 20501, count = 2 },
                 { itemId = 20498, count = 20 },
@@ -24779,7 +24785,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 20501, count = 4 },
                 { itemId = 20498, count = 30 },
@@ -24796,7 +24802,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 20501, count = 5 },
                 { itemId = 20498, count = 40 },
@@ -24813,7 +24819,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 20500, count = 2 },
                 { itemId = 20498, count = 20 },
@@ -24829,7 +24835,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 20500, count = 3 },
                 { itemId = 20498, count = 30 },
@@ -24846,7 +24852,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 20500, count = 4 },
                 { itemId = 20498, count = 40 },
@@ -24863,7 +24869,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12810, count = 6 },
                 { itemId = 12803, count = 4 },
@@ -24879,7 +24885,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12810, count = 6 },
                 { itemId = 18512, count = 3 },
@@ -24896,7 +24902,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12810, count = 14 },
                 { itemId = 19726, count = 7 },
@@ -24912,7 +24918,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 1, 315, 330, 345 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 12803, count = 4 },
@@ -24928,7 +24934,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 1, 315, 330, 345 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 14342, count = 4 },
@@ -24945,7 +24951,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 1, 315, 330, 345 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 19726, count = 3 },
@@ -24962,7 +24968,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 22202, count = 14 },
                 { itemId = 12655, count = 4 },
@@ -24978,7 +24984,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 22202, count = 14 },
                 { itemId = 12810, count = 6 },
@@ -24993,7 +24999,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12810, count = 12 },
                 { itemId = 20381, count = 6 },
@@ -25010,7 +25016,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 30 },
                 { itemId = 234003, count = 8 },
@@ -25028,7 +25034,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 30 },
                 { itemId = 234003, count = 8 },
@@ -25046,7 +25052,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 330 },
+            skillLevels = { 1, 315, 322, 330 },
             reagents = {
                 { itemId = 234008, count = 5 },
             },
@@ -25059,7 +25065,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 22203, count = 8 },
                 { itemId = 22202, count = 24 },
@@ -25075,7 +25081,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 22203, count = 8 },
                 { itemId = 22202, count = 24 },
@@ -25091,7 +25097,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 22203, count = 15 },
                 { itemId = 22202, count = 36 },
@@ -25108,7 +25114,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12810, count = 12 },
                 { itemId = 20381, count = 6 },
@@ -25125,7 +25131,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 14048, count = 30 },
                 { itemId = 20381, count = 4 },
@@ -25142,7 +25148,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 14048, count = 30 },
                 { itemId = 20381, count = 5 },
@@ -25159,7 +25165,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 12360, count = 20 },
                 { itemId = 12810, count = 4 },
@@ -25176,7 +25182,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 22203, count = 18 },
                 { itemId = 22202, count = 40 },
@@ -25193,7 +25199,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 3 },
                 { itemId = 234008, count = 10 },
@@ -25209,7 +25215,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 3 },
                 { itemId = 234008, count = 10 },
@@ -25225,7 +25231,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 3 },
                 { itemId = 234008, count = 10 },
@@ -25241,7 +25247,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 3 },
                 { itemId = 234012, count = 10 },
@@ -25257,7 +25263,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 3 },
                 { itemId = 234012, count = 10 },
@@ -25273,7 +25279,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 3 },
                 { itemId = 234012, count = 10 },
@@ -25289,7 +25295,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 2 },
                 { itemId = 234012, count = 20 },
@@ -25306,7 +25312,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 2 },
                 { itemId = 234012, count = 20 },
@@ -25323,7 +25329,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 2 },
                 { itemId = 234012, count = 20 },
@@ -25339,7 +25345,7 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "drop",
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 14344, count = 2 },
                 { itemId = 16204, count = 20 },
@@ -25355,7 +25361,7 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 235528,
             category = "c2595",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 2 },
                 { itemId = 16204, count = 10 },
@@ -25371,7 +25377,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 16000, count = 1 },
                 { itemId = 12363, count = 1 },
@@ -25385,7 +25391,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2504",
             sortOrder = 150,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             createdCount = 9,
             createdCountMax = 9,
             reagents = {
@@ -25401,7 +25407,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2504",
             sortOrder = 150,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             createdCount = 12,
             createdCountMax = 12,
             reagents = {
@@ -25419,7 +25425,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2504",
             sortOrder = 150,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             createdCount = 6,
             createdCountMax = 6,
             reagents = {
@@ -25438,7 +25444,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2501",
             sortOrder = 120,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             createdCount = 65,
             createdCountMax = 65,
             reagents = {
@@ -25455,7 +25461,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2503",
             sortOrder = 140,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             createdCount = 12,
             createdCountMax = 12,
             reagents = {
@@ -25473,7 +25479,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2506",
             sortOrder = 170,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -25489,7 +25495,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2503",
             sortOrder = 140,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 14344, count = 5 },
                 { itemId = 16204, count = 15 },
@@ -25505,7 +25511,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             createdCount = 16,
             createdCountMax = 16,
             reagents = {
@@ -25524,7 +25530,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2596",
             sortOrder = 9999,
             requiredSkill = 250,
-            skillLevels = { 1, 275, 280 },
+            skillLevels = { 250, 275, 277, 280 },
             reagents = {
                 { itemId = 8170, count = 8 },
                 { itemId = 12800, count = 2 },
@@ -25537,7 +25543,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 1, 315, 330, 345 },
             reagents = {
                 { itemId = 236656, count = 7 },
                 { itemId = 14048, count = 8 },
@@ -25552,7 +25558,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 1, 315, 330, 345 },
             reagents = {
                 { itemId = 236656, count = 5 },
                 { itemId = 14048, count = 4 },
@@ -25567,7 +25573,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 1, 315, 330, 345 },
             reagents = {
                 { itemId = 236656, count = 5 },
                 { itemId = 14048, count = 4 },
@@ -25582,7 +25588,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 1, 315, 330, 345 },
             reagents = {
                 { itemId = 236656, count = 4 },
                 { itemId = 14048, count = 2 },
@@ -25597,7 +25603,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 1, 315, 330, 345 },
             reagents = {
                 { itemId = 236656, count = 7 },
                 { itemId = 14048, count = 8 },
@@ -25612,7 +25618,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 1, 315, 330, 345 },
             reagents = {
                 { itemId = 236656, count = 5 },
                 { itemId = 14048, count = 4 },
@@ -25627,7 +25633,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2598",
             sortOrder = 9999,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 1, 315, 330, 345 },
             reagents = {
                 { itemId = 236656, count = 4 },
                 { itemId = 14048, count = 2 },
@@ -25642,7 +25648,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 236656, count = 7 },
                 { itemId = 15408, count = 24 },
@@ -25658,7 +25664,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 236656, count = 5 },
                 { itemId = 15408, count = 16 },
@@ -25674,7 +25680,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 236656, count = 4 },
                 { itemId = 15408, count = 16 },
@@ -25690,7 +25696,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 236656, count = 7 },
                 { itemId = 12810, count = 16 },
@@ -25706,7 +25712,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 236656, count = 5 },
                 { itemId = 12810, count = 12 },
@@ -25722,7 +25728,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2597",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 236656, count = 4 },
                 { itemId = 12810, count = 12 },
@@ -25738,7 +25744,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 236656, count = 7 },
                 { itemId = 12359, count = 16 },
@@ -25753,7 +25759,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 236656, count = 5 },
                 { itemId = 12359, count = 12 },
@@ -25768,7 +25774,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2593",
             sortOrder = 9999,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 1, 320, 330, 340 },
             reagents = {
                 { itemId = 236656, count = 4 },
                 { itemId = 12359, count = 12 },
@@ -25785,7 +25791,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 280, 285, 295, 305 },
             reagents = {
                 { itemId = 12938, count = 1 },
                 { itemId = 12811, count = 2 },
@@ -25801,7 +25807,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 280, 285, 295, 305 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 14048, count = 10 },
@@ -25816,7 +25822,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 280, 285, 295, 305 },
             reagents = {
                 { itemId = 12938, count = 1 },
                 { itemId = 12811, count = 1 },
@@ -25832,7 +25838,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 250,
-            skillLevels = { 1, 260, 305 },
+            skillLevels = { 250, 260, 282, 305 },
             reagents = {
                 { itemId = 14048, count = 8 },
             },
@@ -25846,7 +25852,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 260,
-            skillLevels = { 1, 270, 305 },
+            skillLevels = { 260, 270, 287, 305 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 14048, count = 10 },
@@ -25861,7 +25867,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 250,
-            skillLevels = { 1, 260, 305 },
+            skillLevels = { 250, 260, 282, 305 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 14048, count = 10 },
@@ -25876,7 +25882,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 270,
-            skillLevels = { 1, 280, 305 },
+            skillLevels = { 270, 280, 292, 305 },
             reagents = {
                 { itemId = 12938, count = 1 },
                 { itemId = 12811, count = 1 },
@@ -25892,7 +25898,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 260,
-            skillLevels = { 1, 270, 305 },
+            skillLevels = { 260, 270, 287, 305 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 14048, count = 10 },
@@ -25907,7 +25913,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 280, 285, 295, 305 },
             reagents = {
                 { itemId = 12938, count = 1 },
                 { itemId = 12811, count = 2 },
@@ -25923,7 +25929,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 280, 285, 295, 305 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 8170, count = 10 },
@@ -25938,7 +25944,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 280, 285, 295, 305 },
             reagents = {
                 { itemId = 12938, count = 1 },
                 { itemId = 12811, count = 1 },
@@ -25954,7 +25960,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 250,
-            skillLevels = { 1, 260, 305 },
+            skillLevels = { 250, 260, 282, 305 },
             reagents = {
                 { itemId = 8170, count = 8 },
             },
@@ -25968,7 +25974,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 260,
-            skillLevels = { 1, 270, 305 },
+            skillLevels = { 260, 270, 287, 305 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 8170, count = 10 },
@@ -25983,7 +25989,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 250,
-            skillLevels = { 1, 260, 305 },
+            skillLevels = { 250, 260, 282, 305 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 8170, count = 10 },
@@ -25998,7 +26004,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 270,
-            skillLevels = { 1, 280, 305 },
+            skillLevels = { 270, 280, 292, 305 },
             reagents = {
                 { itemId = 12938, count = 1 },
                 { itemId = 12811, count = 1 },
@@ -26014,7 +26020,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 260,
-            skillLevels = { 1, 270, 305 },
+            skillLevels = { 260, 270, 287, 305 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 8170, count = 10 },
@@ -26029,7 +26035,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 280, 285, 295, 305 },
             reagents = {
                 { itemId = 12938, count = 1 },
                 { itemId = 12811, count = 2 },
@@ -26045,7 +26051,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 280, 285, 295, 305 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 15408, count = 10 },
@@ -26060,7 +26066,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 280, 285, 295, 305 },
             reagents = {
                 { itemId = 12938, count = 1 },
                 { itemId = 12811, count = 1 },
@@ -26076,7 +26082,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 250,
-            skillLevels = { 1, 260, 305 },
+            skillLevels = { 250, 260, 282, 305 },
             reagents = {
                 { itemId = 15408, count = 8 },
             },
@@ -26090,7 +26096,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 260,
-            skillLevels = { 1, 270, 305 },
+            skillLevels = { 260, 270, 287, 305 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 15408, count = 10 },
@@ -26105,7 +26111,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 250,
-            skillLevels = { 1, 260, 305 },
+            skillLevels = { 250, 260, 282, 305 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 15408, count = 10 },
@@ -26120,7 +26126,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 270,
-            skillLevels = { 1, 280, 305 },
+            skillLevels = { 270, 280, 292, 305 },
             reagents = {
                 { itemId = 12938, count = 1 },
                 { itemId = 12811, count = 1 },
@@ -26136,7 +26142,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 260,
-            skillLevels = { 1, 270, 305 },
+            skillLevels = { 260, 270, 287, 305 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 15408, count = 10 },
@@ -26151,7 +26157,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 280, 285, 295, 305 },
             reagents = {
                 { itemId = 12938, count = 1 },
                 { itemId = 12811, count = 2 },
@@ -26167,7 +26173,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 280, 285, 295, 305 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 12359, count = 20 },
@@ -26182,7 +26188,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 280, 285, 295, 305 },
             reagents = {
                 { itemId = 12938, count = 1 },
                 { itemId = 12811, count = 1 },
@@ -26198,7 +26204,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 250,
-            skillLevels = { 1, 260, 305 },
+            skillLevels = { 250, 260, 282, 305 },
             reagents = {
                 { itemId = 12359, count = 16 },
             },
@@ -26212,7 +26218,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 260,
-            skillLevels = { 1, 270, 305 },
+            skillLevels = { 260, 270, 287, 305 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 12359, count = 20 },
@@ -26227,7 +26233,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 250,
-            skillLevels = { 1, 260, 305 },
+            skillLevels = { 250, 260, 282, 305 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 12359, count = 20 },
@@ -26242,7 +26248,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 270,
-            skillLevels = { 1, 280, 305 },
+            skillLevels = { 270, 280, 292, 305 },
             reagents = {
                 { itemId = 12938, count = 1 },
                 { itemId = 12811, count = 1 },
@@ -26258,7 +26264,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2593",
             sortOrder = 9999,
             requiredSkill = 260,
-            skillLevels = { 1, 270, 305 },
+            skillLevels = { 260, 270, 287, 305 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 12359, count = 20 },
@@ -26273,7 +26279,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2594",
             sortOrder = 9999,
             requiredSkill = 250,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 250, 260, 270, 280 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -26290,7 +26296,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2594",
             sortOrder = 9999,
             requiredSkill = 250,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 250, 260, 270, 280 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -26307,7 +26313,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2594",
             sortOrder = 9999,
             requiredSkill = 250,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 250, 260, 270, 280 },
             createdCount = 2,
             createdCountMax = 2,
             reagents = {
@@ -26324,7 +26330,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2594",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 280, 290, 300, 310 },
             reagents = {
                 { itemId = 4603, count = 12 },
                 { itemId = 12184, count = 4 },
@@ -26341,7 +26347,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2594",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 280, 290, 300, 310 },
             reagents = {
                 { itemId = 13888, count = 12 },
                 { itemId = 3712, count = 4 },
@@ -26357,7 +26363,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 1, 260, 270, 280 },
             reagents = {
                 { itemId = 10561, count = 1 },
                 { itemId = 10558, count = 2 },
@@ -26371,7 +26377,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 1, 270, 280, 290 },
             reagents = {
                 { itemId = 238737, count = 1 },
                 { itemId = 10560, count = 1 },
@@ -26386,7 +26392,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 1, 270, 280, 290 },
             reagents = {
                 { itemId = 238737, count = 1 },
                 { itemId = 10560, count = 1 },
@@ -26401,7 +26407,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 1, 270, 280, 290 },
             reagents = {
                 { itemId = 238737, count = 1 },
                 { itemId = 10560, count = 1 },
@@ -26414,7 +26420,7 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 238786,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 280, 285 },
+            skillLevels = { 1, 280, 282, 285 },
             reagents = {
                 { itemId = 238737, count = 1 },
                 { itemId = 16006, count = 1 },
@@ -26427,7 +26433,7 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 238787,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 280, 285 },
+            skillLevels = { 1, 280, 282, 285 },
             reagents = {
                 { itemId = 238737, count = 1 },
                 { itemId = 16006, count = 1 },
@@ -26440,7 +26446,7 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 238788,
             category = "c2596",
             sortOrder = 9999,
-            skillLevels = { 1, 280, 285 },
+            skillLevels = { 1, 280, 282, 285 },
             reagents = {
                 { itemId = 238737, count = 1 },
                 { itemId = 16006, count = 1 },
@@ -26456,7 +26462,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2596",
             sortOrder = 9999,
             requiredSkill = 300,
-            skillLevels = { 1, 305, 305 },
+            skillLevels = { 300, 305, 305, 305 },
             reagents = {
                 { itemId = 16006, count = 1 },
                 { itemId = 18631, count = 2 },
@@ -26475,7 +26481,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 275,
-            skillLevels = { 1, 280, 290 },
+            skillLevels = { 275, 280, 285, 290 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 8170, count = 24 },
@@ -26491,7 +26497,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2597",
             sortOrder = 9999,
             requiredSkill = 275,
-            skillLevels = { 1, 280, 290 },
+            skillLevels = { 275, 280, 285, 290 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 15408, count = 24 },
@@ -26507,7 +26513,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 250,
-            skillLevels = { 1, 260, 265 },
+            skillLevels = { 250, 260, 262, 265 },
             reagents = {
                 { itemId = 12811, count = 1 },
                 { itemId = 14048, count = 14 },
@@ -26524,7 +26530,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2598",
             sortOrder = 9999,
             requiredSkill = 290,
-            skillLevels = { 1, 300, 305 },
+            skillLevels = { 290, 300, 302, 305 },
             reagents = {
                 { itemId = 12938, count = 1 },
                 { itemId = 14048, count = 24 },
@@ -26542,7 +26548,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2596",
             sortOrder = 9999,
             requiredSkill = 250,
-            skillLevels = { 1, 255, 260 },
+            skillLevels = { 250, 255, 257, 260 },
             reagents = {
                 { itemId = 15994, count = 1 },
                 { itemId = 10560, count = 1 },
@@ -26556,7 +26562,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2574",
             sortOrder = 1,
-            skillLevels = { 1, 20, 25 },
+            requiredSkill = 20,
+            skillLevels = { 20, 20, 22, 25 },
             reagents = {
                 { itemId = 2318, count = 5 },
             },
@@ -26568,7 +26575,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2591",
             sortOrder = 1,
-            skillLevels = { 1, 20, 25 },
+            requiredSkill = 20,
+            skillLevels = { 20, 20, 22, 25 },
             reagents = {
                 { itemId = 2996, count = 1 },
                 { itemId = 2320, count = 1 },
@@ -26581,7 +26589,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2718",
             sortOrder = 1,
-            skillLevels = { 1, 20, 25 },
+            requiredSkill = 20,
+            skillLevels = { 20, 20, 22, 25 },
             reagents = {
                 { itemId = 2318, count = 3 },
                 { itemId = 4470, count = 2 },
@@ -26594,7 +26603,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2716",
             sortOrder = 1,
-            skillLevels = { 1, 20, 25 },
+            requiredSkill = 20,
+            skillLevels = { 20, 20, 22, 25 },
             reagents = {
                 { itemId = 2447, count = 1 },
                 { itemId = 765, count = 1 },
@@ -26607,7 +26617,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2714",
             sortOrder = 1,
-            skillLevels = { 1, 1, 5 },
+            requiredSkill = 1,
+            skillLevels = { 1, 1, 3, 5 },
             reagents = {
                 { itemId = 4470, count = 1 },
             },
@@ -26619,7 +26630,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2715",
             sortOrder = 1,
-            skillLevels = { 1, 20, 20 },
+            requiredSkill = 20,
+            skillLevels = { 20, 20, 20, 20 },
             reagents = {
                 { itemId = 6291, count = 1 },
                 { itemId = 3371, count = 1 },
@@ -26632,7 +26644,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2535",
             sortOrder = 1,
-            skillLevels = { 1, 20, 25 },
+            requiredSkill = 20,
+            skillLevels = { 20, 20, 22, 25 },
             reagents = {
                 { itemId = 1251, count = 3 },
                 { itemId = 159, count = 1 },
@@ -26645,7 +26658,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2717",
             sortOrder = 1,
-            skillLevels = { 1, 20, 25 },
+            requiredSkill = 20,
+            skillLevels = { 20, 20, 22, 25 },
             reagents = {
                 { itemId = 2835, count = 1 },
                 { itemId = 2840, count = 1 },
@@ -26658,7 +26672,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2489",
             sortOrder = 1,
-            skillLevels = { 1, 20, 25 },
+            requiredSkill = 20,
+            skillLevels = { 20, 20, 22, 25 },
             reagents = {
                 { itemId = 2835, count = 1 },
                 { itemId = 2840, count = 1 },
@@ -26672,7 +26687,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "blueprint",
             category = "c2454",
             sortOrder = 1,
-            skillLevels = { 1, 20, 25 },
+            requiredSkill = 20,
+            skillLevels = { 20, 20, 22, 25 },
             reagents = {
                 { itemId = 2447, count = 1 },
                 { itemId = 3371, count = 1 },
@@ -26685,7 +26701,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2514",
             sortOrder = 1,
-            skillLevels = { 1, 20, 25 },
+            requiredSkill = 20,
+            skillLevels = { 20, 20, 22, 25 },
             reagents = {
                 { itemId = 4470, count = 1 },
                 { itemId = 10940, count = 1 },
@@ -26698,7 +26715,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2529",
             sortOrder = 1,
-            skillLevels = { 1, 20, 25 },
+            requiredSkill = 20,
+            skillLevels = { 20, 20, 22, 25 },
             reagents = {
                 { itemId = 4359, count = 1 },
                 { itemId = 4361, count = 1 },
@@ -26711,7 +26729,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2595",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 305, 310 },
+            skillLevels = { 280, 305, 307, 310 },
             reagents = {
                 { itemId = 14344, count = 5 },
                 { itemId = 12811, count = 2 },
@@ -26726,7 +26744,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2595",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 305, 310 },
+            skillLevels = { 280, 305, 307, 310 },
             reagents = {
                 { itemId = 14344, count = 10 },
                 { itemId = 12811, count = 4 },
@@ -26741,7 +26759,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2595",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 305, 310 },
+            skillLevels = { 280, 305, 307, 310 },
             reagents = {
                 { itemId = 14344, count = 6 },
                 { itemId = 12811, count = 3 },
@@ -26758,7 +26776,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2621",
             sortOrder = 20,
             requiredSkill = 250,
-            skillLevels = { 1, 290, 330 },
+            skillLevels = { 250, 290, 310, 330 },
             reagents = {
                 { itemId = 8925, count = 1 },
                 { itemId = 13466, count = 1 },
@@ -26772,7 +26790,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2595",
             sortOrder = 9999,
             requiredSkill = 280,
-            skillLevels = { 1, 305, 310 },
+            skillLevels = { 280, 305, 307, 310 },
             reagents = {
                 { itemId = 14344, count = 10 },
                 { itemId = 12811, count = 6 },
@@ -26789,7 +26807,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 250,
-            skillLevels = { 1, 260, 270 },
+            skillLevels = { 250, 260, 265, 270 },
             reagents = {
                 { itemId = 3819, count = 4 },
                 { itemId = 8846, count = 2 },
@@ -26803,7 +26821,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2531",
             sortOrder = 10,
-            skillLevels = { 1, 55, 95 },
+            requiredSkill = 1,
+            skillLevels = { 1, 55, 75, 95 },
             reagents = {
                 { itemId = 3371, count = 1 },
                 { itemId = 2678, count = 1 },
@@ -26817,7 +26836,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2531",
             sortOrder = 10,
-            skillLevels = { 1, 85, 125 },
+            requiredSkill = 55,
+            skillLevels = { 55, 85, 105, 125 },
             reagents = {
                 { itemId = 3371, count = 1 },
                 { itemId = 2678, count = 2 },
@@ -26831,7 +26851,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2531",
             sortOrder = 10,
-            skillLevels = { 1, 135, 175 },
+            requiredSkill = 110,
+            skillLevels = { 110, 135, 155, 175 },
             reagents = {
                 { itemId = 3372, count = 1 },
                 { itemId = 2692, count = 1 },
@@ -26849,7 +26870,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2531",
             sortOrder = 10,
             requiredSkill = 155,
-            skillLevels = { 1, 175, 215 },
+            skillLevels = { 155, 175, 195, 215 },
             reagents = {
                 { itemId = 3372, count = 1 },
                 { itemId = 2692, count = 3 },
@@ -26865,7 +26886,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2531",
             sortOrder = 10,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 270 },
+            skillLevels = { 215, 230, 250, 270 },
             reagents = {
                 { itemId = 8925, count = 1 },
                 { itemId = 3713, count = 1 },
@@ -26883,7 +26904,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2531",
             sortOrder = 10,
             requiredSkill = 275,
-            skillLevels = { 1, 290, 330 },
+            skillLevels = { 275, 290, 310, 330 },
             reagents = {
                 { itemId = 8925, count = 1 },
                 { itemId = 3713, count = 3 },
@@ -26897,7 +26918,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2621",
             sortOrder = 20,
-            skillLevels = { 1, 85, 125 },
+            skillLevels = { 1, 85, 105, 125 },
             reagents = {
                 { itemId = 3371, count = 1 },
                 { itemId = 2450, count = 1 },
@@ -26911,7 +26932,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2621",
             sortOrder = 20,
-            skillLevels = { 1, 135, 175 },
+            skillLevels = { 1, 135, 155, 175 },
             reagents = {
                 { itemId = 3372, count = 1 },
                 { itemId = 2453, count = 1 },
@@ -26925,7 +26946,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2621",
             sortOrder = 20,
-            skillLevels = { 1, 175, 215 },
+            skillLevels = { 1, 175, 195, 215 },
             reagents = {
                 { itemId = 3372, count = 1 },
                 { itemId = 3356, count = 1 },
@@ -26939,7 +26960,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2621",
             sortOrder = 20,
-            skillLevels = { 1, 230, 270 },
+            skillLevels = { 1, 230, 250, 270 },
             reagents = {
                 { itemId = 8925, count = 1 },
                 { itemId = 8838, count = 1 },
@@ -26954,7 +26975,8 @@ RecipeRegistryRecipeMetadata = {
             sourceKind = "vendor",
             category = "c2450",
             sortOrder = 30,
-            skillLevels = { 1, 10, 15 },
+            requiredSkill = 1,
+            skillLevels = { 1, 10, 12, 15 },
             reagents = {
                 { itemId = 2447, count = 1 },
                 { itemId = 3371, count = 1 },
@@ -26967,7 +26989,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2450",
             sortOrder = 30,
-            skillLevels = { 1, 10, 15 },
+            requiredSkill = 1,
+            skillLevels = { 1, 10, 12, 15 },
             reagents = {
                 { itemId = 765, count = 1 },
                 { itemId = 3371, count = 1 },
@@ -26980,7 +27003,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2488",
             sortOrder = 300,
-            skillLevels = { 1, 10, 15 },
+            requiredSkill = 1,
+            skillLevels = { 1, 10, 12, 15 },
             reagents = {
                 { itemId = 2840, count = 1 },
             },
@@ -26992,7 +27016,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2490",
             sortOrder = 10,
-            skillLevels = { 1, 10, 15 },
+            requiredSkill = 1,
+            skillLevels = { 1, 10, 12, 15 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -27006,7 +27031,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2512",
             sortOrder = 230,
-            skillLevels = { 1, 10, 15 },
+            requiredSkill = 1,
+            skillLevels = { 1, 10, 12, 15 },
             reagents = {
                 { itemId = 4470, count = 1 },
                 { itemId = 247786, count = 1 },
@@ -27019,7 +27045,7 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2644",
             sortOrder = 88,
-            skillLevels = { 1, 210, 220 },
+            skillLevels = { 1, 210, 215, 220 },
             reagents = {
                 { itemId = 8959, count = 1 },
             },
@@ -27033,7 +27059,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 70,
-            skillLevels = { 1, 110, 150 },
+            skillLevels = { 70, 110, 130, 150 },
             reagents = {
                 { itemId = 10938, count = 1 },
             },
@@ -27047,7 +27073,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 90,
-            skillLevels = { 1, 120, 160 },
+            skillLevels = { 90, 120, 140, 160 },
             reagents = {
                 { itemId = 10938, count = 2 },
             },
@@ -27061,7 +27087,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 140,
-            skillLevels = { 1, 165, 205 },
+            skillLevels = { 140, 165, 185, 205 },
             reagents = {
                 { itemId = 11134, count = 1 },
             },
@@ -27075,7 +27101,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2512",
             sortOrder = 230,
             requiredSkill = 185,
-            skillLevels = { 1, 205, 245 },
+            skillLevels = { 185, 205, 225, 245 },
             reagents = {
                 { itemId = 11174, count = 1 },
                 { itemId = 11176, count = 1 },
@@ -27089,7 +27115,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 190,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 190, 225, 245, 265 },
             reagents = {
                 { itemId = 11137, count = 1 },
             },
@@ -27103,7 +27129,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 205,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 205, 225, 245, 265 },
             reagents = {
                 { itemId = 11134, count = 2 },
             },
@@ -27115,7 +27141,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 300 },
+            skillLevels = { 240, 260, 280, 300 },
             reagents = {
                 { itemId = 11176, count = 3 },
                 { itemId = 11174, count = 1 },
@@ -27130,7 +27156,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2512",
             sortOrder = 230,
             requiredSkill = 245,
-            skillLevels = { 1, 265, 305 },
+            skillLevels = { 245, 265, 285, 305 },
             reagents = {
                 { itemId = 16202, count = 1 },
                 { itemId = 11176, count = 1 },
@@ -27146,7 +27172,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2512",
             sortOrder = 230,
             requiredSkill = 215,
-            skillLevels = { 1, 235, 275 },
+            skillLevels = { 215, 235, 255, 275 },
             reagents = {
                 { itemId = 11174, count = 2 },
                 { itemId = 11137, count = 1 },
@@ -27160,7 +27186,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2501",
             sortOrder = 120,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 270 },
+            skillLevels = { 210, 230, 250, 270 },
             reagents = {
                 { itemId = 11137, count = 2 },
                 { itemId = 11139, count = 1 },
@@ -27174,7 +27200,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2501",
             sortOrder = 120,
             requiredSkill = 220,
-            skillLevels = { 1, 240, 280 },
+            skillLevels = { 220, 240, 260, 280 },
             reagents = {
                 { itemId = 11137, count = 1 },
                 { itemId = 11139, count = 1 },
@@ -27190,7 +27216,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2512",
             sortOrder = 230,
             requiredSkill = 275,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 275, 285, 295, 305 },
             reagents = {
                 { itemId = 16203, count = 2 },
                 { itemId = 16204, count = 1 },
@@ -27204,7 +27230,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 310 },
+            skillLevels = { 250, 270, 290, 310 },
             reagents = {
                 { itemId = 11176, count = 2 },
                 { itemId = 15407, count = 1 },
@@ -27217,7 +27243,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 295,
-            skillLevels = { 1, 315, 355 },
+            skillLevels = { 295, 315, 335, 355 },
             reagents = {
                 { itemId = 16204, count = 3 },
                 { itemId = 16203, count = 3 },
@@ -27233,7 +27259,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2501",
             sortOrder = 120,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 248819, count = 4 },
                 { itemId = 16203, count = 6 },
@@ -27252,7 +27278,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2501",
             sortOrder = 120,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 248819, count = 4 },
                 { itemId = 16203, count = 6 },
@@ -27268,7 +27294,7 @@ RecipeRegistryRecipeMetadata = {
             recipeItemId = 249533,
             category = "c2497",
             sortOrder = 80,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 1, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 4 },
                 { itemId = 16203, count = 8 },
@@ -27284,7 +27310,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 20725, count = 2 },
                 { itemId = 14344, count = 5 },
@@ -27302,7 +27328,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2512",
             sortOrder = 230,
             requiredSkill = 275,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 275, 320, 340, 360 },
             reagents = {
                 { itemId = 16203, count = 1 },
                 { itemId = 16204, count = 3 },
@@ -27319,7 +27345,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 16203, count = 10 },
             },
@@ -27333,7 +27359,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2496",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 14344, count = 3 },
             },
@@ -27347,7 +27373,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2501",
             sortOrder = 120,
             requiredSkill = 290,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 290, 295, 297, 300 },
             reagents = {
                 { itemId = 14344, count = 8 },
                 { itemId = 16203, count = 10 },
@@ -27366,7 +27392,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2511",
             sortOrder = 220,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 180 },
+            skillLevels = { 140, 140, 160, 180 },
             reagents = {
                 { itemId = 11084, count = 4 },
                 { itemId = 10978, count = 2 },
@@ -27387,7 +27413,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2511",
             sortOrder = 220,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 180 },
+            skillLevels = { 140, 140, 160, 180 },
             reagents = {
                 { itemId = 11084, count = 2 },
                 { itemId = 10978, count = 1 },
@@ -27408,7 +27434,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2513",
             sortOrder = 240,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 180 },
+            skillLevels = { 140, 140, 160, 180 },
             reagents = {
                 { itemId = 10978, count = 2 },
                 { itemId = 11082, count = 2 },
@@ -27426,7 +27452,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2513",
             sortOrder = 240,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 180 },
+            skillLevels = { 140, 140, 160, 180 },
             reagents = {
                 { itemId = 10978, count = 2 },
                 { itemId = 11082, count = 2 },
@@ -27444,7 +27470,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2509",
             sortOrder = 200,
             requiredSkill = 130,
-            skillLevels = { 1, 140, 180 },
+            skillLevels = { 130, 140, 160, 180 },
             reagents = {
                 { itemId = 10978, count = 1 },
                 { itemId = 10939, count = 2 },
@@ -27463,7 +27489,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2509",
             sortOrder = 200,
             requiredSkill = 130,
-            skillLevels = { 1, 140, 180 },
+            skillLevels = { 130, 140, 160, 180 },
             reagents = {
                 { itemId = 11084, count = 1 },
                 { itemId = 10939, count = 1 },
@@ -27482,7 +27508,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2509",
             sortOrder = 200,
             requiredSkill = 130,
-            skillLevels = { 1, 140, 180 },
+            skillLevels = { 130, 140, 160, 180 },
             reagents = {
                 { itemId = 11084, count = 1 },
                 { itemId = 10939, count = 2 },
@@ -27499,7 +27525,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 180 },
+            skillLevels = { 140, 140, 160, 180 },
             reagents = {
                 { itemId = 10940, count = 10 },
                 { itemId = 11084, count = 4 },
@@ -27517,7 +27543,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 180 },
+            skillLevels = { 140, 140, 160, 180 },
             createdCount = 10,
             createdCountMax = 10,
             reagents = {
@@ -27537,7 +27563,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2502",
             sortOrder = 130,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 180 },
+            skillLevels = { 140, 140, 160, 180 },
             createdCount = 10,
             createdCountMax = 10,
             reagents = {
@@ -27559,7 +27585,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2509",
             sortOrder = 200,
             requiredSkill = 210,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 210, 225, 245, 265 },
             reagents = {
                 { itemId = 11178, count = 2 },
                 { itemId = 11175, count = 4 },
@@ -27580,7 +27606,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2509",
             sortOrder = 200,
             requiredSkill = 210,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 210, 225, 245, 265 },
             reagents = {
                 { itemId = 11178, count = 3 },
                 { itemId = 11175, count = 3 },
@@ -27601,7 +27627,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2509",
             sortOrder = 200,
             requiredSkill = 210,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 210, 225, 245, 265 },
             reagents = {
                 { itemId = 11178, count = 4 },
                 { itemId = 11175, count = 2 },
@@ -27620,7 +27646,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2505",
             sortOrder = 160,
             requiredSkill = 210,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 210, 225, 245, 265 },
             reagents = {
                 { itemId = 11175, count = 4 },
                 { itemId = 11178, count = 4 },
@@ -27638,7 +27664,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2505",
             sortOrder = 160,
             requiredSkill = 210,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 210, 225, 245, 265 },
             reagents = {
                 { itemId = 11175, count = 5 },
                 { itemId = 11178, count = 3 },
@@ -27656,7 +27682,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2505",
             sortOrder = 160,
             requiredSkill = 210,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 210, 225, 245, 265 },
             reagents = {
                 { itemId = 11175, count = 3 },
                 { itemId = 11178, count = 5 },
@@ -27674,7 +27700,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2505",
             sortOrder = 160,
             requiredSkill = 210,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 210, 225, 245, 265 },
             reagents = {
                 { itemId = 11175, count = 2 },
                 { itemId = 11178, count = 8 },
@@ -27692,7 +27718,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2505",
             sortOrder = 160,
             requiredSkill = 210,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 210, 225, 245, 265 },
             reagents = {
                 { itemId = 11175, count = 8 },
                 { itemId = 11178, count = 2 },
@@ -27712,7 +27738,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2511",
             sortOrder = 220,
             requiredSkill = 220,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 220, 225, 245, 265 },
             reagents = {
                 { itemId = 11178, count = 6 },
                 { itemId = 11177, count = 2 },
@@ -27734,7 +27760,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2511",
             sortOrder = 220,
             requiredSkill = 220,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 220, 225, 245, 265 },
             reagents = {
                 { itemId = 11178, count = 4 },
                 { itemId = 11177, count = 4 },
@@ -27756,7 +27782,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2513",
             sortOrder = 240,
             requiredSkill = 220,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 220, 225, 245, 265 },
             reagents = {
                 { itemId = 11178, count = 3 },
                 { itemId = 11177, count = 1 },
@@ -27778,7 +27804,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2513",
             sortOrder = 240,
             requiredSkill = 220,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 220, 225, 245, 265 },
             reagents = {
                 { itemId = 6037, count = 4 },
                 { itemId = 11175, count = 12 },
@@ -27796,7 +27822,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2495",
             sortOrder = 60,
             requiredSkill = 220,
-            skillLevels = { 1, 225, 265 },
+            skillLevels = { 220, 225, 245, 265 },
             reagents = {
                 { itemId = 11176, count = 10 },
                 { itemId = 11175, count = 4 },
@@ -27812,7 +27838,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2510",
             sortOrder = 210,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 325 },
+            skillLevels = { 265, 285, 305, 325 },
             reagents = {
                 { itemId = 11382, count = 1 },
                 { itemId = 12808, count = 1 },
@@ -27828,7 +27854,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2510",
             sortOrder = 210,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 325 },
+            skillLevels = { 265, 285, 305, 325 },
             reagents = {
                 { itemId = 11382, count = 1 },
                 { itemId = 7076, count = 1 },
@@ -27844,7 +27870,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2510",
             sortOrder = 210,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 325 },
+            skillLevels = { 265, 285, 305, 325 },
             reagents = {
                 { itemId = 11382, count = 1 },
                 { itemId = 7080, count = 1 },
@@ -27862,7 +27888,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2509",
             sortOrder = 200,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 14344, count = 2 },
                 { itemId = 16203, count = 4 },
@@ -27884,7 +27910,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2509",
             sortOrder = 200,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 14344, count = 4 },
                 { itemId = 16203, count = 3 },
@@ -27906,7 +27932,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2509",
             sortOrder = 200,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 360 },
+            skillLevels = { 300, 320, 340, 360 },
             reagents = {
                 { itemId = 14344, count = 1 },
                 { itemId = 16203, count = 8 },
@@ -27924,7 +27950,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2448",
             sortOrder = 10,
-            skillLevels = { 1, 50, 90 },
+            requiredSkill = 40,
+            skillLevels = { 40, 50, 70, 90 },
             reagents = {
                 { itemId = 249399, count = 2 },
                 { itemId = 3371, count = 1 },
@@ -27937,7 +27964,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2448",
             sortOrder = 10,
-            skillLevels = { 1, 130, 155 },
+            requiredSkill = 120,
+            skillLevels = { 120, 130, 142, 155 },
             reagents = {
                 { itemId = 249424, count = 2 },
                 { itemId = 3372, count = 1 },
@@ -27950,7 +27978,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2448",
             sortOrder = 10,
-            skillLevels = { 1, 230, 270 },
+            requiredSkill = 215,
+            skillLevels = { 215, 230, 250, 270 },
             reagents = {
                 { itemId = 249274, count = 2 },
                 { itemId = 8925, count = 1 },
@@ -27963,7 +27992,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2448",
             sortOrder = 10,
-            skillLevels = { 1, 50, 90 },
+            requiredSkill = 40,
+            skillLevels = { 40, 50, 70, 90 },
             reagents = {
                 { itemId = 249391, count = 2 },
                 { itemId = 3371, count = 1 },
@@ -27976,7 +28006,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2515",
             sortOrder = 10,
-            skillLevels = { 1, 130, 155 },
+            requiredSkill = 120,
+            skillLevels = { 120, 130, 142, 155 },
             reagents = {
                 { itemId = 249425, count = 2 },
                 { itemId = 2996, count = 1 },
@@ -27989,7 +28020,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2575",
             sortOrder = 100,
-            skillLevels = { 1, 275, 275 },
+            requiredSkill = 275,
+            skillLevels = { 275, 275, 275, 275 },
             reagents = {
                 { itemId = 249426, count = 2 },
                 { itemId = 3857, count = 1 },
@@ -28006,7 +28038,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2646",
             sortOrder = 100,
             requiredSkill = 25,
-            skillLevels = { 1, 30, 45 },
+            skillLevels = { 25, 30, 37, 45 },
             reagents = {
                 { itemId = 159, count = 1 },
                 { itemId = 2447, count = 2 },
@@ -28023,7 +28055,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2646",
             sortOrder = 100,
             requiredSkill = 100,
-            skillLevels = { 1, 105, 125 },
+            skillLevels = { 100, 105, 115, 125 },
             reagents = {
                 { itemId = 1179, count = 1 },
                 { itemId = 785, count = 2 },
@@ -28040,7 +28072,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2646",
             sortOrder = 100,
             requiredSkill = 125,
-            skillLevels = { 1, 155, 185 },
+            skillLevels = { 125, 155, 170, 185 },
             reagents = {
                 { itemId = 1205, count = 1 },
                 { itemId = 3357, count = 2 },
@@ -28055,7 +28087,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2646",
             sortOrder = 100,
             requiredSkill = 180,
-            skillLevels = { 1, 195, 235 },
+            skillLevels = { 180, 195, 215, 235 },
             reagents = {
                 { itemId = 1708, count = 1 },
                 { itemId = 3818, count = 2 },
@@ -28070,7 +28102,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2646",
             sortOrder = 100,
             requiredSkill = 200,
-            skillLevels = { 1, 220, 250 },
+            skillLevels = { 200, 220, 235, 250 },
             reagents = {
                 { itemId = 1645, count = 1 },
                 { itemId = 8838, count = 2 },
@@ -28085,7 +28117,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2646",
             sortOrder = 100,
             requiredSkill = 250,
-            skillLevels = { 1, 260, 290 },
+            skillLevels = { 250, 260, 275, 290 },
             reagents = {
                 { itemId = 8766, count = 1 },
                 { itemId = 13465, count = 2 },
@@ -28102,7 +28134,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2645",
             sortOrder = 90,
             requiredSkill = 25,
-            skillLevels = { 1, 30, 45 },
+            skillLevels = { 25, 30, 37, 45 },
             reagents = {
                 { itemId = 159, count = 1 },
                 { itemId = 2678, count = 1 },
@@ -28120,7 +28152,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2645",
             sortOrder = 90,
             requiredSkill = 100,
-            skillLevels = { 1, 105, 120 },
+            skillLevels = { 100, 105, 112, 120 },
             reagents = {
                 { itemId = 1179, count = 1 },
                 { itemId = 2678, count = 2 },
@@ -28138,7 +28170,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2645",
             sortOrder = 90,
             requiredSkill = 125,
-            skillLevels = { 1, 135, 145 },
+            skillLevels = { 125, 135, 140, 145 },
             reagents = {
                 { itemId = 1205, count = 1 },
                 { itemId = 2692, count = 2 },
@@ -28156,7 +28188,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2645",
             sortOrder = 90,
             requiredSkill = 180,
-            skillLevels = { 1, 185, 195 },
+            skillLevels = { 180, 185, 190, 195 },
             reagents = {
                 { itemId = 1708, count = 1 },
                 { itemId = 2692, count = 3 },
@@ -28174,7 +28206,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2645",
             sortOrder = 90,
             requiredSkill = 200,
-            skillLevels = { 1, 215, 225 },
+            skillLevels = { 200, 215, 220, 225 },
             reagents = {
                 { itemId = 1645, count = 1 },
                 { itemId = 3713, count = 3 },
@@ -28192,7 +28224,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2645",
             sortOrder = 90,
             requiredSkill = 250,
-            skillLevels = { 1, 255, 270 },
+            skillLevels = { 250, 255, 262, 270 },
             reagents = {
                 { itemId = 8766, count = 1 },
                 { itemId = 3713, count = 4 },
@@ -28208,7 +28240,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2633",
             sortOrder = 20,
             requiredSkill = 225,
-            skillLevels = { 1, 230, 245 },
+            skillLevels = { 225, 230, 237, 245 },
             reagents = {
                 { itemId = 5471, count = 2 },
                 { itemId = 2692, count = 3 },
@@ -28223,7 +28255,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2635",
             sortOrder = 40,
             requiredSkill = 275,
-            skillLevels = { 1, 280, 310 },
+            skillLevels = { 275, 280, 295, 310 },
             reagents = {
                 { itemId = 3404, count = 3 },
                 { itemId = 3713, count = 3 },
@@ -28238,7 +28270,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2635",
             sortOrder = 40,
             requiredSkill = 275,
-            skillLevels = { 1, 280, 310 },
+            skillLevels = { 275, 280, 295, 310 },
             reagents = {
                 { itemId = 12223, count = 3 },
                 { itemId = 3713, count = 2 },
@@ -28253,7 +28285,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2640",
             sortOrder = 15,
             requiredSkill = 275,
-            skillLevels = { 1, 280, 310 },
+            skillLevels = { 275, 280, 295, 310 },
             reagents = {
                 { itemId = 3712, count = 3 },
                 { itemId = 3713, count = 3 },
@@ -28268,7 +28300,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2634",
             sortOrder = 30,
             requiredSkill = 275,
-            skillLevels = { 1, 285, 315 },
+            skillLevels = { 275, 285, 300, 315 },
             reagents = {
                 { itemId = 12203, count = 3 },
                 { itemId = 3713, count = 3 },
@@ -28283,7 +28315,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2633",
             sortOrder = 20,
             requiredSkill = 275,
-            skillLevels = { 1, 280, 310 },
+            skillLevels = { 275, 280, 295, 310 },
             reagents = {
                 { itemId = 3730, count = 3 },
                 { itemId = 3713, count = 3 },
@@ -28298,7 +28330,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2633",
             sortOrder = 20,
             requiredSkill = 275,
-            skillLevels = { 1, 280, 310 },
+            skillLevels = { 275, 280, 295, 310 },
             reagents = {
                 { itemId = 5471, count = 3 },
                 { itemId = 3713, count = 4 },
@@ -28313,7 +28345,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2634",
             sortOrder = 30,
             requiredSkill = 275,
-            skillLevels = { 1, 280, 310 },
+            skillLevels = { 275, 280, 295, 310 },
             reagents = {
                 { itemId = 12202, count = 3 },
                 { itemId = 3713, count = 2 },
@@ -28328,7 +28360,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2635",
             sortOrder = 40,
             requiredSkill = 180,
-            skillLevels = { 1, 280, 310 },
+            skillLevels = { 180, 280, 295, 310 },
             reagents = {
                 { itemId = 12184, count = 2 },
                 { itemId = 2692, count = 3 },
@@ -28345,7 +28377,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2633",
             sortOrder = 20,
             requiredSkill = 175,
-            skillLevels = { 1, 200, 220 },
+            skillLevels = { 175, 200, 210, 220 },
             reagents = {
                 { itemId = 3730, count = 2 },
                 { itemId = 2692, count = 3 },
@@ -28360,7 +28392,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2635",
             sortOrder = 40,
             requiredSkill = 275,
-            skillLevels = { 1, 280, 310 },
+            skillLevels = { 275, 280, 295, 310 },
             reagents = {
                 { itemId = 12184, count = 3 },
                 { itemId = 3713, count = 4 },
@@ -28375,7 +28407,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2635",
             sortOrder = 40,
             requiredSkill = 225,
-            skillLevels = { 1, 230, 245 },
+            skillLevels = { 225, 230, 237, 245 },
             reagents = {
                 { itemId = 12184, count = 2 },
                 { itemId = 2692, count = 4 },
@@ -28392,7 +28424,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2635",
             sortOrder = 40,
             requiredSkill = 75,
-            skillLevels = { 1, 115, 150 },
+            skillLevels = { 75, 115, 132, 150 },
             reagents = {
                 { itemId = 12184, count = 1 },
                 { itemId = 2678, count = 2 },
@@ -28409,7 +28441,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2640",
             sortOrder = 15,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 220 },
+            skillLevels = { 175, 195, 207, 220 },
             reagents = {
                 { itemId = 12207, count = 2 },
                 { itemId = 2692, count = 4 },
@@ -28426,7 +28458,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2635",
             sortOrder = 40,
             requiredSkill = 25,
-            skillLevels = { 1, 35, 75 },
+            skillLevels = { 25, 35, 55, 75 },
             reagents = {
                 { itemId = 3685, count = 1 },
                 { itemId = 2678, count = 4 },
@@ -28443,7 +28475,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2640",
             sortOrder = 15,
             requiredSkill = 75,
-            skillLevels = { 1, 80, 95 },
+            skillLevels = { 75, 80, 87, 95 },
             reagents = {
                 { itemId = 6889, count = 1 },
                 { itemId = 2678, count = 4 },
@@ -28458,7 +28490,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2632",
             sortOrder = 10,
             requiredSkill = 275,
-            skillLevels = { 1, 280, 310 },
+            skillLevels = { 275, 280, 295, 310 },
             reagents = {
                 { itemId = 7974, count = 3 },
                 { itemId = 3713, count = 4 },
@@ -28472,7 +28504,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2651",
             sortOrder = 55,
-            skillLevels = { 1, 205, 210 },
+            skillLevels = { 1, 205, 207, 210 },
             reagents = {
                 { itemId = 3818, count = 3 },
                 { itemId = 3358, count = 1 },
@@ -28488,7 +28520,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2651",
             sortOrder = 55,
             requiredSkill = 195,
-            skillLevels = { 1, 200, 205 },
+            skillLevels = { 195, 200, 202, 205 },
             reagents = {
                 { itemId = 3818, count = 2 },
                 { itemId = 3821, count = 2 },
@@ -28506,7 +28538,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 275,
-            skillLevels = { 1, 280, 285 },
+            skillLevels = { 275, 280, 282, 285 },
             reagents = {
                 { itemId = 13463, count = 3 },
                 { itemId = 8846, count = 2 },
@@ -28524,7 +28556,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 250,
-            skillLevels = { 1, 255, 260 },
+            skillLevels = { 250, 255, 257, 260 },
             reagents = {
                 { itemId = 13464, count = 2 },
                 { itemId = 8838, count = 4 },
@@ -28542,7 +28574,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 45,
-            skillLevels = { 1, 50, 55 },
+            skillLevels = { 45, 50, 52, 55 },
             reagents = {
                 { itemId = 785, count = 2 },
                 { itemId = 2453, count = 1 },
@@ -28560,7 +28592,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 95,
-            skillLevels = { 1, 100, 105 },
+            skillLevels = { 95, 100, 102, 105 },
             reagents = {
                 { itemId = 3356, count = 2 },
                 { itemId = 3357, count = 2 },
@@ -28578,7 +28610,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 145,
-            skillLevels = { 1, 150, 155 },
+            skillLevels = { 145, 150, 152, 155 },
             reagents = {
                 { itemId = 3819, count = 2 },
                 { itemId = 4625, count = 2 },
@@ -28596,7 +28628,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 195,
-            skillLevels = { 1, 200, 205 },
+            skillLevels = { 195, 200, 202, 205 },
             reagents = {
                 { itemId = 8836, count = 3 },
                 { itemId = 8831, count = 1 },
@@ -28612,7 +28644,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 150,
-            skillLevels = { 1, 155, 160 },
+            skillLevels = { 150, 155, 157, 160 },
             reagents = {
                 { itemId = 3821, count = 4 },
                 { itemId = 3372, count = 1 },
@@ -28629,7 +28661,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 210 },
+            skillLevels = { 200, 205, 207, 210 },
             reagents = {
                 { itemId = 8838, count = 4 },
                 { itemId = 8925, count = 1 },
@@ -28646,7 +28678,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 285,
-            skillLevels = { 1, 290, 295 },
+            skillLevels = { 285, 290, 292, 295 },
             reagents = {
                 { itemId = 13464, count = 3 },
                 { itemId = 13463, count = 2 },
@@ -28664,7 +28696,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 280,
-            skillLevels = { 1, 285, 290 },
+            skillLevels = { 280, 285, 287, 290 },
             reagents = {
                 { itemId = 13463, count = 4 },
                 { itemId = 13465, count = 2 },
@@ -28682,7 +28714,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 275,
-            skillLevels = { 1, 280, 285 },
+            skillLevels = { 275, 280, 282, 285 },
             reagents = {
                 { itemId = 13463, count = 4 },
                 { itemId = 13464, count = 2 },
@@ -28700,7 +28732,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 25,
-            skillLevels = { 1, 30, 35 },
+            skillLevels = { 25, 30, 32, 35 },
             reagents = {
                 { itemId = 785, count = 2 },
                 { itemId = 3371, count = 1 },
@@ -28717,7 +28749,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 75,
-            skillLevels = { 1, 80, 85 },
+            skillLevels = { 75, 80, 82, 85 },
             reagents = {
                 { itemId = 3356, count = 3 },
                 { itemId = 3371, count = 1 },
@@ -28734,7 +28766,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 175,
-            skillLevels = { 1, 180, 185 },
+            skillLevels = { 175, 180, 182, 185 },
             reagents = {
                 { itemId = 8839, count = 3 },
                 { itemId = 8836, count = 2 },
@@ -28752,7 +28784,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 120,
-            skillLevels = { 1, 125, 130 },
+            skillLevels = { 120, 125, 127, 130 },
             reagents = {
                 { itemId = 3356, count = 4 },
                 { itemId = 3372, count = 1 },
@@ -28769,7 +28801,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 285,
-            skillLevels = { 1, 290, 295 },
+            skillLevels = { 285, 290, 292, 295 },
             reagents = {
                 { itemId = 13464, count = 4 },
                 { itemId = 8838, count = 2 },
@@ -28787,7 +28819,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 15,
-            skillLevels = { 1, 20, 25 },
+            skillLevels = { 15, 20, 22, 25 },
             reagents = {
                 { itemId = 2449, count = 2 },
                 { itemId = 2447, count = 1 },
@@ -28805,7 +28837,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 65,
-            skillLevels = { 1, 70, 75 },
+            skillLevels = { 65, 70, 72, 75 },
             reagents = {
                 { itemId = 3355, count = 2 },
                 { itemId = 785, count = 1 },
@@ -28823,7 +28855,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 115,
-            skillLevels = { 1, 120, 125 },
+            skillLevels = { 115, 120, 122, 125 },
             reagents = {
                 { itemId = 3358, count = 3 },
                 { itemId = 3356, count = 1 },
@@ -28841,7 +28873,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 165,
-            skillLevels = { 1, 170, 175 },
+            skillLevels = { 165, 170, 172, 175 },
             reagents = {
                 { itemId = 8836, count = 3 },
                 { itemId = 8831, count = 2 },
@@ -28859,7 +28891,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 275,
-            skillLevels = { 1, 280, 285 },
+            skillLevels = { 275, 280, 282, 285 },
             reagents = {
                 { itemId = 13463, count = 3 },
                 { itemId = 8846, count = 1 },
@@ -28875,7 +28907,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 150,
-            skillLevels = { 1, 155, 160 },
+            skillLevels = { 150, 155, 157, 160 },
             reagents = {
                 { itemId = 3355, count = 3 },
                 { itemId = 3821, count = 1 },
@@ -28893,7 +28925,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 275,
-            skillLevels = { 1, 280, 285 },
+            skillLevels = { 275, 280, 282, 285 },
             reagents = {
                 { itemId = 8846, count = 3 },
                 { itemId = 8845, count = 1 },
@@ -28911,7 +28943,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 300,
-            skillLevels = { 1, 305, 310 },
+            skillLevels = { 300, 305, 307, 310 },
             reagents = {
                 { itemId = 8846, count = 3 },
                 { itemId = 8839, count = 1 },
@@ -28929,7 +28961,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 95,
-            skillLevels = { 1, 100, 105 },
+            skillLevels = { 95, 100, 102, 105 },
             reagents = {
                 { itemId = 3356, count = 3 },
                 { itemId = 3372, count = 1 },
@@ -28946,7 +28978,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2450",
             sortOrder = 30,
             requiredSkill = 135,
-            skillLevels = { 1, 140, 145 },
+            skillLevels = { 135, 140, 142, 145 },
             reagents = {
                 { itemId = 3358, count = 3 },
                 { itemId = 3372, count = 1 },
@@ -28963,7 +28995,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 35,
-            skillLevels = { 1, 40, 45 },
+            skillLevels = { 35, 40, 42, 45 },
             reagents = {
                 { itemId = 765, count = 1 },
                 { itemId = 2447, count = 1 },
@@ -28981,7 +29013,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 85,
-            skillLevels = { 1, 90, 95 },
+            skillLevels = { 85, 90, 92, 95 },
             reagents = {
                 { itemId = 785, count = 1 },
                 { itemId = 765, count = 2 },
@@ -28999,7 +29031,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 135,
-            skillLevels = { 1, 140, 145 },
+            skillLevels = { 135, 140, 142, 145 },
             reagents = {
                 { itemId = 3355, count = 1 },
                 { itemId = 3369, count = 1 },
@@ -29017,7 +29049,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 185,
-            skillLevels = { 1, 190, 195 },
+            skillLevels = { 185, 190, 192, 195 },
             reagents = {
                 { itemId = 3356, count = 2 },
                 { itemId = 3818, count = 1 },
@@ -29033,7 +29065,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 235,
-            skillLevels = { 1, 240, 245 },
+            skillLevels = { 235, 240, 242, 245 },
             reagents = {
                 { itemId = 3819, count = 2 },
                 { itemId = 3358, count = 2 },
@@ -29051,7 +29083,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 285,
-            skillLevels = { 1, 290, 295 },
+            skillLevels = { 285, 290, 292, 295 },
             reagents = {
                 { itemId = 13463, count = 2 },
                 { itemId = 13465, count = 1 },
@@ -29069,7 +29101,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 40,
-            skillLevels = { 1, 45, 50 },
+            skillLevels = { 40, 45, 47, 50 },
             reagents = {
                 { itemId = 2449, count = 1 },
                 { itemId = 765, count = 1 },
@@ -29087,7 +29119,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 90,
-            skillLevels = { 1, 95, 100 },
+            skillLevels = { 90, 95, 97, 100 },
             reagents = {
                 { itemId = 2450, count = 1 },
                 { itemId = 2449, count = 2 },
@@ -29105,7 +29137,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 140,
-            skillLevels = { 1, 145, 150 },
+            skillLevels = { 140, 145, 147, 150 },
             reagents = {
                 { itemId = 3818, count = 2 },
                 { itemId = 2450, count = 2 },
@@ -29123,7 +29155,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 190,
-            skillLevels = { 1, 195, 200 },
+            skillLevels = { 190, 195, 197, 200 },
             reagents = {
                 { itemId = 4625, count = 3 },
                 { itemId = 3818, count = 2 },
@@ -29139,7 +29171,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 240,
-            skillLevels = { 1, 245, 250 },
+            skillLevels = { 240, 245, 247, 250 },
             reagents = {
                 { itemId = 8839, count = 3 },
                 { itemId = 4625, count = 2 },
@@ -29157,7 +29189,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 290,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 290, 295, 297, 300 },
             reagents = {
                 { itemId = 13466, count = 3 },
                 { itemId = 8839, count = 2 },
@@ -29175,7 +29207,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 30,
-            skillLevels = { 1, 35, 40 },
+            skillLevels = { 30, 35, 37, 40 },
             reagents = {
                 { itemId = 785, count = 2 },
                 { itemId = 2453, count = 1 },
@@ -29193,7 +29225,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 80,
-            skillLevels = { 1, 85, 90 },
+            skillLevels = { 80, 85, 87, 90 },
             reagents = {
                 { itemId = 3356, count = 2 },
                 { itemId = 3357, count = 2 },
@@ -29211,7 +29243,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 130,
-            skillLevels = { 1, 135, 140 },
+            skillLevels = { 130, 135, 137, 140 },
             reagents = {
                 { itemId = 3819, count = 2 },
                 { itemId = 4625, count = 2 },
@@ -29227,7 +29259,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 180,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 180, 185, 187, 190 },
             reagents = {
                 { itemId = 8836, count = 2 },
                 { itemId = 8831, count = 1 },
@@ -29243,7 +29275,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 230,
-            skillLevels = { 1, 235, 240 },
+            skillLevels = { 230, 235, 237, 240 },
             reagents = {
                 { itemId = 8838, count = 2 },
                 { itemId = 8836, count = 1 },
@@ -29261,7 +29293,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 280,
-            skillLevels = { 1, 285, 290 },
+            skillLevels = { 280, 285, 287, 290 },
             reagents = {
                 { itemId = 13463, count = 3 },
                 { itemId = 8838, count = 1 },
@@ -29279,7 +29311,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 275,
-            skillLevels = { 1, 280, 285 },
+            skillLevels = { 275, 280, 282, 285 },
             reagents = {
                 { itemId = 8846, count = 3 },
                 { itemId = 13466, count = 2 },
@@ -29297,7 +29329,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 265,
-            skillLevels = { 1, 270, 275 },
+            skillLevels = { 265, 270, 272, 275 },
             reagents = {
                 { itemId = 8845, count = 2 },
                 { itemId = 3369, count = 2 },
@@ -29314,7 +29346,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 180,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 180, 185, 187, 190 },
             reagents = {
                 { itemId = 8845, count = 3 },
                 { itemId = 3369, count = 2 },
@@ -29332,7 +29364,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 245,
-            skillLevels = { 1, 250, 255 },
+            skillLevels = { 245, 250, 252, 255 },
             reagents = {
                 { itemId = 13465, count = 2 },
                 { itemId = 4625, count = 2 },
@@ -29350,7 +29382,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 280,
-            skillLevels = { 1, 285, 290 },
+            skillLevels = { 280, 285, 287, 290 },
             reagents = {
                 { itemId = 4625, count = 2 },
                 { itemId = 3819, count = 2 },
@@ -29366,7 +29398,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2449",
             sortOrder = 25,
             requiredSkill = 280,
-            skillLevels = { 1, 285, 290 },
+            skillLevels = { 280, 285, 287, 290 },
             reagents = {
                 { itemId = 8846, count = 2 },
                 { itemId = 13466, count = 2 },
@@ -29382,7 +29414,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 35,
-            skillLevels = { 1, 40, 40 },
+            skillLevels = { 35, 40, 40, 40 },
             reagents = {
                 { itemId = 2840, count = 2 },
                 { itemId = 818, count = 2 },
@@ -29399,7 +29431,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 35,
-            skillLevels = { 1, 40, 40 },
+            skillLevels = { 35, 40, 40, 40 },
             reagents = {
                 { itemId = 2840, count = 2 },
                 { itemId = 10940, count = 4 },
@@ -29415,7 +29447,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 35,
-            skillLevels = { 1, 40, 40 },
+            skillLevels = { 35, 40, 40, 40 },
             reagents = {
                 { itemId = 2840, count = 2 },
                 { itemId = 10938, count = 4 },
@@ -29433,7 +29465,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 100,
-            skillLevels = { 1, 130, 160 },
+            skillLevels = { 100, 130, 145, 160 },
             reagents = {
                 { itemId = 2842, count = 6 },
                 { itemId = 2840, count = 2 },
@@ -29452,7 +29484,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 105,
-            skillLevels = { 1, 135, 165 },
+            skillLevels = { 105, 135, 150, 165 },
             reagents = {
                 { itemId = 2842, count = 10 },
                 { itemId = 2840, count = 3 },
@@ -29470,7 +29502,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 105,
-            skillLevels = { 1, 135, 165 },
+            skillLevels = { 105, 135, 150, 165 },
             reagents = {
                 { itemId = 2842, count = 6 },
                 { itemId = 2840, count = 2 },
@@ -29488,7 +29520,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2462",
             sortOrder = 120,
             requiredSkill = 110,
-            skillLevels = { 1, 140, 170 },
+            skillLevels = { 110, 140, 155, 170 },
             reagents = {
                 { itemId = 2842, count = 6 },
                 { itemId = 2840, count = 2 },
@@ -29506,7 +29538,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 125,
-            skillLevels = { 1, 155, 185 },
+            skillLevels = { 125, 155, 170, 185 },
             reagents = {
                 { itemId = 2842, count = 12 },
                 { itemId = 2840, count = 4 },
@@ -29522,7 +29554,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 80,
-            skillLevels = { 1, 85, 85 },
+            skillLevels = { 80, 85, 85, 85 },
             reagents = {
                 { itemId = 2841, count = 4 },
                 { itemId = 3470, count = 2 },
@@ -29540,7 +29572,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 80,
-            skillLevels = { 1, 85, 85 },
+            skillLevels = { 80, 85, 85, 85 },
             reagents = {
                 { itemId = 2841, count = 4 },
                 { itemId = 3470, count = 2 },
@@ -29556,7 +29588,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 80,
-            skillLevels = { 1, 85, 85 },
+            skillLevels = { 80, 85, 85, 85 },
             reagents = {
                 { itemId = 2841, count = 4 },
                 { itemId = 3470, count = 2 },
@@ -29572,7 +29604,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 80,
-            skillLevels = { 1, 85, 85 },
+            skillLevels = { 80, 85, 85, 85 },
             reagents = {
                 { itemId = 2841, count = 4 },
                 { itemId = 3470, count = 2 },
@@ -29588,7 +29620,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 80,
-            skillLevels = { 1, 85, 85 },
+            skillLevels = { 80, 85, 85, 85 },
             reagents = {
                 { itemId = 2841, count = 4 },
                 { itemId = 3470, count = 2 },
@@ -29604,7 +29636,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 95,
-            skillLevels = { 1, 100, 100 },
+            skillLevels = { 95, 100, 100, 100 },
             reagents = {
                 { itemId = 2841, count = 6 },
                 { itemId = 3478, count = 2 },
@@ -29620,7 +29652,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 95,
-            skillLevels = { 1, 100, 100 },
+            skillLevels = { 95, 100, 100, 100 },
             reagents = {
                 { itemId = 2841, count = 6 },
                 { itemId = 3478, count = 2 },
@@ -29636,7 +29668,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 95,
-            skillLevels = { 1, 100, 100 },
+            skillLevels = { 95, 100, 100, 100 },
             reagents = {
                 { itemId = 2841, count = 6 },
                 { itemId = 3478, count = 2 },
@@ -29652,7 +29684,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 95,
-            skillLevels = { 1, 100, 100 },
+            skillLevels = { 95, 100, 100, 100 },
             reagents = {
                 { itemId = 2841, count = 6 },
                 { itemId = 3478, count = 2 },
@@ -29668,7 +29700,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 95,
-            skillLevels = { 1, 100, 100 },
+            skillLevels = { 95, 100, 100, 100 },
             reagents = {
                 { itemId = 2841, count = 6 },
                 { itemId = 3478, count = 2 },
@@ -29684,7 +29716,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2461",
             sortOrder = 110,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 130 },
+            skillLevels = { 125, 130, 130, 130 },
             reagents = {
                 { itemId = 2841, count = 8 },
                 { itemId = 3478, count = 2 },
@@ -29700,7 +29732,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2461",
             sortOrder = 110,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 130 },
+            skillLevels = { 125, 130, 130, 130 },
             reagents = {
                 { itemId = 2841, count = 8 },
                 { itemId = 3478, count = 2 },
@@ -29716,7 +29748,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2461",
             sortOrder = 110,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 130 },
+            skillLevels = { 125, 130, 130, 130 },
             reagents = {
                 { itemId = 2841, count = 8 },
                 { itemId = 3478, count = 2 },
@@ -29732,7 +29764,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2461",
             sortOrder = 110,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 130 },
+            skillLevels = { 125, 130, 130, 130 },
             reagents = {
                 { itemId = 2841, count = 8 },
                 { itemId = 3478, count = 2 },
@@ -29748,7 +29780,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2461",
             sortOrder = 110,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 130 },
+            skillLevels = { 125, 130, 130, 130 },
             reagents = {
                 { itemId = 2841, count = 8 },
                 { itemId = 3478, count = 2 },
@@ -29766,7 +29798,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 85,
-            skillLevels = { 1, 115, 145 },
+            skillLevels = { 85, 115, 130, 145 },
             reagents = {
                 { itemId = 2841, count = 12 },
                 { itemId = 3478, count = 2 },
@@ -29785,7 +29817,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 85,
-            skillLevels = { 1, 115, 145 },
+            skillLevels = { 85, 115, 130, 145 },
             reagents = {
                 { itemId = 2841, count = 12 },
                 { itemId = 3478, count = 2 },
@@ -29804,7 +29836,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 85,
-            skillLevels = { 1, 115, 145 },
+            skillLevels = { 85, 115, 130, 145 },
             reagents = {
                 { itemId = 2841, count = 12 },
                 { itemId = 3478, count = 2 },
@@ -29823,7 +29855,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 85,
-            skillLevels = { 1, 115, 145 },
+            skillLevels = { 85, 115, 130, 145 },
             reagents = {
                 { itemId = 2841, count = 12 },
                 { itemId = 3478, count = 2 },
@@ -29842,7 +29874,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 85,
-            skillLevels = { 1, 115, 145 },
+            skillLevels = { 85, 115, 130, 145 },
             reagents = {
                 { itemId = 2841, count = 12 },
                 { itemId = 3478, count = 2 },
@@ -29861,7 +29893,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 80,
-            skillLevels = { 1, 110, 140 },
+            skillLevels = { 80, 110, 125, 140 },
             reagents = {
                 { itemId = 2841, count = 10 },
                 { itemId = 3470, count = 4 },
@@ -29880,7 +29912,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 80,
-            skillLevels = { 1, 110, 140 },
+            skillLevels = { 80, 110, 125, 140 },
             reagents = {
                 { itemId = 2841, count = 10 },
                 { itemId = 3470, count = 4 },
@@ -29899,7 +29931,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 80,
-            skillLevels = { 1, 110, 140 },
+            skillLevels = { 80, 110, 125, 140 },
             reagents = {
                 { itemId = 2841, count = 10 },
                 { itemId = 3470, count = 4 },
@@ -29918,7 +29950,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 80,
-            skillLevels = { 1, 110, 140 },
+            skillLevels = { 80, 110, 125, 140 },
             reagents = {
                 { itemId = 2841, count = 10 },
                 { itemId = 3470, count = 4 },
@@ -29937,7 +29969,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 80,
-            skillLevels = { 1, 110, 140 },
+            skillLevels = { 80, 110, 125, 140 },
             reagents = {
                 { itemId = 2841, count = 10 },
                 { itemId = 3470, count = 4 },
@@ -29956,7 +29988,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2466",
             sortOrder = 160,
             requiredSkill = 45,
-            skillLevels = { 1, 85, 125 },
+            skillLevels = { 45, 85, 105, 125 },
             reagents = {
                 { itemId = 2840, count = 12 },
                 { itemId = 3470, count = 4 },
@@ -29975,7 +30007,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2466",
             sortOrder = 160,
             requiredSkill = 45,
-            skillLevels = { 1, 85, 125 },
+            skillLevels = { 45, 85, 105, 125 },
             reagents = {
                 { itemId = 2840, count = 12 },
                 { itemId = 3470, count = 4 },
@@ -29994,7 +30026,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2466",
             sortOrder = 160,
             requiredSkill = 45,
-            skillLevels = { 1, 85, 125 },
+            skillLevels = { 45, 85, 105, 125 },
             reagents = {
                 { itemId = 2840, count = 12 },
                 { itemId = 3470, count = 4 },
@@ -30013,7 +30045,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2466",
             sortOrder = 160,
             requiredSkill = 45,
-            skillLevels = { 1, 85, 125 },
+            skillLevels = { 45, 85, 105, 125 },
             reagents = {
                 { itemId = 2840, count = 12 },
                 { itemId = 3470, count = 4 },
@@ -30032,7 +30064,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2466",
             sortOrder = 160,
             requiredSkill = 45,
-            skillLevels = { 1, 85, 125 },
+            skillLevels = { 45, 85, 105, 125 },
             reagents = {
                 { itemId = 2840, count = 12 },
                 { itemId = 3470, count = 4 },
@@ -30051,7 +30083,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 110,
-            skillLevels = { 1, 140, 170 },
+            skillLevels = { 110, 140, 155, 170 },
             reagents = {
                 { itemId = 2841, count = 20 },
                 { itemId = 3478, count = 6 },
@@ -30071,7 +30103,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 110,
-            skillLevels = { 1, 140, 170 },
+            skillLevels = { 110, 140, 155, 170 },
             reagents = {
                 { itemId = 2841, count = 20 },
                 { itemId = 3478, count = 6 },
@@ -30091,7 +30123,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 110,
-            skillLevels = { 1, 140, 170 },
+            skillLevels = { 110, 140, 155, 170 },
             reagents = {
                 { itemId = 2841, count = 20 },
                 { itemId = 3478, count = 6 },
@@ -30111,7 +30143,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 110,
-            skillLevels = { 1, 140, 170 },
+            skillLevels = { 110, 140, 155, 170 },
             reagents = {
                 { itemId = 2841, count = 20 },
                 { itemId = 3478, count = 6 },
@@ -30131,7 +30163,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 110,
-            skillLevels = { 1, 140, 170 },
+            skillLevels = { 110, 140, 155, 170 },
             reagents = {
                 { itemId = 2841, count = 20 },
                 { itemId = 3478, count = 6 },
@@ -30151,7 +30183,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 125,
-            skillLevels = { 1, 155, 185 },
+            skillLevels = { 125, 155, 170, 185 },
             reagents = {
                 { itemId = 2841, count = 20 },
                 { itemId = 3478, count = 8 },
@@ -30171,7 +30203,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 125,
-            skillLevels = { 1, 155, 185 },
+            skillLevels = { 125, 155, 170, 185 },
             reagents = {
                 { itemId = 2841, count = 20 },
                 { itemId = 3478, count = 8 },
@@ -30191,7 +30223,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 125,
-            skillLevels = { 1, 155, 185 },
+            skillLevels = { 125, 155, 170, 185 },
             reagents = {
                 { itemId = 2841, count = 20 },
                 { itemId = 3478, count = 8 },
@@ -30211,7 +30243,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 125,
-            skillLevels = { 1, 155, 185 },
+            skillLevels = { 125, 155, 170, 185 },
             reagents = {
                 { itemId = 2841, count = 20 },
                 { itemId = 3478, count = 8 },
@@ -30231,7 +30263,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 125,
-            skillLevels = { 1, 155, 185 },
+            skillLevels = { 125, 155, 170, 185 },
             reagents = {
                 { itemId = 2841, count = 20 },
                 { itemId = 3478, count = 8 },
@@ -30251,7 +30283,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2461",
             sortOrder = 110,
             requiredSkill = 95,
-            skillLevels = { 1, 125, 155 },
+            skillLevels = { 95, 125, 140, 155 },
             reagents = {
                 { itemId = 2841, count = 15 },
                 { itemId = 3478, count = 6 },
@@ -30271,7 +30303,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2461",
             sortOrder = 110,
             requiredSkill = 95,
-            skillLevels = { 1, 125, 155 },
+            skillLevels = { 95, 125, 140, 155 },
             reagents = {
                 { itemId = 2841, count = 15 },
                 { itemId = 3478, count = 6 },
@@ -30291,7 +30323,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2461",
             sortOrder = 110,
             requiredSkill = 95,
-            skillLevels = { 1, 125, 155 },
+            skillLevels = { 95, 125, 140, 155 },
             reagents = {
                 { itemId = 2841, count = 15 },
                 { itemId = 3478, count = 6 },
@@ -30311,7 +30343,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2461",
             sortOrder = 110,
             requiredSkill = 95,
-            skillLevels = { 1, 125, 155 },
+            skillLevels = { 95, 125, 140, 155 },
             reagents = {
                 { itemId = 2841, count = 15 },
                 { itemId = 3478, count = 6 },
@@ -30331,7 +30363,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2461",
             sortOrder = 110,
             requiredSkill = 95,
-            skillLevels = { 1, 125, 155 },
+            skillLevels = { 95, 125, 140, 155 },
             reagents = {
                 { itemId = 2841, count = 15 },
                 { itemId = 3478, count = 6 },
@@ -30351,7 +30383,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 145,
-            skillLevels = { 1, 170, 195 },
+            skillLevels = { 145, 170, 182, 195 },
             reagents = {
                 { itemId = 3577, count = 12 },
                 { itemId = 3859, count = 3 },
@@ -30369,7 +30401,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 150,
-            skillLevels = { 1, 175, 200 },
+            skillLevels = { 150, 175, 187, 200 },
             reagents = {
                 { itemId = 3577, count = 6 },
                 { itemId = 3859, count = 2 },
@@ -30386,7 +30418,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2464",
             sortOrder = 140,
             requiredSkill = 160,
-            skillLevels = { 1, 185, 210 },
+            skillLevels = { 160, 185, 197, 210 },
             reagents = {
                 { itemId = 3577, count = 6 },
                 { itemId = 3859, count = 1 },
@@ -30402,7 +30434,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 165,
-            skillLevels = { 1, 190, 215 },
+            skillLevels = { 165, 190, 202, 215 },
             reagents = {
                 { itemId = 3577, count = 10 },
                 { itemId = 3859, count = 2 },
@@ -30420,7 +30452,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2461",
             sortOrder = 110,
             requiredSkill = 170,
-            skillLevels = { 1, 195, 220 },
+            skillLevels = { 170, 195, 207, 220 },
             reagents = {
                 { itemId = 3577, count = 10 },
                 { itemId = 3859, count = 2 },
@@ -30438,7 +30470,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 175,
-            skillLevels = { 1, 200, 225 },
+            skillLevels = { 175, 200, 212, 225 },
             reagents = {
                 { itemId = 3577, count = 8 },
                 { itemId = 3859, count = 2 },
@@ -30456,7 +30488,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2462",
             sortOrder = 120,
             requiredSkill = 175,
-            skillLevels = { 1, 200, 225 },
+            skillLevels = { 175, 200, 212, 225 },
             reagents = {
                 { itemId = 3577, count = 8 },
                 { itemId = 3859, count = 2 },
@@ -30472,7 +30504,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2471",
             sortOrder = 50,
             requiredSkill = 195,
-            skillLevels = { 1, 215, 235 },
+            skillLevels = { 195, 215, 225, 235 },
             reagents = {
                 { itemId = 3860, count = 8 },
                 { itemId = 6037, count = 9 },
@@ -30489,7 +30521,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 195,
-            skillLevels = { 1, 215, 235 },
+            skillLevels = { 195, 215, 225, 235 },
             reagents = {
                 { itemId = 3860, count = 6 },
                 { itemId = 6037, count = 3 },
@@ -30508,7 +30540,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 200,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 200, 220, 230, 240 },
             reagents = {
                 { itemId = 3860, count = 4 },
                 { itemId = 6037, count = 3 },
@@ -30525,7 +30557,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2469",
             sortOrder = 30,
             requiredSkill = 215,
-            skillLevels = { 1, 235, 255 },
+            skillLevels = { 215, 235, 245, 255 },
             reagents = {
                 { itemId = 3860, count = 8 },
                 { itemId = 6037, count = 9 },
@@ -30542,7 +30574,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 220,
-            skillLevels = { 1, 240, 260 },
+            skillLevels = { 220, 240, 250, 260 },
             reagents = {
                 { itemId = 3860, count = 6 },
                 { itemId = 6037, count = 9 },
@@ -30559,7 +30591,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 220,
-            skillLevels = { 1, 240, 260 },
+            skillLevels = { 220, 240, 250, 260 },
             reagents = {
                 { itemId = 3860, count = 5 },
                 { itemId = 6037, count = 6 },
@@ -30576,7 +30608,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 205 },
+            skillLevels = { 200, 205, 205, 205 },
             reagents = {
                 { itemId = 3859, count = 4 },
                 { itemId = 3486, count = 4 },
@@ -30592,7 +30624,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 205 },
+            skillLevels = { 200, 205, 205, 205 },
             reagents = {
                 { itemId = 3859, count = 4 },
                 { itemId = 3486, count = 4 },
@@ -30608,7 +30640,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 205 },
+            skillLevels = { 200, 205, 205, 205 },
             reagents = {
                 { itemId = 3859, count = 4 },
                 { itemId = 3486, count = 4 },
@@ -30624,7 +30656,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 205 },
+            skillLevels = { 200, 205, 205, 205 },
             reagents = {
                 { itemId = 3859, count = 4 },
                 { itemId = 3486, count = 4 },
@@ -30640,7 +30672,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 205 },
+            skillLevels = { 200, 205, 205, 205 },
             reagents = {
                 { itemId = 3859, count = 4 },
                 { itemId = 3486, count = 4 },
@@ -30656,7 +30688,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 250,
-            skillLevels = { 1, 255, 255 },
+            skillLevels = { 250, 255, 255, 255 },
             reagents = {
                 { itemId = 12359, count = 8 },
                 { itemId = 7966, count = 4 },
@@ -30672,7 +30704,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 250,
-            skillLevels = { 1, 255, 255 },
+            skillLevels = { 250, 255, 255, 255 },
             reagents = {
                 { itemId = 12359, count = 8 },
                 { itemId = 7966, count = 4 },
@@ -30688,7 +30720,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 250,
-            skillLevels = { 1, 255, 255 },
+            skillLevels = { 250, 255, 255, 255 },
             reagents = {
                 { itemId = 12359, count = 8 },
                 { itemId = 7966, count = 4 },
@@ -30704,7 +30736,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 250,
-            skillLevels = { 1, 255, 255 },
+            skillLevels = { 250, 255, 255, 255 },
             reagents = {
                 { itemId = 12359, count = 8 },
                 { itemId = 7966, count = 4 },
@@ -30720,7 +30752,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 250,
-            skillLevels = { 1, 255, 255 },
+            skillLevels = { 250, 255, 255, 255 },
             reagents = {
                 { itemId = 12359, count = 8 },
                 { itemId = 7966, count = 4 },
@@ -30736,7 +30768,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2466",
             sortOrder = 160,
             requiredSkill = 150,
-            skillLevels = { 1, 155, 155 },
+            skillLevels = { 150, 155, 155, 155 },
             reagents = {
                 { itemId = 3575, count = 6 },
                 { itemId = 3486, count = 2 },
@@ -30752,7 +30784,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2466",
             sortOrder = 160,
             requiredSkill = 150,
-            skillLevels = { 1, 155, 155 },
+            skillLevels = { 150, 155, 155, 155 },
             reagents = {
                 { itemId = 3575, count = 6 },
                 { itemId = 3486, count = 2 },
@@ -30768,7 +30800,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2466",
             sortOrder = 160,
             requiredSkill = 150,
-            skillLevels = { 1, 155, 155 },
+            skillLevels = { 150, 155, 155, 155 },
             reagents = {
                 { itemId = 3575, count = 6 },
                 { itemId = 3486, count = 2 },
@@ -30784,7 +30816,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2466",
             sortOrder = 160,
             requiredSkill = 150,
-            skillLevels = { 1, 155, 155 },
+            skillLevels = { 150, 155, 155, 155 },
             reagents = {
                 { itemId = 3575, count = 6 },
                 { itemId = 3486, count = 2 },
@@ -30800,7 +30832,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2466",
             sortOrder = 160,
             requiredSkill = 150,
-            skillLevels = { 1, 155, 155 },
+            skillLevels = { 150, 155, 155, 155 },
             reagents = {
                 { itemId = 3575, count = 6 },
                 { itemId = 3486, count = 2 },
@@ -30818,7 +30850,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 7966, count = 3 },
@@ -30839,7 +30871,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 7966, count = 3 },
@@ -30860,7 +30892,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 7966, count = 3 },
@@ -30881,7 +30913,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 7966, count = 3 },
@@ -30902,7 +30934,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 7966, count = 3 },
@@ -30923,7 +30955,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 175,
-            skillLevels = { 1, 200, 225 },
+            skillLevels = { 175, 200, 212, 225 },
             reagents = {
                 { itemId = 3859, count = 10 },
                 { itemId = 3486, count = 4 },
@@ -30943,7 +30975,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 175,
-            skillLevels = { 1, 200, 225 },
+            skillLevels = { 175, 200, 212, 225 },
             reagents = {
                 { itemId = 3859, count = 10 },
                 { itemId = 3486, count = 4 },
@@ -30963,7 +30995,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 175,
-            skillLevels = { 1, 200, 225 },
+            skillLevels = { 175, 200, 212, 225 },
             reagents = {
                 { itemId = 3859, count = 10 },
                 { itemId = 3486, count = 4 },
@@ -30983,7 +31015,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 175,
-            skillLevels = { 1, 200, 225 },
+            skillLevels = { 175, 200, 212, 225 },
             reagents = {
                 { itemId = 3859, count = 10 },
                 { itemId = 3486, count = 4 },
@@ -31003,7 +31035,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 175,
-            skillLevels = { 1, 200, 225 },
+            skillLevels = { 175, 200, 212, 225 },
             reagents = {
                 { itemId = 3859, count = 10 },
                 { itemId = 3486, count = 4 },
@@ -31023,7 +31055,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2474",
             sortOrder = 80,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 12359, count = 24 },
                 { itemId = 7966, count = 4 },
@@ -31043,7 +31075,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2474",
             sortOrder = 80,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 12359, count = 24 },
                 { itemId = 7966, count = 4 },
@@ -31063,7 +31095,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2474",
             sortOrder = 80,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 12359, count = 24 },
                 { itemId = 7966, count = 4 },
@@ -31083,7 +31115,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2474",
             sortOrder = 80,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 12359, count = 24 },
                 { itemId = 7966, count = 4 },
@@ -31103,7 +31135,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2474",
             sortOrder = 80,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 12359, count = 24 },
                 { itemId = 7966, count = 4 },
@@ -31123,7 +31155,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 3860, count = 20 },
                 { itemId = 7966, count = 2 },
@@ -31144,7 +31176,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 3860, count = 20 },
                 { itemId = 7966, count = 2 },
@@ -31165,7 +31197,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 3860, count = 20 },
                 { itemId = 7966, count = 2 },
@@ -31186,7 +31218,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 3860, count = 20 },
                 { itemId = 7966, count = 2 },
@@ -31207,7 +31239,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 3860, count = 20 },
                 { itemId = 7966, count = 2 },
@@ -31228,7 +31260,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2472",
             sortOrder = 60,
             requiredSkill = 225,
-            skillLevels = { 1, 250, 275 },
+            skillLevels = { 225, 250, 262, 275 },
             reagents = {
                 { itemId = 12359, count = 16 },
                 { itemId = 7966, count = 2 },
@@ -31249,7 +31281,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2472",
             sortOrder = 60,
             requiredSkill = 225,
-            skillLevels = { 1, 250, 275 },
+            skillLevels = { 225, 250, 262, 275 },
             reagents = {
                 { itemId = 12359, count = 16 },
                 { itemId = 7966, count = 2 },
@@ -31270,7 +31302,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2472",
             sortOrder = 60,
             requiredSkill = 225,
-            skillLevels = { 1, 250, 275 },
+            skillLevels = { 225, 250, 262, 275 },
             reagents = {
                 { itemId = 12359, count = 16 },
                 { itemId = 7966, count = 2 },
@@ -31291,7 +31323,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2472",
             sortOrder = 60,
             requiredSkill = 225,
-            skillLevels = { 1, 250, 275 },
+            skillLevels = { 225, 250, 262, 275 },
             reagents = {
                 { itemId = 12359, count = 16 },
                 { itemId = 7966, count = 2 },
@@ -31312,7 +31344,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2472",
             sortOrder = 60,
             requiredSkill = 225,
-            skillLevels = { 1, 250, 275 },
+            skillLevels = { 225, 250, 262, 275 },
             reagents = {
                 { itemId = 12359, count = 16 },
                 { itemId = 7966, count = 2 },
@@ -31331,7 +31363,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 12361, count = 1 },
@@ -31347,7 +31379,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 12359, count = 24 },
                 { itemId = 12361, count = 1 },
@@ -31363,7 +31395,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 245,
-            skillLevels = { 1, 265, 285 },
+            skillLevels = { 245, 265, 275, 285 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 12361, count = 2 },
@@ -31378,7 +31410,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 255,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 255, 275, 285, 295 },
             reagents = {
                 { itemId = 12359, count = 24 },
                 { itemId = 7910, count = 1 },
@@ -31393,7 +31425,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2472",
             sortOrder = 60,
             requiredSkill = 255,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 255, 275, 285, 295 },
             reagents = {
                 { itemId = 12359, count = 16 },
                 { itemId = 12361, count = 1 },
@@ -31408,7 +31440,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 12359, count = 40 },
                 { itemId = 12361, count = 2 },
@@ -31423,7 +31455,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2474",
             sortOrder = 80,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 12359, count = 18 },
                 { itemId = 12361, count = 1 },
@@ -31440,7 +31472,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2469",
             sortOrder = 30,
             requiredSkill = 275,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 275, 295, 305, 315 },
             reagents = {
                 { itemId = 12359, count = 30 },
                 { itemId = 12361, count = 2 },
@@ -31455,7 +31487,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2471",
             sortOrder = 50,
             requiredSkill = 280,
-            skillLevels = { 1, 300, 320 },
+            skillLevels = { 280, 300, 310, 320 },
             reagents = {
                 { itemId = 12359, count = 36 },
                 { itemId = 12361, count = 2 },
@@ -31472,7 +31504,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2471",
             sortOrder = 50,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 251290, count = 8 },
                 { itemId = 251291, count = 24 },
@@ -31492,7 +31524,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 251290, count = 10 },
                 { itemId = 251291, count = 20 },
@@ -31511,7 +31543,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2469",
             sortOrder = 30,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 251290, count = 6 },
                 { itemId = 251291, count = 16 },
@@ -31528,7 +31560,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 251290, count = 12 },
                 { itemId = 251291, count = 20 },
@@ -31545,7 +31577,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2469",
             sortOrder = 30,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 251290, count = 12 },
                 { itemId = 12359, count = 80 },
@@ -31563,7 +31595,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 251290, count = 12 },
                 { itemId = 251291, count = 20 },
@@ -31580,7 +31612,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2471",
             sortOrder = 50,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 251290, count = 12 },
                 { itemId = 12359, count = 80 },
@@ -31600,7 +31632,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2483",
             sortOrder = 250,
             requiredSkill = 80,
-            skillLevels = { 1, 110, 140 },
+            skillLevels = { 80, 110, 125, 140 },
             reagents = {
                 { itemId = 2841, count = 6 },
                 { itemId = 2880, count = 4 },
@@ -31620,7 +31652,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2479",
             sortOrder = 210,
             requiredSkill = 95,
-            skillLevels = { 1, 125, 155 },
+            skillLevels = { 95, 125, 140, 155 },
             reagents = {
                 { itemId = 2841, count = 8 },
                 { itemId = 2880, count = 4 },
@@ -31638,7 +31670,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2483",
             sortOrder = 250,
             requiredSkill = 130,
-            skillLevels = { 1, 155, 180 },
+            skillLevels = { 130, 155, 167, 180 },
             reagents = {
                 { itemId = 3575, count = 6 },
                 { itemId = 3466, count = 2 },
@@ -31658,7 +31690,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2479",
             sortOrder = 210,
             requiredSkill = 160,
-            skillLevels = { 1, 185, 210 },
+            skillLevels = { 160, 185, 197, 210 },
             reagents = {
                 { itemId = 3859, count = 10 },
                 { itemId = 3466, count = 2 },
@@ -31678,7 +31710,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2484",
             sortOrder = 260,
             requiredSkill = 165,
-            skillLevels = { 1, 190, 215 },
+            skillLevels = { 165, 190, 202, 215 },
             reagents = {
                 { itemId = 3575, count = 14 },
                 { itemId = 3466, count = 2 },
@@ -31698,7 +31730,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2482",
             sortOrder = 240,
             requiredSkill = 180,
-            skillLevels = { 1, 200, 220 },
+            skillLevels = { 180, 200, 210, 220 },
             reagents = {
                 { itemId = 3860, count = 8 },
                 { itemId = 3466, count = 2 },
@@ -31718,7 +31750,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2478",
             sortOrder = 200,
             requiredSkill = 190,
-            skillLevels = { 1, 210, 230 },
+            skillLevels = { 190, 210, 220, 230 },
             reagents = {
                 { itemId = 3860, count = 12 },
                 { itemId = 3864, count = 2 },
@@ -31737,7 +31769,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2483",
             sortOrder = 250,
             requiredSkill = 195,
-            skillLevels = { 1, 215, 235 },
+            skillLevels = { 195, 215, 225, 235 },
             reagents = {
                 { itemId = 3860, count = 8 },
                 { itemId = 1529, count = 1 },
@@ -31754,7 +31786,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2480",
             sortOrder = 220,
             requiredSkill = 195,
-            skillLevels = { 1, 215, 235 },
+            skillLevels = { 195, 215, 225, 235 },
             reagents = {
                 { itemId = 3860, count = 16 },
                 { itemId = 3577, count = 6 },
@@ -31773,7 +31805,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2482",
             sortOrder = 240,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 3860, count = 16 },
                 { itemId = 1210, count = 6 },
@@ -31790,7 +31822,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2477",
             sortOrder = 190,
             requiredSkill = 215,
-            skillLevels = { 1, 235, 255 },
+            skillLevels = { 215, 235, 245, 255 },
             reagents = {
                 { itemId = 3860, count = 20 },
                 { itemId = 7082, count = 6 },
@@ -31809,7 +31841,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2478",
             sortOrder = 200,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 12359, count = 30 },
                 { itemId = 251291, count = 4 },
@@ -31829,7 +31861,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2483",
             sortOrder = 250,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 251291, count = 8 },
@@ -31847,7 +31879,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2479",
             sortOrder = 210,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 305 },
+            skillLevels = { 260, 280, 292, 305 },
             reagents = {
                 { itemId = 12359, count = 20 },
                 { itemId = 251291, count = 6 },
@@ -31867,7 +31899,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2482",
             sortOrder = 240,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 12359, count = 30 },
                 { itemId = 7082, count = 4 },
@@ -31884,7 +31916,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2477",
             sortOrder = 190,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 251290, count = 20 },
                 { itemId = 249726, count = 10 },
@@ -31900,7 +31932,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2483",
             sortOrder = 250,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 251290, count = 10 },
                 { itemId = 251291, count = 10 },
@@ -31920,7 +31952,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2479",
             sortOrder = 210,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 251290, count = 15 },
                 { itemId = 251291, count = 8 },
@@ -31940,7 +31972,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2636",
             sortOrder = 200,
             requiredSkill = 85,
-            skillLevels = { 1, 125, 165 },
+            skillLevels = { 85, 125, 145, 165 },
             reagents = {
                 { itemId = 251524, count = 1 },
                 { itemId = 2678, count = 1 },
@@ -32359,7 +32391,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2569",
             sortOrder = 2000,
             requiredSkill = 235,
-            skillLevels = { 1, 235, 255 },
+            skillLevels = { 235, 235, 245, 255 },
             reagents = {
                 { itemId = 15564, count = 1 },
                 { itemId = 11176, count = 2 },
@@ -32379,7 +32411,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2569",
             sortOrder = 2000,
             requiredSkill = 235,
-            skillLevels = { 1, 235, 255 },
+            skillLevels = { 235, 235, 245, 255 },
             reagents = {
                 { itemId = 15564, count = 1 },
                 { itemId = 11176, count = 2 },
@@ -32397,7 +32429,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2567",
             sortOrder = 1800,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 15408, count = 40 },
@@ -32417,7 +32449,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2561",
             sortOrder = 1200,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 15416, count = 40 },
@@ -32437,7 +32469,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2561",
             sortOrder = 1200,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 15415, count = 40 },
@@ -32457,7 +32489,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2567",
             sortOrder = 1800,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 15414, count = 40 },
@@ -32477,7 +32509,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 280,
-            skillLevels = { 1, 300, 320 },
+            skillLevels = { 280, 300, 310, 320 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 15408, count = 14 },
@@ -32494,7 +32526,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 280,
-            skillLevels = { 1, 300, 320 },
+            skillLevels = { 280, 300, 310, 320 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 15408, count = 10 },
@@ -32510,7 +32542,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2567",
             sortOrder = 1800,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 15408, count = 14 },
@@ -32529,7 +32561,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2563",
             sortOrder = 1400,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 15408, count = 10 },
@@ -32545,7 +32577,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2563",
             sortOrder = 1400,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 8170, count = 6 },
                 { itemId = 15408, count = 12 },
@@ -32562,7 +32594,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2561",
             sortOrder = 1200,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 8170, count = 11 },
                 { itemId = 15408, count = 10 },
@@ -32578,7 +32610,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 255,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 255, 275, 285, 295 },
             reagents = {
                 { itemId = 8170, count = 4 },
                 { itemId = 15408, count = 8 },
@@ -32595,7 +32627,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2566",
             sortOrder = 1700,
             requiredSkill = 255,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 255, 275, 285, 295 },
             reagents = {
                 { itemId = 8170, count = 9 },
                 { itemId = 15408, count = 6 },
@@ -32611,7 +32643,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 255,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 255, 275, 285, 295 },
             reagents = {
                 { itemId = 8170, count = 6 },
                 { itemId = 15408, count = 8 },
@@ -32627,7 +32659,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2564",
             sortOrder = 1500,
             requiredSkill = 255,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 255, 275, 285, 295 },
             reagents = {
                 { itemId = 8170, count = 2 },
                 { itemId = 15408, count = 4 },
@@ -32644,7 +32676,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2562",
             sortOrder = 1300,
             requiredSkill = 255,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 255, 275, 285, 295 },
             reagents = {
                 { itemId = 8170, count = 9 },
                 { itemId = 15408, count = 6 },
@@ -32662,7 +32694,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2566",
             sortOrder = 1700,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 8172, count = 4 },
@@ -32683,7 +32715,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2566",
             sortOrder = 1700,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 8172, count = 4 },
@@ -32704,7 +32736,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2566",
             sortOrder = 1700,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 8172, count = 4 },
@@ -32725,7 +32757,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2566",
             sortOrder = 1700,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 8172, count = 4 },
@@ -32744,7 +32776,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 250,
-            skillLevels = { 1, 255, 255 },
+            skillLevels = { 250, 255, 255, 255 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -32760,7 +32792,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 250,
-            skillLevels = { 1, 255, 255 },
+            skillLevels = { 250, 255, 255, 255 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -32776,7 +32808,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 250,
-            skillLevels = { 1, 255, 255 },
+            skillLevels = { 250, 255, 255, 255 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -32792,7 +32824,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 250,
-            skillLevels = { 1, 255, 255 },
+            skillLevels = { 250, 255, 255, 255 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -32808,7 +32840,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2562",
             sortOrder = 1300,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 8170, count = 4 },
                 { itemId = 15408, count = 8 },
@@ -32825,7 +32857,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2564",
             sortOrder = 1500,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 8170, count = 7 },
                 { itemId = 15408, count = 2 },
@@ -32841,7 +32873,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2561",
             sortOrder = 1200,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 8170, count = 4 },
                 { itemId = 15408, count = 6 },
@@ -32858,7 +32890,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2567",
             sortOrder = 1800,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 8170, count = 9 },
                 { itemId = 15408, count = 4 },
@@ -32876,7 +32908,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 275 },
+            skillLevels = { 235, 255, 265, 275 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -32897,7 +32929,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 275 },
+            skillLevels = { 235, 255, 265, 275 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -32918,7 +32950,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 275 },
+            skillLevels = { 235, 255, 265, 275 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -32939,7 +32971,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 275 },
+            skillLevels = { 235, 255, 265, 275 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -32958,7 +32990,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2566",
             sortOrder = 1700,
             requiredSkill = 230,
-            skillLevels = { 1, 250, 270 },
+            skillLevels = { 230, 250, 260, 270 },
             reagents = {
                 { itemId = 8170, count = 6 },
                 { itemId = 15408, count = 6 },
@@ -32974,7 +33006,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 230,
-            skillLevels = { 1, 250, 270 },
+            skillLevels = { 230, 250, 260, 270 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 15408, count = 4 },
@@ -32992,7 +33024,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2564",
             sortOrder = 1500,
             requiredSkill = 225,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 225, 220, 230, 240 },
             reagents = {
                 { itemId = 4304, count = 12 },
                 { itemId = 4236, count = 4 },
@@ -33013,7 +33045,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2564",
             sortOrder = 1500,
             requiredSkill = 225,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 225, 220, 230, 240 },
             reagents = {
                 { itemId = 4304, count = 12 },
                 { itemId = 4236, count = 4 },
@@ -33034,7 +33066,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2564",
             sortOrder = 1500,
             requiredSkill = 225,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 225, 220, 230, 240 },
             reagents = {
                 { itemId = 4304, count = 12 },
                 { itemId = 4236, count = 4 },
@@ -33055,7 +33087,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2564",
             sortOrder = 1500,
             requiredSkill = 225,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 225, 220, 230, 240 },
             reagents = {
                 { itemId = 4304, count = 12 },
                 { itemId = 4236, count = 4 },
@@ -33076,7 +33108,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2562",
             sortOrder = 1300,
             requiredSkill = 210,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 210, 220, 230, 240 },
             reagents = {
                 { itemId = 4304, count = 10 },
                 { itemId = 4236, count = 3 },
@@ -33097,7 +33129,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2562",
             sortOrder = 1300,
             requiredSkill = 210,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 210, 220, 230, 240 },
             reagents = {
                 { itemId = 4304, count = 10 },
                 { itemId = 4236, count = 3 },
@@ -33118,7 +33150,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2562",
             sortOrder = 1300,
             requiredSkill = 210,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 210, 220, 230, 240 },
             reagents = {
                 { itemId = 4304, count = 10 },
                 { itemId = 4236, count = 3 },
@@ -33139,7 +33171,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2562",
             sortOrder = 1300,
             requiredSkill = 210,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 210, 220, 230, 240 },
             reagents = {
                 { itemId = 4304, count = 10 },
                 { itemId = 4236, count = 3 },
@@ -33160,7 +33192,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 205 },
+            skillLevels = { 200, 205, 205, 205 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -33176,7 +33208,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 205 },
+            skillLevels = { 200, 205, 205, 205 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -33192,7 +33224,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 205 },
+            skillLevels = { 200, 205, 205, 205 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -33208,7 +33240,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 205 },
+            skillLevels = { 200, 205, 205, 205 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -33224,7 +33256,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 15420, count = 120 },
@@ -33244,7 +33276,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 15419, count = 20 },
@@ -33263,7 +33295,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12810, count = 6 },
                 { itemId = 12804, count = 20 },
@@ -33283,7 +33315,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 12810, count = 6 },
                 { itemId = 12809, count = 10 },
@@ -33303,7 +33335,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 8170, count = 20 },
                 { itemId = 12803, count = 20 },
@@ -33323,7 +33355,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 280,
-            skillLevels = { 1, 300, 320 },
+            skillLevels = { 280, 300, 310, 320 },
             reagents = {
                 { itemId = 8170, count = 16 },
                 { itemId = 14341, count = 1 },
@@ -33339,7 +33371,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 280,
-            skillLevels = { 1, 300, 320 },
+            skillLevels = { 280, 300, 310, 320 },
             reagents = {
                 { itemId = 8170, count = 18 },
                 { itemId = 14341, count = 1 },
@@ -33356,7 +33388,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 275,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 275, 295, 305, 315 },
             reagents = {
                 { itemId = 8170, count = 10 },
                 { itemId = 14341, count = 1 },
@@ -33372,7 +33404,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 275,
-            skillLevels = { 1, 295, 315 },
+            skillLevels = { 275, 295, 305, 315 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 14341, count = 1 },
@@ -33389,7 +33421,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 8170, count = 14 },
                 { itemId = 14341, count = 1 },
@@ -33405,7 +33437,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 8170, count = 10 },
                 { itemId = 14341, count = 1 },
@@ -33421,7 +33453,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 270,
-            skillLevels = { 1, 290, 310 },
+            skillLevels = { 270, 290, 300, 310 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 14341, count = 1 },
@@ -33440,7 +33472,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 265, 285, 295, 305 },
             reagents = {
                 { itemId = 8170, count = 14 },
                 { itemId = 15407, count = 2 },
@@ -33458,7 +33490,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 265,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 265, 285, 295, 305 },
             reagents = {
                 { itemId = 8170, count = 14 },
                 { itemId = 14341, count = 1 },
@@ -33474,7 +33506,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 8170, count = 10 },
                 { itemId = 14341, count = 1 },
@@ -33490,7 +33522,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 8170, count = 10 },
                 { itemId = 14341, count = 1 },
@@ -33506,7 +33538,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             reagents = {
                 { itemId = 8170, count = 10 },
                 { itemId = 14341, count = 1 },
@@ -33522,7 +33554,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 255,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 255, 275, 285, 295 },
             reagents = {
                 { itemId = 8170, count = 14 },
                 { itemId = 14341, count = 1 },
@@ -33541,7 +33573,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 255,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 255, 275, 285, 295 },
             reagents = {
                 { itemId = 8170, count = 16 },
                 { itemId = 14341, count = 1 },
@@ -33561,7 +33593,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 8172, count = 4 },
@@ -33582,7 +33614,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 8172, count = 4 },
@@ -33603,7 +33635,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 8172, count = 4 },
@@ -33624,7 +33656,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 8172, count = 4 },
@@ -33645,7 +33677,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 8172, count = 4 },
@@ -33664,7 +33696,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 250,
-            skillLevels = { 1, 255, 255 },
+            skillLevels = { 250, 255, 255, 255 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -33680,7 +33712,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 250,
-            skillLevels = { 1, 255, 255 },
+            skillLevels = { 250, 255, 255, 255 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -33696,7 +33728,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 250,
-            skillLevels = { 1, 255, 255 },
+            skillLevels = { 250, 255, 255, 255 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -33712,7 +33744,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 250,
-            skillLevels = { 1, 255, 255 },
+            skillLevels = { 250, 255, 255, 255 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -33728,7 +33760,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 250,
-            skillLevels = { 1, 255, 255 },
+            skillLevels = { 250, 255, 255, 255 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -33744,7 +33776,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 8170, count = 8 },
                 { itemId = 14341, count = 1 },
@@ -33760,7 +33792,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 240,
-            skillLevels = { 1, 260, 280 },
+            skillLevels = { 240, 260, 270, 280 },
             reagents = {
                 { itemId = 8170, count = 8 },
                 { itemId = 14341, count = 1 },
@@ -33778,7 +33810,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 275 },
+            skillLevels = { 235, 255, 265, 275 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -33799,7 +33831,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 275 },
+            skillLevels = { 235, 255, 265, 275 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -33820,7 +33852,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 275 },
+            skillLevels = { 235, 255, 265, 275 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -33841,7 +33873,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 275 },
+            skillLevels = { 235, 255, 265, 275 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -33862,7 +33894,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 275 },
+            skillLevels = { 235, 255, 265, 275 },
             reagents = {
                 { itemId = 4304, count = 16 },
                 { itemId = 8172, count = 2 },
@@ -33881,7 +33913,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 275 },
+            skillLevels = { 235, 255, 265, 275 },
             reagents = {
                 { itemId = 8170, count = 8 },
                 { itemId = 14341, count = 1 },
@@ -33897,7 +33929,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 235,
-            skillLevels = { 1, 255, 275 },
+            skillLevels = { 235, 255, 265, 275 },
             reagents = {
                 { itemId = 8170, count = 8 },
                 { itemId = 14341, count = 1 },
@@ -33915,7 +33947,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 225, 245, 255, 265 },
             reagents = {
                 { itemId = 4304, count = 12 },
                 { itemId = 4236, count = 4 },
@@ -33936,7 +33968,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 225, 245, 255, 265 },
             reagents = {
                 { itemId = 4304, count = 12 },
                 { itemId = 4236, count = 4 },
@@ -33957,7 +33989,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 225, 245, 255, 265 },
             reagents = {
                 { itemId = 4304, count = 12 },
                 { itemId = 4236, count = 4 },
@@ -33978,7 +34010,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 225, 245, 255, 265 },
             reagents = {
                 { itemId = 4304, count = 12 },
                 { itemId = 4236, count = 4 },
@@ -33999,7 +34031,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 225, 245, 255, 265 },
             reagents = {
                 { itemId = 4304, count = 12 },
                 { itemId = 4236, count = 4 },
@@ -34020,7 +34052,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 4304, count = 10 },
                 { itemId = 4236, count = 3 },
@@ -34041,7 +34073,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 4304, count = 10 },
                 { itemId = 4236, count = 3 },
@@ -34062,7 +34094,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 4304, count = 10 },
                 { itemId = 4236, count = 3 },
@@ -34083,7 +34115,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 4304, count = 10 },
                 { itemId = 4236, count = 3 },
@@ -34104,7 +34136,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 210,
-            skillLevels = { 1, 230, 250 },
+            skillLevels = { 210, 230, 240, 250 },
             reagents = {
                 { itemId = 4304, count = 10 },
                 { itemId = 4236, count = 3 },
@@ -34125,7 +34157,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 205 },
+            skillLevels = { 200, 205, 205, 205 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -34143,7 +34175,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 205 },
+            skillLevels = { 200, 205, 205, 205 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -34161,7 +34193,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 205 },
+            skillLevels = { 200, 205, 205, 205 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -34177,7 +34209,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 205 },
+            skillLevels = { 200, 205, 205, 205 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -34193,7 +34225,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 205 },
+            skillLevels = { 200, 205, 205, 205 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -34211,7 +34243,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 215 },
+            skillLevels = { 175, 195, 205, 215 },
             reagents = {
                 { itemId = 4234, count = 16 },
                 { itemId = 4236, count = 2 },
@@ -34232,7 +34264,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 215 },
+            skillLevels = { 175, 195, 205, 215 },
             reagents = {
                 { itemId = 4234, count = 16 },
                 { itemId = 4236, count = 2 },
@@ -34253,7 +34285,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 215 },
+            skillLevels = { 175, 195, 205, 215 },
             reagents = {
                 { itemId = 4234, count = 16 },
                 { itemId = 4236, count = 2 },
@@ -34274,7 +34306,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 215 },
+            skillLevels = { 175, 195, 205, 215 },
             reagents = {
                 { itemId = 4234, count = 16 },
                 { itemId = 4236, count = 2 },
@@ -34295,7 +34327,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 215 },
+            skillLevels = { 175, 195, 205, 215 },
             reagents = {
                 { itemId = 4234, count = 16 },
                 { itemId = 4236, count = 2 },
@@ -34316,7 +34348,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 215 },
+            skillLevels = { 175, 195, 205, 215 },
             reagents = {
                 { itemId = 4234, count = 16 },
                 { itemId = 4236, count = 2 },
@@ -34337,7 +34369,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 175,
-            skillLevels = { 1, 195, 215 },
+            skillLevels = { 175, 195, 205, 215 },
             reagents = {
                 { itemId = 4234, count = 16 },
                 { itemId = 4236, count = 2 },
@@ -34358,7 +34390,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2569",
             sortOrder = 2000,
             requiredSkill = 185,
-            skillLevels = { 1, 205, 225 },
+            skillLevels = { 185, 205, 215, 225 },
             reagents = {
                 { itemId = 8173, count = 1 },
                 { itemId = 11137, count = 2 },
@@ -34376,7 +34408,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2569",
             sortOrder = 2000,
             requiredSkill = 185,
-            skillLevels = { 1, 205, 225 },
+            skillLevels = { 185, 205, 215, 225 },
             reagents = {
                 { itemId = 8173, count = 1 },
                 { itemId = 11137, count = 2 },
@@ -34394,7 +34426,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 150,
-            skillLevels = { 1, 155, 155 },
+            skillLevels = { 150, 155, 155, 155 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -34412,7 +34444,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 150,
-            skillLevels = { 1, 155, 155 },
+            skillLevels = { 150, 155, 155, 155 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -34430,7 +34462,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 150,
-            skillLevels = { 1, 155, 155 },
+            skillLevels = { 150, 155, 155, 155 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -34448,7 +34480,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 150,
-            skillLevels = { 1, 155, 155 },
+            skillLevels = { 150, 155, 155, 155 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -34466,7 +34498,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 150,
-            skillLevels = { 1, 155, 155 },
+            skillLevels = { 150, 155, 155, 155 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -34484,7 +34516,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 150,
-            skillLevels = { 1, 155, 155 },
+            skillLevels = { 150, 155, 155, 155 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -34502,7 +34534,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 150,
-            skillLevels = { 1, 155, 155 },
+            skillLevels = { 150, 155, 155, 155 },
             reagents = {
                 { itemId = 4234, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -34520,7 +34552,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 125,
-            skillLevels = { 1, 150, 170 },
+            skillLevels = { 125, 150, 160, 170 },
             reagents = {
                 { itemId = 2319, count = 12 },
                 { itemId = 4233, count = 4 },
@@ -34540,7 +34572,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 125,
-            skillLevels = { 1, 150, 170 },
+            skillLevels = { 125, 150, 160, 170 },
             reagents = {
                 { itemId = 2319, count = 12 },
                 { itemId = 4233, count = 4 },
@@ -34560,7 +34592,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 125,
-            skillLevels = { 1, 150, 170 },
+            skillLevels = { 125, 150, 160, 170 },
             reagents = {
                 { itemId = 2319, count = 12 },
                 { itemId = 4233, count = 4 },
@@ -34580,7 +34612,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 125,
-            skillLevels = { 1, 150, 170 },
+            skillLevels = { 125, 150, 160, 170 },
             reagents = {
                 { itemId = 2319, count = 12 },
                 { itemId = 4233, count = 4 },
@@ -34600,7 +34632,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 125,
-            skillLevels = { 1, 150, 170 },
+            skillLevels = { 125, 150, 160, 170 },
             reagents = {
                 { itemId = 2319, count = 12 },
                 { itemId = 4233, count = 4 },
@@ -34620,7 +34652,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 125,
-            skillLevels = { 1, 150, 170 },
+            skillLevels = { 125, 150, 160, 170 },
             reagents = {
                 { itemId = 2319, count = 12 },
                 { itemId = 4233, count = 4 },
@@ -34638,7 +34670,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 130 },
+            skillLevels = { 125, 130, 130, 130 },
             reagents = {
                 { itemId = 2319, count = 12 },
                 { itemId = 4233, count = 2 },
@@ -34654,7 +34686,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 130 },
+            skillLevels = { 125, 130, 130, 130 },
             reagents = {
                 { itemId = 2319, count = 12 },
                 { itemId = 4233, count = 2 },
@@ -34670,7 +34702,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 130 },
+            skillLevels = { 125, 130, 130, 130 },
             reagents = {
                 { itemId = 2319, count = 12 },
                 { itemId = 4233, count = 2 },
@@ -34686,7 +34718,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 130 },
+            skillLevels = { 125, 130, 130, 130 },
             reagents = {
                 { itemId = 2319, count = 12 },
                 { itemId = 4233, count = 2 },
@@ -34702,7 +34734,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 130 },
+            skillLevels = { 125, 130, 130, 130 },
             reagents = {
                 { itemId = 2319, count = 12 },
                 { itemId = 4233, count = 2 },
@@ -34718,7 +34750,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 130 },
+            skillLevels = { 125, 130, 130, 130 },
             reagents = {
                 { itemId = 2319, count = 12 },
                 { itemId = 4233, count = 2 },
@@ -34736,7 +34768,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2569",
             sortOrder = 2000,
             requiredSkill = 135,
-            skillLevels = { 1, 155, 175 },
+            skillLevels = { 135, 155, 165, 175 },
             reagents = {
                 { itemId = 4265, count = 1 },
                 { itemId = 11083, count = 2 },
@@ -34754,7 +34786,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2569",
             sortOrder = 2000,
             requiredSkill = 135,
-            skillLevels = { 1, 155, 175 },
+            skillLevels = { 135, 155, 165, 175 },
             reagents = {
                 { itemId = 4265, count = 1 },
                 { itemId = 11083, count = 2 },
@@ -34772,7 +34804,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 110,
-            skillLevels = { 1, 135, 160 },
+            skillLevels = { 110, 135, 147, 160 },
             reagents = {
                 { itemId = 2319, count = 10 },
                 { itemId = 4233, count = 3 },
@@ -34792,7 +34824,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 110,
-            skillLevels = { 1, 135, 160 },
+            skillLevels = { 110, 135, 147, 160 },
             reagents = {
                 { itemId = 2319, count = 10 },
                 { itemId = 4233, count = 3 },
@@ -34812,7 +34844,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 110,
-            skillLevels = { 1, 135, 160 },
+            skillLevels = { 110, 135, 147, 160 },
             reagents = {
                 { itemId = 2319, count = 10 },
                 { itemId = 4233, count = 3 },
@@ -34832,7 +34864,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 110,
-            skillLevels = { 1, 135, 160 },
+            skillLevels = { 110, 135, 147, 160 },
             reagents = {
                 { itemId = 2319, count = 10 },
                 { itemId = 4233, count = 3 },
@@ -34852,7 +34884,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 110,
-            skillLevels = { 1, 135, 160 },
+            skillLevels = { 110, 135, 147, 160 },
             reagents = {
                 { itemId = 2319, count = 10 },
                 { itemId = 4233, count = 3 },
@@ -34872,7 +34904,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 110,
-            skillLevels = { 1, 135, 160 },
+            skillLevels = { 110, 135, 147, 160 },
             reagents = {
                 { itemId = 2319, count = 10 },
                 { itemId = 4233, count = 3 },
@@ -34892,7 +34924,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 110,
-            skillLevels = { 1, 135, 160 },
+            skillLevels = { 110, 135, 147, 160 },
             reagents = {
                 { itemId = 4233, count = 1 },
                 { itemId = 2319, count = 6 },
@@ -34910,7 +34942,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 100,
-            skillLevels = { 1, 125, 150 },
+            skillLevels = { 100, 125, 137, 150 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -34930,7 +34962,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 100,
-            skillLevels = { 1, 125, 150 },
+            skillLevels = { 100, 125, 137, 150 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -34950,7 +34982,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 100,
-            skillLevels = { 1, 125, 150 },
+            skillLevels = { 100, 125, 137, 150 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -34970,7 +35002,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 100,
-            skillLevels = { 1, 125, 150 },
+            skillLevels = { 100, 125, 137, 150 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -34990,7 +35022,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 100,
-            skillLevels = { 1, 125, 150 },
+            skillLevels = { 100, 125, 137, 150 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -35010,7 +35042,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 100,
-            skillLevels = { 1, 125, 150 },
+            skillLevels = { 100, 125, 137, 150 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 4233, count = 2 },
@@ -35028,7 +35060,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 100,
-            skillLevels = { 1, 105, 105 },
+            skillLevels = { 100, 105, 105, 105 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 4231, count = 4 },
@@ -35044,7 +35076,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 100,
-            skillLevels = { 1, 105, 105 },
+            skillLevels = { 100, 105, 105, 105 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 4231, count = 4 },
@@ -35060,7 +35092,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 100,
-            skillLevels = { 1, 105, 105 },
+            skillLevels = { 100, 105, 105, 105 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 4231, count = 4 },
@@ -35076,7 +35108,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 100,
-            skillLevels = { 1, 105, 105 },
+            skillLevels = { 100, 105, 105, 105 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 4231, count = 4 },
@@ -35092,7 +35124,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 100,
-            skillLevels = { 1, 105, 105 },
+            skillLevels = { 100, 105, 105, 105 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 4231, count = 4 },
@@ -35108,7 +35140,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 100,
-            skillLevels = { 1, 105, 105 },
+            skillLevels = { 100, 105, 105, 105 },
             reagents = {
                 { itemId = 2319, count = 8 },
                 { itemId = 4231, count = 4 },
@@ -35126,7 +35158,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 85,
-            skillLevels = { 1, 110, 135 },
+            skillLevels = { 85, 110, 122, 135 },
             reagents = {
                 { itemId = 2318, count = 14 },
                 { itemId = 4231, count = 4 },
@@ -35146,7 +35178,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 85,
-            skillLevels = { 1, 110, 135 },
+            skillLevels = { 85, 110, 122, 135 },
             reagents = {
                 { itemId = 2318, count = 14 },
                 { itemId = 4231, count = 4 },
@@ -35166,7 +35198,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 85,
-            skillLevels = { 1, 110, 135 },
+            skillLevels = { 85, 110, 122, 135 },
             reagents = {
                 { itemId = 2318, count = 14 },
                 { itemId = 4231, count = 4 },
@@ -35186,7 +35218,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 85,
-            skillLevels = { 1, 110, 135 },
+            skillLevels = { 85, 110, 122, 135 },
             reagents = {
                 { itemId = 2318, count = 14 },
                 { itemId = 4231, count = 4 },
@@ -35206,7 +35238,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 85,
-            skillLevels = { 1, 110, 135 },
+            skillLevels = { 85, 110, 122, 135 },
             reagents = {
                 { itemId = 2318, count = 14 },
                 { itemId = 4231, count = 4 },
@@ -35226,7 +35258,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 85,
-            skillLevels = { 1, 110, 135 },
+            skillLevels = { 85, 110, 122, 135 },
             reagents = {
                 { itemId = 2318, count = 14 },
                 { itemId = 4231, count = 4 },
@@ -35246,7 +35278,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2569",
             sortOrder = 2000,
             requiredSkill = 80,
-            skillLevels = { 1, 95, 110 },
+            skillLevels = { 80, 95, 102, 110 },
             reagents = {
                 { itemId = 2313, count = 1 },
                 { itemId = 10940, count = 2 },
@@ -35264,7 +35296,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2569",
             sortOrder = 2000,
             requiredSkill = 80,
-            skillLevels = { 1, 95, 110 },
+            skillLevels = { 80, 95, 102, 110 },
             reagents = {
                 { itemId = 2313, count = 1 },
                 { itemId = 10940, count = 2 },
@@ -35282,7 +35314,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 125 },
+            skillLevels = { 75, 100, 112, 125 },
             reagents = {
                 { itemId = 2318, count = 12 },
                 { itemId = 4231, count = 3 },
@@ -35302,7 +35334,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 125 },
+            skillLevels = { 75, 100, 112, 125 },
             reagents = {
                 { itemId = 2318, count = 12 },
                 { itemId = 4231, count = 3 },
@@ -35322,7 +35354,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 125 },
+            skillLevels = { 75, 100, 112, 125 },
             reagents = {
                 { itemId = 2318, count = 12 },
                 { itemId = 4231, count = 3 },
@@ -35342,7 +35374,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 125 },
+            skillLevels = { 75, 100, 112, 125 },
             reagents = {
                 { itemId = 2318, count = 12 },
                 { itemId = 4231, count = 3 },
@@ -35362,7 +35394,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 125 },
+            skillLevels = { 75, 100, 112, 125 },
             reagents = {
                 { itemId = 2318, count = 12 },
                 { itemId = 4231, count = 3 },
@@ -35382,7 +35414,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 125 },
+            skillLevels = { 75, 100, 112, 125 },
             reagents = {
                 { itemId = 2318, count = 12 },
                 { itemId = 4231, count = 3 },
@@ -35400,7 +35432,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 75,
-            skillLevels = { 1, 80, 80 },
+            skillLevels = { 75, 80, 80, 80 },
             reagents = {
                 { itemId = 2318, count = 16 },
                 { itemId = 4231, count = 2 },
@@ -35416,7 +35448,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 75,
-            skillLevels = { 1, 80, 80 },
+            skillLevels = { 75, 80, 80, 80 },
             reagents = {
                 { itemId = 2318, count = 16 },
                 { itemId = 4231, count = 2 },
@@ -35432,7 +35464,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 75,
-            skillLevels = { 1, 80, 80 },
+            skillLevels = { 75, 80, 80, 80 },
             reagents = {
                 { itemId = 2318, count = 16 },
                 { itemId = 4231, count = 2 },
@@ -35448,7 +35480,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 75,
-            skillLevels = { 1, 80, 80 },
+            skillLevels = { 75, 80, 80, 80 },
             reagents = {
                 { itemId = 2318, count = 16 },
                 { itemId = 4231, count = 2 },
@@ -35464,7 +35496,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 75,
-            skillLevels = { 1, 80, 80 },
+            skillLevels = { 75, 80, 80, 80 },
             reagents = {
                 { itemId = 2318, count = 16 },
                 { itemId = 4231, count = 2 },
@@ -35480,7 +35512,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 75,
-            skillLevels = { 1, 80, 80 },
+            skillLevels = { 75, 80, 80, 80 },
             reagents = {
                 { itemId = 2318, count = 16 },
                 { itemId = 4231, count = 2 },
@@ -35498,7 +35530,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 60,
-            skillLevels = { 1, 90, 120 },
+            skillLevels = { 60, 90, 105, 120 },
             reagents = {
                 { itemId = 2318, count = 10 },
                 { itemId = 4231, count = 2 },
@@ -35518,7 +35550,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 60,
-            skillLevels = { 1, 90, 120 },
+            skillLevels = { 60, 90, 105, 120 },
             reagents = {
                 { itemId = 2318, count = 10 },
                 { itemId = 4231, count = 2 },
@@ -35538,7 +35570,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 60,
-            skillLevels = { 1, 90, 120 },
+            skillLevels = { 60, 90, 105, 120 },
             reagents = {
                 { itemId = 2318, count = 10 },
                 { itemId = 4231, count = 2 },
@@ -35558,7 +35590,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 60,
-            skillLevels = { 1, 90, 120 },
+            skillLevels = { 60, 90, 105, 120 },
             reagents = {
                 { itemId = 2318, count = 10 },
                 { itemId = 4231, count = 2 },
@@ -35578,7 +35610,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 60,
-            skillLevels = { 1, 90, 120 },
+            skillLevels = { 60, 90, 105, 120 },
             reagents = {
                 { itemId = 2318, count = 10 },
                 { itemId = 4231, count = 2 },
@@ -35598,7 +35630,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 60,
-            skillLevels = { 1, 90, 120 },
+            skillLevels = { 60, 90, 105, 120 },
             reagents = {
                 { itemId = 2318, count = 10 },
                 { itemId = 4231, count = 2 },
@@ -35618,7 +35650,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 35,
-            skillLevels = { 1, 40, 40 },
+            skillLevels = { 35, 40, 40, 40 },
             reagents = {
                 { itemId = 2318, count = 12 },
                 { itemId = 4231, count = 2 },
@@ -35636,7 +35668,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 35,
-            skillLevels = { 1, 40, 40 },
+            skillLevels = { 35, 40, 40, 40 },
             reagents = {
                 { itemId = 2318, count = 12 },
                 { itemId = 4231, count = 2 },
@@ -35654,7 +35686,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 35,
-            skillLevels = { 1, 40, 40 },
+            skillLevels = { 35, 40, 40, 40 },
             reagents = {
                 { itemId = 2318, count = 24 },
                 { itemId = 4231, count = 2 },
@@ -35672,7 +35704,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 35,
-            skillLevels = { 1, 40, 40 },
+            skillLevels = { 35, 40, 40, 40 },
             reagents = {
                 { itemId = 2318, count = 12 },
                 { itemId = 4231, count = 2 },
@@ -35704,7 +35736,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 5,
-            skillLevels = { 1, 30, 65 },
+            skillLevels = { 5, 30, 47, 65 },
             reagents = {
                 { itemId = 2996, count = 6 },
                 { itemId = 2320, count = 6 },
@@ -35721,7 +35753,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 70,
-            skillLevels = { 1, 75, 110 },
+            skillLevels = { 70, 75, 92, 110 },
             reagents = {
                 { itemId = 2997, count = 3 },
                 { itemId = 2321, count = 1 },
@@ -35737,7 +35769,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 55 },
+            skillLevels = { 50, 55, 55, 55 },
             reagents = {
                 { itemId = 2996, count = 8 },
                 { itemId = 2321, count = 2 },
@@ -35753,7 +35785,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 55 },
+            skillLevels = { 50, 55, 55, 55 },
             reagents = {
                 { itemId = 2996, count = 12 },
                 { itemId = 2321, count = 2 },
@@ -35771,7 +35803,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 60,
-            skillLevels = { 1, 85, 120 },
+            skillLevels = { 60, 85, 102, 120 },
             reagents = {
                 { itemId = 2997, count = 8 },
                 { itemId = 2321, count = 2 },
@@ -35790,7 +35822,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 60,
-            skillLevels = { 1, 85, 120 },
+            skillLevels = { 60, 85, 102, 120 },
             reagents = {
                 { itemId = 2997, count = 8 },
                 { itemId = 2321, count = 2 },
@@ -35809,7 +35841,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 60,
-            skillLevels = { 1, 85, 120 },
+            skillLevels = { 60, 85, 102, 120 },
             reagents = {
                 { itemId = 2997, count = 8 },
                 { itemId = 2321, count = 2 },
@@ -35828,7 +35860,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 60,
-            skillLevels = { 1, 85, 120 },
+            skillLevels = { 60, 85, 102, 120 },
             reagents = {
                 { itemId = 2997, count = 8 },
                 { itemId = 2321, count = 2 },
@@ -35847,7 +35879,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 60,
-            skillLevels = { 1, 85, 120 },
+            skillLevels = { 60, 85, 102, 120 },
             reagents = {
                 { itemId = 2997, count = 8 },
                 { itemId = 2321, count = 2 },
@@ -35866,7 +35898,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 60,
-            skillLevels = { 1, 85, 120 },
+            skillLevels = { 60, 85, 102, 120 },
             reagents = {
                 { itemId = 2997, count = 8 },
                 { itemId = 2321, count = 2 },
@@ -35885,7 +35917,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 75,
-            skillLevels = { 1, 80, 80 },
+            skillLevels = { 75, 80, 80, 80 },
             reagents = {
                 { itemId = 2997, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -35904,7 +35936,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 75,
-            skillLevels = { 1, 80, 80 },
+            skillLevels = { 75, 80, 80, 80 },
             reagents = {
                 { itemId = 2997, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -35923,7 +35955,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 75,
-            skillLevels = { 1, 80, 80 },
+            skillLevels = { 75, 80, 80, 80 },
             reagents = {
                 { itemId = 2997, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -35942,7 +35974,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 75,
-            skillLevels = { 1, 80, 80 },
+            skillLevels = { 75, 80, 80, 80 },
             reagents = {
                 { itemId = 2997, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -35961,7 +35993,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 75,
-            skillLevels = { 1, 80, 80 },
+            skillLevels = { 75, 80, 80, 80 },
             reagents = {
                 { itemId = 2997, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -35980,7 +36012,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 75,
-            skillLevels = { 1, 80, 80 },
+            skillLevels = { 75, 80, 80, 80 },
             reagents = {
                 { itemId = 2997, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -35999,7 +36031,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 135 },
+            skillLevels = { 75, 100, 117, 135 },
             reagents = {
                 { itemId = 2997, count = 6 },
                 { itemId = 2321, count = 4 },
@@ -36018,7 +36050,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 135 },
+            skillLevels = { 75, 100, 117, 135 },
             reagents = {
                 { itemId = 2997, count = 6 },
                 { itemId = 2321, count = 4 },
@@ -36037,7 +36069,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 135 },
+            skillLevels = { 75, 100, 117, 135 },
             reagents = {
                 { itemId = 2997, count = 6 },
                 { itemId = 2321, count = 4 },
@@ -36056,7 +36088,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 135 },
+            skillLevels = { 75, 100, 117, 135 },
             reagents = {
                 { itemId = 2997, count = 6 },
                 { itemId = 2321, count = 4 },
@@ -36075,7 +36107,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 135 },
+            skillLevels = { 75, 100, 117, 135 },
             reagents = {
                 { itemId = 2997, count = 6 },
                 { itemId = 2321, count = 4 },
@@ -36094,7 +36126,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 75,
-            skillLevels = { 1, 100, 135 },
+            skillLevels = { 75, 100, 117, 135 },
             reagents = {
                 { itemId = 2997, count = 6 },
                 { itemId = 2321, count = 4 },
@@ -36113,7 +36145,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 85,
-            skillLevels = { 1, 110, 145 },
+            skillLevels = { 85, 110, 127, 145 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36132,7 +36164,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 85,
-            skillLevels = { 1, 110, 145 },
+            skillLevels = { 85, 110, 127, 145 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36151,7 +36183,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 85,
-            skillLevels = { 1, 110, 145 },
+            skillLevels = { 85, 110, 127, 145 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36170,7 +36202,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 85,
-            skillLevels = { 1, 110, 145 },
+            skillLevels = { 85, 110, 127, 145 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36189,7 +36221,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 85,
-            skillLevels = { 1, 110, 145 },
+            skillLevels = { 85, 110, 127, 145 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36208,7 +36240,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 85,
-            skillLevels = { 1, 110, 145 },
+            skillLevels = { 85, 110, 127, 145 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36227,7 +36259,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 100,
-            skillLevels = { 1, 105, 105 },
+            skillLevels = { 100, 105, 105, 105 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36246,7 +36278,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 100,
-            skillLevels = { 1, 105, 105 },
+            skillLevels = { 100, 105, 105, 105 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36265,7 +36297,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 100,
-            skillLevels = { 1, 105, 105 },
+            skillLevels = { 100, 105, 105, 105 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36284,7 +36316,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 100,
-            skillLevels = { 1, 105, 105 },
+            skillLevels = { 100, 105, 105, 105 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36303,7 +36335,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 100,
-            skillLevels = { 1, 105, 105 },
+            skillLevels = { 100, 105, 105, 105 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36322,7 +36354,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 100,
-            skillLevels = { 1, 105, 105 },
+            skillLevels = { 100, 105, 105, 105 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36341,7 +36373,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 100,
-            skillLevels = { 1, 125, 160 },
+            skillLevels = { 100, 125, 142, 160 },
             reagents = {
                 { itemId = 4305, count = 10 },
                 { itemId = 4291, count = 2 },
@@ -36362,7 +36394,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 100,
-            skillLevels = { 1, 125, 160 },
+            skillLevels = { 100, 125, 142, 160 },
             reagents = {
                 { itemId = 4305, count = 10 },
                 { itemId = 4291, count = 2 },
@@ -36383,7 +36415,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 100,
-            skillLevels = { 1, 125, 160 },
+            skillLevels = { 100, 125, 142, 160 },
             reagents = {
                 { itemId = 4305, count = 10 },
                 { itemId = 4291, count = 2 },
@@ -36404,7 +36436,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 100,
-            skillLevels = { 1, 125, 160 },
+            skillLevels = { 100, 125, 142, 160 },
             reagents = {
                 { itemId = 4305, count = 10 },
                 { itemId = 4291, count = 2 },
@@ -36425,7 +36457,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 100,
-            skillLevels = { 1, 125, 160 },
+            skillLevels = { 100, 125, 142, 160 },
             reagents = {
                 { itemId = 4305, count = 10 },
                 { itemId = 4291, count = 2 },
@@ -36446,7 +36478,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 100,
-            skillLevels = { 1, 125, 160 },
+            skillLevels = { 100, 125, 142, 160 },
             reagents = {
                 { itemId = 4305, count = 10 },
                 { itemId = 4291, count = 2 },
@@ -36467,7 +36499,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 110,
-            skillLevels = { 1, 130, 160 },
+            skillLevels = { 110, 130, 145, 160 },
             reagents = {
                 { itemId = 4305, count = 12 },
                 { itemId = 4291, count = 2 },
@@ -36488,7 +36520,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 110,
-            skillLevels = { 1, 130, 160 },
+            skillLevels = { 110, 130, 145, 160 },
             reagents = {
                 { itemId = 4305, count = 12 },
                 { itemId = 4291, count = 2 },
@@ -36509,7 +36541,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 110,
-            skillLevels = { 1, 130, 160 },
+            skillLevels = { 110, 130, 145, 160 },
             reagents = {
                 { itemId = 4305, count = 12 },
                 { itemId = 4291, count = 2 },
@@ -36530,7 +36562,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 110,
-            skillLevels = { 1, 130, 160 },
+            skillLevels = { 110, 130, 145, 160 },
             reagents = {
                 { itemId = 4305, count = 12 },
                 { itemId = 4291, count = 2 },
@@ -36551,7 +36583,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 110,
-            skillLevels = { 1, 130, 160 },
+            skillLevels = { 110, 130, 145, 160 },
             reagents = {
                 { itemId = 4305, count = 12 },
                 { itemId = 4291, count = 2 },
@@ -36572,7 +36604,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 110,
-            skillLevels = { 1, 130, 160 },
+            skillLevels = { 110, 130, 145, 160 },
             reagents = {
                 { itemId = 4305, count = 12 },
                 { itemId = 4291, count = 2 },
@@ -36593,7 +36625,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 125,
-            skillLevels = { 1, 135, 140 },
+            skillLevels = { 125, 135, 137, 140 },
             reagents = {
                 { itemId = 4305, count = 3 },
                 { itemId = 4234, count = 2 },
@@ -36612,7 +36644,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 130 },
+            skillLevels = { 125, 130, 130, 130 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36631,7 +36663,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 130 },
+            skillLevels = { 125, 130, 130, 130 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36650,7 +36682,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 130 },
+            skillLevels = { 125, 130, 130, 130 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36669,7 +36701,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 130 },
+            skillLevels = { 125, 130, 130, 130 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36688,7 +36720,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 130 },
+            skillLevels = { 125, 130, 130, 130 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36707,7 +36739,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 125,
-            skillLevels = { 1, 130, 130 },
+            skillLevels = { 125, 130, 130, 130 },
             reagents = {
                 { itemId = 4305, count = 8 },
                 { itemId = 2321, count = 4 },
@@ -36726,7 +36758,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 125,
-            skillLevels = { 1, 145, 175 },
+            skillLevels = { 125, 145, 160, 175 },
             reagents = {
                 { itemId = 4305, count = 14 },
                 { itemId = 2321, count = 3 },
@@ -36747,7 +36779,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 125,
-            skillLevels = { 1, 145, 175 },
+            skillLevels = { 125, 145, 160, 175 },
             reagents = {
                 { itemId = 4305, count = 14 },
                 { itemId = 2321, count = 3 },
@@ -36768,7 +36800,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 125,
-            skillLevels = { 1, 145, 175 },
+            skillLevels = { 125, 145, 160, 175 },
             reagents = {
                 { itemId = 4305, count = 14 },
                 { itemId = 2321, count = 3 },
@@ -36789,7 +36821,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 125,
-            skillLevels = { 1, 145, 175 },
+            skillLevels = { 125, 145, 160, 175 },
             reagents = {
                 { itemId = 4305, count = 14 },
                 { itemId = 2321, count = 3 },
@@ -36810,7 +36842,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 125,
-            skillLevels = { 1, 145, 175 },
+            skillLevels = { 125, 145, 160, 175 },
             reagents = {
                 { itemId = 4305, count = 14 },
                 { itemId = 2321, count = 3 },
@@ -36831,7 +36863,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 125,
-            skillLevels = { 1, 145, 175 },
+            skillLevels = { 125, 145, 160, 175 },
             reagents = {
                 { itemId = 4305, count = 14 },
                 { itemId = 2321, count = 3 },
@@ -36850,7 +36882,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 140,
-            skillLevels = { 1, 160, 190 },
+            skillLevels = { 140, 160, 175, 190 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 7067, count = 1 },
@@ -36866,7 +36898,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 140,
-            skillLevels = { 1, 145, 145 },
+            skillLevels = { 140, 145, 145, 145 },
             reagents = {
                 { itemId = 4339, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -36884,7 +36916,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 140,
-            skillLevels = { 1, 145, 145 },
+            skillLevels = { 140, 145, 145, 145 },
             reagents = {
                 { itemId = 4339, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -36902,7 +36934,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 140,
-            skillLevels = { 1, 145, 145 },
+            skillLevels = { 140, 145, 145, 145 },
             reagents = {
                 { itemId = 4339, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -36920,7 +36952,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 140,
-            skillLevels = { 1, 145, 145 },
+            skillLevels = { 140, 145, 145, 145 },
             reagents = {
                 { itemId = 4339, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -36938,7 +36970,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 140,
-            skillLevels = { 1, 145, 145 },
+            skillLevels = { 140, 145, 145, 145 },
             reagents = {
                 { itemId = 4339, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -36956,7 +36988,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 140,
-            skillLevels = { 1, 145, 145 },
+            skillLevels = { 140, 145, 145, 145 },
             reagents = {
                 { itemId = 4339, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -36974,7 +37006,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 145,
-            skillLevels = { 1, 165, 195 },
+            skillLevels = { 145, 165, 180, 195 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 7067, count = 1 },
@@ -36991,7 +37023,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 150,
-            skillLevels = { 1, 170, 200 },
+            skillLevels = { 150, 170, 185, 200 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 7067, count = 2 },
@@ -37007,7 +37039,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 160,
-            skillLevels = { 1, 180, 210 },
+            skillLevels = { 160, 180, 195, 210 },
             reagents = {
                 { itemId = 4305, count = 5 },
                 { itemId = 7067, count = 2 },
@@ -37025,7 +37057,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2584",
             sortOrder = 900,
             requiredSkill = 165,
-            skillLevels = { 1, 185, 215 },
+            skillLevels = { 165, 185, 200, 215 },
             reagents = {
                 { itemId = 4305, count = 4 },
                 { itemId = 7067, count = 1 },
@@ -37041,7 +37073,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 165,
-            skillLevels = { 1, 185, 215 },
+            skillLevels = { 165, 185, 200, 215 },
             reagents = {
                 { itemId = 4339, count = 12 },
                 { itemId = 8343, count = 4 },
@@ -37061,7 +37093,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 165,
-            skillLevels = { 1, 185, 215 },
+            skillLevels = { 165, 185, 200, 215 },
             reagents = {
                 { itemId = 4339, count = 12 },
                 { itemId = 8343, count = 4 },
@@ -37081,7 +37113,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 165,
-            skillLevels = { 1, 185, 215 },
+            skillLevels = { 165, 185, 200, 215 },
             reagents = {
                 { itemId = 4339, count = 12 },
                 { itemId = 8343, count = 4 },
@@ -37101,7 +37133,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 165,
-            skillLevels = { 1, 185, 215 },
+            skillLevels = { 165, 185, 200, 215 },
             reagents = {
                 { itemId = 4339, count = 12 },
                 { itemId = 8343, count = 4 },
@@ -37121,7 +37153,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 165,
-            skillLevels = { 1, 185, 215 },
+            skillLevels = { 165, 185, 200, 215 },
             reagents = {
                 { itemId = 4339, count = 12 },
                 { itemId = 8343, count = 4 },
@@ -37141,7 +37173,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 165,
-            skillLevels = { 1, 185, 215 },
+            skillLevels = { 165, 185, 200, 215 },
             reagents = {
                 { itemId = 4339, count = 12 },
                 { itemId = 8343, count = 4 },
@@ -37161,7 +37193,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 170,
-            skillLevels = { 1, 185, 215 },
+            skillLevels = { 170, 185, 200, 215 },
             reagents = {
                 { itemId = 4305, count = 6 },
                 { itemId = 7067, count = 2 },
@@ -37179,7 +37211,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 190,
-            skillLevels = { 1, 205, 215 },
+            skillLevels = { 190, 205, 210, 215 },
             reagents = {
                 { itemId = 4339, count = 4 },
                 { itemId = 8343, count = 2 },
@@ -37196,7 +37228,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 190,
-            skillLevels = { 1, 195, 195 },
+            skillLevels = { 190, 195, 195, 195 },
             reagents = {
                 { itemId = 4339, count = 28 },
                 { itemId = 8343, count = 4 },
@@ -37214,7 +37246,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 190,
-            skillLevels = { 1, 195, 195 },
+            skillLevels = { 190, 195, 195, 195 },
             reagents = {
                 { itemId = 4339, count = 28 },
                 { itemId = 8343, count = 4 },
@@ -37232,7 +37264,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 190,
-            skillLevels = { 1, 195, 195 },
+            skillLevels = { 190, 195, 195, 195 },
             reagents = {
                 { itemId = 4339, count = 28 },
                 { itemId = 8343, count = 4 },
@@ -37250,7 +37282,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 190,
-            skillLevels = { 1, 195, 195 },
+            skillLevels = { 190, 195, 195, 195 },
             reagents = {
                 { itemId = 4339, count = 28 },
                 { itemId = 8343, count = 4 },
@@ -37268,7 +37300,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 190,
-            skillLevels = { 1, 195, 195 },
+            skillLevels = { 190, 195, 195, 195 },
             reagents = {
                 { itemId = 4339, count = 28 },
                 { itemId = 8343, count = 4 },
@@ -37286,7 +37318,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 190,
-            skillLevels = { 1, 195, 195 },
+            skillLevels = { 190, 195, 195, 195 },
             reagents = {
                 { itemId = 4339, count = 28 },
                 { itemId = 8343, count = 4 },
@@ -37306,7 +37338,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 195,
-            skillLevels = { 1, 210, 240 },
+            skillLevels = { 195, 210, 225, 240 },
             reagents = {
                 { itemId = 4339, count = 16 },
                 { itemId = 8343, count = 3 },
@@ -37327,7 +37359,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 195,
-            skillLevels = { 1, 210, 240 },
+            skillLevels = { 195, 210, 225, 240 },
             reagents = {
                 { itemId = 4339, count = 16 },
                 { itemId = 8343, count = 3 },
@@ -37348,7 +37380,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 195,
-            skillLevels = { 1, 210, 240 },
+            skillLevels = { 195, 210, 225, 240 },
             reagents = {
                 { itemId = 4339, count = 16 },
                 { itemId = 8343, count = 3 },
@@ -37369,7 +37401,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 195,
-            skillLevels = { 1, 210, 240 },
+            skillLevels = { 195, 210, 225, 240 },
             reagents = {
                 { itemId = 4339, count = 16 },
                 { itemId = 8343, count = 3 },
@@ -37390,7 +37422,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 195,
-            skillLevels = { 1, 210, 240 },
+            skillLevels = { 195, 210, 225, 240 },
             reagents = {
                 { itemId = 4339, count = 16 },
                 { itemId = 8343, count = 3 },
@@ -37411,7 +37443,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 195,
-            skillLevels = { 1, 210, 240 },
+            skillLevels = { 195, 210, 225, 240 },
             reagents = {
                 { itemId = 4339, count = 16 },
                 { itemId = 8343, count = 3 },
@@ -37432,7 +37464,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2584",
             sortOrder = 900,
             requiredSkill = 205,
-            skillLevels = { 1, 220, 250 },
+            skillLevels = { 205, 220, 235, 250 },
             reagents = {
                 { itemId = 4339, count = 18 },
                 { itemId = 8343, count = 3 },
@@ -37453,7 +37485,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2584",
             sortOrder = 900,
             requiredSkill = 205,
-            skillLevels = { 1, 220, 250 },
+            skillLevels = { 205, 220, 235, 250 },
             reagents = {
                 { itemId = 4339, count = 18 },
                 { itemId = 8343, count = 3 },
@@ -37474,7 +37506,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2584",
             sortOrder = 900,
             requiredSkill = 205,
-            skillLevels = { 1, 220, 250 },
+            skillLevels = { 205, 220, 235, 250 },
             reagents = {
                 { itemId = 4339, count = 18 },
                 { itemId = 8343, count = 3 },
@@ -37495,7 +37527,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2584",
             sortOrder = 900,
             requiredSkill = 205,
-            skillLevels = { 1, 220, 250 },
+            skillLevels = { 205, 220, 235, 250 },
             reagents = {
                 { itemId = 4339, count = 18 },
                 { itemId = 8343, count = 3 },
@@ -37516,7 +37548,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2584",
             sortOrder = 900,
             requiredSkill = 205,
-            skillLevels = { 1, 220, 250 },
+            skillLevels = { 205, 220, 235, 250 },
             reagents = {
                 { itemId = 4339, count = 18 },
                 { itemId = 8343, count = 3 },
@@ -37537,7 +37569,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2584",
             sortOrder = 900,
             requiredSkill = 205,
-            skillLevels = { 1, 220, 250 },
+            skillLevels = { 205, 220, 235, 250 },
             reagents = {
                 { itemId = 4339, count = 18 },
                 { itemId = 8343, count = 3 },
@@ -37556,7 +37588,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 260 },
+            skillLevels = { 215, 230, 245, 260 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 9210, count = 1 },
@@ -37573,7 +37605,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 260 },
+            skillLevels = { 215, 230, 245, 260 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 7076, count = 1 },
@@ -37589,7 +37621,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 260 },
+            skillLevels = { 215, 230, 245, 260 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 7076, count = 2 },
@@ -37607,7 +37639,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 260 },
+            skillLevels = { 215, 230, 245, 260 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 8170, count = 2 },
@@ -37626,7 +37658,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 260 },
+            skillLevels = { 215, 230, 245, 260 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -37646,7 +37678,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 260 },
+            skillLevels = { 215, 230, 245, 260 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -37666,7 +37698,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 260 },
+            skillLevels = { 215, 230, 245, 260 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -37686,7 +37718,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 260 },
+            skillLevels = { 215, 230, 245, 260 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -37706,7 +37738,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 260 },
+            skillLevels = { 215, 230, 245, 260 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -37726,7 +37758,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 260 },
+            skillLevels = { 215, 230, 245, 260 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -37744,7 +37776,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 225,
-            skillLevels = { 1, 240, 270 },
+            skillLevels = { 225, 240, 255, 270 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 7076, count = 2 },
@@ -37761,7 +37793,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 235,
-            skillLevels = { 1, 240, 240 },
+            skillLevels = { 235, 240, 240, 240 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -37779,7 +37811,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 235,
-            skillLevels = { 1, 240, 240 },
+            skillLevels = { 235, 240, 240, 240 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -37797,7 +37829,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 235,
-            skillLevels = { 1, 240, 240 },
+            skillLevels = { 235, 240, 240, 240 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -37815,7 +37847,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 235,
-            skillLevels = { 1, 240, 240 },
+            skillLevels = { 235, 240, 240, 240 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -37833,7 +37865,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 235,
-            skillLevels = { 1, 240, 240 },
+            skillLevels = { 235, 240, 240, 240 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -37851,7 +37883,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 235,
-            skillLevels = { 1, 240, 240 },
+            skillLevels = { 235, 240, 240, 240 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 8343, count = 4 },
@@ -37871,7 +37903,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 235,
-            skillLevels = { 1, 250, 280 },
+            skillLevels = { 235, 250, 265, 280 },
             reagents = {
                 { itemId = 14048, count = 10 },
                 { itemId = 8343, count = 4 },
@@ -37892,7 +37924,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 235,
-            skillLevels = { 1, 250, 280 },
+            skillLevels = { 235, 250, 265, 280 },
             reagents = {
                 { itemId = 14048, count = 10 },
                 { itemId = 8343, count = 4 },
@@ -37913,7 +37945,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 235,
-            skillLevels = { 1, 250, 280 },
+            skillLevels = { 235, 250, 265, 280 },
             reagents = {
                 { itemId = 14048, count = 10 },
                 { itemId = 8343, count = 4 },
@@ -37934,7 +37966,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 235,
-            skillLevels = { 1, 250, 280 },
+            skillLevels = { 235, 250, 265, 280 },
             reagents = {
                 { itemId = 14048, count = 10 },
                 { itemId = 8343, count = 4 },
@@ -37955,7 +37987,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 235,
-            skillLevels = { 1, 250, 280 },
+            skillLevels = { 235, 250, 265, 280 },
             reagents = {
                 { itemId = 14048, count = 10 },
                 { itemId = 8343, count = 4 },
@@ -37976,7 +38008,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 235,
-            skillLevels = { 1, 250, 280 },
+            skillLevels = { 235, 250, 265, 280 },
             reagents = {
                 { itemId = 14048, count = 10 },
                 { itemId = 8343, count = 4 },
@@ -37995,7 +38027,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 240,
-            skillLevels = { 1, 255, 285 },
+            skillLevels = { 240, 255, 270, 285 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 7076, count = 1 },
@@ -38011,7 +38043,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 250,
-            skillLevels = { 1, 265, 295 },
+            skillLevels = { 250, 265, 280, 295 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 7076, count = 1 },
@@ -38029,7 +38061,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2584",
             sortOrder = 900,
             requiredSkill = 250,
-            skillLevels = { 1, 265, 295 },
+            skillLevels = { 250, 265, 280, 295 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 14227, count = 1 },
@@ -38045,7 +38077,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 245,
-            skillLevels = { 1, 260, 290 },
+            skillLevels = { 245, 260, 275, 290 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 7076, count = 2 },
@@ -38061,7 +38093,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 250,
-            skillLevels = { 1, 265, 295 },
+            skillLevels = { 250, 265, 280, 295 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 9210, count = 3 },
@@ -38078,7 +38110,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 255,
-            skillLevels = { 1, 265, 295 },
+            skillLevels = { 255, 265, 280, 295 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 9210, count = 2 },
@@ -38096,7 +38128,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2584",
             sortOrder = 900,
             requiredSkill = 255,
-            skillLevels = { 1, 270, 300 },
+            skillLevels = { 255, 270, 285, 300 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 7076, count = 1 },
@@ -38114,7 +38146,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 255,
-            skillLevels = { 1, 270, 300 },
+            skillLevels = { 255, 270, 285, 300 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 14342, count = 1 },
@@ -38133,7 +38165,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 260,
-            skillLevels = { 1, 275, 305 },
+            skillLevels = { 260, 275, 290, 305 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 9210, count = 3 },
@@ -38150,7 +38182,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 260,
-            skillLevels = { 1, 275, 305 },
+            skillLevels = { 260, 275, 290, 305 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 7076, count = 3 },
@@ -38166,7 +38198,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 300,
-            skillLevels = { 1, 315, 345 },
+            skillLevels = { 300, 315, 330, 345 },
             reagents = {
                 { itemId = 14048, count = 8 },
                 { itemId = 14342, count = 12 },
@@ -38188,7 +38220,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2533",
             sortOrder = 10,
             requiredSkill = 215,
-            skillLevels = { 1, 230, 290 },
+            skillLevels = { 215, 230, 260, 290 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -38202,7 +38234,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2533",
             sortOrder = 10,
-            skillLevels = { 1, 90, 160 },
+            requiredSkill = 90,
+            skillLevels = { 90, 90, 125, 160 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -38222,7 +38255,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2533",
             sortOrder = 10,
             requiredSkill = 140,
-            skillLevels = { 1, 160, 220 },
+            skillLevels = { 140, 160, 190, 220 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -38240,7 +38273,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2533",
             sortOrder = 10,
             requiredSkill = 210,
-            skillLevels = { 1, 225, 285 },
+            skillLevels = { 210, 225, 255, 285 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -38258,7 +38291,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2533",
             sortOrder = 10,
             requiredSkill = 280,
-            skillLevels = { 1, 295, 355 },
+            skillLevels = { 280, 295, 325, 355 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -38274,7 +38307,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2533",
             sortOrder = 10,
-            skillLevels = { 1, 120, 190 },
+            requiredSkill = 120,
+            skillLevels = { 120, 120, 155, 190 },
             reagents = {
                 { itemId = 2592, count = 2 },
                 { itemId = 2321, count = 2 },
@@ -38289,7 +38323,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2533",
             sortOrder = 10,
             requiredSkill = 200,
-            skillLevels = { 1, 220, 280 },
+            skillLevels = { 200, 220, 250, 280 },
             reagents = {
                 { itemId = 4304, count = 2 },
                 { itemId = 4291, count = 2 },
@@ -38304,7 +38338,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2533",
             sortOrder = 10,
             requiredSkill = 265,
-            skillLevels = { 1, 280, 340 },
+            skillLevels = { 265, 280, 310, 340 },
             reagents = {
                 { itemId = 8170, count = 2 },
                 { itemId = 14047, count = 2 },
@@ -38322,7 +38356,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2717",
             sortOrder = 1,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 145 },
+            skillLevels = { 140, 140, 142, 145 },
             reagents = {
                 { itemId = 2838, count = 2 },
                 { itemId = 2772, count = 1 },
@@ -38340,7 +38374,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2714",
             sortOrder = 1,
             requiredSkill = 140,
-            skillLevels = { 1, 145, 150 },
+            skillLevels = { 140, 145, 147, 150 },
             reagents = {
                 { itemId = 12037, count = 2 },
                 { itemId = 12204, count = 1 },
@@ -38358,7 +38392,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2716",
             sortOrder = 1,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 145 },
+            skillLevels = { 140, 140, 142, 145 },
             reagents = {
                 { itemId = 4470, count = 2 },
                 { itemId = 8836, count = 1 },
@@ -38376,7 +38410,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2718",
             sortOrder = 1,
             requiredSkill = 300,
-            skillLevels = { 1, 300, 300 },
+            skillLevels = { 300, 300, 300, 300 },
             reagents = {
                 { itemId = 4470, count = 2 },
                 { itemId = 4234, count = 4 },
@@ -38394,7 +38428,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2718",
             sortOrder = 1,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 145 },
+            skillLevels = { 140, 140, 142, 145 },
             reagents = {
                 { itemId = 2319, count = 3 },
                 { itemId = 5784, count = 2 },
@@ -38412,7 +38446,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2715",
             sortOrder = 1,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 145 },
+            skillLevels = { 140, 140, 142, 145 },
             reagents = {
                 { itemId = 4470, count = 2 },
                 { itemId = 8925, count = 1 },
@@ -38430,7 +38464,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2535",
             sortOrder = 1,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 145 },
+            skillLevels = { 140, 140, 142, 145 },
             reagents = {
                 { itemId = 6452, count = 1 },
                 { itemId = 8544, count = 2 },
@@ -38446,7 +38480,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2715",
             sortOrder = 1,
             requiredSkill = 300,
-            skillLevels = { 1, 300, 300 },
+            skillLevels = { 300, 300, 300, 300 },
             reagents = {
                 { itemId = 4470, count = 5 },
                 { itemId = 14048, count = 2 },
@@ -38463,7 +38497,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2535",
             sortOrder = 1,
             requiredSkill = 300,
-            skillLevels = { 1, 300, 300 },
+            skillLevels = { 300, 300, 300, 300 },
             reagents = {
                 { itemId = 4470, count = 2 },
                 { itemId = 6453, count = 2 },
@@ -38481,7 +38515,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2454",
             sortOrder = 1,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 145 },
+            skillLevels = { 140, 140, 142, 145 },
             reagents = {
                 { itemId = 3372, count = 1 },
                 { itemId = 3356, count = 1 },
@@ -38499,7 +38533,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2574",
             sortOrder = 1,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 145 },
+            skillLevels = { 140, 140, 142, 145 },
             reagents = {
                 { itemId = 2319, count = 5 },
                 { itemId = 2321, count = 3 },
@@ -38517,7 +38551,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2591",
             sortOrder = 1,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 145 },
+            skillLevels = { 140, 140, 142, 145 },
             reagents = {
                 { itemId = 4470, count = 2 },
                 { itemId = 4305, count = 5 },
@@ -38535,7 +38569,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2529",
             sortOrder = 1,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 145 },
+            skillLevels = { 140, 140, 142, 145 },
             reagents = {
                 { itemId = 4375, count = 2 },
                 { itemId = 4371, count = 1 },
@@ -38553,7 +38587,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2489",
             sortOrder = 1,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 145 },
+            skillLevels = { 140, 140, 142, 145 },
             reagents = {
                 { itemId = 2841, count = 5 },
                 { itemId = 3478, count = 2 },
@@ -38570,7 +38604,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2514",
             sortOrder = 1,
             requiredSkill = 140,
-            skillLevels = { 1, 140, 145 },
+            skillLevels = { 140, 140, 142, 145 },
             reagents = {
                 { itemId = 11137, count = 2 },
                 { itemId = 11174, count = 1 },
@@ -38586,7 +38620,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2714",
             sortOrder = 1,
             requiredSkill = 300,
-            skillLevels = { 1, 300, 300 },
+            skillLevels = { 300, 300, 300, 300 },
             reagents = {
                 { itemId = 10284, count = 10 },
                 { itemId = 159, count = 5 },
@@ -38602,7 +38636,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2716",
             sortOrder = 1,
             requiredSkill = 300,
-            skillLevels = { 1, 300, 300 },
+            skillLevels = { 300, 300, 300, 300 },
             reagents = {
                 { itemId = 13465, count = 4 },
                 { itemId = 8925, count = 1 },
@@ -38618,7 +38652,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2717",
             sortOrder = 1,
             requiredSkill = 300,
-            skillLevels = { 1, 300, 300 },
+            skillLevels = { 300, 300, 300, 300 },
             reagents = {
                 { itemId = 12359, count = 5 },
                 { itemId = 12365, count = 2 },
@@ -38634,7 +38668,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2489",
             sortOrder = 1,
             requiredSkill = 300,
-            skillLevels = { 1, 300, 300 },
+            skillLevels = { 300, 300, 300, 300 },
             reagents = {
                 { itemId = 273127, count = 1 },
                 { itemId = 12359, count = 5 },
@@ -38651,7 +38685,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2454",
             sortOrder = 1,
             requiredSkill = 300,
-            skillLevels = { 1, 300, 300 },
+            skillLevels = { 300, 300, 300, 300 },
             reagents = {
                 { itemId = 273125, count = 1 },
                 { itemId = 8925, count = 1 },
@@ -38668,7 +38702,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2574",
             sortOrder = 1,
             requiredSkill = 300,
-            skillLevels = { 1, 300, 300 },
+            skillLevels = { 300, 300, 300, 300 },
             reagents = {
                 { itemId = 273130, count = 1 },
                 { itemId = 8170, count = 5 },
@@ -38684,7 +38718,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2591",
             sortOrder = 1,
             requiredSkill = 300,
-            skillLevels = { 1, 300, 300 },
+            skillLevels = { 300, 300, 300, 300 },
             reagents = {
                 { itemId = 273131, count = 1 },
                 { itemId = 14048, count = 4 },
@@ -38701,7 +38735,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2514",
             sortOrder = 1,
             requiredSkill = 300,
-            skillLevels = { 1, 300, 300 },
+            skillLevels = { 300, 300, 300, 300 },
             reagents = {
                 { itemId = 273128, count = 1 },
                 { itemId = 14344, count = 2 },
@@ -38718,7 +38752,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2529",
             sortOrder = 1,
             requiredSkill = 300,
-            skillLevels = { 1, 300, 300 },
+            skillLevels = { 300, 300, 300, 300 },
             reagents = {
                 { itemId = 273129, count = 1 },
                 { itemId = 15994, count = 2 },
@@ -38731,7 +38765,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2591",
             sortOrder = 1,
-            skillLevels = { 1, 20, 25 },
+            requiredSkill = 20,
+            skillLevels = { 20, 20, 22, 25 },
             reagents = {
                 { itemId = 2996, count = 1 },
                 { itemId = 2320, count = 1 },
@@ -38748,7 +38783,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 25,
-            skillLevels = { 1, 25, 30 },
+            skillLevels = { 25, 25, 27, 30 },
             reagents = {
                 { itemId = 2570, count = 1 },
                 { itemId = 249409, count = 1 },
@@ -38765,7 +38800,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 25,
-            skillLevels = { 1, 25, 35 },
+            skillLevels = { 25, 25, 30, 35 },
             reagents = {
                 { itemId = 4357, count = 2 },
                 { itemId = 2589, count = 1 },
@@ -38782,7 +38817,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 55,
-            skillLevels = { 1, 55, 65 },
+            skillLevels = { 55, 55, 60, 65 },
             reagents = {
                 { itemId = 2840, count = 1 },
                 { itemId = 4359, count = 1 },
@@ -38802,7 +38837,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 100,
-            skillLevels = { 1, 100, 105 },
+            skillLevels = { 100, 100, 102, 105 },
             reagents = {
                 { itemId = 2592, count = 1 },
                 { itemId = 249410, count = 1 },
@@ -38819,7 +38854,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 130,
-            skillLevels = { 1, 130, 180 },
+            skillLevels = { 130, 130, 155, 180 },
             reagents = {
                 { itemId = 2840, count = 3 },
                 { itemId = 4364, count = 4 },
@@ -38838,7 +38873,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 145,
-            skillLevels = { 1, 145, 150 },
+            skillLevels = { 145, 145, 147, 150 },
             reagents = {
                 { itemId = 4234, count = 1 },
                 { itemId = 249430, count = 1 },
@@ -38855,7 +38890,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 145,
-            skillLevels = { 1, 145, 195 },
+            skillLevels = { 145, 145, 170, 195 },
             reagents = {
                 { itemId = 4364, count = 4 },
                 { itemId = 2841, count = 2 },
@@ -38873,7 +38908,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 150,
-            skillLevels = { 1, 150, 170 },
+            skillLevels = { 150, 150, 160, 170 },
             reagents = {
                 { itemId = 4377, count = 2 },
                 { itemId = 2592, count = 1 },
@@ -38891,7 +38926,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 175,
-            skillLevels = { 1, 175, 180 },
+            skillLevels = { 175, 175, 177, 180 },
             reagents = {
                 { itemId = 2841, count = 2 },
                 { itemId = 249432, count = 1 },
@@ -38906,7 +38941,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 175,
-            skillLevels = { 1, 200, 225 },
+            skillLevels = { 175, 200, 212, 225 },
             reagents = {
                 { itemId = 4382, count = 1 },
                 { itemId = 4375, count = 1 },
@@ -38926,7 +38961,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 190,
-            skillLevels = { 1, 190, 195 },
+            skillLevels = { 190, 190, 192, 195 },
             reagents = {
                 { itemId = 4404, count = 1 },
                 { itemId = 249428, count = 1 },
@@ -38941,7 +38976,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 190,
-            skillLevels = { 1, 210, 230 },
+            skillLevels = { 190, 210, 220, 230 },
             reagents = {
                 { itemId = 4371, count = 4 },
                 { itemId = 4387, count = 1 },
@@ -38959,7 +38994,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 200,
-            skillLevels = { 1, 200, 240 },
+            skillLevels = { 200, 200, 220, 240 },
             reagents = {
                 { itemId = 3575, count = 1 },
                 { itemId = 4377, count = 1 },
@@ -38976,7 +39011,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 215,
-            skillLevels = { 1, 215, 220 },
+            skillLevels = { 215, 215, 217, 220 },
             reagents = {
                 { itemId = 10561, count = 1 },
                 { itemId = 4234, count = 1 },
@@ -38991,7 +39026,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 215,
-            skillLevels = { 1, 215, 245 },
+            skillLevels = { 215, 215, 230, 245 },
             reagents = {
                 { itemId = 3575, count = 3 },
                 { itemId = 4377, count = 3 },
@@ -39010,7 +39045,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 265 },
+            skillLevels = { 225, 245, 255, 265 },
             reagents = {
                 { itemId = 4397, count = 1 },
                 { itemId = 260804, count = 1 },
@@ -39027,7 +39062,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 225,
-            skillLevels = { 1, 230, 235 },
+            skillLevels = { 225, 230, 232, 235 },
             reagents = {
                 { itemId = 4234, count = 10 },
                 { itemId = 10559, count = 10 },
@@ -39044,7 +39079,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 240,
-            skillLevels = { 1, 240, 245 },
+            skillLevels = { 240, 240, 242, 245 },
             reagents = {
                 { itemId = 6037, count = 1 },
                 { itemId = 249431, count = 1 },
@@ -39059,7 +39094,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 240,
-            skillLevels = { 1, 240, 280 },
+            skillLevels = { 240, 240, 260, 280 },
             reagents = {
                 { itemId = 10561, count = 1 },
                 { itemId = 10560, count = 1 },
@@ -39078,7 +39113,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 250,
-            skillLevels = { 1, 270, 290 },
+            skillLevels = { 250, 270, 280, 290 },
             reagents = {
                 { itemId = 10518, count = 1 },
                 { itemId = 260804, count = 1 },
@@ -39095,7 +39130,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 250,
-            skillLevels = { 1, 250, 255 },
+            skillLevels = { 250, 250, 252, 255 },
             reagents = {
                 { itemId = 10561, count = 1 },
                 { itemId = 10558, count = 1 },
@@ -39113,7 +39148,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 280 },
+            skillLevels = { 275, 275, 277, 280 },
             reagents = {
                 { itemId = 12359, count = 5 },
                 { itemId = 16203, count = 5 },
@@ -39128,7 +39163,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 280 },
+            skillLevels = { 275, 275, 277, 280 },
             reagents = {
                 { itemId = 12359, count = 1 },
                 { itemId = 249726, count = 1 },
@@ -39143,7 +39178,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 295 },
+            skillLevels = { 275, 275, 285, 295 },
             reagents = {
                 { itemId = 15992, count = 2 },
                 { itemId = 14047, count = 3 },
@@ -39159,7 +39194,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2515",
             sortOrder = 10,
             requiredSkill = 285,
-            skillLevels = { 1, 285, 290 },
+            skillLevels = { 285, 285, 287, 290 },
             reagents = {
                 { itemId = 12359, count = 2 },
                 { itemId = 249429, count = 1 },
@@ -39174,7 +39209,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 285,
-            skillLevels = { 1, 285, 305 },
+            skillLevels = { 285, 285, 295, 305 },
             reagents = {
                 { itemId = 15994, count = 1 },
                 { itemId = 12359, count = 3 },
@@ -39192,7 +39227,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 15994, count = 2 },
                 { itemId = 11371, count = 1 },
@@ -39210,7 +39245,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 16006, count = 1 },
                 { itemId = 12359, count = 3 },
@@ -39227,7 +39262,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2518",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 18986, count = 1 },
                 { itemId = 260815, count = 1 },
@@ -39242,7 +39277,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2518",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 18984, count = 1 },
                 { itemId = 260813, count = 2 },
@@ -39257,7 +39292,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2518",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 260823, count = 1 },
                 { itemId = 260815, count = 1 },
@@ -39275,7 +39310,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2518",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 249410, count = 2 },
                 { itemId = 249426, count = 1 },
@@ -39296,7 +39331,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 3860, count = 10 },
                 { itemId = 18631, count = 1 },
@@ -39316,7 +39351,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 16204, count = 10 },
                 { itemId = 14344, count = 2 },
@@ -39335,7 +39370,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 249431, count = 2 },
                 { itemId = 249726, count = 2 },
@@ -39352,7 +39387,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 7076, count = 2 },
                 { itemId = 7078, count = 2 },
@@ -39372,7 +39407,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 7082, count = 6 },
                 { itemId = 16204, count = 6 },
@@ -39390,7 +39425,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2518",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 238787, count = 1 },
                 { itemId = 260813, count = 2 },
@@ -39405,7 +39440,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2518",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 238788, count = 1 },
                 { itemId = 260815, count = 1 },
@@ -39420,7 +39455,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2518",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 340 },
+            skillLevels = { 300, 320, 330, 340 },
             reagents = {
                 { itemId = 238786, count = 1 },
                 { itemId = 260813, count = 2 },
@@ -39434,7 +39469,7 @@ RecipeRegistryRecipeMetadata = {
             removed = true,
             category = "c2636",
             sortOrder = 200,
-            skillLevels = { 1, 80, 85 },
+            skillLevels = { 1, 80, 82, 85 },
             reagents = {
                 { itemId = 10284, count = 5 },
             },
@@ -39450,7 +39485,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2640",
             sortOrder = 15,
             requiredSkill = 25,
-            skillLevels = { 1, 30, 45 },
+            skillLevels = { 25, 30, 37, 45 },
             reagents = {
                 { itemId = 6889, count = 2 },
                 { itemId = 10284, count = 1 },
@@ -39467,7 +39502,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2636",
             sortOrder = 200,
             requiredSkill = 35,
-            skillLevels = { 1, 40, 55 },
+            skillLevels = { 35, 40, 47, 55 },
             reagents = {
                 { itemId = 2675, count = 1 },
                 { itemId = 10284, count = 1 },
@@ -39484,7 +39519,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2714",
             sortOrder = 1,
             requiredSkill = 90,
-            skillLevels = { 1, 95, 105 },
+            skillLevels = { 90, 95, 100, 105 },
             reagents = {
                 { itemId = 11291, count = 1 },
             },
@@ -39500,7 +39535,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2519",
             sortOrder = 50,
             requiredSkill = 190,
-            skillLevels = { 1, 190, 205 },
+            skillLevels = { 190, 190, 197, 205 },
             reagents = {
                 { itemId = 4387, count = 6 },
                 { itemId = 4389, count = 2 },
@@ -39519,7 +39554,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2518",
             sortOrder = 40,
             requiredSkill = 140,
-            skillLevels = { 1, 150, 160 },
+            skillLevels = { 140, 150, 155, 160 },
             reagents = {
                 { itemId = 4387, count = 3 },
                 { itemId = 4382, count = 2 },
@@ -39537,7 +39572,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2714",
             sortOrder = 1,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 220 },
+            skillLevels = { 200, 205, 212, 220 },
             reagents = {
                 { itemId = 272941, count = 1 },
             },
@@ -39553,7 +39588,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 15407, count = 4 },
@@ -39572,7 +39607,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -39591,7 +39626,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -39610,7 +39645,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -39629,7 +39664,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 15407, count = 4 },
@@ -39648,7 +39683,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -39667,7 +39702,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -39686,7 +39721,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -39705,7 +39740,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 15407, count = 4 },
@@ -39724,7 +39759,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -39743,7 +39778,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -39762,7 +39797,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -39781,7 +39816,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 15407, count = 4 },
@@ -39800,7 +39835,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -39819,7 +39854,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -39838,7 +39873,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -39857,7 +39892,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2567",
             sortOrder = 1800,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 15407, count = 4 },
@@ -39876,7 +39911,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -39895,7 +39930,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2562",
             sortOrder = 1300,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -39914,7 +39949,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -39933,7 +39968,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 14342, count = 3 },
@@ -39952,7 +39987,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 14342, count = 2 },
@@ -39971,7 +40006,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 14342, count = 2 },
@@ -39990,7 +40025,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 14342, count = 2 },
@@ -40009,7 +40044,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 12360, count = 4 },
@@ -40028,7 +40063,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 12360, count = 2 },
@@ -40047,7 +40082,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 12360, count = 2 },
@@ -40066,7 +40101,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 12360, count = 2 },
@@ -40085,7 +40120,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 12360, count = 4 },
@@ -40104,7 +40139,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 12360, count = 2 },
@@ -40123,7 +40158,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 12360, count = 2 },
@@ -40142,7 +40177,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 12360, count = 2 },
@@ -40161,7 +40196,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 12360, count = 4 },
@@ -40180,7 +40215,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 12360, count = 2 },
@@ -40199,7 +40234,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 12360, count = 2 },
@@ -40218,7 +40253,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 12360, count = 2 },
@@ -40237,7 +40272,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 14342, count = 3 },
@@ -40256,7 +40291,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 14342, count = 2 },
@@ -40275,7 +40310,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 14342, count = 2 },
@@ -40294,7 +40329,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 14342, count = 2 },
@@ -40313,7 +40348,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 14342, count = 3 },
@@ -40332,7 +40367,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 14342, count = 2 },
@@ -40351,7 +40386,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 14342, count = 2 },
@@ -40370,7 +40405,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 14342, count = 2 },
@@ -40389,7 +40424,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 15407, count = 4 },
@@ -40408,7 +40443,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -40427,7 +40462,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -40446,7 +40481,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -40465,7 +40500,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2567",
             sortOrder = 1800,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 15407, count = 4 },
@@ -40484,7 +40519,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -40503,7 +40538,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2562",
             sortOrder = 1300,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -40522,7 +40557,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -40541,7 +40576,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2567",
             sortOrder = 1800,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 15407, count = 4 },
@@ -40560,7 +40595,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -40579,7 +40614,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2562",
             sortOrder = 1300,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -40598,7 +40633,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -40617,7 +40652,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 14342, count = 3 },
@@ -40636,7 +40671,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 14342, count = 2 },
@@ -40655,7 +40690,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 14342, count = 2 },
@@ -40674,7 +40709,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 14342, count = 2 },
@@ -40693,7 +40728,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 12360, count = 4 },
@@ -40712,7 +40747,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 12360, count = 2 },
@@ -40731,7 +40766,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 12360, count = 2 },
@@ -40750,7 +40785,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 12360, count = 2 },
@@ -40769,7 +40804,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 12360, count = 4 },
@@ -40788,7 +40823,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 12360, count = 2 },
@@ -40807,7 +40842,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2470",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 12360, count = 2 },
@@ -40826,7 +40861,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 12360, count = 2 },
@@ -40844,7 +40879,7 @@ RecipeRegistryRecipeMetadata = {
             sourcePlaces = { { name = "Crowd Pummeler 9-60", zone = 17 } },
             category = "c2518",
             sortOrder = 40,
-            skillLevels = { 1, 125, 145 },
+            skillLevels = { 1, 125, 135, 145 },
             reagents = {
                 { itemId = 249409, count = 1 },
                 { itemId = 249391, count = 1 },
@@ -40860,7 +40895,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2451",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 248822, count = 1 },
                 { itemId = 248821, count = 12 },
@@ -40877,7 +40912,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2451",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 248822, count = 1 },
                 { itemId = 248821, count = 18 },
@@ -40894,7 +40929,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2451",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 248822, count = 1 },
                 { itemId = 248823, count = 12 },
@@ -40911,7 +40946,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2451",
             sortOrder = 40,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 248822, count = 1 },
                 { itemId = 248823, count = 18 },
@@ -40928,7 +40963,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2528",
             sortOrder = 140,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 320 },
+            skillLevels = { 300, 310, 315, 320 },
             createdCount = 200,
             createdCountMax = 200,
             reagents = {
@@ -40946,7 +40981,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2528",
             sortOrder = 140,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 320 },
+            skillLevels = { 300, 310, 315, 320 },
             createdCount = 200,
             createdCountMax = 200,
             reagents = {
@@ -40966,7 +41001,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2636",
             sortOrder = 200,
             requiredSkill = 275,
-            skillLevels = { 1, 280, 285 },
+            skillLevels = { 275, 280, 282, 285 },
             reagents = {
                 { itemId = 249796, count = 3 },
                 { itemId = 3713, count = 1 },
@@ -40981,7 +41016,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2497",
             sortOrder = 80,
             requiredSkill = 295,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 295, 295, 297, 300 },
             reagents = {
                 { itemId = 248822, count = 1 },
                 { itemId = 14343, count = 2 },
@@ -40998,7 +41033,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2641",
             sortOrder = 50,
             requiredSkill = 200,
-            skillLevels = { 1, 220, 240 },
+            skillLevels = { 200, 220, 230, 240 },
             reagents = {
                 { itemId = 730, count = 2 },
                 { itemId = 12206, count = 1 },
@@ -41016,7 +41051,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2633",
             sortOrder = 20,
             requiredSkill = 185,
-            skillLevels = { 1, 200, 230 },
+            skillLevels = { 185, 200, 215, 230 },
             reagents = {
                 { itemId = 769, count = 2 },
                 { itemId = 2678, count = 1 },
@@ -41033,7 +41068,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 285,
-            skillLevels = { 1, 290, 295 },
+            skillLevels = { 285, 290, 292, 295 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 14343, count = 1 },
@@ -41052,7 +41087,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 290,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 290, 295, 297, 300 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 14343, count = 1 },
@@ -41071,7 +41106,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 295,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 295, 295, 297, 300 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 14343, count = 1 },
@@ -41090,7 +41125,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 285,
-            skillLevels = { 1, 290, 295 },
+            skillLevels = { 285, 290, 292, 295 },
             reagents = {
                 { itemId = 14048, count = 4 },
                 { itemId = 14343, count = 1 },
@@ -41109,7 +41144,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 290,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 290, 295, 297, 300 },
             reagents = {
                 { itemId = 14048, count = 6 },
                 { itemId = 14343, count = 1 },
@@ -41128,7 +41163,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 295,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 295, 295, 297, 300 },
             reagents = {
                 { itemId = 14048, count = 5 },
                 { itemId = 14343, count = 1 },
@@ -41145,7 +41180,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 285,
-            skillLevels = { 1, 290, 295 },
+            skillLevels = { 285, 290, 292, 295 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 12810, count = 3 },
@@ -41162,7 +41197,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 290,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 290, 295, 297, 300 },
             reagents = {
                 { itemId = 8170, count = 18 },
                 { itemId = 12810, count = 3 },
@@ -41179,7 +41214,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 295,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 295, 295, 297, 300 },
             reagents = {
                 { itemId = 8170, count = 15 },
                 { itemId = 12810, count = 3 },
@@ -41196,7 +41231,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 285,
-            skillLevels = { 1, 290, 295 },
+            skillLevels = { 285, 290, 292, 295 },
             reagents = {
                 { itemId = 8170, count = 12 },
                 { itemId = 12810, count = 3 },
@@ -41213,7 +41248,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 290,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 290, 295, 297, 300 },
             reagents = {
                 { itemId = 8170, count = 18 },
                 { itemId = 12810, count = 3 },
@@ -41230,7 +41265,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 295,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 295, 295, 297, 300 },
             reagents = {
                 { itemId = 8170, count = 15 },
                 { itemId = 12810, count = 3 },
@@ -41247,7 +41282,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 285,
-            skillLevels = { 1, 290, 295 },
+            skillLevels = { 285, 290, 292, 295 },
             reagents = {
                 { itemId = 15408, count = 5 },
                 { itemId = 12810, count = 3 },
@@ -41264,7 +41299,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2566",
             sortOrder = 1700,
             requiredSkill = 290,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 290, 295, 297, 300 },
             reagents = {
                 { itemId = 15408, count = 7 },
                 { itemId = 12810, count = 3 },
@@ -41281,7 +41316,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 295,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 295, 295, 297, 300 },
             reagents = {
                 { itemId = 15408, count = 6 },
                 { itemId = 12810, count = 3 },
@@ -41298,7 +41333,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 285,
-            skillLevels = { 1, 290, 295 },
+            skillLevels = { 285, 290, 292, 295 },
             reagents = {
                 { itemId = 15408, count = 5 },
                 { itemId = 12810, count = 3 },
@@ -41315,7 +41350,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2566",
             sortOrder = 1700,
             requiredSkill = 290,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 290, 295, 297, 300 },
             reagents = {
                 { itemId = 15408, count = 7 },
                 { itemId = 12810, count = 3 },
@@ -41332,7 +41367,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 295,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 295, 295, 297, 300 },
             reagents = {
                 { itemId = 15408, count = 6 },
                 { itemId = 12810, count = 3 },
@@ -41351,7 +41386,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 285,
-            skillLevels = { 1, 290, 295 },
+            skillLevels = { 285, 290, 292, 295 },
             reagents = {
                 { itemId = 12359, count = 7 },
                 { itemId = 12655, count = 5 },
@@ -41370,7 +41405,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2474",
             sortOrder = 80,
             requiredSkill = 290,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 290, 295, 297, 300 },
             reagents = {
                 { itemId = 12359, count = 11 },
                 { itemId = 12655, count = 5 },
@@ -41389,7 +41424,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 295,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 295, 295, 297, 300 },
             reagents = {
                 { itemId = 12359, count = 9 },
                 { itemId = 12655, count = 5 },
@@ -41408,7 +41443,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 285,
-            skillLevels = { 1, 290, 295 },
+            skillLevels = { 285, 290, 292, 295 },
             reagents = {
                 { itemId = 12359, count = 7 },
                 { itemId = 12655, count = 5 },
@@ -41427,7 +41462,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2474",
             sortOrder = 80,
             requiredSkill = 290,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 290, 295, 297, 300 },
             reagents = {
                 { itemId = 12359, count = 11 },
                 { itemId = 12655, count = 5 },
@@ -41446,7 +41481,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 295,
-            skillLevels = { 1, 295, 300 },
+            skillLevels = { 295, 295, 297, 300 },
             reagents = {
                 { itemId = 12359, count = 9 },
                 { itemId = 12655, count = 5 },
@@ -41465,7 +41500,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2567",
             sortOrder = 1800,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 5 },
                 { itemId = 15407, count = 4 },
@@ -41484,7 +41519,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -41503,7 +41538,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2562",
             sortOrder = 1300,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -41522,7 +41557,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2568",
             sortOrder = 1900,
             requiredSkill = 300,
-            skillLevels = { 1, 320, 330 },
+            skillLevels = { 300, 320, 325, 330 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 15407, count = 2 },
@@ -41541,7 +41576,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 60,
-            skillLevels = { 1, 65, 70 },
+            skillLevels = { 60, 65, 67, 70 },
             reagents = {
                 { itemId = 2840, count = 8 },
                 { itemId = 2880, count = 1 },
@@ -41558,7 +41593,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2464",
             sortOrder = 140,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 60 },
+            skillLevels = { 50, 55, 57, 60 },
             reagents = {
                 { itemId = 2840, count = 5 },
             },
@@ -41574,7 +41609,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 55,
-            skillLevels = { 1, 60, 65 },
+            skillLevels = { 55, 60, 62, 65 },
             reagents = {
                 { itemId = 2840, count = 7 },
             },
@@ -41590,7 +41625,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2466",
             sortOrder = 160,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 60 },
+            skillLevels = { 50, 55, 57, 60 },
             reagents = {
                 { itemId = 2840, count = 6 },
             },
@@ -41606,7 +41641,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 60,
-            skillLevels = { 1, 65, 70 },
+            skillLevels = { 60, 65, 67, 70 },
             reagents = {
                 { itemId = 2840, count = 8 },
                 { itemId = 2880, count = 1 },
@@ -41623,7 +41658,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 55,
-            skillLevels = { 1, 60, 65 },
+            skillLevels = { 55, 60, 62, 65 },
             reagents = {
                 { itemId = 2840, count = 7 },
             },
@@ -41639,7 +41674,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 60,
-            skillLevels = { 1, 65, 70 },
+            skillLevels = { 60, 65, 67, 70 },
             reagents = {
                 { itemId = 2318, count = 7 },
                 { itemId = 4231, count = 1 },
@@ -41657,7 +41692,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 60 },
+            skillLevels = { 50, 55, 57, 60 },
             reagents = {
                 { itemId = 2318, count = 4 },
                 { itemId = 2320, count = 3 },
@@ -41674,7 +41709,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 55,
-            skillLevels = { 1, 60, 65 },
+            skillLevels = { 55, 60, 62, 65 },
             reagents = {
                 { itemId = 2318, count = 6 },
                 { itemId = 2320, count = 4 },
@@ -41691,7 +41726,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 60 },
+            skillLevels = { 50, 55, 57, 60 },
             reagents = {
                 { itemId = 2318, count = 5 },
                 { itemId = 2320, count = 3 },
@@ -41708,7 +41743,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 60,
-            skillLevels = { 1, 65, 70 },
+            skillLevels = { 60, 65, 67, 70 },
             reagents = {
                 { itemId = 2318, count = 7 },
                 { itemId = 2320, count = 2 },
@@ -41725,7 +41760,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 55,
-            skillLevels = { 1, 60, 65 },
+            skillLevels = { 55, 60, 62, 65 },
             reagents = {
                 { itemId = 2318, count = 6 },
                 { itemId = 2320, count = 3 },
@@ -41742,7 +41777,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 60,
-            skillLevels = { 1, 65, 70 },
+            skillLevels = { 60, 65, 67, 70 },
             reagents = {
                 { itemId = 2318, count = 7 },
                 { itemId = 4231, count = 1 },
@@ -41760,7 +41795,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 60 },
+            skillLevels = { 50, 55, 57, 60 },
             reagents = {
                 { itemId = 2318, count = 4 },
                 { itemId = 2320, count = 3 },
@@ -41777,7 +41812,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 55,
-            skillLevels = { 1, 60, 65 },
+            skillLevels = { 55, 60, 62, 65 },
             reagents = {
                 { itemId = 2318, count = 6 },
                 { itemId = 2320, count = 4 },
@@ -41794,7 +41829,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 60 },
+            skillLevels = { 50, 55, 57, 60 },
             reagents = {
                 { itemId = 2318, count = 5 },
                 { itemId = 2320, count = 3 },
@@ -41811,7 +41846,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 60,
-            skillLevels = { 1, 65, 70 },
+            skillLevels = { 60, 65, 67, 70 },
             reagents = {
                 { itemId = 2318, count = 7 },
                 { itemId = 2320, count = 2 },
@@ -41828,7 +41863,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 55,
-            skillLevels = { 1, 60, 65 },
+            skillLevels = { 55, 60, 62, 65 },
             reagents = {
                 { itemId = 2318, count = 6 },
                 { itemId = 2320, count = 3 },
@@ -41845,7 +41880,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 60,
-            skillLevels = { 1, 65, 70 },
+            skillLevels = { 60, 65, 67, 70 },
             reagents = {
                 { itemId = 2996, count = 5 },
                 { itemId = 2320, count = 2 },
@@ -41862,7 +41897,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2584",
             sortOrder = 900,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 60 },
+            skillLevels = { 50, 55, 57, 60 },
             reagents = {
                 { itemId = 2996, count = 3 },
                 { itemId = 2320, count = 3 },
@@ -41879,7 +41914,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 55,
-            skillLevels = { 1, 60, 65 },
+            skillLevels = { 55, 60, 62, 65 },
             reagents = {
                 { itemId = 2996, count = 4 },
                 { itemId = 2320, count = 4 },
@@ -41896,7 +41931,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 60 },
+            skillLevels = { 50, 55, 57, 60 },
             reagents = {
                 { itemId = 2996, count = 3 },
                 { itemId = 2320, count = 3 },
@@ -41913,7 +41948,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 60,
-            skillLevels = { 1, 65, 70 },
+            skillLevels = { 60, 65, 67, 70 },
             reagents = {
                 { itemId = 2996, count = 5 },
                 { itemId = 2320, count = 2 },
@@ -41930,7 +41965,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 55,
-            skillLevels = { 1, 60, 65 },
+            skillLevels = { 55, 60, 62, 65 },
             reagents = {
                 { itemId = 2996, count = 4 },
                 { itemId = 2320, count = 3 },
@@ -41947,7 +41982,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2463",
             sortOrder = 130,
             requiredSkill = 60,
-            skillLevels = { 1, 65, 70 },
+            skillLevels = { 60, 65, 67, 70 },
             reagents = {
                 { itemId = 2840, count = 8 },
                 { itemId = 2880, count = 1 },
@@ -41964,7 +41999,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2464",
             sortOrder = 140,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 60 },
+            skillLevels = { 50, 55, 57, 60 },
             reagents = {
                 { itemId = 2840, count = 5 },
             },
@@ -41980,7 +42015,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2465",
             sortOrder = 150,
             requiredSkill = 55,
-            skillLevels = { 1, 60, 65 },
+            skillLevels = { 55, 60, 62, 65 },
             reagents = {
                 { itemId = 2840, count = 7 },
             },
@@ -41996,7 +42031,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2466",
             sortOrder = 160,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 60 },
+            skillLevels = { 50, 55, 57, 60 },
             reagents = {
                 { itemId = 2840, count = 6 },
             },
@@ -42012,7 +42047,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2467",
             sortOrder = 170,
             requiredSkill = 60,
-            skillLevels = { 1, 65, 70 },
+            skillLevels = { 60, 65, 67, 70 },
             reagents = {
                 { itemId = 2840, count = 8 },
                 { itemId = 2880, count = 1 },
@@ -42029,7 +42064,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 55,
-            skillLevels = { 1, 60, 65 },
+            skillLevels = { 55, 60, 62, 65 },
             reagents = {
                 { itemId = 2840, count = 7 },
             },
@@ -42045,7 +42080,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 60,
-            skillLevels = { 1, 65, 70 },
+            skillLevels = { 60, 65, 67, 70 },
             reagents = {
                 { itemId = 2318, count = 7 },
                 { itemId = 4231, count = 1 },
@@ -42063,7 +42098,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 60 },
+            skillLevels = { 50, 55, 57, 60 },
             reagents = {
                 { itemId = 2318, count = 4 },
                 { itemId = 2320, count = 3 },
@@ -42080,7 +42115,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 55,
-            skillLevels = { 1, 60, 65 },
+            skillLevels = { 55, 60, 62, 65 },
             reagents = {
                 { itemId = 2318, count = 6 },
                 { itemId = 2320, count = 4 },
@@ -42097,7 +42132,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 60 },
+            skillLevels = { 50, 55, 57, 60 },
             reagents = {
                 { itemId = 2318, count = 5 },
                 { itemId = 2320, count = 3 },
@@ -42114,7 +42149,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 60,
-            skillLevels = { 1, 65, 70 },
+            skillLevels = { 60, 65, 67, 70 },
             reagents = {
                 { itemId = 2318, count = 7 },
                 { itemId = 2320, count = 2 },
@@ -42131,7 +42166,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 55,
-            skillLevels = { 1, 60, 65 },
+            skillLevels = { 55, 60, 62, 65 },
             reagents = {
                 { itemId = 2318, count = 6 },
                 { itemId = 2320, count = 3 },
@@ -42148,7 +42183,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2555",
             sortOrder = 600,
             requiredSkill = 60,
-            skillLevels = { 1, 65, 70 },
+            skillLevels = { 60, 65, 67, 70 },
             reagents = {
                 { itemId = 2318, count = 7 },
                 { itemId = 4231, count = 1 },
@@ -42166,7 +42201,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2556",
             sortOrder = 700,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 60 },
+            skillLevels = { 50, 55, 57, 60 },
             reagents = {
                 { itemId = 2318, count = 4 },
                 { itemId = 2320, count = 3 },
@@ -42183,7 +42218,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2557",
             sortOrder = 800,
             requiredSkill = 55,
-            skillLevels = { 1, 60, 65 },
+            skillLevels = { 55, 60, 62, 65 },
             reagents = {
                 { itemId = 2318, count = 6 },
                 { itemId = 2320, count = 4 },
@@ -42200,7 +42235,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 60 },
+            skillLevels = { 50, 55, 57, 60 },
             reagents = {
                 { itemId = 2318, count = 5 },
                 { itemId = 2320, count = 3 },
@@ -42217,7 +42252,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 60,
-            skillLevels = { 1, 65, 70 },
+            skillLevels = { 60, 65, 67, 70 },
             reagents = {
                 { itemId = 2318, count = 7 },
                 { itemId = 2320, count = 2 },
@@ -42234,7 +42269,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2560",
             sortOrder = 1100,
             requiredSkill = 55,
-            skillLevels = { 1, 60, 65 },
+            skillLevels = { 55, 60, 62, 65 },
             reagents = {
                 { itemId = 2318, count = 6 },
                 { itemId = 2320, count = 3 },
@@ -42251,7 +42286,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 60,
-            skillLevels = { 1, 65, 70 },
+            skillLevels = { 60, 65, 67, 70 },
             reagents = {
                 { itemId = 2996, count = 5 },
                 { itemId = 2320, count = 2 },
@@ -42268,7 +42303,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2584",
             sortOrder = 900,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 60 },
+            skillLevels = { 50, 55, 57, 60 },
             reagents = {
                 { itemId = 2996, count = 3 },
                 { itemId = 2320, count = 3 },
@@ -42285,7 +42320,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2585",
             sortOrder = 1000,
             requiredSkill = 55,
-            skillLevels = { 1, 60, 65 },
+            skillLevels = { 55, 60, 62, 65 },
             reagents = {
                 { itemId = 2996, count = 4 },
                 { itemId = 2320, count = 4 },
@@ -42302,7 +42337,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 50,
-            skillLevels = { 1, 55, 60 },
+            skillLevels = { 50, 55, 57, 60 },
             reagents = {
                 { itemId = 2996, count = 3 },
                 { itemId = 2320, count = 3 },
@@ -42319,7 +42354,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2587",
             sortOrder = 1200,
             requiredSkill = 60,
-            skillLevels = { 1, 65, 70 },
+            skillLevels = { 60, 65, 67, 70 },
             reagents = {
                 { itemId = 2996, count = 5 },
                 { itemId = 2320, count = 2 },
@@ -42336,7 +42371,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 55,
-            skillLevels = { 1, 60, 65 },
+            skillLevels = { 55, 60, 62, 65 },
             reagents = {
                 { itemId = 2996, count = 4 },
                 { itemId = 2320, count = 3 },
@@ -42353,7 +42388,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2461",
             sortOrder = 110,
             requiredSkill = 175,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 175, 185, 187, 190 },
             reagents = {
                 { itemId = 3575, count = 18 },
                 { itemId = 3486, count = 5 },
@@ -42371,7 +42406,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2462",
             sortOrder = 120,
             requiredSkill = 175,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 175, 185, 187, 190 },
             reagents = {
                 { itemId = 3575, count = 14 },
                 { itemId = 3486, count = 3 },
@@ -42389,7 +42424,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 175,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 175, 185, 187, 190 },
             reagents = {
                 { itemId = 4234, count = 15 },
                 { itemId = 4236, count = 3 },
@@ -42408,7 +42443,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 175,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 175, 185, 187, 190 },
             reagents = {
                 { itemId = 4234, count = 12 },
                 { itemId = 4236, count = 2 },
@@ -42427,7 +42462,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 175,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 175, 185, 187, 190 },
             reagents = {
                 { itemId = 4234, count = 15 },
                 { itemId = 4236, count = 3 },
@@ -42446,7 +42481,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 175,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 175, 185, 187, 190 },
             reagents = {
                 { itemId = 4234, count = 12 },
                 { itemId = 4236, count = 2 },
@@ -42465,7 +42500,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 175,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 175, 185, 187, 190 },
             reagents = {
                 { itemId = 4305, count = 7 },
                 { itemId = 11134, count = 2 },
@@ -42484,7 +42519,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 175,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 175, 185, 187, 190 },
             reagents = {
                 { itemId = 4305, count = 5 },
                 { itemId = 11134, count = 1 },
@@ -42503,7 +42538,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2461",
             sortOrder = 110,
             requiredSkill = 175,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 175, 185, 187, 190 },
             reagents = {
                 { itemId = 3575, count = 18 },
                 { itemId = 3486, count = 5 },
@@ -42521,7 +42556,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2462",
             sortOrder = 120,
             requiredSkill = 175,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 175, 185, 187, 190 },
             reagents = {
                 { itemId = 3575, count = 14 },
                 { itemId = 3486, count = 3 },
@@ -42539,7 +42574,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 175,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 175, 185, 187, 190 },
             reagents = {
                 { itemId = 4234, count = 15 },
                 { itemId = 4236, count = 3 },
@@ -42558,7 +42593,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 175,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 175, 185, 187, 190 },
             reagents = {
                 { itemId = 4234, count = 12 },
                 { itemId = 4236, count = 2 },
@@ -42577,7 +42612,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 175,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 175, 185, 187, 190 },
             reagents = {
                 { itemId = 4234, count = 15 },
                 { itemId = 4236, count = 3 },
@@ -42596,7 +42631,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2554",
             sortOrder = 500,
             requiredSkill = 175,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 175, 185, 187, 190 },
             reagents = {
                 { itemId = 4234, count = 12 },
                 { itemId = 4236, count = 2 },
@@ -42615,7 +42650,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2581",
             sortOrder = 600,
             requiredSkill = 175,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 175, 185, 187, 190 },
             reagents = {
                 { itemId = 4305, count = 7 },
                 { itemId = 11134, count = 2 },
@@ -42634,7 +42669,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2582",
             sortOrder = 700,
             requiredSkill = 175,
-            skillLevels = { 1, 185, 190 },
+            skillLevels = { 175, 185, 187, 190 },
             reagents = {
                 { itemId = 4305, count = 5 },
                 { itemId = 11134, count = 1 },
@@ -42653,7 +42688,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2518",
             sortOrder = 40,
             requiredSkill = 65,
-            skillLevels = { 1, 65, 80 },
+            skillLevels = { 65, 65, 72, 80 },
             reagents = {
                 { itemId = 255007, count = 4 },
                 { itemId = 4363, count = 2 },
@@ -42670,7 +42705,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2468",
             sortOrder = 180,
             requiredSkill = 50,
-            skillLevels = { 1, 60, 70 },
+            skillLevels = { 50, 60, 65, 70 },
             reagents = {
                 { itemId = 2840, count = 9 },
             },
@@ -42686,7 +42721,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2551",
             sortOrder = 200,
             requiredSkill = 30,
-            skillLevels = { 1, 40, 50 },
+            skillLevels = { 30, 40, 45, 50 },
             reagents = {
                 { itemId = 2318, count = 8 },
                 { itemId = 4231, count = 1 },
@@ -42700,7 +42735,8 @@ RecipeRegistryRecipeMetadata = {
             bopOutput = false,
             category = "c2575",
             sortOrder = 100,
-            skillLevels = { 1, 300, 315 },
+            requiredSkill = 300,
+            skillLevels = { 300, 300, 307, 315 },
             reagents = {
                 { itemId = 248815, count = 1 },
             },
@@ -42714,7 +42750,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2512",
             sortOrder = 230,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 2 },
                 { itemId = 20725, count = 1 },
@@ -42732,7 +42768,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2509",
             sortOrder = 200,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 1 },
                 { itemId = 20725, count = 1 },
@@ -42750,7 +42786,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2509",
             sortOrder = 200,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 1 },
                 { itemId = 20725, count = 1 },
@@ -42768,7 +42804,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2509",
             sortOrder = 200,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 1 },
                 { itemId = 20725, count = 1 },
@@ -42786,7 +42822,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2509",
             sortOrder = 200,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 1 },
                 { itemId = 20725, count = 1 },
@@ -42804,7 +42840,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2509",
             sortOrder = 200,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 1 },
                 { itemId = 20725, count = 1 },
@@ -42821,7 +42857,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2558",
             sortOrder = 900,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 2 },
                 { itemId = 248824, count = 1 },
@@ -42837,7 +42873,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2553",
             sortOrder = 400,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 248824, count = 2 },
@@ -42853,7 +42889,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2559",
             sortOrder = 1000,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 248824, count = 2 },
@@ -42869,7 +42905,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2562",
             sortOrder = 1300,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 2 },
                 { itemId = 248824, count = 1 },
@@ -42885,7 +42921,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2564",
             sortOrder = 1500,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 1 },
                 { itemId = 248824, count = 1 },
@@ -42901,7 +42937,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2565",
             sortOrder = 1600,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 2 },
                 { itemId = 248824, count = 1 },
@@ -42917,7 +42953,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2569",
             sortOrder = 2000,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 248825, count = 22 },
                 { itemId = 14341, count = 3 },
@@ -42932,7 +42968,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2485",
             sortOrder = 270,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 2 },
                 { itemId = 251290, count = 1 },
@@ -42948,7 +42984,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2477",
             sortOrder = 190,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 4 },
                 { itemId = 251290, count = 1 },
@@ -42964,7 +43000,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2484",
             sortOrder = 260,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 2 },
                 { itemId = 251290, count = 1 },
@@ -42980,7 +43016,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2486",
             sortOrder = 280,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 2 },
                 { itemId = 251290, count = 1 },
@@ -42996,7 +43032,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2476",
             sortOrder = 100,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 2 },
                 { itemId = 251290, count = 1 },
@@ -43012,7 +43048,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2473",
             sortOrder = 70,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 2 },
                 { itemId = 251290, count = 1 },
@@ -43028,7 +43064,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2475",
             sortOrder = 90,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 251290, count = 1 },
@@ -43044,7 +43080,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2583",
             sortOrder = 800,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 3 },
                 { itemId = 14342, count = 3 },
@@ -43060,7 +43096,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2586",
             sortOrder = 1100,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 2 },
                 { itemId = 14342, count = 2 },
@@ -43076,7 +43112,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2588",
             sortOrder = 1300,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 2 },
                 { itemId = 14342, count = 2 },
@@ -43092,7 +43128,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2580",
             sortOrder = 500,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 1 },
                 { itemId = 14342, count = 1 },
@@ -43108,7 +43144,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2580",
             sortOrder = 500,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 1 },
                 { itemId = 14342, count = 1 },
@@ -43124,7 +43160,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2579",
             sortOrder = 400,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 14256, count = 8 },
                 { itemId = 14048, count = 6 },
@@ -43139,7 +43175,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2527",
             sortOrder = 130,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 251290, count = 1 },
                 { itemId = 251291, count = 12 },
@@ -43154,7 +43190,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2526",
             sortOrder = 120,
             requiredSkill = 300,
-            skillLevels = { 1, 310, 325 },
+            skillLevels = { 300, 310, 317, 325 },
             reagents = {
                 { itemId = 274030, count = 4 },
                 { itemId = 251290, count = 2 },
@@ -43173,7 +43209,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 175,
-            skillLevels = { 1, 180, 185 },
+            skillLevels = { 175, 180, 182, 185 },
             reagents = {
                 { itemId = 4382, count = 2 },
                 { itemId = 4375, count = 1 },
@@ -43191,7 +43227,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 175,
-            skillLevels = { 1, 180, 185 },
+            skillLevels = { 175, 180, 182, 185 },
             reagents = {
                 { itemId = 4375, count = 2 },
                 { itemId = 4382, count = 1 },
@@ -43209,7 +43245,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 175,
-            skillLevels = { 1, 180, 185 },
+            skillLevels = { 175, 180, 182, 185 },
             reagents = {
                 { itemId = 4371, count = 2 },
                 { itemId = 4363, count = 1 },
@@ -43225,7 +43261,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2520",
             sortOrder = 60,
             requiredSkill = 175,
-            skillLevels = { 1, 180, 185 },
+            skillLevels = { 175, 180, 182, 185 },
             reagents = {
                 { itemId = 4363, count = 2 },
                 { itemId = 4371, count = 1 },
@@ -43243,7 +43279,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2522",
             sortOrder = 80,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 210 },
+            skillLevels = { 200, 205, 207, 210 },
             reagents = {
                 { itemId = 5507, count = 1 },
                 { itemId = 4389, count = 1 },
@@ -43261,7 +43297,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2523",
             sortOrder = 90,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 210 },
+            skillLevels = { 200, 205, 207, 210 },
             reagents = {
                 { itemId = 5507, count = 1 },
                 { itemId = 4389, count = 1 },
@@ -43279,7 +43315,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2524",
             sortOrder = 100,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 210 },
+            skillLevels = { 200, 205, 207, 210 },
             reagents = {
                 { itemId = 5507, count = 1 },
                 { itemId = 4389, count = 1 },
@@ -43297,7 +43333,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2525",
             sortOrder = 110,
             requiredSkill = 200,
-            skillLevels = { 1, 205, 210 },
+            skillLevels = { 200, 205, 207, 210 },
             reagents = {
                 { itemId = 5507, count = 1 },
                 { itemId = 4389, count = 1 },
@@ -43313,7 +43349,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2516",
             sortOrder = 20,
             requiredSkill = 260,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 260, 280, 290, 300 },
             createdCount = 3,
             createdCountMax = 3,
             reagents = {
@@ -43332,7 +43368,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2620",
             sortOrder = 65,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 290 },
+            skillLevels = { 275, 275, 282, 290 },
             reagents = {
                 { itemId = 251291, count = 1 },
                 { itemId = 248819, count = 1 },
@@ -43349,7 +43385,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2526",
             sortOrder = 120,
             requiredSkill = 85,
-            skillLevels = { 1, 90, 95 },
+            skillLevels = { 85, 90, 92, 95 },
             reagents = {
                 { itemId = 4360, count = 20 },
                 { itemId = 2318, count = 6 },
@@ -43367,7 +43403,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2526",
             sortOrder = 120,
             requiredSkill = 165,
-            skillLevels = { 1, 170, 175 },
+            skillLevels = { 165, 170, 172, 175 },
             reagents = {
                 { itemId = 4380, count = 20 },
                 { itemId = 2319, count = 6 },
@@ -43385,7 +43421,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2526",
             sortOrder = 120,
             requiredSkill = 230,
-            skillLevels = { 1, 235, 240 },
+            skillLevels = { 230, 235, 237, 240 },
             reagents = {
                 { itemId = 4394, count = 20 },
                 { itemId = 4304, count = 6 },
@@ -43403,7 +43439,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2526",
             sortOrder = 120,
             requiredSkill = 285,
-            skillLevels = { 1, 290, 295 },
+            skillLevels = { 285, 290, 292, 295 },
             reagents = {
                 { itemId = 16005, count = 20 },
                 { itemId = 8170, count = 6 },
@@ -43419,7 +43455,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2770",
             sortOrder = 285,
             requiredSkill = 110,
-            skillLevels = { 1, 115, 120 },
+            skillLevels = { 110, 115, 117, 120 },
             reagents = {
                 { itemId = 2841, count = 18 },
                 { itemId = 2842, count = 2 },
@@ -43435,7 +43471,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2770",
             sortOrder = 285,
             requiredSkill = 195,
-            skillLevels = { 1, 200, 205 },
+            skillLevels = { 195, 200, 202, 205 },
             reagents = {
                 { itemId = 3860, count = 10 },
                 { itemId = 3577, count = 2 },
@@ -43451,7 +43487,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2770",
             sortOrder = 285,
             requiredSkill = 270,
-            skillLevels = { 1, 275, 280 },
+            skillLevels = { 270, 275, 277, 280 },
             reagents = {
                 { itemId = 11371, count = 4 },
                 { itemId = 12360, count = 1 },
@@ -43467,7 +43503,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 125,
-            skillLevels = { 1, 125, 150 },
+            skillLevels = { 125, 125, 137, 150 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -43484,7 +43520,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 125,
-            skillLevels = { 1, 125, 150 },
+            skillLevels = { 125, 125, 137, 150 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -43501,7 +43537,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 125,
-            skillLevels = { 1, 125, 150 },
+            skillLevels = { 125, 125, 137, 150 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -43518,7 +43554,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 175,
-            skillLevels = { 1, 175, 200 },
+            skillLevels = { 175, 175, 187, 200 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -43535,7 +43571,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 175,
-            skillLevels = { 1, 175, 200 },
+            skillLevels = { 175, 175, 187, 200 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -43552,7 +43588,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 175,
-            skillLevels = { 1, 175, 200 },
+            skillLevels = { 175, 175, 187, 200 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -43569,7 +43605,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 250 },
+            skillLevels = { 225, 225, 237, 250 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -43586,7 +43622,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 250 },
+            skillLevels = { 225, 225, 237, 250 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -43603,7 +43639,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 225,
-            skillLevels = { 1, 225, 250 },
+            skillLevels = { 225, 225, 237, 250 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -43620,7 +43656,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 285 },
+            skillLevels = { 275, 275, 280, 285 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -43637,7 +43673,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 285 },
+            skillLevels = { 275, 275, 280, 285 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -43654,7 +43690,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2517",
             sortOrder = 30,
             requiredSkill = 275,
-            skillLevels = { 1, 275, 285 },
+            skillLevels = { 275, 275, 280, 285 },
             createdCount = 5,
             createdCountMax = 5,
             reagents = {
@@ -43671,7 +43707,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2771",
             sortOrder = 80,
             requiredSkill = 225,
-            skillLevels = { 1, 245, 255 },
+            skillLevels = { 225, 245, 250, 255 },
             reagents = {
                 { itemId = 13890, count = 1 },
                 { itemId = 3713, count = 1 },
@@ -43684,7 +43720,7 @@ RecipeRegistryRecipeMetadata = {
             category = "c2500",
             sortOrder = 110,
             requiredSkill = 280,
-            skillLevels = { 1, 280, 300 },
+            skillLevels = { 280, 280, 290, 300 },
             reagents = {
                 { itemId = 11175, count = 2 },
                 { itemId = 11176, count = 8 },

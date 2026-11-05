@@ -100,6 +100,10 @@ try {
     if (Test-Path -LiteralPath $worksheet) { $arguments += "--acquisition=$worksheet" }
     $vanillaSkill = Join-Path $PSScriptRoot 'captures\tbc-vanilla-skill.tsv'
     if (Test-Path -LiteralPath $vanillaSkill) { $arguments += "--vanilla-skill=$vanillaSkill" }
+    # Il livello dei trainer di Forever, da Wowhead (scrape-wowhead.py --spells):
+    # senza, le ricette che Forever ha abbassato tornano al livello vanilla.
+    $trainerSkill = Join-Path $PSScriptRoot 'captures\wowhead-trainer-skill.tsv'
+    if (Test-Path -LiteralPath $trainerSkill) { $arguments += "--trainer-skill=$trainerSkill" }
     & $lua @arguments
     if ($LASTEXITCODE -ne 0) { throw 'Importazione fallita: database interno invariato.' }
     $archive = Join-Path $archiveRoot "$id.lua"

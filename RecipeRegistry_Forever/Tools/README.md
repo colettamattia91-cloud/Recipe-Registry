@@ -71,5 +71,9 @@ slot: eventuali ricette con scelte alternative richiedono un adeguamento del
 modello prima di considerare complete le stime dei materiali.
 
 Fonti di apprendimento, trainer e requisiti non restituiti dalle API non vengono
-inventati. Il database interno descrive le ricette; la conoscenza del personaggio
+inventati. Il livello a cui un trainer insegna una ricetta e' dato del server (il
+client dice 1): viene dagli elenchi degli spell di Wowhead, con
+`python RecipeRegistry_Forever/Tools/scrape-wowhead.py --spells all`, che scrive
+`captures/wowhead-trainer-skill.tsv`; `import-dumps.ps1` lo passa al generatore
+se c'e'. Il database interno descrive le ricette; la conoscenza del personaggio
 deve continuare a essere rilevata separatamente dalle API del client.

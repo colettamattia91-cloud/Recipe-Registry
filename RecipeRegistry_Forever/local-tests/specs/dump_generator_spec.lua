@@ -2,7 +2,8 @@
 -- one profession replaces only that profession, regardless of input order.
 local base = "local-tests/specs/.dump-generator-"
 local paths = { base .. "old.lua", base .. "new.lua", base .. "output.lua", base .. "mining.lua",
-    base .. "vanilla-skill.tsv", base .. "capture.lua", base .. "structure.lua", base .. "worksheet.tsv" }
+    base .. "vanilla-skill.tsv", base .. "capture.lua", base .. "structure.lua", base .. "worksheet.tsv",
+    base .. "trainer-skill.tsv" }
 local function write(path, content)
     local file = assert(io.open(path, "w")); file:write(content); file:close()
 end
@@ -65,6 +66,41 @@ MiningItems = { [22] = 1, [33] = 2 }]])
     assert(skilled.recipesBySpellId[3].requiredSkill == 140, "the recipe item's rank comes first")
     assert(skilled.recipesBySpellId[2].requiredSkill == 75, "then the vanilla rank")
     assert(skilled.recipesBySpellId[7443].requiredSkill == nil, "a client 1 is not a requirement")
+    -- Linen Bag: il vanilla la vendeva dal trainer a 45, su Forever il client
+    -- la da' da sola a 1 (AcquireMethod 1). L'addon diceva 45.
+    write(paths[4], [[MiningRecipes = {
+    [2] = { requiredSkill = 1, acquireMethod = 1, skillLevels = { 1, 30, 65 } },
+    [3] = { recipeItemId = 5003, recipeItemSkill = 140, requiredSkill = 1, acquireMethod = 0, skillLevels = { 1, 165, 205 } },
+    [7443] = { requiredSkill = 1, skillLevels = { 1, 0, 0 } },
+}]])
+    local learned = generate(paths[1], paths[2], "--mining=" .. paths[4], "--vanilla-skill=" .. paths[5])
+    assert(learned.recipesBySpellId[2].requiredSkill == 1, "a recipe the game grants by itself is learned at the client's rank")
+    assert(learned.recipesBySpellId[3].requiredSkill == 140, "a recipe bought from a trainer keeps the old order")
+    -- Le soglie: il client ne da' tre (dove si impara, giallo, grigio), l'addon
+    -- ne legge quattro. Il verde e' la meta' fra giallo e grigio, l'arancione
+    -- il livello del record.
+    local ladder = learned.recipesBySpellId[2].skillLevels
+    assert(ladder and #ladder == 4 and ladder[1] == 1 and ladder[2] == 30 and ladder[3] == 47 and ladder[4] == 65,
+        "three client thresholds become the four-step ladder")
+    local bought = learned.recipesBySpellId[3].skillLevels
+    assert(bought[1] == 140 and bought[3] == 185, "orange starts where the recipe is learned")
+    assert(learned.recipesBySpellId[7443].skillLevels == nil, "thresholds at zero are no ladder")
+    -- Il livello del trainer di Forever (Wowhead) batte il vanilla, ma non il
+    -- client: ne' l'oggetto-ricetta ne' una ricetta che il gioco da' da sola.
+    write(paths[9], "spellId\trequiredSkill\tname\n2\t5\tLinen Bag\n3\t120\tPotion\n7443\t40\tCoarse Weightstone\n")
+    local trained = generate(paths[1], paths[2], "--mining=" .. paths[4], "--vanilla-skill=" .. paths[5],
+        "--trainer-skill=" .. paths[9])
+    assert(trained.recipesBySpellId[7443].requiredSkill == 40, "the Forever trainer's rank comes before the vanilla one")
+    assert(trained.recipesBySpellId[7443].skillLevels == nil, "a rank alone makes no ladder")
+    assert(trained.recipesBySpellId[3].requiredSkill == 140, "the recipe item still comes first")
+    assert(trained.recipesBySpellId[2].requiredSkill == 1, "and so does a recipe the game grants by itself")
+    write(paths[4], "MiningRecipes = { [7443] = { requiredSkill = 1, skillLevels = { 1, 40, 55 } } }\n")
+    write(paths[5], "spellId\trequiredSkill\n7443\t65\n")
+    local lowered = generate(paths[1], paths[2], "--mining=" .. paths[4], "--vanilla-skill=" .. paths[5],
+        "--trainer-skill=" .. paths[9])
+    local weightstone = lowered.recipesBySpellId[7443]
+    assert(weightstone.requiredSkill == 40 and weightstone.skillLevels[1] == 40,
+        "orange starts at the trainer's rank, not at the vanilla one")
     -- I nomi con le virgolette. Il worksheet lo scrive il modulo csv di
     -- Python, che racchiude fra virgolette il campo che ne contiene e le
     -- raddoppia dentro. Letto com'era, "Ziri ""The Wrench"" Littlesprocket"
@@ -146,4 +182,4 @@ MiningCategories = { [1] = { name = "Alchemy", order = 0 }, [60] = { name = "Eli
 end)
 for _, path in ipairs(paths) do os.remove(path) end
 assert(ok, err)
-print("PASS generator: multiple sessions, legacy format, newest capture, reagents, indices, outputless is not self-only, static BoP from item binding, recipe items, required skill, quoted names from the worksheet, recipes the build no longer lists, structure from the datamining")
+print("PASS generator: multiple sessions, legacy format, newest capture, reagents, indices, outputless is not self-only, static BoP from item binding, recipe items, required skill, recipes learned by themselves, four-step difficulty ladder, Forever trainer ranks, quoted names from the worksheet, recipes the build no longer lists, structure from the datamining")

@@ -25,6 +25,13 @@ marcare l'indirizzo.
     python RecipeRegistry_Forever/Tools/scrape-wowhead.py --limit 5 --save-html <cartella>
     python RecipeRegistry_Forever/Tools/scrape-wowhead.py --all
     python RecipeRegistry_Forever/Tools/scrape-wowhead.py --report
+
+Con --spells legge invece gli elenchi degli spell di mestiere, uno per
+mestiere, e ne fa Tools/captures/wowhead-trainer-skill.tsv: il livello a cui un
+trainer insegna ogni ricetta, che il client di Forever non porta (dice 1).
+--from-html rilegge le pagine salvate con --save-html, senza rete.
+
+    python RecipeRegistry_Forever/Tools/scrape-wowhead.py --spells all
 """
 import argparse, csv, json, os, re, sys, time
 
@@ -34,6 +41,8 @@ sys.path.insert(0, HERE)
 WORKSHEET = os.path.join(HERE, "acquisition-worksheet.tsv")
 CACHE = os.path.join(HERE, "dumps", "wowhead-cache.json")
 OUT = os.path.join(HERE, "captures", "wowhead-recipes.tsv")
+TRAINER_OUT = os.path.join(HERE, "captures", "wowhead-trainer-skill.tsv")
+TRAINER = 6       # `source` di Wowhead per uno spell: 6 = insegnato da un trainer
 BASE = "https://www.wowhead.com/forever"
 # Si alza quando il parser comincia a estrarre un campo che le voci in cache
 # non hanno: la cache vecchia si butta invece di servire righe a meta'.
@@ -44,6 +53,20 @@ COLS = ["spellId", "recipeItemId", "name", "sourceKind", "npcName", "zone",
 
 LIST_SLUGS = ("alchemy", "blacksmithing", "cooking", "enchanting", "engineering",
               "first-aid", "fishing", "leatherworking", "tailoring")
+
+# Gli elenchi degli spell di mestiere: per ogni ricetta il livello a cui si
+# impara e le soglie di difficolta', un mestiere intero in una richiesta. Il
+# livello dei trainer e' dato del server -- il client di Forever dice 1 -- e il
+# vanilla non regge dove Forever ha abbassato le soglie.
+SPELL_LISTS = {
+    "alchemy": "professions/alchemy", "blacksmithing": "professions/blacksmithing",
+    "enchanting": "professions/enchanting", "engineering": "professions/engineering",
+    "leatherworking": "professions/leatherworking", "mining": "professions/mining",
+    "tailoring": "professions/tailoring", "herbalism": "professions/herbalism",
+    "skinning": "professions/skinning",
+    "cooking": "secondary-skills/cooking", "first-aid": "secondary-skills/first-aid",
+    "fishing": "secondary-skills/fishing",
+}
 
 LISTVIEWS = ("sold-by", "dropped-by", "contained-in-object", "contained-in-item", "reward-from-q")
 BOSS = 3          # classification di Wowhead: 0 normale, 1 elite, 2 rare elite, 3 boss, 4 rare
@@ -215,6 +238,64 @@ def parse_list(html):
                         "sourcemore": sourcemore,
                         "commondrop": '"commondrop":true' in row}
     return found
+
+
+def parse_spell_list(html):
+    """Le righe di un elenco di spell: id, nome, `learnedat`, `colors` (le
+    quattro soglie), `skill` (le skill line), `source` (6 = trainer) e
+    `trainingcost`.
+
+    Stanno in `var listviewspells = [...]`, come quelle degli oggetti in
+    `listviewitems` (vedi parse_list), e non e' JSON: quality e popularity hanno
+    le chiavi senza virgolette. Righe ritagliate con le parentesi, campi letti
+    uno per uno."""
+    found = {}
+    start = html.find("var listviewspells = [")
+    if start == -1:
+        return found
+    start = html.find("[", start)
+    for row in rows(html[start:html.find("];", start) + 1]):
+        ident = field(row, "id")
+        if ident is None:
+            continue
+        learnedat = field(row, "learnedat")
+        cost = field(row, "trainingcost")
+        found[ident] = {"name": (field(row, "name", r'"((?:[^"\\]|\\.)*)"') or "").replace('\\"', '"'),
+                        "learnedat": int(learnedat) if learnedat is not None else None,
+                        "colors": ints(field(row, "colors", r"\[([^\]]*)\]")),
+                        "skill": ints(field(row, "skill", r"\[([^\]]*)\]")),
+                        "source": ints(field(row, "source", r"\[([^\]]*)\]")),
+                        "trainingcost": int(cost) if cost is not None else None}
+    return found
+
+
+def trainer_level(entry):
+    """Il livello a cui un trainer insegna lo spell, quando Wowhead lo sa.
+
+    Wowhead scrive `learnedat` anche quando non lo sa: allora l'arancione,
+    colors[0], e' 0 e learnedat ripete la soglia gialla. Bolt of Linen Cloth,
+    che il gioco da' da solo a 1, esce "a 25" senza nessuna fonte; Shadoweave
+    Pants ha il trainer ma l'arancione a 0. Vale solo con un trainer fra le
+    fonti e l'arancione uguale al livello -- e cosi' restano fuori anche gli
+    spell dei ranghi di mestiere, che di soglie non ne hanno."""
+    level, colors = entry.get("learnedat"), entry.get("colors") or []
+    if TRAINER in (entry.get("source") or []) and level and colors and colors[0] == level:
+        return level
+    return None
+
+
+def write_trainer_tsv(cache):
+    """spellId -> livello del trainer, per generate-from-dump.lua
+    (--trainer-skill=). Dalla cache, che tiene tutto: il filtro e' qui."""
+    out = sorted((int(spell_id), trainer_level(entry), entry["name"])
+                 for spell_id, entry in cache.get("spells", {}).items() if trainer_level(entry))
+    tmp = TRAINER_OUT + ".tmp"
+    with open(tmp, "w", newline="", encoding="utf-8") as f:
+        f.write("spellId\trequiredSkill\tname\n")
+        for spell_id, level, name in out:
+            f.write("%d\t%d\t%s\n" % (spell_id, level, name.replace("\t", " ")))
+    os.replace(tmp, TRAINER_OUT)
+    return out
 
 
 def vendor_reactions(cache):
@@ -456,16 +537,57 @@ def main():
     parser.add_argument("--lists", help="pagine-elenco dei mestieri (separati da virgola, o 'all') e triage")
     parser.add_argument("--triage", action="store_true",
                         help="solo le pagine-oggetto che gli elenchi non bastano a risolvere")
+    parser.add_argument("--spells", help="elenchi degli spell dei mestieri (separati da virgola, o 'all'):"
+                        " livello a cui si imparano e soglie")
+    parser.add_argument("--from-html", help="con --spells: rilegge le pagine salvate qui invece della rete")
     parser.add_argument("--retry-refused", action="store_true", help="richiede anche gli oggetti rifiutati")
     parser.add_argument("--save-html", help="salva qui l'HTML di ogni pagina letta")
     parser.add_argument("--delay", type=float, default=3.0, help="secondi fra una pagina e l'altra")
     parser.add_argument("--max-refusals", type=int, default=3, help="rifiuti di fila prima di fermarsi")
     args = parser.parse_args()
-    if not (args.limit or args.all or args.items or args.report or args.lists or args.triage):
-        parser.error("indica --limit N, --all, --items, --lists, --triage o --report")
+    if not (args.limit or args.all or args.items or args.report or args.lists or args.triage or args.spells):
+        parser.error("indica --limit N, --all, --items, --lists, --spells, --triage o --report")
 
     items = worksheet_items()
     cache = load_cache()
+
+    if args.spells:
+        slugs = list(SPELL_LISTS) if args.spells == "all" else args.spells.split(",")
+        cache.setdefault("spells", {})
+
+        def pages():
+            if args.from_html:
+                for slug in slugs:
+                    path = os.path.join(args.from_html, "spells-%s.html" % slug)
+                    if os.path.exists(path):
+                        yield slug, open(path, encoding="utf-8").read()
+                return
+            from wowhead_browser import Browser, Refused
+            with Browser() as browser:
+                for slug in slugs:
+                    try:
+                        html = browser.read("%s/spells/%s" % (BASE, SPELL_LISTS.get(slug, "professions/" + slug)))
+                    except Refused as error:
+                        print("  %-15s %s" % (slug, error))
+                        continue
+                    if args.save_html:
+                        os.makedirs(args.save_html, exist_ok=True)
+                        open(os.path.join(args.save_html, "spells-%s.html" % slug), "w",
+                             encoding="utf-8").write(html)
+                    yield slug, html
+                    time.sleep(args.delay)
+
+        for slug, html in pages():
+            got = parse_spell_list(html)
+            for spell_id, entry in got.items():
+                cache["spells"][spell_id] = dict(entry, slug=slug)
+            save_cache(cache)
+            print("  %-15s %d spell, %d con il livello del trainer" % (slug, len(got),
+                  sum(1 for e in got.values() if trainer_level(e))))
+        out = write_trainer_tsv(cache)
+        print("in cache %d spell | con il livello del trainer %d -> %s"
+              % (len(cache["spells"]), len(out), TRAINER_OUT))
+        return
 
     if args.lists:
         from wowhead_browser import Browser, Refused

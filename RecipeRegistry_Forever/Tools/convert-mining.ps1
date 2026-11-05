@@ -28,6 +28,10 @@
 # ripiego la riporterebbe in vita. Per distinguerle serve il SkillLineAbility
 # del dataset da cui il bundle e' nato (-Dataset): di norma si trova da solo
 # nella cache del datamining, dal nome scritto nel manifest del bundle.
+#
+# Dallo stesso file viene come si impara ogni ricetta (AcquireMethod), che il
+# bundle non porta: 1 vuol dire che il gioco la da' da sola quando il mestiere
+# arriva a MinSkillLineRank. Linen Bag su Forever e' cosi', a 1.
 param(
     [Parameter(Mandatory = $true)][string]$MiningBundle,
     [string[]]$FallbackBundle,
@@ -48,7 +52,9 @@ $ErrorActionPreference = 'Stop'
 #   7  + la struttura: per ricetta mestiere, oggetto prodotto, categoria,
 #        reagenti, nome e `since`; MiningCategories, MiningBuilds e
 #        MiningStructure, che dice al generatore che quei campi ci sono
-$format = 7
+#   8  + acquireMethod: come si impara la ricetta, da SkillLineAbility del
+#        dataset; 1 = da sola, quando il mestiere arriva a MinSkillLineRank
+$format = 8
 $marker = "-- formato: $format"
 
 $MiningBundle = (Resolve-Path -LiteralPath $MiningBundle).Path
@@ -142,29 +148,36 @@ foreach ($category in $categories) { $knownCategories[[string]$category.id] = $t
 # dump non mostra, il gioco lo nasconde; cio' che e' arrivato dopo e' nuovo.
 $since = @{}
 
+# Il SkillLineAbility della build corrente. Serve due volte: al ripiego, per
+# sapere quali spell la build elenca ancora -- senza, porta tutto, come prima,
+# e una ricetta tolta resterebbe viva -- e a ogni ricetta, per come si impara.
+if (-not $Dataset) {
+    $manifestPath = Join-Path (Split-Path -Parent $MiningBundle) 'manifest.json'
+    if (Test-Path -LiteralPath $manifestPath) {
+        $datasetName = (Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json).source.dataset
+        # <repo>\out\bundle\<ref>\recipes.json oppure <repo>\data\bundles\<ref>\recipes.json
+        $miningRepo = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $MiningBundle)))
+        $guess = Join-Path $miningRepo "cache\datasets\$datasetName"
+        if ($datasetName -and (Test-Path -LiteralPath (Join-Path $guess 'SkillLineAbility.csv'))) { $Dataset = $guess }
+    }
+}
+$listed = $null
+# Per spell e skill line: uno spell puo' stare su piu' skill line (Minor
+# Rejuvenation Potion e' anche sotto la 56), e conta la riga del suo mestiere.
+$acquireMethods = @{}
+if ($Dataset) {
+    $listed = @{}
+    foreach ($row in (Import-Csv -LiteralPath (Join-Path $Dataset 'SkillLineAbility.csv'))) {
+        $listed[[string]$row.Spell] = $true
+        if ($row.AcquireMethod -match '^\d+$') { $acquireMethods["$($row.Spell):$($row.SkillLine)"] = [int]$row.AcquireMethod }
+    }
+} else {
+    Write-Warning "SkillLineAbility della build corrente non trovato: niente acquireMethod, e il ripiego porta anche le ricette uscite dal gioco."
+}
+
 $carried = New-Object System.Collections.Generic.List[string]
 $removedSpells = New-Object System.Collections.Generic.List[string]
 if ($FallbackBundle) {
-    # Gli spell che la build corrente elenca ancora. Senza, il ripiego porta
-    # tutto, come prima, e lo si dice: una ricetta tolta resterebbe viva.
-    if (-not $Dataset) {
-        $manifestPath = Join-Path (Split-Path -Parent $MiningBundle) 'manifest.json'
-        if (Test-Path -LiteralPath $manifestPath) {
-            $datasetName = (Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json).source.dataset
-            # <repo>\out\bundle\<ref>\recipes.json oppure <repo>\data\bundles\<ref>\recipes.json
-            $miningRepo = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $MiningBundle)))
-            $guess = Join-Path $miningRepo "cache\datasets\$datasetName"
-            if ($datasetName -and (Test-Path -LiteralPath (Join-Path $guess 'SkillLineAbility.csv'))) { $Dataset = $guess }
-        }
-    }
-    $listed = $null
-    if ($Dataset) {
-        $listed = @{}
-        foreach ($row in (Import-Csv -LiteralPath (Join-Path $Dataset 'SkillLineAbility.csv'))) { $listed[[string]$row.Spell] = $true }
-    } else {
-        Write-Warning "SkillLineAbility della build corrente non trovato: il ripiego porta anche le ricette uscite dal gioco."
-    }
-
     $known = @{}
     foreach ($row in $rows) { if ($null -ne $row.spellId) { $known[[string]$row.spellId] = $true } }
     $neededItems = @{}
@@ -241,6 +254,8 @@ foreach ($row in $rows) {
     }
     if ($row.recipeItemId) { $parts.Add("recipeItemId = $($row.recipeItemId)") }
     if ($row.recipeItemRequiredSkillRank) { $parts.Add("recipeItemSkill = $($row.recipeItemRequiredSkillRank)") }
+    $acquireKey = "$($row.spellId):$($row.skillLine)"
+    if ($acquireMethods.ContainsKey($acquireKey)) { $parts.Add("acquireMethod = $($acquireMethods[$acquireKey])") }
     if ($structure) {
         $key = [string]$row.spellId
         if ($row.profession) { $parts.Add("profession = '$($row.profession)'") }
