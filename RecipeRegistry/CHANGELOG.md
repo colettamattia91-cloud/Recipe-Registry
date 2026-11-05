@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.3.1] - 2026-11-05
+
+### Fixed
+
+- **Vendor names with quotation marks show correctly.**
+
 ## [2.3.0] - 2026-09-06
 
 ### Added

@@ -1,8 +1,8 @@
 ## Interface: 20506
 ## Title: Recipe Registry
 ## Notes: Lean guild profession tracker with owner-driven sync and metadata-backed recipe browsing
-## Author: OpenAI + User collaboration
-## Version: 2.3.0
+## Author: Kaedros
+## Version: 2.3.1
 ## X-Build-Channel: release
 ## X-Build-ID: release
 ## SavedVariables: RecipeRegistryDB,RecipeRegistryLogDB
