@@ -2,6 +2,18 @@
 
 All notable changes to this addon are documented in this file.
 
+## [Unreleased]
+
+### Changed
+
+- **Less sync traffic between guildmates whose data cannot match.**
+
+### Fixed
+
+- **Sync keeps going after combat** instead of pausing for a few seconds.
+- **A guildmate who cannot answer a sync request now says so**, and the next
+  one is asked right away instead of after a minute.
+
 ## [0.1.5] - 2026-11-06
 
 ### Changed

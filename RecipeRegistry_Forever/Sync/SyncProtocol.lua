@@ -76,6 +76,21 @@ local function applyOwnerProfessionDeclaration(self, ownerKey, professions, comm
     return data:ApplyOwnerProfessionDeclaration(ownerKey, professions)
 end
 
+-- Una richiesta buttata prima di arrivare al suo gestore -- seed in istanza,
+-- compagno che non risulta -- riceve comunque un no, con il motivo: altrimenti
+-- chi l'ha mandata aspetta il timeout. Solo per le due richieste che
+-- aspettano una risposta; tutto il resto si butta come prima.
+local function refuseDroppedRequest(self, payload, peerKey, reason)
+    if not peerKey or type(payload) ~= "table" then
+        return
+    end
+    if payload.kind == "INDEX_DIFF_REQUEST" and self.SendIndexDiffBusy then
+        self:SendIndexDiffBusy(peerKey, payload, reason)
+    elseif payload.kind == "BLOCK_PULL_REQUEST" and self.SendBlockPullRefused then
+        self:SendBlockPullRefused(peerKey, payload, reason)
+    end
+end
+
 local function localProfessionDeclaration()
     local data = Addon.Data
     return data and data.GetDeclaredProfessionList and data:GetDeclaredProfessionList() or nil
@@ -204,6 +219,70 @@ function Sync:BroadcastHello()
     return false
 end
 
+-- I pezzi che non partono.
+--
+-- AceComm spezza un messaggio oltre i 255 byte in pezzi, e ChatThrottleLib li
+-- consegna al client uno alla volta. Se il client ne rifiuta uno, la libreria
+-- lo rimette in coda solo per il codice 3 (throttle): con qualunque altro
+-- codice lo butta, e chi riceve non riesce piu' a ricomporre il messaggio. Una
+-- richiesta di index diff da ~1 KB e' fatta di 4-5 pezzi, un SUMMARY di uno.
+-- Senza questa callback non lo sapremmo mai: ed e' una delle due spiegazioni
+-- dei seed che non rispondono. AceComm ci passa solo se il pezzo e' partito,
+-- non il codice; per sapere se succede basta.
+local function newSendTracker(kind, distribution, target)
+    return { kind = kind, distribution = distribution, target = target, failed = 0 }
+end
+
+local function onChunkSent(tracker, sentBytes, totalBytes, didSend)
+    if didSend ~= false or type(tracker) ~= "table" then
+        return
+    end
+    tracker.failed = tracker.failed + 1
+    local sync = Addon.Sync
+    if sync and sync.telemetry then
+        sync.telemetry.sendChunksFailed = (sync.telemetry.sendChunksFailed or 0) + 1
+        sync.telemetry.lastSendChunkFailedKind = tracker.kind
+        sync.telemetry.lastSendChunkFailedTarget = tracker.target
+    end
+    -- un pezzo perso basta a perdere il messaggio: si scrive il primo
+    if tracker.failed == 1 then
+        Addon:Tracef("sync",
+            "send-chunk-failed kind=%s via=%s target=%s at=%s/%s",
+            tostring(tracker.kind or "unknown"),
+            tostring(tracker.distribution or "unknown"),
+            tostring(tracker.target or "-"),
+            tostring(sentBytes or "?"),
+            tostring(totalBytes or "?")
+        )
+    end
+end
+
+-- Un rifiuto -- busy all'index diff, BLOCK_PULL_REFUSED -- non passa da
+-- CanRunSyncProtocol: si rifiuta proprio quando non si e' pronti, e un seed in
+-- warmup che non puo' nemmeno dire "non posso" lascia chi chiede ad aspettare
+-- il timeout. E' un sussurro di poche decine di byte.
+function Sync:SendRefusalEnvelope(kind, payload, targetKey)
+    if self:IsRealTrafficSuppressed() then
+        if Addon.MockSync and Addon.MockSync.RecordSuppressedSend then
+            Addon.MockSync:RecordSuppressedSend()
+        end
+        return false
+    end
+    local target = self:GetWhisperTarget(targetKey)
+    if not target then
+        return false
+    end
+    payload.kind = kind
+    payload.sender = self:GetSelfKey()
+    local msg = self:EncodeWirePayload(payload)
+    if msg then
+        self:SendCommMessage(PREFIX, msg, "WHISPER", target, "ALERT",
+            onChunkSent, newSendTracker(kind, "WHISPER", targetKey))
+        return true
+    end
+    return false
+end
+
 function Sync:SendGuildEnvelope(kind, payload, priority)
     local allowed = true
     if self.CanRunSyncProtocol then
@@ -231,7 +310,8 @@ function Sync:SendGuildEnvelope(kind, payload, priority)
     end
     local msg = self:EncodeWirePayload(payload)
     if msg then
-        self:SendCommMessage(PREFIX, msg, "GUILD", nil, priority or "NORMAL")
+        self:SendCommMessage(PREFIX, msg, "GUILD", nil, priority or "NORMAL",
+            onChunkSent, newSendTracker(kind, "GUILD", nil))
         return true
     end
     return false
@@ -268,7 +348,8 @@ function Sync:SendDirectEnvelope(kind, payload, targetKey, priority)
     end
     local msg = self:EncodeWirePayload(payload)
     if msg then
-        self:SendCommMessage(PREFIX, msg, "WHISPER", target, priority or "NORMAL")
+        self:SendCommMessage(PREFIX, msg, "WHISPER", target, priority or "NORMAL",
+            onChunkSent, newSendTracker(kind, "WHISPER", targetKey))
         return true
     end
     return false
@@ -338,6 +419,7 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
                 tostring(payload.kind or "unknown"),
                 tostring(peerKey or "unknown")
             )
+            refuseDroppedRequest(self, payload, peerKey, "not-accepted")
             return
         end
     end
@@ -350,6 +432,7 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
             tostring(peerKey or payload.sender or "unknown"),
             tostring(pauseReason)
         )
+        refuseDroppedRequest(self, payload, peerKey, "paused:" .. tostring(pauseReason))
         return
     end
 
@@ -369,6 +452,10 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
         self:HandleBlockPullRequest(payload, distribution, sender)
     elseif payload.kind == "BLOCK_SNAPSHOT" then
         self:HandleBlockSnapshot(payload, distribution, sender)
+    elseif payload.kind == "BLOCK_PULL_REFUSED" then
+        if self.HandleReceivedBlockPullRefused then
+            self:HandleReceivedBlockPullRefused(payload)
+        end
     else
         recordUnsupportedMessage(self, payload.kind, payload.sender)
     end
@@ -380,6 +467,10 @@ function Sync:HandleHello(payload, _distribution, commSender)
     end
     self._lastHelloSeenAt = self._lastHelloSeenAt or {}
     self._lastHelloSeenAt[payload.key] = time()
+    -- l'impronta con cui questo compagno, fra poco, ci manda il suo digest:
+    -- e' quella del suo HELLO, perche' ci elegge da questo suo giro
+    self._peerHelloFingerprints = self._peerHelloFingerprints or {}
+    self._peerHelloFingerprints[payload.key] = payload.globalFingerprint
     if self.RecordPeerCaps then
         self:RecordPeerCaps(payload.sender or payload.key, payload.caps)
     end
@@ -408,8 +499,28 @@ function Sync:HandleHello(payload, _distribution, commSender)
         reason = "hello-response",
         allowDeferred = true,
     }) or nil
-    if shouldSendSummaryForHello(self, payload, localSummary) then
-        self:SendSummary(payload.sender or payload.key, payload.helloId)
+    local peerForSummary = payload.sender or payload.key
+    local sterileServe = false
+    if shouldSendSummaryForHello(self, payload, localSummary)
+        and self._sterilePairs and self._sterilePairs.serve and self._sterilePairs.serve[peerForSummary]
+        and self.IsSterilePair
+    then
+        -- l'ultima volta che ci ha chiesto, con questa sua impronta e con la
+        -- nostra, non avevamo niente da dargli: un SUMMARY lo farebbe solo
+        -- tornare a chiedere, vedi le coppie sterili in SyncRuntime
+        local settled = self:GetSettledLocalFingerprint("hello-response")
+        sterileServe = settled ~= nil
+            and self:IsSterilePair("serve", peerForSummary, payload.globalFingerprint, settled)
+    end
+    if sterileServe then
+        self.telemetry.summarySuppressedSterile = (self.telemetry.summarySuppressedSterile or 0) + 1
+        Addon:Tracef("sync",
+            "summary-suppressed peer=%s reason=sterile-pair remoteFp=%s",
+            tostring(peerForSummary or "unknown"),
+            tostring(payload.globalFingerprint or "nil")
+        )
+    elseif shouldSendSummaryForHello(self, payload, localSummary) then
+        self:SendSummary(peerForSummary, payload.helloId)
     else
         local suppressReason = "unknown"
         if type(localSummary) ~= "table" then
@@ -563,15 +674,34 @@ function Sync:HandleIndexDiffRequest(payload)
         tostring(payload.requestId or "none"),
         type(payload.blocks) == "table" and Private.countKeys(payload.blocks) or 0
     )
+    -- Ogni "no" qui sotto risponde con un busy e il suo motivo. Fino alla 0.1.5
+    -- erano return muti: chi chiedeva aspettava 60 s, e il seed non ne
+    -- scriveva nemmeno il motivo nel log.
     if self.CanServeInboundSeed then
-        local allowed = self:CanServeInboundSeed(payload.sender)
+        local allowed, serveReason = self:CanServeInboundSeed(payload.sender)
         if not allowed then
+            local reason = "not-ready:" .. tostring(serveReason or "not-ready")
+            Addon:Tracef("sync",
+                "index-diff-refused peer=%s requestId=%s reason=%s",
+                tostring(payload.sender or "unknown"),
+                tostring(payload.requestId or "none"),
+                reason
+            )
+            self:SendIndexDiffBusy(payload.sender, payload, reason)
             return
         end
     end
 
     local response = self.BuildIndexDiffResponseForRequest and self:BuildIndexDiffResponseForRequest(payload) or nil
     if type(response) ~= "table" or response.ready ~= true then
+        local reason = "index-not-ready:" .. tostring(type(response) == "table" and response.indexStatus or "none")
+        Addon:Tracef("sync",
+            "index-diff-refused peer=%s requestId=%s reason=%s",
+            tostring(payload.sender or "unknown"),
+            tostring(payload.requestId or "none"),
+            reason
+        )
+        self:SendIndexDiffBusy(payload.sender, payload, reason)
         return
     end
 
@@ -590,8 +720,17 @@ function Sync:HandleIndexDiffRequest(payload)
 
     if self.SendPreparedIndexDiffResponse then
         local sent = self:SendPreparedIndexDiffResponse(payload.sender, payload, response)
-        if not sent and reserved and self.ClearInboundSeedSession then
-            self:ClearInboundSeedSession(payload.sender, payload.requestId, "index-diff-send-failed")
+        if not sent then
+            if reserved and self.ClearInboundSeedSession then
+                self:ClearInboundSeedSession(payload.sender, payload.requestId, "index-diff-send-failed")
+            end
+            self:SendIndexDiffBusy(payload.sender, payload, "response-not-sent")
+        elseif #offeredBlocks == 0 and self.RecordSterilePair then
+            -- niente da dargli: con queste due impronte non ci sara' mai, e il
+            -- prossimo HELLO uguale non riceve il SUMMARY che lo farebbe tornare
+            local requesterFp = self._peerHelloFingerprints and self._peerHelloFingerprints[payload.sender] or nil
+            local settled = self:GetSettledLocalFingerprint("index-diff-serve")
+            self:RecordSterilePair("serve", payload.sender, requesterFp, settled, "no-offer")
         end
     end
 end
@@ -618,6 +757,9 @@ function Sync:HandleBlockPullRequest(payload)
             tostring(requestId or "none"),
             tostring(protoReason or "not-ready")
         )
+        -- da qui in giu' ogni rifiuto lo dice a chi chiede: vedi
+        -- SendBlockPullRefused in SyncTransfer
+        self:SendBlockPullRefused(senderKey, payload, "not-ready:" .. tostring(protoReason or "not-ready"))
         return
     end
     if self.CanServeInboundSeed then
@@ -630,6 +772,7 @@ function Sync:HandleBlockPullRequest(payload)
                 tostring(requestId or "none"),
                 tostring(serveReason or "not-ready")
             )
+            self:SendBlockPullRefused(senderKey, payload, "not-ready:" .. tostring(serveReason or "not-ready"))
             return
         end
     end
@@ -650,6 +793,9 @@ function Sync:HandleBlockPullRequest(payload)
             tostring(blockKey or "none"),
             tostring(requestId or "none")
         )
+        -- la sessione non c'e' piu' -- scaduta, o chiusa da un warmup o da
+        -- un'istanza: per chi chiede e' il seed a non potere, non il blocco
+        self:SendBlockPullRefused(senderKey, payload, "unknown-request")
         return
     end
     if type(inboundSession.offeredBlocks) == "table" and inboundSession.offeredBlocks[blockKey] ~= true then
@@ -669,12 +815,23 @@ function Sync:HandleBlockPullRequest(payload)
             tostring(requestId or "none"),
             tonumber(inboundSession.offeredBlockCount or 0) or 0
         )
+        self:SendBlockPullRefused(senderKey, payload, "block-not-offered")
         return
     end
     inboundSession.lastActivity = time()
     inboundSession.servedBlocks = tonumber(inboundSession.servedBlocks or 0) or 0
     if self.SendBlockSnapshot then
-        local sent = self:SendBlockSnapshot(payload and payload.sender, payload)
+        local sent, notSentReason = self:SendBlockSnapshot(payload and payload.sender, payload)
+        if not sent then
+            Addon:Tracef("sync",
+                "block-pull-rejected peer=%s block=%s requestId=%s reason=%s",
+                tostring(senderKey or "unknown"),
+                tostring(blockKey or "none"),
+                tostring(requestId or "none"),
+                tostring(notSentReason or "send-failed")
+            )
+            self:SendBlockPullRefused(senderKey, payload, tostring(notSentReason or "send-failed"))
+        end
         if sent then
             inboundSession.servedBlocks = inboundSession.servedBlocks + 1
             inboundSession.lastActivity = time()

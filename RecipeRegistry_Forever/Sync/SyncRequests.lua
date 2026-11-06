@@ -7,6 +7,13 @@ local time = time
 local max = math.max
 
 local SESSION_TIMEOUT = Constants.SESSION_TIMEOUT
+-- Quanto si aspetta la risposta a un index diff prima di passare al candidato
+-- dopo. Prima l'unico limite era SESSION_TIMEOUT, 60 s, e poi si aspettava il
+-- prossimo HELLO: un seed muto costava un giro intero. 30 s coprono il caso
+-- peggiore misurato il 06/11 -- un digest di 600 blocchi pesa ~6,8 KB, cioe'
+-- ~8,5 s per uscire a 800 B/s, piu' una coda di SUMMARY sul seed di ~11 s con
+-- 40 compagni online -- e i seed nuovi, quando non possono, rispondono busy.
+local INDEX_DIFF_RESPONSE_TIMEOUT_SECONDS = 30
 -- BLOCK_PULL_DELAY_SECONDS and BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS now
 -- resolve via Sync:GetBlockPullDelay() / :GetBlockPullResponseTimeout()
 -- so the user-tunable values from the options panel take effect without
@@ -200,7 +207,11 @@ function Sync:BuildWantedBlockOrder(offeredBlocks, peerKey)
         end
         return tostring(left.blockKey or "") < tostring(right.blockKey or "")
     end)
-    return rows
+    -- Il secondo valore dice perche' un blocco offerto non si chiede. Conta per
+    -- le coppie sterili: un blocco segnato resta rifiutato finche' le
+    -- impronte non cambiano, uno saturo torna dopo il suo cooldown, e quindi
+    -- un "niente da chiedere" dovuto alla saturazione non e' sterile.
+    return rows, { ownerDropped = dropped, saturated = skipped }
 end
 
 function Sync:RequestIndexDiff(seedKey)
@@ -229,6 +240,10 @@ function Sync:RequestIndexDiff(seedKey)
 
     session.diffRequestId = string.format("DIFFREQ:%s:%d", tostring(seedKey), tonumber(time() or 0) or 0)
     session.diffSentAt = time()
+    -- l'impronta che descrive il digest appena costruito; nil se l'indice non e'
+    -- in ordine, e allora la coppia non si registra
+    session.localFingerprint = self.GetSettledLocalFingerprint
+        and self:GetSettledLocalFingerprint("index-diff-request") or nil
     session.lastProgressAt = session.diffSentAt
     session.state = "waiting-index-diff"
 
@@ -318,21 +333,23 @@ function Sync:SendPreparedIndexDiffResponse(targetKey, requestPayload, response)
     return sent, response
 end
 
+-- Il "no" del seed. Prima passava da CanRunSyncProtocol, e quindi taceva
+-- proprio quando serviva: un seed in warmup, o con l'indice da ricostruire,
+-- non poteva dire di non poter rispondere, e chi chiedeva aspettava 60 s. Un
+-- rifiuto e' un sussurro di poche decine di byte: parte sempre, con il motivo,
+-- e chi lo riceve passa al candidato dopo (HandleSeedBusy). Lo capiscono anche
+-- i client vecchi: e' l'INDEX_DIFF_RESPONSE con busy che conoscono gia'.
 function Sync:SendIndexDiffBusy(targetKey, requestPayload, reason)
-    local allowed = true
-    if self.CanRunSyncProtocol then
-        allowed = self:CanRunSyncProtocol("INDEX_DIFF_RESPONSE")
-    end
-    if not allowed or not self:IsValidSyncMemberKey(targetKey) then
+    if not self:IsValidSyncMemberKey(targetKey) then
         return false
     end
 
     local busyReason = tostring(reason or "busy")
-    local sent = self:SendDirectEnvelope("INDEX_DIFF_RESPONSE", {
+    local sent = self:SendRefusalEnvelope("INDEX_DIFF_RESPONSE", {
         requestId = requestPayload and requestPayload.requestId or nil,
         busy = true,
         reason = busyReason,
-    }, targetKey, "ALERT")
+    }, targetKey)
     if sent then
         self.telemetry.indexDiffBusySent = (self.telemetry.indexDiffBusySent or 0) + 1
         self.telemetry.lastIndexDiffBusyPeer = targetKey
@@ -403,7 +420,7 @@ function Sync:HandleReceivedIndexDiffResponse(payload)
     -- iterated by nextWantedIndex. Same source so share the list — two
     -- BuildWantedBlockOrder calls were doing two table sorts and two
     -- saturation-store walks for the same answer.
-    local orderedBlocks = self:BuildWantedBlockOrder(payload.offeredBlocks or {}, payload.sender)
+    local orderedBlocks, orderStats = self:BuildWantedBlockOrder(payload.offeredBlocks or {}, payload.sender)
     session.offeredBlocks = orderedBlocks
     session.wantedBlocks = orderedBlocks
     session.nextWantedIndex = 1
@@ -434,6 +451,13 @@ function Sync:HandleReceivedIndexDiffResponse(payload)
     )
 
     if #(session.wantedBlocks or {}) == 0 then
+        -- niente da prendere, e non per un cooldown che scade da solo: con
+        -- queste due impronte non verra' mai niente, vedi le coppie sterili
+        if (orderStats and orderStats.saturated or 0) == 0 and self.RecordSterilePair then
+            local offeredCount = #(payload.offeredBlocks or {})
+            self:RecordSterilePair("pull", payload.sender, session.seedFingerprint, session.localFingerprint,
+                offeredCount == 0 and "no-offer" or "owner-dropped")
+        end
         if self.CompleteOutboundSeedSession then
             self:CompleteOutboundSeedSession("index-diff-empty")
         end
@@ -550,9 +574,6 @@ end
 
 function Sync:ProcessRequestQueue()
     self:RefreshSyncReadyState("request-queue")
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic() then
-        return
-    end
 
     local session = self.outboundSeedSession
     if type(session) ~= "table" then
@@ -562,12 +583,31 @@ function Sync:ProcessRequestQueue()
         return
     end
 
-    local allowActivePullAdvance = self.CanAdvanceOutboundPullSession and self:CanAdvanceOutboundPullSession() or false
-    if self.syncReady ~= true and not allowActivePullAdvance then
+    -- I timeout prima di tutto. Erano dopo i due return qui sotto, e quindi
+    -- una sessione aperta un attimo prima di un'istanza, o con l'indice da
+    -- ricostruire, non scadeva mai: in istanza ProcessRequestQueue usciva
+    -- subito, e a indice non pronto anche -- mentre il rebuild completo
+    -- dell'indice aspetta, per scelta, che non ci siano sessioni aperte.
+    -- Trovato dalla gilda simulata il 06/11 (sync_sim_spec, caos).
+    local now = time()
+    local paused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic() or false
+    if session.state == "waiting-index-diff" and session.diffSentAt
+        and (now - session.diffSentAt) > INDEX_DIFF_RESPONSE_TIMEOUT_SECONDS
+    then
+        self.telemetry.indexDiffResponseTimeouts = (self.telemetry.indexDiffResponseTimeouts or 0) + 1
+        Addon:Tracef("sync",
+            "index-diff-timeout peer=%s requestId=%s waited=%d",
+            tostring(session.seedKey or "unknown"),
+            tostring(session.diffRequestId or "none"),
+            now - session.diffSentAt
+        )
+        if self.FallBackFromSeed then
+            self:FallBackFromSeed(session, "index-diff-timeout")
+        elseif self.AbortOutboundSeedSession then
+            self:AbortOutboundSeedSession("index-diff-timeout")
+        end
         return
     end
-
-    local now = time()
     local age = max(0, now - (session.lastProgressAt or session.startedAt or now))
     if age > SESSION_TIMEOUT then
         self.telemetry.lastBlockPullTimeoutAt = now
@@ -588,6 +628,14 @@ function Sync:ProcessRequestQueue()
             end
             return
         end
+    end
+
+    if paused then
+        return
+    end
+    local allowActivePullAdvance = self.CanAdvanceOutboundPullSession and self:CanAdvanceOutboundPullSession() or false
+    if self.syncReady ~= true and not allowActivePullAdvance then
+        return
     end
 
     if session.state == "seed-selected" then
