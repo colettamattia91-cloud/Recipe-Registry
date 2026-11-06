@@ -209,7 +209,8 @@ end
 
 -- I mestieri che il personaggio non ha piu', tolti dal suo blocco. Vale solo
 -- per il proprietario locale: di un compagno non sappiamo cosa abbia
--- abbandonato finche' non ce lo racconta lui.
+-- abbandonato finche' non ce lo racconta lui -- e ce lo racconta con
+-- GetDeclaredProfessionList, qui sotto.
 function Data:PruneDroppedProfessions()
     local current = self._currentProfs
     if type(current) ~= "table" or not next(current) then
@@ -241,6 +242,31 @@ function Data:PruneDroppedProfessions()
         Addon:Debug("Profession dropped, block removed:", professionKey)
     end
     return true
+end
+
+-- I mestieri del personaggio come li dichiara alla gilda, nel HELLO e nel
+-- SUMMARY. Il sync e' additivo: un blocco che il proprietario non ha piu'
+-- resta nelle repliche dei compagni per sempre, e loro lo rimandano agli altri
+-- come "missing". Visto in gioco il 06/11: un compagno passato a Alchemy
+-- risultava alla gilda con tre mestieri principali. Soltanto il proprietario
+-- sa cosa ha abbandonato, quindi lo dice lui.
+--
+-- La lista viene da _currentProfs, cioe' da GetProfessions in questa sessione,
+-- e non dal database: dopo una reinstallazione il database e' vuoto, e
+-- dichiararlo cancellerebbe il personaggio dalle repliche di tutta la gilda.
+-- Senza una risposta del client non si dichiara niente, per la stessa ragione
+-- per cui PruneDroppedProfessions non pota.
+function Data:GetDeclaredProfessionList()
+    local current = self._currentProfs
+    if type(current) ~= "table" or not next(current) then
+        return nil
+    end
+    local list = {}
+    for professionKey in pairs(current) do
+        list[#list + 1] = professionKey
+    end
+    table.sort(list)
+    return list
 end
 
 function Data:EnsureScanState()

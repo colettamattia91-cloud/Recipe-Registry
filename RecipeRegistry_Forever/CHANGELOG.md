@@ -2,6 +2,13 @@
 
 All notable changes to this addon are documented in this file.
 
+## [Unreleased]
+
+### Changed
+
+- **A guildmate who drops a profession stops showing it.** Both of you need
+  this version.
+
 ## [0.1.4] - 2026-11-05
 
 ### Added
