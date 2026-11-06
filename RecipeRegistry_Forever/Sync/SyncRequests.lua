@@ -152,10 +152,21 @@ end
 function Sync:BuildWantedBlockOrder(offeredBlocks, peerKey)
     local rows = {}
     local skipped = 0
+    local dropped = 0
+    -- Un blocco che il proprietario ha detto di non avere piu' non si chiede:
+    -- chi lo offre non ha ancora sentito la dichiarazione. Se il seed e' il
+    -- proprietario stesso, lo offre perche' l'ha ripreso, e lo si prende.
+    local data = Addon.Data
+    local canCheckDropped = data and data.IsSyncBlockDroppedByOwner and data.ParseSyncBlockKey
     for index = 1, #(offeredBlocks or {}) do
         local row = offeredBlocks[index]
         if type(row) == "table" and type(row.blockKey) == "string" and row.blockKey ~= "" then
-            if self:IsBlockFingerprintSaturated(row.blockKey, row.fingerprint) then
+            if canCheckDropped
+                and data:ParseSyncBlockKey(row.blockKey) ~= peerKey
+                and data:IsSyncBlockDroppedByOwner(row.blockKey)
+            then
+                dropped = dropped + 1
+            elseif self:IsBlockFingerprintSaturated(row.blockKey, row.fingerprint) then
                 skipped = skipped + 1
             else
                 rows[#rows + 1] = {
@@ -172,6 +183,14 @@ function Sync:BuildWantedBlockOrder(offeredBlocks, peerKey)
             "block-fingerprint-saturation-skip peer=%s skipped=%d kept=%d",
             tostring(peerKey or "unknown"),
             skipped,
+            #rows
+        )
+    end
+    if dropped > 0 then
+        Addon:Tracef("sync",
+            "block-owner-dropped-skip peer=%s skipped=%d kept=%d",
+            tostring(peerKey or "unknown"),
+            dropped,
             #rows
         )
     end

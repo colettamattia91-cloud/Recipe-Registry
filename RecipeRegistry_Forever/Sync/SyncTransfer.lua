@@ -107,8 +107,10 @@ function Sync:HandleReceivedBlockSnapshot(payload)
     local applied = false
     local result = nil
     if Addon.Data and Addon.Data.ApplyIncomingBlockAdditive then
+        local blockOwner = Addon.Data.ParseSyncBlockKey and Addon.Data:ParseSyncBlockKey(payload.blockKey) or nil
         applied, result = Addon.Data:ApplyIncomingBlockAdditive(payload.blockKey, incomingPayload, {
             sourceType = payload.sender == ((payload.blockPayload and payload.blockPayload.ownerCharacter) or payload.ownerCharacter) and "owner" or "replica",
+            fromOwner = blockOwner ~= nil and payload.sender == blockOwner,
         })
     end
     if not applied then

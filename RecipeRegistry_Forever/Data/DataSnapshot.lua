@@ -7,6 +7,112 @@ local pairs = pairs
 local tostring = tostring
 
 local countRecipeKeys = Private.countRecipeKeys
+local TRACKED = Private.TRACKED
+
+-- Un blocco che il proprietario ha detto di non avere piu'. Il sync e'
+-- additivo e un compagno che non ha sentito la dichiarazione continua a
+-- offrirlo come "missing": senza questo cancello lo si ritirerebbe al primo
+-- sync con lui, e il mestiere abbandonato tornerebbe fino al prossimo HELLO
+-- del proprietario.
+--
+-- Per il personaggio locale l'autorita' e' GetProfessions, gia' in
+-- _currentProfs: il proprietario non si riprende dai compagni un mestiere che
+-- non ha piu'. Per un compagno e' il segno lasciato dalla sua dichiarazione,
+-- e vale solo per i mestieri che quella dichiarazione ha tolto: un mestiere
+-- nuovo arriva da chiunque, senza aspettare di incontrare il proprietario.
+function Data:IsProfessionDroppedByOwner(ownerCharacter, professionKey)
+    if not ownerCharacter or not professionKey then
+        return false
+    end
+    if ownerCharacter == self:GetPlayerKey() then
+        local current = self._currentProfs
+        return type(current) == "table" and next(current) ~= nil and not current[professionKey]
+    end
+    local entry = self:GetMember(ownerCharacter)
+    local dropped = type(entry) == "table" and entry.droppedProfessions or nil
+    return type(dropped) == "table" and dropped[professionKey] == true
+end
+
+function Data:IsSyncBlockDroppedByOwner(blockKey)
+    local ownerCharacter, professionKey = self:ParseSyncBlockKey(blockKey)
+    return self:IsProfessionDroppedByOwner(ownerCharacter, professionKey)
+end
+
+-- Quello che il proprietario dice di avere, arrivato col suo HELLO o col suo
+-- SUMMARY: i blocchi dei mestieri che non nomina se ne vanno, e restano
+-- segnati perche' un compagno rimasto indietro non li rimetta. Solo dalla
+-- bocca del proprietario -- il chiamante passa il mittente del messaggio,
+-- mai l'owner di un blocco -- e solo per un personaggio che si conosce gia':
+-- una dichiarazione non crea voci.
+--
+-- Una lista vuota o assente vuol dire "non lo so" (client vecchio, oppure
+-- GetProfessions non ha ancora risposto), non "nessun mestiere": non pota
+-- niente.
+function Data:ApplyOwnerProfessionDeclaration(ownerCharacter, professionList)
+    if not ownerCharacter or ownerCharacter == self:GetPlayerKey() then
+        return false
+    end
+    if type(professionList) ~= "table" then
+        return false
+    end
+    local declared = {}
+    for _, name in ipairs(professionList) do
+        if type(name) == "string" then
+            local canonical = self:GetCanonicalProfession(name)
+            if TRACKED[canonical] then
+                declared[canonical] = true
+            end
+        end
+    end
+    if not next(declared) then
+        return false
+    end
+    local entry = self:GetMember(ownerCharacter)
+    if type(entry) ~= "table" then
+        return false
+    end
+
+    -- un mestiere ripreso: il segno se ne va, e il blocco puo' tornare da
+    -- chiunque lo abbia
+    if type(entry.droppedProfessions) == "table" then
+        for professionKey in pairs(declared) do
+            entry.droppedProfessions[professionKey] = nil
+        end
+        if not next(entry.droppedProfessions) then
+            entry.droppedProfessions = nil
+        end
+    end
+
+    local dropped = {}
+    for professionKey in pairs(entry.professions or {}) do
+        if not declared[professionKey] then
+            dropped[#dropped + 1] = professionKey
+        end
+    end
+    if #dropped == 0 then
+        return false
+    end
+    table.sort(dropped)
+
+    entry.droppedProfessions = entry.droppedProfessions or {}
+    for _, professionKey in ipairs(dropped) do
+        entry.professions[professionKey] = nil
+        entry.droppedProfessions[professionKey] = true
+        if self.MarkSyncIndexDirty then
+            self:MarkSyncIndexDirty("owner-dropped-profession", self:BuildSyncBlockKey(ownerCharacter, professionKey))
+        end
+    end
+    -- chi sa fare cosa cambia, e una ricetta che solo lui sapeva sparisce
+    -- dalle liste: lo stesso giro di un cambio di cassetto
+    self:InvalidateRecipeCaches("members")
+    Addon:Tracef("sync",
+        "owner-dropped-professions owner=%s dropped=[%s]",
+        tostring(ownerCharacter),
+        table.concat(dropped, ",")
+    )
+    Addon:RequestRefresh("owner-dropped-profession")
+    return true, dropped
+end
 
 function Data:GetLocalSummary()
     if self.BuildLocalSummary then
@@ -33,6 +139,34 @@ function Data:ApplyIncomingBlockAdditive(blockKey, snapshot, opts)
     local ownerCharacter, professionKey = self:ParseSyncBlockKey(blockKey)
     if not ownerCharacter or not professionKey then
         return false, "invalid-block-key"
+    end
+
+    -- BuildWantedBlockOrder non lo chiede nemmeno; questo e' per ogni altra
+    -- strada. Un rifiuto non e' un errore: il sync prosegue col blocco dopo.
+    -- Se a mandarlo e' il proprietario stesso, l'ha ripreso, e vale lui.
+    if opts.fromOwner == true then
+        local entry = self:GetMember(ownerCharacter)
+        if type(entry) == "table" and type(entry.droppedProfessions) == "table" then
+            entry.droppedProfessions[professionKey] = nil
+            if not next(entry.droppedProfessions) then
+                entry.droppedProfessions = nil
+            end
+        end
+    end
+    if self:IsProfessionDroppedByOwner(ownerCharacter, professionKey) then
+        Addon:Tracef("sync",
+            "block-refused-owner-dropped block=%s",
+            tostring(blockKey)
+        )
+        return true, {
+            blockKey = blockKey,
+            ownerCharacter = ownerCharacter,
+            professionKey = professionKey,
+            changed = false,
+            addedRecipes = 0,
+            specializationChanged = false,
+            refused = "owner-dropped",
+        }
     end
 
     -- Membership classification (`guildStatus`) is owned by the trusted-roster

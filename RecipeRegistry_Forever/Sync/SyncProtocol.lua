@@ -29,6 +29,58 @@ local function recordUnsupportedMessage(self, kind, senderKey)
     )
 end
 
+-- I mestieri del mittente, letti dal suo HELLO o dal suo SUMMARY: vedi
+-- Data:GetDeclaredProfessionList per chi la scrive e
+-- Data:ApplyOwnerProfessionDeclaration per cosa ne fa chi la riceve. Un campo
+-- in piu' che i client vecchi ignorano; da un client vecchio non arriva, e
+-- allora non si pota niente. Solo a sync pronto: prima il cassetto di gilda
+-- puo' non essere ancora quello giusto.
+--
+-- E solo se il messaggio viene davvero dal proprietario. Il mittente scritto
+-- nel payload lo scrive chi manda, e nessuno lo confronta con quello che dice
+-- il client: finche' il sync sapeva solo aggiungere, un falso poteva al
+-- massimo inventare ricette; una dichiarazione falsa cancellerebbe i mestieri
+-- di un altro dal database di tutta la gilda. Quindi qui si confronta col
+-- mittente di CHAT_MSG_ADDON, passato da OnCommReceived. Sul live arriva nudo,
+-- "Nome Cognome" (verificato il 05/11 in gilda e in sussurro); se un giorno
+-- arrivasse in un'altra forma il confronto fallirebbe, e si salterebbe solo la
+-- potatura -- il resto del sync non passa di qui.
+local function isFromOwner(ownerKey, commSender)
+    if type(commSender) ~= "string" or commSender == "" then
+        return false
+    end
+    local data = Addon.Data
+    local senderKey = data and data.MemberKeyFromFullName and data:MemberKeyFromFullName(commSender) or commSender
+    return senderKey == ownerKey
+end
+
+local function applyOwnerProfessionDeclaration(self, ownerKey, professions, commSender)
+    if type(professions) ~= "table" or self.syncReady ~= true then
+        return false
+    end
+    if not self:IsValidSyncMemberKey(ownerKey) then
+        return false
+    end
+    if not isFromOwner(ownerKey, commSender) then
+        Addon:Tracef("sync",
+            "owner-declaration-ignored owner=%s sender=%s reason=sender-mismatch",
+            tostring(ownerKey),
+            tostring(commSender or "none")
+        )
+        return false
+    end
+    local data = Addon.Data
+    if not (data and data.ApplyOwnerProfessionDeclaration) then
+        return false
+    end
+    return data:ApplyOwnerProfessionDeclaration(ownerKey, professions)
+end
+
+local function localProfessionDeclaration()
+    local data = Addon.Data
+    return data and data.GetDeclaredProfessionList and data:GetDeclaredProfessionList() or nil
+end
+
 local function shouldSendSummaryForHello(self, helloPayload, localSummary)
     if type(localSummary) ~= "table" then
         return false
@@ -110,6 +162,7 @@ function Sync:BroadcastHello()
         activeBlockCount = summary.activeBlockCount or 0,
         activeContentCount = summary.activeContentCount or 0,
         globalFingerprint = summary.globalFingerprint,
+        professions = localProfessionDeclaration(),
     }, "ALERT")
     if sent then
         self.lastHelloAt = time()
@@ -321,7 +374,7 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
     end
 end
 
-function Sync:HandleHello(payload)
+function Sync:HandleHello(payload, _distribution, commSender)
     if not self:IsValidSyncMemberKey(payload.key) then
         return
     end
@@ -380,6 +433,9 @@ function Sync:HandleHello(payload)
             tostring(payload.globalFingerprint or "nil")
         )
     end
+    -- dopo la risposta, non prima: il SUMMARY parte con l'impronta che il
+    -- mittente ha visto diversa, e la potatura la cambia di nuovo
+    applyOwnerProfessionDeclaration(self, payload.key, payload.professions, commSender)
 end
 
 function Sync:SendSummary(targetKey, helloId)
@@ -435,6 +491,7 @@ function Sync:SendSummary(targetKey, helloId)
         activeBlockCount = summary.activeBlockCount or 0,
         activeContentCount = summary.activeContentCount or 0,
         globalFingerprint = summary.globalFingerprint,
+        professions = localProfessionDeclaration(),
     }, targetKey, "ALERT")
     if sent then
         self.telemetry.summarySent = (self.telemetry.summarySent or 0) + 1
@@ -459,7 +516,7 @@ function Sync:SendSummary(targetKey, helloId)
     return sent
 end
 
-function Sync:HandleSummary(payload)
+function Sync:HandleSummary(payload, _distribution, commSender)
     local peerKey = self:IsValidSyncMemberKey(payload.sender) and payload.sender or nil
     if not peerKey then
         return
@@ -485,6 +542,7 @@ function Sync:HandleSummary(payload)
     if self.RecordSummary then
         self:RecordSummary(peerKey, payload)
     end
+    applyOwnerProfessionDeclaration(self, peerKey, payload.professions, commSender)
 end
 
 function Sync:HandleIndexDiffRequest(payload)
