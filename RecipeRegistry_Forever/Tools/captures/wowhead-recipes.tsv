@@ -51,9 +51,9 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	bossDrop	worldDrop	not
 3928	4408	Mechanical Squirrel	worldDrop					true	wowhead, elenco
 3933	4409	Small Seaforium Charge	worldDrop					true	wowhead, elenco
 3940	4410	Shadow Goggles	worldDrop					true	wowhead, elenco
-3944	4411	Flame Deflector	drop		Gnomeregan				wowhead, elenco
+3944	4411	Flame Deflector	drop	Mekgineer Thermaplugg	Gnomeregan				wowhead, elenco
 3954	4412	Moonsight Rifle	worldDrop					true	wowhead, elenco
-3959	4413	Discombobulator Ray	drop		Gnomeregan				wowhead, elenco
+3959	4413	Discombobulator Ray	drop	Mekgineer Thermaplugg	Gnomeregan				wowhead, elenco
 3960	4414	Portable Bronze Mortar	worldDrop					true	wowhead, elenco
 3968	4416	Goblin Land Mine	worldDrop					true	wowhead, elenco
 3972	4417	Large Seaforium Charge	worldDrop					true	wowhead, elenco
@@ -90,7 +90,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	bossDrop	worldDrop	not
 8784	7090	Green Silk Armor	worldDrop					true	wowhead, elenco
 8782	7091	Truefaith Gloves	worldDrop					true	wowhead, elenco
 8780	7092	Hands of Darkness	worldDrop					true	wowhead, elenco
-8895	7192	Goblin Rocket Boots	drop		Gnomeregan				wowhead, elenco
+8895	7192	Goblin Rocket Boots	drop	Mekgineer Thermaplugg	Gnomeregan				wowhead, elenco
 9064	7288	Rugged Leather Pants	worldDrop					true	wowhead, elenco
 3765	7360	Dark Leather Gloves	worldDrop					true	wowhead, elenco
 9147	7362	Earthen Leather Shoulders	vendor	Zixil	Hillsbrad Foothills				wowhead, elenco
@@ -165,7 +165,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	bossDrop	worldDrop	not
 15296	11612	Dark Iron Plate	drop	Ribbly Screwspigot	Blackrock Depths				wowhead, elenco
 15293	11614	Dark Iron Mail	container	Blacksmithing Plans	Blackrock Depths				wowhead, elenco
 15295	11615	Dark Iron Shoulders	container	Blacksmithing Plans	Blackrock Depths				wowhead, elenco
-	11813		drop	Lord Roccor	Blackrock Depths				wowhead, elenco
+15596	11813	Smoking Heart of the Mountain	drop	Lord Roccor	Blackrock Depths				wowhead, elenco
 16642	12682	Thorium Armor	worldDrop					true	wowhead, elenco
 16643	12683	Thorium Belt	worldDrop					true	wowhead, elenco
 16644	12684	Thorium Bracers	worldDrop					true	wowhead, elenco
@@ -177,7 +177,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	bossDrop	worldDrop	not
 16652	12693	Thorium Boots	worldDrop					true	wowhead, elenco
 16653	12694	Thorium Helm	worldDrop					true	wowhead, elenco
 16654	12695	Radiant Gloves	worldDrop					true	wowhead, elenco
-	12696		quest		Blackrock Spire				wowhead, elenco, quest: The Demon Forge
+16667	12696	Demon Forged Breastplate	quest		Blackrock Spire				wowhead, elenco, quest: The Demon Forge
 16656	12697	Radiant Boots	worldDrop					true	wowhead, elenco
 16655	12699	Fiery Plate Gauntlets	quest		Winterspring				wowhead, elenco, quest: Fiery Plate Gauntlets
 16657	12700	Imperial Plate Boots	quest						wowhead, elenco, quest: Imperial Plate Boots
@@ -190,6 +190,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	bossDrop	worldDrop	not
 16726	12714	Runic Plate Helm	drop	Strashaz Warrior	Dustwallow Marsh				wowhead, elenco
 16730	12715	Imperial Plate Leggings	quest						wowhead, elenco, quest: Imperial Plate Leggings
 16731	12718	Runic Breastplate	drop		Dustwallow Marsh				wowhead, elenco
+16732	12719	Runic Plate Leggings	drop	Scarlet Smith	Western Plaguelands				wowhead, elenco
 16742	12725	Enchanted Thorium Helm	quest						wowhead, elenco, quest: Enchanted Thorium Platemail: Volume III
 16744	12726	Enchanted Thorium Leggings	quest						wowhead, elenco, quest: Enchanted Thorium Platemail: Volume II
 16745	12727	Enchanted Thorium Breastplate	quest						wowhead, elenco, quest: Enchanted Thorium Platemail: Volume I
@@ -216,7 +217,6 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	bossDrop	worldDrop	not
 17576	13496	Greater Nature Protection Potion	drop		Western Plaguelands				wowhead, elenco
 17577	13497	Greater Arcane Protection Potion	drop	Cobalt Mageweaver	Winterspring				wowhead, elenco
 17578	13499	Greater Shadow Protection Potion	drop		Eastern Plaguelands				wowhead, elenco
-17579	13500	Greater Holy Protection Potion	drop	Scarlet Alchemist	Scarlet Enclave				wowhead, elenco
 17632	13517	Alchemist's Stone	vendor	Dala Fairmaw	Mount Hyjal				wowhead, elenco
 18403	14466	Frostweave Tunic	worldDrop					true	wowhead, elenco
 18404	14467	Frostweave Robe	worldDrop					true	wowhead, elenco
@@ -297,7 +297,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	bossDrop	worldDrop	not
 19833	16056	Flawless Arcanite Rifle	drop	Mossflayer Shadowhunter	Eastern Plaguelands				wowhead, elenco
 20008	16214	Enchant Bracer - Greater Intellect	drop	Vilebranch Shadowcaster	The Hinterlands				wowhead, elenco
 20020	16215	Enchant Boots - Greater Stamina	worldDrop					true	wowhead, elenco
-20014	16216	Enchant Cloak - Greater Resistance	drop		The Temple of Atal'Hakkar				wowhead, elenco
+20014	16216	Enchant Cloak - Greater Resistance	drop	Atal'ai Witch Doctor	The Temple of Atal'Hakkar				wowhead, elenco
 20009	16218	Enchant Bracer - Superior Spirit	worldDrop					true	wowhead, elenco
 20012	16219	Enchant Gloves - Greater Agility	drop	Legashi Rogue	Azshara				wowhead, elenco
 20024	16220	Enchant Boots - Spirit	worldDrop					true	wowhead, elenco
@@ -308,10 +308,12 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	bossDrop	worldDrop	not
 20023	16245	Enchant Boots - Greater Agility	worldDrop					true	wowhead, elenco
 20010	16246	Enchant Bracer - Superior Strength	drop	Deadwind Warlock	Deadwind Pass				wowhead, elenco
 20030	16247	Enchant 2H Weapon - Superior Impact	drop	Blackhand Elite	Blackrock Spire				wowhead, elenco
+20033	16248	Enchant Weapon - Unholy Weapon	drop	Thuzadin Shadowcaster	Stratholme				wowhead, elenco
 20036	16249	Enchant 2H Weapon - Major Intellect	drop	Crimson Sorcerer	Stratholme				wowhead, elenco
 20031	16250	Enchant Weapon - Superior Striking	drop	Spirestone Warlord	Blackrock Spire				wowhead, elenco
 20011	16251	Enchant Bracer - Superior Stamina	worldDrop					true	wowhead, elenco
 20034	16252	Enchant Weapon - Crusader	drop	Scarlet Spellbinder	Western Plaguelands				wowhead, elenco
+20032	16254	Enchant Weapon - Lifestealing	drop	Spectral Researcher	Scholomance				wowhead, elenco
 20035	16255	Enchant 2H Weapon - Major Spirit	drop	Scholomance Adept	Scholomance				wowhead, elenco
 20848	17017	Flarecore Mantle	vendor	Lokhtos Darkbargainer	Blackrock Depths				wowhead, elenco
 20849	17018	Flarecore Gloves	vendor	Lokhtos Darkbargainer	Blackrock Depths				wowhead, elenco
@@ -324,10 +326,16 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	bossDrop	worldDrop	not
 20873	17053	Fiery Chain Shoulders	vendor	Lokhtos Darkbargainer	Blackrock Depths				wowhead, elenco
 20890	17059	Dark Iron Reaver	vendor	Lokhtos Darkbargainer	Blackrock Depths				wowhead, elenco
 20897	17060	Dark Iron Destroyer	vendor	Lokhtos Darkbargainer	Blackrock Depths				wowhead, elenco
+22727	18252	Core Armor Kit	drop		Molten Core				wowhead, elenco
 22732	18257	Major Rejuvenation Potion	drop		Molten Core				wowhead, elenco
+22749	18259	Enchant Weapon - Spell Power	drop		Molten Core				wowhead, elenco
+22750	18260	Enchant Weapon - Healing Power	drop		Molten Core				wowhead, elenco
+22757	18264	Elemental Sharpening Stone	drop		Molten Core				wowhead, elenco
 22759	18265	Flarecore Wraps	drop		Molten Core				wowhead, elenco
 22761	18267	Runn Tum Tuber Surprise	drop	Pusillin	Dire Maul				wowhead, elenco
 22793	18290	Biznicks 247x128 Accurascope	drop		Molten Core				wowhead, elenco
+22797	18291	Force Reactive Disk	drop		Molten Core				wowhead, elenco
+22795	18292	Core Marksman Rifle	drop		Molten Core				wowhead, elenco
 22866	18414	Belt of the Archmage	container	Knot Thimblejack's Cache	Dire Maul				wowhead, elenco
 22867	18415	Felcloth Gloves	container	Knot Thimblejack's Cache	Dire Maul				wowhead, elenco
 22868	18416	Inferno Gloves	container	Knot Thimblejack's Cache	Dire Maul				wowhead, elenco
@@ -397,6 +405,8 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	bossDrop	worldDrop	not
 24912	20553	Darkrune Gauntlets	container	Decoded True Believer Clippings					wowhead, elenco
 24914	20554	Darkrune Breastplate	container	Decoded True Believer Clippings					wowhead, elenco
 24913	20555	Darkrune Helm	drop		Silithus				wowhead, elenco
+25072	20726	Enchant Gloves - Threat	drop	Emperor Vek'nilash	Ahn'Qiraj				wowhead, elenco
+25084	20735	Enchant Cloak - Subtlety	drop	Emperor Vek'lor	Ahn'Qiraj				wowhead, elenco
 25129	20756	Brilliant Wizard Oil	vendor	Rin'wosho the Trader	Stranglethorn Vale				wowhead, elenco
 25130	20757	Brilliant Mana Oil	vendor	Rin'wosho the Trader	Stranglethorn Vale				wowhead, elenco
 25146	20761	Transmute: Elemental Fire	vendor	Lokhtos Darkbargainer	Blackrock Depths				wowhead, elenco
@@ -418,7 +428,6 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	bossDrop	worldDrop	not
 28482	22772	Sylvan Shoulders	vendor	Mishta	Silithus				wowhead, elenco
 28481	22773	Sylvan Crown	vendor	Mishta	Silithus				wowhead, elenco
 28480	22774	Sylvan Vest	vendor	Mishta	Silithus				wowhead, elenco
-424641	210178	Shredder Autosalvage Unit	drop	Sneed	The Deadmines				wowhead, elenco
 426607	210709	Elixir of Coalesced Regret	vendor	Kzixx | Zixil	Duskwood | Hillsbrad Foothills	alliance | 			wowhead
 428424	211247	Phoenix Bindings	vendor	Elaine Compton | Jornah | Dokimi | Gishah | Tamelyn Aldridge | Marcy Baker	Stormwind City | Orgrimmar | Thunder Bluff | Undercity | Ironforge | Darnassus	alliance | horde | horde | horde | alliance | alliance			wowhead
 431362	212230	Soul Vessel	vendor	Elaine Compton | Jornah | Dokimi | Gishah | Tamelyn Aldridge | Marcy Baker	Stormwind City | Orgrimmar | Thunder Bluff | Undercity | Ironforge | Darnassus	alliance | horde | horde | horde | alliance | alliance			wowhead
@@ -441,8 +450,8 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	bossDrop	worldDrop	not
 	215423		vendor	Ziri "The Wrench" Littlesprocket	Gnomeregan				wowhead, elenco
 	215424		vendor	Ziri "The Wrench" Littlesprocket	Gnomeregan				wowhead, elenco
 435956	215429	Polished Truesilver Gears	vendor	Ziri "The Wrench" Littlesprocket	Gnomeregan				wowhead, elenco
-	215431		vendor	Ziri "The Wrench" Littlesprocket	Gnomeregan				wowhead, elenco
-	215432		vendor	Ziri "The Wrench" Littlesprocket	Gnomeregan				wowhead, elenco
+435964	215431	High-Yield Radiation Bomb	vendor	Ziri "The Wrench" Littlesprocket	Gnomeregan				wowhead, elenco
+435966	215432	Ez-Thro Radiation Bomb	vendor	Ziri "The Wrench" Littlesprocket	Gnomeregan				wowhead, elenco
 	215433		vendor	Ziri "The Wrench" Littlesprocket	Gnomeregan				wowhead, elenco
 	217266		container	Large Solid Chest					wowhead, elenco
 439118	217271	Turtle Scale Gloves	vendor	Pratt McGrubben | Jangdor Swiftstrider	Feralas | Feralas	alliance | horde			wowhead
@@ -470,10 +479,10 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	bossDrop	worldDrop	not
 	229008		vendor	Lokhtos Darkbargainer	Blackrock Depths				wowhead, elenco
 	229009		vendor	Lokhtos Darkbargainer	Blackrock Depths				wowhead, elenco
 470359	232437	Darkclaw Bisque	vendor	Chief Expeditionary Requisitioner Enkles | Apothecary Quinard	Silithus | Silithus	alliance | horde			wowhead
+470370	232443	Smoked Redgill	vendor	Chief Expeditionary Requisitioner Enkles | Apothecary Quinard	Silithus | Silithus	alliance | horde			wowhead
 471400	232610	Magnificent Trollshine	vendor	Rin'wosho the Trader	Stranglethorn Vale				wowhead
 	238298		drop	Grand Crusader Caldoran	Scarlet Enclave				wowhead, elenco
 	238299		drop		Scarlet Enclave				wowhead, elenco
-	238300		drop		Scarlet Enclave				wowhead, elenco
 	238306		drop	Grand Crusader Caldoran	Scarlet Enclave				wowhead, elenco
 	238307		drop		Scarlet Enclave				wowhead, elenco
 	238308		drop		Scarlet Enclave				wowhead, elenco
@@ -485,10 +494,12 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	bossDrop	worldDrop	not
 	238324		drop		Scarlet Enclave				wowhead, elenco
 1248458	249474	Enchant Bracer - Minor Intellect	drop	Vile Fin Tidehunter	Silverpine Forest				wowhead, elenco
 1248459	249475	Enchant Bracer - Minor Healing Power	drop	Dark Strand Cultist	Ashenvale				wowhead, elenco
+1248511	249513	Enchant 2H Weapon - Lesser Strength	drop	Hatecrest Sorceress	Feralas				wowhead, elenco
 1249957	249879	Peace Tea	drop	Frostmane Seer	Dun Morogh				wowhead, elenco
 1249958	249880	Royal Tea	drop	Windshear Geomancer	Stonetalon Mountains				wowhead, elenco
 1249959	249881	Root Tea	drop	Torn Fin Oracle	Hillsbrad Foothills				wowhead, elenco
 1250151	250182	Bear Brisket	drop	Ashenvale Bear					wowhead, elenco
+1250153	250184	Raptor Rouladen	drop	Bloodfen Lashtail	Dustwallow Marsh				wowhead, elenco
 1250154	250185	Twice-Spiced Raptor Slice	drop	Young Stranglethorn Raptor	Stranglethorn Vale				wowhead
 1250157	250188	Breakfast Omelette	drop	Dire Condor	Redridge Mountains				wowhead, elenco
 1250781	250368	Cleric's Elixir	drop	Xavian Hellcaller	Ashenvale				wowhead
@@ -500,12 +511,28 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	bossDrop	worldDrop	not
 1252234	251337	Sterling Silver Gauntlet	drop	Wrathtail Myrmidon	Ashenvale				wowhead, elenco
 1252235	251338	Sterling Silver Shoulders	drop	Shadowhide Gnoll	Redridge Mountains				wowhead, elenco
 1252236	251339	Sterling Silver Breastplate	drop	Grimtotem Bandit	Thousand Needles				wowhead, elenco
+1252237	251340	Veteran's Chain Shirt	drop		The Deadmines | Shadowfang Keep | Ragefire Chasm				wowhead
 1252238	251341	Guard's Chain Shirt	drop		The Deadmines | Shadowfang Keep | Ragefire Chasm				wowhead
+1252239	251342	Protector's Chain Shirt	drop		The Deadmines | Shadowfang Keep | Ragefire Chasm				wowhead
+1252240	251343	Acolyte's Chain Shirt	drop		The Deadmines | Shadowfang Keep | Ragefire Chasm				wowhead
+1252241	251344	Crusader's Chain Shirt	drop		The Deadmines | Shadowfang Keep | Ragefire Chasm				wowhead
+1252242	251345	Veteran's Chain Leggings	drop	Edwin VanCleef | Targorr the Dread | Ghamoo-ra	The Deadmines | The Stockade | Blackfathom Deeps				wowhead
+1252243	251346	Guard's Chain Leggings	drop	Edwin VanCleef | Targorr the Dread | Shadow Charger | Lady Sarevess | Ghamoo-ra	The Deadmines | The Stockade | Shadowfang Keep | Blackfathom Deeps | Blackfathom Deeps				wowhead
+1252244	251347	Protector's Chain Leggings	drop	Edwin VanCleef | Targorr the Dread | Lady Sarevess | Ghamoo-ra	The Deadmines | The Stockade | Blackfathom Deeps | Blackfathom Deeps				wowhead
+1252245	251348	Acolyte's Chain Leggings	drop	Edwin VanCleef | Targorr the Dread | Shadow Charger | Lady Sarevess	The Deadmines | The Stockade | Shadowfang Keep | Blackfathom Deeps				wowhead
+1252246	251349	Crusader's Chain Leggings	drop	Lady Sarevess | Ghamoo-ra	Blackfathom Deeps | Blackfathom Deeps				wowhead
+1252247	251350	Veteran's Chain Helm	drop		The Stockade | Razorfen Kraul | Blackfathom Deeps				wowhead
+1252248	251351	Guard's Chain Helm	drop	Dextren Ward | Kam Deepfury | Hamhock | Aku'mai | Old Serra'kis | Twilight Lord Kelris | Lorgus Jett	The Stockade | The Stockade | The Stockade | Blackfathom Deeps | Blackfathom Deeps | Blackfathom Deeps | Blackfathom Deeps				wowhead
+1252249	251352	Protector's Chain Helm	drop		The Stockade | Razorfen Kraul | Blackfathom Deeps | Scarlet Monastery				wowhead
+1252250	251353	Acolyte's Chain Helm	drop	Kam Deepfury | Bazil Thredd | Aggem Thorncurse | Twilight Lord Kelris | Gelihast	The Stockade | The Stockade | Razorfen Kraul | Blackfathom Deeps | Blackfathom Deeps				wowhead
+1252251	251354	Crusader's Chain Helm	drop	Hamhock | Overlord Ramtusk | Aku'mai | Old Serra'kis | Twilight Lord Kelris | Baron Aquanis	The Stockade | Razorfen Kraul | Blackfathom Deeps | Blackfathom Deeps | Blackfathom Deeps | Blackfathom Deeps				wowhead
 1252282	251385	Hard Gold Cuirass	drop	Screeching Roguefeather	Thousand Needles				wowhead, elenco
 1252283	251386	Hard Gold Boots	drop	Syndicate Highwayman	Arathi Highlands				wowhead, elenco
+1252285	251388	Hard Gold Leggings	drop	Kurzen Jungle Fighter	Stranglethorn Vale				wowhead, elenco
 1252286	251389	Hard Gold Coif	drop	Dustbelcher Warrior	Badlands				wowhead, elenco
 1252288	251391	Hard Gold Pauldrons	drop	Crushridge Ogre	Alterac Mountains				wowhead, elenco
 1252291	251394	Shining Mithril Boots	drop	Stonevault Shaman	Badlands				wowhead, elenco
+1252296	251399	Sentinel's Boots	drop	Ragglesnout	Razorfen Downs				wowhead, elenco
 1252351	251454	Brass Knuckles	drop	Gogger Rock Keeper	Stonetalon Mountains				wowhead
 1252352	251455	Bronze Dory	drop	Dark Strand Enforcer	Ashenvale				wowhead, elenco
 1252353	251456	Iron Fists	drop	Bleakheart Hellcaller	Ashenvale				wowhead, elenco
@@ -514,29 +541,60 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	bossDrop	worldDrop	not
 1252358	251461	Mithril Claws	drop	Stonevault Bonesnapper	Badlands				wowhead, elenco
 1252360	251463	Mithril Stiletto	drop	Lost One Hunter	Swamp of Sorrows				wowhead, elenco
 1252566	251526	Savory Whimsyfin Delight	drop		Redridge Mountains | Elwynn Forest | Westfall				wowhead
+1255136	252771	Brawler's Leather Armor	drop		The Deadmines | Wailing Caverns | Shadowfang Keep | Ragefire Chasm				wowhead
+1255135	252772	Trapper's Leather Armor	drop		The Deadmines | Shadowfang Keep | Ragefire Chasm				wowhead
+1255134	252773	Defender's Leather Armor	drop		The Deadmines | Shadowfang Keep | Ragefire Chasm				wowhead
+1255133	252774	Totemic Leather Armor	drop		The Deadmines | Shadowfang Keep | Ragefire Chasm				wowhead
+1255132	252775	Stormrider's Leather Armor	drop		The Deadmines | Shadowfang Keep | Ragefire Chasm				wowhead
+1255131	252776	Wisdom's Leather Armor	drop		The Deadmines | Shadowfang Keep | Ragefire Chasm				wowhead
+1255115	252792	Brawler's Leather Pants	drop	Edwin VanCleef | Targorr the Dread | Shadow Charger | Ghamoo-ra	The Deadmines | The Stockade | Shadowfang Keep | Blackfathom Deeps				wowhead
+1255114	252793	Trapper's Leather Pants	drop	Edwin VanCleef | Targorr the Dread | Shadow Charger | Lady Sarevess	The Deadmines | The Stockade | Shadowfang Keep | Blackfathom Deeps				wowhead
+1255113	252794	Defender's Leather Pants	drop	Edwin VanCleef | Shadow Charger | Lady Sarevess | Ghamoo-ra	The Deadmines | Shadowfang Keep | Blackfathom Deeps | Blackfathom Deeps				wowhead
+1255112	252795	Totemic Leather Pants	drop	Edwin VanCleef | Targorr the Dread | Lady Sarevess | Ghamoo-ra	The Deadmines | The Stockade | Blackfathom Deeps | Blackfathom Deeps				wowhead
+1255111	252796	Stormrider's Leather Pants	drop	Edwin VanCleef | Targorr the Dread | Shadow Charger | Ghamoo-ra	The Deadmines | The Stockade | Shadowfang Keep | Blackfathom Deeps				wowhead
+1255110	252797	Wisdom's Leather Pants	drop	Edwin VanCleef | Targorr the Dread | Shadow Charger | Lady Sarevess | Ghamoo-ra	The Deadmines | The Stockade | Shadowfang Keep | Blackfathom Deeps | Blackfathom Deeps				wowhead
 1255103	252804	Hillman's Leather Boots	drop	Shadowhorn Stag	Ashenvale				wowhead, elenco
+1255093	252814	Brawler's Leather Helm	drop		The Stockade | Scarlet Monastery | Razorfen Kraul | Blackfathom Deeps				wowhead
+1255092	252815	Trapper's Leather Helm	drop		The Stockade | Razorfen Kraul | Blackfathom Deeps				wowhead
+1255091	252816	Defender's Leather Helm	drop	Dextren Ward | Bazil Thredd | Death Speaker Jargba | Aku'mai | Old Serra'kis | Roogug | Lorgus Jett	The Stockade | The Stockade | Razorfen Kraul | Blackfathom Deeps | Blackfathom Deeps | Razorfen Kraul | Blackfathom Deeps				wowhead
+1255090	252817	Totemic Leather Helm	drop		The Stockade | Razorfen Kraul | Blackfathom Deeps				wowhead
+1255089	252818	Stormrider's Leather Helm	drop		The Stockade | Razorfen Kraul | Blackfathom Deeps				wowhead
+1255088	252819	Wisdom's Leather Helm	drop		The Stockade | Razorfen Kraul | Blackfathom Deeps				wowhead
 1255062	252845	Warden's Leather Shoes	drop	Arcanist Doan	Scarlet Monastery				wowhead, elenco
 1255061	252846	Skycaller's Leather Shoes	drop	Arcanist Doan	Scarlet Monastery				wowhead, elenco
 1255060	252847	Mender's Leather Shoes	drop	Arcanist Doan	Scarlet Monastery				wowhead, elenco
 1255024	252883	Blue Suede Armor	quest		Desolace				wowhead, elenco, quest: Leather Technique
-1255008	252899	Mender's Mail Boots	drop	Arcanist Doan	Scarlet Monastery				wowhead, elenco
+1255008	252899	Mender's Mail Boots	drop	Arcanist Doan | Mordresh Fire Eye	Scarlet Monastery | Razorfen Downs				wowhead
 1254965	252942	Forceful Rugged Armor Kit	vendor	Jangdor Swiftstrider | Nioma	Feralas | The Hinterlands	horde | alliance			wowhead
+1257425	254000	Earthen Leggings	drop	Gravelsnout Surveyor	Thousand Needles				wowhead, elenco
 1257435	254020	Earthen Silk Cuffs	drop	Mirefin Murloc	Dustwallow Marsh				wowhead, elenco
+1257436	254022	Gilded Handwraps	drop	Saltscale Oracle	Stranglethorn Vale				wowhead, elenco
 1257442	254034	Earthen Silk Shoulders	drop	Dustbelcher Mystic	Badlands				wowhead, elenco
+1257448	254046	Golden Cord	drop	Amnennar the Coldbringer	Razorfen Downs				wowhead, elenco
 1257492	254134	Mooncloth Reagent Bag	vendor	Dala Fairmaw	Mount Hyjal				wowhead, elenco
 1244434	255723	Greater Healing Potion	drop	Syndicate Mercenary	Arathi Highlands				wowhead, elenco
 1259343	255724	Clever Poultice	drop	Defias Enchanter	Duskwood				wowhead, elenco
+1259344	255727	Superior Poultice	drop	Syndicate Sentry	Alterac Mountains				wowhead, elenco
 1259341	255728	Potent Anti-Venom	drop	Lost One Muckdweller	Swamp of Sorrows				wowhead, elenco
 1270633	263511	Skywall Souffle	quest		Zephras Isle				wowhead, elenco, quest: Restocking the Larders
 1270635	263513	Pincer Bites	quest		Zephras Isle				wowhead, elenco, quest: Crab Season
 1266910	264207	SAF-T Bronze Bomb	drop	Scarlet Scout	Tirisfal Glades				wowhead, elenco
+1263005	273085	Fermenter	drop	Rath'mael	Ruins of Lordaeron				wowhead, elenco
+1263041	273086	Anvil	drop	Gilnid	The Deadmines				wowhead, elenco
+1283400	273087	Journeyman Campfire	drop	Lord Serpentis	Wailing Caverns				wowhead, elenco
+1263034	273092	Repair Bot	drop	Sneed	The Deadmines				wowhead, elenco
+1263031	273096	Tanning Rack	drop	Razorclaw the Butcher	Shadowfang Keep				wowhead, elenco
 1262985	273098	Field Guide	vendor	Happy Camper	Durotar	horde			wowhead
+1263032	273099	Spinning Wheel	drop	Unstable Sentinel	Alterac Mountains				wowhead, elenco
+1262978	273102	Cookie's Feast	drop	Cookie	The Deadmines				wowhead, elenco
+1262996	273105	Toxin Study	drop	Commander Springvale	Shadowfang Keep				wowhead, elenco
 1262980	273106	Greenhouse	vendor	Happy Camper	Durotar	horde			wowhead
 1262982	273109	Trapper's Workbench	drop	Houndmaster Loksey	Scarlet Monastery				wowhead
 1262990	273141	Fishing Rack	vendor	Happy Camper	Durotar	horde			wowhead
-	274049		drop	Crowd Pummeler 9-60	Gnomeregan				wowhead, elenco
+1293088	274049	9-60 Battery Pack	drop	Crowd Pummeler 9-60	Gnomeregan				wowhead, elenco
 1294014	274415	Sweetpaw Jam	vendor	Dala Fairmaw	Mount Hyjal				wowhead
 1294054	274424	Enchant Gloves - Lotus Claw	vendor	Dala Fairmaw	Mount Hyjal				wowhead, elenco
+1295805	274972	Briny Seafood Stew	quest		Riverglades				wowhead, elenco, quest: A Taste of the Sea
 1297120	275580	Venomspew Gloves	vendor	Mishta	Silithus				wowhead, elenco
 1297121	275581	Venomspew Cord	vendor	Mishta	Silithus				wowhead, elenco
 1297122	275582	Venomspew Footpads	vendor	Mishta	Silithus				wowhead, elenco
@@ -597,3 +655,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	bossDrop	worldDrop	not
 1301466	276973	Azure Stormsewn Cord	vendor	Vayn Moongaze	Zephras Isle				wowhead, elenco
 1301468	276974	Azure Stormsewn Leggings	vendor	Vayn Moongaze	Zephras Isle				wowhead, elenco
 1301469	276975	Azure Stormsewn Shoes	vendor	Vayn Moongaze	Zephras Isle				wowhead, elenco
+1317962	285289	Cracked Blacksmith Hammer	vendor	Gor'mak | Stondry Darkhammer	The Barrens | Redridge Mountains				wowhead
+1317963	285290	Mithril Blacksmith Hammer	vendor	Gor'mak | Stondry Darkhammer	The Barrens | Redridge Mountains				wowhead
+1317964	285291	Arcanite Blacksmith Hammer	vendor	Gor'mak | Stondry Darkhammer	The Barrens | Redridge Mountains				wowhead
+1328948	289560	Enchant Boots - Speed	vendor	Beneris | Alynsia	The Barrens | Redridge Mountains				wowhead

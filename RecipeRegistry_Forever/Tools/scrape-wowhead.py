@@ -218,13 +218,22 @@ def parse_list(html):
     firstseenpatch hanno le chiavi senza virgolette): righe ritagliate con le
     parentesi e campi letti uno per uno. `sourcemore` invece e' JSON vero.
     Le sue forme: {"n","t":1,"ti","z"} un NPC, {"n","t":5,"ti"} una quest,
-    {"z"} solo una zona, cioe' tante creature in quel posto."""
+    {"z"} solo una zona, cioe' tante creature in quel posto.
+
+    `commondrop` e' None quando la pagina non lo pubblica affatto, cosa diversa
+    da False. Fino al 25/10 gli elenchi lo scrivevano, e la sua assenza su una
+    riga voleva dire "non e' un world drop"; l'08/11 era sparito da tutte le
+    1847 righe, mentre le pagine dicevano ancora che quegli oggetti droppano.
+    Leggerlo come False avrebbe tolto 170 world drop senza che Wowhead avesse
+    detto niente su di loro: vedi merge_list_entry."""
     found = {}
     start = html.find("var listviewitems = [")
     if start == -1:
         return found
     start = html.find("[", start)
-    for row in rows(html[start:html.find("];", start) + 1]):
+    segment = html[start:html.find("];", start) + 1]
+    publishes_commondrop = '"commondrop":' in segment
+    for row in rows(segment):
         ident = field(row, "id")
         if ident is None or field(row, "classs") != "9":
             continue
@@ -236,8 +245,19 @@ def parse_list(html):
         found[ident] = {"name": (field(row, "name", r'"((?:[^"\\]|\\.)*)"') or ""),
                         "source": ints(field(row, "source", r"\[([^\]]*)\]")),
                         "sourcemore": sourcemore,
-                        "commondrop": '"commondrop":true' in row}
+                        "commondrop": ('"commondrop":true' in row) if publishes_commondrop else None}
     return found
+
+
+def merge_list_entry(old, new):
+    """La riga nuova di un elenco sopra quella in cache. Un campo che la pagina
+    non pubblica piu' (None) non cancella quello letto prima: la cache e' la
+    sola copia del dato vecchio, e un cambio di formato di Wowhead non e' un
+    cambio del gioco."""
+    merged = dict(new)
+    if merged.get("commondrop") is None:
+        merged["commondrop"] = bool((old or {}).get("commondrop"))
+    return merged
 
 
 def parse_spell_list(html):
@@ -604,7 +624,8 @@ def main():
                     open(os.path.join(args.save_html, "list-%s.html" % slug), "w", encoding="utf-8").write(html)
                 got = parse_list(html)
                 for item_id, entry in got.items():
-                    cache["lists"][item_id] = dict(entry, slug=slug)
+                    cache["lists"][item_id] = merge_list_entry(cache["lists"].get(item_id),
+                                                               dict(entry, slug=slug))
                 save_cache(cache)
                 print("  %-15s %d oggetti" % (slug, len(got)))
                 time.sleep(args.delay)

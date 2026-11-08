@@ -4,8 +4,13 @@ All notable changes to this addon are documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- **47 more recipes show where to get them.**
+
 ### Changed
 
+- **13 recipes show updated information on where to get them.**
 - **Less sync traffic between guildmates whose data cannot match.**
 
 ### Fixed
