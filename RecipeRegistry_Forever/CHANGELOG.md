@@ -15,8 +15,9 @@ All notable changes to this addon are documented in this file.
 
 ### Fixed
 
-- **Sync between guildmates works again.** Longer sync messages were being
-  lost on the way. Everyone needs this version for it to work both ways.
+- **Sync between guildmates works again.** Forever's servers throttle long
+  sync messages sent all at once, so they now go out one piece at a time.
+  Everyone needs this version for it to work both ways.
 - **Sync keeps going after combat** instead of pausing for a few seconds.
 - **A guildmate who cannot answer a sync request now says so**, and the next
   one is asked right away instead of after a minute.
