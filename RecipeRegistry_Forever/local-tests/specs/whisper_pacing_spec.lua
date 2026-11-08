@@ -323,5 +323,49 @@ Sync:SendWhisper("RRDEV", { kind = "SUMMARY" }, "Bea Rossi", "ALERT")
 Sync.SendCommMessage = realSend
 t("un payload tabella va a SendCommMessage", viaComm and viaComm.distribution, "WHISPER")
 
+-- -------------------------------------------------------------------------
+print("\n== 'No player named' dei nostri sussurri non si vede ==")
+-- l'08/11, con la 0.1.6: a ogni relog di un compagno a cui la coda stava
+-- mandando un blocco, il server rispondeva con una riga per pezzo in chat
+_G.ERR_CHAT_PLAYER_NOT_FOUND_S = "No player named '%s' is currently playing."
+local filters = {}
+_G.ChatFrame_AddMessageEventFilter = function(event, fn) filters[#filters + 1] = { event = event, fn = fn } end
+Sync:InstallWhisperOfflineHooks()
+Sync:InstallWhisperOfflineHooks()
+t("un filtro solo, sui messaggi di sistema", #filters == 1 and filters[1].event, "CHAT_MSG_SYSTEM")
+local filter = filters[1] and filters[1].fn
+local function notFound(name) return "No player named '" .. name .. "' is currently playing." end
+local function hidden(message) return filter(nil, "CHAT_MSG_SYSTEM", message) == true end
+
+resetWire()
+advance(1)
+Sync:SendWhisper("RRDEV", sample(600), "Bea Rossi", "BULK")
+advance(5)
+local before = #traces
+t("il compagno a cui abbiamo sussurrato: nascosta", hidden(notFound("Bea Rossi")), true)
+t("anche col trattino", hidden(notFound("Bea-Rossi")), true)
+t("anche col solo nome", hidden(notFound("Bea")), true)
+local logged = 0
+for i = before + 1, #traces do
+  if traces[i]:find("^whisper%-not%-found%-hidden") then logged = logged + 1 end
+end
+t("nel log una riga sola per la fila", logged, 1)
+t("un nome a cui non abbiamo sussurrato: resta", hidden(notFound("Zeno Verdi")), false)
+t("un altro messaggio di sistema: resta", hidden("Bea Rossi has gone offline."), false)
+advance(11)
+t("passati 10 s dall'ultimo pezzo: resta", hidden(notFound("Bea Rossi")), false)
+
+-- una riga che il client marca come segreta non si tocca, e non esplode
+local secret = setmetatable({}, {
+  __tostring = function() error("secret", 0) end,
+  __len = function() error("secret", 0) end,
+})
+_G.issecretvalue = function(value) return value == secret end
+Sync:SendWhisper("RRDEV", "x", "Bea Rossi", "ALERT")
+advance(1)
+local ok, result = pcall(filter, nil, "CHAT_MSG_SYSTEM", secret)
+t("valore segreto: niente errore, la riga resta", ok and result == false, true)
+_G.issecretvalue = nil
+
 print(fails == 0 and "\nTUTTO OK" or ("\n" .. fails .. " FALLITI"))
 os.exit(fails == 0 and 0 or 1)

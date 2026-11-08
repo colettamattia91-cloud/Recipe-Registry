@@ -2,6 +2,13 @@
 
 All notable changes to this addon are documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- **No more "No player named … is currently playing" lines in chat** when a
+  guildmate logs out or reloads while recipes are being shared with them.
+
 ## [0.1.6] - 2026-11-08
 
 ### Added
