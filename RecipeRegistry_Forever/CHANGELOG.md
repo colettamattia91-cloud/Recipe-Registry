@@ -11,17 +11,11 @@ All notable changes to this addon are documented in this file.
 ### Changed
 
 - **13 recipes show updated information on where to get them.**
-- **Less sync traffic between guildmates whose data cannot match.**
-
-### Fixed
-
-- **Sync between guildmates works again.** It was not a sync bug: unlike
-  TBC, Forever's servers drop long addon messages sent all at once, so they
-  now go out one piece at a time. Everyone needs this version for it to work
-  both ways.
-- **Sync keeps going after combat** instead of pausing for a few seconds.
-- **A guildmate who cannot answer a sync request now says so**, and the next
-  one is asked right away instead of after a minute.
+- **Your guildmates' recipes show up again.** Unlike TBC's, Forever's servers
+  were losing part of what the addon shares between guildmates. Everyone needs
+  this version for it to work both ways.
+- **Recipe updates from guildmates arrive faster**, and keep arriving while
+  you level.
 
 ## [0.1.5] - 2026-11-06
 
