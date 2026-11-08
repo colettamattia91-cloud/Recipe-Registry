@@ -384,6 +384,11 @@ function Sync:Startup()
     end
     self._startupInitialized = true
     self:RegisterComm(PREFIX)
+    -- nasconde "No player named X" quando X e' un compagno a cui l'addon ha
+    -- appena sussurrato: vedi la coda dei sussurri in SyncProtocol.lua
+    if self.InstallWhisperOfflineHooks then
+        self:InstallWhisperOfflineHooks()
+    end
     self.queueTicker = self.queueTicker or self:ScheduleRepeatingTimer("ProcessRequestQueue", 1)
     self.pruneTicker = self.pruneTicker or self:ScheduleRepeatingTimer("PruneState", 5)
     self.autoSyncTicker = self.autoSyncTicker or self:ScheduleRepeatingTimer("AutoSyncTick", AUTO_SYNC_INTERVAL)

@@ -313,6 +313,65 @@ local function whisperQueues(self)
     return self._whisperQueues
 end
 
+-- Chi non c'e' piu'.
+--
+-- Un sussurro a chi e' uscito dal gioco, o sta facendo un reload, il server lo
+-- rifiuta con una riga di sistema in chat -- "No player named X is currently
+-- playing." -- una per pezzo. Prima della coda si vedeva poco: i pezzi a
+-- raffica il server li scartava prima di guardare il destinatario. Con la
+-- 0.1.6, l'08/11 sera, a ogni relog di un compagno a cui si stava mandando un
+-- blocco ne arrivava una fila in chat. La riga si nasconde quando riguarda un
+-- nome a cui la coda ha sussurrato negli ultimi secondi; un sussurro scritto
+-- a mano dal giocatore non passa dalla coda, e la sua riga resta. Il resto non
+-- cambia: i pezzi rimasti vanno a vuoto e la sessione scade come sempre.
+local WHISPER_OFFLINE_WINDOW = 10        -- la risposta del server arriva prima
+
+local function normalizeName(name)
+    if type(name) ~= "string" then
+        return nil
+    end
+    local trimmed = name:gsub("^%s+", ""):gsub("%s+$", ""):gsub("%-", " ")
+    return trimmed:lower()
+end
+
+-- Il nome dentro la riga del server, dalla stringa del client stesso, cosi'
+-- vale in ogni lingua. Una riga che il client marca come segreta non si tocca.
+local playerNotFoundPattern
+local function notFoundName(message)
+    if type(message) ~= "string" or (issecretvalue and issecretvalue(message)) then
+        return nil
+    end
+    if not playerNotFoundPattern then
+        local template = ERR_CHAT_PLAYER_NOT_FOUND_S or "No player named '%s' is currently playing."
+        local escaped = template:gsub("([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1")
+        playerNotFoundPattern = "^" .. escaped:gsub("%%%%s", "(.-)") .. "$"
+    end
+    return message:match(playerNotFoundPattern)
+end
+
+-- A chi la coda ha appena sussurrato. Il server puo' scrivere il nome senza il
+-- secondo pezzo: si accetta anche il solo primo.
+local function recentWhisperTarget(self, name)
+    local key = normalizeName(name)
+    local recent = self._whisperRecent
+    if not key or not recent then
+        return nil
+    end
+    local row = recent[key]
+    if not row then
+        for other, candidate in pairs(recent) do
+            if other:match("^(%S+)") == key then
+                row = candidate
+                break
+            end
+        end
+    end
+    if row and nowForPacing() - row.at <= WHISPER_OFFLINE_WINDOW then
+        return row
+    end
+    return nil
+end
+
 -- Un pezzo a ChatThrottleLib, che tiene il conto della banda con gli altri
 -- addon e richiama quando il pezzo e' uscito davvero.
 function Sync:SendWhisperPart(prefix, text, target, prio, onSent)
@@ -406,6 +465,22 @@ function Sync:PumpWhisperQueue()
         end
         self._whisperLastPartAt = nowForPacing()
         self.telemetry.whisperPartsSent = (self.telemetry.whisperPartsSent or 0) + 1
+        -- a chi si e' appena sussurrato: se il server risponde che non c'e',
+        -- la riga e' nostra
+        local key = normalizeName(message.target)
+        if key then
+            local recent = self._whisperRecent or {}
+            self._whisperRecent = recent
+            recent[key] = { at = self._whisperLastPartAt, target = message.target }
+            self._whisperRecentWrites = (self._whisperRecentWrites or 0) + 1
+            if self._whisperRecentWrites % 64 == 0 then
+                for other, row in pairs(recent) do
+                    if self._whisperLastPartAt - row.at > WHISPER_OFFLINE_WINDOW then
+                        recent[other] = nil
+                    end
+                end
+            end
+        end
         message.nextPart = index + 1
         -- un pezzo rifiutato perde il messaggio: il resto sarebbe solo banda
         if didSend == false or message.nextPart > #message.parts then
@@ -430,6 +505,48 @@ function Sync:PumpWhisperQueue()
         end
     end, Constants.WHISPER_PART_STALL_SECONDS or 15)
     self:SendWhisperPart(message.prefix, message.parts[index], message.target, message.prio, onSent)
+end
+
+-- La riga del server e' nostra se riguarda un nome a cui la coda ha
+-- sussurrato negli ultimi secondi. La prima di una fila finisce nel log.
+function Sync:IsOwnWhisperNotFound(message)
+    local name = notFoundName(message)
+    local row = name and recentWhisperTarget(self, name) or nil
+    if not row then
+        return false
+    end
+    self.telemetry.whisperNotFoundHidden = (self.telemetry.whisperNotFoundHidden or 0) + 1
+    local key = normalizeName(row.target) or ""
+    local traced = self._whisperNotFoundTracedAt or {}
+    self._whisperNotFoundTracedAt = traced
+    if not traced[key] or nowForPacing() - traced[key] > WHISPER_OFFLINE_WINDOW then
+        traced[key] = nowForPacing()
+        Addon:Tracef("sync", "whisper-not-found-hidden target=%s", tostring(row.target))
+    end
+    return true
+end
+
+-- Il filtro della chat: true nasconde la riga. Qualunque cosa vada storta,
+-- la riga resta com'e'.
+local function hideOwnWhisperNotFound(_, _, message)
+    local sync = Addon.Sync
+    if not sync then
+        return false
+    end
+    local ok, ours = pcall(sync.IsOwnWhisperNotFound, sync, message)
+    return ok and ours == true
+end
+
+function Sync:InstallWhisperOfflineHooks()
+    if self._whisperOfflineHooks then
+        return
+    end
+    self._whisperOfflineHooks = true
+    local addFilter = ChatFrame_AddMessageEventFilter
+        or (ChatFrameUtil and ChatFrameUtil.AddMessageEventFilter)
+    if addFilter then
+        addFilter("CHAT_MSG_SYSTEM", hideOwnWhisperNotFound)
+    end
 end
 
 -- Un rifiuto -- busy all'index diff, BLOCK_PULL_REFUSED -- non passa da
