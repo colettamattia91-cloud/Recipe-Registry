@@ -280,6 +280,31 @@ do
   Sync:ProcessRequestQueue()
   t("a 31 s si passa all'altro candidato", Sync.outboundSeedSession.seedKey, SEED_B)
   t("e il log lo dice", lastTrace("index-diff-timeout") ~= nil, true)
+
+  -- e chi non ha risposto passa in fondo ai candidati: l'08/11 il canary
+  -- chiedeva ad Alarnos a ogni HELLO, sempre a vuoto
+  t("chi non ha risposto e' in fondo ai candidati", Sync:IsPeerBackoffActive(SEED_A), true)
+  t("l'altro no", Sync:IsPeerBackoffActive(SEED_B), false)
+  Sync.activeHelloCycle = {
+    cycleId = 12, helloId = ME .. ":12", busySeedKeys = {},
+    summaries = {
+      [SEED_A] = { peerKey = SEED_A, globalFingerprint = "gf3:A", activeContentCount = 10 },
+      [SEED_B] = { peerKey = SEED_B, globalFingerprint = "gf3:B", activeContentCount = 10 },
+    },
+  }
+  Sync.outboundSeedSession = nil
+  t("al giro dopo si elegge l'altro", Sync:SelectOutboundSeed(12), SEED_B)
+  clock = clock + 121
+  t("dopo due minuti torna candidato come gli altri", Sync:IsPeerBackoffActive(SEED_A), false)
+
+  -- lo stesso per chi non consegna il blocco chiesto
+  Sync.outboundSeedSession = {
+    seedKey = SEED_B, state = "waiting-block", successfulBlockMerges = 0,
+    activeBlockKey = "X::Mining", blockRequestedAt = clock, lastProgressAt = clock, startedAt = clock,
+  }
+  clock = clock + 61
+  Sync:ProcessRequestQueue()
+  t("blocco non consegnato: anche lui in fondo", Sync:IsPeerBackoffActive(SEED_B), true)
   restoreExchange(); restoreReady()
 end
 

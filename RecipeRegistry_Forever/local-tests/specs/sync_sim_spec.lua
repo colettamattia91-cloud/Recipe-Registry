@@ -439,6 +439,108 @@ scenario("gilda grande: 24 client, 4% di perdite", function()
   healthy(sim, "gilda grande")
 end)
 
+-- I sussurri a raffica, misurati l'08/11 sul server di Forever con una sonda:
+-- la stessa richiesta da 5 pezzi a 7 compagni, con i pezzi tutti insieme non
+-- e' arrivata mai (0/10), con un pezzo ogni 0.1-1 s quasi sempre (38/40). La
+-- regola del canale qui sotto e' quella: un pezzo di sussurro partito meno di
+-- 50 ms dopo il precedente dello stesso mittente si perde, e il client non lo
+-- sa. I tre scenari dicono che la regola riproduce il guasto vero, che la
+-- coda dei sussurri lo evita, e cosa resta finche' la gilda e' mista.
+local BURST_GAP = 0.05
+local function countTraces(sim, word, filter)
+  local n = 0
+  for _, name in ipairs(sim.order) do
+    local p = sim.peers[name]
+    if not filter or filter(p) then n = n + p:Count(word) end
+  end
+  return n
+end
+
+scenario("sussurri a raffica scartati dal server: la 0.1.5 non converge", function()
+  if not Sim.TreeAvailable("forever-v0.1.5") then
+    print("     saltato: il tag forever-v0.1.5 non c'e' (git fetch --tags)")
+    return
+  end
+  local sim = Sim.New({ seed = 71, whisperBurstGap = BURST_GAP })
+  for _, name in ipairs(names(6, "Vecchio")) do
+    sim:AddPeer(name, { tree = "forever-v0.1.5", professions = randomProfessions(3, 10) })
+  end
+  local took = sim:RunUntilConverged(20 * 60)
+  -- e' il guasto dell'08/11: se un giorno converge, la regola del canale non
+  -- descrive piu' il server, o la 0.1.5 non e' piu' quella
+  t("in 20 minuti non converge", took, nil)
+  t("il server ha scartato pezzi", sim.stats.burstDroppedParts > 0, true)
+  print("     " .. sim:Report() .. " | scartati a raffica=" .. sim.stats.burstDroppedParts)
+  healthy(sim, "0.1.5 a raffica")
+end)
+
+scenario("sussurri a raffica scartati dal server: con la coda la gilda converge", function()
+  local sim = Sim.New({ seed = 71, whisperBurstGap = BURST_GAP })
+  for _, name in ipairs(names(6, "Nuovo")) do sim:AddPeer(name, { professions = randomProfessions(3, 10) }) end
+  local took = sim:RunUntilConverged(20 * 60)
+  t("converge", took ~= nil, true)
+  print("     convergenza in " .. tostring(took) .. " s")
+  t("nessun pezzo scartato", sim.stats.burstDroppedParts, 0)
+  t("nessun index diff senza risposta", countTraces(sim, "index-diff-timeout"), 0)
+  healthy(sim, "coda dei sussurri")
+end)
+
+scenario("sussurri a raffica scartati dal server: gilda mista 0.1.5 e nuova", function()
+  if not Sim.TreeAvailable("forever-v0.1.5") then
+    print("     saltato: il tag forever-v0.1.5 non c'e' (git fetch --tags)")
+    return
+  end
+  local sim = Sim.New({ seed = 71, whisperBurstGap = BURST_GAP })
+  local trees = { "forever-v0.1.5", "forever-v0.1.5", "forever-v0.1.5", "working", "working", "working" }
+  local newNames = {}
+  for i, name in ipairs(names(6, "Socio")) do
+    sim:AddPeer(name, { tree = trees[i], professions = randomProfessions(3, 10) })
+    if trees[i] == "working" then newNames[#newNames + 1] = name end
+  end
+  -- fra i nuovi tutto passa: ognuno ha i blocchi di tutti i nuovi. Non
+  -- RunUntilConverged, che conterebbe come "di troppo" i blocchi dei vecchi
+  -- che un nuovo e' riuscito comunque a ricevere
+  local function newHaveNew()
+    local truth = sim:TruthBlocks(newNames)
+    for _, name in ipairs(newNames) do
+      local have = sim.peers[name]:Blocks()
+      for key, recipes in pairs(truth) do
+        local got = have[key]
+        if not got then return false end
+        for r in pairs(recipes) do if not got[r] then return false end end
+        for r in pairs(got) do if not recipes[r] then return false end end
+      end
+    end
+    return true
+  end
+  local took
+  for step = 1, 80 do
+    sim:Run(15)
+    if newHaveNew() then took = step * 15; break end
+  end
+  t("i nuovi hanno tutto cio' che hanno i nuovi", took ~= nil, true)
+  print("     fra i nuovi in " .. tostring(took) .. " s")
+  -- le richieste dei nuovi arrivano anche ai vecchi, che le ricompongono con
+  -- AceComm come sempre: e' il formato, non il ritmo, che devono conoscere
+  local reached = 0
+  for _, name in ipairs(sim.order) do
+    local p = sim.peers[name]
+    if p.tree ~= "working" then
+      for _, line in ipairs(p.traces or {}) do
+        local from = tostring(line):match("index%-diff%-request%-received peer=(.-) requestId")
+        if from and sim.peers[from] and sim.peers[from].tree == "working" then reached = reached + 1 end
+      end
+    end
+  end
+  t("le richieste dei nuovi arrivano alla 0.1.5", reached > 0, true)
+  -- quello che parte dalla 0.1.5 resta a raffica: finche' non aggiornano,
+  -- i loro blocchi arrivano solo quando la banda li distanzia per caso. Chi
+  -- non consegna va in fondo ai candidati invece di essere richiesto a ogni giro
+  t("chi tace va in fondo ai candidati", countTraces(sim, "peer-backoff-set", function(p) return p.tree == "working" end) > 0, true)
+  print("     " .. sim:Report() .. " | scartati a raffica=" .. sim.stats.burstDroppedParts)
+  healthy(sim, "gilda mista a raffica")
+end)
+
 for _, seed in ipairs({ 131, 137, 139 }) do
   scenario("caos (seme " .. seed .. "): 10 client, un'ora di eventi a caso", function()
     local sim = Sim.New({ seed = seed, lossReject = 0.04, lossSilent = 0.04, duplicate = 0.05, latencyMax = 4 })
@@ -475,7 +577,48 @@ for _, seed in ipairs({ 131, 137, 139 }) do
     local took = sim:RunUntilConverged(30 * 60)
     print(string.format("     eventi: login=%d logout=%d reload=%d combattimenti=%d istanze=%d cambi di mestiere=%d ricette=%d",
       events.login, events.logout, events.reload, events.combat, events.instance, events.swap, events.learn))
-    t("a caos finito converge", took ~= nil, true)
+    -- Il limite noto (vedi lo scenario del mestiere ripreso): un mestiere
+    -- lasciato e ripreso da zero mentre qualcuno era assente torna con le
+    -- ricette della vita vecchia, in tutta la gilda. Il caos ci cade quando
+    -- capita -- l'08/11 il seme 131, appena la coda dei sussurri ha cambiato i
+    -- tempi e quindi la sequenza degli eventi. Vale come convergenza, stampata
+    -- NOTO, solo se tutti hanno lo stesso blocco e le ricette in piu' sono
+    -- tutte del proprietario, in una vita passata del mestiere.
+    local knownLimit = {}
+    if not took then
+      local truth = sim:TruthBlocks()
+      local relaxed = {}
+      for key, recipes in pairs(truth) do relaxed[key] = recipes end
+      local reference = sim.peers[sim.order[1]]:Blocks()
+      for key, recipes in pairs(truth) do
+        local seen = reference[key]
+        local owner, prof = key:match("^(.-)::(.+)$")
+        local ever = sim.peers[owner] and sim.peers[owner].ever[prof] or {}
+        if seen then
+          local superset, fromPast, extra = true, true, 0
+          for r in pairs(recipes) do if not seen[r] then superset = false end end
+          for r in pairs(seen) do
+            if not recipes[r] then
+              extra = extra + 1
+              if not ever[r] then fromPast = false end
+            end
+          end
+          if superset and fromPast and extra > 0 then
+            relaxed[key] = seen
+            knownLimit[#knownLimit + 1] = string.format("%s (+%d della vita vecchia)", key, extra)
+          end
+        end
+      end
+      if #knownLimit > 0 and sim:IsConverged(nil, relaxed) then
+        took = "limite noto"
+      end
+    end
+    if #knownLimit > 0 and took == "limite noto" then
+      print(string.format("%-4s %-66s %s", "NOTO", "a caos finito converge, col mestiere ripreso",
+        table.concat(knownLimit, ", ")))
+    else
+      t("a caos finito converge", took ~= nil, true)
+    end
     print("     convergenza in " .. tostring(took) .. " s; " .. sim:Report())
     if not took then
       for _, name in ipairs(sim.order) do

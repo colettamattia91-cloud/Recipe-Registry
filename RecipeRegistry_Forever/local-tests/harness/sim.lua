@@ -14,7 +14,10 @@
 --     didSend=false, come ChatThrottleLib per un codice diverso da 3) e quello
 --     che il server perde dopo averlo accettato (nessuno lo sa);
 --   * ritardi variabili, quindi messaggi fuori ordine, e duplicati;
---   * l'eco dei messaggi di gilda al mittente, come fa WoW.
+--   * l'eco dei messaggi di gilda al mittente, come fa WoW;
+--   * i sussurri della 0.1.6 a pezzi singoli, ricomposti come fa AceComm, e a
+--     richiesta (whisperBurstGap) la regola del server misurata l'08/11: un
+--     pezzo di sussurro partito subito dopo il precedente si perde.
 --
 -- Core non si carica (vuole frame, UI, comandi): il login, l'ingresso nel
 -- mondo, il roster e il bucket delle fusioni li fa Peer:Login nello stesso
@@ -153,7 +156,8 @@ function Sim.New(opts)
         guildName = opts.guildName or "Grumpy Old Men",
         errors = {},
         violations = {},
-        stats = { sent = {}, bytes = {}, delivered = 0, lostParts = 0, rejectedParts = 0, whisperOffline = 0 },
+        stats = { sent = {}, bytes = {}, delivered = 0, lostParts = 0, rejectedParts = 0, whisperOffline = 0,
+            burstDroppedParts = 0 },
         log = {},
         net = {
             lossReject = opts.lossReject or 0,
@@ -161,7 +165,14 @@ function Sim.New(opts)
             latencyMin = opts.latencyMin or 0.2,
             latencyMax = opts.latencyMax or 1.5,
             duplicate = opts.duplicate or 0,
+            -- il server di Forever, misurato l'08/11: un pezzo di sussurro
+            -- partito meno di tanto dopo il precedente dello stesso mittente
+            -- va perso, e il client non lo sa. nil = regola spenta
+            whisperBurstGap = opts.whisperBurstGap,
         },
+        -- l'ordine dei pezzi singoli fra due client: il canale vero non li
+        -- rimescola, e AceComm non ricompone pezzi fuori ordine
+        rawLastAt = {},
         stuckLimit = opts.stuckLimit or 80,
     }, Sim)
     math.randomseed(opts.seed or 1)
@@ -239,6 +250,45 @@ function Sim:Transmit(peer, prefix, text, distribution, target, prio, callbackFn
     self:PumpLink(peer)
 end
 
+-- Un pezzo solo, come lo affida a ChatThrottleLib la coda dei sussurri (dalla
+-- 0.1.6): gia' spezzato nel formato di AceComm, con la callback della
+-- libreria, (arg, didSend, codice). Chi riceve lo ricompone in Peer:ReceivePart.
+function Sim:TransmitRaw(peer, prefix, text, distribution, target, prio, callbackFn, callbackArg)
+    if type(text) ~= "string" or #text > 255 then
+        self:RecordError(peer, "pezzo non valido: " .. (type(text) == "string" and (#text .. " byte") or type(text)))
+        return
+    end
+    -- il conto per tipo, come in Transmit: il messaggio intero si ricompone
+    -- anche dal lato di chi manda
+    local key = tostring(distribution) .. "\t" .. tostring(target)
+    local marker, whole = text:byte(1), nil
+    if marker == 1 then
+        peer.outSpool[key] = text:sub(2)
+    elseif marker == 2 then
+        peer.outSpool[key] = (peer.outSpool[key] or "") .. text:sub(2)
+    elseif marker == 3 then
+        whole = (peer.outSpool[key] or "") .. text:sub(2)
+        peer.outSpool[key] = nil
+    elseif marker == 4 then
+        whole = text:sub(2)
+    else
+        whole = text
+    end
+    if whole then
+        local kind = wireKind(whole)
+        self.stats.sent[kind] = (self.stats.sent[kind] or 0) + 1
+        self.stats.bytes[kind] = (self.stats.bytes[kind] or 0) + #whole
+        peer.sentByKind[kind] = (peer.sentByKind[kind] or 0) + 1
+    end
+    peer.bytesSent = (peer.bytesSent or 0) + #text
+    local msg = { from = peer, prefix = prefix, text = text, distribution = distribution, target = target,
+        parts = 1, lost = false, kind = "part", gen = peer.gen, raw = true }
+    local queue = peer.link[prio] or peer.link.NORMAL
+    queue[#queue + 1] = { msg = msg, index = 1, size = #text + 40, bytes = #text,
+        callbackFn = callbackFn, callbackArg = callbackArg, raw = true }
+    self:PumpLink(peer)
+end
+
 function Sim:PumpLink(peer)
     if peer.pumpScheduled then return end
     local part, queue
@@ -273,15 +323,31 @@ function Sim:SendPart(peer, part)
         msg.lost = true
         self.stats.lostParts = self.stats.lostParts + 1
     end
+    -- la regola del server: un pezzo di sussurro troppo vicino al precedente
+    -- dello stesso mittente si perde, e il client crede di averlo spedito
+    local gap = self.net.whisperBurstGap
+    if gap and msg.distribution == "WHISPER" then
+        if peer.lastWhisperPartAt and (self.clock - peer.lastWhisperPartAt) < gap then
+            msg.lost = true
+            self.stats.burstDroppedParts = self.stats.burstDroppedParts + 1
+        end
+        peer.lastWhisperPartAt = self.clock
+    end
     if part.callbackFn then
         local ok, err = xpcall(function()
-            part.callbackFn(part.callbackArg, part.bytes, #msg.text, didSend)
+            if part.raw then
+                part.callbackFn(part.callbackArg, didSend, didSend and 0 or 1)
+            else
+                part.callbackFn(part.callbackArg, part.bytes, #msg.text, didSend)
+            end
         end, debug.traceback)
         if not ok then self:RecordError(peer, err) end
     end
     if part.index == msg.parts and not msg.lost then
         self:Deliver(msg)
-        if self.net.duplicate > 0 and math.random() < self.net.duplicate then
+        -- i duplicati sono di messaggi interi: un pezzo doppio, AceComm lo
+        -- attaccherebbe due volte, e il canale vero non ne fa
+        if not msg.raw and self.net.duplicate > 0 and math.random() < self.net.duplicate then
             self:Deliver(msg, 1 + math.random() * 3)
         end
     end
@@ -304,9 +370,21 @@ function Sim:Deliver(msg, extraDelay)
     end
     for _, p in ipairs(recipients) do
         local latency = self.net.latencyMin + math.random() * (self.net.latencyMax - self.net.latencyMin)
-        self:Schedule(latency + (extraDelay or 0), function()
+        local delay = latency + (extraDelay or 0)
+        if msg.raw then
+            -- i pezzi fra due client arrivano nell'ordine in cui sono partiti
+            local link = msg.from.name .. ">" .. p.name
+            local at = math.max(self.rawLastAt[link] or 0, self.clock + delay)
+            self.rawLastAt[link] = at
+            delay = at - self.clock
+        end
+        self:Schedule(delay, function()
             self.stats.delivered = self.stats.delivered + 1
-            p.Sync:OnCommReceived(msg.prefix, msg.text, msg.distribution, msg.from.name)
+            if msg.raw then
+                p:ReceivePart(msg.prefix, msg.text, msg.distribution, msg.from.name)
+            else
+                p.Sync:OnCommReceived(msg.prefix, msg.text, msg.distribution, msg.from.name)
+            end
         end, p)
     end
 end
@@ -442,6 +520,11 @@ function Peer:BuildEnvironment()
         if not row then return nil end
         return row.name, nil, 75, 300
     end
+    -- ChatThrottleLib: la coda dei sussurri le affida i pezzi uno alla volta.
+    -- I client dei tag vecchi non la chiamano: passano da SendCommMessage.
+    env.ChatThrottleLib = { SendAddonMessage = function(_, prio, prefix, text, chattype, target, _, callbackFn, callbackArg)
+        sim:TransmitRaw(peer, prefix, text, chattype, target, prio or "NORMAL", callbackFn, callbackArg)
+    end }
     env.IsInInstance = function() return peer.inInstance end
     env.InCombatLockdown = function() return peer.inCombat end
     env.IsInRaid = function() return false end
@@ -562,6 +645,33 @@ function Peer:BuildEnvironment()
     return env, Addon
 end
 
+-- AceComm in ricezione: i pezzi di un messaggio si ricompongono per mittente.
+-- \001 apre, \002 continua, \003 chiude e consegna; \004 e' un messaggio
+-- intero che comincia con un carattere di controllo. Un \002 o un \003 senza
+-- il suo \001 si butta, e un \001 nuovo scarta quello lasciato a meta': come
+-- AceComm-3.0.
+function Peer:ReceivePart(prefix, text, distribution, sender)
+    local key = prefix .. "\t" .. distribution .. "\t" .. sender
+    local marker = text:byte(1)
+    if marker == 1 then
+        self.inSpool[key] = { text:sub(2) }
+    elseif marker == 2 then
+        local spool = self.inSpool[key]
+        if spool then spool[#spool + 1] = text:sub(2) end
+    elseif marker == 3 then
+        local spool = self.inSpool[key]
+        self.inSpool[key] = nil
+        if spool then
+            spool[#spool + 1] = text:sub(2)
+            self.Sync:OnCommReceived(prefix, table.concat(spool), distribution, sender)
+        end
+    elseif marker == 4 then
+        self.Sync:OnCommReceived(prefix, text:sub(2), distribution, sender)
+    else
+        self.Sync:OnCommReceived(prefix, text, distribution, sender)
+    end
+end
+
 function Peer:Login(isReload)
     local sim = self.sim
     local files, err = readTree(self.tree)
@@ -571,6 +681,7 @@ function Peer:Login(isReload)
     self.prefix = nil
     self.link = { ALERT = {}, NORMAL = {}, BULK = {} }
     self.tokens, self.tokensAt, self.pumpScheduled = BURST, sim.clock, false
+    self.outSpool, self.inSpool, self.lastWhisperPartAt = {}, {}, nil
     self.traces, self.traceCounts = self.traces or {}, self.traceCounts or {}
     self.mergeBucket, self.rosterBucket = nil, nil
 

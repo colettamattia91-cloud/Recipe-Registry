@@ -226,9 +226,10 @@ end
 -- lo rimette in coda solo per il codice 3 (throttle): con qualunque altro
 -- codice lo butta, e chi riceve non riesce piu' a ricomporre il messaggio. Una
 -- richiesta di index diff da ~1 KB e' fatta di 4-5 pezzi, un SUMMARY di uno.
--- Senza questa callback non lo sapremmo mai: ed e' una delle due spiegazioni
--- dei seed che non rispondono. AceComm ci passa solo se il pezzo e' partito,
--- non il codice; per sapere se succede basta.
+-- Senza questa callback non lo sapremmo mai. Ci arriva solo se il pezzo e'
+-- partito, non il codice -- da AceComm in gilda, dalla coda dei sussurri qui
+-- sotto -- e per sapere se succede basta. (L'08/11 il client non ne ha
+-- rifiutato nessuno: i pezzi li perdeva il server, vedi la coda.)
 local function newSendTracker(kind, distribution, target)
     return { kind = kind, distribution = distribution, target = target, failed = 0 }
 end
@@ -257,6 +258,180 @@ local function onChunkSent(tracker, sentBytes, totalBytes, didSend)
     end
 end
 
+-- I sussurri, un pezzo alla volta.
+--
+-- AceComm spezza un messaggio lungo e consegna tutti i pezzi insieme a
+-- ChatThrottleLib, che li spedisce nello stesso frame finche' ha banda. Il
+-- server di Forever i pezzi di un sussurro addon partiti nello stesso istante
+-- li scarta, e chi riceve non ricompone niente: vedi WHISPER_PART_GAP_SECONDS
+-- in Sync.lua per le misure. In gilda non succede.
+--
+-- Quindi i sussurri non passano piu' da AceComm: una coda sola spezza ogni
+-- messaggio negli stessi pezzi che farebbe AceComm-3.0 (v14) e li affida a
+-- ChatThrottleLib uno per volta. Il pezzo dopo parte quando la callback dice
+-- che il precedente e' uscito e ne e' passata la distanza: cosi' la distanza
+-- vale sul filo, anche quando la libreria tiene i pezzi in coda dietro altro
+-- traffico e poi li lascerebbe andare insieme. Un messaggio si finisce prima
+-- di cominciarne un altro, perche' chi riceve ricompone un solo messaggio a
+-- pezzi alla volta per mittente; fra un messaggio e l'altro passa prima chi
+-- ha la priorita' piu' alta. Chi riceve li ricompone con AceComm come sempre,
+-- qualunque versione abbia: e' il formato, non il ritmo, che deve conoscere.
+local WHISPER_MAX = 255           -- un messaggio intero, come AceComm
+local WHISPER_PART = 254          -- un pezzo: 255 meno il byte di posizione
+local WHISPER_PRIORITIES = { "ALERT", "NORMAL", "BULK" }
+
+local function nowForPacing()
+    return Private.nowForPacing and Private.nowForPacing() or time()
+end
+
+-- I pezzi di AceComm-3.0:SendCommMessage. Un messaggio che comincia con un
+-- carattere di controllo va preceduto da \004 se ci sta, altrimenti va a pezzi;
+-- a pezzi, \001 apre, \002 continua, \003 chiude.
+local function splitLikeAceComm(text)
+    local control = text:find("^[\001-\009]") ~= nil
+    if control and #text + 1 <= WHISPER_MAX then
+        return { "\004" .. text }
+    end
+    if not control and #text <= WHISPER_MAX then
+        return { text }
+    end
+    local parts = { "\001" .. text:sub(1, WHISPER_PART) }
+    local pos = 1 + WHISPER_PART
+    while pos + WHISPER_PART <= #text do
+        parts[#parts + 1] = "\002" .. text:sub(pos, pos + WHISPER_PART - 1)
+        pos = pos + WHISPER_PART
+    end
+    parts[#parts + 1] = "\003" .. text:sub(pos)
+    return parts
+end
+Private.splitWhisperLikeAceComm = splitLikeAceComm
+
+local function whisperQueues(self)
+    if not self._whisperQueues then
+        self._whisperQueues = { ALERT = {}, NORMAL = {}, BULK = {} }
+    end
+    return self._whisperQueues
+end
+
+-- Un pezzo a ChatThrottleLib, che tiene il conto della banda con gli altri
+-- addon e richiama quando il pezzo e' uscito davvero.
+function Sync:SendWhisperPart(prefix, text, target, prio, onSent)
+    local CTL = _G.ChatThrottleLib
+    if CTL and CTL.SendAddonMessage then
+        CTL:SendAddonMessage(prio, prefix, text, "WHISPER", target, prefix, function(_, didSend)
+            onSent(didSend)
+        end, nil)
+        return
+    end
+    local send = (C_ChatInfo and C_ChatInfo.SendAddonMessage) or SendAddonMessage
+    local ok = send and pcall(send, prefix, text, "WHISPER", target) or false
+    onSent(ok == true)
+end
+
+-- Al posto di SendCommMessage per i sussurri, con la stessa callback per pezzo:
+-- callbackFn(callbackArg, byteSpediti, byteTotali, didSend).
+function Sync:SendWhisper(prefix, text, target, prio, callbackFn, callbackArg)
+    if type(text) ~= "string" then
+        -- il modo "table-fast" dei test (EncodeWirePayload): niente pezzi
+        self:SendCommMessage(prefix, text, "WHISPER", target, prio, callbackFn, callbackArg)
+        return true
+    end
+    local queues = whisperQueues(self)
+    local list = queues[prio] or queues.NORMAL
+    local parts = splitLikeAceComm(text)
+    list[#list + 1] = {
+        prefix = prefix, target = target, prio = queues[prio] and prio or "NORMAL",
+        parts = parts, nextPart = 1, total = #text,
+        callbackFn = callbackFn, callbackArg = callbackArg,
+        queuedAt = nowForPacing(),
+    }
+    self.telemetry.whisperMessagesQueued = (self.telemetry.whisperMessagesQueued or 0) + 1
+    self.telemetry.whisperPartsQueued = (self.telemetry.whisperPartsQueued or 0) + #parts
+    self:PumpWhisperQueue()
+    return true
+end
+
+function Sync:GetWhisperQueueDepth()
+    local depth = self._whisperCurrent and 1 or 0
+    for _, list in pairs(whisperQueues(self)) do
+        depth = depth + #list
+    end
+    return depth
+end
+
+function Sync:PumpWhisperQueue()
+    if self._whisperInFlight or self._whisperPumpTimer then
+        return
+    end
+    local message = self._whisperCurrent
+    if not message then
+        local queues = whisperQueues(self)
+        for _, prio in ipairs(WHISPER_PRIORITIES) do
+            if queues[prio][1] then
+                message = table.remove(queues[prio], 1)
+                break
+            end
+        end
+        if not message then
+            return
+        end
+        self._whisperCurrent = message
+        local waited = nowForPacing() - (message.queuedAt or nowForPacing())
+        if waited > (self.telemetry.whisperMaxQueueWait or 0) then
+            self.telemetry.whisperMaxQueueWait = waited
+        end
+    end
+
+    local gap = Constants.WHISPER_PART_GAP_SECONDS or 0.25
+    local wait = (self._whisperLastPartAt or -gap) + gap - nowForPacing()
+    if wait > 0 then
+        self._whisperPumpTimer = self:ScheduleTimer(function()
+            self._whisperPumpTimer = nil
+            self:PumpWhisperQueue()
+        end, wait)
+        return
+    end
+
+    local index = message.nextPart
+    local token = {}
+    self._whisperInFlight = token
+    local function onSent(didSend)
+        if self._whisperInFlight ~= token then
+            return
+        end
+        self._whisperInFlight = nil
+        if token.watchdog then
+            self:CancelTimer(token.watchdog, true)
+            token.watchdog = nil
+        end
+        self._whisperLastPartAt = nowForPacing()
+        self.telemetry.whisperPartsSent = (self.telemetry.whisperPartsSent or 0) + 1
+        message.nextPart = index + 1
+        -- un pezzo rifiutato perde il messaggio: il resto sarebbe solo banda
+        if didSend == false or message.nextPart > #message.parts then
+            self._whisperCurrent = nil
+        end
+        if message.callbackFn then
+            local sentBytes = (index == #message.parts) and message.total or math.min(message.total, index * WHISPER_PART)
+            local ok, err = pcall(message.callbackFn, message.callbackArg, sentBytes, message.total, didSend)
+            if not ok then
+                Addon:Tracef("sync", "whisper-callback-error %s", tostring(err))
+            end
+        end
+        self:PumpWhisperQueue()
+    end
+    token.watchdog = self:ScheduleTimer(function()
+        if self._whisperInFlight == token then
+            token.watchdog = nil
+            self.telemetry.whisperPartStalls = (self.telemetry.whisperPartStalls or 0) + 1
+            Addon:Tracef("sync", "whisper-part-stall target=%s part=%d/%d",
+                tostring(message.target), index, #message.parts)
+            onSent(nil)
+        end
+    end, Constants.WHISPER_PART_STALL_SECONDS or 15)
+    self:SendWhisperPart(message.prefix, message.parts[index], message.target, message.prio, onSent)
+end
+
 -- Un rifiuto -- busy all'index diff, BLOCK_PULL_REFUSED -- non passa da
 -- CanRunSyncProtocol: si rifiuta proprio quando non si e' pronti, e un seed in
 -- warmup che non puo' nemmeno dire "non posso" lascia chi chiede ad aspettare
@@ -276,7 +451,7 @@ function Sync:SendRefusalEnvelope(kind, payload, targetKey)
     payload.sender = self:GetSelfKey()
     local msg = self:EncodeWirePayload(payload)
     if msg then
-        self:SendCommMessage(PREFIX, msg, "WHISPER", target, "ALERT",
+        self:SendWhisper(PREFIX, msg, target, "ALERT",
             onChunkSent, newSendTracker(kind, "WHISPER", targetKey))
         return true
     end
@@ -348,7 +523,7 @@ function Sync:SendDirectEnvelope(kind, payload, targetKey, priority)
     end
     local msg = self:EncodeWirePayload(payload)
     if msg then
-        self:SendCommMessage(PREFIX, msg, "WHISPER", target, priority or "NORMAL",
+        self:SendWhisper(PREFIX, msg, target, priority or "NORMAL",
             onChunkSent, newSendTracker(kind, "WHISPER", targetKey))
         return true
     end

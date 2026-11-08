@@ -14,6 +14,28 @@ local SESSION_TIMEOUT = Constants.SESSION_TIMEOUT
 -- ~8,5 s per uscire a 800 B/s, piu' una coda di SUMMARY sul seed di ~11 s con
 -- 40 compagni online -- e i seed nuovi, quando non possono, rispondono busy.
 local INDEX_DIFF_RESPONSE_TIMEOUT_SECONDS = 30
+
+-- Un seed che non risponde, o che non consegna il blocco chiesto, passa in
+-- fondo ai candidati per un po'. L'08/11 il canary chiedeva ad Alarnos a ogni
+-- HELLO, 8 volte in 14 minuti e sempre a vuoto; e nella gilda simulata, con i
+-- sussurri a raffica scartati dal server, un client 0.1.6 chiedeva 34 volte
+-- in 20 minuti un blocco a uno 0.1.5 la cui risposta non arrivava mai. Resta
+-- candidato -- se e' l'unico che ha il blocco lo si richiede -- ma non passa
+-- piu' davanti a chi risponde. Lo stesso registro delle sessioni senza
+-- progressi: una sessione che porta qualcosa lo cancella.
+local function backOffSilentSeed(self, session, reason, now)
+    if not self:IsValidSyncMemberKey(session.seedKey) then
+        return
+    end
+    local cooldown = Constants.SILENT_SEED_BACKOFF_SECONDS or 120
+    self._peerSessionBackoffUntil = self._peerSessionBackoffUntil or {}
+    self._peerSessionBackoffUntil[session.seedKey] = now + cooldown
+    self.telemetry.silentSeedBackoffs = (self.telemetry.silentSeedBackoffs or 0) + 1
+    Addon:Tracef("sync",
+        "peer-backoff-set peer=%s reason=%s cooldownSeconds=%d",
+        tostring(session.seedKey), tostring(reason), cooldown
+    )
+end
 -- BLOCK_PULL_DELAY_SECONDS and BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS now
 -- resolve via Sync:GetBlockPullDelay() / :GetBlockPullResponseTimeout()
 -- so the user-tunable values from the options panel take effect without
@@ -601,6 +623,7 @@ function Sync:ProcessRequestQueue()
             tostring(session.diffRequestId or "none"),
             now - session.diffSentAt
         )
+        backOffSilentSeed(self, session, "index-diff-timeout", now)
         if self.FallBackFromSeed then
             self:FallBackFromSeed(session, "index-diff-timeout")
         elseif self.AbortOutboundSeedSession then
@@ -612,6 +635,7 @@ function Sync:ProcessRequestQueue()
     if age > SESSION_TIMEOUT then
         self.telemetry.lastBlockPullTimeoutAt = now
         self.telemetry.lastBlockPullTimeoutReason = "session-timeout"
+        backOffSilentSeed(self, session, "session-timeout", now)
         if self.AbortOutboundSeedSession then
             self:AbortOutboundSeedSession("session-timeout")
         end
@@ -623,6 +647,7 @@ function Sync:ProcessRequestQueue()
         if blockAge > self:GetBlockPullResponseTimeout() then
             self.telemetry.lastBlockPullTimeoutAt = now
             self.telemetry.lastBlockPullTimeoutReason = "block-response-timeout"
+            backOffSilentSeed(self, session, "block-response-timeout", now)
             if self.AbortOutboundSeedSession then
                 self:AbortOutboundSeedSession("block-response-timeout")
             end
