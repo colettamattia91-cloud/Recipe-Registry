@@ -76,6 +76,21 @@ local function applyOwnerProfessionDeclaration(self, ownerKey, professions, comm
     return data:ApplyOwnerProfessionDeclaration(ownerKey, professions)
 end
 
+-- Una richiesta buttata prima di arrivare al suo gestore -- seed in istanza,
+-- compagno che non risulta -- riceve comunque un no, con il motivo: altrimenti
+-- chi l'ha mandata aspetta il timeout. Solo per le due richieste che
+-- aspettano una risposta; tutto il resto si butta come prima.
+local function refuseDroppedRequest(self, payload, peerKey, reason)
+    if not peerKey or type(payload) ~= "table" then
+        return
+    end
+    if payload.kind == "INDEX_DIFF_REQUEST" and self.SendIndexDiffBusy then
+        self:SendIndexDiffBusy(peerKey, payload, reason)
+    elseif payload.kind == "BLOCK_PULL_REQUEST" and self.SendBlockPullRefused then
+        self:SendBlockPullRefused(peerKey, payload, reason)
+    end
+end
+
 local function localProfessionDeclaration()
     local data = Addon.Data
     return data and data.GetDeclaredProfessionList and data:GetDeclaredProfessionList() or nil
@@ -204,6 +219,245 @@ function Sync:BroadcastHello()
     return false
 end
 
+-- I pezzi che non partono.
+--
+-- AceComm spezza un messaggio oltre i 255 byte in pezzi, e ChatThrottleLib li
+-- consegna al client uno alla volta. Se il client ne rifiuta uno, la libreria
+-- lo rimette in coda solo per il codice 3 (throttle): con qualunque altro
+-- codice lo butta, e chi riceve non riesce piu' a ricomporre il messaggio. Una
+-- richiesta di index diff da ~1 KB e' fatta di 4-5 pezzi, un SUMMARY di uno.
+-- Senza questa callback non lo sapremmo mai. Ci arriva solo se il pezzo e'
+-- partito, non il codice -- da AceComm in gilda, dalla coda dei sussurri qui
+-- sotto -- e per sapere se succede basta. (L'08/11 il client non ne ha
+-- rifiutato nessuno: i pezzi li perdeva il server, vedi la coda.)
+local function newSendTracker(kind, distribution, target)
+    return { kind = kind, distribution = distribution, target = target, failed = 0 }
+end
+
+local function onChunkSent(tracker, sentBytes, totalBytes, didSend)
+    if didSend ~= false or type(tracker) ~= "table" then
+        return
+    end
+    tracker.failed = tracker.failed + 1
+    local sync = Addon.Sync
+    if sync and sync.telemetry then
+        sync.telemetry.sendChunksFailed = (sync.telemetry.sendChunksFailed or 0) + 1
+        sync.telemetry.lastSendChunkFailedKind = tracker.kind
+        sync.telemetry.lastSendChunkFailedTarget = tracker.target
+    end
+    -- un pezzo perso basta a perdere il messaggio: si scrive il primo
+    if tracker.failed == 1 then
+        Addon:Tracef("sync",
+            "send-chunk-failed kind=%s via=%s target=%s at=%s/%s",
+            tostring(tracker.kind or "unknown"),
+            tostring(tracker.distribution or "unknown"),
+            tostring(tracker.target or "-"),
+            tostring(sentBytes or "?"),
+            tostring(totalBytes or "?")
+        )
+    end
+end
+
+-- I sussurri, un pezzo alla volta.
+--
+-- AceComm spezza un messaggio lungo e consegna tutti i pezzi insieme a
+-- ChatThrottleLib, che li spedisce nello stesso frame finche' ha banda. Il
+-- server di Forever i pezzi di un sussurro addon partiti nello stesso istante
+-- li scarta, e chi riceve non ricompone niente: vedi WHISPER_PART_GAP_SECONDS
+-- in Sync.lua per le misure. In gilda non succede.
+--
+-- Quindi i sussurri non passano piu' da AceComm: una coda sola spezza ogni
+-- messaggio negli stessi pezzi che farebbe AceComm-3.0 (v14) e li affida a
+-- ChatThrottleLib uno per volta. Il pezzo dopo parte quando la callback dice
+-- che il precedente e' uscito e ne e' passata la distanza: cosi' la distanza
+-- vale sul filo, anche quando la libreria tiene i pezzi in coda dietro altro
+-- traffico e poi li lascerebbe andare insieme. Un messaggio si finisce prima
+-- di cominciarne un altro, perche' chi riceve ricompone un solo messaggio a
+-- pezzi alla volta per mittente; fra un messaggio e l'altro passa prima chi
+-- ha la priorita' piu' alta. Chi riceve li ricompone con AceComm come sempre,
+-- qualunque versione abbia: e' il formato, non il ritmo, che deve conoscere.
+local WHISPER_MAX = 255           -- un messaggio intero, come AceComm
+local WHISPER_PART = 254          -- un pezzo: 255 meno il byte di posizione
+local WHISPER_PRIORITIES = { "ALERT", "NORMAL", "BULK" }
+
+local function nowForPacing()
+    return Private.nowForPacing and Private.nowForPacing() or time()
+end
+
+-- I pezzi di AceComm-3.0:SendCommMessage. Un messaggio che comincia con un
+-- carattere di controllo va preceduto da \004 se ci sta, altrimenti va a pezzi;
+-- a pezzi, \001 apre, \002 continua, \003 chiude.
+local function splitLikeAceComm(text)
+    local control = text:find("^[\001-\009]") ~= nil
+    if control and #text + 1 <= WHISPER_MAX then
+        return { "\004" .. text }
+    end
+    if not control and #text <= WHISPER_MAX then
+        return { text }
+    end
+    local parts = { "\001" .. text:sub(1, WHISPER_PART) }
+    local pos = 1 + WHISPER_PART
+    while pos + WHISPER_PART <= #text do
+        parts[#parts + 1] = "\002" .. text:sub(pos, pos + WHISPER_PART - 1)
+        pos = pos + WHISPER_PART
+    end
+    parts[#parts + 1] = "\003" .. text:sub(pos)
+    return parts
+end
+Private.splitWhisperLikeAceComm = splitLikeAceComm
+
+local function whisperQueues(self)
+    if not self._whisperQueues then
+        self._whisperQueues = { ALERT = {}, NORMAL = {}, BULK = {} }
+    end
+    return self._whisperQueues
+end
+
+-- Un pezzo a ChatThrottleLib, che tiene il conto della banda con gli altri
+-- addon e richiama quando il pezzo e' uscito davvero.
+function Sync:SendWhisperPart(prefix, text, target, prio, onSent)
+    local CTL = _G.ChatThrottleLib
+    if CTL and CTL.SendAddonMessage then
+        CTL:SendAddonMessage(prio, prefix, text, "WHISPER", target, prefix, function(_, didSend)
+            onSent(didSend)
+        end, nil)
+        return
+    end
+    local send = (C_ChatInfo and C_ChatInfo.SendAddonMessage) or SendAddonMessage
+    local ok = send and pcall(send, prefix, text, "WHISPER", target) or false
+    onSent(ok == true)
+end
+
+-- Al posto di SendCommMessage per i sussurri, con la stessa callback per pezzo:
+-- callbackFn(callbackArg, byteSpediti, byteTotali, didSend).
+function Sync:SendWhisper(prefix, text, target, prio, callbackFn, callbackArg)
+    if type(text) ~= "string" then
+        -- il modo "table-fast" dei test (EncodeWirePayload): niente pezzi
+        self:SendCommMessage(prefix, text, "WHISPER", target, prio, callbackFn, callbackArg)
+        return true
+    end
+    local queues = whisperQueues(self)
+    local list = queues[prio] or queues.NORMAL
+    local parts = splitLikeAceComm(text)
+    list[#list + 1] = {
+        prefix = prefix, target = target, prio = queues[prio] and prio or "NORMAL",
+        parts = parts, nextPart = 1, total = #text,
+        callbackFn = callbackFn, callbackArg = callbackArg,
+        queuedAt = nowForPacing(),
+    }
+    self.telemetry.whisperMessagesQueued = (self.telemetry.whisperMessagesQueued or 0) + 1
+    self.telemetry.whisperPartsQueued = (self.telemetry.whisperPartsQueued or 0) + #parts
+    self:PumpWhisperQueue()
+    return true
+end
+
+function Sync:GetWhisperQueueDepth()
+    local depth = self._whisperCurrent and 1 or 0
+    for _, list in pairs(whisperQueues(self)) do
+        depth = depth + #list
+    end
+    return depth
+end
+
+function Sync:PumpWhisperQueue()
+    if self._whisperInFlight or self._whisperPumpTimer then
+        return
+    end
+    local message = self._whisperCurrent
+    if not message then
+        local queues = whisperQueues(self)
+        for _, prio in ipairs(WHISPER_PRIORITIES) do
+            if queues[prio][1] then
+                message = table.remove(queues[prio], 1)
+                break
+            end
+        end
+        if not message then
+            return
+        end
+        self._whisperCurrent = message
+        local waited = nowForPacing() - (message.queuedAt or nowForPacing())
+        if waited > (self.telemetry.whisperMaxQueueWait or 0) then
+            self.telemetry.whisperMaxQueueWait = waited
+        end
+    end
+
+    local gap = Constants.WHISPER_PART_GAP_SECONDS or 0.25
+    local wait = (self._whisperLastPartAt or -gap) + gap - nowForPacing()
+    if wait > 0 then
+        self._whisperPumpTimer = self:ScheduleTimer(function()
+            self._whisperPumpTimer = nil
+            self:PumpWhisperQueue()
+        end, wait)
+        return
+    end
+
+    local index = message.nextPart
+    local token = {}
+    self._whisperInFlight = token
+    local function onSent(didSend)
+        if self._whisperInFlight ~= token then
+            return
+        end
+        self._whisperInFlight = nil
+        if token.watchdog then
+            self:CancelTimer(token.watchdog, true)
+            token.watchdog = nil
+        end
+        self._whisperLastPartAt = nowForPacing()
+        self.telemetry.whisperPartsSent = (self.telemetry.whisperPartsSent or 0) + 1
+        message.nextPart = index + 1
+        -- un pezzo rifiutato perde il messaggio: il resto sarebbe solo banda
+        if didSend == false or message.nextPart > #message.parts then
+            self._whisperCurrent = nil
+        end
+        if message.callbackFn then
+            local sentBytes = (index == #message.parts) and message.total or math.min(message.total, index * WHISPER_PART)
+            local ok, err = pcall(message.callbackFn, message.callbackArg, sentBytes, message.total, didSend)
+            if not ok then
+                Addon:Tracef("sync", "whisper-callback-error %s", tostring(err))
+            end
+        end
+        self:PumpWhisperQueue()
+    end
+    token.watchdog = self:ScheduleTimer(function()
+        if self._whisperInFlight == token then
+            token.watchdog = nil
+            self.telemetry.whisperPartStalls = (self.telemetry.whisperPartStalls or 0) + 1
+            Addon:Tracef("sync", "whisper-part-stall target=%s part=%d/%d",
+                tostring(message.target), index, #message.parts)
+            onSent(nil)
+        end
+    end, Constants.WHISPER_PART_STALL_SECONDS or 15)
+    self:SendWhisperPart(message.prefix, message.parts[index], message.target, message.prio, onSent)
+end
+
+-- Un rifiuto -- busy all'index diff, BLOCK_PULL_REFUSED -- non passa da
+-- CanRunSyncProtocol: si rifiuta proprio quando non si e' pronti, e un seed in
+-- warmup che non puo' nemmeno dire "non posso" lascia chi chiede ad aspettare
+-- il timeout. E' un sussurro di poche decine di byte.
+function Sync:SendRefusalEnvelope(kind, payload, targetKey)
+    if self:IsRealTrafficSuppressed() then
+        if Addon.MockSync and Addon.MockSync.RecordSuppressedSend then
+            Addon.MockSync:RecordSuppressedSend()
+        end
+        return false
+    end
+    local target = self:GetWhisperTarget(targetKey)
+    if not target then
+        return false
+    end
+    payload.kind = kind
+    payload.sender = self:GetSelfKey()
+    local msg = self:EncodeWirePayload(payload)
+    if msg then
+        self:SendWhisper(PREFIX, msg, target, "ALERT",
+            onChunkSent, newSendTracker(kind, "WHISPER", targetKey))
+        return true
+    end
+    return false
+end
+
 function Sync:SendGuildEnvelope(kind, payload, priority)
     local allowed = true
     if self.CanRunSyncProtocol then
@@ -231,7 +485,8 @@ function Sync:SendGuildEnvelope(kind, payload, priority)
     end
     local msg = self:EncodeWirePayload(payload)
     if msg then
-        self:SendCommMessage(PREFIX, msg, "GUILD", nil, priority or "NORMAL")
+        self:SendCommMessage(PREFIX, msg, "GUILD", nil, priority or "NORMAL",
+            onChunkSent, newSendTracker(kind, "GUILD", nil))
         return true
     end
     return false
@@ -268,7 +523,8 @@ function Sync:SendDirectEnvelope(kind, payload, targetKey, priority)
     end
     local msg = self:EncodeWirePayload(payload)
     if msg then
-        self:SendCommMessage(PREFIX, msg, "WHISPER", target, priority or "NORMAL")
+        self:SendWhisper(PREFIX, msg, target, priority or "NORMAL",
+            onChunkSent, newSendTracker(kind, "WHISPER", targetKey))
         return true
     end
     return false
@@ -338,6 +594,7 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
                 tostring(payload.kind or "unknown"),
                 tostring(peerKey or "unknown")
             )
+            refuseDroppedRequest(self, payload, peerKey, "not-accepted")
             return
         end
     end
@@ -350,6 +607,7 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
             tostring(peerKey or payload.sender or "unknown"),
             tostring(pauseReason)
         )
+        refuseDroppedRequest(self, payload, peerKey, "paused:" .. tostring(pauseReason))
         return
     end
 
@@ -369,6 +627,10 @@ function Sync:OnCommReceived(prefix, text, distribution, sender)
         self:HandleBlockPullRequest(payload, distribution, sender)
     elseif payload.kind == "BLOCK_SNAPSHOT" then
         self:HandleBlockSnapshot(payload, distribution, sender)
+    elseif payload.kind == "BLOCK_PULL_REFUSED" then
+        if self.HandleReceivedBlockPullRefused then
+            self:HandleReceivedBlockPullRefused(payload)
+        end
     else
         recordUnsupportedMessage(self, payload.kind, payload.sender)
     end
@@ -380,6 +642,10 @@ function Sync:HandleHello(payload, _distribution, commSender)
     end
     self._lastHelloSeenAt = self._lastHelloSeenAt or {}
     self._lastHelloSeenAt[payload.key] = time()
+    -- l'impronta con cui questo compagno, fra poco, ci manda il suo digest:
+    -- e' quella del suo HELLO, perche' ci elegge da questo suo giro
+    self._peerHelloFingerprints = self._peerHelloFingerprints or {}
+    self._peerHelloFingerprints[payload.key] = payload.globalFingerprint
     if self.RecordPeerCaps then
         self:RecordPeerCaps(payload.sender or payload.key, payload.caps)
     end
@@ -408,8 +674,28 @@ function Sync:HandleHello(payload, _distribution, commSender)
         reason = "hello-response",
         allowDeferred = true,
     }) or nil
-    if shouldSendSummaryForHello(self, payload, localSummary) then
-        self:SendSummary(payload.sender or payload.key, payload.helloId)
+    local peerForSummary = payload.sender or payload.key
+    local sterileServe = false
+    if shouldSendSummaryForHello(self, payload, localSummary)
+        and self._sterilePairs and self._sterilePairs.serve and self._sterilePairs.serve[peerForSummary]
+        and self.IsSterilePair
+    then
+        -- l'ultima volta che ci ha chiesto, con questa sua impronta e con la
+        -- nostra, non avevamo niente da dargli: un SUMMARY lo farebbe solo
+        -- tornare a chiedere, vedi le coppie sterili in SyncRuntime
+        local settled = self:GetSettledLocalFingerprint("hello-response")
+        sterileServe = settled ~= nil
+            and self:IsSterilePair("serve", peerForSummary, payload.globalFingerprint, settled)
+    end
+    if sterileServe then
+        self.telemetry.summarySuppressedSterile = (self.telemetry.summarySuppressedSterile or 0) + 1
+        Addon:Tracef("sync",
+            "summary-suppressed peer=%s reason=sterile-pair remoteFp=%s",
+            tostring(peerForSummary or "unknown"),
+            tostring(payload.globalFingerprint or "nil")
+        )
+    elseif shouldSendSummaryForHello(self, payload, localSummary) then
+        self:SendSummary(peerForSummary, payload.helloId)
     else
         local suppressReason = "unknown"
         if type(localSummary) ~= "table" then
@@ -563,15 +849,34 @@ function Sync:HandleIndexDiffRequest(payload)
         tostring(payload.requestId or "none"),
         type(payload.blocks) == "table" and Private.countKeys(payload.blocks) or 0
     )
+    -- Ogni "no" qui sotto risponde con un busy e il suo motivo. Fino alla 0.1.5
+    -- erano return muti: chi chiedeva aspettava 60 s, e il seed non ne
+    -- scriveva nemmeno il motivo nel log.
     if self.CanServeInboundSeed then
-        local allowed = self:CanServeInboundSeed(payload.sender)
+        local allowed, serveReason = self:CanServeInboundSeed(payload.sender)
         if not allowed then
+            local reason = "not-ready:" .. tostring(serveReason or "not-ready")
+            Addon:Tracef("sync",
+                "index-diff-refused peer=%s requestId=%s reason=%s",
+                tostring(payload.sender or "unknown"),
+                tostring(payload.requestId or "none"),
+                reason
+            )
+            self:SendIndexDiffBusy(payload.sender, payload, reason)
             return
         end
     end
 
     local response = self.BuildIndexDiffResponseForRequest and self:BuildIndexDiffResponseForRequest(payload) or nil
     if type(response) ~= "table" or response.ready ~= true then
+        local reason = "index-not-ready:" .. tostring(type(response) == "table" and response.indexStatus or "none")
+        Addon:Tracef("sync",
+            "index-diff-refused peer=%s requestId=%s reason=%s",
+            tostring(payload.sender or "unknown"),
+            tostring(payload.requestId or "none"),
+            reason
+        )
+        self:SendIndexDiffBusy(payload.sender, payload, reason)
         return
     end
 
@@ -590,8 +895,17 @@ function Sync:HandleIndexDiffRequest(payload)
 
     if self.SendPreparedIndexDiffResponse then
         local sent = self:SendPreparedIndexDiffResponse(payload.sender, payload, response)
-        if not sent and reserved and self.ClearInboundSeedSession then
-            self:ClearInboundSeedSession(payload.sender, payload.requestId, "index-diff-send-failed")
+        if not sent then
+            if reserved and self.ClearInboundSeedSession then
+                self:ClearInboundSeedSession(payload.sender, payload.requestId, "index-diff-send-failed")
+            end
+            self:SendIndexDiffBusy(payload.sender, payload, "response-not-sent")
+        elseif #offeredBlocks == 0 and self.RecordSterilePair then
+            -- niente da dargli: con queste due impronte non ci sara' mai, e il
+            -- prossimo HELLO uguale non riceve il SUMMARY che lo farebbe tornare
+            local requesterFp = self._peerHelloFingerprints and self._peerHelloFingerprints[payload.sender] or nil
+            local settled = self:GetSettledLocalFingerprint("index-diff-serve")
+            self:RecordSterilePair("serve", payload.sender, requesterFp, settled, "no-offer")
         end
     end
 end
@@ -618,6 +932,9 @@ function Sync:HandleBlockPullRequest(payload)
             tostring(requestId or "none"),
             tostring(protoReason or "not-ready")
         )
+        -- da qui in giu' ogni rifiuto lo dice a chi chiede: vedi
+        -- SendBlockPullRefused in SyncTransfer
+        self:SendBlockPullRefused(senderKey, payload, "not-ready:" .. tostring(protoReason or "not-ready"))
         return
     end
     if self.CanServeInboundSeed then
@@ -630,6 +947,7 @@ function Sync:HandleBlockPullRequest(payload)
                 tostring(requestId or "none"),
                 tostring(serveReason or "not-ready")
             )
+            self:SendBlockPullRefused(senderKey, payload, "not-ready:" .. tostring(serveReason or "not-ready"))
             return
         end
     end
@@ -650,6 +968,9 @@ function Sync:HandleBlockPullRequest(payload)
             tostring(blockKey or "none"),
             tostring(requestId or "none")
         )
+        -- la sessione non c'e' piu' -- scaduta, o chiusa da un warmup o da
+        -- un'istanza: per chi chiede e' il seed a non potere, non il blocco
+        self:SendBlockPullRefused(senderKey, payload, "unknown-request")
         return
     end
     if type(inboundSession.offeredBlocks) == "table" and inboundSession.offeredBlocks[blockKey] ~= true then
@@ -669,12 +990,23 @@ function Sync:HandleBlockPullRequest(payload)
             tostring(requestId or "none"),
             tonumber(inboundSession.offeredBlockCount or 0) or 0
         )
+        self:SendBlockPullRefused(senderKey, payload, "block-not-offered")
         return
     end
     inboundSession.lastActivity = time()
     inboundSession.servedBlocks = tonumber(inboundSession.servedBlocks or 0) or 0
     if self.SendBlockSnapshot then
-        local sent = self:SendBlockSnapshot(payload and payload.sender, payload)
+        local sent, notSentReason = self:SendBlockSnapshot(payload and payload.sender, payload)
+        if not sent then
+            Addon:Tracef("sync",
+                "block-pull-rejected peer=%s block=%s requestId=%s reason=%s",
+                tostring(senderKey or "unknown"),
+                tostring(blockKey or "none"),
+                tostring(requestId or "none"),
+                tostring(notSentReason or "send-failed")
+            )
+            self:SendBlockPullRefused(senderKey, payload, tostring(notSentReason or "send-failed"))
+        end
         if sent then
             inboundSession.servedBlocks = inboundSession.servedBlocks + 1
             inboundSession.lastActivity = time()

@@ -191,6 +191,11 @@ function Data:DetectProfessions()
                         self:BuildSyncBlockKey(self:GetPlayerKey(), canonical)
                     )
                 end
+                -- un mestiere nuovo e' un blocco proprio che i compagni ora
+                -- possono darci: vedi GetDroppedMarksGeneration
+                if wasNewProfession and self.BumpDroppedMarksGeneration then
+                    self:BumpDroppedMarksGeneration()
+                end
             end
         end
     end
@@ -233,6 +238,9 @@ function Data:PruneDroppedProfessions()
     end
     if #dropped == 0 then return false end
 
+    if self.BumpDroppedMarksGeneration then
+        self:BumpDroppedMarksGeneration()
+    end
     for _, professionKey in ipairs(dropped) do
         entry.professions[professionKey] = nil
         if self._scanNeededByProfession then self._scanNeededByProfession[professionKey] = nil end

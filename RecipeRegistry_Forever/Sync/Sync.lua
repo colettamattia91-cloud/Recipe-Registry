@@ -56,6 +56,23 @@ local BLOCK_PULL_DELAY_SECONDS = 2.5
 -- again on the next cycle. The 60s SESSION_TIMEOUT still bounds total
 -- stall in case the seeder truly stops responding.
 local BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS = 60
+-- I sussurri partono un pezzo alla volta, a questa distanza almeno. Il server
+-- scarta i pezzi di un sussurro addon partiti nello stesso istante: AceComm li
+-- consegna tutti insieme a ChatThrottleLib, la sua raffica da 4000 byte li
+-- spedisce nello stesso frame, e chi riceve non ricompone mai il messaggio. Il
+-- canale di gilda non lo fa. Misurato l'08/11 con una sonda, la stessa
+-- richiesta da 5 pezzi a 7 compagni: tutti insieme 0/10, uno ogni 0.1 s 9/10,
+-- 0.25 s 9/10, 0.5 e 1 s 10/10 -- i due mancati sono lo stesso compagno nei
+-- 20 s dopo una raffica. Nello stesso pomeriggio 72 index diff su 75 erano
+-- scaduti. 0.25 s sta sotto il passo che ChatThrottleLib tiene comunque a
+-- regime, 800 B/s, un pezzo ogni ~0.32 s: rallenta solo le raffiche.
+local WHISPER_PART_GAP_SECONDS = 0.25
+-- un pezzo affidato a ChatThrottleLib la cui callback non torna non deve
+-- fermare i sussurri dopo di lui
+local WHISPER_PART_STALL_SECONDS = 15
+-- un seed che non ha risposto a un index diff, o non ha consegnato un blocco,
+-- va in fondo ai candidati per un po' invece di essere rieletto al giro dopo
+local SILENT_SEED_BACKOFF_SECONDS = 120
 local HELLO_RESCHEDULE_DELAY_SECONDS = 5
 local HELLO_RESCHEDULE_JITTER_SECONDS = 10
 local POST_SYNC_HELLO_COOLDOWN_SECONDS = 30
@@ -307,6 +324,9 @@ Private.constants = {
     SUMMARY_SATURATION_THRESHOLD = SUMMARY_SATURATION_THRESHOLD,
     BLOCK_PULL_DELAY_SECONDS = BLOCK_PULL_DELAY_SECONDS,
     BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS = BLOCK_PULL_RESPONSE_TIMEOUT_SECONDS,
+    WHISPER_PART_GAP_SECONDS = WHISPER_PART_GAP_SECONDS,
+    WHISPER_PART_STALL_SECONDS = WHISPER_PART_STALL_SECONDS,
+    SILENT_SEED_BACKOFF_SECONDS = SILENT_SEED_BACKOFF_SECONDS,
     HELLO_RESCHEDULE_DELAY_SECONDS = HELLO_RESCHEDULE_DELAY_SECONDS,
     HELLO_RESCHEDULE_JITTER_SECONDS = HELLO_RESCHEDULE_JITTER_SECONDS,
     POST_SYNC_HELLO_COOLDOWN_SECONDS = POST_SYNC_HELLO_COOLDOWN_SECONDS,

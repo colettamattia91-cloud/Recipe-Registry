@@ -748,7 +748,9 @@ function Sync:ShouldAcceptInboundPayload(payload, peerKey)
             if payload.kind == "INDEX_DIFF_RESPONSE" and session.state == "waiting-index-diff" then
                 return true
             end
-            if payload.kind == "BLOCK_SNAPSHOT" and session.state == "waiting-block" then
+            if (payload.kind == "BLOCK_SNAPSHOT" or payload.kind == "BLOCK_PULL_REFUSED")
+                and session.state == "waiting-block"
+            then
                 return true
             end
         end
@@ -1486,9 +1488,110 @@ function Sync:StartOutboundSeedSession(cycle, selected, reason)
         candidateIndex = cycle.seedCandidateCursor,
         selectionHash = selected.selectionHash,
         selectionBand = selected.selectionBand,
+        -- l'impronta che il seed ha annunciato nel SUMMARY: con quella locale,
+        -- presa quando parte il digest, fa la coppia sterile
+        seedFingerprint = selected.globalFingerprint,
     }
     self:ScheduleQueuePump(0)
     return selected.peerKey
+end
+
+-- Coppie sterili.
+--
+-- L'impronta globale e' solo contenuto, quindi due compagni che divergono in
+-- un modo che il pull non chiude -- un blocco che uno ha e l'altro rifiuta
+-- perche' il proprietario l'ha abbandonato, un blocco in cui chi chiede ha
+-- piu' ricette di chi risponde -- si vedono diversi a ogni HELLO, e a ogni
+-- HELLO rifanno un index diff che non porta niente. Nel log di Kaedros del
+-- 06/11 era la regola: 18 index diff in 22 minuti, 2 utili.
+--
+-- Il risultato di un index diff dipende solo dalle due impronte: quella di
+-- chi chiede descrive il digest che manda, quella del seed descrive l'indice
+-- da cui risponde. Se con le stesse due impronte l'ultima volta non e' venuto
+-- niente, non verra' niente nemmeno adesso. Quindi si ricorda la coppia e la
+-- si salta finche' una delle due impronte non cambia. Due lati:
+--   "pull":  io ho chiesto a lui e non c'era niente da prendere -- non lo
+--            eleggo come seed. Vale anche il contatore dei segni di
+--            DataSnapshot: un segno tolto rende utile un blocco senza cambiare
+--            la mia impronta.
+--   "serve": lui ha chiesto a me e non avevo niente da dargli -- non gli
+--            mando il SUMMARY, cosi' non mi elegge. Questo protegge anche dai
+--            client vecchi, che la coppia non la ricordano.
+-- Solo in memoria e con una scadenza, come rete di sicurezza: un /reload
+-- costa al piu' un tentativo per compagno.
+local STERILE_PAIR_TTL_SECONDS = 1800
+
+local function droppedMarksGeneration()
+    local data = Addon.Data
+    return data and data.GetDroppedMarksGeneration and data:GetDroppedMarksGeneration() or 0
+end
+
+-- L'impronta locale ricalcolata, o nil se l'indice non e' in ordine: una
+-- coppia registrata o confrontata su un'impronta vecchia direbbe il falso.
+function Sync:GetSettledLocalFingerprint(reason)
+    local data = Addon.Data
+    if not (data and data.BuildLocalSummary) then
+        return nil
+    end
+    local summary = data:BuildLocalSummary({
+        reason = reason or "sterile-pair",
+        allowDeferred = true,
+        recomputeGlobalFingerprint = true,
+    })
+    if type(summary) ~= "table" or tostring(summary.indexStatus or "") ~= "ready" then
+        return nil
+    end
+    if summary.globalFingerprintDirty == true then
+        return nil
+    end
+    return summary.globalFingerprint
+end
+
+function Sync:RecordSterilePair(side, peerKey, peerFingerprint, localFingerprint, reason)
+    if (side ~= "pull" and side ~= "serve") or not self:IsValidSyncMemberKey(peerKey) then
+        return false
+    end
+    if type(peerFingerprint) ~= "string" or peerFingerprint == ""
+        or type(localFingerprint) ~= "string" or localFingerprint == ""
+    then
+        return false
+    end
+    self._sterilePairs = self._sterilePairs or {}
+    self._sterilePairs[side] = self._sterilePairs[side] or {}
+    self._sterilePairs[side][peerKey] = {
+        peerFingerprint = peerFingerprint,
+        localFingerprint = localFingerprint,
+        marksGeneration = side == "pull" and droppedMarksGeneration() or nil,
+        at = time(),
+        reason = tostring(reason or "empty"),
+    }
+    self.telemetry.sterilePairsRecorded = (self.telemetry.sterilePairsRecorded or 0) + 1
+    Addon:Tracef("sync",
+        "sterile-pair-recorded side=%s peer=%s reason=%s peerFp=%s localFp=%s",
+        side,
+        tostring(peerKey),
+        tostring(reason or "empty"),
+        tostring(peerFingerprint),
+        tostring(localFingerprint)
+    )
+    return true
+end
+
+function Sync:IsSterilePair(side, peerKey, peerFingerprint, localFingerprint)
+    local store = self._sterilePairs and self._sterilePairs[side] or nil
+    local row = store and store[peerKey] or nil
+    if type(row) ~= "table" then
+        return false
+    end
+    local stillValid = (time() - (row.at or 0)) <= STERILE_PAIR_TTL_SECONDS
+        and row.peerFingerprint == peerFingerprint
+        and row.localFingerprint == localFingerprint
+        and (side ~= "pull" or row.marksGeneration == droppedMarksGeneration())
+    if not stillValid then
+        store[peerKey] = nil
+        return false
+    end
+    return true
 end
 
 function Sync:SelectOutboundSeed(cycleId)
@@ -1502,6 +1605,16 @@ function Sync:SelectOutboundSeed(cycleId)
     if cycle.selectedSeedKey then
         return cycle.selectedSeedKey
     end
+    -- La finestra dei SUMMARY si chiude 6 s dopo il HELLO, e in 6 s si fa in
+    -- tempo a entrare in un'istanza: una sessione aperta li' non puo' partire.
+    -- Il HELLO di ripresa all'uscita rifara' il giro.
+    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("INDEX_DIFF_REQUEST") then
+        Addon:Tracef("sync",
+            "seed-selection-skipped helloId=%s reason=paused",
+            tostring(cycle.helloId or "none")
+        )
+        return nil
+    end
 
     local localSummary = Addon.Data and Addon.Data.BuildLocalSummary and Addon.Data:BuildLocalSummary({
         reason = "seed-selection",
@@ -1510,12 +1623,19 @@ function Sync:SelectOutboundSeed(cycleId)
     local rows = {}
     local rejectReasons = {}
     local candidateCount = 0
+    local sterileRejected = 0
+    local settledFingerprint = next(cycle.summaries or {}) ~= nil and self:GetSettledLocalFingerprint("seed-selection") or nil
     for peerKey, summary in pairs(cycle.summaries or {}) do
         if self:IsValidSyncMemberKey(peerKey) and type(summary) == "table" then
             candidateCount = candidateCount + 1
             local rejectReason = nil
             if tostring(summary.globalFingerprint or "") == tostring(localSummary and localSummary.globalFingerprint or "") then
                 rejectReason = "same-global-fingerprint"
+            elseif settledFingerprint
+                and self:IsSterilePair("pull", peerKey, summary.globalFingerprint, settledFingerprint)
+            then
+                rejectReason = "sterile-pair"
+                sterileRejected = sterileRejected + 1
             else
                 local eligible, eligibleReason = self:CanExchangeDataWithPeer(peerKey, "dispatch", {
                     source = peerKey,
@@ -1571,6 +1691,18 @@ function Sync:SelectOutboundSeed(cycleId)
             requestId = cycle.helloId,
             extra = self.telemetry.lastSeedRejectReasons,
         })
+        -- Se tutti erano coppie sterili non c'e' niente da scoprire: un
+        -- nuovo tentativo fra 20 s ritroverebbe le stesse impronte, e
+        -- aggiungerebbe proprio gli HELLO che le coppie servono a togliere.
+        -- Ci pensa l'HELLO periodico, o il primo cambio d'impronta.
+        if sterileRejected > 0 and sterileRejected == candidateCount then
+            Addon:Tracef("sync",
+                "seed-selection-none-sterile helloId=%s candidates=%d",
+                tostring(cycle.helloId or "none"),
+                candidateCount
+            )
+            return nil
+        end
         self:ScheduleDiscoveryRetry("discovery-miss")
         return nil
     end
@@ -1836,6 +1968,21 @@ function Sync:RegisterInboundSeedSession(requesterKey, requestId, offeredBlocks)
     self:PruneInboundSeedSessions()
     local existingSessions = self.inboundSeedSessions[requesterKey] or {}
     local existing = existingSessions[requestId]
+    -- Chi chiede ha una sola sessione aperta alla volta: una richiesta nuova
+    -- dallo stesso compagno vuol dire che quella vecchia l'ha gia' abbandonata,
+    -- di solito per un timeout. Tenerla fino ai 60 s di inattivita' faceva
+    -- rispondere per-requester-cap proprio al suo nuovo tentativo.
+    if not existing and next(existingSessions) ~= nil then
+        local superseded = countKeys(existingSessions)
+        existingSessions = {}
+        self.inboundSeedSessions[requesterKey] = nil
+        Addon:Tracef("sync",
+            "inbound-seed-session-superseded peer=%s requestId=%s superseded=%d",
+            tostring(requesterKey),
+            tostring(requestId),
+            superseded
+        )
+    end
     if not existing then
         local peerCap = Constants.MAX_INBOUND_SEED_SESSIONS_PER_PEER or 1
         if countKeys(existingSessions) >= peerCap and peerCap > 0 then

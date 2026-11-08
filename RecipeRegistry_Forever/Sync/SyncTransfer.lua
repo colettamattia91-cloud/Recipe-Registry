@@ -3,22 +3,139 @@ local Sync = Addon.Sync
 
 local time = time
 
+-- Un BLOCK_PULL_REQUEST che il seed non puo' servire. Fino alla 0.1.5 il seed
+-- lo scriveva nel suo log e non diceva niente a chi chiedeva, che aspettava
+-- 60 s (block-response-timeout) prima di arrendersi -- e una sessione chiusa
+-- a meta' dal seed, per un warmup o un cambio di zona, voleva dire 60 s di
+-- attesa per ogni compagno che stava tirando da lui. Ora risponde.
+--
+-- Un tipo di messaggio nuovo e non un BLOCK_SNAPSHOT vuoto: un client vecchio
+-- lo prenderebbe per "il seed non ha piu' quel blocco" e creerebbe un mestiere
+-- vuoto. Un tipo che non conosce lo scarta e basta, e resta col timeout di
+-- prima.
+--
+-- Due famiglie di motivi. Quelli del blocco -- non e' fra quelli offerti, o
+-- non c'e' piu' -- dicono di saltare quel blocco e andare avanti col
+-- prossimo. Tutti gli altri dicono che il seed adesso non puo', e chi chiede
+-- passa a un altro candidato.
+local BLOCK_LEVEL_REFUSALS = {
+    ["block-not-offered"] = true,
+    ["snapshot-unavailable"] = true,
+}
+
+function Sync:SendBlockPullRefused(targetKey, requestPayload, reason)
+    if not self:IsValidSyncMemberKey(targetKey) then
+        return false
+    end
+    local refusal = tostring(reason or "refused")
+    local sent = self:SendRefusalEnvelope("BLOCK_PULL_REFUSED", {
+        requestId = requestPayload and requestPayload.requestId or nil,
+        blockKey = requestPayload and requestPayload.blockKey or nil,
+        reason = refusal,
+    }, targetKey)
+    if sent then
+        self.telemetry.blockPullRefusedSent = (self.telemetry.blockPullRefusedSent or 0) + 1
+        Addon:Tracef("sync",
+            "block-pull-refused-sent peer=%s block=%s requestId=%s reason=%s",
+            tostring(targetKey),
+            tostring(requestPayload and requestPayload.blockKey or "none"),
+            tostring(requestPayload and requestPayload.requestId or "none"),
+            refusal
+        )
+    end
+    return sent
+end
+
+-- Lasciare un seed che non risponde, o che dice di non potere. Se da lui si e'
+-- gia' preso qualcosa la sessione si chiude come sempre, perche' l'impronta va
+-- ricalcolata e il prossimo HELLO deve dirlo; altrimenti si prova subito il
+-- candidato dopo dello stesso giro, invece di aspettare il prossimo HELLO.
+function Sync:FallBackFromSeed(session, reason)
+    if type(session) ~= "table" then
+        return false
+    end
+    -- a protocollo fermo o a sync non pronto non si apre una sessione nuova:
+    -- resterebbe li' senza poter partire, si chiude e basta
+    local paused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("INDEX_DIFF_REQUEST") or false
+    if (session.successfulBlockMerges or 0) == 0
+        and not paused
+        and self.syncReady == true
+        and type(self.activeHelloCycle) == "table"
+        and self.HandleSeedBusy
+    then
+        return self:HandleSeedBusy(session.seedKey, reason)
+    end
+    if self.AbortOutboundSeedSession then
+        return self:AbortOutboundSeedSession(reason)
+    end
+    return false
+end
+
+function Sync:HandleReceivedBlockPullRefused(payload)
+    local session = self.outboundSeedSession
+    if type(session) ~= "table" or session.state ~= "waiting-block" then
+        return false
+    end
+    if payload.sender ~= session.seedKey then
+        return false
+    end
+    if payload.requestId and session.activeBlockRequestId and payload.requestId ~= session.activeBlockRequestId then
+        return false
+    end
+    if payload.blockKey and session.activeBlockKey and payload.blockKey ~= session.activeBlockKey then
+        return false
+    end
+
+    local reason = tostring(payload.reason or "refused")
+    self.telemetry.blockPullRefusedReceived = (self.telemetry.blockPullRefusedReceived or 0) + 1
+    Addon:Tracef("sync",
+        "block-pull-refused-received peer=%s block=%s requestId=%s reason=%s",
+        tostring(payload.sender),
+        tostring(session.activeBlockKey or "none"),
+        tostring(payload.requestId or "none"),
+        reason
+    )
+    session.lastProgressAt = time()
+    session.activeBlockKey = nil
+    session.activeBlockRequestId = nil
+    session.activeBlockOfferedFingerprint = nil
+
+    if not BLOCK_LEVEL_REFUSALS[reason] then
+        return self:FallBackFromSeed(session, "seed-refused:" .. reason)
+    end
+
+    session.nextWantedIndex = (session.nextWantedIndex or 1) + 1
+    if not (session.wantedBlocks and session.wantedBlocks[session.nextWantedIndex]) then
+        if self.CompleteOutboundSeedSession then
+            self:CompleteOutboundSeedSession("all-blocks-complete")
+        end
+        return true
+    end
+    if self.ScheduleNextWantedBlock then
+        self:ScheduleNextWantedBlock()
+    end
+    return true
+end
+
 function Sync:SendBlockSnapshot(targetKey, requestPayload)
     local allowed = true
     if self.CanRunSyncProtocol then
         allowed = self:CanRunSyncProtocol("BLOCK_SNAPSHOT")
     end
+    -- il secondo valore e' il motivo, per il BLOCK_PULL_REFUSED che ne segue
     if not allowed then
-        return false
+        return false, "not-ready"
     end
     if not (type(requestPayload) == "table" and type(requestPayload.blockKey) == "string") then
-        return false
+        return false, "bad-request"
     end
     local snapshot = Addon.Data and Addon.Data.BuildBlockSnapshot and Addon.Data:BuildBlockSnapshot(requestPayload.blockKey, {
         snapshotKind = "block-pull",
     }) or nil
     if type(snapshot) ~= "table" then
-        return false
+        -- offerto e poi sparito: il proprietario l'ha dichiarato abbandonato,
+        -- o una pulizia l'ha tolto, fra l'index diff e questa richiesta
+        return false, "snapshot-unavailable"
     end
     local sent = self:SendDirectEnvelope("BLOCK_SNAPSHOT", {
         requestId = requestPayload.requestId,
@@ -52,7 +169,10 @@ function Sync:SendBlockSnapshot(targetKey, requestPayload)
             #(snapshot.recipeKeys or {})
         )
     end
-    return sent
+    if not sent then
+        return false, "send-failed"
+    end
+    return true
 end
 
 function Sync:HandleReceivedBlockSnapshot(payload)

@@ -2,6 +2,21 @@
 
 All notable changes to this addon are documented in this file.
 
+## [0.1.6] - 2026-11-08
+
+### Added
+
+- **47 more recipes show where to get them.**
+
+### Changed
+
+- **13 recipes show updated information on where to get them.**
+- **Your guildmates' recipes show up again.** Unlike TBC's, Forever's servers
+  were losing part of what the addon shares between guildmates. Everyone needs
+  this version for it to work both ways.
+- **Recipe updates from guildmates arrive faster**, and keep arriving while
+  you level.
+
 ## [0.1.5] - 2026-11-06
 
 ### Changed

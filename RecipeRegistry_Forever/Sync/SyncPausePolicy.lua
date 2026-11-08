@@ -90,21 +90,30 @@ function SyncPausePolicy:RefreshPauseState()
             Addon.Sync:AbortOutboundSeedSession(inInstance and "instance-pause" or "protocol-pause")
         end
     end
-    if self._wasPaused and not heavyUiPaused and Addon.Sync and Addon.Sync.EnterWarmup then
-        if self._wasInstance then
-            Addon.Sync:EnterWarmup("instance-exit", 15)
-        elseif self._wasCombat then
-            Addon.Sync:EnterWarmup("combat-exit", 6)
-        end
+    -- Si riparte con calma solo da cio' che ha fermato il protocollo, cioe'
+    -- l'istanza. Il combattimento ferma la UI e basta: il sync va avanti
+    -- mentre combatti, quindi alla fine non c'e' niente da far ripartire.
+    --
+    -- Fino alla 0.1.5 l'uscita dal combattimento apriva un warmup di 6 s, che
+    -- chiudeva le sessioni in cui facevi da seed, per 6 s faceva rifiutare in
+    -- silenzio index diff e SUMMARY, e alla fine rimandava un HELLO. Per chi
+    -- livella -- un combattimento ogni 20-60 s -- voleva dire essere spesso
+    -- in warmup: nel log di Kaedros del 06/11, 14 index diff su 18 scaduti a
+    -- 60 s senza risposta. E qui sotto valeva lo stesso: _wasPaused segue la
+    -- pausa della UI, quindi ogni combattimento finito, e ogni cambio di zona
+    -- durante un combattimento, rimandava anche indice e HELLO.
+    local wasProtocolPaused = self._wasInstance == true
+    if wasProtocolPaused and not protocolPaused and Addon.Sync and Addon.Sync.EnterWarmup then
+        Addon.Sync:EnterWarmup("instance-exit", 15)
     end
     if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then
         if protocolPaused then
             Addon.Data:ScheduleSyncIndexPrepare(inInstance and "instance-pause" or "protocol-pause", 1)
-        elseif self._wasPaused then
+        elseif wasProtocolPaused then
             Addon.Data:ScheduleSyncIndexPrepare("pause-recovery", 0.5)
         end
     end
-    if self._wasPaused and not protocolPaused and Addon.Sync and Addon.Sync.ScheduleHello then
+    if wasProtocolPaused and not protocolPaused and Addon.Sync and Addon.Sync.ScheduleHello then
         if Addon.Sync.RefreshSyncReadyState then
             Addon.Sync:RefreshSyncReadyState("pause-recovery")
         end

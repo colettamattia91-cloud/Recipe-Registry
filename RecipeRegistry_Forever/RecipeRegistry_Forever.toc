@@ -20,7 +20,7 @@
 ## Notes: Guild profession tracker for WoW: Forever.
 ## Author: Kaedros
 ## IconTexture: Interface\Icons\INV_Misc_Book_11
-## Version: 0.1.5
+## Version: 0.1.6
 ## X-Build-Channel: release
 ## X-Build-ID: release
 ## SavedVariables: RecipeRegistryDB,RecipeRegistryLogDB

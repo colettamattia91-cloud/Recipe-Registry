@@ -38,6 +38,34 @@ function Data:IsSyncBlockDroppedByOwner(blockKey)
     return self:IsProfessionDroppedByOwner(ownerCharacter, professionKey)
 end
 
+-- Quante volte e' cambiato cosa IsProfessionDroppedByOwner rifiuta. Serve alle
+-- coppie sterili del sync: un seed che non aveva niente da darci puo' tornare
+-- utile senza che la nostra impronta cambi -- un segno tolto da una
+-- dichiarazione, un mestiere ripreso dal personaggio locale -- e il numero
+-- dice che il verdetto di prima non vale piu'. Solo in memoria: dopo un
+-- /reload le coppie si dimenticano comunque.
+function Data:GetDroppedMarksGeneration()
+    return self._droppedMarksGeneration or 0
+end
+
+function Data:BumpDroppedMarksGeneration()
+    self._droppedMarksGeneration = (self._droppedMarksGeneration or 0) + 1
+    return self._droppedMarksGeneration
+end
+
+local function clearDroppedMark(self, entry, professionKey)
+    local marks = type(entry) == "table" and entry.droppedProfessions or nil
+    if type(marks) ~= "table" or not marks[professionKey] then
+        return false
+    end
+    marks[professionKey] = nil
+    if not next(marks) then
+        entry.droppedProfessions = nil
+    end
+    self:BumpDroppedMarksGeneration()
+    return true
+end
+
 -- Quello che il proprietario dice di avere, arrivato col suo HELLO o col suo
 -- SUMMARY: i blocchi dei mestieri che non nomina se ne vanno, e restano
 -- segnati perche' un compagno rimasto indietro non li rimetta. Solo dalla
@@ -74,13 +102,8 @@ function Data:ApplyOwnerProfessionDeclaration(ownerCharacter, professionList)
 
     -- un mestiere ripreso: il segno se ne va, e il blocco puo' tornare da
     -- chiunque lo abbia
-    if type(entry.droppedProfessions) == "table" then
-        for professionKey in pairs(declared) do
-            entry.droppedProfessions[professionKey] = nil
-        end
-        if not next(entry.droppedProfessions) then
-            entry.droppedProfessions = nil
-        end
+    for professionKey in pairs(declared) do
+        clearDroppedMark(self, entry, professionKey)
     end
 
     local dropped = {}
@@ -95,6 +118,7 @@ function Data:ApplyOwnerProfessionDeclaration(ownerCharacter, professionList)
     table.sort(dropped)
 
     entry.droppedProfessions = entry.droppedProfessions or {}
+    self:BumpDroppedMarksGeneration()
     for _, professionKey in ipairs(dropped) do
         entry.professions[professionKey] = nil
         entry.droppedProfessions[professionKey] = true
@@ -145,13 +169,7 @@ function Data:ApplyIncomingBlockAdditive(blockKey, snapshot, opts)
     -- strada. Un rifiuto non e' un errore: il sync prosegue col blocco dopo.
     -- Se a mandarlo e' il proprietario stesso, l'ha ripreso, e vale lui.
     if opts.fromOwner == true then
-        local entry = self:GetMember(ownerCharacter)
-        if type(entry) == "table" and type(entry.droppedProfessions) == "table" then
-            entry.droppedProfessions[professionKey] = nil
-            if not next(entry.droppedProfessions) then
-                entry.droppedProfessions = nil
-            end
-        end
+        clearDroppedMark(self, self:GetMember(ownerCharacter), professionKey)
     end
     if self:IsProfessionDroppedByOwner(ownerCharacter, professionKey) then
         Addon:Tracef("sync",
