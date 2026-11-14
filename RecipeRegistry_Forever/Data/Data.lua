@@ -100,7 +100,7 @@ local DB_DEFAULTS = {
         -- SavedVariables value (or a stale config from an old version) can't
         -- push the sync engine outside safe bounds.
         tuning = {
-            blockPullDelaySeconds = 2.5,
+            blockPullDelaySeconds = 1.0,
             maxInboundSeedSessions = 4,
             blockPullResponseTimeoutSeconds = 60,
         },

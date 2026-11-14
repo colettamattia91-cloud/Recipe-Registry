@@ -46,7 +46,17 @@ local SUMMARY_SATURATION_THRESHOLD = 80
 -- to ~150 MB and visible stutter during massive pulls at the old
 -- cadence. The total wall-clock for a full sync increases (e.g., 100
 -- blocks: 100s -> 250s) but the per-frame budget breathes.
-local BLOCK_PULL_DELAY_SECONDS = 2.5
+--
+-- Di nuovo 1.0 dal 14/11. I 150 MB venivano dal ricalcolo dell'impronta a
+-- ogni fusione, che da allora e' rimandato a RR_BLOCK_MERGE_POST e si somma
+-- per finestre di mezzo secondo. Misurato nella gilda simulata, con il
+-- codec vero: chi riceve spende 0,3 ms e ~66 KB per blocco, fusione e
+-- impronta comprese; chi serve 3-7 ms e 230-320 KB, quasi tutto
+-- compressione, ma nel log vero un client ne ha serviti 12 in 20 ore. Per
+-- blocco: 4,6 s a 2,5, 3,2 s a 1,0, 2,3 s a 0,25, dove il limite diventa
+-- l'andata e ritorno dei sussurri. 1.0 e' anche il minimo del cursore nelle
+-- opzioni.
+local BLOCK_PULL_DELAY_SECONDS = 1.0
 -- Per-block response window. AceComm BULK priority is rate-limited by
 -- ChatThrottleLib (~800 bytes/sec shared across all BULK queues). A
 -- typical BLOCK_SNAPSHOT compressed is 1-3 KB; a seeder serving multiple

@@ -13,6 +13,10 @@ All notable changes to this addon are documented in this file.
 - **16 recipes show updated information on where to get them.**
 - **Recipe data from game build 1.60.1.70938.** 35 recipes changed, among them
   new difficulty thresholds on 28 and updated reagents on 5.
+- **The recipe database takes less than half the memory it did.**
+- **Your guildmates' recipes download about a third faster** when you join the
+  guild or come back after a long break.
+- **Downloads no longer get stuck on a guildmate who can't send them.**
 
 ## [0.1.7] - 2026-11-09
 
