@@ -47,92 +47,46 @@ local function cloneReagents(reagents)
     return out
 end
 
--- One entry per place: { name, zone, x, y, faction }, every field optional
--- but the pair of them. The zone is still an interned id here; GetSource
--- resolves it to a name.
+-- I record sono quelli del file generato, non copie. Fino al 14/11 _Rebuild
+-- li copiava tutti: 5 MB in piu' sui 3,6 del file (sandbox Lua 5.1), perche'
+-- il costruttore della copia nominava 27 campi e Lua 5.1 riserva lo spazio
+-- per tutti anche quando valgono nil. La copia veniva da quando i metadati
+-- erano un addon a parte; il dato e' statico, e nessun consumatore modifica un
+-- record. Una ricetta con una correzione a mano riceve invece una copia sua
+-- (vedi hasOverride), cosi' il file generato resta com'e' anche quando
+-- _Rebuild gira di nuovo con correzioni diverse.
 --
--- The position and the faction are per NPC and not per recipe: a recipe sold
--- by one vendor in Stormwind and another in Orgrimmar is available to both
--- sides, and the recipe-level faction says exactly that -- which tells a Horde
--- player nothing about which of the two they can walk up to.
-local function clonePlaces(list)
-    if type(list) ~= "table" then return nil end
+-- I campi di un record, come li scrive il generatore; un campo assente vale
+-- il suo caso comune:
+--   spellId           aggiunto qui, dalla chiave
+--   profession        il mestiere primario
+--   professions       l'elenco completo quando sono piu' d'uno: la 461692,
+--                     Synthetic Gordok Ogre Suit, sta in Leatherworking e in
+--                     Tailoring
+--   expansion, recipeItemId, createdItemId, createdCount, createdCountMax,
+--   specialization, category, sortOrder, requiredSkill
+--   classMask         le classi a cui un trainer la insegna; assente = tutte
+--   phase             la fase in cui arriva; assente = contenuto base
+--   trainerTitle, trainerContinents
+--                     il titolo di ogni trainer che la insegna e i continenti
+--   selfOnlyOutputless, bopOutput
+--   faction           assente = entrambe, che e' il caso comune
+--   sourceKind, worldDrop, bossDrop
+--   sourcePlaces      un posto per NPC, { name, zone, x, y, faction }: la zona
+--                     e' un id, GetSource la risolve; posizione e fazione
+--                     sono del singolo NPC, non della ricetta
+--   skillLevels       le quattro soglie di colore della ricetta
+--   removed           nei dati del client ma non nel gioco
+--   reagents          { itemId, count } per slot
+--
+-- I booleani mancano quando sono falsi: chi li legge confronta con true o
+-- ne prende la verita', mai con false.
+local function shallowCopy(record)
     local out = {}
-    for index, place in ipairs(list) do
-        out[index] = {
-            name = place.name,
-            zone = place.zone,
-            x = place.x,
-            y = place.y,
-            faction = place.faction,
-        }
+    for key, value in pairs(record) do
+        out[key] = value
     end
     return out
-end
-
-local function cloneStringList(list)
-    if type(list) ~= "table" then return nil end
-    local out = {}
-    for index, value in ipairs(list) do
-        out[index] = value
-    end
-    return out
-end
-
-local function cloneRecord(spellId, record)
-    if type(record) ~= "table" then
-        return nil
-    end
-    return {
-        spellId = tonumber(spellId),
-        profession = record.profession,
-        -- Una ricetta puo' appartenere a piu' mestieri: la 461692, Synthetic
-        -- Gordok Ogre Suit, sta sia in Leatherworking sia in Tailoring, e il
-        -- dataset TBC ha lo stesso caso con Transmute Gold sotto Mining e
-        -- Alchemy. "profession" resta il primario, per tutto il codice che ne
-        -- vuole uno solo; qui c'e' l'elenco completo quando ce n'e' piu' d'uno.
-        -- Senza questa riga il clone lo perdeva e nessuno se ne accorgeva.
-        professions = cloneStringList(record.professions),
-        expansion = record.expansion,
-        recipeItemId = record.recipeItemId,
-        createdItemId = record.createdItemId,
-        createdCount = record.createdCount,
-        createdCountMax = record.createdCountMax,
-        specialization = record.specialization,
-        category = record.category,
-        sortOrder = record.sortOrder,
-        requiredSkill = record.requiredSkill,
-        -- Which classes a trainer will teach this to, as the client's own
-        -- bitmask. Absent means every class.
-        classMask = record.classMask,
-        -- The content phase it first becomes obtainable in. Absent means base
-        -- content, which is most of the dataset.
-        phase = record.phase,
-        -- The title every trainer of this recipe carries, and the continents
-        -- they stand on. Absent means several ranks of trainer teach it, which
-        -- is the case where "from a trainer" is the right answer.
-        trainerTitle = record.trainerTitle,
-        trainerContinents = cloneStringList(record.trainerContinents),
-        selfOnlyOutputless = record.selfOnlyOutputless == true,
-        bopOutput = record.bopOutput,
-        -- Obtain-side fields. An absent faction means both: that is the
-        -- common case and the generator omits it rather than repeating it on
-        -- most of the dataset.
-        faction = record.faction,
-        sourceKind = record.sourceKind,
-        worldDrop = record.worldDrop == true,
-        bossDrop = record.bossDrop == true,
-        sourcePlaces = clonePlaces(record.sourcePlaces),
-        -- The four thresholds the game itself colours this recipe by. Four
-        -- numbers per recipe, stated by the source: orange up to the first,
-        -- then yellow, green, and grey from the last on.
-        skillLevels = cloneStringList(record.skillLevels),
-        -- In the client data but not in the game. Kept on the record rather
-        -- than left out of the payload, so a recipe flagged wrongly comes
-        -- back through the generator's override instead of an investigation.
-        removed = record.removed == true,
-        reagents = cloneReagents(record.reagents),
-    }
 end
 
 local function cloneSpellIdList(list)
@@ -206,6 +160,20 @@ local function applyOverrides(record)
             record.bopOutput = tonumber(bindType) == 1
         end
     end
+end
+
+-- Se una correzione a mano tocca questa ricetta. Su Forever i secchi delle
+-- correzioni sono tutti vuoti, quindi nessuna ricetta viene copiata.
+local function hasOverride(spellId, record)
+    local function has(bucket, key)
+        return type(bucket) == "table" and key ~= nil and bucket[key] ~= nil
+    end
+    return has(overrides.createdItemBySpellId, spellId)
+        or has(overrides.recipeItemBySpellId, spellId)
+        or has(overrides.categoryBySpellId, spellId)
+        or has(overrides.selfOnlyOutputlessBySpellId, spellId)
+        or has(overrides.bopOutputBySpellId, spellId)
+        or has(overrides.bindTypeByCreatedItemId, record.createdItemId)
 end
 
 local function addCreatedItemIndex(index, createdItemId, spellId)
@@ -286,20 +254,44 @@ function RecipeMetadata:_Rebuild()
     -- it against the fresh record set.
     self._unresolvedSpellIdSet = nil
 
-    for _, spellId in ipairs(sortedRecordIds(generated.recipesBySpellId)) do
-        local record = cloneRecord(spellId, generated.recipesBySpellId[spellId])
-        if record then
-            applyOverrides(record)
-            self._recordsBySpellId[record.spellId] = record
-            if record.recipeItemId then
-                self._recipeItemToSpellId[record.recipeItemId] = record.spellId
+    -- Gli indici per oggetto il generatore li scrive gia', identici a quelli
+    -- che si costruirebbero qui (verificato il 14/11: 2001 e 2330 voci, zero
+    -- differenze). Si rifanno solo se mancano, come nei dati finti degli spec,
+    -- o se una correzione cambia l'oggetto di una ricetta.
+    local itemOverrides = next(overrides.createdItemBySpellId or {}) ~= nil
+        or next(overrides.recipeItemBySpellId or {}) ~= nil
+    local reuseIndexes = not itemOverrides
+        and type(generated.recipeItemToSpellId) == "table"
+        and type(generated.createdItemToSpellIds) == "table"
+
+    local records = generated.recipesBySpellId or {}
+    for _, key in ipairs(sortedRecordIds(records)) do
+        local source = records[key]
+        if type(source) == "table" then
+            local spellId = tonumber(key)
+            source.spellId = spellId
+            local record = source
+            if hasOverride(spellId, source) then
+                record = shallowCopy(source)
+                applyOverrides(record)
             end
-            addCreatedItemIndex(self._createdItemToSpellIds, record.createdItemId, record.spellId)
+            self._recordsBySpellId[spellId] = record
+            if not reuseIndexes then
+                if record.recipeItemId then
+                    self._recipeItemToSpellId[record.recipeItemId] = spellId
+                end
+                addCreatedItemIndex(self._createdItemToSpellIds, record.createdItemId, spellId)
+            end
         end
     end
 
-    for _, spellIds in pairs(self._createdItemToSpellIds) do
-        table.sort(spellIds)
+    if reuseIndexes then
+        self._recipeItemToSpellId = generated.recipeItemToSpellId
+        self._createdItemToSpellIds = generated.createdItemToSpellIds
+    else
+        for _, spellIds in pairs(self._createdItemToSpellIds) do
+            table.sort(spellIds)
+        end
     end
 
     -- Prefer the static nav-tree baked into Generated.lua (fast, no Lua

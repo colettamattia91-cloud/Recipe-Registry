@@ -44,7 +44,7 @@ local function registerOptionsPanel(module, panel)
 end
 
 local TUNING_BOUNDS = {
-    blockPullDelaySeconds          = { default = 2.5, min = 1.0, max = 5.0 },
+    blockPullDelaySeconds          = { default = 1.0, min = 1.0, max = 5.0 },
     maxInboundSeedSessions         = { default = 4,   min = 1,   max = 4   },
     blockPullResponseTimeoutSeconds = { default = 60,  min = 30,  max = 120 },
 }
@@ -811,7 +811,7 @@ function Options:EnsurePanel()
 
     local tuningHeader = createPageHeader(pageSync, "Sync Tuning")
     local tuningHelp = createText(pageSync,
-        "Advanced. Defaults work for most setups; lower the pull delay only on fast PCs, raise it if you see stutter during massive syncs.")
+        "Advanced. Defaults work for most setups; raise the pull delay if you see stutter during large syncs.")
     tuningHelp:SetPoint("TOPLEFT", tuningHeader, "BOTTOMLEFT", 0, -6)
 
     -- Each slider needs ~16px slider body + ~12-14px below for the

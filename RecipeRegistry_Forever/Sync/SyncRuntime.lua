@@ -1406,14 +1406,21 @@ local function prepareSeedCandidateOrder(self, cycle, rows)
     end
 
     sort(rows, function(left, right)
-        if (left.inTopBand == true) ~= (right.inTopBand == true) then
-            return left.inTopBand == true
-        end
-
+        -- La penalita' prima della fascia alta. Al contrario, un seed che non
+        -- consegna e resta il piu' fornito veniva rieletto 13 s dopo la sua
+        -- penalita' di 120 s, a ogni giro: nella gilda simulata con tre 0.1.5
+        -- i cui sussurri il server scarta, 47 volte di fila, e i client nuovi
+        -- non si allineavano entro un'ora in 5 casi su 12. Con la penalita'
+        -- prima, 24 su 24, quasi tutti fra 150 e 400 s (14/11). Resta
+        -- candidato: se e' l'unico, lo si richiede comunque.
         local leftBackoff = self:IsPeerBackoffActive(left.peerKey) and 1 or 0
         local rightBackoff = self:IsPeerBackoffActive(right.peerKey) and 1 or 0
         if leftBackoff ~= rightBackoff then
             return leftBackoff < rightBackoff
+        end
+
+        if (left.inTopBand == true) ~= (right.inTopBand == true) then
+            return left.inTopBand == true
         end
 
         if left.inTopBand == true and right.inTopBand == true then
