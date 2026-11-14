@@ -2,6 +2,18 @@
 
 All notable changes to this addon are documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- **28 more recipes show where to get them.**
+
+### Changed
+
+- **16 recipes show updated information on where to get them.**
+- **Recipe data from game build 1.60.1.70938.** 35 recipes changed, among them
+  new difficulty thresholds on 28 and updated reagents on 5.
+
 ## [0.1.7] - 2026-11-09
 
 ### Fixed
