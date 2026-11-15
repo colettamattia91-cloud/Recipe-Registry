@@ -57,6 +57,7 @@ local ORDER = { 1263078, 22430, 11473, 7183, 1245250, 1245246 }
 local baseProfessionName = ""   -- come risponde a finestra chiusa: vuoto
 local sessionReady = true
 local linked = false
+local guildMember = false
 _G.C_TradeSkillUI = {
   GetAllRecipeIDs = function() return ORDER end,
   GetRecipeInfo = function(id)
@@ -83,6 +84,9 @@ _G.C_TradeSkillUI = {
     return { professionName = "Alchemy", parentProfessionName = "Alchemy" }
   end,
   IsTradeSkillGuild = function() return false end,
+  -- il mestiere di un compagno aperto dalla gilda: per Blizzard e' uno stato a
+  -- parte, IsTradeSkillLinked puo' restare false
+  IsTradeSkillGuildMember = function() return guildMember end,
   IsNPCCrafting = function() return false end,
   GetBaseProfessionInfo = function() return { professionName = baseProfessionName } end,
   -- risponde anche quando GetBaseProfessionInfo tace: e' la seconda strada
@@ -175,6 +179,15 @@ local linkedOk, linkedReason = Data:CanScanTradeSkillData()
 t("cancello chiuso", linkedOk, false)
 t("motivo", linkedReason, "trade-linked")
 linked = false
+
+-- stesso danno dal roster di gilda, senza che il client lo chiami "linked"
+guildMember = true
+local memberOk, memberReason = Data:CanScanTradeSkillData()
+t("compagno di gilda: cancello chiuso", memberOk, false)
+t("motivo", memberReason, "trade-guild-member")
+local memberResult = Data:ScanTradeSkill({ reason = "test", notifyMode = "auto" })
+t("scansione saltata", memberResult and memberResult.skipped, true)
+guildMember = false
 
 print("\n== una ricetta imparata si risolve senza finestra ==")
 -- e' il caso del dungeon: impari, e deve finire nel database da li', senza

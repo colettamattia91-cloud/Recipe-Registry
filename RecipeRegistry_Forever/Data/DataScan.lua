@@ -547,14 +547,26 @@ function Data:CanScanTradeSkillData()
     -- gilda a tuo nome -- dati sbagliati su di te, prodotti da un gesto
     -- innocuo, e nessun modo di accorgersene dopo.
     --
-    -- Stessa cosa per il mestiere di gilda e per la lavorazione presso un PNG:
-    -- in tutti e tre i casi la lista che il client espone non descrive questo
-    -- personaggio.
+    -- Stessa cosa per il mestiere di gilda, per quello di un singolo compagno
+    -- aperto dalla gilda e per la lavorazione presso un PNG: in tutti questi
+    -- casi la lista che il client espone non descrive questo personaggio.
+    --
+    -- Il compagno di gilda e' uno stato a se', non un caso di "linked": Blizzard
+    -- li controlla separatamente in Professions.IsViewingExternalCraftingList.
+    -- Ci si arriva con C_GuildInfo.QueryGuildMemberRecipes, che il roster di
+    -- gilda retail chiama dalla vista Professioni. Sul roster di Forever quella
+    -- vista oggi non c'e' (15/11), ma l'API si': la guardia costa una riga, e
+    -- il danno che evita non si ripara da solo. Se hai lo stesso mestiere del
+    -- compagno, la dichiarazione dei mestieri resta giusta e il contenuto no, e
+    -- la tua scansione dopo verrebbe scartata come parziale.
     if type(CT.IsTradeSkillLinked) == "function" and CT.IsTradeSkillLinked() then
         return false, "trade-linked", canonical
     end
     if type(CT.IsTradeSkillGuild) == "function" and CT.IsTradeSkillGuild() then
         return false, "trade-guild", canonical
+    end
+    if type(CT.IsTradeSkillGuildMember) == "function" and CT.IsTradeSkillGuildMember() then
+        return false, "trade-guild-member", canonical
     end
     if type(CT.IsNPCCrafting) == "function" and CT.IsNPCCrafting() then
         return false, "trade-npc", canonical
