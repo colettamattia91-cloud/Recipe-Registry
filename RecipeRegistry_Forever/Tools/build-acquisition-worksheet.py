@@ -15,6 +15,13 @@ HARVEST = os.path.join(HERE, "captures", "foreverchanges-2026-09-24.tsv")
 # client. Va tenuto uguale al bundle con cui si genera il database.
 MINING_REF = "forever-local-1.60.1.70938"
 
+# Le discordanze fra foreverchanges e Wowhead si decidono caso per caso, e
+# questi sono i casi decisi a favore di Wowhead. 18/11: tre pattern SoD di
+# Tailoring (Phoenix Bindings, Invoker's Cord, Invoker's Mantle) che Wowhead
+# vede vendere dai mercanti di stoffa di sei citta' e foreverchanges da' drop
+# da un mob qualsiasi, letto da un addon.
+PREFER_WOWHEAD = {428424, 435841, 435848}
+
 COLS = ["profession", "learnSkill", "name", "spellId", "recipeItemId", "band",
         "sourceKind", "npcName", "zone", "x", "y", "faction",
         "bossDrop", "worldDrop", "trainerTitle", "mobLevel", "notes"]
@@ -43,6 +50,25 @@ def load_client():
             except (ValueError, IndexError):
                 pass
     return recipes, rank, sparse
+
+
+def camp_spells(recipes):
+    """Le ricette da campo di Forever: per noi, i Blueprint.
+
+    Il client le mette in una categoria "Camping" per ogni mestiere, 39 in
+    tutto: il tier 1 insegnato dal trainer a 20 (Mana Well, Camp Tent, il
+    Basic Campfire...) e i tier 2-4 che si imparano da un oggetto "Blueprint:".
+    L'utente le vuole tutte sotto Blueprint, perche' sono tutte oggetti da
+    campo (18/11). Il criterio sta nel client e non nel testo di una fonte: la
+    raccolta a mano del 24/09 diceva "Blueprint" anche per undici Formula di
+    Enchanting (idol, libram, totem), e ne mancava piu' della meta'.
+    """
+    path = os.path.join(MINING, "cache", "datasets", MINING_REF, "TradeSkillCategory.csv")
+    with open(path, encoding="utf-8") as f:
+        camping = {int(r["ID"]) for r in csv.DictReader(f) if r["Name_lang"] == "Camping"}
+    if not camping:
+        raise SystemExit("nessuna categoria Camping in %s: il client l'ha rinominata?" % path)
+    return {r["spellId"] for r in recipes if r["tradeSkillCategoryId"] in camping}
 
 
 def load_cmangos():
@@ -75,9 +101,11 @@ def parse_source(text):
     s = text.strip()
     low = s.lower()
     if "blueprint" in low:
-        # Le postazioni del sistema di perk di Forever: non le insegna nessuno
-        # e non stanno da nessuna parte, arrivano progredendo nel mestiere.
-        return {"sourceKind": "blueprint"}
+        # Non e' una provenienza: il sito metteva questa parola a una famiglia
+        # di ricette, e la metteva anche dove non andava. Quali siano i
+        # Blueprint lo dice il client (camp_spells); qui non si scrive
+        # niente, cosi' la riga resta vuota invece di dire il falso.
+        return None
     if "nobody has found" in low:
         return {"notes": "ignota anche alla community"}
     m = re.search(r"reward of the quest ([^(]+)", s, re.I)
@@ -113,6 +141,7 @@ def parse_source(text):
 
 def main():
     recipes, rank, sparse = load_client()
+    camp = camp_spells(recipes)
     cur, covered = load_cmangos()
 
     # Il raccolto dal sito, per nome normalizzato.
@@ -144,6 +173,7 @@ def main():
                    name=r["name"], spellId=r["spellId"], recipeItemId=item or "",
                    band=band(r["spellId"]))
         rows.append(row)
+    rows_by_spell = {int(row["spellId"]): row for row in rows}
 
     # PRIMA DI TUTTO le catture in gioco: sono l'unica fonte che ha visto la
     # cosa invece di ricordarsela. Il sito dava Archmage Alvareaux in "Alterac
@@ -232,6 +262,12 @@ def main():
                        trainerTitle="", notes=w["notes"] + " (era trainer per il dataset TBC)")
             tbc_trainer_fixed += 1
             continue
+        if int(row["spellId"]) in PREFER_WOWHEAD:
+            row.update(sourceKind=w["sourceKind"], npcName=w["npcName"], zone=w["zone"],
+                       faction=w["faction"], bossDrop=w["bossDrop"], worldDrop=w["worldDrop"],
+                       trainerTitle="", notes=w["notes"] + " (scelta dell'utente sul disaccordo)")
+            from_wowhead += 1
+            continue
         if row["sourceKind"]:
             if row["sourceKind"] != w["sourceKind"]:
                 disagree.append((row["sourceKind"], w["sourceKind"], row["name"]))
@@ -241,8 +277,7 @@ def main():
                    worldDrop=w["worldDrop"], notes=w["notes"])
         from_wowhead += 1
 
-    # Infine il raccolto a mano dalle pagine, per cio' che lo scraping non ha:
-    # i Blueprint, che sul sito non stanno nel dato strutturato.
+    # Infine il raccolto a mano dalle pagine, per cio' che lo scraping non ha.
     filled = 0
     for row in rows:
         if row["sourceKind"]:
@@ -250,7 +285,10 @@ def main():
         h = harvest.get((row["profession"], norm(row["name"])))
         if not h:
             continue
-        row.update(parse_source(h["source"]))
+        parsed = parse_source(h["source"])
+        if parsed is None:
+            continue
+        row.update(parsed)
         row["notes"] = (row.get("notes") or h["source"]) + " [foreverchanges 2026-09-24]"
         filled += 1
 
@@ -302,6 +340,69 @@ def main():
         if m:
             row["zone"], row["faction"] = m.group(1).strip(), m.group(2).lower()
 
+    # In coda foreverdb (Tools/scrape-foreverdb.py), scelta dell'utente del
+    # 18/11: solo cio' che il suo addon companion ha visto su Forever --
+    # trainer visti insegnare la ricetta, venditori visti venderla, NPC visti
+    # con la loro posizione. Riempie le righe che nessuno ha riempito e mette
+    # le coordinate dove mancano; non corregge niente.
+    from_fdb, fdb_coords, fdb_factions, fdb_zone_conflicts = 0, 0, 0, []
+    fdb_path = os.path.join(HERE, "captures", "foreverdb-recipes.tsv")
+    if os.path.exists(fdb_path):
+        for f in csv.DictReader(open(fdb_path, encoding="utf-8"), delimiter="\t"):
+            row = rows_by_spell.get(int(f["spellId"]))
+            if row is None or row["sourceKind"]:
+                continue
+            row.update(sourceKind=f["sourceKind"], npcName=f["npcName"], zone=f["zone"],
+                       x=f["x"], y=f["y"], faction=f["faction"], notes=f["notes"])
+            from_fdb += 1
+
+    fdb_npcs = {}
+    npcs_path = os.path.join(HERE, "captures", "foreverdb-npcs.tsv")
+    if os.path.exists(npcs_path):
+        for n in csv.DictReader(open(npcs_path, encoding="utf-8"), delimiter="\t"):
+            fdb_npcs.setdefault(n["name"].lower(), []).append(n)
+
+    def positions(value, count, broadcast):
+        """Una colonna " | " come lista lunga quanto i nomi. Le liste sono
+        posizionali; un valore solo vale per tutti solo dove la colonna lo
+        prevede (zona, fazione), mai per le coordinate."""
+        parts = [p.strip() for p in value.split("|")] if value else []
+        if broadcast and len(parts) == 1:
+            parts = parts * count
+        return (parts + [""] * count)[:count]
+
+    for row in rows:
+        if row["sourceKind"] not in ("vendor", "trainer") or not row["npcName"]:
+            continue
+        names = [p.strip() for p in row["npcName"].split("|")]
+        n = len(names)
+        zone, faction = positions(row["zone"], n, True), positions(row["faction"], n, True)
+        x, y = positions(row["x"], n, False), positions(row["y"], n, False)
+        touched = False
+        for i, name in enumerate(names):
+            spots = fdb_npcs.get(name.lower()) if name else None
+            if x[i] or not spots or len(spots) != 1:
+                continue
+            spot = spots[0]
+            # Le coordinate valgono sulla mappa di foreverdb. Se per noi l'NPC
+            # sta in un'altra zona, una delle due fonti sbaglia e non si sa
+            # quale: si lascia com'e' e si conta.
+            if zone[i] and spot["zone"].lower() not in zone[i].lower():
+                fdb_zone_conflicts.append((row["name"], name, zone[i], spot["zone"]))
+                continue
+            x[i], y[i] = spot["x"], spot["y"]
+            zone[i] = zone[i] or spot["zone"]
+            if not faction[i] and spot["faction"]:
+                faction[i] = spot["faction"]
+                fdb_factions += 1
+            fdb_coords += 1
+            touched = True
+        if touched:
+            row.update(zone=" | ".join(zone), x=" | ".join(x), y=" | ".join(y),
+                       faction=" | ".join(faction) if any(faction) else "")
+            if "foreverdb" not in row["notes"]:
+                row["notes"] = (row["notes"] + " + " if row["notes"] else "") + "coordinate da foreverdb"
+
     # Il livello del mob, dal DB cmangos: sono creature vanilla e i loro livelli
     # non sono provenienza, sono anagrafica -- per questo si possono usare.
     for row in rows:
@@ -311,6 +412,18 @@ def main():
             got = cur.fetchone()
             if got:
                 row["mobLevel"] = "%d-%d" % got
+
+    # I Blueprint, per ultimi perche' il tipo sovrascrive quello delle fonti.
+    # Chi e dove restano: il tier 1 lo insegnano i trainer, del tier 2 molti
+    # cadono dai boss delle istanze basse e tre li vende Happy Camper, e
+    # "Blueprint: Gilnid (The Deadmines)" dice al giocatore sia che cosa e'
+    # sia dove andare.
+    blueprints = 0
+    for row in rows:
+        if int(row["spellId"]) in camp:
+            row["sourceKind"] = "blueprint"
+            row["notes"] = (row["notes"] + " + " if row["notes"] else "") + "Blueprint dal client"
+            blueprints += 1
 
     rows.sort(key=lambda r: (r["band"] != "forever", r["profession"],
                              r["learnSkill"] if r["learnSkill"] != "" else 999, r["name"]))
@@ -323,9 +436,13 @@ def main():
     os.replace(tmp, OUT)
 
     print("righe: %d | in gioco: %d | TBC: %d | scraping: %d | wowhead: %d (+%d trainer TBC corretti)"
-          " | a mano: %d | vuote: %d"
+          " | a mano: %d | foreverdb: %d | blueprint: %d | vuote: %d"
           % (len(rows), from_ingame, from_tbc, from_web, from_wowhead, tbc_trainer_fixed, filled,
-             sum(1 for r in rows if not r["sourceKind"])))
+             from_fdb, blueprints, sum(1 for r in rows if not r["sourceKind"])))
+    print("coordinate da foreverdb: %d NPC (%d con la fazione); zona diversa, lasciati: %d"
+          % (fdb_coords, fdb_factions, len(fdb_zone_conflicts)))
+    for recipe, npc, ours, theirs in fdb_zone_conflicts[:12]:
+        print("  %-30s %-22s noi %-28s foreverdb %s" % (recipe[:30], npc[:22], ours[:28], theirs))
     if disagree:
         from collections import Counter
         print("\n=== WOWHEAD DICE ALTRO SU %d RIGHE GIA' PIENE (prima -> wowhead) ===" % len(disagree))

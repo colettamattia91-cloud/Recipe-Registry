@@ -36,6 +36,14 @@ pubbliche che sembrano averla sono tutte lo stesso dato di seconda mano:
   soli. Dal 25/10 si legge direttamente, una pagina-oggetto per ricetta, con
   `Tools/scrape-wowhead.py` (in `captures/wowhead-recipes.tsv`): riempie le
   righe che foreverchanges lascia vuote, e conta dove i due non concordano.
+- **foreverdb.net** (dal 18/11) e' CMaNGOS Classic piu' cio' che il suo addon
+  companion ha visto su Forever. Si prende solo la seconda parte: trainer
+  visti insegnare la ricetta, venditori visti venderla, posizione degli NPC
+  visti. Entra per ultimo nel builder, a riempire righe vuote e coordinate
+  mancanti, senza correggere niente. `python Tools/scrape-foreverdb.py`
+  scrive `captures/foreverdb-recipes.tsv` e `captures/foreverdb-npcs.tsv`;
+  `--save <cartella>` tiene gli snapshot scaricati, `--from <cartella>` li
+  rilegge senza rete.
 
 Quindi le righe vuote qui sono il residuo dopo aver spremuto tutto il
 replicabile: 994 il 24/09, 424 il 25/10 dopo Wowhead. Di queste, 265
@@ -51,11 +59,18 @@ inventarne di nuovi.
 `sourceKind` -- uno di: `trainer`, `vendor`, `drop`, `worldDrop`, `quest`,
 `container`, `blueprint`, `discovery`, `worldEvent`.
 
-`blueprint` e' l'unico che TBC non ha: sono le postazioni di Forever --
-fermentatore, forno, forgia arcana, banco da lavoro, tavolo da conciatura --
-che non le insegna nessuno e non stanno da nessuna parte, arrivano col sistema
-di perk del mestiere. Percio' non hanno ne' NPC ne' zona, e la riga in UI e'
-la sola parola "Blueprint".
+`blueprint` e' l'unico che TBC non ha: sono le ricette da campo di Forever
+-- tenda, falo', fermentatore, forno, forgia arcana, banco da lavoro.
+**Non si scrive a mano e non viene da una fonte:** il builder lo mette alle
+ricette che il client mette nella categoria "Camping" del loro mestiere, 39 in
+tutto. Il tier 1 lo insegna il trainer a 20 (Mana Well, Camp Tent, Basic
+Campfire...); i tier 2-4 si imparano da un oggetto "Blueprint: ...". Sono
+Blueprint tutti, perche' sono tutti oggetti da campo (decisione dell'utente,
+18/11). Il testo "Blueprint" della raccolta del 24/09 lo dava anche a undici
+Formula di Enchanting (idol, libram, totem), e ne mancava piu' della meta'.
+NPC e zona restano quando si conoscono, e la riga in UI e'
+"Blueprint: Gilnid (The Deadmines)"; dove non si sa, la sola parola
+"Blueprint".
 
 - `npcName` / `zone` -- chi e dove. Una delle due puo' mancare: una quest
   nomina la zona e nessuno, una ricetta che insegnano tutti i trainer non

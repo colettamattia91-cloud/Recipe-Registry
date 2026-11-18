@@ -1826,6 +1826,19 @@ local function sourceLabelFor(source, who, where)
         return string.format("%s %s %s", prefix, preposition, where)
     end
 
+    -- I Blueprint di Forever: le ricette da campo, quelle che il client mette
+    -- nella categoria "Camping" di ogni mestiere. E' una famiglia di ricette
+    -- prima che una provenienza, quindi viene prima di tutto il resto, world
+    -- drop compreso: il filtro "Blueprint" deve trovarle tutte. Dove si
+    -- prendono si dice quando si sa -- il tier 1 lo insegnano i trainer, molti
+    -- del tier 2 cadono dai boss delle istanze basse -- e per le altre resta
+    -- la parola sola.
+    if source.kind == "blueprint" then
+        if who then return "blueprint", named("Blueprint") end
+        if where then return "blueprint", placed("Blueprint", "in") end
+        return "blueprint", "Blueprint"
+    end
+
     if source.worldDrop then
         return "worldDrop", "World drop"
     end
@@ -1859,14 +1872,6 @@ local function sourceLabelFor(source, who, where)
     end
     if source.kind == "worldEvent" then
         return "worldEvent", "World event"
-    end
-    -- Le postazioni di Forever -- fermentatore, forno, forgia arcana, banco da
-    -- lavoro. Non le insegna nessuno e non stanno da nessuna parte: arrivano
-    -- col sistema di perk del mestiere, quindi la risposta e' "progredisci",
-    -- non "vai". Nessun luogo, nessun NPC, e per questo il nome del mestiere
-    -- non aggiunge niente alla riga.
-    if source.kind == "blueprint" then
-        return "blueprint", "Blueprint"
     end
     if source.kind == "quest" then
         if who then return "quest", named("Quest") end

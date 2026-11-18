@@ -86,52 +86,53 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 10490	8384	Pattern: Comfortable Leather Hat	drop	Saltstone Crystalhide | Dark Iron Shadowcaster | Bloodfen Raptor | Bloodsail Elder Magus	Thousand Needles | Arathi Highlands | Dustwallow Marsh | Stranglethorn Vale			foreverchanges, letto da addon
 10509	8385	Pattern: Turtle Scale Gloves	vendor	Pratt McGrubben | Jangdor Swiftstrider	Feralas | Feralas	alliance | horde		foreverchanges, letto da addon
 10516	8409	Pattern: Nightscape Shoulders	vendor	Nioma | Jangdor Swiftstrider	The Hinterlands | Feralas	alliance | horde		foreverchanges, letto da addon
-10520	8386	Pattern: Big Voodoo Robe	drop	Syndicate Assassin | Daggerspine Raider | Caretaker Weston | Bubbling Swamp Ooze | Elder Murk Thresher	Alterac Mountains | Arathi Highlands | Arathi Highlands | Dustwallow Marsh | Dustwallow Marsh			foreverchanges, letto da addon
+10520	8386	Pattern: Big Voodoo Robe	drop	Syndicate Conjuror | Syndicate Assassin | Stonevault Rockchewer | Daggerspine Raider | Caretaker Weston | Bubbling Swamp Ooze | Elder Murk Thresher	Arathi Highlands | Alterac Mountains | Badlands | Arathi Highlands | Arathi Highlands | Dustwallow Marsh | Dustwallow Marsh			foreverchanges, letto da addon
 10525	8395	Pattern: Tough Scorpid Breastplate	drop	Wastewander Bandit	Tanaris			foreverchanges, letto da classic
 10529	8403	Pattern: Wild Leather Shoulders	quest			alliance		foreverchanges, letto da classic
-10531	8387	Pattern: Big Voodoo Mask	drop	Nether Sorceress | Razortalon | Syndicate Prowler | Drywhisker Digger | Glommus | Mug'thol	Desolace | The Hinterlands | Arathi Highlands | Arathi Highlands | Alterac Mountains | Alterac Mountains			foreverchanges, letto da addon
+10531	8387	Pattern: Big Voodoo Mask	worldDrop				true	foreverchanges, letto da addon
 10533	8397	Pattern: Tough Scorpid Bracers	drop	Wastewander Shadow Mage	Tanaris			foreverchanges, letto da classic
 10542	8398	Pattern: Tough Scorpid Gloves	drop	Wastewander Thief	Tanaris			foreverchanges, letto da classic
 10544	8404	Pattern: Wild Leather Vest	quest			horde		foreverchanges, letto da classic
 10546	8405	Pattern: Wild Leather Helmet	quest			alliance		foreverchanges, letto da classic
 10554	8399	Pattern: Tough Scorpid Boots	drop	Wastewander Rogue	Tanaris			foreverchanges, letto da classic
-10560	8389	Pattern: Big Voodoo Pants	drop	Sand Crawler | Bloodroar the Stalker | Omgorn the Lost | Wave Strider	Riverglades | Feralas | Tanaris | Feralas			foreverchanges, letto da addon
-10562	8390	Pattern: Big Voodoo Cloak	drop	Jin'Zallah the Sandbringer | Zanzil Naga | Death Cultist | Jade Sludge	Tanaris | Stranglethorn Vale | Eastern Plaguelands | The Hinterlands			foreverchanges, letto da addon
+10560	8389	Pattern: Big Voodoo Pants	drop	Crushridge Mage | Bloodroar the Stalker | Omgorn the Lost | Sand Crawler | Wastewander Thief | Wave Strider	Alterac Mountains | Feralas | Tanaris | Riverglades | Tanaris | Feralas			foreverchanges, letto da addon
+10562	8390	Pattern: Big Voodoo Cloak	worldDrop				true	foreverchanges, letto da addon
 10564	8400	Pattern: Tough Scorpid Shoulders	drop	Wastewander Assassin | Andre Firebeard	Tanaris | Tanaris			foreverchanges, letto da classic
 10566	8406	Pattern: Wild Leather Boots	quest			alliance		foreverchanges, letto da classic
 10568	8401	Pattern: Tough Scorpid Leggings	drop	Wastewander Rogue	Tanaris			foreverchanges, letto da classic
-10570	8402	Pattern: Tough Scorpid Helm	drop	Wastewander Assassin | Andre Firebeard	Tanaris | Tanaris			foreverchanges, letto da classic
+10570	8402	Pattern: Tough Scorpid Helm	drop	Wastewander Scofflaw | Wastewander Assassin | Andre Firebeard	Tanaris | Tanaris | Tanaris			foreverchanges, letto da addon
 10572	8407	Pattern: Wild Leather Leggings	quest			alliance		foreverchanges, letto da classic
 10574	8408	Pattern: Wild Leather Cloak	quest			horde		foreverchanges, letto da classic
 10840	16113	Manual: Mageweave Bandage	vendor	Deneb Walker | Balai Lok'Wein	Arathi Highlands | Dustwallow Marsh	alliance | horde		foreverchanges, letto da addon
 11453	9293	Recipe: Magic Resistance Potion	worldDrop				true	foreverchanges, letto da addon
-11458	9294	Recipe: Wildvine Potion	drop	Vilebranch Aman'zasi Guard | Vilebranch Blood Drinker | Nezzliok the Dire | Skullsplitter Berserker | Zalas Witherbark | Mith'rethis the Enchanter | Yenniku | Skullsplitter Mystic	The Hinterlands | The Hinterlands | Stranglethorn Vale | Stranglethorn Vale | Arathi Highlands | The Hinterlands | Stranglethorn Vale | Stranglethorn Vale			foreverchanges, letto da addon
+11458	9294	Recipe: Wildvine Potion	drop	Gan'zulah | Zalas Witherbark | Vilebranch Aman'zasi Guard | Nezzliok the Dire | Vilebranch Shadow Hunter | Skullsplitter Berserker | Mith'rethis the Enchanter | Yenniku	Stranglethorn Vale | Arathi Highlands | The Hinterlands | Stranglethorn Vale | The Hinterlands | Stranglethorn Vale | The Hinterlands | Stranglethorn Vale			foreverchanges, letto da addon
 11459	9303	Recipe: Philosopher's Stone	vendor	Alchemist Pestlezugg	Tanaris			foreverchanges, letto da addon
-11464	9295	Recipe: Invisibility Potion	drop	Skullsplitter Hunter | Bloodsail Warlock | Lord Sakrasis | Magister Hawkhelm | Thunderstomp Stegodon	Stranglethorn Vale | Stranglethorn Vale | Stranglethorn Vale | Azshara | Un'Goro Crater			foreverchanges, letto da addon
+11464	9295	Recipe: Invisibility Potion	drop	Skullsplitter Hunter | Lord Sakrasis | Magister Hawkhelm | Bloodsail Warlock | Thunderstomp Stegodon	Stranglethorn Vale | Stranglethorn Vale | Azshara | Stranglethorn Vale | Un'Goro Crater			foreverchanges, letto da addon
 11466	9296	Recipe: Gift of Arthas	drop	Slavering Ghoul | Skeletal Flayer	Western Plaguelands | Western Plaguelands			foreverchanges, letto da classic
 11468	9297	Recipe: Draught of Dream Vision	drop	Makrinni Snapclaw | Blood Elf Reclaimer | Bloodpetal Lasher	Azshara | Azshara | Un'Goro Crater			foreverchanges, letto da classic
-11472	9298	Recipe: Elixir of Giants	drop	Wave Strider | Hitah'ya the Keeper | Jade Sludge	Feralas | Arathi Highlands | The Hinterlands			foreverchanges, letto da classic
+11472	9298	Recipe: Elixir of Giants	drop	Fire Roc | Wave Strider | Hitah'ya the Keeper | Jade Sludge	Tanaris | Feralas | Arathi Highlands | The Hinterlands			foreverchanges, letto da addon
 11473	9302	Recipe: Ghost Dye	vendor	Logannas | Bronk	Feralas | Feralas	alliance | horde		foreverchanges, letto da addon
 11476	9301	Recipe: Elixir of Shadow Power	vendor	Maria Lumere | Algernon	Stormwind City | Undercity	alliance | horde		foreverchanges, letto da addon
 11477	9300	Recipe: Potion of Demon Slaying	vendor	Nina Lightbrew | Rartar	Blasted Lands | Swamp of Sorrows	alliance | horde		foreverchanges, letto da addon
 11479	9304	Recipe: Transmute Iron to Gold	vendor	Alchemist Pestlezugg	Tanaris			foreverchanges, letto da addon
 11480	9305	Recipe: Transmute Mithril to Truesilver	vendor	Alchemist Pestlezugg	Tanaris			foreverchanges, letto da addon
 11643	9367	Plans: Golden Scale Gauntlets	quest			alliance		foreverchanges, letto da classic
-12047	10316	Pattern: Colorful Kilt	drop	Raging Cliff Stormer | Hecklefang Snarler | Deviate Stalker | Venture Co. Operator | Kolkar Marauder | Raging Rot Hide | Greater Tarantula | Redridge Mystic	Stonetalon Mountains | The Barrens |  | Stonetalon Mountains | The Barrens | Silverpine Forest | Redridge Mountains | Redridge Mountains			foreverchanges, letto da addon
-12056	10300	Pattern: Red Mageweave Vest	drop	Drywhisker Digger | Anathemus | Highland Thrasher | Otto	Arathi Highlands | Badlands | Arathi Highlands | Arathi Highlands			foreverchanges, letto da addon
-12059	10301	Pattern: White Bandit Mask	drop	Molt Thorn | Skullsplitter Mystic | Lashtail Raptor | Rock Worm | Shore Strider	Swamp of Sorrows | Stranglethorn Vale | Stranglethorn Vale | Desolace | Feralas			foreverchanges, letto da addon
-12060	10302	Pattern: Red Mageweave Pants	drop	Crushridge Mauler | Caretaker Nevlin | Snarler | Deepstrider Giant	Alterac Mountains | Arathi Highlands | Feralas | Desolace			foreverchanges, letto da addon
+12047	10316	Pattern: Colorful Kilt	drop	Raging Cliff Stormer | Hecklefang Snarler | Deviate Stalker | Venture Co. Operator | Kolkar Marauder | Raging Rot Hide | Thistlefur Avenger | Azzere the Skyblade	Stonetalon Mountains | The Barrens |  | Stonetalon Mountains | The Barrens | Silverpine Forest | Ashenvale | The Barrens			foreverchanges, letto da addon
+12056	10300	Pattern: Red Mageweave Vest	drop	Young Lashtail Raptor | Magram Windchaser | Skullsplitter Mystic | Anathemus | Drywhisker Digger | Highland Thrasher | Otto	Stranglethorn Vale | Desolace | Stranglethorn Vale | Badlands | Arathi Highlands | Arathi Highlands | Arathi Highlands			foreverchanges, letto da addon
+12059	10301	Pattern: White Bandit Mask	worldDrop				true	foreverchanges, letto da addon
+12060	10302	Pattern: Red Mageweave Pants	worldDrop				true	foreverchanges, letto da addon
 12063	254682	Pattern: Stormcloth Gloves	vendor	Gorhak	Desolace			foreverchanges, letto da db
 12064	10311	Pattern: Orange Martial Shirt	vendor	Elynna | Mahu	Darnassus | Thunder Bluff	alliance | horde		foreverchanges, letto da addon
-12066	10312	Pattern: Red Mageweave Gloves	drop	Warleader Krazzilak | Emerald Ooze | Ambershard Destroyer	Tanaris | The Hinterlands | Desolace			foreverchanges, letto da classic
+12066	10312	Pattern: Red Mageweave Gloves	worldDrop				true	foreverchanges, letto da addon
 12075	10314	Pattern: Lavender Mageweave Shirt	vendor	Outfitter Eric | Borya	Ironforge | Orgrimmar	alliance | horde		foreverchanges, letto da addon
-12078	10315	Pattern: Red Mageweave Shoulders	drop	Caretaker Weston | Nethergarde Riftwatcher | Mojo the Twisted	Arathi Highlands | Blasted Lands | Blasted Lands			foreverchanges, letto da classic
+12078	10315	Pattern: Red Mageweave Shoulders	drop	Caretaker Weston | Nethergarde Riftwatcher | Bloodsail Swashbuckler | Mojo the Twisted	Arathi Highlands | Blasted Lands | Stranglethorn Vale | Blasted Lands			foreverchanges, letto da addon
 12080	10317	Pattern: Pink Mageweave Shirt	vendor	Outfitter Eric | Borya	Ironforge | Orgrimmar	alliance | horde		foreverchanges, letto da addon
 12081	10318	Pattern: Admiral's Hat	vendor	Cowardly Crosby	Stranglethorn Vale			foreverchanges, letto da addon
 12084	10320	Pattern: Red Mageweave Headband	drop	Grimungous | Deatheye | Gorlash	The Hinterlands | Blasted Lands | Stranglethorn Vale			foreverchanges, letto da classic
 12085	10321	Pattern: Tuxedo Shirt	vendor	Outfitter Eric | Millie Gregorian	Ironforge | Undercity	alliance | horde		foreverchanges, letto da addon
 12086	10463	Pattern: Shadoweave Mask	quest					foreverchanges, letto da classic
 12089	10323	Pattern: Tuxedo Pants	vendor	Outfitter Eric | Millie Gregorian	Ironforge | Undercity	alliance | horde		foreverchanges, letto da addon
+12090	254686	Pattern: Stormcloth Boots	drop	Hatecrest Serpent Guard	Feralas			foreverchanges, letto da addon
 12091	10325	Pattern: White Wedding Dress	vendor	Alexandra Bolero | Mahu	Stormwind City | Thunder Bluff	alliance | horde		foreverchanges, letto da addon
 12093	10326	Pattern: Tuxedo Jacket	vendor	Outfitter Eric | Millie Gregorian	Ironforge | Undercity	alliance | horde		foreverchanges, letto da addon
 12259	10424	Plans: Silvered Bronze Leggings	worldDrop				true	foreverchanges, letto da addon
@@ -163,6 +164,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1250780	250367	Recipe: Lesser Cleric's Elixir	vendor	Nina Surefire | Apothecary Durelle	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1250781	250368	Recipe: Cleric's Elixir	drop	Xavian Hellcaller	Ashenvale			foreverchanges, letto da addon
 1250782	250369	Recipe: Greater Cleric's Elixir	vendor	Nina Surefire | Apothecary Durelle	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
+1250783	250370	Recipe: Elixir of Fortitude	drop	Kolkar Centaur	Desolace			foreverchanges, letto da addon
 1250784	250371	Recipe: Elixir of Greater Fortitude	vendor	Nina Surefire | Apothecary Durelle	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1250785	250372	Recipe: Elixir of Wicked Regeneration	vendor	Nina Surefire | Apothecary Durelle	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1250786	250373	Recipe: Elixir of the Owl	vendor	Nina Surefire | Apothecary Durelle	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
@@ -190,6 +192,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1251736	250983	Recipe: Lesser Frenzy Potion	drop	Raging Rot Hide	Silverpine Forest			foreverchanges, letto da addon
 1251737	250984	Recipe: Frenzy Potion	vendor	Nina Surefire | Apothecary Durelle	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1251738	250985	Recipe: Greater Frenzy Potion	vendor	Gorhak	Desolace			foreverchanges, letto da db
+1251739	250986	Recipe: Superior Frenzy Potion	drop	Northspring Roguefeather	Feralas			foreverchanges, letto da addon
 1251740	250987	Recipe: Major Frenzy Potion	vendor	Nina Surefire | Apothecary Durelle	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1251741	250988	Recipe: Minor Mender's Potion	drop	Tirisfal Farmer | Gnarlpine Mystic	Tirisfal Glades | Teldrassil			foreverchanges, letto da addon
 1251742	250989	Recipe: Lesser Mender's Potion	drop	Theramore Preserver | Stormscale Siren	The Barrens | Darkshore			foreverchanges, letto da db
@@ -237,9 +240,11 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1252283	251386	Plans: Hard Gold Boots	drop	Syndicate Highwayman	Arathi Highlands			foreverchanges, letto da db
 1252284	251387	Plans: Hard Gold Bracers	drop	Slitherblade Naga	Desolace			foreverchanges, letto da addon
 1252285	251388	Plans: Hard Gold Leggings	drop	Kurzen Jungle Fighter	Stranglethorn Vale			foreverchanges, letto da addon
+1252286	251389	Plans: Hard Gold Coif	drop	Dustbelcher Warrior	Badlands			foreverchanges, letto da addon
 1252287	251390	Plans: Hard Gold Gauntlet	vendor	Gorhak	Desolace			foreverchanges, letto da db
 1252288	251391	Plans: Hard Gold Pauldrons	drop	Crushridge Ogre	Alterac Mountains			foreverchanges, letto da addon
 1252289	251392	Plans: Shining Mithril Breastplate	drop	Magram Necromancer | Outcast Necromancer	Shen'dralas | Shen'dralas			foreverchanges, letto da addon
+1252290	251393	Plans: Shining Mithril Pauldrons	drop	Daggerspine Sorceress	Arathi Highlands			foreverchanges, letto da addon
 1252291	251394	Plans: Shining Mithril Boots	drop	Stonevault Shaman	Badlands			foreverchanges, letto da addon
 1252292	251395	Plans: Shining Mithril Helm	drop	Naga Explorer	Stranglethorn Vale			foreverchanges, letto da addon
 1252294	251397	Plans: Shining Mithril Gauntlet	drop	Southsea Pirate	Tanaris			foreverchanges, letto da addon
@@ -268,7 +273,9 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1252332	251435	Plans: Warder's Wristguard	vendor	Stondry Darkhammer | Gor'mak	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1252333	251436	Plans: Prefect's Wristguard	vendor	Stondry Darkhammer | Gor'mak	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1252334	251437	Plans: Justicar's Wristguards	vendor	Stondry Darkhammer | Gor'mak	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
+1252336	251439	Plans: Blessed Plate Boots	drop	Dark Iron Lookout	Searing Gorge			foreverchanges, letto da addon
 1252338	251441	Plans: Imperial Plate Gauntlets	drop	Blood Elf Reclaimer	Azshara			foreverchanges, letto da addon
+1252340	251443	Plans: Blessed Plate Leggings	drop	Raging Owlbeast	Winterspring			foreverchanges, letto da addon
 1252343	251446	Plans: Blessed Plate Chest	drop	Zarrat Wormwing | Wormwing Harpy | Wormwing Windwitch	Mount Hyjal | Mount Hyjal | Mount Hyjal			foreverchanges, letto da addon
 1252344	251447	Plans: Enriched Thorium Breastplate	vendor	Stondry Darkhammer | Gor'mak	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1252345	251448	Plans: Enriched Thorium Leggings	vendor	Stondry Darkhammer | Gor'mak	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
@@ -280,6 +287,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1252355	251458	Plans: Iron Morningstar	vendor	Gorhak	Desolace			foreverchanges, letto da db
 1252357	251460	Plans: Mithril Warhammer	vendor	Martha Wellsworth	Riverglades			foreverchanges, letto da addon
 1252358	251461	Plans: Mithril Claws	drop	Stonevault Bonesnapper	Badlands			foreverchanges, letto da addon
+1252359	251462	Plans: Mithril Claymore	drop	Woodpaw Mongrel	Feralas			foreverchanges, letto da addon
 1252360	251463	Plans: Mithril Stiletto	drop	Lost One Hunter	Swamp of Sorrows			foreverchanges, letto da addon
 1252361	251464	Plans: Charged Mithril Battleaxe	drop	Gordunni Brute	Feralas			foreverchanges, letto da addon
 1252362	251465	Plans: Thorium Greatmace	vendor	Stondry Darkhammer | Gor'mak	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
@@ -289,13 +297,19 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1252566	251526	Recipe: Savory Whimsyfin Delight	drop	Greater Tarantula | Blackrock Grunt	Redridge Mountains | Redridge Mountains			foreverchanges, letto da addon
 1254965	252942	Pattern: Forceful Rugged Armor Kit	vendor	Jangdor Swiftstrider | Nioma	Feralas | The Hinterlands			foreverchanges, letto da addon
 1254966	252941	Pattern: Mystic Rugged Armor Kit	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
+1254973	252934	Pattern: Charged Scorpid Leggings	drop	Unliving Mossflayer	Eastern Plaguelands			foreverchanges, letto da addon
 1254974	252933	Pattern: Supple Scorpid Vest	vendor	Pexmit	Mount Hyjal			foreverchanges, letto da db
-1254978	252929	Pattern: Supple Scorpid Belt	drop	Blood Elf Surveyor	Azshara			foreverchanges, letto da addon
+1254975	252932	Pattern: Charged Scorpid Vest	drop	Spitelash Siren	Azshara			foreverchanges, letto da addon
+1254976	252931	Pattern: Supple Scorpid Helm	drop	Shadowsworn Adept	Blasted Lands			foreverchanges, letto da addon
+1254978	252929	Pattern: Supple Scorpid Belt	drop	Blood Elf Defender | Blood Elf Surveyor	Azshara | Azshara			foreverchanges, letto da addon
+1254980	252927	Pattern: Charged Scorpid Bracers	drop	Tar Creeper	Un'Goro Crater			foreverchanges, letto da addon
 1254982	252925	Pattern: Mender's Mail Belt	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1254983	252924	Pattern: Skirmisher's Mail Belt	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1254984	252923	Pattern: Skycaller's Mail Belt	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1254985	252922	Pattern: Stalker's Mail Belt	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
+1254991	252916	Pattern: Supple Scorpid Bracers	drop	Groddoc Thunderer	Feralas			foreverchanges, letto da addon
 1254992	252915	Pattern: Charged Scorpid Helm	drop	Incendosaur	Searing Gorge			foreverchanges, letto da addon
+1254993	252914	Pattern: Supple Scorpid Leggings	drop	Ravasaur	Un'Goro Crater			foreverchanges, letto da addon
 1254994	252913	Pattern: Mender's Mail Sabatons	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1254995	252912	Pattern: Skirmisher's Mail Sabatons	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1254996	252911	Pattern: Skycaller's Mail Sabatons	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
@@ -322,6 +336,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1255046	252861	Pattern: Skulker's Leather Boots	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1255047	252860	Pattern: Prowler's Leather Boots	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1255048	252859	Pattern: Blue Suede Shoes	drop	Dark Iron Taskmaster	Searing Gorge			foreverchanges, letto da addon
+1255049	252858	Pattern: Tooled Leather Belt	drop	Highborne Apparition	Azshara			foreverchanges, letto da addon
 1255050	252857	Pattern: Mender's Leather Bracers	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1255051	252856	Pattern: Skycaller's Leather Bracers	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1255052	252855	Pattern: Warden's Leather Bracers	vendor	Daniel Stitchsong | Pawani	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
@@ -452,6 +467,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1257433	254016	Pattern: Earthen Silk Hood	drop	Slitherblade Sea Witch	Desolace			foreverchanges, letto da addon
 1257434	254018	Pattern: Earthen Silk Gloves	drop	Bloodscalp Mystic	Stranglethorn Vale			foreverchanges, letto da addon
 1257435	254020	Pattern: Earthen Silk Cuffs	drop	Mirefin Murloc	Dustwallow Marsh			foreverchanges, letto da addon
+1257436	254022	Pattern: Gilded Handwraps	drop	Saltscale Oracle	Stranglethorn Vale			foreverchanges, letto da addon
 1257437	254024	Pattern: Frothing Handwraps	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1257438	254026	Pattern: Fiery Handwraps	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1257439	254028	Pattern: Black Handwraps	vendor	Mivin Shadowweave | Jim'bek	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
@@ -492,7 +508,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1259344	255727	Manual: Superior Poultice	drop	Syndicate Sentry	Alterac Mountains			foreverchanges, letto da addon
 1259348	255726	Manual: Leather Tourniquet	drop	Shadowforge Tunneler	Badlands			foreverchanges, letto da addon
 12597	10602	Schematic: Deadly Scope	vendor	Yuka Screwspigot | Knaz Blunderflame	Burning Steppes | Stranglethorn Vale			foreverchanges, letto da addon
-12607	10603	Schematic: Catseye Ultra Goggles	drop	Caretaker Nevlin | King Bangalash | The Nameless Prophet	Arathi Highlands | Stranglethorn Vale | Desolace			foreverchanges, letto da classic
+12607	10603	Schematic: Catseye Ultra Goggles	drop	Caretaker Nevlin | Shore Crawler | King Bangalash | The Nameless Prophet	Arathi Highlands | Riverglades | Stranglethorn Vale | Desolace			foreverchanges, letto da addon
 12614	10604	Schematic: Mithril Heavy-bore Rifle	worldDrop				true	foreverchanges, letto da addon
 12615	10605	Schematic: Spellpower Goggles Xtreme	drop	Prince Galen Trollbane | Nagaz | Targ	Arathi Highlands | Alterac Mountains | Alterac Mountains			foreverchanges, letto da classic
 12616	10606	Schematic: Parachute Cloak	worldDrop				true	foreverchanges, letto da addon
@@ -507,16 +523,20 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1266907	264204	Schematic: EZ-Thro Wrap	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1266908	264205	Schematic: EZ-Thro Copper Bomb XL	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1266909	264206	Schematic: No Slip SAF-T Padding	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
+1266910	264207	Schematic: SAF-T Bronze Bomb	drop	Scarlet Scout	Tirisfal Glades			foreverchanges, letto da addon
 1266912	264209	Schematic: SAF-T Bell	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
+1266913	264210	Schematic: Shafety Sheep	drop	Venture Co. Miner	Stranglethorn Vale			foreverchanges, letto da addon
 1266914	264211	Schematic: EZ-Thro Fireproof Fuse	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
+1266915	264212	Schematic: EZ-Thro Bronze Mortar	drop	Boulderfist Shaman	Arathi Highlands			foreverchanges, letto da addon
 1266918	264215	Schematic: SAF-T Bomb	drop	Wastewander Thief	Tanaris			foreverchanges, letto da addon
 1266919	264216	Schematic: Emergency Field Cloak	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1266920	264217	Schematic: Compact Critter Carrier	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
+1266921	264218	Schematic: EZ-Thro Tru-Trigger	drop	Jade Ooze	The Hinterlands			foreverchanges, letto da addon
 1266922	264219	Schematic: Tru-Trigger Frag Bomb	drop	Dunemaul Brute	Tanaris			foreverchanges, letto da addon
 1266923	264220	Schematic: SAF-T Disposable Parachute	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1266924	264221	Schematic: Gnomish Army Knife	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1266925	264222	Schematic: Loot-A-Rang	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
-1266931	264228	Schematic: EZ-Thro Mana Bomb	drop	Jaedenar Legionnaire				foreverchanges, letto da addon
+1266931	264228	Schematic: EZ-Thro Mana Bomb	drop	Jaedenar Legionnaire	Felwood			foreverchanges, letto da addon
 1266935	264232	Schematic: Ultrasafe Rechargeable Battery	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1266936	264233	Schematic: Dimensional Transporter: Mt. Hyjal	vendor	Pexmit	Mount Hyjal			foreverchanges, letto da db
 1266937	264234	Schematic: Gnomish Poultryizer	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
@@ -596,6 +616,18 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1292988	274019	Plans: Sabatons of Glory	vendor	Aisarra Nightmeadow	Mount Hyjal			foreverchanges, letto da db
 1295805	274972	Recipe: Briny Seafood Stew	vendor	Fimbo Greasemitz	Riverglades			foreverchanges, letto da addon
 1295834	274977	Recipe: Plain Ol' Paletusk	vendor	Martha Wellsworth	Riverglades			foreverchanges, letto da addon
+1297120	275580	Pattern: Venomspew Gloves	vendor	Mishta	Silithus			foreverchanges, letto da addon
+1297121	275581	Pattern: Venomspew Cord	vendor	Mishta	Silithus			foreverchanges, letto da addon
+1297122	275582	Pattern: Venomspew Footpads	vendor	Mishta	Silithus			foreverchanges, letto da addon
+1297123	275583	Pattern: Swarmtender's Gloves	vendor	Mishta	Silithus			foreverchanges, letto da addon
+1297124	275584	Pattern: Swarmtender's Cord	vendor	Mishta	Silithus			foreverchanges, letto da addon
+1297125	275585	Pattern: Swarmtender's Footpads	vendor	Mishta	Silithus			foreverchanges, letto da addon
+1297138	275598	Plans: Goregasher Grips	vendor	Vargus	Silithus			foreverchanges, letto da addon
+1297139	275599	Plans: Goregasher Support	vendor	Vargus	Silithus			foreverchanges, letto da addon
+1297140	275600	Plans: Goregasher Stompers	vendor	Vargus	Silithus			foreverchanges, letto da addon
+1297141	275601	Plans: Clutchlord's Grips	vendor	Vargus	Silithus			foreverchanges, letto da addon
+1297142	275602	Plans: Clutchlord's Support	vendor	Vargus	Silithus			foreverchanges, letto da addon
+1297143	275603	Plans: Clutchlord's Stompers	vendor	Vargus	Silithus			foreverchanges, letto da addon
 1299914	276542	Pattern: Spiritcaller Kilt	vendor	Aisarra Nightmeadow	Mount Hyjal			foreverchanges, letto da db
 1299915	276543	Pattern: Spiritcaller Gloves	vendor	Aisarra Nightmeadow	Mount Hyjal			foreverchanges, letto da db
 1299916	276544	Pattern: Spiritcaller Mantle	vendor	Aisarra Nightmeadow	Mount Hyjal			foreverchanges, letto da db
@@ -675,7 +707,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 1308185	280327	Schematic: Stuckbutton Goggles	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1308186	280328	Schematic: Dented Goggles	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1317270	284870	Schematic: Unsanctified Grenade	drop	Crushridge Warmonger	Alterac Mountains			foreverchanges, letto da addon
-1317279	284871	Recipe: Transmute Legionite	drop	Mazzogore	Mount Hyjal			foreverchanges, letto da addon
+1317279	284871	Recipe: Transmute Legionite	drop	Mazzogore | Felguard Sentinel	Mount Hyjal | Mount Hyjal			foreverchanges, letto da addon
 1317958	285285	Schematic: Satchel of Copper Bombs	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1317959	285286	Schematic: Satchel of Bronze Bombs	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
 1317960	285287	Schematic: Satchel of Iron Bombs	vendor	Fritz Fizzle | Fizzlefuse	Redridge Mountains | The Barrens	alliance | horde		foreverchanges, letto da db
@@ -697,13 +729,13 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 15933	16110	Recipe: Monster Omelet	vendor	Malygen | Bale | Himmik	Felwood | Felwood | Winterspring	alliance | horde | 		foreverchanges, letto da addon
 15935	12226	Recipe: Crispy Bat Wing	vendor	Abigail Shiel	Tirisfal Glades	horde		foreverchanges, letto da addon
 15973	12261	Plans: Searing Golden Blade	drop	Adolescent Whelp | Boulderfist Magus | Gritjaw Basilisk	Swamp of Sorrows | Arathi Highlands | Desolace			foreverchanges, letto da classic
-16642	12682	Plans: Thorium Armor	drop	Searing Hatchling | Mok'rash | Terrorspark | Lord Banehollow	Dustwallow Marsh | Stranglethorn Vale | Burning Steppes | Felwood			foreverchanges, letto da addon
+16642	12682	Plans: Thorium Armor	worldDrop				true	foreverchanges, letto da addon
 16643	12683	Plans: Thorium Belt	drop	Scarlet Executioner | Uhk'loc | Lord Banehollow	Western Plaguelands | Un'Goro Crater | Felwood			foreverchanges, letto da classic
-16644	12684	Plans: Thorium Bracers	drop	Frayfeather Hippogryph | Manahound | Deep Strider | Gurubashi Warrior	Feralas | Blasted Lands | Feralas | Stranglethorn Vale			foreverchanges, letto da addon
+16644	12684	Plans: Thorium Bracers	drop	Honey Wasp | Frayfeather Hippogryph | Manahound | Deep Strider | Gurubashi Warrior	Azshara | Feralas | Blasted Lands | Feralas | Stranglethorn Vale			foreverchanges, letto da addon
 16645	12685	Plans: Radiant Belt	drop	Anguished Highborne | Arkkoran Oracle | Black Dragonspawn	Winterspring | Azshara | Burning Steppes			foreverchanges, letto da classic
 16646	12687	Plans: Imperial Plate Shoulders	quest					foreverchanges, letto da classic
 16647	12688	Plans: Imperial Plate Belt	quest					foreverchanges, letto da classic
-16648	12689	Plans: Radiant Breastplate	drop	Shade of Ambermoon | Highlord Mastrogonde | Hive'Regal Ambusher	Silithus | Searing Gorge | Silithus			foreverchanges, letto da classic
+16648	12689	Plans: Radiant Breastplate	drop	Vilebranch Blood Drinker | Shade of Ambermoon | Highlord Mastrogonde | Hive'Regal Ambusher	The Hinterlands | Silithus | Searing Gorge | Silithus			foreverchanges, letto da addon
 16649	12690	Plans: Imperial Plate Bracers	quest					foreverchanges, letto da classic
 16650	12691	Pattern: Wildthorn Mail	drop	Manahound | Nethergarde Elite | Manaclaw	Blasted Lands | Blasted Lands | Winterspring			foreverchanges, letto da classic
 16651	12692	Plans: Thorium Shield Spike	drop	Angerclaw Mauler | Black Dragonspawn | Black Wyrmkin	Felwood | Burning Steppes | Burning Steppes			foreverchanges, letto da classic
@@ -722,7 +754,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 16665	12707	Plans: Runic Plate Boots	drop	Scarlet Cavalier	Western Plaguelands			foreverchanges, letto da classic
 16667	12696	Plans: Demon Forged Breastplate	quest					foreverchanges, letto da classic
 16724	12711	Plans: Whitesoul Helm	drop	Angerclaw Grizzly | Berserk Owlbeast | Chillwind Ravager	Felwood | Winterspring | Winterspring			foreverchanges, letto da classic
-16725	12713	Plans: Radiant Leggings	drop	Jademir Oracle | Lethlas | Chimaerok	Feralas | Feralas | Feralas			foreverchanges, letto da classic
+16725	12713	Plans: Radiant Leggings	drop	Jademir Oracle | Lethlas | Chimaerok | Ice Thistle Yeti	Feralas | Feralas | Feralas | Winterspring			foreverchanges, letto da addon
 16726	12714	Plans: Runic Plate Helm	drop	Strashaz Warrior	Dustwallow Marsh			foreverchanges, letto da classic
 16728	12716	Pattern: Helm of the Great Chief	worldDrop				true	foreverchanges, letto da classic
 16729	12717	Plans: Lionheart Helm	drop	Blackhand Elite | Blackhand Iron Guard | Gurubashi Berserker | Hakkari Shadow Hunter | Hive'Zara Wasp | Rage Talon Captain | Thuzadin Necromancer	Blackrock Spire | Blackrock Spire | Zul'Gurub | Zul'Gurub | Ruins of Ahn'Qiraj | Blackrock Spire | Stratholme			foreverchanges, letto da classic
@@ -751,7 +783,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 17553	13477	Recipe: Superior Mana Potion	vendor	Ulthir | Algernon	Darnassus | Undercity	alliance | horde		foreverchanges, letto da addon
 17554	13478	Recipe: Elixir of Superior Defense	vendor	Soolie Berryfizz | Kor'geld	Ironforge | Orgrimmar	alliance | horde		foreverchanges, letto da addon
 17555	13479	Recipe: Elixir of the Sages	drop	Scarlet Curate | Scarlet Enchanter | Scarlet Cleric	Eastern Plaguelands | Eastern Plaguelands | Eastern Plaguelands			foreverchanges, letto da classic
-17559	13482	Recipe: Transmute Air to Fire	vendor	Quartermaster Miranda Breechlock | Argent Quartermaster Hasana | Argent Quartermaster Lightspark	Eastern Plaguelands | Tirisfal Glades | Western Plaguelands			foreverchanges, letto da classic
+17559	13482	Recipe: Transmute Air to Fire	vendor	Quartermaster Miranda Breechlock | Argent Quartermaster Hasana | Argent Quartermaster Lightspark	Eastern Plaguelands | Tirisfal Glades | Western Plaguelands			foreverchanges, letto da addon
 17560	13483	Recipe: Transmute Fire to Earth	vendor	Plugger Spazzring	Blackrock Depths			foreverchanges, letto da classic
 17561	13484	Recipe: Transmute Earth to Water	vendor	Meilosh	Felwood			foreverchanges, letto da classic
 17562	13485	Recipe: Transmute Water to Air	vendor	Magnus Frostwake	Western Plaguelands			foreverchanges, letto da classic
@@ -759,7 +791,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 17564	13487	Recipe: Transmute Water to Undeath	drop	Angerclaw Mauler | Black Broodling | Black Dragonspawn	Felwood | Burning Steppes | Burning Steppes			foreverchanges, letto da classic
 17565	13488	Recipe: Transmute Life to Earth	drop	Anguished Highborne | Black Dragonspawn | Black Wyrmkin	Winterspring | Burning Steppes | Burning Steppes			foreverchanges, letto da classic
 17566	13489	Recipe: Transmute Earth to Life	drop	Anguished Highborne | Blackrock Slayer | Blighted Zombie	Winterspring | Burning Steppes | Western Plaguelands			foreverchanges, letto da classic
-17570	13490	Recipe: Greater Stoneshield Potion	drop	Dessecus | Shade of Ambermoon | King Mosh	Felwood | Silithus | Un'Goro Crater			foreverchanges, letto da classic
+17570	13490	Recipe: Greater Stoneshield Potion	drop	Dessecus | Hulking Feral Scar | Shade of Ambermoon | King Mosh	Felwood | Feralas | Silithus | Un'Goro Crater			foreverchanges, letto da addon
 17571	13491	Recipe: Elixir of the Mongoose	drop	Jadefire Rogue | Legashi Rogue	Felwood | Azshara			foreverchanges, letto da classic
 17572	13492	Recipe: Purification Potion	drop	Lethlas | Rak'shiri | Crimson Courier	Feralas | Winterspring | Eastern Plaguelands			foreverchanges, letto da classic
 17573	13493	Recipe: Greater Arcane Elixir	drop	Angerclaw Grizzly | Blighted Horror | Blighted Zombie	Felwood | Eastern Plaguelands | Western Plaguelands			foreverchanges, letto da classic
@@ -784,8 +816,8 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 18245	13947	Recipe: Lobster Stew	vendor	Vivianna | Sheendra Tallgrass	Feralas | Feralas	alliance | horde		foreverchanges, letto da addon
 18246	13948	Recipe: Mightfish Steak	vendor	Vivianna | Sheendra Tallgrass	Feralas | Feralas	alliance | horde		foreverchanges, letto da addon
 18247	13949	Recipe: Baked Salmon	vendor	Vivianna | Sheendra Tallgrass	Feralas | Feralas	alliance | horde		foreverchanges, letto da addon
-18403	14466	Pattern: Frostweave Tunic	drop	Twilight Dark Shaman | Veyzhak the Cannibal | High General Abbendis | Archmage Allistarj	Searing Gorge | Swamp of Sorrows | Eastern Plaguelands | Blasted Lands			foreverchanges, letto da addon
-18404	14467	Pattern: Frostweave Robe	drop	Master Feardred | Wastewander Thief | Strashaz Hydra | Strashaz Serpent Guard	Azshara | Tanaris | Dustwallow Marsh | Dustwallow Marsh			foreverchanges, letto da addon
+18403	14466	Pattern: Frostweave Tunic	drop	Twilight Dark Shaman | Veyzhak the Cannibal | Carrion Grub | High General Abbendis | Archmage Allistarj	Searing Gorge | Swamp of Sorrows | Eastern Plaguelands | Eastern Plaguelands | Blasted Lands			foreverchanges, letto da addon
+18404	14467	Pattern: Frostweave Robe	drop	Master Feardred | Strashaz Hydra | Wastewander Thief | Strashaz Serpent Guard	Azshara | Dustwallow Marsh | Tanaris | Dustwallow Marsh			foreverchanges, letto da addon
 18405	14468	Pattern: Runecloth Bag	vendor	Qia	Winterspring			foreverchanges, letto da addon
 18406	14469	Pattern: Runecloth Robe	vendor	Darnall	Moonglade			foreverchanges, letto da addon
 18407	14470	Pattern: Runecloth Tunic	drop	Emerald Ooze | Gordok Enforcer | Clunk	The Hinterlands | Feralas | Searing Gorge			foreverchanges, letto da classic
@@ -801,42 +833,42 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 18417	14481	Pattern: Runecloth Gloves	vendor	Qia	Winterspring			foreverchanges, letto da addon
 18418	14482	Pattern: Cindercloth Cloak	drop	Thaurissan Firewalker	Burning Steppes			foreverchanges, letto da classic
 18419	14483	Pattern: Felcloth Pants	vendor	Lorelae Wintersong	Moonglade			foreverchanges, letto da addon
-18420	14484	Pattern: Brightcloth Cloak	drop	Uhk'loc | Cyclone Warrior | Emerald Ooze	Un'Goro Crater | Silithus | The Hinterlands			foreverchanges, letto da classic
+18420	14484	Pattern: Brightcloth Cloak	drop	Legashi Slayer | Uhk'loc | Cyclone Warrior | Emerald Ooze	 | Un'Goro Crater | Silithus | The Hinterlands			foreverchanges, letto da addon
 18421	14485	Pattern: Wizardweave Leggings	drop	Dark Summoner	Eastern Plaguelands			foreverchanges, letto da classic
 18422	14486	Pattern: Cloak of Fire	drop	Overmaster Pyron	Searing Gorge			foreverchanges, letto da classic
 18423	14488	Pattern: Runecloth Boots	vendor	Darnall	Moonglade			foreverchanges, letto da addon
 18424	14489	Pattern: Frostweave Pants	drop	Frenzied Pterrordax | Malfunctioning Reaver | Scarlet Judge | Uhk'loc	Un'Goro Crater | Burning Steppes | Western Plaguelands | Un'Goro Crater			foreverchanges, letto da addon
 18434	14490	Pattern: Cindercloth Pants	drop	Thaurissan Firewalker	Burning Steppes			foreverchanges, letto da classic
 18436	14493	Pattern: Robe of Winter Night	drop	Cobalt Mageweaver	Winterspring			foreverchanges, letto da classic
-18437	14492	Pattern: Felcloth Boots	drop	Demetria | Nethergarde Elite | Cyclone Warrior	Eastern Plaguelands | Blasted Lands | Silithus			foreverchanges, letto da classic
-18438	14491	Pattern: Runecloth Pants	drop	Immolatus | Strashaz Siren | Grol the Destroyer	Felwood | Dustwallow Marsh | Blasted Lands			foreverchanges, letto da classic
-18439	14494	Pattern: Brightcloth Pants	drop	Verdantine Tree Warder | Rex Ashil | Jademir Tree Warder	The Hinterlands | Silithus | Feralas			foreverchanges, letto da classic
+18437	14492	Pattern: Felcloth Boots	drop	Winterfall Den Watcher | Demetria | Nethergarde Elite | Cyclone Warrior	Winterspring | Eastern Plaguelands | Blasted Lands | Silithus			foreverchanges, letto da addon
+18438	14491	Pattern: Runecloth Pants	drop	Vilebranch Berserker | Immolatus | Strashaz Siren | Grol the Destroyer	The Hinterlands | Felwood | Dustwallow Marsh | Blasted Lands			foreverchanges, letto da addon
+18439	14494	Pattern: Brightcloth Pants	drop	Overlord Ror | Verdantine Tree Warder | Rex Ashil | Jademir Tree Warder	Felwood | The Hinterlands | Silithus | Feralas			foreverchanges, letto da addon
 18440	14497	Pattern: Mooncloth Leggings	drop	Black Wyrmkin | Blackrock Slayer | Blackrock Warlock	Burning Steppes | Burning Steppes | Burning Steppes			foreverchanges, letto da classic
 18441	14495	Pattern: Ghostweave Pants	drop	Spectral Citizen	Stratholme			foreverchanges, letto da classic
-18442	14496	Pattern: Felcloth Hood	drop	Zora | Manahound | Hive'Regal Hive Lord	Silithus | Blasted Lands | Silithus			foreverchanges, letto da classic
+18442	14496	Pattern: Felcloth Hood	drop	Vilebranch Raiding Wolf | Zora | Manahound | Hive'Regal Hive Lord	The Hinterlands | Silithus | Blasted Lands | Silithus			foreverchanges, letto da addon
 18444	14498	Pattern: Runecloth Headband	drop	Vilebranch Aman'zasi Guard | Dreadlord | Emeraldon Tree Warder | Lady Sevine	The Hinterlands | Blasted Lands | Ashenvale | Blasted Lands			foreverchanges, letto da addon
 18445	14499	Pattern: Mooncloth Bag	drop	Hive'Regal Burrower | General Colbatann | Manaclaw	Silithus | Winterspring | Winterspring			foreverchanges, letto da classic
 18446	14500	Pattern: Wizardweave Robe	drop	Dark Caster	Eastern Plaguelands			foreverchanges, letto da classic
 18447	14501	Pattern: Mooncloth Vest	drop	Black Dragonspawn | Blackrock Warlock | Blood Elf Reclaimer	Burning Steppes | Burning Steppes | Azshara			foreverchanges, letto da classic
 18448	14507	Pattern: Mooncloth Shoulders	drop	Huntsman Radley | Necromancer | Abomination	Western Plaguelands | Eastern Plaguelands | Eastern Plaguelands			foreverchanges, letto da classic
-18449	14504	Pattern: Runecloth Shoulders	drop	Nathanos Blightcaller | Blighthound | Chimaerok	Eastern Plaguelands | Eastern Plaguelands | Feralas			foreverchanges, letto da classic
+18449	14504	Pattern: Runecloth Shoulders	drop	Nathanos Blightcaller | Firegut Ogre Mage | Blighthound | Chimaerok	Eastern Plaguelands | Burning Steppes | Eastern Plaguelands | Feralas			foreverchanges, letto da addon
 18450	14505	Pattern: Wizardweave Turban	drop	Dark Caster	Eastern Plaguelands			foreverchanges, letto da classic
-18451	14506	Pattern: Felcloth Robe	drop	Dreamtracker | Felguard Elite | Chimaerok Devourer	The Hinterlands | Blasted Lands | Feralas			foreverchanges, letto da classic
+18451	14506	Pattern: Felcloth Robe	drop	Blackmaw Champion | Dreamtracker | Bloodpetal Flayer | Felguard Elite | Chimaerok Devourer	 | The Hinterlands | Un'Goro Crater | Blasted Lands | Feralas			foreverchanges, letto da addon
 18452	14509	Pattern: Mooncloth Circlet	worldDrop				true	foreverchanges, letto da classic
-18453	14508	Pattern: Felcloth Shoulders	drop	Un'Goro Stomper | Scarlet Interrogator | Dreamstalker | Lord Lakmaeran	Un'Goro Crater | Western Plaguelands | Ashenvale | Feralas			foreverchanges, letto da addon
+18453	14508	Pattern: Felcloth Shoulders	drop	Blackmaw Champion | Legashi Slayer | Un'Goro Stomper | Scarlet Interrogator | Dreamstalker | Lord Lakmaeran	 |  | Un'Goro Crater | Western Plaguelands | Ashenvale | Feralas			foreverchanges, letto da addon
 18454	14511	Pattern: Gloves of Spell Mastery	worldDrop				true	foreverchanges, letto da classic
 18455	14510	Pattern: Bottomless Bag	drop	Dreamroarer | Hive'Regal Hive Lord	Feralas | Silithus			foreverchanges, letto da classic
 18457	14513	Pattern: Robe of the Archmage	drop	Firebrand Pyromancer	Blackrock Spire			foreverchanges, letto da classic
 18458	14514	Pattern: Robe of the Void	drop	Darkmaster Gandling	Scholomance			foreverchanges, letto da db
 18560	14526	Pattern: Mooncloth	vendor	Qia	Winterspring			foreverchanges, letto da addon
-19048	15724	Pattern: Heavy Scorpid Bracers	vendor	Zannok Hidepiercer	Silithus			foreverchanges, letto da classic
+19048	15724	Pattern: Heavy Scorpid Bracers	vendor	Zannok Hidepiercer	Silithus			foreverchanges, letto da addon
 19049	15725	Pattern: Wicked Leather Gauntlets	vendor	Leonard Porter | Werg Thickblade	Western Plaguelands | Tirisfal Glades	alliance | horde		foreverchanges, letto da addon
 19050	15726	Pattern: Green Dragonscale Breastplate	vendor	Masat T'andr	Swamp of Sorrows			foreverchanges, letto da classic
 19051	15727	Pattern: Heavy Scorpid Vest	drop	Portal Seeker	Blasted Lands			foreverchanges, letto da classic
 19052	15728	Pattern: Wicked Leather Bracers	drop	Legashi Rogue	Azshara			foreverchanges, letto da classic
 19053	15729	Pattern: Chimeric Gloves	vendor	Blimo Gadgetspring	Azshara			foreverchanges, letto da classic
 19054	15730	Pattern: Red Dragonscale Breastplate	drop	General Drakkisath	Blackrock Spire			foreverchanges, letto da classic
-19055	15731	Pattern: Runic Leather Gauntlets	drop	Southsea Dock Worker | Volchan | Blighthound | Highlord Mastrogonde	Tanaris | Burning Steppes | Eastern Plaguelands | Searing Gorge			foreverchanges, letto da addon
+19055	15731	Pattern: Runic Leather Gauntlets	drop	Volchan | Blighthound | Southsea Dock Worker | Highlord Mastrogonde	Burning Steppes | Eastern Plaguelands | Tanaris | Searing Gorge			foreverchanges, letto da addon
 19059	15732	Pattern: Volcanic Leggings	drop	Firegut Brute	Burning Steppes			foreverchanges, letto da classic
 19060	15733	Pattern: Green Dragonscale Leggings	drop	Murk Worm	The Temple of Atal'Hakkar			foreverchanges, letto da db
 19061	15734	Pattern: Living Shoulders	vendor	Pratt McGrubben | Jangdor Swiftstrider	Feralas | Feralas	alliance | horde		foreverchanges, letto da classic
@@ -854,18 +886,18 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 19074	15747	Pattern: Frostsaber Leggings	drop	Winterfall Den Watcher	Winterspring			foreverchanges, letto da classic
 19075	15748	Pattern: Heavy Scorpid Leggings	drop	Blackrock Slayer	Burning Steppes			foreverchanges, letto da classic
 19076	15749	Pattern: Volcanic Breastplate	drop	Firebrand Grunt	Blackrock Spire			foreverchanges, letto da classic
-19077	15751	Pattern: Blue Dragonscale Breastplate	vendor	Blimo Gadgetspring	Azshara			foreverchanges, letto da classic
+19077	15751	Pattern: Blue Dragonscale Breastplate	vendor	Blimo Gadgetspring	Azshara			foreverchanges, letto da addon
 19078	15752	Pattern: Living Leggings	drop	Deadwood Shaman	Felwood			foreverchanges, letto da classic
 19079	15753	Pattern: Stormshroud Armor	drop	Arkkoran Oracle	Azshara			foreverchanges, letto da classic
 19080	20254	Pattern: Warbear Woolies	vendor	Meilosh	Felwood			foreverchanges, letto da classic
-19081	15755	Pattern: Chimeric Vest	drop	Scarlet Executioner | Caravan Master Tset | Strashaz Myrmidon	Western Plaguelands | Azshara | Dustwallow Marsh			foreverchanges, letto da classic
-19082	15756	Pattern: Runic Leather Headband	vendor	Jase Farlane	Eastern Plaguelands			foreverchanges, letto da classic
-19083	15757	Pattern: Wicked Leather Pants	drop	Warlord Thresh'jin | Mith'rethis the Enchanter | Strashaz Serpent Guard	Eastern Plaguelands | The Hinterlands | Dustwallow Marsh			foreverchanges, letto da classic
+19081	15755	Pattern: Chimeric Vest	drop	Blackmaw Headhunter | Scarlet Executioner | Caravan Master Tset | Strashaz Myrmidon	 | Western Plaguelands | Azshara | Dustwallow Marsh			foreverchanges, letto da addon
+19082	15756	Pattern: Runic Leather Headband	vendor	Jase Farlane	Eastern Plaguelands			foreverchanges, letto da addon
+19083	15757	Pattern: Wicked Leather Pants	drop	Dredge Striker | Bloodpetal Trapper | Warlord Thresh'jin | Mith'rethis the Enchanter | Strashaz Serpent Guard	 | Un'Goro Crater | Eastern Plaguelands | The Hinterlands | Dustwallow Marsh			foreverchanges, letto da addon
 19084	15758	Pattern: Devilsaur Gauntlets	vendor	Nergal	Un'Goro Crater			foreverchanges, letto da classic
 19085	15759	Pattern: Black Dragonscale Breastplate	vendor	Plugger Spazzring	Blackrock Depths			foreverchanges, letto da classic
 19086	15760	Pattern: Ironfeather Breastplate	drop	Vilebranch Hideskinner	The Hinterlands			foreverchanges, letto da classic
 19087	15761	Pattern: Frostsaber Gloves	drop	Winterfall Totemic	Winterspring			foreverchanges, letto da classic
-19088	15762	Pattern: Heavy Scorpid Helm	vendor	Zannok Hidepiercer	Silithus			foreverchanges, letto da classic
+19088	15762	Pattern: Heavy Scorpid Helm	vendor	Zannok Hidepiercer	Silithus			foreverchanges, letto da addon
 19089	15763	Pattern: Blue Dragonscale Shoulders	drop	Cliff Breaker	Azshara			foreverchanges, letto da classic
 19090	15764	Pattern: Stormshroud Shoulders	drop	Son of Arkkoroc	Azshara			foreverchanges, letto da classic
 19091	15765	Pattern: Runic Leather Pants	drop	Demetria | Nathanos Blightcaller | Lord Lakmaeran	Eastern Plaguelands | Eastern Plaguelands | Feralas			foreverchanges, letto da classic
@@ -890,7 +922,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 19799	16049	Schematic: Dark Iron Bomb	drop	Weapon Technician	Blackrock Depths			foreverchanges, letto da classic
 19800	16051	Schematic: Thorium Shells	drop	Doomguard Commander | Hive'Ashi Swarmer | Hive'Ashi Sandstalker	Blasted Lands | Silithus | Silithus			foreverchanges, letto da classic
 19814	16046	Schematic: Masterwork Target Dummy	vendor	Kor'gar | Xizzer Fizzbolt	Riverglades | Winterspring			foreverchanges, letto da addon
-19815	16050	Schematic: Delicate Arcanite Converter	vendor	Xizzer Fizzbolt	Winterspring			foreverchanges, letto da classic
+19815	16050	Schematic: Delicate Arcanite Converter	vendor	Xizzer Fizzbolt	Winterspring			foreverchanges, letto da addon
 19819	16052	Schematic: Voice Amplification Modulator	drop	Crimson Inquisitor	Stratholme			foreverchanges, letto da db
 19825	16053	Schematic: Master Engineer's Goggles	drop	Doomforge Arcanasmith	Blackrock Depths			foreverchanges, letto da classic
 19830	16054	Schematic: Arcanite Dragonling	drop	Cobalt Mageweaver	Winterspring			foreverchanges, letto da classic
@@ -949,8 +981,8 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 23507	19027	Schematic: Snake Burst Firework	vendor	Zorbin Fandazzle	Feralas			foreverchanges, letto da addon
 23628	19202	Pattern: Heavy Timbermaw Belt	vendor	Meilosh	Felwood			foreverchanges, letto da classic
 23629	19204	Pattern: Heavy Timbermaw Boots	vendor	Meilosh	Felwood			foreverchanges, letto da classic
-23632	19203	Plans: Girdle of the Dawn	vendor	Quartermaster Miranda Breechlock | Argent Quartermaster Hasana | Argent Quartermaster Lightspark	Eastern Plaguelands | Tirisfal Glades | Western Plaguelands			foreverchanges, letto da classic
-23633	19205	Plans: Gloves of the Dawn	vendor	Quartermaster Miranda Breechlock | Argent Quartermaster Hasana | Argent Quartermaster Lightspark	Eastern Plaguelands | Tirisfal Glades | Western Plaguelands			foreverchanges, letto da classic
+23632	19203	Plans: Girdle of the Dawn	vendor	Quartermaster Miranda Breechlock | Argent Quartermaster Hasana | Argent Quartermaster Lightspark	Eastern Plaguelands | Tirisfal Glades | Western Plaguelands			foreverchanges, letto da addon
+23633	19205	Plans: Gloves of the Dawn	vendor	Quartermaster Miranda Breechlock | Argent Quartermaster Hasana | Argent Quartermaster Lightspark	Eastern Plaguelands | Tirisfal Glades | Western Plaguelands			foreverchanges, letto da addon
 23636	19206	Plans: Dark Iron Helm	vendor	Lokhtos Darkbargainer	Blackrock Depths			foreverchanges, letto da classic
 23637	19207	Plans: Dark Iron Gauntlets	vendor	Lokhtos Darkbargainer	Blackrock Depths			foreverchanges, letto da classic
 23638	19208	Plans: Black Amnesty	vendor	Lokhtos Darkbargainer	Blackrock Depths			foreverchanges, letto da classic
@@ -960,19 +992,19 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 23653	19212	Plans: Nightfall	vendor	Lokhtos Darkbargainer	Blackrock Depths			foreverchanges, letto da classic
 23662	19215	Pattern: Wisdom of the Timbermaw	vendor	Meilosh	Felwood			foreverchanges, letto da classic
 23663	19218	Pattern: Mantle of the Timbermaw	vendor	Meilosh	Felwood			foreverchanges, letto da classic
-23664	19216	Pattern: Argent Boots	vendor	Quartermaster Miranda Breechlock | Argent Quartermaster Hasana | Argent Quartermaster Lightspark	Eastern Plaguelands | Tirisfal Glades | Western Plaguelands			foreverchanges, letto da classic
-23665	19217	Pattern: Argent Shoulders	vendor	Quartermaster Miranda Breechlock | Argent Quartermaster Hasana | Argent Quartermaster Lightspark	Eastern Plaguelands | Tirisfal Glades | Western Plaguelands			foreverchanges, letto da classic
+23664	19216	Pattern: Argent Boots	vendor	Quartermaster Miranda Breechlock | Argent Quartermaster Hasana | Argent Quartermaster Lightspark	Eastern Plaguelands | Tirisfal Glades | Western Plaguelands			foreverchanges, letto da addon
+23665	19217	Pattern: Argent Shoulders	vendor	Quartermaster Miranda Breechlock | Argent Quartermaster Hasana | Argent Quartermaster Lightspark	Eastern Plaguelands | Tirisfal Glades | Western Plaguelands			foreverchanges, letto da addon
 23666	19219	Pattern: Flarecore Robe	vendor	Lokhtos Darkbargainer	Blackrock Depths			foreverchanges, letto da classic
 23667	19220	Pattern: Flarecore Leggings	vendor	Lokhtos Darkbargainer	Blackrock Depths			foreverchanges, letto da classic
 23703	19326	Pattern: Might of the Timbermaw	vendor	Meilosh	Felwood			foreverchanges, letto da classic
 23704	19327	Pattern: Timbermaw Brawlers	vendor	Meilosh	Felwood			foreverchanges, letto da classic
-23705	19328	Pattern: Dawn Treaders	vendor	Quartermaster Miranda Breechlock | Argent Quartermaster Hasana | Argent Quartermaster Lightspark	Eastern Plaguelands | Tirisfal Glades | Western Plaguelands			foreverchanges, letto da classic
-23706	19329	Pattern: Golden Mantle of the Dawn	vendor	Quartermaster Miranda Breechlock | Argent Quartermaster Hasana | Argent Quartermaster Lightspark	Eastern Plaguelands | Tirisfal Glades | Western Plaguelands			foreverchanges, letto da classic
+23705	19328	Pattern: Dawn Treaders	vendor	Quartermaster Miranda Breechlock | Argent Quartermaster Hasana | Argent Quartermaster Lightspark	Eastern Plaguelands | Tirisfal Glades | Western Plaguelands			foreverchanges, letto da addon
+23706	19329	Pattern: Golden Mantle of the Dawn	vendor	Quartermaster Miranda Breechlock | Argent Quartermaster Hasana | Argent Quartermaster Lightspark	Eastern Plaguelands | Tirisfal Glades | Western Plaguelands			foreverchanges, letto da addon
 23707	19330	Pattern: Lava Belt	vendor	Lokhtos Darkbargainer	Blackrock Depths			foreverchanges, letto da classic
 23708	19331	Pattern: Chromatic Gauntlets	vendor	Lokhtos Darkbargainer	Blackrock Depths			foreverchanges, letto da classic
 23709	19332	Pattern: Corehound Belt	vendor	Lokhtos Darkbargainer	Blackrock Depths			foreverchanges, letto da classic
 23710	19333	Pattern: Molten Belt	vendor	Lokhtos Darkbargainer	Blackrock Depths			foreverchanges, letto da classic
-23787	19442	Formula: Powerful Anti-Venom	vendor	Quartermaster Miranda Breechlock | Argent Quartermaster Hasana | Argent Quartermaster Lightspark	Eastern Plaguelands | Tirisfal Glades | Western Plaguelands			foreverchanges, letto da classic
+23787	19442	Formula: Powerful Anti-Venom	vendor	Quartermaster Miranda Breechlock | Argent Quartermaster Hasana | Argent Quartermaster Lightspark	Eastern Plaguelands | Tirisfal Glades | Western Plaguelands			foreverchanges, letto da addon
 2389	2598	Pattern: Red Linen Robe	worldDrop				true	foreverchanges, letto da addon
 2403	2601	Pattern: Gray Woolen Robe	worldDrop				true	foreverchanges, letto da addon
 24091	19764	Pattern: Bloodvine Vest	vendor	Rin'wosho the Trader	Stranglethorn Vale			foreverchanges, letto da classic
@@ -1007,8 +1039,8 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 2548	2700	Recipe: Succulent Pork Ribs	vendor	Kendor Kabonka	Stormwind City	alliance		foreverchanges, letto da addon
 2549	2701	Recipe: Seasoned Wolf Kabob	vendor	Kendor Kabonka	Stormwind City	alliance		foreverchanges, letto da addon
 25659	21025	Recipe: Dirge's Kickin' Chimaerok Chops	quest					foreverchanges, letto da classic
-25704	21099	Recipe: Smoked Sagefish	vendor	Fyldan | Xen'to | Emrul Riknussun | Erika Tate | Naal Mistrunner | Ronald Burch | Wulan | Derak Nightfall | Micha Yance | Gloria Femmel | Nyoma | Aza'bek | Tarban Hearthgrain | Otho Moji'ko | Derek Odds | Paige | Reagent Bot | Kalsey Sanden | Fimbo Greasemitz | Miranda Turner | Kelsey Yance | Qujo | Repair Bot | Zerril Softbreeze	Darnassus | Orgrimmar | Ironforge | Stormwind City | Thunder Bluff | Undercity | Desolace | Hillsbrad Foothills | Hillsbrad Foothills | Redridge Mountains | Teldrassil | The Barrens | The Barrens | The Hinterlands | Alterac Mountains | Alterac Mountains | Ashenvale | Redridge Mountains | Riverglades | Riverglades | Stranglethorn Vale | The Hinterlands | Wetlands | Zephras Isle	alliance | horde | alliance | alliance | horde | horde | horde | horde | alliance | alliance | alliance | horde | horde | horde |  |  |  |  |  |  |  |  |  | 		foreverchanges, letto da addon
-25954	21219	Recipe: Sagefish Delight	vendor	Fyldan | Xen'to | Emrul Riknussun | Erika Tate | Naal Mistrunner | Ronald Burch | Wulan | Derak Nightfall | Micha Yance | Gloria Femmel | Nyoma | Aza'bek | Tarban Hearthgrain | Otho Moji'ko | Derek Odds | Paige | Reagent Bot | Kalsey Sanden | Fimbo Greasemitz | Miranda Turner | Kelsey Yance | Qujo | Repair Bot | Zerril Softbreeze	Darnassus | Orgrimmar | Ironforge | Stormwind City | Thunder Bluff | Undercity | Desolace | Hillsbrad Foothills | Hillsbrad Foothills | Redridge Mountains | Teldrassil | The Barrens | The Barrens | The Hinterlands | Alterac Mountains | Alterac Mountains | Ashenvale | Redridge Mountains | Riverglades | Riverglades | Stranglethorn Vale | The Hinterlands | Wetlands | Zephras Isle	alliance | horde | alliance | alliance | horde | horde | horde | horde | alliance | alliance | alliance | horde | horde | horde |  |  |  |  |  |  |  |  |  | 		foreverchanges, letto da addon
+25704	21099	Recipe: Smoked Sagefish	vendor	Fyldan | Xen'to | Emrul Riknussun | Erika Tate | Naal Mistrunner | Ronald Burch | Wulan | Derak Nightfall | Micha Yance | Gloria Femmel | Nyoma | Aza'bek | Tarban Hearthgrain | Otho Moji'ko | Derek Odds | Paige | Reagent Bot | Kalsey Sanden | Fimbo Greasemitz | Miranda Turner | Kelsey Yance | Qujo | Repair Bot | Nyalah Brightfire | Zerril Softbreeze	Darnassus | Orgrimmar | Ironforge | Stormwind City | Thunder Bluff | Undercity | Desolace | Hillsbrad Foothills | Hillsbrad Foothills | Redridge Mountains | Teldrassil | The Barrens | The Barrens | The Hinterlands | Alterac Mountains | Alterac Mountains | Ashenvale | Redridge Mountains | Riverglades | Riverglades | Stranglethorn Vale | The Hinterlands | Wetlands | Zephras Isle | Zephras Isle	alliance | horde | alliance | alliance | horde | horde | horde | horde | alliance | alliance | alliance | horde | horde | horde |  |  |  |  |  |  |  |  |  |  | 		foreverchanges, letto da addon
+25954	21219	Recipe: Sagefish Delight	vendor	Fyldan | Xen'to | Emrul Riknussun | Erika Tate | Naal Mistrunner | Ronald Burch | Wulan | Derak Nightfall | Micha Yance | Gloria Femmel | Nyoma | Aza'bek | Tarban Hearthgrain | Otho Moji'ko | Derek Odds | Paige | Reagent Bot | Kalsey Sanden | Fimbo Greasemitz | Miranda Turner | Kelsey Yance | Qujo | Repair Bot | Nyalah Brightfire | Zerril Softbreeze	Darnassus | Orgrimmar | Ironforge | Stormwind City | Thunder Bluff | Undercity | Desolace | Hillsbrad Foothills | Hillsbrad Foothills | Redridge Mountains | Teldrassil | The Barrens | The Barrens | The Hinterlands | Alterac Mountains | Alterac Mountains | Ashenvale | Redridge Mountains | Riverglades | Riverglades | Stranglethorn Vale | The Hinterlands | Wetlands | Zephras Isle | Zephras Isle	alliance | horde | alliance | alliance | horde | horde | horde | horde | alliance | alliance | alliance | horde | horde | horde |  |  |  |  |  |  |  |  |  |  | 		foreverchanges, letto da addon
 26085	21358	Pattern: Soul Pouch	vendor	Stitch Pinwizzle | Vizzklick	Riverglades | Tanaris			foreverchanges, letto da addon
 26277	21547	Recipe: Elixir of Holy Power	drop	Dark Iron Watchman | Dark Iron Slaver | Dark Iron Taskmaster	Searing Gorge | Searing Gorge | Searing Gorge			foreverchanges, letto da classic
 26279	21548	Pattern: Stormshroud Gloves	drop	The Windreaver | Princess Tempestria	Silithus | Winterspring			foreverchanges, letto da db
@@ -1041,7 +1073,7 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 3175	3395	Recipe: Limited Invulnerability Potion	worldDrop				true	foreverchanges, letto da addon
 3188	6211	Recipe: Elixir of Ogre's Strength	drop	Splinter Fist Firemonger | Mudsnout Shaman | Ro'Bark | Splinter Fist Fire Weaver | Deviate Lurker	Duskwood | Hillsbrad Foothills | Hillsbrad Foothills | Duskwood | 			foreverchanges, letto da addon
 3230	2553	Recipe: Elixir of Minor Agility	worldDrop				true	foreverchanges, letto da addon
-3295	2883	Plans: Deadly Bronze Poniard	worldDrop				true	foreverchanges, letto da addon
+3295	2883	Plans: Deadly Bronze Poniard	drop	Moonstalker Matriarch | Mirelow | Devouring Ectoplasm | Undead Dynamiter | Thistle Bear | Fleeting Plainstrider | Thule Ravenclaw | Giant Grizzled Bear	Darkshore | Wetlands |  |  | Darkshore | The Barrens | Silverpine Forest | Silverpine Forest			foreverchanges, letto da addon
 3297	3608	Plans: Mighty Iron Hammer	worldDrop				true	foreverchanges, letto da addon
 3321	3609	Plans: Copper Chain Vest	worldDrop				true	foreverchanges, letto da addon
 3325	3610	Plans: Gemmed Copper Gauntlets	worldDrop				true	foreverchanges, letto da addon
@@ -1059,8 +1091,8 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 3399	3736	Recipe: Tasty Lion Steak	quest			alliance		foreverchanges, letto da classic
 3400	3737	Recipe: Soothing Turtle Bisque	quest			alliance		foreverchanges, letto da classic
 3449	6068	Recipe: Shadow Oil	vendor	Montarr | Vendor-Tron 1000 | Bliztik	Thousand Needles | Desolace | Duskwood	horde |  | 		foreverchanges, letto da addon
-3450	3830	Recipe: Elixir of Lesser Fortitude	drop	Dark Iron Dwarf | Whirlwind Shredder | Murkgill Oracle | Khan Dez'hepah	Wetlands | Desolace | Stranglethorn Vale | Desolace			foreverchanges, letto da addon
-3451	3831	Recipe: Troll's Blood Elixir	drop	Grandpa Vishas | Hatefury Betrayer | Stromgarde Cavalryman | Prince Galen Trollbane | Otto	Alterac Mountains | Desolace | Arathi Highlands | Arathi Highlands | Arathi Highlands			foreverchanges, letto da addon
+3450	3830	Recipe: Elixir of Lesser Fortitude	drop	Bleakheart Satyr | Dark Iron Dwarf | Whirlwind Shredder | Murkgill Oracle | Khan Dez'hepah	Ashenvale | Wetlands | Desolace | Stranglethorn Vale | Desolace			foreverchanges, letto da addon
+3451	3831	Recipe: Troll's Blood Elixir	worldDrop				true	foreverchanges, letto da addon
 3453	3832	Recipe: Elixir of Detect Lesser Invisibility	worldDrop				true	foreverchanges, letto da addon
 3454	14634	Recipe: Frost Oil	vendor	Bro'kin	Alterac Mountains			foreverchanges, letto da addon
 3492	12162	Plans: Hardened Iron Shortsword	vendor	Kaita Deepforge | Sumi | Jutak	Stormwind City | Orgrimmar | Stranglethorn Vale	alliance | horde | 		foreverchanges, letto da addon
@@ -1072,34 +1104,34 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 3498	12164	Plans: Massive Iron Axe	vendor	Vharr | Jaquilina Dramet	Stranglethorn Vale | Stranglethorn Vale	horde | 		foreverchanges, letto da addon
 3500	3869	Plans: Shadow Crescent Axe	worldDrop				true	foreverchanges, letto da addon
 3503	6047	Plans: Golden Scale Coif	vendor	Krinkle Goodsteel	Tanaris			foreverchanges, letto da addon
-3504	3870	Plans: Green Iron Shoulders	drop	Rotted One | Heartrazor | Crushridge Ogre | Nancy Vishas | General Twinbraid	Duskwood | Thousand Needles | Alterac Mountains | Alterac Mountains | The Barrens			foreverchanges, letto da addon
-3505	3871	Plans: Golden Scale Shoulders	drop	Dun Garok Rifleman | Gath'Ilzogg | Adolescent Whelp | Bael'dun Officer	Hillsbrad Foothills | Redridge Mountains | Swamp of Sorrows | The Barrens			foreverchanges, letto da addon
-3507	3872	Plans: Golden Scale Leggings	drop	Dragonmaw Raider | Rok'Alim the Pounder | Captain Ironhill | Cenarion Druid	Wetlands | Thousand Needles | Hillsbrad Foothills | Stonetalon Mountains			foreverchanges, letto da addon
+3504	3870	Plans: Green Iron Shoulders	worldDrop				true	foreverchanges, letto da addon
+3505	3871	Plans: Golden Scale Shoulders	worldDrop				true	foreverchanges, letto da addon
+3507	3872	Plans: Golden Scale Leggings	worldDrop				true	foreverchanges, letto da addon
 3511	3873	Plans: Golden Scale Cuirass	drop	Boulderfist Enforcer | Mana Eater | Ambassador Malcin | Ambershard Crusher	Arathi Highlands | Desolace | The Barrens | Desolace			foreverchanges, letto da addon
-3513	3874	Plans: Polished Steel Boots	worldDrop				true	foreverchanges, letto da addon
+3513	3874	Plans: Polished Steel Boots	drop	Gelkis Windchaser | Venture Co. Miner | Withered Warrior | Hatefury Rogue | Highland Spider | Elder Stranglethorn Tiger | Young Stranglethorn Tiger | Bloodscalp Scout	Desolace | Stranglethorn Vale |  | Desolace | Wetlands | Stranglethorn Vale | Stranglethorn Vale | Stranglethorn Vale			foreverchanges, letto da addon
 3515	3875	Plans: Golden Scale Boots	drop	Singer | Bloodsail Warlock | Bloodscalp Berserker	Arathi Highlands | Stranglethorn Vale | Stranglethorn Vale			foreverchanges, letto da classic
 3758	4292	Pattern: Green Woolen Bag	worldDrop				true	foreverchanges, letto da addon
 3762	4293	Pattern: Hillman's Leather Vest	worldDrop				true	foreverchanges, letto da addon
 3765	7360	Pattern: Dark Leather Gloves	worldDrop				true	foreverchanges, letto da addon
 3767	4294	Pattern: Hillman's Belt	worldDrop				true	foreverchanges, letto da addon
 3769	4296	Pattern: Dark Leather Shoulders	worldDrop				true	foreverchanges, letto da addon
-3771	4297	Pattern: Barbaric Gloves	drop	Wandering Protector | Deviate Creeper | Razormane Warfrenzy | Gray Bear | Great Goretusk | Lake Thresher | Ardo Dirtpaw	Ashenvale |  | The Barrens | Hillsbrad Foothills | Redridge Mountains | Redridge Mountains | Redridge Mountains			foreverchanges, letto da addon
+3771	4297	Pattern: Barbaric Gloves	worldDrop				true	foreverchanges, letto da addon
 3772	7613	Pattern: Green Leather Armor	vendor	Wenna Silkbeard | George Candarte | Vendor-Tron 1000	Wetlands | Hillsbrad Foothills | Desolace	alliance | horde | 		foreverchanges, letto da addon
-3773	4299	Pattern: Guardian Armor	drop	Bloodfury Harpy | Nefaru | Silithid Ravager | Sergeant Malthus	Stonetalon Mountains | Duskwood | Thousand Needles | Stranglethorn Vale			foreverchanges, letto da addon
-3775	4298	Pattern: Guardian Belt	drop	Sparkleshell Tortoise | Bloodscalp Axe Thrower | Bloodscalp Scavenger | Bloodscalp Shaman	Thousand Needles | Stranglethorn Vale | Stranglethorn Vale | Stranglethorn Vale			foreverchanges, letto da addon
-3777	4300	Pattern: Guardian Leather Bracers	drop	Razorfen Battleguard | Silithid Ravager | Screeching Harpy | Darbel Montrose | Stone Fury	The Barrens | Thousand Needles | Thousand Needles | Arathi Highlands | Alterac Mountains			foreverchanges, letto da addon
+3773	4299	Pattern: Guardian Armor	worldDrop				true	foreverchanges, letto da addon
+3775	4298	Pattern: Guardian Belt	drop	Daggerspine Siren | Sparkleshell Tortoise | Bloodscalp Axe Thrower | Bloodscalp Scavenger | Bloodscalp Shaman	Hillsbrad Foothills | Thousand Needles | Stranglethorn Vale | Stranglethorn Vale | Stranglethorn Vale			foreverchanges, letto da addon
+3777	4300	Pattern: Guardian Leather Bracers	drop	Razorfen Battleguard | Silithid Ravager | Darbel Montrose | Screeching Harpy | Stone Fury	The Barrens | Thousand Needles | Arathi Highlands | Thousand Needles | Alterac Mountains			foreverchanges, letto da addon
 3778	14635	Pattern: Gem-studded Leather Belt	vendor	Rikqiz	Stranglethorn Vale			foreverchanges, letto da classic
 3779	4301	Pattern: Barbaric Belt	drop	Bloodsail Mage | Boulderfist Brute | Boulderfist Mauler	Stranglethorn Vale | Arathi Highlands | Arathi Highlands			foreverchanges, letto da classic
-3844	4346	Pattern: Heavy Woolen Cloak	worldDrop				true	foreverchanges, letto da addon
+3844	4346	Pattern: Heavy Woolen Cloak	drop	Kolkar Stormseer | Hecklefang Hyena | Wailing Highborne | Moonstalker | Mad Magglish | Zhevra Runner | Old Murk-Eye | Murloc Raider	The Barrens | The Barrens | Darkshore | Darkshore | The Barrens | The Barrens | Westfall | Westfall			foreverchanges, letto da addon
 3847	4345	Pattern: Red Woolen Boots	worldDrop				true	foreverchanges, letto da addon
 3849	4347	Pattern: Reinforced Woolen Shoulders	worldDrop				true	foreverchanges, letto da addon
 3851	4349	Pattern: Phoenix Pants	drop	Defias Watchman | Trigore the Lasher | Swinegart Spearhide | Ravenclaw Regent | Venture Co. Logger	 | The Barrens | The Barrens | Silverpine Forest | Stonetalon Mountains			foreverchanges, letto da addon
 3854	7114	Pattern: Azure Silk Gloves	vendor	Wenna Silkbeard | Kireena	Wetlands | Desolace	alliance | horde		foreverchanges, letto da addon
-3856	4350	Pattern: Spider Silk Slippers	worldDrop				true	foreverchanges, letto da addon
+3856	4350	Pattern: Spider Silk Slippers	drop	Tor'gan | Zaruk | Dragonmaw Infiltrator | Fallenroot Satyr | Grimtotem Bandit | Grimtotem Geomancer | Bloodfury Ripper | Antlered Courser	Arathi Highlands | Arathi Highlands | Wetlands |  | Thousand Needles | Thousand Needles | Stonetalon Mountains | Stonetalon Mountains			foreverchanges, letto da addon
 3857	14630	Pattern: Enchanter's Cowl	vendor	Super-Seller 680 | Xizk Goodstitch	Desolace | Stranglethorn Vale			foreverchanges, letto da addon
 3858	4351	Pattern: Shadow Hood	drop	Otto | Bleakheart Hellcaller | Bleakheart Satyr	Arathi Highlands | Ashenvale | Ashenvale			foreverchanges, letto da classic
-3860	4352	Pattern: Boots of the Enchanter	drop	Cenarion Vindicator | Terrowulf Packlord | Caverndeep Looter | Elder Gray Bear | Condemned Cleric	Ashenvale | Ashenvale | Dun Morogh | Hillsbrad Foothills | Hillsbrad Foothills			foreverchanges, letto da addon
-3862	4355	Pattern: Icy Cloak	vendor	Micha Yance | Ghok'kah	Hillsbrad Foothills | Dustwallow Marsh	alliance | horde		foreverchanges, letto da classic
+3860	4352	Pattern: Boots of the Enchanter	drop	Cenarion Vindicator | Terrowulf Packlord | Highland Lurker | Caverndeep Looter | Elder Gray Bear | Condemned Cleric	Ashenvale | Ashenvale | Wetlands | Dun Morogh | Hillsbrad Foothills | Hillsbrad Foothills			foreverchanges, letto da addon
+3862	4355	Pattern: Icy Cloak	vendor	Micha Yance | Ghok'kah	Hillsbrad Foothills | Dustwallow Marsh	alliance | horde		foreverchanges, letto da addon
 3863	4353	Pattern: Spider Belt	worldDrop				true	foreverchanges, letto da addon
 3864	4356	Pattern: Star Belt	drop	Lord Sakrasis | Mosh'Ogg Spellcrafter | Sawtooth Crocolisk	Stranglethorn Vale | Stranglethorn Vale | Swamp of Sorrows			foreverchanges, letto da classic
 3868	4348	Pattern: Phoenix Gloves	worldDrop				true	foreverchanges, letto da addon
@@ -1110,22 +1142,25 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 3928	4408	Schematic: Mechanical Squirrel	worldDrop				true	foreverchanges, letto da addon
 3933	4409	Schematic: Small Seaforium Charge	worldDrop				true	foreverchanges, letto da addon
 3939	13309	Schematic: Lovingly Crafted Boomstick	vendor	Fradd Swiftgear | Jinky Twizzlefixxit	Wetlands | Thousand Needles	alliance | 		foreverchanges, letto da addon
-3940	4410	Schematic: Shadow Goggles	drop	Serena Bloodfeather | Supervisor Lugwizzle | Fallenroot Satyr | Blackfathom Tide Priestess | Venture Co. Overseer | Rot Hide Savage | Rot Hide Plague Weaver | Dire Condor	The Barrens | The Barrens |  |  | The Barrens | Silverpine Forest | Silverpine Forest | Redridge Mountains			foreverchanges, letto da addon
+3940	4410	Schematic: Shadow Goggles	drop	Serena Bloodfeather | Supervisor Lugwizzle | Fallenroot Satyr | Blackfathom Tide Priestess | Crimson Whelp | Rot Hide Savage | Venture Co. Overseer | Rot Hide Plague Weaver	The Barrens | The Barrens |  |  | Wetlands | Silverpine Forest | The Barrens | Silverpine Forest			foreverchanges, letto da addon
 3944	4411	Schematic: Flame Deflector	drop	Mekgineer Thermaplugg	Gnomeregan			foreverchanges, letto da classic
 3952	14639	Schematic: Minor Recombobulator	vendor	Namdo Bizzfizzle | Fradd Swiftgear | Gagsprocket	Dun Morogh | Wetlands | The Barrens	alliance | alliance | 		foreverchanges, letto da addon
-3954	4412	Schematic: Moonsight Rifle	drop	Thistlefur Pathfinder | Cracked Golem | Foulweald Totemic | Blackrock Shadowcaster | Wandering Protector | Blackrock Grunt | Lake Thresher | Marcus Bel	Ashenvale | Darkshore | Ashenvale | Redridge Mountains | Ashenvale | Redridge Mountains | Redridge Mountains | The Barrens			foreverchanges, letto da addon
+3954	4412	Schematic: Moonsight Rifle	drop	Thistlefur Pathfinder | Cracked Golem | Blackrock Shadowcaster | Foulweald Totemic | Wandering Protector | Blackrock Grunt | Lake Thresher | Marcus Bel	Ashenvale | Darkshore | Redridge Mountains | Ashenvale | Ashenvale | Redridge Mountains | Redridge Mountains | The Barrens			foreverchanges, letto da addon
 3957	13308	Schematic: Ice Deflector	vendor	Rizz Loosebolt | Super-Seller 680	Alterac Mountains | Desolace			foreverchanges, letto da addon
 3959	4413	Schematic: Discombobulator Ray	drop	Mekgineer Thermaplugg	Gnomeregan			foreverchanges, letto da classic
 3960	4414	Schematic: Portable Bronze Mortar	worldDrop				true	foreverchanges, letto da addon
-3966	4415	Schematic: Craftsman's Monocle	drop	Stonard Scout | Whirlwind Shredder | Boulderfist Lord	Swamp of Sorrows | Desolace | Arathi Highlands			foreverchanges, letto da classic
-3968	4416	Schematic: Goblin Land Mine	drop	Syndicate Assassin | Lieutenant Valorcall | Dying Kodo | Ambassador Malcin | Snapjaw	Alterac Mountains | Arathi Highlands | Desolace | The Barrens | Alterac Mountains			foreverchanges, letto da addon
+3966	4415	Schematic: Craftsman's Monocle	drop	Withered Spearhide | Stonard Scout | Whirlwind Shredder | Boulderfist Lord	 | Swamp of Sorrows | Desolace | Arathi Highlands			foreverchanges, letto da addon
+3968	4416	Schematic: Goblin Land Mine	worldDrop				true	foreverchanges, letto da addon
 3969	13311	Schematic: Mechanical Dragonling	vendor	Gnaz Blunderflame	Stranglethorn Vale			foreverchanges, letto da classic
 3971	7742	Schematic: Gnomish Cloaking Device	vendor	Zan Shivsproket	Alterac Mountains			foreverchanges, letto da classic
 3972	4417	Schematic: Large Seaforium Charge	worldDrop				true	foreverchanges, letto da addon
 3979	13310	Schematic: Accurate Scope	vendor	Super-Seller 680 | Mazk Snipeshot	Desolace | Stranglethorn Vale			foreverchanges, letto da addon
 4094	4609	Recipe: Barbecued Buzzard Wing	vendor	Narj Deepslice | Super-Seller 680	Arathi Highlands | Desolace	alliance | 		foreverchanges, letto da addon
 4096	13287	Pattern: Raptor Hide Harness	vendor	Tunkk	Arathi Highlands	horde		foreverchanges, letto da addon
-4097	13288	Pattern: Raptor Hide Belt	vendor	Androd Fadran	Arathi Highlands	alliance		foreverchanges, letto da classic
+4097	13288	Pattern: Raptor Hide Belt	vendor	Androd Fadran	Arathi Highlands	alliance		foreverchanges, letto da addon
+428424	211247	Pattern: Phoenix Bindings	drop	Burning Blade Augur	Desolace			foreverchanges, letto da addon
+435841	215369	Pattern: Invoker's Cord	drop	Skeletal Fiend	Duskwood			foreverchanges, letto da addon
+435848	215370	Pattern: Invoker's Mantle	drop	Shadowhide Darkweaver	Redridge Mountains			foreverchanges, letto da addon
 4508	4597	Recipe: Minor Discolored Healing Potion	quest			horde		foreverchanges, letto da classic
 4942	4624	Recipe: Lesser Stoneshield Potion	quest					foreverchanges, letto da classic
 5244	5083	Pattern: Kodo Hide Bag	quest			horde		foreverchanges, letto da classic
@@ -1151,11 +1186,11 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 6703	5787	Pattern: Murloc Scale Breastplate	vendor	Mavralyn | Andrew Hilbert | Gina MacGregor	Darkshore | Silverpine Forest | Westfall	alliance | horde | alliance		foreverchanges, letto da addon
 6704	5788	Pattern: Thick Murloc Armor	vendor	Micha Yance | Christoph Jeffcoat | Blixrez Goodstitch	Hillsbrad Foothills | Hillsbrad Foothills | Stranglethorn Vale	alliance | horde | 		foreverchanges, letto da addon
 6705	5789	Pattern: Murloc Scale Bracers	vendor	Helenia Olden | Blixrez Goodstitch	Dustwallow Marsh | Stranglethorn Vale	alliance | 		foreverchanges, letto da addon
-7133	5972	Pattern: Fine Leather Pants	drop	Boulderheart | Swinegart Spearhide | Deviate Lurker | Deviate Creeper | Redridge Poacher | Venture Co. Enforcer | Aean Swiftriver	Redridge Mountains | The Barrens |  |  | Redridge Mountains | The Barrens | The Barrens			foreverchanges, letto da addon
+7133	5972	Pattern: Fine Leather Pants	drop	Boulderheart | Swinegart Spearhide | Deviate Lurker | Foulweald Warrior | Deviate Creeper | Redridge Poacher | Venture Co. Logger | Aean Swiftriver	Redridge Mountains | The Barrens |  | Ashenvale |  | Redridge Mountains | Stonetalon Mountains | The Barrens			foreverchanges, letto da addon
 7149	5973	Pattern: Barbaric Leggings	vendor	Hammon Karwn | Keena | Lardan | Jandia | Vendor-Tron 1000	Arathi Highlands | Arathi Highlands | Ashenvale | Thousand Needles | Desolace	alliance | horde | alliance | horde | 		foreverchanges, letto da addon
 7213	6039	Recipe: Giant Clam Scorcho	vendor	Kelsey Yance	Stranglethorn Vale			foreverchanges, letto da addon
-7221	6044	Plans: Iron Shield Spike	drop	Sentinel Amarassan | Mosshide Mongrel | Skeletal Mage | Dark Iron Demolitionist | Dark Iron Rifleman	Stonetalon Mountains | Wetlands | Duskwood | Wetlands | Wetlands			foreverchanges, letto da addon
-7222	6045	Plans: Iron Counterweight	drop	Lieutenant Valorcall | Keeper Ordanus | Magram Pack Runner	Arathi Highlands | Ashenvale | Desolace			foreverchanges, letto da classic
+7221	6044	Plans: Iron Shield Spike	drop	Mad Magglish | Sentinel Amarassan | Deviate Slayer | Skeletal Mage | Mosshide Mongrel | Mosshide Fenrunner | Dark Iron Demolitionist | Dark Iron Rifleman	 | Stonetalon Mountains |  | Duskwood | Wetlands | Wetlands | Wetlands | Wetlands			foreverchanges, letto da addon
+7222	6045	Plans: Iron Counterweight	worldDrop				true	foreverchanges, letto da addon
 7224	6046	Plans: Steel Weapon Chain	drop	Doomwarder | Dreaming Whelp | Drywhisker Kobold	Desolace | Swamp of Sorrows | Arathi Highlands			foreverchanges, letto da classic
 7255	6053	Recipe: Holy Protection Potion	vendor	Xandar Goodbeard | Hula'mahi | Kzixx	Loch Modan | The Barrens | Duskwood	alliance | horde | 		foreverchanges, letto da addon
 7256	6054	Recipe: Shadow Protection Potion	vendor	Harklan Moongrove | Christoph Jeffcoat	Ashenvale | Hillsbrad Foothills	alliance | horde		foreverchanges, letto da addon
@@ -1175,40 +1210,40 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 7827	6368	Recipe: Rainbow Fin Albacore	vendor	Catherine Leland | Shankys | Ronald Burch | Heldan Galesong | Zansoa | Killian Sanatha | Nessa Shadowsong | Kriggon Talsone | Stuart Fleming | Gritta Chumwater | Kilxx	Stormwind City | Orgrimmar | Undercity | Darkshore | Durotar | Silverpine Forest | Teldrassil | Westfall | Wetlands | Riverglades | The Barrens	alliance | horde | horde | alliance | horde | horde | alliance | alliance | alliance |  | 		foreverchanges, letto da addon
 7828	6369	Recipe: Rockscale Cod	vendor	Tansy Puddlefizz | Shankys | Lizbeth Cromwell | Wik'Tar | Heldan Galesong | Wulan | Lindea Rabonne | Stuart Fleming | Kelsey Yance	Ironforge | Orgrimmar | Undercity | Ashenvale | Darkshore | Desolace | Hillsbrad Foothills | Wetlands | Stranglethorn Vale	alliance | horde | horde | horde | alliance | horde | alliance | alliance | 		foreverchanges, letto da addon
 7892	6390	Pattern: Stylish Blue Shirt	worldDrop				true	foreverchanges, letto da addon
-7893	6391	Pattern: Stylish Green Shirt	drop	Blackrock Scout | Theramore Preserver | Southsea Cutthroat | Rot Hide Brute | Blackrock Hunter | Thora Feathermoon | Aean Swiftriver	Redridge Mountains | The Barrens | The Barrens | Silverpine Forest | Redridge Mountains | The Barrens | The Barrens			foreverchanges, letto da addon
+7893	6391	Pattern: Stylish Green Shirt	drop	Blackrock Scout | Wetlands Crocolisk | Theramore Preserver | Southsea Cutthroat | Defias Digger | Rot Hide Brute | Blackrock Hunter | Thora Feathermoon	Redridge Mountains | Wetlands | The Barrens | The Barrens |  | Silverpine Forest | Redridge Mountains | The Barrens			foreverchanges, letto da addon
 7929	16112	Manual: Heavy Silk Bandage	vendor	Deneb Walker | Balai Lok'Wein	Arathi Highlands | Dustwallow Marsh	alliance | horde		foreverchanges, letto da addon
 7935	6454	Manual: Strong Anti-Venom	worldDrop				true	foreverchanges, letto da addon
 7953	6474	Pattern: Deviate Scale Cloak	vendor	Kalldan Felmoon	The Barrens			foreverchanges, letto da addon
 7954	6475	Pattern: Deviate Scale Gloves	vendor	Kalldan Felmoon	The Barrens			foreverchanges, letto da addon
 7955	6476	Pattern: Deviate Scale Belt	quest					foreverchanges, letto da classic
-8238	6661	Recipe: Savory Deviate Delight	drop	Zhevra Charger | Kolkar Stormseer | Witchwing Harpy | Venture Co. Overseer | Southsea Cannoneer | Sunscale Screecher | Southsea Brigand | Brontus	The Barrens | The Barrens | The Barrens | The Barrens | The Barrens | The Barrens | The Barrens | The Barrens			foreverchanges, letto da addon
-8240	6663	Recipe: Elixir of Giant Growth	drop	Captain Gerogg Hammertoe | Burning Blade Bruiser | Thunderhead | Silithid Harvester | Hecklefang Hyena | Rocklance | Venture Co. Peon | Zhevra Runner	The Barrens | The Barrens | The Barrens | The Barrens | The Barrens | The Barrens | The Barrens | The Barrens			foreverchanges, letto da addon
+8238	6661	Recipe: Savory Deviate Delight	drop	Zhevra Charger | Kolkar Stormseer | Kolkar Pack Runner | Witchwing Harpy | Venture Co. Overseer | Southsea Cannoneer | Venture Co. Enforcer | Sunscale Screecher	The Barrens | The Barrens | The Barrens | The Barrens | The Barrens | The Barrens | The Barrens | The Barrens			foreverchanges, letto da addon
+8240	6663	Recipe: Elixir of Giant Growth	drop	Captain Gerogg Hammertoe | Burning Blade Bruiser | Silithid Harvester | Rocklance | Thunderhead | Hecklefang Hyena | Venture Co. Peon | Bristleback Water Seeker	The Barrens | The Barrens | The Barrens | The Barrens | The Barrens | The Barrens | The Barrens | The Barrens			foreverchanges, letto da addon
 8243	6672	Schematic: Flash Bomb	quest					foreverchanges, letto da classic
 8322	6710	Pattern: Moonglow Vest	quest			alliance		foreverchanges, letto da classic
-8339	6716	Schematic: EZ-Thro Dynamite	drop	Savannah Huntress | Mystlash Flayer | Razormane Dustrunner | Swinegart Spearhide | Hecklefang Hyena | Dalaran Apprentice | Rocklance | Defias Digger	The Barrens | Ashenvale | Durotar | The Barrens | The Barrens | Silverpine Forest | The Barrens | 			foreverchanges, letto da addon
+8339	6716	Schematic: EZ-Thro Dynamite	drop	Mystlash Flayer | Savannah Huntress | Swinegart Spearhide | Razormane Dustrunner | Hecklefang Hyena | Rocklance | Dalaran Apprentice | Defias Digger	Ashenvale | The Barrens | The Barrens | Durotar | The Barrens | The Barrens | Silverpine Forest | 			foreverchanges, letto da addon
 8367	6735	Plans: Ironforge Breastplate	quest			alliance		foreverchanges, letto da classic
 8607	6892	Recipe: Smoked Bear Meat	vendor	Drac Roughcut | Andrew Hilbert	Loch Modan | Silverpine Forest	alliance | horde		foreverchanges, letto da addon
 8780	7092	Pattern: Hands of Darkness	worldDrop				true	foreverchanges, letto da addon
-8782	7091	Pattern: Truefaith Gloves	drop	Swinegart Spearhide | Taskmaster Whipfang | Sister Riven | Mosshide Fenrunner	The Barrens | Stonetalon Mountains | Stonetalon Mountains | Wetlands			foreverchanges, letto da addon
+8782	7091	Pattern: Truefaith Gloves	drop	Swinegart Spearhide | Taskmaster Whipfang | Sister Riven | Mosshide Gnoll | Mosshide Fenrunner	The Barrens | Stonetalon Mountains | Stonetalon Mountains | Wetlands | Wetlands			foreverchanges, letto da addon
 8784	7090	Pattern: Green Silk Armor	worldDrop				true	foreverchanges, letto da addon
 8786	7089	Pattern: Azure Silk Cloak	vendor	Brienna Starglow | Jun'ha	Feralas | Arathi Highlands	alliance | horde		foreverchanges, letto da addon
 8789	7087	Pattern: Crimson Silk Cloak	vendor	Super-Seller 680 | Xizk Goodstitch	Desolace | Stranglethorn Vale			foreverchanges, letto da addon
-8793	7084	Pattern: Crimson Silk Shoulders	drop	Mountain Yeti | Boulderfist Brute | Plains Creeper | Magregan Deepshadow | Rabid Bonepaw | Kegan Darkmar	Alterac Mountains | Arathi Highlands | Arathi Highlands | Loch Modan | Desolace | Alterac Mountains			foreverchanges, letto da addon
-8795	7085	Pattern: Azure Shoulders	drop	Kurzen Medicine Man | Deepstrider Giant | Giant Darkfang Spider | Grel'borg the Miser	Stranglethorn Vale | Desolace | Dustwallow Marsh | Alterac Mountains			foreverchanges, letto da addon
-8797	7086	Pattern: Earthen Silk Belt	drop	Carnivorous Weed | Scarlet Sentry | Kurzen Commando | Saltscale Oracle | Lord Falconcrest | Stromgarde Cavalryman	Stranglethorn Vale | Tirisfal Glades | Stranglethorn Vale | Stranglethorn Vale | Arathi Highlands | Arathi Highlands			foreverchanges, letto da addon
+8793	7084	Pattern: Crimson Silk Shoulders	drop	Withered Warrior | Mountain Yeti | Boulderfist Brute | Plains Creeper | Magregan Deepshadow | Rabid Bonepaw | Kegan Darkmar	 | Alterac Mountains | Arathi Highlands | Arathi Highlands | Loch Modan | Desolace | Alterac Mountains			foreverchanges, letto da addon
+8795	7085	Pattern: Azure Shoulders	worldDrop				true	foreverchanges, letto da addon
+8797	7086	Pattern: Earthen Silk Belt	drop	Carnivorous Weed | Scarlet Sentry | Mountain Lion | Kurzen Commando | Saltscale Oracle | Lord Falconcrest | Stromgarde Cavalryman	Stranglethorn Vale | Tirisfal Glades | Alterac Mountains | Stranglethorn Vale | Stranglethorn Vale | Arathi Highlands | Arathi Highlands			foreverchanges, letto da addon
 8802	7088	Pattern: Crimson Silk Robe	vendor	Stitch Pinwizzle | Vizzklick	Riverglades | Tanaris			foreverchanges, letto da addon
 9064	7288	Pattern: Rugged Leather Pants	worldDrop				true	foreverchanges, letto da addon
 9070	7289	Pattern: Black Whelp Cloak	vendor	Clyde Ranthal	Redridge Mountains	alliance		foreverchanges, letto da addon
 9072	7290	Pattern: Red Whelp Gloves	vendor	Wenna Silkbeard	Wetlands	alliance		foreverchanges, letto da classic
 9146	7361	Pattern: Herbalist's Gloves	vendor	Harlown Darkweave	Ashenvale	alliance		foreverchanges, letto da addon
 9147	7362	Pattern: Earthen Leather Shoulders	vendor	Zixil	Hillsbrad Foothills			foreverchanges, letto da addon
-9148	7363	Pattern: Pilferer's Gloves	drop	Washte Pawne | Rogue Flame Spirit | Deviate Lurker | Mosshide Mongrel | Venture Co. Enforcer | Scargil | Hillsbrad Footman | Chimaera Matriarch	The Barrens | Stonetalon Mountains |  | Wetlands | The Barrens | Hillsbrad Foothills | Hillsbrad Foothills | Stonetalon Mountains			foreverchanges, letto da addon
-9149	7364	Pattern: Heavy Earthen Gloves	drop	Hezrul Bloodmark | Elder Ashenvale Bear | Blackrock Shadowcaster | Plague Spreader | Sunscale Scytheclaw | Keeper Ordanus | Lieutenant Fangore | Blackrock Gladiator	The Barrens | Ashenvale | Redridge Mountains | Duskwood | The Barrens | Ashenvale | Redridge Mountains | Redridge Mountains			foreverchanges, letto da addon
-9195	7449	Pattern: Dusky Leather Leggings	drop	Dark Iron Rifleman | Sleeby | Gazban | Sister Riven	Wetlands | Arathi Highlands | Stranglethorn Vale | Stonetalon Mountains			foreverchanges, letto da addon
+9148	7363	Pattern: Pilferer's Gloves	drop	Washte Pawne | Rogue Flame Spirit | Devouring Ectoplasm | Deviate Lurker | Venture Co. Enforcer | Mosshide Mongrel | Scargil | Hillsbrad Footman	The Barrens | Stonetalon Mountains |  |  | The Barrens | Wetlands | Hillsbrad Foothills | Hillsbrad Foothills			foreverchanges, letto da addon
+9149	7364	Pattern: Heavy Earthen Gloves	worldDrop				true	foreverchanges, letto da addon
+9195	7449	Pattern: Dusky Leather Leggings	worldDrop				true	foreverchanges, letto da addon
 9197	7450	Pattern: Green Whelp Armor	worldDrop				true	foreverchanges, letto da addon
 9202	7451	Pattern: Green Whelp Bracers	vendor	Saenorion | Joseph Moore | Jangdor Swiftstrider | Pratt McGrubben | Vendor-Tron 1000	Darnassus | Undercity | Feralas | Feralas | Desolace	alliance | horde | horde | alliance | 		foreverchanges, letto da addon
 9207	7452	Pattern: Dusky Boots	drop	Khan Jehn | Bhag'thera | Bloodsail Raider	Desolace | Stranglethorn Vale | Stranglethorn Vale			foreverchanges, letto da classic
-9208	7453	Pattern: Swift Boots	drop	Wandering Protector | Ironeye the Invincible | Jugkar Grim'rod	Ashenvale | Thousand Needles | Desolace			foreverchanges, letto da classic
+9208	7453	Pattern: Swift Boots	drop	Wandering Protector | Ironeye the Invincible | Jugkar Grim'rod | Bloodscalp Mystic | Crystal Spine Basilisk	Ashenvale | Thousand Needles | Desolace | Stranglethorn Vale | Stranglethorn Vale			foreverchanges, letto da addon
 9269	7560	Schematic: Gnomish Universal Remote	vendor	Gearcutter Cogspinner | Jinky Twizzlefixxit	Ironforge | Thousand Needles	alliance | 		foreverchanges, letto da addon
 9273	7561	Schematic: Goblin Jumper Cables	vendor	Super-Seller 680 | Kzixx | Zixil | Veenix	Desolace | Duskwood | Hillsbrad Foothills | Stonetalon Mountains			foreverchanges, letto da addon
 9811	7978	Plans: Barbaric Iron Shoulders	quest			horde		foreverchanges, letto da classic
@@ -1216,14 +1251,14 @@ spellId	recipeItemId	name	sourceKind	npcName	zone	faction	worldDrop	notes
 9814	7980	Plans: Barbaric Iron Helm	quest			horde		foreverchanges, letto da classic
 9818	7981	Plans: Barbaric Iron Boots	quest			horde		foreverchanges, letto da classic
 9820	7982	Plans: Barbaric Iron Gloves	quest			horde		foreverchanges, letto da classic
-9933	7975	Plans: Heavy Mithril Pants	drop	Marcel Dabyrie | Bloodscalp Warrior | Lord Aliden Perenolde | Gan'zulah | Crushridge Ogre | Slave Master Blackheart	Arathi Highlands | Stranglethorn Vale | Alterac Mountains | Stranglethorn Vale | Alterac Mountains | Searing Gorge			foreverchanges, letto da addon
+9933	7975	Plans: Heavy Mithril Pants	drop	Marcel Dabyrie | Lord Aliden Perenolde | Gan'zulah | Bloodscalp Warrior | Slave Master Blackheart | Highland Fleshstalker | Crushridge Ogre	Arathi Highlands | Alterac Mountains | Stranglethorn Vale | Stranglethorn Vale | Searing Gorge | Arathi Highlands | Alterac Mountains			foreverchanges, letto da addon
 9937	7995	Plans: Mithril Plate Bracers	vendor	Harggan | Gharash	The Hinterlands | Swamp of Sorrows	alliance | horde		foreverchanges, letto da addon
 9939	7976	Plans: Mithril Shield Spike	drop	Oozeworm | Foulbelly | Bloodpetal Lasher	Dustwallow Marsh | Arathi Highlands | Un'Goro Crater			foreverchanges, letto da classic
 9945	7983	Plans: Ornate Mithril Pants	quest					foreverchanges, letto da classic
 9950	7984	Plans: Ornate Mithril Gloves	quest					foreverchanges, letto da classic
 9952	7985	Plans: Ornate Mithril Shoulders	quest					foreverchanges, letto da classic
-9964	7989	Plans: Mithril Spurs	drop	Death's Head Geomancer | Lady Szallah | Foulbelly | Omgorn the Lost	 | Feralas | Arathi Highlands | Tanaris			foreverchanges, letto da addon
-9966	7991	Plans: Mithril Plate Shoulders	drop	Gan'zulah | Black Dragonspawn | Carrion Grub	Stranglethorn Vale | Burning Steppes | Eastern Plaguelands			foreverchanges, letto da classic
-9970	7990	Plans: Heavy Mithril Helm	drop	Grimungous | Grimtotem Raider | Shore Strider | Stonevault Bonesnapper | Omgorn the Lost	The Hinterlands | Feralas | Feralas | Badlands | Tanaris			foreverchanges, letto da addon
-9995	7992	Plans: Blue Glittering Axe	drop	Hatefury Rogue | Witherheart the Stalker | Caretaker Weston | Targ	Desolace | The Hinterlands | Arathi Highlands | Alterac Mountains			foreverchanges, letto da addon
+9964	7989	Plans: Mithril Spurs	drop	Ironjaw Basilisk | Lady Szallah | Death's Head Geomancer | Foulbelly | Omgorn the Lost	Stranglethorn Vale | Feralas |  | Arathi Highlands | Tanaris			foreverchanges, letto da addon
+9966	7991	Plans: Mithril Plate Shoulders	drop	Witherbark Hideskinner | Gan'zulah | Black Dragonspawn | Carrion Grub	The Hinterlands | Stranglethorn Vale | Burning Steppes | Eastern Plaguelands			foreverchanges, letto da addon
+9970	7990	Plans: Heavy Mithril Helm	worldDrop				true	foreverchanges, letto da addon
+9995	7992	Plans: Blue Glittering Axe	worldDrop				true	foreverchanges, letto da addon
 9997	8029	Plans: Wicked Mithril Blade	worldDrop				true	foreverchanges, letto da addon
