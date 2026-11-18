@@ -313,9 +313,9 @@ local COLLECTION_SOURCE_COLORS = {
     worldDrop = "|cffff9d5a",
     container = "|cffff9d5a",
     quest     = "|cffffe066",
-    -- I Blueprint non sono un posto dove andare: sono le postazioni del
-    -- sistema di perk di Forever, e si sbloccano progredendo nel mestiere.
-    -- Verde perche' e' l'unica provenienza che non chiede un viaggio.
+    -- I Blueprint, le postazioni da campo di Forever. Un colore loro perche'
+    -- sono una famiglia di ricette prima che una provenienza: anche quando la
+    -- riga nomina il boss che le droppa, si devono riconoscere a colpo d'occhio.
     blueprint = "|cff7fd97f",
 }
 

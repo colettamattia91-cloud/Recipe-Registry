@@ -2,6 +2,24 @@
 
 All notable changes to this addon are documented in this file.
 
+## [0.1.9] - 2026-11-18
+
+### Added
+
+- **76 more recipes show where to get them.**
+- **Coordinates for the vendors and trainers of 301 more recipes.**
+
+### Changed
+
+- **11 recipes show updated information on where to get them.**
+
+### Fixed
+
+- **The Blueprint filter lists the 39 camp recipes and nothing else.** They
+  also show the trainer, boss or vendor that gives them, where known.
+- **Coordinates and factions stay with the right vendor.** On 57 recipes sold
+  by several vendors, one vendor could show another's coordinates or faction.
+
 ## [0.1.8] - 2026-11-14
 
 ### Added
