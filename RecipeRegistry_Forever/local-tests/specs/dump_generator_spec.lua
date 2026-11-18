@@ -115,6 +115,22 @@ MiningItems = { [22] = 1, [33] = 2 }]])
     assert(listed[2].name == '"Cookie" McWeaksauce', "a doubled quote inside the field is one quote")
     assert(sold.recipesBySpellId[3].sourcePlaces[1].name == 'Ziri "The Wrench" Littlesprocket',
         "a quoted name comes back as the game writes it")
+    -- Le liste sono posizionali. Un pezzo vuoto e' "questo NPC non ce l'ha",
+    -- non un pezzo da scartare: scartandolo, il 43.8 di Mahu a Thunder Bluff
+    -- restava l'unico valore e passava anche a Saenorion a Darnassus.
+    write(paths[8], 'profession\tspellId\trecipeItemId\tsourceKind\tnpcName\tzone\tx\ty\tfaction\n'
+        .. 'cooking\t2\t\tvendor\tSaenorion | Mahu\tDarnassus | Thunder Bluff\t | 43.8\t | 44.9\t | horde\n'
+        .. 'alchemy\t3\t\tvendor\tA | B | C\tOrgrimmar\t\t\t\n')
+    local holes = generate(paths[1], paths[2], "--acquisition=" .. paths[8])
+    local pair = holes.recipesBySpellId[2].sourcePlaces
+    assert(pair[1].x == nil and pair[1].y == nil, "the first vendor has no coordinates")
+    assert(pair[2].x == 43.8 and pair[2].y == 44.9, "the second keeps its own")
+    assert(pair[1].faction == nil and pair[2].faction == "horde", "a faction stays with its vendor")
+    local trio = holes.recipesBySpellId[3].sourcePlaces
+    assert(#trio == 3, "three vendors, three places")
+    for _, place in ipairs(trio) do
+        assert(place.zone ~= nil, "one zone for the row applies to every vendor in it")
+    end
     -- Una ricetta che la build corrente non elenca piu' (Disorienting Smog
     -- Potion con la 70532) la cattura del client ce l'ha ancora: si marca
     -- `removed` e resta intera, coi dati che il ripiego le ha dato.

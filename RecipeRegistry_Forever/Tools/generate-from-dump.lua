@@ -127,28 +127,41 @@ local function loadAcquisition(path)
                 -- la forma normale dei quartermaster a Merchant's Favor. Si
                 -- srotolano in piu' sourcePlaces, che e' la verita': sono due
                 -- persone in due posti, non una con due nomi.
+                --
+                -- Le liste sono posizionali: "Saenorion | Mahu" con x
+                -- " | 43.8" vuol dire che il primo non ha coordinate e il
+                -- secondo si'. Fino al 18/11 i pezzi vuoti si scartavano, la
+                -- lista restava di un elemento solo, e un elemento solo vale
+                -- per tutti: Saenorion a Darnassus mostrava le coordinate di
+                -- Mahu a Thunder Bluff, e una fazione sola fra pezzi vuoti
+                -- passava a ogni venditore della riga. Un pezzo vuoto ora
+                -- resta al suo posto, come false.
                 local function split(value)
                     if not value then return {} end
                     local parts = {}
-                    for piece in (value .. " | "):gmatch("%s*(.-)%s*| ") do
-                        if piece ~= "" then parts[#parts + 1] = piece end
+                    for piece in (value .. "|"):gmatch("([^|]*)|") do
+                        piece = piece:match("^%s*(.-)%s*$")
+                        parts[#parts + 1] = piece ~= "" and piece or false
                     end
-                    if #parts == 0 then parts[1] = value end
                     return parts
+                end
+                -- Un valore solo vale per tutta la riga -- una zona per tre
+                -- venditori della stessa citta' --, altrimenti ognuno il suo.
+                -- Le coordinate no: sono sempre di un NPC solo, il primo.
+                local function at(list, i)
+                    if #list == 1 then return list[1] or nil end
+                    return list[i] or nil
                 end
                 local names, zones, factions = split(get("npcName")), split(get("zone")), split(get("faction"))
                 local xs, ys = split(get("x")), split(get("y"))
                 local places = {}
                 for i = 1, math.max(#names, #zones, 1) do
                     local place = {
-                        name = names[i] or names[1],
-                        zone = zones[i] or zones[1],
-                        -- Le coordinate seguono il loro NPC: due venditori
-                        -- stanno in due punti, e riusare le prime per il
-                        -- secondo e' un numero preciso e sbagliato.
-                        x = tonumber(xs[i] or (#xs == 1 and xs[1] or nil)),
-                        y = tonumber(ys[i] or (#ys == 1 and ys[1] or nil)),
-                        faction = factions[i] or (#factions == 1 and factions[1] or nil),
+                        name = at(names, i),
+                        zone = at(zones, i),
+                        x = tonumber(xs[i] or nil),
+                        y = tonumber(ys[i] or nil),
+                        faction = at(factions, i),
                     }
                     if place.name or place.zone then places[#places + 1] = place end
                 end
