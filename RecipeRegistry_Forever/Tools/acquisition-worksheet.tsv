@@ -42,7 +42,7 @@ alchemy	275	Elixir of Ferocity	1250799	250386	forever	vendor	Nina Surefire | Apo
 alchemy	275	Elixir of Sages	1250787	250374	forever	vendor	Nina Surefire | Apothecary Durelle	Three Corners, Redridge Mountains | The Barrens	10.9 | 49.9	72.5 | 29.6	alliance | horde					foreverchanges, letto da db + catturato in gioco
 alchemy	275	Elixir of the Whale	1250797	250384	forever	vendor	Nina Surefire | Apothecary Durelle	Three Corners, Redridge Mountains | The Barrens	10.9 | 49.9	72.5 | 29.6	alliance | horde					foreverchanges, letto da db + catturato in gioco
 alchemy	275	Potion of Venomous Blood	1251748	250994	forever	vendor	Nina Surefire | Apothecary Durelle	Three Corners, Redridge Mountains | The Barrens	10.9 | 49.9	72.5 | 29.6	alliance | horde					foreverchanges, letto da db + catturato in gioco
-alchemy	275	Transmute: Legionite	1317279	284871	forever	drop	Mazzogore | Felguard Sentinel	Mount Hyjal | Mount Hyjal								foreverchanges, letto da addon
+alchemy	275	Transmute: Legionite	1317279	284871	forever	drop	Mazzogore the Weak | Felguard Sentinel	Mount Hyjal | Mount Hyjal								foreverchanges, letto da addon
 alchemy	280	Elixir of the Owl	1250786	250373	forever	vendor	Nina Surefire | Apothecary Durelle	Three Corners, Redridge Mountains | The Barrens	10.9 | 49.9	72.5 | 29.6	alliance | horde					foreverchanges, letto da db + catturato in gioco
 alchemy	280	Major Mender's Potion	1251747	250993	forever	vendor	Nina Surefire | Apothecary Durelle	Three Corners, Redridge Mountains | The Barrens	10.9 | 49.9	72.5 | 29.6	alliance | horde					foreverchanges, letto da db + catturato in gioco
 alchemy	280	Potion of Beast Slaying	1251753	250999	forever											
@@ -57,14 +57,14 @@ alchemy	300	Flask of Natural Accuracy	1293559	274277	forever
 alchemy	300	Flask of Natural Aggression	1293560	274278	forever											
 alchemy	300	Flask of Natural Precision	1293561	274279	forever											
 alchemy	300	Flask of Natural Swiftness	1293562	274280	forever											
-alchemy		Cerulean Dye	1249630		forever	trainer	Alchemist Mallory | Carolai Anise | Cyndra Kindwhisper	Elwynn Forest | Tirisfal Glades | Teldrassil	39.8 | 59.4 | 57.6	48.3 | 52.2 | 60.8	alliance | horde | alliance					foreverdb, trainer visto su Forever
+alchemy		Cerulean Dye	1249630		forever	trainer	Alchemist Mallory | Bena Winterhoof | Carolai Anise	Elwynn Forest | Thunder Bluff | Tirisfal Glades	39.8 | 46.7 | 59.4	48.3 | 33.6 | 52.2	alliance | horde | horde					foreverdb, trainer visto su Forever
 alchemy		Discolored Healing Potion	1244646		forever	trainer	Apothecary Renferrel	Silverpine Forest	42.9	40.9	horde					foreverdb, trainer visto su Forever
 alchemy		Elixir of Minor Force	1245250		forever											
 alchemy		Greater Discolored Healing Potion	1244647		forever	trainer	Apothecary Renferrel	Silverpine Forest	42.9	40.9	horde					foreverdb, trainer visto su Forever
 alchemy		Lesser Discolored Healing Potion	1244645		forever	trainer	Apothecary Renferrel	Silverpine Forest	42.9	40.9	horde					foreverdb, trainer visto su Forever
 alchemy		Magenta Dye	1249631		forever	trainer	Bena Winterhoof | Doctor Herbert Halsey | Doctor Marsh	Thunder Bluff | Undercity | Undercity	46.7 | 47.8 | 51.5	33.6 | 72.8 | 74.4	horde | horde | horde					foreverdb, trainer visto su Forever
 alchemy		Minor Arcane Elixir	1245246		forever	vendor										quartermaster a Merchant's Favor -- 45 Merchant's Favor skill 65 to 140 [foreverchanges 2026-09-24]
-alchemy		Sulfuric Acid	1249633		forever	trainer	Alchemist Mallory | Carolai Anise | Cyndra Kindwhisper	Elwynn Forest | Tirisfal Glades | Teldrassil	39.8 | 59.4 | 57.6	48.3 | 52.2 | 60.8	alliance | horde | alliance					foreverdb, trainer visto su Forever
+alchemy		Sulfuric Acid	1249633		forever	trainer	Alchemist Mallory | Bena Winterhoof | Carolai Anise	Elwynn Forest | Thunder Bluff | Tirisfal Glades	39.8 | 46.7 | 59.4	48.3 | 33.6 | 52.2	alliance | horde | horde					foreverdb, trainer visto su Forever
 alchemy		Superior Discolored Healing Potion	1244648		forever	trainer	Apothecary Renferrel	Silverpine Forest	42.9	40.9	horde					foreverdb, trainer visto su Forever
 alchemy		Viridian Dye	1249632		forever	trainer	Ainethil | Doctor Herbert Halsey | Kylanna Windwhisper	Darnassus | Undercity | Feralas	55.0 | 47.8 | 32.6	24.0 | 72.8 | 43.8	alliance | horde | alliance					foreverdb, trainer visto su Forever
 blacksmithing	35	Gemmed Copper Boots	1252229	251332	forever	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance					foreverdb, trainer visto su Forever
@@ -75,19 +75,19 @@ blacksmithing	45	Crusader's Chain Belt	1252266	251369	forever	vendor	Stondry Dar
 blacksmithing	45	Guard's Chain Belt	1252263	251366	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
 blacksmithing	45	Protector's Chain Belt	1252264	251367	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
 blacksmithing	45	Veteran's Chain Belt	1252262	251365	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
-blacksmithing	50	Azure Skyforged Chain	1301448	276955	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-blacksmithing	50	Azure Skyforged Wristguards	1301446	276953	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-blacksmithing	50	Cloudy Skyforged Chain	1301424	276931	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-blacksmithing	50	Cloudy Skyforged Wristguards	1301422	276929	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+blacksmithing	50	Azure Skyforged Chain	1301448	276955	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+blacksmithing	50	Azure Skyforged Wristguards	1301446	276953	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+blacksmithing	50	Cloudy Skyforged Chain	1301424	276931	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+blacksmithing	50	Cloudy Skyforged Wristguards	1301422	276929	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
 blacksmithing	50	Rough Copper Chain Boots	1302598	277673	forever	quest										foreverchanges, letto da db
-blacksmithing	55	Azure Skyforged Gauntlets	1301447	276954	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-blacksmithing	55	Azure Skyforged Greaves	1301450	276957	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-blacksmithing	55	Cloudy Skyforged Gauntlets	1301423	276930	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-blacksmithing	55	Cloudy Skyforged Greaves	1301426	276933	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-blacksmithing	60	Azure Skyforged Chainmail	1301445	276952	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-blacksmithing	60	Azure Skyforged Legguards	1301449	276956	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-blacksmithing	60	Cloudy Skyforged Chainmail	1301421	276928	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-blacksmithing	60	Cloudy Skyforged Legguards	1301425	276932	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+blacksmithing	55	Azure Skyforged Gauntlets	1301447	276954	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+blacksmithing	55	Azure Skyforged Greaves	1301450	276957	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+blacksmithing	55	Cloudy Skyforged Gauntlets	1301423	276930	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+blacksmithing	55	Cloudy Skyforged Greaves	1301426	276933	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+blacksmithing	60	Azure Skyforged Chainmail	1301445	276952	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+blacksmithing	60	Azure Skyforged Legguards	1301449	276956	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+blacksmithing	60	Cloudy Skyforged Chainmail	1301421	276928	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+blacksmithing	60	Cloudy Skyforged Legguards	1301425	276932	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
 blacksmithing	80	Acolyte's Chain Shirt	1252240	251343	forever	drop		The Deadmines | Shadowfang Keep | Ragefire Chasm								wowhead
 blacksmithing	80	Acolyte's Gloves	1252260	251363	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
 blacksmithing	80	Brass Knuckles	1252351	251454	forever	drop	Gogger Rock Keeper	Stonetalon Mountains							16-17	foreverchanges, letto da addon
@@ -140,11 +140,11 @@ blacksmithing	130	Iron Fists	1252353	251456	forever	drop	Bleakheart Hellcaller	A
 blacksmithing	140	Anvil	1263041	273086	forever	blueprint	Gilnid	The Deadmines							20-20	wowhead, elenco + Blueprint dal client
 blacksmithing	145	Hard Gold Cuirass	1252282	251385	forever	drop	Screeching Roguefeather	Thousand Needles							29-30	foreverchanges, letto da addon
 blacksmithing	150	Hard Gold Boots	1252283	251386	forever	drop	Syndicate Highwayman	Arathi Highlands							30-31	foreverchanges, letto da db
-blacksmithing	150	Justicar's Belt	1252309	251412	forever	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.6	 | alliance					foreverdb, trainer visto su Forever
-blacksmithing	150	Officer's Belt	1252305	251408	forever	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.6	 | alliance					foreverdb, trainer visto su Forever
-blacksmithing	150	Prefect's Belt	1252308	251411	forever	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.6	 | alliance					foreverdb, trainer visto su Forever
-blacksmithing	150	Sentinel's Belt	1252306	251409	forever	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.6	 | alliance					foreverdb, trainer visto su Forever
-blacksmithing	150	Warder's Belt	1252307	251410	forever	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.6	 | alliance					foreverdb, trainer visto su Forever
+blacksmithing	150	Justicar's Belt	1252309	251412	forever	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 74.0	45.8 | 48.7	 | alliance					foreverdb, trainer visto su Forever
+blacksmithing	150	Officer's Belt	1252305	251408	forever	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 74.0	45.8 | 48.7	 | alliance					foreverdb, trainer visto su Forever
+blacksmithing	150	Prefect's Belt	1252308	251411	forever	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 74.0	45.8 | 48.7	 | alliance					foreverdb, trainer visto su Forever
+blacksmithing	150	Sentinel's Belt	1252306	251409	forever	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 74.0	45.8 | 48.7	 | alliance					foreverdb, trainer visto su Forever
+blacksmithing	150	Warder's Belt	1252307	251410	forever	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 74.0	45.8 | 48.7	 | alliance					foreverdb, trainer visto su Forever
 blacksmithing	160	Hard Gold Bracers	1252284	251387	forever	drop	Slitherblade Naga	Desolace							32-33	foreverchanges, letto da addon
 blacksmithing	160	Steel Spear	1252354	251457	forever	drop	Saltstone Crystalhide	Thousand Needles							32-33	foreverchanges, letto da addon
 blacksmithing	165	Hard Gold Leggings	1252285	251388	forever	drop	Kurzen Jungle Fighter	Stranglethorn Vale							32-33	foreverchanges, letto da addon
@@ -152,8 +152,8 @@ blacksmithing	165	Iron Morningstar	1252355	251458	forever	vendor	Gorhak	Desolace
 blacksmithing	170	Hard Gold Coif	1252286	251389	forever	drop	Dustbelcher Warrior	Badlands							35-37	foreverchanges, letto da addon
 blacksmithing	175	Azure Skyforged Helm	1301534	276984	forever	vendor	Archmage Alvareaux	The Silver Enclave, City of Dalaran	14.0	63.1	alliance					foreverchanges, letto da addon + catturato in gioco
 blacksmithing	175	Azure Skyforged Pauldrons	1301535	276985	forever	vendor	Archmage Alvareaux	The Silver Enclave, City of Dalaran	14.0	63.1	alliance					foreverchanges, letto da addon + catturato in gioco
-blacksmithing	175	Cloudy Skyforged Helm	1301526	276976	forever	vendor	Sutara Plainstalker	Mulgore	34.5	23.0	horde					foreverchanges, letto da addon + coordinate da foreverdb
-blacksmithing	175	Cloudy Skyforged Pauldrons	1301527	276977	forever	vendor	Sutara Plainstalker	Mulgore	34.5	23.0	horde					foreverchanges, letto da addon + coordinate da foreverdb
+blacksmithing	175	Cloudy Skyforged Helm	1301526	276976	forever	vendor	Sutara Plainstalker	Mulgore	34.5	22.9	horde					foreverchanges, letto da addon + coordinate da foreverdb
+blacksmithing	175	Cloudy Skyforged Pauldrons	1301527	276977	forever	vendor	Sutara Plainstalker	Mulgore	34.5	22.9	horde					foreverchanges, letto da addon + coordinate da foreverdb
 blacksmithing	175	Hard Gold Gauntlet	1252287	251390	forever	vendor	Gorhak	Desolace	66.3	79.5						foreverchanges, letto da db + coordinate da foreverdb
 blacksmithing	175	Hard Gold Pauldrons	1252288	251391	forever	drop	Crushridge Ogre	Alterac Mountains							34-35	foreverchanges, letto da addon
 blacksmithing	175	Justicar's Gauntlet	1252319	251422	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
@@ -161,7 +161,7 @@ blacksmithing	175	Officer's Gauntlet	1252315	251418	forever	vendor	Stondry Darkh
 blacksmithing	175	Prefect's Gauntlet	1252318	251421	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
 blacksmithing	175	Sentinel's Gauntlet	1252316	251419	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
 blacksmithing	175	Warder's Gauntlet	1252317	251420	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
-blacksmithing	180	Mithril Shortsword	1252356	251459	forever	drop	Mirefin Coastrunner	Dustwallow Marsh							36-37	wowhead, elenco
+blacksmithing	180	Mithril Shortsword	1252356	251459	forever	drop	Mirefin Coastrunner	Dustwallow Marsh							36-37	foreverchanges, letto da addon
 blacksmithing	190	Mithril Warhammer	1252357	251460	forever	vendor	Martha Wellsworth	Riverglades	64.3	84.1						foreverchanges, letto da addon + coordinate da foreverdb
 blacksmithing	195	Mithril Blacksmith Hammer	1317963	285290	forever	vendor	Gor'mak | Stondry Darkhammer	The Barrens | Redridge Mountains	49.8 | 10.3	29.7 | 74.6	horde | alliance					wowhead + coordinate da foreverdb
 blacksmithing	195	Mithril Claws	1252358	251461	forever	drop	Stonevault Bonesnapper	Badlands							39-40	foreverchanges, letto da addon
@@ -183,7 +183,7 @@ blacksmithing	210	Warder's Pauldrons	1252327	251430	forever	vendor	Stondry Darkh
 blacksmithing	215	Charged Mithril Battleaxe	1252361	251464	forever	drop	Gordunni Brute	Feralas							42-43	foreverchanges, letto da addon
 blacksmithing	215	Shining Mithril Helm	1252292	251395	forever	drop	Naga Explorer	Stranglethorn Vale							43-44	foreverchanges, letto da addon
 blacksmithing	220	Shining Mithril Gauntlet	1252294	251397	forever	drop	Southsea Pirate	Tanaris							44-45	foreverchanges, letto da addon
-blacksmithing	220	Shining Mithril Pants	1252293	251396	forever											
+blacksmithing	220	Shining Mithril Pants	1252293	251396	forever	drop	Witherbark Sadist	The Hinterlands							44-45	foreverchanges, letto da addon
 blacksmithing	225	Justicar's Wristguards	1252334	251437	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
 blacksmithing	225	Officer's Wristguards	1252330	251433	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
 blacksmithing	225	Prefect's Wristguards	1252333	251436	forever	vendor	Stondry Darkhammer | Gor'mak	Three Corners, Redridge Mountains | The Barrens	10.4 | 49.8	74.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
@@ -213,9 +213,9 @@ blacksmithing	255	Blessed Plate Bracers	1252339	251442	forever
 blacksmithing	255	Imperial Plate Gauntlets	1252338	251441	forever	drop	Blood Elf Reclaimer	Azshara							52-53	foreverchanges, letto da addon
 blacksmithing	260	Thorium Poleaxe	1252364	251467	forever											
 blacksmithing	270	Arcanite Blacksmith Hammer	1317964	285291	forever	vendor	Gor'mak | Stondry Darkhammer	The Barrens | Redridge Mountains	49.8 | 10.3	29.7 | 74.6	horde | alliance					wowhead + coordinate da foreverdb
-blacksmithing	270	Blessed Plate Belt	1252341	251444	forever											
+blacksmithing	270	Blessed Plate Belt	1252341	251444	forever	drop	Plaguebat	Eastern Plaguelands							53-55	foreverchanges, letto da addon
 blacksmithing	270	Blessed Plate Leggings	1252340	251443	forever	drop	Raging Owlbeast	Winterspring							54-56	foreverchanges, letto da addon
-blacksmithing	270	Bold Dirk	1252365	251468	forever	vendor	Pexmit	Mount Hyjal								foreverchanges, letto da db
+blacksmithing	270	Bold Dirk	1252365	251468	forever	vendor	Pexmit	Mount Hyjal								foreverchanges, letto da addon
 blacksmithing	275	Blessed Plate Helm	1252342	251445	forever											
 blacksmithing	280	Blessed Plate Chest	1252343	251446	forever	drop	Zarrat Wormwing | Wormwing Harpy | Wormwing Windwitch	Mount Hyjal | Mount Hyjal | Mount Hyjal								foreverchanges, letto da addon
 blacksmithing	285	Clutchlord's Grips	1297141	275601	forever	vendor	Vargus	Silithus								foreverchanges, letto da addon
@@ -290,17 +290,17 @@ cooking	200	Sunny Tea	1249961	249883	forever	drop	Marsh Oracle	Swamp of Sorrows	
 cooking	225	Plated Armorfish	1319313	286153	forever											
 cooking	225	Raptor Rouladen	1250153	250184	forever	drop	Bloodfen Lashtail	Dustwallow Marsh							38-39	foreverchanges, letto da addon
 cooking	225	Savory Stag Sliders	1250142	250173	forever	vendor	Qia	Winterspring								foreverchanges, letto da addon
-cooking	250	Sage's Tea	1249962	249884	forever											
+cooking	250	Sage's Tea	1249962	249884	forever	drop	Deadwind Ogre Mage	Deadwind Pass							55-57	foreverchanges, letto da addon
 cooking	250	Wicked Smoothie	1249968	249890	forever	vendor	Kalsey Sanden | Aza'bek	Three Corners, Redridge Mountains | The Barrens	10.8 | 49.7	72.8 | 29.4	alliance | horde					foreverchanges, letto da db + catturato in gioco
 cooking	275	Bat Hachee	1250144	250175	forever											
 cooking	275	Bear Bruscitti	1250147	250178	forever											
-cooking	275	Clam Linguine	1250158	250189	forever											
+cooking	275	Clam Linguine	1250158	250189	forever	drop	Spitelash Enchantress	Azshara							54-55	foreverchanges, letto da addon
 cooking	275	Flank au Poivre	1250146	250177	forever											
 cooking	275	Prehistoric Pulled Raptor	1250152	250183	forever											
 cooking	275	Savory Turtle Stew	1250145	250176	forever											ignota anche alla community [foreverchanges 2026-09-24]
 cooking	275	Soaring Pamplona	1250143	250174	forever											
 cooking	275	Steaming Stag Steak	1250148	250179	forever											
-cooking	275	Sweetpaw Jam	1294014	274415	forever	vendor	Dala Fairmaw	Mount Hyjal								wowhead
+cooking	275	Sweetpaw Jam	1294014	274415	forever	vendor	Dala Fairmaw	Mount Hyjal	21.0	78.4						wowhead + coordinate da foreverdb
 cooking	275	Swiftstrike Steak	1250149	250180	forever											
 cooking	300	Iron Oven	1263067	273115	forever	blueprint										Blueprint dal client
 cooking		Spinefin Halibut	1247741		forever											
@@ -348,7 +348,7 @@ enchanting	275	Greater Eternal Wand	1248515	249522	forever
 enchanting	280	Enchant Boots - Speed	1328948	289560	forever	vendor	Beneris | Alynsia	The Barrens | Redridge Mountains	49.7 | 11.2	29.7 | 71.7	horde | alliance					wowhead + coordinate da foreverdb
 enchanting	290	Enchant 2H Weapon - Strength	1248668	249523	forever	vendor	Dalria | Kulwia	Ashenvale | Stonetalon Mountains	35.1 | 45.4	52.0 | 59.4	alliance | horde					Formula sold by Dalria (Alliance) or Kulwia (Horde) [foreverchanges 2026-09-24] + coordinate da foreverdb
 enchanting	295	Enchant Bracer - Superior Agility	1248599	249524	forever											
-enchanting	295	Enchant Gloves - Lotus Claw	1294054	274424	forever	vendor	Dala Fairmaw	Mount Hyjal								wowhead, elenco
+enchanting	295	Enchant Gloves - Lotus Claw	1294054	274424	forever	vendor	Dala Fairmaw	Mount Hyjal	21.0	78.4						wowhead, elenco + coordinate da foreverdb
 enchanting	300	Arcane Forge	1263082	273116	forever	blueprint										Blueprint dal client
 enchanting	300	Enchant 2H Weapon - Mighty Healing Power	1248636	249526	forever	vendor	Alynsia | Beneris	Three Corners, Redridge Mountains | The Barrens	11.2 | 49.7	71.5 | 29.8	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
 enchanting	300	Enchant 2H Weapon - Mighty Spell Power	1248607	249525	forever	vendor	Alynsia | Beneris	Three Corners, Redridge Mountains | The Barrens	11.2 | 49.7	71.5 | 29.8	alliance | horde					foreverchanges, letto da wowhead + catturato in gioco
@@ -423,7 +423,7 @@ engineering	285	EZ-Thro Shell	1266928	264225	forever
 engineering	285	EZ-Thro Thorium Grenade	1266929	264226	forever											ignota anche alla community [foreverchanges 2026-09-24]
 engineering	285	Satchel of Dark Iron Bombs	1317961	285288	forever	vendor	Fritz Fizzle | Fizzlefuse	Three Corners, Redridge Mountains | The Barrens	10.5 | 49.8	74.3 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
 engineering	300	Anarchist's Workbench	1263083	273117	forever	blueprint										Blueprint dal client
-engineering	300	Dimensional Transporter - Mt. Hyjal	1266936	264233	forever	vendor	Pexmit	Mount Hyjal								foreverchanges, letto da db
+engineering	300	Dimensional Transporter - Mt. Hyjal	1266936	264233	forever	vendor	Pexmit	Mount Hyjal								foreverchanges, letto da addon
 engineering	300	EZ and SAF Field Transporter: Mt. Hyjal	1266934	264231	forever											
 engineering	300	EZ-Thro Dark Bomb	1266930	264227	forever											ignota anche alla community [foreverchanges 2026-09-24]
 engineering	300	EZ-Thro Field Transporter: Gadgetzan	1266932	264229	forever											
@@ -450,7 +450,7 @@ first_aid	210	Superior Poultice	1259344	255727	forever	drop	Syndicate Sentry	Alt
 first_aid	215	Potent Anti-Venom	1259341	255728	forever	drop	Lost One Muckdweller	Swamp of Sorrows							36-37	foreverchanges, letto da addon
 first_aid	215	Superior Healing Potion	1244435	255725	forever	drop	Gordunni Shaman	Feralas							44-45	foreverchanges, letto da addon
 first_aid	265	Surgical Tourniquet	1259349	255730	forever											
-first_aid	275	Major Healing Potion	1244436	255729	forever	vendor	Pexmit	Mount Hyjal								foreverchanges, letto da db
+first_aid	275	Major Healing Potion	1244436	255729	forever	vendor	Pexmit	Mount Hyjal								foreverchanges, letto da addon
 first_aid	280	Powerful Poultice	1259345	255731	forever											
 first_aid	300	Plague Doctor's Laboratory	1263001	273118	forever	blueprint										Blueprint dal client
 first_aid		Healing Potion	1244433		forever	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.7	84.5 | 56.8 | 12.5	horde | alliance | alliance					foreverdb, trainer visto su Forever
@@ -467,31 +467,31 @@ leatherworking	35	Black Whelp Slippers	1255146	252761	forever	vendor	Granny Fine
 leatherworking	35	Dark Leather Boots	1255145	252762	forever	vendor	Granny Finespindle	Ironforge	39.4	34.0	alliance					foreverchanges, letto da addon + coordinate da foreverdb
 leatherworking	35	Moonglow Boots	1255143	252764	forever	vendor	Granny Finespindle	Ironforge	39.4	34.0	alliance					foreverchanges, letto da addon + coordinate da foreverdb
 leatherworking	35	Murloc Scale Shoes	1255144	252763	forever	vendor	Granny Finespindle	Ironforge	39.4	34.0	alliance					foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	50	Azure Gustwoven Belt	1301454	276961	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	50	Azure Gustwoven Bracers	1301452	276959	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	50	Azure Windraveled Armguards	1301458	276965	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	50	Azure Windraveled Strap	1301460	276967	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	50	Cloudy Gustwoven Belt	1301430	276937	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	50	Cloudy Gustwoven Bracers	1301428	276935	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	50	Cloudy Windraveled Armguards	1301434	276941	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	50	Cloudy Windraveled Strap	1301436	276943	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	55	Azure Gustwoven Boots	1301456	276963	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	55	Azure Gustwoven Gloves	1301453	276960	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	55	Azure Windraveled Footwraps	1301462	276969	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	55	Azure Windraveled Mitts	1301459	276966	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	55	Cloudy Gustwoven Boots	1301432	276939	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	55	Cloudy Gustwoven Gloves	1301429	276936	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	55	Cloudy Windraveled Footwraps	1301438	276945	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	55	Cloudy Windraveled Mitts	1301435	276942	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	60	Azure Gustwoven Harness	1301451	276958	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	60	Azure Gustwoven Trousers	1301455	276962	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	60	Azure Windraveled Jerkin	1301457	276964	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	60	Azure Windraveled Pants	1301461	276968	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	50	Azure Gustwoven Belt	1301454	276961	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	50	Azure Gustwoven Bracers	1301452	276959	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	50	Azure Windraveled Armguards	1301458	276965	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	50	Azure Windraveled Strap	1301460	276967	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	50	Cloudy Gustwoven Belt	1301430	276937	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	50	Cloudy Gustwoven Bracers	1301428	276935	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	50	Cloudy Windraveled Armguards	1301434	276941	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	50	Cloudy Windraveled Strap	1301436	276943	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	55	Azure Gustwoven Boots	1301456	276963	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	55	Azure Gustwoven Gloves	1301453	276960	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	55	Azure Windraveled Footwraps	1301462	276969	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	55	Azure Windraveled Mitts	1301459	276966	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	55	Cloudy Gustwoven Boots	1301432	276939	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	55	Cloudy Gustwoven Gloves	1301429	276936	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	55	Cloudy Windraveled Footwraps	1301438	276945	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	55	Cloudy Windraveled Mitts	1301435	276942	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	60	Azure Gustwoven Harness	1301451	276958	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	60	Azure Gustwoven Trousers	1301455	276962	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	60	Azure Windraveled Jerkin	1301457	276964	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	60	Azure Windraveled Pants	1301461	276968	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
 leatherworking	60	Brawler's Leather Belt	1255142	252765	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
-leatherworking	60	Cloudy Gustwoven Harness	1301427	276934	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	60	Cloudy Gustwoven Trousers	1301431	276938	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	60	Cloudy Windraveled Jerkin	1301433	276940	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	60	Cloudy Windraveled Pants	1301437	276944	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	60	Cloudy Gustwoven Harness	1301427	276934	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	60	Cloudy Gustwoven Trousers	1301431	276938	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	60	Cloudy Windraveled Jerkin	1301433	276940	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	60	Cloudy Windraveled Pants	1301437	276944	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
 leatherworking	60	Defender's Leather Belt	1255140	252767	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
 leatherworking	60	Stormrider's Leather Belt	1255138	252769	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
 leatherworking	60	Totemic Leather Belt	1255139	252768	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
@@ -558,14 +558,15 @@ leatherworking	150	Skulker's Leather Belt	1255080	252827	forever	vendor	Granny F
 leatherworking	150	Skycaller's Leather Belt	1255076	252831	forever	vendor	Granny Finespindle	Ironforge	39.4	34.0	alliance					foreverchanges, letto da addon + coordinate da foreverdb
 leatherworking	150	Stalker's Leather Belt	1255079	252828	forever	vendor	Granny Finespindle	Ironforge	39.4	34.0	alliance					foreverchanges, letto da addon + coordinate da foreverdb
 leatherworking	150	Warden's Leather Belt	1255078	252829	forever	vendor	Granny Finespindle	Ironforge	39.4	34.0	alliance					foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	165	Centaur Hoofwarmers	1294289	274491	forever											
 leatherworking	175	Azure Gustwoven Hood	1301536	276986	forever	vendor	Archmage Alvareaux	The Silver Enclave, City of Dalaran	14.0	63.1	alliance					foreverchanges, letto da addon + catturato in gioco
 leatherworking	175	Azure Gustwoven Spaulders	1301537	276987	forever	vendor	Archmage Alvareaux	The Silver Enclave, City of Dalaran	14.0	63.1	alliance					foreverchanges, letto da addon + catturato in gioco
 leatherworking	175	Azure Windraveled Cover	1301538	276988	forever	vendor	Archmage Alvareaux	The Silver Enclave, City of Dalaran	14.0	63.1	alliance					foreverchanges, letto da addon + catturato in gioco
 leatherworking	175	Azure Windraveled Drapes	1301539	276989	forever	vendor	Archmage Alvareaux	The Silver Enclave, City of Dalaran	14.0	63.1	alliance					foreverchanges, letto da addon + catturato in gioco
-leatherworking	175	Cloudy Gustwoven Hood	1301528	276978	forever	vendor	Sutara Plainstalker	Mulgore	34.5	23.0	horde					foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	175	Cloudy Gustwoven Spaulders	1301529	276979	forever	vendor	Sutara Plainstalker	Mulgore	34.5	23.0	horde					foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	175	Cloudy Windraveled Cover	1301530	276980	forever	vendor	Sutara Plainstalker	Mulgore	34.5	23.0	horde					foreverchanges, letto da addon + coordinate da foreverdb
-leatherworking	175	Cloudy Windraveled Drapes	1301531	276981	forever	vendor	Sutara Plainstalker	Mulgore	34.5	23.0	horde					foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	175	Cloudy Gustwoven Hood	1301528	276978	forever	vendor	Sutara Plainstalker	Mulgore	34.5	22.9	horde					foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	175	Cloudy Gustwoven Spaulders	1301529	276979	forever	vendor	Sutara Plainstalker	Mulgore	34.5	22.9	horde					foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	175	Cloudy Windraveled Cover	1301530	276980	forever	vendor	Sutara Plainstalker	Mulgore	34.5	22.9	horde					foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	175	Cloudy Windraveled Drapes	1301531	276981	forever	vendor	Sutara Plainstalker	Mulgore	34.5	22.9	horde					foreverchanges, letto da addon + coordinate da foreverdb
 leatherworking	175	Mender's Leather Gloves	1255065	252842	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
 leatherworking	175	Prowler's Leather Gloves	1255071	252836	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
 leatherworking	175	Skirmisher's Leather Gloves	1255067	252840	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
@@ -605,7 +606,7 @@ leatherworking	225	Warden's Leather Bracers	1255052	252855	forever	vendor	Daniel
 leatherworking	230	Charged Scorpid Belt	1254998	252909	forever	drop	Rage Scar Yeti	Feralas							46-47	foreverchanges, letto da addon
 leatherworking	230	Supple Scorpid Boots	1254999	252908	forever											
 leatherworking	235	Blue Suede Shoes	1255048	252859	forever	drop	Dark Iron Taskmaster	Searing Gorge							47-48	foreverchanges, letto da addon
-leatherworking	235	Forceful Rugged Armor Kit	1254965	252942	forever	vendor	Jangdor Swiftstrider | Nioma	Feralas | The Hinterlands	 | 13.4	 | 43.4	 | alliance					foreverchanges, letto da addon + coordinate da foreverdb
+leatherworking	235	Forceful Rugged Armor Kit	1254965	252942	forever	vendor	Jangdor Swiftstrider | Nioma	Feralas | The Hinterlands	74.4 | 13.4	43.0 | 43.4	horde | alliance					foreverchanges, letto da addon + coordinate da foreverdb
 leatherworking	235	Mender's Leather Boots	1255043	252864	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
 leatherworking	235	Mender's Mail Sabatons	1254994	252913	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
 leatherworking	235	Mystic Rugged Armor Kit	1254966	252941	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
@@ -643,28 +644,28 @@ leatherworking	250	Warden's Leather Gauntlets	1255038	252869	forever
 leatherworking	250	Warden's Leather Waistguard	1255033	252874	forever	vendor	Daniel Stitchsong | Pawani	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.8 | 29.7	alliance | horde					foreverchanges, letto da db + catturato in gioco
 leatherworking	255	Blue Suede Pants	1255029	252878	forever											
 leatherworking	255	Charged Scorpid Bracers	1254980	252927	forever	drop	Tar Creeper	Un'Goro Crater							51-52	foreverchanges, letto da addon
-leatherworking	255	Charged Scorpid Gauntlets	1254977	252930	forever											
-leatherworking	255	Heavy Scorpid Boots	1254979	252928	forever											
-leatherworking	255	Supple Scorpid Belt	1254978	252929	forever	drop	Blood Elf Defender | Blood Elf Surveyor	Azshara | Azshara								foreverchanges, letto da addon
-leatherworking	255	Supple Scorpid Shoulders	1254981	252926	forever											
-leatherworking	255	Tooled Leather Armor	1255030	252877	forever	vendor	Pexmit	Mount Hyjal								foreverchanges, letto da db
+leatherworking	255	Charged Scorpid Gauntlets	1254977	252930	forever	drop	Skeletal Sorcerer	Western Plaguelands							51-52	foreverchanges, letto da addon
+leatherworking	255	Heavy Scorpid Boots	1254979	252928	forever	drop	Shadowsworn Cultist	Blasted Lands							51-52	foreverchanges, letto da addon
+leatherworking	255	Supple Scorpid Belt	1254978	252929	forever	drop	Blood Elf Surveyor | Blood Elf Defender	Azshara | Azshara								foreverchanges, letto da addon
+leatherworking	255	Supple Scorpid Shoulders	1254981	252926	forever	drop	Jaedenar Adept	Felwood							51-52	foreverchanges, letto da addon
+leatherworking	255	Tooled Leather Armor	1255030	252877	forever	vendor	Pexmit	Mount Hyjal								foreverchanges, letto da addon
 leatherworking	260	Blue Suede Shoulders	1255026	252881	forever											
 leatherworking	260	Charged Scorpid Vest	1254975	252932	forever	drop	Spitelash Siren	Azshara							51-52	foreverchanges, letto da addon
 leatherworking	260	Supple Scorpid Helm	1254976	252931	forever	drop	Shadowsworn Adept	Blasted Lands							52-53	foreverchanges, letto da addon
 leatherworking	260	Tooled Leather Gauntlets	1255027	252880	forever											
-leatherworking	260	Wicked Leather Boots	1255028	252879	forever											
+leatherworking	260	Wicked Leather Boots	1255028	252879	forever	drop	Entropic Beast	Felwood							51-52	foreverchanges, letto da addon
 leatherworking	265	Blue Suede Armor	1255024	252883	forever	quest		Desolace								wowhead, elenco, quest: Leather Technique
 leatherworking	265	Tooled Leather Crown	1255025	252882	forever											ignota anche alla community [foreverchanges 2026-09-24]
 leatherworking	270	Blue Suede Belt	1255021	252886	forever											
 leatherworking	270	Charged Scorpid Leggings	1254973	252934	forever	drop	Unliving Mossflayer	Eastern Plaguelands							54-55	foreverchanges, letto da addon
-leatherworking	270	Supple Scorpid Vest	1254974	252933	forever	vendor	Pexmit	Mount Hyjal								foreverchanges, letto da db
-leatherworking	270	Tooled Leather Bracers	1255022	252885	forever											
+leatherworking	270	Supple Scorpid Vest	1254974	252933	forever	vendor	Pexmit	Mount Hyjal								foreverchanges, letto da addon
+leatherworking	270	Tooled Leather Bracers	1255022	252885	forever	drop	Putrid Gargoyle	Eastern Plaguelands							54-56	foreverchanges, letto da addon
 leatherworking	270	Wicked Leather Shoulders	1255023	252884	forever											
 leatherworking	275	Blue Suede Bracers	1255019	252888	forever											
 leatherworking	275	Tooled Leather Epaulets	1255020	252887	forever											
-leatherworking	280	Blue Suede Hat	1255017	252890	forever											ignota anche alla community [foreverchanges 2026-09-24]
-leatherworking	280	Charged Scorpid Boots	1254971	252936	forever											
-leatherworking	280	Supple Scorpid Sabatons	1254972	252935	forever											
+leatherworking	280	Blue Suede Hat	1255017	252890	forever	drop	Winterfall Den Watcher	Winterspring							55-56	foreverchanges, letto da addon
+leatherworking	280	Charged Scorpid Boots	1254971	252936	forever	drop	Deadwind Ogre Mage	Deadwind Pass							55-57	foreverchanges, letto da addon
+leatherworking	280	Supple Scorpid Sabatons	1254972	252935	forever	drop	Plaguehound	Eastern Plaguelands							55-56	foreverchanges, letto da addon
 leatherworking	280	Tooled Leather Pants	1255018	252889	forever											
 leatherworking	285	Bileblister Claws	1297126	275586	forever											
 leatherworking	285	Broodwatcher's Clenchers	1297135	275595	forever											
@@ -739,28 +740,28 @@ skill:2933		Smelt Copper (Test)	1240345		forever
 skill:3012		Study	1302508		forever											
 skinning	140	Field Guide	1262985	273098	forever	blueprint	Happy Camper	Durotar	45.3	12.6	horde					wowhead + coordinate da foreverdb + Blueprint dal client
 skinning	300	Trapper's Workbench	1262982	273109	forever	blueprint	Houndmaster Loksey	Scarlet Monastery							34-34	wowhead + Blueprint dal client
-tailoring	5	Linen Reagent Bag	1257013	253665	forever	vendor	Dani'ill | Borya | Elynna | Ellie Stonebrow | Outfitter Eric | Poranna Snowbraid | Darah | Alexandra Bolero | Antonio Bolero | Boramu | Mahu | Angela Ward | Millie Gregorian | Dominique Stefano | Valdaron | Danielle Zipstitch | Lohgan Eva | Brienna Starglow | Mallen Swain | Rann Flamespinner | Basket of Textile Supplies | Franklin Hamar | Wrahk | Yonada | Jennabink Powerseam | Othesia Evengale | Jun'ha | Reagent Bot | Sheri Zipstitch | Ghok'kah | Darnall | Captured Servant of Azora | Stitch Pinwizzle | Cowardly Crosby | Xizk Goodstitch | Vizzklick | Repair Bot | Taleen Shimmerthread	Darnassus | The Drag, Orgrimmar | Darnassus | Ironforge | Ironforge | Ironforge | The Drag, Orgrimmar | Stormwind City | Stormwind City | Thunder Bluff | Thunder Bluff | Undercity | Undercity | Alterac Mountains | Darkshore | Duskwood | Duskwood | Feralas | Hillsbrad Foothills | Loch Modan | Redridge Mountains | Redridge Mountains | The Barrens | The Barrens | Wetlands | Zephras Isle | Arathi Highlands | Ashenvale | Duskwood | Dustwallow Marsh | Moonglade | Redridge Mountains | Riverglades | Stranglethorn Vale | Stranglethorn Vale | Tanaris | Wetlands | Zephras Isle	64.0 | 63.2 | 64.5 | 43.5 | 43.2 | 43.3 | 63.7 | 53.4 | 53.4 | 44.1 | 43.8 | 70.3 | 70.5 |  | 38.2 | 75.8 | 75.7 |  | 62.0 | 36.0 |  | 22.0 | 52.2 | 45.0 | 8.1 | 64.4 | 72.8 |  | 75.8 | 35.2 | 51.6 | 69.2 | 77.3 | 27.0 |  | 51.0 |  | 44.8	21.2 | 51.2 | 21.6 | 27.9 | 29.3 | 28.0 | 50.6 | 81.9 | 81.9 | 45.4 | 44.9 | 29.6 | 29.5 |  | 40.6 | 45.4 | 44.7 |  | 20.9 | 45.9 |  | 45.3 | 31.7 | 59.3 | 56.0 | 81.1 | 36.5 |  | 45.4 | 30.8 | 33.2 | 79.5 | 51.3 | 82.4 |  | 27.3 |  | 44.3	alliance | horde | alliance | alliance | alliance | alliance | horde | alliance | alliance | horde | horde | horde | horde | alliance | alliance | alliance | alliance | alliance | horde | alliance | horde | alliance | horde | horde | alliance | alliance | horde |  | alliance | horde |  |  |  |  |  |  |  | 					foreverchanges, letto da addon + catturato in gioco + coordinate da foreverdb
-tailoring	50	Azure Stormsewn Cord	1301466	276973	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-tailoring	50	Azure Stormsewn Cuffs	1301464	276971	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-tailoring	50	Cloudy Stormsewn Cord	1301442	276949	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-tailoring	50	Cloudy Stormsewn Cuffs	1301440	276947	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-tailoring	50	Novice Arcanist's Sash	1257368	253886	forever	trainer	Bowen Brisboise | Eldrin | Jormund Stonebrow	Tirisfal Glades | Elwynn Forest | Ironforge	52.6 | 79.3 | 43.4	55.6 | 69.0 | 28.7	horde | alliance | alliance					foreverdb, trainer visto su Forever
-tailoring	50	Novice Ardent's Sash	1257369	253888	forever	trainer	Bowen Brisboise | Eldrin | Jormund Stonebrow	Tirisfal Glades | Elwynn Forest | Ironforge	52.6 | 79.3 | 43.4	55.6 | 69.0 | 28.7	horde | alliance | alliance					foreverdb, trainer visto su Forever
-tailoring	55	Azure Stormsewn Handwraps	1301465	276972	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-tailoring	55	Azure Stormsewn Shoes	1301469	276975	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-tailoring	55	Cloudy Stormsewn Handwraps	1301441	276948	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-tailoring	55	Cloudy Stormsewn Shoes	1301444	276951	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-tailoring	60	Azure Stormsewn Leggings	1301468	276974	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-tailoring	60	Azure Stormsewn Vest	1301463	276970	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-tailoring	60	Cloudy Stormsewn Leggings	1301443	276950	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
-tailoring	60	Cloudy Stormsewn Vest	1301439	276946	forever	vendor	Vayn Moongaze	Zephras Isle	63.7	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+tailoring	5	Linen Reagent Bag	1257013	253665	forever	vendor	Dani'ill | Borya | Elynna | Ellie Stonebrow | Outfitter Eric | Poranna Snowbraid | Darah | Alexandra Bolero | Antonio Bolero | Boramu | Mahu | Angela Ward | Millie Gregorian | Dominique Stefano | Valdaron | Danielle Zipstitch | Lohgan Eva | Brienna Starglow | Mallen Swain | Rann Flamespinner | Basket of Textile Supplies | Franklin Hamar | Wrahk | Yonada | Jennabink Powerseam | Othesia Evengale | Jun'ha | Sheri Zipstitch | Ghok'kah | Darnall | Captured Servant of Azora | Stitch Pinwizzle | Cowardly Crosby | Xizk Goodstitch | Vizzklick | Reagent Bot | Repair Bot | Taleen Shimmerthread	Darnassus | The Drag, Orgrimmar | Darnassus | Ironforge | Ironforge | Ironforge | The Drag, Orgrimmar | Stormwind City | Stormwind City | Thunder Bluff | Thunder Bluff | Undercity | Undercity | Alterac Mountains | Darkshore | Duskwood | Duskwood | Feralas | Hillsbrad Foothills | Loch Modan | Redridge Mountains | Redridge Mountains | The Barrens | The Barrens | Wetlands | Zephras Isle | Arathi Highlands | Duskwood | Dustwallow Marsh | Moonglade | Redridge Mountains | Riverglades | Stranglethorn Vale | Stranglethorn Vale | Tanaris | Western Plaguelands | Wetlands | Zephras Isle	64.0 | 63.2 | 64.5 | 43.5 | 43.0 | 43.3 | 63.7 | 53.4 | 53.4 | 44.1 | 43.8 | 70.3 | 70.5 |  | 38.2 | 75.8 | 75.7 |  | 62.0 | 36.0 |  | 22.0 | 52.2 | 45.0 | 8.1 | 64.4 | 72.8 | 75.8 | 35.2 | 51.6 | 69.2 | 77.3 | 27.0 | 28.7 | 51.0 |  |  | 44.8	21.2 | 51.2 | 21.6 | 27.9 | 29.0 | 28.0 | 50.6 | 81.9 | 81.9 | 45.4 | 44.9 | 29.6 | 29.5 |  | 40.6 | 45.4 | 44.7 |  | 20.9 | 45.9 |  | 45.3 | 31.7 | 59.3 | 56.0 | 81.1 | 36.5 | 45.4 | 30.8 | 33.2 | 79.5 | 51.3 | 82.4 | 76.8 | 27.3 |  |  | 44.3	alliance | horde | alliance | alliance | alliance | alliance | horde | alliance | alliance | horde | horde | horde | horde | alliance | alliance | alliance | alliance | alliance | horde | alliance | horde | alliance | horde | horde | alliance | alliance | horde | alliance | horde |  |  |  |  |  |  |  |  | 					foreverchanges, letto da addon + catturato in gioco + coordinate da foreverdb
+tailoring	50	Azure Stormsewn Cord	1301466	276973	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+tailoring	50	Azure Stormsewn Cuffs	1301464	276971	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+tailoring	50	Cloudy Stormsewn Cord	1301442	276949	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+tailoring	50	Cloudy Stormsewn Cuffs	1301440	276947	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+tailoring	50	Novice Arcanist's Sash	1257368	253886	forever	trainer	Bowen Brisboise | Eldrin | Grondal Moonbreeze	Tirisfal Glades | Elwynn Forest | Darkshore	52.6 | 79.3 | 38.2	55.6 | 69.0 | 40.5	horde | alliance | alliance					foreverdb, trainer visto su Forever
+tailoring	50	Novice Ardent's Sash	1257369	253888	forever	trainer	Bowen Brisboise | Eldrin | Grondal Moonbreeze	Tirisfal Glades | Elwynn Forest | Darkshore	52.6 | 79.3 | 38.2	55.6 | 69.0 | 40.5	horde | alliance | alliance					foreverdb, trainer visto su Forever
+tailoring	55	Azure Stormsewn Handwraps	1301465	276972	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+tailoring	55	Azure Stormsewn Shoes	1301469	276975	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+tailoring	55	Cloudy Stormsewn Handwraps	1301441	276948	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+tailoring	55	Cloudy Stormsewn Shoes	1301444	276951	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+tailoring	60	Azure Stormsewn Leggings	1301468	276974	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+tailoring	60	Azure Stormsewn Vest	1301463	276970	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+tailoring	60	Cloudy Stormsewn Leggings	1301443	276950	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
+tailoring	60	Cloudy Stormsewn Vest	1301439	276946	forever	vendor	Vayn Moongaze	Zephras Isle	63.8	36.1						foreverchanges, letto da addon + coordinate da foreverdb
 tailoring	60	Flame Boots	1257372	253894	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da db + catturato in gioco
 tailoring	60	Pearly Boots	1257374	253898	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da db + catturato in gioco
 tailoring	60	Pristine Boots	1257370	253890	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da db + catturato in gioco
 tailoring	60	Shadow Boots	1257373	253896	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da db + catturato in gioco
 tailoring	60	Shining Boots	1257375	253900	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da db + catturato in gioco
 tailoring	60	Silky Boots	1257371	253892	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da db + catturato in gioco
-tailoring	70	Woolen Reagent Bag	1257017	253668	forever	vendor	Dani'ill | Borya | Elynna | Ellie Stonebrow | Outfitter Eric | Poranna Snowbraid | Darah | Alexandra Bolero | Antonio Bolero | Boramu | Mahu | Angela Ward | Millie Gregorian | Dominique Stefano | Valdaron | Danielle Zipstitch | Lohgan Eva | Brienna Starglow | Mallen Swain | Rann Flamespinner | Basket of Textile Supplies | Franklin Hamar | Wrahk | Yonada | Jennabink Powerseam | Othesia Evengale | Jun'ha | Reagent Bot | Sheri Zipstitch | Ghok'kah | Darnall | Captured Servant of Azora | Stitch Pinwizzle | Cowardly Crosby | Xizk Goodstitch | Vizzklick | Repair Bot | Taleen Shimmerthread	Darnassus | The Drag, Orgrimmar | Darnassus | Ironforge | Ironforge | Ironforge | The Drag, Orgrimmar | Stormwind City | Stormwind City | Thunder Bluff | Thunder Bluff | Undercity | Undercity | Alterac Mountains | Darkshore | Duskwood | Duskwood | Feralas | Hillsbrad Foothills | Loch Modan | Redridge Mountains | Redridge Mountains | The Barrens | The Barrens | Wetlands | Zephras Isle | Arathi Highlands | Ashenvale | Duskwood | Dustwallow Marsh | Moonglade | Redridge Mountains | Riverglades | Stranglethorn Vale | Stranglethorn Vale | Tanaris | Wetlands | Zephras Isle	64.0 | 63.2 | 64.5 | 43.5 | 43.2 | 43.3 | 63.7 | 53.4 | 53.4 | 44.1 | 43.8 | 70.3 | 70.5 |  | 38.2 | 75.8 | 75.7 |  | 62.0 | 36.0 |  | 22.0 | 52.2 | 45.0 | 8.1 | 64.4 | 72.8 |  | 75.8 | 35.2 | 51.6 | 69.2 | 77.3 | 27.0 |  | 51.0 |  | 44.8	21.2 | 51.2 | 21.6 | 27.9 | 29.3 | 28.0 | 50.6 | 81.9 | 81.9 | 45.4 | 44.9 | 29.6 | 29.5 |  | 40.6 | 45.4 | 44.7 |  | 20.9 | 45.9 |  | 45.3 | 31.7 | 59.3 | 56.0 | 81.1 | 36.5 |  | 45.4 | 30.8 | 33.2 | 79.5 | 51.3 | 82.4 |  | 27.3 |  | 44.3	alliance | horde | alliance | alliance | alliance | alliance | horde | alliance | alliance | horde | horde | horde | horde | alliance | alliance | alliance | alliance | alliance | horde | alliance | horde | alliance | horde | horde | alliance | alliance | horde |  | alliance | horde |  |  |  |  |  |  |  | 					foreverchanges, letto da addon + catturato in gioco + coordinate da foreverdb
+tailoring	70	Woolen Reagent Bag	1257017	253668	forever	vendor	Dani'ill | Borya | Elynna | Ellie Stonebrow | Outfitter Eric | Poranna Snowbraid | Darah | Alexandra Bolero | Antonio Bolero | Boramu | Mahu | Angela Ward | Millie Gregorian | Dominique Stefano | Valdaron | Danielle Zipstitch | Lohgan Eva | Brienna Starglow | Mallen Swain | Rann Flamespinner | Basket of Textile Supplies | Franklin Hamar | Wrahk | Yonada | Jennabink Powerseam | Othesia Evengale | Jun'ha | Sheri Zipstitch | Ghok'kah | Darnall | Captured Servant of Azora | Stitch Pinwizzle | Cowardly Crosby | Xizk Goodstitch | Vizzklick | Reagent Bot | Repair Bot | Taleen Shimmerthread	Darnassus | The Drag, Orgrimmar | Darnassus | Ironforge | Ironforge | Ironforge | The Drag, Orgrimmar | Stormwind City | Stormwind City | Thunder Bluff | Thunder Bluff | Undercity | Undercity | Alterac Mountains | Darkshore | Duskwood | Duskwood | Feralas | Hillsbrad Foothills | Loch Modan | Redridge Mountains | Redridge Mountains | The Barrens | The Barrens | Wetlands | Zephras Isle | Arathi Highlands | Duskwood | Dustwallow Marsh | Moonglade | Redridge Mountains | Riverglades | Stranglethorn Vale | Stranglethorn Vale | Tanaris | Western Plaguelands | Wetlands | Zephras Isle	64.0 | 63.2 | 64.5 | 43.5 | 43.0 | 43.3 | 63.7 | 53.4 | 53.4 | 44.1 | 43.8 | 70.3 | 70.5 |  | 38.2 | 75.8 | 75.7 |  | 62.0 | 36.0 |  | 22.0 | 52.2 | 45.0 | 8.1 | 64.4 | 72.8 | 75.8 | 35.2 | 51.6 | 69.2 | 77.3 | 27.0 | 28.7 | 51.0 |  |  | 44.8	21.2 | 51.2 | 21.6 | 27.9 | 29.0 | 28.0 | 50.6 | 81.9 | 81.9 | 45.4 | 44.9 | 29.6 | 29.5 |  | 40.6 | 45.4 | 44.7 |  | 20.9 | 45.9 |  | 45.3 | 31.7 | 59.3 | 56.0 | 81.1 | 36.5 | 45.4 | 30.8 | 33.2 | 79.5 | 51.3 | 82.4 | 76.8 | 27.3 |  |  | 44.3	alliance | horde | alliance | alliance | alliance | alliance | horde | alliance | alliance | horde | horde | horde | horde | alliance | alliance | alliance | alliance | alliance | horde | alliance | horde | alliance | horde | horde | alliance | alliance | horde | alliance | horde |  |  |  |  |  |  |  |  | 					foreverchanges, letto da addon + catturato in gioco + coordinate da foreverdb
 tailoring	75	Filigreed Flame Gown	1257378	253906	forever	drop	Fel Steed | Rhahk'Zor | Shadow Charger | Gilnid | Jergosh the Invoker | Captain Greenskin	Shadowfang Keep | The Deadmines | Shadowfang Keep | The Deadmines | Ragefire Chasm | The Deadmines								foreverchanges, letto da db
 tailoring	75	Filigreed Pearly Gown	1257380	253910	forever	drop	Fel Steed | Bazzalan | Cookie	Shadowfang Keep | Ragefire Chasm | The Deadmines								foreverchanges, letto da db
 tailoring	75	Filigreed Pristine Gown	1257376	253902	forever	drop	Fel Steed | Sneed	Shadowfang Keep | The Deadmines								foreverchanges, letto da db
@@ -810,13 +811,13 @@ tailoring	125	Shadow Leggings	1257422	253994	forever	vendor	Mivin Shadowweave | 
 tailoring	125	Shining Leggings	1257424	253998	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da db + catturato in gioco
 tailoring	125	Silk Reagent Bag	1257412	253974	forever	vendor	Gorhak	Desolace	66.3	79.5						foreverchanges, letto da db + coordinate da foreverdb
 tailoring	125	Silky Leggings	1257420	253990	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da db + catturato in gioco
-tailoring	140	Black Slippers	1257429	254008	forever	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde					foreverdb, trainer visto su Forever
+tailoring	140	Black Slippers	1257429	254008	forever	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.3 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance					foreverdb, trainer visto su Forever
 tailoring	140	Earthen Leggings	1257425	254000	forever	drop	Gravelsnout Surveyor	Thousand Needles							29-30	wowhead, elenco
-tailoring	140	Fiery Slippers	1257428	254006	forever	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde					foreverdb, trainer visto su Forever
-tailoring	140	Frothing Slippers	1257427	254004	forever	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde					foreverdb, trainer visto su Forever
-tailoring	140	Gilded Slippers	1257426	254002	forever	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde					foreverdb, trainer visto su Forever
-tailoring	140	Golden Slippers	1257430	254010	forever	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde					foreverdb, trainer visto su Forever
-tailoring	140	Radiant Slippers	1257431	254012	forever	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde					foreverdb, trainer visto su Forever
+tailoring	140	Fiery Slippers	1257428	254006	forever	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.3 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance					foreverdb, trainer visto su Forever
+tailoring	140	Frothing Slippers	1257427	254004	forever	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.3 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance					foreverdb, trainer visto su Forever
+tailoring	140	Gilded Slippers	1257426	254002	forever	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.3 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance					foreverdb, trainer visto su Forever
+tailoring	140	Golden Slippers	1257430	254010	forever	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.3 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance					foreverdb, trainer visto su Forever
+tailoring	140	Radiant Slippers	1257431	254012	forever	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.3 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance					foreverdb, trainer visto su Forever
 tailoring	140	Spinning Wheel	1263032	273099	forever	blueprint	Unstable Sentinel	City of Dalaran								foreverchanges, letto da db + Blueprint dal client
 tailoring	145	Earthen Silk Slippers	1257432	254014	forever	drop	Witherbark Troll	Arathi Highlands							30-31	foreverchanges, letto da addon
 tailoring	150	Earthen Silk Hood	1257433	254016	forever	drop	Slitherblade Sea Witch	Desolace							35-36	foreverchanges, letto da addon
@@ -831,8 +832,8 @@ tailoring	165	Radiant Handwraps	1257441	254032	forever	vendor	Mivin Shadowweave 
 tailoring	170	Earthen Silk Shoulders	1257442	254034	forever	drop	Dustbelcher Mystic	Badlands							36-37	wowhead, elenco
 tailoring	175	Azure Stormsewn Cowl	1301540	276990	forever	vendor	Archmage Alvareaux	The Silver Enclave, City of Dalaran	14.0	63.1	alliance					foreverchanges, letto da addon + catturato in gioco
 tailoring	175	Azure Stormsewn Epaulets	1301541	276991	forever	vendor	Archmage Alvareaux	The Silver Enclave, City of Dalaran	14.0	63.1	alliance					foreverchanges, letto da addon + catturato in gioco
-tailoring	175	Cloudy Stormsewn Cowl	1301532	276982	forever	vendor	Sutara Plainstalker	Mulgore	34.5	23.0	horde					foreverchanges, letto da addon + coordinate da foreverdb
-tailoring	175	Cloudy Stormsewn Epaulets	1301533	276983	forever	vendor	Sutara Plainstalker	Mulgore	34.5	23.0	horde					foreverchanges, letto da addon + coordinate da foreverdb
+tailoring	175	Cloudy Stormsewn Cowl	1301532	276982	forever	vendor	Sutara Plainstalker	Mulgore	34.5	22.9	horde					foreverchanges, letto da addon + coordinate da foreverdb
+tailoring	175	Cloudy Stormsewn Epaulets	1301533	276983	forever	vendor	Sutara Plainstalker	Mulgore	34.5	22.9	horde					foreverchanges, letto da addon + coordinate da foreverdb
 tailoring	190	Black Cord	1257447	254044	forever											
 tailoring	190	Fiery Cord	1257446	254042	forever											
 tailoring	190	Frothing Cord	1257445	254040	forever											
@@ -877,13 +878,13 @@ tailoring	235	Radiant Gloves	1257478	254106	forever
 tailoring	235	Radiant Sandals	1257484	254118	forever	vendor	Mivin Shadowweave | Jim'bek	Three Corners, Redridge Mountains | The Barrens	10.0 | 49.6	72.9 | 29.5	alliance | horde					foreverchanges, letto da db + catturato in gioco
 tailoring	240	Earthenweave Mantle	1257485	254120	forever											
 tailoring	245	Earthenweave Leggings	1257488	254126	forever											
-tailoring	250	Earthenweave Vest	1257486	254122	forever											
+tailoring	250	Earthenweave Vest	1257486	254122	forever	drop	Suffering Highborne	Winterspring							54-55	foreverchanges, letto da addon
 tailoring	250	Ghostweave Mantle	1257489	254128	forever											
-tailoring	250	Runecloth Cuffs	1257487	254124	forever	vendor	Pexmit	Mount Hyjal								foreverchanges, letto da db
+tailoring	250	Runecloth Cuffs	1257487	254124	forever	vendor	Pexmit	Mount Hyjal								foreverchanges, letto da addon
 tailoring	255	Earthenweave Cuffs	1257491	254132	forever											
 tailoring	255	Ghostweave Boots	1257490	254130	forever											
-tailoring	255	Mooncloth Reagent Bag	1257492	254134	forever	vendor	Dala Fairmaw	Mount Hyjal								wowhead, elenco
-tailoring	260	Earthenweave Crown	1257494	254138	forever											ignota anche alla community [foreverchanges 2026-09-24]
+tailoring	255	Mooncloth Reagent Bag	1257492	254134	forever	vendor	Dala Fairmaw	Mount Hyjal	21.0	78.4						wowhead, elenco + coordinate da foreverdb
+tailoring	260	Earthenweave Crown	1257494	254138	forever	drop	Searing Ghoul	Western Plaguelands							55-56	foreverchanges, letto da addon
 tailoring	260	Ghostweave Hood	1257493	254136	forever											ignota anche alla community [foreverchanges 2026-09-24]
 tailoring	285	Swarmtender's Gloves	1297123	275583	forever	vendor	Mishta	Silithus								foreverchanges, letto da addon
 tailoring	285	Venomspew Gloves	1297120	275580	forever	vendor	Mishta	Silithus								foreverchanges, letto da addon
@@ -915,13 +916,13 @@ tailoring	300	Pauldrons of Conviction	1292963	273994	forever	vendor	Aisarra Nigh
 tailoring	300	Rime-encrusted Boots	1306542	279317	forever											
 tailoring	300	Robes of Fiery Devastation	1306540	279315	forever											
 tailoring	300	Treads of Conviction	1292960	273991	forever	vendor	Aisarra Nightmeadow	Mount Hyjal								foreverchanges, letto da db
-tailoring		Faction Banner	1263425		forever	blueprint	Bowen Brisboise | Eldrin | Jormund Stonebrow	Tirisfal Glades | Elwynn Forest | Ironforge	52.6 | 79.3 | 43.4	55.6 | 69.0 | 28.7	horde | alliance | alliance					foreverdb, trainer visto su Forever + Blueprint dal client
+tailoring		Faction Banner	1263425		forever	blueprint	Bowen Brisboise | Eldrin | Grondal Moonbreeze	Tirisfal Glades | Elwynn Forest | Darkshore	52.6 | 79.3 | 38.2	55.6 | 69.0 | 40.5	horde | alliance | alliance					foreverdb, trainer visto su Forever + Blueprint dal client
 alchemy	50	Elixir of Minor Agility	3230	2553	vanilla	worldDrop							true			da vanilla, dataset TBC
 alchemy	50	Elixir of Minor Fortitude	2334	2554	vanilla	trainer										da vanilla, dataset TBC
 alchemy	50	Minor Discolored Healing Potion	4508	4597	vanilla	quest		Silverpine Forest			horde					da vanilla, dataset TBC
-alchemy	60	Rage Potion	6617	5640	vanilla	vendor	Xandar Goodbeard | Hagrus | Defias Profiteer | Ranik	Loch Modan | Orgrimmar | Westfall | The Barrens	82.5 | 46.1 | 43.5 | 61.9	63.2 | 46.1 | 66.9 | 38.7	alliance | horde |  | 					da vanilla, dataset TBC + coordinate da foreverdb
+alchemy	60	Rage Potion	6617	5640	vanilla	vendor	Xandar Goodbeard | Hagrus | Defias Profiteer | Ranik	Loch Modan | Orgrimmar | Westfall | The Barrens	82.5 | 46.1 | 43.5 | 62.0	63.2 | 46.1 | 66.9 | 38.7	alliance | horde |  | 					da vanilla, dataset TBC + coordinate da foreverdb
 alchemy	60	Swiftness Potion	2335	2555	vanilla	worldDrop							true			da vanilla, dataset TBC
-alchemy	90	Elixir of Coalesced Regret	426607	210709	sod	vendor	Kzixx | Zixil	Duskwood | Hillsbrad Foothills	81.9 | 60.8	19.9 | 20.2	alliance | 					wowhead + coordinate da foreverdb
+alchemy	90	Elixir of Coalesced Regret	426607	210709	sod	vendor	Kzixx | Zixil	Duskwood | Hillsbrad Foothills	81.9 | 55.7	19.9 | 27.3	alliance | 					wowhead + coordinate da foreverdb
 alchemy	90	Elixir of Giant Growth	8240	6663	vanilla	worldDrop							true			da vanilla, dataset TBC
 alchemy	100	Holy Protection Potion	7255	6053	vanilla	vendor	Xandar Goodbeard | Kzixx | Hula'mahi	Loch Modan | Duskwood | The Barrens	82.5 | 81.9 | 51.4	63.2 | 19.9 | 30.2	alliance |  | horde					da vanilla, dataset TBC + coordinate da foreverdb
 alchemy	110	Minor Magic Resistance Potion	3172	3393	vanilla	worldDrop							true			da vanilla, dataset TBC
@@ -931,7 +932,7 @@ alchemy	140	Elixir of Lesser Agility	2333	3396	vanilla	worldDrop							true			da
 alchemy	150	Elixir of Ogre Strength	3188	6211	vanilla	worldDrop							true			da vanilla, dataset TBC
 alchemy	150	Free Action Potion	6624	5642	vanilla	vendor	Soolie Berryfizz | Ulthir | Kor'geld	Ironforge | Darnassus | The Drag, Orgrimmar	66.3 | 55.7 | 56.1	55.5 | 24.2 | 34.1	alliance | alliance | horde					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
 alchemy	165	Fire Protection Potion	7257	6055	vanilla	vendor	Jeeda | Nandar Branson	Stonetalon Mountains | Hillsbrad Foothills	47.6 | 50.8	61.6 | 57.1	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
-alchemy	165	Shadow Oil	3449	6068	vanilla	vendor	Bliztik | Montarr	Duskwood | Thousand Needles	18.0 | 45.3	54.4 | 50.9	 | horde					da vanilla, dataset TBC + coordinate da foreverdb
+alchemy	165	Shadow Oil	3449	6068	vanilla	vendor	Bliztik | Montarr	Duskwood | Thousand Needles	18.0 | 45.3	54.5 | 50.8	 | horde					da vanilla, dataset TBC + coordinate da foreverdb
 alchemy	175	Elixir of Lesser Fortitude	3450	3830	vanilla	worldDrop							true			wowhead, elenco (era trainer per il dataset TBC)
 alchemy	175	Great Rage Potion	6618	5643	vanilla	vendor	Hagrus | Ulthir	Orgrimmar | Darnassus	46.1 | 55.7	46.1 | 24.2	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
 alchemy	180	Draught of Water Walking	11447	288206	vanilla											
@@ -939,9 +940,9 @@ alchemy	180	Troll's Blood Elixir	3451	3831	vanilla	worldDrop							true			da van
 alchemy	190	Elixir of Frost Power	21923	17709	vanilla	worldEvent										da vanilla, dataset TBC
 alchemy	190	Frost Protection Potion	7258	6056	vanilla	vendor	Drovnar Strongbrew | Glyx Brewright	Arathi Highlands | Stranglethorn Vale	46.3 | 28.1	47.1 | 78.0	alliance | 					da vanilla, dataset TBC + coordinate da foreverdb
 alchemy	190	Lesser Arcane Elixir	439960	217399	sod	vendor										quartermaster a Merchant's Favor -- 45 Merchant's Favor skill 65 to 140 [foreverchanges 2026-09-24]
-alchemy	190	Nature Protection Potion	7259	6057	vanilla	vendor	Logannas | Bronk | Glyx Brewright | Alchemist Pestlezugg	Feralas | Feralas | Stranglethorn Vale | Tanaris	32.6 |  | 28.1 | 50.9	44.0 |  | 78.0 | 27.0	alliance | horde |  | 					da vanilla, dataset TBC + coordinate da foreverdb
+alchemy	190	Nature Protection Potion	7259	6057	vanilla	vendor	Logannas | Bronk | Glyx Brewright | Alchemist Pestlezugg	Feralas | Feralas | Stranglethorn Vale | Tanaris	32.7 | 76.0 | 28.1 | 50.9	44.0 | 43.4 | 78.0 | 27.0	alliance | horde |  | 					da vanilla, dataset TBC + coordinate da foreverdb
 alchemy	195	Draught of Detect Lesser Invisibility	3453	3832	vanilla	worldDrop							true			da vanilla, dataset TBC
-alchemy	200	Frost Oil	3454	14634	vanilla	vendor	Bro'kin	Alterac Mountains								da vanilla, dataset TBC
+alchemy	200	Frost Oil	3454	14634	vanilla	vendor	Bro'kin	Alterac Mountains	38.3	38.8						da vanilla, dataset TBC + coordinate da foreverdb
 alchemy	210	Goblin Rocket Fuel	11456	10644	vanilla	trainer										da vanilla, dataset TBC
 alchemy	210	Magic Resistance Potion	11453	9293	vanilla	worldDrop							true			da vanilla, dataset TBC
 alchemy	215	Lesser Stoneshield Potion	4942	4624	vanilla	quest		Badlands								da vanilla, dataset TBC
@@ -953,12 +954,12 @@ alchemy	235	Invisibility Potion	11464	9295	vanilla	worldDrop							true			da van
 alchemy	240	Draught of Dream Vision	11468	9297	vanilla	worldDrop							true			da vanilla, dataset TBC
 alchemy	240	Gift of Arthas	11466	9296	vanilla	drop		Western Plaguelands								da vanilla, dataset TBC
 alchemy	245	Elixir of Greater Strength	11472	9298	vanilla	worldDrop							true			da vanilla, dataset TBC
-alchemy	245	Ghost Dye	11473	9302	vanilla	vendor	Logannas | Bronk	Feralas | Feralas	32.6 | 	44.0 | 	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
+alchemy	245	Ghost Dye	11473	9302	vanilla	vendor	Logannas | Bronk	Feralas | Feralas	32.7 | 76.0	44.0 | 43.4	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
 alchemy	250	Elixir of Holy Power	26277	21547	vanilla	drop		Searing Gorge								da vanilla, dataset TBC
-alchemy	250	Elixir of Shadow Power	11476	9301	vanilla	vendor	Maria Lumere | Algernon	Stormwind City | Undercity	55.8 | 52.0	85.4 | 74.3	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
+alchemy	250	Elixir of Shadow Power	11476	9301	vanilla	vendor	Maria Lumere | Algernon	Stormwind City | Undercity	55.8 | 51.9	85.4 | 74.6	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
 alchemy	250	Limited Invulnerability Potion	3175	3395	vanilla	worldDrop							true			da vanilla, dataset TBC
 alchemy	250	Major Discolored Healing Potion	1231583	241651	sod	trainer	Apothecary Renferrel	Silverpine Forest	42.9	40.9	horde					foreverdb, trainer visto su Forever
-alchemy	250	Potion of Demon Slaying	11477	9300	vanilla	vendor	Rartar | Nina Lightbrew	Swamp of Sorrows | Blasted Lands			horde | alliance					da vanilla, dataset TBC
+alchemy	250	Potion of Demon Slaying	11477	9300	vanilla	vendor	Rartar | Nina Lightbrew	Swamp of Sorrows | Blasted Lands	45.4 | 	57.0 | 	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
 alchemy	255	Mighty Rage Potion	17552	13476	vanilla	drop	Blackrock Slayer	Burning Steppes							56-57	wowhead, elenco (era trainer per il dataset TBC)
 alchemy	260	Superior Mana Potion	17553	13477	vanilla	trainer										da vanilla, dataset TBC
 alchemy	265	Elixir of Greater Defense	17554	13478	vanilla	vendor	Soolie Berryfizz | Kor'geld	Ironforge | The Drag, Orgrimmar	66.3 | 56.1	55.5 | 34.1	alliance | horde					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
@@ -1042,7 +1043,7 @@ blacksmithing	120	Mighty Iron Hammer	3297	3608	vanilla	worldDrop							true			da
 blacksmithing	125	Green Iron Gauntlets	3336	3612	vanilla	worldDrop							true			da vanilla, dataset TBC
 blacksmithing	125	Iron Shield Spike	7221	6044	vanilla	worldDrop							true			da vanilla, dataset TBC
 blacksmithing	130	Silvered Bronze Leggings	12259	10424	vanilla	worldDrop							true			da vanilla, dataset TBC
-blacksmithing	130	Solid Iron Maul	3494	10858	vanilla	vendor	"Jazzrik | Muuran | Jannos Ironwill | High Admiral ""Shelly"" Jorrik"	Badlands | Desolace | Arathi Highlands | Dun Morogh	42.5 | 55.7 | 45.9 | 	52.7 | 56.5 | 47.5 | 	horde | horde | alliance | 					da vanilla, dataset TBC + coordinate da foreverdb
+blacksmithing	130	Solid Iron Maul	3494	10858	vanilla	vendor	"Jazzrik | Muuran | Jannos Ironwill | High Admiral ""Shelly"" Jorrik"	Badlands | Desolace | Arathi Highlands | Dun Morogh	42.6 | 55.7 | 45.9 | 	52.6 | 56.5 | 47.5 | 	horde | horde | alliance | 					da vanilla, dataset TBC + coordinate da foreverdb
 blacksmithing	135	Barbaric Iron Breastplate	9813	7979	vanilla	quest		Orgrimmar			horde					da vanilla, dataset TBC
 blacksmithing	135	Barbaric Iron Shoulders	9811	7978	vanilla	quest		Orgrimmar			horde					da vanilla, dataset TBC
 blacksmithing	135	Green Iron Shoulders	3504	3870	vanilla	worldDrop							true			da vanilla, dataset TBC
@@ -1078,6 +1079,7 @@ blacksmithing	200	Low-Background Truesilver Plates	435910	215384	sod	vendor	"Zir
 blacksmithing	200	Ornate Mithril Shoulders	9952	7985	vanilla	quest		Stranglethorn Vale								da vanilla, dataset TBC
 blacksmithing	200	Wicked Mithril Blade	9997	8029	vanilla	worldDrop							true			da vanilla, dataset TBC
 blacksmithing	205	Golden Scale Gauntlets	439120	217274	sod											
+blacksmithing	205	Orcish War Leggings	9957	7994	vanilla	quest		Orgrimmar			horde					da vanilla, dataset TBC
 blacksmithing	210	Mithril Plate Shoulders	9966	7991	vanilla	worldDrop							true			da vanilla, dataset TBC
 blacksmithing	210	Mithril Spurs	9964	7989	vanilla	worldDrop							true			da vanilla, dataset TBC
 blacksmithing	215	Dazzling Mithril Rapier	10005	7993	vanilla	worldDrop							true			da vanilla, dataset TBC
@@ -1234,7 +1236,6 @@ blacksmithing		Light Obsidian Belt	27588	22214	vanilla	vendor	Vargus	Silithus			
 blacksmithing		Mithril Coif	9961		vanilla	trainer										da vanilla, dataset TBC
 blacksmithing		Mithril Plate Gloves	9942	7977	vanilla											
 blacksmithing		Mithril Plate Pants	9931		vanilla	trainer										da vanilla, dataset TBC
-blacksmithing		Orcish War Leggings	9957	7994	vanilla	quest		Orgrimmar			horde					da vanilla, dataset TBC
 blacksmithing		Ornate Mithril Boots	9979	7988	vanilla	quest		Tanaris								da vanilla, dataset TBC
 blacksmithing		Ornate Mithril Breastplate	9972	7986	vanilla	quest		Tanaris								da vanilla, dataset TBC
 blacksmithing		Ornate Mithril Helm	9980	7987	vanilla	quest		Tanaris								da vanilla, dataset TBC
@@ -1273,27 +1274,27 @@ blacksmithing		Truesilver Champion	10015		vanilla	trainer										da vanilla, d
 blacksmithing		Truesilver Gauntlets	9954		vanilla	trainer										da vanilla, dataset TBC
 blacksmithing		Truesilver Rod	14380		vanilla	trainer										da vanilla, dataset TBC
 blacksmithing		Truesilver Skeleton Key	19668		vanilla	trainer										da vanilla, dataset TBC
-cooking	1	Brilliant Smallfish	7751	6325	vanilla	vendor	Harn Longcast | Gretta Ganter | Catherine Leland | Martine Tramblay | Sewa Mistrunner	Mulgore | Dun Morogh | Stormwind City | Tirisfal Glades | Thunder Bluff	46.7 | 31.5 | 55.2 | 65.3 | 55.8	59.2 | 44.7 | 69.5 | 59.9 | 47.2	horde | alliance | alliance | horde | horde					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
+cooking	1	Brilliant Smallfish	7751	6325	vanilla	vendor	Harn Longcast | Gretta Ganter | Catherine Leland | Martine Tramblay | Sewa Mistrunner	Mulgore | Dun Morogh | Stormwind City | Tirisfal Glades | Thunder Bluff	46.7 | 31.5 | 55.2 | 65.8 | 55.8	59.2 | 44.7 | 69.5 | 59.7 | 47.2	horde | alliance | alliance | horde | horde					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
 cooking	1	Crispy Bat Wing	15935	12226	vanilla	vendor	Abigail Shiel	Tirisfal Glades	61.0	52.3	horde					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	1	Gingerbread Cookie	21143	17200	vanilla	vendor	Eebee Jinglepocket | Wolgren Jinglepocket | Khole Jinglepocket | Seersa Copperpinch	Shattrath City | The Exodar | Stormwind City | Thunder Bluff			 | alliance | alliance | horde					da vanilla, dataset TBC
-cooking	1	Slitherskin Mackerel	7752	6326	vanilla	vendor	Tansy Puddlefizz | Kriggon Talsone | Martine Tramblay | Zansoa	Ironforge | Westfall | Tirisfal Glades | Durotar	47.9 | 36.2 | 65.3 | 56.1	6.6 | 90.1 | 59.9 | 73.4	alliance | alliance | horde | horde					da vanilla, dataset TBC + coordinate da foreverdb
+cooking	1	Slitherskin Mackerel	7752	6326	vanilla	vendor	Tansy Puddlefizz | Kriggon Talsone | Martine Tramblay | Zansoa	Ironforge | Westfall | Tirisfal Glades | Durotar	47.9 | 36.2 | 65.8 | 56.1	6.6 | 90.1 | 59.7 | 73.4	alliance | alliance | horde | horde					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	10	Kaldorei Spider Kabob	6412	5482	vanilla	quest		Teldrassil			alliance					da vanilla, dataset TBC
 cooking	20	Scorpid Surprise	6413	5483	vanilla	vendor	Grimtak	Durotar	51.2	42.5	horde					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	25	Beer Basted Boar Ribs	2795	2889	vanilla	vendor	Kendor Kabonka	Stormwind City	77.5	52.9	alliance					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	35	Egg Nog	21144	17201	vanilla	vendor	Eebee Jinglepocket | Wolgren Jinglepocket | Khole Jinglepocket | Seersa Copperpinch	Shattrath City | The Exodar | Stormwind City | Thunder Bluff			 | alliance | alliance | horde					da vanilla, dataset TBC
-cooking	35	Roasted Kodo Meat	6414	5484	vanilla	vendor	Wunna Darkmane	Mulgore	45.5	61.7	horde					da vanilla, dataset TBC + coordinate da foreverdb
-cooking	40	Smoked Bear Meat	8607	6892	vanilla	vendor	Drac Roughcut | Andrew Hilbert	Loch Modan | Silverpine Forest	35.6 | 43.2	49.0 | 40.7	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
+cooking	35	Roasted Kodo Meat	6414	5484	vanilla	vendor	Wunna Darkmane	Mulgore	45.5	61.8	horde					da vanilla, dataset TBC + coordinate da foreverdb
+cooking	40	Smoked Bear Meat	8607	6892	vanilla	vendor	Drac Roughcut | Andrew Hilbert	Loch Modan | Silverpine Forest	35.6 | 43.2	49.0 | 40.8	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	50	Fillet of Frenzy	6415	5485	vanilla	vendor	Laird	Darkshore	36.8	44.2	alliance					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	50	Goretusk Liver Pie	2542	2697	vanilla	vendor	Kendor Kabonka	Stormwind City	77.5	52.9	alliance					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	50	Loch Frenzy Delight	7754	6329	vanilla	vendor	Khara Deepwater	Loch Modan	39.6	39.3	alliance					da vanilla, dataset TBC + coordinate da foreverdb
-cooking	50	Longjaw Mud Snapper	7753	6328	vanilla	vendor	Killian Sanatha | Khara Deepwater | Lizbeth Cromwell | Tharynn Bouden | Naal Mistrunner	Silverpine Forest | Loch Modan | Undercity | Elwynn Forest | Thunder Bluff	33.0 | 39.6 | 81.4 | 41.7 | 51.1	17.7 | 39.3 | 30.6 | 67.0 | 52.5	horde | alliance | horde | alliance | horde					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
-cooking	50	Rainbow Fin Albacore	7827	6368	vanilla	vendor	Kriggon Talsone | Heldan Galesong | Killian Sanatha | Catherine Leland	Westfall | Darkshore | Silverpine Forest | Stormwind City	36.2 | 37.0 | 33.0 | 55.2	90.1 | 56.3 | 17.7 | 69.5	alliance | alliance | horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
+cooking	50	Longjaw Mud Snapper	7753	6328	vanilla	vendor	Killian Sanatha | Khara Deepwater | Lizbeth Cromwell | Tharynn Bouden | Naal Mistrunner	Silverpine Forest | Loch Modan | Undercity | Elwynn Forest | Thunder Bluff	33.1 | 39.6 | 81.4 | 41.7 | 51.1	17.7 | 39.3 | 30.6 | 67.0 | 52.5	horde | alliance | horde | alliance | horde					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
+cooking	50	Rainbow Fin Albacore	7827	6368	vanilla	vendor	Kriggon Talsone | Heldan Galesong | Killian Sanatha | Catherine Leland	Westfall | Darkshore | Silverpine Forest | Stormwind City	36.2 | 37.0 | 33.1 | 55.2	90.1 | 56.3 | 17.7 | 69.5	alliance | alliance | horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	50	Strider Stew	6416	5486	vanilla	vendor	Tari'qa	The Barrens	51.7	30.1	horde					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	60	Blood Sausage	3371	3679	vanilla	vendor	Kendor Kabonka	Stormwind City	77.5	52.9	alliance					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	60	Thistle Tea	9513	7678	vanilla	vendor	Smudge Thunderwood	Alterac Mountains								da vanilla, dataset TBC
 cooking	75	Westfall Stew	2543	728	vanilla	vendor	Kendor Kabonka	Stormwind City	77.5	52.9	alliance					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	80	Crocolisk Steak	3370	3678	vanilla	vendor	Kendor Kabonka	Stormwind City	77.5	52.9	alliance					da vanilla, dataset TBC + coordinate da foreverdb
-cooking	80	Smoked Sagefish	25704	21099	vanilla	vendor	"Derak Nightfall | Phea | Gloria Femmel | ""Cookie"" McWeaksauce | Kalsey Sanden | Aza'bek | Naal Mistrunner | Xen'to"	Hillsbrad Foothills | The Exodar | Redridge Mountains | Azuremyst Isle | Three Corners, Redridge Mountains | The Barrens | Thunder Bluff | The Drag, Orgrimmar	63.1 |  | 21.7 |  | 10.8 | 49.7 | 51.1 | 57.6	19.6 |  | 43.4 |  | 72.8 | 29.4 | 52.5 | 53.3	horde | alliance | alliance | alliance | alliance | horde | horde | horde					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
+cooking	80	Smoked Sagefish	25704	21099	vanilla	vendor	"Derak Nightfall | Phea | Gloria Femmel | ""Cookie"" McWeaksauce | Kalsey Sanden | Aza'bek | Naal Mistrunner | Xen'to"	Hillsbrad Foothills | The Exodar | Redridge Mountains | Azuremyst Isle | Three Corners, Redridge Mountains | The Barrens | Thunder Bluff | The Drag, Orgrimmar	63.1 |  | 21.7 |  | 10.8 | 49.7 | 51.1 | 57.6	19.3 |  | 43.4 |  | 72.8 | 29.4 | 52.5 | 53.3	horde | alliance | alliance | alliance | alliance | horde | horde | horde					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
 cooking	85	Cooked Crab Claw	2545	2698	vanilla	vendor	Kendor Kabonka	Stormwind City	77.5	52.9	alliance					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	85	Savory Deviate Delight	8238	6661	vanilla	worldDrop							true			da vanilla, dataset TBC
 cooking	90	Clam Chowder	6501	5528	vanilla	vendor	Kriggon Talsone | Heldan Galesong	Westfall | Darkshore	36.2 | 37.0	90.1 | 56.3	alliance | alliance					da vanilla, dataset TBC + coordinate da foreverdb
@@ -1303,29 +1304,29 @@ cooking	100	Bristle Whisker Catfish	7755	6330	vanilla	vendor	Kilxx | Ronald Burc
 cooking	100	Crispy Lizard Tail	6418	5488	vanilla	vendor	Tari'qa	The Barrens	51.7	30.1	horde					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	100	Redridge Goulash	2547	2699	vanilla	vendor	Kendor Kabonka	Stormwind City	77.5	52.9	alliance					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	100	Seasoned Wolf Kabob	2549	2701	vanilla	vendor	Kendor Kabonka	Stormwind City	77.5	52.9	alliance					da vanilla, dataset TBC + coordinate da foreverdb
-cooking	110	Big Bear Steak	3397	3734	vanilla	vendor	Ulthaan | Super-Seller 680	Ashenvale | Desolace	50.0 | 	66.6 | 	alliance | 					da vanilla, dataset TBC + coordinate da foreverdb
+cooking	110	Big Bear Steak	3397	3734	vanilla	vendor	Ulthaan | Super-Seller 680	Ashenvale | Desolace	50.0 | 40.5	66.6 | 79.2	alliance | 					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	110	Gooey Spider Cake	3377	3683	vanilla	vendor	Kendor Kabonka	Stormwind City	77.5	52.9	alliance					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	110	Lean Venison	6419	5489	vanilla	vendor	Ulthaan | Vendor-Tron 1000	Ashenvale | Desolace	50.0 | 60.3	66.6 | 38.1	alliance | 					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	110	Succulent Pork Ribs	2548	2700	vanilla	vendor	Kendor Kabonka	Stormwind City	77.5	52.9	alliance					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	120	Crocolisk Gumbo	3373	3681	vanilla	vendor	Kendor Kabonka	Stormwind City	77.5	52.9	alliance					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	125	Hot Lion Chops	3398	3735	vanilla	vendor	Zargh | Vendor-Tron 1000	The Barrens | Desolace	52.6 | 60.3	29.9 | 38.1	horde | 					da vanilla, dataset TBC + coordinate da foreverdb
-cooking	125	Lean Wolf Steak	15853	12227	vanilla	vendor	Super-Seller 680	Desolace								da vanilla, dataset TBC
-cooking	130	Curiously Tasty Omelet	3376	3682	vanilla	vendor	Nerrist | Keena | Kendor Kabonka	Stranglethorn Vale | Arathi Highlands | Stormwind City	 | 74.0 | 77.5	 | 32.7 | 52.9	horde | horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
+cooking	125	Lean Wolf Steak	15853	12227	vanilla	vendor	Super-Seller 680	Desolace	40.5	79.2						da vanilla, dataset TBC + coordinate da foreverdb
+cooking	130	Curiously Tasty Omelet	3376	3682	vanilla	vendor	Nerrist | Keena | Kendor Kabonka	Stranglethorn Vale | Arathi Highlands | Stormwind City	32.7 | 74.0 | 77.5	29.2 | 32.7 | 52.9	horde | horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	150	Heavy Crocolisk Stew	24418	20075	vanilla	vendor	Ogg'marr	Dustwallow Marsh	36.7	31.0	horde					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	150	Tasty Lion Steak	3399	3736	vanilla	quest		Hillsbrad Foothills			alliance					da vanilla, dataset TBC
-cooking	175	Barbecued Buzzard Wing	4094	4609	vanilla	vendor	Narj Deepslice | Super-Seller 680	Arathi Highlands | Desolace	45.7 | 	47.4 | 	alliance | 					da vanilla, dataset TBC + coordinate da foreverdb
-cooking	175	Carrion Surprise	15863	12232	vanilla	vendor	Vendor-Tron 1000 | Ogg'marr | Banalash | Kireena	Desolace | Dustwallow Marsh | Swamp of Sorrows | Desolace	60.3 | 36.7 |  | 	38.1 | 31.0 |  | 	 | horde | horde | horde					da vanilla, dataset TBC + coordinate da foreverdb
+cooking	175	Barbecued Buzzard Wing	4094	4609	vanilla	vendor	Narj Deepslice | Super-Seller 680	Arathi Highlands | Desolace	45.7 | 40.5	47.4 | 79.2	alliance | 					da vanilla, dataset TBC + coordinate da foreverdb
+cooking	175	Carrion Surprise	15863	12232	vanilla	vendor	Vendor-Tron 1000 | Ogg'marr | Banalash | Kireena	Desolace | Dustwallow Marsh | Swamp of Sorrows | Desolace	60.3 | 36.7 |  | 51.0	38.1 | 31.0 |  | 53.5	 | horde | horde | horde					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	175	Giant Clam Scorcho	7213	6039	vanilla	vendor	Kelsey Yance	Stranglethorn Vale	28.2	74.4						da vanilla, dataset TBC + coordinate da foreverdb
-cooking	175	Hot Wolf Ribs	15856	12229	vanilla	vendor	Sheendra Tallgrass | Vivianna | Super-Seller 680	Feralas | Feralas | Desolace			horde | alliance | 					da vanilla, dataset TBC
-cooking	175	Jungle Stew	15861	12231	vanilla	vendor	Nerrist | Corporal Bluth | Vendor-Tron 1000	Stranglethorn Vale | Stranglethorn Vale | Desolace	 | 38.0 | 60.3	 | 3.0 | 38.1	horde | alliance | 					da vanilla, dataset TBC + coordinate da foreverdb
+cooking	175	Hot Wolf Ribs	15856	12229	vanilla	vendor	Sheendra Tallgrass | Vivianna | Super-Seller 680	Feralas | Feralas | Desolace	74.5 | 31.3 | 40.5	42.8 | 43.4 | 79.2	horde | alliance | 					da vanilla, dataset TBC + coordinate da foreverdb
+cooking	175	Jungle Stew	15861	12231	vanilla	vendor	Nerrist | Corporal Bluth | Vendor-Tron 1000	Stranglethorn Vale | Stranglethorn Vale | Desolace	32.7 | 38.0 | 60.3	29.2 | 3.0 | 38.1	horde | alliance | 					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	175	Mithril Headed Trout	20916	17062	vanilla	vendor	Heldan Galesong | Kelsey Yance | Shankys | Wik'Tar	Darkshore | Stranglethorn Vale | Orgrimmar | Ashenvale	37.0 | 28.2 | 69.9 | 11.7	56.3 | 74.4 | 29.7 | 34.1	alliance |  | horde | horde					da vanilla, dataset TBC + coordinate da foreverdb
-cooking	175	Mystery Stew	15865	12233	vanilla	vendor	Helenia Olden | Janet Hommers | Super-Seller 680	Dustwallow Marsh | Desolace | Desolace	66.4 | 66.3 | 	51.5 | 6.7 | 	alliance | alliance | 					da vanilla, dataset TBC + coordinate da foreverdb
-cooking	175	Roast Raptor	15855	12228	vanilla	vendor	Nerrist | Corporal Bluth | Vendor-Tron 1000 | Keena	Stranglethorn Vale | Stranglethorn Vale | Desolace | Arathi Highlands	 | 38.0 | 60.3 | 74.0	 | 3.0 | 38.1 | 32.7	horde | alliance |  | horde					da vanilla, dataset TBC + coordinate da foreverdb
+cooking	175	Mystery Stew	15865	12233	vanilla	vendor	Helenia Olden | Janet Hommers | Super-Seller 680	Dustwallow Marsh | Desolace | Desolace	66.4 | 66.3 | 40.5	51.5 | 6.7 | 79.2	alliance | alliance | 					da vanilla, dataset TBC + coordinate da foreverdb
+cooking	175	Roast Raptor	15855	12228	vanilla	vendor	Nerrist | Corporal Bluth | Vendor-Tron 1000 | Keena	Stranglethorn Vale | Stranglethorn Vale | Desolace | Arathi Highlands	32.7 | 38.0 | 60.3 | 74.0	29.2 | 3.0 | 38.1 | 32.7	horde | alliance |  | horde					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	175	Rockscale Cod	7828	6369	vanilla	vendor	Heldan Galesong | Kelsey Yance | Shankys | Wik'Tar	Darkshore | Stranglethorn Vale | Orgrimmar | Ashenvale	37.0 | 28.2 | 69.9 | 11.7	56.3 | 74.4 | 29.7 | 34.1	alliance |  | horde | horde					da vanilla, dataset TBC + coordinate da foreverdb
-cooking	175	Sagefish Delight	25954	21219	vanilla	vendor	"Derak Nightfall | Phea | Gloria Femmel | ""Cookie"" McWeaksauce | Kalsey Sanden | Aza'bek | Naal Mistrunner | Xen'to"	Hillsbrad Foothills | The Exodar | Redridge Mountains | Azuremyst Isle | Three Corners, Redridge Mountains | The Barrens | Thunder Bluff | The Drag, Orgrimmar	63.1 |  | 21.7 |  | 10.8 | 49.7 | 51.1 | 57.6	19.6 |  | 43.4 |  | 72.8 | 29.4 | 52.5 | 53.3	horde | alliance | alliance | alliance | alliance | horde | horde | horde					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
+cooking	175	Sagefish Delight	25954	21219	vanilla	vendor	"Derak Nightfall | Phea | Gloria Femmel | ""Cookie"" McWeaksauce | Kalsey Sanden | Aza'bek | Naal Mistrunner | Xen'to"	Hillsbrad Foothills | The Exodar | Redridge Mountains | Azuremyst Isle | Three Corners, Redridge Mountains | The Barrens | Thunder Bluff | The Drag, Orgrimmar	63.1 |  | 21.7 |  | 10.8 | 49.7 | 51.1 | 57.6	19.3 |  | 43.4 |  | 72.8 | 29.4 | 52.5 | 53.3	horde | alliance | alliance | alliance | alliance | horde | horde | horde					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
 cooking	175	Soothing Turtle Bisque	3400	3737	vanilla	quest		Hillsbrad Foothills			alliance					da vanilla, dataset TBC
-cooking	200	Dragonbreath Chili	15906	12239	vanilla	vendor	Helenia Olden | Ogg'marr | Super-Seller 680	Dustwallow Marsh | Dustwallow Marsh | Desolace	66.4 | 36.7 | 	51.5 | 31.0 | 	alliance | horde | 					da vanilla, dataset TBC + coordinate da foreverdb
-cooking	200	Heavy Kodo Stew	15910	12240	vanilla	vendor	Vendor-Tron 1000 | Kireena | Janet Hommers	Desolace | Desolace | Desolace	60.3 |  | 66.3	38.1 |  | 6.7	 | horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
+cooking	200	Dragonbreath Chili	15906	12239	vanilla	vendor	Helenia Olden | Ogg'marr | Super-Seller 680	Dustwallow Marsh | Dustwallow Marsh | Desolace	66.4 | 36.7 | 40.5	51.5 | 31.0 | 79.2	alliance | horde | 					da vanilla, dataset TBC + coordinate da foreverdb
+cooking	200	Heavy Kodo Stew	15910	12240	vanilla	vendor	Vendor-Tron 1000 | Kireena | Janet Hommers	Desolace | Desolace | Desolace	60.3 | 51.0 | 66.3	38.1 | 53.5 | 6.7	 | horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	225	Cooked Glossy Mightfish	18239	13940	vanilla	vendor	Kelsey Yance	Stranglethorn Vale	28.2	74.4						da vanilla, dataset TBC + coordinate da foreverdb
 cooking	225	Filet of Redgill	18241	13941	vanilla	vendor	Kelsey Yance	Stranglethorn Vale	28.2	74.4						da vanilla, dataset TBC + coordinate da foreverdb
 cooking	225	Monster Omelet	15933	16110	vanilla	vendor	Malygen | Bale | Himmik	Felwood | Felwood | Winterspring			alliance | horde | 					da vanilla, dataset TBC
@@ -1340,9 +1341,9 @@ cooking	250	Nightfin Soup	18243	13945	vanilla	vendor	Gikkix	Tanaris	66.6	22.1			
 cooking	250	Poached Sunscale Salmon	18244	13946	vanilla	vendor	Gikkix	Tanaris	66.6	22.1						da vanilla, dataset TBC + coordinate da foreverdb
 cooking	250	Prowler Steak	1225758	238645	sod											
 cooking	250	Sunrise Omelette	1225760	238647	sod											
-cooking	275	Baked Salmon	18247	13949	vanilla	vendor	Vivianna | Sheendra Tallgrass	Feralas | Feralas			alliance | horde					da vanilla, dataset TBC
-cooking	275	Lobster Stew	18245	13947	vanilla	vendor	Vivianna | Sheendra Tallgrass	Feralas | Feralas			alliance | horde					da vanilla, dataset TBC
-cooking	275	Mightfish Steak	18246	13948	vanilla	vendor	Vivianna | Sheendra Tallgrass	Feralas | Feralas			alliance | horde					da vanilla, dataset TBC
+cooking	275	Baked Salmon	18247	13949	vanilla	vendor	Vivianna | Sheendra Tallgrass	Feralas | Feralas	31.3 | 74.5	43.4 | 42.8	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
+cooking	275	Lobster Stew	18245	13947	vanilla	vendor	Vivianna | Sheendra Tallgrass	Feralas | Feralas	31.3 | 74.5	43.4 | 42.8	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
+cooking	275	Mightfish Steak	18246	13948	vanilla	vendor	Vivianna | Sheendra Tallgrass	Feralas | Feralas	31.3 | 74.5	43.4 | 42.8	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
 cooking	275	Runn Tum Tuber Surprise	22761	18267	vanilla	drop	Pusillin	Dire Maul							57-57	da vanilla, dataset TBC
 cooking	280	Grand Lobster Banquet	1225763	238650	sod											
 cooking	280	Specklefin Feast	1225762	238649	sod											
@@ -1350,7 +1351,7 @@ cooking	300	Darkclaw Bisque	470359	232437	sod	vendor	Chief Expeditionary Requisi
 cooking	300	Dirge's Kickin' Chimaerok Chops	25659	21025	vanilla	quest		Tanaris								da vanilla, dataset TBC
 cooking	300	Smoked Redgill	470370	232443	sod	vendor	Chief Expeditionary Requisitioner Enkles | Apothecary Quinard	Silithus | Silithus			alliance | horde					wowhead
 cooking		Basic Campfire	818		vanilla											
-cooking		Basic Campfire	1229737		sod	blueprint	Cook Torka | Gremlock Pilsnor | Pyall Silentstride	Durotar | Dun Morogh | Mulgore	51.0 | 47.6 | 45.0	42.5 | 52.4 | 61.7	horde | alliance | horde					foreverdb, trainer visto su Forever + Blueprint dal client
+cooking		Basic Campfire	1229737		sod	blueprint	Cook Torka | Gremlock Pilsnor | Pyall Silentstride	Durotar | Dun Morogh | Mulgore	51.0 | 47.6 | 44.9	42.5 | 52.4 | 61.5	horde | alliance | horde					foreverdb, trainer visto su Forever + Blueprint dal client
 cooking		Boiled Clams	6499		vanilla	trainer										da vanilla, dataset TBC
 cooking		Charred Wolf Meat	2538		vanilla	trainer										da vanilla, dataset TBC
 cooking		Coyote Steak	2541		vanilla	trainer										da vanilla, dataset TBC
@@ -1375,7 +1376,7 @@ enchanting	110	Enchant Cloak - Minor Agility	13419	11039	vanilla	vendor	Dalria |
 enchanting	115	Enchant Shield - Lesser Protection	13464	11081	vanilla	worldDrop							true			da vanilla, dataset TBC
 enchanting	120	Enchant Bracer - Lesser Spirit	7859	6375	vanilla	worldDrop							true			da vanilla, dataset TBC
 enchanting	120	Scroll of Spatial Mending	448624	223163	sod	drop	Fel Interloper									wowhead
-enchanting	125	Enchant Boots - Minor Agility	7867	6377	vanilla	vendor	Nata Dawnstrider | Zixil	Thunder Bluff | Hillsbrad Foothills	44.8 | 60.8	38.8 | 20.2	horde | 					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
+enchanting	125	Enchant Boots - Minor Agility	7867	6377	vanilla	vendor	Nata Dawnstrider | Zixil	Thunder Bluff | Hillsbrad Foothills	44.8 | 55.7	38.8 | 27.3	horde | 					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
 enchanting	125	Enchant Boots - Minor Stamina	7863	6376	vanilla	trainer										da vanilla, dataset TBC
 enchanting	135	Enchant Cloak - Lesser Shadow Resistance	13522	11098	vanilla	worldDrop							true			da vanilla, dataset TBC
 enchanting	140	Enchant Bracer - Lesser Strength	13536	11101	vanilla	vendor	Dalria | Kulwia	Ashenvale | Stonetalon Mountains	35.1 | 45.4	52.0 | 59.4	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
@@ -1556,11 +1557,11 @@ engineering	135	Shredder Autosalvage Unit	424641	210178	sod
 engineering	140	Minor Recombobulator	3952	14639	vanilla	vendor	Gagsprocket | Namdo Bizzfizzle | Fradd Swiftgear	The Barrens | Gnomeregan | Wetlands	62.7 |  | 26.4	36.3 |  | 25.9	 | alliance | alliance					da vanilla, dataset TBC + coordinate da foreverdb
 engineering	145	Moonsight Rifle	3954	4412	vanilla	worldDrop							true			da vanilla, dataset TBC
 engineering	150	Blue Firework	23067	18649	vanilla	vendor	Gearcutter Cogspinner	Ironforge	67.7	43.4	alliance					da vanilla, dataset TBC + coordinate da foreverdb
-engineering	150	Green Firework	23068	18648	vanilla	vendor	Crazk Sparks | Gagsprocket	Stranglethorn Vale | The Barrens	 | 62.7	 | 36.3						da vanilla, dataset TBC + coordinate da foreverdb
+engineering	150	Green Firework	23068	18648	vanilla	vendor	Crazk Sparks | Gagsprocket	Stranglethorn Vale | The Barrens	28.3 | 62.7	76.7 | 36.3						da vanilla, dataset TBC + coordinate da foreverdb
 engineering	150	Red Firework	23066	18647	vanilla	vendor	Sovik	Valley of Honor, Orgrimmar	75.6	25.3	horde					da vanilla, dataset TBC + catturato in gioco
-engineering	155	Ice Deflector	3957	13308	vanilla	vendor	Rizz Loosebolt	Alterac Mountains								da vanilla, dataset TBC
+engineering	155	Ice Deflector	3957	13308	vanilla	vendor	Rizz Loosebolt	Alterac Mountains	47.4	35.3						da vanilla, dataset TBC + coordinate da foreverdb
 engineering	160	Discombobulator Ray	3959	4413	vanilla	drop	Mekgineer Thermaplugg	Gnomeregan							28-28	da vanilla, dataset TBC
-engineering	165	Goblin Jumper Cables	9273	7561	vanilla	vendor	Veenix | Kzixx | Zixil	Stonetalon Mountains | Duskwood | Hillsbrad Foothills	58.3 | 81.9 | 60.8	51.7 | 19.9 | 20.2						da vanilla, dataset TBC + coordinate da foreverdb
+engineering	165	Goblin Jumper Cables	9273	7561	vanilla	vendor	Veenix | Kzixx | Zixil	Stonetalon Mountains | Duskwood | Hillsbrad Foothills	58.3 | 81.9 | 55.7	51.7 | 19.9 | 27.3						da vanilla, dataset TBC + coordinate da foreverdb
 engineering	165	Portable Bronze Mortar	3960	4414	vanilla	worldDrop							true			da vanilla, dataset TBC
 engineering	175	Bright-Eye Goggles	12587	10601	vanilla	worldDrop							true			da vanilla, dataset TBC
 engineering	175	Large Blue Rocket	26420	21727	vanilla	vendor	Fariel Starsong	Moonglade								da vanilla, dataset TBC
@@ -1572,7 +1573,7 @@ engineering	185	Flash Bomb	8243	6672	vanilla	quest		Badlands								da vanilla, 
 engineering	190	Snowmaster 9000	21940	17720	vanilla	worldEvent										da vanilla, dataset TBC
 engineering	195	Goblin Land Mine	3968	4416	vanilla	worldDrop							true			da vanilla, dataset TBC
 engineering	200	EZ-Thro Dynamite II	23069	18650	vanilla	vendor	Blizrik Buckshot	Tanaris	50.8	27.6						da vanilla, dataset TBC + coordinate da foreverdb
-engineering	200	Gnomish Cloaking Device	3971	7742	vanilla	vendor	Zan Shivsproket	Alterac Mountains								da vanilla, dataset TBC
+engineering	200	Gnomish Cloaking Device	3971	7742	vanilla	vendor	Zan Shivsproket	Alterac Mountains	85.9	80.0						da vanilla, dataset TBC + coordinate da foreverdb
 engineering	200	Large Seaforium Charge	3972	4417	vanilla	worldDrop							true			da vanilla, dataset TBC
 engineering	200	Mechanical Dragonling	3969	13311	vanilla	vendor	Gnaz Blunderflame	Stranglethorn Vale								da vanilla, dataset TBC
 engineering	200	Polished Truesilver Gears	435956	215429	sod	vendor	"Ziri ""The Wrench"" Littlesprocket"	Gnomeregan								wowhead, elenco
@@ -1580,7 +1581,7 @@ engineering	205	Goblin Mining Helmet	12717	221336	vanilla	trainer	Vazario Linkgr
 engineering	205	Lil' Smoky	15633	11827	vanilla	container		Gnomeregan								da vanilla, dataset TBC
 engineering	205	Pet Bombling	15628	11828	vanilla	container		Gnomeregan								da vanilla, dataset TBC
 engineering	205	Soul Vessel	431362	212230	sod	vendor	Elaine Compton | Jornah | Dokimi | Gishah | Tamelyn Aldridge | Marcy Baker	Stormwind City | Orgrimmar | Thunder Bluff | Undercity | Ironforge | Darnassus			alliance | horde | horde | horde | alliance | alliance					wowhead
-engineering	210	Deadly Scope	12597	10602	vanilla	vendor	Knaz Blunderflame | Yuka Screwspigot	Stranglethorn Vale | Burning Steppes								da vanilla, dataset TBC
+engineering	210	Deadly Scope	12597	10602	vanilla	vendor	Knaz Blunderflame | Yuka Screwspigot	Stranglethorn Vale | Burning Steppes	 | 66.0	 | 22.0						da vanilla, dataset TBC + coordinate da foreverdb
 engineering	220	Catseye Ultra Goggles	12607	10603	vanilla	worldDrop							true			da vanilla, dataset TBC
 engineering	220	Mithril Heavy-bore Rifle	12614	10604	vanilla	worldDrop							true			da vanilla, dataset TBC
 engineering	225	Blue Rocket Cluster	26423	21730	vanilla	vendor	Fariel Starsong	Moonglade								da vanilla, dataset TBC
@@ -1596,7 +1597,7 @@ engineering	240	Sniper Scope	12620	10608	vanilla	worldDrop							true			da vanil
 engineering	250	Mithril Mechanical Dragonling	12624	10609	vanilla	vendor	Ruppo Zipcoil	The Hinterlands								da vanilla, dataset TBC
 engineering	250	Pop-Up Shrub	1228088	239222	sod											
 engineering	250	Snake Burst Firework	23507	19027	vanilla	vendor	Zorbin Fandazzle	Feralas								da vanilla, dataset TBC
-engineering	260	Gyrofreeze Ice Reflector	23077	18652	vanilla	vendor	Xizzer Fizzbolt	Winterspring								da vanilla, dataset TBC
+engineering	260	Gyrofreeze Ice Reflector	23077	18652	vanilla	vendor	Xizzer Fizzbolt	Winterspring	60.8	38.6						da vanilla, dataset TBC + coordinate da foreverdb
 engineering	260	Thorium Grenade	19790	16041	vanilla	trainer	Sovik	Valley of Honor, Orgrimmar	75.6	25.3	horde					da vanilla, dataset TBC + catturato in gioco
 engineering	260	Thorium Rifle	19792	16043	vanilla	worldDrop							true			wowhead, elenco (era trainer per il dataset TBC)
 engineering	260	Thorium Widget	19791	16042	vanilla	trainer	Sovik	Valley of Honor, Orgrimmar	75.6	25.3	horde					da vanilla, dataset TBC + catturato in gioco
@@ -1612,12 +1613,12 @@ engineering	275	Large Blue Rocket Cluster	26426	21733	vanilla	vendor	Fariel Star
 engineering	275	Large Green Rocket Cluster	26427	21734	vanilla	vendor	Fariel Starsong	Moonglade								da vanilla, dataset TBC
 engineering	275	Large Red Rocket Cluster	26428	21735	vanilla	vendor	Fariel Starsong	Moonglade								da vanilla, dataset TBC
 engineering	275	Major Recombobulator	23079	18655	vanilla	container		Dire Maul								da vanilla, dataset TBC
-engineering	275	Masterwork Target Dummy	19814	16046	vanilla	vendor	Xizzer Fizzbolt	Winterspring								da vanilla, dataset TBC
-engineering	275	Powerful Seaforium Charge	23080	18656	vanilla	vendor	Xizzer Fizzbolt	Winterspring								da vanilla, dataset TBC
+engineering	275	Masterwork Target Dummy	19814	16046	vanilla	vendor	Xizzer Fizzbolt	Winterspring	60.8	38.6						da vanilla, dataset TBC + coordinate da foreverdb
+engineering	275	Powerful Seaforium Charge	23080	18656	vanilla	vendor	Xizzer Fizzbolt	Winterspring	60.8	38.6						da vanilla, dataset TBC + coordinate da foreverdb
 engineering	275	Steam Tonk Controller	28327	22729	vanilla	vendor	Sovik | Gearcutter Cogspinner	Orgrimmar | Ironforge	75.7 | 67.7	25.2 | 43.4	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
 engineering	275	Thorium Tube	19795	16047	vanilla	trainer										da vanilla, dataset TBC
 engineering	285	Dark Iron Bomb	19799	16049	vanilla	drop		Blackrock Depths								da vanilla, dataset TBC
-engineering	285	Delicate Arcanite Converter	19815	16050	vanilla	vendor	Xizzer Fizzbolt	Winterspring								da vanilla, dataset TBC
+engineering	285	Delicate Arcanite Converter	19815	16050	vanilla	vendor	Xizzer Fizzbolt	Winterspring	60.8	38.6						da vanilla, dataset TBC + coordinate da foreverdb
 engineering	285	Thorium Shells	19800	16051	vanilla	worldDrop							true			wowhead, elenco (era trainer per il dataset TBC)
 engineering	290	Hyper-Radiant Flame Reflector	23081	18657	vanilla	drop	Solakar Flamewreath	Blackrock Spire							60-60	da vanilla, dataset TBC
 engineering	290	Master Engineer's Goggles	19825	16053	vanilla	drop	Doomforge Arcanasmith	Blackrock Depths							54-54	wowhead, elenco (era trainer per il dataset TBC)
@@ -1733,8 +1734,8 @@ first_aid		Linen Bandage	3275		vanilla
 first_aid		Runecloth Bandage	18629		vanilla											
 first_aid		Silk Bandage	7928		vanilla	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.7	84.5 | 56.8 | 12.5	horde | alliance | alliance					foreverdb, trainer visto su Forever
 first_aid		Wool Bandage	3277		vanilla	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.7	84.5 | 56.8 | 12.5	horde | alliance | alliance					foreverdb, trainer visto su Forever
-fishing		Fish Bowl	1229745		sod	blueprint	Androl Oakhand | Armand Cromwell | Arnold Leland	Teldrassil | Undercity | Stormwind City	55.8 | 80.9 | 55.1	93.4 | 31.1 | 69.5	alliance | horde | alliance					foreverdb, trainer visto su Forever + Blueprint dal client
-herbalism		Incense Candle	1229705		sod	blueprint	Aranae Venomblood | Faruza | Firodren Mooncaller	Hillsbrad Foothills | Tirisfal Glades | Darnassus	61.8 | 59.8 | 47.9	19.7 | 52.1 | 68.5	horde | horde | alliance					foreverdb, trainer visto su Forever + Blueprint dal client
+fishing		Fish Bowl	1229745		sod	blueprint	Androl Oakhand | Armand Cromwell | Arnold Leland	Teldrassil | Undercity | Stormwind City	55.8 | 80.6 | 55.1	93.4 | 31.0 | 69.5	alliance | horde | alliance					foreverdb, trainer visto su Forever + Blueprint dal client
+herbalism		Incense Candle	1229705		sod	blueprint	Alma Jainrose | Aranae Venomblood | Faruza	Redridge Mountains | Hillsbrad Foothills | Tirisfal Glades	16.3 | 61.6 | 59.8	45.6 | 19.6 | 52.1	alliance | horde | horde					foreverdb, trainer visto su Forever + Blueprint dal client
 leatherworking	30	Rugged Leather Pants	9064	7288	vanilla	worldDrop							true			da vanilla, dataset TBC
 leatherworking	35	Kodo Hide Bag	5244	5083	vanilla	quest		Thunder Bluff			horde					da vanilla, dataset TBC
 leatherworking	40	White Leather Jerkin	2163	2407	vanilla	worldDrop							true			da vanilla, dataset TBC
@@ -1742,8 +1743,8 @@ leatherworking	50	Fine Leather Gloves	2164	2408	vanilla	worldDrop							true			d
 leatherworking	65	Deviate Scale Cloak	7953	6474	vanilla	vendor	Kalldan Felmoon	The Barrens								da vanilla, dataset TBC
 leatherworking	65	Fine Leather Boots	2158	2406	vanilla	worldDrop							true			da vanilla, dataset TBC
 leatherworking	65	Moonglow Vest	8322	6710	vanilla	quest		Darnassus			alliance					da vanilla, dataset TBC
-leatherworking	65	Murloc Scale Belt	6702	5786	vanilla	vendor	Gina MacGregor | Andrew Hilbert | Mavralyn	Westfall | Silverpine Forest | Darkshore	57.6 | 43.2 | 37.1	54.0 | 40.7 | 41.2	alliance | horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
-leatherworking	70	Murloc Scale Breastplate	6703	5787	vanilla	vendor	Gina MacGregor | Andrew Hilbert | Mavralyn	Westfall | Silverpine Forest | Darkshore	57.6 | 43.2 | 37.1	54.0 | 40.7 | 41.2	alliance | horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
+leatherworking	65	Murloc Scale Belt	6702	5786	vanilla	vendor	Gina MacGregor | Andrew Hilbert | Mavralyn	Westfall | Silverpine Forest | Darkshore	57.6 | 43.2 | 37.0	54.0 | 40.8 | 41.2	alliance | horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
+leatherworking	70	Murloc Scale Breastplate	6703	5787	vanilla	vendor	Gina MacGregor | Andrew Hilbert | Mavralyn	Westfall | Silverpine Forest | Darkshore	57.6 | 43.2 | 37.0	54.0 | 40.8 | 41.2	alliance | horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking	75	Black Whelp Cloak	9070	7289	vanilla	vendor	Clyde Ranthal	Redridge Mountains	83.8	70.9	alliance					da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking	75	Black Whelp Tunic	24940	20576	vanilla	vendor	Amy Davenport	Redridge Mountains	24.0	47.4	alliance					da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking	75	Dark Leather Tunic	2169	2409	vanilla	worldDrop							true			da vanilla, dataset TBC
@@ -1753,8 +1754,8 @@ leatherworking	80	Fine Leather Pants	7133	5972	vanilla	worldDrop							true			da
 leatherworking	90	Deviate Scale Belt	7955	6476	vanilla	quest		The Barrens								da vanilla, dataset TBC
 leatherworking	95	Dark Leather Gloves	3765	7360	vanilla	worldDrop							true			da vanilla, dataset TBC
 leatherworking	95	Hillman's Belt	3767	4294	vanilla	worldDrop							true			da vanilla, dataset TBC
-leatherworking	95	Red Whelp Gloves	9072	7290	vanilla	vendor	Wenna Silkbeard	Wetlands			alliance					da vanilla, dataset TBC
-leatherworking	110	Earthen Leather Shoulders	9147	7362	vanilla	vendor	Zixil	Hillsbrad Foothills	60.8	20.2						da vanilla, dataset TBC + coordinate da foreverdb
+leatherworking	95	Red Whelp Gloves	9072	7290	vanilla	vendor	Wenna Silkbeard	Wetlands	25.7	25.8	alliance					da vanilla, dataset TBC + coordinate da foreverdb
+leatherworking	110	Earthen Leather Shoulders	9147	7362	vanilla	vendor	Zixil	Hillsbrad Foothills	55.7	27.3						da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking	110	Herbalist's Gloves	9146	7361	vanilla	vendor	Harlown Darkweave	Ashenvale	18.2	60.0	alliance					da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking	115	Dark Leather Shoulders	3769	4296	vanilla	worldDrop							true			da vanilla, dataset TBC
 leatherworking	115	Pilferer's Gloves	9148	7363	vanilla	worldDrop							true			da vanilla, dataset TBC
@@ -1762,19 +1763,19 @@ leatherworking	120	Heavy Earthen Gloves	9149	7364	vanilla	worldDrop							true		
 leatherworking	125	Barbaric Gloves	3771	4297	vanilla	worldDrop							true			da vanilla, dataset TBC
 leatherworking	125	Guardian Cloak	7153	4295	vanilla	worldDrop							true			da vanilla, dataset TBC
 leatherworking	125	Heavy Leather Ball	23190	18731	vanilla	vendor	Bombus Finespindle | Tamar	Ironforge | Orgrimmar	39.5 | 63.0	34.1 | 45.3	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
-leatherworking	130	Barbaric Bracers	23399	18949	vanilla	vendor	Saenorion | Joseph Moore	Darnassus | Undercity	64.0 | 70.3	22.2 | 57.7	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
-leatherworking	130	Green Leather Armor	3772	7613	vanilla	vendor	Wenna Silkbeard | George Candarte	Wetlands | Hillsbrad Foothills			alliance | horde					da vanilla, dataset TBC
+leatherworking	130	Barbaric Bracers	23399	18949	vanilla	vendor	Saenorion | Joseph Moore	Darnassus | Undercity	64.0 | 70.4	22.2 | 58.8	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
+leatherworking	130	Green Leather Armor	3772	7613	vanilla	vendor	Wenna Silkbeard | George Candarte	Wetlands | Hillsbrad Foothills	25.7 | 	25.8 | 	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking	140	Dusky Leather Leggings	9195	7449	vanilla	worldDrop							true			da vanilla, dataset TBC
 leatherworking	140	Raptor Hide Belt	4097	13288	vanilla	vendor	Androd Fadran	Arathi Highlands	45.1	46.9	alliance					da vanilla, dataset TBC + coordinate da foreverdb
-leatherworking	140	Raptor Hide Harness	4096	13287	vanilla	vendor	Tunkk	Arathi Highlands			horde					da vanilla, dataset TBC
-leatherworking	145	Barbaric Leggings	7149	5973	vanilla	vendor	Lardan | Hammon Karwn | Jandia | Keena	Ashenvale | Arathi Highlands | Thousand Needles | Arathi Highlands	34.7 | 46.5 | 46.1 | 74.0	49.8 | 47.2 | 51.6 | 32.7	alliance | alliance | horde | horde					da vanilla, dataset TBC + coordinate da foreverdb
+leatherworking	140	Raptor Hide Harness	4096	13287	vanilla	vendor	Tunkk	Arathi Highlands	74.8	34.5	horde					da vanilla, dataset TBC + coordinate da foreverdb
+leatherworking	145	Barbaric Leggings	7149	5973	vanilla	vendor	Lardan | Hammon Karwn | Jandia | Keena	Ashenvale | Arathi Highlands | Thousand Needles | Arathi Highlands	34.7 | 46.5 | 46.1 | 74.0	49.8 | 47.2 | 51.5 | 32.7	alliance | alliance | horde | horde					da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking	145	Guardian Belt	3775	4298	vanilla	worldDrop							true			da vanilla, dataset TBC
-leatherworking	145	Thick Murloc Armor	6704	5788	vanilla	vendor	Micha Yance | Christoph Jeffcoat | Blixrez Goodstitch	Hillsbrad Foothills | Hillsbrad Foothills | Stranglethorn Vale	48.9 | 62.3 | 28.2	55.1 | 19.1 | 77.5	alliance | horde | 					da vanilla, dataset TBC + coordinate da foreverdb
+leatherworking	145	Thick Murloc Armor	6704	5788	vanilla	vendor	Micha Yance | Christoph Jeffcoat | Blixrez Goodstitch	Hillsbrad Foothills | Hillsbrad Foothills | Stranglethorn Vale	48.9 | 62.3 | 28.3	55.1 | 19.1 | 77.6	alliance | horde | 					da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking	150	Green Whelp Armor	9197	7450	vanilla	worldDrop							true			da vanilla, dataset TBC
 leatherworking	150	Guardian Armor	3773	4299	vanilla	worldDrop							true			da vanilla, dataset TBC
 leatherworking	160	Gem-studded Leather Belt	3778	14635	vanilla	vendor	Rikqiz	Stranglethorn Vale	28.5	76.0						da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking	165	Gloves of the Greatfather	21943	17722	vanilla	worldEvent										da vanilla, dataset TBC
-leatherworking	165	Green Whelp Bracers	9202	7451	vanilla	vendor	Jangdor Swiftstrider | Pratt McGrubben | Joseph Moore | Saenorion	Feralas | Feralas | Undercity | Darnassus	 |  | 70.3 | 64.0	 |  | 57.7 | 22.2	horde | alliance | horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
+leatherworking	165	Green Whelp Bracers	9202	7451	vanilla	vendor	Jangdor Swiftstrider | Pratt McGrubben | Joseph Moore | Saenorion	Feralas | Feralas | Undercity | Darnassus	74.4 | 30.6 | 70.4 | 64.0	43.0 | 42.7 | 58.8 | 22.2	horde | alliance | horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking	165	Murloc Scale Bracers	6705	5789	vanilla	vendor	Helenia Olden	Dustwallow Marsh	66.4	51.5	alliance					da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking	170	Guardian Leather Bracers	3777	4300	vanilla	worldDrop							true			da vanilla, dataset TBC
 leatherworking	175	Barbaric Belt	3779	4301	vanilla	worldDrop							true			da vanilla, dataset TBC
@@ -1782,8 +1783,8 @@ leatherworking	175	Comfortable Leather Hat	10490	8384	vanilla	worldDrop							tr
 leatherworking	175	Dusky Boots	9207	7452	vanilla	worldDrop							true			da vanilla, dataset TBC
 leatherworking	175	Shadowskin Gloves	22711	18239	vanilla	vendor	Rikqiz	Stranglethorn Vale	28.5	76.0						da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking	175	Swift Boots	9208	7453	vanilla	worldDrop							true			da vanilla, dataset TBC
-leatherworking	180	Turtle Scale Gloves	10509	8385	vanilla	vendor	Pratt McGrubben | Jangdor Swiftstrider	Feralas | Feralas			alliance | horde					da vanilla, dataset TBC
-leatherworking	185	Nightscape Shoulders	10516	8409	vanilla	vendor	Jangdor Swiftstrider | Nioma	Feralas | The Hinterlands	 | 13.4	 | 43.4	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
+leatherworking	180	Turtle Scale Gloves	10509	8385	vanilla	vendor	Pratt McGrubben | Jangdor Swiftstrider	Feralas | Feralas	30.6 | 74.4	42.7 | 43.0	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
+leatherworking	185	Nightscape Shoulders	10516	8409	vanilla	vendor	Jangdor Swiftstrider | Nioma	Feralas | The Hinterlands	74.4 | 13.4	43.0 | 43.4	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking	190	Big Voodoo Robe	10520	8386	vanilla	worldDrop							true			da vanilla, dataset TBC
 leatherworking	195	Big Voodoo Mask	10531	8387	vanilla	worldDrop							true			da vanilla, dataset TBC
 leatherworking	195	Tough Scorpid Bracers	10533	8397	vanilla	drop		Tanaris								da vanilla, dataset TBC
@@ -1794,7 +1795,7 @@ leatherworking	200	Tough Scorpid Gloves	10542	8398	vanilla	drop		Tanaris								
 leatherworking	200	Wild Leather Helmet	10546	8405	vanilla	quest		Feralas			alliance					da vanilla, dataset TBC
 leatherworking	200	Wild Leather Vest	10544	8404	vanilla	quest		Feralas			alliance					da vanilla, dataset TBC
 leatherworking	205	Nightscape Cloak	10550	8388	vanilla											
-leatherworking	205	Turtle Scale Gloves	439118	217271	sod	vendor	Pratt McGrubben | Jangdor Swiftstrider	Feralas | Feralas			alliance | horde					wowhead
+leatherworking	205	Turtle Scale Gloves	439118	217271	sod	vendor	Pratt McGrubben | Jangdor Swiftstrider	Feralas | Feralas	30.6 | 74.4	42.7 | 43.0	alliance | horde					wowhead + coordinate da foreverdb
 leatherworking	210	Tough Scorpid Boots	10554	8399	vanilla	drop		Tanaris								da vanilla, dataset TBC
 leatherworking	215	Big Voodoo Cloak	10562	8390	vanilla	worldDrop							true			da vanilla, dataset TBC
 leatherworking	215	Big Voodoo Pants	10560	8389	vanilla	worldDrop							true			da vanilla, dataset TBC
@@ -1805,13 +1806,13 @@ leatherworking	225	Tough Scorpid Helm	10570	8402	vanilla	drop		Tanaris								da
 leatherworking	225	Wild Leather Cloak	10574	8408	vanilla	quest		Feralas			alliance					da vanilla, dataset TBC
 leatherworking	225	Wild Leather Leggings	10572	8407	vanilla	quest		Feralas			alliance					da vanilla, dataset TBC
 leatherworking	235	Green Dragonscale Breastplate	19050	15726	vanilla	vendor	Masat T'andr	Swamp of Sorrows	26.5	31.6						da vanilla, dataset TBC + coordinate da foreverdb
-leatherworking	235	Wicked Leather Gauntlets	19049	15725	vanilla	vendor	Leonard Porter | Werg Thickblade	Western Plaguelands | Tirisfal Glades	43.1 | 	84.3 | 	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
+leatherworking	235	Wicked Leather Gauntlets	19049	15725	vanilla	vendor	Leonard Porter | Werg Thickblade	Western Plaguelands | Tirisfal Glades	43.0 | 83.3	84.2 | 69.7	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking	240	Chimeric Gloves	19053	15729	vanilla	vendor	Blimo Gadgetspring	Azshara								da vanilla, dataset TBC
 leatherworking	240	Heavy Scorpid Vest	19051	15727	vanilla	drop		Blasted Lands								da vanilla, dataset TBC
 leatherworking	240	Wicked Leather Bracers	19052	15728	vanilla	drop	Legashi Rogue	Azshara							51-53	wowhead, elenco (era trainer per il dataset TBC)
 leatherworking	245	Green Dragonscale Leggings	19060	15733	vanilla	drop		The Temple of Atal'Hakkar								da vanilla, dataset TBC
 leatherworking	245	Ironfeather Shoulders	19062	15735	vanilla	vendor	Gigget Zipcoil	The Hinterlands								da vanilla, dataset TBC
-leatherworking	245	Living Shoulders	19061	15734	vanilla	vendor	Pratt McGrubben | Jangdor Swiftstrider	Feralas | Feralas			alliance | horde					da vanilla, dataset TBC
+leatherworking	245	Living Shoulders	19061	15734	vanilla	vendor	Pratt McGrubben | Jangdor Swiftstrider	Feralas | Feralas	30.6 | 74.4	42.7 | 43.0	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking	245	Runic Leather Gauntlets	19055	15731	vanilla	worldDrop							true			wowhead, elenco (era trainer per il dataset TBC)
 leatherworking	245	Volcanic Leggings	19059	15732	vanilla	drop		Burning Steppes								da vanilla, dataset TBC
 leatherworking	245	Wildthorn Mail	16650	12691	vanilla	worldDrop							true			da vanilla, dataset TBC
@@ -1819,7 +1820,7 @@ leatherworking	250	Chimeric Boots	19063	15737	vanilla	worldDrop							true			da 
 leatherworking	250	Frostsaber Boots	19066	15740	vanilla	vendor	Qia	Winterspring								da vanilla, dataset TBC
 leatherworking	250	Heavy Scorpid Gauntlets	19064	15738	vanilla	drop		Burning Steppes								da vanilla, dataset TBC
 leatherworking	250	Runic Leather Bracers	19065	15739	vanilla	drop	Jaedenar Cultist	Felwood							51-52	wowhead, elenco (era trainer per il dataset TBC)
-leatherworking	250	Stormshroud Pants	19067	15741	vanilla	vendor	Leonard Porter | Werg Thickblade	Western Plaguelands | Tirisfal Glades	43.1 | 	84.3 | 	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
+leatherworking	250	Stormshroud Pants	19067	15741	vanilla	vendor	Leonard Porter | Werg Thickblade	Western Plaguelands | Tirisfal Glades	43.0 | 83.3	84.2 | 69.7	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking	250	Warbear Harness	19068	15742	vanilla	vendor	Meilosh	Felwood			horde					da vanilla, dataset TBC
 leatherworking	255	Chimeric Leggings	19073	15746	vanilla	worldDrop							true			da vanilla, dataset TBC
 leatherworking	255	Heavy Scorpid Belt	19070	15743	vanilla	worldDrop							true			da vanilla, dataset TBC
@@ -1836,7 +1837,7 @@ leatherworking	260	Warbear Woolies	19080	20254	vanilla	vendor	Meilosh	Felwood			
 leatherworking	265	Black Dragonscale Breastplate	19085	15759	vanilla	vendor	Plugger Spazzring	Blackrock Depths								da vanilla, dataset TBC
 leatherworking	265	Chimeric Vest	19081	15755	vanilla	worldDrop							true			da vanilla, dataset TBC
 leatherworking	265	Dawn Treaders	23705	19328	vanilla	vendor	Argent Quartermaster Hasana | Quartermaster Miranda Breechlock | Argent Quartermaster Lightspark	Tirisfal Glades | Eastern Plaguelands | Western Plaguelands								da vanilla, dataset TBC
-leatherworking	265	Devilsaur Gauntlets	19084	15758	vanilla	vendor	Nergal	Un'Goro Crater								da vanilla, dataset TBC
+leatherworking	265	Devilsaur Gauntlets	19084	15758	vanilla	vendor	Nergal	Un'Goro Crater	43.3	7.7						da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking	265	Heavy Timbermaw Belt	23628	19202	vanilla	vendor	Meilosh	Felwood			horde					da vanilla, dataset TBC
 leatherworking	265	Ironfeather Breastplate	19086	15760	vanilla	drop		The Hinterlands								da vanilla, dataset TBC
 leatherworking	265	Might of the Timbermaw	23703	19326	vanilla	vendor	Meilosh	Felwood			horde					da vanilla, dataset TBC
@@ -1892,7 +1893,7 @@ leatherworking		Blue Dragonscale Leggings	24654		vanilla	trainer	Peter Galen | T
 leatherworking		Bramblewood Belt	28474	22769	vanilla	vendor	Aendel Windspear	Silithus								da vanilla, dataset TBC
 leatherworking		Bramblewood Boots	28473	22770	vanilla	vendor	Aendel Windspear	Silithus								da vanilla, dataset TBC
 leatherworking		Bramblewood Helm	28472	22771	vanilla	vendor	Aendel Windspear	Silithus								da vanilla, dataset TBC
-leatherworking		Camp Tent	1229432		sod	blueprint	Adele Fielder | Chaw Stronghide | Dan Golthas	Elwynn Forest | Mulgore | Undercity	46.3 | 45.0 | 70.8	62.1 | 61.5 | 58.5	alliance | horde | horde					foreverdb, trainer visto su Forever + Blueprint dal client
+leatherworking		Camp Tent	1229432		sod	blueprint	Adele Fielder | Chaw Stronghide | Dan Golthas	Elwynn Forest | Mulgore | Undercity	46.3 | 45.0 | 70.5	62.1 | 61.5 | 58.7	alliance | horde | horde					foreverdb, trainer visto su Forever + Blueprint dal client
 leatherworking		Cured Heavy Hide	3818		vanilla	trainer										da vanilla, dataset TBC
 leatherworking		Cured Light Hide	3816		vanilla	trainer										da vanilla, dataset TBC
 leatherworking		Cured Medium Hide	3817		vanilla	trainer										da vanilla, dataset TBC
@@ -1918,7 +1919,7 @@ leatherworking		Fine Leather Cloak	2159		vanilla	trainer										da vanilla, da
 leatherworking		Fine Leather Tunic	3761		vanilla	trainer										da vanilla, dataset TBC
 leatherworking		Fletcher's Gloves	9145		vanilla	trainer										da vanilla, dataset TBC
 leatherworking		Frost Leather Cloak	9198		vanilla	trainer										da vanilla, dataset TBC
-leatherworking		Gauntlets of the Sea	10630		vanilla	trainer	Brumn Winterhoof | Sarah Tanner	Arathi Highlands | Searing Gorge	28.3 | 	45.1 | 	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
+leatherworking		Gauntlets of the Sea	10630		vanilla	trainer	Brumn Winterhoof | Sarah Tanner	Arathi Highlands | Searing Gorge	28.3 | 63.6	45.1 | 76.0	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking		Gordok Ogre Suit	22815		vanilla	quest		Dire Maul								da vanilla, dataset TBC
 leatherworking		Gray Leather Boots	2167		vanilla	trainer										da vanilla, dataset TBC
 leatherworking		Green Dragonscale Gauntlets	24655		vanilla	trainer	Peter Galen | Thorkaf Dragoneye	Azshara | Badlands	 | 62.7	 | 57.4	alliance | horde			Dragonscale Leatherworking Trainer		da vanilla, dataset TBC + coordinate da foreverdb
@@ -1936,7 +1937,7 @@ leatherworking		Heavy Armor Kit	3780		vanilla	trainer										da vanilla, datas
 leatherworking		Heavy Leather	20649		vanilla	trainer										da vanilla, dataset TBC
 leatherworking		Heavy Leather Ammo Pouch	9194		vanilla	trainer										da vanilla, dataset TBC
 leatherworking		Heavy Quiver	9193		vanilla	trainer										da vanilla, dataset TBC
-leatherworking		Helm of Fire	10632		vanilla	trainer	Brumn Winterhoof | Sarah Tanner	Arathi Highlands | Searing Gorge	28.3 | 	45.1 | 	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
+leatherworking		Helm of Fire	10632		vanilla	trainer	Brumn Winterhoof | Sarah Tanner	Arathi Highlands | Searing Gorge	28.3 | 63.6	45.1 | 76.0	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
 leatherworking		Hillman's Cloak	3760		vanilla	trainer										da vanilla, dataset TBC
 leatherworking		Hillman's Leather Gloves	3764		vanilla	trainer										da vanilla, dataset TBC
 leatherworking		Hillman's Shoulders	3768		vanilla	trainer										da vanilla, dataset TBC
@@ -2024,7 +2025,7 @@ skinning		Camp Chair	1229517		sod	blueprint	Dranh | Helene Peltskinner | Ishlee 
 tailoring	25	Red Linen Robe	2389	2598	vanilla	worldDrop							true			da vanilla, dataset TBC
 tailoring	35	Blue Linen Vest	7630	6270	vanilla	vendor	Tharynn Bouden | Borya | Valdaron | Wrahk	Elwynn Forest | The Drag, Orgrimmar | Darkshore | The Barrens	41.7 | 63.2 | 38.2 | 52.2	67.0 | 51.2 | 40.6 | 31.7	alliance | horde | alliance | horde					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
 tailoring	35	Red Linen Vest	7629	6271	vanilla	worldDrop							true			da vanilla, dataset TBC
-tailoring	45	Blue Linen Robe	7633	6272	vanilla	vendor	Elynna | Ranik | Andrew Hilbert | Wrahk	Darnassus | The Barrens | Silverpine Forest | The Barrens	64.5 | 61.9 | 43.2 | 52.2	21.6 | 38.7 | 40.7 | 31.7	alliance |  | horde | horde					da vanilla, dataset TBC + coordinate da foreverdb
+tailoring	45	Blue Linen Robe	7633	6272	vanilla	vendor	Elynna | Ranik | Andrew Hilbert | Wrahk	Darnassus | The Barrens | Silverpine Forest | The Barrens	64.5 | 62.0 | 43.2 | 52.2	21.6 | 38.7 | 40.8 | 31.7	alliance |  | horde | horde					da vanilla, dataset TBC + coordinate da foreverdb
 tailoring	50	Red Linen Bag	6686	5771	vanilla	vendor	Rathis Tomber | Gina MacGregor | Mahu | Valdaron	Ghostlands | Westfall | Thunder Bluff | Darkshore	 | 57.6 | 43.8 | 38.2	 | 54.0 | 44.9 | 40.6	horde | alliance | horde | alliance					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
 tailoring	70	Colorful Kilt	12047	10316	vanilla	worldDrop							true			da vanilla, dataset TBC
 tailoring	75	Blue Overalls	7639	6274	vanilla	vendor	Gina MacGregor | Alexandra Bolero | Mallen Swain | Borya	Westfall | Stormwind City | Hillsbrad Foothills | The Drag, Orgrimmar	57.6 | 53.4 | 62.0 | 63.2	54.0 | 81.9 | 20.9 | 51.2	alliance | alliance | horde | horde					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
@@ -2032,7 +2033,7 @@ tailoring	75	Green Woolen Bag	3758	4292	vanilla	worldDrop							true			da vanill
 tailoring	75	Red Woolen Boots	3847	4345	vanilla	worldDrop							true			da vanilla, dataset TBC
 tailoring	80	Gray Woolen Robe	2403	2601	vanilla	worldDrop							true			da vanilla, dataset TBC
 tailoring	80	Heavy Woolen Cloak	3844	4346	vanilla	worldDrop							true			da vanilla, dataset TBC
-tailoring	90	Greater Adept's Robe	7643	6275	vanilla	vendor	Rann Flamespinner | Ranik | Jennabink Powerseam | Sheri Zipstitch	Loch Modan | The Barrens | Wetlands | Duskwood	36.0 | 61.9 | 8.1 | 75.8	45.9 | 38.7 | 56.0 | 45.4	alliance |  | alliance | alliance					da vanilla, dataset TBC + coordinate da foreverdb
+tailoring	90	Greater Adept's Robe	7643	6275	vanilla	vendor	Rann Flamespinner | Ranik | Jennabink Powerseam | Sheri Zipstitch	Loch Modan | The Barrens | Wetlands | Duskwood	36.0 | 62.0 | 8.1 | 75.8	45.9 | 38.7 | 56.0 | 45.4	alliance |  | alliance | alliance					da vanilla, dataset TBC + coordinate da foreverdb
 tailoring	90	Red Woolen Bag	6688	5772	vanilla	vendor	Amy Davenport | Jennabink Powerseam | Rann Flamespinner | Mahu | Borya	Redridge Mountains | Wetlands | Loch Modan | Thunder Bluff | The Drag, Orgrimmar	24.0 | 8.1 | 36.0 | 43.8 | 63.2	47.4 | 56.0 | 45.9 | 44.9 | 51.2	alliance | alliance | alliance | horde | horde					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
 tailoring	95	Reinforced Woolen Shoulders	3849	4347	vanilla	worldDrop							true			da vanilla, dataset TBC
 tailoring	95	Stylish Blue Shirt	7892	6390	vanilla	worldDrop							true			da vanilla, dataset TBC
@@ -2041,22 +2042,22 @@ tailoring	100	Phoenix Gloves	3868	4348	vanilla	worldDrop							true			da vanilla
 tailoring	100	Phoenix Pants	3851	4349	vanilla	worldDrop							true			da vanilla, dataset TBC
 tailoring	110	Bright Yellow Shirt	3869	14627	vanilla	vendor	Danielle Zipstitch	Duskwood	75.8	45.4	alliance					da vanilla, dataset TBC + coordinate da foreverdb
 tailoring	115	Spider Silk Slippers	3856	4350	vanilla	worldDrop							true			da vanilla, dataset TBC
-tailoring	120	Azure Silk Gloves	3854	7114	vanilla	vendor	Wenna Silkbeard | Kireena	Wetlands | Desolace			alliance | horde					da vanilla, dataset TBC
+tailoring	120	Azure Silk Gloves	3854	7114	vanilla	vendor	Wenna Silkbeard | Kireena	Wetlands | Desolace	25.7 | 51.0	25.8 | 53.5	alliance | horde					da vanilla, dataset TBC + coordinate da foreverdb
 tailoring	120	Dark Silk Shirt	3870	6401	vanilla	vendor	Mallen Swain | Sheri Zipstitch	Hillsbrad Foothills | Duskwood	62.0 | 75.8	20.9 | 45.4	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
 tailoring	120	Hands of Darkness	8780	7092	vanilla	worldDrop							true			da vanilla, dataset TBC
 tailoring	125	Phoenix Bindings	428424	211247	sod	vendor	Elaine Compton | Jornah | Dokimi | Gishah | Tamelyn Aldridge | Marcy Baker	Stormwind City | Orgrimmar | Thunder Bluff | Undercity | Ironforge | Darnassus			alliance | horde | horde | horde | alliance | alliance					wowhead (scelta dell'utente sul disaccordo)
 tailoring	125	Robes of Arcana	6692	5773	vanilla	drop		Thousand Needles | Duskwood | Darkshore								da vanilla, dataset TBC
 tailoring	125	Truefaith Gloves	8782	7091	vanilla	worldDrop							true			da vanilla, dataset TBC
-tailoring	130	Enchanter's Cowl	3857	14630	vanilla	vendor	Xizk Goodstitch	Stranglethorn Vale								da vanilla, dataset TBC
+tailoring	130	Enchanter's Cowl	3857	14630	vanilla	vendor	Xizk Goodstitch	Stranglethorn Vale	28.7	76.8						da vanilla, dataset TBC + coordinate da foreverdb
 tailoring	130	Green Silk Armor	8784	7090	vanilla	worldDrop							true			da vanilla, dataset TBC
 tailoring	135	Shadow Hood	3858	4351	vanilla	worldDrop							true			da vanilla, dataset TBC
 tailoring	140	Azure Silk Cloak	8786	7089	vanilla	vendor	Jun'ha | Brienna Starglow	Arathi Highlands | Feralas	72.8 | 	36.5 | 	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
 tailoring	140	Boots of the Enchanter	3860	4352	vanilla	worldDrop							true			da vanilla, dataset TBC
 tailoring	140	Green Silk Pack	6693	5774	vanilla	worldDrop							true			da vanilla, dataset TBC
-tailoring	140	Tuxedo Jacket	12093	10326	vanilla	vendor	Millie Gregorian | Outfitter Eric	Undercity | Ironforge	70.5 | 43.2	29.5 | 29.3	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
-tailoring	140	Tuxedo Pants	12089	10323	vanilla	vendor	Millie Gregorian | Outfitter Eric	Undercity | Ironforge	70.5 | 43.2	29.5 | 29.3	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
+tailoring	140	Tuxedo Jacket	12093	10326	vanilla	vendor	Millie Gregorian | Outfitter Eric	Undercity | Ironforge	70.5 | 43.0	29.5 | 29.0	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
+tailoring	140	Tuxedo Pants	12089	10323	vanilla	vendor	Millie Gregorian | Outfitter Eric	Undercity | Ironforge	70.5 | 43.0	29.5 | 29.0	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
 tailoring	140	White Wedding Dress	12091	10325	vanilla	vendor	Alexandra Bolero | Mahu	Stormwind City | Thunder Bluff	53.4 | 43.8	81.9 | 44.9	alliance | horde					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
-tailoring	145	Crimson Silk Cloak	8789	7087	vanilla	vendor	Xizk Goodstitch	Stranglethorn Vale								da vanilla, dataset TBC
+tailoring	145	Crimson Silk Cloak	8789	7087	vanilla	vendor	Xizk Goodstitch	Stranglethorn Vale	28.7	76.8						da vanilla, dataset TBC + coordinate da foreverdb
 tailoring	145	Spider Belt	3863	4353	vanilla	worldDrop							true			da vanilla, dataset TBC
 tailoring	150	Black Silk Pack	6695	5775	vanilla	drop		Dustwallow Marsh | Hillsbrad Foothills | Alterac Mountains								da vanilla, dataset TBC
 tailoring	150	Invoker's Cord	435841	215369	sod	vendor	Borya | Elynna	Orgrimmar | Darnassus	63.3 | 64.5	51.2 | 21.6	horde | alliance					wowhead (scelta dell'utente sul disaccordo) + coordinate da foreverdb
@@ -2075,15 +2076,15 @@ tailoring	180	Red Mageweave Vest	12056	10300	vanilla	worldDrop							true			da v
 tailoring	180	White Bandit Mask	12059	10301	vanilla	worldDrop							true			da vanilla, dataset TBC
 tailoring	185	Orange Martial Shirt	12064	10311	vanilla	vendor	Mahu | Elynna	Thunder Bluff | Darnassus	43.8 | 64.5	44.9 | 21.6	horde | alliance					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
 tailoring	190	Enchanted Mageweave Pouch	27658	22307	vanilla	vendor	Kania | Thaddeus Webb | Erilia | Lilly | Kithas | Nata Dawnstrider	Silithus | Undercity | Eversong Woods | Silverpine Forest | The Drag, Orgrimmar | Thunder Bluff	 | 62.1 |  | 43.1 | 53.8 | 44.8	 | 60.7 |  | 50.7 | 38.1 | 38.8	 | horde | horde | horde | horde | horde					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
-tailoring	190	Lavender Mageweave Shirt	12075	10314	vanilla	vendor	Borya | Outfitter Eric	The Drag, Orgrimmar | Ironforge	63.2 | 43.2	51.2 | 29.3	horde | alliance					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
+tailoring	190	Lavender Mageweave Shirt	12075	10314	vanilla	vendor	Borya | Outfitter Eric	The Drag, Orgrimmar | Ironforge	63.2 | 43.0	51.2 | 29.0	horde | alliance					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
 tailoring	190	Red Mageweave Gloves	12066	10312	vanilla	worldDrop							true			da vanilla, dataset TBC
-tailoring	195	Pink Mageweave Shirt	12080	10317	vanilla	vendor	Borya | Outfitter Eric	The Drag, Orgrimmar | Ironforge	63.2 | 43.2	51.2 | 29.3	horde | alliance					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
+tailoring	195	Pink Mageweave Shirt	12080	10317	vanilla	vendor	Borya | Outfitter Eric	The Drag, Orgrimmar | Ironforge	63.2 | 43.0	51.2 | 29.0	horde | alliance					da vanilla, dataset TBC + catturato in gioco + coordinate da foreverdb
 tailoring	195	Red Mageweave Shoulders	12078	10315	vanilla	worldDrop							true			da vanilla, dataset TBC
 tailoring	200	Admiral's Hat	12081	10318	vanilla	vendor	Cowardly Crosby	Stranglethorn Vale	27.0	82.4						da vanilla, dataset TBC + coordinate da foreverdb
 tailoring	200	Hyperconductive Arcano-Filament	435827	215368	sod	vendor	"Ziri ""The Wrench"" Littlesprocket"	Gnomeregan								wowhead, elenco
 tailoring	200	Red Mageweave Headband	12084	10320	vanilla	worldDrop							true			da vanilla, dataset TBC
 tailoring	200	Shadoweave Mask	12086	10463	vanilla	quest		Searing Gorge								da vanilla, dataset TBC
-tailoring	200	Tuxedo Shirt	12085	10321	vanilla	vendor	Millie Gregorian | Outfitter Eric	Undercity | Ironforge	70.5 | 43.2	29.5 | 29.3	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
+tailoring	200	Tuxedo Shirt	12085	10321	vanilla	vendor	Millie Gregorian | Outfitter Eric	Undercity | Ironforge	70.5 | 43.0	29.5 | 29.0	horde | alliance					da vanilla, dataset TBC + coordinate da foreverdb
 tailoring	205	Festival Dress	26403	21722	vanilla	vendor	Fariel Starsong	Moonglade								da vanilla, dataset TBC
 tailoring	205	Festival Suit	26407	21723	vanilla	vendor	Fariel Starsong	Moonglade								da vanilla, dataset TBC
 tailoring	210	Frostweave Robe	18404	14467	vanilla	worldDrop							true			da vanilla, dataset TBC
@@ -2202,7 +2203,7 @@ tailoring		Dreamweave Circlet	12092		vanilla	trainer										da vanilla, datase
 tailoring		Dreamweave Gloves	12067		vanilla	trainer										da vanilla, dataset TBC
 tailoring		Dreamweave Vest	12070		vanilla	trainer										da vanilla, dataset TBC
 tailoring		Earthen Vest	8764		vanilla	trainer										da vanilla, dataset TBC
-tailoring		Faction Banner	1229504		sod	blueprint	Bowen Brisboise | Eldrin | Jormund Stonebrow	Tirisfal Glades | Elwynn Forest | Ironforge	52.6 | 79.3 | 43.4	55.6 | 69.0 | 28.7	horde | alliance | alliance					foreverdb, trainer visto su Forever + Blueprint dal client
+tailoring		Faction Banner	1229504		sod	blueprint	Bowen Brisboise | Eldrin | Grondal Moonbreeze	Tirisfal Glades | Elwynn Forest | Darkshore	52.6 | 79.3 | 38.2	55.6 | 69.0 | 40.5	horde | alliance | alliance					foreverdb, trainer visto su Forever + Blueprint dal client
 tailoring		Felcloth Bag	26086	21369	vanilla	drop	Jandice Barov	Scholomance							61-61	da vanilla, dataset TBC
 tailoring		Formal White Shirt	3871		vanilla	trainer										da vanilla, dataset TBC
 tailoring		Glacial Cloak	28208	22685	vanilla	vendor	Master Craftsman Omarion	Naxxramas								da vanilla, dataset TBC
@@ -2255,7 +2256,7 @@ tailoring		Stormcloth Boots	12090	10324	vanilla	drop	Hatecrest Serpent Guard	Fer
 tailoring		Stormcloth Gloves	12063	10304	vanilla	vendor	Gorhak	Desolace	66.3	79.5						foreverchanges, letto da db + coordinate da foreverdb
 tailoring		Stormcloth Headband	12083	10319	vanilla											ignota anche alla community [foreverchanges 2026-09-24]
 tailoring		Stormcloth Pants	12062	10303	vanilla											
-tailoring		Stormcloth Shoulders	12087	10322	vanilla											
+tailoring		Stormcloth Shoulders	12087	10322	vanilla	drop	Glassweb Spider	Searing Gorge							43-45	foreverchanges, letto da addon
 tailoring		Stormcloth Vest	12068	10313	vanilla											
 tailoring		Stylish Red Shirt	3866		vanilla	trainer										da vanilla, dataset TBC
 tailoring		White Linen Robe	7624		vanilla	trainer										da vanilla, dataset TBC

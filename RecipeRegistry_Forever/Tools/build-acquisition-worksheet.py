@@ -13,7 +13,7 @@ OUT = os.path.join(HERE, "acquisition-worksheet.tsv")
 HARVEST = os.path.join(HERE, "captures", "foreverchanges-2026-09-24.tsv")
 # Il dataset del datamining da cui si prendono le ricette e gli oggetti del
 # client. Va tenuto uguale al bundle con cui si genera il database.
-MINING_REF = "forever-local-1.60.1.70938"
+MINING_REF = "forever-local-1.60.1.71037"
 
 # Le discordanze fra foreverchanges e Wowhead si decidono caso per caso, e
 # questi sono i casi decisi a favore di Wowhead. 18/11: tre pattern SoD di

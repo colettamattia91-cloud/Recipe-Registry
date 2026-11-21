@@ -2,6 +2,20 @@
 
 All notable changes to this addon are documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- **1 new recipe.**
+- **15 more recipes show where to get them.**
+- **Coordinates for the vendors and trainers of 27 more recipes.**
+
+### Changed
+
+- **15 recipes show updated information on where to get them.**
+- **Recipe data from game build 1.60.1.71037.** 7 recipes changed: 6 moved to
+  another category and 1 needs a lower skill to learn.
+
 ## [0.1.9] - 2026-11-18
 
 ### Added
