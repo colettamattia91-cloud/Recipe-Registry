@@ -378,6 +378,84 @@ function Sync:IsProtocolPaused(kind)
     return policy and policy:ShouldPauseProtocolTraffic(kind) or false
 end
 
+-- Le regole di prontezza, tutte qui.
+--
+-- Un controllo guarda una cosa sola e, se non va, restituisce il motivo. Un
+-- profilo e' una lista ordinata di controlli: il primo che dice no da' il
+-- motivo. L'ordine conta: il motivo finisce in lastSyncNotReadyReason e nei
+-- rifiuti sul filo (not-ready:<motivo>). Roster e indice si leggono da cio' che
+-- RefreshSyncReadyState ha messo da parte, non da Data. Sono tutte letture: un
+-- controllo non cambia niente.
+local READINESS_CHECKS = {
+    ["saved-variables"] = function(self)
+        if self.savedVariablesReady ~= true then return "saved-variables" end
+    end,
+    player = function(self)
+        if self.playerReady ~= true then return "player" end
+    end,
+    -- le due finestre insieme, col cambio di zona come motivo se ci sono entrambe
+    world = function(self)
+        if self:IsInWorldTransition() then return "world-transition" end
+        if self:IsInWarmup() then return "warmup" end
+    end,
+    warmup = function(self)
+        if self:IsInWarmup() then return "warmup" end
+    end,
+    ["world-transition"] = function(self)
+        if self:IsInWorldTransition() then return "world-transition" end
+    end,
+    roster = function(self)
+        if self.rosterPreflightReady ~= true then return self.rosterPreflightReason or "roster-unready" end
+    end,
+    ["index-ready"] = function(self)
+        if self.indexReady ~= true then return self.indexStatus or "index-not-ready" end
+    end,
+    ["index-ready-or-dirty"] = function(self)
+        if self.indexStatus ~= "ready" and self.indexStatus ~= "dirty" then
+            return self.indexStatus or "index-not-ready"
+        end
+    end,
+    ["index-dirty"] = function(self)
+        if self.indexStatus ~= "dirty" then return "index-not-dirty" end
+    end,
+    paused = function(self, pauseKind)
+        if self:IsProtocolPaused(pauseKind) then return "paused" end
+    end,
+}
+
+local READINESS_PROFILES = {
+    -- syncReady: tutto in ordine e l'indice pronto
+    full = { pauseKind = "HELLO",
+        "saved-variables", "player", "world", "roster", "index-ready", "paused" },
+    -- indexUsableForActivePull: un pull gia' avviato prosegue con l'indice
+    -- sporco, che le sue stesse fusioni sporcano
+    ["active-pull"] = { pauseKind = "HELLO",
+        "saved-variables", "player", "world", "roster", "index-dirty", "paused" },
+    -- CanServeCachedBlocks: si serve anche con l'indice sporco. La pausa per
+    -- prima, il warmup prima del cambio di zona
+    serve = { pauseKind = "BLOCK_SNAPSHOT",
+        "paused", "saved-variables", "player", "warmup", "world-transition", "roster", "index-ready-or-dirty" },
+}
+
+-- A sync non pronto alcuni messaggi passano lo stesso, con un profilo loro.
+local NOT_READY_FALLBACK = {
+    BLOCK_PULL_REQUEST = "active-pull",
+    BLOCK_SNAPSHOT = "serve",
+    INDEX_DIFF_RESPONSE = "serve",
+}
+
+-- il motivo del primo no del profilo, o nil se va tutto
+local function readinessFailure(self, profileName)
+    local profile = READINESS_PROFILES[profileName]
+    for index = 1, #profile do
+        local why = READINESS_CHECKS[profile[index]](self, profile.pauseKind)
+        if why then
+            return why
+        end
+    end
+    return nil
+end
+
 function Sync:RefreshSyncReadyState(reason)
     if not self.telemetry then
         self.telemetry = newSyncTelemetry()
@@ -417,24 +495,11 @@ function Sync:RefreshSyncReadyState(reason)
         })
     end
 
-    local paused = self:IsProtocolPaused("HELLO")
-    local worldReady = not self:IsInWarmup() and not self:IsInWorldTransition()
-    self.indexUsableForActivePull = sessionActive
-        and self.savedVariablesReady == true
-        and self.playerReady == true
-        and worldReady
-        and self.rosterPreflightReady == true
-        and self.indexStatus == "dirty"
-        and not paused
-    local nextReady = self.savedVariablesReady == true
-        and self.playerReady == true
-        and worldReady
-        and self.rosterPreflightReady == true
-        and self.indexReady == true
-        and not paused
+    self.indexUsableForActivePull = sessionActive and readinessFailure(self, "active-pull") == nil
+    local notReadyReason = readinessFailure(self, "full")
 
     local previous = self.syncReady == true
-    self.syncReady = nextReady == true
+    self.syncReady = notReadyReason == nil
     self.lastSyncReadyChangeAt = time()
     self.lastSyncReadyReason = tostring(reason or "sync-ready")
 
@@ -449,20 +514,7 @@ function Sync:RefreshSyncReadyState(reason)
             })
         end
     else
-        if self.savedVariablesReady ~= true then
-            self.lastSyncNotReadyReason = "saved-variables"
-        elseif self.playerReady ~= true then
-            self.lastSyncNotReadyReason = "player"
-        elseif not worldReady then
-            self.lastSyncNotReadyReason = self:IsInWorldTransition() and "world-transition" or "warmup"
-        elseif self.rosterPreflightReady ~= true then
-            self.lastSyncNotReadyReason = self.rosterPreflightReason or "roster-unready"
-        elseif self.indexReady ~= true then
-            self.lastSyncNotReadyReason = self.indexStatus or "index-not-ready"
-        else
-            -- tutto il resto e' a posto: non resta che la pausa
-            self.lastSyncNotReadyReason = "paused"
-        end
+        self.lastSyncNotReadyReason = notReadyReason
         self.telemetry.lastReadinessGateFailure = self.lastSyncNotReadyReason
         if previous or self.telemetry.lastSyncNotReadyReason ~= self.lastSyncNotReadyReason then
             self:RecordSyncEvent("syncReady", {
@@ -491,40 +543,28 @@ end
 -- to serve in that brief window stalls peers with block-response-timeout and
 -- breaks the architecture's promise of concurrent seeders.
 function Sync:CanServeCachedBlocks()
-    if self:IsProtocolPaused("BLOCK_SNAPSHOT") then
-        return false, "paused"
-    end
-    if self.savedVariablesReady ~= true then
-        return false, "saved-variables"
-    end
-    if self.playerReady ~= true then
-        return false, "player"
-    end
-    if self:IsInWarmup() then
-        return false, "warmup"
-    end
-    if self:IsInWorldTransition() then
-        return false, "world-transition"
-    end
-    if self.rosterPreflightReady ~= true then
-        return false, self.rosterPreflightReason or "roster-unready"
-    end
-    if self.indexStatus ~= "ready" and self.indexStatus ~= "dirty" then
-        return false, self.indexStatus or "index-not-ready"
+    local why = readinessFailure(self, "serve")
+    if why then
+        return false, why
     end
     return true, "serving-allowed"
 end
 
+-- Il cancello di ogni messaggio. RefreshSyncReadyState si chiama qui, a ogni
+-- controllo, e deve restare cosi': syncReady e' anche il cancello della
+-- potatura dei mestieri (SyncProtocol, applyOwnerProfessionDeclaration), e lo
+-- tiene fresco proprio questo.
 function Sync:CanRunSyncProtocol(kind)
     self:RefreshSyncReadyState("protocol:" .. tostring(kind or "sync"))
     if self:IsProtocolPaused(kind) then
         return false, "paused"
     end
     if self.syncReady ~= true then
-        if kind == "BLOCK_PULL_REQUEST" and self:CanAdvanceOutboundPullSession() then
+        local fallback = NOT_READY_FALLBACK[kind]
+        if fallback == "active-pull" and self:CanAdvanceOutboundPullSession() then
             return true, "active-pull-dirty-index"
         end
-        if kind == "BLOCK_SNAPSHOT" or kind == "INDEX_DIFF_RESPONSE" then
+        if fallback == "serve" then
             local allowed, servingReason = self:CanServeCachedBlocks()
             if allowed then
                 return true, "serving-cached-blocks"
