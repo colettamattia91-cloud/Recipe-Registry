@@ -109,9 +109,6 @@ local function shouldSendSummaryForHello(self, helloPayload, localSummary)
     if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("SUMMARY") then
         return false
     end
-    if self.IsSummarySaturated and self:IsSummarySaturated() then
-        return false
-    end
     return tostring(localSummary.globalFingerprint or "") ~= tostring(helloPayload and helloPayload.globalFingerprint or "")
 end
 
@@ -823,8 +820,6 @@ function Sync:HandleHello(payload, _distribution, commSender)
             suppressReason = "remote-index-not-ready:" .. tostring(payload.indexStatus or "unknown")
         elseif Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("SUMMARY") then
             suppressReason = "paused"
-        elseif self.IsSummarySaturated and self:IsSummarySaturated() then
-            suppressReason = "saturated"
         elseif tostring(localSummary.globalFingerprint or "") == tostring(payload.globalFingerprint or "") then
             suppressReason = "fingerprints-match"
         end

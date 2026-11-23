@@ -110,8 +110,6 @@ function Sync:OnInitialize()
     self.onlineNodes = {}
     self.peerCaps = {}
     self.peerVersions = {}
-    self.peerBackoffUntil = {}
-    self.peerHealth = {}
     self.pendingRequests = {}
     self.inFlightRequests = {}
     self.inFlight = nil
@@ -160,8 +158,6 @@ function Sync:ResetRuntimeQueues(reason, opts)
         self.onlineNodes = {}
         self.peerCaps = {}
         self.peerVersions = {}
-        self.peerBackoffUntil = {}
-        self.peerHealth = {}
         self.lastHelloAt = 0
     end
     self.pendingRequests = {}
@@ -414,8 +410,6 @@ function Sync:RefreshSyncReadyState(reason)
     end
 
     local paused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("HELLO") or false
-    local saturationThreshold = Constants.SUMMARY_SATURATION_THRESHOLD or 80
-    local saturated = self:EstimateRuntimeQueuePressure() >= saturationThreshold
     local worldReady = not self:IsInWarmup() and not self:IsInWorldTransition()
     self.indexUsableForActivePull = sessionActive
         and self.savedVariablesReady == true
@@ -424,14 +418,12 @@ function Sync:RefreshSyncReadyState(reason)
         and self.rosterPreflightReady == true
         and self.indexStatus == "dirty"
         and not paused
-        and not saturated
     local nextReady = self.savedVariablesReady == true
         and self.playerReady == true
         and worldReady
         and self.rosterPreflightReady == true
         and self.indexReady == true
         and not paused
-        and not saturated
 
     local previous = self.syncReady == true
     self.syncReady = nextReady == true
@@ -459,10 +451,9 @@ function Sync:RefreshSyncReadyState(reason)
             self.lastSyncNotReadyReason = self.rosterPreflightReason or "roster-unready"
         elseif self.indexReady ~= true then
             self.lastSyncNotReadyReason = self.indexStatus or "index-not-ready"
-        elseif paused then
-            self.lastSyncNotReadyReason = "paused"
         else
-            self.lastSyncNotReadyReason = "runtime-saturated"
+            -- tutto il resto e' a posto: non resta che la pausa
+            self.lastSyncNotReadyReason = "paused"
         end
         self.telemetry.lastReadinessGateFailure = self.lastSyncNotReadyReason
         if previous or self.telemetry.lastSyncNotReadyReason ~= self.lastSyncNotReadyReason then
@@ -512,9 +503,6 @@ function Sync:CanServeCachedBlocks()
     end
     if self.indexStatus ~= "ready" and self.indexStatus ~= "dirty" then
         return false, self.indexStatus or "index-not-ready"
-    end
-    if self:EstimateRuntimeQueuePressure() >= 95 then
-        return false, "saturated"
     end
     return true, "serving-allowed"
 end
@@ -910,20 +898,6 @@ function Sync:MarkPeerSuccess(sourceKey)
     if not self:IsValidSyncMemberKey(sourceKey) then
         return
     end
-    self.peerHealth = self.peerHealth or {}
-    self.peerBackoffUntil = self.peerBackoffUntil or {}
-    local health = self.peerHealth[sourceKey] or {
-        successes = 0,
-        failures = 0,
-        consecutiveFailures = 0,
-        lastSuccessAt = 0,
-        lastFailureAt = 0,
-    }
-    health.successes = (health.successes or 0) + 1
-    health.consecutiveFailures = 0
-    health.lastSuccessAt = time()
-    self.peerHealth[sourceKey] = health
-    self.peerBackoffUntil[sourceKey] = nil
     self.lastSnapshotSuccessAt = time()
 end
 
@@ -1304,11 +1278,6 @@ function Sync:BeginHelloCycle(reason)
         requestId = helloId,
     })
     return self.activeHelloCycle
-end
-
-function Sync:IsSummarySaturated()
-    local pressure = self:EstimateRuntimeQueuePressure()
-    return pressure >= (Constants.SUMMARY_SATURATION_THRESHOLD or 80)
 end
 
 function Sync:RecordSummary(peerKey, payload)
@@ -1846,11 +1815,9 @@ function Sync:CompleteOutboundSeedSession(reason)
     -- INDEX_DIFF cycles keep re-electing the same peer. After two
     -- consecutive sessions that pulled at least one block and added zero
     -- progress, mark the peer for a cooldown so seed selection
-    -- deprioritizes them. We track this on a dedicated field instead of
-    -- peerBackoffUntil because MarkPeerSuccess clears that on every
-    -- successful block-merge (the snapshot delivery itself counts as
-    -- success even when no recipes were added), and would clobber the
-    -- session-level backoff on the very next merge.
+    -- deprioritizes them. The field is dedicated to sessions: a successful
+    -- block-merge counts as success even when no recipes were added, so a
+    -- per-merge register would clear this backoff on the very next merge.
     if self:IsValidSyncMemberKey(session.seedKey) then
         local pulled = (session.successfulBlockMerges or 0) > 0
         local progressed = (session.progressBlockMerges or 0) > 0
@@ -2179,28 +2146,6 @@ function Sync:GetWorldTransitionRemaining()
     return max(0, (self.worldTransitionUntil or 0) - time())
 end
 
-function Sync:EstimateRuntimeQueuePressure()
-    if not self.telemetry then
-        self.telemetry = newSyncTelemetry()
-    end
-    local pressure = 0
-    local session = self.outboundSeedSession
-    if type(session) == "table" and session.state and session.state ~= "completed" and session.state ~= "aborted" then
-        pressure = pressure + 25
-        if session.state == "waiting-block" or session.state == "waiting-index-diff" then
-            pressure = pressure + 25
-        end
-    end
-    if self:IsInWarmup() then
-        pressure = pressure + 10
-    end
-    if self:IsInWorldTransition() then
-        pressure = pressure + 20
-    end
-    self.telemetry.runtimeQueuePressure = min(100, pressure)
-    return self.telemetry.runtimeQueuePressure
-end
-
 function Sync:ShouldDeferHeavyLifecycleWork(_reason)
     if self:IsInWarmup() then
         return true
@@ -2218,7 +2163,7 @@ function Sync:ShouldDeferHeavyLifecycleWork(_reason)
     if self:HasActiveOutboundSeedSession() then
         return true
     end
-    return self:EstimateRuntimeQueuePressure() >= 70
+    return false
 end
 
 local function isBackoffStoreActive(store, sourceKey, now)
@@ -2236,9 +2181,7 @@ function Sync:IsPeerBackoffActive(sourceKey)
     if not self:IsValidSyncMemberKey(sourceKey) then
         return false
     end
-    local now = time()
-    return isBackoffStoreActive(self.peerBackoffUntil, sourceKey, now)
-        or isBackoffStoreActive(self._peerSessionBackoffUntil, sourceKey, now)
+    return isBackoffStoreActive(self._peerSessionBackoffUntil, sourceKey, time())
 end
 
 function Sync:TouchNode(key, version)
@@ -2262,17 +2205,14 @@ function Sync:PruneOnlineNodes()
     for key, info in pairs(self.onlineNodes or {}) do
         if info.lastSeen and (now - info.lastSeen) > NODE_TIMEOUT then
             self.onlineNodes[key] = nil
-            self.peerBackoffUntil[key] = nil
             self.peerVersions[key] = nil
             self.peerCaps[key] = nil
-            self.peerHealth[key] = nil
         end
     end
 end
 
 function Sync:PruneState()
     self:PruneOnlineNodes()
-    self:EstimateRuntimeQueuePressure()
 end
 
 function Sync:AutoSyncTick()
