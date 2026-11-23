@@ -2070,31 +2070,54 @@ function Sync:ScheduleQueuePump(delay)
     end, delay or 0.05)
 end
 
-function Sync:EnterWarmup(reason, seconds)
-    self.warmupReason = tostring(reason or "warmup")
-    self.warmupUntil = time() + max(0, tonumber(seconds or POST_WORLD_GRACE_SECONDS) or POST_WORLD_GRACE_SECONDS)
-    self:ClearInboundSeedSessions("warmup")
-    self:RecordSyncEvent("warmupEnter", {
-        reason = self.warmupReason,
+-- Le due finestre d'attesa: il warmup, all'uscita da un'istanza, e il cambio
+-- di zona, a login, reload e PLAYER_ENTERING_WORLD. Stessa meccanica: finche'
+-- una e' aperta il sync non e' pronto e non serve nessuno; quando si chiude si
+-- ripreparano l'indice e un HELLO. Campi, eventi e motivi restano due, con i
+-- nomi di sempre: li leggono UI, Tooltip, Core, DataIndex e la diagnostica, e i
+-- motivi finiscono nei rifiuti sul filo.
+local WAIT_WINDOWS = {
+    warmup = {
+        reasonField = "warmupReason", untilField = "warmupUntil", timerField = "_warmupTimer",
+        defaultReason = "warmup", clearReason = "warmup",
+        enterEvent = "warmupEnter", exitEvent = "warmupExit", recovery = "warmup-recovery",
+    },
+    transition = {
+        reasonField = "worldTransitionReason", untilField = "worldTransitionUntil", timerField = "_transitionTimer",
+        defaultReason = "transition", clearReason = "world-transition",
+        enterEvent = "worldTransitionEnter", exitEvent = "worldTransitionExit", recovery = "world-transition-recovery",
+    },
+}
+
+local function enterWaitWindow(self, window, reason, seconds)
+    self[window.reasonField] = tostring(reason or window.defaultReason)
+    self[window.untilField] = time() + max(0, tonumber(seconds or POST_WORLD_GRACE_SECONDS) or POST_WORLD_GRACE_SECONDS)
+    self:ClearInboundSeedSessions(window.clearReason)
+    self:RecordSyncEvent(window.enterEvent, {
+        reason = self[window.reasonField],
     })
-    self:RefreshSyncReadyState(self.warmupReason)
-    if self._warmupTimer then
-        self:CancelTimer(self._warmupTimer, true)
+    self:RefreshSyncReadyState(self[window.reasonField])
+    if self[window.timerField] then
+        self:CancelTimer(self[window.timerField], true)
     end
-    self._warmupTimer = self:ScheduleTimer(function()
-        self._warmupTimer = nil
+    self[window.timerField] = self:ScheduleTimer(function()
+        self[window.timerField] = nil
         if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then
-            Addon.Data:ScheduleSyncIndexPrepare("warmup-recovery", 0.5)
+            Addon.Data:ScheduleSyncIndexPrepare(window.recovery, 0.5)
         end
-        self:RefreshSyncReadyState("warmup-recovery")
-        self:ScheduleHello("warmup-recovery")
-        self:RecordSyncEvent("warmupExit", {
-            reason = "warmup-recovery",
+        self:RefreshSyncReadyState(window.recovery)
+        self:ScheduleHello(window.recovery)
+        self:RecordSyncEvent(window.exitEvent, {
+            reason = window.recovery,
         })
         if Addon.UI and Addon.UI.TryResumeFullRefresh then
             Addon.UI:TryResumeFullRefresh()
         end
-    end, max(0, self.warmupUntil - time()))
+    end, max(0, self[window.untilField] - time()))
+end
+
+function Sync:EnterWarmup(reason, seconds)
+    enterWaitWindow(self, WAIT_WINDOWS.warmup, reason, seconds)
 end
 
 function Sync:IsInWarmup()
@@ -2109,30 +2132,7 @@ function Sync:GetWarmupRemaining()
 end
 
 function Sync:EnterWorldTransition(reason, seconds)
-    self.worldTransitionReason = tostring(reason or "transition")
-    self.worldTransitionUntil = time() + max(0, tonumber(seconds or POST_WORLD_GRACE_SECONDS) or POST_WORLD_GRACE_SECONDS)
-    self:ClearInboundSeedSessions("world-transition")
-    self:RecordSyncEvent("worldTransitionEnter", {
-        reason = self.worldTransitionReason,
-    })
-    self:RefreshSyncReadyState(self.worldTransitionReason)
-    if self._transitionTimer then
-        self:CancelTimer(self._transitionTimer, true)
-    end
-    self._transitionTimer = self:ScheduleTimer(function()
-        self._transitionTimer = nil
-        if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then
-            Addon.Data:ScheduleSyncIndexPrepare("world-transition-recovery", 0.5)
-        end
-        self:RefreshSyncReadyState("world-transition-recovery")
-        self:ScheduleHello("world-transition-recovery")
-        self:RecordSyncEvent("worldTransitionExit", {
-            reason = "world-transition-recovery",
-        })
-        if Addon.UI and Addon.UI.TryResumeFullRefresh then
-            Addon.UI:TryResumeFullRefresh()
-        end
-    end, max(0, self.worldTransitionUntil - time()))
+    enterWaitWindow(self, WAIT_WINDOWS.transition, reason, seconds)
 end
 
 function Sync:IsInWorldTransition()
