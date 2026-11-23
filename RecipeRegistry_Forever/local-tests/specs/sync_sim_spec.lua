@@ -44,7 +44,10 @@ local function scenario(title, fn)
   scenarios = scenarios + 1
   print("\n== " .. title .. " ==")
   local started = os.clock()
+  -- il titolo per il registro di run-equivalence.ps1, se acceso
+  Sim.recordLabel = title
   local ok, err = xpcall(fn, debug.traceback)
+  Sim.FinishCurrent()
   if not ok then
     fails = fails + 1
     print("FAIL lo scenario si e' interrotto: " .. tostring(err))
@@ -392,6 +395,70 @@ scenario("un seed che entra in istanza mentre lo si tira", function()
   healthy(sim, "istanza")
 end)
 
+-- Un seed eletto che subito dopo cambia zona, o esce da un'istanza: le
+-- richieste gli arrivano durante il cambio di zona o il warmup, e il suo "no"
+-- porta il motivo sul filo. Negli altri scenari capita di rado, perche' chi non
+-- e' pronto non manda SUMMARY e quindi non viene eletto; qui si forza. Servono
+-- anche a run-equivalence.ps1: il motivo dipende dall'ordine dei controlli.
+local function hasTrace(peer, pattern)
+  for _, line in ipairs(peer.traces or {}) do
+    if line:find(pattern, 1, true) then return true end
+  end
+  return false
+end
+
+-- gira a piccoli passi finche' la sessione del nuovo verso un seed arriva allo
+-- stato voluto; restituisce il seed
+local function seedWhenSessionReaches(sim, newcomer, wanted, maxSeconds)
+  local waited = 0
+  while waited < maxSeconds do
+    sim:Run(0.05)
+    waited = waited + 0.05
+    local s = newcomer.Sync.outboundSeedSession
+    if type(s) == "table" and s.state == wanted then return sim.peers[s.seedKey] end
+  end
+  return nil
+end
+
+scenario("un seed che cambia zona appena eletto", function()
+  local sim = Sim.New({ seed = 89 })
+  for _, name in ipairs(names(6)) do sim:AddPeer(name, { professions = randomProfessions(5, 12) }) end
+  t("all'inizio tutti allineati", sim:RunUntilConverged(20 * 60) ~= nil, true)
+  local newcomer = sim:AddPeer("Nuova Zona", { professions = { { "Tailoring", { 2996 } } } })
+  -- la richiesta di index diff e' appena partita: il seed entra in una zona
+  -- nuova prima che gli arrivi
+  local moved = seedWhenSessionReaches(sim, newcomer, "waiting-index-diff", 180)
+  t("il nuovo aveva scelto un seed", moved ~= nil, true)
+  if moved then moved:SetInstance(false) end
+  local took = sim:RunUntilConverged(5 * 60, { newcomer.name })
+  t("finisce lo stesso", took ~= nil, true)
+  t("il seed ha detto no per il cambio di zona",
+    moved ~= nil and hasTrace(moved, "reason=not-ready:world-transition"), true)
+  t("e il no e' arrivato", newcomer:Count("index-diff-busy-received") > 0, true)
+  healthy(sim, "cambio di zona")
+end)
+
+scenario("un seed che esce da un'istanza mentre lo si tira", function()
+  local sim = Sim.New({ seed = 91 })
+  for _, name in ipairs(names(6)) do sim:AddPeer(name, { professions = randomProfessions(5, 12) }) end
+  t("all'inizio tutti allineati", sim:RunUntilConverged(20 * 60) ~= nil, true)
+  local newcomer = sim:AddPeer("Nuova Uscita", { professions = { { "Tailoring", { 2996 } } } })
+  -- una richiesta di blocco e' in viaggio: il seed entra ed esce da
+  -- un'istanza, e si trova in warmup e in cambio di zona insieme
+  local seed = seedWhenSessionReaches(sim, newcomer, "waiting-block", 180)
+  t("il nuovo tirava da un seed", seed ~= nil, true)
+  if seed then
+    seed:SetInstance(true)
+    seed:SetInstance(false)
+  end
+  local took = sim:RunUntilConverged(5 * 60, { newcomer.name })
+  t("finisce lo stesso", took ~= nil, true)
+  t("il seed ha detto no col motivo del warmup",
+    seed ~= nil and hasTrace(seed, "reason=protocol-gate:warmup"), true)
+  t("e il no e' arrivato", newcomer:Count("block-pull-refused-received") > 0, true)
+  healthy(sim, "uscita dall'istanza")
+end)
+
 scenario("una dichiarazione falsa non cancella niente", function()
   local sim = Sim.New({ seed = 97 })
   local A = sim:AddPeer("Alarnos Duskhallow", { professions = { { "Mining", { 2840 } }, { "Cooking", { 2679 } } } })
@@ -418,6 +485,32 @@ scenario("una dichiarazione falsa non cancella niente", function()
   t("Bea ha ancora il Mining di Alarnos", B:Blocks()["Alarnos Duskhallow::Mining"] ~= nil, true)
   t("e il log dice che l'ha ignorata", B:Count("owner-declaration-ignored") >= 1, true)
   healthy(sim, "dichiarazione falsa")
+end)
+
+-- La potatura e' l'unica scrittura del sync che toglie dati, e si fa solo a
+-- sync pronto: prima il cassetto di gilda puo' non essere quello giusto. Il
+-- HELLO esce prima per conto suo quando non si e' pronti; il SUMMARY no, e
+-- conta solo quel controllo. Qui una dichiarazione vera del proprietario
+-- arriva a un client che sta cambiando zona.
+scenario("una dichiarazione a sync non pronto non pota", function()
+  local sim = Sim.New({ seed = 101 })
+  local A = sim:AddPeer("Alarnos Duskhallow", { professions = { { "Mining", { 2840 } }, { "Cooking", { 2679 } } } })
+  local B = sim:AddPeer("Bea Rossi", { professions = { { "Tailoring", { 2996 } } } })
+  sim:AddPeer("Ciro Verdi", { professions = { { "Fishing", { 279967 } } } })
+  t("allineati", sim:RunUntilConverged(10 * 60) ~= nil, true)
+  B:SetInstance(false)
+  t("Bea sta cambiando zona", B.Sync.syncReady == true, false)
+  local text
+  A:Call(function()
+    text = A.Sync:EncodeWirePayload({ kind = "SUMMARY", sender = A.name, helloId = "x",
+      activeOwnerCount = 1, activeBlockCount = 1, activeContentCount = 1, globalFingerprint = "gf3:x",
+      professions = { "Cooking" } })
+  end)
+  B:Call(function() B.Sync:OnCommReceived(B.prefix, text, "WHISPER", A.name) end)
+  t("Bea non ha potato il Mining di Alarnos", B:Blocks()["Alarnos Duskhallow::Mining"] ~= nil, true)
+  sim:Run(120)
+  t("e lo ha ancora quando torna pronta", B:Blocks()["Alarnos Duskhallow::Mining"] ~= nil, true)
+  healthy(sim, "dichiarazione a sync non pronto")
 end)
 
 scenario("gilda grande: 24 client, 4% di perdite", function()
@@ -541,7 +634,14 @@ scenario("sussurri a raffica scartati dal server: gilda mista 0.1.5 e nuova", fu
   healthy(sim, "gilda mista a raffica")
 end)
 
-for _, seed in ipairs({ 131, 137, 139 }) do
+-- RR_SIM_CHAOS_SEEDS="131,137,..." allarga il caos: lo usa run-equivalence.ps1
+local chaosSeeds = { 131, 137, 139 }
+if os.getenv("RR_SIM_CHAOS_SEEDS") and os.getenv("RR_SIM_CHAOS_SEEDS") ~= "" then
+  chaosSeeds = {}
+  for n in os.getenv("RR_SIM_CHAOS_SEEDS"):gmatch("%d+") do chaosSeeds[#chaosSeeds + 1] = tonumber(n) end
+end
+
+for _, seed in ipairs(chaosSeeds) do
   scenario("caos (seme " .. seed .. "): 10 client, un'ora di eventi a caso", function()
     local sim = Sim.New({ seed = seed, lossReject = 0.04, lossSilent = 0.04, duplicate = 0.05, latencyMax = 4 })
     for _, name in ipairs(names(10, "Caos")) do sim:AddPeer(name, { professions = randomProfessions(2, 10) }) end

@@ -45,6 +45,19 @@ local FILES = {
 }
 local TREE_VERSIONS = { working = "0.1.6" }
 
+-- Il confronto fra due versioni dello stesso codice (run-equivalence.ps1).
+-- RR_SIM_WORKING_REF: i client "working" leggono i file da quel commit invece
+-- che dal disco; il nome resta "working", cosi' versione e controlli degli spec
+-- non cambiano. RR_SIM_RECORD: una cartella dove scrivere, scenario per
+-- scenario, cio' che passa sul filo e cosa c'e' nei database.
+local function envOrNil(name)
+    local value = os.getenv(name)
+    if value == nil or value == "" then return nil end
+    return value
+end
+local WORKING_REF = envOrNil("RR_SIM_WORKING_REF")
+local RECORD_DIR = envOrNil("RR_SIM_RECORD")
+
 local CPS, BURST, PART = 800, 4000, 254
 local PRIORITIES = { "ALERT", "NORMAL", "BULK" }
 local REALM = "CamWoW EU4 Realm 7 PvE"
@@ -87,18 +100,20 @@ local treeCache = {}
 local function readTree(tree)
     if treeCache[tree] then return treeCache[tree] end
     local files = {}
+    local source = tree
+    if tree == "working" and WORKING_REF then source = WORKING_REF end
     for _, rel in ipairs(FILES) do
         local src
-        if tree == "working" then
+        if source == "working" then
             local f = assert(io.open(rel, "rb"))
             src = f:read("*a")
             f:close()
         else
-            local p = io.popen('git show "' .. tree .. ":" .. ADDON_FOLDER .. "/" .. rel .. '" 2>nul')
+            local p = io.popen('git show "' .. source .. ":" .. ADDON_FOLDER .. "/" .. rel .. '" 2>nul')
             src = p and p:read("*a") or ""
             if p then p:close() end
             if src == "" then
-                return nil, "git show " .. tree .. ":" .. rel .. " non ha restituito niente"
+                return nil, "git show " .. source .. ":" .. rel .. " non ha restituito niente"
             end
         end
         files[rel] = src
@@ -177,7 +192,125 @@ function Sim.New(opts)
     }, Sim)
     math.randomseed(opts.seed or 1)
     sim:Every(10, function() sim:CheckStuckSessions() end)
+    if RECORD_DIR then sim:OpenRecord() end
     return sim
+end
+
+-- ---------------------------------------------------------------- registro
+--
+-- Per run-equivalence.ps1: due esecuzioni dello stesso scenario, col codice di
+-- prima e con quello nuovo, devono scrivere file identici. Due file per
+-- scenario: "strict" (cio' che passa sul filo e i database ogni 60 s, deve
+-- coincidere byte per byte) e "info" (conteggi di tracce, errori e violazioni,
+-- da leggere a mano). Tutto qui e' di sola lettura: niente math.random,
+-- niente funzioni dell'addon, cosi' registrare non cambia cio' che si registra.
+
+Sim.recordLabel = nil
+local recordCount = 0
+
+local function escapeBytes(text)
+    return (tostring(text):gsub("[%c\128-\255\\|]", function(c)
+        return string.format("\\%03d", c:byte())
+    end))
+end
+
+local function sortedKeys(t)
+    local keys = {}
+    for k in pairs(t) do keys[#keys + 1] = k end
+    table.sort(keys, function(a, b)
+        local ta, tb = type(a), type(b)
+        if ta ~= tb then return ta < tb end
+        if ta == "number" then return a < b end
+        return tostring(a) < tostring(b)
+    end)
+    return keys
+end
+
+local function scalarText(v)
+    local tv = type(v)
+    if tv == "string" then return "s:" .. escapeBytes(v) end
+    if tv == "number" then return "n:" .. string.format("%.17g", v) end
+    return tv .. ":" .. tostring(v)
+end
+
+-- una riga per foglia, il percorso intero davanti: un database diverso si
+-- vede alla prima riga che non coincide
+local function serializeInto(out, value, path, onPath)
+    if type(value) ~= "table" then
+        out[#out + 1] = path .. " = " .. scalarText(value)
+        return
+    end
+    if onPath[value] then
+        out[#out + 1] = path .. " = <ciclo>"
+        return
+    end
+    onPath[value] = true
+    local keys = sortedKeys(value)
+    if #keys == 0 then out[#out + 1] = path .. " = {}" end
+    for _, k in ipairs(keys) do
+        serializeInto(out, value[k], path .. "[" .. scalarText(k) .. "]", onPath)
+    end
+    onPath[value] = nil
+end
+Sim.SerializeForRecord = function(value, path)
+    local out = {}
+    serializeInto(out, value, path or "", {})
+    return out
+end
+
+local function sanitizeLabel(label)
+    return (tostring(label or "senza-titolo"):gsub("[^%w%-]+", "_"):sub(1, 60))
+end
+
+function Sim:OpenRecord()
+    recordCount = recordCount + 1
+    local base = string.format("%s/%02d-%s", RECORD_DIR, recordCount, sanitizeLabel(Sim.recordLabel))
+    self.recordStrict = assert(io.open(base .. ".strict.txt", "wb"))
+    self.recordInfo = assert(io.open(base .. ".info.txt", "wb"))
+    self.recordStrict:write("# " .. tostring(Sim.recordLabel) .. "\n")
+    self.recordInfo:write("# " .. tostring(Sim.recordLabel) .. "\n")
+    Sim.current = self
+    self:Every(60, function() self:RecordDatabases("checkpoint") end)
+end
+
+function Sim:RecordWire(peer, how, distribution, target, prio, text)
+    if not self.recordStrict then return end
+    self.recordStrict:write(string.format("W %.6f %s %s %s %s %s %s\n", self.clock, escapeBytes(peer.name), how,
+        tostring(distribution), escapeBytes(tostring(target)), tostring(prio), escapeBytes(text)))
+end
+
+function Sim:RecordDatabases(why)
+    if not self.recordStrict then return end
+    local f = self.recordStrict
+    f:write(string.format("D %.6f %s\n", self.clock, why))
+    for _, name in ipairs(self.order) do
+        local p = self.peers[name]
+        f:write(string.format("P %s online=%s gen=%d\n", escapeBytes(name), tostring(p.online), p.gen or 0))
+        for _, line in ipairs(Sim.SerializeForRecord(p.savedDB, "db")) do f:write(line, "\n") end
+        for _, line in ipairs(Sim.SerializeForRecord(p.charDB, "char")) do f:write(line, "\n") end
+    end
+end
+
+function Sim:FinishRecord()
+    if not self.recordStrict then return end
+    self:RecordDatabases("fine")
+    local info = self.recordInfo
+    info:write(string.format("errori=%d violazioni=%d\n", #self.errors, #self.violations))
+    for _, name in ipairs(self.order) do
+        local p = self.peers[name]
+        for _, word in ipairs(sortedKeys(p.traceCounts or {})) do
+            info:write(string.format("T %s %s %d\n", escapeBytes(name), word, p.traceCounts[word]))
+        end
+    end
+    self.recordStrict:close()
+    self.recordInfo:close()
+    self.recordStrict, self.recordInfo = nil, nil
+    if Sim.current == self then Sim.current = nil end
+end
+
+-- chiude il registro dello scenario in corso, se c'e'
+function Sim.FinishCurrent()
+    if Sim.current then Sim.current:FinishRecord() end
 end
 
 function Sim:Schedule(delay, fn, owner)
@@ -233,6 +366,7 @@ function Sim:Transmit(peer, prefix, text, distribution, target, prio, callbackFn
         self:RecordError(peer, "SendCommMessage con un messaggio non stringa: " .. type(text))
         return
     end
+    self:RecordWire(peer, "msg", distribution, target, prio, text)
     local kind = wireKind(text)
     self.stats.sent[kind] = (self.stats.sent[kind] or 0) + 1
     self.stats.bytes[kind] = (self.stats.bytes[kind] or 0) + #text
@@ -258,6 +392,7 @@ function Sim:TransmitRaw(peer, prefix, text, distribution, target, prio, callbac
         self:RecordError(peer, "pezzo non valido: " .. (type(text) == "string" and (#text .. " byte") or type(text)))
         return
     end
+    self:RecordWire(peer, "part", distribution, target, prio, text)
     -- il conto per tipo, come in Transmit: il messaggio intero si ricompone
     -- anche dal lato di chi manda
     local key = tostring(distribution) .. "\t" .. tostring(target)
