@@ -210,6 +210,8 @@ Sync.syncReady = true
 Sync.GetSelfKey = function() return me end
 Sync.IsValidSyncMemberKey = function(_, key) return type(key) == "string" and key ~= "" end
 Sync.CanRunSyncProtocol = function() return true, "ready" end
+-- SyncPausePolicy qui non c'e': il protocollo non e' mai in pausa
+Sync.IsProtocolPaused = function() return false end
 Sync.ScheduleTimer = function() return {} end
 Sync.CancelTimer = function() end
 Sync.GetPeerVersionInfo = function() return {} end

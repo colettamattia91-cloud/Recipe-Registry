@@ -118,7 +118,7 @@ function Sync:DecodeWirePayload(text)
 end
 
 function Sync:GetLocalProtocolCaps()
-    local protocolPaused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("BLOCK_PULL_REQUEST") or false
+    local protocolPaused = self:IsProtocolPaused("BLOCK_PULL_REQUEST")
     return {
         wireVersion = Addon.WIRE_VERSION,
         addonVersion = Addon.ADDON_VERSION or Addon.DISPLAY_VERSION,

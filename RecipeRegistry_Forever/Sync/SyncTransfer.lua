@@ -56,7 +56,7 @@ function Sync:FallBackFromSeed(session, reason)
     end
     -- a protocollo fermo o a sync non pronto non si apre una sessione nuova:
     -- resterebbe li' senza poter partire, si chiude e basta
-    local paused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("INDEX_DIFF_REQUEST") or false
+    local paused = self:IsProtocolPaused("INDEX_DIFF_REQUEST")
     if (session.successfulBlockMerges or 0) == 0
         and not paused
         and self.syncReady == true

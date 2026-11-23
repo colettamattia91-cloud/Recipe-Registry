@@ -339,7 +339,7 @@ function Sync:ScheduleDiscoveryRetry(reason)
     if self._helloTimer then
         return false, "hello-already-scheduled"
     end
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("HELLO") then
+    if self:IsProtocolPaused("HELLO") then
         return false, "paused"
     end
     self:RefreshSyncReadyState(reason or "discovery-retry")
@@ -368,6 +368,14 @@ function Sync:ScheduleDiscoveryRetry(reason)
         extra = string.format("misses=%d delay=%d", self.discoveryRetryMisses or 0, delay),
     })
     return scheduled
+end
+
+-- Il protocollo e' fermo? Lo decide SyncPausePolicy: oggi solo in istanza, e
+-- il tipo di messaggio non cambia la risposta, ma si passa lo stesso. Ogni
+-- controllo del sync chiede qui, invece di ripetere la stessa riga.
+function Sync:IsProtocolPaused(kind)
+    local policy = Addon.SyncPausePolicy
+    return policy and policy:ShouldPauseProtocolTraffic(kind) or false
 end
 
 function Sync:RefreshSyncReadyState(reason)
@@ -409,7 +417,7 @@ function Sync:RefreshSyncReadyState(reason)
         })
     end
 
-    local paused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("HELLO") or false
+    local paused = self:IsProtocolPaused("HELLO")
     local worldReady = not self:IsInWarmup() and not self:IsInWorldTransition()
     self.indexUsableForActivePull = sessionActive
         and self.savedVariablesReady == true
@@ -483,7 +491,7 @@ end
 -- to serve in that brief window stalls peers with block-response-timeout and
 -- breaks the architecture's promise of concurrent seeders.
 function Sync:CanServeCachedBlocks()
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("BLOCK_SNAPSHOT") then
+    if self:IsProtocolPaused("BLOCK_SNAPSHOT") then
         return false, "paused"
     end
     if self.savedVariablesReady ~= true then
@@ -509,7 +517,7 @@ end
 
 function Sync:CanRunSyncProtocol(kind)
     self:RefreshSyncReadyState("protocol:" .. tostring(kind or "sync"))
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic(kind) then
+    if self:IsProtocolPaused(kind) then
         return false, "paused"
     end
     if self.syncReady ~= true then
@@ -1584,7 +1592,7 @@ function Sync:SelectOutboundSeed(cycleId)
     -- La finestra dei SUMMARY si chiude 6 s dopo il HELLO, e in 6 s si fa in
     -- tempo a entrare in un'istanza: una sessione aperta li' non puo' partire.
     -- Il HELLO di ripresa all'uscita rifara' il giro.
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("INDEX_DIFF_REQUEST") then
+    if self:IsProtocolPaused("INDEX_DIFF_REQUEST") then
         Addon:Tracef("sync",
             "seed-selection-skipped helloId=%s reason=paused",
             tostring(cycle.helloId or "none")
@@ -2220,7 +2228,7 @@ function Sync:AutoSyncTick()
         return
     end
     self:RefreshSyncReadyState("auto-sync")
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("HELLO") then
+    if self:IsProtocolPaused("HELLO") then
         self.telemetry.pausedSyncCycles = (self.telemetry.pausedSyncCycles or 0) + 1
         return
     end
