@@ -106,6 +106,22 @@ local function isCompatiblePurpose(purpose)
         or purpose == "hello"
 end
 
+-- Con questo compagno si puo' parlare? La regola e' una, che si riceva
+-- (ShouldAcceptInboundPayload) o che si scelga lui per uno scambio
+-- (CanExchangeDataWithPeer): no se il canale e' un altro (dev contro release),
+-- no se il protocollo e' piu' nuovo o troppo vecchio. Restituisce il motivo
+-- del no, o nil, e la compatibilita' calcolata.
+local function peerCompatibilityProblem(self, info)
+    local compatibility = info.compatibility or self:ComputePeerCompatibility(info)
+    if compatibility == "channel-mismatch" then
+        return "channel-mismatch", compatibility
+    end
+    if compatibility == "remote-newer-wire" or compatibility == "remote-older-wire" then
+        return "wire-mismatch", compatibility
+    end
+    return nil, compatibility
+end
+
 function Sync:OnInitialize()
     self.onlineNodes = {}
     self.peerCaps = {}
@@ -806,11 +822,7 @@ function Sync:ShouldAcceptInboundPayload(payload, peerKey)
         end
         return false
     end
-    local compatibility = info.compatibility or self:ComputePeerCompatibility(info)
-    if compatibility == "remote-newer-wire" or compatibility == "remote-older-wire" then
-        return false
-    end
-    return compatibility ~= "channel-mismatch"
+    return peerCompatibilityProblem(self, info) == nil
 end
 
 function Sync:MaybeNotifyPeerVersion(peerKey, info)
@@ -966,18 +978,14 @@ function Sync:CanExchangeDataWithPeer(peerKey, purpose, request)
         return false, "unknown-peer"
     end
 
-    local compatibility = peerVersion.compatibility or self:ComputePeerCompatibility(peerVersion)
-    if compatibility == "channel-mismatch" then
-        self:SetPeerIneligibleReason(peerKey, "channel-mismatch")
-        self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
-        self.telemetry.skippedVersionIncompatible = (self.telemetry.skippedVersionIncompatible or 0) + 1
-        return false, "channel-mismatch"
-    end
-    if compatibility == "remote-newer-wire" or compatibility == "remote-older-wire" then
+    local problem, compatibility = peerCompatibilityProblem(self, peerVersion)
+    if problem then
+        -- il motivo per la diagnostica e' la compatibilita' stessa:
+        -- "channel-mismatch", "remote-newer-wire" o "remote-older-wire"
         self:SetPeerIneligibleReason(peerKey, compatibility)
         self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
         self.telemetry.skippedVersionIncompatible = (self.telemetry.skippedVersionIncompatible or 0) + 1
-        return false, "wire-mismatch"
+        return false, problem
     end
 
     if isCompatiblePurpose(purpose) then
