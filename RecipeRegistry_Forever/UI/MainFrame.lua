@@ -774,6 +774,19 @@ local function recipeLinkFor(createdItemID, recipeItemID, spellID)
         or nil
 end
 
+-- The Collection asks a different question -- not "who makes this" but "how
+-- do I learn it" -- so what it hands over is the recipe before the output:
+-- the pattern that teaches it, which is what a player searches the auction
+-- house for or asks a guildmate about, else the recipe itself, which for a
+-- trainer recipe or an enchant is the only thing there is. The output comes
+-- last, for a recipe the client knows nothing else about.
+local function collectionLinkFor(recipeItemID, spellID, createdItemID)
+    return getItemLinkByID(recipeItemID)
+        or (spellID and GetSpellLink and GetSpellLink(spellID))
+        or getItemLinkByID(createdItemID)
+        or nil
+end
+
 local function whisperTargetFromMemberKey(memberKey)
     if not memberKey then return nil end
     return Addon.Data:GetMemberKeyName(tostring(memberKey))
@@ -3048,6 +3061,17 @@ function UI:EnsureRecipeRow(index)
         if self.addonStatusMemberKey then
             return
         end
+        -- A Collection row has no recipeKey on purpose -- clicking it does not
+        -- select anything in the browser -- and that made it return right here,
+        -- so a shift-click on it linked nothing. It links the pattern, or the
+        -- recipe when there is no pattern; a plain click still does nothing.
+        if self.collectionInfo then
+            if button == "LeftButton" then
+                insertLinkInChat(collectionLinkFor(
+                    self.linkRecipeItemID, self.linkSpellID, self.linkCreatedItemID))
+            end
+            return
+        end
         if not self.recipeKey then
             return
         end
@@ -4659,6 +4683,12 @@ function UI:ShowCollectionRowTooltip(row)
         local r, g, b = 0.35, 0.85, 0.45
         if not known and not collection.specializationMet then r, g, b = 0.95, 0.35, 0.35 end
         GameTooltip:AddLine("Requires " .. collection.specializationName, r, g, b)
+    end
+    -- Nothing on the row says it can be linked, and nobody tries a shift-click
+    -- on a table they were not told about.
+    if row.linkRecipeItemID or row.linkSpellID or row.linkCreatedItemID then
+        GameTooltip:AddLine(row.linkRecipeItemID and "Shift-click to link the recipe item."
+            or "Shift-click to link the recipe.", 0.55, 0.55, 0.55)
     end
     GameTooltip:Show()
 end
