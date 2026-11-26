@@ -241,6 +241,22 @@ end
 -- question about recipes that are not in this view at all, and the two must
 -- not drift into two vocabularies.
 
+-- Can the recipe be had this way? Any of its sources counts, not only the
+-- first: a recipe that drops and is also a quest reward belongs under the
+-- "Quest" filter as much as under "Drop". A row built before recipes had more
+-- than one source carries only sourceKind, and is matched on that.
+function Data:CollectionHasSourceKind(collection, kind)
+    if not collection then return false end
+    local kinds = collection.sourceKinds
+    if type(kinds) == "table" and #kinds > 0 then
+        for _, have in ipairs(kinds) do
+            if have == kind then return true end
+        end
+        return false
+    end
+    return collection.sourceKind == kind
+end
+
 -- Names, icons and item quality come from Data:GetRecipeDisplayInfo, which
 -- costs two GetItemInfo calls per recipe and takes a slot in a 256-entry
 -- cache. A blacksmith alone has ~385 catalogued recipes and a second
@@ -354,11 +370,17 @@ function Data:BuildCollectionRowsForProfession(professionName, prof)
                     -- the profession further first?
                     skillMet = requiredSkill == nil or skillRank >= requiredSkill,
                     sourceKind = source.kind,
+                    -- Every kind the recipe has, the main one first: the
+                    -- source filter matches any of them.
+                    sourceKinds = source.kinds,
                     sourceLabel = source.label,
                     -- One line per place, for the row tooltip: the table
                     -- column clips, and a recipe sold in four cities is
                     -- exactly the case where the clipped half matters.
                     sourceLines = source.lines,
+                    -- One kind per line, so each line takes its own colour:
+                    -- a drop and the quest under it are two errands.
+                    sourceLineKinds = source.lineKinds,
                     -- One entry per line: which NPC it names, where they
                     -- stand, and whose side they are on.
                     sourceLineInfo = source.lineInfo,

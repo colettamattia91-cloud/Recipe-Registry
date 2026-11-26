@@ -2,6 +2,23 @@
 
 All notable changes to this addon are documented in this file.
 
+## [0.2.0] - 2026-11-26
+
+### Added
+
+- **Recipes you can get in more than one way show every way.** 165 recipes
+  list each source on its own line, coloured by type, and the source filter
+  finds a recipe under any of them.
+- **Shift-click a recipe in the Collection to link it in chat.**
+- **13 more recipes show where to get them.**
+- **Coordinates for the vendors and trainers of 117 more recipes.**
+
+### Changed
+
+- **98 recipes show updated information on where to get them.**
+- **Recipe data from game build 1.60.1.71139.** 4 recipes need different
+  reagents.
+
 ## [0.1.10] - 2026-11-21
 
 ### Added

@@ -1909,44 +1909,18 @@ local function sourceLabelFor(source, who, where)
     return source.kind, nil
 end
 
-function Data:DescribeRecipeSource(recipeKey, professionHint, metadataInfo)
-    local metadata = getRecipeMetadata()
-    if not metadata then
-        return nil
-    end
-    if metadataInfo == nil then
-        metadataInfo = metadata.GetRecipeInfo and metadata:GetRecipeInfo(recipeKey, professionHint) or nil
-    end
-
-    local source = metadata.GetSource and metadata:GetSource(recipeKey, metadataInfo) or nil
-    if not (source and source.kind) then
-        -- Nessuna provenienza nota, ma a volte si sa quale oggetto insegna la
-        -- ricetta -- "Pattern: Mooncloth" -- e quello e' un fatto, dal
-        -- datamining. Si mostra lui e basta: dove si trovi l'oggetto non si sa,
-        -- e non lo si indovina. Il nome viene dal client, localizzato; finche'
-        -- non l'ha in cache resta "Recipe item", che e' comunque vero.
-        local recipeItemId = metadataInfo and metadataInfo.recipeItemId
-        if recipeItemId then
-            local label = getItemData(recipeItemId) or "Recipe item"
-            return {
-                kind = "item",
-                label = label,
-                lines = { label },
-                known = true,
-                recipeItemId = recipeItemId,
-            }
-        end
-        return nil
-    end
-
-    -- Each place carries its own zone, so a row can say which vendor stands
-    -- where: "Xandar Goodbeard (Loch Modan), Hagrus (Orgrimmar)". Vendor stock
-    -- is often limited, which is why the alternatives are listed rather than
-    -- collapsed to the first one.
-    -- lineInfo runs alongside lines: one entry per line, carrying the NPC
-    -- that line is about. A line's faction is the NPC's, not the recipe's --
-    -- "sold by an Alliance vendor and a Horde one" is a recipe both sides can
-    -- have and two lines only one side each can use.
+-- One source -- the main one, or one of the others -- as its kind, its
+-- one-line label, and one line per place.
+--
+-- Each place carries its own zone, so a row can say which vendor stands
+-- where: "Xandar Goodbeard (Loch Modan), Hagrus (Orgrimmar)". Vendor stock
+-- is often limited, which is why the alternatives are listed rather than
+-- collapsed to the first one.
+-- lineInfo runs alongside lines: one entry per line, carrying the NPC
+-- that line is about. A line's faction is the NPC's, not the recipe's --
+-- "sold by an Alliance vendor and a Horde one" is a recipe both sides can
+-- have and two lines only one side each can use.
+local function describeOneSource(source)
     local withNames, zonesOnly, lines, lineInfo = {}, {}, {}, {}
     -- A kind whose label names no place -- a world drop, a discovery -- would
     -- otherwise repeat the same sentence once per place.
@@ -1978,21 +1952,91 @@ function Data:DescribeRecipeSource(recipeKey, professionHint, metadataInfo)
     local kind, label = sourceLabelFor(source,
         #withNames > 0 and table.concat(withNames, ", ") or nil,
         #zonesOnly > 0 and table.concat(zonesOnly, ", ") or nil)
+    if not label then
+        return kind, nil
+    end
+    if #lines == 0 then
+        lines = { label }
+        lineInfo = nil
+    end
+    return kind, label, lines, lineInfo
+end
 
+function Data:DescribeRecipeSource(recipeKey, professionHint, metadataInfo)
+    local metadata = getRecipeMetadata()
+    if not metadata then
+        return nil
+    end
+    if metadataInfo == nil then
+        metadataInfo = metadata.GetRecipeInfo and metadata:GetRecipeInfo(recipeKey, professionHint) or nil
+    end
+
+    local source = metadata.GetSource and metadata:GetSource(recipeKey, metadataInfo) or nil
+    if not (source and source.kind) then
+        -- Nessuna provenienza nota, ma a volte si sa quale oggetto insegna la
+        -- ricetta -- "Pattern: Mooncloth" -- e quello e' un fatto, dal
+        -- datamining. Si mostra lui e basta: dove si trovi l'oggetto non si sa,
+        -- e non lo si indovina. Il nome viene dal client, localizzato; finche'
+        -- non l'ha in cache resta "Recipe item", che e' comunque vero.
+        local recipeItemId = metadataInfo and metadataInfo.recipeItemId
+        if recipeItemId then
+            local label = getItemData(recipeItemId) or "Recipe item"
+            return {
+                kind = "item",
+                label = label,
+                lines = { label },
+                known = true,
+                recipeItemId = recipeItemId,
+            }
+        end
+        return nil
+    end
+
+    local kind, label, lines, lineInfo = describeOneSource(source)
     if not label then
         -- A kind nothing above renders: the metadata grew a shape this
         -- describer does not know. Unknown, then, not guessed.
         return nil
     end
-    if not lines or #lines == 0 then
-        lines = { label }
-        lineInfo = nil
+
+    -- The other ways to get it, each in its own lines after the main one and
+    -- each with its own kind. lineKinds runs alongside lines so a view can
+    -- colour a line by what it asks of the player -- the drop orange, the
+    -- quest under it yellow -- and kinds is the whole set, for a filter that
+    -- has to find a recipe by any of them: "Quest" must list Blue Suede Armor
+    -- even though its first line is a drop.
+    local kinds, labels, lineKinds = { kind }, { label }, {}
+    for index = 1, #lines do lineKinds[index] = kind end
+    local seenKinds = { [kind] = true }
+    for _, extra in ipairs(source.also or {}) do
+        local extraKind, extraLabel, extraLines, extraInfo = describeOneSource(extra)
+        -- Two sources of one kind would be two answers to one question; the
+        -- generator does not write them, and a second one here is dropped
+        -- rather than shown as a contradiction.
+        if extraLabel and not seenKinds[extraKind] then
+            seenKinds[extraKind] = true
+            kinds[#kinds + 1] = extraKind
+            labels[#labels + 1] = extraLabel
+            for index, line in ipairs(extraLines) do
+                local at = #lines + 1
+                lines[at] = line
+                lineKinds[at] = extraKind
+                -- lineInfo is indexed by line, so the main source may leave
+                -- holes in it: a trainer with no places has none for line 1.
+                if extraInfo and extraInfo[index] then
+                    lineInfo = lineInfo or {}
+                    lineInfo[at] = extraInfo[index]
+                end
+            end
+        end
     end
 
     return {
         kind = kind,
-        label = label,
+        kinds = kinds,
+        label = table.concat(labels, "; "),
         lines = lines,
+        lineKinds = lineKinds,
         lineInfo = lineInfo,
         known = true,
         faction = source.faction,

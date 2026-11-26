@@ -106,12 +106,26 @@ local function isCompatiblePurpose(purpose)
         or purpose == "hello"
 end
 
+-- Con questo compagno si puo' parlare? La regola e' una, che si riceva
+-- (ShouldAcceptInboundPayload) o che si scelga lui per uno scambio
+-- (CanExchangeDataWithPeer): no se il canale e' un altro (dev contro release),
+-- no se il protocollo e' piu' nuovo o troppo vecchio. Restituisce il motivo
+-- del no, o nil, e la compatibilita' calcolata.
+local function peerCompatibilityProblem(self, info)
+    local compatibility = info.compatibility or self:ComputePeerCompatibility(info)
+    if compatibility == "channel-mismatch" then
+        return "channel-mismatch", compatibility
+    end
+    if compatibility == "remote-newer-wire" or compatibility == "remote-older-wire" then
+        return "wire-mismatch", compatibility
+    end
+    return nil, compatibility
+end
+
 function Sync:OnInitialize()
     self.onlineNodes = {}
     self.peerCaps = {}
     self.peerVersions = {}
-    self.peerBackoffUntil = {}
-    self.peerHealth = {}
     self.pendingRequests = {}
     self.inFlightRequests = {}
     self.inFlight = nil
@@ -160,8 +174,6 @@ function Sync:ResetRuntimeQueues(reason, opts)
         self.onlineNodes = {}
         self.peerCaps = {}
         self.peerVersions = {}
-        self.peerBackoffUntil = {}
-        self.peerHealth = {}
         self.lastHelloAt = 0
     end
     self.pendingRequests = {}
@@ -343,7 +355,7 @@ function Sync:ScheduleDiscoveryRetry(reason)
     if self._helloTimer then
         return false, "hello-already-scheduled"
     end
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("HELLO") then
+    if self:IsProtocolPaused("HELLO") then
         return false, "paused"
     end
     self:RefreshSyncReadyState(reason or "discovery-retry")
@@ -372,6 +384,92 @@ function Sync:ScheduleDiscoveryRetry(reason)
         extra = string.format("misses=%d delay=%d", self.discoveryRetryMisses or 0, delay),
     })
     return scheduled
+end
+
+-- Il protocollo e' fermo? Lo decide SyncPausePolicy: oggi solo in istanza, e
+-- il tipo di messaggio non cambia la risposta, ma si passa lo stesso. Ogni
+-- controllo del sync chiede qui, invece di ripetere la stessa riga.
+function Sync:IsProtocolPaused(kind)
+    local policy = Addon.SyncPausePolicy
+    return policy and policy:ShouldPauseProtocolTraffic(kind) or false
+end
+
+-- Le regole di prontezza, tutte qui.
+--
+-- Un controllo guarda una cosa sola e, se non va, restituisce il motivo. Un
+-- profilo e' una lista ordinata di controlli: il primo che dice no da' il
+-- motivo. L'ordine conta: il motivo finisce in lastSyncNotReadyReason e nei
+-- rifiuti sul filo (not-ready:<motivo>). Roster e indice si leggono da cio' che
+-- RefreshSyncReadyState ha messo da parte, non da Data. Sono tutte letture: un
+-- controllo non cambia niente.
+local READINESS_CHECKS = {
+    ["saved-variables"] = function(self)
+        if self.savedVariablesReady ~= true then return "saved-variables" end
+    end,
+    player = function(self)
+        if self.playerReady ~= true then return "player" end
+    end,
+    -- le due finestre insieme, col cambio di zona come motivo se ci sono entrambe
+    world = function(self)
+        if self:IsInWorldTransition() then return "world-transition" end
+        if self:IsInWarmup() then return "warmup" end
+    end,
+    warmup = function(self)
+        if self:IsInWarmup() then return "warmup" end
+    end,
+    ["world-transition"] = function(self)
+        if self:IsInWorldTransition() then return "world-transition" end
+    end,
+    roster = function(self)
+        if self.rosterPreflightReady ~= true then return self.rosterPreflightReason or "roster-unready" end
+    end,
+    ["index-ready"] = function(self)
+        if self.indexReady ~= true then return self.indexStatus or "index-not-ready" end
+    end,
+    ["index-ready-or-dirty"] = function(self)
+        if self.indexStatus ~= "ready" and self.indexStatus ~= "dirty" then
+            return self.indexStatus or "index-not-ready"
+        end
+    end,
+    ["index-dirty"] = function(self)
+        if self.indexStatus ~= "dirty" then return "index-not-dirty" end
+    end,
+    paused = function(self, pauseKind)
+        if self:IsProtocolPaused(pauseKind) then return "paused" end
+    end,
+}
+
+local READINESS_PROFILES = {
+    -- syncReady: tutto in ordine e l'indice pronto
+    full = { pauseKind = "HELLO",
+        "saved-variables", "player", "world", "roster", "index-ready", "paused" },
+    -- indexUsableForActivePull: un pull gia' avviato prosegue con l'indice
+    -- sporco, che le sue stesse fusioni sporcano
+    ["active-pull"] = { pauseKind = "HELLO",
+        "saved-variables", "player", "world", "roster", "index-dirty", "paused" },
+    -- CanServeCachedBlocks: si serve anche con l'indice sporco. La pausa per
+    -- prima, il warmup prima del cambio di zona
+    serve = { pauseKind = "BLOCK_SNAPSHOT",
+        "paused", "saved-variables", "player", "warmup", "world-transition", "roster", "index-ready-or-dirty" },
+}
+
+-- A sync non pronto alcuni messaggi passano lo stesso, con un profilo loro.
+local NOT_READY_FALLBACK = {
+    BLOCK_PULL_REQUEST = "active-pull",
+    BLOCK_SNAPSHOT = "serve",
+    INDEX_DIFF_RESPONSE = "serve",
+}
+
+-- il motivo del primo no del profilo, o nil se va tutto
+local function readinessFailure(self, profileName)
+    local profile = READINESS_PROFILES[profileName]
+    for index = 1, #profile do
+        local why = READINESS_CHECKS[profile[index]](self, profile.pauseKind)
+        if why then
+            return why
+        end
+    end
+    return nil
 end
 
 function Sync:RefreshSyncReadyState(reason)
@@ -413,28 +511,11 @@ function Sync:RefreshSyncReadyState(reason)
         })
     end
 
-    local paused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("HELLO") or false
-    local saturationThreshold = Constants.SUMMARY_SATURATION_THRESHOLD or 80
-    local saturated = self:EstimateRuntimeQueuePressure() >= saturationThreshold
-    local worldReady = not self:IsInWarmup() and not self:IsInWorldTransition()
-    self.indexUsableForActivePull = sessionActive
-        and self.savedVariablesReady == true
-        and self.playerReady == true
-        and worldReady
-        and self.rosterPreflightReady == true
-        and self.indexStatus == "dirty"
-        and not paused
-        and not saturated
-    local nextReady = self.savedVariablesReady == true
-        and self.playerReady == true
-        and worldReady
-        and self.rosterPreflightReady == true
-        and self.indexReady == true
-        and not paused
-        and not saturated
+    self.indexUsableForActivePull = sessionActive and readinessFailure(self, "active-pull") == nil
+    local notReadyReason = readinessFailure(self, "full")
 
     local previous = self.syncReady == true
-    self.syncReady = nextReady == true
+    self.syncReady = notReadyReason == nil
     self.lastSyncReadyChangeAt = time()
     self.lastSyncReadyReason = tostring(reason or "sync-ready")
 
@@ -449,21 +530,7 @@ function Sync:RefreshSyncReadyState(reason)
             })
         end
     else
-        if self.savedVariablesReady ~= true then
-            self.lastSyncNotReadyReason = "saved-variables"
-        elseif self.playerReady ~= true then
-            self.lastSyncNotReadyReason = "player"
-        elseif not worldReady then
-            self.lastSyncNotReadyReason = self:IsInWorldTransition() and "world-transition" or "warmup"
-        elseif self.rosterPreflightReady ~= true then
-            self.lastSyncNotReadyReason = self.rosterPreflightReason or "roster-unready"
-        elseif self.indexReady ~= true then
-            self.lastSyncNotReadyReason = self.indexStatus or "index-not-ready"
-        elseif paused then
-            self.lastSyncNotReadyReason = "paused"
-        else
-            self.lastSyncNotReadyReason = "runtime-saturated"
-        end
+        self.lastSyncNotReadyReason = notReadyReason
         self.telemetry.lastReadinessGateFailure = self.lastSyncNotReadyReason
         if previous or self.telemetry.lastSyncNotReadyReason ~= self.lastSyncNotReadyReason then
             self:RecordSyncEvent("syncReady", {
@@ -492,43 +559,28 @@ end
 -- to serve in that brief window stalls peers with block-response-timeout and
 -- breaks the architecture's promise of concurrent seeders.
 function Sync:CanServeCachedBlocks()
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("BLOCK_SNAPSHOT") then
-        return false, "paused"
-    end
-    if self.savedVariablesReady ~= true then
-        return false, "saved-variables"
-    end
-    if self.playerReady ~= true then
-        return false, "player"
-    end
-    if self:IsInWarmup() then
-        return false, "warmup"
-    end
-    if self:IsInWorldTransition() then
-        return false, "world-transition"
-    end
-    if self.rosterPreflightReady ~= true then
-        return false, self.rosterPreflightReason or "roster-unready"
-    end
-    if self.indexStatus ~= "ready" and self.indexStatus ~= "dirty" then
-        return false, self.indexStatus or "index-not-ready"
-    end
-    if self:EstimateRuntimeQueuePressure() >= 95 then
-        return false, "saturated"
+    local why = readinessFailure(self, "serve")
+    if why then
+        return false, why
     end
     return true, "serving-allowed"
 end
 
+-- Il cancello di ogni messaggio. RefreshSyncReadyState si chiama qui, a ogni
+-- controllo, e deve restare cosi': syncReady e' anche il cancello della
+-- potatura dei mestieri (SyncProtocol, applyOwnerProfessionDeclaration), e lo
+-- tiene fresco proprio questo.
 function Sync:CanRunSyncProtocol(kind)
     self:RefreshSyncReadyState("protocol:" .. tostring(kind or "sync"))
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic(kind) then
+    if self:IsProtocolPaused(kind) then
         return false, "paused"
     end
     if self.syncReady ~= true then
-        if kind == "BLOCK_PULL_REQUEST" and self:CanAdvanceOutboundPullSession() then
+        local fallback = NOT_READY_FALLBACK[kind]
+        if fallback == "active-pull" and self:CanAdvanceOutboundPullSession() then
             return true, "active-pull-dirty-index"
         end
-        if kind == "BLOCK_SNAPSHOT" or kind == "INDEX_DIFF_RESPONSE" then
+        if fallback == "serve" then
             local allowed, servingReason = self:CanServeCachedBlocks()
             if allowed then
                 return true, "serving-cached-blocks"
@@ -770,11 +822,7 @@ function Sync:ShouldAcceptInboundPayload(payload, peerKey)
         end
         return false
     end
-    local compatibility = info.compatibility or self:ComputePeerCompatibility(info)
-    if compatibility == "remote-newer-wire" or compatibility == "remote-older-wire" then
-        return false
-    end
-    return compatibility ~= "channel-mismatch"
+    return peerCompatibilityProblem(self, info) == nil
 end
 
 function Sync:MaybeNotifyPeerVersion(peerKey, info)
@@ -910,20 +958,6 @@ function Sync:MarkPeerSuccess(sourceKey)
     if not self:IsValidSyncMemberKey(sourceKey) then
         return
     end
-    self.peerHealth = self.peerHealth or {}
-    self.peerBackoffUntil = self.peerBackoffUntil or {}
-    local health = self.peerHealth[sourceKey] or {
-        successes = 0,
-        failures = 0,
-        consecutiveFailures = 0,
-        lastSuccessAt = 0,
-        lastFailureAt = 0,
-    }
-    health.successes = (health.successes or 0) + 1
-    health.consecutiveFailures = 0
-    health.lastSuccessAt = time()
-    self.peerHealth[sourceKey] = health
-    self.peerBackoffUntil[sourceKey] = nil
     self.lastSnapshotSuccessAt = time()
 end
 
@@ -944,18 +978,14 @@ function Sync:CanExchangeDataWithPeer(peerKey, purpose, request)
         return false, "unknown-peer"
     end
 
-    local compatibility = peerVersion.compatibility or self:ComputePeerCompatibility(peerVersion)
-    if compatibility == "channel-mismatch" then
-        self:SetPeerIneligibleReason(peerKey, "channel-mismatch")
-        self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
-        self.telemetry.skippedVersionIncompatible = (self.telemetry.skippedVersionIncompatible or 0) + 1
-        return false, "channel-mismatch"
-    end
-    if compatibility == "remote-newer-wire" or compatibility == "remote-older-wire" then
+    local problem, compatibility = peerCompatibilityProblem(self, peerVersion)
+    if problem then
+        -- il motivo per la diagnostica e' la compatibilita' stessa:
+        -- "channel-mismatch", "remote-newer-wire" o "remote-older-wire"
         self:SetPeerIneligibleReason(peerKey, compatibility)
         self.telemetry.versionIneligiblePeers = (self.telemetry.versionIneligiblePeers or 0) + 1
         self.telemetry.skippedVersionIncompatible = (self.telemetry.skippedVersionIncompatible or 0) + 1
-        return false, "wire-mismatch"
+        return false, problem
     end
 
     if isCompatiblePurpose(purpose) then
@@ -1306,11 +1336,6 @@ function Sync:BeginHelloCycle(reason)
     return self.activeHelloCycle
 end
 
-function Sync:IsSummarySaturated()
-    local pressure = self:EstimateRuntimeQueuePressure()
-    return pressure >= (Constants.SUMMARY_SATURATION_THRESHOLD or 80)
-end
-
 function Sync:RecordSummary(peerKey, payload)
     if not self:IsValidSyncMemberKey(peerKey) then
         return false
@@ -1615,7 +1640,7 @@ function Sync:SelectOutboundSeed(cycleId)
     -- La finestra dei SUMMARY si chiude 6 s dopo il HELLO, e in 6 s si fa in
     -- tempo a entrare in un'istanza: una sessione aperta li' non puo' partire.
     -- Il HELLO di ripresa all'uscita rifara' il giro.
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("INDEX_DIFF_REQUEST") then
+    if self:IsProtocolPaused("INDEX_DIFF_REQUEST") then
         Addon:Tracef("sync",
             "seed-selection-skipped helloId=%s reason=paused",
             tostring(cycle.helloId or "none")
@@ -1846,11 +1871,9 @@ function Sync:CompleteOutboundSeedSession(reason)
     -- INDEX_DIFF cycles keep re-electing the same peer. After two
     -- consecutive sessions that pulled at least one block and added zero
     -- progress, mark the peer for a cooldown so seed selection
-    -- deprioritizes them. We track this on a dedicated field instead of
-    -- peerBackoffUntil because MarkPeerSuccess clears that on every
-    -- successful block-merge (the snapshot delivery itself counts as
-    -- success even when no recipes were added), and would clobber the
-    -- session-level backoff on the very next merge.
+    -- deprioritizes them. The field is dedicated to sessions: a successful
+    -- block-merge counts as success even when no recipes were added, so a
+    -- per-merge register would clear this backoff on the very next merge.
     if self:IsValidSyncMemberKey(session.seedKey) then
         local pulled = (session.successfulBlockMerges or 0) > 0
         local progressed = (session.progressBlockMerges or 0) > 0
@@ -2103,31 +2126,54 @@ function Sync:ScheduleQueuePump(delay)
     end, delay or 0.05)
 end
 
-function Sync:EnterWarmup(reason, seconds)
-    self.warmupReason = tostring(reason or "warmup")
-    self.warmupUntil = time() + max(0, tonumber(seconds or POST_WORLD_GRACE_SECONDS) or POST_WORLD_GRACE_SECONDS)
-    self:ClearInboundSeedSessions("warmup")
-    self:RecordSyncEvent("warmupEnter", {
-        reason = self.warmupReason,
+-- Le due finestre d'attesa: il warmup, all'uscita da un'istanza, e il cambio
+-- di zona, a login, reload e PLAYER_ENTERING_WORLD. Stessa meccanica: finche'
+-- una e' aperta il sync non e' pronto e non serve nessuno; quando si chiude si
+-- ripreparano l'indice e un HELLO. Campi, eventi e motivi restano due, con i
+-- nomi di sempre: li leggono UI, Tooltip, Core, DataIndex e la diagnostica, e i
+-- motivi finiscono nei rifiuti sul filo.
+local WAIT_WINDOWS = {
+    warmup = {
+        reasonField = "warmupReason", untilField = "warmupUntil", timerField = "_warmupTimer",
+        defaultReason = "warmup", clearReason = "warmup",
+        enterEvent = "warmupEnter", exitEvent = "warmupExit", recovery = "warmup-recovery",
+    },
+    transition = {
+        reasonField = "worldTransitionReason", untilField = "worldTransitionUntil", timerField = "_transitionTimer",
+        defaultReason = "transition", clearReason = "world-transition",
+        enterEvent = "worldTransitionEnter", exitEvent = "worldTransitionExit", recovery = "world-transition-recovery",
+    },
+}
+
+local function enterWaitWindow(self, window, reason, seconds)
+    self[window.reasonField] = tostring(reason or window.defaultReason)
+    self[window.untilField] = time() + max(0, tonumber(seconds or POST_WORLD_GRACE_SECONDS) or POST_WORLD_GRACE_SECONDS)
+    self:ClearInboundSeedSessions(window.clearReason)
+    self:RecordSyncEvent(window.enterEvent, {
+        reason = self[window.reasonField],
     })
-    self:RefreshSyncReadyState(self.warmupReason)
-    if self._warmupTimer then
-        self:CancelTimer(self._warmupTimer, true)
+    self:RefreshSyncReadyState(self[window.reasonField])
+    if self[window.timerField] then
+        self:CancelTimer(self[window.timerField], true)
     end
-    self._warmupTimer = self:ScheduleTimer(function()
-        self._warmupTimer = nil
+    self[window.timerField] = self:ScheduleTimer(function()
+        self[window.timerField] = nil
         if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then
-            Addon.Data:ScheduleSyncIndexPrepare("warmup-recovery", 0.5)
+            Addon.Data:ScheduleSyncIndexPrepare(window.recovery, 0.5)
         end
-        self:RefreshSyncReadyState("warmup-recovery")
-        self:ScheduleHello("warmup-recovery")
-        self:RecordSyncEvent("warmupExit", {
-            reason = "warmup-recovery",
+        self:RefreshSyncReadyState(window.recovery)
+        self:ScheduleHello(window.recovery)
+        self:RecordSyncEvent(window.exitEvent, {
+            reason = window.recovery,
         })
         if Addon.UI and Addon.UI.TryResumeFullRefresh then
             Addon.UI:TryResumeFullRefresh()
         end
-    end, max(0, self.warmupUntil - time()))
+    end, max(0, self[window.untilField] - time()))
+end
+
+function Sync:EnterWarmup(reason, seconds)
+    enterWaitWindow(self, WAIT_WINDOWS.warmup, reason, seconds)
 end
 
 function Sync:IsInWarmup()
@@ -2142,30 +2188,7 @@ function Sync:GetWarmupRemaining()
 end
 
 function Sync:EnterWorldTransition(reason, seconds)
-    self.worldTransitionReason = tostring(reason or "transition")
-    self.worldTransitionUntil = time() + max(0, tonumber(seconds or POST_WORLD_GRACE_SECONDS) or POST_WORLD_GRACE_SECONDS)
-    self:ClearInboundSeedSessions("world-transition")
-    self:RecordSyncEvent("worldTransitionEnter", {
-        reason = self.worldTransitionReason,
-    })
-    self:RefreshSyncReadyState(self.worldTransitionReason)
-    if self._transitionTimer then
-        self:CancelTimer(self._transitionTimer, true)
-    end
-    self._transitionTimer = self:ScheduleTimer(function()
-        self._transitionTimer = nil
-        if Addon.Data and Addon.Data.ScheduleSyncIndexPrepare then
-            Addon.Data:ScheduleSyncIndexPrepare("world-transition-recovery", 0.5)
-        end
-        self:RefreshSyncReadyState("world-transition-recovery")
-        self:ScheduleHello("world-transition-recovery")
-        self:RecordSyncEvent("worldTransitionExit", {
-            reason = "world-transition-recovery",
-        })
-        if Addon.UI and Addon.UI.TryResumeFullRefresh then
-            Addon.UI:TryResumeFullRefresh()
-        end
-    end, max(0, self.worldTransitionUntil - time()))
+    enterWaitWindow(self, WAIT_WINDOWS.transition, reason, seconds)
 end
 
 function Sync:IsInWorldTransition()
@@ -2177,28 +2200,6 @@ function Sync:GetWorldTransitionRemaining()
         return 0
     end
     return max(0, (self.worldTransitionUntil or 0) - time())
-end
-
-function Sync:EstimateRuntimeQueuePressure()
-    if not self.telemetry then
-        self.telemetry = newSyncTelemetry()
-    end
-    local pressure = 0
-    local session = self.outboundSeedSession
-    if type(session) == "table" and session.state and session.state ~= "completed" and session.state ~= "aborted" then
-        pressure = pressure + 25
-        if session.state == "waiting-block" or session.state == "waiting-index-diff" then
-            pressure = pressure + 25
-        end
-    end
-    if self:IsInWarmup() then
-        pressure = pressure + 10
-    end
-    if self:IsInWorldTransition() then
-        pressure = pressure + 20
-    end
-    self.telemetry.runtimeQueuePressure = min(100, pressure)
-    return self.telemetry.runtimeQueuePressure
 end
 
 function Sync:ShouldDeferHeavyLifecycleWork(_reason)
@@ -2218,7 +2219,7 @@ function Sync:ShouldDeferHeavyLifecycleWork(_reason)
     if self:HasActiveOutboundSeedSession() then
         return true
     end
-    return self:EstimateRuntimeQueuePressure() >= 70
+    return false
 end
 
 local function isBackoffStoreActive(store, sourceKey, now)
@@ -2236,9 +2237,7 @@ function Sync:IsPeerBackoffActive(sourceKey)
     if not self:IsValidSyncMemberKey(sourceKey) then
         return false
     end
-    local now = time()
-    return isBackoffStoreActive(self.peerBackoffUntil, sourceKey, now)
-        or isBackoffStoreActive(self._peerSessionBackoffUntil, sourceKey, now)
+    return isBackoffStoreActive(self._peerSessionBackoffUntil, sourceKey, time())
 end
 
 function Sync:TouchNode(key, version)
@@ -2262,17 +2261,14 @@ function Sync:PruneOnlineNodes()
     for key, info in pairs(self.onlineNodes or {}) do
         if info.lastSeen and (now - info.lastSeen) > NODE_TIMEOUT then
             self.onlineNodes[key] = nil
-            self.peerBackoffUntil[key] = nil
             self.peerVersions[key] = nil
             self.peerCaps[key] = nil
-            self.peerHealth[key] = nil
         end
     end
 end
 
 function Sync:PruneState()
     self:PruneOnlineNodes()
-    self:EstimateRuntimeQueuePressure()
 end
 
 function Sync:AutoSyncTick()
@@ -2280,7 +2276,7 @@ function Sync:AutoSyncTick()
         return
     end
     self:RefreshSyncReadyState("auto-sync")
-    if Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic("HELLO") then
+    if self:IsProtocolPaused("HELLO") then
         self.telemetry.pausedSyncCycles = (self.telemetry.pausedSyncCycles or 0) + 1
         return
     end

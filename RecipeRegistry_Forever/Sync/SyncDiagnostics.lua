@@ -134,8 +134,6 @@ function Sync:GetRuntimeObservabilitySnapshot()
             inInstance = pause.inInstance == true,
             inRaid = pause.inRaid == true,
             inCombat = pause.inCombat == true,
-            runtimeSaturated = (tel.runtimeQueuePressure or 0) >= 95,
-            runtimeQueuePressure = tel.runtimeQueuePressure or 0,
             lastReadinessGateFailure = tel.lastReadinessGateFailure,
         },
         hello = {
@@ -462,14 +460,12 @@ function Sync:CleanupMockState()
             self.onlineNodes[key] = nil
             self.peerCaps[key] = nil
             self.peerVersions[key] = nil
-            self.peerBackoffUntil[key] = nil
             if self._peerSessionBackoffUntil then
                 self._peerSessionBackoffUntil[key] = nil
             end
             if self._peerSessionNoProgressCount then
                 self._peerSessionNoProgressCount[key] = nil
             end
-            self.peerHealth[key] = nil
             removedOnlineNodes = removedOnlineNodes + 1
         end
     end
@@ -512,11 +508,6 @@ function Sync:CleanCorruptState(opts)
     for key in pairs(self.peerCaps or {}) do
         if not self:IsValidSyncMemberKey(key) then
             drop(self.peerCaps, key, "peerCaps")
-        end
-    end
-    for key in pairs(self.peerBackoffUntil or {}) do
-        if not self:IsValidSyncMemberKey(key) then
-            drop(self.peerBackoffUntil, key, "peerBackoff")
         end
     end
     for key in pairs(self._peerSessionBackoffUntil or {}) do

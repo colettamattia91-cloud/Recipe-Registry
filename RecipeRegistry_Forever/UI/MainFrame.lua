@@ -774,6 +774,19 @@ local function recipeLinkFor(createdItemID, recipeItemID, spellID)
         or nil
 end
 
+-- The Collection asks a different question -- not "who makes this" but "how
+-- do I learn it" -- so what it hands over is the recipe before the output:
+-- the pattern that teaches it, which is what a player searches the auction
+-- house for or asks a guildmate about, else the recipe itself, which for a
+-- trainer recipe or an enchant is the only thing there is. The output comes
+-- last, for a recipe the client knows nothing else about.
+local function collectionLinkFor(recipeItemID, spellID, createdItemID)
+    return getItemLinkByID(recipeItemID)
+        or (spellID and GetSpellLink and GetSpellLink(spellID))
+        or getItemLinkByID(createdItemID)
+        or nil
+end
+
 local function whisperTargetFromMemberKey(memberKey)
     if not memberKey then return nil end
     return Addon.Data:GetMemberKeyName(tostring(memberKey))
@@ -1250,7 +1263,7 @@ function UI:CollectionRowPassesColumns(row)
     end
 
     local source = self:GetCollectionColumnFilter("source")
-    if source ~= "all" and collection.sourceKind ~= source then
+    if source ~= "all" and not Addon.Data:CollectionHasSourceKind(collection, source) then
         return false
     end
 
@@ -3048,6 +3061,17 @@ function UI:EnsureRecipeRow(index)
         if self.addonStatusMemberKey then
             return
         end
+        -- A Collection row has no recipeKey on purpose -- clicking it does not
+        -- select anything in the browser -- and that made it return right here,
+        -- so a shift-click on it linked nothing. It links the pattern, or the
+        -- recipe when there is no pattern; a plain click still does nothing.
+        if self.collectionInfo then
+            if button == "LeftButton" then
+                insertLinkInChat(collectionLinkFor(
+                    self.linkRecipeItemID, self.linkSpellID, self.linkCreatedItemID))
+            end
+            return
+        end
         if not self.recipeKey then
             return
         end
@@ -3858,6 +3882,44 @@ local COLLECTION_ROW_HEIGHT = 30
 -- there is nothing to elide.
 local COLLECTION_ROW_LINE_HEIGHT = 14
 local COLLECTION_MAX_SOURCE_LINES = 4
+
+-- Which source lines the row shows, by index into sourceLines: all of them
+-- up to the cap. Past it -- a recipe sold in four cities that also drops --
+-- the first line of every kind stays, then the rest in order, so a second
+-- source is never cut off the row by a long list of vendors. The tooltip
+-- still lists every line. The count is always min(lines, cap), which is what
+-- the row height was measured for, and the source and coordinate columns
+-- both read this list so their lines stay side by side.
+local function collectionVisibleSourceLines(collection)
+    local lines = collection.sourceLines
+    local count = (lines and #lines > 0) and #lines or 1
+    local out = {}
+    if count <= COLLECTION_MAX_SOURCE_LINES then
+        for index = 1, count do out[index] = index end
+        return out
+    end
+    local kinds = collection.sourceLineKinds or {}
+    local keep, seen, kept = {}, {}, 0
+    for index = 1, count do
+        local kind = kinds[index]
+        if kind and not seen[kind] and kept < COLLECTION_MAX_SOURCE_LINES then
+            seen[kind] = true
+            keep[index] = true
+            kept = kept + 1
+        end
+    end
+    for index = 1, count do
+        if kept >= COLLECTION_MAX_SOURCE_LINES then break end
+        if not keep[index] then
+            keep[index] = true
+            kept = kept + 1
+        end
+    end
+    for index = 1, count do
+        if keep[index] then out[#out + 1] = index end
+    end
+    return out
+end
 local COLLECTION_GROUP_ROW_HEIGHT = 34
 local COLLECTION_ROW_ICON_SIZE = 24
 -- A recipe already in the book still shows every column -- a collector may
@@ -4255,19 +4317,16 @@ end
 -- ha un trattino, cosi' le righe sotto non salgono di posto.
 function UI:CollectionCoordsText(collection, known)
     local lineInfo = collection.sourceLineInfo
-    local lines = collection.sourceLines
-    local count = (lines and #lines > 0) and #lines or 1
-    if count > COLLECTION_MAX_SOURCE_LINES then count = COLLECTION_MAX_SOURCE_LINES end
     local colour = known and COLLECTION_KNOWN_DIM or "|cffc8c8c8"
     local out, any = {}, false
-    for index = 1, count do
+    for slot, index in ipairs(collectionVisibleSourceLines(collection)) do
         local info = lineInfo and lineInfo[index]
         local x, y = info and tonumber(info.x), info and tonumber(info.y)
         if x and y then
-            out[index] = string.format("%s%.1f, %.1f|r", colour, x, y)
+            out[slot] = string.format("%s%.1f, %.1f|r", colour, x, y)
             any = true
         else
-            out[index] = "|cff8f949c-|r"
+            out[slot] = "|cff8f949c-|r"
         end
     end
     if not any then return "|cff8f949c-|r" end
@@ -4283,11 +4342,15 @@ function UI:CollectionSourceText(collection, known)
     if not lines or #lines == 0 then
         lines = { collection.sourceLabel or "" }
     end
-    local colour = known and COLLECTION_KNOWN_DIM or collectionSourceColor(collection.sourceKind)
+    local lineKinds = collection.sourceLineKinds
     local lineInfo = collection.sourceLineInfo
     local out = {}
-    for index = 1, math.min(#lines, COLLECTION_MAX_SOURCE_LINES) do
-        out[index] = string.format("%s%s|r", colour, safeText(lines[index]))
+    for slot, index in ipairs(collectionVisibleSourceLines(collection)) do
+        -- Each line in the colour of its own kind: a recipe that drops and is
+        -- also a quest reward reads orange then yellow, two errands.
+        local colour = known and COLLECTION_KNOWN_DIM
+            or collectionSourceColor(lineKinds and lineKinds[index] or collection.sourceKind)
+        out[slot] = string.format("%s%s|r", colour, safeText(lines[index] or ""))
         -- The banner belongs to the line, not to the recipe. A recipe sold by
         -- an Alliance vendor in Stormwind and a Horde one in Orgrimmar is one
         -- both sides can have, and hanging one banner on the whole recipe
@@ -4295,14 +4358,16 @@ function UI:CollectionSourceText(collection, known)
         local info = lineInfo and lineInfo[index]
         local faction = info and info.faction
         if faction == "alliance" then
-            out[index] = out[index] .. " " .. ALLIANCE_INLINE_TAG
+            out[slot] = out[slot] .. " " .. ALLIANCE_INLINE_TAG
         elseif faction == "horde" then
-            out[index] = out[index] .. " " .. HORDE_INLINE_TAG
+            out[slot] = out[slot] .. " " .. HORDE_INLINE_TAG
         end
     end
     -- A recipe-level restriction still exists -- a quest only one side can
-    -- take -- and with no per-line answer it goes where it used to.
-    if not lineInfo then
+    -- take -- and with no per-line answer it goes where it used to. The first
+    -- line is the one to ask about: a recipe whose main source names no place
+    -- can still carry places for the sources under it.
+    if not (lineInfo and lineInfo[1]) then
         if collection.faction == "alliance" then
             out[1] = out[1] .. " " .. ALLIANCE_INLINE_TAG
         elseif collection.faction == "horde" then
@@ -4618,6 +4683,12 @@ function UI:ShowCollectionRowTooltip(row)
         local r, g, b = 0.35, 0.85, 0.45
         if not known and not collection.specializationMet then r, g, b = 0.95, 0.35, 0.35 end
         GameTooltip:AddLine("Requires " .. collection.specializationName, r, g, b)
+    end
+    -- Nothing on the row says it can be linked, and nobody tries a shift-click
+    -- on a table they were not told about.
+    if row.linkRecipeItemID or row.linkSpellID or row.linkCreatedItemID then
+        GameTooltip:AddLine(row.linkRecipeItemID and "Shift-click to link the recipe item."
+            or "Shift-click to link the recipe.", 0.55, 0.55, 0.55)
     end
     GameTooltip:Show()
 end

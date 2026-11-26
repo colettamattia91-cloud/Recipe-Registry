@@ -75,6 +75,8 @@ end
 --   sourcePlaces      un posto per NPC, { name, zone, x, y, faction }: la zona
 --                     e' un id, GetSource la risolve; posizione e fazione
 --                     sono del singolo NPC, non della ricetta
+--   alsoSources       le provenienze oltre la principale, in ordine:
+--                     { kind, places, worldDrop, bossDrop, trainerTitle }
 --   skillLevels       le quattro soglie di colore della ricetta
 --   removed           nei dati del client ma non nel gioco
 --   reagents          { itemId, count } per slot
@@ -579,17 +581,37 @@ function RecipeMetadata:GetSource(recipeKey, info)
     -- half can be missing: a quest names a zone and nobody, and a recipe every
     -- trainer teaches names neither.
     local zoneNames = self._generated and self._generated.zoneNamesById or nil
-    local places
-    for _, place in ipairs(info.sourcePlaces or {}) do
-        local zone = place.zone and zoneNames and zoneNames[place.zone] or nil
-        if place.name or zone then
-            places = places or {}
-            places[#places + 1] = {
-                name = place.name,
-                zone = zone,
-                x = place.x,
-                y = place.y,
-                faction = place.faction,
+    local function resolvePlaces(list)
+        local places
+        for _, place in ipairs(list or {}) do
+            local zone = place.zone and zoneNames and zoneNames[place.zone] or nil
+            if place.name or zone then
+                places = places or {}
+                places[#places + 1] = {
+                    name = place.name,
+                    zone = zone,
+                    x = place.x,
+                    y = place.y,
+                    faction = place.faction,
+                }
+            end
+        end
+        return places
+    end
+
+    -- The other ways to get it, after the main one and in the generator's
+    -- order. On Forever a recipe can drop AND be a quest reward -- Pattern:
+    -- Blue Suede Armor does both -- and the main source alone hid the other.
+    local also
+    for _, extra in ipairs(info.alsoSources or {}) do
+        if extra.kind then
+            also = also or {}
+            also[#also + 1] = {
+                kind = extra.kind,
+                worldDrop = extra.worldDrop == true,
+                bossDrop = extra.bossDrop == true,
+                places = resolvePlaces(extra.places),
+                trainerTitle = extra.trainerTitle,
             }
         end
     end
@@ -599,12 +621,13 @@ function RecipeMetadata:GetSource(recipeKey, info)
         kind = info.sourceKind,
         worldDrop = info.worldDrop == true,
         bossDrop = info.bossDrop == true,
-        places = places,
+        places = resolvePlaces(info.sourcePlaces),
         -- Trainer-taught recipes have no places -- no source names the NPCs --
         -- so the answer they do have is the title every one of their trainers
         -- carries, which is the line the player reads under the NPC in game.
         trainerTitle = info.trainerTitle,
         trainerContinents = info.trainerContinents,
+        also = also,
     }
 end
 

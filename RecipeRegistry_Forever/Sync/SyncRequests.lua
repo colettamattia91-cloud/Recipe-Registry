@@ -612,7 +612,7 @@ function Sync:ProcessRequestQueue()
     -- dell'indice aspetta, per scelta, che non ci siano sessioni aperte.
     -- Trovato dalla gilda simulata il 06/11 (sync_sim_spec, caos).
     local now = time()
-    local paused = Addon.SyncPausePolicy and Addon.SyncPausePolicy:ShouldPauseProtocolTraffic() or false
+    local paused = self:IsProtocolPaused()
     if session.state == "waiting-index-diff" and session.diffSentAt
         and (now - session.diffSentAt) > INDEX_DIFF_RESPONSE_TIMEOUT_SECONDS
     then
