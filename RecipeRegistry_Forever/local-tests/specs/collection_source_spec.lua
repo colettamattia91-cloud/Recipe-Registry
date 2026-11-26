@@ -71,5 +71,28 @@ t("sourceKind", pattern.sourceKind, "item")
 t("sourceLabel", pattern.sourceLabel, "Pattern: Fine Leather Boots")
 t("sourceLines[1]", pattern.sourceLines and pattern.sourceLines[1], "Pattern: Fine Leather Boots")
 
+-- Piu' provenienze (26/11): la riga porta tutti i tipi e il tipo di ogni
+-- riga, e il filtro per provenienza trova la ricetta sotto ognuno.
+print("\n== piu' provenienze ==")
+Data.DescribeRecipeSource = function(_, recipeKey)
+  if recipeKey == -2158 then
+    return { kind = "drop", kinds = { "drop", "quest" }, label = "Drop: X; Quest: Y",
+             lines = { "Drop: X", "Quest: Y" }, lineKinds = { "drop", "quest" }, known = true }
+  end
+  return nil
+end
+ok, rows = pcall(Data.BuildCollectionRowsForProfession, Data, "Leatherworking", { skillRank = 1 })
+byKey = {}
+for _, row in ipairs(ok and rows or {}) do byKey[row.recipeKey] = row.collection end
+local both = byKey[-2158] or {}
+t("sourceKind resta la principale", both.sourceKind, "drop")
+t("sourceKinds[2]", both.sourceKinds and both.sourceKinds[2], "quest")
+t("sourceLineKinds[2]", both.sourceLineKinds and both.sourceLineKinds[2], "quest")
+t("filtro Drop la trova", Data:CollectionHasSourceKind(both, "drop"), true)
+t("filtro Quest la trova", Data:CollectionHasSourceKind(both, "quest"), true)
+t("filtro Vendor no", Data:CollectionHasSourceKind(both, "vendor"), false)
+t("una riga col solo sourceKind", Data:CollectionHasSourceKind({ sourceKind = "vendor" }, "vendor"), true)
+t("una riga senza provenienza", Data:CollectionHasSourceKind(byKey[-2149] or {}, "trainer"), false)
+
 print(fails == 0 and "\nTUTTO OK" or ("\n" .. fails .. " FALLITI"))
 os.exit(fails == 0 and 0 or 1)

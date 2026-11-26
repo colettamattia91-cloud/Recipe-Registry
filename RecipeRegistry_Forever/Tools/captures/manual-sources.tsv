@@ -1,0 +1,27 @@
+spellId	name	action	sourceKind	npcName	zone	faction	bossDrop	notes
+17632	Alchemist's Stone	set	vendor	Dala Fairmaw	Mount Hyjal			verificato in gioco dall'utente, 26/11
+17638	Flask of Chromatic Resistance	set	vendor	Pix Xizzix	Stranglethorn Vale			verificato in gioco dall'utente, 26/11
+17638	Flask of Chromatic Resistance	set	drop	Gyth	Blackrock Spire		true	verificato in gioco dall'utente, 26/11
+17636	Flask of Distilled Wisdom	set	vendor	Pix Xizzix	Stranglethorn Vale			verificato in gioco dall'utente, 26/11
+17636	Flask of Distilled Wisdom	set	drop	Grand Crusader Dathrohan | Balnazzar	Stratholme		true	verificato in gioco dall'utente, 26/11
+17635	Flask of the Titans	set	vendor	Pix Xizzix	Stranglethorn Vale			verificato in gioco dall'utente, 26/11
+17635	Flask of the Titans	set	drop	General Drakkisath	Blackrock Spire		true	verificato in gioco dall'utente, 26/11
+25086	Enchant Cloak - Dodge	set	drop		Ruins of Ahn'Qiraj | Temple of Ahn'Qiraj		true	utente: i boss di Ahn'Qiraj; cMaNGOS: 15 boss di Ruins e Temple (non gli Imperatori ne' C'Thun), 26/11
+25083	Enchant Cloak - Stealth	set	drop		Ruins of Ahn'Qiraj | Temple of Ahn'Qiraj		true	utente: i boss di Ahn'Qiraj; cMaNGOS: 15 boss di Ruins e Temple (non gli Imperatori ne' C'Thun), 26/11
+25084	Enchant Cloak - Subtlety	set	drop	Emperor Vek'lor	Temple of Ahn'Qiraj		true	verificato dall'utente, 26/11; cMaNGOS concorda
+25072	Enchant Gloves - Threat	set	drop	Emperor Vek'nilash	Temple of Ahn'Qiraj		true	verificato dall'utente, 26/11; cMaNGOS concorda
+20033	Enchant Weapon - Unholy Weapon	set	drop	Thuzadin Shadowcaster	Stratholme			verificato in gioco dall'utente, 26/11
+21143	Gingerbread Cookie	remove		Eebee Jinglepocket | Wolgren Jinglepocket				venditori di Shattrath e The Exodar, che su Forever non ci sono (utente, 26/11)
+21144	Egg Nog	remove		Eebee Jinglepocket | Wolgren Jinglepocket				venditori di Shattrath e The Exodar, che su Forever non ci sono (utente, 26/11)
+25704	Smoked Sagefish	remove		Phea | "Cookie" McWeaksauce				venditori di The Exodar e Azuremyst Isle, che su Forever non ci sono (utente, 26/11)
+25954	Sagefish Delight	remove		Phea | "Cookie" McWeaksauce				gli stessi venditori di Smoked Sagefish (26/11)
+25125	Minor Mana Oil	remove		Erilia				venditrice di Eversong Woods, che su Forever non c'e' (utente, 26/11)
+25126	Lesser Wizard Oil	remove		Erilia				venditrice di Eversong Woods, che su Forever non c'e' (utente, 26/11)
+25124	Minor Wizard Oil	remove		Erilia				la stessa venditrice di Minor Mana Oil (26/11)
+27658	Enchanted Mageweave Pouch	remove		Erilia				venditrice di Eversong Woods, che su Forever non c'e' (utente, 26/11)
+6686	Red Linen Bag	set	vendor	Mahu | Andrew Hilbert | Gina MacGregor | Valdaron	Thunder Bluff | Silverpine Forest | Westfall | Darkshore			verificato in gioco dall'utente, 26/11
+6686	Red Linen Bag	set	drop	Pyrewood Tailor | Defias Looter | Moonrage Tailor	Silverpine Forest | Westfall | Silverpine Forest			verificato in gioco dall'utente, 26/11
+1257013	Linen Reagent Bag	remove		Reagent Bot | Repair Bot				NPC evocati con Engineering, non vendono niente (utente, 26/11)
+1257017	Woolen Reagent Bag	remove		Reagent Bot | Repair Bot				NPC evocati con Engineering, non vendono niente (utente, 26/11)
+25704	Smoked Sagefish	remove		Reagent Bot | Repair Bot				NPC evocati con Engineering, non vendono niente (utente, 26/11)
+25954	Sagefish Delight	remove		Reagent Bot | Repair Bot				NPC evocati con Engineering, non vendono niente (utente, 26/11)

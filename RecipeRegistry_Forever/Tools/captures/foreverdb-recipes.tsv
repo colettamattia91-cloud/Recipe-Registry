@@ -8,229 +8,229 @@ spellId	recipeItemId	profession	sourceKind	npcName	zone	x	y	faction	notes
 2166		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
 2167		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
 2168		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
-2329		alchemy	trainer	Alchemist Mallory | Carolai Anise | Cyndra Kindwhisper	Elwynn Forest | Tirisfal Glades | Teldrassil	39.8 | 59.4 | 57.6	48.3 | 52.2 | 60.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
-2331		alchemy	trainer	Alchemist Mallory | Carolai Anise | Cyndra Kindwhisper	Elwynn Forest | Tirisfal Glades | Teldrassil	39.8 | 59.4 | 57.6	48.3 | 52.2 | 60.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
-2332		alchemy	trainer	Alchemist Mallory | Carolai Anise | Cyndra Kindwhisper	Elwynn Forest | Tirisfal Glades | Teldrassil	39.8 | 59.4 | 57.6	48.3 | 52.2 | 60.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
-2334		alchemy	trainer	Alchemist Mallory | Carolai Anise | Cyndra Kindwhisper	Elwynn Forest | Tirisfal Glades | Teldrassil	39.8 | 59.4 | 57.6	48.3 | 52.2 | 60.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
-2385		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.3	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
-2386		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.3	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
-2392		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.3	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+2329		alchemy	trainer	Ainethil | Alchemist Mallory | Carolai Anise	Darnassus | Elwynn Forest | Tirisfal Glades	55.0 | 39.8 | 59.4	23.7 | 48.3 | 52.2	alliance | alliance | horde	foreverdb, trainer visto su Forever
+2331		alchemy	trainer	Ainethil | Alchemist Mallory | Carolai Anise	Darnassus | Elwynn Forest | Tirisfal Glades	55.0 | 39.8 | 59.4	23.7 | 48.3 | 52.2	alliance | alliance | horde	foreverdb, trainer visto su Forever
+2332		alchemy	trainer	Ainethil | Alchemist Mallory | Carolai Anise	Darnassus | Elwynn Forest | Tirisfal Glades	55.0 | 39.8 | 59.4	23.7 | 48.3 | 52.2	alliance | alliance | horde	foreverdb, trainer visto su Forever
+2334		alchemy	trainer	Ainethil | Alchemist Mallory | Carolai Anise	Darnassus | Elwynn Forest | Tirisfal Glades	55.0 | 39.8 | 59.4	23.7 | 48.3 | 52.2	alliance | alliance | horde	foreverdb, trainer visto su Forever
+2385		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+2386		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+2392		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
 2393		tailoring	trainer	Bowen Brisboise | Eldrin | Grondal Moonbreeze	Tirisfal Glades | Elwynn Forest | Darkshore	52.6 | 79.3 | 38.2	55.6 | 69.0 | 40.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-2394		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.3	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
-2395		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.3	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
-2396		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.3	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+2394		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+2395		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+2396		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
 2397		tailoring	trainer	Bowen Brisboise | Eldrin | Grondal Moonbreeze	Tirisfal Glades | Elwynn Forest | Darkshore	52.6 | 79.3 | 38.2	55.6 | 69.0 | 40.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-2399		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.3 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
-2401		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.3 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
+2399		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
+2401		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
 2402		tailoring	trainer	Bowen Brisboise | Eldrin | Grondal Moonbreeze	Tirisfal Glades | Elwynn Forest | Darkshore	52.6 | 79.3 | 38.2	55.6 | 69.0 | 40.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-2406		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Magar	Stormwind City | Ironforge | Orgrimmar	53.3 | 43.4 | 63.4	81.4 | 28.7 | 50.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
+2406		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
 2539		cooking	trainer	Alegorn | Aska Mistrunner | Cook Torka	Darnassus | Thunder Bluff | Durotar	48.8 | 50.8 | 51.0	21.5 | 52.2 | 42.5	alliance | horde | horde	foreverdb, trainer visto su Forever
 2541		cooking	trainer	Alegorn | Aska Mistrunner | Cook Torka	Darnassus | Thunder Bluff | Durotar	48.8 | 50.8 | 51.0	21.5 | 52.2 | 42.5	alliance | horde | horde	foreverdb, trainer visto su Forever
 2544		cooking	trainer	Alegorn | Aska Mistrunner | Cook Torka	Darnassus | Thunder Bluff | Durotar	48.8 | 50.8 | 51.0	21.5 | 52.2 | 42.5	alliance | horde | horde	foreverdb, trainer visto su Forever
 2546		cooking	trainer	Alegorn | Aska Mistrunner | Cook Torka	Darnassus | Thunder Bluff | Durotar	48.8 | 50.8 | 51.0	21.5 | 52.2 | 42.5	alliance | horde | horde	foreverdb, trainer visto su Forever
-2658		mining	trainer	Brom Killian | Gelman Stonehand | Krunn	Undercity | Stormwind City | Durotar	56.1 | 59.0 | 51.8	37.0 | 37.7 | 40.9	horde | alliance | horde	foreverdb, trainer visto su Forever
-2659		mining	trainer	Brock Stoneseeker | Gelman Stonehand | Grungle	Loch Modan | Stormwind City | Riverglades	37.1 | 59.0 | 77.7	47.9 | 37.7 | 51.9	alliance | alliance | 	foreverdb, trainer visto su Forever
-2661		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-2662		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-2664		blacksmithing	trainer	Angus Hammerhand | James Van Brunt | Rotgath Stonebeard	Tirisfal Glades | Undercity | Ironforge	21.2 | 61.1 | 52.1	45.8 | 30.2 | 42.5	 | horde | alliance	foreverdb, trainer visto su Forever
-2665		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-2666		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-2668		blacksmithing	trainer	Angus Hammerhand | James Van Brunt | Rotgath Stonebeard	Tirisfal Glades | Undercity | Ironforge	21.2 | 61.1 | 52.1	45.8 | 30.2 | 42.5	 | horde | alliance	foreverdb, trainer visto su Forever
-2670		blacksmithing	trainer	Angus Hammerhand | James Van Brunt | Rotgath Stonebeard	Tirisfal Glades | Undercity | Ironforge	21.2 | 61.1 | 52.1	45.8 | 30.2 | 42.5	 | horde | alliance	foreverdb, trainer visto su Forever
-2672		blacksmithing	trainer	Angus Hammerhand | James Van Brunt | Rotgath Stonebeard	Tirisfal Glades | Undercity | Ironforge	21.2 | 61.1 | 52.1	45.8 | 30.2 | 42.5	 | horde | alliance	foreverdb, trainer visto su Forever
-2674		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree | James Van Brunt	Tirisfal Glades | Duskwood | Undercity	21.2 | 74.0 | 61.1	45.8 | 48.7 | 30.2	 | alliance | horde	foreverdb, trainer visto su Forever
-2675		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree | James Van Brunt	Tirisfal Glades | Duskwood | Undercity	21.2 | 74.0 | 61.1	45.8 | 48.7 | 30.2	 | alliance | horde	foreverdb, trainer visto su Forever
-2737		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-2738		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-2739		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
+2658		mining	trainer	Brom Killian | Dank Drizzlecut | Gelman Stonehand	Undercity | Dun Morogh | Stormwind City	56.1 | 69.3 | 59.0	37.0 | 55.4 | 37.7	horde | alliance | alliance	foreverdb, trainer visto su Forever
+2659		mining	trainer	Brock Stoneseeker | Dank Drizzlecut | Gelman Stonehand	Loch Modan | Dun Morogh | Stormwind City	37.1 | 69.3 | 59.0	47.9 | 55.4 | 37.7	alliance | alliance | alliance	foreverdb, trainer visto su Forever
+2661		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+2662		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+2664		blacksmithing	trainer	Angus Hammerhand | James Van Brunt | Karn Stonehoof	Tirisfal Glades | Undercity | Thunder Bluff	21.2 | 61.1 | 39.5	45.8 | 30.2 | 55.8	 | horde | horde	foreverdb, trainer visto su Forever
+2665		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+2666		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+2668		blacksmithing	trainer	Angus Hammerhand | James Van Brunt | Karn Stonehoof	Tirisfal Glades | Undercity | Thunder Bluff	21.2 | 61.1 | 39.5	45.8 | 30.2 | 55.8	 | horde | horde	foreverdb, trainer visto su Forever
+2670		blacksmithing	trainer	Angus Hammerhand | James Van Brunt | Karn Stonehoof	Tirisfal Glades | Undercity | Thunder Bluff	21.2 | 61.1 | 39.5	45.8 | 30.2 | 55.8	 | horde | horde	foreverdb, trainer visto su Forever
+2672		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree | James Van Brunt	Tirisfal Glades | Duskwood | Undercity	21.2 | 73.9 | 61.1	45.8 | 48.5 | 30.2	 | alliance | horde	foreverdb, trainer visto su Forever
+2674		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
+2675		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
+2737		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+2738		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+2739		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
 2740		blacksmithing	trainer	Angus Hammerhand | James Van Brunt	Tirisfal Glades | Undercity	21.2 | 61.1	45.8 | 30.2	 | horde	foreverdb, trainer visto su Forever
 2741		blacksmithing	trainer	Angus Hammerhand | James Van Brunt	Tirisfal Glades | Undercity	21.2 | 61.1	45.8 | 30.2	 | horde	foreverdb, trainer visto su Forever
-2742		blacksmithing	trainer	Angus Hammerhand | James Van Brunt	Tirisfal Glades | Undercity	21.2 | 61.1	45.8 | 30.2	 | horde	foreverdb, trainer visto su Forever
+2742		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
 2964		tailoring	trainer	Bowen Brisboise | Eldrin | Grondal Moonbreeze	Tirisfal Glades | Elwynn Forest | Darkshore	52.6 | 79.3 | 38.2	55.6 | 69.0 | 40.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-3116		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-3117		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree | James Van Brunt	Tirisfal Glades | Duskwood | Undercity	21.2 | 74.0 | 61.1	45.8 | 48.7 | 30.2	 | alliance | horde	foreverdb, trainer visto su Forever
-3170		alchemy	trainer	Alchemist Mallory | Carolai Anise | Cyndra Kindwhisper	Elwynn Forest | Tirisfal Glades | Teldrassil	39.8 | 59.4 | 57.6	48.3 | 52.2 | 60.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
-3171		alchemy	trainer	Bena Winterhoof | Doctor Marsh | Kylanna	Thunder Bluff | Undercity | Ashenvale	46.7 | 51.5 | 50.9	33.6 | 74.4 | 67.1	horde | horde | alliance	foreverdb, trainer visto su Forever
-3173		alchemy	trainer	Bena Winterhoof | Doctor Marsh | Jaxin Chong	Thunder Bluff | Undercity | Stranglethorn Vale	46.7 | 51.5 | 28.1	33.6 | 74.4 | 78.0	horde | horde | 	foreverdb, trainer visto su Forever
-3176		alchemy	trainer	Ainethil | Bena Winterhoof | Doctor Marsh	Darnassus | Thunder Bluff | Undercity	55.0 | 46.7 | 51.5	24.0 | 33.6 | 74.4	alliance | horde | horde	foreverdb, trainer visto su Forever
-3177		alchemy	trainer	Bena Winterhoof | Doctor Marsh | Jaxin Chong	Thunder Bluff | Undercity | Stranglethorn Vale	46.7 | 51.5 | 28.1	33.6 | 74.4 | 78.0	horde | horde | 	foreverdb, trainer visto su Forever
-3276		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.7	84.5 | 56.8 | 12.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-3277		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.7	84.5 | 56.8 | 12.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-3278		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.7	84.5 | 56.8 | 12.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-3292		blacksmithing	trainer	Angus Hammerhand | James Van Brunt | Karn Stonehoof	Tirisfal Glades | Undercity | Thunder Bluff	21.2 | 61.1 | 39.5	45.8 | 30.2 | 55.8	 | horde | horde	foreverdb, trainer visto su Forever
-3293		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-3294		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-3296		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 74.0	45.8 | 48.7	 | alliance	foreverdb, trainer visto su Forever
-3304		mining	trainer	Brock Stoneseeker | Grungle | Krunn	Loch Modan | Riverglades | Durotar	37.1 | 77.7 | 51.8	47.9 | 51.9 | 40.9	alliance |  | horde	foreverdb, trainer visto su Forever
-3307		mining	trainer	Brock Stoneseeker | Brom Killian | Gelman Stonehand	Loch Modan | Undercity | Stormwind City	37.1 | 56.1 | 59.0	47.9 | 37.0 | 37.7	alliance | horde | alliance	foreverdb, trainer visto su Forever
-3308		mining	trainer	Brock Stoneseeker | Brom Killian | Gelman Stonehand	Loch Modan | Undercity | Stormwind City	37.1 | 56.1 | 59.0	47.9 | 37.0 | 37.7	alliance | horde | alliance	foreverdb, trainer visto su Forever
-3319		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-3320		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-3323		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-3324		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-3326		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-3328		blacksmithing	trainer	Angus Hammerhand | James Van Brunt | Karn Stonehoof	Tirisfal Glades | Undercity | Thunder Bluff	21.2 | 61.1 | 39.5	45.8 | 30.2 | 55.8	 | horde | horde	foreverdb, trainer visto su Forever
-3331		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree | James Van Brunt	Tirisfal Glades | Duskwood | Undercity	21.2 | 74.0 | 61.1	45.8 | 48.7 | 30.2	 | alliance | horde	foreverdb, trainer visto su Forever
-3333		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree | James Van Brunt	Tirisfal Glades | Duskwood | Undercity	21.2 | 74.0 | 61.1	45.8 | 48.7 | 30.2	 | alliance | horde	foreverdb, trainer visto su Forever
-3337		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree | James Van Brunt	Tirisfal Glades | Duskwood | Undercity	21.2 | 74.0 | 61.1	45.8 | 48.7 | 30.2	 | alliance | horde	foreverdb, trainer visto su Forever
-3448		alchemy	trainer	Ainethil | Doctor Herbert Halsey	Darnassus | Undercity	55.0 | 47.8	24.0 | 72.8	alliance | horde	foreverdb, trainer visto su Forever
-3450	3830	alchemy	trainer	Ainethil | Doctor Herbert Halsey	Darnassus | Undercity	55.0 | 47.8	24.0 | 72.8	alliance | horde	foreverdb, trainer visto su Forever
-3452		alchemy	trainer	Ainethil | Doctor Herbert Halsey	Darnassus | Undercity	55.0 | 47.8	24.0 | 72.8	alliance | horde	foreverdb, trainer visto su Forever
-3491		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 74.0	45.8 | 48.7	 | alliance	foreverdb, trainer visto su Forever
+3116		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+3117		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
+3170		alchemy	trainer	Ainethil | Alchemist Mallory | Carolai Anise	Darnassus | Elwynn Forest | Tirisfal Glades	55.0 | 39.8 | 59.4	23.7 | 48.3 | 52.2	alliance | alliance | horde	foreverdb, trainer visto su Forever
+3171		alchemy	trainer	Ainethil | Bena Winterhoof | Doctor Marsh	Darnassus | Thunder Bluff | Undercity	55.0 | 46.7 | 51.5	23.7 | 33.6 | 74.4	alliance | horde | horde	foreverdb, trainer visto su Forever
+3173		alchemy	trainer	Ainethil | Bena Winterhoof | Doctor Marsh	Darnassus | Thunder Bluff | Undercity	55.0 | 46.7 | 51.5	23.7 | 33.6 | 74.4	alliance | horde | horde	foreverdb, trainer visto su Forever
+3176		alchemy	trainer	Ainethil | Bena Winterhoof | Doctor Marsh	Darnassus | Thunder Bluff | Undercity	55.0 | 46.7 | 51.5	23.7 | 33.6 | 74.4	alliance | horde | horde	foreverdb, trainer visto su Forever
+3177		alchemy	trainer	Ainethil | Bena Winterhoof | Doctor Marsh	Darnassus | Thunder Bluff | Undercity	55.0 | 46.7 | 51.5	23.7 | 33.6 | 74.4	alliance | horde | horde	foreverdb, trainer visto su Forever
+3276		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.6	84.5 | 56.8 | 12.3	horde | alliance | alliance	foreverdb, trainer visto su Forever
+3277		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.6	84.5 | 56.8 | 12.3	horde | alliance | alliance	foreverdb, trainer visto su Forever
+3278		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.6	84.5 | 56.8 | 12.3	horde | alliance | alliance	foreverdb, trainer visto su Forever
+3292		blacksmithing	trainer	Angus Hammerhand | James Van Brunt	Tirisfal Glades | Undercity	21.2 | 61.1	45.8 | 30.2	 | horde	foreverdb, trainer visto su Forever
+3293		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+3294		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+3296		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
+3304		mining	trainer	Brock Stoneseeker | Dank Drizzlecut | Grungle	Loch Modan | Dun Morogh | Riverglades	37.1 | 69.3 | 77.7	47.9 | 55.4 | 51.9	alliance | alliance | 	foreverdb, trainer visto su Forever
+3307		mining	trainer	Brock Stoneseeker | Brom Killian | Dank Drizzlecut	Loch Modan | Undercity | Dun Morogh	37.1 | 56.1 | 69.3	47.9 | 37.0 | 55.4	alliance | horde | alliance	foreverdb, trainer visto su Forever
+3308		mining	trainer	Brock Stoneseeker | Brom Killian | Dank Drizzlecut	Loch Modan | Undercity | Dun Morogh	37.1 | 56.1 | 69.3	47.9 | 37.0 | 55.4	alliance | horde | alliance	foreverdb, trainer visto su Forever
+3319		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+3320		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+3323		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+3324		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+3326		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+3328		blacksmithing	trainer	Angus Hammerhand | James Van Brunt	Tirisfal Glades | Undercity	21.2 | 61.1	45.8 | 30.2	 | horde	foreverdb, trainer visto su Forever
+3331		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
+3333		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
+3337		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree | James Van Brunt	Tirisfal Glades | Duskwood | Undercity	21.2 | 73.9 | 61.1	45.8 | 48.5 | 30.2	 | alliance | horde	foreverdb, trainer visto su Forever
+3448		alchemy	trainer	Ainethil | Doctor Herbert Halsey | Kylanna Windwhisper	Darnassus | Undercity | Feralas	55.0 | 47.8 | 32.6	23.7 | 72.8 | 43.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
+3450	3830	alchemy	trainer	Ainethil | Doctor Herbert Halsey | Kylanna Windwhisper	Darnassus | Undercity | Feralas	55.0 | 47.8 | 32.6	23.7 | 72.8 | 43.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
+3452		alchemy	trainer	Ainethil | Doctor Herbert Halsey | Kylanna Windwhisper	Darnassus | Undercity | Feralas	55.0 | 47.8 | 32.6	23.7 | 72.8 | 43.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
+3491		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
 3501		blacksmithing	trainer	Saru Steelfury	Orgrimmar	82.2	23.0	horde	foreverdb, trainer visto su Forever
 3502		blacksmithing	trainer	Saru Steelfury	Orgrimmar	82.2	23.0	horde	foreverdb, trainer visto su Forever
 3506		blacksmithing	trainer	Saru Steelfury	Orgrimmar	82.2	23.0	horde	foreverdb, trainer visto su Forever
 3508		blacksmithing	trainer	Saru Steelfury	Orgrimmar	82.2	23.0	horde	foreverdb, trainer visto su Forever
-3569		mining	trainer	Brek Stonehoof | Brom Killian | Gelman Stonehand	Thunder Bluff | Undercity | Stormwind City	34.7 | 56.1 | 59.0	57.7 | 37.0 | 37.7	horde | horde | alliance	foreverdb, trainer visto su Forever
+3569		mining	trainer	Brek Stonehoof | Brom Killian | Dank Drizzlecut	Thunder Bluff | Undercity | Dun Morogh	34.7 | 56.1 | 69.3	57.7 | 37.0 | 55.4	horde | horde | alliance	foreverdb, trainer visto su Forever
 3753		leatherworking	trainer	Adele Fielder | Chaw Stronghide | Dan Golthas	Elwynn Forest | Mulgore | Undercity	46.3 | 45.0 | 70.5	62.1 | 61.5 | 58.7	alliance | horde | horde	foreverdb, trainer visto su Forever
 3755		tailoring	trainer	Bowen Brisboise | Eldrin | Grondal Moonbreeze	Tirisfal Glades | Elwynn Forest | Darkshore	52.6 | 79.3 | 38.2	55.6 | 69.0 | 40.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
 3756		leatherworking	trainer	Adele Fielder | Chaw Stronghide | Dan Golthas	Elwynn Forest | Mulgore | Undercity	46.3 | 45.0 | 70.5	62.1 | 61.5 | 58.7	alliance | horde | horde	foreverdb, trainer visto su Forever
-3757		tailoring	trainer	Jormund Stonebrow | Magar | Othesia Evengale	Ironforge | Orgrimmar | Zephras Isle	43.4 | 63.4 | 64.4	28.7 | 50.3 | 81.1	alliance | horde | 	foreverdb, trainer visto su Forever
+3757		tailoring	trainer	Jormund Stonebrow | Magar | Mahani	Ironforge | Orgrimmar | The Barrens	43.4 | 63.4 | 44.9	28.7 | 50.3 | 59.4	alliance | horde | horde	foreverdb, trainer visto su Forever
 3759		leatherworking	trainer	Aayndia Floralwind | Adele Fielder | Arthur Moore	Ashenvale | Elwynn Forest | Undercity	35.9 | 46.3 | 70.3	52.1 | 62.1 | 57.8	alliance | alliance | horde	foreverdb, trainer visto su Forever
-3760		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
-3761		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Fimble Finespindle	Undercity | Zephras Isle | Ironforge	70.3 | 63.8 | 39.8	57.8 | 80.7 | 33.5	horde |  | alliance	foreverdb, trainer visto su Forever
-3763		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Fimble Finespindle	Undercity | Zephras Isle | Ironforge	70.3 | 63.8 | 39.8	57.8 | 80.7 | 33.5	horde |  | alliance	foreverdb, trainer visto su Forever
-3764		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
+3760		leatherworking	trainer	Arthur Moore | Brawn | Emerii Tallgust	Undercity | Stranglethorn Vale | Zephras Isle	70.3 | 31.8 | 63.8	57.8 | 28.8 | 80.7	horde | horde | 	foreverdb, trainer visto su Forever
+3761		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
+3763		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
+3764		leatherworking	trainer	Arthur Moore | Brawn | Emerii Tallgust	Undercity | Stranglethorn Vale | Zephras Isle	70.3 | 31.8 | 63.8	57.8 | 28.8 | 80.7	horde | horde | 	foreverdb, trainer visto su Forever
 3766		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
 3768		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
 3770		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
-3774		leatherworking	trainer	Telonis | Una	Darnassus | Thunder Bluff	64.2 | 42.0	21.6 | 42.8	alliance | horde	foreverdb, trainer visto su Forever
-3776		leatherworking	trainer	Hahrana Ironhide | Telonis | Una	Feralas | Darnassus | Thunder Bluff	74.4 | 64.2 | 42.0	43.1 | 21.6 | 42.8	horde | alliance | horde	foreverdb, trainer visto su Forever
+3774		leatherworking	trainer	Drakk Stonehand | Telonis | Una	The Hinterlands | Darnassus | Thunder Bluff	13.4 | 64.2 | 42.0	43.4 | 21.6 | 42.8	alliance | alliance | horde	foreverdb, trainer visto su Forever
+3776		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide | Telonis	The Hinterlands | Feralas | Darnassus	13.4 | 74.4 | 64.2	43.4 | 43.1 | 21.6	alliance | horde | alliance	foreverdb, trainer visto su Forever
 3778	14635	leatherworking	vendor	Rikqiz	Stranglethorn Vale	28.5	76.0		foreverdb, venditore visto su Forever
-3780		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
-3813		tailoring	trainer	Jormund Stonebrow | Magar | Mahani	Ironforge | Orgrimmar | The Barrens	43.4 | 63.4 | 44.9	28.7 | 50.3 | 59.4	alliance | horde | horde	foreverdb, trainer visto su Forever
+3780		leatherworking	trainer	Arthur Moore | Brawn | Emerii Tallgust	Undercity | Stranglethorn Vale | Zephras Isle	70.3 | 31.8 | 63.8	57.8 | 28.8 | 80.7	horde | horde | 	foreverdb, trainer visto su Forever
+3813		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Magar	Stormwind City | Ironforge | Orgrimmar	53.2 | 43.4 | 63.4	81.4 | 28.7 | 50.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
 3816		leatherworking	trainer	Adele Fielder | Arthur Moore | Chaw Stronghide	Elwynn Forest | Undercity | Mulgore	46.3 | 70.3 | 45.0	62.1 | 57.8 | 61.5	alliance | horde | horde	foreverdb, trainer visto su Forever
-3817		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Fimble Finespindle	Undercity | Zephras Isle | Ironforge	70.3 | 63.8 | 39.8	57.8 | 80.7 | 33.5	horde |  | alliance	foreverdb, trainer visto su Forever
-3818		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
+3817		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
+3818		leatherworking	trainer	Arthur Moore | Brawn | Emerii Tallgust	Undercity | Stranglethorn Vale | Zephras Isle	70.3 | 31.8 | 63.8	57.8 | 28.8 | 80.7	horde | horde | 	foreverdb, trainer visto su Forever
 3839		tailoring	trainer	Jormund Stonebrow | Magar | Mahani	Ironforge | Orgrimmar | The Barrens	43.4 | 63.4 | 44.9	28.7 | 50.3 | 59.4	alliance | horde | horde	foreverdb, trainer visto su Forever
-3840		tailoring	trainer	Bowen Brisboise | Eldrin | Grondal Moonbreeze	Tirisfal Glades | Elwynn Forest | Darkshore	52.6 | 79.3 | 38.2	55.6 | 69.0 | 40.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-3841		tailoring	trainer	Bowen Brisboise | Eldrin | Grondal Moonbreeze	Tirisfal Glades | Elwynn Forest | Darkshore	52.6 | 79.3 | 38.2	55.6 | 69.0 | 40.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-3842		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.3	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
-3843		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.3 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
-3845		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.3 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
-3848		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Magar	Stormwind City | Ironforge | Orgrimmar	53.3 | 43.4 | 63.4	81.4 | 28.7 | 50.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
-3850		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.3 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
-3852		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Magar	Stormwind City | Ironforge | Orgrimmar	53.3 | 43.4 | 63.4	81.4 | 28.7 | 50.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
+3840		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+3841		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+3842		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+3843		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
+3845		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
+3848		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Magar	Stormwind City | Ironforge | Orgrimmar	53.2 | 43.4 | 63.4	81.4 | 28.7 | 50.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
+3850		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
+3852		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
 3855		tailoring	trainer	Jormund Stonebrow | Magar | Mahani	Ironforge | Orgrimmar | The Barrens	43.4 | 63.4 | 44.9	28.7 | 50.3 | 59.4	alliance | horde | horde	foreverdb, trainer visto su Forever
-3859		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.3 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
-3861		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-3862	4355	tailoring	vendor	Micha Yance | Ghok'kah	Hillsbrad Foothills | Dustwallow Marsh	48.9 | 35.2	55.1 | 30.8	alliance | horde	foreverdb, venditore visto su Forever
-3865		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-3866		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.3 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
-3871		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-3914		tailoring	trainer	Bowen Brisboise | Eldrin | Grondal Moonbreeze	Tirisfal Glades | Elwynn Forest | Darkshore	52.6 | 79.3 | 38.2	55.6 | 69.0 | 40.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-3922		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Graham Van Talen	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 75.4	50.4 | 13.6 | 73.0	alliance | alliance | horde	foreverdb, trainer visto su Forever
-3923		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Graham Van Talen	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 75.4	50.4 | 13.6 | 73.0	alliance | alliance | horde	foreverdb, trainer visto su Forever
-3924		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Graham Van Talen	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 75.4	50.4 | 13.6 | 73.0	alliance | alliance | horde	foreverdb, trainer visto su Forever
-3925		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Graham Van Talen	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 75.4	50.4 | 13.6 | 73.0	alliance | alliance | horde	foreverdb, trainer visto su Forever
-3926		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Graham Van Talen	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 75.4	50.4 | 13.6 | 73.0	alliance | alliance | horde	foreverdb, trainer visto su Forever
-3929		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Graham Van Talen	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 75.4	50.4 | 13.6 | 73.0	alliance | alliance | horde	foreverdb, trainer visto su Forever
-3930		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Graham Van Talen	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 75.4	50.4 | 13.6 | 73.0	alliance | alliance | horde	foreverdb, trainer visto su Forever
-3931		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Graham Van Talen	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 75.4	50.4 | 13.6 | 73.0	alliance | alliance | horde	foreverdb, trainer visto su Forever
-3932		engineering	trainer	Lilliam Sparkspindle | Nogg | Trixie Quikswitch	Stormwind City | Orgrimmar | Ironforge	62.1 | 75.9 | 67.8	30.6 | 25.2 | 43.2	alliance | horde | alliance	foreverdb, trainer visto su Forever
-3934		engineering	trainer	Lilliam Sparkspindle | Nogg | Trixie Quikswitch	Stormwind City | Orgrimmar | Ironforge	62.1 | 75.9 | 67.8	30.6 | 25.2 | 43.2	alliance | horde | alliance	foreverdb, trainer visto su Forever
-3936		engineering	trainer	Lilliam Sparkspindle | Nogg | Trixie Quikswitch	Stormwind City | Orgrimmar | Ironforge	62.1 | 75.9 | 67.8	30.6 | 25.2 | 43.2	alliance | horde | alliance	foreverdb, trainer visto su Forever
-3937		engineering	trainer	Lilliam Sparkspindle | Nogg | Trixie Quikswitch	Stormwind City | Orgrimmar | Ironforge	62.1 | 75.9 | 67.8	30.6 | 25.2 | 43.2	alliance | horde | alliance	foreverdb, trainer visto su Forever
-3938		engineering	trainer	Lilliam Sparkspindle | Nogg | Trixie Quikswitch	Stormwind City | Orgrimmar | Ironforge	62.1 | 75.9 | 67.8	30.6 | 25.2 | 43.2	alliance | horde | alliance	foreverdb, trainer visto su Forever
-3941		engineering	trainer	Lilliam Sparkspindle | Nogg | Roxxik	Stormwind City | Orgrimmar | Orgrimmar	62.1 | 75.9 | 76.1	30.6 | 25.2 | 25.1	alliance | horde | horde	foreverdb, trainer visto su Forever
-3942		engineering	trainer	Lilliam Sparkspindle | Nogg | Roxxik	Stormwind City | Orgrimmar | Orgrimmar	62.1 | 75.9 | 76.1	30.6 | 25.2 | 25.1	alliance | horde | horde	foreverdb, trainer visto su Forever
-3945		engineering	trainer	Lilliam Sparkspindle | Nogg | Roxxik	Stormwind City | Orgrimmar | Orgrimmar	62.1 | 75.9 | 76.1	30.6 | 25.2 | 25.1	alliance | horde | horde	foreverdb, trainer visto su Forever
-3946		engineering	trainer	Lilliam Sparkspindle | Nogg | Roxxik	Stormwind City | Orgrimmar | Orgrimmar	62.1 | 75.9 | 76.1	30.6 | 25.2 | 25.1	alliance | horde | horde	foreverdb, trainer visto su Forever
-3947		engineering	trainer	Lilliam Sparkspindle | Nogg | Roxxik	Stormwind City | Orgrimmar | Orgrimmar	62.1 | 75.9 | 76.1	30.6 | 25.2 | 25.1	alliance | horde | horde	foreverdb, trainer visto su Forever
-3949		engineering	trainer	Lilliam Sparkspindle | Nogg | Roxxik	Stormwind City | Orgrimmar | Orgrimmar	62.1 | 75.9 | 76.1	30.6 | 25.2 | 25.1	alliance | horde | horde	foreverdb, trainer visto su Forever
-3950		engineering	trainer	Lilliam Sparkspindle | Nogg | Roxxik	Stormwind City | Orgrimmar | Orgrimmar	62.1 | 75.9 | 76.1	30.6 | 25.2 | 25.1	alliance | horde | horde	foreverdb, trainer visto su Forever
+3859		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
+3861		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+3862	4355	tailoring	vendor	Micha Yance | Ghok'kah	Hillsbrad Foothills | Dustwallow Marsh	49.0 | 35.2	55.1 | 30.8	alliance | horde	foreverdb, venditore visto su Forever
+3865		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+3866		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
+3871		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+3914		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+3922		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Franklin Lloyd	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 76.0	50.4 | 13.6 | 73.8	alliance | alliance | horde	foreverdb, trainer visto su Forever
+3923		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Franklin Lloyd	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 76.0	50.4 | 13.6 | 73.8	alliance | alliance | horde	foreverdb, trainer visto su Forever
+3924		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Franklin Lloyd	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 76.0	50.4 | 13.6 | 73.8	alliance | alliance | horde	foreverdb, trainer visto su Forever
+3925		engineering	trainer	Bronk Guzzlegear | Buzzek Bracketswing | Deek Fizzlebizz	Dun Morogh | Tanaris | Loch Modan	50.1 | 52.3 | 45.8	50.4 | 27.6 | 13.6	alliance |  | alliance	foreverdb, trainer visto su Forever
+3926		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Franklin Lloyd	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 76.0	50.4 | 13.6 | 73.8	alliance | alliance | horde	foreverdb, trainer visto su Forever
+3929		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Franklin Lloyd	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 76.0	50.4 | 13.6 | 73.8	alliance | alliance | horde	foreverdb, trainer visto su Forever
+3930		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Franklin Lloyd	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 76.0	50.4 | 13.6 | 73.8	alliance | alliance | horde	foreverdb, trainer visto su Forever
+3931		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Franklin Lloyd	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 76.0	50.4 | 13.6 | 73.8	alliance | alliance | horde	foreverdb, trainer visto su Forever
+3932		engineering	trainer	Franklin Lloyd | Lilliam Sparkspindle | NPC 249235	Undercity | Stormwind City | Mount Hyjal	76.0 | 62.1 | 60.2	73.8 | 30.6 | 61.4	horde | alliance | 	foreverdb, trainer visto su Forever
+3934		engineering	trainer	Franklin Lloyd | Lilliam Sparkspindle | NPC 249235	Undercity | Stormwind City | Mount Hyjal	76.0 | 62.1 | 60.2	73.8 | 30.6 | 61.4	horde | alliance | 	foreverdb, trainer visto su Forever
+3936		engineering	trainer	Franklin Lloyd | Lilliam Sparkspindle | NPC 249235	Undercity | Stormwind City | Mount Hyjal	76.0 | 62.1 | 60.2	73.8 | 30.6 | 61.4	horde | alliance | 	foreverdb, trainer visto su Forever
+3937		engineering	trainer	Franklin Lloyd | Lilliam Sparkspindle | NPC 249235	Undercity | Stormwind City | Mount Hyjal	76.0 | 62.1 | 60.2	73.8 | 30.6 | 61.4	horde | alliance | 	foreverdb, trainer visto su Forever
+3938		engineering	trainer	Franklin Lloyd | Lilliam Sparkspindle | NPC 249235	Undercity | Stormwind City | Mount Hyjal	76.0 | 62.1 | 60.2	73.8 | 30.6 | 61.4	horde | alliance | 	foreverdb, trainer visto su Forever
+3941		engineering	trainer	Franklin Lloyd | Lilliam Sparkspindle | NPC 249235	Undercity | Stormwind City | Mount Hyjal	76.0 | 62.1 | 60.2	73.8 | 30.6 | 61.4	horde | alliance | 	foreverdb, trainer visto su Forever
+3942		engineering	trainer	Franklin Lloyd | Lilliam Sparkspindle | NPC 249235	Undercity | Stormwind City | Mount Hyjal	76.0 | 62.1 | 60.2	73.8 | 30.6 | 61.4	horde | alliance | 	foreverdb, trainer visto su Forever
+3945		engineering	trainer	Franklin Lloyd | Lilliam Sparkspindle | NPC 249235	Undercity | Stormwind City | Mount Hyjal	76.0 | 62.1 | 60.2	73.8 | 30.6 | 61.4	horde | alliance | 	foreverdb, trainer visto su Forever
+3946		engineering	trainer	Franklin Lloyd | Lilliam Sparkspindle | NPC 249235	Undercity | Stormwind City | Mount Hyjal	76.0 | 62.1 | 60.2	73.8 | 30.6 | 61.4	horde | alliance | 	foreverdb, trainer visto su Forever
+3947		engineering	trainer	Buzzek Bracketswing | Franklin Lloyd | Lilliam Sparkspindle	Tanaris | Undercity | Stormwind City	52.3 | 76.0 | 62.1	27.6 | 73.8 | 30.6	 | horde | alliance	foreverdb, trainer visto su Forever
+3949		engineering	trainer	Franklin Lloyd | Lilliam Sparkspindle | NPC 249235	Undercity | Stormwind City | Mount Hyjal	76.0 | 62.1 | 60.2	73.8 | 30.6 | 61.4	horde | alliance | 	foreverdb, trainer visto su Forever
+3950		engineering	trainer	Franklin Lloyd | Lilliam Sparkspindle | NPC 249235	Undercity | Stormwind City | Mount Hyjal	76.0 | 62.1 | 60.2	73.8 | 30.6 | 61.4	horde | alliance | 	foreverdb, trainer visto su Forever
 3952	14639	engineering	vendor	Fradd Swiftgear | Gagsprocket	Wetlands | The Barrens	26.4 | 62.7	25.9 | 36.3	alliance | 	foreverdb, venditore visto su Forever
-3953		engineering	trainer	Lilliam Sparkspindle | Nogg | Roxxik	Stormwind City | Orgrimmar | Orgrimmar	62.1 | 75.9 | 76.1	30.6 | 25.2 | 25.1	alliance | horde | horde	foreverdb, trainer visto su Forever
-3955		engineering	trainer	Lilliam Sparkspindle | Nogg | Roxxik	Stormwind City | Orgrimmar | Orgrimmar	62.1 | 75.9 | 76.1	30.6 | 25.2 | 25.1	alliance | horde | horde	foreverdb, trainer visto su Forever
-3956		engineering	trainer	Lilliam Sparkspindle | Nogg | Roxxik	Stormwind City | Orgrimmar | Orgrimmar	62.1 | 75.9 | 76.1	30.6 | 25.2 | 25.1	alliance | horde | horde	foreverdb, trainer visto su Forever
-3958		engineering	trainer	Roxxik	Orgrimmar	76.1	25.1	horde	foreverdb, trainer visto su Forever
-3961		engineering	trainer	Roxxik | Springspindle Fizzlegear	Orgrimmar | Ironforge	76.1 | 68.4	25.1 | 44.0	horde | alliance	foreverdb, trainer visto su Forever
-3962		engineering	trainer	Roxxik | Springspindle Fizzlegear	Orgrimmar | Ironforge	76.1 | 68.4	25.1 | 44.0	horde | alliance	foreverdb, trainer visto su Forever
-3963		engineering	trainer	Roxxik | Springspindle Fizzlegear	Orgrimmar | Ironforge	76.1 | 68.4	25.1 | 44.0	horde | alliance	foreverdb, trainer visto su Forever
-3965		engineering	trainer	Roxxik | Springspindle Fizzlegear	Orgrimmar | Ironforge	76.1 | 68.4	25.1 | 44.0	horde | alliance	foreverdb, trainer visto su Forever
-3967		engineering	trainer	Roxxik | Springspindle Fizzlegear	Orgrimmar | Ironforge	76.1 | 68.4	25.1 | 44.0	horde | alliance	foreverdb, trainer visto su Forever
-3973		engineering	trainer	Lilliam Sparkspindle | Nogg | Trixie Quikswitch	Stormwind City | Orgrimmar | Ironforge	62.1 | 75.9 | 67.8	30.6 | 25.2 | 43.2	alliance | horde | alliance	foreverdb, trainer visto su Forever
-3977		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Graham Van Talen	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 75.4	50.4 | 13.6 | 73.0	alliance | alliance | horde	foreverdb, trainer visto su Forever
-3978		engineering	trainer	Lilliam Sparkspindle | Nogg | Roxxik	Stormwind City | Orgrimmar | Orgrimmar	62.1 | 75.9 | 76.1	30.6 | 25.2 | 25.1	alliance | horde | horde	foreverdb, trainer visto su Forever
+3953		engineering	trainer	Franklin Lloyd | Lilliam Sparkspindle | NPC 249235	Undercity | Stormwind City | Mount Hyjal	76.0 | 62.1 | 60.2	73.8 | 30.6 | 61.4	horde | alliance | 	foreverdb, trainer visto su Forever
+3955		engineering	trainer	Franklin Lloyd | Lilliam Sparkspindle | NPC 249235	Undercity | Stormwind City | Mount Hyjal	76.0 | 62.1 | 60.2	73.8 | 30.6 | 61.4	horde | alliance | 	foreverdb, trainer visto su Forever
+3956		engineering	trainer	Franklin Lloyd | Lilliam Sparkspindle | NPC 249235	Undercity | Stormwind City | Mount Hyjal	76.0 | 62.1 | 60.2	73.8 | 30.6 | 61.4	horde | alliance | 	foreverdb, trainer visto su Forever
+3958		engineering	trainer	Buzzek Bracketswing | NPC 249235 | Roxxik	Tanaris | Mount Hyjal | Orgrimmar	52.3 | 60.2 | 76.1	27.6 | 61.4 | 25.1	 |  | horde	foreverdb, trainer visto su Forever
+3961		engineering	trainer	Buzzek Bracketswing | NPC 249235 | Roxxik	Tanaris | Mount Hyjal | Orgrimmar	52.3 | 60.2 | 76.1	27.6 | 61.4 | 25.1	 |  | horde	foreverdb, trainer visto su Forever
+3962		engineering	trainer	NPC 249235 | Roxxik | Springspindle Fizzlegear	Mount Hyjal | Orgrimmar | Ironforge	60.2 | 76.1 | 68.4	61.4 | 25.1 | 44.3	 | horde | alliance	foreverdb, trainer visto su Forever
+3963		engineering	trainer	Buzzek Bracketswing | NPC 249235 | Roxxik	Tanaris | Mount Hyjal | Orgrimmar	52.3 | 60.2 | 76.1	27.6 | 61.4 | 25.1	 |  | horde	foreverdb, trainer visto su Forever
+3965		engineering	trainer	Buzzek Bracketswing | NPC 249235 | Roxxik	Tanaris | Mount Hyjal | Orgrimmar	52.3 | 60.2 | 76.1	27.6 | 61.4 | 25.1	 |  | horde	foreverdb, trainer visto su Forever
+3967		engineering	trainer	NPC 249235 | Roxxik | Springspindle Fizzlegear	Mount Hyjal | Orgrimmar | Ironforge	60.2 | 76.1 | 68.4	61.4 | 25.1 | 44.3	 | horde | alliance	foreverdb, trainer visto su Forever
+3973		engineering	trainer	Franklin Lloyd | Lilliam Sparkspindle | NPC 249235	Undercity | Stormwind City | Mount Hyjal	76.0 | 62.1 | 60.2	73.8 | 30.6 | 61.4	horde | alliance | 	foreverdb, trainer visto su Forever
+3977		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Franklin Lloyd	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 76.0	50.4 | 13.6 | 73.8	alliance | alliance | horde	foreverdb, trainer visto su Forever
+3978		engineering	trainer	Franklin Lloyd | Lilliam Sparkspindle | NPC 249235	Undercity | Stormwind City | Mount Hyjal	76.0 | 62.1 | 60.2	73.8 | 30.6 | 61.4	horde | alliance | 	foreverdb, trainer visto su Forever
 4096	13287	leatherworking	vendor	Tunkk	Arathi Highlands	74.8	34.5	horde	foreverdb, venditore visto su Forever
 4097	13288	leatherworking	vendor	Androd Fadran	Arathi Highlands	45.1	46.9	alliance	foreverdb, venditore visto su Forever
 4508	4597	alchemy	trainer	Apothecary Renferrel	Silverpine Forest	42.9	40.9	horde	foreverdb, trainer visto su Forever
-6458		engineering	trainer	Lilliam Sparkspindle | Nogg | Roxxik	Stormwind City | Orgrimmar | Orgrimmar	62.1 | 75.9 | 76.1	30.6 | 25.2 | 25.1	alliance | horde | horde	foreverdb, trainer visto su Forever
+6458		engineering	trainer	Buzzek Bracketswing | Franklin Lloyd | Lilliam Sparkspindle	Tanaris | Undercity | Stormwind City	52.3 | 76.0 | 62.1	27.6 | 73.8 | 30.6	 | horde | alliance	foreverdb, trainer visto su Forever
 6499		cooking	trainer	Alegorn | Aska Mistrunner | Cook Torka	Darnassus | Thunder Bluff | Durotar	48.8 | 50.8 | 51.0	21.5 | 52.2 | 42.5	alliance | horde | horde	foreverdb, trainer visto su Forever
 6500		cooking	trainer	Alegorn | Aska Mistrunner | Cook Torka	Darnassus | Thunder Bluff | Durotar	48.8 | 50.8 | 51.0	21.5 | 52.2 | 42.5	alliance | horde | horde	foreverdb, trainer visto su Forever
-6517		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 74.0	45.8 | 48.7	 | alliance	foreverdb, trainer visto su Forever
-6521		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.3 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
-6661		leatherworking	trainer	Hahrana Ironhide | Telonis | Una	Feralas | Darnassus | Thunder Bluff	74.4 | 64.2 | 42.0	43.1 | 21.6 | 42.8	horde | alliance | horde	foreverdb, trainer visto su Forever
-6690		tailoring	trainer	Jormund Stonebrow | Magar | Mahani	Ironforge | Orgrimmar | The Barrens	43.4 | 63.4 | 44.9	28.7 | 50.3 | 59.4	alliance | horde | horde	foreverdb, trainer visto su Forever
+6517		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
+6521		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
+6661		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide | Telonis	The Hinterlands | Feralas | Darnassus	13.4 | 74.4 | 64.2	43.4 | 43.1 | 21.6	alliance | horde | alliance	foreverdb, trainer visto su Forever
+6690		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
 7135		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
-7147		leatherworking	trainer	Hahrana Ironhide | Telonis | Una	Feralas | Darnassus | Thunder Bluff	74.4 | 64.2 | 42.0	43.1 | 21.6 | 42.8	horde | alliance | horde	foreverdb, trainer visto su Forever
-7151		leatherworking	trainer	Telonis	Darnassus	64.2	21.6	alliance	foreverdb, trainer visto su Forever
+7147		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide | Telonis	The Hinterlands | Feralas | Darnassus	13.4 | 74.4 | 64.2	43.4 | 43.1 | 21.6	alliance | horde | alliance	foreverdb, trainer visto su Forever
+7151		leatherworking	trainer	Telonis | Una	Darnassus | Thunder Bluff	64.2 | 42.0	21.6 | 42.8	alliance | horde	foreverdb, trainer visto su Forever
 7156		leatherworking	trainer	Hahrana Ironhide | Telonis | Una	Feralas | Darnassus | Thunder Bluff	74.4 | 64.2 | 42.0	43.1 | 21.6 | 42.8	horde | alliance | horde	foreverdb, trainer visto su Forever
-7179		alchemy	trainer	Bena Winterhoof | Doctor Marsh | Kylanna	Thunder Bluff | Undercity | Ashenvale	46.7 | 51.5 | 50.9	33.6 | 74.4 | 67.1	horde | horde | alliance	foreverdb, trainer visto su Forever
+7179		alchemy	trainer	Ainethil | Bena Winterhoof | Doctor Marsh	Darnassus | Thunder Bluff | Undercity	55.0 | 46.7 | 51.5	23.7 | 33.6 | 74.4	alliance | horde | horde	foreverdb, trainer visto su Forever
 7223		blacksmithing	trainer	Saru Steelfury	Orgrimmar	82.2	23.0	horde	foreverdb, trainer visto su Forever
-7408		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
+7408		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
 7420		enchanting	trainer	Alanna Raveneye | Betty Quin | Eaysaa Brightgust	Teldrassil | Stormwind City | Zephras Isle	36.8 | 53.0 | 59.2	34.2 | 73.8 | 76.4	alliance | alliance | 	foreverdb, trainer visto su Forever
 7426		enchanting	trainer	Alanna Raveneye | Betty Quin | Eaysaa Brightgust	Teldrassil | Stormwind City | Zephras Isle	36.8 | 53.0 | 59.2	34.2 | 73.8 | 76.4	alliance | alliance | 	foreverdb, trainer visto su Forever
-7430		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Graham Van Talen	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 75.4	50.4 | 13.6 | 73.0	alliance | alliance | horde	foreverdb, trainer visto su Forever
+7430		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Franklin Lloyd	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 76.0	50.4 | 13.6 | 73.8	alliance | alliance | horde	foreverdb, trainer visto su Forever
 7454		enchanting	trainer	Alanna Raveneye | Betty Quin | Eaysaa Brightgust	Teldrassil | Stormwind City | Zephras Isle	36.8 | 53.0 | 59.2	34.2 | 73.8 | 76.4	alliance | alliance | 	foreverdb, trainer visto su Forever
 7457		enchanting	trainer	Alanna Raveneye | Betty Quin | Eaysaa Brightgust	Teldrassil | Stormwind City | Zephras Isle	36.8 | 53.0 | 59.2	34.2 | 73.8 | 76.4	alliance | alliance | 	foreverdb, trainer visto su Forever
-7623		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.3	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
-7624		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.3	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
-7745		enchanting	trainer	Godan | Lavinia Crowe | Lucan Cordell	Orgrimmar | Undercity | Stormwind City	53.7 | 62.2 | 53.1	38.3 | 61.6 | 74.3	horde | horde | alliance	foreverdb, trainer visto su Forever
+7623		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+7624		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+7745		enchanting	trainer	Gimble Thistlefuzz | Godan | Lavinia Crowe	Ironforge | Orgrimmar | Undercity	60.3 | 53.7 | 62.2	45.3 | 38.3 | 61.6	alliance | horde | horde	foreverdb, trainer visto su Forever
 7748		enchanting	trainer	Alanna Raveneye | Betty Quin | Eaysaa Brightgust	Teldrassil | Stormwind City | Zephras Isle	36.8 | 53.0 | 59.2	34.2 | 73.8 | 76.4	alliance | alliance | 	foreverdb, trainer visto su Forever
 7771	6345	enchanting	trainer	Alanna Raveneye | Betty Quin | Eaysaa Brightgust	Teldrassil | Stormwind City | Zephras Isle	36.8 | 53.0 | 59.2	34.2 | 73.8 | 76.4	alliance | alliance | 	foreverdb, trainer visto su Forever
 7776	6346	enchanting	vendor	Kithas | Lilly	Orgrimmar | Silverpine Forest	53.7 | 43.1	38.0 | 50.7	horde | horde	foreverdb, venditore visto su Forever
-7779		enchanting	trainer	Godan | Lavinia Crowe | Lucan Cordell	Orgrimmar | Undercity | Stormwind City	53.7 | 62.2 | 53.1	38.3 | 61.6 | 74.3	horde | horde | alliance	foreverdb, trainer visto su Forever
-7788		enchanting	trainer	Godan | Lavinia Crowe | Lucan Cordell	Orgrimmar | Undercity | Stormwind City	53.7 | 62.2 | 53.1	38.3 | 61.6 | 74.3	horde | horde | alliance	foreverdb, trainer visto su Forever
-7795		enchanting	trainer	Godan | Lavinia Crowe | Lucan Cordell	Orgrimmar | Undercity | Stormwind City	53.7 | 62.2 | 53.1	38.3 | 61.6 | 74.3	horde | horde | alliance	foreverdb, trainer visto su Forever
+7779		enchanting	trainer	Gimble Thistlefuzz | Godan | Lavinia Crowe	Ironforge | Orgrimmar | Undercity	60.3 | 53.7 | 62.2	45.3 | 38.3 | 61.6	alliance | horde | horde	foreverdb, trainer visto su Forever
+7788		enchanting	trainer	Gimble Thistlefuzz | Godan | Lavinia Crowe	Ironforge | Orgrimmar | Undercity	60.3 | 53.7 | 62.2	45.3 | 38.3 | 61.6	alliance | horde | horde	foreverdb, trainer visto su Forever
+7795		enchanting	trainer	Gimble Thistlefuzz | Godan | Lavinia Crowe	Ironforge | Orgrimmar | Undercity	60.3 | 53.7 | 62.2	45.3 | 38.3 | 61.6	alliance | horde | horde	foreverdb, trainer visto su Forever
 7817		blacksmithing	trainer	Angus Hammerhand | James Van Brunt | Karn Stonehoof	Tirisfal Glades | Undercity | Thunder Bluff	21.2 | 61.1 | 39.5	45.8 | 30.2 | 55.8	 | horde | horde	foreverdb, trainer visto su Forever
-7818		blacksmithing	trainer	Angus Hammerhand | James Van Brunt | Rotgath Stonebeard	Tirisfal Glades | Undercity | Ironforge	21.2 | 61.1 | 52.1	45.8 | 30.2 | 42.5	 | horde | alliance	foreverdb, trainer visto su Forever
-7836		alchemy	trainer	Bena Winterhoof | Doctor Marsh | Lilyssia Nightbreeze	Thunder Bluff | Undercity | Stormwind City	46.7 | 51.5 | 55.6	33.6 | 74.4 | 85.9	horde | horde | alliance	foreverdb, trainer visto su Forever
-7837		alchemy	trainer	Ainethil | Bena Winterhoof | Doctor Herbert Halsey	Darnassus | Thunder Bluff | Undercity	55.0 | 46.7 | 47.8	24.0 | 33.6 | 72.8	alliance | horde | horde	foreverdb, trainer visto su Forever
-7841		alchemy	trainer	Bena Winterhoof | Doctor Marsh | Kylanna	Thunder Bluff | Undercity | Ashenvale	46.7 | 51.5 | 50.9	33.6 | 74.4 | 67.1	horde | horde | alliance	foreverdb, trainer visto su Forever
-7845		alchemy	trainer	Ainethil | Bena Winterhoof | Doctor Herbert Halsey	Darnassus | Thunder Bluff | Undercity	55.0 | 46.7 | 47.8	24.0 | 33.6 | 72.8	alliance | horde | horde	foreverdb, trainer visto su Forever
+7818		blacksmithing	trainer	Angus Hammerhand | James Van Brunt	Tirisfal Glades | Undercity	21.2 | 61.1	45.8 | 30.2	 | horde	foreverdb, trainer visto su Forever
+7836		alchemy	trainer	Ainethil | Bena Winterhoof | Doctor Marsh	Darnassus | Thunder Bluff | Undercity	55.0 | 46.7 | 51.5	23.7 | 33.6 | 74.4	alliance | horde | horde	foreverdb, trainer visto su Forever
+7837		alchemy	trainer	Ainethil | Bena Winterhoof | Doctor Herbert Halsey	Darnassus | Thunder Bluff | Undercity	55.0 | 46.7 | 47.8	23.7 | 33.6 | 72.8	alliance | horde | horde	foreverdb, trainer visto su Forever
+7841		alchemy	trainer	Ainethil | Bena Winterhoof | Doctor Marsh	Darnassus | Thunder Bluff | Undercity	55.0 | 46.7 | 51.5	23.7 | 33.6 | 74.4	alliance | horde | horde	foreverdb, trainer visto su Forever
+7845		alchemy	trainer	Ainethil | Bena Winterhoof | Doctor Herbert Halsey	Darnassus | Thunder Bluff | Undercity	55.0 | 46.7 | 47.8	23.7 | 33.6 | 72.8	alliance | horde | horde	foreverdb, trainer visto su Forever
 7857		enchanting	trainer	Gimble Thistlefuzz | Godan | Lavinia Crowe	Ironforge | Orgrimmar | Undercity	60.3 | 53.7 | 62.2	45.3 | 38.3 | 61.6	alliance | horde | horde	foreverdb, trainer visto su Forever
-7861		enchanting	trainer	Gimble Thistlefuzz | Godan | Kitta Firewind	Ironforge | Orgrimmar | Elwynn Forest	60.3 | 53.7 | 65.0	45.3 | 38.3 | 70.7	alliance | horde | alliance	foreverdb, trainer visto su Forever
+7861		enchanting	trainer	Gimble Thistlefuzz | Godan | Hgarth	Ironforge | Orgrimmar | Stonetalon Mountains	60.3 | 53.7 | 49.2	45.3 | 38.3 | 57.1	alliance | horde | horde	foreverdb, trainer visto su Forever
 7863	6376	enchanting	trainer	Gimble Thistlefuzz | Godan | Lavinia Crowe	Ironforge | Orgrimmar | Undercity	60.3 | 53.7 | 62.2	45.3 | 38.3 | 61.6	alliance | horde | horde	foreverdb, trainer visto su Forever
-7928		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.7	84.5 | 56.8 | 12.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-7934		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.7	84.5 | 56.8 | 12.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-8334		engineering	trainer	Lilliam Sparkspindle | Nogg | Trixie Quikswitch	Stormwind City | Orgrimmar | Ironforge	62.1 | 75.9 | 67.8	30.6 | 25.2 | 43.2	alliance | horde | alliance	foreverdb, trainer visto su Forever
-8465		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.3	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
-8467		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.3 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
-8483		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-8489		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-8758		tailoring	trainer	Jormund Stonebrow | Josef Gregorian | Magar	Ironforge | Undercity | Orgrimmar	43.4 | 70.4 | 63.4	28.7 | 30.3 | 50.3	alliance | horde | horde	foreverdb, trainer visto su Forever
+7928		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.6	84.5 | 56.8 | 12.3	horde | alliance | alliance	foreverdb, trainer visto su Forever
+7934		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.6	84.5 | 56.8 | 12.3	horde | alliance | alliance	foreverdb, trainer visto su Forever
+8334		engineering	trainer	Buzzek Bracketswing | Franklin Lloyd | Lilliam Sparkspindle	Tanaris | Undercity | Stormwind City	52.3 | 76.0 | 62.1	27.6 | 73.8 | 30.6	 | horde | alliance	foreverdb, trainer visto su Forever
+8465		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+8467		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
+8483		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+8489		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+8758		tailoring	trainer	Georgio Bolero | Jormund Stonebrow | Josef Gregorian	Stormwind City | Ironforge | Undercity	53.2 | 43.4 | 70.4	81.4 | 28.7 | 30.3	alliance | alliance | horde	foreverdb, trainer visto su Forever
 8760		tailoring	trainer	Jormund Stonebrow | Magar | Mahani	Ironforge | Orgrimmar | The Barrens	43.4 | 63.4 | 44.9	28.7 | 50.3 | 59.4	alliance | horde | horde	foreverdb, trainer visto su Forever
-8762		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-8764		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-8766		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-8768		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree | James Van Brunt	Tirisfal Glades | Duskwood | Undercity	21.2 | 74.0 | 61.1	45.8 | 48.7 | 30.2	 | alliance | horde	foreverdb, trainer visto su Forever
-8770		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-8772		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-8774		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-8776		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.3	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
-8791		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-8799		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-8804		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-8880		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
+8762		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+8764		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+8766		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+8768		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
+8770		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+8772		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+8774		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+8776		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+8791		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+8799		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+8804		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+8880		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
 8895	7192	engineering	trainer	Melbin Powderfuse	Riverglades	77.8	50.9		foreverdb, trainer visto su Forever
 9060		leatherworking	trainer	Adele Fielder | Arthur Moore | Chaw Stronghide	Elwynn Forest | Undercity | Mulgore	46.3 | 70.3 | 45.0	62.1 | 57.8 | 61.5	alliance | horde | horde	foreverdb, trainer visto su Forever
 9062		leatherworking	trainer	Adele Fielder | Arthur Moore | Chaw Stronghide	Elwynn Forest | Undercity | Mulgore	46.3 | 70.3 | 45.0	62.1 | 57.8 | 61.5	alliance | horde | horde	foreverdb, trainer visto su Forever
 9065		leatherworking	trainer	Adele Fielder | Arthur Moore | Chaw Stronghide	Elwynn Forest | Undercity | Mulgore	46.3 | 70.3 | 45.0	62.1 | 57.8 | 61.5	alliance | horde | horde	foreverdb, trainer visto su Forever
-9068		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Fimble Finespindle	Undercity | Zephras Isle | Ironforge	70.3 | 63.8 | 39.8	57.8 | 80.7 | 33.5	horde |  | alliance	foreverdb, trainer visto su Forever
+9068		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
 9070	7289	leatherworking	vendor	Clyde Ranthal	Redridge Mountains	83.8	70.9	alliance	foreverdb, venditore visto su Forever
 9072	7290	leatherworking	vendor	Wenna Silkbeard	Wetlands	25.7	25.8	alliance	foreverdb, venditore visto su Forever
 9074		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
 9145		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
 9146	7361	leatherworking	vendor	Harlown Darkweave	Ashenvale	18.2	60.0	alliance	foreverdb, venditore visto su Forever
-9193		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
-9194		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
+9193		leatherworking	trainer	Arthur Moore | Brawn | Emerii Tallgust	Undercity | Stranglethorn Vale | Zephras Isle	70.3 | 31.8 | 63.8	57.8 | 28.8 | 80.7	horde | horde | 	foreverdb, trainer visto su Forever
+9194		leatherworking	trainer	Arthur Moore | Brawn | Emerii Tallgust	Undercity | Stranglethorn Vale | Zephras Isle	70.3 | 31.8 | 63.8	57.8 | 28.8 | 80.7	horde | horde | 	foreverdb, trainer visto su Forever
 9196		leatherworking	trainer	Hahrana Ironhide | Telonis | Una	Feralas | Darnassus | Thunder Bluff	74.4 | 64.2 | 42.0	43.1 | 21.6 | 42.8	horde | alliance | horde	foreverdb, trainer visto su Forever
-9198		leatherworking	trainer	Hahrana Ironhide | Telonis | Una	Feralas | Darnassus | Thunder Bluff	74.4 | 64.2 | 42.0	43.1 | 21.6 | 42.8	horde | alliance | horde	foreverdb, trainer visto su Forever
-9201		leatherworking	trainer	Hahrana Ironhide | Telonis | Una	Feralas | Darnassus | Thunder Bluff	74.4 | 64.2 | 42.0	43.1 | 21.6 | 42.8	horde | alliance | horde	foreverdb, trainer visto su Forever
-9206		leatherworking	trainer	Hahrana Ironhide | Telonis | Una	Feralas | Darnassus | Thunder Bluff	74.4 | 64.2 | 42.0	43.1 | 21.6 | 42.8	horde | alliance | horde	foreverdb, trainer visto su Forever
-9271		engineering	trainer	Lilliam Sparkspindle | Nogg | Roxxik	Stormwind City | Orgrimmar | Orgrimmar	62.1 | 75.9 | 76.1	30.6 | 25.2 | 25.1	alliance | horde | horde	foreverdb, trainer visto su Forever
-9273	7561	engineering	vendor	Kzixx | Zixil | Veenix	Duskwood | Hillsbrad Foothills | Stonetalon Mountains	81.9 | 55.7 | 58.3	19.9 | 27.3 | 51.7		foreverdb, venditore visto su Forever
+9198		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide | Telonis	The Hinterlands | Feralas | Darnassus	13.4 | 74.4 | 64.2	43.4 | 43.1 | 21.6	alliance | horde | alliance	foreverdb, trainer visto su Forever
+9201		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide | Telonis	The Hinterlands | Feralas | Darnassus	13.4 | 74.4 | 64.2	43.4 | 43.1 | 21.6	alliance | horde | alliance	foreverdb, trainer visto su Forever
+9206		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide | Telonis	The Hinterlands | Feralas | Darnassus	13.4 | 74.4 | 64.2	43.4 | 43.1 | 21.6	alliance | horde | alliance	foreverdb, trainer visto su Forever
+9271		engineering	trainer	Franklin Lloyd | Lilliam Sparkspindle | NPC 249235	Undercity | Stormwind City | Mount Hyjal	76.0 | 62.1 | 60.2	73.8 | 30.6 | 61.4	horde | alliance | 	foreverdb, trainer visto su Forever
+9273	7561	engineering	vendor	Kzixx | Zixil | Veenix	Duskwood | Hillsbrad Foothills | Stonetalon Mountains	81.9 | 60.7 | 58.3	19.9 | 19.9 | 51.7		foreverdb, venditore visto su Forever
 9916		blacksmithing	trainer	Saru Steelfury	Orgrimmar	82.2	23.0	horde	foreverdb, trainer visto su Forever
 9918		blacksmithing	trainer	Saru Steelfury	Orgrimmar	82.2	23.0	horde	foreverdb, trainer visto su Forever
 9920		blacksmithing	trainer	Saru Steelfury	Orgrimmar	82.2	23.0	horde	foreverdb, trainer visto su Forever
@@ -239,60 +239,68 @@ spellId	recipeItemId	profession	sourceKind	npcName	zone	x	y	faction	notes
 9928		blacksmithing	trainer	Saru Steelfury	Orgrimmar	82.2	23.0	horde	foreverdb, trainer visto su Forever
 9931		blacksmithing	trainer	Saru Steelfury	Orgrimmar	82.2	23.0	horde	foreverdb, trainer visto su Forever
 9935		blacksmithing	trainer	Saru Steelfury	Orgrimmar	82.2	23.0	horde	foreverdb, trainer visto su Forever
-9983		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-9985		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 74.0	45.8 | 48.7	 | alliance	foreverdb, trainer visto su Forever
-9986		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 74.0	45.8 | 48.7	 | alliance	foreverdb, trainer visto su Forever
-9987		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 74.0	45.8 | 48.7	 | alliance	foreverdb, trainer visto su Forever
+9983		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+9985		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
+9986		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
+9987		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
 9993		blacksmithing	trainer	Saru Steelfury	Orgrimmar	82.2	23.0	horde	foreverdb, trainer visto su Forever
-10097		mining	trainer	Brock Stoneseeker | Brom Killian | Gelman Stonehand	Loch Modan | Undercity | Stormwind City	37.1 | 56.1 | 59.0	47.9 | 37.0 | 37.7	alliance | horde | alliance	foreverdb, trainer visto su Forever
-10098		mining	trainer	Brock Stoneseeker | Brom Killian | Gelman Stonehand	Loch Modan | Undercity | Stormwind City	37.1 | 56.1 | 59.0	47.9 | 37.0 | 37.7	alliance | horde | alliance	foreverdb, trainer visto su Forever
+10097		mining	trainer	Brock Stoneseeker | Brom Killian | Dank Drizzlecut	Loch Modan | Undercity | Dun Morogh	37.1 | 56.1 | 69.3	47.9 | 37.0 | 55.4	alliance | horde | alliance	foreverdb, trainer visto su Forever
+10098		mining	trainer	Brock Stoneseeker | Brom Killian | Dank Drizzlecut	Loch Modan | Undercity | Dun Morogh	37.1 | 56.1 | 69.3	47.9 | 37.0 | 55.4	alliance | horde | alliance	foreverdb, trainer visto su Forever
 10482		leatherworking	trainer	Telonis | Una	Darnassus | Thunder Bluff	64.2 | 42.0	21.6 | 42.8	alliance | horde	foreverdb, trainer visto su Forever
 10487		leatherworking	trainer	Telonis | Una	Darnassus | Thunder Bluff	64.2 | 42.0	21.6 | 42.8	alliance | horde	foreverdb, trainer visto su Forever
-10499		leatherworking	trainer	Hahrana Ironhide | Telonis | Una	Feralas | Darnassus | Thunder Bluff	74.4 | 64.2 | 42.0	43.1 | 21.6 | 42.8	horde | alliance | horde	foreverdb, trainer visto su Forever
+10499		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide | Telonis	The Hinterlands | Feralas | Darnassus	13.4 | 74.4 | 64.2	43.4 | 43.1 | 21.6	alliance | horde | alliance	foreverdb, trainer visto su Forever
 10507		leatherworking	trainer	Telonis | Una	Darnassus | Thunder Bluff	64.2 | 42.0	21.6 | 42.8	alliance | horde	foreverdb, trainer visto su Forever
-10511		leatherworking	trainer	Hahrana Ironhide | Telonis | Una	Feralas | Darnassus | Thunder Bluff	74.4 | 64.2 | 42.0	43.1 | 21.6 | 42.8	horde | alliance | horde	foreverdb, trainer visto su Forever
-10518		leatherworking	trainer	Hahrana Ironhide | Telonis | Una	Feralas | Darnassus | Thunder Bluff	74.4 | 64.2 | 42.0	43.1 | 21.6 | 42.8	horde | alliance | horde	foreverdb, trainer visto su Forever
-10548		leatherworking	trainer	Drakk Stonehand	The Hinterlands	13.4	43.4	alliance	foreverdb, trainer visto su Forever
+10511		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide | Telonis	The Hinterlands | Feralas | Darnassus	13.4 | 74.4 | 64.2	43.4 | 43.1 | 21.6	alliance | horde | alliance	foreverdb, trainer visto su Forever
+10518		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide | Telonis	The Hinterlands | Feralas | Darnassus	13.4 | 74.4 | 64.2	43.4 | 43.1 | 21.6	alliance | horde | alliance	foreverdb, trainer visto su Forever
+10548		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide	The Hinterlands | Feralas	13.4 | 74.4	43.4 | 43.1	alliance | horde	foreverdb, trainer visto su Forever
 10552		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide	The Hinterlands | Feralas	13.4 | 74.4	43.4 | 43.1	alliance | horde	foreverdb, trainer visto su Forever
 10556		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide	The Hinterlands | Feralas	13.4 | 74.4	43.4 | 43.1	alliance | horde	foreverdb, trainer visto su Forever
 10558		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide	The Hinterlands | Feralas	13.4 | 74.4	43.4 | 43.1	alliance | horde	foreverdb, trainer visto su Forever
-11448		alchemy	trainer	Ainethil | Doctor Herbert Halsey | Kylanna Windwhisper	Darnassus | Undercity | Feralas	55.0 | 47.8 | 32.6	24.0 | 72.8 | 43.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
-11449		alchemy	trainer	Ainethil | Doctor Herbert Halsey	Darnassus | Undercity	55.0 | 47.8	24.0 | 72.8	alliance | horde	foreverdb, trainer visto su Forever
-11450		alchemy	trainer	Ainethil | Doctor Herbert Halsey | Patricia Egan	Darnassus | Undercity | Alterac Mountains	55.0 | 47.8 | 18.5	24.0 | 72.8 | 62.4	alliance | horde | 	foreverdb, trainer visto su Forever
-11451		alchemy	trainer	Ainethil | Doctor Herbert Halsey | Kylanna Windwhisper	Darnassus | Undercity | Feralas	55.0 | 47.8 | 32.6	24.0 | 72.8 | 43.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
+11448		alchemy	trainer	Ainethil | Doctor Herbert Halsey | Kylanna Windwhisper	Darnassus | Undercity | Feralas	55.0 | 47.8 | 32.6	23.7 | 72.8 | 43.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
+11449		alchemy	trainer	Ainethil | Doctor Herbert Halsey | Kylanna Windwhisper	Darnassus | Undercity | Feralas	55.0 | 47.8 | 32.6	23.7 | 72.8 | 43.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
+11450		alchemy	trainer	Ainethil | Doctor Herbert Halsey | Kylanna Windwhisper	Darnassus | Undercity | Feralas	55.0 | 47.8 | 32.6	23.7 | 72.8 | 43.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
+11451		alchemy	trainer	Ainethil | Doctor Herbert Halsey | Kylanna Windwhisper	Darnassus | Undercity | Feralas	55.0 | 47.8 | 32.6	23.7 | 72.8 | 43.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
 11460		alchemy	trainer	Kylanna Windwhisper	Feralas	32.6	43.8	alliance	foreverdb, trainer visto su Forever
 11461		alchemy	trainer	Kylanna Windwhisper	Feralas	32.6	43.8	alliance	foreverdb, trainer visto su Forever
 11465		alchemy	trainer	Kylanna Windwhisper	Feralas	32.6	43.8	alliance	foreverdb, trainer visto su Forever
 11467		alchemy	trainer	Kylanna Windwhisper	Feralas	32.6	43.8	alliance	foreverdb, trainer visto su Forever
 11478		alchemy	trainer	Kylanna Windwhisper	Feralas	32.6	43.8	alliance	foreverdb, trainer visto su Forever
-12045		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.3	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
-12046		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.3	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
-12048		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-12049		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-12050		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-12053		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-12061		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
+12045		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+12046		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+12048		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+12049		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+12050		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+12053		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+12061		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
 12063	254682	tailoring	vendor	Gorhak | Molkar	Desolace | Desolace	66.3 | 35.7	79.5 | 92.2		foreverdb, venditore visto su Forever
-12065		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-12067		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-12069		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-12070		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-12081	10318	tailoring	vendor	Cowardly Crosby	Stranglethorn Vale	27.0	82.4		foreverdb, venditore visto su Forever
-12584		engineering	trainer	Lilliam Sparkspindle | Nogg | Roxxik	Stormwind City | Orgrimmar | Orgrimmar	62.1 | 75.9 | 76.1	30.6 | 25.2 | 25.1	alliance | horde | horde	foreverdb, trainer visto su Forever
-12585		engineering	trainer	Roxxik | Springspindle Fizzlegear	Orgrimmar | Ironforge	76.1 | 68.4	25.1 | 44.0	horde | alliance	foreverdb, trainer visto su Forever
-12586		engineering	trainer	Roxxik | Springspindle Fizzlegear	Orgrimmar | Ironforge	76.1 | 68.4	25.1 | 44.0	horde | alliance	foreverdb, trainer visto su Forever
-12589		engineering	trainer	Roxxik | Springspindle Fizzlegear	Orgrimmar | Ironforge	76.1 | 68.4	25.1 | 44.0	horde | alliance	foreverdb, trainer visto su Forever
-12590		engineering	trainer	Roxxik | Springspindle Fizzlegear	Orgrimmar | Ironforge	76.1 | 68.4	25.1 | 44.0	horde | alliance	foreverdb, trainer visto su Forever
-12591		engineering	trainer	Roxxik | Springspindle Fizzlegear	Orgrimmar | Ironforge	76.1 | 68.4	25.1 | 44.0	horde | alliance	foreverdb, trainer visto su Forever
-12594		engineering	trainer	Roxxik | Springspindle Fizzlegear	Orgrimmar | Ironforge	76.1 | 68.4	25.1 | 44.0	horde | alliance	foreverdb, trainer visto su Forever
-12595		engineering	trainer	Roxxik | Springspindle Fizzlegear	Orgrimmar | Ironforge	76.1 | 68.4	25.1 | 44.0	horde | alliance	foreverdb, trainer visto su Forever
-12596		engineering	trainer	Roxxik | Springspindle Fizzlegear	Orgrimmar | Ironforge	76.1 | 68.4	25.1 | 44.0	horde | alliance	foreverdb, trainer visto su Forever
-12599		engineering	trainer	Roxxik | Springspindle Fizzlegear	Orgrimmar | Ironforge	76.1 | 68.4	25.1 | 44.0	horde | alliance	foreverdb, trainer visto su Forever
-12603		engineering	trainer	Roxxik | Springspindle Fizzlegear	Orgrimmar | Ironforge	76.1 | 68.4	25.1 | 44.0	horde | alliance	foreverdb, trainer visto su Forever
-12609		alchemy	trainer	Ainethil | Doctor Herbert Halsey | Kylanna Windwhisper	Darnassus | Undercity | Feralas	55.0 | 47.8 | 32.6	24.0 | 72.8 | 43.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
-12619		engineering	trainer	NPC 249235	Mount Hyjal	60.2	61.4		foreverdb, trainer visto su Forever
-12621		engineering	trainer	NPC 249235	Mount Hyjal	60.2	61.4		foreverdb, trainer visto su Forever
-12622		engineering	trainer	NPC 249235	Mount Hyjal	60.2	61.4		foreverdb, trainer visto su Forever
+12065		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+12067		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+12069		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+12070		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+12072		tailoring	trainer	Timothy Worthington	Dustwallow Marsh	66.2	51.8	alliance	foreverdb, trainer visto su Forever
+12073		tailoring	trainer	Timothy Worthington	Dustwallow Marsh	66.2	51.8	alliance	foreverdb, trainer visto su Forever
+12074		tailoring	trainer	Timothy Worthington	Dustwallow Marsh	66.2	51.8	alliance	foreverdb, trainer visto su Forever
+12077		tailoring	trainer	Timothy Worthington	Dustwallow Marsh	66.2	51.8	alliance	foreverdb, trainer visto su Forever
+12079		tailoring	trainer	Timothy Worthington	Dustwallow Marsh	66.2	51.8	alliance	foreverdb, trainer visto su Forever
+12081	10318	tailoring	vendor	Cowardly Crosby	Stranglethorn Vale	27.0	82.6		foreverdb, venditore visto su Forever
+12088		tailoring	trainer	Timothy Worthington	Dustwallow Marsh	66.2	51.8	alliance	foreverdb, trainer visto su Forever
+12092		tailoring	trainer	Timothy Worthington	Dustwallow Marsh	66.2	51.8	alliance	foreverdb, trainer visto su Forever
+12584		engineering	trainer	Buzzek Bracketswing | Franklin Lloyd | Lilliam Sparkspindle	Tanaris | Undercity | Stormwind City	52.3 | 76.0 | 62.1	27.6 | 73.8 | 30.6	 | horde | alliance	foreverdb, trainer visto su Forever
+12585		engineering	trainer	NPC 249235 | Roxxik | Springspindle Fizzlegear	Mount Hyjal | Orgrimmar | Ironforge	60.2 | 76.1 | 68.4	61.4 | 25.1 | 44.3	 | horde | alliance	foreverdb, trainer visto su Forever
+12586		engineering	trainer	Buzzek Bracketswing | NPC 249235 | Roxxik	Tanaris | Mount Hyjal | Orgrimmar	52.3 | 60.2 | 76.1	27.6 | 61.4 | 25.1	 |  | horde	foreverdb, trainer visto su Forever
+12589		engineering	trainer	NPC 249235 | Roxxik | Springspindle Fizzlegear	Mount Hyjal | Orgrimmar | Ironforge	60.2 | 76.1 | 68.4	61.4 | 25.1 | 44.3	 | horde | alliance	foreverdb, trainer visto su Forever
+12590		engineering	trainer	NPC 249235 | Roxxik | Springspindle Fizzlegear	Mount Hyjal | Orgrimmar | Ironforge	60.2 | 76.1 | 68.4	61.4 | 25.1 | 44.3	 | horde | alliance	foreverdb, trainer visto su Forever
+12591		engineering	trainer	NPC 249235 | Roxxik | Springspindle Fizzlegear	Mount Hyjal | Orgrimmar | Ironforge	60.2 | 76.1 | 68.4	61.4 | 25.1 | 44.3	 | horde | alliance	foreverdb, trainer visto su Forever
+12594		engineering	trainer	Buzzek Bracketswing | NPC 249235 | Roxxik	Tanaris | Mount Hyjal | Orgrimmar	52.3 | 60.2 | 76.1	27.6 | 61.4 | 25.1	 |  | horde	foreverdb, trainer visto su Forever
+12595		engineering	trainer	Buzzek Bracketswing | NPC 249235 | Roxxik	Tanaris | Mount Hyjal | Orgrimmar	52.3 | 60.2 | 76.1	27.6 | 61.4 | 25.1	 |  | horde	foreverdb, trainer visto su Forever
+12596		engineering	trainer	NPC 249235 | Roxxik | Springspindle Fizzlegear	Mount Hyjal | Orgrimmar | Ironforge	60.2 | 76.1 | 68.4	61.4 | 25.1 | 44.3	 | horde | alliance	foreverdb, trainer visto su Forever
+12599		engineering	trainer	NPC 249235 | Roxxik | Springspindle Fizzlegear	Mount Hyjal | Orgrimmar | Ironforge	60.2 | 76.1 | 68.4	61.4 | 25.1 | 44.3	 | horde | alliance	foreverdb, trainer visto su Forever
+12603		engineering	trainer	NPC 249235 | Roxxik | Springspindle Fizzlegear	Mount Hyjal | Orgrimmar | Ironforge	60.2 | 76.1 | 68.4	61.4 | 25.1 | 44.3	 | horde | alliance	foreverdb, trainer visto su Forever
+12609		alchemy	trainer	Ainethil | Doctor Herbert Halsey | Kylanna Windwhisper	Darnassus | Undercity | Feralas	55.0 | 47.8 | 32.6	23.7 | 72.8 | 43.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
+12618		engineering	trainer	Buzzek Bracketswing | NPC 249235	Tanaris | Mount Hyjal	52.3 | 60.2	27.6 | 61.4		foreverdb, trainer visto su Forever
+12619		engineering	trainer	Buzzek Bracketswing | NPC 249235	Tanaris | Mount Hyjal	52.3 | 60.2	27.6 | 61.4		foreverdb, trainer visto su Forever
+12621		engineering	trainer	Buzzek Bracketswing | NPC 249235	Tanaris | Mount Hyjal	52.3 | 60.2	27.6 | 61.4		foreverdb, trainer visto su Forever
+12622		engineering	trainer	Buzzek Bracketswing | NPC 249235	Tanaris | Mount Hyjal	52.3 | 60.2	27.6 | 61.4		foreverdb, trainer visto su Forever
 12715		engineering	trainer	Melbin Powderfuse	Riverglades	77.8	50.9		foreverdb, trainer visto su Forever
 12716		engineering	trainer	Melbin Powderfuse	Riverglades	77.8	50.9		foreverdb, trainer visto su Forever
 12717	221336	engineering	trainer	Melbin Powderfuse	Riverglades	77.8	50.9		foreverdb, trainer visto su Forever
@@ -300,91 +308,105 @@ spellId	recipeItemId	profession	sourceKind	npcName	zone	x	y	faction	notes
 12754		engineering	trainer	Melbin Powderfuse	Riverglades	77.8	50.9		foreverdb, trainer visto su Forever
 12755		engineering	trainer	Melbin Powderfuse	Riverglades	77.8	50.9		foreverdb, trainer visto su Forever
 12758		engineering	trainer	Melbin Powderfuse	Riverglades	77.8	50.9		foreverdb, trainer visto su Forever
+12759		engineering	trainer	Oglethorpe Obnoticus	Stranglethorn Vale	28.4	76.3		foreverdb, trainer visto su Forever
 12760		engineering	trainer	Melbin Powderfuse	Riverglades	77.8	50.9		foreverdb, trainer visto su Forever
+12895		engineering	trainer	Oglethorpe Obnoticus	Stranglethorn Vale	28.4	76.3		foreverdb, trainer visto su Forever
+12897		engineering	trainer	Oglethorpe Obnoticus	Stranglethorn Vale	28.4	76.3		foreverdb, trainer visto su Forever
+12899		engineering	trainer	Oglethorpe Obnoticus	Stranglethorn Vale	28.4	76.3		foreverdb, trainer visto su Forever
+12902		engineering	trainer	Oglethorpe Obnoticus	Stranglethorn Vale	28.4	76.3		foreverdb, trainer visto su Forever
+12903		engineering	trainer	Oglethorpe Obnoticus	Stranglethorn Vale	28.4	76.3		foreverdb, trainer visto su Forever
+12905		engineering	trainer	Oglethorpe Obnoticus	Stranglethorn Vale	28.4	76.3		foreverdb, trainer visto su Forever
+12906		engineering	trainer	Oglethorpe Obnoticus	Stranglethorn Vale	28.4	76.3		foreverdb, trainer visto su Forever
+12907		engineering	trainer	Oglethorpe Obnoticus	Stranglethorn Vale	28.4	76.3		foreverdb, trainer visto su Forever
 12908		engineering	trainer	Melbin Powderfuse	Riverglades	77.8	50.9		foreverdb, trainer visto su Forever
 13240		engineering	trainer	Melbin Powderfuse	Riverglades	77.8	50.9		foreverdb, trainer visto su Forever
 13378		enchanting	trainer	Gimble Thistlefuzz | Godan | Lavinia Crowe	Ironforge | Orgrimmar | Undercity	60.3 | 53.7 | 62.2	45.3 | 38.3 | 61.6	alliance | horde | horde	foreverdb, trainer visto su Forever
-13421		enchanting	trainer	Gimble Thistlefuzz | Godan | Lavinia Crowe	Ironforge | Orgrimmar | Undercity	60.3 | 53.7 | 62.2	45.3 | 38.3 | 61.6	alliance | horde | horde	foreverdb, trainer visto su Forever
+13421		enchanting	trainer	Gimble Thistlefuzz | Godan | Kitta Firewind	Ironforge | Orgrimmar | Elwynn Forest	60.3 | 53.7 | 65.0	45.3 | 38.3 | 70.7	alliance | horde | alliance	foreverdb, trainer visto su Forever
 13485		enchanting	trainer	Gimble Thistlefuzz | Godan | Hgarth	Ironforge | Orgrimmar | Stonetalon Mountains	60.3 | 53.7 | 49.2	45.3 | 38.3 | 57.1	alliance | horde | horde	foreverdb, trainer visto su Forever
 13501		enchanting	trainer	Gimble Thistlefuzz | Godan | Kitta Firewind	Ironforge | Orgrimmar | Elwynn Forest	60.3 | 53.7 | 65.0	45.3 | 38.3 | 70.7	alliance | horde | alliance	foreverdb, trainer visto su Forever
 13503		enchanting	trainer	Gimble Thistlefuzz | Godan | Hgarth	Ironforge | Orgrimmar | Stonetalon Mountains	60.3 | 53.7 | 49.2	45.3 | 38.3 | 57.1	alliance | horde | horde	foreverdb, trainer visto su Forever
 13529		enchanting	trainer	Gimble Thistlefuzz | Godan | Hgarth	Ironforge | Orgrimmar | Stonetalon Mountains	60.3 | 53.7 | 49.2	45.3 | 38.3 | 57.1	alliance | horde | horde	foreverdb, trainer visto su Forever
 13538		enchanting	trainer	Gimble Thistlefuzz | Godan | Hgarth	Ironforge | Orgrimmar | Stonetalon Mountains	60.3 | 53.7 | 49.2	45.3 | 38.3 | 57.1	alliance | horde | horde	foreverdb, trainer visto su Forever
-13607		enchanting	trainer	Gimble Thistlefuzz | Godan | Kitta Firewind	Ironforge | Orgrimmar | Elwynn Forest	60.3 | 53.7 | 65.0	45.3 | 38.3 | 70.7	alliance | horde | alliance	foreverdb, trainer visto su Forever
+13607		enchanting	trainer	Gimble Thistlefuzz | Godan | Hgarth	Ironforge | Orgrimmar | Stonetalon Mountains	60.3 | 53.7 | 49.2	45.3 | 38.3 | 57.1	alliance | horde | horde	foreverdb, trainer visto su Forever
 13622		enchanting	trainer	Gimble Thistlefuzz | Godan | Hgarth	Ironforge | Orgrimmar | Stonetalon Mountains	60.3 | 53.7 | 49.2	45.3 | 38.3 | 57.1	alliance | horde | horde	foreverdb, trainer visto su Forever
 13626		enchanting	trainer	Gimble Thistlefuzz | Godan | Hgarth	Ironforge | Orgrimmar | Stonetalon Mountains	60.3 | 53.7 | 49.2	45.3 | 38.3 | 57.1	alliance | horde | horde	foreverdb, trainer visto su Forever
 13628		enchanting	trainer	Gimble Thistlefuzz | Godan | Hgarth	Ironforge | Orgrimmar | Stonetalon Mountains	60.3 | 53.7 | 49.2	45.3 | 38.3 | 57.1	alliance | horde | horde	foreverdb, trainer visto su Forever
-13631		enchanting	trainer	Hgarth	Stonetalon Mountains	49.2	57.1	horde	foreverdb, trainer visto su Forever
-13635		enchanting	trainer	Hgarth | Kitta Firewind	Stonetalon Mountains | Elwynn Forest	49.2 | 65.0	57.1 | 70.7	horde | alliance	foreverdb, trainer visto su Forever
-13637		enchanting	trainer	Hgarth | Kitta Firewind	Stonetalon Mountains | Elwynn Forest	49.2 | 65.0	57.1 | 70.7	horde | alliance	foreverdb, trainer visto su Forever
-13640		enchanting	trainer	Hgarth | Kitta Firewind	Stonetalon Mountains | Elwynn Forest	49.2 | 65.0	57.1 | 70.7	horde | alliance	foreverdb, trainer visto su Forever
-13642		enchanting	trainer	Hgarth | Kitta Firewind	Stonetalon Mountains | Elwynn Forest	49.2 | 65.0	57.1 | 70.7	horde | alliance	foreverdb, trainer visto su Forever
-13644		enchanting	trainer	Hgarth | Kitta Firewind	Stonetalon Mountains | Elwynn Forest	49.2 | 65.0	57.1 | 70.7	horde | alliance	foreverdb, trainer visto su Forever
-13648		enchanting	trainer	Hgarth | Kitta Firewind	Stonetalon Mountains | Elwynn Forest	49.2 | 65.0	57.1 | 70.7	horde | alliance	foreverdb, trainer visto su Forever
-13657		enchanting	trainer	Hgarth | Kitta Firewind	Stonetalon Mountains | Elwynn Forest	49.2 | 65.0	57.1 | 70.7	horde | alliance	foreverdb, trainer visto su Forever
-13659		enchanting	trainer	Hgarth	Stonetalon Mountains	49.2	57.1	horde	foreverdb, trainer visto su Forever
+13631		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
+13635		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
+13637		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
+13640		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
+13642		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
+13644		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
+13648		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
+13657		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
+13659		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
 13661		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
 13663		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
-13693		enchanting	trainer	Hgarth	Stonetalon Mountains	49.2	57.1	horde	foreverdb, trainer visto su Forever
+13693		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
 13695		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
-13700		enchanting	trainer	Hgarth | Kitta Firewind	Stonetalon Mountains | Elwynn Forest	49.2 | 65.0	57.1 | 70.7	horde | alliance	foreverdb, trainer visto su Forever
-13702		enchanting	trainer	Hgarth	Stonetalon Mountains	49.2	57.1	horde	foreverdb, trainer visto su Forever
-13746		enchanting	trainer	Hgarth | Kitta Firewind	Stonetalon Mountains | Elwynn Forest	49.2 | 65.0	57.1 | 70.7	horde | alliance	foreverdb, trainer visto su Forever
-13794		enchanting	trainer	Hgarth | Kitta Firewind	Stonetalon Mountains | Elwynn Forest	49.2 | 65.0	57.1 | 70.7	horde | alliance	foreverdb, trainer visto su Forever
-13815		enchanting	trainer	Hgarth | Kitta Firewind	Stonetalon Mountains | Elwynn Forest	49.2 | 65.0	57.1 | 70.7	horde | alliance	foreverdb, trainer visto su Forever
+13700		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
+13702		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
+13746		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
+13794		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
+13815		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
 13822		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
 13836		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
-13858		enchanting	trainer	Hgarth | Kitta Firewind	Stonetalon Mountains | Elwynn Forest	49.2 | 65.0	57.1 | 70.7	horde | alliance	foreverdb, trainer visto su Forever
-13887		enchanting	trainer	Hgarth	Stonetalon Mountains	49.2	57.1	horde	foreverdb, trainer visto su Forever
+13858		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
+13887		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
 13890		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
 14293		enchanting	trainer	Alanna Raveneye | Betty Quin | Eaysaa Brightgust	Teldrassil | Stormwind City | Zephras Isle	36.8 | 53.0 | 59.2	34.2 | 73.8 | 76.4	alliance | alliance | 	foreverdb, trainer visto su Forever
-14379		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree | James Van Brunt	Tirisfal Glades | Duskwood | Undercity	21.2 | 74.0 | 61.1	45.8 | 48.7 | 30.2	 | alliance | horde	foreverdb, trainer visto su Forever
+14379		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
 14380		blacksmithing	trainer	Saru Steelfury	Orgrimmar	82.2	23.0	horde	foreverdb, trainer visto su Forever
 14807		enchanting	trainer	Alanna Raveneye | Betty Quin | Eaysaa Brightgust	Teldrassil | Stormwind City | Zephras Isle	36.8 | 53.0 | 59.2	34.2 | 73.8 | 76.4	alliance | alliance | 	foreverdb, trainer visto su Forever
-14809		enchanting	trainer	Hgarth	Stonetalon Mountains	49.2	57.1	horde	foreverdb, trainer visto su Forever
-14810		enchanting	trainer	Hgarth	Stonetalon Mountains	49.2	57.1	horde	foreverdb, trainer visto su Forever
-14930		leatherworking	trainer	Telonis | Una	Darnassus | Thunder Bluff	64.2 | 42.0	21.6 | 42.8	alliance | horde	foreverdb, trainer visto su Forever
-14932		leatherworking	trainer	Telonis | Una	Darnassus | Thunder Bluff	64.2 | 42.0	21.6 | 42.8	alliance | horde	foreverdb, trainer visto su Forever
-15255		engineering	trainer	Roxxik | Springspindle Fizzlegear	Orgrimmar | Ironforge	76.1 | 68.4	25.1 | 44.0	horde | alliance	foreverdb, trainer visto su Forever
+14809		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
+14810		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
+14930		leatherworking	trainer	Drakk Stonehand | Telonis | Una	The Hinterlands | Darnassus | Thunder Bluff	13.4 | 64.2 | 42.0	43.4 | 21.6 | 42.8	alliance | alliance | horde	foreverdb, trainer visto su Forever
+14932		leatherworking	trainer	Drakk Stonehand | Telonis | Una	The Hinterlands | Darnassus | Thunder Bluff	13.4 | 64.2 | 42.0	43.4 | 21.6 | 42.8	alliance | alliance | horde	foreverdb, trainer visto su Forever
+15255		engineering	trainer	Buzzek Bracketswing | NPC 249235 | Roxxik	Tanaris | Mount Hyjal | Orgrimmar	52.3 | 60.2 | 76.1	27.6 | 61.4 | 25.1	 |  | horde	foreverdb, trainer visto su Forever
 15833		alchemy	trainer	Kylanna Windwhisper	Feralas	32.6	43.8	alliance	foreverdb, trainer visto su Forever
-15906	12239	cooking	vendor	Super-Seller 680	Desolace	40.5	79.2		foreverdb, venditore visto su Forever
+15906	12239	cooking	vendor	Super-Seller 680	Desolace	40.5	79.4		foreverdb, venditore visto su Forever
 15972		blacksmithing	trainer	Saru Steelfury	Orgrimmar	82.2	23.0	horde	foreverdb, trainer visto su Forever
 16153		mining	trainer	Brek Stonehoof | Brock Stoneseeker | Brom Killian	Thunder Bluff | Loch Modan | Undercity	34.7 | 37.1 | 56.1	57.7 | 47.9 | 37.0	horde | alliance | horde	foreverdb, trainer visto su Forever
 17551		alchemy	trainer	Kylanna Windwhisper	Feralas	32.6	43.8	alliance	foreverdb, trainer visto su Forever
 17632	13517	alchemy	vendor	Dala Fairmaw	Mount Hyjal	21.0	78.4		foreverdb, venditore visto su Forever
-19047		leatherworking	trainer	Drakk Stonehand	The Hinterlands	13.4	43.4	alliance	foreverdb, trainer visto su Forever
+18401		tailoring	trainer	Timothy Worthington	Dustwallow Marsh	66.2	51.8	alliance	foreverdb, trainer visto su Forever
+18402		tailoring	trainer	Timothy Worthington	Dustwallow Marsh	66.2	51.8	alliance	foreverdb, trainer visto su Forever
+18405	14468	tailoring	vendor	Qia	Winterspring	61.2	37.2		foreverdb, venditore visto su Forever
+19047		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide	The Hinterlands | Feralas	13.4 | 74.4	43.4 | 43.1	alliance | horde	foreverdb, trainer visto su Forever
 19050	15726	leatherworking	vendor	Masat T'andr	Swamp of Sorrows	26.5	31.6		foreverdb, venditore visto su Forever
-19058		leatherworking	trainer	Drakk Stonehand	The Hinterlands	13.4	43.4	alliance	foreverdb, trainer visto su Forever
+19058		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide	The Hinterlands | Feralas	13.4 | 74.4	43.4 | 43.1	alliance | horde	foreverdb, trainer visto su Forever
 19061	15734	leatherworking	vendor	Pratt McGrubben | Jangdor Swiftstrider	Feralas | Feralas	30.6 | 74.4	42.7 | 43.0	alliance | horde	foreverdb, venditore visto su Forever
 19067	15741	leatherworking	vendor	Leonard Porter | Werg Thickblade	Western Plaguelands | Tirisfal Glades	43.0 | 83.3	84.2 | 69.7	alliance | horde	foreverdb, venditore visto su Forever
+19077	15751	leatherworking	vendor	Blimo Gadgetspring	Azshara	45.3	90.8		foreverdb, venditore visto su Forever
 19084	15758	leatherworking	vendor	Nergal	Un'Goro Crater	43.3	7.7		foreverdb, venditore visto su Forever
-19567		engineering	trainer	NPC 249235	Mount Hyjal	60.2	61.4		foreverdb, trainer visto su Forever
-19666		blacksmithing	trainer	Angus Hammerhand | James Van Brunt | Rotgath Stonebeard	Tirisfal Glades | Undercity | Ironforge	21.2 | 61.1 | 52.1	45.8 | 30.2 | 42.5	 | horde | alliance	foreverdb, trainer visto su Forever
-19667		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree | James Van Brunt	Tirisfal Glades | Duskwood | Undercity	21.2 | 74.0 | 61.1	45.8 | 48.7 | 30.2	 | alliance | horde	foreverdb, trainer visto su Forever
+19567		engineering	trainer	Buzzek Bracketswing | NPC 249235	Tanaris | Mount Hyjal	52.3 | 60.2	27.6 | 61.4		foreverdb, trainer visto su Forever
+19666		blacksmithing	trainer	Angus Hammerhand | James Van Brunt	Tirisfal Glades | Undercity	21.2 | 61.1	45.8 | 30.2	 | horde	foreverdb, trainer visto su Forever
+19667		blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
 19668		blacksmithing	trainer	Saru Steelfury	Orgrimmar	82.2	23.0	horde	foreverdb, trainer visto su Forever
-19788		engineering	trainer	NPC 249235	Mount Hyjal	60.2	61.4		foreverdb, trainer visto su Forever
+19788		engineering	trainer	Buzzek Bracketswing | NPC 249235	Tanaris | Mount Hyjal	52.3 | 60.2	27.6 | 61.4		foreverdb, trainer visto su Forever
 20015	16224	enchanting	vendor	Lorelae Wintersong	Moonglade	48.4	40.0		foreverdb, venditore visto su Forever
-20648		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Fimble Finespindle	Undercity | Zephras Isle | Ironforge	70.3 | 63.8 | 39.8	57.8 | 80.7 | 33.5	horde |  | alliance	foreverdb, trainer visto su Forever
-20649		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
+20026	16221	enchanting	vendor	Qia	Winterspring	61.2	37.2		foreverdb, venditore visto su Forever
+20648		leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
+20649		leatherworking	trainer	Arthur Moore | Brawn | Emerii Tallgust	Undercity | Stranglethorn Vale | Zephras Isle	70.3 | 31.8 | 63.8	57.8 | 28.8 | 80.7	horde | horde | 	foreverdb, trainer visto su Forever
 20650		leatherworking	trainer	Telonis | Una	Darnassus | Thunder Bluff	64.2 | 42.0	21.6 | 42.8	alliance | horde	foreverdb, trainer visto su Forever
 21175		cooking	trainer	Alegorn | Aska Mistrunner | Cook Torka	Darnassus | Thunder Bluff | Durotar	48.8 | 50.8 | 51.0	21.5 | 52.2 | 42.5	alliance | horde | horde	foreverdb, trainer visto su Forever
-22331		leatherworking	trainer	Drakk Stonehand	The Hinterlands	13.4	43.4	alliance	foreverdb, trainer visto su Forever
+22331		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide	The Hinterlands | Feralas	13.4 | 74.4	43.4 | 43.1	alliance | horde	foreverdb, trainer visto su Forever
 22711	18239	leatherworking	vendor	Rikqiz	Stranglethorn Vale	28.5	76.0		foreverdb, venditore visto su Forever
-22808		alchemy	trainer	Ainethil | Doctor Herbert Halsey | Kylanna Windwhisper	Darnassus | Undercity | Feralas	55.0 | 47.8 | 32.6	24.0 | 72.8 | 43.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
-23070		engineering	trainer	NPC 249235	Mount Hyjal	60.2	61.4		foreverdb, trainer visto su Forever
+22808		alchemy	trainer	Ainethil | Doctor Herbert Halsey | Kylanna Windwhisper	Darnassus | Undercity | Feralas	55.0 | 47.8 | 32.6	23.7 | 72.8 | 43.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
+23070		engineering	trainer	Buzzek Bracketswing | NPC 249235	Tanaris | Mount Hyjal	52.3 | 60.2	27.6 | 61.4		foreverdb, trainer visto su Forever
 23077	18652	engineering	vendor	Xizzer Fizzbolt	Winterspring	60.8	38.6		foreverdb, venditore visto su Forever
 23080	18656	engineering	vendor	Xizzer Fizzbolt	Winterspring	60.8	38.6		foreverdb, venditore visto su Forever
 23399	18949	leatherworking	vendor	Saenorion | Joseph Moore	Darnassus | Undercity	64.0 | 70.4	22.2 | 58.8	alliance | horde	foreverdb, venditore visto su Forever
 24940	20576	leatherworking	vendor	Amy Davenport	Redridge Mountains	24.0	47.4	alliance	foreverdb, venditore visto su Forever
 28327	22729	engineering	vendor	Gelvas Grimegate	Elwynn Forest	41.5	69.0		foreverdb, venditore visto su Forever
-439086		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-439088		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-439094		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-439098		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-439100		tailoring	trainer	Georgio Bolero | Josef Gregorian	Stormwind City | Undercity	53.3 | 70.4	81.4 | 30.3	alliance | horde	foreverdb, trainer visto su Forever
-439114		leatherworking	trainer	Hahrana Ironhide | Telonis | Una	Feralas | Darnassus | Thunder Bluff	74.4 | 64.2 | 42.0	43.1 | 21.6 | 42.8	horde | alliance | horde	foreverdb, trainer visto su Forever
-439116		leatherworking	trainer	Hahrana Ironhide | Telonis | Una	Feralas | Darnassus | Thunder Bluff	74.4 | 64.2 | 42.0	43.1 | 21.6 | 42.8	horde | alliance | horde	foreverdb, trainer visto su Forever
-439134		enchanting	trainer	Hgarth	Stonetalon Mountains	49.2	57.1	horde	foreverdb, trainer visto su Forever
+439086		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+439088		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+439094		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+439098		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+439100		tailoring	trainer	Georgio Bolero | Josef Gregorian | Melanori	Stormwind City | Undercity | Shen'dralas	53.2 | 70.4 | 43.4	81.4 | 30.3 | 77.8	alliance | horde | 	foreverdb, trainer visto su Forever
+439114		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide | Telonis	The Hinterlands | Feralas | Darnassus	13.4 | 74.4 | 64.2	43.4 | 43.1 | 21.6	alliance | horde | alliance	foreverdb, trainer visto su Forever
+439116		leatherworking	trainer	Drakk Stonehand | Hahrana Ironhide | Telonis	The Hinterlands | Feralas | Darnassus	13.4 | 74.4 | 64.2	43.4 | 43.1 | 21.6	alliance | horde | alliance	foreverdb, trainer visto su Forever
+439134		enchanting	trainer	Hgarth | Kitta Firewind | NPC 251978	Stonetalon Mountains | Elwynn Forest | Alterac Mountains	49.2 | 65.0 | 16.7	57.1 | 70.7 | 62.3	horde | alliance | 	foreverdb, trainer visto su Forever
 1213622	249536	enchanting	vendor	Beneris | Alynsia	The Barrens | Redridge Mountains	49.7 | 11.2	29.7 | 71.7	horde | alliance	foreverdb, venditore visto su Forever
 1213626	249534	enchanting	vendor	Beneris | Alynsia	The Barrens | Redridge Mountains	49.7 | 11.2	29.7 | 71.7	horde | alliance	foreverdb, venditore visto su Forever
 1219579	274393	enchanting	vendor	Beneris | Alynsia	The Barrens | Redridge Mountains	49.7 | 11.2	29.7 | 71.7	horde | alliance	foreverdb, venditore visto su Forever
@@ -392,21 +414,21 @@ spellId	recipeItemId	profession	sourceKind	npcName	zone	x	y	faction	notes
 1219587	274399	enchanting	vendor	Beneris | Alynsia	The Barrens | Redridge Mountains	49.7 | 11.2	29.7 | 71.7	horde | alliance	foreverdb, venditore visto su Forever
 1220624	274401	enchanting	vendor	Beneris | Alynsia	The Barrens | Redridge Mountains	49.7 | 11.2	29.7 | 71.7	horde | alliance	foreverdb, venditore visto su Forever
 1229432		leatherworking	trainer	Adele Fielder | Chaw Stronghide | Dan Golthas	Elwynn Forest | Mulgore | Undercity	46.3 | 45.0 | 70.5	62.1 | 61.5 | 58.7	alliance | horde | horde	foreverdb, trainer visto su Forever
-1229504		tailoring	trainer	Bowen Brisboise | Eldrin | Grondal Moonbreeze	Tirisfal Glades | Elwynn Forest | Darkshore	52.6 | 79.3 | 38.2	55.6 | 69.0 | 40.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-1229517		skinning	trainer	Dranh | Helene Peltskinner | Ishlee Breezewhisper	The Barrens | Elwynn Forest | Zephras Isle	45.0 | 46.3 | 59.6	59.0 | 62.3 | 76.0	horde | alliance | 	foreverdb, trainer visto su Forever
-1229705		herbalism	trainer	Alma Jainrose | Aranae Venomblood | Faruza	Redridge Mountains | Hillsbrad Foothills | Tirisfal Glades	16.3 | 61.6 | 59.8	45.6 | 19.6 | 52.1	alliance | horde | horde	foreverdb, trainer visto su Forever
+1229504		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+1229517		skinning	trainer	Balthus Stoneflayer | Dranh | Helene Peltskinner	Ironforge | The Barrens | Elwynn Forest	39.6 | 45.0 | 46.3	32.9 | 59.0 | 62.3	alliance | horde | alliance	foreverdb, trainer visto su Forever
+1229705		herbalism	trainer	Alma Jainrose | Angrun | Aranae Venomblood	Redridge Mountains | Stranglethorn Vale | Hillsbrad Foothills	16.3 | 32.2 | 61.6	45.6 | 27.5 | 19.6	alliance | horde | horde	foreverdb, trainer visto su Forever
 1229737		cooking	trainer	Cook Torka | Gremlock Pilsnor | Pyall Silentstride	Durotar | Dun Morogh | Mulgore	51.0 | 47.6 | 44.9	42.5 | 52.4 | 61.5	horde | alliance | horde	foreverdb, trainer visto su Forever
-1229745		fishing	trainer	Androl Oakhand | Armand Cromwell | Arnold Leland	Teldrassil | Undercity | Stormwind City	55.8 | 80.6 | 55.1	93.4 | 31.0 | 69.5	alliance | horde | alliance	foreverdb, trainer visto su Forever
-1230117		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.7	84.5 | 56.8 | 12.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
+1229745		fishing	trainer	Androl Oakhand | Armand Cromwell | Arnold Leland	Teldrassil | Undercity | Stormwind City	55.9 | 80.6 | 55.1	93.5 | 31.0 | 69.5	alliance | horde | alliance	foreverdb, trainer visto su Forever
+1230117		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.6	84.5 | 56.8 | 12.3	horde | alliance | alliance	foreverdb, trainer visto su Forever
 1230161		mining	trainer	Brock Stoneseeker | Brom Killian | Gelman Stonehand	Loch Modan | Undercity | Stormwind City	37.1 | 56.1 | 59.0	47.9 | 37.0 | 37.7	alliance | horde | alliance	foreverdb, trainer visto su Forever
-1230171		blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-1230564		alchemy	trainer	Alchemist Mallory | Carolai Anise | Cyndra Kindwhisper	Elwynn Forest | Tirisfal Glades | Teldrassil	39.8 | 59.4 | 57.6	48.3 | 52.2 | 60.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
+1230171		blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+1230564		alchemy	trainer	Ainethil | Alchemist Mallory | Carolai Anise	Darnassus | Elwynn Forest | Tirisfal Glades	55.0 | 39.8 | 59.4	23.7 | 48.3 | 52.2	alliance | alliance | horde	foreverdb, trainer visto su Forever
 1230643		enchanting	trainer	Alanna Raveneye | Betty Quin | Eaysaa Brightgust	Teldrassil | Stormwind City | Zephras Isle	36.8 | 53.0 | 59.2	34.2 | 73.8 | 76.4	alliance | alliance | 	foreverdb, trainer visto su Forever
-1230656		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Graham Van Talen	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 75.4	50.4 | 13.6 | 73.0	alliance | alliance | horde	foreverdb, trainer visto su Forever
+1230656		engineering	trainer	Bronk Guzzlegear | Deek Fizzlebizz | Franklin Lloyd	Dun Morogh | Loch Modan | Undercity	50.1 | 45.8 | 76.0	50.4 | 13.6 | 73.8	alliance | alliance | horde	foreverdb, trainer visto su Forever
 1231583	241651	alchemy	trainer	Apothecary Renferrel	Silverpine Forest	42.9	40.9	horde	foreverdb, trainer visto su Forever
-1244431		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.7	84.5 | 56.8 | 12.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-1244432		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.7	84.5 | 56.8 | 12.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-1244433		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.7	84.5 | 56.8 | 12.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
+1244431		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.6	84.5 | 56.8 | 12.3	horde | alliance | alliance	foreverdb, trainer visto su Forever
+1244432		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.6	84.5 | 56.8 | 12.3	horde | alliance | alliance	foreverdb, trainer visto su Forever
+1244433		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.6	84.5 | 56.8 | 12.3	horde | alliance | alliance	foreverdb, trainer visto su Forever
 1244645		alchemy	trainer	Apothecary Renferrel	Silverpine Forest	42.9	40.9	horde	foreverdb, trainer visto su Forever
 1244646		alchemy	trainer	Apothecary Renferrel	Silverpine Forest	42.9	40.9	horde	foreverdb, trainer visto su Forever
 1244647		alchemy	trainer	Apothecary Renferrel	Silverpine Forest	42.9	40.9	horde	foreverdb, trainer visto su Forever
@@ -446,11 +468,11 @@ spellId	recipeItemId	profession	sourceKind	npcName	zone	x	y	faction	notes
 1249128	249529	enchanting	vendor	Beneris | Alynsia	The Barrens | Redridge Mountains	49.7 | 11.2	29.7 | 71.7	horde | alliance	foreverdb, venditore visto su Forever
 1249152	249530	enchanting	vendor	Beneris | Alynsia	The Barrens | Redridge Mountains	49.7 | 11.2	29.7 | 71.7	horde | alliance	foreverdb, venditore visto su Forever
 1249154	249532	enchanting	vendor	Beneris | Alynsia	The Barrens | Redridge Mountains	49.7 | 11.2	29.7 | 71.7	horde | alliance	foreverdb, venditore visto su Forever
-1249630		alchemy	trainer	Alchemist Mallory | Bena Winterhoof | Carolai Anise	Elwynn Forest | Thunder Bluff | Tirisfal Glades	39.8 | 46.7 | 59.4	48.3 | 33.6 | 52.2	alliance | horde | horde	foreverdb, trainer visto su Forever
-1249631		alchemy	trainer	Bena Winterhoof | Doctor Herbert Halsey | Doctor Marsh	Thunder Bluff | Undercity | Undercity	46.7 | 47.8 | 51.5	33.6 | 72.8 | 74.4	horde | horde | horde	foreverdb, trainer visto su Forever
-1249632		alchemy	trainer	Ainethil | Doctor Herbert Halsey | Kylanna Windwhisper	Darnassus | Undercity | Feralas	55.0 | 47.8 | 32.6	24.0 | 72.8 | 43.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
-1249633		alchemy	trainer	Alchemist Mallory | Bena Winterhoof | Carolai Anise	Elwynn Forest | Thunder Bluff | Tirisfal Glades	39.8 | 46.7 | 59.4	48.3 | 33.6 | 52.2	alliance | horde | horde	foreverdb, trainer visto su Forever
-1249634		engineering	trainer	Roxxik	Orgrimmar	76.1	25.1	horde	foreverdb, trainer visto su Forever
+1249630		alchemy	trainer	Ainethil | Alchemist Mallory | Bena Winterhoof	Darnassus | Elwynn Forest | Thunder Bluff	55.0 | 39.8 | 46.7	23.7 | 48.3 | 33.6	alliance | alliance | horde	foreverdb, trainer visto su Forever
+1249631		alchemy	trainer	Ainethil | Bena Winterhoof | Doctor Herbert Halsey	Darnassus | Thunder Bluff | Undercity	55.0 | 46.7 | 47.8	23.7 | 33.6 | 72.8	alliance | horde | horde	foreverdb, trainer visto su Forever
+1249632		alchemy	trainer	Ainethil | Doctor Herbert Halsey | Kylanna Windwhisper	Darnassus | Undercity | Feralas	55.0 | 47.8 | 32.6	23.7 | 72.8 | 43.8	alliance | horde | alliance	foreverdb, trainer visto su Forever
+1249633		alchemy	trainer	Ainethil | Alchemist Mallory | Bena Winterhoof	Darnassus | Elwynn Forest | Thunder Bluff	55.0 | 39.8 | 46.7	23.7 | 48.3 | 33.6	alliance | alliance | horde	foreverdb, trainer visto su Forever
+1249634		engineering	trainer	NPC 249235 | Roxxik	Mount Hyjal | Orgrimmar	60.2 | 76.1	61.4 | 25.1	 | horde	foreverdb, trainer visto su Forever
 1249637		mining	trainer	Brek Stonehoof | Brock Stoneseeker | Brom Killian	Thunder Bluff | Loch Modan | Undercity	34.7 | 37.1 | 56.1	57.7 | 47.9 | 37.0	horde | alliance | horde	foreverdb, trainer visto su Forever
 1249963	249885	cooking	vendor	Aza'bek | Kalsey Sanden	The Barrens | Redridge Mountains	49.8 | 10.7	29.4 | 72.6	horde | alliance	foreverdb, venditore visto su Forever
 1249964	249886	cooking	vendor	Aza'bek | Kalsey Sanden	The Barrens | Redridge Mountains	49.8 | 10.7	29.4 | 72.6	horde | alliance	foreverdb, venditore visto su Forever
@@ -488,9 +510,9 @@ spellId	recipeItemId	profession	sourceKind	npcName	zone	x	y	faction	notes
 1251749	250995	alchemy	vendor	Apothecary Durelle | Nina Surefire	The Barrens | Redridge Mountains	49.9 | 10.7	29.6 | 72.6	horde | alliance	foreverdb, venditore visto su Forever
 1251751	250997	alchemy	vendor	Apothecary Durelle | Nina Surefire	The Barrens | Redridge Mountains	49.9 | 10.7	29.6 | 72.6	horde | alliance	foreverdb, venditore visto su Forever
 1251752	250998	alchemy	vendor	Apothecary Durelle | Nina Surefire	The Barrens | Redridge Mountains	49.9 | 10.7	29.6 | 72.6	horde | alliance	foreverdb, venditore visto su Forever
-1252229	251332	blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-1252230	251333	blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
-1252231	251334	blacksmithing	trainer	Angus Hammerhand | Basil Frye | Dane Lindgren	Tirisfal Glades | Undercity | Stormwind City	21.2 | 60.1 | 64.0	45.8 | 28.7 | 37.2	 | horde | alliance	foreverdb, trainer visto su Forever
+1252229	251332	blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+1252230	251333	blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
+1252231	251334	blacksmithing	trainer	Alphonse Dumas | Angus Hammerhand | Basil Frye	Riverglades | Tirisfal Glades | Undercity	64.4 | 21.2 | 60.1	82.0 | 45.8 | 28.7	 |  | horde	foreverdb, trainer visto su Forever
 1252252	251355	blacksmithing	vendor	Gor'mak | Stondry Darkhammer	The Barrens | Redridge Mountains	49.8 | 10.3	29.7 | 74.6	horde | alliance	foreverdb, venditore visto su Forever
 1252253	251356	blacksmithing	vendor	Gor'mak | Stondry Darkhammer	The Barrens | Redridge Mountains	49.8 | 10.3	29.7 | 74.6	horde | alliance	foreverdb, venditore visto su Forever
 1252254	251357	blacksmithing	vendor	Gor'mak | Stondry Darkhammer	The Barrens | Redridge Mountains	49.8 | 10.3	29.7 | 74.6	horde | alliance	foreverdb, venditore visto su Forever
@@ -522,11 +544,11 @@ spellId	recipeItemId	profession	sourceKind	npcName	zone	x	y	faction	notes
 1252280	251383	blacksmithing	vendor	Gor'mak | Stondry Darkhammer	The Barrens | Redridge Mountains	49.8 | 10.3	29.7 | 74.6	horde | alliance	foreverdb, venditore visto su Forever
 1252281	251384	blacksmithing	vendor	Gor'mak | Stondry Darkhammer	The Barrens | Redridge Mountains	49.8 | 10.3	29.7 | 74.6	horde | alliance	foreverdb, venditore visto su Forever
 1252287	251390	blacksmithing	vendor	Gorhak | Molkar	Desolace | Desolace	66.3 | 35.7	79.5 | 92.2		foreverdb, venditore visto su Forever
-1252305	251408	blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 74.0	45.8 | 48.7	 | alliance	foreverdb, trainer visto su Forever
-1252306	251409	blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 74.0	45.8 | 48.7	 | alliance	foreverdb, trainer visto su Forever
-1252307	251410	blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 74.0	45.8 | 48.7	 | alliance	foreverdb, trainer visto su Forever
-1252308	251411	blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 74.0	45.8 | 48.7	 | alliance	foreverdb, trainer visto su Forever
-1252309	251412	blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 74.0	45.8 | 48.7	 | alliance	foreverdb, trainer visto su Forever
+1252305	251408	blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
+1252306	251409	blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
+1252307	251410	blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
+1252308	251411	blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
+1252309	251412	blacksmithing	trainer	Angus Hammerhand | Clarise Gnarltree	Tirisfal Glades | Duskwood	21.2 | 73.9	45.8 | 48.5	 | alliance	foreverdb, trainer visto su Forever
 1252310	251413	blacksmithing	vendor	Gor'mak | Stondry Darkhammer	The Barrens | Redridge Mountains	49.8 | 10.3	29.7 | 74.6	horde | alliance	foreverdb, venditore visto su Forever
 1252311	251414	blacksmithing	vendor	Gor'mak | Stondry Darkhammer	The Barrens | Redridge Mountains	49.8 | 10.3	29.7 | 74.6	horde | alliance	foreverdb, venditore visto su Forever
 1252312	251415	blacksmithing	vendor	Gor'mak | Stondry Darkhammer	The Barrens | Redridge Mountains	49.8 | 10.3	29.7 | 74.6	horde | alliance	foreverdb, venditore visto su Forever
@@ -605,13 +627,13 @@ spellId	recipeItemId	profession	sourceKind	npcName	zone	x	y	faction	notes
 1255071	252836	leatherworking	vendor	Pawani | Daniel Stitchsong	The Barrens | Redridge Mountains	49.6 | 10.1	29.7 | 72.8	horde | alliance	foreverdb, venditore visto su Forever
 1255073	252834	leatherworking	vendor	Pawani | Daniel Stitchsong	The Barrens | Redridge Mountains	49.6 | 10.1	29.7 | 72.8	horde | alliance	foreverdb, venditore visto su Forever
 1255074	252833	leatherworking	vendor	Gorhak | Molkar	Desolace | Desolace	66.3 | 35.7	79.5 | 92.2		foreverdb, venditore visto su Forever
-1255075	252832	leatherworking	trainer	Aayndia Floralwind | Arthur Moore | Emerii Tallgust	Ashenvale | Undercity | Zephras Isle	35.9 | 70.3 | 63.8	52.1 | 57.8 | 80.7	alliance | horde | 	foreverdb, trainer visto su Forever
-1255076	252831	leatherworking	trainer	Aayndia Floralwind | Arthur Moore | Emerii Tallgust	Ashenvale | Undercity | Zephras Isle	35.9 | 70.3 | 63.8	52.1 | 57.8 | 80.7	alliance | horde | 	foreverdb, trainer visto su Forever
-1255077	252830	leatherworking	trainer	Aayndia Floralwind | Arthur Moore | Emerii Tallgust	Ashenvale | Undercity | Zephras Isle	35.9 | 70.3 | 63.8	52.1 | 57.8 | 80.7	alliance | horde | 	foreverdb, trainer visto su Forever
-1255078	252829	leatherworking	trainer	Aayndia Floralwind | Arthur Moore | Emerii Tallgust	Ashenvale | Undercity | Zephras Isle	35.9 | 70.3 | 63.8	52.1 | 57.8 | 80.7	alliance | horde | 	foreverdb, trainer visto su Forever
-1255079	252828	leatherworking	trainer	Arthur Moore | Emerii Tallgust | Faldron	Undercity | Zephras Isle | Darnassus	70.3 | 63.8 | 64.4	57.8 | 80.7 | 21.8	horde |  | alliance	foreverdb, trainer visto su Forever
-1255080	252827	leatherworking	trainer	Aayndia Floralwind | Arthur Moore | Emerii Tallgust	Ashenvale | Undercity | Zephras Isle	35.9 | 70.3 | 63.8	52.1 | 57.8 | 80.7	alliance | horde | 	foreverdb, trainer visto su Forever
-1255081	252826	leatherworking	trainer	Aayndia Floralwind | Arthur Moore | Emerii Tallgust	Ashenvale | Undercity | Zephras Isle	35.9 | 70.3 | 63.8	52.1 | 57.8 | 80.7	alliance | horde | 	foreverdb, trainer visto su Forever
+1255075	252832	leatherworking	trainer	Aayndia Floralwind | Arthur Moore | Brawn	Ashenvale | Undercity | Stranglethorn Vale	35.9 | 70.3 | 31.8	52.1 | 57.8 | 28.8	alliance | horde | horde	foreverdb, trainer visto su Forever
+1255076	252831	leatherworking	trainer	Aayndia Floralwind | Arthur Moore | Brawn	Ashenvale | Undercity | Stranglethorn Vale	35.9 | 70.3 | 31.8	52.1 | 57.8 | 28.8	alliance | horde | horde	foreverdb, trainer visto su Forever
+1255077	252830	leatherworking	trainer	Aayndia Floralwind | Arthur Moore | Brawn	Ashenvale | Undercity | Stranglethorn Vale	35.9 | 70.3 | 31.8	52.1 | 57.8 | 28.8	alliance | horde | horde	foreverdb, trainer visto su Forever
+1255078	252829	leatherworking	trainer	Aayndia Floralwind | Arthur Moore | Brawn	Ashenvale | Undercity | Stranglethorn Vale	35.9 | 70.3 | 31.8	52.1 | 57.8 | 28.8	alliance | horde | horde	foreverdb, trainer visto su Forever
+1255079	252828	leatherworking	trainer	Arthur Moore | Brawn | Emerii Tallgust	Undercity | Stranglethorn Vale | Zephras Isle	70.3 | 31.8 | 63.8	57.8 | 28.8 | 80.7	horde | horde | 	foreverdb, trainer visto su Forever
+1255080	252827	leatherworking	trainer	Aayndia Floralwind | Arthur Moore | Brawn	Ashenvale | Undercity | Stranglethorn Vale	35.9 | 70.3 | 31.8	52.1 | 57.8 | 28.8	alliance | horde | horde	foreverdb, trainer visto su Forever
+1255081	252826	leatherworking	trainer	Aayndia Floralwind | Arthur Moore | Brawn	Ashenvale | Undercity | Stranglethorn Vale	35.9 | 70.3 | 31.8	52.1 | 57.8 | 28.8	alliance | horde | horde	foreverdb, trainer visto su Forever
 1255082	252825	leatherworking	vendor	Pawani | Daniel Stitchsong	The Barrens | Redridge Mountains	49.6 | 10.1	29.7 | 72.8	horde | alliance	foreverdb, venditore visto su Forever
 1255083	252824	leatherworking	vendor	Pawani | Daniel Stitchsong	The Barrens | Redridge Mountains	49.6 | 10.1	29.7 | 72.8	horde | alliance	foreverdb, venditore visto su Forever
 1255084	252823	leatherworking	vendor	Pawani | Daniel Stitchsong	The Barrens | Redridge Mountains	49.6 | 10.1	29.7 | 72.8	horde | alliance	foreverdb, venditore visto su Forever
@@ -652,8 +674,8 @@ spellId	recipeItemId	profession	sourceKind	npcName	zone	x	y	faction	notes
 1255144	252763	leatherworking	trainer	Adele Fielder | Arthur Moore | Chaw Stronghide	Elwynn Forest | Undercity | Mulgore	46.3 | 70.3 | 45.0	62.1 | 57.8 | 61.5	alliance | horde | horde	foreverdb, trainer visto su Forever
 1255145	252762	leatherworking	trainer	Adele Fielder | Arthur Moore | Chaw Stronghide	Elwynn Forest | Undercity | Mulgore	46.3 | 70.3 | 45.0	62.1 | 57.8 | 61.5	alliance | horde | horde	foreverdb, trainer visto su Forever
 1255146	252761	leatherworking	trainer	Aayndia Floralwind | Adele Fielder | Arthur Moore	Ashenvale | Elwynn Forest | Undercity	35.9 | 46.3 | 70.3	52.1 | 62.1 | 57.8	alliance | alliance | horde	foreverdb, trainer visto su Forever
-1257368	253886	tailoring	trainer	Bowen Brisboise | Eldrin | Grondal Moonbreeze	Tirisfal Glades | Elwynn Forest | Darkshore	52.6 | 79.3 | 38.2	55.6 | 69.0 | 40.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-1257369	253888	tailoring	trainer	Bowen Brisboise | Eldrin | Grondal Moonbreeze	Tirisfal Glades | Elwynn Forest | Darkshore	52.6 | 79.3 | 38.2	55.6 | 69.0 | 40.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
+1257368	253886	tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
+1257369	253888	tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
 1257370	253890	tailoring	vendor	Jim'bek | Mivin Shadowweave	The Barrens | Redridge Mountains	49.6 | 10.1	29.5 | 73.1	horde | alliance	foreverdb, venditore visto su Forever
 1257371	253892	tailoring	vendor	Jim'bek | Mivin Shadowweave	The Barrens | Redridge Mountains	49.6 | 10.1	29.5 | 73.1	horde | alliance	foreverdb, venditore visto su Forever
 1257372	253894	tailoring	vendor	Jim'bek | Mivin Shadowweave	The Barrens | Redridge Mountains	49.6 | 10.1	29.5 | 73.1	horde | alliance	foreverdb, venditore visto su Forever
@@ -691,12 +713,12 @@ spellId	recipeItemId	profession	sourceKind	npcName	zone	x	y	faction	notes
 1257422	253994	tailoring	vendor	Jim'bek | Mivin Shadowweave	The Barrens | Redridge Mountains	49.6 | 10.1	29.5 | 73.1	horde | alliance	foreverdb, venditore visto su Forever
 1257423	253996	tailoring	vendor	Jim'bek | Mivin Shadowweave	The Barrens | Redridge Mountains	49.6 | 10.1	29.5 | 73.1	horde | alliance	foreverdb, venditore visto su Forever
 1257424	253998	tailoring	vendor	Jim'bek | Mivin Shadowweave	The Barrens | Redridge Mountains	49.6 | 10.1	29.5 | 73.1	horde | alliance	foreverdb, venditore visto su Forever
-1257426	254002	tailoring	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.3 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance	foreverdb, trainer visto su Forever
-1257427	254004	tailoring	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.3 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance	foreverdb, trainer visto su Forever
-1257428	254006	tailoring	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.3 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance	foreverdb, trainer visto su Forever
-1257429	254008	tailoring	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.3 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance	foreverdb, trainer visto su Forever
-1257430	254010	tailoring	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.3 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance	foreverdb, trainer visto su Forever
-1257431	254012	tailoring	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.3 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance	foreverdb, trainer visto su Forever
+1257426	254002	tailoring	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.2 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance	foreverdb, trainer visto su Forever
+1257427	254004	tailoring	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.2 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance	foreverdb, trainer visto su Forever
+1257428	254006	tailoring	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.2 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance	foreverdb, trainer visto su Forever
+1257429	254008	tailoring	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.2 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance	foreverdb, trainer visto su Forever
+1257430	254010	tailoring	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.2 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance	foreverdb, trainer visto su Forever
+1257431	254012	tailoring	trainer	Georgio Bolero | Grarnik Goodstitch | Jormund Stonebrow	Stormwind City | Stranglethorn Vale | Ironforge	53.2 | 28.7 | 43.4	81.4 | 76.8 | 28.7	alliance |  | alliance	foreverdb, trainer visto su Forever
 1257437	254024	tailoring	vendor	Jim'bek | Mivin Shadowweave	The Barrens | Redridge Mountains	49.6 | 10.1	29.5 | 73.1	horde | alliance	foreverdb, venditore visto su Forever
 1257438	254026	tailoring	vendor	Jim'bek | Mivin Shadowweave	The Barrens | Redridge Mountains	49.6 | 10.1	29.5 | 73.1	horde | alliance	foreverdb, venditore visto su Forever
 1257439	254028	tailoring	vendor	Jim'bek | Mivin Shadowweave	The Barrens | Redridge Mountains	49.6 | 10.1	29.5 | 73.1	horde | alliance	foreverdb, venditore visto su Forever
@@ -729,9 +751,9 @@ spellId	recipeItemId	profession	sourceKind	npcName	zone	x	y	faction	notes
 1257483	254116	tailoring	vendor	Jim'bek | Mivin Shadowweave	The Barrens | Redridge Mountains	49.6 | 10.1	29.5 | 73.1	horde | alliance	foreverdb, venditore visto su Forever
 1257484	254118	tailoring	vendor	Jim'bek | Mivin Shadowweave	The Barrens | Redridge Mountains	49.6 | 10.1	29.5 | 73.1	horde | alliance	foreverdb, venditore visto su Forever
 1257492	254134	tailoring	vendor	Dala Fairmaw	Mount Hyjal	21.0	78.4		foreverdb, venditore visto su Forever
-1259342		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.7	84.5 | 56.8 | 12.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-1259347		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.7	84.5 | 56.8 | 12.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
-1263425		tailoring	trainer	Bowen Brisboise | Eldrin | Grondal Moonbreeze	Tirisfal Glades | Elwynn Forest | Darkshore	52.6 | 79.3 | 38.2	55.6 | 69.0 | 40.5	horde | alliance | alliance	foreverdb, trainer visto su Forever
+1259342		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.6	84.5 | 56.8 | 12.3	horde | alliance | alliance	foreverdb, trainer visto su Forever
+1259347		first-aid	trainer	Arnok | Byancie | Dannelor	Orgrimmar | Teldrassil | Darnassus	34.3 | 55.3 | 51.6	84.5 | 56.8 | 12.3	horde | alliance | alliance	foreverdb, trainer visto su Forever
+1263425		tailoring	trainer	Bowen Brisboise | Eldrin | Georgio Bolero	Tirisfal Glades | Elwynn Forest | Stormwind City	52.6 | 79.3 | 53.2	55.6 | 69.0 | 81.4	horde | alliance | alliance	foreverdb, trainer visto su Forever
 1266893	264201	engineering	vendor	Fizzlefuse | Fritz Fizzle	The Barrens | Redridge Mountains	49.8 | 10.5	29.7 | 74.0	horde | alliance	foreverdb, venditore visto su Forever
 1266905	264202	engineering	vendor	Fizzlefuse | Fritz Fizzle	The Barrens | Redridge Mountains	49.8 | 10.5	29.7 | 74.0	horde | alliance	foreverdb, venditore visto su Forever
 1266906	264203	engineering	vendor	Fizzlefuse | Fritz Fizzle	The Barrens | Redridge Mountains	49.8 | 10.5	29.7 | 74.0	horde | alliance	foreverdb, venditore visto su Forever

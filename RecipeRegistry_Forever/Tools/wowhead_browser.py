@@ -1,11 +1,10 @@
 """Un Chrome vero, pilotato via DevTools, per leggere le pagine di Wowhead.
 
 Wowhead risponde 403 a curl, e a un browser chiede prima una verifica di AWS
-WAF: una pagina di due KB che esegue il suo script, ottiene un token, lo salva
-in un cookie e si ricarica sulla pagina vera. Un Chrome vero la supera da solo;
-quello che serve qui e' aspettare che lo faccia, invece di leggere la pagina
-della verifica come se fosse la risposta -- che e' l'errore della prima prova
-del 25/10: cinque pagine lette, cinque verifiche, zero dati.
+WAF. A volte Chrome completa la verifica da solo, altre volte serve intervenire
+nella scheda: interactive=True lascia farlo all'utente, poi rilegge la stessa
+pagina. Una pagina viene accettata solo quando contiene i dati richiesti,
+mai per la sola dimensione dell'HTML.
 
 Il profilo e' separato dal Chrome di tutti i giorni e resta fra un giro e
 l'altro, cosi' il token vale anche per il giro dopo.
@@ -19,11 +18,13 @@ non hanno dipendenze esterne.
 import base64
 import json
 import os
+import re
 import socket
 import struct
 import subprocess
 import time
 from urllib.request import urlopen
+from urllib.parse import urlsplit
 
 
 DEFAULT_PORT = 9333
@@ -42,6 +43,44 @@ CHALLENGE_FAILED = "Max challenge attempts exceeded"
 
 class Refused(Exception):
     """La verifica non e' passata: la pagina non arrivera'."""
+
+    def __init__(self, message, html=""):
+        super().__init__(message)
+        self.html = html
+
+
+def challenge_reason(html):
+    lowered = html.lower()
+    if CHALLENGE_FAILED.lower() in lowered:
+        return "verifica fallita"
+    if any(mark in lowered for mark in (CHALLENGE_MARK, "captcha-container",
+                                        "awswaf-captcha", "cf-chl-")):
+        return "verifica richiesta da Wowhead"
+    title = re.search(r"<title[^>]*>(.*?)</title>", lowered, re.S)
+    if title and any(mark in title.group(1) for mark in
+                     ("just a moment", "access denied", "request blocked", "403 forbidden")):
+        return "accesso rifiutato da Wowhead"
+    return None
+
+
+def page_has_data(html, url):
+    """Gli stessi blocchi letti dal parser, per il tipo e l'ID richiesti.
+
+    Anche una pagina di errore puo' superare 10 KB. Un oggetto senza fonti e'
+    valido se ha il suo blob; una pagina di verifica senza blob non lo e'.
+    """
+    route = urlsplit(url).path
+    item = re.search(r"/item=(\d+)(?:/|$)", route)
+    if item:
+        return bool(re.search(r"\$\.extend\(g_items\[%s\],\s*\{" % item.group(1), html))
+    if "/items/recipes/" in route:
+        return "var listviewitems = [" in html
+    if "/spells/" in route:
+        return "var listviewspells = [" in html
+    if route.endswith("/zones") or "/zones/" in route:
+        return bool(re.search(
+            r'<script type="application/json" id="data\.page\.listPage\.listviews">', html))
+    return False
 
 
 def find_browser():
@@ -130,8 +169,11 @@ class WebSocket(object):
 
 
 class Browser(object):
-    def __init__(self, port=DEFAULT_PORT, profile_dir=DEFAULT_PROFILE):
+    def __init__(self, port=DEFAULT_PORT, profile_dir=DEFAULT_PROFILE, interactive=False,
+                 verification_timeout=300.0):
         self.port = port
+        self.interactive = interactive
+        self.verification_timeout = verification_timeout
         self._next_id = 0
         self._process = subprocess.Popen(
             [find_browser(), "--remote-debugging-port=%d" % port,
@@ -164,8 +206,17 @@ class Browser(object):
             return reply.get("result", {})
 
     def close(self):
-        self._root.close()
-        self._process.terminate()
+        try:
+            # Una chiusura normale lascia a Chrome il tempo di salvare i cookie.
+            self._command(self._root, "Browser.close")
+        except (OSError, RuntimeError):
+            pass
+        finally:
+            self._root.close()
+        try:
+            self._process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            self._process.terminate()
 
     def __enter__(self):
         return self
@@ -187,20 +238,35 @@ class Browser(object):
                     page = WebSocket(entry["webSocketDebuggerUrl"])
             if page is None:
                 raise RuntimeError("la scheda non ha un endpoint di debug")
-            deadline = time.time() + timeout
+            deadline = time.monotonic() + timeout
             html = ""
-            while time.time() < deadline:
+            manual_used = False
+            while True:
                 time.sleep(1)
                 try:
                     state = self._evaluate(page, "document.readyState")
                     html = self._evaluate(page, "document.documentElement.outerHTML") or ""
                 except RuntimeError:
-                    continue
-                if CHALLENGE_FAILED in html:
-                    raise Refused("verifica fallita")
-                if state == "complete" and CHALLENGE_MARK not in html and len(html) > 10000:
+                    # Una ricarica invalida il contesto JS, ma non il timeout.
+                    state, html = "loading", ""
+                reason = challenge_reason(html)
+                if state == "complete" and not reason and page_has_data(html, url):
                     return html
-            raise Refused("verifica non conclusa in %ds" % timeout)
+                expired = time.monotonic() >= deadline
+                if self.interactive and not manual_used and (reason or expired):
+                    print("\nWowhead: %s\n%s" % (reason or "dati della pagina non disponibili", url), flush=True)
+                    print("Completa la verifica nel Chrome aperto (se serve, ricarica la scheda). "
+                          "Riprendo automaticamente quando compaiono i dati; attendo al massimo %ds. "
+                          "Ctrl+C interrompe." % self.verification_timeout, flush=True)
+                    manual_used = True
+                    deadline = time.monotonic() + self.verification_timeout
+                    continue
+                if not manual_used and reason in ("verifica fallita", "accesso rifiutato da Wowhead"):
+                    raise Refused(reason + "; prova --interactive o --from-html", html)
+                if expired:
+                    waited = self.verification_timeout if manual_used else timeout
+                    raise Refused((reason or "dati attesi non trovati") +
+                                  " dopo %ds; prova --interactive o --from-html" % waited, html)
         finally:
             if page:
                 page.close()

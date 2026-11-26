@@ -89,6 +89,23 @@ M:_Rebuild()
 t("torna il record del file", M:GetRecipeInfo(-spellId) == sample, true)
 t("con l'oggetto di sempre", M:GetRecipeInfo(originalItem) == sample, true)
 
+-- Piu' provenienze (26/11), sul file vero: Pattern: Blue Suede Armor cade da
+-- Shadowsworn Thug ed e' premio di Leather Technique. GetSource da' la
+-- principale nei campi di sempre e le altre in `also`, con le zone risolte.
+print("\n== piu' provenienze ==")
+local blueSuede = M:GetSource(-1255024)
+t("principale: drop", blueSuede and blueSuede.kind, "drop")
+local quest = blueSuede and blueSuede.also and blueSuede.also[1]
+t("poi la quest", quest and quest.kind, "quest")
+t("col suo nome", quest and quest.places and quest.places[1].name, "Leather Technique")
+t("e la zona per nome, non per id", quest and quest.places and quest.places[1].zone, "Desolace")
+local single = 0
+for id, record in pairs(generated.recipesBySpellId) do
+  if record.sourceKind and not record.alsoSources then single = id; break end
+end
+local one = M:GetSource(-single)
+t("una ricetta con una provenienza sola non ha also", one and one.also, nil)
+
 print("\n== dati senza indici, come i dati finti ==")
 _G.RecipeRegistryRecipeMetadata = {
   recipesBySpellId = {

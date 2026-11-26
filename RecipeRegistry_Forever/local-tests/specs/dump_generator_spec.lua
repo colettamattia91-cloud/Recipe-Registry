@@ -131,6 +131,33 @@ MiningItems = { [22] = 1, [33] = 2 }]])
     for _, place in ipairs(trio) do
         assert(place.zone ~= nil, "one zone for the row applies to every vendor in it")
     end
+    -- Piu' provenienze per ricetta (26/11): una riga del foglio ciascuna, la
+    -- principale per prima. La principale resta nei campi di sempre, le altre
+    -- vanno in alsoSources nello stesso ordine, coi loro luoghi e booleani.
+    write(paths[8], 'profession\tspellId\trecipeItemId\tsourceKind\tnpcName\tzone\tx\ty\tfaction\tworldDrop\n'
+        .. 'cooking\t2\t\tdrop\tShadowsworn Thug\tBlasted Lands\t\t\t\t\n'
+        .. 'cooking\t2\t\tquest\tLeather Technique\tDesolace\t\t\talliance\t\n'
+        .. 'cooking\t2\t\tvendor\tSovik\tOrgrimmar\t75.6\t25.3\thorde\t\n'
+        .. 'alchemy\t3\t\tvendor\tA\tOrgrimmar\t\t\t\t\n'
+        .. 'alchemy\t3\t\tdrop\t\t\t\t\t\ttrue\n')
+    local multi = generate(paths[1], paths[2], "--acquisition=" .. paths[8])
+    local stew = multi.recipesBySpellId[2]
+    assert(stew.sourceKind == "drop" and stew.sourcePlaces[1].name == "Shadowsworn Thug",
+        "the first row of a recipe is its main source")
+    assert(stew.alsoSources and #stew.alsoSources == 2, "every other row is one more source")
+    assert(stew.alsoSources[1].kind == "quest" and stew.alsoSources[2].kind == "vendor",
+        "in the order of the sheet")
+    local quest = stew.alsoSources[1].places[1]
+    assert(quest.name == "Leather Technique" and quest.faction == "alliance",
+        "a further source keeps its own place and faction")
+    assert(multi.zoneNamesById[quest.zone] == "Desolace", "its zone is interned like any other")
+    assert(stew.alsoSources[2].places[1].x == 75.6, "and its coordinates")
+    local potion = multi.recipesBySpellId[3]
+    assert(potion.sourceKind == "vendor" and potion.alsoSources[1].worldDrop == true,
+        "a world drop further down keeps its flag")
+    assert(potion.alsoSources[1].places == nil, "and has no places to list")
+    assert(multi.recipesBySpellId[1] == nil or multi.recipesBySpellId[1].alsoSources == nil,
+        "a recipe with one row has no alsoSources")
     -- Una ricetta che la build corrente non elenca piu' (Disorienting Smog
     -- Potion con la 70532) la cattura del client ce l'ha ancora: si marca
     -- `removed` e resta intera, coi dati che il ripiego le ha dato.
@@ -198,4 +225,4 @@ MiningCategories = { [1] = { name = "Alchemy", order = 0 }, [60] = { name = "Eli
 end)
 for _, path in ipairs(paths) do os.remove(path) end
 assert(ok, err)
-print("PASS generator: multiple sessions, legacy format, newest capture, reagents, indices, outputless is not self-only, static BoP from item binding, recipe items, required skill, recipes learned by themselves, four-step difficulty ladder, Forever trainer ranks, quoted names from the worksheet, recipes the build no longer lists, structure from the datamining")
+print("PASS generator: multiple sessions, legacy format, newest capture, reagents, indices, outputless is not self-only, static BoP from item binding, recipe items, required skill, recipes learned by themselves, four-step difficulty ladder, Forever trainer ranks, quoted names from the worksheet, recipes the build no longer lists, structure from the datamining, several sources per recipe")

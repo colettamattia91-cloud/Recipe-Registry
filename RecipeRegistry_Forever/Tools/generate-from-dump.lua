@@ -179,8 +179,19 @@ local function loadAcquisition(path)
                 -- questo secondo indice non si potrebbe correggere: e' il caso
                 -- di Enchant Bracer - Strength, che la deduzione dava per
                 -- trainer e che invece vende Dalria.
-                if itemId then acquisition[itemId] = entry end
-                if spellId then acquisitionBySpell[spellId] = entry end
+                --
+                -- Ogni indice tiene una LISTA: una ricetta puo' avere piu'
+                -- provenienze, una per riga del foglio, la principale per
+                -- prima. Pattern: Blue Suede Armor cade da Shadowsworn Thug ed
+                -- e' premio di Leather Technique.
+                if itemId then
+                    acquisition[itemId] = acquisition[itemId] or {}
+                    table.insert(acquisition[itemId], entry)
+                end
+                if spellId then
+                    acquisitionBySpell[spellId] = acquisitionBySpell[spellId] or {}
+                    table.insert(acquisitionBySpell[spellId], entry)
+                end
                 acquisitionRows = acquisitionRows + 1
             end
         end
@@ -561,8 +572,9 @@ local function completeRecord(record, spellId)
     -- La provenienza raccolta a mano, se per questa ricetta c'e'.
     -- Si indicizza sull'oggetto-ricetta perche' e' quello che si
     -- vede in gioco: la riga del venditore, l'oggetto che cade.
-    local got = (record.recipeItemId and acquisition[record.recipeItemId])
+    local list = (record.recipeItemId and acquisition[record.recipeItemId])
         or acquisitionBySpell[spellId]
+    local got = list and list[1]
     if got then
         record.sourceKind = got.kind
         record.bossDrop = got.bossDrop or nil
@@ -570,6 +582,14 @@ local function completeRecord(record, spellId)
         record.trainerTitle = got.trainerTitle
         if got.places and #got.places > 0 then
             record.sourcePlaces = got.places
+        end
+        -- Le altre, dopo la principale e nello stesso ordine. La principale
+        -- resta nei campi di sempre, cosi' chi legge solo quelli -- il filtro
+        -- di una versione vecchia, una correzione a mano -- vede quello che
+        -- vedeva prima.
+        for index = 2, #list do
+            record.alsoSources = record.alsoSources or {}
+            table.insert(record.alsoSources, list[index])
         end
     end
     -- Niente deduzione per esclusione: l'assenza di un
@@ -840,6 +860,25 @@ local function zoneId(name)
     return zoneIds[name]
 end
 
+-- Una lista di luoghi come letterale Lua, per sourcePlaces e per i places di
+-- ogni provenienza in piu'.
+local function placesLiteral(places)
+    local parts = {}
+    for _, place in ipairs(places) do
+        local fields = {}
+        if place.name then fields[#fields + 1] = string.format("name = %q", place.name) end
+        -- La zona e' un id internato, non una stringa: RecipeMetadata
+        -- la risolve da zoneNamesById, e una citta' che compare su
+        -- cento righe si scrive una volta sola.
+        if place.zone then fields[#fields + 1] = string.format("zone = %d", zoneId(place.zone)) end
+        if place.x then fields[#fields + 1] = string.format("x = %s", tostring(place.x)) end
+        if place.y then fields[#fields + 1] = string.format("y = %s", tostring(place.y)) end
+        if place.faction then fields[#fields + 1] = string.format("faction = %q", place.faction) end
+        parts[#parts + 1] = "{ " .. table.concat(fields, ", ") .. " }"
+    end
+    return "{ " .. table.concat(parts, ", ") .. " }"
+end
+
 local function sortedKeys(tbl)
     local keys = {}
     for k in pairs(tbl) do keys[#keys + 1] = k end
@@ -879,6 +918,7 @@ local COVERAGE_FIELDS = {
     { "removed",        "datamining", "nei dati del client ma non nel gioco" },
     { "sourceKind",     "a mano",     "da dove si ottiene" },
     { "sourcePlaces",   "a mano",     "chi la vende o la droppa, e dove" },
+    { "alsoSources",    "a mano",     "le provenienze oltre la principale" },
 }
 local MISSING_FIELDS = {
     { "trainerTitle",     "quale trainer la insegna" },
@@ -981,20 +1021,25 @@ for _, spellId in ipairs(ids) do
         if r.worldDrop then emit("            worldDrop = true,") end
         if r.trainerTitle then emit(string.format("            trainerTitle = %q,", r.trainerTitle)) end
         if r.sourcePlaces then
+            emit(string.format("            sourcePlaces = %s,", placesLiteral(r.sourcePlaces)))
+        end
+        -- Le provenienze oltre la principale, una tabella ciascuna con gli
+        -- stessi campi: kind, places, e i booleani solo quando sono veri.
+        if r.alsoSources then
             local parts = {}
-            for _, place in ipairs(r.sourcePlaces) do
-                local fields = {}
-                if place.name then fields[#fields + 1] = string.format("name = %q", place.name) end
-                -- La zona e' un id internato, non una stringa: RecipeMetadata
-                -- la risolve da zoneNamesById, e una citta' che compare su
-                -- cento righe si scrive una volta sola.
-                if place.zone then fields[#fields + 1] = string.format("zone = %d", zoneId(place.zone)) end
-                if place.x then fields[#fields + 1] = string.format("x = %s", tostring(place.x)) end
-                if place.y then fields[#fields + 1] = string.format("y = %s", tostring(place.y)) end
-                if place.faction then fields[#fields + 1] = string.format("faction = %q", place.faction) end
+            for _, also in ipairs(r.alsoSources) do
+                local fields = { string.format("kind = %q", also.kind) }
+                if also.bossDrop then fields[#fields + 1] = "bossDrop = true" end
+                if also.worldDrop then fields[#fields + 1] = "worldDrop = true" end
+                if also.trainerTitle then
+                    fields[#fields + 1] = string.format("trainerTitle = %q", also.trainerTitle)
+                end
+                if also.places and #also.places > 0 then
+                    fields[#fields + 1] = "places = " .. placesLiteral(also.places)
+                end
                 parts[#parts + 1] = "{ " .. table.concat(fields, ", ") .. " }"
             end
-            emit(string.format("            sourcePlaces = { %s },", table.concat(parts, ", ")))
+            emit(string.format("            alsoSources = { %s },", table.concat(parts, ", ")))
         end
     end
     if r.category then emit(string.format("            category = %q,", r.category)) end

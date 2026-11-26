@@ -82,32 +82,59 @@ def recipe_objects(html):
 
 
 def classify(source):
-    """I campi del sito -> il nostro vocabolario. Un solo tipo per ricetta:
-    l'ordine sotto e' quello di quanto e' azionabile la risposta."""
+    """I campi del sito -> il nostro vocabolario, una voce per tipo.
+
+    Ogni voce e' (tipo, nomi, zone, fazioni, worldDrop). L'ordine e' quello di
+    quanto e' azionabile la risposta -- venditore, drop, quest -- e la prima
+    voce e' la provenienza principale della ricetta.
+
+    Fino al 26/11 usciva solo la prima, e le altre si perdevano: 49 ricette su
+    1293 hanno sul sito piu' di un tipo (31 venditore e drop, 16 venditore e
+    quest, 2 drop e quest), e su Forever sono vere insieme -- Plans: Copper
+    Chain Vest e' premio di "Supplying the Front" e cade da Captain Perrine.
+    """
+    if not isinstance(source, dict):
+        return []
     drops = source.get("drops") or []
     vendors = source.get("vendors") or []
     quests = source.get("quests") or []
-    names, zones, factions = [], [], []
+    out = []
     if vendors:
-        for v in vendors:
-            names.append(v.get("npc") or "")
-            zones.append(v.get("zone") or "")
-            factions.append(SIDE.get(v.get("side"), ""))
-        return "vendor", names, zones, factions, ""
+        out.append(("vendor", [v.get("npc") or "" for v in vendors],
+                    [v.get("zone") or "" for v in vendors],
+                    [SIDE.get(v.get("side"), "") for v in vendors], ""))
     if drops:
-        for d in drops:
-            names.append(d.get("npc") or "")
-            zones.append(d.get("zone") or "")
-            factions.append("")
+        names = [d.get("npc") or "" for d in drops]
+        zones = [d.get("zone") or "" for d in drops]
         # Tanti NPC in tante zone non e' un drop da cercare, e' un world drop:
         # mandare il giocatore dal primo della lista sarebbe una bugia comoda.
         if len({z for z in zones if z}) > 4:
-            return "worldDrop", [], [], [], "true"
-        return "drop", names, zones, factions, ""
+            out.append(("worldDrop", [], [], [], "true"))
+        else:
+            out.append(("drop", names, zones, [""] * len(drops), ""))
     if quests:
-        q = quests[0]
-        return "quest", [], [q.get("zone") or ""], [SIDE.get(q.get("side"), "")], ""
-    return "", [], [], [], ""
+        # Il nome della quest va dove il resto del foglio mette il "chi": la
+        # riga diventa "Quest: Supplying the Front", che si cerca nel registro
+        # delle missioni, invece di "Quest" e basta. La zona c'e' quando il
+        # sito la sa.
+        #
+        # Molte quest vanilla esistono due volte, una per fazione, con lo
+        # stesso nome (Wild Leather Shoulders): sono una quest sola per chi
+        # legge, e la valgono entrambe le fazioni. Tenute separate davano due
+        # righe identiche, e la UI ne mostrava una con la bandiera di una
+        # fazione sola.
+        merged, order = {}, []
+        for q in quests:
+            key = (q.get("name") or "", q.get("zone") or "")
+            if key not in merged:
+                merged[key] = set()
+                order.append(key)
+            merged[key].add(SIDE.get(q.get("side"), ""))
+        def side(sides):
+            return next(iter(sides)) if len(sides) == 1 else ""
+        out.append(("quest", [k[0] for k in order], [k[1] for k in order],
+                    [side(merged[k]) for k in order], ""))
+    return out
 
 
 def main():
@@ -128,23 +155,27 @@ def main():
             key = ("s", spell) if spell else ("f", formula.get("id"))
             if key[1] is None or key in seen:
                 continue
-            kind, names, zones, factions, world = classify(source)
-            if not kind:
+            kinds = classify(source)
+            if not kinds:
                 continue
             seen.add(key)
             def join(values):
                 return " | ".join(values) if any(values) else ""
-            rows.append({
-                "spellId": spell or "",
-                "recipeItemId": formula.get("id") or "",
-                "name": formula.get("name") or obj.get("n") or "",
-                "sourceKind": kind,
-                "npcName": join(names),
-                "zone": join(zones),
-                "faction": join(factions),
-                "worldDrop": world,
-                "notes": "foreverchanges, letto da " + (source.get("read") or "?"),
-            })
+            # Una riga per tipo, nell'ordine di classify: chi legge il file
+            # prende la prima come principale e le altre come provenienze in
+            # piu' della stessa ricetta.
+            for kind, names, zones, factions, world in kinds:
+                rows.append({
+                    "spellId": spell or "",
+                    "recipeItemId": formula.get("id") or "",
+                    "name": formula.get("name") or obj.get("n") or "",
+                    "sourceKind": kind,
+                    "npcName": join(names),
+                    "zone": join(zones),
+                    "faction": join(factions),
+                    "worldDrop": world,
+                    "notes": "foreverchanges, letto da " + (source.get("read") or "?"),
+                })
             found += 1
         print("  %-16s %d ricette con provenienza" % (profession, found))
 
@@ -157,7 +188,8 @@ def main():
 
     from collections import Counter
     print()
-    print("totale %d -> %s" % (len(rows), OUT))
+    recipes = len({(r["spellId"], r["recipeItemId"]) for r in rows})
+    print("totale %d ricette, %d righe -> %s" % (recipes, len(rows), OUT))
     for kind, n in Counter(r["sourceKind"] for r in rows).most_common():
         print("   %-12s %d" % (kind, n))
 

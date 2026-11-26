@@ -25,15 +25,18 @@ marcare l'indirizzo.
     python RecipeRegistry_Forever/Tools/scrape-wowhead.py --limit 5 --save-html <cartella>
     python RecipeRegistry_Forever/Tools/scrape-wowhead.py --all
     python RecipeRegistry_Forever/Tools/scrape-wowhead.py --report
+    python RecipeRegistry_Forever/Tools/scrape-wowhead.py --triage --limit 5 --interactive
 
 Con --spells legge invece gli elenchi degli spell di mestiere, uno per
 mestiere, e ne fa Tools/captures/wowhead-trainer-skill.tsv: il livello a cui un
 trainer insegna ogni ricetta, che il client di Forever non porta (dice 1).
---from-html rilegge le pagine salvate con --save-html, senza rete.
+--from-html rilegge pagine salvate dal browser o con --save-html, senza rete:
+item-ID.html, list-MESTIERE.html, spells-MESTIERE.html e zones*.html.
 
     python RecipeRegistry_Forever/Tools/scrape-wowhead.py --spells all
 """
 import argparse, csv, json, os, re, sys, time
+from contextlib import nullcontext
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -420,7 +423,8 @@ def parse_zones(html):
 
 def load_cache():
     try:
-        cache = json.load(open(CACHE, encoding="utf-8"))
+        with open(CACHE, encoding="utf-8") as f:
+            cache = json.load(f)
     except (OSError, ValueError):
         cache = {}
     if cache.get("parser") != PARSER_VERSION:
@@ -442,10 +446,11 @@ def worksheet_items():
     provenienza: se il giro si interrompe, ha gia' preso quelli che contano.
     Si chiedono comunque tutti -- e' un ordine, non un filtro."""
     out, seen = [], set()
-    for row in csv.DictReader(open(WORKSHEET, encoding="utf-8"), delimiter="\t"):
-        if row["recipeItemId"] and row["recipeItemId"] not in seen:
-            seen.add(row["recipeItemId"])
-            out.append(row)
+    with open(WORKSHEET, encoding="utf-8") as f:
+        for row in csv.DictReader(f, delimiter="\t"):
+            if row["recipeItemId"] and row["recipeItemId"] not in seen:
+                seen.add(row["recipeItemId"])
+                out.append(row)
     out.sort(key=lambda r: (bool(r["sourceKind"]), r["band"] != "forever"))
     return out
 
@@ -453,6 +458,18 @@ def worksheet_items():
 # -- dalla cache al TSV ------------------------------------------------------------
 
 def summarize(entry):
+    """La provenienza principale della pagina-oggetto: la prima di summarize_all."""
+    got = summarize_all(entry)
+    return got[0] if got else ("", [], [], "", "")
+
+
+def summarize_all(entry):
+    """Ogni provenienza della pagina-oggetto, una per tipo, nell'ordine
+    venditore, drop, container, quest -- che e' anche l'ordine in cui la
+    sceglieva quando ne usciva una sola, quindi la prima resta quella di prima.
+
+    Fino al 26/11 usciva solo la prima: una ricetta venduta e premio di una
+    quest perdeva la quest. Su Forever le due cose sono vere insieme."""
     def faction(place):
         if place["alliance"] and not place["horde"]:
             return "alliance"
@@ -460,14 +477,29 @@ def summarize(entry):
             return "horde"
         return ""
 
+    out = []
     if entry["vendors"]:
         places = entry["vendors"]
-        return "vendor", places, [faction(p) for p in places], "", ""
+        out.append(("vendor", places, [faction(p) for p in places], "", ""))
     if entry["drops"]:
+        out.append(summarize_drops(entry["drops"]))
+    if entry["containers"]:
+        places = entry["containers"]
+        out.append(("container", places, [""] * len(places), "", ""))
+    if entry["quests"]:
+        quest = entry["quests"][0]
+        side = {1: "alliance", 2: "horde"}.get(quest["side"], "")
+        out.append(("quest", [dict(quest, name="")], [side], "", ""))
+    return out
+
+
+def summarize_drops(drops):
+    """I drop di una pagina-oggetto come una provenienza sola."""
+    if drops:
         # Lo stesso nome con piu' ID (Fel Interloper, quattro volte) e' una
         # creatura sola per chi la cerca.
         places, by_name = [], {}
-        for place in entry["drops"]:
+        for place in drops:
             if place["name"] not in by_name:
                 by_name[place["name"]] = dict(place, zones=[])
                 places.append(by_name[place["name"]])
@@ -493,34 +525,117 @@ def summarize(entry):
         if len(places) == 1:
             return "drop", [dict(places[0], zones=[])], [""], boss, ""
         return "worldDrop", [], [], "", "true"
-    if entry["containers"]:
-        places = entry["containers"]
-        return "container", places, [""] * len(places), "", ""
-    if entry["quests"]:
-        quest = entry["quests"][0]
-        side = {1: "alliance", 2: "horde"}.get(quest["side"], "")
-        return "quest", [dict(quest, name="")], [side], "", ""
     return "", [], [], "", ""
+
+
+# I codici di `source` negli elenchi: 2 drop, 4 quest, 5 venditore; 16
+# pescato e 21 borseggiato sono modi di farlo cadere, e contano come il drop.
+DROP_CODES = (2, 16, 21)
+
+
+def summarize_list_all(entry, reactions):
+    """Ogni provenienza di una riga d'elenco, una per tipo.
+
+    `source` dice QUALI tipi ha l'oggetto, `sourcemore` CHI per ciascuno, e
+    quando sono lunghi uguali vanno in parallelo: Flask of Distilled Wisdom e'
+    [2, 5] con [un drop a Stratholme, Pix Xizzix]. Quando `sourcemore` e' piu'
+    corto -- Wowhead non lo pubblica sempre -- ogni sua voce va al tipo che
+    dice di se': `dd` e' un'istanza, quindi drop; `t` 5 e' una quest; un NPC
+    gia' visto vendere su una pagina-oggetto e' un venditore. Una voce che non
+    si sa attribuire non si attribuisce: Skeletal Fiend con [2, 5] potrebbe
+    essere l'uno o l'altro, e il tipo resta senza nome.
+
+    Un venditore senza nome ne' fazione non entra: la riga direbbe "Vendor" e
+    basta, e summarize_list per la stessa ragione lo lascia alla pagina.
+    """
+    if entry["commondrop"]:
+        return [("worldDrop", [], [], "", "true")]
+    codes = []
+    for code in entry["source"] or []:
+        code = 2 if code in DROP_CODES else code
+        if code in (2, 4, 5) and code not in codes:
+            codes.append(code)
+    more = list(entry["sourcemore"] or [])
+
+    def own_code(m, left):
+        if m.get("t") == 5 and 4 in left:
+            return 4
+        if ("dd" in m or m.get("t") in (2, 3)) and 2 in left:
+            return 2
+        if m.get("t") == 1 and m.get("ti") in reactions and 5 in left:
+            return 5
+        return None
+
+    pairs = []
+    if len(more) == len(codes):
+        pairs = list(zip(codes, more))
+    else:
+        left = list(codes)
+        for m in more:
+            code = own_code(m, left)
+            if code is not None:
+                pairs.append((code, m))
+        assigned = {code for code, _ in pairs}
+        pairs += [(code, None) for code in left if code not in assigned]
+
+    vendors, drops, containers, quests = [], [], [], []
+    for code, m in pairs:
+        m = m or {}
+        place = {"name": m.get("n", ""), "zones": [m["z"]] if m.get("z") else []}
+        if code == 5:
+            if m.get("ti") in reactions:
+                alliance, horde = reactions[m["ti"]]
+                vendors.append(dict(place, alliance=alliance, horde=horde))
+        elif code == 4:
+            zone = m.get("c") or 0
+            quests.append({"name": "", "zones": [zone] if zone > 0 else []})
+        elif m.get("t") in (2, 3):
+            containers.append(place)
+        else:
+            drops.append(place)
+
+    def side(v):
+        return "alliance" if v["alliance"] and not v["horde"] else \
+               "horde" if v["horde"] and not v["alliance"] else ""
+
+    out = []
+    if vendors:
+        out.append(("vendor", vendors, [side(v) for v in vendors], "", ""))
+    if drops:
+        named = [p for p in drops if p["name"] or p["zones"]]
+        out.append(("drop", named, [""] * len(named), "", ""))
+    if containers:
+        out.append(("container", containers, [""] * len(containers), "", ""))
+    if quests:
+        out.append(("quest", quests[:1], [""], "", ""))
+    return out
 
 
 def write_tsv(cache, items):
     """Prima la pagina-oggetto, che vede tutte le fonti e chi e' boss; dove
-    la pagina non c'e', l'elenco nei casi che risolve da solo."""
+    la pagina non c'e', l'elenco.
+
+    Una riga per provenienza, la principale per prima: per una pagina e'
+    quella che summarize sceglieva da sola, per un elenco quella che
+    summarize_list risolveva da solo, se la risolveva. Le altre vengono dopo,
+    solo se di un tipo che la principale non ha."""
     names = {r["recipeItemId"]: r for r in items}
     reactions = vendor_reactions(cache)
     out = []
     for item_id in sorted(set(cache["items"]) | set(cache["lists"]), key=int):
         entry = cache["items"].get(item_id)
         if entry and not entry.get("refused"):
-            kind, places, factions, boss, world = summarize(entry)
+            found = summarize_all(entry)
             notes = "wowhead"
         elif item_id in cache["lists"]:
             entry = cache["lists"][item_id]
-            kind, places, factions, boss, world = summarize_list(entry, reactions)
+            found = summarize_list_all(entry, reactions)
+            first = summarize_list(entry, reactions)
+            if first[0]:
+                family = ("drop", "worldDrop") if first[0] in ("drop", "worldDrop") else (first[0],)
+                found = [first] + [f for f in found if f[0] not in family]
             notes = "wowhead, elenco"
         else:
-            continue
-        if not kind:
             continue
         row = names.get(item_id, {})
         def join(values):
@@ -528,15 +643,22 @@ def write_tsv(cache, items):
         def zone_of(place):
             ids = place.get("zones") or ([place["zone"]] if place.get("zone") else [])
             return cache["zones"].get(str(ids[0]), str(ids[0])) if ids else ""
-        if kind == "quest":
-            quest = entry["quests"][0]["name"] if "quests" in entry else entry["sourcemore"][0].get("n", "")
-            notes += ", quest: " + quest
-        out.append({"spellId": row.get("spellId", ""), "recipeItemId": item_id,
-                    "name": row.get("name", ""), "sourceKind": kind,
-                    "npcName": join([p["name"] for p in places]),
-                    "zone": join([zone_of(p) for p in places]),
-                    "faction": join(factions), "bossDrop": boss, "worldDrop": world,
-                    "notes": notes})
+        for kind, places, factions, boss, world in found:
+            if not kind:
+                continue
+            row_notes = notes
+            if kind == "quest":
+                if "quests" in entry:
+                    quest = entry["quests"][0]["name"]
+                else:
+                    quest = next((m.get("n", "") for m in entry["sourcemore"] if m.get("t") == 5), "")
+                row_notes += ", quest: " + quest
+            out.append({"spellId": row.get("spellId", ""), "recipeItemId": item_id,
+                        "name": row.get("name", ""), "sourceKind": kind,
+                        "npcName": join([p["name"] for p in places]),
+                        "zone": join([zone_of(p) for p in places]),
+                        "faction": join(factions), "bossDrop": boss, "worldDrop": world,
+                        "notes": row_notes})
     tmp = OUT + ".tmp"
     with open(tmp, "w", newline="", encoding="utf-8") as f:
         f.write("\t".join(COLS) + "\n")
@@ -547,6 +669,61 @@ def write_tsv(cache, items):
 
 
 # -- il giro -------------------------------------------------------------------
+
+def read_pages(args, requests):
+    """Stesso percorso di validazione per rete e file, con uno stop per tutti
+    i tipi di pagina. Una verifica non finisce mai in cache come dato vuoto.
+    """
+    from wowhead_browser import Browser, Refused, challenge_reason, page_has_data
+
+    requests = list(requests)
+    if not requests:
+        return
+    context = nullcontext(None) if args.from_html else Browser(
+        interactive=args.interactive, verification_timeout=args.verification_timeout)
+    with context as browser:
+        streak = 0
+        missing = 0
+        for label, url in requests:
+            try:
+                if args.from_html:
+                    path = os.path.join(args.from_html, label + ".html")
+                    try:
+                        with open(path, encoding="utf-8-sig") as f:
+                            html = f.read()
+                    except FileNotFoundError:
+                        missing += 1
+                        continue
+                else:
+                    html = browser.read(url)
+                reason = challenge_reason(html)
+                if reason or not page_has_data(html, url):
+                    raise Refused(reason or "dati attesi non trovati nella pagina", html)
+            except Refused as error:
+                if args.save_html and error.html:
+                    os.makedirs(args.save_html, exist_ok=True)
+                    diagnostic = os.path.join(args.save_html, "refused-" + label + ".html")
+                    with open(diagnostic, "w", encoding="utf-8") as f:
+                        f.write(error.html)
+                    print("  pagina rifiutata salvata in " + diagnostic)
+                streak += 1
+                yield label, None, str(error)
+                if browser and streak >= args.max_refusals:
+                    print("\n%d rifiuti di fila: mi fermo. Completa la verifica con "
+                          "--interactive o importa con --from-html." % streak)
+                    break
+            else:
+                streak = 0
+                if args.save_html:
+                    os.makedirs(args.save_html, exist_ok=True)
+                    with open(os.path.join(args.save_html, label + ".html"), "w", encoding="utf-8") as f:
+                        f.write(html)
+                yield label, html, None
+            if browser:
+                time.sleep(args.delay)
+        if missing:
+            print("%d file HTML non presenti: ignorati, cache conservata." % missing)
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -559,12 +736,24 @@ def main():
                         help="solo le pagine-oggetto che gli elenchi non bastano a risolvere")
     parser.add_argument("--spells", help="elenchi degli spell dei mestieri (separati da virgola, o 'all'):"
                         " livello a cui si imparano e soglie")
-    parser.add_argument("--from-html", help="con --spells: rilegge le pagine salvate qui invece della rete")
+    parser.add_argument("--from-html", help="legge item-ID.html, list-MESTIERE.html, "
+                        "spells-MESTIERE.html e zones*.html da questa cartella, senza rete")
+    parser.add_argument("--interactive", action="store_true",
+                        help="attende la verifica manuale in Chrome e riprende automaticamente")
+    parser.add_argument("--verification-timeout", type=float, default=300.0,
+                        help="secondi per completare la verifica con --interactive (default: 300)")
     parser.add_argument("--retry-refused", action="store_true", help="richiede anche gli oggetti rifiutati")
     parser.add_argument("--save-html", help="salva qui l'HTML di ogni pagina letta")
     parser.add_argument("--delay", type=float, default=3.0, help="secondi fra una pagina e l'altra")
     parser.add_argument("--max-refusals", type=int, default=3, help="rifiuti di fila prima di fermarsi")
     args = parser.parse_args()
+    if args.limit is not None and args.limit < 1:
+        parser.error("--limit deve essere almeno 1")
+    if args.delay < 0 or args.max_refusals < 1 or args.verification_timeout <= 0:
+        parser.error("--delay deve essere >= 0, --max-refusals almeno 1 "
+                     "e --verification-timeout > 0")
+    if args.from_html and not os.path.isdir(args.from_html):
+        parser.error("cartella --from-html non trovata: " + args.from_html)
     if not (args.limit or args.all or args.items or args.report or args.lists or args.triage or args.spells):
         parser.error("indica --limit N, --all, --items, --lists, --spells, --triage o --report")
 
@@ -575,29 +764,13 @@ def main():
         slugs = list(SPELL_LISTS) if args.spells == "all" else args.spells.split(",")
         cache.setdefault("spells", {})
 
-        def pages():
-            if args.from_html:
-                for slug in slugs:
-                    path = os.path.join(args.from_html, "spells-%s.html" % slug)
-                    if os.path.exists(path):
-                        yield slug, open(path, encoding="utf-8").read()
-                return
-            from wowhead_browser import Browser, Refused
-            with Browser() as browser:
-                for slug in slugs:
-                    try:
-                        html = browser.read("%s/spells/%s" % (BASE, SPELL_LISTS.get(slug, "professions/" + slug)))
-                    except Refused as error:
-                        print("  %-15s %s" % (slug, error))
-                        continue
-                    if args.save_html:
-                        os.makedirs(args.save_html, exist_ok=True)
-                        open(os.path.join(args.save_html, "spells-%s.html" % slug), "w",
-                             encoding="utf-8").write(html)
-                    yield slug, html
-                    time.sleep(args.delay)
-
-        for slug, html in pages():
+        requests = [("spells-" + slug, "%s/spells/%s" %
+                     (BASE, SPELL_LISTS.get(slug, "professions/" + slug))) for slug in slugs]
+        for label, html, error in read_pages(args, requests):
+            slug = label[len("spells-"):]
+            if error:
+                print("  %-15s %s" % (slug, error))
+                continue
             got = parse_spell_list(html)
             for spell_id, entry in got.items():
                 cache["spells"][spell_id] = dict(entry, slug=slug)
@@ -610,25 +783,19 @@ def main():
         return
 
     if args.lists:
-        from wowhead_browser import Browser, Refused
         slugs = LIST_SLUGS if args.lists == "all" else args.lists.split(",")
-        with Browser() as browser:
-            for slug in slugs:
-                try:
-                    html = browser.read("%s/items/recipes/%s" % (BASE, slug))
-                except Refused as error:
-                    print("  %-15s %s" % (slug, error))
-                    continue
-                if args.save_html:
-                    os.makedirs(args.save_html, exist_ok=True)
-                    open(os.path.join(args.save_html, "list-%s.html" % slug), "w", encoding="utf-8").write(html)
-                got = parse_list(html)
-                for item_id, entry in got.items():
-                    cache["lists"][item_id] = merge_list_entry(cache["lists"].get(item_id),
-                                                               dict(entry, slug=slug))
-                save_cache(cache)
-                print("  %-15s %d oggetti" % (slug, len(got)))
-                time.sleep(args.delay)
+        requests = [("list-" + slug, "%s/items/recipes/%s" % (BASE, slug)) for slug in slugs]
+        for label, html, error in read_pages(args, requests):
+            slug = label[len("list-"):]
+            if error:
+                print("  %-15s %s" % (slug, error))
+                continue
+            got = parse_list(html)
+            for item_id, entry in got.items():
+                cache["lists"][item_id] = merge_list_entry(cache["lists"].get(item_id),
+                                                           dict(entry, slug=slug))
+            save_cache(cache)
+            print("  %-15s %d oggetti" % (slug, len(got)))
         triage(cache, items)
         return
 
@@ -645,46 +812,39 @@ def main():
             pending = pending[:args.limit]
         print("da leggere: %d pagine (in cache: %d)" % (len(pending), len(cache["items"])))
 
-        from wowhead_browser import Browser, Refused
-        fetched, refused, streak = 0, 0, 0
-        with Browser() as browser:
-            def read(url, label):
-                html = browser.read(url)
-                if args.save_html:
-                    os.makedirs(args.save_html, exist_ok=True)
-                    open(os.path.join(args.save_html, label + ".html"), "w", encoding="utf-8").write(html)
-                return html
-
-            if not cache["zones"]:
-                for slug in ("", "/eastern-kingdoms", "/kalimdor"):
-                    try:
-                        zones, instances = parse_zones(read(BASE + "/zones" + slug, "zones" + slug.replace("/", "-")))
-                    except Refused as error:
-                        print("  zone%s: %s" % (slug, error))
-                        continue
-                    cache["zones"].update(zones)
-                    cache["instances"] = sorted(set(cache["instances"]) | instances)
-                    time.sleep(args.delay)
+        requests = []
+        if not cache["zones"]:
+            requests += [("zones" + slug.replace("/", "-"), BASE + "/zones" + slug)
+                         for slug in ("", "/eastern-kingdoms", "/kalimdor")]
+        requests += [("item-" + item_id, "%s/item=%s" % (BASE, item_id)) for item_id in pending]
+        fetched, refused, index = 0, 0, 0
+        for label, html, error in read_pages(args, requests):
+            if label.startswith("zones"):
+                if error:
+                    print("  %s: %s" % (label, error))
+                    continue
+                zones, instances = parse_zones(html)
+                cache["zones"].update(zones)
+                cache["instances"] = sorted(set(cache["instances"]) | instances)
+                save_cache(cache)
                 print("zone note: %d" % len(cache["zones"]))
-                save_cache(cache)
-
-            for index, item_id in enumerate(pending, 1):
-                try:
-                    entry = parse_item(read("%s/item=%s" % (BASE, item_id), "item-" + item_id), item_id)
-                    streak = 0
-                    fetched += 1
-                except Refused as error:
-                    entry = {"refused": str(error)}
-                    streak += 1
-                    refused += 1
+                continue
+            item_id = label[len("item-"):]
+            index += 1
+            if error:
+                entry = {"refused": error}
+                refused += 1
+            else:
+                entry = parse_item(html, item_id)
+                fetched += 1
+            old = cache["items"].get(item_id)
+            if not error or not old or old.get("refused"):
                 cache["items"][item_id] = entry
-                save_cache(cache)
-                print("  %4d/%d  item %-7s %s" % (index, len(pending), item_id,
-                      entry.get("refused") or ", ".join(entry["listviews"]) or "nessun listview"))
-                if streak >= args.max_refusals:
-                    print("\n%d rifiuti di fila: mi fermo. Rilanciare con --retry-refused." % streak)
-                    break
-                time.sleep(args.delay)
+            save_cache(cache)
+            print("  %4d/%d  item %-7s %s" % (index, len(pending), item_id,
+                  entry.get("refused") or ", ".join(entry["listviews"]) or "nessun listview"))
+            if error and old and not old.get("refused"):
+                print("     dati validi precedenti conservati")
         print("\nlette %d, rifiutate %d" % (fetched, refused))
 
     out = write_tsv(cache, items)

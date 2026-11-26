@@ -77,3 +77,52 @@ client dice 1): viene dagli elenchi degli spell di Wowhead, con
 `captures/wowhead-trainer-skill.tsv`; `import-dumps.ps1` lo passa al generatore
 se c'e'. Il database interno descrive le ricette; la conoscenza del personaggio
 deve continuare a essere rilevata separatamente dalle API del client.
+
+## Quando Wowhead blocca lo script
+
+Per una prima prova di cinque pagine ancora da risolvere:
+
+```powershell
+python RecipeRegistry_Forever/Tools/scrape-wowhead.py --triage --limit 5 --interactive --delay 5 --max-refusals 1
+```
+
+Lo script apre un Chrome con un profilo dedicato e persistente. Se compare una
+verifica, completala in quella finestra (ricaricando la scheda se necessario),
+e lo script riprende automaticamente quando arrivano i dati, senza input dal
+terminale. Aspetta al massimo cinque minuti: `--verification-timeout 600`
+porta l'attesa a dieci minuti. Lo script rilegge la stessa pagina. La verifica
+rimane manuale; se non passa, il giro si ferma senza sostituire i dati validi
+gia' raccolti. `--interactive` funziona anche con `--lists all` e `--spells all`.
+
+Se Wowhead funziona solo nel tuo Chrome abituale, puoi importare da quello:
+
+1. Apri la pagina `https://www.wowhead.com/forever/item=2555` e aspetta che
+   compaiano i dati dell'oggetto.
+2. Con Ctrl+S salva come **Pagina web, solo HTML**, chiamandola `item-2555.html`
+   in una cartella locale. Non usare il formato MHTML.
+3. Importala indicando quella cartella:
+
+```powershell
+python RecipeRegistry_Forever/Tools/scrape-wowhead.py --items 2555 --from-html .\build\wowhead-html
+```
+
+Sostituisci l'ID e la cartella con quelli salvati. Per piu' oggetti usa
+`--items 2555,2697`; per le pagine-elenco salva `list-alchemy.html` e usa
+`--lists alchemy --from-html <cartella>`, poi `--report` per aggiornare il TSV.
+Gli spell usano `spells-alchemy.html` con `--spells alchemy --from-html <cartella>`.
+Le zone usano `zones.html`, `zones-eastern-kingdoms.html`, `zones-kalimdor.html`.
+La modalita' `--from-html` non apre Chrome e non fa richieste di rete.
+
+Una pagina di verifica o priva dei blocchi di dati attesi viene rifiutata anche
+se salvata su disco. I file mancanti vengono ignorati; una lettura fallita non
+cancella una pagina valida gia' in cache. Per ritentare oggetti registrati come
+rifiutati usa `--retry-refused`, oppure selezionali con `--items` o `--triage`.
+Il limite `--max-refusals` vale anche per gli elenchi e le zone.
+Con `--save-html <cartella>` vengono salvate anche le risposte rifiutate come
+`refused-item-ID.html` (o `refused-list-MESTIERE.html`), per diagnosticare il blocco.
+
+I controlli dello scraper si eseguono senza rete e senza aprire il browser:
+
+```powershell
+python -m unittest discover -s RecipeRegistry_Forever/local-tests -p "test_wowhead_scraper.py" -v
+```
