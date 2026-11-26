@@ -2088,8 +2088,22 @@ function UI:CreateMainFrame()
         UI:Close("button")
     end)
 
+    -- Every option the addon has was reachable only from /rr options or from
+    -- the game's AddOns settings, and people asked on the project page for a
+    -- way to turn the tooltip lines off that was already there. A labelled
+    -- button where the window's own controls are is the door they were
+    -- looking for.
+    local options = createButton(titleBar, "Options", 72, 22)
+    options:SetPoint("RIGHT", close, "LEFT", -8, 0)
+    options:SetScript("OnClick", function()
+        if not (Addon.Options and Addon.Options.Open and Addon.Options:Open()) then
+            Addon:Print("Options panel not available yet.")
+        end
+    end)
+    f.optionsButton = options
+
     local cleanup = createButton(titleBar, "Roster Cleanup", 112, 22)
-    cleanup:SetPoint("RIGHT", close, "LEFT", -12, 0)
+    cleanup:SetPoint("RIGHT", options, "LEFT", -8, 0)
     cleanup:SetScript("OnClick", function()
         if not (Addon.GuildLifecycleMaintenance and Addon.GuildLifecycleMaintenance.StartManualCleanup) then
             Addon:Print("Guild cleanup is not available.")
@@ -4099,6 +4113,64 @@ local function getVisibleRecipeWindow(ui, total)
     return firstIdx, lastIdx
 end
 
+-- The filter was the half of a header nobody found. Right-click was the only
+-- way in, and the only thing that said so was the header's own tooltip, so a
+-- player who never hovered never learned the table could filter at all. The
+-- arrow is the one the Share button already uses for "this opens a menu", and
+-- it turns gold while its column is narrowing the list: a table showing fewer
+-- rows than expected says why without anyone opening anything.
+local HEADER_FILTER_ARROW_TEXTURE = "Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up"
+local HEADER_FILTER_ARROW_SIZE = 14
+
+-- describe(columnKey) returns the column's title and what its filter is
+-- showing, or nil for "everything".
+local function createHeaderFilterArrow(header, columnKey, openMenu, describe)
+    local arrow = CreateFrame("Button", nil, header)
+    arrow:SetSize(HEADER_FILTER_ARROW_SIZE, HEADER_FILTER_ARROW_SIZE)
+    arrow:SetPoint("RIGHT", header, "RIGHT", -2, 0)
+    arrow:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+    arrow.icon = arrow:CreateTexture(nil, "ARTWORK")
+    arrow.icon:SetAllPoints()
+    arrow.icon:SetTexture(HEADER_FILTER_ARROW_TEXTURE)
+    arrow:SetHighlightTexture(HEADER_FILTER_ARROW_TEXTURE, "ADD")
+    -- The menu hangs from the header, not from the arrow: it lines up with
+    -- the column it filters, and a right-click on the header and a click on
+    -- the arrow are the same control, so either one closes what the other
+    -- opened.
+    arrow:SetScript("OnClick", function()
+        openMenu(columnKey, header)
+    end)
+    arrow:SetScript("OnEnter", function(self)
+        local title, showing = describe(columnKey)
+        GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+        GameTooltip:AddLine("Filter: " .. tostring(title or "Column"))
+        if showing then
+            GameTooltip:AddLine("Showing: " .. showing, 1, 0.82, 0)
+        else
+            GameTooltip:AddLine("Showing everything", 0.8, 0.8, 0.8)
+        end
+        GameTooltip:Show()
+    end)
+    arrow:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    header.filterArrow = arrow
+    return arrow
+end
+
+local function setHeaderFilterArrowActive(arrow, active)
+    if not arrow then return end
+    active = active and true or false
+    if arrow._rrActive == active then return end
+    arrow._rrActive = active
+    if arrow.icon.SetDesaturated then arrow.icon:SetDesaturated(not active) end
+    if active then
+        arrow.icon:SetVertexColor(1.0, 0.82, 0, 1)
+    else
+        arrow.icon:SetVertexColor(0.75, 0.75, 0.75, 0.75)
+    end
+end
+
 function UI:EnsureAddonStatusRowParts(row)
     if row.addonStatusPartsReady then return end
 
@@ -4169,10 +4241,10 @@ function UI:EnsureAddonStatusRowParts(row)
             local columnKey = self.addonStatusColumnKey
             GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
             GameTooltip:AddLine(ADDON_STATUS_COLUMN_TITLES[columnKey] or "Column")
-            GameTooltip:AddLine("Left-click to sort", 0.8, 0.8, 0.8)
+            GameTooltip:AddLine("Click to sort", 0.8, 0.8, 0.8)
             if ADDON_STATUS_FILTER_CYCLES[columnKey] then
                 local current = UI:GetAddonStatusFilter(columnKey)
-                GameTooltip:AddLine("Right-click to filter", 0.8, 0.8, 0.8)
+                GameTooltip:AddLine("Click the arrow to filter", 0.8, 0.8, 0.8)
                 if current ~= "all" then
                     GameTooltip:AddLine("Showing: "
                         .. (ADDON_STATUS_FILTER_LABELS[current] or current), 1, 0.82, 0)
@@ -4183,6 +4255,15 @@ function UI:EnsureAddonStatusRowParts(row)
         button:SetScript("OnLeave", function()
             GameTooltip:Hide()
         end)
+        if ADDON_STATUS_FILTER_CYCLES[column.key] then
+            createHeaderFilterArrow(button, column.key, function(columnKey, header)
+                UI:OpenAddonStatusColumnMenu(columnKey, header)
+            end, function(columnKey)
+                local current = UI:GetAddonStatusFilter(columnKey)
+                return ADDON_STATUS_COLUMN_TITLES[columnKey],
+                    current ~= "all" and (ADDON_STATUS_FILTER_LABELS[current] or current) or nil
+            end)
+        end
         button:Hide()
         row.addonHeaderButtons[column.key] = button
     end
@@ -4482,9 +4563,10 @@ function UI:EnsureCollectionRowParts(row)
     end)
 
     -- One transparent button per column on the header row, exactly as the
-    -- guild members table does it: left-click sorts, right-click cycles the
-    -- filter. They live on every pooled row and are shown only while the row
-    -- is bound as the header.
+    -- guild members table does it: a click sorts, the arrow on a filterable
+    -- column opens its filter, and so does a right-click anywhere on it. They
+    -- live on every pooled row and are shown only while the row is bound as
+    -- the header.
     row.collectionHeaderButtons = {}
     for _, column in ipairs({
         { key = "name",   region = row.collectionName },
@@ -4508,10 +4590,10 @@ function UI:EnsureCollectionRowParts(row)
         button:SetScript("OnEnter", function(self)
             GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
             GameTooltip:AddLine(COLLECTION_COLUMN_TITLES[self.collectionColumnKey] or "Column")
-            GameTooltip:AddLine("Left-click to sort", 0.8, 0.8, 0.8)
+            GameTooltip:AddLine("Click to sort", 0.8, 0.8, 0.8)
             if COLLECTION_FILTER_CYCLES[self.collectionColumnKey] then
                 local current = UI:GetCollectionColumnFilter(self.collectionColumnKey)
-                GameTooltip:AddLine("Right-click to filter", 0.8, 0.8, 0.8)
+                GameTooltip:AddLine("Click the arrow to filter", 0.8, 0.8, 0.8)
                 if current ~= "all" then
                     GameTooltip:AddLine("Showing: "
                         .. (COLLECTION_COLUMN_FILTER_LABELS[current] or current), 1, 0.82, 0)
@@ -4522,6 +4604,15 @@ function UI:EnsureCollectionRowParts(row)
         button:SetScript("OnLeave", function()
             GameTooltip:Hide()
         end)
+        if COLLECTION_FILTER_CYCLES[column.key] then
+            createHeaderFilterArrow(button, column.key, function(columnKey, header)
+                UI:OpenCollectionColumnMenu(columnKey, header)
+            end, function(columnKey)
+                local current = UI:GetCollectionColumnFilter(columnKey)
+                return COLLECTION_COLUMN_TITLES[columnKey],
+                    current ~= "all" and (COLLECTION_COLUMN_FILTER_LABELS[current] or current) or nil
+            end)
+        end
         button:Hide()
         row.collectionHeaderButtons[column.key] = button
     end
@@ -4734,6 +4825,9 @@ function UI:BindCollectionHeaderRow(row, rowData)
     if row.collectionCoords.SetMaxLines then row.collectionCoords:SetMaxLines(1) end
     setTextIfChanged(row.collectionCoords, "Coords")
     self:SetCollectionHeaderButtonsVisible(row, true)
+    for columnKey, button in pairs(row.collectionHeaderButtons) do
+        setHeaderFilterArrowActive(button.filterArrow, self:GetCollectionColumnFilter(columnKey) ~= "all")
+    end
     row.collectionName:SetTextColor(0.72, 0.72, 0.72)
     row.collectionStatus:SetTextColor(0.72, 0.72, 0.72)
     row.collectionSkill:SetTextColor(0.72, 0.72, 0.72)
@@ -4919,6 +5013,9 @@ function UI:BindAddonStatusHeaderRow(row, rowIdx)
     row.addonStatusHeaderRow = true
     self:SetAddonStatusPartsVisible(row, true)
     self:SetAddonStatusHeaderButtonsVisible(row, true)
+    for columnKey, button in pairs(row.addonHeaderButtons) do
+        setHeaderFilterArrowActive(button.filterArrow, self:GetAddonStatusFilter(columnKey) ~= "all")
+    end
     setShownIfChanged(row.addonSectionTitle, false)
 
     setTextIfChanged(row.addonName, self:GetAddonStatusHeaderText("name", "Name"))

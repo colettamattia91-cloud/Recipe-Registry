@@ -30,18 +30,24 @@ local function getSettings()
     return settings
 end
 
+-- Right-click opens the options, as it does on most minimap buttons: that is
+-- where players look for them. The sync status it used to print is a
+-- diagnostic, and it stays one modifier away and on /rr sync.
 local function handleClick(_, button)
     if button == "LeftButton" then
         if Addon.UI then Addon.UI:Toggle() end
-    else
+    elseif IsShiftKeyDown and IsShiftKeyDown() then
         if Addon.Sync then Addon.Sync:DumpStatus() end
+    elseif Addon.Options and Addon.Options.Open then
+        Addon.Options:Open()
     end
 end
 
 local function showTooltip(tooltip)
     tooltip:AddLine("Recipe Registry")
     tooltip:AddLine("|cffffffffLeft-click|r to toggle window", 0.8, 0.8, 0.8)
-    tooltip:AddLine("|cffffffffRight-click|r to show sync status", 0.8, 0.8, 0.8)
+    tooltip:AddLine("|cffffffffRight-click|r for options", 0.8, 0.8, 0.8)
+    tooltip:AddLine("|cffffffffShift-right-click|r to show sync status", 0.8, 0.8, 0.8)
     tooltip:AddLine("|cffffffffDrag|r to reposition", 0.8, 0.8, 0.8)
 end
 

@@ -2,6 +2,19 @@
 
 All notable changes to this addon are documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- **Filter arrows on the table headers.** Click the arrow next to a column
+  name to filter by it. It turns gold while that filter is on.
+- **Options button in the main window.**
+
+### Changed
+
+- **Right-click the minimap icon to open the options.** Shift-right-click
+  shows the sync status.
+
 ## [0.2.0] - 2026-11-26
 
 ### Added
